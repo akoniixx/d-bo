@@ -1,13 +1,12 @@
 import React from 'react'
 import Layouts from '../../components/layout/Layout'
 
-function IndexDroner() {
+function PromotionPage() {
   return (
     <Layouts>
- <div>IndexDroner</div>
+    <div>PromotionPage</div>
     </Layouts>
-   
   )
 }
 
-export default IndexDroner
+export default PromotionPage

@@ -1,13 +1,12 @@
 import React from 'react'
 import Layouts from '../../components/layout/Layout'
 
-function IndexDroner() {
+function TotalIncomePage() {
   return (
     <Layouts>
- <div>IndexDroner</div>
+    <div>TotalIncomePage</div>
     </Layouts>
-   
   )
 }
 
-export default IndexDroner
+export default TotalIncomePage

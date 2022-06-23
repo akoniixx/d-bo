@@ -1,8 +1,12 @@
 import React from 'react'
+import Layouts from '../../components/layout/Layout'
 
 function IndexFarmer() {
   return (
-    <div>IndexFarmer</div>
+    <Layouts>
+ <div>IndexFarmer</div>
+    </Layouts>
+   
   )
 }
 
