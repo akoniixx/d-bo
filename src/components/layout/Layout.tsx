@@ -26,14 +26,19 @@ const Layouts: React.FC<any> = ({ children }) => {
           borderBottom: "0.1px",
           borderBottomColor: "#E0E0E0",
           borderBottomStyle: "solid",
-          padding: "0 20px"
+         
         }}
       >
-        <div className="">
+        <div className="d-flex justify-content-between">
             <div>
               <img src={HeaderLogo} width={140} />
+             
             </div>
-            <div>
+            <div className="d-flex align-items-center">
+              <div className="me-4">
+              <span>Make by Yeen</span>
+              </div>
+             
             <Button
                 //onClick={() => logout()}
                 icon={<LogoutOutlined />}
