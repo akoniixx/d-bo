@@ -5,7 +5,6 @@ function TotalIncomePage() {
   return (
     <Layouts>
     <div>TotalIncomePage</div>
-
     </Layouts>
   )
 }

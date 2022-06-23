@@ -5,7 +5,6 @@ function PromotionPage() {
   return (
     <Layouts>
     <div>PromotionPage</div>
-
     </Layouts>
   )
 }

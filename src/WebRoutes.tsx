@@ -10,20 +10,14 @@ const WebRoutes: React.FC<any> = () => {
   return (
     <BrowserRouter>
       <Routes>
-      <Route path="*" element={<Navigate to="/OverviwePage"  />} />
-      <Route path="/OverviwePage" element={<OverviwePage />} />
-      <Route path="/IndexDroner" element={<IndexDroner />} />
-      <Route path="/IndexFarmer" element={<IndexFarmer />} />
-      <Route path="/TotalIncomePage" element={<TotalIncomePage />} />
-      <Route path="/PromotionPage" element={<PromotionPage />} />
-      <Route path="/TotalIncomePage" element={<TotalIncomePage />} />
-
-      
-
-
-
-
-</Routes>
+        <Route path="*" element={<Navigate to="/OverviwePage" />} />
+        <Route path="/OverviwePage" element={<OverviwePage />} />
+        <Route path="/IndexDroner" element={<IndexDroner />} />
+        <Route path="/IndexFarmer" element={<IndexFarmer />} />
+        <Route path="/TotalIncomePage" element={<TotalIncomePage />} />
+        <Route path="/PromotionPage" element={<PromotionPage />} />
+        <Route path="/TotalIncomePage" element={<TotalIncomePage />} />
+      </Routes>
     </BrowserRouter>
   );
 };
