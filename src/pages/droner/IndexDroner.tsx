@@ -1,8 +1,12 @@
 import React from 'react'
+import Layouts from '../../components/layout/Layout'
 
 function IndexDroner() {
   return (
-    <div>IndexDroner</div>
+    <Layouts>
+ <div>IndexDroner</div>
+    </Layouts>
+   
   )
 }
 

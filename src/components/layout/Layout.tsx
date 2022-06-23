@@ -3,14 +3,15 @@ import Layout, { Content, Header } from "antd/lib/layout/layout";
 import Sider from "antd/lib/layout/Sider";
 import React, { Children, useState } from "react";
 import {
-  HomeOutlined,
-  ShoppingCartOutlined,
-  GiftOutlined,
-  TagOutlined,
+    GiftFilled,
+    SettingFilled,
+  ProfileFilled,
+  SignalFilled,
   UserOutlined,
-  FundOutlined,
-  ContainerOutlined,
+  MacCommandFilled,
   LogoutOutlined,
+  ContactsFilled,
+  DollarCircleFilled
 } from "@ant-design/icons";
 import { Link, useNavigate } from "react-router-dom";
 import icon from "../../resource/icon";
@@ -40,15 +41,13 @@ const Layouts: React.FC<any> = ({ children }) => {
               </div>
              
             <Button
+                 style={{backgroundColor: "green", color: "white"}}
                 //onClick={() => logout()}
                 icon={<LogoutOutlined />}
                 size="middle"
               />
             </div>
         </div>
-        
-       
-
       </Header>
       <Layout>
         <Sider width={200} className="site-layout-background">
@@ -57,39 +56,39 @@ const Layouts: React.FC<any> = ({ children }) => {
             defaultOpenKeys={["order"]}
             style={{ height: "100%", borderRight: 0, paddingTop: 30 }}
           >
-            <Menu.Item key={"order"} icon={<ShoppingCartOutlined />}>
+            <Menu.Item  icon={<SignalFilled />}>
               <Link to="/OverviewPage">
                 <span>ภาพรวม</span>
               </Link>
             </Menu.Item>
             <Menu.SubMenu
-              icon={<ContainerOutlined />}
+              icon={<ProfileFilled />}
               title={<span>ติดตามงาน</span>}
               key={"sub1"}
             >
             </Menu.SubMenu>
-            <Menu.Item key={"order"} icon={<ShoppingCartOutlined />}>
+            <Menu.Item  icon={<DollarCircleFilled />}>
               <Link to="/TotalIncomePage">
                 <span>ยอดรวมรายได้</span>
               </Link>
             </Menu.Item>
-            <Menu.Item key={"order"} icon={<ShoppingCartOutlined />}>
+            <Menu.Item  icon={<ContactsFilled />}>
               <Link to="/IndexFarmer">
                 <span>ข้อมูลเกษตรกร</span>
               </Link>
             </Menu.Item>
-            <Menu.Item key={"order"} icon={<ShoppingCartOutlined />}>
+            <Menu.Item  icon={<MacCommandFilled />}>
               <Link to="/IndexDroner">
                 <span>ข้อมูลนักบินโดรน</span>
               </Link>
             </Menu.Item>
-            <Menu.Item key={"order"} icon={<ShoppingCartOutlined />}>
+            <Menu.Item  icon={<GiftFilled />}>
               <Link to="/PromotionPage">
                 <span>โปรโมชั่น</span>
               </Link>
             </Menu.Item>
             <Menu.SubMenu
-              icon={<ContainerOutlined />}
+              icon={<SettingFilled />}
               title={<span>ผู้ดูแลระบบ</span>}
               key={"sub2"}
             >
