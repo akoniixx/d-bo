@@ -7,7 +7,7 @@ import Search from "antd/lib/input/Search";
 import { Option } from "antd/lib/mentions";
 import color from "../../resource/color";
 import { Container } from "react-bootstrap";
-function IndexFarmer() {
+function DronerList() {
   const onSearch = (value: string) => console.log(value);
   const PageTitle = () => {
     return (
@@ -19,7 +19,7 @@ function IndexFarmer() {
                 className="card-label font-weight-bolder text-dark"
                 style={{ fontSize: 20, fontWeight: "bold", padding: "8px 0" }}
               >
-                ข้อมูลเกษตรกร (Farmer)
+                รายการโดรนเกษตร (Drone List)
               </span>
             </div>
           </Col>
@@ -137,16 +137,19 @@ function IndexFarmer() {
     <Layouts>
       <PageTitle />
       <br />
+      <CardContainer>
       <Table
         columns={columns}
         pagination={{ position: ["bottomCenter"] }}
         size="large"
         tableLayout="fixed"
       />
+      </CardContainer>
+      
       {/* <CardContainer>
       </CardContainer> */}
     </Layouts>
   );
 }
 
-export default IndexFarmer;
+export default DronerList;

@@ -7,17 +7,22 @@ import {
   SettingFilled,
   ProfileFilled,
   SignalFilled,
-  UserOutlined,
   MacCommandFilled,
   LogoutOutlined,
   ContactsFilled,
   DollarCircleFilled,
 } from "@ant-design/icons";
 import { Link, useNavigate } from "react-router-dom";
-import icon from "../../resource/icon";
 import HeaderLogo from "../../resource/media/logos/HeaderLogo.png";
+import color from "../../resource/color";
 
 const Layouts: React.FC<any> = ({ children }) => {
+  const style: React.CSSProperties = {
+    height: "100%",
+    borderRight: 0,
+    paddingTop: 30,
+  };
+
   return (
     <Layout style={{ height: "100vh" }}>
       <Header
@@ -36,9 +41,8 @@ const Layouts: React.FC<any> = ({ children }) => {
             <div className="me-4">
               <span>Make by Yeen</span>
             </div>
-
             <Button
-              style={{ backgroundColor: "green", color: "white" }}
+              style={{ backgroundColor: color.primary1, color: color.BG }}
               //onClick={() => logout()}
               icon={<LogoutOutlined />}
               size="middle"
@@ -47,12 +51,8 @@ const Layouts: React.FC<any> = ({ children }) => {
         </div>
       </Header>
       <Layout>
-        <Sider width={200} className="site-layout-background">
-          <Menu
-            mode="inline"
-            defaultOpenKeys={["order"]}
-            style={{ height: "100%", borderRight: 0, paddingTop: 30 }}
-          >
+        <Sider width={200}>
+          <Menu mode="inline" defaultOpenKeys={["order"]} style={style}>
             <Menu.Item icon={<SignalFilled />}>
               <Link to="/OverviewPage">
                 <span>ภาพรวม</span>
@@ -73,11 +73,22 @@ const Layouts: React.FC<any> = ({ children }) => {
                 <span>ข้อมูลเกษตรกร</span>
               </Link>
             </Menu.Item>
-            <Menu.Item icon={<MacCommandFilled />}>
-              <Link to="/IndexDroner">
-                <span>ข้อมูลนักบินโดรน</span>
-              </Link>
-            </Menu.Item>
+            <Menu.SubMenu
+              icon={<MacCommandFilled />}
+              title={<span>ข้อมูลนักบินโดรน</span>}
+              key={"sub2"}
+            >
+              <Menu.Item>
+                <Link to="/IndexDroner">
+                  <span>รายชื่อนักบินโดรน</span>
+                </Link>
+              </Menu.Item>
+              <Menu.Item>
+                <Link to="/IndexDroner">
+                  <span>รายการโดรนเกษตร</span>
+                </Link>
+              </Menu.Item>
+            </Menu.SubMenu>
             <Menu.Item icon={<GiftFilled />}>
               <Link to="/PromotionPage">
                 <span>โปรโมชั่น</span>
@@ -86,13 +97,12 @@ const Layouts: React.FC<any> = ({ children }) => {
             <Menu.SubMenu
               icon={<SettingFilled />}
               title={<span>ผู้ดูแลระบบ</span>}
-              key={"sub2"}
+              key={"sub3"}
             ></Menu.SubMenu>
           </Menu>
         </Sider>
         <Layout>
           <Content
-            className="site-layout-background"
             style={{
               padding: 24,
               margin: 0,

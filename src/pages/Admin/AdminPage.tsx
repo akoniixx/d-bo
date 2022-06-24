@@ -1,9 +1,12 @@
-import React from 'react'
+import React from "react";
+import Layouts from "../../components/layout/Layout";
 
 function AdminPage() {
   return (
-    <div>AdminPage</div>
-  )
+    <Layouts>
+      <div>AdminPage</div>
+    </Layouts>
+  );
 }
 
-export default AdminPage
+export default AdminPage;
