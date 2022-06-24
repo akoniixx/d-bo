@@ -1,12 +1,12 @@
 import React from 'react'
 import Layouts from '../../components/layout/Layout'
 
-function OverviwePage() {
+function OverviewPage() {
   return (
     <Layouts>
-    <div>OverviwePage</div>
+    <div>OverviewPage</div>
     </Layouts>
   )
 }
 
-export default OverviwePage
+export default OverviewPage
