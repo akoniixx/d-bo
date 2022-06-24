@@ -1,9 +1,16 @@
-import React from 'react'
+import React from "react";
+import Layout from "../../components/layout/Layout";
+import Button from "antd/lib/button/button";
 
-function AddFarmer() {
+ function AddFarmer() {
   return (
-    <div>AddFarmer</div>
-  )
+    <>
+      <Layout>
+      <div className="container">
+        <Button type="primary">test</Button>
+      </div>
+      </Layout>
+    </>
+  );
 }
-
 export default AddFarmer
