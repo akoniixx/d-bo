@@ -2,22 +2,19 @@ import { Button, Col, Input, Row, Select, Table } from "antd";
 import React, { useState } from "react";
 import { CardContainer } from "../../components/card/CardContainer";
 import Layouts from "../../components/layout/Layout";
-import { SearchOutlined } from "@ant-design/icons";
 import Search from "antd/lib/input/Search";
 import { Option } from "antd/lib/mentions";
-import color from "../../resource/color";
-import { Container } from "react-bootstrap";
 function DronerList() {
   const onSearch = (value: string) => console.log(value);
   const PageTitle = () => {
     return (
       <div className="container">
         <Row gutter={{ xs: 8, sm: 16, md: 24, lg: 32 }}>
-          <Col className="gutter-row" span={6}>
+          <Col className="gutter-row" span={8}>
             <div>
               <span
                 className="card-label font-weight-bolder text-dark"
-                style={{ fontSize: 20, fontWeight: "bold", padding: "8px 0" }}
+                style={{ fontSize: 22, fontWeight: "bold", padding: "8px 0" }}
               >
                 รายการโดรนเกษตร (Drone List)
               </span>
@@ -25,20 +22,19 @@ function DronerList() {
           </Col>
           <Col className="gutter-row" span={6}>
             <Search
-              style={{ width: "290px", marginRight: "5px", padding: "8px 0" }}
-              placeholder="ค้นหาชื่อเกษตรกร หรือเบอร์โทร"
+              style={{ width: "290px", padding: "8px 0" }}
+              placeholder="ค้นหาเลขตัวถังหรือชื่อนักบินโดรน"
               onSearch={onSearch}
             />
           </Col>
-          <Col className="gutter-row" span={4}>
+          <Col className="gutter-row" span={3}>
             <Select
               style={{
-                width: "190px",
-                marginRight: "5px",
+                width: "140px",
                 padding: "8px 0",
                 color: "#C6C6C6",
               }}
-              defaultValue="เลือกจังหวัด/อำเภอ/ตำบล"
+              defaultValue="เลือกยี่ห้อ"
               // onChange={handleChange}>
             >
               <Option value="1">1</Option>
@@ -47,15 +43,15 @@ function DronerList() {
               <Option value="4">4</Option>
             </Select>
           </Col>
-          <Col className="gutter-row" span={4}>
+          <Col className="gutter-row" span={3}>
             <Select
               style={{
-                width: "190px",
+                width: "140px",
                 marginRight: "5px",
                 padding: "8px 0",
                 color: "#C6C6C6",
               }}
-              defaultValue="เลือกสถานะการใช้งาน"
+              defaultValue="เลือกรุ่นโดรน"
               // onChange={handleChange}>
             >
               <Option value="1">1</Option>
@@ -64,19 +60,22 @@ function DronerList() {
               <Option value="4">4</Option>
             </Select>
           </Col>
-          <Col className="gutter-row" span={4} style={{ marginTop: "8px" }}>
-            <Button
+          <Col className="gutter-row">
+            <Select
               style={{
                 width: "130px",
-                padding: "8 0",
-                backgroundColor: color.primary1,
-                color: color.secondary2,
+                marginRight: "5px",
+                padding: "8px 0",
+                color: "#C6C6C6",
               }}
-              onClick={() => (window.location.href = "/AddFarmer")}
-              type="primary"
+              defaultValue="เลือกสถานะ"
+              // onChange={handleChange}>
             >
-              + เพิ่มเกษตรกร
-            </Button>
+              <Option value="1">1</Option>
+              <Option value="2">2</Option>
+              <Option value="3">3</Option>
+              <Option value="4">4</Option>
+            </Select>
           </Col>
         </Row>
       </div>
@@ -84,52 +83,52 @@ function DronerList() {
   };
   const columns = [
     {
-      title: "ชื่อเกษตรกร",
+      title: "วันที่ลงทะเบียน",
+      dataIndex: "date",
+      key: "date",
+      width: "15%",
+    },
+    {
+      title: "ยี่ห้อโดรน",
       dataIndex: "date",
       key: "date",
       width: "12%",
     },
     {
-      title: "เบอร์โทร",
+      title: "เลขตัวถัง",
       dataIndex: "date",
       key: "date",
-      width: "12%",
+      width: "18%",
     },
     {
-      title: "จังหวัด",
+      title: "ชื่อนักบินโดรน",
       dataIndex: "date",
       key: "date",
-      width: "12%",
+      width: "20%",
     },
     {
-      title: "อำเภอ",
+      title: "ใบอนุญาตนักบิน ",
       dataIndex: "date",
       key: "date",
-      width: "12%",
+      width: "18%",
     },
     {
-      title: "ตำบล",
+      title: "ใบอนุญาตโดรน(กสทช.) ",
       dataIndex: "date",
       key: "date",
-      width: "12%",
-    },
-    {
-      title: "จำนวนแปลง",
-      dataIndex: "date",
-      key: "date",
-      width: "12%",
-    },
-    {
-      title: "จำนวนไร่",
-      dataIndex: "date",
-      key: "date",
-      width: "12%",
+      width: "18%",
     },
     {
       title: "สถานะ",
       dataIndex: "date",
       key: "date",
-      width: "12%",
+      width: "10%",
+    },
+    {
+      title: "",
+      dataIndex: "date",
+      key: "date",
+      width: "5%",
     },
   ];
 
@@ -137,17 +136,12 @@ function DronerList() {
     <Layouts>
       <PageTitle />
       <br />
-      <CardContainer>
       <Table
         columns={columns}
-        pagination={{ position: ["bottomCenter"] }}
+        pagination={{ position: ["bottomRight"] }}
         size="large"
         tableLayout="fixed"
       />
-      </CardContainer>
-      
-      {/* <CardContainer>
-      </CardContainer> */}
     </Layouts>
   );
 }

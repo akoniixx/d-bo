@@ -1,12 +1,11 @@
-import { Button, Col, Input, Row, Select, Table } from "antd";
+import { Button, Col, Empty, Row, Select, Switch, Table } from "antd";
 import React, { useState } from "react";
-import { CardContainer } from "../../components/card/CardContainer";
-import Layouts from "../../components/layout/Layout";
-import { SearchOutlined } from "@ant-design/icons";
 import Search from "antd/lib/input/Search";
 import { Option } from "antd/lib/mentions";
 import color from "../../resource/color";
-import { Container } from "react-bootstrap";
+import Layouts from "../../components/layout/Layout";
+import EditButton from "../../components/button/EditButton";
+
 function IndexFarmer() {
   const onSearch = (value: string) => console.log(value);
   const PageTitle = () => {
@@ -17,7 +16,7 @@ function IndexFarmer() {
             <div>
               <span
                 className="card-label font-weight-bolder text-dark"
-                style={{ fontSize: 20, fontWeight: "bold", padding: "8px 0" }}
+                style={{ fontSize: 22, fontWeight: "bold", padding: "8px 0" }}
               >
                 ข้อมูลเกษตรกร (Farmer)
               </span>
@@ -85,20 +84,20 @@ function IndexFarmer() {
   const columns = [
     {
       title: "ชื่อเกษตรกร",
-      dataIndex: "date",
-      key: "date",
+      dataIndex: "name",
+      key: "name",
       width: "12%",
     },
     {
       title: "เบอร์โทร",
-      dataIndex: "date",
-      key: "date",
+      dataIndex: "age",
+      key: "age",
       width: "12%",
     },
     {
       title: "จังหวัด",
-      dataIndex: "date",
-      key: "date",
+      dataIndex: "address",
+      key: "address",
       width: "12%",
     },
     {
@@ -131,20 +130,55 @@ function IndexFarmer() {
       key: "date",
       width: "12%",
     },
+    {
+      title: "",
+      dataIndex: "Action",
+      key: "Action",
+      width: "9%",
+      render: (value: any, row: any, index: number) => {
+        return {
+          children: (
+            <>
+              <div className="d-flex flex-row justify-content-between">
+                <div
+                  className="btn btn-icon btn-sm"
+                  onClick={() => (window.location.href = "")}
+                >
+                  <EditButton />
+                </div>
+              </div>
+            </>
+          ),
+        };
+      },
+    },
   ];
-
+  //MockData
+  const dataSource = [
+    {
+      key: "1",
+      name: "Mike",
+      age: 32,
+      address: "Bangkok",
+    },
+    {
+      key: "2",
+      name: "John",
+      age: 42,
+      address: "Saraburi",
+    },
+  ];
   return (
     <Layouts>
       <PageTitle />
       <br />
       <Table
+        dataSource={dataSource}
         columns={columns}
-        pagination={{ position: ["bottomCenter"] }}
+        pagination={{ position: ["bottomRight"] }}
         size="large"
         tableLayout="fixed"
       />
-      {/* <CardContainer>
-      </CardContainer> */}
     </Layouts>
   );
 }
