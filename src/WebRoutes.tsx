@@ -20,7 +20,7 @@ const WebRoutes: React.FC<any> = () => {
         <Route path="/IndexDroner" element={<IndexDroner />} />
         <Route path="/IndexFarmer" element={<IndexFarmer />} />
         <Route path="/TotalIncomePage" element={<TotalIncomePage />} />
-        <Route path="/PromotionPage" element={<PromotionPage />} />
+        <Route path="/PromotionPage" element={<PromotionPage />} />        
         <Route path="/TotalIncomePage" element={<TotalIncomePage />} />
         <Route path="/AddFarmer" element={<AddFarmer />} />
         <Route path="/DronerList" element={<DronerList />} />
