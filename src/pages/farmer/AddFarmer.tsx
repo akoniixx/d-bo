@@ -12,8 +12,8 @@ import FooterPage from "../../components/footer/FooterPage";
 
 const uploadButton = (
   <div>
-    <PictureFilled style={{ fontSize: "50px", color: "#219653" }} />
-    <div style={{ fontSize: "20px", color: "#219653" }}>+ Upload</div>
+    <PictureFilled style={{ fontSize: "50px", color: color.Success }} />
+    <div style={{ fontSize: "20px", color: color.Success }}>+ Upload</div>
   </div>
 );
 
