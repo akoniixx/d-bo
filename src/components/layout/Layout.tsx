@@ -1,5 +1,14 @@
-import { MenuProps, Menu, Breadcrumb, Row, Col, Button, Space } from "antd";
-import Layout, { Content, Header } from "antd/lib/layout/layout";
+import {
+  MenuProps,
+  Menu,
+  Breadcrumb,
+  Row,
+  Col,
+  Button,
+  Space,
+  AutoComplete,
+} from "antd";
+import Layout, { Content, Footer, Header } from "antd/lib/layout/layout";
 import Sider from "antd/lib/layout/Sider";
 import React, { Children, useState } from "react";
 import {
@@ -15,11 +24,11 @@ import {
 import { Link, useNavigate } from "react-router-dom";
 import HeaderLogo from "../../resource/media/logos/HeaderLogo.png";
 import color from "../../resource/color";
+import icon from "../../resource/icon";
 
 const Layouts: React.FC<any> = ({ children }) => {
   const style: React.CSSProperties = {
     height: "100%",
-    borderRight: 0,
     paddingTop: 30,
   };
 
@@ -27,23 +36,30 @@ const Layouts: React.FC<any> = ({ children }) => {
     <Layout style={{ height: "100vh" }}>
       <Header
         style={{
+          position: "fixed",
+          zIndex: 1200,
+          width: "100%",
           backgroundColor: "#FFFFFF",
           borderBottom: "0.1px",
-          borderBottomColor: "#E0E0E0",
+          borderBottomColor: "#C6C6C6",
           borderBottomStyle: "solid",
         }}
       >
         <div className="d-flex justify-content-between">
           <div>
-            <img src={HeaderLogo} width={140} />
+            <img src={icon.logoHeader} width={140} />
           </div>
           <div className="d-flex align-items-center">
             <div className="me-4">
               <span>Make by Yeen</span>
             </div>
             <Button
-              style={{ backgroundColor: color.primary1, color: color.BG }}
-              //onClick={() => logout()}
+              style={{
+                backgroundColor: color.primary1,
+                color: color.BG,
+                borderRadius: "5px",
+              }}
+              onClick={() => (window.location.href = "/AuthPage")}
               icon={<LogoutOutlined />}
               size="middle"
             />
@@ -51,7 +67,10 @@ const Layouts: React.FC<any> = ({ children }) => {
         </div>
       </Header>
       <Layout>
-        <Sider width={200}>
+        <Sider
+          width={200}
+          style={{ position: "fixed", height: "100%", marginTop: "60px" }}
+        >
           <Menu mode="inline" defaultOpenKeys={["order"]} style={style}>
             <Menu.Item icon={<SignalFilled />}>
               <Link to="/OverviewPage">
@@ -84,8 +103,13 @@ const Layouts: React.FC<any> = ({ children }) => {
                 </Link>
               </Menu.Item>
               <Menu.Item>
-                <Link to="/IndexDroner">
+                <Link to="/DronerList">
                   <span>รายการโดรนเกษตร</span>
+                </Link>
+              </Menu.Item>
+              <Menu.Item>
+                <Link to="/RateDroner">
+                  <span>อันดับนักบินโดรน</span>
                 </Link>
               </Menu.Item>
             </Menu.SubMenu>
@@ -101,16 +125,15 @@ const Layouts: React.FC<any> = ({ children }) => {
             ></Menu.SubMenu>
           </Menu>
         </Sider>
-        <Layout>
-          <Content
-            style={{
-              padding: 24,
-              margin: 0,
-              minHeight: 280,
-            }}
-          >
-            {children}
-          </Content>
+        <Layout
+          style={{
+            height: "max-content",
+            marginLeft: 200,
+            marginTop: 60,
+            padding: 30,
+          }}
+        >
+          <Content>{children}</Content>
         </Layout>
       </Layout>
     </Layout>
