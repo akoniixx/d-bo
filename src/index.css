@@ -22,6 +22,7 @@ table tr td {
   font-weight: normal !important;
 }
 Form,
+Input,
 p,
 Table,
 Form,
@@ -30,6 +31,7 @@ h2,
 h3,
 h4,
 h5,
+label,
 span,
 .font-size-h1,
 .font-size-h2,

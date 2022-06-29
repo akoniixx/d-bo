@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Routes, Route, Navigate, BrowserRouter } from "react-router-dom";
 import AuthPage from "./pages/authPage/AuthPage";
 import DronerList from "./pages/droner/DronerList";
+import EditFarmer from "./pages/farmer/EditFarmer";
 import IndexDroner from "./pages/droner/IndexDroner";
 import RateDroner from "./pages/droner/RateDroner";
 import AddFarmer from "./pages/farmer/AddFarmer";
@@ -20,11 +21,12 @@ const WebRoutes: React.FC<any> = () => {
         <Route path="/IndexDroner" element={<IndexDroner />} />
         <Route path="/IndexFarmer" element={<IndexFarmer />} />
         <Route path="/TotalIncomePage" element={<TotalIncomePage />} />
-        <Route path="/PromotionPage" element={<PromotionPage />} />        
+        <Route path="/PromotionPage" element={<PromotionPage />} />
         <Route path="/TotalIncomePage" element={<TotalIncomePage />} />
         <Route path="/AddFarmer" element={<AddFarmer />} />
         <Route path="/DronerList" element={<DronerList />} />
         <Route path="/RateDroner" element={<RateDroner />} />
+        <Route path="/EditFarmer" element={<EditFarmer />} />
       </Routes>
     </BrowserRouter>
   );
