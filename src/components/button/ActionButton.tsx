@@ -4,8 +4,8 @@ import color from "../../resource/color";
 
 interface ActionButtonProps {
   onClick?: () => void;
-  icon: any;
-  color: any;
+  icon: React.ReactNode;
+  color: string;
 }
 
 const ActionButton: React.FC<ActionButtonProps> = ({
