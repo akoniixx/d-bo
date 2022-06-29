@@ -5,11 +5,16 @@ import { color } from "../../resource";
 interface CardHeaderProps {
   onClick?: Function;
   showButton: boolean;
-  textHeader:string;
+  textHeader: string;
   textButton?: string;
 }
-export const CardHeader: React.FC<CardHeaderProps> = ({ onClick, showButton,textHeader,textButton }) => (
-    <div
+export const CardHeader: React.FC<CardHeaderProps> = ({
+  onClick,
+  showButton,
+  textHeader,
+  textButton,
+}) => (
+  <div
     style={{
       backgroundColor: color.Success,
       borderRadius: "12px 12px 0px 0px",
@@ -21,7 +26,15 @@ export const CardHeader: React.FC<CardHeaderProps> = ({ onClick, showButton,text
       {textHeader}
     </h4>
     {showButton ? (
-      <Button className="pt-2" style={{backgroundColor:color.secondary1,color:'white', border:'none', borderRadius:'5px'}}>
+      <Button
+        className="pt-2"
+        style={{
+          backgroundColor: color.secondary1,
+          color: "white",
+          border: "none",
+          borderRadius: "5px",
+        }}
+      >
         {textButton}
       </Button>
     ) : (
