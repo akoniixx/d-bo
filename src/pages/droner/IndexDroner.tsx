@@ -4,7 +4,9 @@ import Search from "antd/lib/input/Search";
 import { Option } from "antd/lib/mentions";
 import color from "../../resource/color";
 import Layouts from "../../components/layout/Layout";
-import EditButton from "../../components/button/EditButton";
+import EditButton from "../../components/button/ActionButton";
+import ActionButton from "../../components/button/ActionButton";
+import { EditOutlined } from "@ant-design/icons";
 
 function IndexDroner() {
   const onSearch = (value: string) => console.log(value);
@@ -153,16 +155,13 @@ function IndexDroner() {
       render: (value: any, row: any, index: number) => {
         return {
           children: (
-            <>
-              <div className="d-flex flex-row justify-content-between">
-                <div
-                  className="btn btn-icon btn-sm"
-                  onClick={() => (window.location.href = "")}
-                >
-                  <EditButton />
-                </div>
-              </div>
-            </>
+            <div className="d-flex flex-row justify-content-between">
+              <ActionButton
+                icon={<EditOutlined />}
+                color={color.primary1}
+                onClick={() => (window.location.href = "")}
+              />
+            </div>
           ),
         };
       },

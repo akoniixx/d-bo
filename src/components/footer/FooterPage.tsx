@@ -2,17 +2,21 @@ import React from "react";
 import { Button, Row } from "antd";
 import { color } from "../../resource";
 import { Footer } from "antd/lib/layout/layout";
-import BackPagebtn from "../button/BackPagebtn";
-import SavePagebtn from "../button/SavePagebtn";
+import { BackButton } from "../button/BackButton";
+import SaveButton from "../button/SaveButton";
 
 interface FoolterPageProps {
-  onClick?: Function;
+  onClickBack?: () => void;
+  onClickSave?: () => void;
 }
-export const FooterPage: React.FC<FoolterPageProps> = ({ onClick }) => (
+export const FooterPage: React.FC<FoolterPageProps> = ({
+  onClickBack,
+  onClickSave,
+}) => (
   <Footer>
     <Row className="d-flex justify-content-between">
-      <BackPagebtn />
-      <SavePagebtn />
+      <BackButton onClick={onClickBack} />
+      <SaveButton onClick={onClickSave} />
     </Row>
   </Footer>
 );
