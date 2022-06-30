@@ -20,16 +20,6 @@ export const AuthPage: React.FC = () => {
             <div className="d-flex justify-content-center">
               <img alt="imageLogin" src={image.login} width={"100%"} />
             </div>
-            <div
-              style={{
-                position: "absolute",
-                zIndex: "99px",
-                marginTop: "55rem",
-                marginLeft: "2rem",
-              }}
-            >
-              <img alt="imageLogin" src={icon.logoLogin} width={"30%"} />
-            </div>
           </div>
         </div>
         <Col className="gutter-row d-flex align-item-center justify-content-center height-res">
@@ -38,7 +28,7 @@ export const AuthPage: React.FC = () => {
             style={{ paddingBottom: "10rem" }}
           >
             <div className="d-flex justify-content-center">
-              <img alt="logo" src={icon.logoLogin} width={"30%"} />
+              <img alt="logo" src={icon.iconlogin} width={"30%"} />
             </div>
             <div className="d-flex justify-content-center">
               <FromLogin />

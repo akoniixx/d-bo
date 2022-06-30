@@ -4,7 +4,6 @@ import { CardContainer } from "../../components/card/CardContainer";
 import Layouts from "../../components/layout/Layout";
 import Search from "antd/lib/input/Search";
 import { Option } from "antd/lib/mentions";
-import EditButton from "../../components/button/EditButton";
 function DronerList() {
   const onSearch = (value: string) => console.log(value);
   const PageTitle = () => {
@@ -139,7 +138,7 @@ function DronerList() {
                   className="btn btn-icon btn-sm"
                   onClick={() => (window.location.href = "/EditDroneList")}
                 >
-                  <EditButton />
+                  <Button />
                 </div>
               </div>
             </>

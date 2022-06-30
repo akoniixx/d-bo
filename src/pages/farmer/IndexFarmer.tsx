@@ -1,10 +1,11 @@
-import { Button, Col, Empty, Row, Select, Switch, Table } from "antd";
+import { Button, Col, Row, Select, Table } from "antd";
 import React, { useState } from "react";
 import Search from "antd/lib/input/Search";
 import { Option } from "antd/lib/mentions";
 import color from "../../resource/color";
 import Layouts from "../../components/layout/Layout";
-import EditButton from "../../components/button/EditButton";
+import ActionButton from "../../components/button/ActionButton";
+import { EditOutlined } from "@ant-design/icons";
 
 function IndexFarmer() {
   const onSearch = (value: string) => console.log(value);
@@ -13,12 +14,12 @@ function IndexFarmer() {
       <div className="container">
         <Row gutter={{ xs: 8, sm: 16, md: 24, lg: 32 }}>
           <Col className="gutter-row" span={6}>
-            <div>
+            <div className="pt-2 text-left">
               <span
                 className="card-label font-weight-bolder text-dark"
-                style={{ fontSize: 22, fontWeight: "bold", padding: "8px 0" }}
+                style={{ fontSize: 22, fontWeight: "bold", padding: "8px" }}
               >
-                ข้อมูลเกษตรกร (Farmer)
+                <strong>ข้อมูลเกษตรกร (Farmer)</strong>
               </span>
             </div>
           </Col>
@@ -70,6 +71,8 @@ function IndexFarmer() {
                 padding: "8 0",
                 backgroundColor: color.primary1,
                 color: color.secondary2,
+                borderColor: color.Success,
+                borderRadius: "5px",
               }}
               onClick={() => (window.location.href = "/AddFarmer")}
               type="primary"
@@ -138,16 +141,13 @@ function IndexFarmer() {
       render: (value: any, row: any, index: number) => {
         return {
           children: (
-            <>
-              <div className="d-flex flex-row justify-content-between">
-                <div
-                  className="btn btn-icon btn-sm"
-                  onClick={() => (window.location.href = "")}
-                >
-                  <EditButton />
-                </div>
-              </div>
-            </>
+            <div className="d-flex flex-row justify-content-between">
+              <ActionButton
+                icon={<EditOutlined />}
+                color={color.primary1}
+                onClick={() => (window.location.href = "/EditFarmer")}
+              />
+            </div>
           ),
         };
       },

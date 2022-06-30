@@ -14,12 +14,12 @@ import {
   RadioChangeEvent,
 } from "antd";
 import { CardContainer } from "../../components/card/CardContainer";
-import Backbtn from "../../components/button/Backbtn";
 import color from "../../resource/color";
 import { CardHeader } from "../../components/header/CardHearder";
 import FooterPage from "../../components/footer/FooterPage";
 import image from "../../resource/image";
 import { Link } from "react-router-dom";
+import { BackButton } from "../../components/button/BackButton";
 
 function EditDroneList() {
 
@@ -31,7 +31,7 @@ function EditDroneList() {
   const renderFromData = (
     <div className="col-lg-7">
       <CardContainer style={{ height: "850px" }}>
-        <CardHeader showButton={false} textHeader="ข้อมูลโดรนเกษตรกร" />
+        <CardHeader textHeader="ข้อมูลโดรนเกษตรกร" />
         <Form style={{ padding: "32px" }}>
           <div className="row">
             <div className="form-group col-lg-6">
@@ -167,7 +167,7 @@ function EditDroneList() {
   const renderLand = (
     <div className="col-lg-4">
       <CardContainer style={{ height: "640px" }}>
-        <CardHeader showButton={true} textHeader="ข้อมูลนักบินโดรน" />
+        <CardHeader textHeader="ข้อมูลนักบินโดรน" />
         <Form>
           <div className="container text-center" style={{ padding: "30px" }}>
             <div className="row">
@@ -207,7 +207,7 @@ function EditDroneList() {
   return (
     <Layout>
       <Row>
-        <Link to='/DronerList'> <Backbtn /></Link>
+        <Link to='/DronerList'> <BackButton /></Link>
        
         <span className="pt-4">
           <strong style={{ fontSize: "20px" }}>แก้ไขข้อมูลโดรนเกษตร</strong>

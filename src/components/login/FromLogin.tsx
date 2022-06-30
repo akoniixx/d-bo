@@ -16,6 +16,7 @@ const FromLogin: React.FC = () => {
   );
   const navigate = useNavigate();
   const [token, setToken] = useLocalStorage("token", []);
+
   const handlerSubmitFrom = (data: any) => {
     AuthDatasource.login(data.username, data.password).then((res: any) => {
       if (res.accessToken) {
@@ -24,10 +25,11 @@ const FromLogin: React.FC = () => {
         setToken(res.accessToken);
         return navigate("OverviewPage");
       } else {
-        return navigate("/");
+        return navigate("ErrorLoginPage");
       }
     });
   };
+
   return (
     <div>
       <Form

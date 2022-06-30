@@ -26,6 +26,17 @@ import HeaderLogo from "../../resource/media/logos/HeaderLogo.png";
 import color from "../../resource/color";
 import icon from "../../resource/icon";
 
+const logout = () => {
+  localStorage.clear();
+  sessionStorage.clear();
+  var url = window.location.href;
+  var arr = url.split("/");
+  var resultUrlHost = arr[0] + "//" + arr[2];
+  window.location.href =
+    "AuthPage" ;
+};
+
+
 const Layouts: React.FC<any> = ({ children }) => {
   const style: React.CSSProperties = {
     height: "100%",
@@ -59,7 +70,7 @@ const Layouts: React.FC<any> = ({ children }) => {
                 color: color.BG,
                 borderRadius: "5px",
               }}
-              onClick={() => (window.location.href = "/AuthPage")}
+              onClick={() => logout()}
               icon={<LogoutOutlined />}
               size="middle"
             />
