@@ -1,7 +1,7 @@
 import React from 'react'
 import Layouts from '../../components/layout/Layout'
 
-function OverviewPage() {
+export function OverviewPage() {
   return (
     <Layouts>
     <div>OverviewPage</div>
@@ -9,4 +9,4 @@ function OverviewPage() {
   )
 }
 
-export default OverviewPage
+ 

@@ -25,8 +25,22 @@ import { Link, useNavigate } from "react-router-dom";
 import HeaderLogo from "../../resource/media/logos/HeaderLogo.png";
 import color from "../../resource/color";
 import icon from "../../resource/icon";
+import { useLocalStorage } from "../../hook/useLocalStorage";
+const logout = () => {
+  localStorage.clear();
+  sessionStorage.clear();
+  var url = window.location.href;
+  var arr = url.split("/");
+  var resultUrlHost = arr[0] + "//" + arr[2];
+  window.location.href = "AuthPage";
+};
 
 const Layouts: React.FC<any> = ({ children }) => {
+  const [persistedProfile, setPersistedProfile] = useLocalStorage(
+    "profile",
+    []
+  );
+
   const style: React.CSSProperties = {
     height: "100%",
     paddingTop: 30,
@@ -51,7 +65,17 @@ const Layouts: React.FC<any> = ({ children }) => {
           </div>
           <div className="d-flex align-items-center">
             <div className="me-4">
-              <span>Make by Yeen</span>
+              <span>
+                <b>
+                  {persistedProfile.firstname +
+                    " " +
+                    persistedProfile.lastname +
+                    " " +
+                    "(" +
+                    persistedProfile.role +
+                    ")"}
+                </b>
+              </span>
             </div>
             <Button
               style={{
@@ -59,7 +83,7 @@ const Layouts: React.FC<any> = ({ children }) => {
                 color: color.BG,
                 borderRadius: "5px",
               }}
-              onClick={() => (window.location.href = "/AuthPage")}
+              onClick={() => logout()}
               icon={<LogoutOutlined />}
               size="middle"
             />
@@ -69,7 +93,7 @@ const Layouts: React.FC<any> = ({ children }) => {
       <Layout>
         <Sider
           width={200}
-          style={{ position: "fixed", height: "100%", marginTop: "60px" }}
+          style={{ position: "fixed", height: "100%", marginTop: "50px" }}
         >
           <Menu mode="inline" defaultOpenKeys={["order"]} style={style}>
             <Menu.Item icon={<SignalFilled />}>

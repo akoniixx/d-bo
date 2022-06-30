@@ -90,45 +90,67 @@ function DronerList() {
     },
     {
       title: "ยี่ห้อโดรน",
-      dataIndex: "date",
-      key: "date",
+      dataIndex: "bran",
+      key: "bran",
       width: "12%",
     },
     {
       title: "เลขตัวถัง",
-      dataIndex: "date",
-      key: "date",
+      dataIndex: "numb",
+      key: "numb",
       width: "18%",
     },
     {
       title: "ชื่อนักบินโดรน",
-      dataIndex: "date",
-      key: "date",
+      dataIndex: "named",
+      key: "named",
       width: "20%",
     },
     {
       title: "ใบอนุญาตนักบิน ",
-      dataIndex: "date",
-      key: "date",
+      dataIndex: "paper",
+      key: "paper",
       width: "18%",
     },
     {
       title: "ใบอนุญาตโดรน(กสทช.) ",
-      dataIndex: "date",
-      key: "date",
+      dataIndex: "paperA",
+      key: "paperA",
       width: "18%",
     },
     {
       title: "สถานะ",
-      dataIndex: "date",
-      key: "date",
+      dataIndex: "active",
+      key: "active",
       width: "10%",
     },
     {
       title: "",
-      dataIndex: "date",
-      key: "date",
-      width: "5%",
+      dataIndex: "Action",
+      key: "Action",
+      width: "9%",
+      render: (value: any, row: any, index: number) => {
+        return {
+          children: (
+            <>
+              <div className="d-flex flex-row justify-content-between">
+                <div
+                  className="btn btn-icon btn-sm"
+                  onClick={() => (window.location.href = "/EditDroneList")}
+                >
+                  <Button />
+                </div>
+              </div>
+            </>
+          ),
+        };
+      },
+    },
+  ];
+  const dataMock = [
+    {
+      key: "1",
+      name: "Mike",
     },
   ];
 
@@ -138,6 +160,7 @@ function DronerList() {
       <br />
       <Table
         columns={columns}
+        dataSource={dataMock}
         pagination={{ position: ["bottomRight"] }}
         size="large"
         tableLayout="fixed"
