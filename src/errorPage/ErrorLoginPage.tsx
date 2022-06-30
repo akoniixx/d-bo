@@ -19,7 +19,7 @@ export default class ErrorLoginPage extends Component<{}> {
                 className="max-w-300px mt-1ถ mt-md-0 mb-12"
               />
             </div>
-            <br/>
+            <br />
             <h1
               className="error-title font-weight-boldest mb-8"
               style={{ color: "#99A2B2" }}

@@ -8,36 +8,37 @@ import icon from "../../resource/icon";
 import image from "../../resource/image";
 
 export const AuthPage: React.FC = () => {
-
   return (
     <div
       className="px-0 vh-100 row overflow-hidden "
       style={{ backgroundColor: color.BG }}
     >
-      <div className="h-100 row">
+      <div className=" row">
         <div className="col-lg-6">
-          <div className="d-flex flex-column h-100 justify-content-center">
-            <div className="d-flex justify-content-center">
-              <img alt="imageLogin" src={image.login} width={"100%"} />
-            </div>
+          <div className="d-flex justify-content-center">
+            <img alt="imageLogin" src={image.login} width={"100%"} />
           </div>
         </div>
-        <Col className="gutter-row d-flex align-item-center justify-content-center height-res">
+        <div className="col-lg-6 ">
           <div
-            className="login-content flex-row-fluid d-flex flex-column justify-content-center position-relative overflow-hidden mx-auto"
-            style={{ paddingBottom: "10rem" }}
+            style={{
+              marginTop: "25%",
+              paddingLeft: "25%",
+              paddingRight: "25%",
+            }}
           >
-            <div className="d-flex justify-content-center">
-              <img alt="logo" src={icon.iconlogin} width={"30%"} />
+            <div className="text-center">
+              <img alt="logo" src={icon.iconLogin} width={"60%"} />
             </div>
-            <div className="d-flex justify-content-center">
+            <div
+              className="text-center justify-content-center"
+              style={{ marginTop: "3rem" }}
+            >
               <FromLogin />
             </div>
           </div>
-        </Col>
+        </div>
       </div>
     </div>
   );
 };
-
-export default AuthPage;
