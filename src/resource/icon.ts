@@ -1,4 +1,5 @@
 export default {
     logoHeader : require('./media/logos/HeaderLogo.png'),
-    logoLogin : require('./media/logos/LogoLogin.png'),
+    iconLogin : require('./media/images/login-image.png'),
+
 }

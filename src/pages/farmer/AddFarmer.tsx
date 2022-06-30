@@ -20,9 +20,9 @@ import {
 } from "@ant-design/icons";
 import emptyData from "../../resource/media/empties/iconoir_farm.png";
 import color from "../../resource/color";
-import { CardHeader } from "../../components/header/CardHearder";
 import FooterPage from "../../components/footer/FooterPage";
 import { ModalPage } from "../../components/modal/ModalPage";
+import { CardHeader } from "../../components/header/CardHearder";
 
 const AddFarmer = () => {
   const [modal, setModal] = useState(false);
