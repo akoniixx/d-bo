@@ -1,7 +1,7 @@
 import { Button, Divider, Form, Input, Space } from "antd";
 import React, { SyntheticEvent, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { AuthDatasource } from "../../datasource/AuthDatasource";
+import AuthDatasource from "../../datasource/AuthDatasource";
 import { useLocalStorage } from "../../hook/useLocalStorage";
 const FromLogin: React.FC = () => {
   const style: React.CSSProperties = {
@@ -10,18 +10,25 @@ const FromLogin: React.FC = () => {
     borderRadius: "5px",
   };
   const [formLogin] = Form.useForm();
+  const [persistedProfile, setPersistedProfile] = useLocalStorage(
+    "profile",
+    []
+  );
+  const navigate = useNavigate();
   const [token, setToken] = useLocalStorage("token", []);
-  let navigate = useNavigate();
 
-  const handlerSubmitFrom = async (values: any) => {
-    console.log(values);
-    await AuthDatasource.login(values.username, values.password).then(
-      (response: any) => {
-        console.log(response);
+  const handlerSubmitFrom = (data: any) => {
+    AuthDatasource.login(data.username, data.password).then((res: any) => {
+      if (res.accessToken) {
+        setPersistedProfile(res.data);
+
+        setToken(res.accessToken);
+        return navigate("OverviewPage");
+      } else {
+        return navigate("/");
       }
-    );
+    });
   };
-
   return (
     <div>
       <Form

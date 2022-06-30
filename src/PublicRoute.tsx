@@ -11,7 +11,6 @@ const useAuth = () => {
 
 const PublicRoute = (props: any) => {
   const auth = useAuth();
-
   return auth ? <Navigate to="/AuthPage" /> : <Outlet />;
 };
 

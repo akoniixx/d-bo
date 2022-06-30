@@ -1,8 +1,8 @@
 import { Navigate, Outlet } from "react-router-dom";
 
 const useAuth = () => {
-  const user = localStorage.getItem("accessToken");
-  if (user) {
+  const username = localStorage.getItem("accessToken");
+  if (username) {
     return true;
   } else {
     return false;

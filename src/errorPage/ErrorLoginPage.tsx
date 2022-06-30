@@ -1,12 +1,12 @@
 import React, { Component } from "react";
-
+import image from "../resource/image";
 export default class ErrorLoginPage extends Component<{}> {
   logout = () => {
     localStorage.clear();
     var url = window.location.href;
     var arr = url.split("/");
     var resultUrlHost = arr[0] + "//" + arr[2];
-    window.location.href = "https://www.youtube.com/";
+    window.location.href = "/";
   };
   render() {
     return (
@@ -15,10 +15,11 @@ export default class ErrorLoginPage extends Component<{}> {
           <div className="d-flex flex-column flex-row-fluid text-center">
             <div style={{ marginTop: "10%" }}>
               <img
-                src="media/images/errorPage_1.png"
-                className="max-w-300px mt-10 mt-md-0 mb-12"
+                src={image.errorPage}
+                className="max-w-300px mt-1ถ mt-md-0 mb-12"
               />
             </div>
+            <br/>
             <h1
               className="error-title font-weight-boldest mb-8"
               style={{ color: "#99A2B2" }}
@@ -29,9 +30,9 @@ export default class ErrorLoginPage extends Component<{}> {
               className="font-weight-bold text-gray"
               style={{ color: "#99A2B2" }}
             >
-              กรุณาออกจากระบบ"{window.location.href.split("?")[1]}"
+              กรุณาออกจากระบบ
               <br />
-              และเข้าสู่ระบบด้วย username ที่ถูกต้อง
+              และเข้าสู่ระบบด้วย Username และ Password ที่ถูกต้อง
             </h2>
             <div className="text-center mt-5">
               <button

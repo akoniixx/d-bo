@@ -1,6 +1,6 @@
 import React from "react";
 import { useLocation } from "react-router-dom";
-import image from "../../resource/image";
+import { image } from "../resource";
 
 const PageNotFound: React.FC = () => {
   const NoMatch = () => {
