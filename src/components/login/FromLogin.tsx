@@ -1,7 +1,7 @@
 import { Button, Divider, Form, Input, Space } from "antd";
 import React, { SyntheticEvent, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import AuthDatasource from "../../datasource/AuthDatasource";
+import { AuthDatasource } from "../../datasource/AuthDatasource";
 import { useLocalStorage } from "../../hook/useLocalStorage";
 const FromLogin: React.FC = () => {
   const style: React.CSSProperties = {
@@ -16,7 +16,6 @@ const FromLogin: React.FC = () => {
   );
   const navigate = useNavigate();
   const [token, setToken] = useLocalStorage("token", []);
-
   const handlerSubmitFrom = (data: any) => {
     AuthDatasource.login(data.username, data.password).then((res: any) => {
       if (res.accessToken) {

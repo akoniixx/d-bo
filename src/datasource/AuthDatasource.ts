@@ -1,8 +1,8 @@
 import axios from "axios";
 const API_URL = "https://api-dev-dnds.iconkaset.com";
 
-class AuthDatasource {
-  login(username: string, password: string) {
+export class AuthDatasource {
+ static login(username: string, password: string) {
     return axios
       .post(API_URL + "/auth/login-user-staff", {
         username,
@@ -15,8 +15,8 @@ class AuthDatasource {
         return response.data;
       });
   }
-  logout() {
+  static logout() {
     localStorage.removeItem("username");
   }
 }
-export default new AuthDatasource();
+
