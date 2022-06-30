@@ -74,7 +74,7 @@ const EditFarmer = () => {
     </div>
   );
 
-  const inputLandInModal = (
+  const formModal = (
     <Form>
       <div className="form-group">
         <label>
@@ -396,7 +396,7 @@ const EditFarmer = () => {
           visible={modal}
           textHeader="เพิ่มแปลงเกษตร"
           closeModal={closeModal}
-          data={inputLandInModal}
+          data={formModal}
           backButton={closeModal}
         />
         <Form>

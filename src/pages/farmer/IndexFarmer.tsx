@@ -6,6 +6,7 @@ import color from "../../resource/color";
 import Layouts from "../../components/layout/Layout";
 import ActionButton from "../../components/button/ActionButton";
 import { EditOutlined } from "@ant-design/icons";
+import AddButtton from "../../components/button/AddButton";
 
 function IndexFarmer() {
   const onSearch = (value: string) => console.log(value);
@@ -65,20 +66,10 @@ function IndexFarmer() {
             </Select>
           </Col>
           <Col className="gutter-row" span={4} style={{ marginTop: "8px" }}>
-            <Button
-              style={{
-                width: "130px",
-                padding: "8 0",
-                backgroundColor: color.primary1,
-                color: color.secondary2,
-                borderColor: color.Success,
-                borderRadius: "5px",
-              }}
+            <AddButtton
+              text="เพิ่มเกษตร"
               onClick={() => (window.location.href = "/AddFarmer")}
-              type="primary"
-            >
-              + เพิ่มเกษตรกร
-            </Button>
+            />
           </Col>
         </Row>
       </div>
