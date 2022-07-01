@@ -24,21 +24,6 @@ const WebRoutes: React.FC<any> = () => {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="*" element={<Navigate to="/AuthPage" />} />
-        <Route path="/OverviewPage" element={<OverviewPage />} />
-        <Route path="/AuthPage" element={<AuthPage />} />
-        <Route path="/IndexDroner" element={<IndexDroner />} />
-        <Route path="/IndexFarmer" element={<IndexFarmer />} />
-        <Route path="/TotalIncomePage" element={<TotalIncomePage />} />
-        <Route path="/PromotionPage" element={<PromotionPage />} />
-        <Route path="/TotalIncomePage" element={<TotalIncomePage />} />
-        <Route path="/AddFarmer" element={<AddFarmer />} />
-        <Route path="/DronerList" element={<DronerList />} />
-        <Route path="/RateDroner" element={<RateDroner />} />
-        <Route path="/EditFarmer" element={<EditFarmer />} />
-        <Route path="/IndexAdmin" element={<IndexAdmin />} />
-        <Route path="/AddAdmin" element={<AddAdmin />} />
-        <Route path="/EditAdmin" element={<EditAdmin />} />
         <Route element={<ProtectRoute />}>
           <Route path="*" element={<Navigate to="/HomePage" />} />
           <Route path="/HomePage" element={<HomePage />} />
@@ -53,6 +38,9 @@ const WebRoutes: React.FC<any> = () => {
           <Route path="/RateDroner" element={<RateDroner />} />
           <Route path="/EditDroneList" element={<EditDroneList />} />
           <Route path="/EditFarmer" element={<EditFarmer />} />
+          <Route path="/IndexAdmin" element={<IndexAdmin />} />
+        <Route path="/AddAdmin" element={<AddAdmin />} />
+        <Route path="/EditAdmin" element={<EditAdmin />} />
           <Route path="*" element={<PageNotFound />} />
         </Route>
 

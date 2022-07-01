@@ -10,3 +10,15 @@ export interface UserStaffCreate {
   updateAt: string;
   isActive: boolean;
 }
+export const UserStaffCreate_INIT: UserStaffCreate = {
+  id: "",
+  email: "",
+  username: "",
+  password: "",
+  role: "",
+  firstname: "",
+  lastname: "",
+  createdAt: "",
+  updateAt: "",
+  isActive: true,
+};

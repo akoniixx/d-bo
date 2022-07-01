@@ -5,13 +5,158 @@ import { BackIconButton } from "../../components/button/BackButton";
 import { CardContainer } from "../../components/card/CardContainer";
 import { CardHeader } from "../../components/header/CardHearder";
 import FooterPage from "../../components/footer/FooterPage";
+import { ROLE_ADMIN } from "../../definitions/RoleAdmin";
+import {
+  UserStaffCreate,
+  UserStaffCreate_INIT,
+} from "../../entities/UserStaffEntities";
+import { AdminDatasource } from "../../datasource/AdminDatasource";
+
+const _ = require("lodash");
+const { Map } = require("immutable");
 
 const AddAdmin = () => {
   const [status, setStatus] = useState(true);
+  const [data, setData] = useState<UserStaffCreate>(UserStaffCreate_INIT);
 
-  const headleChangestatus = (e: any) => {
+  const handleChangestatus = (e: any) => {
     setStatus(e.target.value);
   };
+
+  const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const m = Map(data).set(e.target.id, e.target.value);
+    setData(m.toJS());
+  };
+  console.log(data);
+
+  const insertNewAdmin = (data: UserStaffCreate) => {
+    console.log(1);
+    console.log(data);
+    // AdminDatasource.insertAdmin(data).then((res) => {});
+  };
+
+  const renderFromData = (
+    <Form style={{ padding: "32px" }}>
+      <div className="row">
+        <div className="form-group col-lg-6">
+          <label>
+            ชื่อ <span style={{ color: "red" }}>*</span>
+          </label>
+          <Form.Item
+            name="firstname"
+            rules={[
+              {
+                required: true,
+                message: "กรุณากรอกชื่อ!",
+              },
+            ]}
+          >
+            <Input
+              placeholder="กรอกชื่อ"
+              value={data?.firstname}
+              onChange={handleOnChange}
+            />
+          </Form.Item>
+        </div>
+        <div className="form-group col-lg-6">
+          <label>
+            นามสกุล <span style={{ color: "red" }}>*</span>
+          </label>
+          <Form.Item
+            name="LastName"
+            rules={[
+              {
+                required: true,
+                message: "กรุณากรอกนามสกุล!",
+              },
+            ]}
+          >
+            <Input placeholder="กรอกนามสกุล" value={data?.lastname} />
+          </Form.Item>
+        </div>
+      </div>
+      <div className="row">
+        <div className="form-group col-lg-6">
+          <label>
+            อีเมลล์ <span style={{ color: "red" }}>*</span>
+          </label>
+          <Form.Item
+            name="Email"
+            rules={[
+              {
+                required: true,
+                message: "กรุณากรอกอีเมลล์!",
+              },
+            ]}
+          >
+            <Input placeholder="กรอกอีเมลล์" value={data?.email} />
+          </Form.Item>
+        </div>
+      </div>
+      <div className="row">
+        <div className="form-group col-lg-6">
+          <label>
+            ชื่อผู้ใช้ <span style={{ color: "red" }}>*</span>
+          </label>
+          <Form.Item
+            name="ีUserName"
+            rules={[
+              {
+                required: true,
+                message: "กรุณากรอกชื่อในระบบ!",
+              },
+            ]}
+          >
+            <Input placeholder="กรอกชื่อในระบบ" value={data?.username} />
+          </Form.Item>
+        </div>
+        <div className="form-group col-lg-6">
+          <label>
+            รหัสผ่าน <span style={{ color: "red" }}>*</span>
+          </label>
+          <Form.Item
+            name="password"
+            rules={[
+              {
+                required: true,
+                message: "กรุณากรอกรหัสผ่าน!",
+              },
+            ]}
+          >
+            <Input placeholder="กรอกรหัสผ่าน" value={data?.password} />
+          </Form.Item>
+        </div>
+      </div>
+      <div className="row">
+        <div className="form-group col-lg-6">
+          <label>
+            บทบาท <span style={{ color: "red" }}>*</span>
+          </label>
+          <Form.Item name="Province">
+            <Select placeholder="เลือกบทบาท" allowClear value={data?.role}>
+              {ROLE_ADMIN.map((item) => (
+                <option value={item}></option>
+              ))}
+            </Select>
+          </Form.Item>
+        </div>
+      </div>
+      <div className="row">
+        <div className="col-lg-6 form-group">
+          <label>
+            สถานะ <span style={{ color: "red" }}>*</span>
+          </label>
+          <br />
+          <Radio.Group value={data?.isActive} onChange={handleChangestatus}>
+            <Space direction="vertical">
+              <Radio value={true}>ใช้งาน</Radio>
+              <Radio value={false}>ไม่ใช้งาน</Radio>
+            </Space>
+          </Radio.Group>
+        </div>
+      </div>
+    </Form>
+  );
 
   return (
     <Layout>
@@ -27,125 +172,12 @@ const AddAdmin = () => {
       </Row>
       <CardContainer>
         <CardHeader textHeader="ข้อมูลผู้ดูแลระบบ" />
-        <Form style={{ padding: "32px" }}>
-          <div className="row">
-            <div className="form-group col-lg-6">
-              <label>
-                ชื่อ <span style={{ color: "red" }}>*</span>
-              </label>
-              <Form.Item
-                name="FirstName"
-                rules={[
-                  {
-                    required: true,
-                    message: "กรุณากรอกชื่อ!",
-                  },
-                ]}
-              >
-                <Input placeholder="กรอกชื่อ" />
-              </Form.Item>
-            </div>
-            <div className="form-group col-lg-6">
-              <label>
-                นามสกุล <span style={{ color: "red" }}>*</span>
-              </label>
-              <Form.Item
-                name="LastName"
-                rules={[
-                  {
-                    required: true,
-                    message: "กรุณากรอกนามสกุล!",
-                  },
-                ]}
-              >
-                <Input placeholder="กรอกนามสกุล" />
-              </Form.Item>
-            </div>
-          </div>
-          <div className="row">
-            <div className="form-group col-lg-6">
-              <label>
-                อีเมลล์ <span style={{ color: "red" }}>*</span>
-              </label>
-              <Form.Item
-                name="Email"
-                rules={[
-                  {
-                    required: true,
-                    message: "กรุณากรอกอีเมลล์!",
-                  },
-                ]}
-              >
-                <Input placeholder="กรอกอีเมลล์" />
-              </Form.Item>
-            </div>
-          </div>
-          <div className="row">
-            <div className="form-group col-lg-6">
-              <label>
-                ชื่อผู้ใช้ <span style={{ color: "red" }}>*</span>
-              </label>
-              <Form.Item
-                name="ีUserName"
-                rules={[
-                  {
-                    required: true,
-                    message: "กรุณากรอกชื่อในระบบ!",
-                  },
-                ]}
-              >
-                <Input placeholder="กรอกชื่อในระบบ" />
-              </Form.Item>
-            </div>
-            <div className="form-group col-lg-6">
-              <label>
-                รหัสผ่าน <span style={{ color: "red" }}>*</span>
-              </label>
-              <Form.Item
-                name="password"
-                rules={[
-                  {
-                    required: true,
-                    message: "กรุณากรอกรหัสผ่าน!",
-                  },
-                ]}
-              >
-                <Input placeholder="กรอกรหัสผ่าน" />
-              </Form.Item>
-            </div>
-          </div>
-          <div className="row">
-            <div className="form-group col-lg-6">
-              <label>
-                บทบาท <span style={{ color: "red" }}>*</span>
-              </label>
-              <Form.Item name="Province">
-                <Select placeholder="เลือกบทบาท" allowClear>
-                  <option value={"SUPER_ADMIN"}></option>
-                  <option value={"ADMIN"}></option>
-                  <option value={"SALE"}></option>
-                  <option value={"ACCOUNT"}></option>
-                </Select>
-              </Form.Item>
-            </div>
-          </div>
-          <div className="row">
-            <div className="col-lg-6 form-group">
-              <label>
-                สถานะ <span style={{ color: "red" }}>*</span>
-              </label>
-              <br />
-              <Radio.Group value={status} onChange={headleChangestatus}>
-                <Space direction="vertical">
-                  <Radio value={true}>ใช้งาน</Radio>
-                  <Radio value={false}>ไม่ใช้งาน</Radio>
-                </Space>
-              </Radio.Group>
-            </div>
-          </div>
-        </Form>
+        {renderFromData}
       </CardContainer>
-      <FooterPage onClickBack={() => (window.location.href = "/IndexAdmin")} />
+      <FooterPage
+        onClickBack={() => (window.location.href = "/IndexAdmin")}
+        onClickSave={() => {insertNewAdmin(data)}}
+      />
     </Layout>
   );
 };
