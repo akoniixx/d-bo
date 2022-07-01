@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import { Form, Input, Radio, Row, Select, Space } from "antd";
 import { BackIconButton } from "../../components/button/BackButton";
 import { CardContainer } from "../../components/card/CardContainer";
-import CardHeader from "../../components/header/CardHearder";
+import { CardHeader } from "../../components/header/CardHearder";
 import FooterPage from "../../components/footer/FooterPage";
 
 const EditAdmin = () => {

@@ -14,20 +14,16 @@ import { HomePage } from "./pages/home/HomePage";
 import { OverviewPage } from "./pages/overview/OverviewPage";
 import PromotionPage from "./pages/promotion/PromotionPage";
 import TotalIncomePage from "./pages/totalincome/TotalIncomePage";
-<<<<<<< HEAD
 import IndexAdmin from "./pages/admin/IndexAdmin";
 import AddAdmin from "./pages/admin/AddAdmin";
 import EditAdmin from "./pages/admin/EditAdmin";
-=======
 import ProtectRoute from "./ProtectRoute";
 import PublicRoute from "./PublicRoute";
->>>>>>> 4ddb02e9734a02e73404da55750e468fa736bdc8
 
 const WebRoutes: React.FC<any> = () => {
   return (
     <BrowserRouter>
       <Routes>
-<<<<<<< HEAD
         <Route path="*" element={<Navigate to="/AuthPage" />} />
         <Route path="/OverviewPage" element={<OverviewPage />} />
         <Route path="/AuthPage" element={<AuthPage />} />
@@ -43,7 +39,6 @@ const WebRoutes: React.FC<any> = () => {
         <Route path="/IndexAdmin" element={<IndexAdmin />} />
         <Route path="/AddAdmin" element={<AddAdmin />} />
         <Route path="/EditAdmin" element={<EditAdmin />} />
-=======
         <Route element={<ProtectRoute />}>
           <Route path="*" element={<Navigate to="/HomePage" />} />
           <Route path="/HomePage" element={<HomePage />} />
@@ -66,7 +61,6 @@ const WebRoutes: React.FC<any> = () => {
           <Route path="/ErrorLoginPage" element={<ErrorLoginPage />} />
           <Route path="*" element={<PageNotFound />} />
         </Route>
->>>>>>> 4ddb02e9734a02e73404da55750e468fa736bdc8
       </Routes>
     </BrowserRouter>
   );
