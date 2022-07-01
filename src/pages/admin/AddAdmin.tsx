@@ -27,11 +27,11 @@ const AddAdmin = () => {
     const m = Map(data).set(e.target.id, e.target.value);
     setData(m.toJS());
   };
-  console.log(data);
+  
 
   const insertNewAdmin = (data: UserStaffCreate) => {
-    console.log(1);
-    console.log(data);
+    console.log('tes')
+    console.log(data)
     // AdminDatasource.insertAdmin(data).then((res) => {});
   };
 
