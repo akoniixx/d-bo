@@ -16,7 +16,7 @@ export const FooterPage: React.FC<FoolterPageProps> = ({
   <Footer>
     <Row className="d-flex justify-content-between">
       <BackButton onClick={onClickBack} />
-      <SaveButton onClick={()=>(onClickSave)} />
+      <SaveButton onClick={() => onClickSave} />
     </Row>
   </Footer>
 );
