@@ -8,18 +8,17 @@ import Layout from "../../components/layout/Layout";
 import { AdminDatasource } from "../../datasource/AdminDatasource";
 import { STATUS_NORMAL_MAPPING } from "../../definitions/Status";
 import {
-  UserStaffCreate,
-  UserStaffCreate_INIT,
+  UserStaffEntity,
+  UserStaffEntity_INIT,
 } from "../../entities/UserStaffEntities";
 import { color } from "../../resource";
 import { DateTimeUtil } from "../../utilities/DateTimeUtil";
 
 const IndexAdmin = () => {
-  const [data, setData] = useState<UserStaffCreate[]>([UserStaffCreate_INIT]);
+  const [data, setData] = useState<UserStaffEntity[]>([UserStaffEntity_INIT]);
 
   const fecthAdmin = async () => {
-    await AdminDatasource.getAdminList().then((res: UserStaffCreate[]) => {
-      console.log(res);
+    await AdminDatasource.getAdminList().then((res: UserStaffEntity[]) => {
       setData(res);
     });
   };
@@ -89,18 +88,14 @@ const IndexAdmin = () => {
       width: "15%",
       render: (value: any, row: any, index: number) => {
         return {
-          children: (
-            <span>              
-              {DateTimeUtil.formatDateTime(value)}
-            </span>
-          ),
+          children: <span>{DateTimeUtil.formatDateTime(value)}</span>,
         };
       },
     },
     {
       title: "",
-      dataIndex: "Action",
-      key: "Action",
+      dataIndex: "id",
+      key: "id",
       width: "9%",
       render: (value: any, row: any, index: number) => {
         return {
@@ -109,7 +104,7 @@ const IndexAdmin = () => {
               <ActionButton
                 icon={<EditOutlined />}
                 color={color.primary1}
-                onClick={() => (window.location.href = "/EditAdmin")}
+                onClick={() => (window.location.href = "/EditAdmin/id=" + value)}
               />
             </div>
           ),
@@ -140,7 +135,7 @@ const IndexAdmin = () => {
   return (
     <Layout>
       {pageTitle}
-      <CardContainer style={{ paddingBottom: "30%" }}>
+      <CardContainer>
         <Table
           dataSource={data}
           columns={columns}

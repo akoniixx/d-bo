@@ -39,8 +39,8 @@ const WebRoutes: React.FC<any> = () => {
           <Route path="/EditDroneList" element={<EditDroneList />} />
           <Route path="/EditFarmer" element={<EditFarmer />} />
           <Route path="/IndexAdmin" element={<IndexAdmin />} />
-        <Route path="/AddAdmin" element={<AddAdmin />} />
-        <Route path="/EditAdmin" element={<EditAdmin />} />
+          <Route path="/AddAdmin" element={<AddAdmin />} />
+          <Route path="/EditAdmin/:id" element={<EditAdmin />} />
           <Route path="*" element={<PageNotFound />} />
         </Route>
 

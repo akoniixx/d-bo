@@ -1,4 +1,4 @@
-export interface UserStaffCreate {
+export interface UserStaffEntity {
   id: string;
   email: string;
   username: string;
@@ -10,7 +10,7 @@ export interface UserStaffCreate {
   updateAt: string;
   isActive: boolean;
 }
-export const UserStaffCreate_INIT: UserStaffCreate = {
+export const UserStaffEntity_INIT: UserStaffEntity = {
   id: "",
   email: "",
   username: "",

@@ -7,32 +7,45 @@ import { CardHeader } from "../../components/header/CardHearder";
 import FooterPage from "../../components/footer/FooterPage";
 import { ROLE_ADMIN } from "../../definitions/RoleAdmin";
 import {
-  UserStaffCreate,
-  UserStaffCreate_INIT,
+  UserStaffEntity,
+  UserStaffEntity_INIT,
 } from "../../entities/UserStaffEntities";
 import { AdminDatasource } from "../../datasource/AdminDatasource";
+import Swal from "sweetalert2";
 
 const _ = require("lodash");
 const { Map } = require("immutable");
 
 const AddAdmin = () => {
-  const [status, setStatus] = useState(true);
-  const [data, setData] = useState<UserStaffCreate>(UserStaffCreate_INIT);
+  const [data, setData] = useState<UserStaffEntity>(UserStaffEntity_INIT);
 
   const handleChangestatus = (e: any) => {
-    setStatus(e.target.value);
+    const m = Map(data).set("isActive", e.target.value);
+    setData(m.toJS());
   };
 
   const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const m = Map(data).set(e.target.id, e.target.value);
     setData(m.toJS());
   };
-  
 
-  const insertNewAdmin = (data: UserStaffCreate) => {
-    console.log('tes')
-    console.log(data)
-    // AdminDatasource.insertAdmin(data).then((res) => {});
+  const handleOnChangeSelect = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const m = Map(data).set("role", e);
+    setData(m.toJS());
+  };
+
+  const insertNewAdmin = (data: UserStaffEntity) => {
+    AdminDatasource.insertAdmin(data).then((res) => {
+      if (res.success) {
+        Swal.fire({
+          title: "บันทึกสำเร็จ",
+          icon: "success",
+          timer: 2000,
+          showConfirmButton: false,
+        });
+      }
+      // window.location.href = "/IndexAdmin";
+    });
   };
 
   const renderFromData = (
@@ -63,7 +76,7 @@ const AddAdmin = () => {
             นามสกุล <span style={{ color: "red" }}>*</span>
           </label>
           <Form.Item
-            name="LastName"
+            name="lastname"
             rules={[
               {
                 required: true,
@@ -71,7 +84,11 @@ const AddAdmin = () => {
               },
             ]}
           >
-            <Input placeholder="กรอกนามสกุล" value={data?.lastname} />
+            <Input
+              placeholder="กรอกนามสกุล"
+              value={data?.lastname}
+              onChange={handleOnChange}
+            />
           </Form.Item>
         </div>
       </div>
@@ -81,7 +98,7 @@ const AddAdmin = () => {
             อีเมลล์ <span style={{ color: "red" }}>*</span>
           </label>
           <Form.Item
-            name="Email"
+            name="email"
             rules={[
               {
                 required: true,
@@ -89,7 +106,11 @@ const AddAdmin = () => {
               },
             ]}
           >
-            <Input placeholder="กรอกอีเมลล์" value={data?.email} />
+            <Input
+              placeholder="กรอกอีเมลล์"
+              value={data?.email}
+              onChange={handleOnChange}
+            />
           </Form.Item>
         </div>
       </div>
@@ -99,7 +120,7 @@ const AddAdmin = () => {
             ชื่อผู้ใช้ <span style={{ color: "red" }}>*</span>
           </label>
           <Form.Item
-            name="ีUserName"
+            name="username"
             rules={[
               {
                 required: true,
@@ -107,7 +128,11 @@ const AddAdmin = () => {
               },
             ]}
           >
-            <Input placeholder="กรอกชื่อในระบบ" value={data?.username} />
+            <Input
+              placeholder="กรอกชื่อในระบบ"
+              value={data?.username}
+              onChange={handleOnChange}
+            />
           </Form.Item>
         </div>
         <div className="form-group col-lg-6">
@@ -123,7 +148,11 @@ const AddAdmin = () => {
               },
             ]}
           >
-            <Input placeholder="กรอกรหัสผ่าน" value={data?.password} />
+            <Input
+              placeholder="กรอกรหัสผ่าน"
+              value={data?.password}
+              onChange={handleOnChange}
+            />
           </Form.Item>
         </div>
       </div>
@@ -132,8 +161,8 @@ const AddAdmin = () => {
           <label>
             บทบาท <span style={{ color: "red" }}>*</span>
           </label>
-          <Form.Item name="Province">
-            <Select placeholder="เลือกบทบาท" allowClear value={data?.role}>
+          <Form.Item name="role">
+            <Select placeholder="เลือกบทบาท" onChange={handleOnChangeSelect}>
               {ROLE_ADMIN.map((item) => (
                 <option value={item}></option>
               ))}
@@ -147,7 +176,7 @@ const AddAdmin = () => {
             สถานะ <span style={{ color: "red" }}>*</span>
           </label>
           <br />
-          <Radio.Group value={data?.isActive} onChange={handleChangestatus}>
+          <Radio.Group value={data.isActive} onChange={handleChangestatus}>
             <Space direction="vertical">
               <Radio value={true}>ใช้งาน</Radio>
               <Radio value={false}>ไม่ใช้งาน</Radio>
@@ -176,7 +205,9 @@ const AddAdmin = () => {
       </CardContainer>
       <FooterPage
         onClickBack={() => (window.location.href = "/IndexAdmin")}
-        onClickSave={() => {insertNewAdmin(data)}}
+        onClickSave={() => {
+          insertNewAdmin(data);
+        }}
       />
     </Layout>
   );
