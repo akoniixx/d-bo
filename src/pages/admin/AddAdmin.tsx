@@ -17,7 +17,7 @@ const _ = require("lodash");
 const { Map } = require("immutable");
 
 const AddAdmin = () => {
-  //const [showBtn, setShowBtn] = useState<boolean>(true);
+  const [showBtn, setShowBtn] = useState<boolean>(true);
   const [data, setData] = useState<UserStaffEntity>(UserStaffEntity_INIT);
 
   const handleChangestatus = (e: any) => {
@@ -28,11 +28,27 @@ const AddAdmin = () => {
   const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const m = Map(data).set(e.target.id, e.target.value);
     setData(m.toJS());
+    checkValidate();
   };
 
-  const handleOnChangeSelect = (value : any) => {
+  const handleOnChangeSelect = (value: any) => {
     const m = Map(data).set("role", value);
     setData(m.toJS());
+    checkValidate();
+  };
+
+  const checkValidate = () => {
+    if (
+      data.firstname.trim() != "" &&
+      data.lastname.trim() != "" &&
+      data.email.trim() != "" &&
+      data.username.trim() != "" &&
+      data.password.trim() != ""
+    ) {
+      setShowBtn(false);
+    } else {
+      setShowBtn(true);
+    }
   };
 
   const insertNewAdmin = (data: UserStaffEntity) => {
@@ -51,7 +67,7 @@ const AddAdmin = () => {
   };
 
   const renderFromData = (
-    <Form style={{ padding: "32px" }}>
+    <Form style={{ padding: "32px" }} key={data.id}>
       <div className="row">
         <div className="form-group col-lg-6">
           <label>
@@ -210,6 +226,7 @@ const AddAdmin = () => {
         onClickSave={() => {
           insertNewAdmin(data);
         }}
+        disableSaveBtn={showBtn}
       />
     </Layout>
   );

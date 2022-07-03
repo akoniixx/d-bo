@@ -20,10 +20,20 @@ let queryString = _.split(window.location.pathname, "=");
 
 const EditAdmin = () => {
   const admidId = queryString[1];
+  const [showBtn, setShowBtn] = useState<boolean>(true);
   const [data, setData] = useState<UserStaffEntity>(UserStaffEntity_INIT);
 
   const fecthAdmin = async (id: string) => {
     await AdminDatasource.getAdminById(id).then((res) => {
+      if (
+        res.firstname != "" &&
+        res.lastname != "" &&
+        res.email != "" &&
+        res.username != "" &&
+        res.password != ""
+      ) {
+        setShowBtn(false);
+      }
       setData(res);
     });
   };
@@ -40,11 +50,13 @@ const EditAdmin = () => {
   const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const m = Map(data).set(e.target.id, e.target.value);
     setData(m.toJS());
+    checkValidate();
   };
 
-  const handleOnChangeSelect = (value : any) => {
+  const handleOnChangeSelect = (value: any) => {
     const m = Map(data).set("role", value);
     setData(m.toJS());
+    checkValidate();
   };
 
   const updateAdmin = (data: UserStaffEntity) => {
@@ -60,6 +72,20 @@ const EditAdmin = () => {
         });
       }
     });
+  };
+
+  const checkValidate = () => {
+    if (
+      data.firstname.trim() != "" &&
+      data.lastname.trim() != "" &&
+      data.email.trim() != "" &&
+      data.username.trim() != "" &&
+      data.password.trim() != ""
+    ) {
+      setShowBtn(false);
+    } else {
+      setShowBtn(true);
+    }
   };
 
   const renderFromData = (
@@ -202,6 +228,7 @@ const EditAdmin = () => {
       <FooterPage
         onClickBack={() => (window.location.href = "/IndexAdmin")}
         onClickSave={() => updateAdmin(data)}
+        disableSaveBtn={showBtn}
       />
     </Layout>
   );
