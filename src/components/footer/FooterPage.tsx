@@ -8,15 +8,19 @@ import SaveButton from "../button/SaveButton";
 interface FoolterPageProps {
   onClickBack?: () => void;
   onClickSave?: () => void;
+  disableBackBtn?: boolean;
+  disableSaveBtn?: boolean;
 }
 export const FooterPage: React.FC<FoolterPageProps> = ({
   onClickBack,
   onClickSave,
+  disableBackBtn,
+  disableSaveBtn,
 }) => (
   <Footer>
     <Row className="d-flex justify-content-between">
-      <BackButton onClick={onClickBack} />
-      <SaveButton onClick={() => onClickSave} />
+      <BackButton onClick={onClickBack} disableBtn={disableBackBtn} />
+      <SaveButton onClick={() => onClickSave} disableBtn={disableSaveBtn} />
     </Row>
   </Footer>
 );

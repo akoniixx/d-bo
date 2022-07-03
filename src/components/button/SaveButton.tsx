@@ -5,8 +5,9 @@ import { color } from "../../resource";
 
 interface SaveButtonProps {
   onClick: Function;
+  disableBtn?: boolean
 }
-export const SaveButtton: React.FC<SaveButtonProps> = ({ onClick }) => (
+export const SaveButtton: React.FC<SaveButtonProps> = ({ onClick,disableBtn }) => (
   <Button
     style={{
       backgroundColor: color.Success,
@@ -15,6 +16,7 @@ export const SaveButtton: React.FC<SaveButtonProps> = ({ onClick }) => (
       color: color.BG,
     }}
    onClick={onClick()}
+   disabled={disableBtn}
   >
     บันทึก
   </Button>

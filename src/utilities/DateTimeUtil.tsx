@@ -22,6 +22,6 @@ export class DateTimeUtil {
     });
   };
   static formatDateTime = (date:string) =>{
-    return moment(date).format('DD/MM/yyyy hh:mm');
+    return moment(date).format('DD/MM/yyyy HH:mm');
   }
 }

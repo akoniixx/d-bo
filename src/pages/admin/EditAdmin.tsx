@@ -42,23 +42,23 @@ const EditAdmin = () => {
     setData(m.toJS());
   };
 
-  const handleOnChangeSelect = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const m = Map(data).set("role", e);
+  const handleOnChangeSelect = (value : any) => {
+    const m = Map(data).set("role", value);
     setData(m.toJS());
   };
 
   const updateAdmin = (data: UserStaffEntity) => {
-    AdminDatasource.insertAdmin(data).then((res) => {
-      console.log(res);
-      if (res.success) {
+    AdminDatasource.updateAdmin(data).then((res) => {
+      if (res.id != null) {
         Swal.fire({
           title: "บันทึกสำเร็จ",
           icon: "success",
-          timer: 2000,
+          timer: 1500,
           showConfirmButton: false,
+        }).then((time) => {
+          window.location.href = "/IndexAdmin";
         });
       }
-      // window.location.href = "/IndexAdmin";
     });
   };
 
@@ -157,7 +157,7 @@ const EditAdmin = () => {
             <Select
               placeholder="เลือกบทบาท"
               defaultValue={data.role}
-              onChange={() => handleOnChangeSelect}
+              onChange={handleOnChangeSelect}
             >
               {ROLE_ADMIN.map((item) => (
                 <option value={item}></option>
@@ -185,7 +185,6 @@ const EditAdmin = () => {
 
   return (
     <Layout>
-      {console.log(data)}
       <Row>
         <BackIconButton
           onClick={() => (window.location.href = "/IndexAdmin")}
@@ -200,7 +199,10 @@ const EditAdmin = () => {
         <CardHeader textHeader="ข้อมูลผู้ดูแลระบบ" />
         {renderFromData}
       </CardContainer>
-      <FooterPage onClickBack={() => (window.location.href = "/IndexAdmin")} />
+      <FooterPage
+        onClickBack={() => (window.location.href = "/IndexAdmin")}
+        onClickSave={() => updateAdmin(data)}
+      />
     </Layout>
   );
 };

@@ -17,6 +17,7 @@ const _ = require("lodash");
 const { Map } = require("immutable");
 
 const AddAdmin = () => {
+  //const [showBtn, setShowBtn] = useState<boolean>(true);
   const [data, setData] = useState<UserStaffEntity>(UserStaffEntity_INIT);
 
   const handleChangestatus = (e: any) => {
@@ -29,8 +30,8 @@ const AddAdmin = () => {
     setData(m.toJS());
   };
 
-  const handleOnChangeSelect = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const m = Map(data).set("role", e);
+  const handleOnChangeSelect = (value : any) => {
+    const m = Map(data).set("role", value);
     setData(m.toJS());
   };
 
@@ -40,11 +41,12 @@ const AddAdmin = () => {
         Swal.fire({
           title: "บันทึกสำเร็จ",
           icon: "success",
-          timer: 2000,
+          timer: 1500,
           showConfirmButton: false,
+        }).then((time) => {
+          window.location.href = "/IndexAdmin";
         });
       }
-      // window.location.href = "/IndexAdmin";
     });
   };
 

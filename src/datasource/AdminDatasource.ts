@@ -13,6 +13,7 @@ export class AdminDatasource {
         console.log(err, "err getAdmin");
       });
   }
+
   static getAdminById(id: string): Promise<UserStaffEntity> {
     return httpClient
       .get(API_URL + "/user-staff/" + id)
@@ -23,6 +24,7 @@ export class AdminDatasource {
         console.log(err, "err getAdminBy" + id);
       });
   }
+
   static insertAdmin(data: UserStaffEntity): Promise<any> {
     const params = {
       email: data.email,
@@ -42,23 +44,23 @@ export class AdminDatasource {
         console.log(err, "err insert admin");
       });
   }
+  
   static updateAdmin(data: UserStaffEntity): Promise<any> {
     const params = {
       email: data.email,
       username: data.username,
-      password: data.password,
       role: data.role,
       firstname: data.firstname,
       lastname: data.lastname,
       isActive: data.isActive,
     };
     return httpClient
-      .patch(API_URL + "/user-staff", params)
+      .patch(API_URL + "/user-staff/" + data.id, params)
       .then((response) => {
         return response.data;
       })
       .catch((err) => {
-        console.log(err, "err insert admin");
+        console.log(err, "err update admin");
       });
   }
 }
