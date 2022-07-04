@@ -1,13 +1,54 @@
+@import url("https://fonts.googleapis.com/css2?family=Prompt:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&display=swap");
+
+html {
+  font-size: 10px;
+  height: 100%;
+  line-height: 1.8;
+  -webkit-text-size-adjust: 100%;
+  -ms-text-size-adjust: 100%;
+}
 body {
+  color: #000;
+  font-family: "sans-serif", "Helvetica Neue", Arial !important;
+  font-weight: normal !important;
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
+  padding: 0;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  height: 100%;
 }
 
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+table tr td {
+  font-weight: normal !important;
+}
+Form,
+Input,
+p,
+Table,
+Form,
+h1,
+h2,
+h3,
+h4,
+h5,
+label,
+span,
+.font-size-h1,
+.font-size-h2,
+.font-size-h3,
+.font-size-h4,
+.font-size-h5 {
+  font-family: "Prompt" !important;
+  font-weight: 400 !important;
+}
+
+.ant-layout-sider-light {
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24) !important;
+}
+.ant-table-container table thead tr th {
+  background-color: #219653;
+  font-family: "Prompt" !important;
+  font-weight: 500 !important;
+  color: rgb(255, 255, 255) !important;
+  font-weight: bold !important;
 }
