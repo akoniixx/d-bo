@@ -71,6 +71,10 @@ const AddDroner = () => {
     const m = Map(droner).set("firstname", e.target.value);
     setDroner(m.toJS());
   };
+  const handleLastName = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const m = Map(droner).set("lastname", e.target.value);
+    setDroner(m.toJS());
+  };
 
   const saveNewDroner = (data: DronerEntity) => {
     DronerDatasource.createDronerList(data).then((res) => {
@@ -234,7 +238,8 @@ const AddDroner = () => {
                   },
                 ]}
               >
-                <Input placeholder="กรอกนามสกุล" />
+                <Input placeholder="กรอกนามสกุล"  value={droner.lastname}
+                  onChange={handleLastName}/>
               </Form.Item>
             </div>
           </div>

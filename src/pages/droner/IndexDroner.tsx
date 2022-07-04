@@ -42,8 +42,15 @@ function IndexDroner() {
   };
 
   useEffect(() => {
-    fetchDronerList("OPEN", 1, 5, "ASC", optionalTextSearch);
+    fetchDronerList("OPEN", 1, 10, "ASC", optionalTextSearch);
   }, [optionalTextSearch]);
+
+  const sorter = (a: any, b: any) => {
+    if (a === b) return 0;
+    else if (a === null) return 1;
+    else if (b === null) return -1;
+    else return a.localeCompare(b);
+  };
 
   const PageTitle = () => {
     return (
@@ -142,6 +149,7 @@ function IndexDroner() {
       dataIndex: "firstname",
       key: "firstname",
       width: "20%",
+      sorter: (a: any, b: any) => sorter(a.firstname, b.firstname),
       render: (value: any, row: any, index: number) => {
         return {
           children: (
@@ -160,18 +168,24 @@ function IndexDroner() {
       dataIndex: "subDistrict",
       key: "subDistrict",
       width: "12%",
+      sorter: (a: any, b: any) => sorter(a.subDistrict, b.subDistrict),
+
     },
     {
       title: "อำเภอ",
       dataIndex: "district",
       key: "district",
       width: "12%",
+      sorter: (a: any, b: any) => sorter(a.district, b.district),
+
     },
     {
       title: "จังหวัด",
       dataIndex: "province",
       key: "province",
       width: "12%",
+      sorter: (a: any, b: any) => sorter(a.province, b.province),
+
     },
     {
       title: "เบอร์โทร",
@@ -184,6 +198,7 @@ function IndexDroner() {
       dataIndex: "count",
       key: "count",
       width: "12%",
+      sorter: (a: any, b: any) => sorter(a.count, b.count),
       render: (value: any, row: any, index: number) => {
         return {
           children: (
@@ -201,6 +216,7 @@ function IndexDroner() {
       dataIndex: "brand",
       key: "brand",
       width: "12%",
+      sorter: (a: any, b: any) => sorter(a.brand, b.brand),
       render: (value: any, row: any, index: number) => {
         return {
           children: (
@@ -219,6 +235,7 @@ function IndexDroner() {
       dataIndex: "active",
       key: "active",
       width: "12%",
+      sorter: (a: any, b: any) => sorter(a.active, b.active),
     },
     {
       title: "",

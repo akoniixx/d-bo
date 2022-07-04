@@ -7,7 +7,7 @@ export class DronerDatasource {
     page: number,
     take: number,
     sortDirection: string,
-    sortField?: string,
+    // sortField?: string,
     search?: string
   ): Promise<any> {
     const params = {
@@ -15,7 +15,7 @@ export class DronerDatasource {
       page: page,
       take: take,
       sortDirection: sortDirection,
-      sortField: sortField,
+      // sortField: sortField,
       search: search,
     };
     return httpClient
