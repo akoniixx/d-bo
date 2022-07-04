@@ -1,11 +1,45 @@
 import { Button, Col, Input, Row, Select, Table } from "antd";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { CardContainer } from "../../components/card/CardContainer";
 import Layouts from "../../components/layout/Layout";
 import Search from "antd/lib/input/Search";
 import { Option } from "antd/lib/mentions";
-function DronerList() {
+import ActionButton from "../../components/button/ActionButton";
+import { EditOutlined } from "@ant-design/icons";
+import color from "../../resource/color";
+import { useLocalStorage } from "../../hook/useLocalStorage";
+import { DroneDatasource } from "../../datasource/DroneDatasource";
+import { formatDate } from "../../utilities/TextFormatter";
+function DroneList() {
   const onSearch = (value: string) => console.log(value);
+  const [droneList, setDroneList] = useState([]);
+  const [persistedProfile, setPersistedProfile] = useLocalStorage(
+    "profile",
+    []
+  );
+  const fetchDroneList = async (
+    page: number,
+    take: number,
+    sortField: string,
+    sortDirection: string,
+    search?: string
+  ) => {
+    await DroneDatasource.getDroneList(
+      page,
+      take,
+      sortField,
+      sortDirection,
+      search
+    ).then((res) => {
+      setDroneList(res);
+      console.log(res);
+    });
+  };
+
+  useEffect(() => {
+    fetchDroneList(1, 2, "", "");
+  }, []);
+
   const PageTitle = () => {
     return (
       <div className="container">
@@ -84,33 +118,52 @@ function DronerList() {
   const columns = [
     {
       title: "วันที่ลงทะเบียน",
-      dataIndex: "date",
-      key: "date",
-      width: "15%",
+      dataIndex: "createdAt",
+      key: "createdAt",
+      width: "20%",
+      render: (value: any, row: any, index: number) => {
+        return {
+          children: (
+            <>
+              <Row>
+                <span className="text-dark-75  text-hover-primary mb-1 font-size-lg">
+                  {formatDate(row.createdAt)}
+                </span>
+              </Row>
+            </>
+          ),
+        };
+      },
     },
     {
       title: "ยี่ห้อโดรน",
-      dataIndex: "bran",
-      key: "bran",
-      width: "12%",
+      dataIndex: "brand",
+      key: "brand",
+      width: "10%",
+    },
+    {
+      title: "รุ่นโดรน",
+      dataIndex: "series",
+      key: "series",
+      width: "15%",
     },
     {
       title: "เลขตัวถัง",
       dataIndex: "numb",
       key: "numb",
-      width: "18%",
+      width: "15%",
     },
     {
       title: "ชื่อนักบินโดรน",
       dataIndex: "named",
       key: "named",
-      width: "20%",
+      width: "15%",
     },
     {
       title: "ใบอนุญาตนักบิน ",
       dataIndex: "paper",
       key: "paper",
-      width: "18%",
+      width: "15%",
     },
     {
       title: "ใบอนุญาตโดรน(กสทช.) ",
@@ -122,7 +175,26 @@ function DronerList() {
       title: "สถานะ",
       dataIndex: "active",
       key: "active",
-      width: "10%",
+      width: "13%",
+      render: (value: any, row: any, index: number) => {
+        return {
+          children: (
+            <div className="d-flex flex-row align-items-baseline">
+              <div>
+                <span style={{ fontWeight: "bold" }}>
+                  {row.active === "Active" ? (
+                    <span style={{ color: "green" }}>ใช้งาน</span>
+                  ) : row.active === "inActive" ? (
+                    <span style={{ color: "red" }}>ปิดการใช้งาน</span>
+                  ) : (
+                    <span style={{ color: color.secondary2 }}>รอตรวจสอบ</span>
+                  )}
+                </span>
+              </div>
+            </div>
+          ),
+        };
+      },
     },
     {
       title: "",
@@ -132,25 +204,18 @@ function DronerList() {
       render: (value: any, row: any, index: number) => {
         return {
           children: (
-            <>
-              <div className="d-flex flex-row justify-content-between">
-                <div
-                  className="btn btn-icon btn-sm"
-                  onClick={() => (window.location.href = "/EditDroneList")}
-                >
-                  <Button />
-                </div>
-              </div>
-            </>
+            <div className="d-flex flex-row justify-content-between">
+              <ActionButton
+                icon={<EditOutlined />}
+                color={color.primary1}
+                onClick={() =>
+                  (window.location.href = "/EditDroneList?=" + row.id)
+                }
+              />
+            </div>
           ),
         };
       },
-    },
-  ];
-  const dataMock = [
-    {
-      key: "1",
-      name: "Mike",
     },
   ];
 
@@ -160,7 +225,7 @@ function DronerList() {
       <br />
       <Table
         columns={columns}
-        dataSource={dataMock}
+        dataSource={droneList}
         pagination={{ position: ["bottomRight"] }}
         size="large"
         tableLayout="fixed"
@@ -169,4 +234,4 @@ function DronerList() {
   );
 }
 
-export default DronerList;
+export default DroneList;

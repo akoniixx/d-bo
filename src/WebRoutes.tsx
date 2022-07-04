@@ -3,8 +3,10 @@ import { Routes, Route, Navigate, BrowserRouter } from "react-router-dom";
 import ErrorLoginPage from "./errorPage/ErrorLoginPage";
 import PageNotFound from "./httpError/PageNotFound";
 import { AuthPage } from "./pages/authPage/AuthPage";
-import DronerList from "./pages/droner/DronerList";
+import AddDroner from "./pages/droner/AddDroner";
+import DroneList from "./pages/droner/DroneList";
 import EditDroneList from "./pages/droner/EditDroneList";
+import EditDroner from "./pages/droner/EditDroner";
 import IndexDroner from "./pages/droner/IndexDroner";
 import RateDroner from "./pages/droner/RateDroner";
 import AddFarmer from "./pages/farmer/AddFarmer";
@@ -31,10 +33,12 @@ const WebRoutes: React.FC<any> = () => {
           <Route path="/PromotionPage" element={<PromotionPage />} />
           <Route path="/TotalIncomePage" element={<TotalIncomePage />} />
           <Route path="/AddFarmer" element={<AddFarmer />} />
-          <Route path="/DronerList" element={<DronerList />} />
+          <Route path="/AddDroner" element={<AddDroner />} />
+          <Route path="/DroneList" element={<DroneList />} />
           <Route path="/RateDroner" element={<RateDroner />} />
           <Route path="/EditDroneList" element={<EditDroneList />} />
           <Route path="/EditFarmer" element={<EditFarmer />} />
+          <Route path="/EditDroner" element={<EditDroner />} />
           <Route path="*" element={<PageNotFound />} />
         </Route>
 

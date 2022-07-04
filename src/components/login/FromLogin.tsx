@@ -1,7 +1,6 @@
 import { Button, Divider, Form, Input, message, Space } from "antd";
 import React, { SyntheticEvent, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import swal from "sweetalert";
 import { AuthDatasource } from "../../datasource/AuthDatasource";
 import { useLocalStorage } from "../../hook/useLocalStorage";
 import color from "../../resource/color";
@@ -20,6 +19,7 @@ const FromLogin: React.FC = () => {
 
   const navigate = useNavigate();
   const [token, setToken] = useLocalStorage("token", []);
+  
   const handlerSubmitFrom = (data: any) => {
     AuthDatasource.login(data.username, data.password).then((res: any) => {
       if (res.accessToken) {

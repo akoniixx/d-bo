@@ -8,9 +8,9 @@ html {
   -ms-text-size-adjust: 100%;
 }
 body {
+  font-family: "Prompt" !important;
+  font-weight: 400 !important;
   color: #000;
-  font-family: "sans-serif", "Helvetica Neue", Arial !important;
-  font-weight: normal !important;
   margin: 0;
   padding: 0;
   -webkit-font-smoothing: antialiased;
@@ -20,26 +20,6 @@ body {
 
 table tr td {
   font-weight: normal !important;
-}
-Form,
-Input,
-p,
-Table,
-Form,
-h1,
-h2,
-h3,
-h4,
-h5,
-label,
-span,
-.font-size-h1,
-.font-size-h2,
-.font-size-h3,
-.font-size-h4,
-.font-size-h5 {
-  font-family: "Prompt" !important;
-  font-weight: 400 !important;
 }
 
 .ant-layout-sider-light {

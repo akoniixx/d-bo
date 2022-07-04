@@ -1,5 +1,5 @@
-import { Button, Col, Empty, Row, Select, Switch, Table } from "antd";
-import React, { useState } from "react";
+import { Button, Col, Empty, Input, Row, Select, Switch, Table } from "antd";
+import React, { useEffect, useState } from "react";
 import Search from "antd/lib/input/Search";
 import { Option } from "antd/lib/mentions";
 import color from "../../resource/color";
@@ -7,9 +7,44 @@ import Layouts from "../../components/layout/Layout";
 import EditButton from "../../components/button/ActionButton";
 import ActionButton from "../../components/button/ActionButton";
 import { EditOutlined } from "@ant-design/icons";
+import { useLocalStorage } from "../../hook/useLocalStorage";
+import { DronerEntity, DronerEntity_INIT } from "../../entities/DronerEntities";
+import { DronerDatasource } from "../../datasource/DronerDatasource";
 
 function IndexDroner() {
-  const onSearch = (value: string) => console.log(value);
+  const { Search } = Input;
+  const [optionalTextSearch, setTextSearch] = useState<string>();
+  const [dronerList, setDronerList] = useState<DronerEntity[]>([
+    DronerEntity_INIT,
+  ]);
+
+  const fetchDronerList = async (
+    status: string,
+    page: number,
+    take: number,
+    sortDirection: string,
+    search?: string
+  ) => {
+    await DronerDatasource.getDronerList(
+      status,
+      page,
+      take,
+      sortDirection,
+      search
+    ).then((res) => {
+      setDronerList(res.data);
+      console.log(res.data);
+    });
+  };
+
+  const changeTextSearch = (text?: string) => {
+    setTextSearch(text);
+  };
+
+  useEffect(() => {
+    fetchDronerList("OPEN", 1, 5, "ASC", optionalTextSearch);
+  }, [optionalTextSearch]);
+
   const PageTitle = () => {
     return (
       <div className="container">
@@ -28,7 +63,7 @@ function IndexDroner() {
             <Search
               style={{ width: "245px", padding: "8px 0" }}
               placeholder="ค้นหาชื่อนักบินโดรนหรือเบอร์โทร"
-              onSearch={onSearch}
+              onSearch={changeTextSearch}
             />
           </Col>
           <Col className="gutter-row" span={3}>
@@ -85,8 +120,11 @@ function IndexDroner() {
             <Button
               style={{
                 width: "130px",
+                padding: "8 0",
                 backgroundColor: color.primary1,
                 color: color.secondary2,
+                borderColor: color.Success,
+                borderRadius: "5px",
               }}
               onClick={() => (window.location.href = "/AddDroner")}
               type="primary"
@@ -101,20 +139,32 @@ function IndexDroner() {
   const columns = [
     {
       title: "ชื่อนักบินโดรน",
-      dataIndex: "name",
-      key: "name",
-      width: "12%",
+      dataIndex: "firstname",
+      key: "firstname",
+      width: "20%",
+      render: (value: any, row: any, index: number) => {
+        return {
+          children: (
+            <div className="test">
+              <span className="text-dark-75  d-block font-size-lg">
+                {row.firstname + " " + row.lastname}
+              </span>
+              <span style={{ color: color.Disable }}>{row.pin}</span>
+            </div>
+          ),
+        };
+      },
     },
     {
       title: "ตำบล",
-      dataIndex: "age",
-      key: "age",
+      dataIndex: "subDistrict",
+      key: "subDistrict",
       width: "12%",
     },
     {
       title: "อำเภอ",
-      dataIndex: "address",
-      key: "address",
+      dataIndex: "district",
+      key: "district",
       width: "12%",
     },
     {
@@ -125,8 +175,8 @@ function IndexDroner() {
     },
     {
       title: "เบอร์โทร",
-      dataIndex: "tel",
-      key: "tel",
+      dataIndex: "telephoneNo",
+      key: "telephoneNo",
       width: "12%",
     },
     {
@@ -134,12 +184,35 @@ function IndexDroner() {
       dataIndex: "count",
       key: "count",
       width: "12%",
+      render: (value: any, row: any, index: number) => {
+        return {
+          children: (
+            <div className="test">
+              <span className="text-dark-75  d-block font-size-lg">
+                {/* {row.count + " " + "เครื่อง"} */}
+              </span>
+            </div>
+          ),
+        };
+      },
     },
     {
       title: "ยี่ห้อ",
       dataIndex: "brand",
       key: "brand",
       width: "12%",
+      render: (value: any, row: any, index: number) => {
+        return {
+          children: (
+            <div className="test">
+              <span className="text-dark-75  d-block font-size-lg">
+                {row.brand}
+              </span>
+              <span style={{ color: color.Disable }}>{row.otherdrone}</span>
+            </div>
+          ),
+        };
+      },
     },
     {
       title: "สถานะ",
@@ -159,7 +232,9 @@ function IndexDroner() {
               <ActionButton
                 icon={<EditOutlined />}
                 color={color.primary1}
-                onClick={() => (window.location.href = "")}
+                onClick={() =>
+                  (window.location.href = "/EditDroner?=" + row.id)
+                }
               />
             </div>
           ),
@@ -167,26 +242,14 @@ function IndexDroner() {
       },
     },
   ];
-  const dataMock = [
-    {
-      key: "1",
-      name: "Mike",
-      age: 32,
-      address: "ABC",
-      province: "Bangkok",
-      tel: "098-1234567",
-      count: "2",
-      brand: "Cat",
-      active: "รอตรวจสอบ",
-    },
-  ];
+
   return (
     <Layouts>
       <PageTitle />
       <br />
       <Table
         columns={columns}
-        dataSource={dataMock}
+        dataSource={dronerList}
         pagination={{ position: ["bottomRight"] }}
         size="large"
         tableLayout="fixed"

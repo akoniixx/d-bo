@@ -9,13 +9,10 @@ import image from "../../resource/image";
 
 export const AuthPage: React.FC = () => {
   return (
-    <div
-      className="px-0 vh-100 row overflow-hidden "
-      style={{ backgroundColor: color.BG }}
-    >
-      <div className=" row">
+    <div className=" overflow-hidden " style={{ backgroundColor: color.BG }}>
+      <div className="row">
         <div className="col-lg-6">
-          <div className="d-flex justify-content-center">
+          <div className="d-flex justify-content-start">
             <img alt="imageLogin" src={image.login} width={"100%"} />
           </div>
         </div>
