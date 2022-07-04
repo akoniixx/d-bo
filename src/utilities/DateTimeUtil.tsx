@@ -1,3 +1,5 @@
+import moment from "moment";
+
 export class DateTimeUtil {
   static getTimestampSecond(dt: Date): number {
     return Math.floor(dt.getTime() / 1000);
@@ -19,4 +21,7 @@ export class DateTimeUtil {
       minute: "numeric",
     });
   };
+  static formatDateTime = (date:string) =>{
+    return moment(date).format('DD/MM/yyyy HH:mm');
+  }
 }

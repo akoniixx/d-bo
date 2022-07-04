@@ -146,7 +146,13 @@ const Layouts: React.FC<any> = ({ children }) => {
               icon={<SettingFilled />}
               title={<span>ผู้ดูแลระบบ</span>}
               key={"sub3"}
-            ></Menu.SubMenu>
+            >
+              <Menu.Item>
+                <Link to="/IndexAdmin">
+                  <span>รายชื่อผู้ดูแลระบบ</span>
+                </Link>
+              </Menu.Item>
+            </Menu.SubMenu>
           </Menu>
         </Sider>
         <Layout
