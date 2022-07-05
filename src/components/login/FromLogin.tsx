@@ -23,15 +23,21 @@ const FromLogin: React.FC = () => {
   const handlerSubmitFrom = (data: any) => {
     AuthDatasource.login(data.username, data.password).then((res: any) => {
       if (res.accessToken) {
-        console.log(res.accessToken);
         message.success("Login Successful");
         setPersistedProfile(res.data);
         setToken(res.accessToken);
         return navigate("HomePage");
       } else {
-        return message.error("กรุณากรอกชื่อผู้ใช้หรือรหัสผ่านที่ถูกต้อง");
+        return message.error("something wrong");
       }
-    });
+    }).catch((reason) => {
+      if (reason.response!.status === 400) {
+         message.error("400");
+      } else {
+        message.error("509403");
+      }
+      console.log(reason.message)
+    })
   };
 
   return (

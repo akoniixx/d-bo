@@ -209,7 +209,7 @@ function IndexDroner() {
           children: (
             <div className="test">
               <span className="text-dark-75  d-block font-size-lg">
-                {row.province}
+                {row.address.province? row.address.province.region : ''}
               </span>
             </div>
           ),
