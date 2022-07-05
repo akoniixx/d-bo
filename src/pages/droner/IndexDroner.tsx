@@ -10,13 +10,21 @@ import { EditOutlined } from "@ant-design/icons";
 import { useLocalStorage } from "../../hook/useLocalStorage";
 import { DronerEntity, DronerEntity_INIT } from "../../entities/DronerEntities";
 import { DronerDatasource } from "../../datasource/DronerDatasource";
+import { DRONER_STATUS } from "../../definitions/DronerStatus";
 
+const _ = require("lodash");
+const { Map } = require("immutable");
 function IndexDroner() {
   const { Search } = Input;
   const [optionalTextSearch, setTextSearch] = useState<string>();
+  const [dronerStatus, setDronerStatus] = useState<any>();
   const [dronerList, setDronerList] = useState<DronerEntity[]>([
     DronerEntity_INIT,
   ]);
+  const handleOnChangeSelect = (value: any) => {
+    const m = Map(dronerList).set("role", value);
+    setDronerList(m.toJS());
+  };
 
   const fetchDronerList = async (
     status: string,
@@ -42,8 +50,22 @@ function IndexDroner() {
   };
 
   useEffect(() => {
-    fetchDronerList("OPEN", 1, 10, "ASC", optionalTextSearch);
+    fetchDronerList(dronerStatus, 1, 5, "ASC", optionalTextSearch);
   }, [optionalTextSearch]);
+
+  const colorStatus = (status: string) => {
+    if (status == "OPEN") {
+      return "text-success font-weight-bold d-block";
+    } else if (status == "PENDING") {
+      return "text-warning font-weight-bold d-block";
+    } else if (status == "APPROVED") {
+      return "text-primary font-weight-bold d-block";
+    } else if (status == "REJECTED") {
+      return "text-danger font-weight-bold d-block";
+    } else {
+      return "text-muted font-weight-bold d-block";
+    }
+  };
 
   const sorter = (a: any, b: any) => {
     if (a === b) return 0;
@@ -114,13 +136,12 @@ function IndexDroner() {
                 padding: "8px 0",
                 color: "#C6C6C6",
               }}
-              defaultValue="เลือกสถานะ"
-              // onChange={handleChange}>
+              placeholder="เลือกสถานะ"
+              onChange={handleOnChangeSelect}
             >
-              <Option value="1">1</Option>
-              <Option value="2">2</Option>
-              <Option value="3">3</Option>
-              <Option value="4">4</Option>
+              {DRONER_STATUS.map((item) => (
+                <option value={item}></option>
+              ))}
             </Select>
           </Col>
           <Col className="gutter-row" style={{ marginTop: "8px" }}>
@@ -169,7 +190,6 @@ function IndexDroner() {
       key: "subDistrict",
       width: "12%",
       sorter: (a: any, b: any) => sorter(a.subDistrict, b.subDistrict),
-
     },
     {
       title: "อำเภอ",
@@ -177,7 +197,6 @@ function IndexDroner() {
       key: "district",
       width: "12%",
       sorter: (a: any, b: any) => sorter(a.district, b.district),
-
     },
     {
       title: "จังหวัด",
@@ -185,7 +204,17 @@ function IndexDroner() {
       key: "province",
       width: "12%",
       sorter: (a: any, b: any) => sorter(a.province, b.province),
-
+      render: (value: any, row: any, index: number) => {
+        return {
+          children: (
+            <div className="test">
+              <span className="text-dark-75  d-block font-size-lg">
+                {row.province}
+              </span>
+            </div>
+          ),
+        };
+      },
     },
     {
       title: "เบอร์โทร",
@@ -232,10 +261,19 @@ function IndexDroner() {
     },
     {
       title: "สถานะ",
-      dataIndex: "active",
-      key: "active",
+      dataIndex: "status",
+      key: "status",
       width: "12%",
-      sorter: (a: any, b: any) => sorter(a.active, b.active),
+      sorter: (a: any, b: any) => sorter(a.status, b.status),
+      render: (value: any, row: any, index: number) => {
+        return {
+          children: (
+            <div className="test">
+              <span className={colorStatus(row.status)}>{row.status}</span>
+            </div>
+          ),
+        };
+      },
     },
     {
       title: "",

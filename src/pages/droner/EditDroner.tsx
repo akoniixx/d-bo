@@ -30,13 +30,14 @@ import { ModalPage } from "../../components/modal/ModalPage";
 import ActionButton from "../../components/button/ActionButton";
 import { DronerEntity, DronerEntity_INIT } from "../../entities/DronerEntities";
 import { DronerDatasource } from "../../datasource/DronerDatasource";
+import Swal from "sweetalert2";
 
 const _ = require("lodash");
 const { Map } = require("immutable");
 let queryString = _.split(window.location.pathname, "=");
 
 function EditDroner() {
-  const DronerId = queryString[1];
+  const dronerId = queryString[1];
   //MockData
   const dataSource = {
     dataDrone: [
@@ -51,20 +52,91 @@ function EditDroner() {
   const [dronerData, setDronerData] = useState<DronerEntity>(DronerEntity_INIT);
   const [modal, setModal] = useState(false);
   const [value, setValue] = useState(1);
+  const [showBtn, setShowBtn] = useState<boolean>(true);
   const onChange = (e: RadioChangeEvent) => {
     console.log("radio checked", e.target.value);
     setValue(e.target.value);
   };
 
-  // const fecthDroner = async (id: string) => {
-  //   await DronerDatasource.getDronerListByID(id).then((res) => {
-  //     setData(res);
+  const fetchDronerById = async (id: string) => {
+    await DronerDatasource.getDronerListByID(id).then((res) => {
+      setDronerData(res);
+    });
+  };
+
+  const UpdateDronerList = (dronerId: string) => {
+    DronerDatasource.updateDroner(dronerData)
+      .then((res) => {
+        if (res != null) {
+          Swal.fire({
+            title: "บันทึกสำเร็จ",
+            icon: "success",
+            confirmButtonText: "ยืนยัน",
+            confirmButtonColor: "#0068F4",
+          }).then((result) => {
+            if (result.value == true) {
+              window.location.href = "/IndexDroner";
+            }
+          });
+        }
+      })
+      .catch((err) => console.log(err));
+  };
+  useEffect(() => {
+    fetchDronerById(dronerId);
+  }, []);
+
+
+  const handleChangestatus = (e: any) => {
+    const m = Map(dronerData).set("isActive", e.target.value);
+    setDronerData(m.toJS());
+  };
+
+  // const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  //   const m = Map(dronerData).set(e.target.id, e.target.value);
+  //   setDronerData(m.toJS());
+  //   checkValidate();
+  // };
+
+  // const handleOnChangeSelect = (value: any) => {
+  //   const m = Map(dronerData).set("role", value);
+  //   setDronerData(m.toJS());
+  //   checkValidate();
+  // };
+
+  // const updateDroner = (data: DronerEntity) => {
+  //   DronerDatasource.updateDroner(data).then((res) => {
+  //     if (res.id != null) {
+  //       Swal.fire({
+  //         title: "บันทึกสำเร็จ",
+  //         icon: "success",
+  //         timer: 1500,
+  //         showConfirmButton: false,
+  //       }).then((time) => {
+  //         window.location.href = "/IndexAdmin";
+  //       });
+  //     }
   //   });
   // };
 
-  // useEffect(() => {
-  //   fecthDroner(DronerId);
-  // }, []);
+  // const checkValidate = () => {
+  //   if (
+  //     dronerData.firstname.trim() != "" &&
+  //       dronerData.lastname.trim() != "" &&
+  //       dronerData.telephoneNo.trim() != "" &&
+  //       dronerData.idNo.trim() != "" &&
+  //       dronerData.expYear.trim() != "" &&
+  //       dronerData.expMonth.trim() != "" &&
+  //       dronerData.address.trim() != "" &&
+  //       dronerData.dronerDrone.trim() != "" &&
+  //       dronerData.expPlant.trim() != "" 
+  //   ) {
+  //     setShowBtn(false);
+  //   } else {
+  //     setShowBtn(true);
+  //   }
+  // };
+
 
   const showModal = () => {
     setModal(true);
