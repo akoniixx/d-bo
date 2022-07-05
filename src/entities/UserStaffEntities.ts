@@ -22,3 +22,13 @@ export const UserStaffEntity_INIT: UserStaffEntity = {
   updateAt: "",
   isActive: true,
 };
+export interface UserStaffPageEntity {
+  results: UserStaffEntity[];
+  total_page: number;
+  total: number;
+}
+export const UserStaffPageEntity_INIT: UserStaffPageEntity = {
+  results: [UserStaffEntity_INIT],
+  total_page: 0,
+  total: 0
+};
