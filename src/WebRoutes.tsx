@@ -14,6 +14,9 @@ import { HomePage } from "./pages/home/HomePage";
 import { OverviewPage } from "./pages/overview/OverviewPage";
 import PromotionPage from "./pages/promotion/PromotionPage";
 import TotalIncomePage from "./pages/totalincome/TotalIncomePage";
+import IndexAdmin from "./pages/admin/IndexAdmin";
+import AddAdmin from "./pages/admin/AddAdmin";
+import EditAdmin from "./pages/admin/EditAdmin";
 import ProtectRoute from "./ProtectRoute";
 import PublicRoute from "./PublicRoute";
 
@@ -35,6 +38,9 @@ const WebRoutes: React.FC<any> = () => {
           <Route path="/RateDroner" element={<RateDroner />} />
           <Route path="/EditDroneList" element={<EditDroneList />} />
           <Route path="/EditFarmer" element={<EditFarmer />} />
+          <Route path="/IndexAdmin" element={<IndexAdmin />} />
+          <Route path="/AddAdmin" element={<AddAdmin />} />
+          <Route path="/EditAdmin/:id" element={<EditAdmin />} />
           <Route path="*" element={<PageNotFound />} />
         </Route>
 
