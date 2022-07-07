@@ -6,7 +6,7 @@ export function numberWithCommas(x: number) {
 }
 
 export function formatDate(d: string) {
-  return moment(d).format("DD/MM/yyyy");
+  return moment(d).format("DD/MM/yyyy, HH:mm");
 }
 
 export function formatMoney(amount: number) {

@@ -5135,6 +5135,11 @@ immer@^9.0.7:
   resolved "https://registry.npmjs.org/immer/-/immer-9.0.15.tgz"
   integrity sha512-2eB/sswms9AEUSkOm4SbV5Y7Vmt/bKRwByd52jfLkW4OLYeaTP3EEiJ9agqU0O/tq6Dk62Zfj+TJSqfm1rLVGQ==
 
+immutable@^4.1.0:
+  version "4.1.0"
+  resolved "https://registry.yarnpkg.com/immutable/-/immutable-4.1.0.tgz#f795787f0db780183307b9eb2091fcac1f6fafef"
+  integrity sha512-oNkuqVTA8jqG1Q6c+UglTOD1xhC1BtjKI7XkCXRkZHrN5m18/XsnUp8Q89GkQO/z+0WjonSvl0FLhDYftp46nQ==
+
 import-fresh@^3.0.0, import-fresh@^3.1.0, import-fresh@^3.2.1:
   version "3.3.0"
   resolved "https://registry.npmjs.org/import-fresh/-/import-fresh-3.3.0.tgz"
@@ -6363,7 +6368,7 @@ mkdirp@~0.5.1:
   dependencies:
     minimist "^1.2.6"
 
-moment@^2.24.0, moment@^2.29.2:
+moment@^2.24.0, moment@^2.29.2, moment@^2.29.3:
   version "2.29.3"
   resolved "https://registry.npmjs.org/moment/-/moment-2.29.3.tgz"
   integrity sha512-c6YRvhEo//6T2Jz/vVtYzqBzwvPT95JBQ+smCytzf7c50oMZRsR/a4w88aD34I+/QVSfnoAnSBFPJHItlOMJVw==
@@ -8917,6 +8922,11 @@ svgo@^2.7.0:
     csso "^4.2.0"
     picocolors "^1.0.0"
     stable "^0.1.8"
+
+sweetalert2@^11.4.19:
+  version "11.4.19"
+  resolved "https://registry.yarnpkg.com/sweetalert2/-/sweetalert2-11.4.19.tgz#b30f30035ba9479be46be5e296ce14b621896c9d"
+  integrity sha512-N3GA2M/K6PFzLprKWENioL0ckXPHLiWwvMMAJSfGgxB+aptzQrElv6D+j3D++K9yXSjpTs3XqJHYUQpEUzpv/g==
 
 sweetalert@^2.1.2:
   version "2.1.2"

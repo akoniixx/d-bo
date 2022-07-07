@@ -1,0 +1,3 @@
+export const DRONER_STATUS = ["OPEN", "PENDING", "APPROVED", "APPROVED"];
+
+  
