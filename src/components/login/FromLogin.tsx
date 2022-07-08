@@ -32,9 +32,10 @@ const FromLogin: React.FC = () => {
       }
     }).catch((reason) => {
       if (reason.response!.status === 400) {
-         message.error("400");
-      } else {
-        message.error("509403");
+         message.error("username หรือ password ไม่ถูกต้อง");
+      } 
+      else {
+        message.error("กรุณาตรวจสอบการเข้าสู่ระบบของคุณ");
       }
       console.log(reason.message)
     })
