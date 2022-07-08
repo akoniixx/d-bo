@@ -1,7 +1,6 @@
 import { Button, Divider, Form, Input, message, Space } from "antd";
 import React, { SyntheticEvent, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import swal from "sweetalert";
 import { AuthDatasource } from "../../datasource/AuthDatasource";
 import { useLocalStorage } from "../../hook/useLocalStorage";
 import color from "../../resource/color";
@@ -20,18 +19,26 @@ const FromLogin: React.FC = () => {
 
   const navigate = useNavigate();
   const [token, setToken] = useLocalStorage("token", []);
+  
   const handlerSubmitFrom = (data: any) => {
     AuthDatasource.login(data.username, data.password).then((res: any) => {
       if (res.accessToken) {
-        console.log(res.accessToken);
         message.success("Login Successful");
         setPersistedProfile(res.data);
         setToken(res.accessToken);
         return navigate("HomePage");
       } else {
-        return message.error("กรุณากรอกชื่อผู้ใช้หรือรหัสผ่านที่ถูกต้อง");
+        return message.error("something wrong");
       }
-    });
+    }).catch((reason) => {
+      if (reason.response!.status === 400) {
+         message.error("username หรือ password ไม่ถูกต้อง");
+      } 
+      else {
+        message.error("กรุณาตรวจสอบการเข้าสู่ระบบของคุณ");
+      }
+      console.log(reason.message)
+    })
   };
 
   return (

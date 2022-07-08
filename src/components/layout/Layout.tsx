@@ -127,7 +127,7 @@ const Layouts: React.FC<any> = ({ children }) => {
                 </Link>
               </Menu.Item>
               <Menu.Item>
-                <Link to="/DronerList">
+                <Link to="/DroneList">
                   <span>รายการโดรนเกษตร</span>
                 </Link>
               </Menu.Item>
