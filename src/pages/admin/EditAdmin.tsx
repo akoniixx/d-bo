@@ -25,15 +25,7 @@ const EditAdmin = () => {
 
   const fecthAdmin = async (id: string) => {
     await AdminDatasource.getAdminById(id).then((res) => {
-      if (
-        res.firstname != "" &&
-        res.lastname != "" &&
-        res.email != "" &&
-        res.username != "" &&
-        res.password != ""
-      ) {
-        setShowBtn(false);
-      }
+      checkValidate(res);
       setData(res);
     });
   };
@@ -50,17 +42,18 @@ const EditAdmin = () => {
   const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const m = Map(data).set(e.target.id, e.target.value);
     setData(m.toJS());
-    checkValidate();
+    checkValidate(m.toJS());
   };
 
   const handleOnChangeSelect = (value: any) => {
     const m = Map(data).set("role", value);
     setData(m.toJS());
-    checkValidate();
+    checkValidate(m.toJS());
   };
 
   const updateAdmin = (data: UserStaffEntity) => {
     AdminDatasource.updateAdmin(data).then((res) => {
+      console.log(res);
       if (res.id != null) {
         Swal.fire({
           title: "บันทึกสำเร็จ",
@@ -74,13 +67,14 @@ const EditAdmin = () => {
     });
   };
 
-  const checkValidate = () => {
+  const checkValidate = (data: UserStaffEntity) => {
     if (
-      data.firstname.trim() != "" &&
-      data.lastname.trim() != "" &&
-      data.email.trim() != "" &&
-      data.username.trim() != "" &&
-      data.password.trim() != ""
+      data.firstname != "" &&
+      data.lastname != "" &&
+      data.email != "" &&
+      data.username != "" &&
+      data.password != "" &&
+      data.role != ""
     ) {
       setShowBtn(false);
     } else {
@@ -186,7 +180,7 @@ const EditAdmin = () => {
               onChange={handleOnChangeSelect}
             >
               {ROLE_ADMIN.map((item) => (
-                <option value={item}></option>
+                <option value={item.key}></option>
               ))}
             </Select>
           </Form.Item>

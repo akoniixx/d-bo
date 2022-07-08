@@ -28,22 +28,23 @@ const AddAdmin = () => {
   const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const m = Map(data).set(e.target.id, e.target.value);
     setData(m.toJS());
-    checkValidate();
+    checkValidate(m.toJS());
   };
 
   const handleOnChangeSelect = (value: any) => {
     const m = Map(data).set("role", value);
     setData(m.toJS());
-    checkValidate();
+    checkValidate(m.toJS());
   };
 
-  const checkValidate = () => {
+  const checkValidate = (data: UserStaffEntity) => {
     if (
-      data.firstname.trim() != "" &&
-      data.lastname.trim() != "" &&
-      data.email.trim() != "" &&
-      data.username.trim() != "" &&
-      data.password.trim() != ""
+      data.firstname != "" &&
+      data.lastname != "" &&
+      data.email != "" &&
+      data.username != "" &&
+      data.password != "" &&
+      data.role != ""
     ) {
       setShowBtn(false);
     } else {
@@ -84,8 +85,9 @@ const AddAdmin = () => {
           >
             <Input
               placeholder="กรอกชื่อ"
-              value={data?.firstname}
+              value={data.firstname}
               onChange={handleOnChange}
+              key={1}
             />
           </Form.Item>
         </div>
@@ -182,7 +184,7 @@ const AddAdmin = () => {
           <Form.Item name="role">
             <Select placeholder="เลือกบทบาท" onChange={handleOnChangeSelect}>
               {ROLE_ADMIN.map((item) => (
-                <option value={item}></option>
+                <option value={item.key}></option>
               ))}
             </Select>
           </Form.Item>
@@ -197,7 +199,6 @@ const AddAdmin = () => {
           <Radio.Group value={data.isActive} onChange={handleChangestatus}>
             <Space direction="vertical">
               <Radio value={true}>ใช้งาน</Radio>
-              <Radio value={false}>ไม่ใช้งาน</Radio>
             </Space>
           </Radio.Group>
         </div>
@@ -216,6 +217,7 @@ const AddAdmin = () => {
             เพิ่มข้อมูลผู้ดูแลระบบ (User Management)
           </strong>
         </span>
+        
       </Row>
       <CardContainer>
         <CardHeader textHeader="ข้อมูลผู้ดูแลระบบ" />

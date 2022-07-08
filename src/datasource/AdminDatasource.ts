@@ -1,11 +1,25 @@
 import { httpClient } from "../config/develop-config";
-import { UserStaffEntity } from "../entities/UserStaffEntities";
+import {
+  UserStaffEntity,
+  UserStaffPageEntity,
+} from "../entities/UserStaffEntities";
 const API_URL = "https://api-dev-dnds.iconkaset.com";
 
 export class AdminDatasource {
-  static getAdminList(): Promise<UserStaffEntity[]> {
+  static getAdminList(
+    page: number,
+    row: number,
+    status?: boolean,
+    role?: string
+  ): Promise<UserStaffPageEntity> {
+    const params = {
+      role: role,
+      isActive: status,
+      page: page,
+      limit: row,
+    };
     return httpClient
-      .get(API_URL + "/user-staff")
+      .get(API_URL + "/user-staff", { params })
       .then((response) => {
         return response.data;
       })
@@ -44,7 +58,7 @@ export class AdminDatasource {
         console.log(err, "err insert admin");
       });
   }
-  
+
   static updateAdmin(data: UserStaffEntity): Promise<any> {
     const params = {
       email: data.email,
