@@ -16,29 +16,23 @@ const FromLogin: React.FC = () => {
     "profile",
     []
   );
-
   const navigate = useNavigate();
   const [token, setToken] = useLocalStorage("token", []);
-  
   const handlerSubmitFrom = (data: any) => {
-    AuthDatasource.login(data.username, data.password).then((res: any) => {
-      if (res.accessToken) {
-        message.success("Login Successful");
-        setPersistedProfile(res.data);
-        setToken(res.accessToken);
-        return navigate("HomePage");
-      } else {
-        return message.error("something wrong");
-      }
-    }).catch((reason) => {
-      if (reason.response!.status === 400) {
-         message.error("username หรือ password ไม่ถูกต้อง");
-      } 
-      else {
-        message.error("กรุณาตรวจสอบการเข้าสู่ระบบของคุณ");
-      }
-      console.log(reason.message)
-    })
+    AuthDatasource.login(data.username, data.password)
+      .then((res: any) => {
+        if (res.accessToken) {
+          message.success("Login Successful");
+          setPersistedProfile(res.data);
+          setToken(res.accessToken);
+          return navigate("HomePage");
+        } else {
+          return message.error("something wrong");
+        }
+      })
+      .catch((error) => {
+        message.error("username หรือ password ไม่ถูกต้อง");
+      });
   };
 
   return (
@@ -87,8 +81,9 @@ const FromLogin: React.FC = () => {
                 style={{
                   borderRadius: "5px",
                   backgroundColor: color.primary1,
+                  color: color.White,
                 }}
-                type="primary"
+                type="ghost"
                 htmlType="submit"
               >
                 Login
