@@ -7,8 +7,7 @@ import color from "../../resource/color";
 
 const FromLogin: React.FC = () => {
   const style: React.CSSProperties = {
-    width: "400px",
-    height: "40px",
+    height: "35px",
     borderRadius: "5px",
   };
   const [formLogin] = Form.useForm();
@@ -56,7 +55,7 @@ const FromLogin: React.FC = () => {
               },
             ]}
           >
-            <Input placeholder="กรอกชื่อผู้ใช้" />
+            <Input placeholder="กรอกชื่อผู้ใช้" style={style} />
           </Form.Item>
         </div>
         <div className="text-start">
@@ -72,7 +71,7 @@ const FromLogin: React.FC = () => {
               },
             ]}
           >
-            <Input.Password placeholder="กรอกรหัสผ่าน" />
+            <Input.Password placeholder="กรอกรหัสผ่าน" style={style} />
           </Form.Item>
           <div className="text-start">
             <Form.Item>
@@ -80,6 +79,7 @@ const FromLogin: React.FC = () => {
                 className="col-lg-12"
                 style={{
                   borderRadius: "5px",
+                  height: "35px",
                   backgroundColor: color.primary1,
                   color: color.White,
                 }}
