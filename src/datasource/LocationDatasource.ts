@@ -1,7 +1,8 @@
 import { BASE_URL, httpClient } from "../config/develop-config";
+import { DistrictEntity, ProviceEntity, SubdistrictEntity } from "../entities/LocationEntities";
 
 export class LocationDatasource {
-  static getProvince(): Promise<any> {
+  static getProvince(): Promise<ProviceEntity[]> {
     return httpClient
       .get(BASE_URL + "/location/province")
       .then((response) => {
@@ -11,7 +12,7 @@ export class LocationDatasource {
         console.log(error);
       });
   }
-  static getDistrict(id: number): Promise<any> {
+  static getDistrict(id: number): Promise<DistrictEntity[]> {
 
     return httpClient
       .get(BASE_URL + "/location/district/"+id)
@@ -22,7 +23,7 @@ export class LocationDatasource {
         console.log(error);
       });
   }
-  static getSubdistrict(id: number): Promise<any> {
+  static getSubdistrict(id: number): Promise<SubdistrictEntity[]> {
     return httpClient
       .get(BASE_URL + "/location/sub-district/" + id)
       .then((response) => {

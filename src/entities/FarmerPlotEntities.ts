@@ -9,8 +9,8 @@ export interface FarmerPlotEntity {
   mapUrl: string;
   lat: string;
   long: string;
-  farmerId: string;
   isActive: boolean;
+  plotId: number;
 }
 export const FarmerPlotEntity_INIT: FarmerPlotEntity = {
   plotName: "",
@@ -21,6 +21,6 @@ export const FarmerPlotEntity_INIT: FarmerPlotEntity = {
   mapUrl: "",
   lat: "",
   long: "",
-  farmerId: "",
   isActive: true,
+  plotId: 0,
 };
