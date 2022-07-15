@@ -1,10 +1,12 @@
-import { idText } from "typescript";
+import { DronerEntity, CreateDronerEntity } from './../entities/DronerEntities';
 import { BASE_URL, httpClient } from "../config/develop-config";
-import { DronerEntity } from "../entities/DronerEntities";
 
 export class DronerDatasource {
   static getDronerList(
     status: string,
+    provinceId : number,
+    districtId : number,
+    subdistrictId : number,
     page: number,
     take: number,
     sortDirection: string,
@@ -12,6 +14,9 @@ export class DronerDatasource {
   ): Promise<any> {
     const params = {
       status: status,
+      provinceId : provinceId,
+      districtId : districtId,
+      subdistrictId : subdistrictId,
       page: page,
       take: take,
       sortDirection: sortDirection,
@@ -27,9 +32,9 @@ export class DronerDatasource {
       });
   }
 
-  static getDronerListByID(id: string): Promise<any> {
+  static getDronerByID(id: string): Promise<any> {
     return httpClient
-      .get(BASE_URL +'/droner/' + id)
+      .get(BASE_URL+"/droner/" + id)
       .then((res) => {
         return res.data;
       })
@@ -39,18 +44,8 @@ export class DronerDatasource {
   }
 
   static updateDroner(data: DronerEntity): Promise<any> {
-    const params = {
-      firstname: data.firstname,
-      lastname: data.lastname,
-      telephoneNo: data.telephoneNo,
-      idNo: data.idNo,
-      expYear: data.expYear,
-      expMonth: data.expMonth,
-      expPlant: data.expPlant,
-      status: data.status
-    };
     return httpClient
-      .post(BASE_URL + "/droner" + data.id , { params })
+      .patch(BASE_URL + "/droner/" + data.id , data )
       .then((response) => {
         return response.data;
       })
@@ -59,9 +54,9 @@ export class DronerDatasource {
       });
   }
 
-  static createDronerList(data: any): Promise<any> {
+  static createDronerList(data:CreateDronerEntity): Promise<any> {
     return httpClient
-      .post(BASE_URL + "/droner", { data })
+      .post(BASE_URL + "/droner", data)
       .then((response) => {
         return response.data;
       })

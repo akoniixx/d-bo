@@ -10,9 +10,11 @@ import color from "../../resource/color";
 import { useLocalStorage } from "../../hook/useLocalStorage";
 import { DroneDatasource } from "../../datasource/DroneDatasource";
 import { formatDate } from "../../utilities/TextFormatter";
+import { DroneEntity, DroneListEntity } from "../../entities/DroneEntities";
 function DroneList() {
   const onSearch = (value: string) => console.log(value);
-  const [droneList, setDroneList] = useState([]);
+  const [droneList, setDroneList] = useState<DroneEntity[]>();
+  const [optionalTextSearch, setTextSearch] = useState<string>();
   const [persistedProfile, setPersistedProfile] = useLocalStorage(
     "profile",
     []
@@ -20,26 +22,27 @@ function DroneList() {
   const fetchDroneList = async (
     page: number,
     take: number,
-    sortField: string,
     sortDirection: string,
     search?: string
   ) => {
     await DroneDatasource.getDroneList(
       page,
       take,
-      sortField,
       sortDirection,
       search
     ).then((res) => {
-      setDroneList(res);
+      setDroneList(res.data);
       console.log(res);
     });
   };
 
   useEffect(() => {
-    fetchDroneList(1, 2, "", "");
-  }, []);
+    fetchDroneList(1, 3, "ASC");
+  }, [optionalTextSearch]);
 
+  const changeTextSearch = (text?: string) => {
+    setTextSearch(text);
+  };
   const PageTitle = () => {
     return (
       <div className="container">
@@ -58,8 +61,7 @@ function DroneList() {
             <Search
               style={{ width: "290px", padding: "8px 0" }}
               placeholder="ค้นหาเลขตัวถังหรือชื่อนักบินโดรน"
-              onSearch={onSearch}
-            />
+              onSearch={changeTextSearch}            />
           </Col>
           <Col className="gutter-row" span={3}>
             <Select

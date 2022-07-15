@@ -17,7 +17,11 @@ import {
   Badge,
 } from "antd";
 import emptyData from "../../resource/media/empties/iconoir_farm.png";
-import { SearchOutlined, EditOutlined } from "@ant-design/icons";
+import {
+  SearchOutlined,
+  EditOutlined,
+  DeleteOutlined,
+} from "@ant-design/icons";
 import { CardContainer } from "../../components/card/CardContainer";
 import color from "../../resource/color";
 import { CardHeader } from "../../components/header/CardHearder";
@@ -27,135 +31,223 @@ import { Link } from "react-router-dom";
 import { BackButton, BackIconButton } from "../../components/button/BackButton";
 import TextArea from "antd/lib/input/TextArea";
 import { ModalPage } from "../../components/modal/ModalPage";
-import ActionButton from "../../components/button/ActionButton";
 import { DronerEntity, DronerEntity_INIT } from "../../entities/DronerEntities";
 import { DronerDatasource } from "../../datasource/DronerDatasource";
 import Swal from "sweetalert2";
+import { LocationDatasource } from "../../datasource/LocationDatasource";
+import { DefaultOptionType } from "antd/lib/select";
+import { EXP_PLANT } from "../../definitions/ExpPlant";
+import { Toast } from "react-bootstrap";
+import {
+  AddrSubDisEntity,
+  AddrSubDisEntity_INIT,
+} from "../../entities/AddressEntities";
+import ActionButton from "../../components/button/ActionButton";
+import { DefaultValue } from "recoil";
+import { DroneDatasource } from "../../datasource/DroneDatasource";
+import {
+  DroneEntity,
+  DroneEntity_INIT,
+  UpdateDroneEntity,
+  UpdateDroneEntity_INIT,
+} from "../../entities/DroneEntities";
 
 const _ = require("lodash");
 const { Map } = require("immutable");
-let queryString = _.split(window.location.pathname, "=");
+let queryString = _.split(window.location.search, "=");
 
 function EditDroner() {
   const dronerId = queryString[1];
-  //MockData
-  const dataSource = {
-    dataDrone: [
-      {
-        dronekay: 1,
-        dronename: "DJI",
-        dronestatus: "ใช้งาน",
-      },
-    ],
-  };
-  const [data, setData] = useState(dataSource);
-  const [dronerData, setDronerData] = useState<DronerEntity>(DronerEntity_INIT);
+  const [data, setData] = useState<DronerEntity>(DronerEntity_INIT);
+  const [address, setAddress] = useState<AddrSubDisEntity>(
+    AddrSubDisEntity_INIT
+  );
+  const [dronerDrone, setDronerDrone] = useState<UpdateDroneEntity>(
+    UpdateDroneEntity_INIT
+  );
   const [modal, setModal] = useState(false);
-  const [value, setValue] = useState(1);
+  const [province, setProvince] = useState<any[]>([]);
+  const [district, setDistrict] = useState<any[]>([]);
+  const [subdistrict, setSubdistrict] = useState<any[]>([]);
+  const [brandId, setBrandId] = useState<any[]>([]);
   const [showBtn, setShowBtn] = useState<boolean>(true);
-  const onChange = (e: RadioChangeEvent) => {
-    console.log("radio checked", e.target.value);
-    setValue(e.target.value);
-  };
 
+  useEffect(() => {
+    fetchDronerById(dronerId);
+    fetchProvince();
+    fetchDrone(1, 5, "ASC");
+  }, []);
   const fetchDronerById = async (id: string) => {
-    await DronerDatasource.getDronerListByID(id).then((res) => {
-      setDronerData(res);
+    await DronerDatasource.getDronerByID(id).then((res) => {
+      console.log(res);
+      setData(res);
+      setDronerDrone(res.dronerDrone);
+      setAddress(res.address);
+      fetchDistrict(res.address.provinceId);
+      fetchSubDistrict(res.address.districtId);
     });
   };
-
-  const UpdateDronerList = (dronerId: string) => {
-    DronerDatasource.updateDroner(dronerData)
+  const fetchProvince = async () => {
+    await LocationDatasource.getProvince()
       .then((res) => {
-        if (res != null) {
+        setProvince(res);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+  const fetchDistrict = async (provinceId: number) => {
+    await LocationDatasource.getDistrict(provinceId)
+      .then((res) => {
+        setDistrict(res);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+  const fetchSubDistrict = async (districtId: number) => {
+    await LocationDatasource.getSubdistrict(districtId)
+      .then((res) => {
+        setSubdistrict(res);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+  const handleOnChange = (e: any) => {
+    const m = Map(data).set(e.target.id, e.target.value);
+    setData(m.toJS());
+  };
+  const handleChangestatus = (e: any) => {
+    const m = Map(data).set("status", e.target.value);
+    setData(m.toJS());
+  };
+  const handleExpPlant = (e: any) => {
+    const m = Map(data).set("expPlant", e);
+    setData(m.toJS());
+  };
+  const handleProvince = async (provinceId: number) => {
+    const m = Map(address).set("provinceId", provinceId);
+    setAddress(m.toJS());
+    saveAdd(m.toJS());
+    console.log(m.toJS());
+    await LocationDatasource.getDistrict(provinceId)
+      .then((res) => {
+        setDistrict(res);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+  const handleDistrict = async (districtId: number) => {
+    const m = Map(address).set("districtId", districtId);
+    setAddress(m.toJS());
+    saveAdd(m.toJS());
+    console.log(m.toJS());
+    await LocationDatasource.getSubdistrict(districtId)
+      .then((res) => {
+        setSubdistrict(res);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+  const handleSubDistrict = async (subdistrictId: number) => {
+    const m = Map(address).set("subdistrictId", subdistrictId);
+    setAddress(m.toJS());
+    saveAdd(m.toJS());
+    console.log(m.toJS());
+    await handelPostCode(m.toJS());
+  };
+  const handelPostCode = (add: AddrSubDisEntity) => {
+    let filterSubDistrict = subdistrict.filter(
+      (item) => item.subdistrictId == add.subdistrictId
+    )[0].postcode;
+    const m = Map(add).set("postcode", filterSubDistrict);
+    setAddress(m.toJS());
+    saveAdd(m.toJS());
+  };
+  const handleBrandId = async (brand: string) => {
+    const m = Map(dronerDrone).set("brand", brand);
+    setDronerDrone(m.toJS());
+  };
+  const handleSeries = async (brand: string) => {
+    const m = Map(dronerDrone).set("brand", brand);
+    setDronerDrone(m.toJS());
+  };
+  const handleSerialNo = async (e: any) => {
+    const m = Map(dronerDrone).set(e.target.id, e.target.value);
+    setDronerDrone(m.toJS());
+  };
+  const saveAdd = (add: AddrSubDisEntity) => {
+    const m = Map(data).set("address", add);
+    setData(m.toJS());
+  };
+  const updateDroner = () => {
+    const m = Map(data).set("address", address);
+    setData(m.toJS());
+    DronerDatasource.updateDroner(m.toJS())
+      .then((res) => {
+        if (res.id) {
           Swal.fire({
             title: "บันทึกสำเร็จ",
             icon: "success",
-            confirmButtonText: "ยืนยัน",
-            confirmButtonColor: "#0068F4",
-          }).then((result) => {
-            if (result.value == true) {
-              window.location.href = "/IndexDroner";
-            }
+            timer: 1500,
+            showConfirmButton: false,
+          }).then((time) => {
+            window.location.href = "/IndexDroner";
           });
         }
       })
       .catch((err) => console.log(err));
   };
-  useEffect(() => {
-    fetchDronerById(dronerId);
-  }, []);
-
-
-  const handleChangestatus = (e: any) => {
-    const m = Map(dronerData).set("isActive", e.target.value);
-    setDronerData(m.toJS());
+  const fetchDrone = async (
+    page: number,
+    take: number,
+    sortDirection: string,
+    search?: string
+  ) => {
+    await DroneDatasource.getDroneList(page, take, sortDirection, search).then(
+      (res) => {
+        setBrandId(res.data);
+      }
+    );
   };
-
-  // const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-  //   const m = Map(dronerData).set(e.target.id, e.target.value);
-  //   setDronerData(m.toJS());
-  //   checkValidate();
-  // };
-
-  // const handleOnChangeSelect = (value: any) => {
-  //   const m = Map(dronerData).set("role", value);
-  //   setDronerData(m.toJS());
-  //   checkValidate();
-  // };
-
-  // const updateDroner = (data: DronerEntity) => {
-  //   DronerDatasource.updateDroner(data).then((res) => {
-  //     if (res.id != null) {
-  //       Swal.fire({
-  //         title: "บันทึกสำเร็จ",
-  //         icon: "success",
-  //         timer: 1500,
-  //         showConfirmButton: false,
-  //       }).then((time) => {
-  //         window.location.href = "/IndexAdmin";
-  //       });
-  //     }
-  //   });
-  // };
-
-  // const checkValidate = () => {
-  //   if (
-  //     dronerData.firstname.trim() != "" &&
-  //       dronerData.lastname.trim() != "" &&
-  //       dronerData.telephoneNo.trim() != "" &&
-  //       dronerData.idNo.trim() != "" &&
-  //       dronerData.expYear.trim() != "" &&
-  //       dronerData.expMonth.trim() != "" &&
-  //       dronerData.address.trim() != "" &&
-  //       dronerData.dronerDrone.trim() != "" &&
-  //       dronerData.expPlant.trim() != "" 
-  //   ) {
-  //     setShowBtn(false);
-  //   } else {
-  //     setShowBtn(true);
-  //   }
-  // };
-
-
   const showModal = () => {
     setModal(true);
   };
-
   const closeModal = () => {
     setModal(false);
   };
+  const saveModal = () => {
+    console.log(dronerDrone);
+    //  const m = Map(data).set("dronerDrone", dronerDrone);
+    //  setData(m.toJS());
 
+    //  DroneDatasource.UpdateDroneList(m.toJS())
+    //  .then((res) => {
+    //   setModal(false);
+    //   console.log(res)
+    // })
+    // .catch((err) => console.log(err));
+  };
   const inputLandInModal = (
     <Form>
       <div className="form-group">
         <label>
           ยี่ห้อโดรนฉีดพ่น <span style={{ color: "red" }}>*</span>
         </label>
-        <Form.Item>
-          <Select placeholder="เลือกยี่ห้อโดรนฉีดพ่น" allowClear>
-            <option>DJI</option>
-            <option>DJI</option>
+        <Form.Item name="brand">
+          <Select
+            onChange={handleBrandId}
+            placeholder="เลือกยี่ห้อโดรนฉีดพ่น"
+            defaultValue={dronerDrone.droneBrandId}
+          >
+            {brandId.map((item: any, index: any) => (
+              <option key={index} value={item.id}>
+                {item.brand}
+              </option>
+            ))}
           </Select>
         </Form.Item>
       </div>
@@ -163,10 +255,13 @@ function EditDroner() {
         <label>
           รุ่น <span style={{ color: "red" }}>*</span>
         </label>
-        <Form.Item name="Crop">
-          <Select placeholder="เลือกรุ่นโดรน" allowClear>
-            <option>GRAS T20</option>
-            <option>GRAS T20</option>
+        <Form.Item name="series">
+          <Select onChange={handleSeries} placeholder="เลือกรุ่นโดรน">
+            {brandId.map((item: any, index: any) => (
+              <option key={index} value={item.id}>
+                {item.series}
+              </option>
+            ))}
           </Select>
         </Form.Item>
       </div>
@@ -175,7 +270,7 @@ function EditDroner() {
           เลขตัวถัง <span style={{ color: "red" }}>*</span>
         </label>
         <Form.Item
-          name="LandTotal"
+          name="serialNo"
           rules={[
             {
               required: true,
@@ -183,7 +278,7 @@ function EditDroner() {
             },
           ]}
         >
-          <Input placeholder="กรอกเลขตัวถัง" />
+          <Input placeholder="กรอกเลขตัวถัง" onChange={handleSerialNo} />
         </Form.Item>
       </div>
       <div className="form-group col-lg-12 pb-5">
@@ -226,38 +321,8 @@ function EditDroner() {
           </Button>
         </Upload>
       </div>
-      <div className="row">
-        <div className="form-group">
-          <label style={{ marginBottom: "10px" }}>
-            สถานะ <span style={{ color: "red" }}>*</span>
-          </label>
-          <Form.Item
-            rules={[
-              {
-                required: true,
-                message: "กรุณาเลือกสถานะ!",
-              },
-            ]}
-          >
-            <Radio.Group onChange={onChange} value={value}>
-              <Space direction="vertical">
-                <Radio value={1}>อนุมัติ</Radio>
-                <Radio value={2}>รอตรวจสอบ</Radio>
-                <Radio value={3}>ไม่อนุมัติ</Radio>
-              </Space>
-            </Radio.Group>
-          </Form.Item>
-        </div>
-      </div>
     </Form>
   );
-
-  const colorStatus = (status: string) => {
-    var colorText = color.Success;
-    colorText = status == "ใช้งาน" ? colorText : color.Error;
-    return colorText;
-  };
-
   const renderFromData = (
     <div className="col-lg-7">
       <CardContainer>
@@ -279,8 +344,11 @@ function EditDroner() {
           <div className="row">
             <div className="form-group col-lg-6">
               <label>Drone ID</label>
-              <Form.Item>
-                <Input disabled placeholder="DN0000001" />
+              <Form.Item name="id">
+                <Input
+                disabled
+                  defaultValue={data.id}
+                />
               </Form.Item>
             </div>
           </div>
@@ -290,6 +358,7 @@ function EditDroner() {
                 ชื่อ <span style={{ color: "red" }}>*</span>
               </label>
               <Form.Item
+                name="firstname"
                 rules={[
                   {
                     required: true,
@@ -297,7 +366,11 @@ function EditDroner() {
                   },
                 ]}
               >
-                <Input placeholder="" value={dronerData.firstname} />
+                <Input
+                  placeholder=""
+                  defaultValue={data.firstname}
+                  onChange={handleOnChange}
+                />
               </Form.Item>
             </div>
             <div className="form-group col-lg-6">
@@ -305,6 +378,7 @@ function EditDroner() {
                 นามสกุล <span style={{ color: "red" }}>*</span>
               </label>
               <Form.Item
+                name="lastname"
                 rules={[
                   {
                     required: true,
@@ -312,12 +386,17 @@ function EditDroner() {
                   },
                 ]}
               >
-                <Input placeholder="" value={dronerData.lastname} />
+                <Input
+                  placeholder=""
+                  defaultValue={data.lastname}
+                  onChange={handleOnChange}
+                />
               </Form.Item>
             </div>
             <div className="form-group col-lg-6">
               <label>เบอร์โทร</label>
               <Form.Item
+                name="telephoneNo"
                 rules={[
                   {
                     required: true,
@@ -325,12 +404,17 @@ function EditDroner() {
                   },
                 ]}
               >
-                <Input placeholder="" value={dronerData.telephoneNo} />
+                <Input
+                  placeholder=""
+                  defaultValue={data.telephoneNo}
+                  onChange={handleOnChange}
+                />
               </Form.Item>
             </div>
             <div className="form-group col-lg-6">
               <label>รหัสบัตรประชาชน</label>
               <Form.Item
+                name="idNo"
                 rules={[
                   {
                     required: true,
@@ -338,7 +422,11 @@ function EditDroner() {
                   },
                 ]}
               >
-                <Input placeholder="" value={dronerData.idNo} />
+                <Input
+                  placeholder=""
+                  defaultValue={data.idNo}
+                  onChange={handleOnChange}
+                />
               </Form.Item>
             </div>
           </div>
@@ -370,6 +458,7 @@ function EditDroner() {
                 <span style={{ color: "red" }}>*</span>
               </label>
               <Form.Item
+                name="province"
                 rules={[
                   {
                     required: true,
@@ -377,9 +466,26 @@ function EditDroner() {
                   },
                 ]}
               >
-                <Select placeholder="เลือกจังหวัด" allowClear>
-                  <option>สระบุรี</option>
-                  <option>เชียงใหม่</option>
+                <Select
+                  showSearch
+                  optionFilterProp="children"
+                  filterOption={(input: any, option: any) =>
+                    option.children.includes(input)
+                  }
+                  filterSort={(optionA, optionB) =>
+                    optionA.children
+                      .toLowerCase()
+                      .localeCompare(optionB.children.toLowerCase())
+                  }
+                  placeholder="เลือกจังหวัด"
+                  onChange={handleProvince}
+                  defaultValue={address.provinceId}
+                >
+                  {province.map((item: any, index: any) => (
+                    <option key={index} value={item.provinceId}>
+                      {item.region}
+                    </option>
+                  ))}
                 </Select>
               </Form.Item>
             </div>
@@ -389,6 +495,7 @@ function EditDroner() {
                 <span style={{ color: "red" }}>*</span>
               </label>
               <Form.Item
+                name="district"
                 rules={[
                   {
                     required: true,
@@ -396,9 +503,26 @@ function EditDroner() {
                   },
                 ]}
               >
-                <Select placeholder="เลือกอำเภอ" allowClear>
-                  <option>เมืองสระบุรี</option>
-                  <option>หางดง</option>
+                <Select
+                  showSearch
+                  optionFilterProp="children"
+                  filterOption={(input: any, option: any) =>
+                    option.children.includes(input)
+                  }
+                  filterSort={(optionA, optionB) =>
+                    optionA.children
+                      .toLowerCase()
+                      .localeCompare(optionB.children.toLowerCase())
+                  }
+                  placeholder="เลือกอำเภอ"
+                  onChange={handleDistrict}
+                  defaultValue={address.districtId}
+                >
+                  {district.map((item: any, index: any) => (
+                    <option key={index} value={item.districtId}>
+                      {item.districtName}
+                    </option>
+                  ))}
                 </Select>
               </Form.Item>
             </div>
@@ -410,6 +534,7 @@ function EditDroner() {
                 <span style={{ color: "red" }}>*</span>
               </label>
               <Form.Item
+                name="subdistrict"
                 rules={[
                   {
                     required: true,
@@ -417,9 +542,26 @@ function EditDroner() {
                   },
                 ]}
               >
-                <Select placeholder="เลือกตำบล" allowClear>
-                  <option>ปากเพรียว</option>
-                  <option>สันผักหวาน</option>
+                <Select
+                  showSearch
+                  optionFilterProp="children"
+                  filterOption={(input: any, option: any) =>
+                    option.children.includes(input)
+                  }
+                  filterSort={(optionA, optionB) =>
+                    optionA.children
+                      .toLowerCase()
+                      .localeCompare(optionB.children.toLowerCase())
+                  }
+                  placeholder="เลือกตำบล"
+                  onChange={handleSubDistrict}
+                  defaultValue={address.subdistrictId}
+                >
+                  {subdistrict.map((item: any, index: any) => (
+                    <option key={index} value={item.subdistrictId}>
+                      {item.subdistrictName}
+                    </option>
+                  ))}
                 </Select>
               </Form.Item>
             </div>
@@ -429,6 +571,7 @@ function EditDroner() {
                 <span style={{ color: "red" }}>*</span>
               </label>
               <Form.Item
+                name="postcode"
                 rules={[
                   {
                     required: true,
@@ -436,10 +579,13 @@ function EditDroner() {
                   },
                 ]}
               >
-                <Select placeholder="เลือกรหัสไปรษณีย์" allowClear>
-                  <option>10600</option>
-                  <option>18000</option>
-                </Select>
+                <Input
+                  name="postcode"
+                  placeholder="กรอกรหัสไปรษณีย์"
+                  defaultValue={address.postcode}
+                  key={address.subdistrictId}
+                  
+                />
               </Form.Item>
             </div>
           </div>
@@ -449,7 +595,7 @@ function EditDroner() {
                 ที่อยู่บ้าน <span style={{ color: "red" }}>*</span>
               </label>
               <Form.Item
-                name="Address"
+                name="address"
                 rules={[
                   {
                     required: true,
@@ -458,11 +604,11 @@ function EditDroner() {
                 ]}
               >
                 <TextArea
+                  onChange={handleOnChange}
                   className="col-lg-12"
                   rows={5}
-                  placeholder="กรอกที่อยู่บ้าน (เลขที่บ้าน, หมู่บ้าน, ชื่ออาคาร/ตึก, ซอย)"
-                  //defaultValue={data.address}
-                  autoComplete="off"
+                  placeholder=""
+                  defaultValue={data.address.address1}
                 />
               </Form.Item>
             </div>
@@ -473,7 +619,7 @@ function EditDroner() {
                 พื้นที่ให้บริการ<span style={{ color: "red" }}>*</span>
               </label>
               <Form.Item
-                name="Address"
+                name="dronerArea"
                 rules={[
                   {
                     required: true,
@@ -482,7 +628,9 @@ function EditDroner() {
                 ]}
               >
                 <Input
-                  placeholder="กรอกพื้นที่ให้บริการ"
+                  placeholder=""
+                  onChange={handleOnChange}
+                  defaultValue={data.dronerArea}
                   prefix={<SearchOutlined />}
                 />
               </Form.Item>
@@ -494,13 +642,23 @@ function EditDroner() {
                 ประสบการณ์บินโดรน <span style={{ color: "red" }}>*</span>
               </label>
               <Form.Item name="expYear">
-                <Input placeholder="กรอกจำนวนปี" />
+                <Input
+                  type="number"
+                  placeholder="ปี"
+                  onChange={handleOnChange}
+                  defaultValue={data.expYear}
+                />
               </Form.Item>
             </div>
             <div className="form-group col-lg-6">
               <label></label>
-              <Form.Item name="ExpMonth">
-                <Input placeholder="กรอกจำนวนเดือน" />
+              <Form.Item name="expMonth">
+                <Input
+                  type="number"
+                  placeholder="เดือน"
+                  defaultValue={data.expMonth}
+                  onChange={handleOnChange}
+                />
               </Form.Item>
             </div>
           </div>
@@ -512,43 +670,25 @@ function EditDroner() {
               </span>
               <span style={{ color: "red" }}>*</span>
             </label>
-            <Form.Item name="plant">
-              <Checkbox.Group style={{ width: "100%" }}>
-                <Row>
+
+            <Checkbox.Group
+              onChange={handleExpPlant}
+              options={EXP_PLANT}
+              style={{ width: "100%" }}
+              defaultValue={data.expPlant}
+            >
+              <Row>
+                {EXP_PLANT.map((item) => (
                   <Col span={8}>
-                    <Checkbox value="นาข้าว">นาข้าว</Checkbox>
+                    <Checkbox value={item}>{item}</Checkbox>
                   </Col>
-                  <Col span={8}>
-                    <Checkbox value="มันสำปะหลัง">มันสำปะหลัง</Checkbox>
-                  </Col>
-                  <Col span={8}>
-                    <Checkbox value="ทุเรียน">ทุเรียน</Checkbox>
-                  </Col>
-                  <Col span={8}>
-                    <Checkbox value="ข้าวโพด">ข้าวโพด</Checkbox>
-                  </Col>
-                  <Col span={8}>
-                    <Checkbox value="มะม่วง">มะม่วง</Checkbox>
-                  </Col>
-                  <Col span={8}>
-                    <Checkbox value="ปาล์ม">ปาล์ม</Checkbox>
-                  </Col>
-                  <Col span={8}>
-                    <Checkbox value="อ้อย">อ้อย</Checkbox>
-                  </Col>
-                  <Col span={8}>
-                    <Checkbox value="ลำไย">ลำไย</Checkbox>
-                  </Col>
-                  <Col span={8}>
-                    <Checkbox value="ยางพารา">ยางพารา</Checkbox>
-                  </Col>
-                </Row>
-              </Checkbox.Group>
-            </Form.Item>
+                ))}
+              </Row>
+            </Checkbox.Group>
           </div>
           <div className="form-group col-lg-6">
             <Form.Item name="plantOther">
-              <Input placeholder="พืชอื่นๆ" />
+              <Input placeholder="พืชอื่นๆ" onChange={handleExpPlant} />
             </Form.Item>
           </div>
           <div className="row">
@@ -557,6 +697,7 @@ function EditDroner() {
                 สถานะ <span style={{ color: "red" }}>*</span>
               </label>
               <Form.Item
+                name="status"
                 rules={[
                   {
                     required: true,
@@ -564,11 +705,15 @@ function EditDroner() {
                   },
                 ]}
               >
-                <Radio.Group onChange={onChange} value={value}>
+                <Radio.Group
+                  defaultValue={data.status}
+                  onChange={handleChangestatus}
+                >
                   <Space direction="vertical">
-                    <Radio value={1}>อนุมัติ</Radio>
-                    <Radio value={2}>รอตรวจสอบ</Radio>
-                    <Radio value={3}>ไม่อนุมัติ</Radio>
+                    <Radio value={"ACTIVE"}>ใช้งาน</Radio>
+                    <Radio value={"PENDING"}>รอยืนยันตัวตน</Radio>
+                    <Radio value={"INACTIVE"}>ปิดการใช้งาน</Radio>
+                    <Radio value={"REJECTED"}>ไม่อนุมัติ</Radio>
                   </Space>
                 </Radio.Group>
               </Form.Item>
@@ -578,7 +723,19 @@ function EditDroner() {
       </CardContainer>
     </div>
   );
-
+  const colorStatus = (status: string) => {
+    if (status == "ACTIVE") {
+      return "text-success ";
+    } else if (status == "PENDING") {
+      return "text-warning ";
+    } else if (status == "INACTIVE") {
+      return "text-muted ";
+    } else if (status == "REJECTED") {
+      return "text-danger ";
+    } else {
+      return "text-muted ";
+    }
+  };
   const renderLand = (
     <div className="col-lg-4">
       <CardContainer>
@@ -601,7 +758,7 @@ function EditDroner() {
               border: "none",
               borderRadius: "5px",
             }}
-            //onClick={showModal}
+            onClick={showModal}
           >
             เพิ่มโดรน
           </Button>
@@ -612,19 +769,20 @@ function EditDroner() {
           closeModal={closeModal}
           data={inputLandInModal}
           backButton={closeModal}
+          saveButton={saveModal}
         />
         <Form>
-          {data.dataDrone.length != 0 ? (
+          {dronerDrone != null ? (
             <div className="container">
-              {data.dataDrone.map((item) => (
-                <div className="row pt-3 pb-3 ">
+              {brandId.map((item: any, index: any) => (
+                <div className="row pt-3 pb-3">
                   <div className="col-lg-6">
-                    <span>{item.dronename}</span>
+                    <span key={index}>{item.brand}</span>
                   </div>
                   <div className="col-lg-3">
-                    <span style={{ color: colorStatus(item.dronestatus) }}>
-                      <Badge color={colorStatus(item.dronestatus)} />
-                      {item.dronestatus}
+                    <span className={colorStatus(item.status)}>
+                      <Badge color={colorStatus(item.status)} />
+                      {item.status}
                     </span>
                   </div>
                   <div className="col-lg-3 d-flex justify-content-between">
@@ -642,19 +800,17 @@ function EditDroner() {
           ) : (
             <div className="container text-center" style={{ padding: "80px" }}>
               <img src={emptyData}></img>
-              <p>ยังไม่มีโดรนเกษตร</p>
+              <p>ยังไม่มีแปลงเกษตร</p>
             </div>
           )}
         </Form>
       </CardContainer>
       <div className="d-flex justify-content-between pt-5">
-        <p>รายการทั้งหมด {data.dataDrone.length} รายการ</p>
-        {data.dataDrone.length < 10 ? null : (
-          <Pagination defaultCurrent={1} total={1} />
-        )}
+        <Pagination defaultCurrent={1} total={1} />
       </div>
     </div>
   );
+
   return (
     <Layout>
       <Row>
@@ -665,11 +821,15 @@ function EditDroner() {
           <strong style={{ fontSize: "20px" }}>แก้ไขข้อมูลคนบินโดรน</strong>
         </span>
       </Row>
-      <Row className="d-flex justify-content-around">
+      <Row className="d-flex justify-content-around" key={data.id}>
         {renderFromData}
         {renderLand}
       </Row>
-      <FooterPage />
+      <FooterPage
+        onClickBack={() => (window.location.href = "/IndexDroner")}
+        onClickSave={() => updateDroner()}
+        // disableSaveBtn={showBtn}
+      />
     </Layout>
   );
 }

@@ -97,7 +97,7 @@ function EditDroneList() {
               >
                 <Select
                   allowClear
-                  value={droneData.brand}
+                  value={droneData.series}
                   // onChange={onChange}
                 >
                   <option>DJL</option>

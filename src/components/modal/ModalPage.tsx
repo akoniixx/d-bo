@@ -16,6 +16,11 @@ export const ModalPage: React.FC<ModalProps> = ({
   visible,
   data,
   backButton,
+<<<<<<< Updated upstream
+  saveButton
+=======
+  saveButton,
+>>>>>>> Stashed changes
 }) => (
   <Modal
     title={
@@ -30,7 +35,13 @@ export const ModalPage: React.FC<ModalProps> = ({
     }
     visible={visible}
     onCancel={closeModal}
-    footer={[<FooterPage onClickBack={backButton} />]}
+<<<<<<< Updated upstream
+    footer={[<FooterPage onClickBack={backButton} onClickSave={saveButton}/>]}
+=======
+    footer={[<FooterPage 
+      onClickBack={backButton} 
+      onClickSave={saveButton}/>]}
+>>>>>>> Stashed changes
   >
     {data}
   </Modal>
