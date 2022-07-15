@@ -48,3 +48,22 @@ export const FullAddressEntiry_INIT : FullAddressEntity = {
   province : ProvinceEntity_INIT,
   subdistricr : SubdistrictEntity_INIT,
 }
+
+export interface CreateAddressEntity {
+  address1: string;
+  address2: string;
+  address3: string;
+  provinceId: number;
+  districtId: number;
+  subdistrictId: number;
+  postcode: string;
+}
+export const CreateAddressEntity_INIT: CreateAddressEntity = {
+  address1: "",
+  address2: "",
+  address3: "",
+  provinceId: 0,
+  districtId: 0,
+  subdistrictId: 0,
+  postcode: "",
+};
