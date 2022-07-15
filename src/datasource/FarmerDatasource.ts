@@ -1,5 +1,5 @@
 import { httpClient } from "../config/develop-config";
-import { FarmerEntity, FarmerPageEntity } from "../entities/FarmerEntities";
+import { CreateFarmerEntity, FarmerPageEntity } from "../entities/FarmerEntities";
 const API_URL = `https://api-dev-dnds.iconkaset.com`;
 
 export class FarmerDatasource {
@@ -23,7 +23,7 @@ export class FarmerDatasource {
       });
   }
 
-  static insertFarmer(data: FarmerEntity): Promise<any> {
+  static insertFarmer(data: CreateFarmerEntity): Promise<any> {
     console.log(data);
     return httpClient
       .post(API_URL + "/farmer", data)

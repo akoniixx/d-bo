@@ -1,8 +1,12 @@
-import { FullAddressEntity, FullAddressEntiry_INIT, AddressEntity, AddressEntity_INIT } from "./AddressEntities";
+import {
+  FullAddressEntity,
+  FullAddressEntiry_INIT,
+  CreateAddressEntity,
+  CreateAddressEntity_INIT,
+} from "./AddressEntities";
 import { FarmerPlotEntity, FarmerPlotEntity_INIT } from "./FarmerPlotEntities";
 
 export interface FarmerEntity {
-  
   firstname: string;
   lastname: string;
   idNo: string;
@@ -33,14 +37,14 @@ export interface CreateFarmerEntity {
   lastname: string;
   idNo: string;
   telephoneNo: string;
-  address: AddressEntity;
+  address: CreateAddressEntity;
   farmerPlot: FarmerPlotEntity[];
 }
-export const CreateFarmerEntity_INIT : CreateFarmerEntity ={
+export const CreateFarmerEntity_INIT: CreateFarmerEntity = {
   firstname: "",
   lastname: "",
   idNo: "",
   telephoneNo: "",
-  address: AddressEntity_INIT,
+  address: CreateAddressEntity_INIT,
   farmerPlot: [FarmerPlotEntity_INIT],
-}
+};

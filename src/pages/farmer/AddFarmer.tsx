@@ -34,8 +34,6 @@ import {
 } from "../../entities/LocationEntities";
 import { LocationDatasource } from "../../datasource/LocationDatasource";
 import {
-  AddressEntity,
-  AddressEntity_INIT,
   CreateAddressEntity,
   CreateAddressEntity_INIT,
 } from "../../entities/AddressEntities";
@@ -91,10 +89,10 @@ const AddFarmer = () => {
     setData(m.toJS());
   };
   const handleOnChangeProvince = async (provinceId: number) => {
-    await getProvince(provinceId, AddressEntity_INIT);
+    await getProvince(provinceId, CreateAddressEntity_INIT);
   };
 
-  const getProvince = async (provinceId: number, addr: AddressEntity) => {
+  const getProvince = async (provinceId: number, addr: CreateAddressEntity) => {
     const d = Map(addr).set("provinceId", provinceId);
     setAddress(d.toJS());
     await LocationDatasource.getDistrict(provinceId).then((res) => {
@@ -117,7 +115,7 @@ const AddFarmer = () => {
     await handleOnChangePostcode(d.toJS());
   };
 
-  const handleOnChangePostcode = (addr: AddressEntity) => {
+  const handleOnChangePostcode = (addr: CreateAddressEntity) => {
     let getPostcode = subdistrict.filter(
       (x) => x.subdistrictId == addr.subdistrictId
     )[0].postcode;
@@ -177,6 +175,7 @@ const AddFarmer = () => {
     setData(pushAddr.toJS());
     const pushPlot = Map(pushAddr.toJS()).set("farmerPlot", farmerPlotList);
     setData(pushPlot.toJS());
+    console.log("data",pushPlot.toJS());
     await FarmerDatasource.insertFarmer(pushPlot.toJS()).then((res) => {
       console.log(res);
       if (res.id != null) {
@@ -512,6 +511,7 @@ const AddFarmer = () => {
 
   return (
     <Layout>
+      {console.log(address)}
       <Row>
         <BackIconButton
           onClick={() => (window.location.href = "/IndexFarmer")}

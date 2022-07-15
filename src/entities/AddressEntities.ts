@@ -1,4 +1,11 @@
-import { DistrictEntity, DistrictEntity_INIT, ProviceEntity, ProvinceEntity_INIT, SubdistrictEntity, SubdistrictEntity_INIT } from "./LocationEntities";
+import {
+  DistrictEntity,
+  DistrictEntity_INIT,
+  ProviceEntity,
+  ProvinceEntity_INIT,
+  SubdistrictEntity,
+  SubdistrictEntity_INIT,
+} from "./LocationEntities";
 
 export interface AddressEntity {
   id: string;
@@ -21,7 +28,7 @@ export const AddressEntity_INIT: AddressEntity = {
   postcode: "",
 };
 
-export interface FullAddressEntity{
+export interface FullAddressEntity {
   id: string;
   address1: string;
   address2: string;
@@ -31,11 +38,11 @@ export interface FullAddressEntity{
   subdistrictId: number;
   postcode: string;
   district: DistrictEntity;
-  province : ProviceEntity;
-  subdistricr : SubdistrictEntity;
+  province: ProviceEntity;
+  subdistricr: SubdistrictEntity;
 }
 
-export const FullAddressEntiry_INIT : FullAddressEntity = {
+export const FullAddressEntiry_INIT: FullAddressEntity = {
   id: "",
   address1: "",
   address2: "",
@@ -45,9 +52,9 @@ export const FullAddressEntiry_INIT : FullAddressEntity = {
   subdistrictId: 0,
   postcode: "",
   district: DistrictEntity_INIT,
-  province : ProvinceEntity_INIT,
-  subdistricr : SubdistrictEntity_INIT,
-}
+  province: ProvinceEntity_INIT,
+  subdistricr: SubdistrictEntity_INIT,
+};
 
 export interface CreateAddressEntity {
   address1: string;
