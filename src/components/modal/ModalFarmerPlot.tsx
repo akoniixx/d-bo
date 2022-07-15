@@ -2,10 +2,8 @@ import React, { useState } from "react";
 import { Form, Input, Modal, Radio, Select, Space } from "antd";
 import FooterPage from "../footer/FooterPage";
 import { SearchOutlined } from "@ant-design/icons";
-import {
-  FarmerPlotEntity,
-  FarmerPlotEntity_INIT,
-} from "../../entities/FarmerPlotEntities";
+import { FarmerPlotEntity } from "../../entities/FarmerPlotEntities";
+import { EXP_PLANT } from "../../definitions/ExpPlant";
 
 const _ = require("lodash");
 const { Map } = require("immutable");
@@ -15,15 +13,16 @@ interface ModalFarmerPlotProps {
   backButton: () => void;
   callBack: (data: FarmerPlotEntity) => void;
   data: FarmerPlotEntity;
+  editIndex: number;
 }
 const ModalFarmerPlot: React.FC<ModalFarmerPlotProps> = ({
   show,
   backButton,
   callBack,
   data,
+  editIndex,
 }) => {
   const [farmerPlot, setFarmerPlot] = useState<FarmerPlotEntity>(data);
-  console.log("check", farmerPlot);
 
   const handleOnChangePlot = (e: React.ChangeEvent<HTMLInputElement>) => {
     const m = Map(farmerPlot).set(e.target.id, e.target.value);
@@ -35,8 +34,14 @@ const ModalFarmerPlot: React.FC<ModalFarmerPlotProps> = ({
     setFarmerPlot(m.toJS());
   };
 
+  const handleOnChangePlantSelect = (value: any) => {
+    const m = Map(farmerPlot).set("plantName", value);
+    setFarmerPlot(m.toJS());
+  };
+
   const handelCallBack = () => {
-    callBack(farmerPlot);
+    const m = Map(farmerPlot).set("plotId", editIndex);
+    callBack(m.toJS());
   };
 
   return (
@@ -60,9 +65,8 @@ const ModalFarmerPlot: React.FC<ModalFarmerPlotProps> = ({
             onClickSave={() => handelCallBack()}
           />,
         ]}
-        key={data.farmerId}
       >
-        <Form key={data.farmerId}>
+        <Form key={data.plotId}>
           <div className="form-group">
             <label>
               ชื่อแปลง <span style={{ color: "red" }}>*</span>
@@ -89,9 +93,14 @@ const ModalFarmerPlot: React.FC<ModalFarmerPlotProps> = ({
               พืชที่ปลูก <span style={{ color: "red" }}>*</span>
             </label>
             <Form.Item name="plantName">
-              <Select placeholder="เลือกพืชที่ปลูก" allowClear>
-                <option>ข้าว</option>
-                <option>ข้าวโพด</option>
+              <Select
+                placeholder="เลือกพืชที่ปลูก"
+                defaultValue={farmerPlot.plantName}
+                onChange={handleOnChangePlantSelect}
+              >
+                {EXP_PLANT.map((x) => (
+                  <option value={x}>{x}</option>
+                ))}
               </Select>
             </Form.Item>
           </div>
@@ -110,7 +119,6 @@ const ModalFarmerPlot: React.FC<ModalFarmerPlotProps> = ({
             >
               <Input
                 placeholder="ไร่"
-                style={{ textAlign: "right" }}
                 onChange={handleOnChangePlot}
                 defaultValue={farmerPlot.raiAmount}
                 autoComplete="off"

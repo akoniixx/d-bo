@@ -9,24 +9,21 @@ import {
   Button,
   Pagination,
   Badge,
-  Radio,
-  Space,
-  Modal,
 } from "antd";
 import { CardContainer } from "../../components/card/CardContainer";
 import { BackIconButton } from "../../components/button/BackButton";
 import TextArea from "antd/lib/input/TextArea";
 import {
+  DeleteOutlined,
   EditOutlined,
   PictureFilled,
-  SearchOutlined,
   UploadOutlined,
 } from "@ant-design/icons";
 import emptyData from "../../resource/media/empties/iconoir_farm.png";
 import color from "../../resource/color";
 import FooterPage from "../../components/footer/FooterPage";
 import { CardHeader } from "../../components/header/CardHearder";
-import { FarmerEntity, FarmerEntity_INIT } from "../../entities/FarmerEntities";
+import { CreateFarmerEntity, CreateFarmerEntity_INIT } from "../../entities/FarmerEntities";
 import {
   DistrictEntity,
   DistrictEntity_INIT,
@@ -39,6 +36,8 @@ import { LocationDatasource } from "../../datasource/LocationDatasource";
 import {
   AddressEntity,
   AddressEntity_INIT,
+  CreateAddressEntity,
+  CreateAddressEntity_INIT,
 } from "../../entities/AddressEntities";
 import {
   FarmerPlotEntity,
@@ -49,8 +48,6 @@ import ActionButton from "../../components/button/ActionButton";
 import { FarmerDatasource } from "../../datasource/FarmerDatasource";
 import Swal from "sweetalert2";
 import ModalFarmerPlot from "../../components/modal/ModalFarmerPlot";
-import { boolean, number } from "yup";
-import { Prev } from "react-bootstrap/esm/PageItem";
 
 const { Option } = Select;
 
@@ -58,11 +55,12 @@ const _ = require("lodash");
 const { Map } = require("immutable");
 
 const AddFarmer = () => {
-  const [data, setData] = useState<FarmerEntity>(FarmerEntity_INIT);
-  const [address, setAddress] = useState<AddressEntity>(AddressEntity_INIT);
+  const [data, setData] = useState<CreateFarmerEntity>(CreateFarmerEntity_INIT);
+  const [address, setAddress] = useState<CreateAddressEntity>(CreateAddressEntity_INIT);
 
-  const [addModal, setAddModal] = useState(false);
+  const [showAddModal, setShowAddModal] = useState(false);
   const [editModal, setEditModal] = useState(false);
+  const [editIndex, setEditIndex] = useState(0);
   const [province, setProvince] = useState<ProviceEntity[]>([
     ProvinceEntity_INIT,
   ]);
@@ -131,33 +129,6 @@ const AddFarmer = () => {
     const d = Map(address).set("address1", e.target.value);
     setAddress(d.toJS());
   };
-  //#endregion
-
-  //#region data plot farmer
-  const colorStatus = (status: string) => {
-    var mapStatus = STATUS_NORMAL_MAPPING[status];
-    var colorText = color.Success;
-    colorText = mapStatus == "ใช้งาน" ? colorText : color.Error;
-    return colorText;
-  };
-
-  const insertFarmerPlot = (data: FarmerPlotEntity) => {
-    console.log("data", data);
-    const mId = Map(data).set("farmerId", farmerPlotList.length + 1);
-    setFarmerPlotList([...farmerPlotList, mId.toJS()]);
-
-    // if (checkPlot.length) {
-
-    // } else {
-    //   const mId = Map(data).set("farmerId", farmerPlotList.length + 1);
-    //   console.log("2",mId.toJS());
-    //   setFarmerPlotList([...farmerPlotList, mId.toJS()]);
-    // }
-
-    setAddModal(false);
-    setEditModal(false);
-  };
-  //#endregion
 
   const uploadButton = (
     <div>
@@ -166,29 +137,59 @@ const AddFarmer = () => {
     </div>
   );
 
+  //#endregion
+
+  //#region data farmer plot
+  const colorStatus = (status: string) => {
+    var mapStatus = STATUS_NORMAL_MAPPING[status];
+    var colorText = color.Success;
+    colorText = mapStatus == "ใช้งาน" ? colorText : color.Error;
+    return colorText;
+  };
+
+  const editPlot = (data: FarmerPlotEntity, index: number) => {
+    setEditModal((prev) => !prev);
+    setEditIndex(index);
+    setEditFarmerPlot(data);
+  };
+
+  const removePlot = (index: number) => {
+    const newData = farmerPlotList.filter((x) => x.plotId != index);
+    setFarmerPlotList(newData);
+  };
+
+  const insertFarmerPlot = (data: FarmerPlotEntity) => {
+    if (data.plotId == 0) {
+      const pushId = Map(data).set("plotId", farmerPlotList.length + 1);
+      setFarmerPlotList([...farmerPlotList, pushId.toJS()]);
+    } else {
+      const newData = farmerPlotList.filter((x) => x.plotId != data.plotId);
+      setFarmerPlotList([...newData, data]);
+    }
+    setShowAddModal(false);
+    setEditModal(false);
+    setEditIndex(0);
+  };
+  //#endregion
+
   const insertFarmer = async () => {
     const pushAddr = Map(data).set("address", address);
     setData(pushAddr.toJS());
     const pushPlot = Map(pushAddr.toJS()).set("farmerPlot", farmerPlotList);
     setData(pushPlot.toJS());
-    console.log(pushPlot.toJS());
-    // await FarmerDatasource.insertFarmer(pushPlot.toJS()).then((res) => {
-    //   if (res.success) {
-    //     Swal.fire({
-    //       title: "บันทึกสำเร็จ",
-    //       icon: "success",
-    //       timer: 1500,
-    //       showConfirmButton: false,
-    //     }).then((time) => {
-    //       window.location.href = "/IndexAdmin";
-    //     });
-    //   }
-    // });
-  };
-
-  const editPlot = (data: FarmerPlotEntity, index:number) => {
-    setEditModal((prev) => !prev);
-    setEditFarmerPlot(data);
+    await FarmerDatasource.insertFarmer(pushPlot.toJS()).then((res) => {
+      console.log(res);
+      if (res.id != null) {
+        Swal.fire({
+          title: "บันทึกสำเร็จ",
+          icon: "success",
+          timer: 1500,
+          showConfirmButton: false,
+        }).then((time) => {
+          window.location.href = "/IndexFarmer";
+        });
+      }
+    });
   };
 
   const renderFromData = (
@@ -447,7 +448,7 @@ const AddFarmer = () => {
               border: "none",
               borderRadius: "5px",
             }}
-            onClick={() => setAddModal((prev) => !prev)}
+            onClick={() => setShowAddModal((prev) => !prev)}
           >
             เพิ่มแปลง
           </Button>
@@ -455,15 +456,17 @@ const AddFarmer = () => {
         {farmerPlotList?.length != 0 ? (
           <Form>
             {farmerPlotList.map((item, index) => (
-              <div className="container" style={{ padding: "10px" }}>
-                <div className="d-flex justify-content-between">
-                  <div>
+              <div className="container">
+                <div className="row pt-3 pb-3">
+                  <div className="col-lg-4">
                     {item.plotName}
                     <br />
-                    <small>{item.plantName}</small>
+                    <p style={{ fontSize: "12px", color: color.Grey }}>
+                      {item.plantName}
+                    </p>
                   </div>
-                  <div>{item.raiAmount} ไร่</div>
-                  <div>
+                  <div className="col-lg-2">{item.raiAmount} ไร่</div>
+                  <div className="col-lg-3">
                     <span
                       style={{ color: colorStatus(item.isActive.toString()) }}
                     >
@@ -471,11 +474,22 @@ const AddFarmer = () => {
                       {STATUS_NORMAL_MAPPING[item.isActive.toString()]}
                     </span>
                   </div>
-                  <ActionButton
-                    icon={<EditOutlined />}
-                    color={color.primary1}
-                    onClick={() => editPlot(item, index)}
-                  />
+                  <div className="col-lg-3 d-flex justify-content-between">
+                    <div className="col-lg-6">
+                      <ActionButton
+                        icon={<EditOutlined />}
+                        color={color.primary1}
+                        onClick={() => editPlot(item, index + 1)}
+                      />
+                    </div>
+                    <div className="col-lg-6">
+                      <ActionButton
+                        icon={<DeleteOutlined />}
+                        color={color.Error}
+                        onClick={() => removePlot(index + 1)}
+                      />
+                    </div>
+                  </div>
                 </div>
               </div>
             ))}
@@ -498,7 +512,6 @@ const AddFarmer = () => {
 
   return (
     <Layout>
-      {console.log(farmerPlotList)}
       <Row>
         <BackIconButton
           onClick={() => (window.location.href = "/IndexFarmer")}
@@ -517,12 +530,13 @@ const AddFarmer = () => {
         onClickBack={() => (window.location.href = "/IndexFarmer")}
         onClickSave={insertFarmer}
       />
-      {addModal && (
+      {showAddModal && (
         <ModalFarmerPlot
-          show={addModal}
-          backButton={() => setAddModal((prev) => !prev)}
+          show={showAddModal}
+          backButton={() => setShowAddModal((prev) => !prev)}
           callBack={insertFarmerPlot}
           data={FarmerPlotEntity_INIT}
+          editIndex={editIndex}
         />
       )}
       {editModal && (
@@ -531,6 +545,7 @@ const AddFarmer = () => {
           backButton={() => setEditModal((prev) => !prev)}
           callBack={insertFarmerPlot}
           data={editFarmerPlot}
+          editIndex={editIndex}
         />
       )}
     </Layout>
