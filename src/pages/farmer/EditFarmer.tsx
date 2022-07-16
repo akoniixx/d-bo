@@ -19,7 +19,6 @@ import {
   DeleteOutlined,
   EditOutlined,
   PictureFilled,
-  SearchOutlined,
   UploadOutlined,
 } from "@ant-design/icons";
 import emptyData from "../../resource/media/empties/iconoir_farm.png";
@@ -56,6 +55,7 @@ import {
 import { LocationDatasource } from "../../datasource/LocationDatasource";
 import ModalFarmerPlot from "../../components/modal/ModalFarmerPlot";
 import { FarmerPlotDatasource } from "../../datasource/FarmerPlotDatasource";
+import Swal from "sweetalert2";
 
 const { Option } = Select;
 
@@ -124,22 +124,26 @@ const EditFarmer = () => {
   const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const m = Map(data).set(e.target.id, e.target.value);
     setData(m.toJS());
+    checkValidate(m.toJS());
   };
 
   const handleOnChangeProvince = async (provinceId: number) => {
     console.log(provinceId);
     const d = Map(address).set("provinceId", provinceId);
     setAddress(d.toJS());
+    checkValidateAddr(d.toJS());
   };
 
   const handleOnChangeDistrict = async (districtId: number) => {
     const d = Map(address).set("districtId", districtId);
     setAddress(d.toJS());
+    checkValidateAddr(d.toJS());
   };
 
   const handleOnChangeSubdistrict = async (subdistrictId: number) => {
     const d = Map(address).set("subdistrictId", subdistrictId);
     setAddress(d.toJS());
+    checkValidateAddr(d.toJS());
     await handleOnChangePostcode(d.toJS());
   };
 
@@ -149,16 +153,19 @@ const EditFarmer = () => {
     )[0].postcode;
     const c = Map(addr).set("postcode", getPostcode);
     setAddress(c.toJS());
+    checkValidateAddr(c.toJS());
   };
 
   const handleOnChangeAddress = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const d = Map(address).set("address1", e.target.value);
     setAddress(d.toJS());
+    checkValidateAddr(d.toJS());
   };
 
   const handleChangePlotstatus = (e: any) => {
     const m = Map(data).set("status", e.target.value);
     setData(m.toJS());
+    checkValidate(m.toJS());
   };
   //#endregion
 
@@ -185,7 +192,58 @@ const EditFarmer = () => {
     }
     fecthFarmer();
   };
-  //#region 
+  //#endregion
+
+  const checkValidate = (data: GetFarmerEntity) => {
+    if (
+      data.firstname != "" &&
+      data.lastname != "" &&
+      data.telephoneNo != "" &&
+      data.idNo != "" &&
+      address.provinceId != 0 &&
+      address.districtId != 0 &&
+      address.subdistrictId != 0 &&
+      address.address1 != ""
+    ) {
+      setBtnSaveDisable(false);
+    } else {
+      setBtnSaveDisable(true);
+    }
+  };
+
+  const checkValidateAddr = (addr: AddressEntity) => {
+    if (
+      addr.provinceId != 0 &&
+      addr.subdistrictId != 0 &&
+      addr.districtId != 0 &&
+      addr.postcode != "" &&
+      addr.address1 != "" &&
+      data.firstname != "" &&
+      data.lastname != "" &&
+      data.telephoneNo != "" &&
+      data.idNo != ""
+    ) {
+      setBtnSaveDisable(false);
+    } else {
+      setBtnSaveDisable(true);
+    }
+  };
+
+  const updateFarmer = async () => {
+    const pushAddr = Map(data).set("address", address);
+    await FarmerDatasource.updateFarmer(pushAddr.toJS()).then((res) => {
+      if (res.id != null) {
+        Swal.fire({
+          title: "บันทึกสำเร็จ",
+          icon: "success",
+          timer: 1500,
+          showConfirmButton: false,
+        }).then((time) => {
+          window.location.href = "/IndexFarmer";
+        });
+      }
+    });
+  };
 
   const renderFromData = (
     <div className="col-lg-7">
@@ -573,6 +631,7 @@ const EditFarmer = () => {
       </Row>
       <FooterPage
         onClickBack={() => (window.location.href = "/IndexFarmer")}
+        onClickSave={updateFarmer}
         disableSaveBtn={saveBtnDisable}
       />
       {showAddModal && (

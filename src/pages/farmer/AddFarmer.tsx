@@ -1,14 +1,6 @@
 import React, { useEffect, useState } from "react";
 import Layout from "../../components/layout/Layout";
-import {
-  Row,
-  Form,
-  Input,
-  Select,
-  Upload,
-  Button,
-  Badge,
-} from "antd";
+import { Row, Form, Input, Select, Upload, Button, Badge } from "antd";
 import { CardContainer } from "../../components/card/CardContainer";
 import { BackIconButton } from "../../components/button/BackButton";
 import TextArea from "antd/lib/input/TextArea";
@@ -266,7 +258,11 @@ const AddFarmer = () => {
                   },
                 ]}
               >
-                <Input placeholder="กรอกชื่อ" onChange={handleOnChange} />
+                <Input
+                  placeholder="กรอกชื่อ"
+                  onChange={handleOnChange}
+                  autoComplete="off"
+                />
               </Form.Item>
             </div>
             <div className="form-group col-lg-6">
@@ -282,7 +278,11 @@ const AddFarmer = () => {
                   },
                 ]}
               >
-                <Input placeholder="กรอกนามสกุล" onChange={handleOnChange} />
+                <Input
+                  placeholder="กรอกนามสกุล"
+                  onChange={handleOnChange}
+                  autoComplete="off"
+                />
               </Form.Item>
             </div>
           </div>
@@ -300,7 +300,11 @@ const AddFarmer = () => {
                   },
                 ]}
               >
-                <Input placeholder="กรอกเบอร์โทร" onChange={handleOnChange} />
+                <Input
+                  placeholder="กรอกเบอร์โทร"
+                  onChange={handleOnChange}
+                  autoComplete="off"
+                />
               </Form.Item>
             </div>
             <div className="form-group col-lg-6">
@@ -319,6 +323,7 @@ const AddFarmer = () => {
                 <Input
                   placeholder="กรอกบัตรประชาชน"
                   onChange={handleOnChange}
+                  autoComplete="off"
                 />
               </Form.Item>
             </div>
@@ -388,7 +393,6 @@ const AddFarmer = () => {
                       .localeCompare(optionB.children.toLowerCase())
                   }
                   onChange={handleOnChangeDistrict}
-                  key={address.provinceId}
                 >
                   {district?.map((item) => (
                     <Option value={item.districtId}>{item.districtName}</Option>
@@ -416,7 +420,6 @@ const AddFarmer = () => {
                       .localeCompare(optionB.children.toLowerCase())
                   }
                   onChange={handleOnChangeSubdistrict}
-                  key={address.provinceId}
                 >
                   {subdistrict?.map((item) => (
                     <Option value={item.subdistrictId}>
@@ -459,6 +462,7 @@ const AddFarmer = () => {
                   rows={5}
                   placeholder="กรอกที่อยู่บ้าน (เลขที่บ้าน, หมู่บ้าน, ชื่ออาคาร/ตึก, ซอย)"
                   onChange={handleOnChangeAddress}
+                  autoComplete="off"
                 />
               </Form.Item>
             </div>
