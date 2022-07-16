@@ -175,7 +175,6 @@ const AddFarmer = () => {
     setData(pushAddr.toJS());
     const pushPlot = Map(pushAddr.toJS()).set("farmerPlot", farmerPlotList);
     setData(pushPlot.toJS());
-    console.log("data",pushPlot.toJS());
     await FarmerDatasource.insertFarmer(pushPlot.toJS()).then((res) => {
       console.log(res);
       if (res.id != null) {

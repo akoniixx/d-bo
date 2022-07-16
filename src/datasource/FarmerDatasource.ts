@@ -1,17 +1,28 @@
 import { httpClient } from "../config/develop-config";
-import { CreateFarmerEntity, FarmerPageEntity } from "../entities/FarmerEntities";
+import {
+  CreateFarmerEntity,
+  FarmerPageEntity,
+} from "../entities/FarmerEntities";
 const API_URL = `https://api-dev-dnds.iconkaset.com`;
 
 export class FarmerDatasource {
   static getFarmerList(
     page: number,
     row: number,
-    status?: boolean
+    status?: string,
+    search?: string,
+    provinceId?: number,
+    districtId?: number,
+    subdistrictId?: number
   ): Promise<FarmerPageEntity> {
     const params = {
       status: status,
       page: page,
       take: row,
+      search: search,
+      provinceId: provinceId,
+      districtId: districtId,
+      subdistrictId: subdistrictId,
     };
     return httpClient
       .get(API_URL + "/farmer", { params })

@@ -1,4 +1,4 @@
-import { Button, Col, Pagination, Row, Select, Table } from "antd";
+import { Badge, Pagination, Select, Table } from "antd";
 import React, { useEffect, useState } from "react";
 import Search from "antd/lib/input/Search";
 import { Option } from "antd/lib/mentions";
@@ -8,33 +8,95 @@ import ActionButton from "../../components/button/ActionButton";
 import { EditOutlined } from "@ant-design/icons";
 import AddButtton from "../../components/button/AddButton";
 import { CardContainer } from "../../components/card/CardContainer";
-import {
-  FarmerPageEntity,
-  FarmerPageEntity_INIT,
-} from "../../entities/FarmerEntities";
+import { FarmerPageEntity } from "../../entities/FarmerEntities";
 import { FarmerDatasource } from "../../datasource/FarmerDatasource";
+import {
+  FARMER_STATUS_SEARCH,
+  STATUS_COLOR_MAPPING,
+  STATUS_FARMER_MAPPING,
+} from "../../definitions/Status";
+import moment from "moment";
+import { LocationDatasource } from "../../datasource/LocationDatasource";
+import {
+  DistrictEntity,
+  ProviceEntity,
+  SubdistrictEntity,
+} from "../../entities/LocationEntities";
 
 function IndexFarmer() {
   const row = 10;
   const [current, setCurrent] = useState(1);
   const [data, setData] = useState<FarmerPageEntity>();
+  const [searchStatus, setSearchStatus] = useState<string>();
+  const [searchText, setSearchText] = useState<string>();
+  const [searchProvince, setSearchProvince] = useState<any>();
+  const [searchDistrict, setSearchDistrict] = useState<any>();
+  const [searchSubdistrict, setSearchSubdstrict] = useState<any>();
+  const [province, setProvince] = useState<ProviceEntity[]>();
+  const [district, setDistrict] = useState<DistrictEntity[]>();
+  const [subdistrict, setSubdistrict] = useState<SubdistrictEntity[]>();
 
   const fecthAdmin = async () => {
     await FarmerDatasource.getFarmerList(
       current,
       row,
+      searchStatus,
+      searchText,
+      searchProvince,
+      searchDistrict,
+      searchSubdistrict
     ).then((res: FarmerPageEntity) => {
-      console.log(res);
       setData(res);
+    });
+  };
+  const fecthProvince = async () => {
+    await LocationDatasource.getProvince().then((res) => {
+      setProvince(res);
+    });
+  };
+  const fetchDistrict = async () => {
+    await LocationDatasource.getDistrict(searchProvince).then((res) => {
+      setDistrict(res);
+    });
+  };
+  const fetchSubdistrict = async () => {
+    await LocationDatasource.getSubdistrict(searchDistrict).then((res) => {
+      setSubdistrict(res);
     });
   };
 
   useEffect(() => {
     fecthAdmin();
-  }, [current]);
+    fecthProvince();
+    fetchDistrict();
+    fetchSubdistrict();
+  }, [
+    current,
+    searchStatus,
+    searchText,
+    searchProvince,
+    searchDistrict,
+    searchSubdistrict,
+  ]);
 
   const onChangePage = (page: number) => {
     setCurrent(page);
+  };
+
+  const handleSearchStatus = (status: any) => {
+    setSearchStatus(status);
+  };
+  const handleSearchText = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchText(e.target.value);
+  };
+  const handleSearchProvince = (provinceId: number) => {
+    setSearchProvince(provinceId);
+  };
+  const handleSearchDistrict = (districtId: number) => {
+    setSearchDistrict(districtId);
+  };
+  const handleSearchSubdistrict = (subdistrictId: number) => {
+    setSearchSubdstrict(subdistrictId);
   };
 
   const pageTitle = (
@@ -66,27 +128,88 @@ function IndexFarmer() {
           <Search
             placeholder="ค้นหาชื่อเกษตรกร หรือเบอร์โทร"
             className="col-lg-12 p-1"
+            onChange={handleSearchText}
           />
         </div>
         <div className="col-lg-3">
-          <Select className="col-lg-12 p-1" placeholder="เลือกจังหวัด"></Select>
+          <Select
+            className="col-lg-12 p-1"
+            placeholder="เลือกจังหวัด"
+            onChange={handleSearchProvince}
+            showSearch
+            optionFilterProp="children"
+            filterOption={(input: any, option: any) =>
+              option.children.includes(input)
+            }
+            filterSort={(optionA, optionB) =>
+              optionA.children
+                .toLowerCase()
+                .localeCompare(optionB.children.toLowerCase())
+            }
+          >
+            {province?.map((item) => (
+              <Option value={item.provinceId.toString()}>{item.region}</Option>
+            ))}
+          </Select>
         </div>
         <div className="col-lg-2">
           <Select
             className="col-lg-12 p-1"
             placeholder="เลือกอำเภอ"
-            disabled
-          ></Select>
+            onChange={handleSearchDistrict}
+            showSearch
+            optionFilterProp="children"
+            filterOption={(input: any, option: any) =>
+              option.children.includes(input)
+            }
+            filterSort={(optionA, optionB) =>
+              optionA.children
+                .toLowerCase()
+                .localeCompare(optionB.children.toLowerCase())
+            }
+            disabled={searchProvince == undefined}
+          >
+            {district?.map((item) => (
+              <Option value={item.districtId.toString()}>
+                {item.districtName}
+              </Option>
+            ))}
+          </Select>
         </div>
         <div className="col-lg-2">
           <Select
             className="col-lg-12 p-1"
             placeholder="เลือกตำบล"
-            disabled
-          ></Select>
+            onChange={handleSearchSubdistrict}
+            showSearch
+            optionFilterProp="children"
+            filterOption={(input: any, option: any) =>
+              option.children.includes(input)
+            }
+            filterSort={(optionA, optionB) =>
+              optionA.children
+                .toLowerCase()
+                .localeCompare(optionB.children.toLowerCase())
+            }
+            disabled={searchDistrict == undefined}
+          >
+            {subdistrict?.map((item) => (
+              <Option value={item.subdistrictId.toString()}>
+                {item.subdistrictName}
+              </Option>
+            ))}
+          </Select>
         </div>
         <div className="col-lg-2">
-          <Select className="col-lg-12 p-1" placeholder="เลือกสถานะ"></Select>
+          <Select
+            className="col-lg-12 p-1"
+            placeholder="เลือกสถานะ"
+            onChange={handleSearchStatus}
+          >
+            {FARMER_STATUS_SEARCH.map((item) => (
+              <option value={item.value}>{item.name}</option>
+            ))}
+          </Select>
         </div>
       </div>
     </>
@@ -100,11 +223,7 @@ function IndexFarmer() {
       width: "12%",
       render: (value: any, row: any, index: number) => {
         return {
-          children: (
-            <span>
-              {row.firstname + " " + row.lastname}
-            </span>
-          ),
+          children: <span>{row.firstname + " " + row.lastname}</span>,
         };
       },
     },
@@ -121,11 +240,7 @@ function IndexFarmer() {
       width: "12%",
       render: (value: any, row: any, index: number) => {
         return {
-          children: (
-            <span>
-              {row.address.province.region}
-            </span>
-          ),
+          children: <span>{row.address.province.region}</span>,
         };
       },
     },
@@ -136,11 +251,7 @@ function IndexFarmer() {
       width: "12%",
       render: (value: any, row: any, index: number) => {
         return {
-          children: (
-            <span>
-              {row.address.district.districtName}
-            </span>
-          ),
+          children: <span>{row.address.district.districtName}</span>,
         };
       },
     },
@@ -151,11 +262,7 @@ function IndexFarmer() {
       width: "12%",
       render: (value: any, row: any, index: number) => {
         return {
-          children: (
-            <span>
-              {row.address.subdistrict.subdistrictName}
-            </span>
-          ),
+          children: <span>{row.address.subdistrict.subdistrictName}</span>,
         };
       },
     },
@@ -166,11 +273,7 @@ function IndexFarmer() {
       width: "12%",
       render: (value: any, row: any, index: number) => {
         return {
-          children: (
-            <span>
-              {row.totalPlotCount} แปลง
-            </span>
-          ),
+          children: <span>{row.totalPlotCount} แปลง</span>,
         };
       },
     },
@@ -181,19 +284,39 @@ function IndexFarmer() {
       width: "12%",
       render: (value: any, row: any, index: number) => {
         return {
-          children: (
-            <span>
-              {row.totalRaiCount} ไร่
-            </span>
-          ),
+          children: <span>{row.totalRaiCount} ไร่</span>,
         };
       },
     },
     {
       title: "สถานะ",
-      dataIndex: "date",
-      key: "date",
+      dataIndex: "status",
+      key: "status",
       width: "12%",
+      render: (value: any, row: any, index: number) => {
+        const countDay = () => {
+          let dateToday: any = moment(Date.now());
+          let createDate: any = moment(new Date(row.createdAt));
+          let dateDiff = dateToday.diff(createDate, "day");
+          let textDateDiff =
+            dateDiff == 0 ? null : "(รอไปแล้ว " + dateDiff + " วัน)";
+          return textDateDiff;
+        };
+        return {
+          children: (
+            <>
+              <span style={{ color: STATUS_COLOR_MAPPING[row.status] }}>
+                <Badge color={STATUS_COLOR_MAPPING[row.status]} />
+                {STATUS_FARMER_MAPPING[row.status]}
+                <br />
+              </span>
+              <span style={{ color: color.Grey }}>
+                {row.status == "PENDING" ? countDay() : null}
+              </span>
+            </>
+          ),
+        };
+      },
     },
     {
       title: "",
