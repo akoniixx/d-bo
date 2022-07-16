@@ -60,9 +60,8 @@ const AddFarmer = () => {
     CreateAddressEntity_INIT
   );
   const [saveBtnDisable, setBtnSaveDisable] = useState<boolean>(true);
-
   const [showAddModal, setShowAddModal] = useState(false);
-  const [editModal, setEditModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
   const [editIndex, setEditIndex] = useState(0);
   const [province, setProvince] = useState<ProviceEntity[]>([
     ProvinceEntity_INIT,
@@ -157,7 +156,7 @@ const AddFarmer = () => {
   };
 
   const editPlot = (data: FarmerPlotEntity, index: number) => {
-    setEditModal((prev) => !prev);
+    setShowEditModal((prev) => !prev);
     setEditIndex(index);
     setEditFarmerPlot(data);
   };
@@ -176,7 +175,7 @@ const AddFarmer = () => {
       setFarmerPlotList([...newData, data]);
     }
     setShowAddModal(false);
-    setEditModal(false);
+    setShowEditModal(false);
     setEditIndex(0);
   };
   //#endregion
@@ -583,10 +582,10 @@ const AddFarmer = () => {
           editIndex={editIndex}
         />
       )}
-      {editModal && (
+      {showEditModal && (
         <ModalFarmerPlot
-          show={editModal}
-          backButton={() => setEditModal((prev) => !prev)}
+          show={showEditModal}
+          backButton={() => setShowEditModal((prev) => !prev)}
           callBack={insertFarmerPlot}
           data={editFarmerPlot}
           editIndex={editIndex}

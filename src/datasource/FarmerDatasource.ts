@@ -2,6 +2,7 @@ import { httpClient } from "../config/develop-config";
 import {
   CreateFarmerEntity,
   FarmerPageEntity,
+  GetFarmerEntity,
 } from "../entities/FarmerEntities";
 const API_URL = `https://api-dev-dnds.iconkaset.com`;
 
@@ -35,7 +36,10 @@ export class FarmerDatasource {
   }
 
   static insertFarmer(data: CreateFarmerEntity): Promise<any> {
-    console.log(data);
+    var id: any = "id";
+    var farmerId: any = "farmerId";
+    delete data.farmerPlot[id];
+    delete data.farmerPlot[farmerId];
     return httpClient
       .post(API_URL + "/farmer", data)
       .then((response) => {
@@ -43,6 +47,17 @@ export class FarmerDatasource {
       })
       .catch((err) => {
         console.log(err, "err insertFarmer");
+      });
+  }
+
+  static getFarmerById(id: string): Promise<GetFarmerEntity> {
+    return httpClient
+      .get(API_URL + "/farmer/" + id)
+      .then((response) => {
+        return response.data;
+      })
+      .catch((err) => {
+        console.log(err, "err getFarmerid");
       });
   }
 }

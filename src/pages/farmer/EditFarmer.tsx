@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Layout from "../../components/layout/Layout";
 import {
   Row,
@@ -8,8 +8,9 @@ import {
   Upload,
   Button,
   Pagination,
-  Modal,
   Badge,
+  Radio,
+  Space,
 } from "antd";
 import { CardContainer } from "../../components/card/CardContainer";
 import { BackIconButton } from "../../components/button/BackButton";
@@ -24,48 +25,93 @@ import {
 import emptyData from "../../resource/media/empties/iconoir_farm.png";
 import color from "../../resource/color";
 import FooterPage from "../../components/footer/FooterPage";
-import { ModalPage } from "../../components/modal/ModalPage";
 import ActionButton from "../../components/button/ActionButton";
 import { CardHeader } from "../../components/header/CardHearder";
+import {
+  GetFarmerEntity,
+  GetFarmerEntity_INIT,
+} from "../../entities/FarmerEntities";
+import {
+  DistrictEntity,
+  DistrictEntity_INIT,
+  ProviceEntity,
+  ProvinceEntity_INIT,
+  SubdistrictEntity,
+  SubdistrictEntity_INIT,
+} from "../../entities/LocationEntities";
+import { FarmerDatasource } from "../../datasource/FarmerDatasource";
+import {
+  FarmerPlotEntity,
+  FarmerPlotEntity_INIT,
+} from "../../entities/FarmerPlotEntities";
+import {
+  FARMER_STATUS_SEARCH,
+  STATUS_FARMERPLOT_COLOR_MAPPING,
+  STATUS_NORMAL_MAPPING,
+} from "../../definitions/Status";
+import {
+  AddressEntity,
+  AddressEntity_INIT,
+} from "../../entities/AddressEntities";
+import { LocationDatasource } from "../../datasource/LocationDatasource";
+import ModalFarmerPlot from "../../components/modal/ModalFarmerPlot";
+import { FarmerPlotDatasource } from "../../datasource/FarmerPlotDatasource";
+
+const { Option } = Select;
+
+const _ = require("lodash");
+const { Map } = require("immutable");
+
+let queryString = _.split(window.location.pathname, "=");
 
 const EditFarmer = () => {
-  //MockData
-  const dataSource = {
-    key: "1",
-    name: "Mike",
-    lastname: "Jones",
-    telephone: "0935355808",
-    idcard: "0123456789xxx",
-    province: "กรุงเทพมหานคร",
-    district: "คลองเตย",
-    subdistrict: "คลองตัน",
-    postcode: "10110",
-    address: "98 ซอยแสนสุข",
-    dataLand: [
-      {
-        landkay: 1,
-        landname: "นาลุงแทนทิศเหนือ",
-        landtotal: "100 ไร่",
-        landstatus: "ใช้งาน",
-      },
-      {
-        landkay: 2,
-        landname: "นาลุงแทนทิศใต้",
-        landtotal: "50 ไร่",
-        landstatus: "ไม่ได้ใช้งาน",
-      },
-    ],
-  };
-  const [data, setData] = useState(dataSource);
-  const [modal, setModal] = useState(false);
+  const farmerId = queryString[1];
+  const [data, setData] = useState<GetFarmerEntity>(GetFarmerEntity_INIT);
+  const [address, setAddress] = useState<AddressEntity>(AddressEntity_INIT);
+  const [farmerPlotList, setFarmerPlotList] = useState<FarmerPlotEntity[]>([
+    FarmerPlotEntity_INIT,
+  ]);
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editIndex, setEditIndex] = useState(0);
 
-  const showModal = () => {
-    setModal(true);
+  const [province, setProvince] = useState<ProviceEntity[]>([
+    ProvinceEntity_INIT,
+  ]);
+  const [district, setDistrict] = useState<DistrictEntity[]>([
+    DistrictEntity_INIT,
+  ]);
+  const [subdistrict, setSubdistrict] = useState<SubdistrictEntity[]>([
+    SubdistrictEntity_INIT,
+  ]);
+  const [saveBtnDisable, setBtnSaveDisable] = useState<boolean>(true);
+  const [editFarmerPlot, setEditFarmerPlot] = useState<FarmerPlotEntity>(
+    FarmerPlotEntity_INIT
+  );
+
+  const fecthFarmer = async () => {
+    await FarmerDatasource.getFarmerById(farmerId).then((res) => {
+      setData(res);
+      setAddress(res.address);
+      setFarmerPlotList(res.farmerPlot);
+    });
   };
 
-  const closeModal = () => {
-    setModal(false);
-  };
+  useEffect(() => {
+    fecthFarmer();
+  }, []);
+
+  useEffect(() => {
+    LocationDatasource.getProvince().then((res) => {
+      setProvince(res);
+    });
+    LocationDatasource.getDistrict(address.provinceId).then((res) => {
+      setDistrict(res);
+    });
+    LocationDatasource.getSubdistrict(address.districtId).then((res) => {
+      setSubdistrict(res);
+    });
+  }, [address.provinceId, address.districtId]);
 
   const uploadButton = (
     <div>
@@ -74,73 +120,72 @@ const EditFarmer = () => {
     </div>
   );
 
-  const formModal = (
-    <Form>
-      <div className="form-group">
-        <label>
-          ชื่อแปลง <span style={{ color: "red" }}>*</span>
-        </label>
-        <Form.Item
-          name="LandName"
-          rules={[
-            {
-              required: true,
-              message: "กรุณากรอกชื่อแปลง!",
-            },
-          ]}
-        >
-          <Input placeholder="กรอกชื่อแปลง" />
-        </Form.Item>
-      </div>
-      <div className="form-group">
-        <label>
-          พืชที่ปลูก <span style={{ color: "red" }}>*</span>
-        </label>
-        <Form.Item name="Crop">
-          <Select placeholder="เลือกพืชที่ปลูก" allowClear>
-            <option>ข้าว</option>
-            <option>ข้าวโพด</option>
-          </Select>
-        </Form.Item>
-      </div>
-      <div className="form-group col-lg-6">
-        <label>
-          จำนวนไร่ <span style={{ color: "red" }}>*</span>
-        </label>
-        <Form.Item
-          name="LandTotal"
-          rules={[
-            {
-              required: true,
-              message: "กรุณากรอกจำนวนไร่!",
-            },
-          ]}
-        >
-          <Input placeholder="ไร่" style={{ textAlign: "right" }} />
-        </Form.Item>
-      </div>
-      <div className="form-group">
-        <label>พื้นที่แปลงเกษตร</label>
-        <Form.Item name="SearchAddress">
-          <Input
-            placeholder="ค้นหาตำบล/อำเภอ/จังหวัด"
-            prefix={<SearchOutlined />}
-          />
-        </Form.Item>
-      </div>
-      {/* map */}
-      <p>map</p>
-      <div className="form-group">
-        <label>
-          จุดสังเกตใกล้แปลง (เช่น รร.บ้านน้อย){" "}
-          <span style={{ color: "red" }}>*</span>
-        </label>
-        <Form.Item name="SearchAddress">
-          <Input placeholder="กรอกจุดสังเกต" />
-        </Form.Item>
-      </div>
-    </Form>
-  );
+  //#region funttion farmer
+  const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const m = Map(data).set(e.target.id, e.target.value);
+    setData(m.toJS());
+  };
+
+  const handleOnChangeProvince = async (provinceId: number) => {
+    console.log(provinceId);
+    const d = Map(address).set("provinceId", provinceId);
+    setAddress(d.toJS());
+  };
+
+  const handleOnChangeDistrict = async (districtId: number) => {
+    const d = Map(address).set("districtId", districtId);
+    setAddress(d.toJS());
+  };
+
+  const handleOnChangeSubdistrict = async (subdistrictId: number) => {
+    const d = Map(address).set("subdistrictId", subdistrictId);
+    setAddress(d.toJS());
+    await handleOnChangePostcode(d.toJS());
+  };
+
+  const handleOnChangePostcode = (addr: AddressEntity) => {
+    let getPostcode = subdistrict.filter(
+      (x) => x.subdistrictId == addr.subdistrictId
+    )[0].postcode;
+    const c = Map(addr).set("postcode", getPostcode);
+    setAddress(c.toJS());
+  };
+
+  const handleOnChangeAddress = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const d = Map(address).set("address1", e.target.value);
+    setAddress(d.toJS());
+  };
+
+  const handleChangePlotstatus = (e: any) => {
+    const m = Map(data).set("status", e.target.value);
+    setData(m.toJS());
+  };
+  //#endregion
+
+  //#region function farmer plot
+  const editPlot = (data: FarmerPlotEntity, index: number) => {
+    setShowEditModal((prev) => !prev);
+    setEditIndex(index);
+    setEditFarmerPlot(data);
+  };
+
+  const removePlot = async (data: FarmerPlotEntity) => {
+    await FarmerPlotDatasource.deleteFarmerPlot(data.id).then();
+    fecthFarmer();
+  };
+
+  const updateFarmerPlot = async (data: FarmerPlotEntity) => {
+    const p = Map(data).set("farmerId", farmerId);
+    if (p.toJS().id != "") {
+      await FarmerPlotDatasource.updateFarmerPlot(p.toJS()).then();
+      setShowEditModal((prev) => !prev);
+    } else {
+      await FarmerPlotDatasource.insertFarmerPlot(p.toJS()).then();
+      setShowAddModal((prev) => !prev);
+    }
+    fecthFarmer();
+  };
+  //#region 
 
   const renderFromData = (
     <div className="col-lg-7">
@@ -166,7 +211,7 @@ const EditFarmer = () => {
                 ชื่อ <span style={{ color: "red" }}>*</span>
               </label>
               <Form.Item
-                name="FirstName"
+                name="firstname"
                 rules={[
                   {
                     required: true,
@@ -176,8 +221,9 @@ const EditFarmer = () => {
               >
                 <Input
                   placeholder="กรอกชื่อ"
-                  defaultValue={data.name}
+                  defaultValue={data.firstname}
                   autoComplete="off"
+                  onChange={handleOnChange}
                 />
               </Form.Item>
             </div>
@@ -186,7 +232,7 @@ const EditFarmer = () => {
                 นามสกุล <span style={{ color: "red" }}>*</span>
               </label>
               <Form.Item
-                name="LastName"
+                name="lastname"
                 rules={[
                   {
                     required: true,
@@ -198,6 +244,7 @@ const EditFarmer = () => {
                   placeholder="กรอกนามสกุล"
                   defaultValue={data.lastname}
                   autoComplete="off"
+                  onChange={handleOnChange}
                 />
               </Form.Item>
             </div>
@@ -208,7 +255,7 @@ const EditFarmer = () => {
                 เบอร์โทร <span style={{ color: "red" }}>*</span>
               </label>
               <Form.Item
-                name="Telephone"
+                name="telephoneNo"
                 rules={[
                   {
                     required: true,
@@ -218,8 +265,9 @@ const EditFarmer = () => {
               >
                 <Input
                   placeholder="กรอกเบอร์โทร"
-                  defaultValue={data.telephone}
+                  defaultValue={data.telephoneNo}
                   autoComplete="off"
+                  onChange={handleOnChange}
                 />
               </Form.Item>
             </div>
@@ -228,7 +276,7 @@ const EditFarmer = () => {
                 รหัสบัตรประชาชน <span style={{ color: "red" }}>*</span>
               </label>
               <Form.Item
-                name="CardID"
+                name="idNo"
                 rules={[
                   {
                     required: true,
@@ -238,8 +286,9 @@ const EditFarmer = () => {
               >
                 <Input
                   placeholder="กรอกบัตรประชาชน"
-                  defaultValue={data.idcard}
+                  defaultValue={data.idNo}
                   autoComplete="off"
+                  onChange={handleOnChange}
                 />
               </Form.Item>
             </div>
@@ -269,14 +318,25 @@ const EditFarmer = () => {
               <label>
                 จังหวัด <span style={{ color: "red" }}>*</span>
               </label>
-              <Form.Item name="Province">
+              <Form.Item name="province">
                 <Select
                   placeholder="เลือกจังหวัด"
-                  allowClear
-                  defaultValue={data.province}
+                  defaultValue={address.provinceId}
+                  showSearch
+                  optionFilterProp="children"
+                  filterOption={(input: any, option: any) =>
+                    option.children.includes(input)
+                  }
+                  filterSort={(optionA, optionB) =>
+                    optionA.children
+                      .toLowerCase()
+                      .localeCompare(optionB.children.toLowerCase())
+                  }
+                  onChange={handleOnChangeProvince}
                 >
-                  <option>กรุงเทพมหานคร</option>
-                  <option>นครปฐม</option>
+                  {province.map((item) => (
+                    <Option value={item.provinceId}>{item.region}</Option>
+                  ))}
                 </Select>
               </Form.Item>
             </div>
@@ -287,11 +347,22 @@ const EditFarmer = () => {
               <Form.Item name="district">
                 <Select
                   placeholder="เลือกอำเภอ"
-                  allowClear
-                  defaultValue={data.district}
+                  defaultValue={address.districtId}
+                  showSearch
+                  optionFilterProp="children"
+                  filterOption={(input: any, option: any) =>
+                    option.children.includes(input)
+                  }
+                  filterSort={(optionA, optionB) =>
+                    optionA.children
+                      .toLowerCase()
+                      .localeCompare(optionB.children.toLowerCase())
+                  }
+                  onChange={handleOnChangeDistrict}
                 >
-                  <option>คลองเตย</option>
-                  <option>บางรัก</option>
+                  {district.map((item) => (
+                    <Option value={item.districtId}>{item.districtName}</Option>
+                  ))}
                 </Select>
               </Form.Item>
             </div>
@@ -301,15 +372,27 @@ const EditFarmer = () => {
               <label>
                 ตำบล <span style={{ color: "red" }}>*</span>
               </label>
-              <Form.Item name="Subdistrict">
+              <Form.Item name="subdistrict">
                 <Select
                   placeholder="เลือกตำบล"
-                  disabled
-                  allowClear
-                  defaultValue={data.subdistrict}
+                  defaultValue={address.subdistrictId}
+                  showSearch
+                  optionFilterProp="children"
+                  filterOption={(input: any, option: any) =>
+                    option.children.includes(input)
+                  }
+                  filterSort={(optionA, optionB) =>
+                    optionA.children
+                      .toLowerCase()
+                      .localeCompare(optionB.children.toLowerCase())
+                  }
+                  onChange={handleOnChangeSubdistrict}
                 >
-                  <option>คลองตัน</option>
-                  <option>สี่พระยา</option>
+                  {subdistrict.map((item) => (
+                    <Option value={item.subdistrictId}>
+                      {item.subdistrictName}
+                    </Option>
+                  ))}
                 </Select>
               </Form.Item>
             </div>
@@ -317,16 +400,13 @@ const EditFarmer = () => {
               <label>
                 รหัสไปรษณีย์ <span style={{ color: "red" }}>*</span>
               </label>
-              <Form.Item name="PostCode">
-                <Select
-                  placeholder="เลือกรหัสไปรษณย์"
+              <Form.Item name="postcode">
+                <Input
+                  placeholder="เลือกรหัสไปรษณีย์"
+                  defaultValue={address.postcode}
+                  key={address.subdistrictId}
                   disabled
-                  allowClear
-                  defaultValue={data.postcode}
-                >
-                  <option>10110</option>
-                  <option>10500</option>
-                </Select>
+                />
               </Form.Item>
             </div>
           </div>
@@ -348,22 +428,35 @@ const EditFarmer = () => {
                   className="col-lg-12"
                   rows={5}
                   placeholder="กรอกที่อยู่บ้าน (เลขที่บ้าน, หมู่บ้าน, ชื่ออาคาร/ตึก, ซอย)"
-                  defaultValue={data.address}
+                  defaultValue={address.address1}
                   autoComplete="off"
+                  onChange={handleOnChangeAddress}
                 />
               </Form.Item>
+            </div>
+          </div>
+          <div>
+            <div className="form-group">
+              <label>
+                สถานะ <span style={{ color: "red" }}>*</span>
+              </label>
+              <br />
+              <Radio.Group
+                defaultValue={data.status}
+                onChange={handleChangePlotstatus}
+              >
+                <Space direction="vertical">
+                  {FARMER_STATUS_SEARCH.map((item) => (
+                    <Radio value={item.value}>{item.name}</Radio>
+                  ))}
+                </Space>
+              </Radio.Group>
             </div>
           </div>
         </Form>
       </CardContainer>
     </div>
   );
-
-  const colorStatus = (status: string) => {
-    var colorText = color.Success;
-    colorText = status == "ใช้งาน" ? colorText : color.Error;
-    return colorText;
-  };
 
   const renderLand = (
     <div className="col-lg-4">
@@ -387,33 +480,43 @@ const EditFarmer = () => {
               border: "none",
               borderRadius: "5px",
             }}
-            onClick={showModal}
+            onClick={() => setShowAddModal((prev) => !prev)}
           >
             เพิ่มแปลง
           </Button>
         </div>
-        <ModalPage
-          visible={modal}
-          textHeader="เพิ่มแปลงเกษตร"
-          closeModal={closeModal}
-          data={formModal}
-          backButton={closeModal}
-        />
         <Form>
-          {data.dataLand.length != 0 ? (
+          {farmerPlotList.length != 0 ? (
             <div className="container">
-              {data.dataLand.map((item) => (
+              {farmerPlotList.map((item, index) => (
                 <div className="row pt-3 pb-3">
                   <div className="col-lg-4">
-                    <span>{item.landname}</span>
+                    <span>{item.plotName}</span>
+                    <br />
+                    <p style={{ fontSize: "12px", color: color.Grey }}>
+                      {item.plantName}
+                    </p>
                   </div>
                   <div className="col-lg-2">
-                    <span>{item.landtotal}</span>
+                    <span>{item.raiAmount} ไร่</span>
                   </div>
                   <div className="col-lg-3">
-                    <span style={{ color: colorStatus(item.landstatus) }}>
-                      <Badge color={colorStatus(item.landstatus)} />
-                      {item.landstatus}
+                    <span
+                      style={{
+                        color:
+                          STATUS_FARMERPLOT_COLOR_MAPPING[
+                            item.isActive.toString()
+                          ],
+                      }}
+                    >
+                      <Badge
+                        color={
+                          STATUS_FARMERPLOT_COLOR_MAPPING[
+                            item.isActive.toString()
+                          ]
+                        }
+                      />
+                      {STATUS_NORMAL_MAPPING[item.isActive.toString()]}
                     </span>
                   </div>
                   <div className="col-lg-3 d-flex justify-content-between">
@@ -421,13 +524,14 @@ const EditFarmer = () => {
                       <ActionButton
                         icon={<EditOutlined />}
                         color={color.primary1}
-                        onClick={showModal}
+                        onClick={() => editPlot(item, index)}
                       />
                     </div>
                     <div className="col-lg-6">
                       <ActionButton
                         icon={<DeleteOutlined />}
                         color={color.Error}
+                        onClick={() => removePlot(item)}
                       />
                     </div>
                   </div>
@@ -437,18 +541,18 @@ const EditFarmer = () => {
           ) : (
             <div className="container text-center" style={{ padding: "80px" }}>
               <img src={emptyData}></img>
-              <p>ยังไม่มีแปลงเกษตร</p>
+              <h5>ยังไม่มีแปลงเกษตร</h5>
             </div>
           )}
         </Form>
       </CardContainer>
       <div className="d-flex justify-content-between pt-5">
-        <p>รายการทั้งหมด {data.dataLand.length} รายการ</p>
-        {data.dataLand.length < 10 ? null : (
+        <h5>รายการทั้งหมด {farmerPlotList.length} รายการ</h5>
+        {farmerPlotList.length < 10 ? null : (
           <Pagination defaultCurrent={1} total={1} />
         )}
       </div>
-    </div> 
+    </div>
   );
 
   return (
@@ -463,11 +567,32 @@ const EditFarmer = () => {
           </strong>
         </span>
       </Row>
-      <Row className="d-flex justify-content-around">
+      <Row className="d-flex justify-content-around" key={data.id}>
         {renderFromData}
         {renderLand}
       </Row>
-      <FooterPage onClickBack={() => (window.location.href = "/IndexFarmer")} />
+      <FooterPage
+        onClickBack={() => (window.location.href = "/IndexFarmer")}
+        disableSaveBtn={saveBtnDisable}
+      />
+      {showAddModal && (
+        <ModalFarmerPlot
+          show={showAddModal}
+          backButton={() => setShowAddModal((prev) => !prev)}
+          callBack={updateFarmerPlot}
+          data={FarmerPlotEntity_INIT}
+          editIndex={editIndex}
+        />
+      )}
+      {showEditModal && (
+        <ModalFarmerPlot
+          show={showEditModal}
+          backButton={() => setShowEditModal((prev) => !prev)}
+          callBack={updateFarmerPlot}
+          data={editFarmerPlot}
+          editIndex={editIndex}
+        />
+      )}
     </Layout>
   );
 };

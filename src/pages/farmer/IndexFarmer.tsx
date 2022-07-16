@@ -330,7 +330,7 @@ function IndexFarmer() {
               <ActionButton
                 icon={<EditOutlined />}
                 color={color.primary1}
-                onClick={() => (window.location.href = "/EditFarmer")}
+                onClick={() => (window.location.href = "/EditFarmer/id=" + row.id)}
               />
             </div>
           ),
