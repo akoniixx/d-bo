@@ -7,7 +7,6 @@ import {
   Select,
   Upload,
   Button,
-  Pagination,
   Badge,
 } from "antd";
 import { CardContainer } from "../../components/card/CardContainer";
@@ -23,7 +22,10 @@ import emptyData from "../../resource/media/empties/iconoir_farm.png";
 import color from "../../resource/color";
 import FooterPage from "../../components/footer/FooterPage";
 import { CardHeader } from "../../components/header/CardHearder";
-import { CreateFarmerEntity, CreateFarmerEntity_INIT } from "../../entities/FarmerEntities";
+import {
+  CreateFarmerEntity,
+  CreateFarmerEntity_INIT,
+} from "../../entities/FarmerEntities";
 import {
   DistrictEntity,
   DistrictEntity_INIT,
@@ -54,7 +56,10 @@ const { Map } = require("immutable");
 
 const AddFarmer = () => {
   const [data, setData] = useState<CreateFarmerEntity>(CreateFarmerEntity_INIT);
-  const [address, setAddress] = useState<CreateAddressEntity>(CreateAddressEntity_INIT);
+  const [address, setAddress] = useState<CreateAddressEntity>(
+    CreateAddressEntity_INIT
+  );
+  const [saveBtnDisable, setBtnSaveDisable] = useState<boolean>(true);
 
   const [showAddModal, setShowAddModal] = useState(false);
   const [editModal, setEditModal] = useState(false);
@@ -87,7 +92,9 @@ const AddFarmer = () => {
   const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const m = Map(data).set(e.target.id, e.target.value);
     setData(m.toJS());
+    checkValidate(m.toJS());
   };
+
   const handleOnChangeProvince = async (provinceId: number) => {
     await getProvince(provinceId, CreateAddressEntity_INIT);
   };
@@ -95,6 +102,7 @@ const AddFarmer = () => {
   const getProvince = async (provinceId: number, addr: CreateAddressEntity) => {
     const d = Map(addr).set("provinceId", provinceId);
     setAddress(d.toJS());
+    checkValidateAddr(d.toJS());
     await LocationDatasource.getDistrict(provinceId).then((res) => {
       setDistrict(res);
     });
@@ -103,7 +111,7 @@ const AddFarmer = () => {
   const handleOnChangeDistrict = async (districtId: number) => {
     const d = Map(address).set("districtId", districtId);
     setAddress(d.toJS());
-
+    checkValidateAddr(d.toJS());
     await LocationDatasource.getSubdistrict(districtId).then((res) => {
       setSubdistrict(res);
     });
@@ -112,6 +120,7 @@ const AddFarmer = () => {
   const handleOnChangeSubdistrict = async (subdistrictId: number) => {
     const d = Map(address).set("subdistrictId", subdistrictId);
     setAddress(d.toJS());
+    checkValidateAddr(d.toJS());
     await handleOnChangePostcode(d.toJS());
   };
 
@@ -121,11 +130,13 @@ const AddFarmer = () => {
     )[0].postcode;
     const c = Map(addr).set("postcode", getPostcode);
     setAddress(c.toJS());
+    checkValidateAddr(c.toJS());
   };
 
   const handleOnChangeAddress = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const d = Map(address).set("address1", e.target.value);
     setAddress(d.toJS());
+    checkValidateAddr(d.toJS());
   };
 
   const uploadButton = (
@@ -170,13 +181,47 @@ const AddFarmer = () => {
   };
   //#endregion
 
+  const checkValidate = (data: CreateFarmerEntity) => {
+    if (
+      data.firstname != "" &&
+      data.lastname != "" &&
+      data.telephoneNo != "" &&
+      data.idNo != "" &&
+      address.provinceId != 0 &&
+      address.districtId != 0 &&
+      address.subdistrictId != 0 &&
+      address.address1 != ""
+    ) {
+      setBtnSaveDisable(false);
+    } else {
+      setBtnSaveDisable(true);
+    }
+  };
+
+  const checkValidateAddr = (addr: CreateAddressEntity) => {
+    if (
+      addr.provinceId != 0 &&
+      addr.subdistrictId != 0 &&
+      addr.districtId != 0 &&
+      addr.postcode != "" &&
+      addr.address1 != "" &&
+      data.firstname != "" &&
+      data.lastname != "" &&
+      data.telephoneNo != "" &&
+      data.idNo != ""
+    ) {
+      setBtnSaveDisable(false);
+    } else {
+      setBtnSaveDisable(true);
+    }
+  };
+
   const insertFarmer = async () => {
     const pushAddr = Map(data).set("address", address);
     setData(pushAddr.toJS());
     const pushPlot = Map(pushAddr.toJS()).set("farmerPlot", farmerPlotList);
     setData(pushPlot.toJS());
     await FarmerDatasource.insertFarmer(pushPlot.toJS()).then((res) => {
-      console.log(res);
       if (res.id != null) {
         Swal.fire({
           title: "บันทึกสำเร็จ",
@@ -510,7 +555,6 @@ const AddFarmer = () => {
 
   return (
     <Layout>
-      {console.log(address)}
       <Row>
         <BackIconButton
           onClick={() => (window.location.href = "/IndexFarmer")}
@@ -528,6 +572,7 @@ const AddFarmer = () => {
       <FooterPage
         onClickBack={() => (window.location.href = "/IndexFarmer")}
         onClickSave={insertFarmer}
+        disableSaveBtn={saveBtnDisable}
       />
       {showAddModal && (
         <ModalFarmerPlot

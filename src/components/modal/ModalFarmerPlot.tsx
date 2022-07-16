@@ -23,10 +23,12 @@ const ModalFarmerPlot: React.FC<ModalFarmerPlotProps> = ({
   editIndex,
 }) => {
   const [farmerPlot, setFarmerPlot] = useState<FarmerPlotEntity>(data);
+  const [saveBtnDisable, setBtnSaveDisable] = useState<boolean>(true);
 
   const handleOnChangePlot = (e: React.ChangeEvent<HTMLInputElement>) => {
     const m = Map(farmerPlot).set(e.target.id, e.target.value);
     setFarmerPlot(m.toJS());
+    checkValidate(m.toJS());
   };
 
   const handleChangePlotstatus = (e: any) => {
@@ -37,11 +39,25 @@ const ModalFarmerPlot: React.FC<ModalFarmerPlotProps> = ({
   const handleOnChangePlantSelect = (value: any) => {
     const m = Map(farmerPlot).set("plantName", value);
     setFarmerPlot(m.toJS());
+    checkValidate(m.toJS());
   };
 
   const handelCallBack = () => {
     const m = Map(farmerPlot).set("plotId", editIndex);
     callBack(m.toJS());
+  };
+
+  const checkValidate = (data: FarmerPlotEntity) => {
+    if (
+      data.plotName != "" &&
+      data.plantName != "" &&
+      data.raiAmount != 0 &&
+      data.landmark != ""
+    ) {
+      setBtnSaveDisable(false);
+    } else {
+      setBtnSaveDisable(true);
+    }
   };
 
   return (
@@ -63,6 +79,7 @@ const ModalFarmerPlot: React.FC<ModalFarmerPlotProps> = ({
           <FooterPage
             onClickBack={backButton}
             onClickSave={() => handelCallBack()}
+            disableSaveBtn={saveBtnDisable}
           />,
         ]}
       >
