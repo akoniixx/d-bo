@@ -19,7 +19,6 @@ import {
   DeleteOutlined,
   EditOutlined,
   PictureFilled,
-  UploadOutlined,
 } from "@ant-design/icons";
 import emptyData from "../../resource/media/empties/iconoir_farm.png";
 import color from "../../resource/color";
@@ -56,6 +55,7 @@ import { LocationDatasource } from "../../datasource/LocationDatasource";
 import ModalFarmerPlot from "../../components/modal/ModalFarmerPlot";
 import { FarmerPlotDatasource } from "../../datasource/FarmerPlotDatasource";
 import Swal from "sweetalert2";
+import ImgCrop from "antd-img-crop";
 
 const { Option } = Select;
 
@@ -88,6 +88,9 @@ const EditFarmer = () => {
   const [editFarmerPlot, setEditFarmerPlot] = useState<FarmerPlotEntity>(
     FarmerPlotEntity_INIT
   );
+
+  const [imgProfile, setImgProfile] = useState<any[]>([]);
+  const [imgIdCard, setImgIdCard] = useState<any[]>([]);
 
   const fecthFarmer = async () => {
     await FarmerDatasource.getFarmerById(farmerId).then((res) => {
@@ -194,6 +197,33 @@ const EditFarmer = () => {
   };
   //#endregion
 
+  //#region image
+  const onChangeProfile = (newFileList: any) => {
+    setImgProfile(newFileList.fileList);
+  };
+
+  const onPreviewProfile = async (file: any) => {
+    let src = file.url;
+    if (!src) {
+      src = await new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file.originFileObj);
+        reader.onload = () => resolve(reader.result);
+      });
+    }
+    const image = new Image();
+    image.src = src;
+    const imgWindow = window.open(src);
+    imgWindow?.document.write(image.outerHTML);
+  };
+  const uploadProfile = (
+    <div>
+      <PictureFilled style={{ fontSize: "50px", color: color.Success }} />
+      <div style={{ fontSize: "18px", color: color.Success }}>+ Upload</div>
+    </div>
+  );
+  //#endregion
+
   const checkValidate = (data: GetFarmerEntity) => {
     if (
       data.firstname != "" &&
@@ -252,15 +282,16 @@ const EditFarmer = () => {
         <Form style={{ padding: "32px" }}>
           <div className="row">
             <div className="form-group text-center pb-5">
-              <Upload
-                name="avatar"
-                listType="picture-card"
-                className="avatar-uploader"
-                showUploadList={false}
-                iconRender={UploadOutlined}
-              >
-                {uploadButton}
-              </Upload>
+              <ImgCrop rotate>
+                <Upload
+                  listType="picture-card"
+                  fileList={imgProfile}
+                  onChange={onChangeProfile}
+                  onPreview={onPreviewProfile}
+                >
+                  {imgProfile.length < 1 && uploadProfile}
+                </Upload>
+              </ImgCrop>
             </div>
           </div>
           <div className="row">
@@ -358,7 +389,7 @@ const EditFarmer = () => {
                 {/* <span style={{ color: "red" }}>*</span> */}
               </label>
               <br />
-              <Upload listType="picture" className="upload-list-inline">
+              <Upload listType="picture" defaultFileList={[...imgIdCard]} onPreview={onPreviewProfile}>
                 <Button
                   style={{
                     backgroundColor: "rgba(33, 150, 83, 0.1)",
