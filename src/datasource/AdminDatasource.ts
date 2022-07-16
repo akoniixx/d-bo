@@ -55,7 +55,7 @@ export class AdminDatasource {
         return response.data;
       })
       .catch((err) => {
-        console.log(err, "err insert admin");
+        return err.message;
       });
   }
 
@@ -74,7 +74,7 @@ export class AdminDatasource {
         return response.data;
       })
       .catch((err) => {
-        console.log(err, "err update admin");
+        return err.message;
       });
   }
 }
