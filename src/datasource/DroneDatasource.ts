@@ -6,13 +6,13 @@ export class DroneDatasource {
   static getDroneList(
     page: number,
     take: number,
-    sortDirection: string,
+    // droneBrandId?: string,
     search?: string
   ): Promise<DroneListEntity> {
     const params = {
       page: page,
       take: take,
-      sortDirection: sortDirection,
+      // droneBrandId: droneBrandId,
       search: search,
     };
     return httpClient

@@ -5,7 +5,6 @@ export interface DroneEntity {
   droneBrandId: string;
   series: string;
   droneBrand: DroneBrandEntity;
-  file: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -15,7 +14,6 @@ export const DroneEntity_INIT: DroneEntity = {
   droneBrandId: "",
   series: "",
   droneBrand: DroneBrandEntity_INIT,
-  file: "",
   createdAt: "",
   updatedAt: "",
 };

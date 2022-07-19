@@ -1,152 +1,128 @@
 import {
+  Avatar,
   Badge,
-  Button,
-  Col,
-  Empty,
   Input,
+  Pagination,
   Row,
   Select,
   Switch,
   Table,
+  Tooltip,
 } from "antd";
 import React, { useEffect, useState } from "react";
 import Search from "antd/lib/input/Search";
 import { Option } from "antd/lib/mentions";
 import color from "../../resource/color";
-import Layouts from "../../components/layout/Layout";
 import EditButton from "../../components/button/ActionButton";
 import ActionButton from "../../components/button/ActionButton";
-import { EditOutlined } from "@ant-design/icons";
+import { EditOutlined, InfoCircleOutlined } from "@ant-design/icons";
 import { useLocalStorage } from "../../hook/useLocalStorage";
-import { DronerEntity, DronerEntity_INIT } from "../../entities/DronerEntities";
+import {
+  DronerListEntity,
+  DronerListEntity_INIT,
+} from "../../entities/DronerEntities";
 import { DronerDatasource } from "../../datasource/DronerDatasource";
 import {
   DRONER_STATUS,
   DRONER_STATUS_MAPPING,
+  STATUS_COLOR,
 } from "../../definitions/DronerStatus";
 import { LocationDatasource } from "../../datasource/LocationDatasource";
+import {
+  DistrictEntity,
+  ProviceEntity,
+  SubdistrictEntity,
+} from "../../entities/LocationEntities";
+import moment from "moment";
+import AddButtton from "../../components/button/AddButton";
+import { DroneDatasource } from "../../datasource/DroneDatasource";
+import Layouts from "../../components/layout/Layout";
 
-const _ = require("lodash");
-const { Map } = require("immutable");
 function IndexDroner() {
+  const row = 10;
+  const [current, setCurrent] = useState(1);
   const { Search } = Input;
-  const [optionalTextSearch, setTextSearch] = useState<string>();
-  const [selectStatus, setSelectStatus] = useState<string>("");
+  const [textSearch, setTextSearch] = useState<string>();
+  const [selectStatus, setSelectStatus] = useState<string>();
   const [searchProvince, setSearchProvince] = useState<any>();
   const [searchDistrict, setSearchDistrict] = useState<any>();
   const [searchSubdistrict, setSearchSubdistrict] = useState<any>();
-  const [province, setProvince] = useState<any[]>([]);
-  const [district, setDistrict] = useState<any[]>([]);
-  const [subdistrict, setSubdistrict] = useState<any[]>([]);
-  const [data, setData] = useState<DronerEntity[]>([DronerEntity_INIT]);
+  const [province, setProvince] = useState<ProviceEntity[]>([]);
+  const [district, setDistrict] = useState<DistrictEntity[]>([]);
+  const [subdistrict, setSubdistrict] = useState<SubdistrictEntity[]>([]);
+  const [droneBrandId, setDroneBrandId] = useState<any>();
+  const [searchDroneBrand, setSearchDroneBrand] = useState<any>();
+  const [data, setData] = useState<DronerListEntity>();
+
   useEffect(() => {
-    fetchDronerList(
+    fetchDronerList();
+    fetchProvince();
+    fetchDistrict();
+    fetchSubdistrict();
+    fetchDroneBrand();
+  }, [
+    current,
+    textSearch,
+    selectStatus,
+    searchProvince,
+    searchDistrict,
+    searchDroneBrand,
+    searchSubdistrict,
+  ]);
+  const fetchDronerList = async () => {
+    await DronerDatasource.getDronerList(
+      current,
+      row,
       selectStatus,
       searchProvince,
       searchDistrict,
       searchSubdistrict,
-      1,
-      10,
-      "ASC",
-      optionalTextSearch
-    );
-    fetchProvince();
-  }, [
-    optionalTextSearch,
-    selectStatus,
-    searchProvince,
-    searchDistrict,
-    searchSubdistrict,
-  ]);
-  const fetchDronerList = async (
-    status: string,
-    provinceId: number,
-    districtId: number,
-    subdistrictId: number,
-    page: number,
-    take: number,
-    sortDirection: string,
-    search?: string
-  ) => {
-    await DronerDatasource.getDronerList(
-      status,
-      provinceId,
-      districtId,
-      subdistrictId,
-      page,
-      take,
-      sortDirection,
-      search
-    ).then((res) => {
-      console.log(res)
-      setData(res.data);
+      searchDroneBrand,
+      textSearch
+    ).then((res: any) => {
+      setData(res);
     });
   };
   const fetchProvince = async () => {
-    await LocationDatasource.getProvince()
-      .then((res) => {
-        setProvince(res);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
+    await LocationDatasource.getProvince().then((res) => {
+      setProvince(res);
+    });
   };
-  const handleProvince = async (provinceId: any) => {
-    setSearchProvince(provinceId)
-    LocationDatasource.getDistrict(provinceId)
-      .then((res) => {
-        console.log(res)
-        setDistrict(res);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
+  const fetchDistrict = async () => {
+    await LocationDatasource.getDistrict(searchProvince).then((res) => {
+      setDistrict(res);
+    });
   };
-  const handleDistrict = (districtId: any) => {
-    setSearchDistrict(districtId)
-    LocationDatasource.getSubdistrict(districtId)
-      .then((res) => {
-        console.log(res)
-        setSubdistrict(res);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
+  const fetchSubdistrict = async () => {
+    await LocationDatasource.getSubdistrict(searchDistrict).then((res) => {
+      setSubdistrict(res);
+    });
+  };
+  const fetchDroneBrand = async () => {
+    await DroneDatasource.getDroneBrandList().then((res) => {
+      setDroneBrandId(res.data);
+    });
+  };
+  const onChangePage = (page: number) => {
+    setCurrent(page);
+  };
+  const handleProvince = (provinceId: number) => {
+    setSearchProvince(provinceId);
+  };
+  const handleDistrict = (districtId: number) => {
+    setSearchDistrict(districtId);
   };
   const handleSubDistrict = (subdistrictId: any) => {
-    setSearchSubdistrict(subdistrictId)
+    setSearchSubdistrict(subdistrictId);
   };
-  const changeTextSearch = (text?: string) => {
-    setTextSearch(text);
+  const handleDroneBrand = (droneBrandId: string) => {
+    setSearchDroneBrand(droneBrandId);
   };
-  const handleStatus = (value: string) => {
-    setSelectStatus(value);
+  const changeTextSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setTextSearch(e.target.value);
   };
-  const colorStatus = (status: string) => {
-    if (status == "ACTIVE") {
-      return "text-success ";
-    } else if (status == "PENDING") {
-      return "text-warning ";
-    } else if (status == "INACTIVE") {
-      return "text-muted ";
-    } else if (status == "REJECTED") {
-      return "text-danger ";
-    } else {
-      return "text-muted ";
-    }
-  };
-  const colorBadge = (status: string) => {
-    if (status == "ACTIVE") {
-      return color.Success;
-    } else if (status == "PENDING") {
-      return color.Warning;
-    } else if (status == "INACTIVE") {
-      return color.Grey;
-    } else if (status == "REJECTED") {
-      return color.Error;
-    } else {
-      return color.Disable;
-    }
+  const handleStatus = (status: any) => {
+    setSelectStatus(status);
   };
   const sorter = (a: any, b: any) => {
     if (a === b) return 0;
@@ -154,178 +130,151 @@ function IndexDroner() {
     else if (b === null) return -1;
     else return a.localeCompare(b);
   };
-
-  const PageTitle = () => {
-    return (
-      <div className="container">
-        <Row gutter={{ xs: 8, sm: 16, md: 24, lg: 32 }}>
-          <Col className="gutter-row" span={20}>
-            <div>
-              <span
-                className="card-label font-weight-bolder text-dark"
-                style={{ fontSize: 22, fontWeight: "bold", padding: "8px 0" }}
-              >
-                รายชื่อนักบินโดรน (Droner)
-              </span>
-            </div>
-          </Col>
-          <Col className="gutter-row" style={{ marginTop: "8px" }}>
-            <Button
-              style={{
-                width: "130px",
-                padding: "8 0",
-                backgroundColor: color.primary1,
-                color: color.secondary2,
-                borderColor: color.Success,
-                borderRadius: "5px",
-              }}
-              onClick={() => (window.location.href = "/AddDroner")}
-              type="primary"
-            >
-              + เพิ่มนักบินโดรน
-            </Button>
-          </Col>
-        </Row>
-        <Row gutter={{ xs: 8, sm: 16, md: 24, lg: 32 }}>
-          <Col className="gutter-row" span={5}>
-            <Search
-              style={{ width: "250px", padding: "8px 0" }}
-              placeholder="ค้นหาชื่อนักบินโดรนหรือเบอร์โทร"
-              onSearch={changeTextSearch}
-            />
-          </Col>
-          <Col className="gutter-row" span={3} offset={3}>
-            <Select
-              style={{
-                width: "145px",
-                padding: "8px 0",
-                color: "#C6C6C6",
-              }}
-              showSearch
-              optionFilterProp="children"
-              filterOption={(input: any, option: any) =>
-                option.children.includes(input)
-              }
-              filterSort={(optionA, optionB) =>
-                optionA.children
-                  .toLowerCase()
-                  .localeCompare(optionB.children.toLowerCase())
-              }
-              defaultValue="เลือกจังหวัด"
-              onChange={handleProvince}
-              value={searchProvince}
-
-            >
-              {province.map((item: any, index: any) => (
-                <option key={index} value={item.provinceId}>
-                  {item.region}
-                </option>
-              ))}
-            </Select>
-          </Col>
-          <Col className="gutter-row" span={3}>
-            <Select
-              style={{
-                width: "145px",
-                padding: "8px 0",
-                color: "#C6C6C6",
-              }}
-              showSearch
-              optionFilterProp="children"
-              filterOption={(input: any, option: any) =>
-                option.children.includes(input)
-              }
-              filterSort={(optionA, optionB) =>
-                optionA.children
-                  .toLowerCase()
-                  .localeCompare(optionB.children.toLowerCase())
-              }
-              defaultValue="เลือกอำเภอ"
-              onChange={handleDistrict}
-              value={searchDistrict}
-
-            >
-              {district.map((item: any, index: any) => (
-                <option key={index} value={item.districtId}>
-                  {item.districtName}
-                </option>
-              ))}
-            </Select>
-          </Col>
-          <Col className="gutter-row" span={3}>
-            <Select
-              style={{
-                width: "145px",
-                padding: "8px 0",
-                color: "#C6C6C6",
-              }}
-              showSearch
-              optionFilterProp="children"
-              filterOption={(input: any, option: any) =>
-                option.children.includes(input)
-              }
-              filterSort={(optionA, optionB) =>
-                optionA.children
-                  .toLowerCase()
-                  .localeCompare(optionB.children.toLowerCase())
-              }
-              defaultValue="เลือกตำบล"
-              onChange={handleSubDistrict}
-              value={searchSubdistrict}>
-            
-              {subdistrict.map((item: any, index: any) => (
-                <option key={index} value={item.subdistrictId}>
-                  {item.subdistrictName}
-                </option>
-              ))}
-            </Select>
-          </Col>
-          <Col className="gutter-row" span={3}>
-            <Select
-              style={{
-                width: "140px",
-                marginRight: "5px",
-                padding: "8px 0",
-                color: "#C6C6C6",
-              }}
-              defaultValue="เลือกยี่ห้อ"
-              // onChange={handleChange}>
-            >
-              <Option value="1">DJI</Option>
-              <Option value="2">AAA</Option>
-              <Option value="3">DDD</Option>
-              <Option value="4">CAT</Option>
-            </Select>
-          </Col>
-          <Col className="gutter-row">
-            <Select
-              style={{
-                width: "145px",
-                marginRight: "5px",
-                padding: "8px 0",
-                color: "#C6C6C6",
-              }}
-              className="col-lg-12"
-              defaultValue="เลือกสถานะ"
-              onChange={handleStatus}
-              value={selectStatus}
-            >
-              <Option value="">เลือกสถานะ</Option>
-              {DRONER_STATUS.map((item) => (
-                <option value={item.key}></option>
-              ))}
-            </Select>
-          </Col>
-        </Row>
+  const PageTitle = (
+    <>
+      <div
+        className="container d-flex justify-content-between"
+        style={{ padding: "10px" }}
+      >
+        <div>
+          <span
+            className="card-label font-weight-bolder text-dark"
+            style={{ fontSize: 22, fontWeight: "bold", padding: "8px" }}
+          >
+            <strong>รายชื่อนักบินโดรน (Droner)</strong>
+          </span>
+        </div>
+        <div>
+          <AddButtton
+            text="เพิ่มนักบินโดรน"
+            onClick={() => (window.location.href = "/AddDroner")}
+          />
+        </div>
       </div>
-    );
-  };
+      <div
+        className="container d-flex justify-content-between"
+        style={{ padding: "8px" }}
+      >
+        <div className="col-lg-3">
+          <Search
+            placeholder="ค้นหาชื่อนักบินโดรน หรือเบอร์โทร"
+            className="col-lg-12 p-1"
+            onChange={changeTextSearch}
+          />
+        </div>
+        <div className="col">
+          <Select
+            className="col-lg-12 p-1"
+            placeholder="เลือกจังหวัด"
+            allowClear
+            onChange={handleProvince}
+            showSearch
+            optionFilterProp="children"
+            filterOption={(input: any, option: any) =>
+              option.children.includes(input)
+            }
+            filterSort={(optionA, optionB) =>
+              optionA.children
+                .toLowerCase()
+                .localeCompare(optionB.children.toLowerCase())
+            }
+          >
+            {province?.map((item) => (
+              <Option value={item.provinceId.toString()}>{item.region}</Option>
+            ))}
+          </Select>
+        </div>
+        <div className="col">
+          <Select
+            className="col-lg-12 p-1"
+            placeholder="เลือกอำเภอ"
+            allowClear
+            onChange={handleDistrict}
+            showSearch
+            optionFilterProp="children"
+            filterOption={(input: any, option: any) =>
+              option.children.includes(input)
+            }
+            filterSort={(optionA, optionB) =>
+              optionA.children
+                .toLowerCase()
+                .localeCompare(optionB.children.toLowerCase())
+            }
+            disabled={searchProvince == undefined}
+          >
+            {district?.map((item) => (
+              <Option value={item.districtId.toString()}>
+                {item.districtName}
+              </Option>
+            ))}
+          </Select>
+        </div>
+        <div className="col">
+          <Select
+            className="col-lg-12 p-1"
+            placeholder="เลือกตำบล"
+            allowClear
+            onChange={handleSubDistrict}
+            showSearch
+            optionFilterProp="children"
+            filterOption={(input: any, option: any) =>
+              option.children.includes(input)
+            }
+            filterSort={(optionA, optionB) =>
+              optionA.children
+                .toLowerCase()
+                .localeCompare(optionB.children.toLowerCase())
+            }
+            disabled={searchDistrict == undefined}
+          >
+            {subdistrict?.map((item) => (
+              <Option value={item.subdistrictId.toString()}>
+                {item.subdistrictName}
+              </Option>
+            ))}
+          </Select>
+        </div>
+        <div className="col">
+          <Select
+            showSearch
+            optionFilterProp="children"
+            filterOption={(input: any, option: any) =>
+              option.children.includes(input)
+            }
+            filterSort={(optionA, optionB) =>
+              optionA.children
+                .toLowerCase()
+                .localeCompare(optionB.children.toLowerCase())
+            }
+            className="col-lg-12 p-1"
+            placeholder="เลือกยี่ห้อ"
+            allowClear
+            onChange={handleDroneBrand}
+          >
+            {droneBrandId?.map((item: any) => (
+              <Option value={item.id.toString()}>{item.name}</Option>
+            ))}
+          </Select>
+        </div>
+        <div className="col">
+          <Select
+            className="col-lg-12 p-1"
+            placeholder="เลือกสถานะ"
+            onChange={handleStatus}
+          >
+            {DRONER_STATUS.map((item) => (
+              <option value={item.value}>{item.name}</option>
+            ))}
+          </Select>
+        </div>
+      </div>
+    </>
+  );
   const columns = [
     {
       title: "ชื่อนักบินโดรน",
       dataIndex: "firstname",
       key: "firstname",
-      width: "20%",
       sorter: (a: any, b: any) => sorter(a.firstname, b.firstname),
       render: (value: any, row: any, index: number) => {
         return {
@@ -344,23 +293,13 @@ function IndexDroner() {
       title: "ตำบล",
       dataIndex: "subdistrict",
       key: "subdistrict",
-      width: "15%",
-      sorter: (a: any, b: any) => sorter(a.subdistrict, b.subdistrict),
       render: (value: any, row: any, index: number) => {
-        const checkNull = () => {
-          if (row.address?.subdistrict) {
-            return row.address?.subdistrict.subdistrictName;
-          } else {
-            return null;
-          }
-        };
+        const subdistrict = row.address.subdistrict;
         return {
           children: (
-            <div className="container">
-              <span className="text-dark-75  d-block font-size-lg">
-                {checkNull()}
-              </span>
-            </div>
+            <span className="text-dark-75  d-block font-size-lg">
+              {subdistrict !== undefined ? subdistrict.subdistrictName : null}
+            </span>
           ),
         };
       },
@@ -369,21 +308,14 @@ function IndexDroner() {
       title: "อำเภอ",
       dataIndex: "district",
       key: "district",
-      width: "15%",
-      sorter: (a: any, b: any) => sorter(a.district, b.district),
       render: (value: any, row: any, index: number) => {
-        const checkNull = () => {
-          if (row.address.district) {
-            return row.address.district.districtName;
-          } else {
-            return null;
-          }
-        };
+        const district = row.address.district;
+
         return {
           children: (
             <div className="container">
               <span className="text-dark-75  d-block font-size-lg">
-                {checkNull()}
+                {district !== undefined ? district.districtName : null}
               </span>
             </div>
           ),
@@ -394,21 +326,13 @@ function IndexDroner() {
       title: "จังหวัด",
       dataIndex: "province",
       key: "province",
-      width: "15%",
-      sorter: (a: any, b: any) => sorter(a.province, b.province),
       render: (value: any, row: any, index: number) => {
-        const checkNull = () => {
-          if (row.address.province) {
-            return row.address.province.region;
-          } else {
-            return null;
-          }
-        };
+        const province = row.address.province;
         return {
           children: (
             <div className="container">
               <span className="text-dark-75  d-block font-size-lg">
-                {checkNull()}
+                {province !== undefined ? province.region : null}
               </span>
             </div>
           ),
@@ -419,20 +343,17 @@ function IndexDroner() {
       title: "เบอร์โทร",
       dataIndex: "telephoneNo",
       key: "telephoneNo",
-      width: "14%",
     },
     {
       title: "จำนวนโดรน",
       dataIndex: "totalDroneCount",
       key: "totalDroneCount",
-      width: "13%",
-      sorter: (a: any, b: any) => sorter(a.totalDroneCount, b.totalDroneCount),
       render: (value: any, row: any, index: number) => {
         return {
           children: (
             <div className="container">
               <span className="text-dark-75  d-block font-size-lg">
-                {row.totalDroneCount + " " + "เครื่อง"}
+                {row.dronerDrone.length + " " + "เครื่อง"}
               </span>
             </div>
           ),
@@ -443,42 +364,65 @@ function IndexDroner() {
       title: "ยี่ห้อ",
       dataIndex: "brand",
       key: "brand",
-      width: "10%",
-      sorter: (a: any, b: any) => sorter(a.brand, b.brand),
       render: (value: any, row: any, index: number) => {
-        const checkNull = () => {
-          if (row.dronerDrone.drone) {
-            return row.dronerDrone.drone.brand;
-          } else {
-            return null;
-          }
-        };
+        const droneLatest = row.dronerDrone[0];
         return {
           children: (
             <div className="container">
               <span className="text-dark-75  d-block font-size-lg">
-                {checkNull()}
+                {droneLatest ? (
+                  <Avatar
+                    size={25}
+                    src={droneLatest.drone.droneBrand.logoImagePath}
+                    style={{ marginRight: "5px" }}
+                  />
+                ) : (
+                  <Avatar
+                    size={25}
+                    style={{ color: "#0068F4", backgroundColor: "#EFF2F9" }}
+                  >
+                    {droneLatest.charAt(0)}
+                  </Avatar>
+                )}
+                {droneLatest !== undefined
+                  ? droneLatest.drone.droneBrand.name
+                  : null}
+              </span>
+              <span style={{ color: color.Grey, fontSize: "12px" }}>
+                {row.dronerDrone.length > 1 ? "(มากกว่า 1 ยี่ห้อ)" : null}
               </span>
             </div>
           ),
         };
       },
     },
+
     {
       title: "สถานะ",
       dataIndex: "status",
       key: "status",
-      width: "16%",
       sorter: (a: any, b: any) => sorter(a.status, b.status),
       render: (value: any, row: any, index: number) => {
+        const countDay = () => {
+          let dateToday: any = moment(Date.now());
+          let createDate: any = moment(new Date(row.createdAt));
+          let dateDiff = dateToday.diff(createDate, "day");
+          let textDateDiff =
+            dateDiff == 0 ? null : "(รอไปแล้ว " + dateDiff + " วัน)";
+          return textDateDiff;
+        };
         return {
           children: (
-            <div className="container">
-              <span className={colorStatus(value)}>
-                <Badge color={colorBadge(value)} />
-                {DRONER_STATUS_MAPPING[value]}
+            <>
+              <span style={{ color: STATUS_COLOR[row.status] }}>
+                <Badge color={STATUS_COLOR[row.status]} />
+                {DRONER_STATUS_MAPPING[row.status]}
+                <br />
               </span>
-            </div>
+              <span style={{ color: color.Grey }}>
+                {row.status == "PENDING" ? countDay() : null}
+              </span>
+            </>
           ),
         };
       },
@@ -487,7 +431,7 @@ function IndexDroner() {
       title: "",
       dataIndex: "Action",
       key: "Action",
-      width: "7%",
+      // width: "7%",
       render: (value: any, row: any, index: number) => {
         return {
           children: (
@@ -508,15 +452,23 @@ function IndexDroner() {
 
   return (
     <Layouts>
-      <PageTitle />
+      {PageTitle}
       <br />
       <Table
         columns={columns}
-        dataSource={data}
-        pagination={{ position: ["bottomRight"] }}
-        size="large"
-        tableLayout="fixed"
+        dataSource={data?.data}
+        pagination={false}
+        scroll={{ x: 1500 }}
       />
+      <div className="d-flex justify-content-between pt-5">
+        <span>รายการทั้งหมด {data?.count} รายการ</span>
+        <Pagination
+          current={current}
+          total={data?.count}
+          onChange={onChangePage}
+          pageSize={row}
+        />
+      </div>
     </Layouts>
   );
 }
