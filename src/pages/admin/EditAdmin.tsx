@@ -53,7 +53,6 @@ const EditAdmin = () => {
 
   const updateAdmin = (data: UserStaffEntity) => {
     AdminDatasource.updateAdmin(data).then((res) => {
-      console.log(res);
       if (res.id != null) {
         Swal.fire({
           title: "บันทึกสำเร็จ",
@@ -62,6 +61,13 @@ const EditAdmin = () => {
           showConfirmButton: false,
         }).then((time) => {
           window.location.href = "/IndexAdmin";
+        });
+      }
+      else{
+        Swal.fire({
+          title: "Username หรือ Email ซ้ำในระบบ",
+          icon: "error",
+          showConfirmButton: true,
         });
       }
     });

@@ -64,6 +64,13 @@ const AddAdmin = () => {
           window.location.href = "/IndexAdmin";
         });
       }
+      else{
+        Swal.fire({
+          title: "Username หรือ Email ซ้ำในระบบ",
+          icon: "error",
+          showConfirmButton: true,
+        });
+      }
     });
   };
 
@@ -88,6 +95,7 @@ const AddAdmin = () => {
               value={data.firstname}
               onChange={handleOnChange}
               key={1}
+              autoComplete="off"
             />
           </Form.Item>
         </div>
@@ -108,6 +116,7 @@ const AddAdmin = () => {
               placeholder="กรอกนามสกุล"
               value={data?.lastname}
               onChange={handleOnChange}
+              autoComplete="off"
             />
           </Form.Item>
         </div>
@@ -130,6 +139,7 @@ const AddAdmin = () => {
               placeholder="กรอกอีเมลล์"
               value={data?.email}
               onChange={handleOnChange}
+              autoComplete="off"
             />
           </Form.Item>
         </div>
@@ -152,6 +162,7 @@ const AddAdmin = () => {
               placeholder="กรอกชื่อในระบบ"
               value={data?.username}
               onChange={handleOnChange}
+              autoComplete="off"
             />
           </Form.Item>
         </div>
@@ -172,6 +183,7 @@ const AddAdmin = () => {
               placeholder="กรอกรหัสผ่าน"
               value={data?.password}
               onChange={handleOnChange}
+              autoComplete="off"
             />
           </Form.Item>
         </div>
