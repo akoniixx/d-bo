@@ -4,11 +4,7 @@ import { Row, Form, Input, Select, Upload, Button, Badge } from "antd";
 import { CardContainer } from "../../components/card/CardContainer";
 import { BackIconButton } from "../../components/button/BackButton";
 import TextArea from "antd/lib/input/TextArea";
-import {
-  DeleteOutlined,
-  EditOutlined,
-  PictureFilled,
-} from "@ant-design/icons";
+import { DeleteOutlined, EditOutlined, PictureFilled } from "@ant-design/icons";
 import emptyData from "../../resource/media/empties/iconoir_farm.png";
 import color from "../../resource/color";
 import FooterPage from "../../components/footer/FooterPage";
@@ -40,6 +36,11 @@ import { FarmerDatasource } from "../../datasource/FarmerDatasource";
 import Swal from "sweetalert2";
 import ModalFarmerPlot from "../../components/modal/ModalFarmerPlot";
 import ImgCrop from "antd-img-crop";
+import {
+  UploadImageEntity_INIT,
+  UploadImageEntity,
+} from "../../entities/UploadImageEntities";
+import { UploadImageDatasouce } from "../../datasource/UploadImageDatasource";
 
 const { Option } = Select;
 
@@ -69,7 +70,7 @@ const AddFarmer = () => {
   );
   const [farmerPlotList, setFarmerPlotList] = useState<FarmerPlotEntity[]>([]);
 
-  const [imgProfile, setImgProfile] = useState<any[]>([]);
+  const [imgProfile, setImgProfile] = useState<UploadImageEntity>();
   const [imgIdCard, setImgIdCard] = useState<any[]>([]);
 
   const fetchProvince = async () => {
@@ -169,7 +170,10 @@ const AddFarmer = () => {
 
   //#region image
   const onChangeProfile = (newFileList: any) => {
-    setImgProfile(newFileList.fileList);
+    const d = Map(imgProfile).set("file", newFileList.fileList[0]);
+    const e = Map(d.toJS()).set("resource", "FARMER");
+    const f = Map(e.toJS()).set("category", "PROFILE_IMAGE");
+    setImgProfile(f.toJS());
   };
 
   const onPreviewProfile = async (file: any) => {
@@ -186,6 +190,7 @@ const AddFarmer = () => {
     const imgWindow = window.open(src);
     imgWindow?.document.write(image.outerHTML);
   };
+
   const uploadProfile = (
     <div>
       <PictureFilled style={{ fontSize: "50px", color: color.Success }} />
@@ -236,14 +241,22 @@ const AddFarmer = () => {
     setData(pushPlot.toJS());
     await FarmerDatasource.insertFarmer(pushPlot.toJS()).then((res) => {
       if (res.id != null) {
-        Swal.fire({
-          title: "บันทึกสำเร็จ",
-          icon: "success",
-          timer: 1500,
-          showConfirmButton: false,
-        }).then((time) => {
-          window.location.href = "/IndexFarmer";
-        });
+        if (res.id != null) {
+          Swal.fire({
+            title: "บันทึกสำเร็จ",
+            icon: "success",
+            timer: 1500,
+            showConfirmButton: false,
+          }).then((time) => {
+            window.location.href = "/IndexFarmer";
+          });
+        }
+        // console.log("dataImg before",imgProfile);
+        // const pushIdFarmer = Map(imgProfile).set("resourceId", res.id);
+        // console.log("dataImg",pushIdFarmer.toJS());
+        // UploadImageDatasouce.uploadImage(pushIdFarmer.toJS()).then((res) => {
+        //   console.log("resImg", res);
+        // });
       }
     });
   };
@@ -255,16 +268,15 @@ const AddFarmer = () => {
         <Form style={{ padding: "32px" }}>
           <div className="row">
             <div className="form-group text-center pb-5">
-              <ImgCrop rotate>
-                <Upload
-                  listType="picture-card"
-                  fileList={imgProfile}
-                  onChange={onChangeProfile}
-                  onPreview={onPreviewProfile}
-                >
-                  {imgProfile.length < 1 && uploadProfile}
-                </Upload>
-              </ImgCrop>
+              <Upload
+                listType="picture-card"
+                onChange={onChangeProfile}
+                onPreview={onPreviewProfile}
+              >
+                {(imgProfile?.file == undefined ||
+                  imgProfile.file.length < 1) &&
+                  uploadProfile}
+              </Upload>
             </div>
           </div>
           <div className="row">
@@ -353,11 +365,13 @@ const AddFarmer = () => {
           </div>
           <div className="row">
             <div className="form-group col-lg-12 pb-5">
-              <label>
-                รูปถ่ายผู้สมัครคู่กับบัตรประชาชน
-              </label>
+              <label>รูปถ่ายผู้สมัครคู่กับบัตรประชาชน</label>
               <br />
-              <Upload listType="picture" defaultFileList={[...imgIdCard]} onPreview={onPreviewProfile}>
+              <Upload
+                listType="picture"
+                defaultFileList={[...imgIdCard]}
+                onPreview={onPreviewProfile}
+              >
                 <Button
                   style={{
                     backgroundColor: "rgba(33, 150, 83, 0.1)",

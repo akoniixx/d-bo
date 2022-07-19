@@ -220,7 +220,6 @@ function IndexFarmer() {
       title: "ชื่อเกษตรกร",
       dataIndex: "fullname",
       key: "name",
-      width: "12%",
       render: (value: any, row: any, index: number) => {
         return {
           children: <span>{row.firstname + " " + row.lastname}</span>,
@@ -231,13 +230,11 @@ function IndexFarmer() {
       title: "เบอร์โทร",
       dataIndex: "telephoneNo",
       key: "telephoneNo",
-      width: "12%",
     },
     {
       title: "จังหวัด",
       dataIndex: "province",
       key: "province",
-      width: "12%",
       render: (value: any, row: any, index: number) => {
         return {
           children: <span>{row.address.province.region}</span>,
@@ -248,7 +245,6 @@ function IndexFarmer() {
       title: "อำเภอ",
       dataIndex: "district",
       key: "district",
-      width: "12%",
       render: (value: any, row: any, index: number) => {
         return {
           children: <span>{row.address.district.districtName}</span>,
@@ -259,7 +255,6 @@ function IndexFarmer() {
       title: "ตำบล",
       dataIndex: "date",
       key: "date",
-      width: "12%",
       render: (value: any, row: any, index: number) => {
         return {
           children: <span>{row.address.subdistrict.subdistrictName}</span>,
@@ -270,7 +265,6 @@ function IndexFarmer() {
       title: "จำนวนแปลง",
       dataIndex: "totalPlotCount",
       key: "totalPlotCount",
-      width: "12%",
       render: (value: any, row: any, index: number) => {
         return {
           children: <span>{row.totalPlotCount} แปลง</span>,
@@ -281,7 +275,6 @@ function IndexFarmer() {
       title: "จำนวนไร่",
       dataIndex: "totalRaiCount",
       key: "totalRaiCount",
-      width: "12%",
       render: (value: any, row: any, index: number) => {
         return {
           children: <span>{row.totalRaiCount} ไร่</span>,
@@ -292,7 +285,6 @@ function IndexFarmer() {
       title: "สถานะ",
       dataIndex: "status",
       key: "status",
-      width: "12%",
       render: (value: any, row: any, index: number) => {
         const countDay = () => {
           let dateToday: any = moment(Date.now());
@@ -322,7 +314,6 @@ function IndexFarmer() {
       title: "",
       dataIndex: "Action",
       key: "Action",
-      width: "9%",
       render: (value: any, row: any, index: number) => {
         return {
           children: (
@@ -330,7 +321,9 @@ function IndexFarmer() {
               <ActionButton
                 icon={<EditOutlined />}
                 color={color.primary1}
-                onClick={() => (window.location.href = "/EditFarmer/id=" + row.id)}
+                onClick={() =>
+                  (window.location.href = "/EditFarmer/id=" + row.id)
+                }
               />
             </div>
           ),
@@ -347,8 +340,9 @@ function IndexFarmer() {
           dataSource={data?.data}
           columns={columns}
           pagination={false}
-          size="large"
-          tableLayout="fixed"
+          scroll={{
+            x: 300,
+          }}
         />
       </CardContainer>
       <div className="d-flex justify-content-between pt-5">

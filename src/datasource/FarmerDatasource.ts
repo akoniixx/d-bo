@@ -63,8 +63,9 @@ export class FarmerDatasource {
 
   static updateFarmer(data: GetFarmerEntity): Promise<any> {
     return httpClient
-      .patch(API_URL + "/farmer/" + data.id, { data })
+      .patch(API_URL + "/farmer/" + data.id, data)
       .then((response) => {
+        console.log("respo", response);
         return response.data;
       })
       .catch((err) => {

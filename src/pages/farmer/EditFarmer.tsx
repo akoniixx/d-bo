@@ -261,7 +261,8 @@ const EditFarmer = () => {
 
   const updateFarmer = async () => {
     const pushAddr = Map(data).set("address", address);
-    await FarmerDatasource.updateFarmer(pushAddr.toJS()).then((res) => {
+    const pushPin = Map(pushAddr.toJS()).set("pin", "");
+    await FarmerDatasource.updateFarmer(pushPin.toJS()).then((res) => {
       if (res.id != null) {
         Swal.fire({
           title: "บันทึกสำเร็จ",
