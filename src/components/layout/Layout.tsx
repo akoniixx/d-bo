@@ -34,11 +34,18 @@ const logout = () => {
   var resultUrlHost = arr[0] + "//" + arr[2];
   window.location.href = "AuthPage";
 };
+
 const Layouts: React.FC<any> = ({ children }) => {
   const [persistedProfile, setPersistedProfile] = useLocalStorage(
     "profile",
     []
   );
+
+  const style: React.CSSProperties = {
+    height: "100%",
+    paddingTop: 30,
+  };
+
   return (
     <Layout style={{ height: "100vh" }}>
       <Header
@@ -83,83 +90,81 @@ const Layouts: React.FC<any> = ({ children }) => {
           </div>
         </div>
       </Header>
-      <Sider
-        width={200}
-        style={{ position: "fixed", height: "100%", marginTop: "50px" }}
-      >
-        <Menu
-          mode="inline"
-          defaultOpenKeys={["order"]}
-          style={{ height: "100%", paddingTop: 30 }}
+      <Layout>
+        <Sider
+          width={200}
+          style={{ position: "fixed", height: "100%", marginTop: "50px" }}
         >
-          <Menu.Item key={"order"} icon={<SignalFilled />}>
-            <Link to="/OverviewPage" style={{ textDecoration: "none" }}>
-              <span>ภาพรวม</span>
-            </Link>
-          </Menu.Item>
-          <Menu.SubMenu
-            icon={<ProfileFilled />}
-            title={<span>ติดตามงาน</span>}
-            key={"sub1"}
-          ></Menu.SubMenu>
-          <Menu.Item icon={<DollarCircleFilled />}>
-            <Link to="/TotalIncomePage" style={{ textDecoration: "none" }}>
-              <span>ยอดรวมรายได้</span>
-            </Link>
-          </Menu.Item>
-          <Menu.Item icon={<ContactsFilled />}>
-            <Link to="/IndexFarmer" style={{ textDecoration: "none" }}>
-              <span>ข้อมูลเกษตรกร</span>
-            </Link>
-          </Menu.Item>
-          <Menu.SubMenu
-            icon={<MacCommandFilled />}
-            title={<span>ข้อมูลนักบินโดรน</span>}
-            key={"sub2"}
-          >
-            <Menu.Item>
-              <Link to="/IndexDroner" style={{ textDecoration: "none" }}>
-                <span>รายชื่อนักบินโดรน</span>
+          <Menu mode="inline" defaultOpenKeys={["order"]} style={style}>
+            <Menu.Item icon={<SignalFilled />}>
+              <Link to="/OverviewPage">
+                <span>ภาพรวม</span>
               </Link>
             </Menu.Item>
-            <Menu.Item>
-              <Link to="/DroneList" style={{ textDecoration: "none" }}>
-                <span>รายการโดรนเกษตร</span>
+            <Menu.SubMenu
+              icon={<ProfileFilled />}
+              title={<span>ติดตามงาน</span>}
+              key={"sub1"}
+            ></Menu.SubMenu>
+            <Menu.Item icon={<DollarCircleFilled />}>
+              <Link to="/TotalIncomePage">
+                <span>ยอดรวมรายได้</span>
               </Link>
             </Menu.Item>
-            <Menu.Item>
-              <Link to="/RateDroner" style={{ textDecoration: "none" }}>
-                <span>อันดับนักบินโดรน</span>
+            <Menu.Item icon={<ContactsFilled />}>
+              <Link to="/IndexFarmer">
+                <span>ข้อมูลเกษตรกร</span>
               </Link>
             </Menu.Item>
-          </Menu.SubMenu>
-          <Menu.Item icon={<GiftFilled />}>
-            <Link to="/PromotionPage" style={{ textDecoration: "none" }}>
-              <span>โปรโมชั่น</span>
-            </Link>
-          </Menu.Item>
-          <Menu.SubMenu
-            icon={<SettingFilled />}
-            title={<span>ผู้ดูแลระบบ</span>}
-            key={"sub3"}
-          >
-            <Menu.Item>
-              <Link to="/IndexAdmin" style={{ textDecoration: "none" }}>
-                <span>รายชื่อผู้ดูแลระบบ</span>
+            <Menu.SubMenu
+              icon={<MacCommandFilled />}
+              title={<span>ข้อมูลนักบินโดรน</span>}
+              key={"sub2"}
+            >
+              <Menu.Item>
+                <Link to="/IndexDroner">
+                  <span>รายชื่อนักบินโดรน</span>
+                </Link>
+              </Menu.Item>
+              <Menu.Item>
+                <Link to="/DroneList">
+                  <span>รายการโดรนเกษตร</span>
+                </Link>
+              </Menu.Item>
+              <Menu.Item>
+                <Link to="/RateDroner">
+                  <span>อันดับนักบินโดรน</span>
+                </Link>
+              </Menu.Item>
+            </Menu.SubMenu>
+            <Menu.Item icon={<GiftFilled />}>
+              <Link to="/PromotionPage">
+                <span>โปรโมชั่น</span>
               </Link>
             </Menu.Item>
-          </Menu.SubMenu>
-        </Menu>
-      </Sider>
-      <Layout
-        style={{
-          height: "max-content",
-          marginLeft: 200,
-          marginTop: 60,
-          padding: 30,
-        }}
-      >
-        <Content>{children}</Content>
+            <Menu.SubMenu
+              icon={<SettingFilled />}
+              title={<span>ผู้ดูแลระบบ</span>}
+              key={"sub3"}
+            >
+              <Menu.Item>
+                <Link to="/IndexAdmin">
+                  <span>รายชื่อผู้ดูแลระบบ</span>
+                </Link>
+              </Menu.Item>
+            </Menu.SubMenu>
+          </Menu>
+        </Sider>
+        <Layout
+          style={{
+            height: "max-content",
+            marginLeft: 200,
+            marginTop: 60,
+            padding: 30,
+          }}
+        >
+          <Content>{children}</Content>
+        </Layout>
       </Layout>
     </Layout>
   );

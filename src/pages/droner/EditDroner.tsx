@@ -39,13 +39,15 @@ import { DefaultOptionType } from "antd/lib/select";
 import { EXP_PLANT } from "../../definitions/ExpPlant";
 import { Toast } from "react-bootstrap";
 import {
-  FullAddressEntity,
-  FullAddressEntiry_INIT,
+  AddrSubDisEntity,
+  AddrSubDisEntity_INIT,
 } from "../../entities/AddressEntities";
 import ActionButton from "../../components/button/ActionButton";
 import { DefaultValue } from "recoil";
 import { DroneDatasource } from "../../datasource/DroneDatasource";
 import {
+  DroneEntity,
+  DroneEntity_INIT,
   UpdateDroneEntity,
   UpdateDroneEntity_INIT,
 } from "../../entities/DroneEntities";
@@ -57,8 +59,8 @@ let queryString = _.split(window.location.search, "=");
 function EditDroner() {
   const dronerId = queryString[1];
   const [data, setData] = useState<DronerEntity>(DronerEntity_INIT);
-  const [address, setAddress] = useState<FullAddressEntity>(
-    FullAddressEntiry_INIT
+  const [address, setAddress] = useState<AddrSubDisEntity>(
+    AddrSubDisEntity_INIT
   );
   const [dronerDrone, setDronerDrone] = useState<UpdateDroneEntity>(
     UpdateDroneEntity_INIT
@@ -68,11 +70,12 @@ function EditDroner() {
   const [district, setDistrict] = useState<any[]>([]);
   const [subdistrict, setSubdistrict] = useState<any[]>([]);
   const [brandId, setBrandId] = useState<any[]>([]);
+  const [showBtn, setShowBtn] = useState<boolean>(true);
 
   useEffect(() => {
     fetchDronerById(dronerId);
     fetchProvince();
-    // fetchDrone();
+    fetchDrone(1, 5, "ASC");
   }, []);
   const fetchDronerById = async (id: string) => {
     await DronerDatasource.getDronerByID(id).then((res) => {
@@ -156,7 +159,7 @@ function EditDroner() {
     console.log(m.toJS());
     await handelPostCode(m.toJS());
   };
-  const handelPostCode = (add: FullAddressEntity) => {
+  const handelPostCode = (add: AddrSubDisEntity) => {
     let filterSubDistrict = subdistrict.filter(
       (item) => item.subdistrictId == add.subdistrictId
     )[0].postcode;
@@ -176,7 +179,7 @@ function EditDroner() {
     const m = Map(dronerDrone).set(e.target.id, e.target.value);
     setDronerDrone(m.toJS());
   };
-  const saveAdd = (add: FullAddressEntity) => {
+  const saveAdd = (add: AddrSubDisEntity) => {
     const m = Map(data).set("address", add);
     setData(m.toJS());
   };
@@ -198,23 +201,18 @@ function EditDroner() {
       })
       .catch((err) => console.log(err));
   };
-  // const fetchDrone = async (
-  //   status: string,
-  //   page: number,
-  //   take: number,
-  //   droneId?: string,
-  //   search?: string
-  // ) => {
-  //   await DronerDroneDatasource.getDronerDrone(
-  //     status,
-  //     page,
-  //     take,
-  //     droneId,
-  //     search
-  //   ).then((res) => {
-  //     setBrandId(res.data);
-  //   });
-  // };
+  const fetchDrone = async (
+    page: number,
+    take: number,
+    sortDirection: string,
+    search?: string
+  ) => {
+    await DroneDatasource.getDroneList(page, take, sortDirection, search).then(
+      (res) => {
+        setBrandId(res.data);
+      }
+    );
+  };
   const showModal = () => {
     setModal(true);
   };
@@ -347,7 +345,10 @@ function EditDroner() {
             <div className="form-group col-lg-6">
               <label>Drone ID</label>
               <Form.Item name="id">
-                <Input disabled defaultValue={data.id} />
+                <Input
+                disabled
+                  defaultValue={data.id}
+                />
               </Form.Item>
             </div>
           </div>
@@ -583,6 +584,7 @@ function EditDroner() {
                   placeholder="กรอกรหัสไปรษณีย์"
                   defaultValue={address.postcode}
                   key={address.subdistrictId}
+                  
                 />
               </Form.Item>
             </div>
@@ -774,13 +776,6 @@ function EditDroner() {
             <div className="container">
               {brandId.map((item: any, index: any) => (
                 <div className="row pt-3 pb-3">
-                  <div className="col-lg-1">
-                    <img
-                      src={item.logoImagePath}
-                      width={"25px"}
-                      height={"25px"}
-                    />
-                  </div>
                   <div className="col-lg-6">
                     <span key={index}>{item.brand}</span>
                   </div>

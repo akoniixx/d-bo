@@ -1,7 +1,7 @@
 @import url("https://fonts.googleapis.com/css2?family=Prompt:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&display=swap");
 
 html {
-  font-size: 14px;
+  font-size: 10px;
   height: 100%;
   line-height: 1.8;
   -webkit-text-size-adjust: 100%;
@@ -24,7 +24,6 @@ table tr td {
 
 .ant-layout-sider-light {
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24) !important;
-  text-decoration: underline;
 }
 .ant-table-container table thead tr th {
   background-color: #219653;

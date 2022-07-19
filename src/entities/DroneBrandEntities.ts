@@ -2,27 +2,29 @@ import { CreateDroneEntity, CreateDroneEntity_INIT } from "./DroneEntities";
 export interface DroneBrandEntity {
   id: string;
   name: string;
-  logoImagePath: string;
   isActive: boolean;
   createdAt: string;
   updatedAt: string;
 }
-export const DroneBrandEntity_INIT: DroneBrandEntity = {
+export const DroneBrandEntity_INIT : DroneBrandEntity = {
   id: "",
   name: "",
-  logoImagePath: "",
   isActive: true,
   createdAt: "",
-  updatedAt: "",
-};
+  updatedAt: ""
+}
 
 export interface CreateDroneBrandEntity {
   name: string;
   isActive: boolean;
-  drone: CreateDroneEntity;
+  drone: CreateDroneEntity
 }
-
 export interface DroneBrandListEntity {
   data: DroneBrandEntity[];
   count: number;
 }
+// export const CreateDroneBrandEntity_INIT : CreateDroneBrandEntity = {
+//     name: "",
+//     isActive: true,
+//     drone: CreateDroneEntity_INIT
+//   }
