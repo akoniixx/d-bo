@@ -277,7 +277,7 @@ function IndexFarmer() {
       key: "totalRaiCount",
       render: (value: any, row: any, index: number) => {
         return {
-          children: <span>{row.totalRaiCount} ไร่</span>,
+          children: <span>{row.totalRaiCount ? row.totalRaiCount : 0} ไร่</span>,
         };
       },
     },

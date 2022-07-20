@@ -15,11 +15,7 @@ import {
 import { CardContainer } from "../../components/card/CardContainer";
 import { BackIconButton } from "../../components/button/BackButton";
 import TextArea from "antd/lib/input/TextArea";
-import {
-  DeleteOutlined,
-  EditOutlined,
-  PictureFilled,
-} from "@ant-design/icons";
+import { DeleteOutlined, EditOutlined, PictureFilled } from "@ant-design/icons";
 import emptyData from "../../resource/media/empties/iconoir_farm.png";
 import color from "../../resource/color";
 import FooterPage from "../../components/footer/FooterPage";
@@ -56,6 +52,12 @@ import ModalFarmerPlot from "../../components/modal/ModalFarmerPlot";
 import { FarmerPlotDatasource } from "../../datasource/FarmerPlotDatasource";
 import Swal from "sweetalert2";
 import ImgCrop from "antd-img-crop";
+import { UploadImageDatasouce } from "../../datasource/UploadImageDatasource";
+import {
+  ImageEntity,
+  ImageEntity_INTI,
+} from "../../entities/UploadImageEntities";
+import { number } from "yup";
 
 const { Option } = Select;
 
@@ -89,11 +91,12 @@ const EditFarmer = () => {
     FarmerPlotEntity_INIT
   );
 
-  const [imgProfile, setImgProfile] = useState<any[]>([]);
+  const [imgProfile, setImgProfile] = useState<any>();
   const [imgIdCard, setImgIdCard] = useState<any[]>([]);
 
   const fecthFarmer = async () => {
     await FarmerDatasource.getFarmerById(farmerId).then((res) => {
+      console.log(res);
       setData(res);
       setAddress(res.address);
       setFarmerPlotList(res.farmerPlot);
@@ -115,13 +118,6 @@ const EditFarmer = () => {
       setSubdistrict(res);
     });
   }, [address.provinceId, address.districtId]);
-
-  const uploadButton = (
-    <div>
-      <PictureFilled style={{ fontSize: "50px", color: color.Success }} />
-      <div style={{ fontSize: "20px", color: color.Success }}>+ Upload</div>
-    </div>
-  );
 
   //#region funttion farmer
   const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -199,7 +195,11 @@ const EditFarmer = () => {
 
   //#region image
   const onChangeProfile = (newFileList: any) => {
-    setImgProfile(newFileList.fileList);
+    const d = Map(imgProfile).set("file", newFileList.fileList[0].originFileObj);
+    const e = Map(d.toJS()).set("resource", "FARMER");
+    const f = Map(e.toJS()).set("category", "PROFILE_IMAGE");
+    const g = Map(f.toJS()).set("resourceId", farmerId);
+    setImgProfile(g.toJS());
   };
 
   const onPreviewProfile = async (file: any) => {
@@ -262,16 +262,21 @@ const EditFarmer = () => {
   const updateFarmer = async () => {
     const pushAddr = Map(data).set("address", address);
     const pushPin = Map(pushAddr.toJS()).set("pin", "");
+    
     await FarmerDatasource.updateFarmer(pushPin.toJS()).then((res) => {
       if (res.id != null) {
-        Swal.fire({
-          title: "บันทึกสำเร็จ",
-          icon: "success",
-          timer: 1500,
-          showConfirmButton: false,
-        }).then((time) => {
-          window.location.href = "/IndexFarmer";
-        });
+        UploadImageDatasouce.uploadImage(imgProfile).then(
+          (res) => {
+            Swal.fire({
+              title: "บันทึกสำเร็จ",
+              icon: "success",
+              timer: 1500,
+              showConfirmButton: false,
+            }).then((time) => {
+              window.location.href = "/IndexFarmer";
+            });
+          }
+        );
       }
     });
   };
@@ -283,16 +288,13 @@ const EditFarmer = () => {
         <Form style={{ padding: "32px" }}>
           <div className="row">
             <div className="form-group text-center pb-5">
-              <ImgCrop rotate>
-                <Upload
-                  listType="picture-card"
-                  fileList={imgProfile}
-                  onChange={onChangeProfile}
-                  onPreview={onPreviewProfile}
-                >
-                  {imgProfile.length < 1 && uploadProfile}
-                </Upload>
-              </ImgCrop>
+              <Upload
+                listType="picture-card"
+                onChange={onChangeProfile}
+                onPreview={onPreviewProfile}
+              >
+                {imgProfile?.file == undefined && uploadProfile}
+              </Upload>
             </div>
           </div>
           <div className="row">
@@ -390,7 +392,11 @@ const EditFarmer = () => {
                 {/* <span style={{ color: "red" }}>*</span> */}
               </label>
               <br />
-              <Upload listType="picture" defaultFileList={[...imgIdCard]} onPreview={onPreviewProfile}>
+              <Upload
+                listType="picture"
+                defaultFileList={[...imgIdCard]}
+                onPreview={onPreviewProfile}
+              >
                 <Button
                   style={{
                     backgroundColor: "rgba(33, 150, 83, 0.1)",

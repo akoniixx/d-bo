@@ -37,7 +37,6 @@ import Swal from "sweetalert2";
 import ModalFarmerPlot from "../../components/modal/ModalFarmerPlot";
 import ImgCrop from "antd-img-crop";
 import {
-  UploadImageEntity_INIT,
   UploadImageEntity,
 } from "../../entities/UploadImageEntities";
 import { UploadImageDatasouce } from "../../datasource/UploadImageDatasource";
@@ -170,7 +169,7 @@ const AddFarmer = () => {
 
   //#region image
   const onChangeProfile = (newFileList: any) => {
-    const d = Map(imgProfile).set("file", newFileList.fileList[0]);
+    const d = Map(imgProfile).set("file", newFileList.fileList[0].originFileObj);
     const e = Map(d.toJS()).set("resource", "FARMER");
     const f = Map(e.toJS()).set("category", "PROFILE_IMAGE");
     setImgProfile(f.toJS());
@@ -241,22 +240,20 @@ const AddFarmer = () => {
     setData(pushPlot.toJS());
     await FarmerDatasource.insertFarmer(pushPlot.toJS()).then((res) => {
       if (res.id != null) {
-        if (res.id != null) {
-          Swal.fire({
-            title: "บันทึกสำเร็จ",
-            icon: "success",
-            timer: 1500,
-            showConfirmButton: false,
-          }).then((time) => {
-            window.location.href = "/IndexFarmer";
-          });
-        }
-        // console.log("dataImg before",imgProfile);
-        // const pushIdFarmer = Map(imgProfile).set("resourceId", res.id);
-        // console.log("dataImg",pushIdFarmer.toJS());
-        // UploadImageDatasouce.uploadImage(pushIdFarmer.toJS()).then((res) => {
-        //   console.log("resImg", res);
-        // });
+        const pushIdFarmer = Map(imgProfile).set("resourceId", res.id);
+        UploadImageDatasouce.uploadImage(pushIdFarmer.toJS()).then((res) => {
+          console.log("resImg", res);
+          if (res.id != null) {
+            Swal.fire({
+              title: "บันทึกสำเร็จ",
+              icon: "success",
+              timer: 1500,
+              showConfirmButton: false,
+            }).then((time) => {
+              window.location.href = "/IndexFarmer";
+            });
+          }
+        });
       }
     });
   };
@@ -273,8 +270,8 @@ const AddFarmer = () => {
                 onChange={onChangeProfile}
                 onPreview={onPreviewProfile}
               >
-                {(imgProfile?.file == undefined ||
-                  imgProfile.file.length < 1) &&
+                {(imgProfile?.file == undefined
+                  ) &&
                   uploadProfile}
               </Upload>
             </div>

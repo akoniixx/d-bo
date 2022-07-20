@@ -9,7 +9,8 @@ export interface ImageEntity extends UploadImageEntity {
   id: string;
 }
 
-export const UploadImageEntity_INIT: UploadImageEntity = {
+export const ImageEntity_INTI: ImageEntity = {
+  id:"",
   resourceId: "",
   resource: "",
   category: "",

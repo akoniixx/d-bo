@@ -1,15 +1,22 @@
 import { BASE_URL, httpClient } from "../config/develop-config";
-import { UploadImageEntity } from "../entities/UploadImageEntities";
+import { ImageEntity } from "../entities/UploadImageEntities";
+const API_URL = "https://api-dev-dnds.iconkaset.com";
 
-export class UploadImageDatasouce{
-    static uploadImage(file: UploadImageEntity) :Promise<any>{
-        return httpClient
-        .post(BASE_URL + "/file/upload", file)
-        .then((response) => {
-          return response.data;
-        })
-        .catch((err) => {
-          console.log(err, "err insertFarmer");
-        });
-    }
+export class UploadImageDatasouce {
+  static uploadImage(file: ImageEntity): Promise<any> {
+    const formDataProfile = new FormData();
+    formDataProfile.append("file", file.file);
+    formDataProfile.append("resource", file.resource);
+    formDataProfile.append("category", file.category);
+    formDataProfile.append("resourceId", file.resourceId);
+
+    return httpClient
+      .post(API_URL + "/file/upload", formDataProfile)
+      .then((response) => {
+        return response.data;
+      })
+      .catch((err) => {
+        console.log(err, "err insertFarmer");
+      });
+  }
 }
