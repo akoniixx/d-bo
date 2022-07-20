@@ -11,6 +11,7 @@ import {
   Badge,
   Radio,
   Space,
+  Tag,
 } from "antd";
 import { CardContainer } from "../../components/card/CardContainer";
 import { BackIconButton } from "../../components/button/BackButton";
@@ -51,13 +52,10 @@ import { LocationDatasource } from "../../datasource/LocationDatasource";
 import ModalFarmerPlot from "../../components/modal/ModalFarmerPlot";
 import { FarmerPlotDatasource } from "../../datasource/FarmerPlotDatasource";
 import Swal from "sweetalert2";
-import ImgCrop from "antd-img-crop";
 import { UploadImageDatasouce } from "../../datasource/UploadImageDatasource";
-import {
-  ImageEntity,
-  ImageEntity_INTI,
-} from "../../entities/UploadImageEntities";
-import { number } from "yup";
+import { ImageEntity, ImageEntity_INTI } from "../../entities/UploadImageEntities";
+import "../farmer/Style.css";
+import img_empty from "../../resource/media/empties/uploadImg.png";
 
 const { Option } = Select;
 
@@ -94,12 +92,19 @@ const EditFarmer = () => {
   const [imgProfile, setImgProfile] = useState<any>();
   const [imgIdCard, setImgIdCard] = useState<any[]>([]);
 
+  const [createImgProfile, setCreateImgProfile] = useState<ImageEntity>(ImageEntity_INTI);
+
+  let getPath: string = "";
+
   const fecthFarmer = async () => {
     await FarmerDatasource.getFarmerById(farmerId).then((res) => {
-      console.log(res);
       setData(res);
       setAddress(res.address);
       setFarmerPlotList(res.farmerPlot);
+      getPath = res.file.filter((x) => x.category == "PROFILE_IMAGE")[0].path;
+      UploadImageDatasouce.getImage(getPath).then((resImg) => {
+        setImgProfile(resImg.url);
+      });
     });
   };
 
@@ -180,8 +185,8 @@ const EditFarmer = () => {
     fecthFarmer();
   };
 
-  const updateFarmerPlot = async (data: FarmerPlotEntity) => {
-    const p = Map(data).set("farmerId", farmerId);
+  const updateFarmerPlot = async (plot: FarmerPlotEntity) => {
+    const p = Map(plot).set("farmerId", farmerId);
     if (p.toJS().id != "") {
       await FarmerPlotDatasource.updateFarmerPlot(p.toJS()).then();
       setShowEditModal((prev) => !prev);
@@ -190,24 +195,33 @@ const EditFarmer = () => {
       setShowAddModal((prev) => !prev);
     }
     fecthFarmer();
+    checkValidate(data)
   };
   //#endregion
 
   //#region image
-  const onChangeProfile = (newFileList: any) => {
-    const d = Map(imgProfile).set("file", newFileList.fileList[0].originFileObj);
+  const onChangeProfile = async (file: any) => {
+    let src = file.target.files[0];
+    src = await new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(src);
+      reader.onload = () => resolve(reader.result);
+    });
+    setImgProfile(src);
+    checkValidate(data);
+    const d = Map(createImgProfile).set("file", file.target.files[0]);
     const e = Map(d.toJS()).set("resource", "FARMER");
     const f = Map(e.toJS()).set("category", "PROFILE_IMAGE");
     const g = Map(f.toJS()).set("resourceId", farmerId);
-    setImgProfile(g.toJS());
+    setCreateImgProfile(g.toJS());
   };
 
-  const onPreviewProfile = async (file: any) => {
-    let src = file.url;
+  const onPreviewProfile = async () => {
+    let src = imgProfile;
     if (!src) {
       src = await new Promise((resolve) => {
         const reader = new FileReader();
-        reader.readAsDataURL(file.originFileObj);
+        reader.readAsDataURL(imgProfile);
         reader.onload = () => resolve(reader.result);
       });
     }
@@ -216,12 +230,11 @@ const EditFarmer = () => {
     const imgWindow = window.open(src);
     imgWindow?.document.write(image.outerHTML);
   };
-  const uploadProfile = (
-    <div>
-      <PictureFilled style={{ fontSize: "50px", color: color.Success }} />
-      <div style={{ fontSize: "18px", color: color.Success }}>+ Upload</div>
-    </div>
-  );
+
+  const removeImg = () => {
+    setImgProfile(undefined);
+    checkValidate(data);
+  };
   //#endregion
 
   const checkValidate = (data: GetFarmerEntity) => {
@@ -262,21 +275,19 @@ const EditFarmer = () => {
   const updateFarmer = async () => {
     const pushAddr = Map(data).set("address", address);
     const pushPin = Map(pushAddr.toJS()).set("pin", "");
-    
+
     await FarmerDatasource.updateFarmer(pushPin.toJS()).then((res) => {
       if (res.id != null) {
-        UploadImageDatasouce.uploadImage(imgProfile).then(
-          (res) => {
-            Swal.fire({
-              title: "บันทึกสำเร็จ",
-              icon: "success",
-              timer: 1500,
-              showConfirmButton: false,
-            }).then((time) => {
-              window.location.href = "/IndexFarmer";
-            });
-          }
-        );
+        UploadImageDatasouce.uploadImage(createImgProfile).then((res) => {
+          Swal.fire({
+            title: "บันทึกสำเร็จ",
+            icon: "success",
+            timer: 1500,
+            showConfirmButton: false,
+          }).then((time) => {
+            window.location.href = "/IndexFarmer";
+          });
+        });
       }
     });
   };
@@ -287,14 +298,37 @@ const EditFarmer = () => {
         <CardHeader textHeader="ข้อมูลเกษตรกร" />
         <Form style={{ padding: "32px" }}>
           <div className="row">
-            <div className="form-group text-center pb-5">
-              <Upload
-                listType="picture-card"
-                onChange={onChangeProfile}
-                onPreview={onPreviewProfile}
+            <div className="form-group text-center pb-4">
+              <div
+                className="hiddenFileInput zoom"
+                style={{
+                  backgroundImage: `url(${
+                    imgProfile == undefined ? img_empty : imgProfile
+                  })`,
+                }}
               >
-                {imgProfile?.file == undefined && uploadProfile}
-              </Upload>
+                <input type="file" onChange={onChangeProfile} title="เลือกรูป"/>
+              </div>
+              <div>
+                {imgProfile != undefined && (
+                  <>
+                    <Tag
+                      color={color.Success}
+                      onClick={onPreviewProfile}
+                      style={{ cursor: "pointer", borderRadius: "5px" }}
+                    >
+                      View
+                    </Tag>
+                    <Tag
+                      color={color.Error}
+                      onClick={removeImg}
+                      style={{ cursor: "pointer", borderRadius: "5px" }}
+                    >
+                      Remove
+                    </Tag>
+                  </>
+                )}
+              </div>
             </div>
           </div>
           <div className="row">
@@ -643,7 +677,7 @@ const EditFarmer = () => {
         </Form>
       </CardContainer>
       <div className="d-flex justify-content-between pt-5">
-        <h5>รายการทั้งหมด {farmerPlotList.length} รายการ</h5>
+        <p>รายการทั้งหมด {farmerPlotList.length} รายการ</p>
         {farmerPlotList.length < 10 ? null : (
           <Pagination defaultCurrent={1} total={1} />
         )}

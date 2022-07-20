@@ -16,7 +16,17 @@ export class UploadImageDatasouce {
         return response.data;
       })
       .catch((err) => {
-        console.log(err, "err insertFarmer");
+        console.log(err, "err insertImg");
+      });
+  }
+  static getImage(path: string): Promise<any> {
+    return httpClient
+      .get(API_URL + "/file/geturl?path=" + path)
+      .then((response) => {
+        return response.data;
+      })
+      .catch((err) => {
+        console.log(err, "err getImg");
       });
   }
 }

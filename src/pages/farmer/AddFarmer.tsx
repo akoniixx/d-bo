@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import Layout from "../../components/layout/Layout";
-import { Row, Form, Input, Select, Upload, Button, Badge } from "antd";
+import { Row, Form, Input, Select, Upload, Button, Badge, Tag } from "antd";
 import { CardContainer } from "../../components/card/CardContainer";
 import { BackIconButton } from "../../components/button/BackButton";
 import TextArea from "antd/lib/input/TextArea";
@@ -38,8 +38,10 @@ import ModalFarmerPlot from "../../components/modal/ModalFarmerPlot";
 import ImgCrop from "antd-img-crop";
 import {
   UploadImageEntity,
+  UploadImageEntity_INTI,
 } from "../../entities/UploadImageEntities";
 import { UploadImageDatasouce } from "../../datasource/UploadImageDatasource";
+import img_empty from "../../resource/media/empties/uploadImg.png";
 
 const { Option } = Select;
 
@@ -69,8 +71,12 @@ const AddFarmer = () => {
   );
   const [farmerPlotList, setFarmerPlotList] = useState<FarmerPlotEntity[]>([]);
 
-  const [imgProfile, setImgProfile] = useState<UploadImageEntity>();
+  const [imgProfile, setImgProfile] = useState<any>();
   const [imgIdCard, setImgIdCard] = useState<any[]>([]);
+
+  const [createImgProfile, setCreateImgProfile] = useState<UploadImageEntity>(
+    UploadImageEntity_INTI
+  );
 
   const fetchProvince = async () => {
     await LocationDatasource.getProvince().then((res) => {
@@ -168,19 +174,27 @@ const AddFarmer = () => {
   //#endregion
 
   //#region image
-  const onChangeProfile = (newFileList: any) => {
-    const d = Map(imgProfile).set("file", newFileList.fileList[0].originFileObj);
+  const onChangeProfile = async (file: any) => {
+    let src = file.target.files[0];
+    src = await new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(src);
+      reader.onload = () => resolve(reader.result);
+    });
+    setImgProfile(src);
+    checkValidate(data);
+    const d = Map(createImgProfile).set("file", file.target.files[0]);
     const e = Map(d.toJS()).set("resource", "FARMER");
     const f = Map(e.toJS()).set("category", "PROFILE_IMAGE");
-    setImgProfile(f.toJS());
+    setCreateImgProfile(f.toJS());
   };
 
-  const onPreviewProfile = async (file: any) => {
-    let src = file.url;
+  const onPreviewProfile = async () => {
+    let src = imgProfile;
     if (!src) {
       src = await new Promise((resolve) => {
         const reader = new FileReader();
-        reader.readAsDataURL(file.originFileObj);
+        reader.readAsDataURL(imgProfile);
         reader.onload = () => resolve(reader.result);
       });
     }
@@ -189,13 +203,10 @@ const AddFarmer = () => {
     const imgWindow = window.open(src);
     imgWindow?.document.write(image.outerHTML);
   };
-
-  const uploadProfile = (
-    <div>
-      <PictureFilled style={{ fontSize: "50px", color: color.Success }} />
-      <div style={{ fontSize: "18px", color: color.Success }}>+ Upload</div>
-    </div>
-  );
+  const removeImg = () => {
+    setImgProfile(undefined);
+    checkValidate(data);
+  };
   //#endregion
 
   const checkValidate = (data: CreateFarmerEntity) => {
@@ -240,9 +251,8 @@ const AddFarmer = () => {
     setData(pushPlot.toJS());
     await FarmerDatasource.insertFarmer(pushPlot.toJS()).then((res) => {
       if (res.id != null) {
-        const pushIdFarmer = Map(imgProfile).set("resourceId", res.id);
+        const pushIdFarmer = Map(createImgProfile).set("resourceId", res.id);
         UploadImageDatasouce.uploadImage(pushIdFarmer.toJS()).then((res) => {
-          console.log("resImg", res);
           if (res.id != null) {
             Swal.fire({
               title: "บันทึกสำเร็จ",
@@ -265,15 +275,36 @@ const AddFarmer = () => {
         <Form style={{ padding: "32px" }}>
           <div className="row">
             <div className="form-group text-center pb-5">
-              <Upload
-                listType="picture-card"
-                onChange={onChangeProfile}
-                onPreview={onPreviewProfile}
+              <div
+                className="hiddenFileInput"
+                style={{
+                  backgroundImage: `url(${
+                    imgProfile == undefined ? img_empty : imgProfile
+                  })`,
+                }}
               >
-                {(imgProfile?.file == undefined
-                  ) &&
-                  uploadProfile}
-              </Upload>
+                <input type="file" onChange={onChangeProfile} title="เลือกรูป" />
+              </div>
+              <div>
+                {imgProfile != undefined && (
+                  <>
+                    <Tag
+                      color={color.Success}
+                      onClick={onPreviewProfile}
+                      style={{ cursor: "pointer", borderRadius: "5px" }}
+                    >
+                      View
+                    </Tag>
+                    <Tag
+                      color={color.Error}
+                      onClick={removeImg}
+                      style={{ cursor: "pointer", borderRadius: "5px" }}
+                    >
+                      Remove
+                    </Tag>
+                  </>
+                )}
+              </div>
             </div>
           </div>
           <div className="row">
@@ -583,7 +614,7 @@ const AddFarmer = () => {
         )}
       </CardContainer>
       <div className="d-flex justify-content-between pt-5">
-        <h5>รายการทั้งหมด {farmerPlotList?.length} รายการ</h5>
+        <p>รายการทั้งหมด {farmerPlotList?.length} รายการ</p>
         {/* <Pagination defaultCurrent={1} total={1} /> */}
       </div>
     </div>
