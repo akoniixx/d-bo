@@ -25,8 +25,12 @@ const FromLogin: React.FC = () => {
           setPersistedProfile(res.data);
           setToken(res.accessToken);
           return navigate("HomePage");
-        } else {
-          return message.error("something wrong");
+        } else if (res.responseCode == "F101-Permission") {
+          message.error("user นี้ไม่มีสิทธิ์เข้าใช้งาน กรุณาติดต่อเจ้าหน้าที่");
+        } else if (
+          res.responseCode == "F102-This user does not exist in the system."
+        ) {
+          message.error("user นี้ไม่มีในระบบ");
         }
       })
       .catch((error) => {

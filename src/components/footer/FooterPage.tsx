@@ -7,7 +7,7 @@ import SaveButton from "../button/SaveButton";
 
 interface FoolterPageProps {
   onClickBack?: () => void;
-  onClickSave?: () => void;
+  onClickSave?:  () => void;
   disableBackBtn?: boolean;
   disableSaveBtn?: boolean;
 }
