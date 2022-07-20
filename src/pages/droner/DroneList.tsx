@@ -11,37 +11,32 @@ import { useLocalStorage } from "../../hook/useLocalStorage";
 import { DroneDatasource } from "../../datasource/DroneDatasource";
 import { formatDate } from "../../utilities/TextFormatter";
 import { DroneEntity, DroneListEntity } from "../../entities/DroneEntities";
+import { DRONER_STATUS } from "../../definitions/DronerStatus";
 function DroneList() {
   const onSearch = (value: string) => console.log(value);
   const [droneList, setDroneList] = useState<DroneEntity[]>();
   const [optionalTextSearch, setTextSearch] = useState<string>();
-  const [persistedProfile, setPersistedProfile] = useLocalStorage(
-    "profile",
-    []
-  );
-  const fetchDroneList = async (
-    page: number,
-    take: number,
-    sortDirection: string,
-    search?: string
-  ) => {
-    await DroneDatasource.getDroneList(
-      page,
-      take,
-      sortDirection,
-      search
-    ).then((res) => {
-      setDroneList(res.data);
-      console.log(res);
-    });
-  };
+
+  // const fetchDroneList = async (
+  //   page: number,
+  //   take: number,
+  // ) => {
+  //   await DroneDatasource.getDroneList(
+  //     page,
+  //     take,
+  //   ).then((res) => {
+  //     setDroneList(res.data);
+  //   });
+  // };
 
   useEffect(() => {
-    fetchDroneList(1, 3, "ASC");
+    // fetchDroneList(1, 3);
   }, [optionalTextSearch]);
 
   const changeTextSearch = (text?: string) => {
     setTextSearch(text);
+  };
+  const handleStatus = (status: any) => {
   };
   const PageTitle = () => {
     return (
@@ -65,18 +60,24 @@ function DroneList() {
           </Col>
           <Col className="gutter-row" span={3}>
             <Select
-              style={{
-                width: "140px",
-                padding: "8px 0",
-                color: "#C6C6C6",
-              }}
-              defaultValue="เลือกยี่ห้อ"
-              // onChange={handleChange}>
+              showSearch
+              optionFilterProp="children"
+              filterOption={(input: any, option: any) =>
+                option.children.includes(input)
+              }
+              filterSort={(optionA, optionB) =>
+                optionA.children
+                  .toLowerCase()
+                  .localeCompare(optionB.children.toLowerCase())
+              }
+              className="col-lg-12 p-1"
+              placeholder="เลือกยี่ห้อ"
+              allowClear
+              // onChange={handleDroneBrand}
             >
-              <Option value="1">1</Option>
-              <Option value="2">2</Option>
-              <Option value="3">3</Option>
-              <Option value="4">4</Option>
+              {/* {droneBrandId?.map((item: any) => (
+                <Option value={item.id.toString()}>{item.name}</Option>
+              ))} */}
             </Select>
           </Col>
           <Col className="gutter-row" span={3}>
@@ -98,19 +99,13 @@ function DroneList() {
           </Col>
           <Col className="gutter-row">
             <Select
-              style={{
-                width: "130px",
-                marginRight: "5px",
-                padding: "8px 0",
-                color: "#C6C6C6",
-              }}
-              defaultValue="เลือกสถานะ"
-              // onChange={handleChange}>
+              className="col-lg-12 p-1"
+              placeholder="เลือกสถานะ"
+              onChange={handleStatus}
             >
-              <Option value="1">1</Option>
-              <Option value="2">2</Option>
-              <Option value="3">3</Option>
-              <Option value="4">4</Option>
+              {/* {DRONER_STATUS.map((item) => (
+                <option value={item.value}>{item.name}</option>
+              ))} */}
             </Select>
           </Col>
         </Row>
@@ -142,6 +137,20 @@ function DroneList() {
       dataIndex: "brand",
       key: "brand",
       width: "10%",
+      render: (value: any, row: any, index: number) => {
+        // const droneList = row.drone[{}];
+        return {
+          children: (
+            <div className="container">
+              <span className="text-dark-75  d-block font-size-lg">
+                {/* {droneList !== undefined
+                  ? droneList.droneBrandId.name
+                  : null}             */}
+              </span>
+            </div>
+          ),
+        };
+      },
     },
     {
       title: "รุ่นโดรน",

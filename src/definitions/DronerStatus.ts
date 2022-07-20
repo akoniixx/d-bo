@@ -1,22 +1,32 @@
-export const DRONER_STATUS = [
-  { key: "OPEN", status: "OPEN" },
-  { key: "PENDING", status: "PENDING" },
-  { key: "REJECTED", status: "REJECTED" },
-  { key: "ACTIVE", status: "ACTIVE" },
-  { key: "INACTIVE", status: "INACTIVE" },
-];
+import { color } from "./../resource/index";
 export const DRONER_STATUS_MAPPING: any = {
-  OPEN: "ยังไม่ได้ใช้งาน",
+  OPEN: "ยังไม่เปิดใช้งาน",
   PENDING: "รอยืนยันตัวตน",
-  ACTIVE: "ใช้งาน",
   REJECTED: "ไม่อนุมัติ",
+  ACTIVE: "ใช้งาน",
   INACTIVE: "ปิดการใช้งาน",
 };
 
 export const DRONER_DRONE_STATUS: any = {
-  OPEN : "ยังไม่เปิดใช้งาน",
+  ACTIVE: "อนุมัติ",
   PENDING: "รอยืนยันตัวตน",
-  ACTIVE: "ใช้งาน",
   INACTIVE: "ปิดการใช้งาน",
   REJECTED: "ไม่อนุมัติ",
 };
+
+export const STATUS_COLOR: any = {
+  PENDING: color.Warning,
+  ACTIVE: color.Success,
+  INACTIVE: color.Grey,
+  OPEN: color.Disable,
+  REJECTED: color.Error,
+};
+
+export const DRONER_STATUS = [
+  { value: "", name: "ทั้งหมด" },
+  { value: "OPEN", name: "ยังไม่เปิดใช้งาน" },
+  { value: "PENDING", name: "รอยืนยันตัวตน" },
+  { value: "REJECTED", name: "ไม่อนุมัติ" },
+  { value: "ACTIVE", name: "ใช้งาน" },
+  { value: "INACTIVE", name: "ปิดการใช้งาน" },
+];

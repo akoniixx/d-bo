@@ -1,6 +1,7 @@
 import { AddressEntity, AddressEntity_INIT } from "./AddressEntities";
 
 export interface FarmerPlotEntity {
+  id?: string;
   plotName: string;
   raiAmount: number;
   landmark: string;
@@ -11,8 +12,10 @@ export interface FarmerPlotEntity {
   long: string;
   isActive: boolean;
   plotId: number;
+  farmerId?: string;
 }
 export const FarmerPlotEntity_INIT: FarmerPlotEntity = {
+  id: "",
   plotName: "",
   raiAmount: 0,
   landmark: "",
@@ -23,4 +26,5 @@ export const FarmerPlotEntity_INIT: FarmerPlotEntity = {
   long: "",
   isActive: true,
   plotId: 0,
+  farmerId: "",
 };

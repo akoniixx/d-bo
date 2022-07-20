@@ -38,8 +38,10 @@ import {
   DronerEntity_INIT,
 } from "../../entities/DronerEntities";
 import {
-  AddrSubDisEntity,
-  AddrSubDisEntity_INIT,
+  FullAddressEntity,
+  FullAddressEntiry_INIT,
+  CreateAddressEntity,
+  CreateAddressEntity_INIT,
 } from "../../entities/AddressEntities";
 import { LocationDatasource } from "../../datasource/LocationDatasource";
 import FooterPage from "../../components/footer/FooterPage";
@@ -51,134 +53,127 @@ import {
 } from "../../entities/DroneEntities";
 import { DroneDatasource } from "../../datasource/DroneDatasource";
 import ActionButton from "../../components/button/ActionButton";
-import ModalDrone from "../../components/modal/ModalDrone";
-import {} from "../../definitions/Status";
-import { DRONER_DRONE_STATUS } from "../../definitions/DronerStatus";
+import {
+  DRONER_DRONE_STATUS,
+  STATUS_COLOR,
+} from "../../definitions/DronerStatus";
 import {
   CreateDronerDrone,
   CreateDronerDrone_INIT,
   DronerDroneEntity,
 } from "../../entities/DronerDroneEntities";
 import { DronerDatasource } from "../../datasource/DronerDatasource";
+import {
+  DRONER_STATUS,
+  DRONER_STATUS_MAPPING,
+} from "../../definitions/DronerStatus";
+import { Console } from "console";
+import {
+  DistrictEntity,
+  ProviceEntity,
+  SubdistrictEntity,
+} from "../../entities/LocationEntities";
+import ModalDrone from "../../components/modal/ModalDronerDrone";
 
 const _ = require("lodash");
 const { Map } = require("immutable");
 function AddDroner() {
   const [data, setData] = useState<CreateDronerEntity>(CreateDronerEntity_INIT);
-  const [address, setAddress] = useState<AddrSubDisEntity>(
-    AddrSubDisEntity_INIT
+  const [address, setAddress] = useState<FullAddressEntity>(
+    FullAddressEntiry_INIT
   );
   const [dronerDroneList, setDronerDroneList] = useState<CreateDronerDrone[]>(
     []
   );
   const [droneList, setDroneList] = useState<DroneEntity[]>([]);
-  const [addModal, setAddModal] = useState(false);
-  const [editModal, setEditModal] = useState(false);
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editIndex, setEditIndex] = useState(0);
   const [editDrone, setEditDrone] = useState<CreateDronerDrone>(
     CreateDronerDrone_INIT
   );
-  const [modal, setModal] = useState(false);
-  const [province, setProvince] = useState<any[]>([]);
-  const [district, setDistrict] = useState<any[]>([]);
-  const [subdistrict, setSubdistrict] = useState<any[]>([]);
-
-  const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const m = Map(data).set(e.target.id, e.target.value);
-    setData(m.toJS());
-  };
-  const handleAddress = (e: React.ChangeEvent<HTMLTextAreaElement>) =>{
-    console.log(e.target.value)
-
-    const m = Map(address).set(e.target.id, e.target.value);
-    setAddress(m.toJS());
-  }
+  const [province, setProvince] = useState<ProviceEntity[]>([]);
+  const [district, setDistrict] = useState<DistrictEntity[]>([]);
+  const [subdistrict, setSubdistrict] = useState<SubdistrictEntity[]>([]);
 
   useEffect(() => {
-    fetchDrone(1, 100, "ASC");
+    fetchDrone(1, 500);
     fetchProvince();
     insertDroner();
   }, []);
 
-  const fetchDrone = async (
-    page: number,
-    take: number,
-    sortDirection: string,
-    search?: string
-  ) => {
-    await DroneDatasource.getDroneList(page, take, sortDirection, search).then(
-      (res) => {
-        setDroneList(res.data);
-      }
-    );
+  const fetchDrone = async (page: number, take: number, search?: string) => {
+    await DroneDatasource.getDroneList(page, take, search).then((res) => {
+      setDroneList(res.data);
+    });
   };
+
   const fetchProvince = async () => {
-    await LocationDatasource.getProvince()
-      .then((res) => {
-        setProvince(res);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
+    await LocationDatasource.getProvince().then((res) => {
+      setProvince(res);
+    });
+  };
+  const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const m = Map(data).set(e.target.id, e.target.value);
+    setData(m.toJS());
+  };
+  const handleAddress = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const m = Map(address).set(e.target.id, e.target.value);
+    setAddress(m.toJS());
   };
   const handleProvince = async (provinceId: number) => {
     const m = Map(address).set("provinceId", provinceId);
     setAddress(m.toJS());
-    saveAdd(m.toJS());
-    console.log(m.toJS());
-    await LocationDatasource.getDistrict(provinceId)
-      .then((res) => {
-        setDistrict(res);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
+    await LocationDatasource.getDistrict(provinceId).then((res) => {
+      setDistrict(res);
+    });
   };
   const handleDistrict = async (districtId: number) => {
     const m = Map(address).set("districtId", districtId);
     setAddress(m.toJS());
-    saveAdd(m.toJS());
-    console.log(m.toJS());
-    await LocationDatasource.getSubdistrict(districtId)
-      .then((res) => {
-        setSubdistrict(res);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
+    await LocationDatasource.getSubdistrict(districtId).then((res) => {
+      setSubdistrict(res);
+    });
   };
   const handleSubDistrict = async (subdistrictId: number) => {
     const m = Map(address).set("subdistrictId", subdistrictId);
     setAddress(m.toJS());
-    saveAdd(m.toJS());
-    console.log(m.toJS());
     await handelPostCode(m.toJS());
   };
-  const handelPostCode = (add: AddrSubDisEntity) => {
+  const handelPostCode = (add: FullAddressEntity) => {
     let filterSubDistrict = subdistrict.filter(
       (item) => item.subdistrictId == add.subdistrictId
     )[0].postcode;
     const m = Map(add).set("postcode", filterSubDistrict);
     setAddress(m.toJS());
-    saveAdd(m.toJS());
-    console.log(m.toJS());
   };
-  const saveAdd = (add: AddrSubDisEntity) => {
-    const m = Map(data).set("address", add);
-    setData(m.toJS());
-  };
+
   const handleExpPlant = (e: any) => {
     const m = Map(data).set("expPlant", e);
     setData(m.toJS());
   };
   const insertDroneList = (data: CreateDronerDrone) => {
-    setDronerDroneList([...dronerDroneList, data]);
-    setAddModal(false);
-    setEditModal(false);
+    console.log(data);
+    if (data.modalDroneIndex == 0) {
+      const pushId = Map(data).set(
+        "modalDroneIndex",
+        dronerDroneList.length + 1
+      );
+      setDronerDroneList([...dronerDroneList, pushId.toJS()]);
+    } else {
+      const m = dronerDroneList.filter(
+        (x) => x.modalDroneIndex != data.modalDroneIndex
+      );
+      setDronerDroneList([...m, data]);
+    }
+    setShowAddModal(false);
+    setShowEditModal(false);
+    setEditIndex(0);
   };
-  const editDroneList = (data: CreateDronerDrone) => {
-    setEditModal((prev) => !prev);
-    console.log("need", data);
+  const editDroneList = (data: CreateDronerDrone, index: number) => {
+    setShowEditModal((prev) => !prev);
     setEditDrone(data);
+    setEditIndex(index);
   };
   const uploadButton = (
     <div>
@@ -402,7 +397,7 @@ function AddDroner() {
               <Form.Item name="postcode">
                 <Input
                   name="postcode"
-                  placeholder="กรอกรหัสไปรษณย์"
+                  placeholder="กรอกรหัสไปรษณีย์"
                   defaultValue={address?.postcode}
                   key={address.subdistrictId}
                   disabled
@@ -453,32 +448,6 @@ function AddDroner() {
                 prefix={<SearchOutlined />}
               />
             </Form.Item>
-          </div>
-          <div className="row">
-            <div className="form-group col-lg-6">
-              <label>
-                ประสบการณ์บินโดรน <span style={{ color: "red" }}>*</span>
-              </label>
-              <Form.Item name="expYear">
-                <Input
-                type="number"
-                  placeholder="กรอกจำนวนปี"
-                  value={data?.expYear}
-                  onChange={handleOnChange}
-                />
-              </Form.Item>
-            </div>
-            <div className="form-group col-lg-6">
-              <label></label>
-              <Form.Item name="expMonth">
-                <Input
-                  type="number"
-                  placeholder="กรอกจำนวนเดือน"
-                  value={data?.expMonth}
-                  onChange={handleOnChange}
-                />
-              </Form.Item>
-            </div>
           </div>
           <div className="row ">
             <div className="form-group col-lg-7">
@@ -559,45 +528,13 @@ function AddDroner() {
       </CardContainer>
     </div>
   );
-  const colorStatus = (status: string) => {
-    if (status == "ACTIVE") {
-      return "text-success ";
-    } else if (status == "PENDING") {
-      return "text-warning ";
-    } else if (status == "INACTIVE") {
-      return "text-muted ";
-    } else if (status == "REJECTED") {
-      return "text-danger ";
-    } else if (status == "OPEN") {
-      return "text-muted ";
-    }
-    else {
-      return "text-muted ";
-    }
-  };
-  const colorBadge = (status: string) => {
-    if (status == "ACTIVE") {
-      return color.Success;
-    } else if (status == "PENDING") {
-      return color.Warning;
-    } else if (status == "INACTIVE") {
-      return color.Grey;
-    } else if (status == "REJECTED") {
-      return color.Error;
-    } else {
-      return color.Disable;
-    }
-  };
-
-  const getImgDrone = (id: string) => {
-    return droneList.filter((x) => x.id == id)[0].file;
-  };
   const getSeriesDrone = (id: string) => {
     return droneList.filter((x) => x.id == id)[0].series;
   };
-  const getDroneBrand = (id: string) => {
-    return droneList.filter((x) => x.id == id)[0].droneBrand.name;
-  };
+  // const getDroneBrand = (id: string) => {
+  //   return droneList.filter((x) => x.id == id)[0].droneBrand.name;
+  // };
+
   const insertDroner = async () => {
     const pushAdd = Map(data).set("address", address);
     setData(pushAdd.toJS());
@@ -606,22 +543,21 @@ function AddDroner() {
       dronerDroneList
     );
     setData(pushDroneList.toJS());
-    console.log(pushDroneList.toJS());
-   await DronerDatasource.createDronerList(pushDroneList.toJS())
-    .then((res) => {
-      if (res) {
-        Swal.fire({
-          title: "บันทึกสำเร็จ",
-          icon: "success",
-          timer: 1500,
-          showConfirmButton: false,
-        }).then((time) => {
-          window.location.href = "/IndexDroner";
-        });
-      }
-    })
-   };
-
+    // await DronerDatasource.createDronerList(pushDroneList.toJS()).then(
+    //   (res) => {
+    //     if (res) {
+    //       Swal.fire({
+    //         title: "บันทึกสำเร็จ",
+    //         icon: "success",
+    //         timer: 1500,
+    //         showConfirmButton: false,
+    //       }).then((time) => {
+    //         window.location.href = "/IndexDroner";
+    //       });
+    //     }
+    //   }
+    // );
+  };
   const renderLand = (
     <div className="col-lg-4">
       <CardContainer>
@@ -644,7 +580,7 @@ function AddDroner() {
               border: "none",
               borderRadius: "5px",
             }}
-            onClick={() => setAddModal((prev) => !prev)}
+            onClick={() => setShowAddModal((prev) => !prev)}
           >
             เพิ่มโดรน
           </Button>
@@ -659,32 +595,30 @@ function AddDroner() {
                 <div className="row d-flex">
                   <div className="col-lg-2">
                     <img
-                      src={getImgDrone(item.droneId)}
+                      src={item.logoImagePath}
                       width={"25px"}
                       height={"25px"}
                     />
                   </div>
-                  <div className="col-lg-3">
-                    <span style={{ fontSize: "12px" }}>
-                      {getDroneBrand(item.droneId)}
-                    </span>
-                  </div>
                   <div className="col-lg-4">
                     <span style={{ fontSize: "12px" }}>
+                      {item.droneName}
+                      <br />
                       {getSeriesDrone(item.droneId)}
                     </span>
                   </div>
                   <div className="col-lg-4">
-                    <span className={colorStatus(item.status)}>
-                      <Badge color={colorBadge(item.status)} />
+                    <span style={{ color: STATUS_COLOR[item.status] }}>
+                      <Badge color={STATUS_COLOR[item.status]} />
                       {DRONER_DRONE_STATUS[item.status]}
+                      <br />
                     </span>
                   </div>
                   <div className="col">
                     <ActionButton
                       icon={<EditOutlined />}
                       color={color.primary1}
-                      onClick={() => editDroneList(item)}
+                      onClick={() => editDroneList(item, index + 1)}
                     />
                   </div>
                 </div>
@@ -701,7 +635,7 @@ function AddDroner() {
         )}
       </CardContainer>
       <div className="d-flex justify-content-between pt-5">
-        <p>รายการทั้งหมด 0 รายการ</p>
+        <p>รายการทั้งหมด {dronerDroneList.length} รายการ</p>
         <Pagination defaultCurrent={1} total={1} />
       </div>
     </div>
@@ -727,20 +661,22 @@ function AddDroner() {
         onClickBack={() => (window.location.href = "/IndexDroner")}
         onClickSave={insertDroner}
       />
-      {addModal && (
+      {showAddModal && (
         <ModalDrone
-          show={addModal}
-          backButton={() => setAddModal((prev) => !prev)}
+          show={showAddModal}
+          backButton={() => setShowAddModal((prev) => !prev)}
           callBack={insertDroneList}
           data={CreateDronerDrone_INIT}
+          editIndex={editIndex}
         />
       )}
-      {editModal && (
+      {showEditModal && (
         <ModalDrone
-          show={editModal}
-          backButton={() => setEditModal((prev) => !prev)}
+          show={showEditModal}
+          backButton={() => setShowEditModal((prev) => !prev)}
           callBack={insertDroneList}
           data={editDrone}
+          editIndex={editIndex}
         />
       )}
     </Layout>

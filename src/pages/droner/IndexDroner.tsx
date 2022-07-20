@@ -17,7 +17,7 @@ import EditButton from "../../components/button/ActionButton";
 import ActionButton from "../../components/button/ActionButton";
 import { EditOutlined, InfoCircleOutlined } from "@ant-design/icons";
 import { useLocalStorage } from "../../hook/useLocalStorage";
-import { DronerListEntity } from "../../entities/DronerEntities";
+import { DronerEntity, DronerListEntity } from "../../entities/DronerEntities";
 import { DronerDatasource } from "../../datasource/DronerDatasource";
 import {
   DRONER_STATUS,
@@ -79,6 +79,7 @@ function IndexDroner() {
       searchStatus,
       searchText
     ).then((res: DronerListEntity) => {
+      console.log(res)
       setData(res);
     });
   };
@@ -121,7 +122,6 @@ function IndexDroner() {
     setSearchText(value);
   };
   const handleStatus = (status: any) => {
-    console.log(status);
     setSearchStatus(status);
   };
   const sorter = (a: any, b: any) => {
@@ -276,6 +276,7 @@ function IndexDroner() {
       title: "ชื่อนักบินโดรน",
       dataIndex: "firstname",
       key: "firstname",
+      width: "12%",
       sorter: (a: any, b: any) => sorter(a.firstname, b.firstname),
       render: (value: any, row: any, index: number) => {
         return {
@@ -294,6 +295,7 @@ function IndexDroner() {
       title: "ตำบล",
       dataIndex: "subdistrict",
       key: "subdistrict",
+      width: "10%",
       render: (value: any, row: any, index: number) => {
         const subdistrict = row.address.subdistrict;
         return {
@@ -309,6 +311,7 @@ function IndexDroner() {
       title: "อำเภอ",
       dataIndex: "district",
       key: "district",
+      width: "10%",
       render: (value: any, row: any, index: number) => {
         const district = row.address.district;
         return {
@@ -326,6 +329,7 @@ function IndexDroner() {
       title: "จังหวัด",
       dataIndex: "province",
       key: "province",
+      width: "10%",
       render: (value: any, row: any, index: number) => {
         const province = row.address.province;
         return {
@@ -343,11 +347,13 @@ function IndexDroner() {
       title: "เบอร์โทร",
       dataIndex: "telephoneNo",
       key: "telephoneNo",
+      width: "10%",
     },
     {
       title: "จำนวนโดรน",
       dataIndex: "totalDroneCount",
       key: "totalDroneCount",
+      width: "8%",
       render: (value: any, row: any, index: number) => {
         return {
           children: (
@@ -364,6 +370,7 @@ function IndexDroner() {
       title: "ยี่ห้อ",
       dataIndex: "brand",
       key: "brand",
+      width: "10%",
       render: (value: any, row: any, index: number) => {
         const droneLatest = row.dronerDrone[0];
         return {
@@ -401,12 +408,12 @@ function IndexDroner() {
       title: "สถานะ",
       dataIndex: "status",
       key: "status",
+      width: "10%",
       sorter: (a: any, b: any) => sorter(a.status, b.status),
       render: (value: any, row: any, index: number) => {
         const countDay = () => {
           let dateToday: any = moment(Date.now());
           let createDate: any = moment(new Date(row.createdAt));
-
           let dateDiff = dateToday.diff(createDate, "day");
           let textDateDiff =
             dateDiff == 0 ? null : "(รอไปแล้ว " + dateDiff + " วัน)";
@@ -432,7 +439,7 @@ function IndexDroner() {
       title: "",
       dataIndex: "Action",
       key: "Action",
-      // width: "7%",
+      width: "7%",
       render: (value: any, row: any, index: number) => {
         return {
           children: (
@@ -458,10 +465,13 @@ function IndexDroner() {
         columns={columns}
         dataSource={data?.data}
         pagination={false}
-        scroll={{ x: 1500 }}
+        scroll={{ x: 1300 }}
+        rowClassName={(a) => a.status == 'PENDING'  ? 'table-row-old'  : 'table-row-lasted'}
+
+
       />
       <div className="d-flex justify-content-between pt-5">
-        <span>รายการทั้งหมด {data?.count} รายการ</span>
+        <h5>รายการทั้งหมด {data?.count} รายการ</h5>
         <Pagination
           current={current}
           total={data?.count}

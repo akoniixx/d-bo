@@ -38,10 +38,6 @@ import { LocationDatasource } from "../../datasource/LocationDatasource";
 import { DefaultOptionType } from "antd/lib/select";
 import { EXP_PLANT } from "../../definitions/ExpPlant";
 import { Toast } from "react-bootstrap";
-import {
-  AddrSubDisEntity,
-  AddrSubDisEntity_INIT,
-} from "../../entities/AddressEntities";
 import ActionButton from "../../components/button/ActionButton";
 import { DefaultValue } from "recoil";
 import { DroneDatasource } from "../../datasource/DroneDatasource";
@@ -51,6 +47,7 @@ import {
   UpdateDroneEntity,
   UpdateDroneEntity_INIT,
 } from "../../entities/DroneEntities";
+import { AddressEntity, AddressEntity_INIT } from "../../entities/AddressEntities";
 
 const _ = require("lodash");
 const { Map } = require("immutable");
@@ -59,8 +56,8 @@ let queryString = _.split(window.location.search, "=");
 function EditDroner() {
   const dronerId = queryString[1];
   const [data, setData] = useState<DronerEntity>(DronerEntity_INIT);
-  const [address, setAddress] = useState<AddrSubDisEntity>(
-    AddrSubDisEntity_INIT
+  const [address, setAddress] = useState<AddressEntity>(
+    AddressEntity_INIT
   );
   const [dronerDrone, setDronerDrone] = useState<UpdateDroneEntity>(
     UpdateDroneEntity_INIT
@@ -75,11 +72,10 @@ function EditDroner() {
   useEffect(() => {
     fetchDronerById(dronerId);
     fetchProvince();
-    fetchDrone(1, 5, "ASC");
+    // fetchDrone(1, 5, "ASC");
   }, []);
   const fetchDronerById = async (id: string) => {
     await DronerDatasource.getDronerByID(id).then((res) => {
-      console.log(res);
       setData(res);
       setDronerDrone(res.dronerDrone);
       setAddress(res.address);
@@ -130,7 +126,6 @@ function EditDroner() {
     const m = Map(address).set("provinceId", provinceId);
     setAddress(m.toJS());
     saveAdd(m.toJS());
-    console.log(m.toJS());
     await LocationDatasource.getDistrict(provinceId)
       .then((res) => {
         setDistrict(res);
@@ -143,7 +138,6 @@ function EditDroner() {
     const m = Map(address).set("districtId", districtId);
     setAddress(m.toJS());
     saveAdd(m.toJS());
-    console.log(m.toJS());
     await LocationDatasource.getSubdistrict(districtId)
       .then((res) => {
         setSubdistrict(res);
@@ -156,10 +150,9 @@ function EditDroner() {
     const m = Map(address).set("subdistrictId", subdistrictId);
     setAddress(m.toJS());
     saveAdd(m.toJS());
-    console.log(m.toJS());
     await handelPostCode(m.toJS());
   };
-  const handelPostCode = (add: AddrSubDisEntity) => {
+  const handelPostCode = (add: AddressEntity) => {
     let filterSubDistrict = subdistrict.filter(
       (item) => item.subdistrictId == add.subdistrictId
     )[0].postcode;
@@ -179,7 +172,7 @@ function EditDroner() {
     const m = Map(dronerDrone).set(e.target.id, e.target.value);
     setDronerDrone(m.toJS());
   };
-  const saveAdd = (add: AddrSubDisEntity) => {
+  const saveAdd = (add: AddressEntity) => {
     const m = Map(data).set("address", add);
     setData(m.toJS());
   };
@@ -201,18 +194,17 @@ function EditDroner() {
       })
       .catch((err) => console.log(err));
   };
-  const fetchDrone = async (
-    page: number,
-    take: number,
-    sortDirection: string,
-    search?: string
-  ) => {
-    await DroneDatasource.getDroneList(page, take, sortDirection, search).then(
-      (res) => {
-        setBrandId(res.data);
-      }
-    );
-  };
+  // const fetchDrone = async (
+  //   page: number,
+  //   take: number,
+  //   search?: string
+  // ) => {
+  //   await DroneDatasource.getDroneList(page, take, search).then(
+  //     (res) => {
+  //       setBrandId(res.data);
+  //     }
+  //   );
+  // };
   const showModal = () => {
     setModal(true);
   };
@@ -220,7 +212,6 @@ function EditDroner() {
     setModal(false);
   };
   const saveModal = () => {
-    console.log(dronerDrone);
     //  const m = Map(data).set("dronerDrone", dronerDrone);
     //  setData(m.toJS());
 
