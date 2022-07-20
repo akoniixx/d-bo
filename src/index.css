@@ -1,7 +1,7 @@
 @import url("https://fonts.googleapis.com/css2?family=Prompt:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&display=swap");
 
 html {
-  font-size: 10px;
+  font-size: 14px;
   height: 100%;
   line-height: 1.8;
   -webkit-text-size-adjust: 100%;
@@ -31,4 +31,13 @@ table tr td {
   font-weight: 500 !important;
   color: rgb(255, 255, 255) !important;
   font-weight: bold !important;
+}
+.table-row-old td {
+  background-color: #EA973E1A;
+}
+.table-row-older td {
+  background-color: #EB57571A;
+}
+.table-row-lasted {
+  background-color: rgb(255, 255, 255);
 }

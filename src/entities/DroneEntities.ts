@@ -1,19 +1,46 @@
+import { DroneBrandEntity, DroneBrandEntity_INIT } from "./DroneBrandEntities";
+
 export interface DroneEntity {
   id: string;
-  brand: string;
+  droneBrandId: string;
   series: string;
-  imgDrone: string;
+  droneBrand: DroneBrandEntity;
+  file: string;
   createdAt: string;
   updatedAt: string;
 }
 
 export const DroneEntity_INIT: DroneEntity = {
-    id: "",
-    brand: "",
-    series: "",
-    imgDrone: "",
-    createdAt: "",
-    updatedAt: "",
+  id: "",
+  droneBrandId: "",
+  series: "",
+  droneBrand: DroneBrandEntity_INIT,
+  file: "",
+  createdAt: "",
+  updatedAt: "",
+};
+
+export interface UpdateDroneEntity {
+  droneBrandId: string;
+  series: string;
+  id: string;
 }
+export const UpdateDroneEntity_INIT: UpdateDroneEntity = {
+  droneBrandId: "",
+  series: "",
+  id: "",
+};
 
+export interface CreateDroneEntity {
+  droneBrandId: string;
+  series: string;
+}
+export const CreateDroneEntity_INIT: CreateDroneEntity = {
+  droneBrandId: "",
+  series: "",
+};
 
+export interface DroneListEntity {
+  data: DroneEntity[];
+  count: number;
+}

@@ -16,7 +16,7 @@ export const ModalPage: React.FC<ModalProps> = ({
   visible,
   data,
   backButton,
-  saveButton
+  saveButton,
 }) => (
   <Modal
     title={
@@ -31,7 +31,9 @@ export const ModalPage: React.FC<ModalProps> = ({
     }
     visible={visible}
     onCancel={closeModal}
-    footer={[<FooterPage onClickBack={backButton} onClickSave={saveButton}/>]}
+    footer={[<FooterPage 
+      onClickBack={backButton} 
+      onClickSave={saveButton}/>]}
   >
     {data}
   </Modal>

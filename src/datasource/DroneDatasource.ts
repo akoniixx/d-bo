@@ -1,18 +1,16 @@
+import { DroneBrandEntity, DroneBrandListEntity } from './../entities/DroneBrandEntities';
+import { DroneEntity, DroneListEntity } from './../entities/DroneEntities';
 import { BASE_URL, httpClient } from "../config/develop-config";
 
 export class DroneDatasource {
   static getDroneList(
     page: number,
     take: number,
-    sortField: string,
-    sortDirection: string,
     search?: string
-  ): Promise<any> {
+  ): Promise<DroneListEntity> {
     const params = {
       page: page,
       take: take,
-      sortField: sortField,
-      sortDirection: sortDirection,
       search: search,
     };
     return httpClient
@@ -36,9 +34,20 @@ export class DroneDatasource {
       });
   }
 
-  static UpdateDroneList(data: any): Promise<any> {
+  static CreateDroneList(data: DroneEntity): Promise<any> {
     return httpClient
       .post(BASE_URL + "/drone", { data })
+      .then((response) => {
+        return response.data;
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  }
+  
+  static UpdateDroneList(data: any): Promise<any> {
+    return httpClient
+      .patch(BASE_URL + "/drone", { data })
       .then((response) => {
         return response.data;
       })
@@ -56,5 +65,16 @@ export class DroneDatasource {
       .catch((error) => {
         console.log(error);
       });
+  }
+
+  static getDroneBrandList () : Promise<DroneBrandListEntity> {
+    return httpClient
+      .get(BASE_URL + "/drone-brand")
+      .then((response) => {
+        return response.data;
+      })
+      .catch((error) => {
+        console.log(error);
+      }); 
   }
 }

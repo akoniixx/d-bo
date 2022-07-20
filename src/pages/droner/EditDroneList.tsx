@@ -33,7 +33,6 @@ let queryString = _.split(window.location.search, "=");
 function EditDroneList() {
   const [value, setValue] = useState(1);
   const onChange = (e: RadioChangeEvent) => {
-    console.log("radio checked", e.target.value);
     setValue(e.target.value);
   };
   const id = queryString[1];
@@ -97,7 +96,7 @@ function EditDroneList() {
               >
                 <Select
                   allowClear
-                  value={droneData.brand}
+                  value={droneData.series}
                   // onChange={onChange}
                 >
                   <option>DJL</option>
