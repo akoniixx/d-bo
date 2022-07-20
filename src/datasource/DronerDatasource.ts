@@ -1,25 +1,29 @@
-import { DronerEntity, CreateDronerEntity } from './../entities/DronerEntities';
+import {
+  DronerEntity,
+  CreateDronerEntity,
+  DronerListEntity,
+} from "./../entities/DronerEntities";
 import { BASE_URL, httpClient } from "../config/develop-config";
 
 export class DronerDatasource {
   static getDronerList(
-    status: string,
-    provinceId : number,
-    districtId : number,
-    subdistrictId : number,
     page: number,
-    take: number,
-    sortDirection: string,
+    row: number,
+    subdistrictId?: number,
+    districtId?: number,
+    provinceId?: number,
+    droneBrandId?: string,
+    status?: string,
     search?: string
-  ): Promise<any> {
+  ): Promise<DronerListEntity> {
     const params = {
-      status: status,
-      provinceId : provinceId,
-      districtId : districtId,
-      subdistrictId : subdistrictId,
       page: page,
-      take: take,
-      sortDirection: sortDirection,
+      take: row,
+      subdistrictId: subdistrictId,
+      districtId: districtId,
+      provinceId: provinceId,
+      droneBrandId: droneBrandId,
+      status: status,
       search: search,
     };
     return httpClient
@@ -34,7 +38,7 @@ export class DronerDatasource {
 
   static getDronerByID(id: string): Promise<any> {
     return httpClient
-      .get(BASE_URL+"/droner/" + id)
+      .get(BASE_URL + "/droner/" + id)
       .then((res) => {
         return res.data;
       })
@@ -45,7 +49,7 @@ export class DronerDatasource {
 
   static updateDroner(data: DronerEntity): Promise<any> {
     return httpClient
-      .patch(BASE_URL + "/droner/" + data.id , data )
+      .patch(BASE_URL + "/droner/" + data.id, data)
       .then((response) => {
         return response.data;
       })
@@ -54,7 +58,7 @@ export class DronerDatasource {
       });
   }
 
-  static createDronerList(data:CreateDronerEntity): Promise<any> {
+  static createDronerList(data: CreateDronerEntity): Promise<any> {
     return httpClient
       .post(BASE_URL + "/droner", data)
       .then((response) => {
