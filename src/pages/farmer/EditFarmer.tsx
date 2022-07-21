@@ -53,9 +53,13 @@ import ModalFarmerPlot from "../../components/modal/ModalFarmerPlot";
 import { FarmerPlotDatasource } from "../../datasource/FarmerPlotDatasource";
 import Swal from "sweetalert2";
 import { UploadImageDatasouce } from "../../datasource/UploadImageDatasource";
-import { ImageEntity, ImageEntity_INTI } from "../../entities/UploadImageEntities";
+import {
+  ImageEntity,
+  ImageEntity_INTI,
+} from "../../entities/UploadImageEntities";
 import "../farmer/Style.css";
 import img_empty from "../../resource/media/empties/uploadImg.png";
+import bth_img_empty from "../../resource/media/empties/upload_Img_btn.png";
 
 const { Option } = Select;
 
@@ -90,21 +94,35 @@ const EditFarmer = () => {
   );
 
   const [imgProfile, setImgProfile] = useState<any>();
-  const [imgIdCard, setImgIdCard] = useState<any[]>([]);
+  const [imgIdCard, setImgIdCard] = useState<any>();
 
-  const [createImgProfile, setCreateImgProfile] = useState<ImageEntity>(ImageEntity_INTI);
+  const [createImgProfile, setCreateImgProfile] =
+    useState<ImageEntity>(ImageEntity_INTI);
+  const [createImgIdCard, setCreateImgIdCrad] =
+    useState<ImageEntity>(ImageEntity_INTI);
 
-  let getPath: string = "";
-
+  let getPathPro: string = "";
+  let getPathCard: string = "";
   const fecthFarmer = async () => {
     await FarmerDatasource.getFarmerById(farmerId).then((res) => {
       setData(res);
       setAddress(res.address);
       setFarmerPlotList(res.farmerPlot);
-      getPath = res.file.filter((x) => x.category == "PROFILE_IMAGE")[0].path;
-      UploadImageDatasouce.getImage(getPath).then((resImg) => {
-        setImgProfile(resImg.url);
-      });
+      getPathPro = res.file.filter((x) => x.category == "PROFILE_IMAGE")[0]
+        .path;
+      getPathCard = res.file.filter((x) => x.category == "ID_CARD_IMAGE")[0]
+        .path;
+      var i = 0;
+      for (i; 2 > i; i++) {
+        i == 0 &&
+          UploadImageDatasouce.getImage(getPathPro).then((resImg) => {
+            setImgProfile(resImg.url);
+          });
+        i == 1 &&
+          UploadImageDatasouce.getImage(getPathCard).then((resImg) => {
+            setImgIdCard(resImg.url);
+          });
+      }
     });
   };
 
@@ -195,7 +213,7 @@ const EditFarmer = () => {
       setShowAddModal((prev) => !prev);
     }
     fecthFarmer();
-    checkValidate(data)
+    checkValidate(data);
   };
   //#endregion
 
@@ -233,6 +251,40 @@ const EditFarmer = () => {
 
   const removeImg = () => {
     setImgProfile(undefined);
+    checkValidate(data);
+  };
+  const onChangeIdCard = async (file: any) => {
+    let src = file.target.files[0];
+    src = await new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(src);
+      reader.onload = () => resolve(reader.result);
+    });
+    setImgIdCard(src);
+    checkValidate(data);
+    const d = Map(createImgIdCard).set("file", file.target.files[0]);
+    const e = Map(d.toJS()).set("resource", "FARMER");
+    const f = Map(e.toJS()).set("category", "ID_CARD_IMAGE");
+    const g = Map(f.toJS()).set("resourceId", farmerId);
+    setCreateImgIdCrad(g.toJS());
+  };
+
+  const onPreviewIdCard = async () => {
+    let src = imgIdCard;
+    if (!src) {
+      src = await new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(imgIdCard);
+        reader.onload = () => resolve(reader.result);
+      });
+    }
+    const image = new Image();
+    image.src = src;
+    const imgWindow = window.open(src);
+    imgWindow?.document.write(image.outerHTML);
+  };
+  const removeImgIdCard = () => {
+    setImgIdCard(undefined);
     checkValidate(data);
   };
   //#endregion
@@ -278,15 +330,19 @@ const EditFarmer = () => {
 
     await FarmerDatasource.updateFarmer(pushPin.toJS()).then((res) => {
       if (res.id != null) {
-        UploadImageDatasouce.uploadImage(createImgProfile).then((res) => {
-          Swal.fire({
-            title: "บันทึกสำเร็จ",
-            icon: "success",
-            timer: 1500,
-            showConfirmButton: false,
-          }).then((time) => {
-            window.location.href = "/IndexFarmer";
-          });
+        var i = 0;
+        for (i; 2 > i; i++) {
+          i == 0 &&
+            UploadImageDatasouce.uploadImage(createImgProfile).then(res);
+          i == 1 && UploadImageDatasouce.uploadImage(createImgIdCard).then(res);
+        }
+        Swal.fire({
+          title: "บันทึกสำเร็จ",
+          icon: "success",
+          timer: 1500,
+          showConfirmButton: false,
+        }).then((time) => {
+          window.location.href = "/IndexFarmer";
         });
       }
     });
@@ -307,7 +363,11 @@ const EditFarmer = () => {
                   })`,
                 }}
               >
-                <input type="file" onChange={onChangeProfile} title="เลือกรูป"/>
+                <input
+                  type="file"
+                  onChange={onChangeProfile}
+                  title="เลือกรูป"
+                />
               </div>
               <div>
                 {imgProfile != undefined && (
@@ -421,26 +481,46 @@ const EditFarmer = () => {
           </div>
           <div className="row">
             <div className="form-group col-lg-12 pb-5">
-              <label>
-                รูปถ่ายผู้สมัครคู่กับบัตรประชาชน{" "}
-                {/* <span style={{ color: "red" }}>*</span> */}
-              </label>
+              <label>รูปถ่ายผู้สมัครคู่กับบัตรประชาชน </label>
               <br />
-              <Upload
-                listType="picture"
-                defaultFileList={[...imgIdCard]}
-                onPreview={onPreviewProfile}
-              >
-                <Button
+              <div className="pb-2">
+                <div
+                  className="hiddenFileInput"
                   style={{
-                    backgroundColor: "rgba(33, 150, 83, 0.1)",
-                    border: color.Success + "1px dashed",
-                    borderRadius: "5px",
+                    backgroundImage: `url(${imgIdCard})`,
+                    display: imgIdCard != undefined ? "block" : "none",
                   }}
-                >
-                  <span style={{ color: color.Success }}>อัพโหลดรูปภาพ</span>
-                </Button>
-              </Upload>
+                ></div>
+              </div>
+              <div className="text-left ps-4">
+                {imgIdCard != undefined && (
+                  <>
+                    <Tag
+                      color={color.Success}
+                      onClick={onPreviewIdCard}
+                      style={{ cursor: "pointer", borderRadius: "5px" }}
+                    >
+                      View
+                    </Tag>
+                    <Tag
+                      color={color.Error}
+                      onClick={removeImgIdCard}
+                      style={{ cursor: "pointer", borderRadius: "5px" }}
+                    >
+                      Remove
+                    </Tag>
+                  </>
+                )}
+              </div>
+              <div
+                className="hiddenFileBtn"
+                style={{
+                  backgroundImage: `url(${bth_img_empty})`,
+                  display: imgIdCard == undefined ? "block" : "none",
+                }}
+              >
+                <input type="file" onChange={onChangeIdCard} title="เลือกรูป" />
+              </div>
             </div>
           </div>
           <div className="row">
@@ -450,6 +530,7 @@ const EditFarmer = () => {
               </label>
               <Form.Item name="province">
                 <Select
+                  allowClear
                   placeholder="เลือกจังหวัด"
                   defaultValue={address.provinceId}
                   showSearch
@@ -476,6 +557,7 @@ const EditFarmer = () => {
               </label>
               <Form.Item name="district">
                 <Select
+                  allowClear
                   placeholder="เลือกอำเภอ"
                   defaultValue={address.districtId}
                   showSearch
@@ -504,6 +586,7 @@ const EditFarmer = () => {
               </label>
               <Form.Item name="subdistrict">
                 <Select
+                  allowClear
                   placeholder="เลือกตำบล"
                   defaultValue={address.subdistrictId}
                   showSearch

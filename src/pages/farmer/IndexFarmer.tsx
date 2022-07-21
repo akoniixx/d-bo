@@ -133,6 +133,7 @@ function IndexFarmer() {
         </div>
         <div className="col-lg-3">
           <Select
+            allowClear
             className="col-lg-12 p-1"
             placeholder="เลือกจังหวัด"
             onChange={handleSearchProvince}
@@ -154,6 +155,7 @@ function IndexFarmer() {
         </div>
         <div className="col-lg-2">
           <Select
+            allowClear
             className="col-lg-12 p-1"
             placeholder="เลือกอำเภอ"
             onChange={handleSearchDistrict}
@@ -178,6 +180,7 @@ function IndexFarmer() {
         </div>
         <div className="col-lg-2">
           <Select
+            allowClear
             className="col-lg-12 p-1"
             placeholder="เลือกตำบล"
             onChange={handleSearchSubdistrict}
@@ -202,6 +205,7 @@ function IndexFarmer() {
         </div>
         <div className="col-lg-2">
           <Select
+            allowClear
             className="col-lg-12 p-1"
             placeholder="เลือกสถานะ"
             onChange={handleSearchStatus}
@@ -277,7 +281,9 @@ function IndexFarmer() {
       key: "totalRaiCount",
       render: (value: any, row: any, index: number) => {
         return {
-          children: <span>{row.totalRaiCount ? row.totalRaiCount : 0} ไร่</span>,
+          children: (
+            <span>{row.totalRaiCount ? row.totalRaiCount : 0} ไร่</span>
+          ),
         };
       },
     },
