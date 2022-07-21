@@ -57,11 +57,6 @@ import {
   DRONER_DRONE_STATUS,
   STATUS_COLOR,
 } from "../../definitions/DronerStatus";
-import {
-  CreateDronerDrone,
-  CreateDronerDrone_INIT,
-  DronerDroneEntity,
-} from "../../entities/DronerDroneEntities";
 import { DronerDatasource } from "../../datasource/DronerDatasource";
 import {
   DRONER_STATUS,
@@ -74,23 +69,27 @@ import {
   SubdistrictEntity,
 } from "../../entities/LocationEntities";
 import ModalDrone from "../../components/modal/ModalDronerDrone";
+import {
+  DronerDroneEntity,
+  DronerDroneEntity_INIT,
+} from "../../entities/DronerDroneEntities";
 
 const _ = require("lodash");
 const { Map } = require("immutable");
 function AddDroner() {
   const [data, setData] = useState<CreateDronerEntity>(CreateDronerEntity_INIT);
-  const [address, setAddress] = useState<FullAddressEntity>(
-    FullAddressEntiry_INIT
+  const [address, setAddress] = useState<CreateAddressEntity>(
+    CreateAddressEntity_INIT
   );
-  const [dronerDroneList, setDronerDroneList] = useState<CreateDronerDrone[]>(
+  const [dronerDroneList, setDronerDroneList] = useState<DronerDroneEntity[]>(
     []
   );
   const [droneList, setDroneList] = useState<DroneEntity[]>([]);
   const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [editIndex, setEditIndex] = useState(0);
-  const [editDrone, setEditDrone] = useState<CreateDronerDrone>(
-    CreateDronerDrone_INIT
+  const [editDrone, setEditDrone] = useState<DronerDroneEntity>(
+    DronerDroneEntity_INIT
   );
   const [province, setProvince] = useState<ProviceEntity[]>([]);
   const [district, setDistrict] = useState<DistrictEntity[]>([]);
@@ -147,13 +146,16 @@ function AddDroner() {
     const m = Map(add).set("postcode", filterSubDistrict);
     setAddress(m.toJS());
   };
-
   const handleExpPlant = (e: any) => {
     const m = Map(data).set("expPlant", e);
     setData(m.toJS());
   };
-  const insertDroneList = (data: CreateDronerDrone) => {
-    console.log(data);
+  const handlePlantOther = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const m = Map(data).set(e.target.id, e.target.value);
+    setData(m.toJS());
+  }
+
+  const insertDroneList = (data: DronerDroneEntity) => {
     if (data.modalDroneIndex == 0) {
       const pushId = Map(data).set(
         "modalDroneIndex",
@@ -170,7 +172,7 @@ function AddDroner() {
     setShowEditModal(false);
     setEditIndex(0);
   };
-  const editDroneList = (data: CreateDronerDrone, index: number) => {
+  const editDroneList = (data: DronerDroneEntity, index: number) => {
     setShowEditModal((prev) => !prev);
     setEditDrone(data);
     setEditIndex(index);
@@ -287,7 +289,7 @@ function AddDroner() {
             <div className="form-group col-lg-12 pb-5">
               <label>
                 รูปถ่ายผู้สมัครคู่กับบัตรประชาชน
-                {/* <span style={{ color: "red" }}>*</span> */}
+                <span style={{ color: "red" }}>*</span>
               </label>
               <br />
               <Upload listType="picture" className="upload-list-inline">
@@ -400,7 +402,6 @@ function AddDroner() {
                   placeholder="กรอกรหัสไปรษณีย์"
                   defaultValue={address?.postcode}
                   key={address.subdistrictId}
-                  disabled
                 />
               </Form.Item>
             </div>
@@ -449,8 +450,25 @@ function AddDroner() {
               />
             </Form.Item>
           </div>
+          <div className="form-group">
+            <label>หรือ</label>
+            <Form.Item
+              name="areaDrone"
+              rules={[
+                {
+                  required: true,
+                  message: "กรุณากรอกข้อมูล Url Google Map",
+                },
+              ]}
+            >
+              <Input
+                // value={data?.dronerArea}
+                placeholder="กรอกข้อมูล Url Google Map"
+              />
+            </Form.Item>
+          </div>
           <div className="row ">
-            <div className="form-group col-lg-7">
+            <div className="form-group col-lg-6">
               <label>
                 พืชที่เคยฉีดพ่น
                 <span style={{ color: color.Disable }}>
@@ -461,7 +479,7 @@ function AddDroner() {
               <Checkbox.Group
                 onChange={handleExpPlant}
                 options={EXP_PLANT}
-                style={{ width: "100%" }}
+                style={{ width: "220px" }}
                 defaultValue={data.expPlant}
               >
                 <Row>
@@ -475,54 +493,12 @@ function AddDroner() {
             </div>
           </div>
           <div className="form-group col-lg-6">
+            <label></label>
             <Form.Item name="plantOther">
-              <Input placeholder="พืชอื่นๆ" />
+              <Input 
+              onChange={handlePlantOther}
+              placeholder="พืชอื่นๆ เช่น ส้ม มะละกอม มะพร้าว" />
             </Form.Item>
-          </div>
-          <div className="form-group ">
-            <Form.List name="plantOther">
-              {(fields, { add, remove }, { errors }) => (
-                <>
-                  {fields.map((field, index) => (
-                    <Form.Item>
-                      <Form.Item
-                        {...field}
-                        validateTrigger={["onChange", "onBlur"]}
-                        noStyle
-                      >
-                        <Input
-                          value={data?.expPlant}
-                          placeholder="พืชอื่นๆ"
-                          style={{
-                            width: "50%",
-                          }}
-                        />
-                      </Form.Item>
-                      {fields.length > 0 ? (
-                        <DeleteOutlined
-                          style={{ color: color.Error }}
-                          onClick={() => remove(field.name)}
-                        />
-                      ) : null}
-                    </Form.Item>
-                  ))}
-                  <Form.Item>
-                    <Button
-                      type="dashed"
-                      onClick={() => add()}
-                      style={{
-                        width: "50%",
-                        backgroundColor: "#D6F1CD",
-                        color: color.Success,
-                      }}
-                    >
-                      + เพิ่มรายการพืชอื่นๆ
-                    </Button>
-                    <Form.ErrorList errors={errors} />
-                  </Form.Item>
-                </>
-              )}
-            </Form.List>
           </div>
         </Form>
       </CardContainer>
@@ -531,9 +507,9 @@ function AddDroner() {
   const getSeriesDrone = (id: string) => {
     return droneList.filter((x) => x.id == id)[0].series;
   };
-  // const getDroneBrand = (id: string) => {
-  //   return droneList.filter((x) => x.id == id)[0].droneBrand.name;
-  // };
+  const getDroneBrand = (id: string) => {
+    return droneList.filter((x) => x.id == id)[0].droneBrand.name;
+  };
 
   const insertDroner = async () => {
     const pushAdd = Map(data).set("address", address);
@@ -543,20 +519,22 @@ function AddDroner() {
       dronerDroneList
     );
     setData(pushDroneList.toJS());
-    // await DronerDatasource.createDronerList(pushDroneList.toJS()).then(
-    //   (res) => {
-    //     if (res) {
-    //       Swal.fire({
-    //         title: "บันทึกสำเร็จ",
-    //         icon: "success",
-    //         timer: 1500,
-    //         showConfirmButton: false,
-    //       }).then((time) => {
-    //         window.location.href = "/IndexDroner";
-    //       });
-    //     }
-    //   }
-    // );
+    console.log(pushDroneList.toJS())
+    await DronerDatasource.createDronerList(pushDroneList.toJS()).then(
+      (res) => {
+        console.log(res);
+        if (res) {
+          Swal.fire({
+            title: "บันทึกสำเร็จ",
+            icon: "success",
+            timer: 1500,
+            showConfirmButton: false,
+          }).then((time) => {
+            window.location.href = "/IndexDroner";
+          });
+        }
+      }
+    );
   };
   const renderLand = (
     <div className="col-lg-4">
@@ -602,7 +580,7 @@ function AddDroner() {
                   </div>
                   <div className="col-lg-4">
                     <span style={{ fontSize: "12px" }}>
-                      {item.droneName}
+                      {getDroneBrand(item.droneId)}
                       <br />
                       {getSeriesDrone(item.droneId)}
                     </span>
@@ -666,7 +644,7 @@ function AddDroner() {
           show={showAddModal}
           backButton={() => setShowAddModal((prev) => !prev)}
           callBack={insertDroneList}
-          data={CreateDronerDrone_INIT}
+          data={DronerDroneEntity_INIT}
           editIndex={editIndex}
         />
       )}

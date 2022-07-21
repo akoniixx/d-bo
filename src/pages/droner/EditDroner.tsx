@@ -47,8 +47,27 @@ import {
   UpdateDroneEntity,
   UpdateDroneEntity_INIT,
 } from "../../entities/DroneEntities";
-import { AddressEntity, AddressEntity_INIT } from "../../entities/AddressEntities";
+import {
+  AddressEntity,
+  AddressEntity_INIT,
+} from "../../entities/AddressEntities";
+import { DronerDroneDatasource } from "../../datasource/DronerDroneDatasource";
+import {
+  DistrictEntity,
+  ProviceEntity,
+  SubdistrictEntity,
+} from "../../entities/LocationEntities";
+import {
+  DronerDroneEntity,
+  DronerDroneEntity_INIT,
+} from "../../entities/DronerDroneEntities";
+import ModalDrone from "../../components/modal/ModalDronerDrone";
+import {
+  DRONER_DRONE_STATUS,
+  STATUS_COLOR,
+} from "../../definitions/DronerStatus";
 
+const { Option } = Select;
 const _ = require("lodash");
 const { Map } = require("immutable");
 let queryString = _.split(window.location.search, "=");
@@ -56,65 +75,46 @@ let queryString = _.split(window.location.search, "=");
 function EditDroner() {
   const dronerId = queryString[1];
   const [data, setData] = useState<DronerEntity>(DronerEntity_INIT);
-  const [address, setAddress] = useState<AddressEntity>(
-    AddressEntity_INIT
+  const [address, setAddress] = useState<AddressEntity>(AddressEntity_INIT);
+  const [dronerDroneList, setDronerDroneList] = useState<DronerDroneEntity[]>([
+    DronerDroneEntity_INIT,
+  ]);
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editIndex, setEditIndex] = useState(0);
+  const [editDroneList, setEditDroneList] = useState<DronerDroneEntity>(
+    DronerDroneEntity_INIT
   );
-  const [dronerDrone, setDronerDrone] = useState<UpdateDroneEntity>(
-    UpdateDroneEntity_INIT
-  );
-  const [modal, setModal] = useState(false);
-  const [province, setProvince] = useState<any[]>([]);
-  const [district, setDistrict] = useState<any[]>([]);
-  const [subdistrict, setSubdistrict] = useState<any[]>([]);
-  const [brandId, setBrandId] = useState<any[]>([]);
-  const [showBtn, setShowBtn] = useState<boolean>(true);
+  const [province, setProvince] = useState<ProviceEntity[]>([]);
+  const [district, setDistrict] = useState<DistrictEntity[]>([]);
+  const [subdistrict, setSubdistrict] = useState<SubdistrictEntity[]>([]);
 
   useEffect(() => {
-    fetchDronerById(dronerId);
-    fetchProvince();
-    // fetchDrone(1, 5, "ASC");
+    fetchDronerById();
   }, []);
-  const fetchDronerById = async (id: string) => {
-    await DronerDatasource.getDronerByID(id).then((res) => {
+  const fetchDronerById = async () => {
+    await DronerDatasource.getDronerByID(dronerId).then((res) => {
       setData(res);
-      setDronerDrone(res.dronerDrone);
       setAddress(res.address);
-      fetchDistrict(res.address.provinceId);
-      fetchSubDistrict(res.address.districtId);
+      setDronerDroneList(res.dronerDrone);
     });
   };
-  const fetchProvince = async () => {
-    await LocationDatasource.getProvince()
-      .then((res) => {
-        setProvince(res);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  };
-  const fetchDistrict = async (provinceId: number) => {
-    await LocationDatasource.getDistrict(provinceId)
-      .then((res) => {
-        setDistrict(res);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  };
-  const fetchSubDistrict = async (districtId: number) => {
-    await LocationDatasource.getSubdistrict(districtId)
-      .then((res) => {
-        setSubdistrict(res);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  };
-  const handleOnChange = (e: any) => {
+  useEffect(() => {
+    LocationDatasource.getProvince().then((res) => {
+      setProvince(res);
+    });
+    LocationDatasource.getDistrict(address.provinceId).then((res) => {
+      setDistrict(res);
+    });
+    LocationDatasource.getSubdistrict(address.districtId).then((res) => {
+      setSubdistrict(res);
+    });
+  }, [address.provinceId, address.districtId]);
+  const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const m = Map(data).set(e.target.id, e.target.value);
     setData(m.toJS());
   };
-  const handleChangestatus = (e: any) => {
+  const handleChangeStatus = (e: any) => {
     const m = Map(data).set("status", e.target.value);
     setData(m.toJS());
   };
@@ -123,34 +123,17 @@ function EditDroner() {
     setData(m.toJS());
   };
   const handleProvince = async (provinceId: number) => {
-    const m = Map(address).set("provinceId", provinceId);
-    setAddress(m.toJS());
-    saveAdd(m.toJS());
-    await LocationDatasource.getDistrict(provinceId)
-      .then((res) => {
-        setDistrict(res);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
+    const d = Map(address).set("provinceId", provinceId);
+    setAddress(d.toJS());
   };
   const handleDistrict = async (districtId: number) => {
-    const m = Map(address).set("districtId", districtId);
-    setAddress(m.toJS());
-    saveAdd(m.toJS());
-    await LocationDatasource.getSubdistrict(districtId)
-      .then((res) => {
-        setSubdistrict(res);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
+    const d = Map(address).set("districtId", districtId);
+    setAddress(d.toJS());
   };
   const handleSubDistrict = async (subdistrictId: number) => {
-    const m = Map(address).set("subdistrictId", subdistrictId);
-    setAddress(m.toJS());
-    saveAdd(m.toJS());
-    await handelPostCode(m.toJS());
+    const d = Map(address).set("subdistrictId", subdistrictId);
+    setAddress(d.toJS());
+    await handelPostCode(d.toJS());
   };
   const handelPostCode = (add: AddressEntity) => {
     let filterSubDistrict = subdistrict.filter(
@@ -158,162 +141,43 @@ function EditDroner() {
     )[0].postcode;
     const m = Map(add).set("postcode", filterSubDistrict);
     setAddress(m.toJS());
-    saveAdd(m.toJS());
+  };
+  const handleAddress = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const d = Map(address).set("address1", e.target.value);
+    setAddress(d.toJS());
+  };
+  const handleStatusDrone = (e: any) => {
+    const m = Map(data).set("status", e.target.value);
+    setData(m.toJS());
   };
   const handleBrandId = async (brand: string) => {
-    const m = Map(dronerDrone).set("brand", brand);
-    setDronerDrone(m.toJS());
+    const m = Map(dronerDroneList).set("brand", brand);
+    setDronerDroneList(m.toJS());
   };
   const handleSeries = async (brand: string) => {
-    const m = Map(dronerDrone).set("brand", brand);
-    setDronerDrone(m.toJS());
+    const m = Map(dronerDroneList).set("brand", brand);
+    setDronerDroneList(m.toJS());
   };
   const handleSerialNo = async (e: any) => {
-    const m = Map(dronerDrone).set(e.target.id, e.target.value);
-    setDronerDrone(m.toJS());
+    const m = Map(dronerDroneList).set(e.target.id, e.target.value);
+    setDronerDroneList(m.toJS());
   };
-  const saveAdd = (add: AddressEntity) => {
-    const m = Map(data).set("address", add);
-    setData(m.toJS());
+  const editDroner = (data: DronerDroneEntity, index: number) => {
+    setShowEditModal((prev) => !prev);
+    setEditIndex(index);
+    setEditDroneList(data);
   };
-  const updateDroner = () => {
-    const m = Map(data).set("address", address);
-    setData(m.toJS());
-    DronerDatasource.updateDroner(m.toJS())
-      .then((res) => {
-        if (res.id) {
-          Swal.fire({
-            title: "บันทึกสำเร็จ",
-            icon: "success",
-            timer: 1500,
-            showConfirmButton: false,
-          }).then((time) => {
-            window.location.href = "/IndexDroner";
-          });
-        }
-      })
-      .catch((err) => console.log(err));
+  const updateDrone = async (data: DronerDroneEntity) => {
+    const p = Map(data).set("dronerId", dronerId);
+    if (p.toJS().id != "") {
+      await DronerDroneDatasource.updateDronerDrone(p.toJS()).then();
+      setShowEditModal((prev) => !prev);
+    } else {
+      await DronerDroneDatasource.updateDronerDrone(p.toJS()).then();
+      setShowAddModal((prev) => !prev);
+    }
+    fetchDronerById();
   };
-  // const fetchDrone = async (
-  //   page: number,
-  //   take: number,
-  //   search?: string
-  // ) => {
-  //   await DroneDatasource.getDroneList(page, take, search).then(
-  //     (res) => {
-  //       setBrandId(res.data);
-  //     }
-  //   );
-  // };
-  const showModal = () => {
-    setModal(true);
-  };
-  const closeModal = () => {
-    setModal(false);
-  };
-  const saveModal = () => {
-    //  const m = Map(data).set("dronerDrone", dronerDrone);
-    //  setData(m.toJS());
-
-    //  DroneDatasource.UpdateDroneList(m.toJS())
-    //  .then((res) => {
-    //   setModal(false);
-    //   console.log(res)
-    // })
-    // .catch((err) => console.log(err));
-  };
-  const inputLandInModal = (
-    <Form>
-      <div className="form-group">
-        <label>
-          ยี่ห้อโดรนฉีดพ่น <span style={{ color: "red" }}>*</span>
-        </label>
-        <Form.Item name="brand">
-          <Select
-            onChange={handleBrandId}
-            placeholder="เลือกยี่ห้อโดรนฉีดพ่น"
-            defaultValue={dronerDrone.droneBrandId}
-          >
-            {brandId.map((item: any, index: any) => (
-              <option key={index} value={item.id}>
-                {item.brand}
-              </option>
-            ))}
-          </Select>
-        </Form.Item>
-      </div>
-      <div className="form-group">
-        <label>
-          รุ่น <span style={{ color: "red" }}>*</span>
-        </label>
-        <Form.Item name="series">
-          <Select onChange={handleSeries} placeholder="เลือกรุ่นโดรน">
-            {brandId.map((item: any, index: any) => (
-              <option key={index} value={item.id}>
-                {item.series}
-              </option>
-            ))}
-          </Select>
-        </Form.Item>
-      </div>
-      <div className="form-group">
-        <label>
-          เลขตัวถัง <span style={{ color: "red" }}>*</span>
-        </label>
-        <Form.Item
-          name="serialNo"
-          rules={[
-            {
-              required: true,
-              message: "กรุณากรอกเลขตัวถัง!",
-            },
-          ]}
-        >
-          <Input placeholder="กรอกเลขตัวถัง" onChange={handleSerialNo} />
-        </Form.Item>
-      </div>
-      <div className="form-group col-lg-12 pb-5">
-        <label>
-          ใบอนุญาตนักบิน
-          <span style={{ color: "red" }}>*</span>
-          <span style={{ color: color.Disable }}>(ไฟล์รูป หรือPDF)</span>
-        </label>
-        <br />
-        <Upload listType="picture" className="upload-list-inline">
-          <Button
-            style={{
-              backgroundColor: "rgba(33, 150, 83, 0.1)",
-              border: color.Success + "1px dashed",
-              borderRadius: "5px",
-              width: "190px",
-            }}
-          >
-            <span style={{ color: color.Success }}>อัพโหลด</span>
-          </Button>
-        </Upload>
-      </div>
-      <div className="form-group col-lg-12 pb-5">
-        <label>
-          ใบอนุญาตอนุญาตโดรนจาก กสทช.
-          <span style={{ color: "red" }}>*</span>
-          <span style={{ color: color.Disable }}>(ไฟล์รูป หรือPDF)</span>
-        </label>
-        <br />
-        <Upload listType="picture" className="upload-list-inline">
-          <Button
-            style={{
-              backgroundColor: "rgba(33, 150, 83, 0.1)",
-              border: color.Success + "1px dashed",
-              borderRadius: "5px",
-              width: "190px",
-            }}
-          >
-            <span style={{ color: color.Success }}>อัพโหลด</span>
-          </Button>
-        </Upload>
-      </div>
-    </Form>
-  );
   const renderFromData = (
     <div className="col-lg-7">
       <CardContainer>
@@ -336,10 +200,7 @@ function EditDroner() {
             <div className="form-group col-lg-6">
               <label>Drone ID</label>
               <Form.Item name="id">
-                <Input
-                disabled
-                  defaultValue={data.id}
-                />
+                <Input disabled defaultValue={data.id} />
               </Form.Item>
             </div>
           </div>
@@ -575,7 +436,6 @@ function EditDroner() {
                   placeholder="กรอกรหัสไปรษณีย์"
                   defaultValue={address.postcode}
                   key={address.subdistrictId}
-                  
                 />
               </Form.Item>
             </div>
@@ -595,7 +455,7 @@ function EditDroner() {
                 ]}
               >
                 <TextArea
-                  onChange={handleOnChange}
+                  onChange={handleAddress}
                   className="col-lg-12"
                   rows={5}
                   placeholder=""
@@ -698,7 +558,7 @@ function EditDroner() {
               >
                 <Radio.Group
                   defaultValue={data.status}
-                  onChange={handleChangestatus}
+                  onChange={handleChangeStatus}
                 >
                   <Space direction="vertical">
                     <Radio value={"ACTIVE"}>ใช้งาน</Radio>
@@ -714,19 +574,6 @@ function EditDroner() {
       </CardContainer>
     </div>
   );
-  const colorStatus = (status: string) => {
-    if (status == "ACTIVE") {
-      return "text-success ";
-    } else if (status == "PENDING") {
-      return "text-warning ";
-    } else if (status == "INACTIVE") {
-      return "text-muted ";
-    } else if (status == "REJECTED") {
-      return "text-danger ";
-    } else {
-      return "text-muted ";
-    }
-  };
   const renderLand = (
     <div className="col-lg-4">
       <CardContainer>
@@ -749,31 +596,35 @@ function EditDroner() {
               border: "none",
               borderRadius: "5px",
             }}
-            onClick={showModal}
+            onClick={() => setShowAddModal((prev) => !prev)}
           >
             เพิ่มโดรน
           </Button>
         </div>
-        <ModalPage
-          visible={modal}
-          textHeader="แก้ไขข้อมูลโดรนเกษตร"
-          closeModal={closeModal}
-          data={inputLandInModal}
-          backButton={closeModal}
-          saveButton={saveModal}
-        />
         <Form>
-          {dronerDrone != null ? (
+          {dronerDroneList.length != 0 ? (
             <div className="container">
-              {brandId.map((item: any, index: any) => (
+              {dronerDroneList.map((item, index) => (
                 <div className="row pt-3 pb-3">
-                  <div className="col-lg-6">
-                    <span key={index}>{item.brand}</span>
+                  <div className="col-lg-2">
+                    <img
+                      src={item.logoImagePath}
+                      width={"25px"}
+                      height={"25px"}
+                    />
                   </div>
-                  <div className="col-lg-3">
-                    <span className={colorStatus(item.status)}>
-                      <Badge color={colorStatus(item.status)} />
-                      {item.status}
+                  <div className="col-lg-4">
+                    <span style={{ fontSize: "12px" }}>
+                      {item.droneName}
+                      <br />
+                      {item.droneId}
+                    </span>
+                  </div>
+                  <div className="col-lg-4">
+                    <span style={{ color: STATUS_COLOR[item.status] }}>
+                      <Badge color={STATUS_COLOR[item.status]} />
+                      {DRONER_DRONE_STATUS[item.status]}
+                      <br />
                     </span>
                   </div>
                   <div className="col-lg-3 d-flex justify-content-between">
@@ -781,7 +632,7 @@ function EditDroner() {
                       <ActionButton
                         icon={<EditOutlined />}
                         color={color.primary1}
-                        onClick={showModal}
+                        onClick={() => editDroner(item, index)}
                       />
                     </div>
                   </div>
@@ -797,6 +648,11 @@ function EditDroner() {
         </Form>
       </CardContainer>
       <div className="d-flex justify-content-between pt-5">
+        <h5>รายการทั้งหมด {dronerDroneList.length} รายการ</h5>
+        {dronerDroneList.length < 10 ? null : (
+          <Pagination defaultCurrent={1} total={1} />
+        )}
+
         <Pagination defaultCurrent={1} total={1} />
       </div>
     </div>
@@ -818,9 +674,26 @@ function EditDroner() {
       </Row>
       <FooterPage
         onClickBack={() => (window.location.href = "/IndexDroner")}
-        onClickSave={() => updateDroner()}
-        // disableSaveBtn={showBtn}
+        //disableSaveBtn={showBtn}
       />
+      {showAddModal && (
+        <ModalDrone
+          show={showAddModal}
+          backButton={() => setShowAddModal((prev) => !prev)}
+          callBack={updateDrone}
+          data={DronerDroneEntity_INIT}
+          editIndex={editIndex}
+        />
+      )}
+      {showEditModal && (
+        <ModalDrone
+          show={showEditModal}
+          backButton={() => setShowEditModal((prev) => !prev)}
+          callBack={updateDrone}
+          data={editDroneList}
+          editIndex={editIndex}
+        />
+      )}
     </Layout>
   );
 }

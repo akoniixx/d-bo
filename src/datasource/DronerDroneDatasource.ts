@@ -1,3 +1,4 @@
+import { DronerDroneEntity } from './../entities/DronerDroneEntities';
 import { BASE_URL, httpClient } from "../config/develop-config";
 
 export class DronerDroneDatasource {
@@ -23,6 +24,27 @@ export class DronerDroneDatasource {
       .catch((error) => {
         console.log(error);
       });
+  }
+  static  createDronerDrone(data: DronerDroneEntity) : Promise<any> {
+   delete data.id
+    return httpClient
+    .get(BASE_URL + "/droner-drone", {data})
+    .then((response) => {
+      return response.data;
+    })
+    .catch((error) => {
+      console.log(error);
+    });
+  }
+  static  updateDronerDrone(data: DronerDroneEntity) : Promise<any> {
+    return httpClient
+    .patch(BASE_URL + "/droner-drone", data.modalDroneIndex)
+    .then((response) => {
+      return response.data;
+    })
+    .catch((error) => {
+      console.log(error);
+    });
   }
 
  

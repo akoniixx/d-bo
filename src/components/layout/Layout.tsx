@@ -148,7 +148,7 @@ const Layouts: React.FC<any> = ({ children }) => {
               key={"sub3"}
             >
               <Menu.Item>
-                <Link to="/IndexAdmin">
+                <Link to="/IndexAdmin" style={{ textDecoration: "none" }}>
                   <span>รายชื่อผู้ดูแลระบบ</span>
                 </Link>
               </Menu.Item>

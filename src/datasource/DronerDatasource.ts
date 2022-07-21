@@ -36,7 +36,7 @@ export class DronerDatasource {
       });
   }
 
-  static getDronerByID(id: string): Promise<any> {
+  static getDronerByID(id: string): Promise<DronerEntity> {
     return httpClient
       .get(BASE_URL + "/droner/" + id)
       .then((res) => {
@@ -59,6 +59,10 @@ export class DronerDatasource {
   }
 
   static createDronerList(data: CreateDronerEntity): Promise<any> {
+    var droneName: any = "droneName";
+    var logoImagePath: any ="logoImagePath";
+    delete data.dronerDrone[droneName];
+    delete data.dronerDrone[logoImagePath];
     return httpClient
       .post(BASE_URL + "/droner", data)
       .then((response) => {
