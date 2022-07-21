@@ -1,26 +1,29 @@
 import { DroneEntity, DroneEntity_INIT } from "./DroneEntities";
 import { DronerEntity, DronerEntity_INIT } from "./DronerEntities";
-export interface CreateDronerDrone {
+export interface DronerDroneEntity {
+  id?: string,
   modalDroneIndex: number,
+  droneName: string,
+  logoImagePath: string,
   dronerId: string,
   droneId: string,
-  logoImagePath: string,
-  droneName: string,
   serialNo: string,
   status: string,
-
 }
 
-export const CreateDronerDrone_INIT : CreateDronerDrone = {
+export const DronerDroneEntity_INIT : DronerDroneEntity = {
+  id: "",
   modalDroneIndex: 0,
+  droneName: "",
+  logoImagePath: "",
   dronerId: "",
   droneId: "",
-  logoImagePath: "",
-  droneName:"",
   serialNo: "",
   status: "",
 }
-export interface DronerDroneEntity {
+
+
+export interface GetDronerDroneEntity {
   id: string;
   dronerId: string;
   droneId: string;
@@ -28,7 +31,6 @@ export interface DronerDroneEntity {
   status: string;
   droner: DronerEntity[];
   drone: DroneEntity[];
-  createdAt: string;
-  updatedAt: string;
 }
+
 

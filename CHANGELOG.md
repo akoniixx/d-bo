@@ -1,4 +1,7 @@
 ## [Version - 0]
+## Feature [v0.4.0] 2022-07-21
+- add index droner 
+-  fix auth page full screen
 ## Feature [v0.3.0] 2022-07-21
 - create upload images in farmer menu
 - edit farmer menu page

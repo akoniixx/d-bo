@@ -79,7 +79,6 @@ function IndexDroner() {
       searchStatus,
       searchText
     ).then((res: DronerListEntity) => {
-      console.log(res)
       setData(res);
     });
   };
@@ -388,7 +387,7 @@ function IndexDroner() {
                     size={25}
                     style={{ color: "#0068F4", backgroundColor: "#EFF2F9" }}
                   >
-                    {droneLatest.charAt(0)}
+                    {/* {droneLatest.charAt(0)} */}
                   </Avatar>
                 )}
                 {droneLatest !== undefined
@@ -403,7 +402,6 @@ function IndexDroner() {
         };
       },
     },
-
     {
       title: "สถานะ",
       dataIndex: "status",
@@ -466,9 +464,9 @@ function IndexDroner() {
         dataSource={data?.data}
         pagination={false}
         scroll={{ x: 1300 }}
-        rowClassName={(a) => a.status == 'PENDING'  ? 'table-row-old'  : 'table-row-lasted'}
-
-
+        // rowClassName={(a) =>
+        //   a.status == "PENDING" ? "table-row-old" : "table-row-lasted"
+        // }
       />
       <div className="d-flex justify-content-between pt-5">
         <h5>รายการทั้งหมด {data?.count} รายการ</h5>

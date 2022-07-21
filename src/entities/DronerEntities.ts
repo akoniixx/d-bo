@@ -1,7 +1,11 @@
-import { CreateDronerDrone, CreateDronerDrone_INIT } from './DronerDroneEntities';
+import { DronerDroneEntity, DronerDroneEntity_INIT } from './DronerDroneEntities';
 import { DroneEntity, DroneEntity_INIT } from "./DroneEntities";
-import { AddressEntity, FullAddressEntiry_INIT, FullAddressEntity, AddressEntity_INIT } from './AddressEntities';
-
+import {
+  FullAddressEntiry_INIT,
+  FullAddressEntity,
+  CreateAddressEntity,
+  CreateAddressEntity_INIT,
+} from "./AddressEntities";
 
 export interface DronerEntity {
   id: string;
@@ -15,7 +19,7 @@ export interface DronerEntity {
   expPlant: string[];
   address: FullAddressEntity;
   pin: string;
-  dronerDrone: DroneEntity;
+  dronerDrone: DronerDroneEntity[];
   dronerArea: string;
   createdAt: string;
   updatedAt: string;
@@ -33,7 +37,7 @@ export const DronerEntity_INIT: DronerEntity = {
   expPlant: [""],
   address: FullAddressEntiry_INIT,
   pin: "",
-  dronerDrone: DroneEntity_INIT,
+  dronerDrone: [DronerDroneEntity_INIT],
   dronerArea: "",
   createdAt: "",
   updatedAt: "",
@@ -48,13 +52,13 @@ export interface CreateDronerEntity {
   expYear: number;
   expMonth: number;
   expPlant: string[];
-  address: AddressEntity;
+  address: CreateAddressEntity;
   pin: string;
-  dronerDrone: CreateDronerDrone[];
+  dronerDrone: DronerDroneEntity[];
   // dronerArea: CreateDronerAreaEntity;
 }
 
-export const CreateDronerEntity_INIT : CreateDronerEntity = {
+export const CreateDronerEntity_INIT: CreateDronerEntity = {
   firstname: "",
   lastname: "",
   idNo: "",
@@ -63,11 +67,11 @@ export const CreateDronerEntity_INIT : CreateDronerEntity = {
   expYear: 0,
   expMonth: 0,
   expPlant: [""],
-  address: AddressEntity_INIT,
+  address: CreateAddressEntity_INIT,
   pin: "123456",
-  dronerDrone: [CreateDronerDrone_INIT],
+  dronerDrone: [DronerDroneEntity_INIT],
   // dronerArea: CreateDronerAreaEntity_INIT,
-}
+};
 
 export interface DronerListEntity {
   data: DronerEntity[];

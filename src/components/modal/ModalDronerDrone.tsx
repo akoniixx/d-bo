@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import { DroneDatasource } from "../../datasource/DroneDatasource";
 import { DroneBrandEntity } from "../../entities/DroneBrandEntities";
 import { DroneEntity } from "../../entities/DroneEntities";
-import { CreateDronerDrone } from "../../entities/DronerDroneEntities";
+import { DronerDroneEntity } from "../../entities/DronerDroneEntities";
 import color from "../../resource/color";
 import FooterPage from "../footer/FooterPage";
 
@@ -13,8 +13,8 @@ const { Map } = require("immutable");
 interface ModalDroneProps {
   show: boolean;
   backButton: () => void;
-  callBack: (data: CreateDronerDrone) => void;
-  data: CreateDronerDrone;
+  callBack: (data: DronerDroneEntity) => void;
+  data: DronerDroneEntity;
   editIndex: number;
 }
 const ModalDrone: React.FC<ModalDroneProps> = ({
@@ -25,8 +25,10 @@ const ModalDrone: React.FC<ModalDroneProps> = ({
   editIndex,
 }) => {
   const [droneList, setDroneList] = useState<DroneBrandEntity[]>();
-  const [dataDrone, setDataDrone] = useState<CreateDronerDrone>(data);
+  const [dataDrone, setDataDrone] = useState<DronerDroneEntity>(data);
   const [seriesDrone, setSeriesDrone] = useState<DroneEntity[]>();
+  const [saveBtnDisable, setBtnSaveDisable] = useState<boolean>(true);
+
   const fetchDrone = async () => {
     await DroneDatasource.getDroneBrandList().then((res) => {
       setDroneList(res.data);
@@ -54,6 +56,8 @@ const ModalDrone: React.FC<ModalDroneProps> = ({
     let nameDrone = seriesDrone?.filter((x) => x.id == id)[0].droneBrand.name;
     const x = Map(d.toJS()).set("droneName", nameDrone);
     setDataDrone(x.toJS());
+    checkValidate(m.toJS());
+
   };
   // const m = Map(dataDrone).set("droneId", brand);
   // let nameDrone = seriesDrone?.filter((x) => x.droneBrandId == brand)[0].droneBrand.name;
@@ -63,14 +67,29 @@ const ModalDrone: React.FC<ModalDroneProps> = ({
   const handleSerialNo = async (e: any) => {
     const m = Map(dataDrone).set(e.target.id, e.target.value);
     setDataDrone(m.toJS());
+    checkValidate(m.toJS());
   };
   const handleChangeStatus = (e: any) => {
     const m = Map(dataDrone).set("status", e.target.value);
     setDataDrone(m.toJS());
+    checkValidate(m.toJS());
+
   };
   const handleCallBack = () => {
     const m = Map(dataDrone).set("modalDroneIndex", editIndex);
     callBack(m.toJS());
+  };
+  const checkValidate = (data: DronerDroneEntity) => {
+    if (
+      data.droneName != "" &&
+      data.serialNo != "" &&
+      //data.serialNo != 0 &&
+      data.status != ""
+    ) {
+      setBtnSaveDisable(false);
+    } else {
+      setBtnSaveDisable(true);
+    }
   };
   return (
     <>
@@ -93,6 +112,7 @@ const ModalDrone: React.FC<ModalDroneProps> = ({
             onClickSave={() => {
               handleCallBack();
             }}
+            disableSaveBtn={saveBtnDisable}
           />,
         ]}
       >
