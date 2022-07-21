@@ -519,10 +519,8 @@ function AddDroner() {
       dronerDroneList
     );
     setData(pushDroneList.toJS());
-    console.log(pushDroneList.toJS())
     await DronerDatasource.createDronerList(pushDroneList.toJS()).then(
       (res) => {
-        console.log(res);
         if (res) {
           Swal.fire({
             title: "บันทึกสำเร็จ",

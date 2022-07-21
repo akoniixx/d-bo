@@ -79,7 +79,6 @@ function IndexDroner() {
       searchStatus,
       searchText
     ).then((res: DronerListEntity) => {
-      console.log(res);
       setData(res);
     });
   };
