@@ -403,7 +403,6 @@ function IndexDroner() {
         };
       },
     },
-
     {
       title: "สถานะ",
       dataIndex: "status",
