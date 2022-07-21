@@ -11,17 +11,12 @@ import {
   Badge,
   Radio,
   Space,
+  Tag,
 } from "antd";
 import { CardContainer } from "../../components/card/CardContainer";
 import { BackIconButton } from "../../components/button/BackButton";
 import TextArea from "antd/lib/input/TextArea";
-import {
-  DeleteOutlined,
-  EditOutlined,
-  PictureFilled,
-  SearchOutlined,
-  UploadOutlined,
-} from "@ant-design/icons";
+import { DeleteOutlined, EditOutlined, PictureFilled } from "@ant-design/icons";
 import emptyData from "../../resource/media/empties/iconoir_farm.png";
 import color from "../../resource/color";
 import FooterPage from "../../components/footer/FooterPage";
@@ -56,6 +51,15 @@ import {
 import { LocationDatasource } from "../../datasource/LocationDatasource";
 import ModalFarmerPlot from "../../components/modal/ModalFarmerPlot";
 import { FarmerPlotDatasource } from "../../datasource/FarmerPlotDatasource";
+import Swal from "sweetalert2";
+import { UploadImageDatasouce } from "../../datasource/UploadImageDatasource";
+import {
+  ImageEntity,
+  ImageEntity_INTI,
+} from "../../entities/UploadImageEntities";
+import "../farmer/Style.css";
+import img_empty from "../../resource/media/empties/uploadImg.png";
+import bth_img_empty from "../../resource/media/empties/upload_Img_btn.png";
 
 const { Option } = Select;
 
@@ -89,11 +93,36 @@ const EditFarmer = () => {
     FarmerPlotEntity_INIT
   );
 
+  const [imgProfile, setImgProfile] = useState<any>();
+  const [imgIdCard, setImgIdCard] = useState<any>();
+
+  const [createImgProfile, setCreateImgProfile] =
+    useState<ImageEntity>(ImageEntity_INTI);
+  const [createImgIdCard, setCreateImgIdCrad] =
+    useState<ImageEntity>(ImageEntity_INTI);
+
+  let getPathPro: string = "";
+  let getPathCard: string = "";
   const fecthFarmer = async () => {
     await FarmerDatasource.getFarmerById(farmerId).then((res) => {
       setData(res);
       setAddress(res.address);
       setFarmerPlotList(res.farmerPlot);
+      getPathPro = res.file.filter((x) => x.category == "PROFILE_IMAGE")[0]
+        .path;
+      getPathCard = res.file.filter((x) => x.category == "ID_CARD_IMAGE")[0]
+        .path;
+      var i = 0;
+      for (i; 2 > i; i++) {
+        i == 0 &&
+          UploadImageDatasouce.getImage(getPathPro).then((resImg) => {
+            setImgProfile(resImg.url);
+          });
+        i == 1 &&
+          UploadImageDatasouce.getImage(getPathCard).then((resImg) => {
+            setImgIdCard(resImg.url);
+          });
+      }
     });
   };
 
@@ -113,32 +142,30 @@ const EditFarmer = () => {
     });
   }, [address.provinceId, address.districtId]);
 
-  const uploadButton = (
-    <div>
-      <PictureFilled style={{ fontSize: "50px", color: color.Success }} />
-      <div style={{ fontSize: "20px", color: color.Success }}>+ Upload</div>
-    </div>
-  );
-
   //#region funttion farmer
   const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const m = Map(data).set(e.target.id, e.target.value);
     setData(m.toJS());
+    checkValidate(m.toJS());
   };
 
   const handleOnChangeProvince = async (provinceId: number) => {
+    console.log(provinceId);
     const d = Map(address).set("provinceId", provinceId);
     setAddress(d.toJS());
+    checkValidateAddr(d.toJS());
   };
 
   const handleOnChangeDistrict = async (districtId: number) => {
     const d = Map(address).set("districtId", districtId);
     setAddress(d.toJS());
+    checkValidateAddr(d.toJS());
   };
 
   const handleOnChangeSubdistrict = async (subdistrictId: number) => {
     const d = Map(address).set("subdistrictId", subdistrictId);
     setAddress(d.toJS());
+    checkValidateAddr(d.toJS());
     await handleOnChangePostcode(d.toJS());
   };
 
@@ -148,16 +175,19 @@ const EditFarmer = () => {
     )[0].postcode;
     const c = Map(addr).set("postcode", getPostcode);
     setAddress(c.toJS());
+    checkValidateAddr(c.toJS());
   };
 
   const handleOnChangeAddress = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const d = Map(address).set("address1", e.target.value);
     setAddress(d.toJS());
+    checkValidateAddr(d.toJS());
   };
 
   const handleChangePlotstatus = (e: any) => {
     const m = Map(data).set("status", e.target.value);
     setData(m.toJS());
+    checkValidate(m.toJS());
   };
   //#endregion
 
@@ -173,8 +203,8 @@ const EditFarmer = () => {
     fecthFarmer();
   };
 
-  const updateFarmerPlot = async (data: FarmerPlotEntity) => {
-    const p = Map(data).set("farmerId", farmerId);
+  const updateFarmerPlot = async (plot: FarmerPlotEntity) => {
+    const p = Map(plot).set("farmerId", farmerId);
     if (p.toJS().id != "") {
       await FarmerPlotDatasource.updateFarmerPlot(p.toJS()).then();
       setShowEditModal((prev) => !prev);
@@ -183,8 +213,140 @@ const EditFarmer = () => {
       setShowAddModal((prev) => !prev);
     }
     fecthFarmer();
+    checkValidate(data);
   };
-  //#region 
+  //#endregion
+
+  //#region image
+  const onChangeProfile = async (file: any) => {
+    let src = file.target.files[0];
+    src = await new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(src);
+      reader.onload = () => resolve(reader.result);
+    });
+    setImgProfile(src);
+    checkValidate(data);
+    const d = Map(createImgProfile).set("file", file.target.files[0]);
+    const e = Map(d.toJS()).set("resource", "FARMER");
+    const f = Map(e.toJS()).set("category", "PROFILE_IMAGE");
+    const g = Map(f.toJS()).set("resourceId", farmerId);
+    setCreateImgProfile(g.toJS());
+  };
+
+  const onPreviewProfile = async () => {
+    let src = imgProfile;
+    if (!src) {
+      src = await new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(imgProfile);
+        reader.onload = () => resolve(reader.result);
+      });
+    }
+    const image = new Image();
+    image.src = src;
+    const imgWindow = window.open(src);
+    imgWindow?.document.write(image.outerHTML);
+  };
+
+  const removeImg = () => {
+    setImgProfile(undefined);
+    checkValidate(data);
+  };
+  const onChangeIdCard = async (file: any) => {
+    let src = file.target.files[0];
+    src = await new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(src);
+      reader.onload = () => resolve(reader.result);
+    });
+    setImgIdCard(src);
+    checkValidate(data);
+    const d = Map(createImgIdCard).set("file", file.target.files[0]);
+    const e = Map(d.toJS()).set("resource", "FARMER");
+    const f = Map(e.toJS()).set("category", "ID_CARD_IMAGE");
+    const g = Map(f.toJS()).set("resourceId", farmerId);
+    setCreateImgIdCrad(g.toJS());
+  };
+
+  const onPreviewIdCard = async () => {
+    let src = imgIdCard;
+    if (!src) {
+      src = await new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(imgIdCard);
+        reader.onload = () => resolve(reader.result);
+      });
+    }
+    const image = new Image();
+    image.src = src;
+    const imgWindow = window.open(src);
+    imgWindow?.document.write(image.outerHTML);
+  };
+  const removeImgIdCard = () => {
+    setImgIdCard(undefined);
+    checkValidate(data);
+  };
+  //#endregion
+
+  const checkValidate = (data: GetFarmerEntity) => {
+    if (
+      data.firstname != "" &&
+      data.lastname != "" &&
+      data.telephoneNo != "" &&
+      data.idNo != "" &&
+      address.provinceId != 0 &&
+      address.districtId != 0 &&
+      address.subdistrictId != 0 &&
+      address.address1 != ""
+    ) {
+      setBtnSaveDisable(false);
+    } else {
+      setBtnSaveDisable(true);
+    }
+  };
+
+  const checkValidateAddr = (addr: AddressEntity) => {
+    if (
+      addr.provinceId != 0 &&
+      addr.subdistrictId != 0 &&
+      addr.districtId != 0 &&
+      addr.postcode != "" &&
+      addr.address1 != "" &&
+      data.firstname != "" &&
+      data.lastname != "" &&
+      data.telephoneNo != "" &&
+      data.idNo != ""
+    ) {
+      setBtnSaveDisable(false);
+    } else {
+      setBtnSaveDisable(true);
+    }
+  };
+
+  const updateFarmer = async () => {
+    const pushAddr = Map(data).set("address", address);
+    const pushPin = Map(pushAddr.toJS()).set("pin", "");
+
+    await FarmerDatasource.updateFarmer(pushPin.toJS()).then((res) => {
+      if (res.id != null) {
+        var i = 0;
+        for (i; 2 > i; i++) {
+          i == 0 &&
+            UploadImageDatasouce.uploadImage(createImgProfile).then(res);
+          i == 1 && UploadImageDatasouce.uploadImage(createImgIdCard).then(res);
+        }
+        Swal.fire({
+          title: "บันทึกสำเร็จ",
+          icon: "success",
+          timer: 1500,
+          showConfirmButton: false,
+        }).then((time) => {
+          window.location.href = "/IndexFarmer";
+        });
+      }
+    });
+  };
 
   const renderFromData = (
     <div className="col-lg-7">
@@ -192,16 +354,41 @@ const EditFarmer = () => {
         <CardHeader textHeader="ข้อมูลเกษตรกร" />
         <Form style={{ padding: "32px" }}>
           <div className="row">
-            <div className="form-group text-center pb-5">
-              <Upload
-                name="avatar"
-                listType="picture-card"
-                className="avatar-uploader"
-                showUploadList={false}
-                iconRender={UploadOutlined}
+            <div className="form-group text-center pb-4">
+              <div
+                className="hiddenFileInput zoom"
+                style={{
+                  backgroundImage: `url(${
+                    imgProfile == undefined ? img_empty : imgProfile
+                  })`,
+                }}
               >
-                {uploadButton}
-              </Upload>
+                <input
+                  type="file"
+                  onChange={onChangeProfile}
+                  title="เลือกรูป"
+                />
+              </div>
+              <div>
+                {imgProfile != undefined && (
+                  <>
+                    <Tag
+                      color={color.Success}
+                      onClick={onPreviewProfile}
+                      style={{ cursor: "pointer", borderRadius: "5px" }}
+                    >
+                      View
+                    </Tag>
+                    <Tag
+                      color={color.Error}
+                      onClick={removeImg}
+                      style={{ cursor: "pointer", borderRadius: "5px" }}
+                    >
+                      Remove
+                    </Tag>
+                  </>
+                )}
+              </div>
             </div>
           </div>
           <div className="row">
@@ -294,22 +481,46 @@ const EditFarmer = () => {
           </div>
           <div className="row">
             <div className="form-group col-lg-12 pb-5">
-              <label>
-                รูปถ่ายผู้สมัครคู่กับบัตรประชาชน{" "}
-                {/* <span style={{ color: "red" }}>*</span> */}
-              </label>
+              <label>รูปถ่ายผู้สมัครคู่กับบัตรประชาชน </label>
               <br />
-              <Upload listType="picture" className="upload-list-inline">
-                <Button
+              <div className="pb-2">
+                <div
+                  className="hiddenFileInput"
                   style={{
-                    backgroundColor: "rgba(33, 150, 83, 0.1)",
-                    border: color.Success + "1px dashed",
-                    borderRadius: "5px",
+                    backgroundImage: `url(${imgIdCard})`,
+                    display: imgIdCard != undefined ? "block" : "none",
                   }}
-                >
-                  <span style={{ color: color.Success }}>อัพโหลดรูปภาพ</span>
-                </Button>
-              </Upload>
+                ></div>
+              </div>
+              <div className="text-left ps-4">
+                {imgIdCard != undefined && (
+                  <>
+                    <Tag
+                      color={color.Success}
+                      onClick={onPreviewIdCard}
+                      style={{ cursor: "pointer", borderRadius: "5px" }}
+                    >
+                      View
+                    </Tag>
+                    <Tag
+                      color={color.Error}
+                      onClick={removeImgIdCard}
+                      style={{ cursor: "pointer", borderRadius: "5px" }}
+                    >
+                      Remove
+                    </Tag>
+                  </>
+                )}
+              </div>
+              <div
+                className="hiddenFileBtn"
+                style={{
+                  backgroundImage: `url(${bth_img_empty})`,
+                  display: imgIdCard == undefined ? "block" : "none",
+                }}
+              >
+                <input type="file" onChange={onChangeIdCard} title="เลือกรูป" />
+              </div>
             </div>
           </div>
           <div className="row">
@@ -319,6 +530,7 @@ const EditFarmer = () => {
               </label>
               <Form.Item name="province">
                 <Select
+                  allowClear
                   placeholder="เลือกจังหวัด"
                   defaultValue={address.provinceId}
                   showSearch
@@ -345,6 +557,7 @@ const EditFarmer = () => {
               </label>
               <Form.Item name="district">
                 <Select
+                  allowClear
                   placeholder="เลือกอำเภอ"
                   defaultValue={address.districtId}
                   showSearch
@@ -373,6 +586,7 @@ const EditFarmer = () => {
               </label>
               <Form.Item name="subdistrict">
                 <Select
+                  allowClear
                   placeholder="เลือกตำบล"
                   defaultValue={address.subdistrictId}
                   showSearch
@@ -546,7 +760,7 @@ const EditFarmer = () => {
         </Form>
       </CardContainer>
       <div className="d-flex justify-content-between pt-5">
-        <h5>รายการทั้งหมด {farmerPlotList.length} รายการ</h5>
+        <p>รายการทั้งหมด {farmerPlotList.length} รายการ</p>
         {farmerPlotList.length < 10 ? null : (
           <Pagination defaultCurrent={1} total={1} />
         )}
@@ -572,6 +786,7 @@ const EditFarmer = () => {
       </Row>
       <FooterPage
         onClickBack={() => (window.location.href = "/IndexFarmer")}
+        onClickSave={updateFarmer}
         disableSaveBtn={saveBtnDisable}
       />
       {showAddModal && (

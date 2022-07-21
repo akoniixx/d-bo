@@ -12,8 +12,8 @@ export const STATUS_FARMERPLOT_COLOR_MAPPING: any = {
 
 export const STATUS_FARMER_MAPPING: any = {
   PENDING: "รอยืนยันตัวตน",
-  ACTIVE: "อนุมัติ",
-  INACTIVE: "ไม่อนุมัติ",
+  ACTIVE: "ใช้งาน",
+  INACTIVE: "ปิดการใช้งาน",
 };
 
 export const STATUS_COLOR_MAPPING: any = {
