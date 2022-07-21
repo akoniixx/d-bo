@@ -387,7 +387,7 @@ function IndexDroner() {
                     size={25}
                     style={{ color: "#0068F4", backgroundColor: "#EFF2F9" }}
                   >
-                    {row.drone.droneBrand.name.charAt(0)}
+                    {/* {droneLatest.charAt(0)} */}
                   </Avatar>
                 )}
                 {droneLatest !== undefined
