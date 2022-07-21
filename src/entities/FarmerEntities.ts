@@ -7,6 +7,7 @@ import {
   AddressEntity_INIT,
 } from "./AddressEntities";
 import { FarmerPlotEntity, FarmerPlotEntity_INIT } from "./FarmerPlotEntities";
+import { ImageEntity, ImageEntity_INTI } from "./UploadImageEntities";
 
 export interface FarmerEntity {
   id: string;
@@ -36,6 +37,7 @@ export interface GetFarmerEntity {
   status: string;
   address: AddressEntity;
   farmerPlot: FarmerPlotEntity[];
+  file: ImageEntity[];
 }
 export const GetFarmerEntity_INIT: GetFarmerEntity = {
   id: "",
@@ -46,6 +48,7 @@ export const GetFarmerEntity_INIT: GetFarmerEntity = {
   status: "",
   address: AddressEntity_INIT,
   farmerPlot: [FarmerPlotEntity_INIT],
+  file: [ImageEntity_INTI],
 };
 
 export interface FarmerPageEntity {

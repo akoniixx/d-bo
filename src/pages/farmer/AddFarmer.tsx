@@ -1,29 +1,18 @@
 import React, { useEffect, useState } from "react";
 import Layout from "../../components/layout/Layout";
-import {
-  Row,
-  Form,
-  Input,
-  Select,
-  Upload,
-  Button,
-  Pagination,
-  Badge,
-} from "antd";
+import { Row, Form, Input, Select, Upload, Button, Badge, Tag } from "antd";
 import { CardContainer } from "../../components/card/CardContainer";
 import { BackIconButton } from "../../components/button/BackButton";
 import TextArea from "antd/lib/input/TextArea";
-import {
-  DeleteOutlined,
-  EditOutlined,
-  PictureFilled,
-  UploadOutlined,
-} from "@ant-design/icons";
+import { DeleteOutlined, EditOutlined, PictureFilled } from "@ant-design/icons";
 import emptyData from "../../resource/media/empties/iconoir_farm.png";
 import color from "../../resource/color";
 import FooterPage from "../../components/footer/FooterPage";
 import { CardHeader } from "../../components/header/CardHearder";
-import { CreateFarmerEntity, CreateFarmerEntity_INIT } from "../../entities/FarmerEntities";
+import {
+  CreateFarmerEntity,
+  CreateFarmerEntity_INIT,
+} from "../../entities/FarmerEntities";
 import {
   DistrictEntity,
   DistrictEntity_INIT,
@@ -34,8 +23,6 @@ import {
 } from "../../entities/LocationEntities";
 import { LocationDatasource } from "../../datasource/LocationDatasource";
 import {
-  AddressEntity,
-  AddressEntity_INIT,
   CreateAddressEntity,
   CreateAddressEntity_INIT,
 } from "../../entities/AddressEntities";
@@ -48,6 +35,13 @@ import ActionButton from "../../components/button/ActionButton";
 import { FarmerDatasource } from "../../datasource/FarmerDatasource";
 import Swal from "sweetalert2";
 import ModalFarmerPlot from "../../components/modal/ModalFarmerPlot";
+import {
+  UploadImageEntity,
+  UploadImageEntity_INTI,
+} from "../../entities/UploadImageEntities";
+import { UploadImageDatasouce } from "../../datasource/UploadImageDatasource";
+import img_empty from "../../resource/media/empties/uploadImg.png";
+import bth_img_empty from "../../resource/media/empties/upload_Img_btn.png";
 
 const { Option } = Select;
 
@@ -56,10 +50,12 @@ const { Map } = require("immutable");
 
 const AddFarmer = () => {
   const [data, setData] = useState<CreateFarmerEntity>(CreateFarmerEntity_INIT);
-  const [address, setAddress] = useState<CreateAddressEntity>(CreateAddressEntity_INIT);
-
+  const [address, setAddress] = useState<CreateAddressEntity>(
+    CreateAddressEntity_INIT
+  );
+  const [saveBtnDisable, setBtnSaveDisable] = useState<boolean>(true);
   const [showAddModal, setShowAddModal] = useState(false);
-  const [editModal, setEditModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
   const [editIndex, setEditIndex] = useState(0);
   const [province, setProvince] = useState<ProviceEntity[]>([
     ProvinceEntity_INIT,
@@ -75,6 +71,16 @@ const AddFarmer = () => {
   );
   const [farmerPlotList, setFarmerPlotList] = useState<FarmerPlotEntity[]>([]);
 
+  const [imgProfile, setImgProfile] = useState<any>();
+  const [imgIdCard, setImgIdCard] = useState<any>();
+
+  const [createImgProfile, setCreateImgProfile] = useState<UploadImageEntity>(
+    UploadImageEntity_INTI
+  );
+  const [createImgIdCard, setCreateImgIdCrad] = useState<UploadImageEntity>(
+    UploadImageEntity_INTI
+  );
+
   const fetchProvince = async () => {
     await LocationDatasource.getProvince().then((res) => {
       setProvince(res);
@@ -89,14 +95,17 @@ const AddFarmer = () => {
   const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const m = Map(data).set(e.target.id, e.target.value);
     setData(m.toJS());
-  };
-  const handleOnChangeProvince = async (provinceId: number) => {
-    await getProvince(provinceId, AddressEntity_INIT);
+    checkValidate(m.toJS());
   };
 
-  const getProvince = async (provinceId: number, addr: AddressEntity) => {
+  const handleOnChangeProvince = async (provinceId: number) => {
+    await getProvince(provinceId, CreateAddressEntity_INIT);
+  };
+
+  const getProvince = async (provinceId: number, addr: CreateAddressEntity) => {
     const d = Map(addr).set("provinceId", provinceId);
     setAddress(d.toJS());
+    checkValidateAddr(d.toJS());
     await LocationDatasource.getDistrict(provinceId).then((res) => {
       setDistrict(res);
     });
@@ -105,7 +114,7 @@ const AddFarmer = () => {
   const handleOnChangeDistrict = async (districtId: number) => {
     const d = Map(address).set("districtId", districtId);
     setAddress(d.toJS());
-
+    checkValidateAddr(d.toJS());
     await LocationDatasource.getSubdistrict(districtId).then((res) => {
       setSubdistrict(res);
     });
@@ -114,29 +123,24 @@ const AddFarmer = () => {
   const handleOnChangeSubdistrict = async (subdistrictId: number) => {
     const d = Map(address).set("subdistrictId", subdistrictId);
     setAddress(d.toJS());
+    checkValidateAddr(d.toJS());
     await handleOnChangePostcode(d.toJS());
   };
 
-  const handleOnChangePostcode = (addr: AddressEntity) => {
+  const handleOnChangePostcode = (addr: CreateAddressEntity) => {
     let getPostcode = subdistrict.filter(
       (x) => x.subdistrictId == addr.subdistrictId
     )[0].postcode;
     const c = Map(addr).set("postcode", getPostcode);
     setAddress(c.toJS());
+    checkValidateAddr(c.toJS());
   };
 
   const handleOnChangeAddress = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const d = Map(address).set("address1", e.target.value);
     setAddress(d.toJS());
+    checkValidateAddr(d.toJS());
   };
-
-  const uploadButton = (
-    <div>
-      <PictureFilled style={{ fontSize: "50px", color: color.Success }} />
-      <div style={{ fontSize: "20px", color: color.Success }}>+ Upload</div>
-    </div>
-  );
-
   //#endregion
 
   //#region data farmer plot
@@ -148,7 +152,7 @@ const AddFarmer = () => {
   };
 
   const editPlot = (data: FarmerPlotEntity, index: number) => {
-    setEditModal((prev) => !prev);
+    setShowEditModal((prev) => !prev);
     setEditIndex(index);
     setEditFarmerPlot(data);
   };
@@ -167,10 +171,113 @@ const AddFarmer = () => {
       setFarmerPlotList([...newData, data]);
     }
     setShowAddModal(false);
-    setEditModal(false);
+    setShowEditModal(false);
     setEditIndex(0);
   };
   //#endregion
+
+  //#region image
+  const onChangeProfile = async (file: any) => {
+    let src = file.target.files[0];
+    src = await new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(src);
+      reader.onload = () => resolve(reader.result);
+    });
+    setImgProfile(src);
+    checkValidate(data);
+    const d = Map(createImgProfile).set("file", file.target.files[0]);
+    const e = Map(d.toJS()).set("resource", "FARMER");
+    const f = Map(e.toJS()).set("category", "PROFILE_IMAGE");
+    setCreateImgProfile(f.toJS());
+  };
+  const onPreviewProfile = async () => {
+    let src = imgProfile;
+    if (!src) {
+      src = await new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(imgProfile);
+        reader.onload = () => resolve(reader.result);
+      });
+    }
+    const image = new Image();
+    image.src = src;
+    const imgWindow = window.open(src);
+    imgWindow?.document.write(image.outerHTML);
+  };
+  const removeImgProfile = () => {
+    setImgProfile(undefined);
+    checkValidate(data);
+  };
+
+  const onChangeIdCard = async (file: any) => {
+    let src = file.target.files[0];
+    src = await new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(src);
+      reader.onload = () => resolve(reader.result);
+    });
+    setImgIdCard(src);
+    checkValidate(data);
+    const d = Map(createImgIdCard).set("file", file.target.files[0]);
+    const e = Map(d.toJS()).set("resource", "FARMER");
+    const f = Map(e.toJS()).set("category", "ID_CARD_IMAGE");
+    setCreateImgIdCrad(f.toJS());
+  };
+  const onPreviewIdCard = async () => {
+    let src = imgIdCard;
+    if (!src) {
+      src = await new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(imgIdCard);
+        reader.onload = () => resolve(reader.result);
+      });
+    }
+    const image = new Image();
+    image.src = src;
+    const imgWindow = window.open(src);
+    imgWindow?.document.write(image.outerHTML);
+  };
+  const removeImgIdCard = () => {
+    setImgIdCard(undefined);
+    checkValidate(data);
+  };
+  //#endregion
+
+  const checkValidate = (data: CreateFarmerEntity) => {
+    if (
+      data.firstname != "" &&
+      data.lastname != "" &&
+      data.telephoneNo != "" &&
+      data.idNo != "" &&
+      address.provinceId != 0 &&
+      address.districtId != 0 &&
+      address.subdistrictId != 0 &&
+      address.address1 != ""
+    ) {
+      setBtnSaveDisable(false);
+    } else {
+      setBtnSaveDisable(true);
+    }
+  };
+
+  const checkValidateAddr = (addr: CreateAddressEntity) => {
+    if (
+      addr.provinceId != 0 &&
+      addr.subdistrictId != 0 &&
+      addr.districtId != 0 &&
+      addr.postcode != "" &&
+      addr.address1 != "" &&
+      data.firstname != "" &&
+      data.lastname != "" &&
+      data.telephoneNo != "" &&
+      data.idNo != ""
+    ) {
+      setBtnSaveDisable(false);
+    } else {
+      setBtnSaveDisable(true);
+    }
+  };
 
   const insertFarmer = async () => {
     const pushAddr = Map(data).set("address", address);
@@ -178,8 +285,16 @@ const AddFarmer = () => {
     const pushPlot = Map(pushAddr.toJS()).set("farmerPlot", farmerPlotList);
     setData(pushPlot.toJS());
     await FarmerDatasource.insertFarmer(pushPlot.toJS()).then((res) => {
-      console.log(res);
       if (res.id != null) {
+        const pushImgProId = Map(createImgProfile).set("resourceId", res.id);
+        const pushImgCardId = Map(createImgIdCard).set("resourceId", res.id);
+        var i = 0;
+        for (i; 2 > i; i++) {
+          i == 0 &&
+            UploadImageDatasouce.uploadImage(pushImgProId.toJS()).then(res);
+          i == 1 &&
+            UploadImageDatasouce.uploadImage(pushImgCardId.toJS()).then(res);
+        }
         Swal.fire({
           title: "บันทึกสำเร็จ",
           icon: "success",
@@ -199,15 +314,40 @@ const AddFarmer = () => {
         <Form style={{ padding: "32px" }}>
           <div className="row">
             <div className="form-group text-center pb-5">
-              <Upload
-                name="avatar"
-                listType="picture-card"
-                className="avatar-uploader"
-                showUploadList={false}
-                iconRender={UploadOutlined}
+              <div
+                className="hiddenFileInput"
+                style={{
+                  backgroundImage: `url(${
+                    imgProfile == undefined ? img_empty : imgProfile
+                  })`,
+                }}
               >
-                {uploadButton}
-              </Upload>
+                <input
+                  type="file"
+                  onChange={onChangeProfile}
+                  title="เลือกรูป"
+                />
+              </div>
+              <div>
+                {imgProfile != undefined && (
+                  <>
+                    <Tag
+                      color={color.Success}
+                      onClick={onPreviewProfile}
+                      style={{ cursor: "pointer", borderRadius: "5px" }}
+                    >
+                      View
+                    </Tag>
+                    <Tag
+                      color={color.Error}
+                      onClick={removeImgProfile}
+                      style={{ cursor: "pointer", borderRadius: "5px" }}
+                    >
+                      Remove
+                    </Tag>
+                  </>
+                )}
+              </div>
             </div>
           </div>
           <div className="row">
@@ -224,7 +364,11 @@ const AddFarmer = () => {
                   },
                 ]}
               >
-                <Input placeholder="กรอกชื่อ" onChange={handleOnChange} />
+                <Input
+                  placeholder="กรอกชื่อ"
+                  onChange={handleOnChange}
+                  autoComplete="off"
+                />
               </Form.Item>
             </div>
             <div className="form-group col-lg-6">
@@ -240,7 +384,11 @@ const AddFarmer = () => {
                   },
                 ]}
               >
-                <Input placeholder="กรอกนามสกุล" onChange={handleOnChange} />
+                <Input
+                  placeholder="กรอกนามสกุล"
+                  onChange={handleOnChange}
+                  autoComplete="off"
+                />
               </Form.Item>
             </div>
           </div>
@@ -258,7 +406,11 @@ const AddFarmer = () => {
                   },
                 ]}
               >
-                <Input placeholder="กรอกเบอร์โทร" onChange={handleOnChange} />
+                <Input
+                  placeholder="กรอกเบอร์โทร"
+                  onChange={handleOnChange}
+                  autoComplete="off"
+                />
               </Form.Item>
             </div>
             <div className="form-group col-lg-6">
@@ -277,28 +429,53 @@ const AddFarmer = () => {
                 <Input
                   placeholder="กรอกบัตรประชาชน"
                   onChange={handleOnChange}
+                  autoComplete="off"
                 />
               </Form.Item>
             </div>
           </div>
           <div className="row">
-            <div className="form-group col-lg-12 pb-5">
-              <label>
-                รูปถ่ายผู้สมัครคู่กับบัตรประชาชน{" "}
-                {/* <span style={{ color: "red" }}>*</span> */}
-              </label>
+            <div className="form-group col-lg-6 pb-5">
+              <label>รูปถ่ายผู้สมัครคู่กับบัตรประชาชน</label>
               <br />
-              <Upload listType="picture" className="upload-list-inline">
-                <Button
+              <div className="pb-2">
+                <div
+                  className="hiddenFileInput"
                   style={{
-                    backgroundColor: "rgba(33, 150, 83, 0.1)",
-                    border: color.Success + "1px dashed",
-                    borderRadius: "5px",
+                    backgroundImage: `url(${imgIdCard})`,
+                    display: imgIdCard != undefined ? "block" : "none",
                   }}
-                >
-                  <span style={{ color: color.Success }}>อัพโหลดรูปภาพ</span>
-                </Button>
-              </Upload>
+                ></div>
+              </div>
+              <div className="text-left ps-4">
+                {imgIdCard != undefined && (
+                  <>
+                    <Tag
+                      color={color.Success}
+                      onClick={onPreviewIdCard}
+                      style={{ cursor: "pointer", borderRadius: "5px" }}
+                    >
+                      View
+                    </Tag>
+                    <Tag
+                      color={color.Error}
+                      onClick={removeImgIdCard}
+                      style={{ cursor: "pointer", borderRadius: "5px" }}
+                    >
+                      Remove
+                    </Tag>
+                  </>
+                )}
+              </div>
+              <div
+                className="hiddenFileBtn"
+                style={{
+                  backgroundImage: `url(${bth_img_empty})`,
+                  display: imgIdCard == undefined ? "block" : "none",
+                }}
+              >
+                <input type="file" onChange={onChangeIdCard} title="เลือกรูป" />
+              </div>
             </div>
           </div>
           <div className="row">
@@ -308,6 +485,7 @@ const AddFarmer = () => {
               </label>
               <Form.Item name="provinceId">
                 <Select
+                  allowClear
                   showSearch
                   placeholder="เลือกจังหวัด"
                   optionFilterProp="children"
@@ -334,6 +512,7 @@ const AddFarmer = () => {
               </label>
               <Form.Item name="districtId">
                 <Select
+                  allowClear
                   placeholder="เลือกอำเภอ"
                   showSearch
                   optionFilterProp="children"
@@ -346,7 +525,6 @@ const AddFarmer = () => {
                       .localeCompare(optionB.children.toLowerCase())
                   }
                   onChange={handleOnChangeDistrict}
-                  key={address.provinceId}
                 >
                   {district?.map((item) => (
                     <Option value={item.districtId}>{item.districtName}</Option>
@@ -362,6 +540,7 @@ const AddFarmer = () => {
               </label>
               <Form.Item name="subdistrictId">
                 <Select
+                  allowClear
                   placeholder="เลือกตำบล"
                   showSearch
                   optionFilterProp="children"
@@ -374,7 +553,6 @@ const AddFarmer = () => {
                       .localeCompare(optionB.children.toLowerCase())
                   }
                   onChange={handleOnChangeSubdistrict}
-                  key={address.provinceId}
                 >
                   {subdistrict?.map((item) => (
                     <Option value={item.subdistrictId}>
@@ -417,6 +595,7 @@ const AddFarmer = () => {
                   rows={5}
                   placeholder="กรอกที่อยู่บ้าน (เลขที่บ้าน, หมู่บ้าน, ชื่ออาคาร/ตึก, ซอย)"
                   onChange={handleOnChangeAddress}
+                  autoComplete="off"
                 />
               </Form.Item>
             </div>
@@ -504,7 +683,7 @@ const AddFarmer = () => {
         )}
       </CardContainer>
       <div className="d-flex justify-content-between pt-5">
-        <h5>รายการทั้งหมด {farmerPlotList?.length} รายการ</h5>
+        <p>รายการทั้งหมด {farmerPlotList?.length} รายการ</p>
         {/* <Pagination defaultCurrent={1} total={1} /> */}
       </div>
     </div>
@@ -529,6 +708,7 @@ const AddFarmer = () => {
       <FooterPage
         onClickBack={() => (window.location.href = "/IndexFarmer")}
         onClickSave={insertFarmer}
+        disableSaveBtn={saveBtnDisable}
       />
       {showAddModal && (
         <ModalFarmerPlot
@@ -539,10 +719,10 @@ const AddFarmer = () => {
           editIndex={editIndex}
         />
       )}
-      {editModal && (
+      {showEditModal && (
         <ModalFarmerPlot
-          show={editModal}
-          backButton={() => setEditModal((prev) => !prev)}
+          show={showEditModal}
+          backButton={() => setShowEditModal((prev) => !prev)}
           callBack={insertFarmerPlot}
           data={editFarmerPlot}
           editIndex={editIndex}

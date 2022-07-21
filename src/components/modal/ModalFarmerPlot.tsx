@@ -34,7 +34,7 @@ const ModalFarmerPlot: React.FC<ModalFarmerPlotProps> = ({
   const handleChangePlotstatus = (e: any) => {
     const m = Map(farmerPlot).set("isActive", e.target.value);
     setFarmerPlot(m.toJS());
-    checkValidate(m.toJS())
+    checkValidate(m.toJS());
   };
 
   const handleOnChangePlantSelect = (value: any) => {
@@ -112,6 +112,7 @@ const ModalFarmerPlot: React.FC<ModalFarmerPlotProps> = ({
             </label>
             <Form.Item name="plantName">
               <Select
+                allowClear
                 placeholder="เลือกพืชที่ปลูก"
                 defaultValue={farmerPlot.plantName}
                 onChange={handleOnChangePlantSelect}

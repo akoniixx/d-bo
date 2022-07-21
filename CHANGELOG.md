@@ -1,4 +1,8 @@
 ## [Version - 0]
+## Feature [v0.3.0] 2022-07-21
+- create upload images in farmer menu
+- edit farmer menu page
+- validation in add/edit farmer menu
 ## Feature [v0.2.0] 2022-07-20
 - Index Droner
 ## Fix [v0.2.1] 2022-07-20

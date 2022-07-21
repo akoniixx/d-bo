@@ -9,7 +9,15 @@ axios.interceptors.request.use(async (config: any) => {
   config.headers["Authorization"] = `Bearer ${token}`;
   return config;
 });
+
 export const httpClient = axios;
 export const intanceAuth = axios.create({
   baseURL: BASE_URL,
+});
+
+export const axiosFormBo = axios.create({
+  headers: {
+    "Content-Type": "multipart/form-data",
+    Accept: "application/json",
+  },
 });

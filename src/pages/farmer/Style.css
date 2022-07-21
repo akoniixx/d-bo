@@ -1,0 +1,46 @@
+.hiddenFileInput > input {
+  height: 100%;
+  width: 100%;
+  opacity: 0;
+  cursor: pointer;
+}
+.hiddenFileInput {
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  width: 150px;
+  height: 150px;
+  display: inline-block;
+  overflow: hidden;
+
+  /*for the background, optional*/
+  background: center center no-repeat;
+  background-size: 100%;
+}
+.zoom {
+  padding: 50px;
+  transition: transform .2s;
+  margin: 0 auto;
+}
+
+.zoom:hover {
+  transform: scale(1.05);
+}
+
+.hiddenFileBtn > input {
+  height: 100%;
+  width: 100%;
+  opacity: 0;
+  cursor: pointer;
+}
+.hiddenFileBtn {
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  width: 135px;
+  height: 25px;
+  display: inline-block;
+  overflow: hidden;
+
+  /*for the background, optional*/
+  background: center center no-repeat;
+  background-size: 100%;
+}
