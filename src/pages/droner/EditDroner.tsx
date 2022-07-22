@@ -487,32 +487,6 @@ function EditDroner() {
               </Form.Item>
             </div>
           </div>
-          <div className="row">
-            <div className="form-group col-lg-6">
-              <label>
-                ประสบการณ์บินโดรน <span style={{ color: "red" }}>*</span>
-              </label>
-              <Form.Item name="expYear">
-                <Input
-                  type="number"
-                  placeholder="ปี"
-                  onChange={handleOnChange}
-                  defaultValue={data.expYear}
-                />
-              </Form.Item>
-            </div>
-            <div className="form-group col-lg-6">
-              <label></label>
-              <Form.Item name="expMonth">
-                <Input
-                  type="number"
-                  placeholder="เดือน"
-                  defaultValue={data.expMonth}
-                  onChange={handleOnChange}
-                />
-              </Form.Item>
-            </div>
-          </div>
           <div className="form-group col-lg-7">
             <label>
               พืชที่เคยฉีดพ่น

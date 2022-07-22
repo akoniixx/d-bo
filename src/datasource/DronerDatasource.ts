@@ -59,10 +59,10 @@ export class DronerDatasource {
   }
 
   static createDronerList(data: CreateDronerEntity): Promise<any> {
-    var droneName: any = "droneName";
-    var logoImagePath: any ="logoImagePath";
-    delete data.dronerDrone[droneName];
-    delete data.dronerDrone[logoImagePath];
+   var id: any = "id";
+   var dronerId: any = "dronerId"
+   delete data.dronerDrone[id];
+   delete data.dronerDrone[dronerId];
     return httpClient
       .post(BASE_URL + "/droner", data)
       .then((response) => {

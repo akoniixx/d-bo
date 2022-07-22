@@ -91,6 +91,7 @@ function AddDroner() {
   const [editDrone, setEditDrone] = useState<DronerDroneEntity>(
     DronerDroneEntity_INIT
   );
+  const [saveBtnDisable, setBtnSaveDisable] = useState<boolean>(true);
   const [province, setProvince] = useState<ProviceEntity[]>([]);
   const [district, setDistrict] = useState<DistrictEntity[]>([]);
   const [subdistrict, setSubdistrict] = useState<SubdistrictEntity[]>([]);
@@ -106,7 +107,6 @@ function AddDroner() {
       setDroneList(res.data);
     });
   };
-
   const fetchProvince = async () => {
     await LocationDatasource.getProvince().then((res) => {
       setProvince(res);
@@ -115,14 +115,20 @@ function AddDroner() {
   const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const m = Map(data).set(e.target.id, e.target.value);
     setData(m.toJS());
+    checkValidate(m.toJS());
   };
   const handleAddress = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const m = Map(address).set(e.target.id, e.target.value);
     setAddress(m.toJS());
+    checkValidateAddr(m.toJS());
   };
   const handleProvince = async (provinceId: number) => {
-    const m = Map(address).set("provinceId", provinceId);
+    await getProvince(provinceId, CreateAddressEntity_INIT);
+  };
+  const getProvince = async (provinceId: number, addr: CreateAddressEntity) => {
+    const m = Map(addr).set("provinceId", provinceId);
     setAddress(m.toJS());
+    checkValidateAddr(m.toJS());
     await LocationDatasource.getDistrict(provinceId).then((res) => {
       setDistrict(res);
     });
@@ -130,6 +136,7 @@ function AddDroner() {
   const handleDistrict = async (districtId: number) => {
     const m = Map(address).set("districtId", districtId);
     setAddress(m.toJS());
+    checkValidateAddr(m.toJS());
     await LocationDatasource.getSubdistrict(districtId).then((res) => {
       setSubdistrict(res);
     });
@@ -137,14 +144,17 @@ function AddDroner() {
   const handleSubDistrict = async (subdistrictId: number) => {
     const m = Map(address).set("subdistrictId", subdistrictId);
     setAddress(m.toJS());
+    checkValidateAddr(m.toJS());
     await handelPostCode(m.toJS());
   };
-  const handelPostCode = (add: FullAddressEntity) => {
+  const handelPostCode = (add: CreateAddressEntity) => {
     let filterSubDistrict = subdistrict.filter(
       (item) => item.subdistrictId == add.subdistrictId
     )[0].postcode;
     const m = Map(add).set("postcode", filterSubDistrict);
     setAddress(m.toJS());
+    checkValidateAddr(m.toJS());
+
   };
   const handleExpPlant = (e: any) => {
     const m = Map(data).set("expPlant", e);
@@ -153,9 +163,12 @@ function AddDroner() {
   const handlePlantOther = (e: React.ChangeEvent<HTMLInputElement>) => {
     const m = Map(data).set(e.target.id, e.target.value);
     setData(m.toJS());
+  };
+  const mapPlant = () => {
   }
 
   const insertDroneList = (data: DronerDroneEntity) => {
+    console.log(data)
     if (data.modalDroneIndex == 0) {
       const pushId = Map(data).set(
         "modalDroneIndex",
@@ -310,9 +323,11 @@ function AddDroner() {
               <label>
                 จังหวัด <span style={{ color: "red" }}>*</span>
               </label>
-              <Form.Item name="Province">
-                <Select
+              <Form.Item name="provinceId">
+              <Select
+                  allowClear
                   showSearch
+                  placeholder="เลือกจังหวัด"
                   optionFilterProp="children"
                   filterOption={(input: any, option: any) =>
                     option.children.includes(input)
@@ -322,15 +337,14 @@ function AddDroner() {
                       .toLowerCase()
                       .localeCompare(optionB.children.toLowerCase())
                   }
-                  value={address?.provinceId}
-                  placeholder="เลือกจังหวัด"
                   onChange={handleProvince}
+                  key={address.provinceId}
                 >
-                  {province.map((item: any, index: any) => (
+                   {province.map((item: any, index: any) => (
                     <option key={index} value={item.provinceId}>
                       {item.region}
                     </option>
-                  ))}
+                    ))}
                 </Select>
               </Form.Item>
             </div>
@@ -338,7 +352,7 @@ function AddDroner() {
               <label>
                 อำเภอ <span style={{ color: "red" }}>*</span>
               </label>
-              <Form.Item name="district">
+              <Form.Item name="districtId">
                 <Select
                   showSearch
                   optionFilterProp="children"
@@ -352,6 +366,7 @@ function AddDroner() {
                   }
                   value={address?.districtId}
                   placeholder="เลือกอำเภอ"
+                  allowClear
                   onChange={handleDistrict}
                 >
                   {district.map((item: any, index: any) => (
@@ -368,7 +383,7 @@ function AddDroner() {
               <label>
                 ตำบล <span style={{ color: "red" }}>*</span>
               </label>
-              <Form.Item name="Subdistrict">
+              <Form.Item name="subdistrictId">
                 <Select
                   showSearch
                   optionFilterProp="children"
@@ -382,6 +397,7 @@ function AddDroner() {
                   }
                   value={address?.subdistrictId}
                   placeholder="เลือกตำบล"
+                  allowClear
                   onChange={handleSubDistrict}
                 >
                   {subdistrict.map((item: any, index: any) => (
@@ -480,7 +496,6 @@ function AddDroner() {
                 onChange={handleExpPlant}
                 options={EXP_PLANT}
                 style={{ width: "220px" }}
-                defaultValue={data.expPlant}
               >
                 <Row>
                   {EXP_PLANT.map((item) => (
@@ -495,9 +510,15 @@ function AddDroner() {
           <div className="form-group col-lg-6">
             <label></label>
             <Form.Item name="plantOther">
-              <Input 
-              onChange={handlePlantOther}
-              placeholder="พืชอื่นๆ เช่น ส้ม มะละกอม มะพร้าว" />
+            {/* {mapPlant.map((item) => (
+                    <Col span={8}>
+                      <Input value={item}>{item}</Input>
+                    </Col>
+                  ))} */}
+               <Input
+                onChange={handlePlantOther}
+                placeholder="พืชอื่นๆ เช่น ส้ม มะละกอ มะพร้าว"
+              /> 
             </Form.Item>
           </div>
         </Form>
@@ -511,6 +532,39 @@ function AddDroner() {
     return droneList.filter((x) => x.id == id)[0].droneBrand.name;
   };
 
+  const checkValidate = (data: CreateDronerEntity) => {
+    if (
+      data.firstname != "" &&
+      data.lastname != "" &&
+      data.telephoneNo != "" &&
+      data.idNo != "" &&
+      address.provinceId != 0 &&
+      address.districtId != 0 &&
+      address.subdistrictId != 0 &&
+      address.address1 != ""
+    ) {
+      setBtnSaveDisable(false);
+    } else {
+      setBtnSaveDisable(true);
+    }
+  };
+  const checkValidateAddr = (addr: CreateAddressEntity) => {
+    if (
+      addr.provinceId != 0 &&
+      addr.subdistrictId != 0 &&
+      addr.districtId != 0 &&
+      addr.postcode != "" &&
+      addr.address1 != "" &&
+      data.firstname != "" &&
+      data.lastname != "" &&
+      data.telephoneNo != "" &&
+      data.idNo != ""
+    ) {
+      setBtnSaveDisable(false);
+    } else {
+      setBtnSaveDisable(true);
+    }
+  };
   const insertDroner = async () => {
     const pushAdd = Map(data).set("address", address);
     setData(pushAdd.toJS());
@@ -518,10 +572,11 @@ function AddDroner() {
       "dronerDrone",
       dronerDroneList
     );
+    console.log(pushDroneList.toJS());
     setData(pushDroneList.toJS());
     await DronerDatasource.createDronerList(pushDroneList.toJS()).then(
       (res) => {
-        if (res) {
+        if (res != null) {
           Swal.fire({
             title: "บันทึกสำเร็จ",
             icon: "success",
@@ -636,6 +691,8 @@ function AddDroner() {
       <FooterPage
         onClickBack={() => (window.location.href = "/IndexDroner")}
         onClickSave={insertDroner}
+        disableSaveBtn={saveBtnDisable}
+
       />
       {showAddModal && (
         <ModalDrone

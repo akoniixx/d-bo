@@ -26,7 +26,7 @@ export class DronerDroneDatasource {
       });
   }
   static  createDronerDrone(data: DronerDroneEntity) : Promise<any> {
-   delete data.id
+    delete data.id;
     return httpClient
     .get(BASE_URL + "/droner-drone", {data})
     .then((response) => {

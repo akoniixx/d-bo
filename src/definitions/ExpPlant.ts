@@ -9,3 +9,4 @@ export const EXP_PLANT = [
   "ลำไย",
   "ยางพารา",
 ];
+

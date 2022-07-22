@@ -79,6 +79,7 @@ function IndexDroner() {
       searchStatus,
       searchText
     ).then((res: DronerListEntity) => {
+      console.log(res);
       setData(res);
     });
   };
@@ -358,7 +359,7 @@ function IndexDroner() {
           children: (
             <div className="container">
               <span className="text-dark-75  d-block font-size-lg">
-                {row.dronerDrone.length + " " + "เครื่อง"}
+                {row.totalDroneCount + " " + "เครื่อง"}
               </span>
             </div>
           ),
