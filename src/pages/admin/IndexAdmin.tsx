@@ -70,7 +70,7 @@ const IndexAdmin = () => {
       title: "ชื่อ-นามสกุล",
       dataIndex: "firstname",
       key: "firstname",
-      width: "10%",
+      width:"15%",
       render: (value: any, row: any, index: number) => {
         return {
           children: (
@@ -85,7 +85,6 @@ const IndexAdmin = () => {
       title: "ชื่อผู้ใช้ (User Name)",
       dataIndex: "username",
       key: "username",
-      width: "15%",
     },
     {
       title: "อีเมลล์",
@@ -97,13 +96,11 @@ const IndexAdmin = () => {
       title: "บทบาท",
       dataIndex: "role",
       key: "role",
-      width: "12%",
     },
     {
       title: "สถานะ",
       dataIndex: "isActive",
       key: "isActive",
-      width: "12%",
       render: (value: any, row: any, index: number) => {
         return {
           children: (
@@ -119,7 +116,6 @@ const IndexAdmin = () => {
       title: "อัพเดทล่าสุด",
       dataIndex: "updatedAt",
       key: "updatedAt",
-      width: "15%",
       render: (value: any, row: any, index: number) => {
         return {
           children: <span>{DateTimeUtil.formatDateTime(value)}</span>,
@@ -130,7 +126,6 @@ const IndexAdmin = () => {
       title: "",
       dataIndex: "id",
       key: "id",
-      width: "9%",
       render: (value: any, row: any, index: number) => {
         return {
           children: (
@@ -208,7 +203,7 @@ const IndexAdmin = () => {
         />
       </CardContainer>
       <div className="d-flex justify-content-between pt-5">
-        <h5>รายการทั้งหมด {data.total} รายการ</h5>
+        <p>รายการทั้งหมด {data.total} รายการ</p>
         <Pagination
           current={current}
           total={data.total}

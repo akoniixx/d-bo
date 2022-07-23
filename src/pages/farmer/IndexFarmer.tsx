@@ -44,7 +44,7 @@ function IndexFarmer() {
       searchText,
       searchProvince,
       searchDistrict,
-      searchSubdistrict
+      searchSubdistrict,
     ).then((res: FarmerPageEntity) => {
       setData(res);
     });
@@ -86,8 +86,8 @@ function IndexFarmer() {
   const handleSearchStatus = (status: any) => {
     setSearchStatus(status);
   };
-  const handleSearchText = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchText(e.target.value);
+  const handleSearchText = (e: string) => {
+    setSearchText(e);
   };
   const handleSearchProvince = (provinceId: number) => {
     setSearchProvince(provinceId);
@@ -128,7 +128,7 @@ function IndexFarmer() {
           <Search
             placeholder="ค้นหาชื่อเกษตรกร หรือเบอร์โทร"
             className="col-lg-12 p-1"
-            onChange={handleSearchText}
+            onSearch={handleSearchText}
           />
         </div>
         <div className="col-lg-3">
@@ -340,6 +340,7 @@ function IndexFarmer() {
 
   return (
     <Layouts>
+      {/* {console.log(data?.data)} */}
       {pageTitle}
       <CardContainer>
         <Table
@@ -349,6 +350,16 @@ function IndexFarmer() {
           scroll={{
             x: 300,
           }}
+          rowClassName={(a) =>
+            a.status == "PENDING" &&
+            moment(Date.now()).diff(moment(new Date(a.createdAt)), "day") >= 3
+              ? "PENDING" &&
+                moment(Date.now()).diff(moment(new Date(a.createdAt)), "day") >=
+                  7
+                ? "table-row-older"
+                : "table-row-old"
+              : "table-row-lasted"
+          }
         />
       </CardContainer>
       <div className="d-flex justify-content-between pt-5">

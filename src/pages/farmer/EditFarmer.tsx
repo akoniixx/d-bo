@@ -5,7 +5,6 @@ import {
   Form,
   Input,
   Select,
-  Upload,
   Button,
   Pagination,
   Badge,
@@ -198,9 +197,21 @@ const EditFarmer = () => {
     setEditFarmerPlot(data);
   };
 
-  const removePlot = async (data: FarmerPlotEntity) => {
-    await FarmerPlotDatasource.deleteFarmerPlot(data.id).then();
-    fecthFarmer();
+  const removePlot = (data: FarmerPlotEntity) => {
+    Swal.fire({
+      title: "ยืนยันการลบ",
+      text: "โปรดตรวจสอบแปลงเกษตรที่คุณต้องการลบ เพราะอาจจะส่งผลต่อการจ้างงานในแอปพลิเคชัน",
+      cancelButtonText: "ย้อนกลับ",
+      confirmButtonText: "ลบ",
+      confirmButtonColor: "#d33",
+      showCancelButton: true,
+      showCloseButton: true,
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        await FarmerPlotDatasource.deleteFarmerPlot(data.id).then();
+      }
+      fecthFarmer();
+    });
   };
 
   const updateFarmerPlot = async (plot: FarmerPlotEntity) => {
@@ -666,6 +677,23 @@ const EditFarmer = () => {
               </Radio.Group>
             </div>
           </div>
+          {data.status == "INACTIVE" && (
+            <div>
+              <div className="form-group">
+                <label></label>
+                <br />
+                <Form.Item name="reason">
+                  <TextArea
+                    className="col-lg-12"
+                    rows={3}
+                    placeholder="กรอกเหตุผล/เหตุหมายเพิ่มเติม"
+                    autoComplete="off"
+                    id="reasomText"
+                  />
+                </Form.Item>
+              </div>
+            </div>
+          )}
         </Form>
       </CardContainer>
     </div>

@@ -1,6 +1,16 @@
 import React, { useEffect, useState } from "react";
 import Layout from "../../components/layout/Layout";
-import { Row, Form, Input, Select, Upload, Button, Badge, Tag } from "antd";
+import {
+  Row,
+  Form,
+  Input,
+  Select,
+  Button,
+  Badge,
+  Tag,
+  Radio,
+  Space,
+} from "antd";
 import { CardContainer } from "../../components/card/CardContainer";
 import { BackIconButton } from "../../components/button/BackButton";
 import TextArea from "antd/lib/input/TextArea";
@@ -30,7 +40,10 @@ import {
   FarmerPlotEntity,
   FarmerPlotEntity_INIT,
 } from "../../entities/FarmerPlotEntities";
-import { STATUS_NORMAL_MAPPING } from "../../definitions/Status";
+import {
+  FARMER_STATUS_SEARCH,
+  STATUS_NORMAL_MAPPING,
+} from "../../definitions/Status";
 import ActionButton from "../../components/button/ActionButton";
 import { FarmerDatasource } from "../../datasource/FarmerDatasource";
 import Swal from "sweetalert2";
@@ -140,6 +153,12 @@ const AddFarmer = () => {
     const d = Map(address).set("address1", e.target.value);
     setAddress(d.toJS());
     checkValidateAddr(d.toJS());
+  };
+
+  const handleChangeStatus = (e: any) => {
+    const m = Map(data).set("status", e.target.value);
+    setData(m.toJS());
+    checkValidate(m.toJS());
   };
   //#endregion
 
@@ -598,6 +617,26 @@ const AddFarmer = () => {
                   autoComplete="off"
                 />
               </Form.Item>
+            </div>
+          </div>
+          <div>
+            <div className="form-group">
+              <label>
+                สถานะ <span style={{ color: "red" }}>*</span>
+              </label>
+              <br />
+              <Radio.Group
+                defaultValue={data.status}
+                onChange={handleChangeStatus}
+              >
+                <Space direction="vertical">
+                  {FARMER_STATUS_SEARCH.filter(
+                    (x) => x.value != "INACTIVE"
+                  ).map((item) => (
+                    <Radio value={item.value}>{item.name}</Radio>
+                  ))}
+                </Space>
+              </Radio.Group>
             </div>
           </div>
         </Form>

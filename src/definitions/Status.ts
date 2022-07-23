@@ -17,7 +17,7 @@ export const STATUS_FARMER_MAPPING: any = {
 };
 
 export const STATUS_COLOR_MAPPING: any = {
-  PENDING: color.secondary2,
+  PENDING: "#EA973E",
   ACTIVE: color.Success,
   INACTIVE: color.Error,
 };
