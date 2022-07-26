@@ -109,6 +109,8 @@ function AddDroner() {
   const [createImgIdCard, setCreateImgIdCrad] = useState<UploadImageEntity>(
     UploadImageEntity_INTI
   );
+  const [otherPlant, setOtherPlant] = useState<any[]>([]);
+
   useEffect(() => {
     fetchProvince();
     insertDroner();
@@ -163,8 +165,7 @@ function AddDroner() {
     checkValidateAddr(c.toJS());
   };
   const handleExpPlant = (e: any) => {
-    console.log(e);
-    const m = Map(data).set("expPlant", [...data.expPlant, e[0]]);
+    const m = Map(data).set("expPlant", e);
     setData(m.toJS());
   };
   // const handlePlantOther = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -174,14 +175,7 @@ function AddDroner() {
 
   const handlePlantOther = (e: React.ChangeEvent<HTMLInputElement>) => {
     let m = e.target.value.split(",");
-    var i = 0;
-    let d: any = {};
-    console.log(m);
-    for (i; m.length > i; i++) {
-      d = Map(data).set("expPlant", [...data.expPlant, m[i]]);
-      setData(d.toJS());
-    }
-    console.log(d.toJS());
+    setOtherPlant(m);
   };
 
   const insertDroneList = (data: DronerDroneEntity) => {
@@ -319,7 +313,13 @@ function AddDroner() {
       dronerDroneList
     );
     setData(pushDroneList.toJS());
-    console.log(pushDroneList.toJS());
+    var i = 0;
+    let d : any = [];
+    for (i; otherPlant.length > i; i++) {
+      d = Map(pushDroneList.toJS()).set("expPlant", [...pushDroneList.toJS().expPlant, otherPlant[i]]);
+      setData(d.toJS())
+    }
+    console.log(d.toJS());
     // await DronerDatasource.createDronerList(pushDroneList.toJS()).then(
     //   (res) => {
     //     if (res != null) {
@@ -655,7 +655,7 @@ function AddDroner() {
           <div className="row ">
             <div className="form-group col-lg-6">
               <label>
-                พืชที่เคยฉีดพ่น
+                พืชที่เคยฉีดพ่น{" "}
                 <span style={{ color: color.Disable }}>
                   (กรุณาเลือกอย่างน้อย 1 อย่าง)
                 </span>
