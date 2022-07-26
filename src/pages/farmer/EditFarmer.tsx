@@ -149,7 +149,6 @@ const EditFarmer = () => {
   };
 
   const handleOnChangeProvince = async (provinceId: number) => {
-    console.log(provinceId);
     const d = Map(address).set("provinceId", provinceId);
     setAddress(d.toJS());
     checkValidateAddr(d.toJS());
@@ -482,7 +481,7 @@ const EditFarmer = () => {
                 ]}
               >
                 <Input
-                  placeholder="กรอกบัตรประชาชน"
+                  placeholder="กรอกรหัสบัตรประชาชน"
                   defaultValue={data.idNo}
                   autoComplete="off"
                   onChange={handleOnChange}

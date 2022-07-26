@@ -1,9 +1,14 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Form, Input, Modal, Radio, Select, Space } from "antd";
 import FooterPage from "../footer/FooterPage";
-import { SearchOutlined } from "@ant-design/icons";
 import { FarmerPlotEntity } from "../../entities/FarmerPlotEntities";
 import { EXP_PLANT } from "../../definitions/ExpPlant";
+import GoogleMap from "../map/GoogleMap";
+import { SubdistrictEntity } from "../../entities/LocationEntities";
+import { LocationDatasource } from "../../datasource/LocationDatasource";
+import { LAT_LNG_BANGKOK } from "../../definitions/Location";
+
+const { Option } = Select;
 
 const _ = require("lodash");
 const { Map } = require("immutable");
@@ -24,6 +29,22 @@ const ModalFarmerPlot: React.FC<ModalFarmerPlotProps> = ({
 }) => {
   const [farmerPlot, setFarmerPlot] = useState<FarmerPlotEntity>(data);
   const [saveBtnDisable, setBtnSaveDisable] = useState<boolean>(true);
+  const [mapPosition, setMapPosition] = useState<{ lat: number; lng: number }>({
+    lat: parseFloat(data.lat),
+    lng: parseFloat(data.long),
+  });
+  const [location, setLocation] = useState<SubdistrictEntity[]>([]);
+  const [searchLocation] = useState("");
+
+  const fetchLocation = async (text?: string) => {
+    await LocationDatasource.getSearchLocation(text).then((res) => {
+      setLocation(res);
+    });
+  };
+
+  useEffect(() => {
+    fetchLocation(searchLocation);
+  }, [searchLocation]);
 
   const handleOnChangePlot = (e: React.ChangeEvent<HTMLInputElement>) => {
     const m = Map(farmerPlot).set(e.target.id, e.target.value);
@@ -43,6 +64,47 @@ const ModalFarmerPlot: React.FC<ModalFarmerPlotProps> = ({
     checkValidate(m.toJS());
   };
 
+  const handleSearchLocation = async (value: any) => {
+    if (value != undefined) {
+      const a = location.filter((x) => x.subdistrictId == value)[0];
+      const pushLat = Map(farmerPlot).set("lat", a.lat);
+      const pushLong = Map(pushLat.toJS()).set("long", a.long);
+      setFarmerPlot(pushLong.toJS());
+      setMapPosition({
+        lat: a.lat != null ? parseFloat(a.lat) : 0,
+        lng: a.long != null ? parseFloat(a.long) : 0,
+      });
+      checkValidate(pushLong.toJS());
+    } else {
+      setMapPosition(LAT_LNG_BANGKOK);
+    }
+  };
+  const handleOnChangeUrl = (value: any) => {
+    const m = Map(farmerPlot).set("mapUrl", value.target.value);
+    setFarmerPlot(m.toJS());
+    checkValidate(m.toJS());
+  };
+
+  const handleOnChangeLat = (value: any) => {
+    const m = Map(farmerPlot).set("lat", value.target.value);
+    setFarmerPlot(m.toJS());
+    checkValidate(m.toJS());
+    setMapPosition((prev) => ({
+      lat: parseFloat(value.target.value),
+      lng: prev.lng,
+    }));
+  };
+
+  const handleOnChangeLng = (value: any) => {
+    const m = Map(farmerPlot).set("long", value.target.value);
+    setFarmerPlot(m.toJS());
+    checkValidate(m.toJS());
+    setMapPosition((prev) => ({
+      lat: prev.lat,
+      lng: parseFloat(value.target.value),
+    }));
+  };
+
   const handelCallBack = () => {
     const m = Map(farmerPlot).set("plotId", editIndex);
     callBack(m.toJS());
@@ -53,7 +115,9 @@ const ModalFarmerPlot: React.FC<ModalFarmerPlotProps> = ({
       data.plotName != "" &&
       data.plantName != "" &&
       data.raiAmount != 0 &&
-      data.landmark != ""
+      data.landmark != "" &&
+      data.lat != "" &&
+      data.long != ""
     ) {
       setBtnSaveDisable(false);
     } else {
@@ -141,20 +205,100 @@ const ModalFarmerPlot: React.FC<ModalFarmerPlotProps> = ({
                 onChange={handleOnChangePlot}
                 defaultValue={farmerPlot.raiAmount}
                 autoComplete="off"
+                suffix="ไร่"
               />
             </Form.Item>
           </div>
           <div className="form-group">
             <label>พื้นที่แปลงเกษตร</label>
-            <Form.Item name="SearchAddress">
-              <Input
+            <Form.Item name="searchAddress">
+              <Select
+                allowClear
+                showSearch
                 placeholder="ค้นหาตำบล/อำเภอ/จังหวัด"
-                prefix={<SearchOutlined />}
+                onChange={handleSearchLocation}
+                optionFilterProp="children"
+                filterSort={(optionA, optionB) =>
+                  optionA.children
+                    .toLowerCase()
+                    .localeCompare(optionB.children.toLowerCase())
+                }
+                filterOption={(input: any, option: any) =>
+                  option.children.includes(input)
+                }
+              >
+                {location.map((item) => (
+                  <Option value={item.subdistrictId}>
+                    {item.districtName +
+                      "/" +
+                      item.subdistrictName +
+                      "/" +
+                      item.provinceName}
+                  </Option>
+                ))}
+              </Select>
+            </Form.Item>
+          </div>
+          <div className="form-group">
+            <label>Link Google Map</label>
+            <Form.Item name="url">
+              <Input
+                defaultValue={farmerPlot.mapUrl}
+                placeholder="กรอกข้อมูล Url Google Map"
+                onBlur={handleOnChangeUrl}
+                autoComplete="off"
               />
             </Form.Item>
           </div>
-          {/* map */}
-          <p>map</p>
+          <div className="row">
+            <div className="form-group col-lg-6">
+              <label>Latitude (ละติจูด) </label>
+              <span style={{ color: "red" }}>*</span>
+              <Form.Item
+                name="lat"
+                rules={[
+                  {
+                    required: true,
+                    message: "กรุณากรอกละติจูด!",
+                  },
+                ]}
+                key={mapPosition.lat}
+              >
+                <Input
+                  placeholder="กรอกข้อมูล Latitude"
+                  defaultValue={mapPosition.lat}
+                  onBlur={handleOnChangeLat}
+                />
+              </Form.Item>
+            </div>
+            <div className="form-group col-lg-6">
+              <label>Longitude (ลองติจูด) </label>
+              <span style={{ color: "red" }}>*</span>
+              <Form.Item
+                name="long"
+                rules={[
+                  {
+                    required: true,
+                    message: "กรุณากรอกลองติจูด!",
+                  },
+                ]}
+                key={mapPosition.lng}
+              >
+                <Input
+                  placeholder="กรอกข้อมูล Longitude"
+                  defaultValue={mapPosition.lng}
+                  onBlur={handleOnChangeLng}
+                />
+              </Form.Item>
+            </div>
+          </div>
+          <GoogleMap
+            width="470px"
+            height="300px"
+            zoom={17}
+            lat={mapPosition.lat}
+            lng={mapPosition.lng}
+          />
           <div className="form-group">
             <label>
               จุดสังเกตใกล้แปลง (เช่น รร.บ้านน้อย){" "}

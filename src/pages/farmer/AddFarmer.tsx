@@ -446,7 +446,7 @@ const AddFarmer = () => {
                 ]}
               >
                 <Input
-                  placeholder="กรอกบัตรประชาชน"
+                  placeholder="กรอกรหัสบัตรประชาชน"
                   onChange={handleOnChange}
                   autoComplete="off"
                 />
