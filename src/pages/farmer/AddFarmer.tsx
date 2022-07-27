@@ -520,7 +520,7 @@ const AddFarmer = () => {
                   key={address.provinceId}
                 >
                   {province?.map((item) => (
-                    <Option value={item.provinceId}>{item.region}</Option>
+                    <Option value={item.provinceId}>{item.provinceName}</Option>
                   ))}
                 </Select>
               </Form.Item>

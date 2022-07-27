@@ -556,7 +556,7 @@ const EditFarmer = () => {
                   onChange={handleOnChangeProvince}
                 >
                   {province.map((item) => (
-                    <Option value={item.provinceId}>{item.region}</Option>
+                    <Option value={item.provinceId}>{item.provinceName}</Option>
                   ))}
                 </Select>
               </Form.Item>

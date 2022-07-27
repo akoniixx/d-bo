@@ -149,7 +149,7 @@ function IndexFarmer() {
             }
           >
             {province?.map((item) => (
-              <Option value={item.provinceId.toString()}>{item.region}</Option>
+              <Option value={item.provinceId.toString()}>{item.provinceName}</Option>
             ))}
           </Select>
         </div>
@@ -241,7 +241,7 @@ function IndexFarmer() {
       key: "province",
       render: (value: any, row: any, index: number) => {
         return {
-          children: <span>{row.address.province.region}</span>,
+          children: <span>{row.address.province.provinceName}</span>,
         };
       },
     },
