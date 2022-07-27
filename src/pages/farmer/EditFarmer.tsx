@@ -99,19 +99,15 @@ const EditFarmer = () => {
     useState<ImageEntity>(ImageEntity_INTI);
   const [createImgIdCard, setCreateImgIdCrad] =
     useState<ImageEntity>(ImageEntity_INTI);
-
-  //let getPathPro: string = "";
-  //let getPathCard: string = "";
+ 
   let imgList: (string | boolean)[] = [];
   const fecthFarmer = async () => {
     await FarmerDatasource.getFarmerById(farmerId).then((res) => {
-      console.log(res);
       setData(res);
       setAddress(res.address);
       setFarmerPlotList(res.farmerPlot);
       let getPathPro = res.file.filter((x) => x.category == "PROFILE_IMAGE");
       let getPathCard = res.file.filter((x) => x.category == "ID_CARD_IMAGE");
-      console.log(getPathCard);
       imgList.push(
         getPathPro.length >= 1 ? getPathPro[0].path : "",
         getPathCard.length >= 1 ? getPathCard[0].path : ""
