@@ -304,7 +304,7 @@ const AddFarmer = () => {
     const pushPlot = Map(pushAddr.toJS()).set("farmerPlot", farmerPlotList);
     setData(pushPlot.toJS());
     await FarmerDatasource.insertFarmer(pushPlot.toJS()).then((res) => {
-      if (res.id != null) {
+      if (res != undefined) {
         const pushImgProId = Map(createImgProfile).set("resourceId", res.id);
         const pushImgCardId = Map(createImgIdCard).set("resourceId", res.id);
         var i = 0;
@@ -321,6 +321,12 @@ const AddFarmer = () => {
           showConfirmButton: false,
         }).then((time) => {
           window.location.href = "/IndexFarmer";
+        });
+      }else{
+        Swal.fire({
+          title: "เบอร์โทร หรือ รหัสบัตรประชาชน <br/> ซ้ำในระบบ",
+          icon: "error",
+          showConfirmButton: true,
         });
       }
     });
@@ -756,6 +762,7 @@ const AddFarmer = () => {
           callBack={insertFarmerPlot}
           data={FarmerPlotEntity_INIT}
           editIndex={editIndex}
+          title="เพิ่มแปลงเกษตร"
         />
       )}
       {showEditModal && (
@@ -765,6 +772,7 @@ const AddFarmer = () => {
           callBack={insertFarmerPlot}
           data={editFarmerPlot}
           editIndex={editIndex}
+          title="แก้ไขแปลงเกษตร"
         />
       )}
     </Layout>

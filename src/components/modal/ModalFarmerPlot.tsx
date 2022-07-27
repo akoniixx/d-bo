@@ -19,6 +19,7 @@ interface ModalFarmerPlotProps {
   callBack: (data: FarmerPlotEntity) => void;
   data: FarmerPlotEntity;
   editIndex: number;
+  title:string;
 }
 const ModalFarmerPlot: React.FC<ModalFarmerPlotProps> = ({
   show,
@@ -26,6 +27,7 @@ const ModalFarmerPlot: React.FC<ModalFarmerPlotProps> = ({
   callBack,
   data,
   editIndex,
+  title
 }) => {
   const [farmerPlot, setFarmerPlot] = useState<FarmerPlotEntity>(data);
   const [saveBtnDisable, setBtnSaveDisable] = useState<boolean>(true);
@@ -135,7 +137,7 @@ const ModalFarmerPlot: React.FC<ModalFarmerPlotProps> = ({
               cursor: "move",
             }}
           >
-            เพิ่มแปลงแกษตรกร
+            {title}
           </div>
         }
         visible={show}
