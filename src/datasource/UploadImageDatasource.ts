@@ -29,4 +29,19 @@ export class UploadImageDatasouce {
         console.log(err, "err getImg");
       });
   }
+
+  static deleteImage(id: string, path: string): Promise<any> {
+    const params = {
+      id: id,
+      path: path,
+    };
+    return httpClient
+      .delete(API_URL + "/file/delete", { params })
+      .then((response) => {
+        return response.data;
+      })
+      .catch((err) => {
+        console.log(err, "err getImg");
+      });
+  }
 }

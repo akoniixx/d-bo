@@ -33,10 +33,10 @@ table tr td {
   font-weight: bold !important;
 }
 .table-row-old td {
-  background-color: #EA973E1A;
+  background-color: rgba(244, 132, 26, 0.2);
 }
 .table-row-older td {
-  background-color: #EB57571A;
+  background-color: rgba(235, 87, 87, 0.3);
 }
 .table-row-lasted {
   background-color: rgb(255, 255, 255);

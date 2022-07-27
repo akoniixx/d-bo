@@ -1,4 +1,9 @@
 ## [Version - 0]
+## Feature [v0.5.0] 2022-07-27
+- fixed response message user staff memu
+- create logic color rows in index farmer menu
+- create component google map in farmer menu
+- create function delete image in farmer menu
 ## Feature [v0.4.0] 2022-07-21
 - add index droner 
 -  fix auth page full screen

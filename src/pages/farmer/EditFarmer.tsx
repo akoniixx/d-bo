@@ -5,7 +5,6 @@ import {
   Form,
   Input,
   Select,
-  Upload,
   Button,
   Pagination,
   Badge,
@@ -100,28 +99,33 @@ const EditFarmer = () => {
     useState<ImageEntity>(ImageEntity_INTI);
   const [createImgIdCard, setCreateImgIdCrad] =
     useState<ImageEntity>(ImageEntity_INTI);
-
-  let getPathPro: string = "";
-  let getPathCard: string = "";
+ 
+  let imgList: (string | boolean)[] = [];
   const fecthFarmer = async () => {
     await FarmerDatasource.getFarmerById(farmerId).then((res) => {
       setData(res);
       setAddress(res.address);
       setFarmerPlotList(res.farmerPlot);
-      getPathPro = res.file.filter((x) => x.category == "PROFILE_IMAGE")[0]
-        .path;
-      getPathCard = res.file.filter((x) => x.category == "ID_CARD_IMAGE")[0]
-        .path;
+      let getPathPro = res.file.filter((x) => x.category == "PROFILE_IMAGE");
+      let getPathCard = res.file.filter((x) => x.category == "ID_CARD_IMAGE");
+      imgList.push(
+        getPathPro.length >= 1 ? getPathPro[0].path : "",
+        getPathCard.length >= 1 ? getPathCard[0].path : ""
+      );
       var i = 0;
-      for (i; 2 > i; i++) {
+      for (i; imgList.length > i; i++) {
         i == 0 &&
-          UploadImageDatasouce.getImage(getPathPro).then((resImg) => {
-            setImgProfile(resImg.url);
-          });
+          UploadImageDatasouce.getImage(imgList[i].toString()).then(
+            (resImg) => {
+              setImgProfile(resImg.url);
+            }
+          );
         i == 1 &&
-          UploadImageDatasouce.getImage(getPathCard).then((resImg) => {
-            setImgIdCard(resImg.url);
-          });
+          UploadImageDatasouce.getImage(imgList[i].toString()).then(
+            (resImg) => {
+              setImgIdCard(resImg.url);
+            }
+          );
       }
     });
   };
@@ -150,7 +154,6 @@ const EditFarmer = () => {
   };
 
   const handleOnChangeProvince = async (provinceId: number) => {
-    console.log(provinceId);
     const d = Map(address).set("provinceId", provinceId);
     setAddress(d.toJS());
     checkValidateAddr(d.toJS());
@@ -198,9 +201,21 @@ const EditFarmer = () => {
     setEditFarmerPlot(data);
   };
 
-  const removePlot = async (data: FarmerPlotEntity) => {
-    await FarmerPlotDatasource.deleteFarmerPlot(data.id).then();
-    fecthFarmer();
+  const removePlot = (data: FarmerPlotEntity) => {
+    Swal.fire({
+      title: "ยืนยันการลบ",
+      text: "โปรดตรวจสอบแปลงเกษตรที่คุณต้องการลบ เพราะอาจจะส่งผลต่อการจ้างงานในแอปพลิเคชัน",
+      cancelButtonText: "ย้อนกลับ",
+      confirmButtonText: "ลบ",
+      confirmButtonColor: "#d33",
+      showCancelButton: true,
+      showCloseButton: true,
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        await FarmerPlotDatasource.deleteFarmerPlot(data.id).then();
+      }
+      fecthFarmer();
+    });
   };
 
   const updateFarmerPlot = async (plot: FarmerPlotEntity) => {
@@ -250,6 +265,8 @@ const EditFarmer = () => {
   };
 
   const removeImg = () => {
+    const getImg = data.file.filter((x) => x.category == "PROFILE_IMAGE")[0];
+    UploadImageDatasouce.deleteImage(getImg.id, getImg.path).then((res) => {});
     setImgProfile(undefined);
     checkValidate(data);
   };
@@ -284,6 +301,8 @@ const EditFarmer = () => {
     imgWindow?.document.write(image.outerHTML);
   };
   const removeImgIdCard = () => {
+    const getImg = data.file.filter((x) => x.category == "ID_CARD_IMAGE")[0];
+    UploadImageDatasouce.deleteImage(getImg.id, getImg.path).then((res) => {});
     setImgIdCard(undefined);
     checkValidate(data);
   };
@@ -329,7 +348,7 @@ const EditFarmer = () => {
     const pushPin = Map(pushAddr.toJS()).set("pin", "");
 
     await FarmerDatasource.updateFarmer(pushPin.toJS()).then((res) => {
-      if (res.id != null) {
+      if (res != undefined) {
         var i = 0;
         for (i; 2 > i; i++) {
           i == 0 &&
@@ -343,6 +362,12 @@ const EditFarmer = () => {
           showConfirmButton: false,
         }).then((time) => {
           window.location.href = "/IndexFarmer";
+        });
+      } else {
+        Swal.fire({
+          title: "เบอร์โทร หรือ รหัสบัตรประชาชน <br/> ซ้ำในระบบ",
+          icon: "error",
+          showConfirmButton: true,
         });
       }
     });
@@ -471,7 +496,7 @@ const EditFarmer = () => {
                 ]}
               >
                 <Input
-                  placeholder="กรอกบัตรประชาชน"
+                  placeholder="กรอกรหัสบัตรประชาชน"
                   defaultValue={data.idNo}
                   autoComplete="off"
                   onChange={handleOnChange}
@@ -546,7 +571,7 @@ const EditFarmer = () => {
                   onChange={handleOnChangeProvince}
                 >
                   {province.map((item) => (
-                    <Option value={item.provinceId}>{item.region}</Option>
+                    <Option value={item.provinceId}>{item.provinceName}</Option>
                   ))}
                 </Select>
               </Form.Item>
@@ -666,6 +691,23 @@ const EditFarmer = () => {
               </Radio.Group>
             </div>
           </div>
+          {data.status == "INACTIVE" && (
+            <div>
+              <div className="form-group">
+                <label></label>
+                <br />
+                <Form.Item name="reason">
+                  <TextArea
+                    className="col-lg-12"
+                    rows={3}
+                    placeholder="กรอกเหตุผล/เหตุหมายเพิ่มเติม"
+                    autoComplete="off"
+                    id="reasomText"
+                  />
+                </Form.Item>
+              </div>
+            </div>
+          )}
         </Form>
       </CardContainer>
     </div>
@@ -796,6 +838,7 @@ const EditFarmer = () => {
           callBack={updateFarmerPlot}
           data={FarmerPlotEntity_INIT}
           editIndex={editIndex}
+          title="เพิ่มแปลงเกษตร"
         />
       )}
       {showEditModal && (
@@ -805,6 +848,7 @@ const EditFarmer = () => {
           callBack={updateFarmerPlot}
           data={editFarmerPlot}
           editIndex={editIndex}
+          title="แก้ไขแปลงเกษตร"
         />
       )}
     </Layout>

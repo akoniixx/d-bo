@@ -53,7 +53,7 @@ const EditAdmin = () => {
 
   const updateAdmin = (data: UserStaffEntity) => {
     AdminDatasource.updateAdmin(data).then((res) => {
-      if (res.id != null) {
+      if (res.success) {
         Swal.fire({
           title: "บันทึกสำเร็จ",
           icon: "success",

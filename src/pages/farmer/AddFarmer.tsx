@@ -1,6 +1,16 @@
 import React, { useEffect, useState } from "react";
 import Layout from "../../components/layout/Layout";
-import { Row, Form, Input, Select, Upload, Button, Badge, Tag } from "antd";
+import {
+  Row,
+  Form,
+  Input,
+  Select,
+  Button,
+  Badge,
+  Tag,
+  Radio,
+  Space,
+} from "antd";
 import { CardContainer } from "../../components/card/CardContainer";
 import { BackIconButton } from "../../components/button/BackButton";
 import TextArea from "antd/lib/input/TextArea";
@@ -30,7 +40,10 @@ import {
   FarmerPlotEntity,
   FarmerPlotEntity_INIT,
 } from "../../entities/FarmerPlotEntities";
-import { STATUS_NORMAL_MAPPING } from "../../definitions/Status";
+import {
+  FARMER_STATUS_SEARCH,
+  STATUS_NORMAL_MAPPING,
+} from "../../definitions/Status";
 import ActionButton from "../../components/button/ActionButton";
 import { FarmerDatasource } from "../../datasource/FarmerDatasource";
 import Swal from "sweetalert2";
@@ -140,6 +153,12 @@ const AddFarmer = () => {
     const d = Map(address).set("address1", e.target.value);
     setAddress(d.toJS());
     checkValidateAddr(d.toJS());
+  };
+
+  const handleChangeStatus = (e: any) => {
+    const m = Map(data).set("status", e.target.value);
+    setData(m.toJS());
+    checkValidate(m.toJS());
   };
   //#endregion
 
@@ -285,7 +304,7 @@ const AddFarmer = () => {
     const pushPlot = Map(pushAddr.toJS()).set("farmerPlot", farmerPlotList);
     setData(pushPlot.toJS());
     await FarmerDatasource.insertFarmer(pushPlot.toJS()).then((res) => {
-      if (res.id != null) {
+      if (res != undefined) {
         const pushImgProId = Map(createImgProfile).set("resourceId", res.id);
         const pushImgCardId = Map(createImgIdCard).set("resourceId", res.id);
         var i = 0;
@@ -302,6 +321,12 @@ const AddFarmer = () => {
           showConfirmButton: false,
         }).then((time) => {
           window.location.href = "/IndexFarmer";
+        });
+      }else{
+        Swal.fire({
+          title: "เบอร์โทร หรือ รหัสบัตรประชาชน <br/> ซ้ำในระบบ",
+          icon: "error",
+          showConfirmButton: true,
         });
       }
     });
@@ -427,7 +452,7 @@ const AddFarmer = () => {
                 ]}
               >
                 <Input
-                  placeholder="กรอกบัตรประชาชน"
+                  placeholder="กรอกรหัสบัตรประชาชน"
                   onChange={handleOnChange}
                   autoComplete="off"
                 />
@@ -501,7 +526,7 @@ const AddFarmer = () => {
                   key={address.provinceId}
                 >
                   {province?.map((item) => (
-                    <Option value={item.provinceId}>{item.region}</Option>
+                    <Option value={item.provinceId}>{item.provinceName}</Option>
                   ))}
                 </Select>
               </Form.Item>
@@ -598,6 +623,26 @@ const AddFarmer = () => {
                   autoComplete="off"
                 />
               </Form.Item>
+            </div>
+          </div>
+          <div>
+            <div className="form-group">
+              <label>
+                สถานะ <span style={{ color: "red" }}>*</span>
+              </label>
+              <br />
+              <Radio.Group
+                defaultValue={data.status}
+                onChange={handleChangeStatus}
+              >
+                <Space direction="vertical">
+                  {FARMER_STATUS_SEARCH.filter(
+                    (x) => x.value != "INACTIVE"
+                  ).map((item) => (
+                    <Radio value={item.value}>{item.name}</Radio>
+                  ))}
+                </Space>
+              </Radio.Group>
             </div>
           </div>
         </Form>
@@ -717,6 +762,7 @@ const AddFarmer = () => {
           callBack={insertFarmerPlot}
           data={FarmerPlotEntity_INIT}
           editIndex={editIndex}
+          title="เพิ่มแปลงเกษตร"
         />
       )}
       {showEditModal && (
@@ -726,6 +772,7 @@ const AddFarmer = () => {
           callBack={insertFarmerPlot}
           data={editFarmerPlot}
           editIndex={editIndex}
+          title="แก้ไขแปลงเกษตร"
         />
       )}
     </Layout>
