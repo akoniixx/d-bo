@@ -1,19 +1,22 @@
-import { DronerDroneEntity } from './../entities/DronerDroneEntities';
+import {
+  DronerDroneEntity,
+  DronerDroneListEntity,
+} from "./../entities/DronerDroneEntities";
 import { BASE_URL, httpClient } from "../config/develop-config";
 
 export class DronerDroneDatasource {
   static getDronerDrone(
-    status: string,
     page: number,
-    take: number,
+    row: number,
+    status: string,
     droneId?: string,
     search?: string
-  ): Promise<any> {
+  ): Promise<DronerDroneListEntity> {
     const params = {
-    status: status,
       page: page,
-      take: take,
-      droneId:droneId,
+      take: row,
+      status: status,
+      droneId: droneId,
       search: search,
     };
     return httpClient
@@ -25,27 +28,34 @@ export class DronerDroneDatasource {
         console.log(error);
       });
   }
-  static  createDronerDrone(data: DronerDroneEntity) : Promise<any> {
-    delete data.id;
+  static getDronerDroneById(id: string): Promise<DronerDroneEntity> {
     return httpClient
-    .get(BASE_URL + "/droner-drone", {data})
-    .then((response) => {
-      return response.data;
-    })
-    .catch((error) => {
-      console.log(error);
-    });
+      .get(BASE_URL + "/droner-drone/" + id)
+      .then((res) => {
+        return res.data;
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   }
-  static  updateDronerDrone(data: DronerDroneEntity) : Promise<any> {
+  static createDronerDrone(data: DronerDroneEntity): Promise<any> {
     return httpClient
-    .patch(BASE_URL + "/droner-drone", data.modalDroneIndex)
-    .then((response) => {
-      return response.data;
-    })
-    .catch((error) => {
-      console.log(error);
-    });
+      .post(BASE_URL + "/droner-drone", { data })
+      .then((response) => {
+        return response.data;
+      })
+      .catch((error) => {
+        console.log(error);
+      });
   }
-
- 
+  static updateDronerDrone(data: DronerDroneEntity): Promise<any> {
+    return httpClient
+      .patch(BASE_URL + "/droner-drone" + data.id, data)
+      .then((response) => {
+        return response.data;
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  }
 }

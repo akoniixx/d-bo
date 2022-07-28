@@ -79,7 +79,6 @@ function IndexDroner() {
       searchStatus,
       searchText
     ).then((res: DronerListEntity) => {
-      console.log(res);
       setData(res);
     });
   };
@@ -181,7 +180,7 @@ function IndexDroner() {
             }
           >
             {province?.map((item) => (
-              <Option value={item.provinceId.toString()}>{item.region}</Option>
+              <Option value={item.provinceId.toString()}>{item.provinceName}</Option>
             ))}
           </Select>
         </div>
@@ -336,7 +335,7 @@ function IndexDroner() {
           children: (
             <div className="container">
               <span className="text-dark-75  d-block font-size-lg">
-                {province !== undefined ? province.region : null}
+                {province !== undefined ? province.provinceName : null}
               </span>
             </div>
           ),
@@ -377,7 +376,7 @@ function IndexDroner() {
           children: (
             <div className="container">
               <span className="text-dark-75  d-block font-size-lg">
-                {droneLatest ? (
+                {/* {droneLatest.drone.droneBrand.logoImagePath ? (
                   <Avatar
                     size={25}
                     src={droneLatest.drone.droneBrand.logoImagePath}
@@ -388,9 +387,9 @@ function IndexDroner() {
                     size={25}
                     style={{ color: "#0068F4", backgroundColor: "#EFF2F9" }}
                   >
-                    {/* {droneLatest.charAt(0)} */}
+                    {droneLatest.drone.droneBrand.name.charAt(0)}
                   </Avatar>
-                )}
+                )} */}
                 {droneLatest !== undefined
                   ? droneLatest.drone.droneBrand.name
                   : null}
@@ -465,9 +464,15 @@ function IndexDroner() {
         dataSource={data?.data}
         pagination={false}
         scroll={{ x: 1300 }}
-        // rowClassName={(a) =>
-        //   a.status == "PENDING" ? "table-row-old" : "table-row-lasted"
-        // }
+        rowClassName={(a) =>
+          a.status == "PENDING" &&
+          moment(Date.now()).diff(moment(new Date(a.createdAt)), "day") >= 3
+            ? "PENDING" &&
+              moment(Date.now()).diff(moment(new Date(a.createdAt)), "day") >= 7
+              ? "table-row-older"
+              : "table-row-old"
+            : "table-row-lasted"
+        }
       />
       <div className="d-flex justify-content-between pt-5">
         <h5>รายการทั้งหมด {data?.count} รายการ</h5>

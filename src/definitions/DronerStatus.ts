@@ -9,7 +9,7 @@ export const DRONER_STATUS_MAPPING: any = {
 
 export const DRONER_DRONE_STATUS: any = {
   ACTIVE: "อนุมัติ",
-  PENDING: "รอยืนยันตัวตน",
+  PENDING: "รอตรวจสอบ",
   INACTIVE: "ปิดการใช้งาน",
   REJECTED: "ไม่อนุมัติ",
 };

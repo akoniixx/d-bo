@@ -8,13 +8,13 @@ import {
   Upload,
   Button,
   Pagination,
-  Image,
   Radio,
   Space,
   RadioChangeEvent,
   Checkbox,
   Col,
   Badge,
+  Tag,
 } from "antd";
 import emptyData from "../../resource/media/empties/iconoir_farm.png";
 import {
@@ -26,7 +26,6 @@ import { CardContainer } from "../../components/card/CardContainer";
 import color from "../../resource/color";
 import { CardHeader } from "../../components/header/CardHearder";
 import FooterPage from "../../components/footer/FooterPage";
-import image from "../../resource/image";
 import { Link } from "react-router-dom";
 import { BackButton, BackIconButton } from "../../components/button/BackButton";
 import TextArea from "antd/lib/input/TextArea";
@@ -37,16 +36,7 @@ import Swal from "sweetalert2";
 import { LocationDatasource } from "../../datasource/LocationDatasource";
 import { DefaultOptionType } from "antd/lib/select";
 import { EXP_PLANT } from "../../definitions/ExpPlant";
-import { Toast } from "react-bootstrap";
 import ActionButton from "../../components/button/ActionButton";
-import { DefaultValue } from "recoil";
-import { DroneDatasource } from "../../datasource/DroneDatasource";
-import {
-  DroneEntity,
-  DroneEntity_INIT,
-  UpdateDroneEntity,
-  UpdateDroneEntity_INIT,
-} from "../../entities/DroneEntities";
 import {
   AddressEntity,
   AddressEntity_INIT,
@@ -66,6 +56,15 @@ import {
   DRONER_DRONE_STATUS,
   STATUS_COLOR,
 } from "../../definitions/DronerStatus";
+import {
+  ImageEntity,
+  ImageEntity_INTI,
+} from "../../entities/UploadImageEntities";
+import { UploadImageDatasouce } from "../../datasource/UploadImageDatasource";
+import "../farmer/Style.css";
+import uploadImg from "../../resource/media/empties/uploadImg.png";
+import bth_img_empty from "../../resource/media/empties/upload_Img_btn.png";
+import { DroneEntity } from "../../entities/DroneEntities";
 
 const { Option } = Select;
 const _ = require("lodash");
@@ -88,6 +87,14 @@ function EditDroner() {
   const [province, setProvince] = useState<ProviceEntity[]>([]);
   const [district, setDistrict] = useState<DistrictEntity[]>([]);
   const [subdistrict, setSubdistrict] = useState<SubdistrictEntity[]>([]);
+  const [imgProfile, setImgProfile] = useState<any>();
+  const [imgIdCard, setImgIdCard] = useState<any>();
+  const [createImgProfile, setCreateImgProfile] =
+    useState<ImageEntity>(ImageEntity_INTI);
+  const [createImgIdCard, setCreateImgIdCrad] =
+    useState<ImageEntity>(ImageEntity_INTI);
+  let getPathPro: string = "";
+  let getPathCard: string = "";
 
   useEffect(() => {
     fetchDronerById();
@@ -97,6 +104,21 @@ function EditDroner() {
       setData(res);
       setAddress(res.address);
       setDronerDroneList(res.dronerDrone);
+      getPathPro = res.file.filter((x) => x.category == "PROFILE_IMAGE")[0]
+        .path;
+      getPathCard = res.file.filter((x) => x.category == "ID_CARD_IMAGE")[0]
+        .path;
+      var i = 0;
+      for (i; 2 > i; i++) {
+        i == 0 &&
+          UploadImageDatasouce.getImage(getPathPro).then((resImg) => {
+            setImgProfile(resImg.url);
+          });
+        i == 1 &&
+          UploadImageDatasouce.getImage(getPathCard).then((resImg) => {
+            setImgIdCard(resImg.url);
+          });
+      }
     });
   };
   useEffect(() => {
@@ -146,22 +168,6 @@ function EditDroner() {
     const d = Map(address).set("address1", e.target.value);
     setAddress(d.toJS());
   };
-  const handleStatusDrone = (e: any) => {
-    const m = Map(data).set("status", e.target.value);
-    setData(m.toJS());
-  };
-  const handleBrandId = async (brand: string) => {
-    const m = Map(dronerDroneList).set("brand", brand);
-    setDronerDroneList(m.toJS());
-  };
-  const handleSeries = async (brand: string) => {
-    const m = Map(dronerDroneList).set("brand", brand);
-    setDronerDroneList(m.toJS());
-  };
-  const handleSerialNo = async (e: any) => {
-    const m = Map(dronerDroneList).set(e.target.id, e.target.value);
-    setDronerDroneList(m.toJS());
-  };
   const editDroner = (data: DronerDroneEntity, index: number) => {
     setShowEditModal((prev) => !prev);
     setEditIndex(index);
@@ -178,6 +184,90 @@ function EditDroner() {
     }
     fetchDronerById();
   };
+  const onChangeProfile = async (file: any) => {
+    let src = file.target.files[0];
+    src = await new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(src);
+      reader.onload = () => resolve(reader.result);
+    });
+    setImgProfile(src);
+    const d = Map(createImgProfile).set("file", file.target.files[0]);
+    const e = Map(d.toJS()).set("resource", "DRONER");
+    const f = Map(e.toJS()).set("category", "PROFILE_IMAGE");
+    const g = Map(f.toJS()).set("resourceId", dronerId);
+    setCreateImgProfile(g.toJS());
+  };
+  const onPreviewProfile = async () => {
+    let src = imgProfile;
+    if (!src) {
+      src = await new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(imgProfile);
+        reader.onload = () => resolve(reader.result);
+      });
+    }
+    const image = new Image();
+    image.src = src;
+    const imgWindow = window.open(src);
+    imgWindow?.document.write(image.outerHTML);
+  };
+  const removeImg = () => {
+    setImgProfile(undefined);
+  };
+  const onChangeIdCard = async (file: any) => {
+    let src = file.target.files[0];
+    src = await new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(src);
+      reader.onload = () => resolve(reader.result);
+    });
+    setImgIdCard(src);
+    const d = Map(createImgIdCard).set("file", file.target.files[0]);
+    const e = Map(d.toJS()).set("resource", "DRONER");
+    const f = Map(e.toJS()).set("category", "ID_CARD_IMAGE");
+    const g = Map(f.toJS()).set("resourceId", dronerId);
+    setCreateImgIdCrad(g.toJS());
+  };
+  const onPreviewIdCard = async () => {
+    let src = imgIdCard;
+    if (!src) {
+      src = await new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(imgIdCard);
+        reader.onload = () => resolve(reader.result);
+      });
+    }
+    const image = new Image();
+    image.src = src;
+    const imgWindow = window.open(src);
+    imgWindow?.document.write(image.outerHTML);
+  };
+  const removeImgIdCard = () => {
+    setImgIdCard(undefined);
+  };
+  const updateDroner = async () => {
+    const pushAddr = Map(data).set("address", address);
+    const pushPin = Map(pushAddr.toJS()).set("pin", "");
+    await DronerDatasource.updateDroner(pushPin.toJS()).then((res) => {
+      if (res != null) {
+        var i = 0;
+        for (i; 2 > i; i++) {
+          i == 0 &&
+            UploadImageDatasouce.uploadImage(createImgProfile).then(res);
+          i == 1 && UploadImageDatasouce.uploadImage(createImgIdCard).then(res);
+        }
+        Swal.fire({
+          title: "บันทึกสำเร็จ",
+          icon: "success",
+          timer: 1500,
+          showConfirmButton: false,
+        }).then((time) => {
+          window.location.href = "/IndexDroner";
+        });
+      }
+    });
+  };
   const renderFromData = (
     <div className="col-lg-7">
       <CardContainer>
@@ -185,16 +275,45 @@ function EditDroner() {
         <Form>
           <div className="container text-center" style={{ padding: "30px" }}>
             <div className="row">
-              <div className="form-group text-center pb-5">
-                <Image
-                  style={{ width: "160px", height: "160px" }}
-                  src={image.drone}
-                />
+              <div className="form-group text-center pb-4">
+                <div
+                  className="hiddenFileInput zoom"
+                  style={{
+                    backgroundImage: `url(${
+                      imgProfile == undefined ? uploadImg : imgProfile
+                    })`,
+                  }}
+                >
+                  <input
+                    type="file"
+                    onChange={onChangeProfile}
+                    title="เลือกรูป"
+                  />
+                </div>
+                <div>
+                  {imgProfile != undefined && (
+                    <>
+                      <Tag
+                        color={color.Success}
+                        onClick={onPreviewProfile}
+                        style={{ cursor: "pointer", borderRadius: "5px" }}
+                      >
+                        View
+                      </Tag>
+                      <Tag
+                        color={color.Error}
+                        onClick={removeImg}
+                        style={{ cursor: "pointer", borderRadius: "5px" }}
+                      >
+                        Remove
+                      </Tag>
+                    </>
+                  )}
+                </div>
               </div>
             </div>
           </div>
         </Form>
-
         <Form style={{ padding: "32px" }}>
           <div className="row">
             <div className="form-group col-lg-6">
@@ -204,6 +323,7 @@ function EditDroner() {
               </Form.Item>
             </div>
           </div>
+
           <div className="row">
             <div className="form-group col-lg-6">
               <label>
@@ -288,19 +408,48 @@ function EditDroner() {
                 รูปถ่ายผู้สมัครคู่บัตรประชาชน
                 <span style={{ color: "red" }}>*</span>
               </label>
-              <br />
-              <Upload listType="picture" className="upload-list-inline">
-                <Button
+              <div className="pb-2">
+                <div
+                  className="hiddenFileInput"
                   style={{
-                    backgroundColor: "rgba(33, 150, 83, 0.1)",
-                    border: color.Success + "1px dashed",
-                    borderRadius: "5px",
-                    width: "190px",
+                    backgroundImage: `url(${imgIdCard})`,
+                    display: imgIdCard != undefined ? "block" : "none",
+                  }}
+                ></div>
+                <div className="text-left ps-4">
+                  {imgIdCard != undefined && (
+                    <>
+                      <Tag
+                        color={color.Success}
+                        onClick={onPreviewIdCard}
+                        style={{ cursor: "pointer", borderRadius: "5px" }}
+                      >
+                        View
+                      </Tag>
+                      <Tag
+                        color={color.Error}
+                        onClick={removeImgIdCard}
+                        style={{ cursor: "pointer", borderRadius: "5px" }}
+                      >
+                        Remove
+                      </Tag>
+                    </>
+                  )}
+                </div>
+                <div
+                  className="hiddenFileBtn"
+                  style={{
+                    backgroundImage: `url(${bth_img_empty})`,
+                    display: imgIdCard == undefined ? "block" : "none",
                   }}
                 >
-                  <span style={{ color: color.Success }}>อัพโหลด</span>
-                </Button>
-              </Upload>
+                  <input
+                    type="file"
+                    onChange={onChangeIdCard}
+                    title="เลือกรูป"
+                  />
+                </div>
+              </div>
             </div>
           </div>
           <div className="row">
@@ -335,7 +484,7 @@ function EditDroner() {
                 >
                   {province.map((item: any, index: any) => (
                     <option key={index} value={item.provinceId}>
-                      {item.region}
+                      {item.provinceName}
                     </option>
                   ))}
                 </Select>
@@ -481,7 +630,7 @@ function EditDroner() {
                 <Input
                   placeholder=""
                   onChange={handleOnChange}
-                  defaultValue={data.dronerArea}
+                  //defaultValue={data.dronerArea}
                   prefix={<SearchOutlined />}
                 />
               </Form.Item>
@@ -648,6 +797,7 @@ function EditDroner() {
       </Row>
       <FooterPage
         onClickBack={() => (window.location.href = "/IndexDroner")}
+        onClickSave={updateDroner}
         //disableSaveBtn={showBtn}
       />
       {showAddModal && (

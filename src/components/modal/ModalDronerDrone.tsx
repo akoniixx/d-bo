@@ -31,12 +31,11 @@ const ModalDrone: React.FC<ModalDroneProps> = ({
 
   const fetchDrone = async () => {
     await DroneDatasource.getDroneBrandList().then((res) => {
-      console.log(res)
       setDroneList(res.data);
     });
   };
   const fetchDroneSeries = async () => {
-    await DroneDatasource.getDroneList(1, 500, "ASC").then((res) => {
+    await DroneDatasource.getDroneList(1, 500).then((res) => {
       setSeriesDrone(res.data);
     });
   };
@@ -47,10 +46,8 @@ const ModalDrone: React.FC<ModalDroneProps> = ({
   const handleBrand = async (brand: string) => {
     let filterSeries = seriesDrone?.filter((x) => x.droneBrandId == brand);
     setSeriesDrone(filterSeries);
-    console.log(filterSeries)
   };
   const handleSeries = async (id: string) => {
-    console.log(id)
     const m = Map(dataDrone).set("droneId", id);
     let filterLogo = seriesDrone?.filter((x) => x.id == id)[0].droneBrand
       .logoImagePath;
@@ -63,7 +60,7 @@ const ModalDrone: React.FC<ModalDroneProps> = ({
   };
 
   const handleSerialNo = async (e: any) => {
-    const m = Map(dataDrone).set(e.target.id, e.target.value);
+    const m = Map(dataDrone).set("serialNo", e.target.value);
     setDataDrone(m.toJS());
     checkValidate(m.toJS());
   };
@@ -80,7 +77,7 @@ const ModalDrone: React.FC<ModalDroneProps> = ({
     if (
       data.droneName != "" &&
       data.serialNo != "" &&
-      //data.serialNo != 0 &&
+      // data.series != 0 &&
       data.status != ""
     ) {
       setBtnSaveDisable(false);
@@ -230,7 +227,7 @@ const ModalDrone: React.FC<ModalDroneProps> = ({
                 >
                   <Space direction="vertical">
                     <Radio value="ACTIVE">อนุมัติ</Radio>
-                    <Radio value="PENDING">รอยืนยันตัวตน</Radio>
+                    <Radio value="PENDING">รอตรวจสอบ</Radio>
                     <Radio value="REJECTED">ไม่อนุมัติ</Radio>
                     <Radio value="INACTIVE">ปิดการใช้งาน</Radio>
                   </Space>

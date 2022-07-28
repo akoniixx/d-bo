@@ -1,8 +1,14 @@
-import { DronerDroneEntity, DronerDroneEntity_INIT } from './DronerDroneEntities';
+import { ImageEntity, ImageEntity_INTI } from "./UploadImageEntities";
+import {
+  DronerDroneEntity,
+  DronerDroneEntity_INIT,
+} from "./DronerDroneEntities";
 import { DroneEntity, DroneEntity_INIT } from "./DroneEntities";
 import {
+  AddressEntity,
   FullAddressEntiry_INIT,
   FullAddressEntity,
+  AddressEntity_INIT,
   CreateAddressEntity,
   CreateAddressEntity_INIT,
 } from "./AddressEntities";
@@ -21,6 +27,7 @@ export interface DronerEntity {
   pin: string;
   dronerDrone: DronerDroneEntity[];
   dronerArea: string;
+  file: ImageEntity[];
   createdAt: string;
   updatedAt: string;
   totalDroneCount: number;
@@ -34,11 +41,12 @@ export const DronerEntity_INIT: DronerEntity = {
   status: "",
   expYear: 0,
   expMonth: 0,
-  expPlant: [],
+  expPlant: [""],
   address: FullAddressEntiry_INIT,
   pin: "",
   dronerDrone: [DronerDroneEntity_INIT],
   dronerArea: "",
+  file: [ImageEntity_INTI],
   createdAt: "",
   updatedAt: "",
   totalDroneCount: 0,
@@ -55,7 +63,7 @@ export interface CreateDronerEntity {
   address: CreateAddressEntity;
   pin: string;
   dronerDrone: DronerDroneEntity[];
-  // dronerArea: CreateDronerAreaEntity;
+  //dronerArea: CreateDronerAreaEntity;
 }
 
 export const CreateDronerEntity_INIT: CreateDronerEntity = {
@@ -66,11 +74,11 @@ export const CreateDronerEntity_INIT: CreateDronerEntity = {
   status: "OPEN",
   expYear: 0,
   expMonth: 0,
-  expPlant: [],
+  expPlant: [""],
   address: CreateAddressEntity_INIT,
   pin: "123456",
   dronerDrone: [DronerDroneEntity_INIT],
-  // dronerArea: CreateDronerAreaEntity_INIT,
+  //dronerArea: CreateDronerAreaEntity_INIT,
 };
 
 export interface DronerListEntity {

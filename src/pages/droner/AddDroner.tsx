@@ -71,6 +71,10 @@ import {
 import { UploadImageDatasouce } from "../../datasource/UploadImageDatasource";
 import img_empty from "../../resource/media/empties/uploadImg.png";
 import bth_img_empty from "../../resource/media/empties/upload_Img_btn.png";
+import {
+  CreateDronerAreaEntity,
+  CreateDronerAreaEntity_INIT,
+} from "../../entities/DronerAreaEntities";
 
 const _ = require("lodash");
 const { Map } = require("immutable");
@@ -106,7 +110,7 @@ function AddDroner() {
   const [createImgProfile, setCreateImgProfile] = useState<UploadImageEntity>(
     UploadImageEntity_INTI
   );
-  const [createImgIdCard, setCreateImgIdCrad] = useState<UploadImageEntity>(
+  const [createImgIdCard, setCreateImgIdCard] = useState<UploadImageEntity>(
     UploadImageEntity_INTI
   );
   const [otherPlant, setOtherPlant] = useState<any[]>([]);
@@ -164,22 +168,20 @@ function AddDroner() {
     setAddress(c.toJS());
     checkValidateAddr(c.toJS());
   };
+  const handleDronerArea = (dronerArea: CreateDronerAreaEntity) => {
+    const c = Map(dronerArea).set("dronerArea", dronerArea);
+    // console.log(c.toJS());
+  };
   const handleExpPlant = (e: any) => {
     const m = Map(data).set("expPlant", e);
     setData(m.toJS());
   };
-  // const handlePlantOther = (e: React.ChangeEvent<HTMLInputElement>) => {
-  //   const m = Map(data).set(e.target.id, e.target.value);
-  //   setData(m.toJS());
-  // };
-
   const handlePlantOther = (e: React.ChangeEvent<HTMLInputElement>) => {
     let m = e.target.value.split(",");
     setOtherPlant(m);
   };
 
   const insertDroneList = (data: DronerDroneEntity) => {
-    console.log(data);
     if (data.modalDroneIndex == 0) {
       const pushId = Map(data).set(
         "modalDroneIndex",
@@ -248,11 +250,11 @@ function AddDroner() {
       reader.onload = () => resolve(reader.result);
     });
     setImgProfile(src);
-    checkValidate(data);
     const d = Map(createImgProfile).set("file", file.target.files[0]);
     const e = Map(d.toJS()).set("resource", "DRONER");
     const f = Map(e.toJS()).set("category", "PROFILE_IMAGE");
     setCreateImgProfile(f.toJS());
+    checkValidate(f.toJS());
   };
   const onPreviewProfile = async () => {
     let src = imgProfile;
@@ -285,7 +287,7 @@ function AddDroner() {
     const d = Map(createImgIdCard).set("file", file.target.files[0]);
     const e = Map(d.toJS()).set("resource", "DRONER");
     const f = Map(e.toJS()).set("category", "ID_CARD_IMAGE");
-    setCreateImgIdCrad(f.toJS());
+    setCreateImgIdCard(f.toJS());
   };
   const onPreviewIdCard = async () => {
     let src = imgIdCard;
@@ -314,35 +316,37 @@ function AddDroner() {
     );
     setData(pushDroneList.toJS());
     var i = 0;
-    let d : any = [];
+    let d: any = [];
     for (i; otherPlant.length > i; i++) {
-      d = Map(pushDroneList.toJS()).set("expPlant", [...pushDroneList.toJS().expPlant, otherPlant[i]]);
-      setData(d.toJS())
+      d = Map(pushDroneList.toJS()).set("expPlant", [
+        ...pushDroneList.toJS().expPlant,
+        otherPlant[i],
+      ]);
+      setData(d.toJS());
     }
-    console.log(d.toJS());
-    // await DronerDatasource.createDronerList(pushDroneList.toJS()).then(
-    //   (res) => {
-    //     if (res != null) {
-    //       const pushImgProId = Map(createImgProfile).set("resourceId", res);
-    //       const pushImgCardId = Map(createImgIdCard).set("resourceId", res);
-    //       var i = 0;
-    //       for (i; 2 > i; i++) {
-    //         i == 0 &&
-    //           UploadImageDatasouce.uploadImage(pushImgProId.toJS()).then(res);
-    //         i == 1 &&
-    //           UploadImageDatasouce.uploadImage(pushImgCardId.toJS()).then(res);
-    //       }
-    //       Swal.fire({
-    //         title: "บันทึกสำเร็จ",
-    //         icon: "success",
-    //         timer: 1500,
-    //         showConfirmButton: false,
-    //       }).then((time) => {
-    //         window.location.href = "/IndexDroner";
-    //       });
-    //     }
-    //   }
-    // );
+    await DronerDatasource.createDronerList(pushDroneList.toJS()).then(
+      (res) => {
+        if (res.id != null) {
+          const pushImgProId = Map(createImgProfile).set("resourceId", res.id);
+          const pushImgCardId = Map(createImgIdCard).set("resourceId", res.id);
+          var i = 0;
+          for (i; 2 > i; i++) {
+            i == 0 &&
+              UploadImageDatasouce.uploadImage(pushImgProId.toJS()).then(res);
+            i == 1 &&
+              UploadImageDatasouce.uploadImage(pushImgCardId.toJS()).then(res);
+          }
+          Swal.fire({
+            title: "บันทึกสำเร็จ",
+            icon: "success",
+            timer: 1500,
+            showConfirmButton: false,
+          }).then((time) => {
+            window.location.href = "/IndexDroner";
+          });
+        }
+      }
+    );
   };
   const renderFromData = (
     <div className="col-lg-7">
@@ -472,23 +476,47 @@ function AddDroner() {
             </div>
           </div>
           <div className="row">
-            <div className="form-group col-lg-12 pb-5">
-              <label>
-                รูปถ่ายผู้สมัครคู่กับบัตรประชาชน
-                <span style={{ color: "red" }}>*</span>
-              </label>
+            <div className="form-group col-lg-6 pb-5">
+              <label>รูปถ่ายผู้สมัครคู่กับบัตรประชาชน</label>
               <br />
-              <Upload listType="picture" className="upload-list-inline">
-                <Button
+              <div className="pb-2">
+                <div
+                  className="hiddenFileInput"
                   style={{
-                    backgroundColor: "rgba(33, 150, 83, 0.1)",
-                    border: color.Success + "1px dashed",
-                    borderRadius: "5px",
+                    backgroundImage: `url(${imgIdCard})`,
+                    display: imgIdCard != undefined ? "block" : "none",
                   }}
-                >
-                  <span style={{ color: color.Success }}>อัพโหลดรูปภาพ</span>
-                </Button>
-              </Upload>
+                ></div>
+              </div>
+              <div className="text-left ps-4">
+                {imgIdCard != undefined && (
+                  <>
+                    <Tag
+                      color={color.Success}
+                      onClick={onPreviewIdCard}
+                      style={{ cursor: "pointer", borderRadius: "5px" }}
+                    >
+                      View
+                    </Tag>
+                    <Tag
+                      color={color.Error}
+                      onClick={removeImgIdCard}
+                      style={{ cursor: "pointer", borderRadius: "5px" }}
+                    >
+                      Remove
+                    </Tag>
+                  </>
+                )}
+              </div>
+              <div
+                className="hiddenFileBtn"
+                style={{
+                  backgroundImage: `url(${bth_img_empty})`,
+                  display: imgIdCard == undefined ? "block" : "none",
+                }}
+              >
+                <input type="file" onChange={onChangeIdCard} title="เลือกรูป" />
+              </div>
             </div>
           </div>
           <div className="row">
@@ -514,7 +542,7 @@ function AddDroner() {
                   key={address.provinceId}
                 >
                   {province?.map((item) => (
-                    <option value={item.provinceId}>{item.region}</option>
+                    <option value={item.provinceId}>{item.provinceName}</option>
                   ))}
                 </Select>
               </Form.Item>
@@ -620,7 +648,7 @@ function AddDroner() {
               พื้นที่ให้บริการหลัก <span style={{ color: "red" }}>*</span>
             </label>
             <Form.Item
-              name="areaDrone"
+              name="dronerArea"
               rules={[
                 {
                   required: true,
@@ -629,8 +657,8 @@ function AddDroner() {
               ]}
             >
               <Input
-                // value={data?.dronerArea}
                 placeholder="ค้นหาตำบล/อำเภอ/จังหวัด"
+                //onChange={handleDronerArea}
                 prefix={<SearchOutlined />}
               />
             </Form.Item>
@@ -679,11 +707,6 @@ function AddDroner() {
           <div className="form-group col-lg-6">
             <label></label>
             <Form.Item name="otherPlant">
-              {/* {mapPlant.map((item) => (
-                    <Col span={8}>
-                      <Input value={item}>{item}</Input>
-                    </Col>
-                  ))} */}
               <Input
                 onBlur={handlePlantOther}
                 placeholder="พืชอื่นๆ เช่น ส้ม มะละกอ มะพร้าว"
@@ -797,7 +820,7 @@ function AddDroner() {
       <FooterPage
         onClickBack={() => (window.location.href = "/IndexDroner")}
         onClickSave={insertDroner}
-        // disableSaveBtn={saveBtnDisable}
+        disableSaveBtn={saveBtnDisable}
       />
       {showAddModal && (
         <ModalDrone
