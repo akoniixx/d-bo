@@ -15,6 +15,10 @@ export interface FarmerEntity {
   lastname: string;
   idNo: string;
   telephoneNo: string;
+  status: string;
+  addressId: string;
+  createdAt: string;
+  updatedAt: string;
   address: FullAddressEntity;
   farmerPlot: FarmerPlotEntity[];
 }
@@ -24,6 +28,10 @@ export const FarmerEntity_INIT: FarmerEntity = {
   lastname: "",
   idNo: "",
   telephoneNo: "",
+  status: "",
+  addressId: "",
+  createdAt: "",
+  updatedAt: "",
   address: FullAddressEntiry_INIT,
   farmerPlot: [FarmerPlotEntity_INIT],
 };
@@ -65,6 +73,7 @@ export interface CreateFarmerEntity {
   lastname: string;
   idNo: string;
   telephoneNo: string;
+  status:string,
   address: CreateAddressEntity;
   farmerPlot: FarmerPlotEntity[];
 }
@@ -73,6 +82,7 @@ export const CreateFarmerEntity_INIT: CreateFarmerEntity = {
   lastname: "",
   idNo: "",
   telephoneNo: "",
+  status:"PENDING",
   address: CreateAddressEntity_INIT,
   farmerPlot: [FarmerPlotEntity_INIT],
 };

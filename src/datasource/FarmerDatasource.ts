@@ -14,7 +14,8 @@ export class FarmerDatasource {
     search?: string,
     provinceId?: number,
     districtId?: number,
-    subdistrictId?: number
+    subdistrictId?: number,
+    sortDirection?: string
   ): Promise<FarmerPageEntity> {
     const params = {
       status: status,
@@ -24,6 +25,7 @@ export class FarmerDatasource {
       provinceId: provinceId,
       districtId: districtId,
       subdistrictId: subdistrictId,
+      sortDirection: sortDirection,
     };
     return httpClient
       .get(API_URL + "/farmer", { params })
