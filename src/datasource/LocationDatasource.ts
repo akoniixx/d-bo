@@ -14,7 +14,7 @@ export class LocationDatasource {
   }
   static getDistrict(id: number): Promise<any> {
     return httpClient
-      .get(BASE_URL + "/location/district/?proviceId=" + id)
+      .get(BASE_URL + "/location/district/?provinceId=" + id)
       .then((response) => {
         return response.data;
       })
@@ -27,11 +27,9 @@ export class LocationDatasource {
     text?: string
   ): Promise<SubdistrictEntity[]> {
     let script = null;
-    id == 0
-      ? (script = "search=" + text)
-      : (script = "districtId" + id + "&search=" + text);
+    script = id != 0 ? "?districtId=" + id : text == '' ? "?search=" + text : null;
     return httpClient
-      .get(BASE_URL + "/location/sub-district/?" + script)
+      .get(BASE_URL + "/location/sub-district/" + script)
       .then((response) => {
         return response.data;
       })
