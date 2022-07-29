@@ -36,10 +36,10 @@ const ModalFarmerPlot: React.FC<ModalFarmerPlotProps> = ({
     lng: parseFloat(data.long),
   });
   const [location, setLocation] = useState<SubdistrictEntity[]>([]);
-  const [searchLocation] = useState("");
+  const [searchLocation] = useState('');
 
   const fetchLocation = async (text?: string) => {
-    await LocationDatasource.getSearchLocation(text).then((res) => {
+    await LocationDatasource.getSubdistrict(0, text).then((res) => {
       setLocation(res);
     });
   };
