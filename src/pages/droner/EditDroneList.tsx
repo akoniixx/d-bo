@@ -244,7 +244,7 @@ function EditDroneList() {
               <div className="form-group col-lg-12 text-start">
                 <label>Drone ID</label>
                 <Form.Item>
-                  <Input disabled value={data.id} />
+                  <Input disabled value={data.droneId} />
                 </Form.Item>
                 <label>ชื่อ</label>
                 <Form.Item>

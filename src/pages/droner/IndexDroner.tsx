@@ -375,8 +375,8 @@ function IndexDroner() {
         return {
           children: (
             <div className="container">
-              <span className="text-dark-75  d-block font-size-lg">
-                {/* {droneLatest.drone.droneBrand.logoImagePath ? (
+             <span className="text-dark-75  d-block font-size-lg">
+                {droneLatest ? (
                   <Avatar
                     size={25}
                     src={droneLatest.drone.droneBrand.logoImagePath}
@@ -387,9 +387,9 @@ function IndexDroner() {
                     size={25}
                     style={{ color: "#0068F4", backgroundColor: "#EFF2F9" }}
                   >
-                    {droneLatest.drone.droneBrand.name.charAt(0)}
+                    {/* {droneLatest.charAt(0)} */}
                   </Avatar>
-                )} */}
+                )}
                 {droneLatest !== undefined
                   ? droneLatest.drone.droneBrand.name
                   : null}
@@ -397,6 +397,7 @@ function IndexDroner() {
               <span style={{ color: color.Grey, fontSize: "12px" }}>
                 {row.dronerDrone.length > 1 ? "(มากกว่า 1 ยี่ห้อ)" : null}
               </span>
+
             </div>
           ),
         };

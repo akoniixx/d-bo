@@ -63,6 +63,7 @@ export interface CreateDronerEntity {
   address: CreateAddressEntity;
   pin: string;
   dronerDrone: DronerDroneEntity[];
+  file: ImageEntity[];
   //dronerArea: CreateDronerAreaEntity;
 }
 
@@ -78,6 +79,7 @@ export const CreateDronerEntity_INIT: CreateDronerEntity = {
   address: CreateAddressEntity_INIT,
   pin: "123456",
   dronerDrone: [DronerDroneEntity_INIT],
+  file: [ImageEntity_INTI],
   //dronerArea: CreateDronerAreaEntity_INIT,
 };
 

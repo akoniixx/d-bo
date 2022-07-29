@@ -170,7 +170,6 @@ function AddDroner() {
   };
   const handleDronerArea = (dronerArea: CreateDronerAreaEntity) => {
     const c = Map(dronerArea).set("dronerArea", dronerArea);
-    // console.log(c.toJS());
   };
   const handleExpPlant = (e: any) => {
     const m = Map(data).set("expPlant", e);
@@ -180,7 +179,6 @@ function AddDroner() {
     let m = e.target.value.split(",");
     setOtherPlant(m);
   };
-
   const insertDroneList = (data: DronerDroneEntity) => {
     if (data.modalDroneIndex == 0) {
       const pushId = Map(data).set(
@@ -326,7 +324,7 @@ function AddDroner() {
     }
     await DronerDatasource.createDronerList(pushDroneList.toJS()).then(
       (res) => {
-        if (res.id != null) {
+        if (res != undefined) {
           const pushImgProId = Map(createImgProfile).set("resourceId", res.id);
           const pushImgCardId = Map(createImgIdCard).set("resourceId", res.id);
           var i = 0;
@@ -336,14 +334,14 @@ function AddDroner() {
             i == 1 &&
               UploadImageDatasouce.uploadImage(pushImgCardId.toJS()).then(res);
           }
-          Swal.fire({
-            title: "บันทึกสำเร็จ",
-            icon: "success",
-            timer: 1500,
-            showConfirmButton: false,
-          }).then((time) => {
-            window.location.href = "/IndexDroner";
-          });
+          // Swal.fire({
+          //   title: "บันทึกสำเร็จ",
+          //   icon: "success",
+          //   timer: 1500,
+          //   showConfirmButton: false,
+          // }).then((time) => {
+          //   window.location.href = "/IndexDroner";
+          // });
         }
       }
     );
@@ -568,9 +566,9 @@ function AddDroner() {
                   allowClear
                   onChange={handleOnChangeDistrict}
                 >
-                  {district?.map((item) => (
+                  {/* {district?.map((item) => (
                     <option value={item.districtId}>{item.districtName}</option>
-                  ))}
+                  ))} */}
                 </Select>
               </Form.Item>
             </div>
@@ -597,11 +595,11 @@ function AddDroner() {
                   allowClear
                   onChange={handleOnChangeSubdistrict}
                 >
-                  {subdistrict?.map((item) => (
+                  {/* {subdistrict?.map((item) => (
                     <option value={item.subdistrictId}>
                       {item.subdistrictName}
                     </option>
-                  ))}
+                  ))} */}
                 </Select>
               </Form.Item>
             </div>
@@ -829,6 +827,7 @@ function AddDroner() {
           callBack={insertDroneList}
           data={DronerDroneEntity_INIT}
           editIndex={editIndex}
+          title="เพิ่มโดรนเกษตร"
         />
       )}
       {showEditModal && (
@@ -838,6 +837,7 @@ function AddDroner() {
           callBack={insertDroneList}
           data={editDrone}
           editIndex={editIndex}
+          title="แก้ไขโดรนเกษตร"
         />
       )}
     </Layout>

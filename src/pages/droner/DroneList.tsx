@@ -46,7 +46,6 @@ function DroneList() {
       searchStatus,
       searchText
     ).then((res) => {
-      console.log(res);
       setDroneList(res);
     });
   };

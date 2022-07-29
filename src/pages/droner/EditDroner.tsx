@@ -93,8 +93,7 @@ function EditDroner() {
     useState<ImageEntity>(ImageEntity_INTI);
   const [createImgIdCard, setCreateImgIdCrad] =
     useState<ImageEntity>(ImageEntity_INTI);
-  let getPathPro: string = "";
-  let getPathCard: string = "";
+  let imgList: (string | boolean)[] = [];
 
   useEffect(() => {
     fetchDronerById();
@@ -104,20 +103,26 @@ function EditDroner() {
       setData(res);
       setAddress(res.address);
       setDronerDroneList(res.dronerDrone);
-      getPathPro = res.file.filter((x) => x.category == "PROFILE_IMAGE")[0]
-        .path;
-      getPathCard = res.file.filter((x) => x.category == "ID_CARD_IMAGE")[0]
-        .path;
+      let getPathPro = res.file.filter((x) => x.category == "PROFILE_IMAGE");
+      let getPathCard = res.file.filter((x) => x.category == "ID_CARD_IMAGE");
+      imgList.push(
+        getPathPro.length >= 1 ? getPathPro[0].path : "",
+        getPathCard.length >= 1 ? getPathCard[0].path : ""
+      );
       var i = 0;
-      for (i; 2 > i; i++) {
+      for (i; imgList.length > i; i++) {
         i == 0 &&
-          UploadImageDatasouce.getImage(getPathPro).then((resImg) => {
-            setImgProfile(resImg.url);
-          });
+          UploadImageDatasouce.getImage(imgList[i].toString()).then(
+            (resImg) => {
+              setImgProfile(resImg.url);
+            }
+          );
         i == 1 &&
-          UploadImageDatasouce.getImage(getPathCard).then((resImg) => {
-            setImgIdCard(resImg.url);
-          });
+          UploadImageDatasouce.getImage(imgList[i].toString()).then(
+            (resImg) => {
+              setImgIdCard(resImg.url);
+            }
+          );
       }
     });
   };
@@ -213,6 +218,10 @@ function EditDroner() {
     imgWindow?.document.write(image.outerHTML);
   };
   const removeImg = () => {
+    const dronerImg = data.file.filter((x) => x.category == "PROFILE_IMAGE")[0];
+    UploadImageDatasouce.deleteImage(dronerImg.id, dronerImg.path).then(
+      (res) => {}
+    );
     setImgProfile(undefined);
   };
   const onChangeIdCard = async (file: any) => {
@@ -244,6 +253,11 @@ function EditDroner() {
     imgWindow?.document.write(image.outerHTML);
   };
   const removeImgIdCard = () => {
+    const dronerImg = data.file.filter((x) => x.category == "ID_CARD_IMAGE")[0];
+    UploadImageDatasouce.deleteImage(dronerImg.id, dronerImg.path).then(
+      (res) => {}
+    );
+
     setImgIdCard(undefined);
   };
   const updateDroner = async () => {
@@ -558,11 +572,11 @@ function EditDroner() {
                   onChange={handleSubDistrict}
                   defaultValue={address.subdistrictId}
                 >
-                  {subdistrict.map((item: any, index: any) => (
+                  {/* {subdistrict.map((item: any, index: any) => (
                     <option key={index} value={item.subdistrictId}>
                       {item.subdistrictName}
                     </option>
-                  ))}
+                  ))} */}
                 </Select>
               </Form.Item>
             </div>
@@ -807,6 +821,7 @@ function EditDroner() {
           callBack={updateDrone}
           data={DronerDroneEntity_INIT}
           editIndex={editIndex}
+          title="เพิ่มโดรนเกษตร"
         />
       )}
       {showEditModal && (
@@ -816,6 +831,7 @@ function EditDroner() {
           callBack={updateDrone}
           data={editDroneList}
           editIndex={editIndex}
+          title="แก้ไขโดรนเกษตร"
         />
       )}
     </Layout>
