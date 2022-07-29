@@ -31,7 +31,6 @@ export class LocationDatasource {
     return httpClient
       .get(BASE_URL + "/location/sub-district/" + script)
       .then((response) => {
-        console.log(response.data);
         return response.data;
       })
       .catch((error) => {
