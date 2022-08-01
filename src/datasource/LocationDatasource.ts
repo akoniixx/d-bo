@@ -14,7 +14,7 @@ export class LocationDatasource {
   }
   static getDistrict(id: number): Promise<any> {
     return httpClient
-      .get(BASE_URL + "/location/district/" + id)
+      .get(BASE_URL + "/location/district/?provinceId=" + id)
       .then((response) => {
         return response.data;
       })
@@ -22,22 +22,14 @@ export class LocationDatasource {
         console.log(error);
       });
   }
-  static getSubdistrict(id: number): Promise<any> {
+  static getSubdistrict(
+    id?: number,
+    text?: string
+  ): Promise<SubdistrictEntity[]> {
+    let script = null;
+    script = id != 0 ? "?districtId=" + id : text == '' ? "?search=" + text : null;
     return httpClient
-      .get(BASE_URL + "/location/sub-district/" + id)
-      .then((response) => {
-        return response.data;
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-  }
-  static getSearchLocation(text?: string): Promise<SubdistrictEntity[]> {
-    const param = {
-      text: text
-    }
-    return httpClient
-      .post(BASE_URL + "/location/sub-district" , param)
+      .get(BASE_URL + "/location/sub-district/" + script)
       .then((response) => {
         return response.data;
       })

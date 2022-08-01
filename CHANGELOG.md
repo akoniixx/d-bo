@@ -1,4 +1,6 @@
 ## [Version - 0]
+## Fix [v0.5.1] 2022-07-29
+- fixed params location following api 
 ## Feature [v0.5.0] 2022-07-27
 - fixed response message user staff memu
 - create logic color rows in index farmer menu
