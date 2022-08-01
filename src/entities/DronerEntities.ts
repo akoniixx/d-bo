@@ -1,3 +1,4 @@
+import { DronerAreaEntity, DronerAreaEntity_INIT } from "./DronerAreaEntities";
 import { ImageEntity, ImageEntity_INTI } from "./UploadImageEntities";
 import {
   DronerDroneEntity,
@@ -64,7 +65,7 @@ export interface CreateDronerEntity {
   pin: string;
   dronerDrone: DronerDroneEntity[];
   file: ImageEntity[];
-  //dronerArea: CreateDronerAreaEntity;
+  dronerArea: DronerAreaEntity;
 }
 
 export const CreateDronerEntity_INIT: CreateDronerEntity = {
@@ -80,7 +81,7 @@ export const CreateDronerEntity_INIT: CreateDronerEntity = {
   pin: "123456",
   dronerDrone: [DronerDroneEntity_INIT],
   file: [ImageEntity_INTI],
-  //dronerArea: CreateDronerAreaEntity_INIT,
+  dronerArea: DronerAreaEntity_INIT,
 };
 
 export interface DronerListEntity {

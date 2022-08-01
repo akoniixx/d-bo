@@ -23,6 +23,7 @@ import { formatDate } from "../../utilities/TextFormatter";
 import {
   DRONER_DRONE_STATUS,
   DRONER_STATUS,
+  DRONE_STATUS,
   STATUS_COLOR,
 } from "../../definitions/DronerStatus";
 import { DroneBrandListEntity } from "../../entities/DroneBrandEntities";
@@ -51,7 +52,7 @@ function DroneList() {
   };
   const fetchDroneBrand = async () => {
     await DroneDatasource.getDroneBrandList().then((res) => {
-      setDroneBrandId(res);
+      setDroneBrandId(res.data);
     });
   };
 
@@ -69,7 +70,9 @@ function DroneList() {
   const handleDroneBrand = (droneBrandId: string) => {
     setSearchDroneBrand(droneBrandId);
   };
-  const handleStatus = (status: any) => {};
+  const handleStatus = (status: any) => {
+    setSearchStatus(status);
+  };
   const PageTitle = (
     <>
       <div
@@ -109,9 +112,9 @@ function DroneList() {
               allowClear
               onChange={handleDroneBrand}
             >
-              {/* {droneBrandId?.map((item: any) => (
-              <Option value={item.id.toString()}>{item.name}</Option>
-            ))} */}
+              {droneBrandId?.map((item: any) => (
+                <Option value={item.id.toString()}>{item.name}</Option>
+              ))}
             </Select>
           </div>
           <div className="col">
@@ -142,9 +145,9 @@ function DroneList() {
               placeholder="เลือกสถานะ"
               onChange={handleStatus}
             >
-              {/* {DRONER_STATUS.map((item) => (
+              {DRONE_STATUS.map((item) => (
                 <option value={item.value}>{item.name}</option>
-              ))} */}
+              ))}
             </Select>
           </div>
         </div>
@@ -260,8 +263,8 @@ function DroneList() {
     },
     {
       title: "สถานะ",
-      dataIndex: "active",
-      key: "active",
+      dataIndex: "status",
+      key: "status",
       // width: "13%",
       render: (value: any, row: any, index: number) => {
         const countDay = () => {

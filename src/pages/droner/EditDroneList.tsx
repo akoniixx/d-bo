@@ -36,6 +36,7 @@ const { Map } = require("immutable");
 let queryString = _.split(window.location.search, "=");
 
 function EditDroneList() {
+  const DronerDroneId = queryString[1];
   const [value, setValue] = useState(1);
   const onChange = (e: RadioChangeEvent) => {
     setValue(e.target.value);
@@ -46,10 +47,13 @@ function EditDroneList() {
   const [dronerDrone, setDronerDrone] = useState<DronerDroneEntity[]>([
     DronerDroneEntity_INIT,
   ]);
-  const fecthDronerDrone = async () => {
-    await DronerDroneDatasource.getDronerDroneById(id).then((res) => {
-      setData(res);
-    });
+  const fetchDronerDrone = async () => {
+    await DronerDroneDatasource.getDronerDroneById(DronerDroneId).then(
+      (res) => {
+        setData(res);
+        //setDronerDrone(res)
+      }
+    );
   };
 
   const UpdateDroneList = (id: string) => {
@@ -72,7 +76,7 @@ function EditDroneList() {
   };
 
   useEffect(() => {
-    fecthDronerDrone();
+    fetchDronerDrone();
   }, []);
 
   const renderFromData = (
@@ -141,13 +145,19 @@ function EditDroneList() {
             <div className="form-group col-lg-6">
               <label>ปีที่ซื้อ</label>
               <Form.Item>
-                <Input placeholder=" กรอกปี พ.ศ.ที่ซื้อ" />
+                <Input
+                  placeholder=" กรอกปี พ.ศ.ที่ซื้อ"
+                  value={data.purchaseYear}
+                />
               </Form.Item>
             </div>
             <div className="form-group col-lg-6">
               <label>เดือนที่ซื้อ</label>
               <Form.Item>
-                <Input placeholder="กรอกเดือนที่ซื้อ" />
+                <Input
+                  placeholder="กรอกเดือนที่ซื้อ"
+                  value={data.purchaseMonth}
+                />
               </Form.Item>
             </div>
           </div>
@@ -243,6 +253,8 @@ function EditDroneList() {
             <div className="row">
               <div className="form-group col-lg-12 text-start">
                 <label>Drone ID</label>
+                <Form>{}</Form>
+
                 <Form.Item>
                   <Input disabled value={data.droneId} />
                 </Form.Item>

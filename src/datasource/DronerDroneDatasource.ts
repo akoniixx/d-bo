@@ -8,7 +8,7 @@ export class DronerDroneDatasource {
   static getDronerDrone(
     page: number,
     row: number,
-    status: string,
+    status?: string,
     droneId?: string,
     search?: string
   ): Promise<DronerDroneListEntity> {

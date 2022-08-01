@@ -1,4 +1,5 @@
-export interface CreateDronerAreaEntity {
+import { LAT_LNG_BANGKOK } from "./../definitions/Location";
+export interface DronerAreaEntity {
   dronerId: string;
   provinceId: 0;
   districtId: 0;
@@ -7,12 +8,12 @@ export interface CreateDronerAreaEntity {
   long: string;
   distance: string;
 }
-export const CreateDronerAreaEntity_INIT: CreateDronerAreaEntity = {
+export const DronerAreaEntity_INIT: DronerAreaEntity = {
   dronerId: "",
   provinceId: 0,
   districtId: 0,
   subdistrictId: 0,
-  lat: "",
-  long: "",
+  lat: LAT_LNG_BANGKOK.lat,
+  long: LAT_LNG_BANGKOK.lng,
   distance: "",
 };

@@ -72,9 +72,11 @@ import { UploadImageDatasouce } from "../../datasource/UploadImageDatasource";
 import img_empty from "../../resource/media/empties/uploadImg.png";
 import bth_img_empty from "../../resource/media/empties/upload_Img_btn.png";
 import {
-  CreateDronerAreaEntity,
-  CreateDronerAreaEntity_INIT,
+  DronerAreaEntity,
+  DronerAreaEntity_INIT,
 } from "../../entities/DronerAreaEntities";
+import { LAT_LNG_BANGKOK } from "../../definitions/Location";
+import GoogleMap from "../../components/map/GoogleMap";
 
 const _ = require("lodash");
 const { Map } = require("immutable");
@@ -82,6 +84,9 @@ function AddDroner() {
   const [data, setData] = useState<CreateDronerEntity>(CreateDronerEntity_INIT);
   const [address, setAddress] = useState<CreateAddressEntity>(
     CreateAddressEntity_INIT
+  );
+  const [dronerArea, setDronerArea] = useState<DronerAreaEntity>(
+    DronerAreaEntity_INIT
   );
   const [dronerDroneList, setDronerDroneList] = useState<DronerDroneEntity[]>(
     []
@@ -114,15 +119,27 @@ function AddDroner() {
     UploadImageEntity_INTI
   );
   const [otherPlant, setOtherPlant] = useState<any[]>([]);
+  const [mapPosition, setMapPosition] = useState<{ lat: number; lng: number }>({
+    lat: parseFloat(data.dronerArea.lat),
+    lng: parseFloat(data.dronerArea.long),
+  });
+  const [location, setLocation] = useState<SubdistrictEntity[]>([]);
+  const [searchLocation] = useState("");
 
   useEffect(() => {
     fetchProvince();
     insertDroner();
-  }, []);
+    fetchLocation(searchLocation);
+  }, [searchLocation]);
 
   const fetchProvince = async () => {
     await LocationDatasource.getProvince().then((res) => {
       setProvince(res);
+    });
+  };
+  const fetchLocation = async (text?: string) => {
+    await LocationDatasource.getSubdistrict(0, text).then((res) => {
+      setLocation(res);
     });
   };
   const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -168,9 +185,6 @@ function AddDroner() {
     setAddress(c.toJS());
     checkValidateAddr(c.toJS());
   };
-  const handleDronerArea = (dronerArea: CreateDronerAreaEntity) => {
-    const c = Map(dronerArea).set("dronerArea", dronerArea);
-  };
   const handleExpPlant = (e: any) => {
     const m = Map(data).set("expPlant", e);
     setData(m.toJS());
@@ -178,6 +192,53 @@ function AddDroner() {
   const handlePlantOther = (e: React.ChangeEvent<HTMLInputElement>) => {
     let m = e.target.value.split(",");
     setOtherPlant(m);
+  };
+  const handleSearchLocation = async (value: any) => {
+    if (value != undefined) {
+      const a = location.filter((x) => x.subdistrictId == value)[0];
+      const pushProvince = Map(dronerArea).set("provinceId", a.provinceId);
+      const pushDistric = Map(pushProvince.toJS()).set(
+        "districtId",
+        a.districtId
+      );
+      const pushSubDis = Map(pushDistric.toJS()).set(
+        "subdistrictId",
+        a.subdistrictId
+      );
+      const pushLat = Map(pushSubDis.toJS()).set("lat", a.lat);
+      const pushLong = Map(pushLat.toJS()).set("long", a.long);
+      setDronerArea(pushLong.toJS());
+      setMapPosition({
+        lat: a.lat != null ? parseFloat(a.lat) : 0,
+        lng: a.long != null ? parseFloat(a.long) : 0,
+      });
+      checkValidate(pushLong.toJS());
+    } else {
+      setMapPosition(LAT_LNG_BANGKOK);
+    }
+  };
+  const handleOnChangeUrl = (value: any) => {
+    const m = Map(dronerArea).set("mapUrl", value.target.value);
+    setDronerArea(m.toJS());
+    checkValidate(m.toJS());
+  };
+  const handleOnChangeLat = (value: any) => {
+    const m = Map(dronerArea).set("lat", value.target.value);
+    setDronerArea(m.toJS());
+    setMapPosition((prev) => ({
+      lat: parseFloat(value.target.value),
+      lng: prev.lng,
+    }));
+  };
+
+  const handleOnChangeLng = (value: any) => {
+    const m = Map(dronerArea).set("long", value.target.value);
+    setDronerArea(m.toJS());
+    checkValidate(m.toJS());
+    setMapPosition((prev) => ({
+      lat: prev.lat,
+      lng: parseFloat(value.target.value),
+    }));
   };
   const insertDroneList = (data: DronerDroneEntity) => {
     if (data.modalDroneIndex == 0) {
@@ -272,7 +333,6 @@ function AddDroner() {
     setImgProfile(undefined);
     checkValidate(data);
   };
-
   const onChangeIdCard = async (file: any) => {
     let src = file.target.files[0];
     src = await new Promise((resolve) => {
@@ -308,7 +368,9 @@ function AddDroner() {
   const insertDroner = async () => {
     const pushAdd = Map(data).set("address", address);
     setData(pushAdd.toJS());
-    const pushDroneList = Map(pushAdd.toJS()).set(
+    const pushDronerArea = Map(pushAdd.toJS()).set("dronerArea", dronerArea);
+    setData(pushDronerArea.toJS());
+    const pushDroneList = Map(pushDronerArea.toJS()).set(
       "dronerDrone",
       dronerDroneList
     );
@@ -334,14 +396,14 @@ function AddDroner() {
             i == 1 &&
               UploadImageDatasouce.uploadImage(pushImgCardId.toJS()).then(res);
           }
-          // Swal.fire({
-          //   title: "บันทึกสำเร็จ",
-          //   icon: "success",
-          //   timer: 1500,
-          //   showConfirmButton: false,
-          // }).then((time) => {
-          //   window.location.href = "/IndexDroner";
-          // });
+          Swal.fire({
+            title: "บันทึกสำเร็จ",
+            icon: "success",
+            timer: 1500,
+            showConfirmButton: false,
+          }).then((time) => {
+            window.location.href = "/IndexDroner";
+          });
         }
       }
     );
@@ -566,9 +628,9 @@ function AddDroner() {
                   allowClear
                   onChange={handleOnChangeDistrict}
                 >
-                  {/* {district?.map((item) => (
+                  {district?.map((item) => (
                     <option value={item.districtId}>{item.districtName}</option>
-                  ))} */}
+                  ))}
                 </Select>
               </Form.Item>
             </div>
@@ -595,11 +657,11 @@ function AddDroner() {
                   allowClear
                   onChange={handleOnChangeSubdistrict}
                 >
-                  {/* {subdistrict?.map((item) => (
+                  {subdistrict?.map((item) => (
                     <option value={item.subdistrictId}>
                       {item.subdistrictName}
                     </option>
-                  ))} */}
+                  ))}
                 </Select>
               </Form.Item>
             </div>
@@ -654,17 +716,37 @@ function AddDroner() {
                 },
               ]}
             >
-              <Input
+              <Select
+                allowClear
+                showSearch
                 placeholder="ค้นหาตำบล/อำเภอ/จังหวัด"
-                //onChange={handleDronerArea}
-                prefix={<SearchOutlined />}
-              />
+                onChange={handleSearchLocation}
+                optionFilterProp="children"
+                filterSort={(optionA, optionB) =>
+                  optionA.children
+                    .toLowerCase()
+                    .localeCompare(optionB.children.toLowerCase())
+                }
+                filterOption={(input: any, option: any) =>
+                  option.children.includes(input)
+                }
+              >
+                {location.map((item) => (
+                  <option value={item.subdistrictId}>
+                    {item.districtName +
+                      "/" +
+                      item.subdistrictName +
+                      "/" +
+                      item.provinceName}
+                  </option>
+                ))}
+              </Select>
             </Form.Item>
           </div>
           <div className="form-group">
             <label>หรือ</label>
             <Form.Item
-              name="areaDrone"
+              name="url"
               rules={[
                 {
                   required: true,
@@ -673,11 +755,62 @@ function AddDroner() {
               ]}
             >
               <Input
-                // value={data?.dronerArea}
+                //defaultValue={dronerArea.mapUrl}
                 placeholder="กรอกข้อมูล Url Google Map"
+                onBlur={handleOnChangeUrl}
+                autoComplete="off"
               />
             </Form.Item>
           </div>
+          <div className="row">
+            <div className="form-group col-lg-6">
+              <label>Latitude (ละติจูด) </label>
+              <span style={{ color: "red" }}>*</span>
+              <Form.Item
+                name="lat"
+                rules={[
+                  {
+                    required: true,
+                    message: "กรุณากรอกละติจูด!",
+                  },
+                ]}
+                key={mapPosition.lat}
+              >
+                <Input
+                  placeholder="กรอกข้อมูล Latitude"
+                  defaultValue={mapPosition.lat}
+                  onBlur={handleOnChangeLat}
+                />
+              </Form.Item>
+            </div>
+            <div className="form-group col-lg-6">
+              <label>Longitude (ลองติจูด) </label>
+              <span style={{ color: "red" }}>*</span>
+              <Form.Item
+                name="long"
+                rules={[
+                  {
+                    required: true,
+                    message: "กรุณากรอกลองติจูด!",
+                  },
+                ]}
+                key={mapPosition.lng}
+              >
+                <Input
+                  placeholder="กรอกข้อมูล Longitude"
+                  defaultValue={mapPosition.lng}
+                  onBlur={handleOnChangeLng}
+                />
+              </Form.Item>
+            </div>
+          </div>
+          <GoogleMap
+            width="100%"
+            height="300px"
+            zoom={17}
+            lat={mapPosition.lat}
+            lng={mapPosition.lng}
+          />
           <div className="row ">
             <div className="form-group col-lg-6">
               <label>
