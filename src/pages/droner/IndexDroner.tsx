@@ -180,7 +180,7 @@ function IndexDroner() {
             }
           >
             {province?.map((item) => (
-              <Option value={item.provinceId.toString()}>{item.region}</Option>
+              <Option value={item.provinceId.toString()}>{item.provinceName}</Option>
             ))}
           </Select>
         </div>
@@ -335,7 +335,7 @@ function IndexDroner() {
           children: (
             <div className="container">
               <span className="text-dark-75  d-block font-size-lg">
-                {province !== undefined ? province.region : null}
+                {province !== undefined ? province.provinceName : null}
               </span>
             </div>
           ),
@@ -358,7 +358,7 @@ function IndexDroner() {
           children: (
             <div className="container">
               <span className="text-dark-75  d-block font-size-lg">
-                {row.dronerDrone.length + " " + "เครื่อง"}
+                {row.totalDroneCount + " " + "เครื่อง"}
               </span>
             </div>
           ),
@@ -375,7 +375,7 @@ function IndexDroner() {
         return {
           children: (
             <div className="container">
-              <span className="text-dark-75  d-block font-size-lg">
+             <span className="text-dark-75  d-block font-size-lg">
                 {droneLatest ? (
                   <Avatar
                     size={25}
@@ -397,6 +397,7 @@ function IndexDroner() {
               <span style={{ color: color.Grey, fontSize: "12px" }}>
                 {row.dronerDrone.length > 1 ? "(มากกว่า 1 ยี่ห้อ)" : null}
               </span>
+
             </div>
           ),
         };
@@ -464,9 +465,15 @@ function IndexDroner() {
         dataSource={data?.data}
         pagination={false}
         scroll={{ x: 1300 }}
-        // rowClassName={(a) =>
-        //   a.status == "PENDING" ? "table-row-old" : "table-row-lasted"
-        // }
+        rowClassName={(a) =>
+          a.status == "PENDING" &&
+          moment(Date.now()).diff(moment(new Date(a.createdAt)), "day") >= 3
+            ? "PENDING" &&
+              moment(Date.now()).diff(moment(new Date(a.createdAt)), "day") >= 7
+              ? "table-row-older"
+              : "table-row-old"
+            : "table-row-lasted"
+        }
       />
       <div className="d-flex justify-content-between pt-5">
         <h5>รายการทั้งหมด {data?.count} รายการ</h5>

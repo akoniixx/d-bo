@@ -340,7 +340,6 @@ function IndexFarmer() {
 
   return (
     <Layouts>
-      {/* {console.log(data?.data)} */}
       {pageTitle}
       <CardContainer>
         <Table

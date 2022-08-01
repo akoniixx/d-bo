@@ -25,48 +25,59 @@ import Swal from "sweetalert2";
 import { DroneDatasource } from "../../datasource/DroneDatasource";
 import { formatDate } from "../../utilities/TextFormatter";
 import { DroneEntity, DroneEntity_INIT } from "../../entities/DroneEntities";
+import {
+  DronerDroneEntity,
+  DronerDroneEntity_INIT,
+} from "../../entities/DronerDroneEntities";
+import { DronerDroneDatasource } from "../../datasource/DronerDroneDatasource";
 
 const _ = require("lodash");
 const { Map } = require("immutable");
 let queryString = _.split(window.location.search, "=");
 
 function EditDroneList() {
+  const DronerDroneId = queryString[1];
   const [value, setValue] = useState(1);
   const onChange = (e: RadioChangeEvent) => {
     setValue(e.target.value);
   };
   const id = queryString[1];
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const [droneData, setDroneData] = useState<DroneEntity>(DroneEntity_INIT);
+  const [data, setData] = useState<DronerDroneEntity>(DronerDroneEntity_INIT);
+  const [dronerDrone, setDronerDrone] = useState<DronerDroneEntity[]>([
+    DronerDroneEntity_INIT,
+  ]);
+  const fetchDronerDrone = async () => {
+    await DronerDroneDatasource.getDronerDroneById(DronerDroneId).then(
+      (res) => {
+        setData(res);
+        //setDronerDrone(res)
+      }
+    );
+  };
 
-  // const fetchDroneById = async (id: string) => {
-  //   await DroneDatasource.getDroneListByID(id).then((res) => {
-  //     setDroneData(res);
-  //   });
-  // };
+  const UpdateDroneList = (id: string) => {
+    DroneDatasource.UpdateDroneList(id)
+      .then((res) => {
+        if (res != null) {
+          Swal.fire({
+            title: "บันทึกสำเร็จ",
+            icon: "success",
+            confirmButtonText: "ยืนยัน",
+            confirmButtonColor: "#0068F4",
+          }).then((result) => {
+            if (result.value == true) {
+              window.location.href = "/DroneList";
+            }
+          });
+        }
+      })
+      .catch((err) => console.log(err));
+  };
 
-  // const UpdateDroneList = (id: string) => {
-  //   DroneDatasource.UpdateDroneList(id)
-  //     .then((res) => {
-  //       if (res != null) {
-  //         Swal.fire({
-  //           title: "บันทึกสำเร็จ",
-  //           icon: "success",
-  //           confirmButtonText: "ยืนยัน",
-  //           confirmButtonColor: "#0068F4",
-  //         }).then((result) => {
-  //           if (result.value == true) {
-  //             window.location.href = "/DroneList";
-  //           }
-  //         });
-  //       }
-  //     })
-  //     .catch((err) => console.log(err));
-  // };
-
-  // useEffect(() => {
-  //   fetchDroneById(id);
-  // }, []);
+  useEffect(() => {
+    fetchDronerDrone();
+  }, []);
 
   const renderFromData = (
     <div className="col-lg-7">
@@ -77,7 +88,7 @@ function EditDroneList() {
             <div className="form-group col-lg-6">
               <label>วันที่ลงทะเบียน</label>
               <Form.Item>
-                <Input disabled value={formatDate(droneData.createdAt)} />
+                <Input disabled value={formatDate(data.createdAt)} />
               </Form.Item>
             </div>
           </div>
@@ -96,12 +107,9 @@ function EditDroneList() {
               >
                 <Select
                   allowClear
-                  value={droneData.series}
+                  // value={data.droneBrand.name}
                   // onChange={onChange}
-                >
-                  <option>DJL</option>
-                  <option>DJL</option>
-                </Select>
+                ></Select>
               </Form.Item>
             </div>
             <div className="form-group col-lg-6">
@@ -116,10 +124,7 @@ function EditDroneList() {
                   },
                 ]}
               >
-                <Select value={droneData.series} allowClear>
-                  <option>AGRAS T20</option>
-                  <option>AGRAS T20</option>
-                </Select>
+                <Select value={data.serialNo} allowClear></Select>
               </Form.Item>
             </div>
             <div className="form-group col-lg-6">
@@ -132,7 +137,27 @@ function EditDroneList() {
                   },
                 ]}
               >
-                <Input placeholder="DJL0012345678" />
+                <Input value={data.serialNo} placeholder="กรอกเลขตัวถังโดรน" />
+              </Form.Item>
+            </div>
+          </div>
+          <div className="row">
+            <div className="form-group col-lg-6">
+              <label>ปีที่ซื้อ</label>
+              <Form.Item>
+                <Input
+                  placeholder=" กรอกปี พ.ศ.ที่ซื้อ"
+                  value={data.purchaseYear}
+                />
+              </Form.Item>
+            </div>
+            <div className="form-group col-lg-6">
+              <label>เดือนที่ซื้อ</label>
+              <Form.Item>
+                <Input
+                  placeholder="กรอกเดือนที่ซื้อ"
+                  value={data.purchaseMonth}
+                />
               </Form.Item>
             </div>
           </div>
@@ -228,20 +253,22 @@ function EditDroneList() {
             <div className="row">
               <div className="form-group col-lg-12 text-start">
                 <label>Drone ID</label>
+                <Form>{}</Form>
+
                 <Form.Item>
-                  <Input disabled value={droneData.id} />
+                  <Input disabled value={data.droneId} />
                 </Form.Item>
                 <label>ชื่อ</label>
                 <Form.Item>
-                  <Input disabled placeholder="สมศักดิ์" />
+                  <Input disabled />
                 </Form.Item>
                 <label>นามสกุล</label>
                 <Form.Item>
-                  <Input disabled placeholder="บินโดรน" />
+                  <Input disabled />
                 </Form.Item>
                 <label>เบอร์โทร</label>
                 <Form.Item>
-                  <Input disabled placeholder="0957796588" />
+                  <Input disabled />
                 </Form.Item>
               </div>
             </div>
@@ -268,7 +295,9 @@ function EditDroneList() {
         <Col span={22}>
           <BackButton onClick={() => (window.location.href = "/DroneList")} />
         </Col>
-        <Col>{/* <SaveButtton onClick={() => UpdateDroneList(id)} /> */}</Col>
+        <Col>
+          <SaveButtton onClick={() => UpdateDroneList(id)} />
+        </Col>
       </Row>
     </Layout>
   );
