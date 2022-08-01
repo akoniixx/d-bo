@@ -5,10 +5,8 @@ import {
   Form,
   Input,
   Select,
-  Upload,
   Button,
   Pagination,
-  Modal,
   Checkbox,
   Col,
   Badge,
@@ -18,19 +16,9 @@ import { CardContainer } from "../../components/card/CardContainer";
 import { BackButton, BackIconButton } from "../../components/button/BackButton";
 import TextArea from "antd/lib/input/TextArea";
 import emptyData from "../../resource/media/empties/iconoir_farm.png";
-import {
-  PictureFilled,
-  SearchOutlined,
-  UploadOutlined,
-  DeleteOutlined,
-  PlusOutlined,
-  EditOutlined,
-} from "@ant-design/icons";
-import emptyDrone from "../../resource/media/empties/icon_drone.png";
+import { EditOutlined } from "@ant-design/icons";
 import color from "../../resource/color";
-import { ModalPage } from "../../components/modal/ModalPage";
 import { CardHeader } from "../../components/header/CardHearder";
-import { useLocalStorage } from "../../hook/useLocalStorage";
 import Swal from "sweetalert2";
 import {
   CreateDronerEntity,
@@ -44,7 +32,6 @@ import { LocationDatasource } from "../../datasource/LocationDatasource";
 import FooterPage from "../../components/footer/FooterPage";
 import { EXP_PLANT } from "../../definitions/ExpPlant";
 import { DroneEntity } from "../../entities/DroneEntities";
-import { DroneDatasource } from "../../datasource/DroneDatasource";
 import ActionButton from "../../components/button/ActionButton";
 import {
   DRONER_DRONE_STATUS,
@@ -132,6 +119,7 @@ function AddDroner() {
     fetchLocation(searchLocation);
   }, [searchLocation]);
 
+  //#region data droner
   const fetchProvince = async () => {
     await LocationDatasource.getProvince().then((res) => {
       setProvince(res);
@@ -193,6 +181,9 @@ function AddDroner() {
     let m = e.target.value.split(",");
     setOtherPlant(m);
   };
+  //#endregion
+
+  //#region map
   const handleSearchLocation = async (value: any) => {
     if (value != undefined) {
       const a = location.filter((x) => x.subdistrictId == value)[0];
@@ -240,6 +231,8 @@ function AddDroner() {
       lng: parseFloat(value.target.value),
     }));
   };
+//#endregion
+
   const insertDroneList = (data: DronerDroneEntity) => {
     if (data.modalDroneIndex == 0) {
       const pushId = Map(data).set(
@@ -262,12 +255,7 @@ function AddDroner() {
     setEditDrone(data);
     setEditIndex(index);
   };
-  const getSeriesDrone = (id: string) => {
-    return droneList.filter((x) => x.id == id)[0].series;
-  };
-  const getDroneBrand = (id: string) => {
-    return droneList.filter((x) => x.id == id)[0].droneBrand.name;
-  };
+
   const checkValidate = (data: CreateDronerEntity) => {
     if (
       data.firstname != "" &&
@@ -301,6 +289,8 @@ function AddDroner() {
       setBtnSaveDisable(true);
     }
   };
+
+  //#region Image
   const onChangeProfile = async (file: any) => {
     let src = file.target.files[0];
     src = await new Promise((resolve) => {
@@ -365,6 +355,8 @@ function AddDroner() {
     setImgIdCard(undefined);
     checkValidate(data);
   };
+  //#endregion
+  
   const insertDroner = async () => {
     const pushAdd = Map(data).set("address", address);
     setData(pushAdd.toJS());
@@ -408,6 +400,7 @@ function AddDroner() {
       }
     );
   };
+
   const renderFromData = (
     <div className="col-lg-7">
       <CardContainer>
