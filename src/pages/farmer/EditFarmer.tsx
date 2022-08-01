@@ -99,7 +99,7 @@ const EditFarmer = () => {
     useState<ImageEntity>(ImageEntity_INTI);
   const [createImgIdCard, setCreateImgIdCrad] =
     useState<ImageEntity>(ImageEntity_INTI);
- 
+
   let imgList: (string | boolean)[] = [];
   const fecthFarmer = async () => {
     await FarmerDatasource.getFarmerById(farmerId).then((res) => {
@@ -570,7 +570,7 @@ const EditFarmer = () => {
                   }
                   onChange={handleOnChangeProvince}
                 >
-                  {province.map((item) => (
+                  {province?.map((item) => (
                     <Option value={item.provinceId}>{item.provinceName}</Option>
                   ))}
                 </Select>
@@ -590,14 +590,14 @@ const EditFarmer = () => {
                   filterOption={(input: any, option: any) =>
                     option.children.includes(input)
                   }
-                  filterSort={(optionA, optionB) =>
+                  filterSort={(optionA : any, optionB: any) =>
                     optionA.children
                       .toLowerCase()
                       .localeCompare(optionB.children.toLowerCase())
                   }
                   onChange={handleOnChangeDistrict}
                 >
-                  {district.map((item) => (
+                  {district?.map((item) => (
                     <Option value={item.districtId}>{item.districtName}</Option>
                   ))}
                 </Select>
@@ -626,7 +626,7 @@ const EditFarmer = () => {
                   }
                   onChange={handleOnChangeSubdistrict}
                 >
-                  {subdistrict.map((item) => (
+                  {subdistrict?.map((item) => (
                     <Option value={item.subdistrictId}>
                       {item.subdistrictName}
                     </Option>
