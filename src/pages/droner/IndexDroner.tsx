@@ -18,13 +18,10 @@ import {
   ProviceEntity,
   SubdistrictEntity,
 } from "../../entities/LocationEntities";
-import moment, { max } from "moment";
+import moment from "moment";
 import AddButtton from "../../components/button/AddButton";
 import { DroneDatasource } from "../../datasource/DroneDatasource";
 import Layouts from "../../components/layout/Layout";
-
-const _ = require("lodash");
-const { Map } = require("immutable");
 
 function IndexDroner() {
   const row = 10;
@@ -451,7 +448,7 @@ function IndexDroner() {
       },
     },
   ];
-  
+
   return (
     <Layouts>
       {PageTitle}

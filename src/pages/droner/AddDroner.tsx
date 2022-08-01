@@ -67,6 +67,7 @@ import GoogleMap from "../../components/map/GoogleMap";
 
 const _ = require("lodash");
 const { Map } = require("immutable");
+
 function AddDroner() {
   const [data, setData] = useState<CreateDronerEntity>(CreateDronerEntity_INIT);
   const [address, setAddress] = useState<CreateAddressEntity>(
@@ -233,6 +234,13 @@ function AddDroner() {
   };
 //#endregion
 
+  //#region modal
+  const editDroneList = (data: DronerDroneEntity, index: number) => {
+    setShowEditModal((prev) => !prev);
+    setEditDrone(data);
+    setEditIndex(index);
+  };
+
   const insertDroneList = (data: DronerDroneEntity) => {
     if (data.modalDroneIndex == 0) {
       const pushId = Map(data).set(
@@ -250,45 +258,7 @@ function AddDroner() {
     setShowEditModal(false);
     setEditIndex(0);
   };
-  const editDroneList = (data: DronerDroneEntity, index: number) => {
-    setShowEditModal((prev) => !prev);
-    setEditDrone(data);
-    setEditIndex(index);
-  };
-
-  const checkValidate = (data: CreateDronerEntity) => {
-    if (
-      data.firstname != "" &&
-      data.lastname != "" &&
-      data.telephoneNo != "" &&
-      data.idNo != "" &&
-      address.provinceId != 0 &&
-      address.districtId != 0 &&
-      address.subdistrictId != 0 &&
-      address.address1 != ""
-    ) {
-      setBtnSaveDisable(false);
-    } else {
-      setBtnSaveDisable(true);
-    }
-  };
-  const checkValidateAddr = (addr: CreateAddressEntity) => {
-    if (
-      addr.provinceId != 0 &&
-      addr.subdistrictId != 0 &&
-      addr.districtId != 0 &&
-      addr.postcode != "" &&
-      addr.address1 != "" &&
-      data.firstname != "" &&
-      data.lastname != "" &&
-      data.telephoneNo != "" &&
-      data.idNo != ""
-    ) {
-      setBtnSaveDisable(false);
-    } else {
-      setBtnSaveDisable(true);
-    }
-  };
+  //#endregion
 
   //#region Image
   const onChangeProfile = async (file: any) => {
@@ -356,6 +326,40 @@ function AddDroner() {
     checkValidate(data);
   };
   //#endregion
+  
+  const checkValidate = (data: CreateDronerEntity) => {
+    if (
+      data.firstname != "" &&
+      data.lastname != "" &&
+      data.telephoneNo != "" &&
+      data.idNo != "" &&
+      address.provinceId != 0 &&
+      address.districtId != 0 &&
+      address.subdistrictId != 0 &&
+      address.address1 != ""
+    ) {
+      setBtnSaveDisable(false);
+    } else {
+      setBtnSaveDisable(true);
+    }
+  };
+  const checkValidateAddr = (addr: CreateAddressEntity) => {
+    if (
+      addr.provinceId != 0 &&
+      addr.subdistrictId != 0 &&
+      addr.districtId != 0 &&
+      addr.postcode != "" &&
+      addr.address1 != "" &&
+      data.firstname != "" &&
+      data.lastname != "" &&
+      data.telephoneNo != "" &&
+      data.idNo != ""
+    ) {
+      setBtnSaveDisable(false);
+    } else {
+      setBtnSaveDisable(true);
+    }
+  };
   
   const insertDroner = async () => {
     const pushAdd = Map(data).set("address", address);
