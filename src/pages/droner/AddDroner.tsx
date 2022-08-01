@@ -13,7 +13,7 @@ import {
   Tag,
 } from "antd";
 import { CardContainer } from "../../components/card/CardContainer";
-import { BackButton, BackIconButton } from "../../components/button/BackButton";
+import { BackIconButton } from "../../components/button/BackButton";
 import TextArea from "antd/lib/input/TextArea";
 import emptyData from "../../resource/media/empties/iconoir_farm.png";
 import { EditOutlined } from "@ant-design/icons";
@@ -232,16 +232,18 @@ function AddDroner() {
       lng: parseFloat(value.target.value),
     }));
   };
-//#endregion
+  //#endregion
 
   //#region modal
   const editDroneList = (data: DronerDroneEntity, index: number) => {
+    console.log("edit", data);
     setShowEditModal((prev) => !prev);
     setEditDrone(data);
     setEditIndex(index);
   };
 
   const insertDroneList = (data: DronerDroneEntity) => {
+    console.log("data", data);
     if (data.modalDroneIndex == 0) {
       const pushId = Map(data).set(
         "modalDroneIndex",
@@ -326,7 +328,7 @@ function AddDroner() {
     checkValidate(data);
   };
   //#endregion
-  
+
   const checkValidate = (data: CreateDronerEntity) => {
     if (
       data.firstname != "" &&
@@ -360,7 +362,7 @@ function AddDroner() {
       setBtnSaveDisable(true);
     }
   };
-  
+
   const insertDroner = async () => {
     const pushAdd = Map(data).set("address", address);
     setData(pushAdd.toJS());
@@ -808,7 +810,7 @@ function AddDroner() {
             lat={mapPosition.lat}
             lng={mapPosition.lng}
           />
-          <div className="row ">
+          <div className="row">
             <div className="form-group col-lg-6">
               <label>
                 พืชที่เคยฉีดพ่น{" "}
@@ -820,13 +822,11 @@ function AddDroner() {
               <Checkbox.Group
                 onChange={handleExpPlant}
                 options={EXP_PLANT}
-                style={{ width: "220px" }}
+                className="col-lg-8" 
               >
-                <Row>
+                <Row className="d-flex justify-content-center">
                   {EXP_PLANT.map((item) => (
-                    <Col span={8}>
-                      <Checkbox value={item}>{item}</Checkbox>
-                    </Col>
+                    <Checkbox value={item}>{item}</Checkbox>
                   ))}
                 </Row>
               </Checkbox.Group>
@@ -846,7 +846,7 @@ function AddDroner() {
     </div>
   );
 
-  const renderLand = (
+  const renderDrone = (
     <div className="col-lg-4">
       <CardContainer>
         <div
@@ -881,7 +881,7 @@ function AddDroner() {
                 style={{ padding: "10px", fontSize: "13px" }}
               >
                 <div className="row d-flex">
-                  <div className="col-lg-2">
+                  <div className="col-lg-1">
                     <img
                       src={item.logoImagePath}
                       width={"25px"}
@@ -889,17 +889,13 @@ function AddDroner() {
                     />
                   </div>
                   <div className="col-lg-4">
-                    <span style={{ fontSize: "12px" }}>
-                      {item.droneName}
-                      <br />
-                      {item.serialNo}
-                    </span>
+                    <h6>{item.droneName}</h6>
+                    <p>{item.serialNo}</p>
                   </div>
                   <div className="col-lg-4">
                     <span style={{ color: STATUS_COLOR[item.status] }}>
                       <Badge color={STATUS_COLOR[item.status]} />
                       {DRONER_DRONE_STATUS[item.status]}
-                      <br />
                     </span>
                   </div>
                   <div className="col">
@@ -924,7 +920,9 @@ function AddDroner() {
       </CardContainer>
       <div className="d-flex justify-content-between pt-5">
         <p>รายการทั้งหมด {dronerDroneList.length} รายการ</p>
-        <Pagination defaultCurrent={1} total={1} />
+        {dronerDroneList.length > 10 && (
+          <Pagination defaultCurrent={1} total={1} />
+        )}
       </div>
     </div>
   );
@@ -943,7 +941,7 @@ function AddDroner() {
       </Row>
       <Row className="d-flex justify-content-around">
         {renderFromData}
-        {renderLand}
+        {renderDrone}
       </Row>
       <FooterPage
         onClickBack={() => (window.location.href = "/IndexDroner")}

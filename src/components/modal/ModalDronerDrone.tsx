@@ -21,7 +21,6 @@ import {
 } from "../../entities/UploadImageEntities";
 import color from "../../resource/color";
 import FooterPage from "../footer/FooterPage";
-import img_empty from "../../resource/media/empties/uploadImg.png";
 import bth_img_empty from "../../resource/media/empties/upload_Img_btn.png";
 import { MONTH_SALE } from "../../definitions/Month";
 
@@ -41,18 +40,33 @@ const ModalDrone: React.FC<ModalDroneProps> = ({
   callBack,
   data,
   editIndex,
-  title
+  title,
 }) => {
-  const [droneList, setDroneList] = useState<DroneBrandEntity[]>();
+  //console.log("modal", data);
+  let checkDronerLicense = data.img.filter(
+    (x) => x.category == "DRONER_LICENSE"
+  );
+  let checkDroneLicense = data.img.filter((x) => x.category == "DRONE_LICENSE");
+  console.log(checkDronerLicense);
   const [dataDrone, setDataDrone] = useState<DronerDroneEntity>(data);
+  const [droneList, setDroneList] = useState<DroneBrandEntity[]>();
   const [seriesDrone, setSeriesDrone] = useState<DroneEntity[]>();
+  const [searchSeriesDrone, setSeatchSeriesDrone] = useState<DroneEntity[]>();
   const [saveBtnDisable, setBtnSaveDisable] = useState<boolean>(true);
-  const [imgLicenseDroner, setImgLicenseDroner] = useState<any>();
-  const [imgLicenseDrone, setImgLicenseDrone] = useState<any>();
+
+  const [imgLicenseDroner, setImgLicenseDroner] = useState<any>(
+    checkDronerLicense.length &&
+      data.img.filter((x) => x.category == "DRONER_LICENSE")[0].file
+  );
+  const [imgLicenseDrone, setImgLicenseDrone] = useState<any>(
+    checkDroneLicense.length &&
+      data.img.filter((x) => x.category == "DRONE_LICENSE")[0].file
+  );
+
   const [createLicenseDroner, setCreateLicenseDroner] =
-    useState<UploadImageEntity>(UploadImageEntity_INTI);
+    useState<UploadImageEntity>();
   const [createLicenseDrone, setCreateLicenseDrone] =
-    useState<UploadImageEntity>(UploadImageEntity_INTI);
+    useState<UploadImageEntity>();
 
   const fetchDrone = async () => {
     await DroneDatasource.getDroneBrandList().then((res) => {
@@ -62,25 +76,19 @@ const ModalDrone: React.FC<ModalDroneProps> = ({
   const fetchDroneSeries = async () => {
     await DroneDatasource.getDroneList(1, 500).then((res) => {
       setSeriesDrone(res.data);
+      setSeatchSeriesDrone(res.data);
     });
   };
   useEffect(() => {
     fetchDrone();
     fetchDroneSeries();
   }, []);
-  const handleBrand = async (brand: string) => {
+
+  const handleBrand = (brand: string) => {
     let filterSeries = seriesDrone?.filter((x) => x.droneBrandId == brand);
-    setSeriesDrone(filterSeries);
+    setSeatchSeriesDrone(filterSeries);
   };
-  const handleYear = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const m = Map(dataDrone).set(e.target.id, e.target.value);
-    setDataDrone(m.toJS());
-  };
-  const handleMonth = async (e: any) => {
-    const m = Map(dataDrone).set("purchaseMonth", e);
-    setDataDrone(m.toJS());
-  };
-  const handleSeries = async (id: string) => {
+  const handleSeries = (id: string) => {
     const m = Map(dataDrone).set("droneId", id);
     let filterLogo = seriesDrone?.filter((x) => x.id == id)[0].droneBrand
       .logoImagePath;
@@ -91,6 +99,28 @@ const ModalDrone: React.FC<ModalDroneProps> = ({
     setDataDrone(x.toJS());
     checkValidate(m.toJS());
   };
+  const handleSerialNo = (e: any) => {
+    const m = Map(dataDrone).set("serialNo", e.target.value);
+    setDataDrone(m.toJS());
+    checkValidate(m.toJS());
+  };
+  const handleYear = (e: any) => {
+    const m = Map(dataDrone).set("purchaseYear", e.target.value);
+    setDataDrone(m.toJS());
+    checkValidate(m.toJS());
+  };
+  const handleMonth = (e: any) => {
+    const m = Map(dataDrone).set("purchaseMonth", e);
+    setDataDrone(m.toJS());
+    checkValidate(m.toJS());
+  };
+  const handleChangeStatus = (e: any) => {
+    const m = Map(dataDrone).set("status", e.target.value);
+    setDataDrone(m.toJS());
+    checkValidate(m.toJS());
+  };
+
+  //#region Image
   const onChangeLicenseDroner = async (file: any) => {
     let src = file.target.files[0];
     src = await new Promise((resolve) => {
@@ -99,11 +129,16 @@ const ModalDrone: React.FC<ModalDroneProps> = ({
       reader.onload = () => resolve(reader.result);
     });
     setImgLicenseDroner(src);
-    const d = Map(createLicenseDroner).set("file", file.target.files[0]);
+    const d = Map(createLicenseDroner).set("file", src);
     const e = Map(d.toJS()).set("resource", "DRONER");
     const f = Map(e.toJS()).set("category", "DRONER_LICENSE");
     setCreateLicenseDroner(f.toJS());
-
+    const pushImg = Map(dataDrone).set("img", [
+      ...dataDrone.img.filter((x) => x.file != ""),
+      f.toJS(),
+    ]);
+    setDataDrone(pushImg.toJS());
+    checkValidate(pushImg.toJS());
   };
   const previewLicenseDroner = async () => {
     let src = imgLicenseDroner;
@@ -120,7 +155,15 @@ const ModalDrone: React.FC<ModalDroneProps> = ({
     imgWindow?.document.write(image.outerHTML);
   };
   const removeLicenseDroner = () => {
-    setImgLicenseDroner(undefined);
+    const removeImg = dataDrone.img.filter(
+      (x) => x.category != "DRONER_LICENSE"
+    )[0];
+    const d = Map(dataDrone).set(
+      "img",
+      removeImg == undefined ? [] : [removeImg]
+    );
+    setDataDrone(d.toJS());
+    setImgLicenseDroner(false);
     checkValidate(data);
   };
   const onChangeLicenseDrone = async (file: any) => {
@@ -132,10 +175,16 @@ const ModalDrone: React.FC<ModalDroneProps> = ({
     });
     setImgLicenseDrone(src);
     checkValidate(data);
-    const d = Map(createLicenseDrone).set("file", file.target.files[0]);
+    const d = Map(createLicenseDrone).set("file", src);
     const e = Map(d.toJS()).set("resource", "DRONER");
     const f = Map(e.toJS()).set("category", "DRONE_LICENSE");
     setCreateLicenseDrone(f.toJS());
+    const pushImg = Map(dataDrone).set("img", [
+      ...dataDrone.img.filter((x) => x.file != ""),
+      f.toJS(),
+    ]);
+    setDataDrone(pushImg.toJS());
+    checkValidate(pushImg.toJS());
   };
   const previewLicenseDrone = async () => {
     let src = imgLicenseDrone;
@@ -152,28 +201,31 @@ const ModalDrone: React.FC<ModalDroneProps> = ({
     imgWindow?.document.write(image.outerHTML);
   };
   const removeLicenseDrone = () => {
-    setImgLicenseDrone(undefined);
+    const removeImg = dataDrone.img.filter(
+      (x) => x.category != "DRONE_LICENSE"
+    )[0];
+    console.log(removeImg);
+    const d = Map(dataDrone).set(
+      "img",
+      removeImg == undefined ? [] : [removeImg]
+    );
+    setDataDrone(d.toJS());
+    setImgLicenseDrone(false);
     checkValidate(data);
   };
-  const handleSerialNo = async (e: any) => {
-    const m = Map(dataDrone).set("serialNo", e.target.value);
-    setDataDrone(m.toJS());
-    checkValidate(m.toJS());
-  };
-  const handleChangeStatus = (e: any) => {
-    const m = Map(dataDrone).set("status", e.target.value);
-    setDataDrone(m.toJS());
-    checkValidate(m.toJS());
-  };
+  //#endregion
+
   const handleCallBack = () => {
     const m = Map(dataDrone).set("modalDroneIndex", editIndex);
     callBack(m.toJS());
   };
+
   const checkValidate = (data: DronerDroneEntity) => {
     if (
       data.droneName != "" &&
       data.serialNo != "" &&
-      // data.series != 0 &&
+      data.purchaseYear != "" &&
+      data.purchaseMonth != "" &&
       data.status != ""
     ) {
       setBtnSaveDisable(false);
@@ -253,7 +305,7 @@ const ModalDrone: React.FC<ModalDroneProps> = ({
                 onChange={handleSeries}
                 defaultValue={dataDrone.droneId}
               >
-                {seriesDrone?.map((item: any, index: any) => (
+                {searchSeriesDrone?.map((item: any, index: any) => (
                   <option key={index} value={item.id}>
                     {item.series}
                   </option>
@@ -278,6 +330,7 @@ const ModalDrone: React.FC<ModalDroneProps> = ({
                 onChange={handleSerialNo}
                 placeholder="กรอกเลขตัวถังโดรน"
                 defaultValue={dataDrone.serialNo}
+                autoComplete="off"
               />
             </Form.Item>
           </div>
@@ -289,6 +342,7 @@ const ModalDrone: React.FC<ModalDroneProps> = ({
                   placeholder="กรอกปี พ.ศ. ที่ซื้อ"
                   onChange={handleYear}
                   defaultValue={dataDrone.purchaseYear}
+                  autoComplete="off"
                 />
               </Form.Item>
             </div>
@@ -302,7 +356,7 @@ const ModalDrone: React.FC<ModalDroneProps> = ({
                   defaultValue={dataDrone.purchaseMonth}
                 >
                   {MONTH_SALE.map((item) => (
-                    <Option value={item.value}>{item.name}</Option>
+                    <Option value={item.name}>{item.name}</Option>
                   ))}
                 </Select>
               </Form.Item>
@@ -311,20 +365,19 @@ const ModalDrone: React.FC<ModalDroneProps> = ({
           <div className="row">
             <div className="form-group col-lg-6 pb-5">
               <label>ใบอนุญาตนักบิน</label>
-              <span style={{ color: color.Disable }}>(ไฟล์รูป หรือ pdf.)</span>
-
+              <span style={{ color: color.Disable }}> (ไฟล์รูป หรือ pdf.)</span>
               <br />
               <div className="pb-2">
                 <div
                   className="hiddenFileInput"
                   style={{
                     backgroundImage: `url(${imgLicenseDroner})`,
-                    display: imgLicenseDroner != undefined ? "block" : "none",
+                    display: imgLicenseDroner != false ? "block" : "none",
                   }}
                 ></div>
               </div>
               <div className="text-left ps-4">
-                {imgLicenseDroner != undefined && (
+                {imgLicenseDroner != false && (
                   <>
                     <Tag
                       color={color.Success}
@@ -347,7 +400,7 @@ const ModalDrone: React.FC<ModalDroneProps> = ({
                 className="hiddenFileBtn"
                 style={{
                   backgroundImage: `url(${bth_img_empty})`,
-                  display: imgLicenseDroner == undefined ? "block" : "none",
+                  display: imgLicenseDroner == false ? "block" : "none",
                 }}
               >
                 <input
@@ -362,19 +415,19 @@ const ModalDrone: React.FC<ModalDroneProps> = ({
             <div className="form-group">
               <label>ใบอนุญาตโดรนจาก กสทช.</label>
               <span style={{ color: "red" }}>*</span>
-              <span style={{ color: color.Disable }}>(ไฟล์รูป หรือ pdf.)</span>
+              <span style={{ color: color.Disable }}> (ไฟล์รูป หรือ pdf.)</span>
               <br />
               <div className="pb-2">
                 <div
                   className="hiddenFileInput"
                   style={{
                     backgroundImage: `url(${imgLicenseDrone})`,
-                    display: imgLicenseDrone != undefined ? "block" : "none",
+                    display: imgLicenseDrone != false ? "block" : "none",
                   }}
                 ></div>
               </div>
               <div className="text-left ps-4">
-                {imgLicenseDrone != undefined && (
+                {imgLicenseDrone != false && (
                   <>
                     <Tag
                       color={color.Success}
@@ -397,7 +450,7 @@ const ModalDrone: React.FC<ModalDroneProps> = ({
                 className="hiddenFileBtn"
                 style={{
                   backgroundImage: `url(${bth_img_empty})`,
-                  display: imgLicenseDrone == undefined ? "block" : "none",
+                  display: imgLicenseDrone == false ? "block" : "none",
                 }}
               >
                 <input
@@ -429,8 +482,8 @@ const ModalDrone: React.FC<ModalDroneProps> = ({
                   onChange={handleChangeStatus}
                 >
                   <Space direction="vertical">
-                    <Radio value="ACTIVE">อนุมัติ</Radio>
                     <Radio value="PENDING">รอตรวจสอบ</Radio>
+                    <Radio value="ACTIVE">อนุมัติ</Radio>
                     <Radio value="REJECTED">ไม่อนุมัติ</Radio>
                     <Radio value="INACTIVE">ปิดการใช้งาน</Radio>
                   </Space>
