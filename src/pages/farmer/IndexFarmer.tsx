@@ -85,18 +85,23 @@ function IndexFarmer() {
 
   const handleSearchStatus = (status: any) => {
     setSearchStatus(status);
+    setCurrent(1);
   };
   const handleSearchText = (e: string) => {
     setSearchText(e);
+    setCurrent(1);
   };
   const handleSearchProvince = (provinceId: number) => {
     setSearchProvince(provinceId);
+    setCurrent(1);
   };
   const handleSearchDistrict = (districtId: number) => {
     setSearchDistrict(districtId);
+    setCurrent(1);
   };
   const handleSearchSubdistrict = (subdistrictId: number) => {
     setSearchSubdstrict(subdistrictId);
+    setCurrent(1);
   };
 
   const pageTitle = (

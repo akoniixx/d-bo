@@ -13,10 +13,8 @@ import React, { useEffect, useState } from "react";
 import Search from "antd/lib/input/Search";
 import { Option } from "antd/lib/mentions";
 import color from "../../resource/color";
-import EditButton from "../../components/button/ActionButton";
 import ActionButton from "../../components/button/ActionButton";
 import { EditOutlined, InfoCircleOutlined } from "@ant-design/icons";
-import { useLocalStorage } from "../../hook/useLocalStorage";
 import { DronerEntity, DronerListEntity } from "../../entities/DronerEntities";
 import { DronerDatasource } from "../../datasource/DronerDatasource";
 import {
@@ -107,21 +105,27 @@ function IndexDroner() {
   };
   const handleProvince = (provinceId: number) => {
     setSearchProvince(provinceId);
+    setCurrent(1);
   };
   const handleDistrict = (districtId: number) => {
     setSearchDistrict(districtId);
+    setCurrent(1);
   };
   const handleSubDistrict = (subdistrictId: any) => {
     setSearchSubdistrict(subdistrictId);
+    setCurrent(1);
   };
   const handleDroneBrand = (droneBrandId: string) => {
     setSearchDroneBrand(droneBrandId);
+    setCurrent(1);
   };
   const changeTextSearch = (value: string) => {
     setSearchText(value);
+    setCurrent(1);
   };
   const handleStatus = (status: any) => {
     setSearchStatus(status);
+    setCurrent(1);
   };
   const sorter = (a: any, b: any) => {
     if (a === b) return 0;
