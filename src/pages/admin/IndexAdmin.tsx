@@ -59,10 +59,12 @@ const IndexAdmin = () => {
     } else {
       setSearchRole(roleNull);
     }
+    setCurrent(1);
   };
 
   const handleOnChangeStatus = (value: any) => {
     setSearchStatus(value);
+    setCurrent(1);
   };
 
   const columns = [
