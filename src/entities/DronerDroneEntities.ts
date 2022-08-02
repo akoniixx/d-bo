@@ -43,6 +43,8 @@ export interface GetDronerDroneEntity {
   status: string;
   droner: DronerEntity[];
   drone: DroneEntity[];
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface DronerDroneListEntity {

@@ -3,6 +3,7 @@ import {
   Badge,
   Button,
   Col,
+  Image,
   Input,
   Pagination,
   Row,
@@ -30,36 +31,42 @@ import { DroneBrandListEntity } from "../../entities/DroneBrandEntities";
 import { DronerDroneListEntity } from "../../entities/DronerDroneEntities";
 import { DronerDroneDatasource } from "../../datasource/DronerDroneDatasource";
 import moment from "moment";
+import { Link } from "react-router-dom";
+import { FileTextFilled } from "@ant-design/icons";
+import { DroneEntity } from "../../entities/DroneEntities";
+
 function DroneList() {
   const row = 10;
   const [current, setCurrent] = useState(1);
   const [droneList, setDroneList] = useState<DronerDroneListEntity>();
-  const [searchDroneBrand, setSearchDroneBrand] = useState<any>();
-  const [droneBrandId, setDroneBrandId] = useState<any>();
+  const [seriesDrone, setSeriesDrone] = useState<any>();
+  const [searchDroneId, setSearchDroneId] = useState<any>();
+  const [droneId, setDroneId] = useState<DroneEntity[]>();
   const [searchStatus, setSearchStatus] = useState<string>();
   const [searchText, setSearchText] = useState<string>();
 
-  const fetchDroneList = async () => {
+  const fetchDronerDroneList = async () => {
     await DronerDroneDatasource.getDronerDrone(
       current,
       row,
-      searchDroneBrand,
       searchStatus,
+      searchDroneId,
       searchText
     ).then((res) => {
       setDroneList(res);
     });
   };
-  const fetchDroneBrand = async () => {
-    await DroneDatasource.getDroneBrandList().then((res) => {
-      setDroneBrandId(res.data);
-    });
-  };
+  const fetchDroneList = async() => {
+    await DroneDatasource.getDroneList(current, 500 ).then((res) => {
+      setDroneId(res)
+      setSeriesDrone(res.data)
+    })
+  }
 
   useEffect(() => {
+    fetchDronerDroneList();
     fetchDroneList();
-    fetchDroneBrand();
-  }, [current, searchText, searchStatus, searchDroneBrand]);
+  }, [current, searchText, searchStatus, searchDroneId]);
 
   const onChangePage = (page: number) => {
     setCurrent(page);
@@ -67,12 +74,16 @@ function DroneList() {
   const changeTextSearch = (value: string) => {
     setSearchText(value);
   };
-  const handleDroneBrand = (droneBrandId: string) => {
-    setSearchDroneBrand(droneBrandId);
+  const handleDroneBrand = (droneBrand: string) => {
+    setSeriesDrone(droneBrand)    
+  };
+  const handleDroneSeries = (id: string) => {
+    setSeriesDrone(id)
   };
   const handleStatus = (status: any) => {
     setSearchStatus(status);
   };
+
   const PageTitle = (
     <>
       <div
@@ -112,9 +123,9 @@ function DroneList() {
               allowClear
               onChange={handleDroneBrand}
             >
-              {droneBrandId?.map((item: any) => (
+              {/* {droneId?.map((item: any) => (
                 <Option value={item.id.toString()}>{item.name}</Option>
-              ))}
+              ))} */}
             </Select>
           </div>
           <div className="col">
@@ -132,11 +143,13 @@ function DroneList() {
               }
               placeholder="เลือกรุ่นโดรน"
               allowClear
-              //onChange={handleDroneBrand}
+              onChange={handleDroneSeries}
             >
-              {/* {droneBrandId?.map((item: any) => (
-                <Option value={item.id.toString()}>{item.name}</Option>
-              ))} */}
+               {seriesDrone?.map((item: any, index: any) => (
+                  <option key={index} value={item.id}>
+                    {item.series}
+                  </option>
+                ))}
             </Select>
           </div>
           <div className="col">
@@ -179,10 +192,11 @@ function DroneList() {
       dataIndex: "droneBrand",
       key: "droneBrand",
       // width: "25%",
-      render: (value: any, row: any, index: number) => {
+      render: (value: any, row: any, index: number) => { 
         return {
           children: (
             <div className="container">
+             
               {/* <span className="text-dark-75  d-block font-size-lg">
                 {row.droneBrand.logoImagePath ? (
                   <Avatar
@@ -241,7 +255,7 @@ function DroneList() {
             <>
               <Row>
                 <span className="text-dark-75  text-hover-primary mb-1 font-size-lg">
-                  {row.droner.firstname + row.droner.lastname}
+                  {row.droner.firstname + " " + row.droner.lastname}
                 </span>
               </Row>
             </>
@@ -254,12 +268,48 @@ function DroneList() {
       dataIndex: "paper",
       key: "paper",
       // width: "15%",
+      render: (value: any, row: any, index: number) => {
+        return {
+          children: (
+            <>
+              <Row>
+                <span className="text-dark-75  text-hover-primary mb-1 font-size-lg">
+                  <Link to="/" style={{ color: color.Success }}>
+                    <span style={{ marginRight: "5px", color: color.Success }}>
+                      <FileTextFilled />
+                    </span>
+                    ใบอนุญาตนักบิน
+                  </Link>
+                </span>
+              </Row>
+            </>
+          ),
+        };
+      },
     },
     {
       title: "ใบอนุญาตโดรน(กสทช.) ",
       dataIndex: "paperA",
       key: "paperA",
       // width: "18%",
+      render: (value: any, row: any, index: number) => {
+        return {
+          children: (
+            <>
+              <Row>
+                <span className="text-dark-75  text-hover-primary mb-1 font-size-lg">
+                  <Link to="/" style={{ color: color.Success }}>
+                    <span style={{ marginRight: "5px", color: color.Success }}>
+                      <FileTextFilled />
+                    </span>
+                    ใบอนุญาตโดรน(กสทช.)
+                  </Link>
+                </span>
+              </Row>
+            </>
+          ),
+        };
+      },
     },
     {
       title: "สถานะ",
@@ -322,7 +372,16 @@ function DroneList() {
         columns={columns}
         dataSource={droneList?.data}
         pagination={false}
-        scroll={{ x: 1300 }}
+        scroll={{ x: 1400 }}
+        rowClassName={(a) =>
+          a.status == "PENDING" &&
+          moment(Date.now()).diff(moment(new Date(a.createdAt)), "day") >= 3
+            ? "PENDING" &&
+              moment(Date.now()).diff(moment(new Date(a.createdAt)), "day") >= 7
+              ? "table-row-older"
+              : "table-row-old"
+            : "table-row-lasted"
+        }
       />
       <div className="d-flex justify-content-between pt-5">
         <h5>รายการทั้งหมด {droneList?.count} รายการ</h5>

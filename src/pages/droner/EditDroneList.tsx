@@ -25,11 +25,9 @@ import Swal from "sweetalert2";
 import { DroneDatasource } from "../../datasource/DroneDatasource";
 import { formatDate } from "../../utilities/TextFormatter";
 import { DroneEntity, DroneEntity_INIT } from "../../entities/DroneEntities";
-import {
-  DronerDroneEntity,
-  DronerDroneEntity_INIT,
-} from "../../entities/DronerDroneEntities";
 import { DronerDroneDatasource } from "../../datasource/DronerDroneDatasource";
+import FooterPage from "../../components/footer/FooterPage";
+import { DronerDroneEntity, DronerDroneEntity_INIT } from "../../entities/DronerDroneEntities";
 
 const _ = require("lodash");
 const { Map } = require("immutable");
@@ -37,42 +35,37 @@ let queryString = _.split(window.location.search, "=");
 
 function EditDroneList() {
   const DronerDroneId = queryString[1];
-  const [value, setValue] = useState(1);
-  const onChange = (e: RadioChangeEvent) => {
-    setValue(e.target.value);
-  };
-  const id = queryString[1];
-  const [isModalVisible, setIsModalVisible] = useState(false);
   const [data, setData] = useState<DronerDroneEntity>(DronerDroneEntity_INIT);
-  const [dronerDrone, setDronerDrone] = useState<DronerDroneEntity[]>([
-    DronerDroneEntity_INIT,
-  ]);
+
   const fetchDronerDrone = async () => {
     await DronerDroneDatasource.getDronerDroneById(DronerDroneId).then(
       (res) => {
         setData(res);
-        //setDronerDrone(res)
       }
     );
   };
 
-  const UpdateDroneList = (id: string) => {
-    DroneDatasource.UpdateDroneList(id)
-      .then((res) => {
-        if (res != null) {
-          Swal.fire({
-            title: "บันทึกสำเร็จ",
-            icon: "success",
-            confirmButtonText: "ยืนยัน",
-            confirmButtonColor: "#0068F4",
-          }).then((result) => {
-            if (result.value == true) {
-              window.location.href = "/DroneList";
-            }
-          });
-        }
-      })
-      .catch((err) => console.log(err));
+  const handleChangeStatus = (e: any) => {
+    const m = Map(data).set("status", e.target.value);
+    setData(m.toJS());
+  };
+
+  const UpdateDroneList = (data: DronerDroneEntity) => {
+    // DronerDroneDatasource.updateDronerDrone(data)
+    //   .then((res) => {
+    //     if (res) {
+    //       Swal.fire({
+    //         title: "บันทึกสำเร็จ",
+    //         icon: "success",
+    //         // confirmButtonText: "ยืนยัน",
+    //         // confirmButtonColor: "#0068F4",
+    //       }).then((result) => {
+    //         if (result.value == true) {
+    //           window.location.href = "/DroneList";
+    //         }
+    //       });
+    //     }
+    //   })
   };
 
   useEffect(() => {
@@ -88,7 +81,7 @@ function EditDroneList() {
             <div className="form-group col-lg-6">
               <label>วันที่ลงทะเบียน</label>
               <Form.Item>
-                <Input disabled value={formatDate(data.createdAt)} />
+                {/* <Input disabled value={formatDate(data.createdAt)} /> */}
               </Form.Item>
             </div>
           </div>
@@ -147,7 +140,7 @@ function EditDroneList() {
               <Form.Item>
                 <Input
                   placeholder=" กรอกปี พ.ศ.ที่ซื้อ"
-                  value={data.purchaseYear}
+                  // value={data.purchaseYear}
                 />
               </Form.Item>
             </div>
@@ -218,14 +211,12 @@ function EditDroneList() {
                   },
                 ]}
               >
-                <Radio.Group
-                  //onChange={onChange}
-                  value={value}
-                >
+                <Radio.Group value={data.status} onChange={handleChangeStatus}>
                   <Space direction="vertical">
-                    <Radio value={1}>อนุมัติ</Radio>
-                    <Radio value={2}>รอตรวจสอบ</Radio>
-                    <Radio value={3}>ไม่อนุมัติ</Radio>
+                    <Radio value={"ACTIVE"}>ใช้งาน</Radio>
+                    <Radio value={"PENDING"}>รอยืนยันตัวตน</Radio>
+                    <Radio value={"INACTIVE"}>ปิดการใช้งาน</Radio>
+                    <Radio value={"REJECTED"}>ไม่อนุมัติ</Radio>
                   </Space>
                 </Radio.Group>
               </Form.Item>
@@ -260,7 +251,7 @@ function EditDroneList() {
                 </Form.Item>
                 <label>ชื่อ</label>
                 <Form.Item>
-                  <Input disabled />
+                  <Input disabled/>
                 </Form.Item>
                 <label>นามสกุล</label>
                 <Form.Item>
@@ -290,15 +281,11 @@ function EditDroneList() {
         {renderLand}
         {renderFromData}
       </Row>
-      <br />
-      <Row>
-        <Col span={22}>
-          <BackButton onClick={() => (window.location.href = "/DroneList")} />
-        </Col>
-        <Col>
-          <SaveButtton onClick={() => UpdateDroneList(id)} />
-        </Col>
-      </Row>
+      <FooterPage
+        onClickBack={() => (window.location.href = "/DroneList")}
+        onClickSave={() => UpdateDroneList(DronerDroneId)}
+        //disableSaveBtn={showBtn}
+      />
     </Layout>
   );
 }
