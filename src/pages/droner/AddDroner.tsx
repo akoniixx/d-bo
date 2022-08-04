@@ -8,9 +8,9 @@ import {
   Button,
   Pagination,
   Checkbox,
-  Col,
   Badge,
   Tag,
+  Avatar,
 } from "antd";
 import { CardContainer } from "../../components/card/CardContainer";
 import { BackIconButton } from "../../components/button/BackButton";
@@ -31,7 +31,6 @@ import {
 import { LocationDatasource } from "../../datasource/LocationDatasource";
 import FooterPage from "../../components/footer/FooterPage";
 import { EXP_PLANT } from "../../definitions/ExpPlant";
-import { DroneEntity } from "../../entities/DroneEntities";
 import ActionButton from "../../components/button/ActionButton";
 import {
   DRONER_DRONE_STATUS,
@@ -79,7 +78,6 @@ function AddDroner() {
   const [dronerDroneList, setDronerDroneList] = useState<DronerDroneEntity[]>(
     []
   );
-  const [droneList, setDroneList] = useState<DroneEntity[]>([]);
   const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [editIndex, setEditIndex] = useState(0);
@@ -99,6 +97,9 @@ function AddDroner() {
 
   const [imgProfile, setImgProfile] = useState<any>();
   const [imgIdCard, setImgIdCard] = useState<any>();
+  const [imgDroneList] = useState<UploadImageEntity[]>([
+    UploadImageEntity_INTI,
+  ]);
 
   const [createImgProfile, setCreateImgProfile] = useState<UploadImageEntity>(
     UploadImageEntity_INTI
@@ -106,7 +107,6 @@ function AddDroner() {
   const [createImgIdCard, setCreateImgIdCard] = useState<UploadImageEntity>(
     UploadImageEntity_INTI
   );
-  const [otherPlant, setOtherPlant] = useState<any[]>([]);
   const [mapPosition, setMapPosition] = useState<{ lat: number; lng: number }>({
     lat: parseFloat(data.dronerArea.lat),
     lng: parseFloat(data.dronerArea.long),
@@ -175,12 +175,15 @@ function AddDroner() {
     checkValidateAddr(c.toJS());
   };
   const handleExpPlant = (e: any) => {
-    const m = Map(data).set("expPlant", e);
-    setData(m.toJS());
+    data.expPlant.push.apply(data.expPlant, e);
   };
   const handlePlantOther = (e: React.ChangeEvent<HTMLInputElement>) => {
+    let otherPlant = [];
     let m = e.target.value.split(",");
-    setOtherPlant(m);
+    for (let i = 0; m.length > i; i++) {
+      otherPlant.push(m[i]);
+    }
+    data.expPlant.push.apply(data.expPlant, otherPlant);
   };
   //#endregion
 
@@ -236,14 +239,12 @@ function AddDroner() {
 
   //#region modal
   const editDroneList = (data: DronerDroneEntity, index: number) => {
-    console.log("edit", data);
     setShowEditModal((prev) => !prev);
     setEditDrone(data);
     setEditIndex(index);
   };
 
   const insertDroneList = (data: DronerDroneEntity) => {
-    console.log("data", data);
     if (data.modalDroneIndex == 0) {
       const pushId = Map(data).set(
         "modalDroneIndex",
@@ -251,6 +252,7 @@ function AddDroner() {
       );
       setDronerDroneList([...dronerDroneList, pushId.toJS()]);
     } else {
+      console.log("list", dronerDroneList);
       const m = dronerDroneList.filter(
         (x) => x.modalDroneIndex != data.modalDroneIndex
       );
@@ -365,26 +367,23 @@ function AddDroner() {
 
   const insertDroner = async () => {
     const pushAdd = Map(data).set("address", address);
-    setData(pushAdd.toJS());
     const pushDronerArea = Map(pushAdd.toJS()).set("dronerArea", dronerArea);
-    setData(pushDronerArea.toJS());
     const pushDroneList = Map(pushDronerArea.toJS()).set(
       "dronerDrone",
       dronerDroneList
     );
-    setData(pushDroneList.toJS());
-    var i = 0;
-    let d: any = [];
-    for (i; otherPlant.length > i; i++) {
-      d = Map(pushDroneList.toJS()).set("expPlant", [
-        ...pushDroneList.toJS().expPlant,
-        otherPlant[i],
-      ]);
-      setData(d.toJS());
-    }
-    await DronerDatasource.createDronerList(pushDroneList.toJS()).then(
+    data.dronerDrone.push.apply(dronerDroneList);
+    const setOtherPlant = Array.from(
+      new Set(pushDroneList.toJS().expPlant)
+    ).filter((x) => x != "");
+    data.expPlant.push.apply(setOtherPlant);
+    const pushOtherPlant = Map(pushDroneList.toJS()).set(
+      "expPlant",
+      setOtherPlant
+    );
+    await DronerDatasource.createDronerList(pushOtherPlant.toJS()).then(
       (res) => {
-        if (res != undefined) {
+        if (res.id != null) {
           const pushImgProId = Map(createImgProfile).set("resourceId", res.id);
           const pushImgCardId = Map(createImgIdCard).set("resourceId", res.id);
           var i = 0;
@@ -393,6 +392,28 @@ function AddDroner() {
               UploadImageDatasouce.uploadImage(pushImgProId.toJS()).then(res);
             i == 1 &&
               UploadImageDatasouce.uploadImage(pushImgCardId.toJS()).then(res);
+          }
+          for (i = 0; res.dronerDrone.length > i; i++) {
+            let findId = res.dronerDrone[i];
+            let getData = dronerDroneList.filter(
+              (x) => x.serialNo == findId.serialNo
+            )[0];
+
+            for (let j = 0; getData.img.length > j; j++) {
+              let getImg = getData.img[i];
+              imgDroneList?.push({
+                resourceId: res.dronerDrone[i].id,
+                category: getImg.category,
+                file: getImg.file,
+                resource: getImg.resource,
+                path: "",
+              });
+            }
+          }
+          const checkImg = imgDroneList.filter((x) => x.resourceId != "");
+          for (let k = 0; checkImg.length > k; k++) {
+            let getDataImg: any = checkImg[k];
+            UploadImageDatasouce.uploadImage(getDataImg).then(res);
           }
           Swal.fire({
             title: "บันทึกสำเร็จ",
@@ -744,17 +765,8 @@ function AddDroner() {
           </div>
           <div className="form-group">
             <label>หรือ</label>
-            <Form.Item
-              name="url"
-              rules={[
-                {
-                  required: true,
-                  message: "กรุณากรอกข้อมูล Url Google Map",
-                },
-              ]}
-            >
+            <Form.Item name="url">
               <Input
-                //defaultValue={dronerArea.mapUrl}
                 placeholder="กรอกข้อมูล Url Google Map"
                 onBlur={handleOnChangeUrl}
                 autoComplete="off"
@@ -822,7 +834,7 @@ function AddDroner() {
               <Checkbox.Group
                 onChange={handleExpPlant}
                 options={EXP_PLANT}
-                className="col-lg-8" 
+                className="col-lg-8"
               >
                 <Row className="d-flex justify-content-center">
                   {EXP_PLANT.map((item) => (
@@ -838,6 +850,7 @@ function AddDroner() {
               <Input
                 onBlur={handlePlantOther}
                 placeholder="พืชอื่นๆ เช่น ส้ม มะละกอ มะพร้าว"
+                autoComplete="off"
               />
             </Form.Item>
           </div>
@@ -875,39 +888,38 @@ function AddDroner() {
         </div>
         {dronerDroneList?.length != 0 ? (
           <Form>
-            {dronerDroneList.map((item, index) => (
-              <div
-                className="container"
-                style={{ padding: "10px", fontSize: "13px" }}
-              >
-                <div className="row d-flex">
-                  <div className="col-lg-1">
-                    <img
-                      src={item.logoImagePath}
-                      width={"25px"}
-                      height={"25px"}
-                    />
-                  </div>
-                  <div className="col-lg-4">
-                    <h6>{item.droneName}</h6>
-                    <p>{item.serialNo}</p>
-                  </div>
-                  <div className="col-lg-4">
-                    <span style={{ color: STATUS_COLOR[item.status] }}>
-                      <Badge color={STATUS_COLOR[item.status]} />
-                      {DRONER_DRONE_STATUS[item.status]}
-                    </span>
-                  </div>
-                  <div className="col">
-                    <ActionButton
-                      icon={<EditOutlined />}
-                      color={color.primary1}
-                      onClick={() => editDroneList(item, index + 1)}
-                    />
+            {dronerDroneList
+              .sort((x, y) => x.modalDroneIndex - y.modalDroneIndex)
+              .map((item, index) => (
+                <div className="container">
+                  <div className="row pt-3">
+                    <div className="col-lg-1 text-center">
+                      <Avatar
+                        size={25}
+                        src={item.logoImagePath}
+                        style={{ marginRight: "5px" }}
+                      />
+                    </div>
+                    <div className="col-lg-5">
+                      <h6>{item.droneName}</h6>
+                      <p style={{ color: "#ccc" }}>{item.serialNo}</p>
+                    </div>
+                    <div className="col-lg-4">
+                      <span style={{ color: STATUS_COLOR[item.status] }}>
+                        <Badge color={STATUS_COLOR[item.status]} />
+                        {DRONER_DRONE_STATUS[item.status]}
+                      </span>
+                    </div>
+                    <div className="col-lg-2">
+                      <ActionButton
+                        icon={<EditOutlined />}
+                        color={color.primary1}
+                        onClick={() => editDroneList(item, index + 1)}
+                      />
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              ))}
           </Form>
         ) : (
           <Form>
@@ -918,7 +930,7 @@ function AddDroner() {
           </Form>
         )}
       </CardContainer>
-      <div className="d-flex justify-content-between pt-5">
+      <div className="d-flex justify-content-between pt-3">
         <p>รายการทั้งหมด {dronerDroneList.length} รายการ</p>
         {dronerDroneList.length > 10 && (
           <Pagination defaultCurrent={1} total={1} />

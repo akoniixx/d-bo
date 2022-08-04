@@ -1,6 +1,5 @@
-import { DroneBrandEntity, DroneBrandEntity_INIT } from "./DroneBrandEntities";
 import { DroneEntity, DroneEntity_INIT } from "./DroneEntities";
-import { DronerEntity, DronerEntity_INIT } from "./DronerEntities";
+import { DronerEntity } from "./DronerEntities";
 import {
   UploadImageEntity,
   UploadImageEntity_INTI,
@@ -14,9 +13,10 @@ export interface DronerDroneEntity {
   status: string;
   purchaseYear: string;
   purchaseMonth: string;
+  drone: DroneEntity;
   modalDroneIndex: number;
-  droneName: string;
-  logoImagePath: string;
+  droneName?: string;
+  logoImagePath?: string;
   createdAt: string;
   updatedAt: string;
   img: UploadImageEntity[];
@@ -29,6 +29,7 @@ export const DronerDroneEntity_INIT: DronerDroneEntity = {
   status: "",
   purchaseYear: "",
   purchaseMonth: "",
+  drone: DroneEntity_INIT,
   modalDroneIndex: 0,
   droneName: "",
   logoImagePath: "",

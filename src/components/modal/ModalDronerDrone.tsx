@@ -15,10 +15,7 @@ import { DroneDatasource } from "../../datasource/DroneDatasource";
 import { DroneBrandEntity } from "../../entities/DroneBrandEntities";
 import { DroneEntity } from "../../entities/DroneEntities";
 import { DronerDroneEntity } from "../../entities/DronerDroneEntities";
-import {
-  UploadImageEntity,
-  UploadImageEntity_INTI,
-} from "../../entities/UploadImageEntities";
+import { UploadImageEntity } from "../../entities/UploadImageEntities";
 import color from "../../resource/color";
 import FooterPage from "../footer/FooterPage";
 import bth_img_empty from "../../resource/media/empties/upload_Img_btn.png";
@@ -42,12 +39,12 @@ const ModalDrone: React.FC<ModalDroneProps> = ({
   editIndex,
   title,
 }) => {
-  //console.log("modal", data);
-  let checkDronerLicense = data.img.filter(
+  let checkDronerLicense = data.img?.filter(
     (x) => x.category == "DRONER_LICENSE"
   );
-  let checkDroneLicense = data.img.filter((x) => x.category == "DRONE_LICENSE");
-  console.log(checkDronerLicense);
+  let checkDroneLicense = data.img?.filter(
+    (x) => x.category == "DRONE_LICENSE"
+  );
   const [dataDrone, setDataDrone] = useState<DronerDroneEntity>(data);
   const [droneList, setDroneList] = useState<DroneBrandEntity[]>();
   const [seriesDrone, setSeriesDrone] = useState<DroneEntity[]>();
@@ -55,12 +52,12 @@ const ModalDrone: React.FC<ModalDroneProps> = ({
   const [saveBtnDisable, setBtnSaveDisable] = useState<boolean>(true);
 
   const [imgLicenseDroner, setImgLicenseDroner] = useState<any>(
-    checkDronerLicense.length &&
-      data.img.filter((x) => x.category == "DRONER_LICENSE")[0].file
+    checkDronerLicense?.length &&
+      data.img?.filter((x) => x.category == "DRONER_LICENSE")[0].file
   );
   const [imgLicenseDrone, setImgLicenseDrone] = useState<any>(
-    checkDroneLicense.length &&
-      data.img.filter((x) => x.category == "DRONE_LICENSE")[0].file
+    checkDroneLicense?.length &&
+      data.img?.filter((x) => x.category == "DRONE_LICENSE")[0].file
   );
 
   const [createLicenseDroner, setCreateLicenseDroner] =
@@ -129,8 +126,8 @@ const ModalDrone: React.FC<ModalDroneProps> = ({
       reader.onload = () => resolve(reader.result);
     });
     setImgLicenseDroner(src);
-    const d = Map(createLicenseDroner).set("file", src);
-    const e = Map(d.toJS()).set("resource", "DRONER");
+    const d = Map(createLicenseDroner).set("file", file.target.files[0]);
+    const e = Map(d.toJS()).set("resource", "DRONER_DRONE");
     const f = Map(e.toJS()).set("category", "DRONER_LICENSE");
     setCreateLicenseDroner(f.toJS());
     const pushImg = Map(dataDrone).set("img", [
@@ -155,7 +152,7 @@ const ModalDrone: React.FC<ModalDroneProps> = ({
     imgWindow?.document.write(image.outerHTML);
   };
   const removeLicenseDroner = () => {
-    const removeImg = dataDrone.img.filter(
+    const removeImg = dataDrone.img?.filter(
       (x) => x.category != "DRONER_LICENSE"
     )[0];
     const d = Map(dataDrone).set(
@@ -175,8 +172,8 @@ const ModalDrone: React.FC<ModalDroneProps> = ({
     });
     setImgLicenseDrone(src);
     checkValidate(data);
-    const d = Map(createLicenseDrone).set("file", src);
-    const e = Map(d.toJS()).set("resource", "DRONER");
+    const d = Map(createLicenseDrone).set("file", file.target.files[0]);
+    const e = Map(d.toJS()).set("resource", "DRONER_DRONE");
     const f = Map(e.toJS()).set("category", "DRONE_LICENSE");
     setCreateLicenseDrone(f.toJS());
     const pushImg = Map(dataDrone).set("img", [
@@ -201,10 +198,9 @@ const ModalDrone: React.FC<ModalDroneProps> = ({
     imgWindow?.document.write(image.outerHTML);
   };
   const removeLicenseDrone = () => {
-    const removeImg = dataDrone.img.filter(
+    const removeImg = dataDrone.img?.filter(
       (x) => x.category != "DRONE_LICENSE"
     )[0];
-    console.log(removeImg);
     const d = Map(dataDrone).set(
       "img",
       removeImg == undefined ? [] : [removeImg]
@@ -233,6 +229,7 @@ const ModalDrone: React.FC<ModalDroneProps> = ({
       setBtnSaveDisable(true);
     }
   };
+
   return (
     <>
       <Modal
@@ -276,7 +273,7 @@ const ModalDrone: React.FC<ModalDroneProps> = ({
                 placeholder="เลือกยี่ห้อโดรน"
                 allowClear
                 onChange={handleBrand}
-                defaultValue={dataDrone.droneName}
+                defaultValue={dataDrone.drone.droneBrand.id}
               >
                 {droneList?.map((item: any, index: any) => (
                   <Option key={index} value={item.id}>
