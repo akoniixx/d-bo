@@ -10,6 +10,7 @@ export class DronerDroneDatasource {
     row: number,
     status?: string,
     droneId?: string,
+    droneBrandId?: string,
     search?: string
   ): Promise<DronerDroneListEntity> {
     const params = {
@@ -17,6 +18,7 @@ export class DronerDroneDatasource {
       take: row,
       status: status,
       droneId: droneId,
+      droneBrandId: droneBrandId,
       search: search,
     };
     return httpClient
@@ -28,7 +30,7 @@ export class DronerDroneDatasource {
         console.log(error);
       });
   }
-  static getDronerDroneById(id: string): Promise<DronerDroneEntity> {
+  static getDronerDroneById(id: string): Promise<any> {
     return httpClient
       .get(BASE_URL + "/droner-drone/" + id)
       .then((res) => {

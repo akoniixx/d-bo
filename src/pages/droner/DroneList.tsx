@@ -22,86 +22,97 @@ import { useLocalStorage } from "../../hook/useLocalStorage";
 import { DroneDatasource } from "../../datasource/DroneDatasource";
 import { formatDate } from "../../utilities/TextFormatter";
 import {
+  DRONER_DRONE_MAPPING,
   DRONER_DRONE_STATUS,
   DRONER_STATUS,
   DRONE_STATUS,
   STATUS_COLOR,
 } from "../../definitions/DronerStatus";
-import { DroneBrandListEntity } from "../../entities/DroneBrandEntities";
+import {
+  DroneBrandEntity,
+  DroneBrandListEntity,
+} from "../../entities/DroneBrandEntities";
 import { DronerDroneListEntity } from "../../entities/DronerDroneEntities";
 import { DronerDroneDatasource } from "../../datasource/DronerDroneDatasource";
 import moment from "moment";
 import { Link } from "react-router-dom";
 import { FileTextFilled } from "@ant-design/icons";
 import { DroneEntity } from "../../entities/DroneEntities";
-
+const { Map } = require("immutable");
 function DroneList() {
   const row = 10;
   const [current, setCurrent] = useState(1);
   const [droneList, setDroneList] = useState<DronerDroneListEntity>();
-  const [seriesDrone, setSeriesDrone] = useState<any>();
-  const [searchDroneId, setSearchDroneId] = useState<any>();
-  const [droneId, setDroneId] = useState<DroneEntity[]>();
+  const [droneBrand, setDroneBrand] = useState<DroneBrandEntity[]>();
+  const [seriesDrone, setSeriesDrone] = useState<DroneEntity[]>();
+  const [searchSeriesDrone, setSearchSeriesDrone] = useState<any>();
+  const [searchDroneBrand, setSearchDroneBrand] = useState<any>();
   const [searchStatus, setSearchStatus] = useState<string>();
   const [searchText, setSearchText] = useState<string>();
+  const [visible, setVisible] = useState(false);
 
   const fetchDronerDroneList = async () => {
     await DronerDroneDatasource.getDronerDrone(
       current,
       row,
       searchStatus,
-      searchDroneId,
+      searchSeriesDrone,
+      searchDroneBrand,
       searchText
     ).then((res) => {
       setDroneList(res);
     });
   };
-  const fetchDroneList = async() => {
-    await DroneDatasource.getDroneList(current, 500 ).then((res) => {
-      setDroneId(res)
-      setSeriesDrone(res.data)
-    })
-  }
-
+  const fetchDroneList = async () => {
+    await DroneDatasource.getDroneList(current, 500).then((res) => {
+      setSeriesDrone(res.data);
+    });
+  };
+  const fetchDroneBrand = async () => {
+    await DroneDatasource.getDroneBrandList().then((res) => {
+      setDroneBrand(res.data);
+    });
+  };
   useEffect(() => {
     fetchDronerDroneList();
     fetchDroneList();
-  }, [current, searchText, searchStatus, searchDroneId]);
+    fetchDroneBrand();
+  }, [current, searchStatus, searchSeriesDrone, searchDroneBrand, searchText]);
 
   const onChangePage = (page: number) => {
     setCurrent(page);
   };
   const changeTextSearch = (value: string) => {
     setSearchText(value);
+    setCurrent(1);
   };
   const handleDroneBrand = (droneBrand: string) => {
-    setSeriesDrone(droneBrand)    
+    setSearchDroneBrand(droneBrand);
+    setCurrent(1);
   };
-  const handleDroneSeries = (id: string) => {
-    setSeriesDrone(id)
+  const handleDroneSeries = (seriesDrone: string) => {
+    setSearchSeriesDrone(seriesDrone);
+    setCurrent(1);
   };
   const handleStatus = (status: any) => {
     setSearchStatus(status);
+    setCurrent(1);
   };
-
   const PageTitle = (
     <>
       <div
         className="container d-flex justify-content-between"
         style={{ padding: "10px" }}
       >
-        <div className="col-lg-4">
-          <span style={{ fontSize: 22, fontWeight: "bold" }}>
+        <div className="col-lg-3">
+          <span style={{ fontSize: 20, fontWeight: "bold" }}>
             <span> รายการโดรนเกษตร (Drone List)</span>
           </span>
         </div>
-        <div
-          className="container d-flex justify-content-between"
-          style={{ padding: "8px" }}
-        >
-          <div className="col-lg-5">
+        <div className="container d-flex justify-content-between">
+          <div className="col-lg-4">
             <Search
-              placeholder="ค้นหาเลขตัวถังหรือชื่อนักบินโดรน หรือเบอร์โทร"
+              placeholder="ค้นหาเลขตัวถังหรือชื่อนักบินโดรน"
               className="col-lg-12 p-1"
               onSearch={changeTextSearch}
             />
@@ -123,9 +134,9 @@ function DroneList() {
               allowClear
               onChange={handleDroneBrand}
             >
-              {/* {droneId?.map((item: any) => (
+              {droneBrand?.map((item: any) => (
                 <Option value={item.id.toString()}>{item.name}</Option>
-              ))} */}
+              ))}
             </Select>
           </div>
           <div className="col">
@@ -145,11 +156,9 @@ function DroneList() {
               allowClear
               onChange={handleDroneSeries}
             >
-               {seriesDrone?.map((item: any, index: any) => (
-                  <option key={index} value={item.id}>
-                    {item.series}
-                  </option>
-                ))}
+              {seriesDrone?.map((item: any) => (
+                <Option value={item.id.toString()}>{item.series}</Option>
+              ))}
             </Select>
           </div>
           <div className="col">
@@ -172,7 +181,6 @@ function DroneList() {
       title: "วันที่ลงทะเบียน",
       dataIndex: "createdAt",
       key: "createdAt",
-      // width: "20%",
       render: (value: any, row: any, index: number) => {
         return {
           children: (
@@ -191,17 +199,17 @@ function DroneList() {
       title: "ยี่ห้อโดรน",
       dataIndex: "droneBrand",
       key: "droneBrand",
-      // width: "25%",
-      render: (value: any, row: any, index: number) => { 
+      render: (value: any, row: any, index: number) => {
+        const filterDrone = row.drone.droneBrandId;
+        let nameDrone = droneBrand?.filter((x) => x.id == filterDrone)[0];
         return {
           children: (
             <div className="container">
-             
-              {/* <span className="text-dark-75  d-block font-size-lg">
-                {row.droneBrand.logoImagePath ? (
+              <span className="text-dark-75  d-block font-size-lg">
+                {nameDrone?.logoImagePath ? (
                   <Avatar
                     size={25}
-                    src={row.droneBrand.logoImagePath}
+                    src={nameDrone.logoImagePath}
                     style={{ marginRight: "5px" }}
                   />
                 ) : (
@@ -209,11 +217,11 @@ function DroneList() {
                     size={25}
                     style={{ color: "#0068F4", backgroundColor: "#EFF2F9" }}
                   >
-                    {row.droneBrand.name.charAt(0)}
+                    {nameDrone?.name.charAt(0)}
                   </Avatar>
                 )}
-               
-              </span> */}
+                {nameDrone?.name}
+              </span>
             </div>
           ),
         };
@@ -223,7 +231,6 @@ function DroneList() {
       title: "รุ่นโดรน",
       dataIndex: "series",
       key: "series",
-      // width: "24%",
       render: (value: any, row: any, index: number) => {
         return {
           children: (
@@ -242,13 +249,11 @@ function DroneList() {
       title: "เลขตัวถัง",
       dataIndex: "serialNo",
       key: "serialNo",
-      // width: "15%",
     },
     {
       title: "ชื่อนักบินโดรน",
       dataIndex: "named",
       key: "named",
-      // width: "15%",
       render: (value: any, row: any, index: number) => {
         return {
           children: (
@@ -265,10 +270,15 @@ function DroneList() {
     },
     {
       title: "ใบอนุญาตนักบิน ",
-      dataIndex: "paper",
-      key: "paper",
-      // width: "15%",
+      dataIndex: "licenseDroner",
+      key: "licenseDroner",
       render: (value: any, row: any, index: number) => {
+        const filterDrone = row.drone.droneBrandId;
+        let nameDrone = droneBrand?.filter((x) => x.id == filterDrone)[0];
+        // console.log(nameDrone);
+        // const filterFile = row.drone.droneBrandId;
+        // let licenseDroner = seriesDrone?.filter((x) => x.id == filterFile);
+        // console.log(licenseDroner)
         return {
           children: (
             <>
@@ -289,9 +299,8 @@ function DroneList() {
     },
     {
       title: "ใบอนุญาตโดรน(กสทช.) ",
-      dataIndex: "paperA",
-      key: "paperA",
-      // width: "18%",
+      dataIndex: "licenseDrone",
+      key: "licenseDrone",
       render: (value: any, row: any, index: number) => {
         return {
           children: (
@@ -315,7 +324,6 @@ function DroneList() {
       title: "สถานะ",
       dataIndex: "status",
       key: "status",
-      // width: "13%",
       render: (value: any, row: any, index: number) => {
         const countDay = () => {
           let dateToday: any = moment(Date.now());
@@ -330,7 +338,7 @@ function DroneList() {
             <>
               <span style={{ color: STATUS_COLOR[row.status] }}>
                 <Badge color={STATUS_COLOR[row.status]} />
-                {DRONER_DRONE_STATUS[row.status]}
+                {DRONER_DRONE_MAPPING[row.status]}
                 <br />
               </span>
               <span style={{ color: color.Grey }}>
@@ -345,7 +353,6 @@ function DroneList() {
       title: "",
       dataIndex: "Action",
       key: "Action",
-      // width: "9%",
       render: (value: any, row: any, index: number) => {
         return {
           children: (
@@ -372,7 +379,7 @@ function DroneList() {
         columns={columns}
         dataSource={droneList?.data}
         pagination={false}
-        scroll={{ x: 1400 }}
+        scroll={{ x: 1410 }}
         rowClassName={(a) =>
           a.status == "PENDING" &&
           moment(Date.now()).diff(moment(new Date(a.createdAt)), "day") >= 3
