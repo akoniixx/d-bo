@@ -27,7 +27,7 @@ export interface DronerEntity {
   address: FullAddressEntity;
   pin: string;
   dronerDrone: DronerDroneEntity[];
-  dronerArea: string;
+  dronerArea: DronerAreaEntity;
   file: ImageEntity[];
   createdAt: string;
   updatedAt: string;
@@ -46,7 +46,7 @@ export const DronerEntity_INIT: DronerEntity = {
   address: FullAddressEntiry_INIT,
   pin: "",
   dronerDrone: [DronerDroneEntity_INIT],
-  dronerArea: "",
+  dronerArea: DronerAreaEntity_INIT,
   file: [ImageEntity_INTI],
   createdAt: "",
   updatedAt: "",
@@ -73,7 +73,7 @@ export const CreateDronerEntity_INIT: CreateDronerEntity = {
   lastname: "",
   idNo: "",
   telephoneNo: "",
-  status: "OPEN",
+  status: "PENDING",
   expYear: 0,
   expMonth: 0,
   expPlant: [""],

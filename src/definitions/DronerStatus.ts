@@ -1,6 +1,6 @@
 import { color } from "./../resource/index";
 export const DRONER_STATUS_MAPPING: any = {
-  OPEN: "ยังไม่เปิดใช้งาน",
+  OPEN: "ข้อมูลไม่ครบถ้วน",
   PENDING: "รอตรวจสอบ",
   REJECTED: "ไม่อนุมัติ",
   ACTIVE: "ใช้งาน",
@@ -8,7 +8,7 @@ export const DRONER_STATUS_MAPPING: any = {
 };
 export const DRONER_STATUS = [
   { value: "", name: "ทั้งหมด" },
-  { value: "OPEN", name: "ยังไม่เปิดใช้งาน" },
+  { value: "OPEN", name: "ข้อมูลไม่ครบถ้วน" },
   { value: "PENDING", name: "รอตรวจสอบ" },
   { value: "REJECTED", name: "ไม่อนุมัติ" },
   { value: "ACTIVE", name: "ใช้งาน" },
