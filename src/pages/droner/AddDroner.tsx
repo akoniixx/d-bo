@@ -11,6 +11,7 @@ import {
   Badge,
   Tag,
   Avatar,
+  message,
 } from "antd";
 import { CardContainer } from "../../components/card/CardContainer";
 import { BackIconButton } from "../../components/button/BackButton";
@@ -176,14 +177,32 @@ function AddDroner() {
   };
   const handleExpPlant = (e: any) => {
     data.expPlant.push.apply(data.expPlant, e);
+    checkValidate(data);
   };
   const handlePlantOther = (e: React.ChangeEvent<HTMLInputElement>) => {
     let otherPlant = [];
-    let m = e.target.value.split(",");
-    for (let i = 0; m.length > i; i++) {
-      otherPlant.push(m[i]);
+    const checkComma = checkValidateComma(e.target.value);
+    if (checkComma) {
+      let m = e.target.value.split(",");
+      for (let i = 0; m.length > i; i++) {
+        otherPlant.push(m[i]);
+      }
+      data.expPlant.push.apply(data.expPlant, otherPlant);
+    } else {
     }
-    data.expPlant.push.apply(data.expPlant, otherPlant);
+    console.log(data);
+  };
+
+  const checkValidateComma = (e: string) => {
+    const a = e.indexOf(" ");
+    const b = e.indexOf("/");
+    const c = e.indexOf("-");
+    const d = e.indexOf("*");
+    if (a > -1 || b > -1 || c > -1 || d > -1) {
+      return false;
+    } else {
+      return true;
+    }
   };
   //#endregion
 
@@ -208,6 +227,7 @@ function AddDroner() {
         lng: a.long != null ? parseFloat(a.long) : 0,
       });
       checkValidate(pushLong.toJS());
+      console.log(pushLong.toJS());
     } else {
       setMapPosition(LAT_LNG_BANGKOK);
     }
@@ -220,12 +240,12 @@ function AddDroner() {
   const handleOnChangeLat = (value: any) => {
     const m = Map(dronerArea).set("lat", value.target.value);
     setDronerArea(m.toJS());
+    checkValidate(m.toJS());
     setMapPosition((prev) => ({
       lat: parseFloat(value.target.value),
       lng: prev.lng,
     }));
   };
-
   const handleOnChangeLng = (value: any) => {
     const m = Map(dronerArea).set("long", value.target.value);
     setDronerArea(m.toJS());
@@ -243,7 +263,6 @@ function AddDroner() {
     setEditDrone(data);
     setEditIndex(index);
   };
-
   const insertDroneList = (data: DronerDroneEntity) => {
     if (data.modalDroneIndex == 0) {
       const pushId = Map(data).set(
@@ -340,7 +359,10 @@ function AddDroner() {
       address.provinceId != 0 &&
       address.districtId != 0 &&
       address.subdistrictId != 0 &&
-      address.address1 != ""
+      address.address1 != "" &&
+      dronerArea.lat != "" &&
+      dronerArea.long != "" &&
+      data.expPlant != []
     ) {
       setBtnSaveDisable(false);
     } else {
@@ -357,6 +379,9 @@ function AddDroner() {
       data.firstname != "" &&
       data.lastname != "" &&
       data.telephoneNo != "" &&
+      dronerArea.lat != "" &&
+      dronerArea.long != "" &&
+      data.expPlant != [] &&
       data.idNo != ""
     ) {
       setBtnSaveDisable(false);
@@ -381,51 +406,52 @@ function AddDroner() {
       "expPlant",
       setOtherPlant
     );
-    await DronerDatasource.createDronerList(pushOtherPlant.toJS()).then(
-      (res) => {
-        if (res.id != null) {
-          const pushImgProId = Map(createImgProfile).set("resourceId", res.id);
-          const pushImgCardId = Map(createImgIdCard).set("resourceId", res.id);
-          var i = 0;
-          for (i; 2 > i; i++) {
-            i == 0 &&
-              UploadImageDatasouce.uploadImage(pushImgProId.toJS()).then(res);
-            i == 1 &&
-              UploadImageDatasouce.uploadImage(pushImgCardId.toJS()).then(res);
-          }
-          for (i = 0; res.dronerDrone.length > i; i++) {
-            let findId = res.dronerDrone[i];
-            let getData = dronerDroneList.filter(
-              (x) => x.serialNo == findId.serialNo
-            )[0];
+    console.log(pushOtherPlant.toJS());
+    // await DronerDatasource.createDronerList(pushOtherPlant.toJS()).then(
+    //   (res) => {
+    //     if (res.id != null) {
+    //       const pushImgProId = Map(createImgProfile).set("resourceId", res.id);
+    //       const pushImgCardId = Map(createImgIdCard).set("resourceId", res.id);
+    //       var i = 0;
+    //       for (i; 2 > i; i++) {
+    //         i == 0 &&
+    //           UploadImageDatasouce.uploadImage(pushImgProId.toJS()).then(res);
+    //         i == 1 &&
+    //           UploadImageDatasouce.uploadImage(pushImgCardId.toJS()).then(res);
+    //       }
+    //       for (i = 0; res.dronerDrone.length > i; i++) {
+    //         let findId = res.dronerDrone[i];
+    //         let getData = dronerDroneList.filter(
+    //           (x) => x.serialNo == findId.serialNo
+    //         )[0];
 
-            for (let j = 0; getData.img.length > j; j++) {
-              let getImg = getData.img[i];
-              imgDroneList?.push({
-                resourceId: res.dronerDrone[i].id,
-                category: getImg.category,
-                file: getImg.file,
-                resource: getImg.resource,
-                path: "",
-              });
-            }
-          }
-          const checkImg = imgDroneList.filter((x) => x.resourceId != "");
-          for (let k = 0; checkImg.length > k; k++) {
-            let getDataImg: any = checkImg[k];
-            UploadImageDatasouce.uploadImage(getDataImg).then(res);
-          }
-          Swal.fire({
-            title: "บันทึกสำเร็จ",
-            icon: "success",
-            timer: 1500,
-            showConfirmButton: false,
-          }).then((time) => {
-            window.location.href = "/IndexDroner";
-          });
-        }
-      }
-    );
+    //         for (let j = 0; getData.img.length > j; j++) {
+    //           let getImg = getData.img[i];
+    //           imgDroneList?.push({
+    //             resourceId: res.dronerDrone[i].id,
+    //             category: getImg.category,
+    //             file: getImg.file,
+    //             resource: getImg.resource,
+    //             path: "",
+    //           });
+    //         }
+    //       }
+    //       const checkImg = imgDroneList.filter((x) => x.resourceId != "");
+    //       for (let k = 0; checkImg.length > k; k++) {
+    //         let getDataImg: any = checkImg[k];
+    //         UploadImageDatasouce.uploadImage(getDataImg).then(res);
+    //       }
+    //       Swal.fire({
+    //         title: "บันทึกสำเร็จ",
+    //         icon: "success",
+    //         timer: 1500,
+    //         showConfirmButton: false,
+    //       }).then((time) => {
+    //         window.location.href = "/IndexDroner";
+    //       });
+    //     }
+    //   }
+    // );
   };
 
   const renderFromData = (
@@ -751,7 +777,7 @@ function AddDroner() {
                   option.children.includes(input)
                 }
               >
-                {location.map((item) => (
+                {location?.map((item) => (
                   <option value={item.subdistrictId}>
                     {item.districtName +
                       "/" +
@@ -825,13 +851,14 @@ function AddDroner() {
           <div className="row">
             <div className="form-group col-lg-6">
               <label>
-                พืชที่เคยฉีดพ่น{" "}
+                พืชที่เคยฉีดพ่น
                 <span style={{ color: color.Disable }}>
                   (กรุณาเลือกอย่างน้อย 1 อย่าง)
                 </span>
                 <span style={{ color: "red" }}>*</span>
               </label>
               <Checkbox.Group
+                name="expPlant"
                 onChange={handleExpPlant}
                 options={EXP_PLANT}
                 className="col-lg-8"
@@ -846,8 +873,17 @@ function AddDroner() {
           </div>
           <div className="form-group col-lg-6">
             <label></label>
-            <Form.Item name="otherPlant">
+            <Form.Item
+              name="otherPlant"
+              rules={[
+                {
+                  required: true,
+                  message: "กรุณากรอกข้อมูลแล้วคั่นด้วย (,)",
+                },
+              ]}
+            >
               <Input
+                pattern="[+-]?\d+(?:[,]\d+)?"
                 onBlur={handlePlantOther}
                 placeholder="พืชอื่นๆ เช่น ส้ม มะละกอ มะพร้าว"
                 autoComplete="off"
