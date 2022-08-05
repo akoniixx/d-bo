@@ -181,29 +181,29 @@ function AddDroner() {
   };
   const handlePlantOther = (e: React.ChangeEvent<HTMLInputElement>) => {
     let otherPlant = [];
-    let m = e.target.value.split(",");
-    for (let i = 0; m.length > i; i++) {
-      otherPlant.push(m[i]);
+    const checkComma = checkValidateComma(e.target.value);
+    if (checkComma ) {
+      let m = e.target.value.split(",");
+      for (let i = 0; m.length > i; i++) {
+        otherPlant.push(m[i]);
+      }
+      data.expPlant.push.apply(data.expPlant, otherPlant);
+    } else  {
     }
-    data.expPlant.push.apply(data.expPlant, otherPlant);
-
-    if (data.expPlant != []) {
-      console.log(otherPlant);
-      setBtnSaveDisable(false);
-    } else {
-      setBtnSaveDisable(true);
-    }
+    console.log(data);
   };
 
-  const checkValidateComma = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const symbol = /^(?:\d+(?:,\d+)*,?)?$/;
-    if (symbol.test(e.target.value)) {
-      setBtnSaveDisable(false);
+  const checkValidateComma = (e: string) => {
+    const a = e.indexOf(" ");
+    const b = e.indexOf("/");
+    const c = e.indexOf("-");
+    const d = e.indexOf("*");
+    if (a > -1 || b > -1 || c > -1 || d > -1) {
+      return false;
     } else {
-      setBtnSaveDisable(true);
+      return true;
     }
   };
-
   //#endregion
 
   //#region map

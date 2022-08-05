@@ -149,7 +149,6 @@ function EditDroner() {
       }
     });
   };
-
   useEffect(() => {
     LocationDatasource.getProvince().then((res) => {
       setProvince(res);
