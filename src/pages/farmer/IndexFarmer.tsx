@@ -46,7 +46,6 @@ function IndexFarmer() {
       searchDistrict,
       searchSubdistrict,
     ).then((res: FarmerPageEntity) => {
-      console.log(res);
       setData(res);
     });
   };
