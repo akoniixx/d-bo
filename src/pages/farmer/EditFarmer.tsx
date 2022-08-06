@@ -15,7 +15,7 @@ import {
 import { CardContainer } from "../../components/card/CardContainer";
 import { BackIconButton } from "../../components/button/BackButton";
 import TextArea from "antd/lib/input/TextArea";
-import { DeleteOutlined, EditOutlined, PictureFilled } from "@ant-design/icons";
+import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
 import emptyData from "../../resource/media/empties/iconoir_farm.png";
 import color from "../../resource/color";
 import FooterPage from "../../components/footer/FooterPage";
@@ -101,6 +101,7 @@ const EditFarmer = () => {
     useState<ImageEntity>(ImageEntity_INTI);
 
   let imgList: (string | boolean)[] = [];
+
   const fecthFarmer = async () => {
     await FarmerDatasource.getFarmerById(farmerId).then((res) => {
       setData(res);
@@ -146,7 +147,7 @@ const EditFarmer = () => {
     });
   }, [address.provinceId, address.districtId]);
 
-  //#region funttion farmer
+  //#region function farmer
   const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const m = Map(data).set(e.target.id, e.target.value);
     setData(m.toJS());
@@ -187,10 +188,21 @@ const EditFarmer = () => {
     checkValidateAddr(d.toJS());
   };
 
-  const handleChangePlotstatus = (e: any) => {
+  const handleChangeFarmerstatus = (e: any) => {
+    if (e.target.value != "INATIVE") {
+      data.reason = "";
+    }
     const m = Map(data).set("status", e.target.value);
     setData(m.toJS());
     checkValidate(m.toJS());
+    checkValidateReason(m.toJS());
+  };
+
+  const handleOnChangeReason = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const d = Map(data).set("reason", e.target.value);
+    setData(d.toJS());
+    checkValidateAddr(d.toJS());
+    checkValidateReason(d.toJS());
   };
   //#endregion
 
@@ -266,7 +278,12 @@ const EditFarmer = () => {
 
   const removeImg = () => {
     const getImg = data.file.filter((x) => x.category == "PROFILE_IMAGE")[0];
-    UploadImageDatasouce.deleteImage(getImg.id, getImg.path).then((res) => {});
+    if (getImg != undefined) {
+      UploadImageDatasouce.deleteImage(getImg.id, getImg.path).then(
+        (res) => {}
+      );
+    }
+    setCreateImgProfile(ImageEntity_INTI);
     setImgProfile(undefined);
     checkValidate(data);
   };
@@ -302,7 +319,12 @@ const EditFarmer = () => {
   };
   const removeImgIdCard = () => {
     const getImg = data.file.filter((x) => x.category == "ID_CARD_IMAGE")[0];
-    UploadImageDatasouce.deleteImage(getImg.id, getImg.path).then((res) => {});
+    if (getImg != undefined) {
+      UploadImageDatasouce.deleteImage(getImg.id, getImg.path).then(
+        (res) => {}
+      );
+    }
+    setCreateImgIdCrad(ImageEntity_INTI);
     setImgIdCard(undefined);
     checkValidate(data);
   };
@@ -343,10 +365,20 @@ const EditFarmer = () => {
     }
   };
 
+  const checkValidateReason = (data: GetFarmerEntity) => {
+    if (
+      data.status == "INACTIVE" &&
+      (data.reason == null || data.reason == "")
+    ) {
+      setBtnSaveDisable(true);
+    } else {
+      setBtnSaveDisable(false);
+    }
+  };
+
   const updateFarmer = async () => {
     const pushAddr = Map(data).set("address", address);
     const pushPin = Map(pushAddr.toJS()).set("pin", "");
-
     await FarmerDatasource.updateFarmer(pushPin.toJS()).then((res) => {
       if (res != undefined) {
         var i = 0;
@@ -590,7 +622,7 @@ const EditFarmer = () => {
                   filterOption={(input: any, option: any) =>
                     option.children.includes(input)
                   }
-                  filterSort={(optionA : any, optionB: any) =>
+                  filterSort={(optionA: any, optionB: any) =>
                     optionA.children
                       .toLowerCase()
                       .localeCompare(optionB.children.toLowerCase())
@@ -681,7 +713,7 @@ const EditFarmer = () => {
               <br />
               <Radio.Group
                 defaultValue={data.status}
-                onChange={handleChangePlotstatus}
+                onChange={handleChangeFarmerstatus}
               >
                 <Space direction="vertical">
                   {FARMER_STATUS_SEARCH.map((item) => (
@@ -696,13 +728,14 @@ const EditFarmer = () => {
               <div className="form-group">
                 <label></label>
                 <br />
-                <Form.Item name="reason">
+                <Form.Item>
                   <TextArea
                     className="col-lg-12"
                     rows={3}
                     placeholder="กรอกเหตุผล/เหตุหมายเพิ่มเติม"
                     autoComplete="off"
-                    id="reasomText"
+                    onChange={handleOnChangeReason}
+                    defaultValue={data.reason}
                   />
                 </Form.Item>
               </div>

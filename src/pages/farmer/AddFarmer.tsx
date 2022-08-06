@@ -226,6 +226,7 @@ const AddFarmer = () => {
   };
   const removeImgProfile = () => {
     setImgProfile(undefined);
+    setCreateImgProfile(UploadImageEntity_INTI);
     checkValidate(data);
   };
 
@@ -259,6 +260,7 @@ const AddFarmer = () => {
   };
   const removeImgIdCard = () => {
     setImgIdCard(undefined);
+    setCreateImgIdCrad(UploadImageEntity_INTI);
     checkValidate(data);
   };
   //#endregion
@@ -303,6 +305,7 @@ const AddFarmer = () => {
     setData(pushAddr.toJS());
     const pushPlot = Map(pushAddr.toJS()).set("farmerPlot", farmerPlotList);
     setData(pushPlot.toJS());
+
     await FarmerDatasource.insertFarmer(pushPlot.toJS()).then((res) => {
       if (res != undefined) {
         const pushImgProId = Map(createImgProfile).set("resourceId", res.id);
