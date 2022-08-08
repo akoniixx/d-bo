@@ -31,7 +31,6 @@ import { DronerDroneDatasource } from "../../datasource/DronerDroneDatasource";
 import FooterPage from "../../components/footer/FooterPage";
 import {
   DronerDroneEntity,
-
   GetDronerDroneEntity,
   GetDronerDroneEntity_INIT,
 } from "../../entities/DronerDroneEntities";
@@ -51,6 +50,7 @@ import bth_img_empty from "../../resource/media/empties/upload_Img_btn.png";
 import { REASON_CHECK } from "../../definitions/Reason";
 import uploadImg from "../../resource/media/empties/uploadImg.png";
 import { DronerDatasource } from "../../datasource/DronerDatasource";
+import { UploadImageDatasouce } from "../../datasource/UploadImageDatasource";
 
 const _ = require("lodash");
 const { Map } = require("immutable");
@@ -58,8 +58,9 @@ let queryString = _.split(window.location.search, "=");
 
 function EditDroneList() {
   const DronerDroneId = queryString[1];
-  const [data, setData] = useState<GetDronerDroneEntity>(GetDronerDroneEntity_INIT);
-  const [droner, setDroner] = useState<DronerEntity[]>([DronerEntity_INIT]);
+  const [data, setData] = useState<GetDronerDroneEntity>(
+    GetDronerDroneEntity_INIT
+  );
   const [droneBrand, setDroneBrand] = useState<DroneBrandEntity[]>();
   const [seriesDrone, setSeriesDrone] = useState<DroneEntity[]>();
   const [searchSeriesDrone, setSearchSeriesDrone] = useState<DroneEntity[]>();
@@ -73,11 +74,24 @@ function EditDroneList() {
     useState<UploadImageEntity>(UploadImageEntity_INTI);
   const [createImgProfile, setCreateImgProfile] =
     useState<ImageEntity>(ImageEntity_INTI);
+  let imgList: (string | boolean)[] = [];
 
   const fetchDronerDrone = async () => {
     await DronerDroneDatasource.getDronerDroneById(DronerDroneId).then(
       (res) => {
+        console.log(res);
         setData(res);
+        let getPathPro = res.file.filter((x) => x.category == "PROFILE_IMAGE");
+        imgList.push(getPathPro.length >= 1 ? getPathPro[0].path : "");
+        var i = 0;
+        for (i; imgList.length > i; i++) {
+          i == 0 &&
+            UploadImageDatasouce.getImage(imgList[i].toString()).then(
+              (resImg) => {
+                setImgProfile(resImg.url);
+              }
+            );
+        }
       }
     );
   };
@@ -89,7 +103,7 @@ function EditDroneList() {
   const fetchDroneSeries = async () => {
     await DroneDatasource.getDroneList(1, 500).then((res) => {
       setSeriesDrone(res.data);
-      setSearchSeriesDrone(res.data)
+      setSearchSeriesDrone(res.data);
     });
   };
   useEffect(() => {
@@ -117,18 +131,16 @@ function EditDroneList() {
     const m = Map(data).set("status", e.target.value);
     setData(m.toJS());
     checkValidate(m.toJS());
-
   };
   const handleMonth = async (e: any) => {
     const m = Map(data).set("purchaseMonth", e);
     setData(m.toJS());
     checkValidate(m.toJS());
-
   };
   const handleYear = async (e: any) => {
     const m = Map(data).set("purchaseYear", e);
     setData(m.toJS());
-    checkValidate(m.toJS()); 
+    checkValidate(m.toJS());
   };
   const onChangeProfile = async (file: any) => {
     let src = file.target.files[0];
@@ -143,6 +155,27 @@ function EditDroneList() {
     const f = Map(e.toJS()).set("category", "PROFILE_IMAGE");
     const g = Map(f.toJS()).set("resourceId", DronerDroneId);
     setCreateImgProfile(g.toJS());
+  };
+  const onPreviewProfile = async () => {
+    let src = imgProfile;
+    if (!src) {
+      src = await new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(imgProfile);
+        reader.onload = () => resolve(reader.result);
+      });
+    }
+    // const image = new Image();
+    // image.src = src;
+    // const imgWindow = window.open(src);
+    // imgWindow?.document.write(image.outerHTML);
+  };
+  const removeImg = () => {
+    const dronerImg = data.file.filter((x) => x.category == "PROFILE_IMAGE")[0];
+    UploadImageDatasouce.deleteImage(dronerImg.id, dronerImg.path).then(
+      (res) => {}
+    );
+    setImgProfile(undefined);
   };
   const onChangeLicenseDroner = async (file: any) => {
     let src = file.target.files[0];
@@ -218,28 +251,27 @@ function EditDroneList() {
       data.serialNo != "" &&
       data.purchaseYear != "" &&
       data.purchaseMonth != "" &&
-      data.status != "" 
+      data.status != ""
     ) {
       setBtnSaveDisable(false);
     } else {
       setBtnSaveDisable(true);
     }
   };
- const UpdateDronerDrone = async (data: GetDronerDroneEntity) => {
-  await DronerDroneDatasource.updateDronerDrone(data).then((res) => {
-    if(res) {
-      Swal.fire({
-        title: "บันทึกสำเร็จ",
-        icon: "success",
-        timer: 1500,
-        showConfirmButton: false,
-      }).then((time) => {
-        window.location.href = "/DroneList";
-      });
-
-    }
-  })
- }
+  const UpdateDronerDrone = async (data: GetDronerDroneEntity) => {
+    await DronerDroneDatasource.updateDronerDrone(data).then((res) => {
+      if (res) {
+        Swal.fire({
+          title: "บันทึกสำเร็จ",
+          icon: "success",
+          timer: 1500,
+          showConfirmButton: false,
+        }).then((time) => {
+          window.location.href = "/DroneList";
+        });
+      }
+    });
+  };
   const renderFromData = (
     <div className="col-lg-7">
       <CardContainer>
@@ -271,8 +303,8 @@ function EditDroneList() {
                   placeholder="เลือกยี่ห้อโดรน"
                   allowClear
                   onChange={handleBrand}
-                  //defaultValue={data.drone.droneBrandId}
-                  >
+                  defaultValue={data.drone.droneBrandId}
+                >
                   {droneBrand?.map((item: any, index: any) => (
                     <option key={index} value={item.id}>
                       {item.name}
@@ -360,20 +392,19 @@ function EditDroneList() {
           <div className="row">
             <div className="form-group col-lg-6 pb-5">
               <label>ใบอนุญาตนักบิน</label>
-              <span style={{ color: "red" }}>*</span>
-              <span style={{ color: color.Disable }}>(ไฟล์รูป หรือ pdf.)</span>
+              <span style={{ color: color.Disable }}> (ไฟล์รูป หรือ pdf.)</span>
               <br />
               <div className="pb-2">
                 <div
                   className="hiddenFileInput"
                   style={{
                     backgroundImage: `url(${imgLicenseDroner})`,
-                    display: imgLicenseDroner != undefined ? "block" : "none",
+                    display: imgLicenseDroner != false ? "block" : "none",
                   }}
                 ></div>
               </div>
               <div className="text-left ps-4">
-                {imgLicenseDroner != undefined && (
+                {imgLicenseDroner != false && (
                   <>
                     <Tag
                       color={color.Success}
@@ -396,7 +427,7 @@ function EditDroneList() {
                 className="hiddenFileBtn"
                 style={{
                   backgroundImage: `url(${bth_img_empty})`,
-                  display: imgLicenseDroner == undefined ? "block" : "none",
+                  display: imgLicenseDroner == false ? "block" : "none",
                 }}
               >
                 <input
@@ -411,19 +442,19 @@ function EditDroneList() {
             <div className="form-group">
               <label>ใบอนุญาตโดรนจาก กสทช.</label>
               <span style={{ color: "red" }}>*</span>
-              <span style={{ color: color.Disable }}>(ไฟล์รูป หรือ pdf.)</span>
+              <span style={{ color: color.Disable }}> (ไฟล์รูป หรือ pdf.)</span>
               <br />
               <div className="pb-2">
                 <div
                   className="hiddenFileInput"
                   style={{
                     backgroundImage: `url(${imgLicenseDrone})`,
-                    display: imgLicenseDrone != undefined ? "block" : "none",
+                    display: imgLicenseDrone != false ? "block" : "none",
                   }}
                 ></div>
               </div>
               <div className="text-left ps-4">
-                {imgLicenseDrone != undefined && (
+                {imgLicenseDrone != false && (
                   <>
                     <Tag
                       color={color.Success}
@@ -446,7 +477,7 @@ function EditDroneList() {
                 className="hiddenFileBtn"
                 style={{
                   backgroundImage: `url(${bth_img_empty})`,
-                  display: imgLicenseDrone == undefined ? "block" : "none",
+                  display: imgLicenseDrone == false ? "block" : "none",
                 }}
               >
                 <input
@@ -523,10 +554,10 @@ function EditDroneList() {
     <div className="col-lg-4">
       <CardContainer style={{ height: "640px" }}>
         <CardHeader textHeader="ข้อมูลนักบินโดรน" />
-        <Form key={data.dronerId}>
+        <Form>
           <div className="container text-center" style={{ padding: "30px" }}>
             <div className="row">
-              <div className="form-group text-center pb-5">
+              <div className="form-group text-center pb-4">
                 <div
                   className="hiddenFileInput zoom"
                   style={{
@@ -541,17 +572,37 @@ function EditDroneList() {
                     title="เลือกรูป"
                   />
                 </div>
+                <div>
+                  {imgProfile != undefined && (
+                    <>
+                      <Tag
+                        color={color.Success}
+                        onClick={onPreviewProfile}
+                        style={{ cursor: "pointer", borderRadius: "5px" }}
+                      >
+                        View
+                      </Tag>
+                      <Tag
+                        color={color.Error}
+                        onClick={removeImg}
+                        style={{ cursor: "pointer", borderRadius: "5px" }}
+                      >
+                        Remove
+                      </Tag>
+                    </>
+                  )}
+                </div>
               </div>
             </div>
             <div className="row">
               <div className="form-group col-lg-12 text-start">
                 <label>Droner ID</label>
                 <Form.Item name="droneId">
-                  <Input disabled defaultValue={data.dronerId}/>
+                  <Input disabled defaultValue={data.dronerId} />
                 </Form.Item>
                 <label>ชื่อ</label>
                 <Form.Item name="firstname">
-                  <Input disabled/>
+                  <Input disabled />
                 </Form.Item>
                 <label>นามสกุล</label>
                 <Form.Item name="lastname">
