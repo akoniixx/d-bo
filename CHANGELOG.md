@@ -1,4 +1,8 @@
 ## [Version - 0]
+## Fix [v0.6.2] 2022-08-06
+- fixed remove img before save in add farmer menu
+- enhanced function validate when remove plant in farmer plot
+- created function add reason when selected status 'INACTIVE'
 ## Fix [v0.6.1] 2022-08-01
 - fixed search by set state page in index farmer, droner, user staff
 ## Feature [v0.6.0] 2022-08-01

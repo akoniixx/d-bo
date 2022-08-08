@@ -19,7 +19,7 @@ interface ModalFarmerPlotProps {
   callBack: (data: FarmerPlotEntity) => void;
   data: FarmerPlotEntity;
   editIndex: number;
-  title:string;
+  title: string;
 }
 const ModalFarmerPlot: React.FC<ModalFarmerPlotProps> = ({
   show,
@@ -27,7 +27,7 @@ const ModalFarmerPlot: React.FC<ModalFarmerPlotProps> = ({
   callBack,
   data,
   editIndex,
-  title
+  title,
 }) => {
   const [farmerPlot, setFarmerPlot] = useState<FarmerPlotEntity>(data);
   const [saveBtnDisable, setBtnSaveDisable] = useState<boolean>(true);
@@ -36,7 +36,7 @@ const ModalFarmerPlot: React.FC<ModalFarmerPlotProps> = ({
     lng: parseFloat(data.long),
   });
   const [location, setLocation] = useState<SubdistrictEntity[]>([]);
-  const [searchLocation] = useState('');
+  const [searchLocation] = useState("");
 
   const fetchLocation = async (text?: string) => {
     await LocationDatasource.getSubdistrict(0, text).then((res) => {
@@ -61,7 +61,7 @@ const ModalFarmerPlot: React.FC<ModalFarmerPlotProps> = ({
   };
 
   const handleOnChangePlantSelect = (value: any) => {
-    const m = Map(farmerPlot).set("plantName", value);
+    const m = Map(farmerPlot).set("plantName", value == undefined ? "" : value);
     setFarmerPlot(m.toJS());
     checkValidate(m.toJS());
   };
@@ -113,14 +113,14 @@ const ModalFarmerPlot: React.FC<ModalFarmerPlotProps> = ({
   };
 
   const checkValidate = (data: FarmerPlotEntity) => {
-    if (
-      data.plotName != "" &&
-      data.plantName != "" &&
-      data.raiAmount != 0 &&
-      data.landmark != "" &&
-      data.lat != "" &&
-      data.long != ""
-    ) {
+    let checkEmpty = ![
+      data.plantName,
+      data.plotName,
+      data.landmark,
+      data.lat,
+      data.long,
+    ].includes("");
+    if (checkEmpty) {
       setBtnSaveDisable(false);
     } else {
       setBtnSaveDisable(true);
