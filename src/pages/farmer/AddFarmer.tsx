@@ -112,11 +112,15 @@ const AddFarmer = () => {
   };
 
   const handleOnChangeProvince = async (provinceId: number) => {
+    setAddress(CreateAddressEntity_INIT);
     await getProvince(provinceId, CreateAddressEntity_INIT);
   };
 
   const getProvince = async (provinceId: number, addr: CreateAddressEntity) => {
-    const d = Map(addr).set("provinceId", provinceId);
+    const d = Map(addr).set(
+      "provinceId",
+      provinceId == undefined ? 0 : provinceId
+    );
     setAddress(d.toJS());
     checkValidateAddr(d.toJS());
     await LocationDatasource.getDistrict(provinceId).then((res) => {
@@ -125,7 +129,10 @@ const AddFarmer = () => {
   };
 
   const handleOnChangeDistrict = async (districtId: number) => {
-    const d = Map(address).set("districtId", districtId);
+    const d = Map(address).set(
+      "districtId",
+      districtId == undefined ? 0 : districtId
+    );
     setAddress(d.toJS());
     checkValidateAddr(d.toJS());
     await LocationDatasource.getSubdistrict(districtId).then((res) => {
@@ -134,7 +141,10 @@ const AddFarmer = () => {
   };
 
   const handleOnChangeSubdistrict = async (subdistrictId: number) => {
-    const d = Map(address).set("subdistrictId", subdistrictId);
+    const d = Map(address).set(
+      "subdistrictId",
+      subdistrictId == undefined ? 0 : subdistrictId
+    );
     setAddress(d.toJS());
     checkValidateAddr(d.toJS());
     await handleOnChangePostcode(d.toJS());
@@ -146,7 +156,6 @@ const AddFarmer = () => {
     )[0].postcode;
     const c = Map(addr).set("postcode", getPostcode);
     setAddress(c.toJS());
-    checkValidateAddr(c.toJS());
   };
 
   const handleOnChangeAddress = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -226,6 +235,7 @@ const AddFarmer = () => {
   };
   const removeImgProfile = () => {
     setImgProfile(undefined);
+    setCreateImgProfile(UploadImageEntity_INTI);
     checkValidate(data);
   };
 
@@ -259,21 +269,26 @@ const AddFarmer = () => {
   };
   const removeImgIdCard = () => {
     setImgIdCard(undefined);
+    setCreateImgIdCrad(UploadImageEntity_INTI);
     checkValidate(data);
   };
   //#endregion
 
   const checkValidate = (data: CreateFarmerEntity) => {
-    if (
-      data.firstname != "" &&
-      data.lastname != "" &&
-      data.telephoneNo != "" &&
-      data.idNo != "" &&
-      address.provinceId != 0 &&
-      address.districtId != 0 &&
-      address.subdistrictId != 0 &&
-      address.address1 != ""
-    ) {
+    let checkEmptySting = ![
+      data.firstname,
+      data.lastname,
+      data.telephoneNo,
+      data.idNo,
+      address.address1,
+    ].includes("");
+    let checkEmptyNumber = ![
+      address.provinceId,
+      address.districtId,
+      address.subdistrictId,
+    ].includes(0);
+
+    if (checkEmptySting && checkEmptyNumber) {
       setBtnSaveDisable(false);
     } else {
       setBtnSaveDisable(true);
@@ -281,17 +296,19 @@ const AddFarmer = () => {
   };
 
   const checkValidateAddr = (addr: CreateAddressEntity) => {
-    if (
-      addr.provinceId != 0 &&
-      addr.subdistrictId != 0 &&
-      addr.districtId != 0 &&
-      addr.postcode != "" &&
-      addr.address1 != "" &&
-      data.firstname != "" &&
-      data.lastname != "" &&
-      data.telephoneNo != "" &&
-      data.idNo != ""
-    ) {
+    let checkEmptySting = ![
+      data.firstname,
+      data.lastname,
+      data.telephoneNo,
+      data.idNo,
+      addr.address1,
+    ].includes("");
+    let checkEmptyNumber = ![
+      addr.provinceId,
+      addr.districtId,
+      addr.subdistrictId,
+    ].includes(0);
+    if (checkEmptySting && checkEmptyNumber) {
       setBtnSaveDisable(false);
     } else {
       setBtnSaveDisable(true);
@@ -303,6 +320,7 @@ const AddFarmer = () => {
     setData(pushAddr.toJS());
     const pushPlot = Map(pushAddr.toJS()).set("farmerPlot", farmerPlotList);
     setData(pushPlot.toJS());
+
     await FarmerDatasource.insertFarmer(pushPlot.toJS()).then((res) => {
       if (res != undefined) {
         const pushImgProId = Map(createImgProfile).set("resourceId", res.id);
@@ -322,7 +340,7 @@ const AddFarmer = () => {
         }).then((time) => {
           window.location.href = "/IndexFarmer";
         });
-      }else{
+      } else {
         Swal.fire({
           title: "เบอร์โทร หรือ รหัสบัตรประชาชน <br/> ซ้ำในระบบ",
           icon: "error",
@@ -607,7 +625,6 @@ const AddFarmer = () => {
                 ที่อยู่บ้าน <span style={{ color: "red" }}>*</span>
               </label>
               <Form.Item
-                name="Address"
                 rules={[
                   {
                     required: true,
@@ -621,6 +638,7 @@ const AddFarmer = () => {
                   placeholder="กรอกที่อยู่บ้าน (เลขที่บ้าน, หมู่บ้าน, ชื่ออาคาร/ตึก, ซอย)"
                   onChange={handleOnChangeAddress}
                   autoComplete="off"
+                  key={address.provinceId}
                 />
               </Form.Item>
             </div>
