@@ -54,28 +54,8 @@ const ModalDrone: React.FC<ModalDroneProps> = ({
   let checkDroneLicense = data.file?.filter(
     (x) => x.category == "DRONE_LICENSE"
   );
-  const [imgLicenseDroner, setImgLicenseDroner] = useState<any>(
-    checkDronerLicense?.length > 0
-      ? checkDronerLicense[0].path == ""
-        ? checkDronerLicense[0].file
-        : UploadImageDatasouce.getImage(checkDronerLicense[0].path).then(
-            (resImg) => {
-              return resImg.url;
-            }
-          )
-      : false
-  );
-  const [imgLicenseDrone, setImgLicenseDrone] = useState<any>(
-    checkDroneLicense?.length > 0
-      ? checkDroneLicense[0].path == ""
-        ? checkDroneLicense[0].file
-        : UploadImageDatasouce.getImage(checkDroneLicense[0].path).then(
-            (resImg) => {
-              return resImg.url;
-            }
-          )
-      : false
-  );
+  const [imgLicenseDroner, setImgLicenseDroner] = useState<any>(false);
+  const [imgLicenseDrone, setImgLicenseDrone] = useState<any>(false);
 
   const [createLicenseDroner, setCreateLicenseDroner] =
     useState<UploadImageEntity>();
@@ -93,9 +73,47 @@ const ModalDrone: React.FC<ModalDroneProps> = ({
       setSeatchSeriesDrone(res.data);
     });
   };
+  const fetchImg = async () => {
+    if (checkDronerLicense?.length > 0) {
+      if (checkDronerLicense[0].path == "") {
+        let src = checkDronerLicense[0].file;
+        src = await new Promise((resolve) => {
+          const reader = new FileReader();
+          reader.readAsDataURL(src);
+          reader.onload = () => resolve(reader.result);
+        });
+        setImgLicenseDroner(src);
+      } else {
+        await UploadImageDatasouce.getImage(checkDronerLicense[0].path).then(
+          (resImg) => {
+            setImgLicenseDroner(resImg.url);
+          }
+        );
+      }
+    }
+    if (checkDroneLicense?.length > 0) {
+      if (checkDroneLicense[0].path == "") {
+        let src = checkDroneLicense[0].file;
+        src = await new Promise((resolve) => {
+          const reader = new FileReader();
+          reader.readAsDataURL(src);
+          reader.onload = () => resolve(reader.result);
+        });
+        setImgLicenseDrone(src);
+      } else {
+        await UploadImageDatasouce.getImage(checkDroneLicense[0].path).then(
+          (resImg) => {
+            setImgLicenseDrone(resImg.url);
+          }
+        );
+      }
+    }
+  };
+
   useEffect(() => {
     fetchDrone();
     fetchDroneSeries();
+    fetchImg();
   }, [droneBrandId]);
 
   const handleBrand = (brand: string) => {
@@ -142,14 +160,16 @@ const ModalDrone: React.FC<ModalDroneProps> = ({
       reader.readAsDataURL(src);
       reader.onload = () => resolve(reader.result);
     });
+    console.log(src);
     setImgLicenseDroner(src);
     const d = Map(createLicenseDroner).set("file", file.target.files[0]);
     const e = Map(d.toJS()).set("resource", "DRONER_DRONE");
     const f = Map(e.toJS()).set("category", "DRONER_LICENSE");
-    setCreateLicenseDroner(f.toJS());
+    const g = Map(f.toJS()).set("path", "");
+    setCreateLicenseDroner(g.toJS());
     const pushImg = Map(dataDrone).set("file", [
       ...dataDrone.file.filter((x) => x.file != ""),
-      f.toJS(),
+      g.toJS(),
     ]);
     setDataDrone(pushImg.toJS());
     checkValidate(pushImg.toJS());
@@ -192,10 +212,11 @@ const ModalDrone: React.FC<ModalDroneProps> = ({
     const d = Map(createLicenseDrone).set("file", file.target.files[0]);
     const e = Map(d.toJS()).set("resource", "DRONER_DRONE");
     const f = Map(e.toJS()).set("category", "DRONE_LICENSE");
-    setCreateLicenseDrone(f.toJS());
+    const g = Map(f.toJS()).set("path", "");
+    setCreateLicenseDrone(g.toJS());
     const pushImg = Map(dataDrone).set("file", [
       ...dataDrone.file.filter((x) => x.file != ""),
-      f.toJS(),
+      g.toJS(),
     ]);
     setDataDrone(pushImg.toJS());
     checkValidate(pushImg.toJS());
@@ -258,7 +279,6 @@ const ModalDrone: React.FC<ModalDroneProps> = ({
 
   return (
     <>
-      {console.log(imgLicenseDrone)}
       <Modal
         title={
           <div

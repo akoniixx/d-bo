@@ -264,6 +264,8 @@ function AddDroner() {
     setEditIndex(index);
   };
   const insertDroneList = (data: DronerDroneEntity) => {
+    console.log("call",data);
+    
     if (data.modalDroneIndex == 0) {
       const pushId = Map(data).set(
         "modalDroneIndex",
