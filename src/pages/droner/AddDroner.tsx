@@ -406,52 +406,51 @@ function AddDroner() {
       "expPlant",
       setOtherPlant
     );
-    console.log(pushOtherPlant.toJS());
-    // await DronerDatasource.createDronerList(pushOtherPlant.toJS()).then(
-    //   (res) => {
-    //     if (res.id != null) {
-    //       const pushImgProId = Map(createImgProfile).set("resourceId", res.id);
-    //       const pushImgCardId = Map(createImgIdCard).set("resourceId", res.id);
-    //       var i = 0;
-    //       for (i; 2 > i; i++) {
-    //         i == 0 &&
-    //           UploadImageDatasouce.uploadImage(pushImgProId.toJS()).then(res);
-    //         i == 1 &&
-    //           UploadImageDatasouce.uploadImage(pushImgCardId.toJS()).then(res);
-    //       }
-    //       for (i = 0; res.dronerDrone.length > i; i++) {
-    //         let findId = res.dronerDrone[i];
-    //         let getData = dronerDroneList.filter(
-    //           (x) => x.serialNo == findId.serialNo
-    //         )[0];
+    await DronerDatasource.createDronerList(pushOtherPlant.toJS()).then(
+      (res) => {
+        if (res.id != null) {
+          const pushImgProId = Map(createImgProfile).set("resourceId", res.id);
+          const pushImgCardId = Map(createImgIdCard).set("resourceId", res.id);
+          var i = 0;
+          for (i; 2 > i; i++) {
+            i == 0 &&
+              UploadImageDatasouce.uploadImage(pushImgProId.toJS()).then(res);
+            i == 1 &&
+              UploadImageDatasouce.uploadImage(pushImgCardId.toJS()).then(res);
+          }
+          for (i = 0; res.dronerDrone.length > i; i++) {
+            let findId = res.dronerDrone[i];
+            let getData = dronerDroneList.filter(
+              (x) => x.serialNo == findId.serialNo
+            )[0];
 
-    //         for (let j = 0; getData.img.length > j; j++) {
-    //           let getImg = getData.img[i];
-    //           imgDroneList?.push({
-    //             resourceId: res.dronerDrone[i].id,
-    //             category: getImg.category,
-    //             file: getImg.file,
-    //             resource: getImg.resource,
-    //             path: "",
-    //           });
-    //         }
-    //       }
-    //       const checkImg = imgDroneList.filter((x) => x.resourceId != "");
-    //       for (let k = 0; checkImg.length > k; k++) {
-    //         let getDataImg: any = checkImg[k];
-    //         UploadImageDatasouce.uploadImage(getDataImg).then(res);
-    //       }
-    //       Swal.fire({
-    //         title: "บันทึกสำเร็จ",
-    //         icon: "success",
-    //         timer: 1500,
-    //         showConfirmButton: false,
-    //       }).then((time) => {
-    //         window.location.href = "/IndexDroner";
-    //       });
-    //     }
-    //   }
-    // );
+            for (let j = 0; getData.file.length > j; j++) {
+              let getImg = getData.file[i];
+              imgDroneList?.push({
+                resourceId: res.dronerDrone[i].id,
+                category: getImg.category,
+                file: getImg.file,
+                resource: getImg.resource,
+                path: "",
+              });
+            }
+          }
+          const checkImg = imgDroneList.filter((x) => x.resourceId != "");
+          for (let k = 0; checkImg.length > k; k++) {
+            let getDataImg: any = checkImg[k];
+            UploadImageDatasouce.uploadImage(getDataImg).then(res);
+          }
+          Swal.fire({
+            title: "บันทึกสำเร็จ",
+            icon: "success",
+            timer: 1500,
+            showConfirmButton: false,
+          }).then((time) => {
+            window.location.href = "/IndexDroner";
+          });
+        }
+      }
+    );
   };
 
   const renderFromData = (

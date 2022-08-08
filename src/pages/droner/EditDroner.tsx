@@ -52,7 +52,6 @@ import {
 } from "../../entities/DronerDroneEntities";
 import ModalDrone from "../../components/modal/ModalDronerDrone";
 import {
-  DRONER_DRONE_MAPPING,
   DRONER_DRONE_STATUS,
   DRONER_STATUS,
   STATUS_COLOR,
@@ -114,7 +113,8 @@ function EditDroner() {
 
   useEffect(() => {
     fetchDronerById();
-  }, []);
+    fetchLocation(searchLocation);
+  }, [searchLocation]);
 
   const fetchDronerById = async () => {
     await DronerDatasource.getDronerByID(dronerId).then((res) => {
@@ -149,6 +149,12 @@ function EditDroner() {
       }
     });
   };
+  const fetchLocation = async (text?: string) => {
+    await LocationDatasource.getSubdistrict(0, text).then((res) => {
+      setLocation(res);
+    });
+  };
+
   useEffect(() => {
     LocationDatasource.getProvince().then((res) => {
       setProvince(res);
@@ -913,16 +919,13 @@ function EditDroner() {
                     />
                   </div>
                   <div className="col-lg-5">
-                    <span style={{ fontSize: "12px" }}>
-                      {item.drone.droneBrand.name}
-                      <br />
-                      {item.drone.series}
-                    </span>
+                    <h6>{item.drone.droneBrand.name}</h6>
+                    <p style={{ color: "#ccc" }}>{item.drone.series}</p>
                   </div>
                   <div className="col-lg-4">
                     <span style={{ color: STATUS_COLOR[item.status] }}>
                       <Badge color={STATUS_COLOR[item.status]} />
-                      {DRONER_DRONE_MAPPING[item.status]}
+                      {DRONER_DRONE_STATUS[item.status]}
                       <br />
                     </span>
                   </div>

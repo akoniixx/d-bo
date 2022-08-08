@@ -20,9 +20,11 @@ import color from "../../resource/color";
 import FooterPage from "../footer/FooterPage";
 import bth_img_empty from "../../resource/media/empties/upload_Img_btn.png";
 import { MONTH_SALE } from "../../definitions/Month";
+import { UploadImageDatasouce } from "../../datasource/UploadImageDatasource";
 
 const _ = require("lodash");
 const { Map } = require("immutable");
+
 interface ModalDroneProps {
   show: boolean;
   backButton: () => void;
@@ -39,25 +41,40 @@ const ModalDrone: React.FC<ModalDroneProps> = ({
   editIndex,
   title,
 }) => {
-  let checkDronerLicense = data.img?.filter(
-    (x) => x.category == "DRONER_LICENSE"
-  );
-  let checkDroneLicense = data.img?.filter(
-    (x) => x.category == "DRONE_LICENSE"
-  );
   const [dataDrone, setDataDrone] = useState<DronerDroneEntity>(data);
   const [droneList, setDroneList] = useState<DroneBrandEntity[]>();
+  const [droneBrandId, setDroneBrandId] = useState<string>();
   const [seriesDrone, setSeriesDrone] = useState<DroneEntity[]>();
   const [searchSeriesDrone, setSeatchSeriesDrone] = useState<DroneEntity[]>();
   const [saveBtnDisable, setBtnSaveDisable] = useState<boolean>(true);
 
+  let checkDronerLicense = data.file?.filter(
+    (x) => x.category == "DRONER_LICENSE"
+  );
+  let checkDroneLicense = data.file?.filter(
+    (x) => x.category == "DRONE_LICENSE"
+  );
   const [imgLicenseDroner, setImgLicenseDroner] = useState<any>(
-    checkDronerLicense?.length &&
-      data.img?.filter((x) => x.category == "DRONER_LICENSE")[0].file
+    checkDronerLicense?.length > 0
+      ? checkDronerLicense[0].path == ""
+        ? checkDronerLicense[0].file
+        : UploadImageDatasouce.getImage(checkDronerLicense[0].path).then(
+            (resImg) => {
+              return resImg.url;
+            }
+          )
+      : false
   );
   const [imgLicenseDrone, setImgLicenseDrone] = useState<any>(
-    checkDroneLicense?.length &&
-      data.img?.filter((x) => x.category == "DRONE_LICENSE")[0].file
+    checkDroneLicense?.length > 0
+      ? checkDroneLicense[0].path == ""
+        ? checkDroneLicense[0].file
+        : UploadImageDatasouce.getImage(checkDroneLicense[0].path).then(
+            (resImg) => {
+              return resImg.url;
+            }
+          )
+      : false
   );
 
   const [createLicenseDroner, setCreateLicenseDroner] =
@@ -71,7 +88,7 @@ const ModalDrone: React.FC<ModalDroneProps> = ({
     });
   };
   const fetchDroneSeries = async () => {
-    await DroneDatasource.getDroneList(1, 500).then((res) => {
+    await DroneDatasource.getDroneList(1, 500, droneBrandId).then((res) => {
       setSeriesDrone(res.data);
       setSeatchSeriesDrone(res.data);
     });
@@ -79,21 +96,21 @@ const ModalDrone: React.FC<ModalDroneProps> = ({
   useEffect(() => {
     fetchDrone();
     fetchDroneSeries();
-  }, []);
+  }, [droneBrandId]);
 
   const handleBrand = (brand: string) => {
+    setDroneBrandId(brand);
     let filterSeries = seriesDrone?.filter((x) => x.droneBrandId == brand);
+    const m = Map(dataDrone.drone).set("droneBrandId", brand);
+    const t = Map(dataDrone).set("drone", m.toJS());
+    setDataDrone(t.toJS());
     setSeatchSeriesDrone(filterSeries);
+    checkValidate(t.toJS());
   };
   const handleSeries = (id: string) => {
+    console.log(id);
     const m = Map(dataDrone).set("droneId", id);
-    let filterLogo = seriesDrone?.filter((x) => x.id == id)[0].droneBrand
-      .logoImagePath;
-    const d = Map(m.toJS()).set("logoImagePath", filterLogo);
-
-    let nameDrone = seriesDrone?.filter((x) => x.id == id)[0].droneBrand.name;
-    const x = Map(d.toJS()).set("droneName", nameDrone);
-    setDataDrone(x.toJS());
+    setDataDrone(m.toJS());
     checkValidate(m.toJS());
   };
   const handleSerialNo = (e: any) => {
@@ -130,8 +147,8 @@ const ModalDrone: React.FC<ModalDroneProps> = ({
     const e = Map(d.toJS()).set("resource", "DRONER_DRONE");
     const f = Map(e.toJS()).set("category", "DRONER_LICENSE");
     setCreateLicenseDroner(f.toJS());
-    const pushImg = Map(dataDrone).set("img", [
-      ...dataDrone.img.filter((x) => x.file != ""),
+    const pushImg = Map(dataDrone).set("file", [
+      ...dataDrone.file.filter((x) => x.file != ""),
       f.toJS(),
     ]);
     setDataDrone(pushImg.toJS());
@@ -152,11 +169,11 @@ const ModalDrone: React.FC<ModalDroneProps> = ({
     imgWindow?.document.write(image.outerHTML);
   };
   const removeLicenseDroner = () => {
-    const removeImg = dataDrone.img?.filter(
+    const removeImg = dataDrone.file?.filter(
       (x) => x.category != "DRONER_LICENSE"
     )[0];
     const d = Map(dataDrone).set(
-      "img",
+      "file",
       removeImg == undefined ? [] : [removeImg]
     );
     setDataDrone(d.toJS());
@@ -176,8 +193,8 @@ const ModalDrone: React.FC<ModalDroneProps> = ({
     const e = Map(d.toJS()).set("resource", "DRONER_DRONE");
     const f = Map(e.toJS()).set("category", "DRONE_LICENSE");
     setCreateLicenseDrone(f.toJS());
-    const pushImg = Map(dataDrone).set("img", [
-      ...dataDrone.img.filter((x) => x.file != ""),
+    const pushImg = Map(dataDrone).set("file", [
+      ...dataDrone.file.filter((x) => x.file != ""),
       f.toJS(),
     ]);
     setDataDrone(pushImg.toJS());
@@ -198,11 +215,11 @@ const ModalDrone: React.FC<ModalDroneProps> = ({
     imgWindow?.document.write(image.outerHTML);
   };
   const removeLicenseDrone = () => {
-    const removeImg = dataDrone.img?.filter(
+    const removeImg = dataDrone.file?.filter(
       (x) => x.category != "DRONE_LICENSE"
     )[0];
     const d = Map(dataDrone).set(
-      "img",
+      "file",
       removeImg == undefined ? [] : [removeImg]
     );
     setDataDrone(d.toJS());
@@ -213,16 +230,25 @@ const ModalDrone: React.FC<ModalDroneProps> = ({
 
   const handleCallBack = () => {
     const m = Map(dataDrone).set("modalDroneIndex", editIndex);
-    callBack(m.toJS());
+    let filterLogo = seriesDrone?.filter((x) => x.id == dataDrone.droneId)[0]
+      .droneBrand.logoImagePath;
+    let nameDrone = seriesDrone?.filter((x) => x.id == dataDrone.droneId)[0]
+      .droneBrand.name;
+    const d = Map(m.toJS()).set("logoImagePath", filterLogo);
+    const x = Map(d.toJS()).set("droneName", nameDrone);
+    callBack(x.toJS());
   };
 
   const checkValidate = (data: DronerDroneEntity) => {
     if (
-      data.droneName != "" &&
+      data.droneId != "" &&
+      data.droneId != undefined &&
       data.serialNo != "" &&
       data.purchaseYear != "" &&
       data.purchaseMonth != "" &&
-      data.status != ""
+      data.status != "" &&
+      data.drone.droneBrandId != "" &&
+      data.drone.droneBrandId != undefined
     ) {
       setBtnSaveDisable(false);
     } else {
@@ -232,6 +258,7 @@ const ModalDrone: React.FC<ModalDroneProps> = ({
 
   return (
     <>
+      {console.log(imgLicenseDrone)}
       <Modal
         title={
           <div
@@ -261,7 +288,7 @@ const ModalDrone: React.FC<ModalDroneProps> = ({
               ยี่ห้อโดรนที่ฉีดพ่น <span style={{ color: "red" }}>*</span>
             </label>
             <Form.Item
-              name="droneId"
+              name="droneBrand"
               rules={[
                 {
                   required: true,
@@ -273,12 +300,10 @@ const ModalDrone: React.FC<ModalDroneProps> = ({
                 placeholder="เลือกยี่ห้อโดรน"
                 allowClear
                 onChange={handleBrand}
-                defaultValue={dataDrone.drone.droneBrand.id}
+                defaultValue={dataDrone.drone.droneBrandId}
               >
-                {droneList?.map((item: any, index: any) => (
-                  <Option key={index} value={item.id}>
-                    {item.name}
-                  </Option>
+                {droneList?.map((item: any) => (
+                  <Option value={item.id}>{item.name}</Option>
                 ))}
               </Select>
             </Form.Item>

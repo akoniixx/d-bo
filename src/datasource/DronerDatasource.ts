@@ -64,8 +64,8 @@ export class DronerDatasource {
       delete data.dronerDrone[i].id;
       delete data.dronerDrone[i].logoImagePath;
       delete data.dronerDrone[i].dronerId;
-      for(let j = 0; data.dronerDrone[i].img.length > j; j++){
-        delete data.dronerDrone[i].img[j];
+      for(let j = 0; data.dronerDrone[i].file.length > j; j++){
+        delete data.dronerDrone[i].file[j];
       }
     }
     return httpClient

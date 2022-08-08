@@ -19,7 +19,7 @@ export interface DronerDroneEntity {
   logoImagePath?: string;
   createdAt: string;
   updatedAt: string;
-  img: UploadImageEntity[];
+  file: UploadImageEntity[];
 }
 export const DronerDroneEntity_INIT: DronerDroneEntity = {
   id: "",
@@ -35,7 +35,7 @@ export const DronerDroneEntity_INIT: DronerDroneEntity = {
   logoImagePath: "",
   createdAt: "",
   updatedAt: "",
-  img: [UploadImageEntity_INTI],
+  file: [UploadImageEntity_INTI],
 };
 export interface GetDronerDroneEntity {
   id: string;
