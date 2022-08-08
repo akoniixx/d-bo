@@ -155,19 +155,19 @@ const EditFarmer = () => {
   };
 
   const handleOnChangeProvince = async (provinceId: number) => {
-    const d = Map(address).set("provinceId", provinceId);
+    const d = Map(address).set("provinceId", provinceId == undefined ? 0 : provinceId);
     setAddress(d.toJS());
     checkValidateAddr(d.toJS());
   };
 
   const handleOnChangeDistrict = async (districtId: number) => {
-    const d = Map(address).set("districtId", districtId);
+    const d = Map(address).set("districtId", districtId == undefined ? 0 : districtId);
     setAddress(d.toJS());
     checkValidateAddr(d.toJS());
   };
 
   const handleOnChangeSubdistrict = async (subdistrictId: number) => {
-    const d = Map(address).set("subdistrictId", subdistrictId);
+    const d = Map(address).set("subdistrictId", subdistrictId == undefined ? 0 : subdistrictId);
     setAddress(d.toJS());
     checkValidateAddr(d.toJS());
     await handleOnChangePostcode(d.toJS());
@@ -331,16 +331,20 @@ const EditFarmer = () => {
   //#endregion
 
   const checkValidate = (data: GetFarmerEntity) => {
-    if (
-      data.firstname != "" &&
-      data.lastname != "" &&
-      data.telephoneNo != "" &&
-      data.idNo != "" &&
-      address.provinceId != 0 &&
-      address.districtId != 0 &&
-      address.subdistrictId != 0 &&
-      address.address1 != ""
-    ) {
+    let checkEmptySting = ![
+      data.firstname,
+      data.lastname,
+      data.telephoneNo,
+      data.idNo,
+      address.address1,
+    ].includes("");
+    let checkEmptyNumber = ![
+      address.provinceId,
+      address.districtId,
+      address.subdistrictId,
+    ].includes(0);
+
+    if (checkEmptySting && checkEmptyNumber) {
       setBtnSaveDisable(false);
     } else {
       setBtnSaveDisable(true);
@@ -348,17 +352,20 @@ const EditFarmer = () => {
   };
 
   const checkValidateAddr = (addr: AddressEntity) => {
-    if (
-      addr.provinceId != 0 &&
-      addr.subdistrictId != 0 &&
-      addr.districtId != 0 &&
-      addr.postcode != "" &&
-      addr.address1 != "" &&
-      data.firstname != "" &&
-      data.lastname != "" &&
-      data.telephoneNo != "" &&
-      data.idNo != ""
-    ) {
+    let checkEmptySting = ![
+      data.firstname,
+      data.lastname,
+      data.telephoneNo,
+      data.idNo,
+      address.address1,
+    ].includes("");
+    let checkEmptyNumber = ![
+      addr.provinceId,
+      addr.districtId,
+      addr.subdistrictId,
+    ].includes(0);
+
+    if (checkEmptySting && checkEmptyNumber) {
       setBtnSaveDisable(false);
     } else {
       setBtnSaveDisable(true);
