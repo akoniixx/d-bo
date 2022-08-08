@@ -49,7 +49,7 @@ function DroneList() {
   const [searchDroneBrand, setSearchDroneBrand] = useState<any>();
   const [searchStatus, setSearchStatus] = useState<string>();
   const [searchText, setSearchText] = useState<string>();
-  const [visible, setVisible] = useState(false);
+
 
   const fetchDronerDroneList = async () => {
     await DronerDroneDatasource.getDronerDrone(

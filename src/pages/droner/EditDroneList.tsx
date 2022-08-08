@@ -31,7 +31,9 @@ import { DronerDroneDatasource } from "../../datasource/DronerDroneDatasource";
 import FooterPage from "../../components/footer/FooterPage";
 import {
   DronerDroneEntity,
-  DronerDroneEntity_INIT,
+
+  GetDronerDroneEntity,
+  GetDronerDroneEntity_INIT,
 } from "../../entities/DronerDroneEntities";
 import { MONTH_SALE } from "../../definitions/Month";
 import { DRONER_DRONE_STATUS } from "../../definitions/DronerStatus";
@@ -56,11 +58,12 @@ let queryString = _.split(window.location.search, "=");
 
 function EditDroneList() {
   const DronerDroneId = queryString[1];
-  const [current, setCurrent] = useState(1);
-  const [data, setData] = useState<DronerDroneEntity>(DronerDroneEntity_INIT);
-  const [droner, setDroner] = useState<DronerEntity>(DronerEntity_INIT);
+  const [data, setData] = useState<GetDronerDroneEntity>(GetDronerDroneEntity_INIT);
+  const [droner, setDroner] = useState<DronerEntity[]>([DronerEntity_INIT]);
   const [droneBrand, setDroneBrand] = useState<DroneBrandEntity[]>();
   const [seriesDrone, setSeriesDrone] = useState<DroneEntity[]>();
+  const [searchSeriesDrone, setSearchSeriesDrone] = useState<DroneEntity[]>();
+  const [saveBtnDisable, setBtnSaveDisable] = useState<boolean>(true);
   const [imgProfile, setImgProfile] = useState<any>();
   const [imgLicenseDroner, setImgLicenseDroner] = useState<any>();
   const [imgLicenseDrone, setImgLicenseDrone] = useState<any>();
@@ -75,7 +78,6 @@ function EditDroneList() {
     await DronerDroneDatasource.getDronerDroneById(DronerDroneId).then(
       (res) => {
         setData(res);
-        setDroner(res)
       }
     );
   };
@@ -84,43 +86,49 @@ function EditDroneList() {
       setDroneBrand(res.data);
     });
   };
-  const fetchDroneList = async () => {
-    await DroneDatasource.getDroneList(current, 500).then((res) => {
+  const fetchDroneSeries = async () => {
+    await DroneDatasource.getDroneList(1, 500).then((res) => {
       setSeriesDrone(res.data);
+      setSearchSeriesDrone(res.data)
     });
   };
   useEffect(() => {
     fetchDronerDrone();
     fetchDroneBrand();
-    fetchDroneList();
+    fetchDroneSeries();
   }, []);
-  const handleBrand = async (droneBrandId: string) => {
-    let filterSeries = seriesDrone?.filter(
-      (x) => x.droneBrandId == droneBrandId
-    );
-    setSeriesDrone(filterSeries);
+  const handleBrand = (brand: string) => {
+    let filterSeries = seriesDrone?.filter((x) => x.droneBrandId == brand);
+    setSearchSeriesDrone(filterSeries);
   };
   const handleSeries = async (id: string) => {
     const m = Map(data).set("droneId", id);
     let nameDrone = seriesDrone?.filter((x) => x.id == id)[0].droneBrand.name;
     const x = Map(m.toJS()).set("droneName", nameDrone);
     setData(x.toJS());
+    checkValidate(x.toJS());
   };
   const handleSerialNo = async (e: any) => {
     const m = Map(data).set("serialNo", e.target.value);
     setData(m.toJS());
+    checkValidate(m.toJS());
   };
   const handleChangeStatus = (e: any) => {
     const m = Map(data).set("status", e.target.value);
     setData(m.toJS());
+    checkValidate(m.toJS());
+
   };
   const handleMonth = async (e: any) => {
     const m = Map(data).set("purchaseMonth", e);
     setData(m.toJS());
+    checkValidate(m.toJS());
+
   };
   const handleYear = async (e: any) => {
     const m = Map(data).set("purchaseYear", e);
     setData(m.toJS());
+    checkValidate(m.toJS()); 
   };
   const onChangeProfile = async (file: any) => {
     let src = file.target.files[0];
@@ -204,22 +212,34 @@ function EditDroneList() {
     const m = Map(data).set(e.target.id, e.target.value);
     setData(m.toJS());
   };
-  const UpdateDronerDrone = async () => {
-    await DronerDroneDatasource.updateDronerDrone(data).then((res) => {
-      if (res != null) {
-        Swal.fire({
-          title: "บันทึกสำเร็จ",
-          icon: "success",
-          timer: 1500,
-          // confirmButtonText: "ยืนยัน",
-          // confirmButtonColor: "#0068F4",
-        }).then((timer) => {
-          window.location.href = "/DroneList";
-        });
-      }
-    });
+  const checkValidate = (data: DronerDroneEntity) => {
+    if (
+      data.droneName != "" &&
+      data.serialNo != "" &&
+      data.purchaseYear != "" &&
+      data.purchaseMonth != "" &&
+      data.status != "" 
+    ) {
+      setBtnSaveDisable(false);
+    } else {
+      setBtnSaveDisable(true);
+    }
   };
+ const UpdateDronerDrone = async (data: GetDronerDroneEntity) => {
+  await DronerDroneDatasource.updateDronerDrone(data).then((res) => {
+    if(res) {
+      Swal.fire({
+        title: "บันทึกสำเร็จ",
+        icon: "success",
+        timer: 1500,
+        showConfirmButton: false,
+      }).then((time) => {
+        window.location.href = "/DroneList";
+      });
 
+    }
+  })
+ }
   const renderFromData = (
     <div className="col-lg-7">
       <CardContainer>
@@ -251,8 +271,8 @@ function EditDroneList() {
                   placeholder="เลือกยี่ห้อโดรน"
                   allowClear
                   onChange={handleBrand}
-                  defaultValue={data.droneId}
-                >
+                  //defaultValue={data.drone.droneBrandId}
+                  >
                   {droneBrand?.map((item: any, index: any) => (
                     <option key={index} value={item.id}>
                       {item.name}
@@ -280,7 +300,7 @@ function EditDroneList() {
                   onChange={handleSeries}
                   defaultValue={data.droneId}
                 >
-                  {seriesDrone?.map((item: any, index: any) => (
+                  {searchSeriesDrone?.map((item: any, index: any) => (
                     <option key={index} value={item.id}>
                       {item.series}
                     </option>
@@ -499,12 +519,11 @@ function EditDroneList() {
       </CardContainer>
     </div>
   );
-
-  const renderLand = (
+  const renderDroner = (
     <div className="col-lg-4">
       <CardContainer style={{ height: "640px" }}>
         <CardHeader textHeader="ข้อมูลนักบินโดรน" />
-        <Form key={droner.id}>
+        <Form key={data.dronerId}>
           <div className="container text-center" style={{ padding: "30px" }}>
             <div className="row">
               <div className="form-group text-center pb-5">
@@ -526,17 +545,17 @@ function EditDroneList() {
             </div>
             <div className="row">
               <div className="form-group col-lg-12 text-start">
-                <label>Drone ID</label>
+                <label>Droner ID</label>
                 <Form.Item name="droneId">
-                  <Input defaultValue={droner.id} disabled />
+                  <Input disabled defaultValue={data.dronerId}/>
                 </Form.Item>
                 <label>ชื่อ</label>
                 <Form.Item name="firstname">
-                  <Input disabled defaultValue={droner.firstname}/>
+                  <Input disabled/>
                 </Form.Item>
                 <label>นามสกุล</label>
                 <Form.Item name="lastname">
-                  <Input disabled defaultValue={droner.lastname}/>
+                  <Input disabled />
                 </Form.Item>
                 <label>เบอร์โทร</label>
                 <Form.Item name="telephoneNo">
@@ -557,14 +576,14 @@ function EditDroneList() {
           <strong style={{ fontSize: "20px" }}>แก้ไขข้อมูลโดรนเกษตร</strong>
         </span>
       </Row>
-      <Row className="d-flex justify-content-around">
-        {renderLand}
+      <Row className="d-flex justify-content-around" key={data.id}>
+        {renderDroner}
         {renderFromData}
       </Row>
       <FooterPage
         onClickBack={() => (window.location.href = "/DroneList")}
-        onClickSave={() => UpdateDronerDrone}
-        //disableSaveBtn={showBtn}
+        onClickSave={() => UpdateDronerDrone(data)}
+        disableSaveBtn={saveBtnDisable}
       />
     </Layout>
   );
