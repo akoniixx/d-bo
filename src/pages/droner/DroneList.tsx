@@ -45,11 +45,11 @@ function DroneList() {
   const [droneList, setDroneList] = useState<DronerDroneListEntity>();
   const [droneBrand, setDroneBrand] = useState<DroneBrandEntity[]>();
   const [seriesDrone, setSeriesDrone] = useState<DroneEntity[]>();
+  const [droneBrandId, setDroneBrandId] = useState<string>();
   const [searchSeriesDrone, setSearchSeriesDrone] = useState<any>();
   const [searchDroneBrand, setSearchDroneBrand] = useState<any>();
   const [searchStatus, setSearchStatus] = useState<string>();
   const [searchText, setSearchText] = useState<string>();
-
 
   const fetchDronerDroneList = async () => {
     await DronerDroneDatasource.getDronerDrone(
@@ -57,16 +57,18 @@ function DroneList() {
       row,
       searchStatus,
       searchSeriesDrone,
-      searchDroneBrand,
+      droneBrandId,
       searchText
     ).then((res) => {
       setDroneList(res);
     });
   };
   const fetchDroneList = async () => {
-    await DroneDatasource.getDroneList(current, 500).then((res) => {
-      setSeriesDrone(res.data);
-    });
+    await DroneDatasource.getDroneList(current, 500, droneBrandId).then(
+      (res) => {
+        setSeriesDrone(res.data);
+      }
+    );
   };
   const fetchDroneBrand = async () => {
     await DroneDatasource.getDroneBrandList().then((res) => {
@@ -77,7 +79,7 @@ function DroneList() {
     fetchDronerDroneList();
     fetchDroneList();
     fetchDroneBrand();
-  }, [current, searchStatus, searchSeriesDrone, searchDroneBrand, searchText]);
+  }, [current, searchStatus, searchSeriesDrone, searchText, droneBrandId]);
 
   const onChangePage = (page: number) => {
     setCurrent(page);
@@ -87,7 +89,7 @@ function DroneList() {
     setCurrent(1);
   };
   const handleDroneBrand = (droneBrand: string) => {
-    setSearchDroneBrand(droneBrand);
+    setDroneBrandId(droneBrand);
     setCurrent(1);
   };
   const handleDroneSeries = (seriesDrone: string) => {
