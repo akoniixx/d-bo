@@ -1,5 +1,4 @@
 import {
-  Button,
   Form,
   Input,
   Modal,
@@ -7,7 +6,6 @@ import {
   Select,
   Space,
   Tag,
-  Upload,
 } from "antd";
 import { Option } from "antd/lib/mentions";
 import React, { useEffect, useState } from "react";
@@ -126,7 +124,6 @@ const ModalDrone: React.FC<ModalDroneProps> = ({
     checkValidate(t.toJS());
   };
   const handleSeries = (id: string) => {
-    console.log(id);
     const m = Map(dataDrone).set("droneId", id);
     setDataDrone(m.toJS());
     checkValidate(m.toJS());
@@ -160,7 +157,6 @@ const ModalDrone: React.FC<ModalDroneProps> = ({
       reader.readAsDataURL(src);
       reader.onload = () => resolve(reader.result);
     });
-    console.log(src);
     setImgLicenseDroner(src);
     const d = Map(createLicenseDroner).set("file", file.target.files[0]);
     const e = Map(d.toJS()).set("resource", "DRONER_DRONE");
@@ -200,6 +196,7 @@ const ModalDrone: React.FC<ModalDroneProps> = ({
     setImgLicenseDroner(false);
     checkValidate(data);
   };
+
   const onChangeLicenseDrone = async (file: any) => {
     let src = file.target.files[0];
     src = await new Promise((resolve) => {
@@ -221,6 +218,7 @@ const ModalDrone: React.FC<ModalDroneProps> = ({
     setDataDrone(pushImg.toJS());
     checkValidate(pushImg.toJS());
   };
+
   const previewLicenseDrone = async () => {
     let src = imgLicenseDrone;
     if (!src) {

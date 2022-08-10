@@ -7,11 +7,9 @@ import {
   Select,
   Button,
   Pagination,
-  Checkbox,
   Badge,
   Tag,
   Avatar,
-  message,
 } from "antd";
 import { CardContainer } from "../../components/card/CardContainer";
 import { BackIconButton } from "../../components/button/BackButton";
@@ -176,7 +174,19 @@ function AddDroner() {
     checkValidateAddr(c.toJS());
   };
   const handleExpPlant = (e: any) => {
-    data.expPlant.push.apply(data.expPlant, e);
+    let checked = e.target.checked;
+    let value = e.target.value;
+    let p: any = "";
+    if (checked) {
+      p = Map(data).set(
+        "expPlant",
+        [...data.expPlant, value].filter((x) => x != "")
+      );
+    } else {
+      let removePlant = data.expPlant.filter((x) => x != value);
+      p = Map(data).set("expPlant", removePlant);
+    }
+    setData(p.toJS());
     checkValidate(data);
   };
   const handlePlantOther = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -187,17 +197,19 @@ function AddDroner() {
       for (let i = 0; m.length > i; i++) {
         otherPlant.push(m[i]);
       }
-      data.expPlant.push.apply(data.expPlant, otherPlant);
     } else {
     }
-    console.log(data);
+    data.expPlant.push.apply(
+      data.expPlant,
+      otherPlant.filter((x) => x != "")
+    );
   };
 
-  const checkValidateComma = (e: string) => {
-    const a = e.indexOf(" ");
-    const b = e.indexOf("/");
-    const c = e.indexOf("-");
-    const d = e.indexOf("*");
+  const checkValidateComma = (data: string) => {
+    const a = data.indexOf(" ");
+    const b = data.indexOf("/");
+    const c = data.indexOf("-");
+    const d = data.indexOf("*");
     if (a > -1 || b > -1 || c > -1 || d > -1) {
       return false;
     } else {
@@ -227,7 +239,6 @@ function AddDroner() {
         lng: a.long != null ? parseFloat(a.long) : 0,
       });
       checkValidate(pushLong.toJS());
-      console.log(pushLong.toJS());
     } else {
       setMapPosition(LAT_LNG_BANGKOK);
     }
@@ -264,8 +275,6 @@ function AddDroner() {
     setEditIndex(index);
   };
   const insertDroneList = (data: DronerDroneEntity) => {
-    console.log("call",data);
-    
     if (data.modalDroneIndex == 0) {
       const pushId = Map(data).set(
         "modalDroneIndex",
@@ -273,7 +282,6 @@ function AddDroner() {
       );
       setDronerDroneList([...dronerDroneList, pushId.toJS()]);
     } else {
-      console.log("list", dronerDroneList);
       const m = dronerDroneList.filter(
         (x) => x.modalDroneIndex != data.modalDroneIndex
       );
@@ -353,39 +361,44 @@ function AddDroner() {
   //#endregion
 
   const checkValidate = (data: CreateDronerEntity) => {
-    if (
-      data.firstname != "" &&
-      data.lastname != "" &&
-      data.telephoneNo != "" &&
-      data.idNo != "" &&
-      address.provinceId != 0 &&
-      address.districtId != 0 &&
-      address.subdistrictId != 0 &&
-      address.address1 != "" &&
-      dronerArea.lat != "" &&
-      dronerArea.long != "" &&
-      data.expPlant != []
-    ) {
+    let checkEmptySting = ![
+      data.firstname,
+      data.telephoneNo,
+      data.idNo,
+      address.address1,
+      dronerArea.lat,
+      dronerArea.long,
+    ].includes("");
+    let checkEmptyNumber = ![
+      address.provinceId,
+      address.districtId,
+      address.subdistrictId,
+    ].includes(0);
+    let checkEmptyArray = ![data.expPlant].includes([""]);
+
+    if (checkEmptySting && checkEmptyNumber && checkEmptyArray) {
       setBtnSaveDisable(false);
     } else {
       setBtnSaveDisable(true);
     }
   };
   const checkValidateAddr = (addr: CreateAddressEntity) => {
-    if (
-      addr.provinceId != 0 &&
-      addr.subdistrictId != 0 &&
-      addr.districtId != 0 &&
-      addr.postcode != "" &&
-      addr.address1 != "" &&
-      data.firstname != "" &&
-      data.lastname != "" &&
-      data.telephoneNo != "" &&
-      dronerArea.lat != "" &&
-      dronerArea.long != "" &&
-      data.expPlant != [] &&
-      data.idNo != ""
-    ) {
+    let checkEmptySting = ![
+      data.firstname,
+      data.telephoneNo,
+      data.idNo,
+      address.address1,
+      dronerArea.lat,
+      dronerArea.long,
+    ].includes("");
+    let checkEmptyNumber = ![
+      addr.provinceId,
+      addr.districtId,
+      addr.subdistrictId,
+    ].includes(0);
+    let checkEmptyArray = ![data.expPlant].includes([""]);
+
+    if (checkEmptySting && checkEmptyNumber && checkEmptyArray) {
       setBtnSaveDisable(false);
     } else {
       setBtnSaveDisable(true);
@@ -403,11 +416,11 @@ function AddDroner() {
     const setOtherPlant = Array.from(
       new Set(pushDroneList.toJS().expPlant)
     ).filter((x) => x != "");
-    data.expPlant.push.apply(setOtherPlant);
     const pushOtherPlant = Map(pushDroneList.toJS()).set(
       "expPlant",
       setOtherPlant
     );
+    
     await DronerDatasource.createDronerList(pushOtherPlant.toJS()).then(
       (res) => {
         if (res.id != null) {
@@ -516,6 +529,7 @@ function AddDroner() {
                   placeholder="กรอกชื่อ"
                   value={data?.firstname}
                   onChange={handleOnChange}
+                  autoComplete="off"
                 />
               </Form.Item>
             </div>
@@ -536,6 +550,7 @@ function AddDroner() {
                   placeholder="กรอกนามสกุล"
                   value={data?.lastname}
                   onChange={handleOnChange}
+                  autoComplete="off"
                 />
               </Form.Item>
             </div>
@@ -558,6 +573,7 @@ function AddDroner() {
                   placeholder="กรอกเบอร์โทร"
                   value={data?.telephoneNo}
                   onChange={handleOnChange}
+                  autoComplete="off"
                 />
               </Form.Item>
             </div>
@@ -578,6 +594,7 @@ function AddDroner() {
                   placeholder="กรอกบัตรประชาชน"
                   value={data?.idNo}
                   onChange={handleOnChange}
+                  autoComplete="off"
                 />
               </Form.Item>
             </div>
@@ -818,6 +835,7 @@ function AddDroner() {
                   placeholder="กรอกข้อมูล Latitude"
                   defaultValue={mapPosition.lat}
                   onBlur={handleOnChangeLat}
+                  autoComplete="off"
                 />
               </Form.Item>
             </div>
@@ -838,6 +856,7 @@ function AddDroner() {
                   placeholder="กรอกข้อมูล Longitude"
                   defaultValue={mapPosition.lng}
                   onBlur={handleOnChangeLng}
+                  autoComplete="off"
                 />
               </Form.Item>
             </div>
@@ -852,24 +871,22 @@ function AddDroner() {
           <div className="row">
             <div className="form-group col-lg-6">
               <label>
-                พืชที่เคยฉีดพ่น
+                พืชที่เคยฉีดพ่น{" "}
                 <span style={{ color: color.Disable }}>
                   (กรุณาเลือกอย่างน้อย 1 อย่าง)
                 </span>
                 <span style={{ color: "red" }}>*</span>
               </label>
-              <Checkbox.Group
-                name="expPlant"
-                onChange={handleExpPlant}
-                options={EXP_PLANT}
-                className="col-lg-8"
-              >
-                <Row className="d-flex justify-content-center">
-                  {EXP_PLANT.map((item) => (
-                    <Checkbox value={item}>{item}</Checkbox>
-                  ))}
-                </Row>
-              </Checkbox.Group>
+              {EXP_PLANT.map((item) => (
+                <div>
+                  <input
+                    type="checkbox"
+                    value={item}
+                    onClick={handleExpPlant}
+                  />{" "}
+                  <label>{item}</label>
+                </div>
+              ))}
             </div>
           </div>
           <div className="form-group col-lg-6">
