@@ -1,4 +1,7 @@
 ## [Version - 0]
+## Feature [v0.7.0] 2022-08-10
+- enhanced upload file licenses
+- enhanced checkbox plant and input other plant
 ## Fix [v0.6.2] 2022-08-06
 - fixed remove img before save in add farmer menu
 - enhanced function validate when remove plant in farmer plot

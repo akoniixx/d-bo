@@ -697,44 +697,46 @@ const AddFarmer = () => {
         </div>
         {farmerPlotList?.length != 0 ? (
           <Form>
-            {farmerPlotList.map((item, index) => (
-              <div className="container">
-                <div className="row pt-3 pb-3">
-                  <div className="col-lg-4">
-                    {item.plotName}
-                    <br />
-                    <p style={{ fontSize: "12px", color: color.Grey }}>
-                      {item.plantName}
-                    </p>
-                  </div>
-                  <div className="col-lg-2">{item.raiAmount} ไร่</div>
-                  <div className="col-lg-3">
-                    <span
-                      style={{ color: colorStatus(item.isActive.toString()) }}
-                    >
-                      <Badge color={colorStatus(item.isActive.toString())} />
-                      {STATUS_NORMAL_MAPPING[item.isActive.toString()]}
-                    </span>
-                  </div>
-                  <div className="col-lg-3 d-flex justify-content-between">
-                    <div className="col-lg-6">
-                      <ActionButton
-                        icon={<EditOutlined />}
-                        color={color.primary1}
-                        onClick={() => editPlot(item, index + 1)}
-                      />
+            {farmerPlotList
+              .sort((x, y) => x.plotId - y.plotId)
+              .map((item, index) => (
+                <div className="container">
+                  <div className="row pt-3 pb-3">
+                    <div className="col-lg-4">
+                      {item.plotName}
+                      <br />
+                      <p style={{ fontSize: "12px", color: color.Grey }}>
+                        {item.plantName}
+                      </p>
                     </div>
-                    <div className="col-lg-6">
-                      <ActionButton
-                        icon={<DeleteOutlined />}
-                        color={color.Error}
-                        onClick={() => removePlot(index + 1)}
-                      />
+                    <div className="col-lg-2">{item.raiAmount} ไร่</div>
+                    <div className="col-lg-3">
+                      <span
+                        style={{ color: colorStatus(item.isActive.toString()) }}
+                      >
+                        <Badge color={colorStatus(item.isActive.toString())} />
+                        {STATUS_NORMAL_MAPPING[item.isActive.toString()]}
+                      </span>
+                    </div>
+                    <div className="col-lg-3 d-flex justify-content-between">
+                      <div className="col-lg-6">
+                        <ActionButton
+                          icon={<EditOutlined />}
+                          color={color.primary1}
+                          onClick={() => editPlot(item, index + 1)}
+                        />
+                      </div>
+                      <div className="col-lg-6">
+                        <ActionButton
+                          icon={<DeleteOutlined />}
+                          color={color.Error}
+                          onClick={() => removePlot(index + 1)}
+                        />
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              ))}
           </Form>
         ) : (
           <Form>

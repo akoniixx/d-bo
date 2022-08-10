@@ -1,6 +1,9 @@
-import { DroneBrandEntity, DroneBrandEntity_INIT } from "./DroneBrandEntities";
 import { DroneEntity, DroneEntity_INIT } from "./DroneEntities";
-import { DronerEntity, DronerEntity_INIT } from "./DronerEntities";
+import { DronerEntity } from "./DronerEntities";
+import {
+  UploadImageEntity,
+  UploadImageEntity_INTI,
+} from "./UploadImageEntities";
 
 export interface DronerDroneEntity {
   id?: string;
@@ -10,27 +13,29 @@ export interface DronerDroneEntity {
   status: string;
   purchaseYear: string;
   purchaseMonth: string;
-  reason: [""];
+  drone: DroneEntity;
   modalDroneIndex: number;
-  droneName: string;
-  logoImagePath: string;
+  droneName?: string;
+  logoImagePath?: string;
   createdAt: string;
   updatedAt: string;
+  file: UploadImageEntity[];
 }
 export const DronerDroneEntity_INIT: DronerDroneEntity = {
   id: "",
   dronerId: "",
   droneId: "",
   serialNo: "",
-  status: "PENDING",
+  status: "",
   purchaseYear: "",
   purchaseMonth: "",
-  reason: [""],
+  drone: DroneEntity_INIT,
   modalDroneIndex: 0,
   droneName: "",
   logoImagePath: "",
   createdAt: "",
   updatedAt: "",
+  file: [UploadImageEntity_INTI],
 };
 export interface GetDronerDroneEntity {
   id: string;

@@ -1,21 +1,11 @@
-import {
-  Avatar,
-  Badge,
-  Input,
-  Pagination,
-  Row,
-  Select,
-  Switch,
-  Table,
-  Tooltip,
-} from "antd";
+import { Avatar, Badge, Pagination, Select, Table } from "antd";
 import React, { useEffect, useState } from "react";
 import Search from "antd/lib/input/Search";
 import { Option } from "antd/lib/mentions";
 import color from "../../resource/color";
 import ActionButton from "../../components/button/ActionButton";
-import { EditOutlined, InfoCircleOutlined } from "@ant-design/icons";
-import { DronerEntity, DronerListEntity } from "../../entities/DronerEntities";
+import { EditOutlined } from "@ant-design/icons";
+import { DronerListEntity } from "../../entities/DronerEntities";
 import { DronerDatasource } from "../../datasource/DronerDatasource";
 import {
   DRONER_STATUS,
@@ -28,13 +18,10 @@ import {
   ProviceEntity,
   SubdistrictEntity,
 } from "../../entities/LocationEntities";
-import moment, { max } from "moment";
+import moment from "moment";
 import AddButtton from "../../components/button/AddButton";
 import { DroneDatasource } from "../../datasource/DroneDatasource";
 import Layouts from "../../components/layout/Layout";
-
-const _ = require("lodash");
-const { Map } = require("immutable");
 
 function IndexDroner() {
   const row = 10;
@@ -184,7 +171,9 @@ function IndexDroner() {
             }
           >
             {province?.map((item) => (
-              <Option value={item.provinceId.toString()}>{item.provinceName}</Option>
+              <Option value={item.provinceId.toString()}>
+                {item.provinceName}
+              </Option>
             ))}
           </Select>
         </div>
@@ -379,7 +368,7 @@ function IndexDroner() {
         return {
           children: (
             <div className="container">
-             <span className="text-dark-75  d-block font-size-lg">
+              <span className="text-dark-75  d-block font-size-lg">
                 {droneLatest ? (
                   <Avatar
                     size={25}
@@ -401,7 +390,6 @@ function IndexDroner() {
               <span style={{ color: color.Grey, fontSize: "12px" }}>
                 {row.dronerDrone.length > 1 ? "(มากกว่า 1 ยี่ห้อ)" : null}
               </span>
-
             </div>
           ),
         };
@@ -460,6 +448,7 @@ function IndexDroner() {
       },
     },
   ];
+
   return (
     <Layouts>
       {PageTitle}
