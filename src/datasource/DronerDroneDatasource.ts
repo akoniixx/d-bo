@@ -50,7 +50,7 @@ export class DronerDroneDatasource {
   }
   static updateDronerDrone(data: DronerDroneEntity): Promise<any> {
     return httpClient
-      .patch(BASE_URL + "/droner-drone/" + data.droneId, data)
+      .patch(BASE_URL + "/droner-drone/" + data.id, data)
       .then((response) => {
         return response.data;
       })

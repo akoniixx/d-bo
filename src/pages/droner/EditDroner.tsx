@@ -24,7 +24,7 @@ import { DronerEntity, DronerEntity_INIT } from "../../entities/DronerEntities";
 import { DronerDatasource } from "../../datasource/DronerDatasource";
 import Swal from "sweetalert2";
 import { LocationDatasource } from "../../datasource/LocationDatasource";
-import { EXP_PLANT } from "../../definitions/ExpPlant";
+import { EXP_PLANT, EXP_PLANT_CHECKBOX } from "../../definitions/ExpPlant";
 import ActionButton from "../../components/button/ActionButton";
 import {
   AddressEntity,
@@ -94,8 +94,8 @@ function EditDroner() {
     useState<ImageEntity>(ImageEntity_INTI);
   let imgList: (string | boolean)[] = [];
   const [mapPosition, setMapPosition] = useState<{ lat: number; lng: number }>({
-    lat: parseFloat(dronerArea.lat),
-    lng: parseFloat(dronerArea.long),
+    lat: LAT_LNG_BANGKOK.lat,
+    lng: LAT_LNG_BANGKOK.lng,
   });
   const [location, setLocation] = useState<SubdistrictEntity[]>([]);
   const [searchLocation] = useState("");
@@ -107,10 +107,11 @@ function EditDroner() {
 
   const fetchDronerById = async () => {
     await DronerDatasource.getDronerByID(dronerId).then((res) => {
+      console.log("get", res);
       setData(res);
       setMapPosition({
-        lat: parseFloat(dronerArea.lat),
-        lng: parseFloat(dronerArea.long),
+        lat: parseFloat(res.dronerArea.lat),
+        lng: parseFloat(res.dronerArea.long),
       });
       setAddress(res.address);
       setDronerDroneList(res.dronerDrone);
@@ -165,9 +166,17 @@ function EditDroner() {
     const m = Map(data).set("status", e.target.value);
     setData(m.toJS());
   };
+
   const handleExpPlant = (e: any) => {
     let checked = e.target.checked;
     let value = e.target.value;
+    EXP_PLANT_CHECKBOX.map((item) =>
+      _.set(
+        item,
+        "isChecked",
+        item.plantName == value ? checked : item.isChecked
+      )
+    );
     let p: any = "";
     if (checked) {
       p = Map(data).set(
@@ -181,21 +190,20 @@ function EditDroner() {
     setData(p.toJS());
     checkValidate(data);
   };
-  const handlePlantOther = (e: React.ChangeEvent<HTMLInputElement>) => {
-    let otherPlant = [];
-    const checkComma = checkValidateComma(e.target.value);
-    if (checkComma) {
-      let m = e.target.value.split(",");
-      for (let i = 0; m.length > i; i++) {
-        otherPlant.push(m[i]);
-      }
-    } else {
+  const handlePlantOther = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    let setDataPlant = data.expPlant
+      .map((x) => EXP_PLANT.find((y) => y == x))
+      .filter((z) => z != undefined);
+
+    let m = e.target.value.split(",");
+    for (let i = 0; m.length > i; i++) {
+      setDataPlant.push(m[i]);
     }
-    data.expPlant.push.apply(
-      data.expPlant,
-      otherPlant.filter((x) => x != "")
-    );
+    const p = Map(data).set("expPlant", []);
+    const t = Map(p.toJS()).set("expPlant", setDataPlant);
+    setData(t.toJS());
   };
+
   const handleProvince = async (provinceId: number) => {
     const d = Map(address).set("provinceId", provinceId);
     setAddress(d.toJS());
@@ -224,24 +232,6 @@ function EditDroner() {
     const d = Map(address).set("address1", e.target.value);
     setAddress(d.toJS());
     checkValidateAddr(d.toJS());
-  };
-  const handleOnChangeLat = (value: any) => {
-    const m = Map(dronerArea).set("lat", value.target.value);
-    setDronerArea(m.toJS());
-    checkValidate(m.toJS());
-    setMapPosition((prev) => ({
-      lat: parseFloat(value.target.value),
-      lng: prev.lng,
-    }));
-  };
-  const handleOnChangeLng = (value: any) => {
-    const m = Map(dronerArea).set("long", value.target.value);
-    setDronerArea(m.toJS());
-    checkValidate(m.toJS());
-    setMapPosition((prev) => ({
-      lat: prev.lat,
-      lng: parseFloat(value.target.value),
-    }));
   };
   //#endregion
 
@@ -275,6 +265,24 @@ function EditDroner() {
     setDronerArea(m.toJS());
     checkValidate(m.toJS());
   };
+  const handleOnChangeLat = (value: any) => {
+    const m = Map(dronerArea).set("lat", value.target.value);
+    setDronerArea(m.toJS());
+    checkValidate(m.toJS());
+    setMapPosition((prev) => ({
+      lat: parseFloat(value.target.value),
+      lng: prev.lng,
+    }));
+  };
+  const handleOnChangeLng = (value: any) => {
+    const m = Map(dronerArea).set("long", value.target.value);
+    setDronerArea(m.toJS());
+    checkValidate(m.toJS());
+    setMapPosition((prev) => ({
+      lat: prev.lat,
+      lng: parseFloat(value.target.value),
+    }));
+  };
   //#endregion
 
   //#region modal drone
@@ -284,10 +292,8 @@ function EditDroner() {
     setEditDroneList(data);
   };
   const updateDrone = async (data: DronerDroneEntity) => {
-    await DronerDroneDatasource.updateDronerDrone(data).then((res) => {
-    });
+    await DronerDroneDatasource.updateDronerDrone(data).then((res) => {});
     setShowEditModal((prev) => !prev);
-    setShowAddModal((prev) => !prev);
     fetchDronerById();
   };
   //#endregion
@@ -429,6 +435,13 @@ function EditDroner() {
     const pushAddr = Map(data).set("address", address);
     const pushDronerArea = Map(pushAddr.toJS()).set("dronerArea", dronerArea);
     const pushPin = Map(pushDronerArea.toJS()).set("pin", "");
+    const setOtherPlant = Array.from(new Set(pushPin.toJS().expPlant)).filter(
+      (x) => x != ""
+    );
+    const pushOtherPlant = Map(pushPin.toJS()).set("expPlant", setOtherPlant);
+    console.log(pushOtherPlant.toJS());
+    console.log(JSON.stringify(pushOtherPlant.toJS()));
+
     await DronerDatasource.updateDroner(pushPin.toJS()).then((res) => {
       if (res != null) {
         var i = 0;
@@ -851,7 +864,6 @@ function EditDroner() {
               <label>Latitude (ละติจูด) </label>
               <span style={{ color: "red" }}>*</span>
               <Form.Item
-                name="lat"
                 rules={[
                   {
                     required: true,
@@ -872,7 +884,6 @@ function EditDroner() {
               <label>Longitude (ลองติจูด) </label>
               <span style={{ color: "red" }}>*</span>
               <Form.Item
-                name="long"
                 rules={[
                   {
                     required: true,
@@ -905,10 +916,24 @@ function EditDroner() {
               </span>
               <span style={{ color: "red" }}>*</span>
             </label>
-            {EXP_PLANT.map((item) => (
-              <div className="col-lg-12">
-                <input type="checkbox" value={item} onClick={handleExpPlant} />{" "}
-                <label>{item}</label>
+            {EXP_PLANT_CHECKBOX.map((item) =>
+              _.set(
+                item,
+                "isChecked",
+                data?.expPlant.map((x) => x).find((y) => y === item.plantName)
+                  ? true
+                  : item.isChecked
+              )
+            ).map((x) => (
+              <div>
+                <input
+                  key={x.key}
+                  type="checkbox"
+                  value={x.plantName}
+                  onClick={handleExpPlant}
+                  checked={x.isChecked}
+                />{" "}
+                <label>{x.plantName}</label>
                 <br />
               </div>
             ))}
@@ -918,10 +943,11 @@ function EditDroner() {
             <Form.Item>
               <Input
                 placeholder="พืชอื่นๆ"
-                onChange={handlePlantOther}
-                defaultValue={
-                  EXP_PLANT.map((x) => data.expPlant.filter((y) => y != x))[0]
-                }
+                onBlur={handlePlantOther}
+                defaultValue={data.expPlant
+                  .map((x) => EXP_PLANT.find((y) => y != x))
+                  .filter((x) => x != undefined)
+                  .join(",")}
               />
             </Form.Item>
           </div>
@@ -1039,6 +1065,11 @@ function EditDroner() {
 
   return (
     <Layout>
+      {console.log(
+        EXP_PLANT.map((x) => data.expPlant.find((y) => x === y))
+        // .filter((x) => x != undefined)
+        // .join(",")
+      )}
       <Row>
         <BackIconButton
           onClick={() => (window.location.href = "/IndexDroner")}
