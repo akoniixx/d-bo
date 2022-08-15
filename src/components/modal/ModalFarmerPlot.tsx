@@ -113,7 +113,6 @@ const ModalFarmerPlot: React.FC<ModalFarmerPlotProps> = ({
   };
 
   const checkValidate = (data: FarmerPlotEntity) => {
-    console.log(data);
     let checkEmpty = ![
       data.plantName,
       data.plotName,
