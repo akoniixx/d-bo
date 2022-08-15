@@ -380,8 +380,11 @@ function AddDroner() {
       address.subdistrictId,
     ].includes(0);
     let checkEmptyArray =
-      data.expPlant.filter((x) => x != "").length > 0 ? true : false;
-
+      data.expPlant != undefined
+        ? data.expPlant.filter((x) => x != "").length > 0
+          ? true
+          : false
+        : false;
     if (checkEmptySting && checkEmptyNumber && checkEmptyArray) {
       setBtnSaveDisable(false);
     } else {
@@ -403,7 +406,11 @@ function AddDroner() {
       addr.subdistrictId,
     ].includes(0);
     let checkEmptyArray =
-      data.expPlant.filter((x) => x != "").length > 0 ? true : false;
+      data.expPlant != undefined
+        ? data.expPlant.filter((x) => x != "").length > 0
+          ? true
+          : false
+        : false;
 
     if (checkEmptySting && checkEmptyNumber && checkEmptyArray) {
       setBtnSaveDisable(false);
@@ -414,9 +421,11 @@ function AddDroner() {
 
   const insertDroner = async () => {
     let otherPlantList = [];
-    let m = otherPlant.split(",");
-    for (let i = 0; m.length > i; i++) {
-      otherPlantList.push(m[i]);
+    if (otherPlant != undefined) {
+      let m = otherPlant.split(",");
+      for (let i = 0; m.length > i; i++) {
+        otherPlantList.push(m[i]);
+      }
     }
     data.expPlant.push.apply(
       data.expPlant,
@@ -456,9 +465,9 @@ function AddDroner() {
             )[0];
 
             for (let j = 0; getData.file.length > j; j++) {
-              let getImg = getData.file[i];
+              let getImg = getData.file[j];
               imgDroneList?.push({
-                resourceId: res.dronerDrone[i].id,
+                resourceId: res.dronerDrone[j].id,
                 category: getImg.category,
                 file: getImg.file,
                 resource: getImg.resource,
@@ -466,19 +475,21 @@ function AddDroner() {
               });
             }
           }
+          console.log(imgDroneList);
           const checkImg = imgDroneList.filter((x) => x.resourceId != "");
           for (let k = 0; checkImg.length > k; k++) {
             let getDataImg: any = checkImg[k];
+            console.log(getDataImg);
             UploadImageDatasouce.uploadImage(getDataImg).then(res);
           }
-          Swal.fire({
-            title: "บันทึกสำเร็จ",
-            icon: "success",
-            timer: 1500,
-            showConfirmButton: false,
-          }).then((time) => {
-            window.location.href = "/IndexDroner";
-          });
+          // Swal.fire({
+          //   title: "บันทึกสำเร็จ",
+          //   icon: "success",
+          //   timer: 1500,
+          //   showConfirmButton: false,
+          // }).then((time) => {
+          //   window.location.href = "/IndexDroner";
+          // });
         }
       }
     );
@@ -839,7 +850,6 @@ function AddDroner() {
               <label>Latitude (ละติจูด) </label>
               <span style={{ color: "red" }}>*</span>
               <Form.Item
-                name="lat"
                 rules={[
                   {
                     required: true,
@@ -860,7 +870,6 @@ function AddDroner() {
               <label>Longitude (ลองติจูด) </label>
               <span style={{ color: "red" }}>*</span>
               <Form.Item
-                name="long"
                 rules={[
                   {
                     required: true,

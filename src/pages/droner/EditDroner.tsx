@@ -487,9 +487,7 @@ function EditDroner() {
       "dronerDrone",
       dronerDroneList
     );
-    console.log(pushDroneList.toJS());
     await DronerDatasource.updateDroner(pushDroneList.toJS()).then((res) => {
-      console.log("res", res);
       if (res != null) {
         for (i = 0; res.dronerDrone.length > i; i++) {
           let findId = res.dronerDrone[i];
@@ -1094,13 +1092,13 @@ function EditDroner() {
                 <div className="row pt-3 pb-3">
                   <div className="col-lg-1">
                     <img
-                      src={item.logoImagePath}
+                      src={item.drone.droneBrand.logoImagePath}
                       width={"25px"}
                       height={"25px"}
                     />
                   </div>
                   <div className="col-lg-5">
-                    <h6>{item.droneName}</h6>
+                    <h6>{item.drone.droneBrand.name}</h6>
                     <p style={{ color: "#ccc" }}>{item.serialNo}</p>
                   </div>
                   <div className="col-lg-4">
