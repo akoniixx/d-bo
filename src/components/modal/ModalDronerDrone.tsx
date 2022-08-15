@@ -1,12 +1,4 @@
-import {
-  Form,
-  Input,
-  Modal,
-  Radio,
-  Select,
-  Space,
-  Tag,
-} from "antd";
+import { Form, Input, Modal, Radio, Select, Space, Tag } from "antd";
 import { Option } from "antd/lib/mentions";
 import React, { useEffect, useState } from "react";
 import { DroneDatasource } from "../../datasource/DroneDatasource";
@@ -444,6 +436,7 @@ const ModalDrone: React.FC<ModalDroneProps> = ({
                 }}
               >
                 <input
+                  key={imgLicenseDroner}
                   type="file"
                   onChange={onChangeLicenseDroner}
                   title="เลือกรูป"
@@ -495,6 +488,7 @@ const ModalDrone: React.FC<ModalDroneProps> = ({
               >
                 <input
                   required
+                  key={imgLicenseDrone}
                   type="file"
                   onChange={onChangeLicenseDrone}
                   title="เลือกรูป"

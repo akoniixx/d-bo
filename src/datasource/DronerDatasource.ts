@@ -48,6 +48,13 @@ export class DronerDatasource {
   }
 
   static updateDroner(data: DronerEntity): Promise<any> {
+    if (data.dronerArea.provinceId == 0) {
+      delete data.dronerArea["provinceId"];
+      delete data.dronerArea["dronerId"];
+      delete data.dronerArea["districtId"];
+      delete data.dronerArea["subdistrictId"];
+      delete data.dronerArea["distance"];
+    }
     return httpClient
       .patch(BASE_URL + "/droner/" + data.id, data)
       .then((response) => {

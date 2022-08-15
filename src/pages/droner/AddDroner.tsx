@@ -15,7 +15,7 @@ import { CardContainer } from "../../components/card/CardContainer";
 import { BackIconButton } from "../../components/button/BackButton";
 import TextArea from "antd/lib/input/TextArea";
 import emptyData from "../../resource/media/empties/iconoir_farm.png";
-import { EditOutlined } from "@ant-design/icons";
+import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
 import color from "../../resource/color";
 import { CardHeader } from "../../components/header/CardHearder";
 import Swal from "sweetalert2";
@@ -292,6 +292,10 @@ function AddDroner() {
     setShowEditModal(false);
     setEditIndex(0);
   };
+  const removeDrone = (index: number) => {
+    const newData = dronerDroneList.filter((x) => x.modalDroneIndex != index);
+    setDronerDroneList(newData);
+  };
   //#endregion
 
   //#region Image
@@ -418,7 +422,7 @@ function AddDroner() {
       data.expPlant,
       otherPlantList.filter((x) => x != "")
     );
-   
+
     const pushAdd = Map(data).set("address", address);
     const pushDronerArea = Map(pushAdd.toJS()).set("dronerArea", dronerArea);
     const pushDroneList = Map(pushDronerArea.toJS()).set(
@@ -751,6 +755,7 @@ function AddDroner() {
                   placeholder="กรอกรหัสไปรษณีย์"
                   defaultValue={address?.postcode}
                   key={address.subdistrictId}
+                  disabled
                 />
               </Form.Item>
             </div>
@@ -973,12 +978,21 @@ function AddDroner() {
                         {DRONER_DRONE_STATUS[item.status]}
                       </span>
                     </div>
-                    <div className="col-lg-2">
-                      <ActionButton
-                        icon={<EditOutlined />}
-                        color={color.primary1}
-                        onClick={() => editDroneList(item, index + 1)}
-                      />
+                    <div className="col-lg-2 d-flex justify-content-between">
+                      <div className="col-lg-6">
+                        <ActionButton
+                          icon={<EditOutlined />}
+                          color={color.primary1}
+                          onClick={() => editDroneList(item, index + 1)}
+                        />
+                      </div>
+                      <div className="col-lg-6">
+                        <ActionButton
+                          icon={<DeleteOutlined />}
+                          color={color.Error}
+                          onClick={() => removeDrone(index + 1)}
+                        />
+                      </div>
                     </div>
                   </div>
                 </div>
