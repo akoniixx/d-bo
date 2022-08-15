@@ -113,12 +113,14 @@ const ModalFarmerPlot: React.FC<ModalFarmerPlotProps> = ({
   };
 
   const checkValidate = (data: FarmerPlotEntity) => {
+    console.log(data);
     let checkEmpty = ![
       data.plantName,
       data.plotName,
       data.landmark,
       data.lat,
       data.long,
+      data.raiAmount
     ].includes("");
     if (checkEmpty) {
       setBtnSaveDisable(false);
@@ -257,7 +259,6 @@ const ModalFarmerPlot: React.FC<ModalFarmerPlotProps> = ({
               <label>Latitude (ละติจูด) </label>
               <span style={{ color: "red" }}>*</span>
               <Form.Item
-                name="lat"
                 rules={[
                   {
                     required: true,
@@ -277,7 +278,6 @@ const ModalFarmerPlot: React.FC<ModalFarmerPlotProps> = ({
               <label>Longitude (ลองติจูด) </label>
               <span style={{ color: "red" }}>*</span>
               <Form.Item
-                name="long"
                 rules={[
                   {
                     required: true,

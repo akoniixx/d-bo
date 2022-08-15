@@ -366,6 +366,7 @@ const AddFarmer = () => {
                 }}
               >
                 <input
+                  key={imgProfile}
                   type="file"
                   onChange={onChangeProfile}
                   title="เลือกรูป"
@@ -517,7 +518,12 @@ const AddFarmer = () => {
                   display: imgIdCard == undefined ? "block" : "none",
                 }}
               >
-                <input type="file" onChange={onChangeIdCard} title="เลือกรูป" />
+                <input
+                  key={imgIdCard}
+                  type="file"
+                  onChange={onChangeIdCard}
+                  title="เลือกรูป"
+                />
               </div>
             </div>
           </div>
