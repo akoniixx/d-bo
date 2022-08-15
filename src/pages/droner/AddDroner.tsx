@@ -112,6 +112,8 @@ function AddDroner() {
   });
   const [location, setLocation] = useState<SubdistrictEntity[]>([]);
   const [searchLocation] = useState("");
+  const [validateComma, setValidateComma] = useState<any>("");
+  let [otherPlant, setOtherPlant] = useState<any>();
 
   useEffect(() => {
     fetchProvince();
@@ -163,7 +165,7 @@ function AddDroner() {
     const d = Map(address).set("subdistrictId", subdistrictId);
     setAddress(d.toJS());
     checkValidateAddr(d.toJS());
-    await handleOnChangePostcode(d.toJS());
+    handleOnChangePostcode(d.toJS());
   };
   const handleOnChangePostcode = (addr: CreateAddressEntity) => {
     let getPostcode = subdistrict.filter(
@@ -187,34 +189,33 @@ function AddDroner() {
       p = Map(data).set("expPlant", removePlant);
     }
     setData(p.toJS());
-    checkValidate(data);
+    checkValidate(p.toJS());
   };
-  const handlePlantOther = (e: React.ChangeEvent<HTMLInputElement>) => {
-    let otherPlant = [];
-    const checkComma = checkValidateComma(e.target.value);
-    if (checkComma) {
-      let m = e.target.value.split(",");
-      for (let i = 0; m.length > i; i++) {
-        otherPlant.push(m[i]);
+  const handlePlantOther = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.value.trim().length != 0) {
+      setOtherPlant(e.target.value);
+      const checkComma = checkValidateComma(e.target.value);
+      if (!checkComma) {
+        setValidateComma("");
+        setBtnSaveDisable(checkComma);
+      } else {
+        setValidateComma("error");
+        setBtnSaveDisable(checkComma);
       }
     } else {
+      setValidateComma("");
+      setBtnSaveDisable(true);
     }
-    data.expPlant.push.apply(
-      data.expPlant,
-      otherPlant.filter((x) => x != "")
-    );
   };
 
   const checkValidateComma = (data: string) => {
-    const a = data.indexOf(" ");
-    const b = data.indexOf("/");
-    const c = data.indexOf("-");
-    const d = data.indexOf("*");
-    if (a > -1 || b > -1 || c > -1 || d > -1) {
-      return false;
-    } else {
-      return true;
-    }
+    const checkSyntax =
+      data.includes("*") ||
+      data.includes("/") ||
+      data.includes(" ") ||
+      data.includes("-") ||
+      data.includes("+");
+    return data.trim().length != 0 ? (checkSyntax ? true : false) : true;
   };
   //#endregion
 
@@ -374,7 +375,8 @@ function AddDroner() {
       address.districtId,
       address.subdistrictId,
     ].includes(0);
-    let checkEmptyArray = ![data.expPlant].includes([""]);
+    let checkEmptyArray =
+      data.expPlant.filter((x) => x != "").length > 0 ? true : false;
 
     if (checkEmptySting && checkEmptyNumber && checkEmptyArray) {
       setBtnSaveDisable(false);
@@ -396,7 +398,8 @@ function AddDroner() {
       addr.districtId,
       addr.subdistrictId,
     ].includes(0);
-    let checkEmptyArray = ![data.expPlant].includes([""]);
+    let checkEmptyArray =
+      data.expPlant.filter((x) => x != "").length > 0 ? true : false;
 
     if (checkEmptySting && checkEmptyNumber && checkEmptyArray) {
       setBtnSaveDisable(false);
@@ -406,6 +409,16 @@ function AddDroner() {
   };
 
   const insertDroner = async () => {
+    let otherPlantList = [];
+    let m = otherPlant.split(",");
+    for (let i = 0; m.length > i; i++) {
+      otherPlantList.push(m[i]);
+    }
+    data.expPlant.push.apply(
+      data.expPlant,
+      otherPlantList.filter((x) => x != "")
+    );
+   
     const pushAdd = Map(data).set("address", address);
     const pushDronerArea = Map(pushAdd.toJS()).set("dronerArea", dronerArea);
     const pushDroneList = Map(pushDronerArea.toJS()).set(
@@ -420,7 +433,6 @@ function AddDroner() {
       "expPlant",
       setOtherPlant
     );
-    
     await DronerDatasource.createDronerList(pushOtherPlant.toJS()).then(
       (res) => {
         if (res.id != null) {
@@ -889,23 +901,20 @@ function AddDroner() {
               ))}
             </div>
           </div>
-          <div className="form-group col-lg-6">
+          <div className="form-group col-lg-12">
             <label></label>
-            <Form.Item
-              name="otherPlant"
-              rules={[
-                {
-                  required: true,
-                  message: "กรุณากรอกข้อมูลแล้วคั่นด้วย (,)",
-                },
-              ]}
-            >
+            <Form.Item name="otherPlant">
               <Input
-                pattern="[+-]?\d+(?:[,]\d+)?"
-                onBlur={handlePlantOther}
-                placeholder="พืชอื่นๆ เช่น ส้ม มะละกอ มะพร้าว"
+                status={validateComma}
+                onChange={handlePlantOther}
+                placeholder="กรอกข้อมูลพืชอื่นๆ เช่น ส้ม,มะขาม (กรุณาใช้ (,) ให้กับการเพิ่มพืชมากกว่า 1 อย่าง)"
                 autoComplete="off"
               />
+              {validateComma == "error" && (
+                <p style={{ color: color.Error }}>
+                  กรุณาใช้ (,) ให้กับการเพิ่มพืชมากกว่า 1 อย่าง
+                </p>
+              )}
             </Form.Item>
           </div>
         </Form>

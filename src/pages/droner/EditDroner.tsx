@@ -440,26 +440,25 @@ function EditDroner() {
     );
     const pushOtherPlant = Map(pushPin.toJS()).set("expPlant", setOtherPlant);
     console.log(pushOtherPlant.toJS());
-    console.log(JSON.stringify(pushOtherPlant.toJS()));
 
-    await DronerDatasource.updateDroner(pushPin.toJS()).then((res) => {
-      if (res != null) {
-        var i = 0;
-        for (i; 2 > i; i++) {
-          i == 0 &&
-            UploadImageDatasouce.uploadImage(createImgProfile).then(res);
-          i == 1 && UploadImageDatasouce.uploadImage(createImgIdCard).then(res);
-        }
-        Swal.fire({
-          title: "บันทึกสำเร็จ",
-          icon: "success",
-          timer: 1500,
-          showConfirmButton: false,
-        }).then((time) => {
-          window.location.href = "/IndexDroner";
-        });
-      }
-    });
+    // await DronerDatasource.updateDroner(pushPin.toJS()).then((res) => {
+    //   if (res != null) {
+    //     var i = 0;
+    //     for (i; 2 > i; i++) {
+    //       i == 0 &&
+    //         UploadImageDatasouce.uploadImage(createImgProfile).then(res);
+    //       i == 1 && UploadImageDatasouce.uploadImage(createImgIdCard).then(res);
+    //     }
+    //     Swal.fire({
+    //       title: "บันทึกสำเร็จ",
+    //       icon: "success",
+    //       timer: 1500,
+    //       showConfirmButton: false,
+    //     }).then((time) => {
+    //       window.location.href = "/IndexDroner";
+    //     });
+    //   }
+    // });
   };
 
   const renderFromData = (
@@ -945,8 +944,7 @@ function EditDroner() {
                 placeholder="พืชอื่นๆ"
                 onBlur={handlePlantOther}
                 defaultValue={data.expPlant
-                  .map((x) => EXP_PLANT.find((y) => y != x))
-                  .filter((x) => x != undefined)
+                  .filter((a) => !EXP_PLANT.some((x) => x === a))
                   .join(",")}
               />
             </Form.Item>
@@ -1065,11 +1063,6 @@ function EditDroner() {
 
   return (
     <Layout>
-      {console.log(
-        EXP_PLANT.map((x) => data.expPlant.find((y) => x === y))
-        // .filter((x) => x != undefined)
-        // .join(",")
-      )}
       <Row>
         <BackIconButton
           onClick={() => (window.location.href = "/IndexDroner")}
