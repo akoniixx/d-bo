@@ -155,19 +155,28 @@ const EditFarmer = () => {
   };
 
   const handleOnChangeProvince = async (provinceId: number) => {
-    const d = Map(address).set("provinceId", provinceId == undefined ? 0 : provinceId);
+    const d = Map(address).set(
+      "provinceId",
+      provinceId == undefined ? 0 : provinceId
+    );
     setAddress(d.toJS());
     checkValidateAddr(d.toJS());
   };
 
   const handleOnChangeDistrict = async (districtId: number) => {
-    const d = Map(address).set("districtId", districtId == undefined ? 0 : districtId);
+    const d = Map(address).set(
+      "districtId",
+      districtId == undefined ? 0 : districtId
+    );
     setAddress(d.toJS());
     checkValidateAddr(d.toJS());
   };
 
   const handleOnChangeSubdistrict = async (subdistrictId: number) => {
-    const d = Map(address).set("subdistrictId", subdistrictId == undefined ? 0 : subdistrictId);
+    const d = Map(address).set(
+      "subdistrictId",
+      subdistrictId == undefined ? 0 : subdistrictId
+    );
     setAddress(d.toJS());
     checkValidateAddr(d.toJS());
     await handleOnChangePostcode(d.toJS());
@@ -428,6 +437,7 @@ const EditFarmer = () => {
                 }}
               >
                 <input
+                  key={imgProfile}
                   type="file"
                   onChange={onChangeProfile}
                   title="เลือกรูป"
@@ -583,7 +593,12 @@ const EditFarmer = () => {
                   display: imgIdCard == undefined ? "block" : "none",
                 }}
               >
-                <input type="file" onChange={onChangeIdCard} title="เลือกรูป" />
+                <input
+                  key={imgIdCard}
+                  type="file"
+                  onChange={onChangeIdCard}
+                  title="เลือกรูป"
+                />
               </div>
             </div>
           </div>
