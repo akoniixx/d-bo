@@ -1,44 +1,24 @@
-import {
-  Avatar,
-  Badge,
-  Button,
-  Col,
-  Image,
-  Input,
-  Pagination,
-  Row,
-  Select,
-  Table,
-} from "antd";
-import React, { useEffect, useState } from "react";
-import { CardContainer } from "../../components/card/CardContainer";
-import Layouts from "../../components/layout/Layout";
+import { Avatar, Badge, Pagination, Row, Select, Table } from "antd";
 import Search from "antd/lib/input/Search";
-import { Option } from "antd/lib/mentions";
+import moment from "moment";
+import { useEffect, useState } from "react";
 import ActionButton from "../../components/button/ActionButton";
-import { EditOutlined } from "@ant-design/icons";
-import color from "../../resource/color";
-import { useLocalStorage } from "../../hook/useLocalStorage";
+import Layouts from "../../components/layout/Layout";
 import { DroneDatasource } from "../../datasource/DroneDatasource";
-import { formatDate } from "../../utilities/TextFormatter";
+import { DronerDroneDatasource } from "../../datasource/DronerDroneDatasource";
+import { UploadImageDatasouce } from "../../datasource/UploadImageDatasource";
 import {
   DRONER_DRONE_MAPPING,
-  DRONER_DRONE_STATUS,
-  DRONER_STATUS,
   DRONE_STATUS,
   STATUS_COLOR,
 } from "../../definitions/DronerStatus";
-import {
-  DroneBrandEntity,
-  DroneBrandListEntity,
-} from "../../entities/DroneBrandEntities";
-import { DronerDroneListEntity } from "../../entities/DronerDroneEntities";
-import { DronerDroneDatasource } from "../../datasource/DronerDroneDatasource";
-import moment from "moment";
-import { Link } from "react-router-dom";
-import { FileTextFilled } from "@ant-design/icons";
+import { DroneBrandEntity } from "../../entities/DroneBrandEntities";
 import { DroneEntity } from "../../entities/DroneEntities";
-const { Map } = require("immutable");
+import { DronerDroneListEntity } from "../../entities/DronerDroneEntities";
+import color from "../../resource/color";
+import { formatDate } from "../../utilities/TextFormatter";
+import { EditOutlined, FileTextFilled } from "@ant-design/icons";
+
 function DroneList() {
   const row = 10;
   const [current, setCurrent] = useState(1);
@@ -47,7 +27,6 @@ function DroneList() {
   const [seriesDrone, setSeriesDrone] = useState<DroneEntity[]>();
   const [droneBrandId, setDroneBrandId] = useState<string>();
   const [searchSeriesDrone, setSearchSeriesDrone] = useState<any>();
-  const [searchDroneBrand, setSearchDroneBrand] = useState<any>();
   const [searchStatus, setSearchStatus] = useState<string>();
   const [searchText, setSearchText] = useState<string>();
 
@@ -137,7 +116,7 @@ function DroneList() {
               onChange={handleDroneBrand}
             >
               {droneBrand?.map((item: any) => (
-                <Option value={item.id.toString()}>{item.name}</Option>
+                <option value={item.id.toString()}>{item.name}</option>
               ))}
             </Select>
           </div>
@@ -159,7 +138,7 @@ function DroneList() {
               onChange={handleDroneSeries}
             >
               {seriesDrone?.map((item: any) => (
-                <Option value={item.id.toString()}>{item.series}</Option>
+                <option value={item.id.toString()}>{item.series}</option>
               ))}
             </Select>
           </div>
@@ -272,27 +251,36 @@ function DroneList() {
     },
     {
       title: "ใบอนุญาตนักบิน ",
-      dataIndex: "licenseDroner",
-      key: "licenseDroner",
+      dataIndex: "file",
+      key: "file",
       render: (value: any, row: any, index: number) => {
-        const filterDrone = row.drone.droneBrandId;
-        let nameDrone = droneBrand?.filter((x) => x.id == filterDrone)[0];
-        // console.log(nameDrone);
-        // const filterFile = row.drone.droneBrandId;
-        // let licenseDroner = seriesDrone?.filter((x) => x.id == filterFile);
-        // console.log(licenseDroner)
+        let getLicenseDroner = row.file?.filter(
+          (x: { category: string }) => x.category == "DRONER_LICENSE"
+        );
+        const previewLicenseDroner = async () => {
+          let src = getLicenseDroner[0].path;
+          UploadImageDatasouce.getImage(src.toString()).then((resImg) => {
+            const image = new Image();
+            image.src = resImg.url;
+            const imgWindow = window.open(src);
+            imgWindow?.document.write(image.outerHTML);
+          });
+        };
         return {
           children: (
             <>
               <Row>
-                <span className="text-dark-75  text-hover-primary mb-1 font-size-lg">
-                  <Link to="/" style={{ color: color.Success }}>
-                    <span style={{ marginRight: "5px", color: color.Success }}>
+                <div
+                  className="text-left ps-4"
+                  style={{ cursor: "pointer", color: color.Success}}
+                >
+                  {getLicenseDroner != false && (
+                    <>
                       <FileTextFilled />
-                    </span>
-                    ใบอนุญาตนักบิน
-                  </Link>
-                </span>
+                      <text onClick={previewLicenseDroner}>ใบอนุญาตนักบิน</text>
+                    </>
+                  )}
+                </div>
               </Row>
             </>
           ),
@@ -304,18 +292,35 @@ function DroneList() {
       dataIndex: "licenseDrone",
       key: "licenseDrone",
       render: (value: any, row: any, index: number) => {
+        let getLicenseDrone = row.file?.filter(
+          (x: { category: string }) => x.category == "DRONE_LICENSE"
+        );
+        const previewLicenseDrone = async () => {
+          let src = getLicenseDrone[0].path;
+          UploadImageDatasouce.getImage(src.toString()).then((resImg) => {
+            const image = new Image();
+            image.src = resImg.url;
+            const imgWindow = window.open(src);
+            imgWindow?.document.write(image.outerHTML);
+          });
+        };
         return {
           children: (
             <>
               <Row>
-                <span className="text-dark-75  text-hover-primary mb-1 font-size-lg">
-                  <Link to="/" style={{ color: color.Success }}>
-                    <span style={{ marginRight: "5px", color: color.Success }}>
+                <div
+                  className="text-left ps-4"
+                  style={{ cursor: "pointer", color: color.Success }}
+                >
+                  {getLicenseDrone != false && (
+                    <>
                       <FileTextFilled />
-                    </span>
-                    ใบอนุญาตโดรน(กสทช.)
-                  </Link>
-                </span>
+                      <text onClick={previewLicenseDrone}>
+                        ใบอนุญาตโดรน(กสทช.)
+                      </text>
+                    </>
+                  )}
+                </div>
               </Row>
             </>
           ),
@@ -381,7 +386,7 @@ function DroneList() {
         columns={columns}
         dataSource={droneList?.data}
         pagination={false}
-        scroll={{ x: 1410 }}
+        scroll={{ x: 1400 }}
         rowClassName={(a) =>
           a.status == "PENDING" &&
           moment(Date.now()).diff(moment(new Date(a.createdAt)), "day") >= 3
@@ -393,12 +398,13 @@ function DroneList() {
         }
       />
       <div className="d-flex justify-content-between pt-5">
-        <h5>รายการทั้งหมด {droneList?.count} รายการ</h5>
+        <p>รายการทั้งหมด {droneList?.count} รายการ</p>
         <Pagination
           current={current}
           total={droneList?.count}
           onChange={onChangePage}
           pageSize={row}
+          showSizeChanger={false}
         />
       </div>
     </Layouts>

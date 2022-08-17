@@ -5,31 +5,21 @@ import {
   Form,
   Input,
   Select,
-  Upload,
   Button,
   Pagination,
   Radio,
   Space,
-  RadioChangeEvent,
-  Checkbox,
-  Col,
   Badge,
   Tag,
 } from "antd";
 import emptyData from "../../resource/media/empties/iconoir_farm.png";
-import {
-  SearchOutlined,
-  EditOutlined,
-  DeleteOutlined,
-} from "@ant-design/icons";
+import { EditOutlined } from "@ant-design/icons";
 import { CardContainer } from "../../components/card/CardContainer";
 import color from "../../resource/color";
 import { CardHeader } from "../../components/header/CardHearder";
 import FooterPage from "../../components/footer/FooterPage";
-import { Link } from "react-router-dom";
-import { BackButton, BackIconButton } from "../../components/button/BackButton";
+import { BackIconButton } from "../../components/button/BackButton";
 import TextArea from "antd/lib/input/TextArea";
-import { ModalPage } from "../../components/modal/ModalPage";
 import { DronerEntity, DronerEntity_INIT } from "../../entities/DronerEntities";
 import { DronerDatasource } from "../../datasource/DronerDatasource";
 import Swal from "sweetalert2";
@@ -65,7 +55,6 @@ import { UploadImageDatasouce } from "../../datasource/UploadImageDatasource";
 import "../farmer/Style.css";
 import uploadImg from "../../resource/media/empties/uploadImg.png";
 import bth_img_empty from "../../resource/media/empties/upload_Img_btn.png";
-import { DroneEntity } from "../../entities/DroneEntities";
 import GoogleMap from "../../components/map/GoogleMap";
 import {
   DronerAreaEntity,
@@ -114,11 +103,11 @@ function EditDroner() {
 
   useEffect(() => {
     fetchDronerById();
-  }, []);
+    fetchLocation(searchLocation);
+  }, [searchLocation]);
 
   const fetchDronerById = async () => {
     await DronerDatasource.getDronerByID(dronerId).then((res) => {
-      console.log("edit", res);
       setData(res);
       setMapPosition({
         lat: parseFloat(dronerArea.lat),
@@ -149,6 +138,12 @@ function EditDroner() {
       }
     });
   };
+  const fetchLocation = async (text?: string) => {
+    await LocationDatasource.getSubdistrict(0, text).then((res) => {
+      setLocation(res);
+    });
+  };
+
   useEffect(() => {
     LocationDatasource.getProvince().then((res) => {
       setProvince(res);
@@ -172,15 +167,35 @@ function EditDroner() {
     setData(m.toJS());
   };
   const handleExpPlant = (e: any) => {
-    data.expPlant.push.apply(data.expPlant, e);
+    let checked = e.target.checked;
+    let value = e.target.value;
+    let p: any = "";
+    if (checked) {
+      p = Map(data).set(
+        "expPlant",
+        [...data.expPlant, value].filter((x) => x != "")
+      );
+    } else {
+      let removePlant = data.expPlant.filter((x) => x != value);
+      p = Map(data).set("expPlant", removePlant);
+    }
+    setData(p.toJS());
+    checkValidate(data);
   };
   const handlePlantOther = (e: React.ChangeEvent<HTMLInputElement>) => {
     let otherPlant = [];
-    let m = e.target.value.split(",");
-    for (let i = 0; m.length > i; i++) {
-      otherPlant.push(m[i]);
+    const checkComma = checkValidateComma(e.target.value);
+    if (checkComma) {
+      let m = e.target.value.split(",");
+      for (let i = 0; m.length > i; i++) {
+        otherPlant.push(m[i]);
+      }
+    } else {
     }
-    data.expPlant.push.apply(data.expPlant, otherPlant);
+    data.expPlant.push.apply(
+      data.expPlant,
+      otherPlant.filter((x) => x != "")
+    );
   };
   const handleProvince = async (provinceId: number) => {
     const d = Map(address).set("provinceId", provinceId);
@@ -210,6 +225,24 @@ function EditDroner() {
     const d = Map(address).set("address1", e.target.value);
     setAddress(d.toJS());
     checkValidateAddr(d.toJS());
+  };
+  const handleOnChangeLat = (value: any) => {
+    const m = Map(dronerArea).set("lat", value.target.value);
+    setDronerArea(m.toJS());
+    checkValidate(m.toJS());
+    setMapPosition((prev) => ({
+      lat: parseFloat(value.target.value),
+      lng: prev.lng,
+    }));
+  };
+  const handleOnChangeLng = (value: any) => {
+    const m = Map(dronerArea).set("long", value.target.value);
+    setDronerArea(m.toJS());
+    checkValidate(m.toJS());
+    setMapPosition((prev) => ({
+      lat: prev.lat,
+      lng: parseFloat(value.target.value),
+    }));
   };
   //#endregion
 
@@ -252,14 +285,10 @@ function EditDroner() {
     setEditDroneList(data);
   };
   const updateDrone = async (data: DronerDroneEntity) => {
-    const p = Map(data).set("dronerId", dronerId);
-    if (p.toJS().id != "") {
-      await DronerDroneDatasource.updateDronerDrone(p.toJS()).then();
-      setShowEditModal((prev) => !prev);
-    } else {
-      await DronerDroneDatasource.updateDronerDrone(p.toJS()).then();
-      setShowAddModal((prev) => !prev);
-    }
+    await DronerDroneDatasource.updateDronerDrone(data).then((res) => {
+    });
+    setShowEditModal((prev) => !prev);
+    setShowAddModal((prev) => !prev);
     fetchDronerById();
   };
   //#endregion
@@ -342,40 +371,58 @@ function EditDroner() {
   //#endregion
 
   const checkValidate = (data: DronerEntity) => {
-    if (
-      data.firstname != "" &&
-      data.lastname != "" &&
-      data.telephoneNo != "" &&
-      data.idNo != "" &&
-      address.provinceId != 0 &&
-      address.districtId != 0 &&
-      address.subdistrictId != 0 &&
-      dronerArea.lat != "" &&
-      dronerArea.long != "" &&
-      address.address1 != ""
-    ) {
+    let checkEmptySting = ![
+      data.firstname,
+      data.telephoneNo,
+      data.idNo,
+      address.address1,
+      dronerArea.lat,
+      dronerArea.long,
+    ].includes("");
+    let checkEmptyNumber = ![
+      address.provinceId,
+      address.districtId,
+      address.subdistrictId,
+    ].includes(0);
+    let checkEmptyArray = ![data.expPlant].includes([""]);
+
+    if (checkEmptySting && checkEmptyNumber && checkEmptyArray) {
       setBtnSaveDisable(false);
     } else {
       setBtnSaveDisable(true);
     }
   };
   const checkValidateAddr = (addr: AddressEntity) => {
-    if (
-      addr.provinceId != 0 &&
-      addr.subdistrictId != 0 &&
-      addr.districtId != 0 &&
-      addr.postcode != "" &&
-      addr.address1 != "" &&
-      data.firstname != "" &&
-      data.lastname != "" &&
-      data.telephoneNo != "" &&
-      dronerArea.lat != "" &&
-      dronerArea.long != "" &&
-      data.idNo != ""
-    ) {
+    let checkEmptySting = ![
+      data.firstname,
+      data.telephoneNo,
+      data.idNo,
+      address.address1,
+      dronerArea.lat,
+      dronerArea.long,
+    ].includes("");
+    let checkEmptyNumber = ![
+      addr.provinceId,
+      addr.districtId,
+      addr.subdistrictId,
+    ].includes(0);
+    let checkEmptyArray = ![data.expPlant].includes([""]);
+
+    if (checkEmptySting && checkEmptyNumber && checkEmptyArray) {
       setBtnSaveDisable(false);
     } else {
       setBtnSaveDisable(true);
+    }
+  };
+  const checkValidateComma = (data: string) => {
+    const a = data.indexOf(" ");
+    const b = data.indexOf("/");
+    const c = data.indexOf("-");
+    const d = data.indexOf("*");
+    if (a > -1 || b > -1 || c > -1 || d > -1) {
+      return false;
+    } else {
+      return true;
     }
   };
 
@@ -458,7 +505,6 @@ function EditDroner() {
               </Form.Item>
             </div>
           </div>
-
           <div className="row">
             <div className="form-group col-lg-6">
               <label>
@@ -801,6 +847,50 @@ function EditDroner() {
               />
             </Form.Item>
           </div>
+          <div className="row">
+            <div className="form-group col-lg-6">
+              <label>Latitude (ละติจูด) </label>
+              <span style={{ color: "red" }}>*</span>
+              <Form.Item
+                name="lat"
+                rules={[
+                  {
+                    required: true,
+                    message: "กรุณากรอกละติจูด!",
+                  },
+                ]}
+                key={mapPosition.lat}
+              >
+                <Input
+                  placeholder="กรอกข้อมูล Latitude"
+                  defaultValue={mapPosition.lat}
+                  onBlur={handleOnChangeLat}
+                  autoComplete="off"
+                />
+              </Form.Item>
+            </div>
+            <div className="form-group col-lg-6">
+              <label>Longitude (ลองติจูด) </label>
+              <span style={{ color: "red" }}>*</span>
+              <Form.Item
+                name="long"
+                rules={[
+                  {
+                    required: true,
+                    message: "กรุณากรอกลองติจูด!",
+                  },
+                ]}
+                key={mapPosition.lng}
+              >
+                <Input
+                  placeholder="กรอกข้อมูล Longitude"
+                  defaultValue={mapPosition.lng}
+                  onBlur={handleOnChangeLng}
+                  autoComplete="off"
+                />
+              </Form.Item>
+            </div>
+          </div>
           <GoogleMap
             width="100%"
             height="300px"
@@ -816,18 +906,13 @@ function EditDroner() {
               </span>
               <span style={{ color: "red" }}>*</span>
             </label>
-            <Checkbox.Group
-              onChange={handleExpPlant}
-              options={EXP_PLANT}
-              className="col-lg-8"
-              defaultValue={data.expPlant}
-            >
-              <Row className="d-flex justify-content-center">
-                {EXP_PLANT.map((item) => (
-                  <Checkbox value={item}>{item}</Checkbox>
-                ))}
-              </Row>
-            </Checkbox.Group>
+            {EXP_PLANT.map((item) => (
+              <div className="col-lg-12">
+                <input type="checkbox" value={item} onClick={handleExpPlant} />{" "}
+                <label>{item}</label>
+                <br />
+              </div>
+            ))}
           </div>
           <div className="form-group col-lg-6">
             <label></label>
@@ -872,7 +957,6 @@ function EditDroner() {
       </CardContainer>
     </div>
   );
-
   const renderDrone = (
     <div className="col-lg-4">
       <CardContainer>
@@ -913,11 +997,8 @@ function EditDroner() {
                     />
                   </div>
                   <div className="col-lg-5">
-                    <span style={{ fontSize: "12px" }}>
-                      {item.drone.droneBrand.name}
-                      <br />
-                      {item.drone.series}
-                    </span>
+                    <h6>{item.drone.droneBrand.name}</h6>
+                    <p style={{ color: "#ccc" }}>{item.drone.series}</p>
                   </div>
                   <div className="col-lg-4">
                     <span style={{ color: STATUS_COLOR[item.status] }}>

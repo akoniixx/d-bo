@@ -1,7 +1,5 @@
 import { ImageEntity, ImageEntity_INTI, UploadImageEntity, UploadImageEntity_INTI } from './UploadImageEntities';
 import { DroneEntity, DroneEntity_INIT } from "./DroneEntities";
-// import { DroneEntity, DroneEntity_INIT } from "./DroneEntities";
-// import { DronerEntity, DronerEntity_INIT } from "./DronerEntities";
 
 export interface DronerDroneEntity {
   id?: string;
@@ -17,7 +15,7 @@ export interface DronerDroneEntity {
   logoImagePath?: string;
   createdAt: string;
   updatedAt: string;
-  img: UploadImageEntity[];
+  file: UploadImageEntity[];
 }
 export const DronerDroneEntity_INIT: DronerDroneEntity = {
   id: "",
@@ -33,7 +31,7 @@ export const DronerDroneEntity_INIT: DronerDroneEntity = {
   logoImagePath: "",
   createdAt: "",
   updatedAt: "",
-  img: [UploadImageEntity_INTI],
+  file: [UploadImageEntity_INTI],
 };
 
 export interface DronerEntity {

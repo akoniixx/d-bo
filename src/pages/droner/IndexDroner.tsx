@@ -461,12 +461,13 @@ function IndexDroner() {
         }
       />
       <div className="d-flex justify-content-between pt-5">
-        <h5>รายการทั้งหมด {data?.count} รายการ</h5>
+        <p>รายการทั้งหมด {data?.count} รายการ</p>
         <Pagination
           current={current}
           total={data?.count}
           onChange={onChangePage}
           pageSize={row}
+          showSizeChanger={false}
         />
       </div>
     </Layouts>
