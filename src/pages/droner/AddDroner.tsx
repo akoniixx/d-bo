@@ -190,7 +190,7 @@ function AddDroner() {
       data.expPlant.push.apply(data.expPlant, otherPlant);
     } else  {
     }
-    console.log(data);
+   
   };
 
   const checkValidateComma = (e: string) => {
@@ -227,7 +227,7 @@ function AddDroner() {
         lng: a.long != null ? parseFloat(a.long) : 0,
       });
       checkValidate(pushLong.toJS());
-      console.log(pushLong.toJS());
+    
     } else {
       setMapPosition(LAT_LNG_BANGKOK);
     }
@@ -271,7 +271,6 @@ function AddDroner() {
       );
       setDronerDroneList([...dronerDroneList, pushId.toJS()]);
     } else {
-      console.log("list", dronerDroneList);
       const m = dronerDroneList.filter(
         (x) => x.modalDroneIndex != data.modalDroneIndex
       );
@@ -406,7 +405,6 @@ function AddDroner() {
       "expPlant",
       setOtherPlant
     );
-    console.log(pushOtherPlant.toJS());
     // await DronerDatasource.createDronerList(pushOtherPlant.toJS()).then(
     //   (res) => {
     //     if (res.id != null) {
