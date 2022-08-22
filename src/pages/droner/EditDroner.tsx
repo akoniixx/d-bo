@@ -47,6 +47,7 @@ import {
 } from "../../entities/DronerDroneEntities";
 import ModalDrone from "../../components/modal/ModalDronerDrone";
 import {
+  DRONER_DRONE_MAPPING,
   DRONER_DRONE_STATUS,
   DRONER_STATUS,
   STATUS_COLOR,
@@ -1180,7 +1181,7 @@ function EditDroner() {
                   <div className="col-lg-4">
                     <span style={{ color: STATUS_COLOR[item.status] }}>
                       <Badge color={STATUS_COLOR[item.status]} />
-                      {DRONER_DRONE_STATUS[item.status]}
+                      {DRONER_DRONE_MAPPING[item.status]}
                       <br />
                     </span>
                   </div>
