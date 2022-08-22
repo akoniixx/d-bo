@@ -73,7 +73,7 @@ export const CreateDronerEntity_INIT: CreateDronerEntity = {
   lastname: "",
   idNo: "",
   telephoneNo: "",
-  status: "OPEN",
+  status: "PENDING",
   expYear: 0,
   expMonth: 0,
   expPlant: [""],

@@ -1,4 +1,7 @@
 ## [Version - 0]
+## Feature [v0.8.0] 2022-08-22
+- create drone list page
+- create drone list edit page
 ## Fix [v0.7.1] 2022-08-15
 - fixed validate plot modal "raiAmount"
 - fixed render img when select previous img in farmer menu

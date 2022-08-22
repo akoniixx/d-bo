@@ -43,7 +43,7 @@ const ModalDrone: React.FC<ModalDroneProps> = ({
   const [droneList, setDroneList] = useState<DroneBrandEntity[]>();
   const [droneBrandId, setDroneBrandId] = useState<string>();
   const [seriesDrone, setSeriesDrone] = useState<DroneEntity[]>();
-  const [searchSeriesDrone, setSeatchSeriesDrone] = useState<DroneEntity[]>();
+  const [searchSeriesDrone, setSearchSeriesDrone] = useState<DroneEntity[]>();
   const [saveBtnDisable, setBtnSaveDisable] = useState<boolean>(true);
 
   let checkDronerLicense = data.file?.filter(
@@ -68,7 +68,7 @@ const ModalDrone: React.FC<ModalDroneProps> = ({
   const fetchDroneSeries = async () => {
     await DroneDatasource.getDroneList(1, 500, droneBrandId).then((res) => {
       setSeriesDrone(res.data);
-      setSeatchSeriesDrone(res.data);
+      setSearchSeriesDrone(res.data);
     });
   };
   const fetchImg = async () => {
@@ -120,7 +120,7 @@ const ModalDrone: React.FC<ModalDroneProps> = ({
     const m = Map(dataDrone.drone).set("droneBrandId", brand);
     const t = Map(dataDrone).set("drone", m.toJS());
     setDataDrone(t.toJS());
-    setSeatchSeriesDrone(filterSeries);
+    setSearchSeriesDrone(filterSeries);
     checkValidate(t.toJS());
   };
   const handleSeries = (id: string) => {
