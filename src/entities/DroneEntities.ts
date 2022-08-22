@@ -1,3 +1,4 @@
+import { ImageEntity, ImageEntity_INTI } from './UploadImageEntities';
 import { DroneBrandEntity, DroneBrandEntity_INIT } from "./DroneBrandEntities";
 
 export interface DroneEntity {
@@ -5,7 +6,7 @@ export interface DroneEntity {
   droneBrandId: string;
   series: string;
   droneBrand: DroneBrandEntity;
-  file: string;
+  file: ImageEntity[];
   createdAt: string;
   updatedAt: string;
 }
@@ -15,7 +16,7 @@ export const DroneEntity_INIT: DroneEntity = {
   droneBrandId: "",
   series: "",
   droneBrand: DroneBrandEntity_INIT,
-  file: "",
+  file: [ImageEntity_INTI],
   createdAt: "",
   updatedAt: "",
 };

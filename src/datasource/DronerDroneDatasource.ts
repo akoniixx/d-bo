@@ -1,6 +1,7 @@
 import {
   DronerDroneEntity,
   DronerDroneListEntity,
+  GetDronerDroneEntity,
 } from "./../entities/DronerDroneEntities";
 import { BASE_URL, httpClient } from "../config/develop-config";
 
@@ -10,6 +11,7 @@ export class DronerDroneDatasource {
     row: number,
     status?: string,
     droneId?: string,
+    droneBrandId?: string,
     search?: string
   ): Promise<DronerDroneListEntity> {
     const params = {
@@ -17,6 +19,7 @@ export class DronerDroneDatasource {
       take: row,
       status: status,
       droneId: droneId,
+      droneBrandId: droneBrandId,
       search: search,
     };
     return httpClient
@@ -28,7 +31,7 @@ export class DronerDroneDatasource {
         console.log(error);
       });
   }
-  static getDronerDroneById(id: string): Promise<DronerDroneEntity> {
+  static getDronerDroneById(id: string): Promise<GetDronerDroneEntity> {
     return httpClient
       .get(BASE_URL + "/droner-drone/" + id)
       .then((res) => {
@@ -50,7 +53,17 @@ export class DronerDroneDatasource {
   }
   static updateDronerDrone(data: DronerDroneEntity): Promise<any> {
     return httpClient
-      .patch(BASE_URL + "/droner-drone/" + data.droneId, data)
+      .patch(BASE_URL + "/droner-drone/" + data.id, data)
+      .then((response) => {
+        return response.data;
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  }
+  static updateDroneList(data: GetDronerDroneEntity): Promise<any> {
+    return httpClient
+      .patch(BASE_URL + "/droner-drone/" + data.id, data)
       .then((response) => {
         return response.data;
       })
