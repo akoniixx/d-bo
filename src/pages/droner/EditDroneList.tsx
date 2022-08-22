@@ -5,67 +5,33 @@ import {
   Form,
   Input,
   Select,
-  Button,
-  Pagination,
   Radio,
   Space,
-  Badge,
   Tag,
   Checkbox,
-  Col,
 } from "antd";
-import emptyData from "../../resource/media/empties/iconoir_farm.png";
-import { EditOutlined } from "@ant-design/icons";
+
 import { CardContainer } from "../../components/card/CardContainer";
 import color from "../../resource/color";
 import { CardHeader } from "../../components/header/CardHearder";
 import FooterPage from "../../components/footer/FooterPage";
 import { BackIconButton } from "../../components/button/BackButton";
 import TextArea from "antd/lib/input/TextArea";
-import { DronerEntity, DronerEntity_INIT } from "../../entities/DronerEntities";
-import { DronerDatasource } from "../../datasource/DronerDatasource";
 import Swal from "sweetalert2";
-import { LocationDatasource } from "../../datasource/LocationDatasource";
-import { EXP_PLANT } from "../../definitions/ExpPlant";
-import ActionButton from "../../components/button/ActionButton";
-import {
-  AddressEntity,
-  AddressEntity_INIT,
-} from "../../entities/AddressEntities";
 import { DronerDroneDatasource } from "../../datasource/DronerDroneDatasource";
 import {
-  DistrictEntity,
-  ProviceEntity,
-  SubdistrictEntity,
-} from "../../entities/LocationEntities";
-import {
-  DronerDroneEntity,
-  DronerDroneEntity_INIT,
   GetDronerDroneEntity,
   GetDronerDroneEntity_INIT,
 } from "../../entities/DronerDroneEntities";
-import ModalDrone from "../../components/modal/ModalDronerDrone";
 import {
-  DRONER_DRONE_MAPPING,
-  DRONER_DRONE_STATUS,
-  DRONER_STATUS,
-  STATUS_COLOR,
+  DRONER_DRONE_STATUS
 } from "../../definitions/DronerStatus";
 import {
   ImageEntity,
-  ImageEntity_INTI,
-  UploadImageEntity,
+  ImageEntity_INTI
 } from "../../entities/UploadImageEntities";
 import { UploadImageDatasouce } from "../../datasource/UploadImageDatasource";
-import "../farmer/Style.css";
-import uploadImg from "../../resource/media/empties/uploadImg.png";
 import bth_img_empty from "../../resource/media/empties/upload_Img_btn.png";
-import GoogleMap from "../../components/map/GoogleMap";
-import {
-  DronerAreaEntity,
-  DronerAreaEntity_INIT,
-} from "../../entities/DronerAreaEntities";
-import { LAT_LNG_BANGKOK } from "../../definitions/Location";
 import { DroneBrandEntity } from "../../entities/DroneBrandEntities";
 import { DroneEntity } from "../../entities/DroneEntities";
 import { DroneDatasource } from "../../datasource/DroneDatasource";
@@ -104,7 +70,6 @@ function EditDroneList() {
   const fetchDronerDrone = async () => {
     await DronerDroneDatasource.getDronerDroneById(DronerDroneId).then(
       (res) => {
-        
         setData(res);
         setDronerId(res.dronerId);
         let getPathPro = res.droner.file.filter(
@@ -362,7 +327,8 @@ function EditDroneList() {
     const pushImg = Map(data).set("file", [
       ...data.file.filter((x) => x.file != ""),
       g.toJS(),
-    ]);
+    ]);   
+
     setData(pushImg.toJS());
     checkValidate(pushImg.toJS());
   };
@@ -392,22 +358,7 @@ function EditDroneList() {
     checkValidate(data);
   };
   const UpdateDronerDrone = async () => {
-    let textReasonList = [];
-    if (textReason != undefined) {
-      let m = textReason.split(",");
-      for (let i = 0; m.length > i; i++) {
-        textReasonList.push(m[i]);
-      }
-    }
-    data.reason.push.apply(
-      data.reason,
-      textReasonList.filter((x) => x != "")
-    );
-    const setTextReason = Array.from(new Set(data.reason)).filter(
-      (x) => x != ""
-    );
-    const pushTextReason = Map(data).set("reason", setTextReason);
-    await DronerDroneDatasource.updateDroneList(pushTextReason.toJS()).then(
+    await DronerDroneDatasource.updateDroneList(data).then(
       (res) => {
         if (res != undefined) {
           var i = 0;
@@ -677,7 +628,7 @@ function EditDroneList() {
               {data.status == "REJECTED" && (
                 <div style={{ marginLeft: "20px" }}>
                   <div className="form-group">
-                    <Form.Item>
+                     <Form.Item>
                       {REASON_IS_CHECK.map((item) =>
                         _.set(
                           item,
@@ -714,7 +665,7 @@ function EditDroneList() {
                         <p style={{ color: color.Error }}>
                           กรุณาใช้ (,) ให้กับการเพิ่มเหตุผลมากกว่า 1 อย่าง
                         </p>
-                      )}
+                      )} 
                     </Form.Item>
                   </div>
                 </div>

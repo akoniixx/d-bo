@@ -272,7 +272,7 @@ function DroneList() {
               <Row>
                 <div
                   className="text-left ps-4"
-                  style={{ cursor: "pointer", color: color.Success}}
+                  style={{ cursor: "pointer", color: color.Success, textDecorationLine:"underline"}}
                 >
                   {getLicenseDroner != false && (
                     <>
@@ -310,7 +310,7 @@ function DroneList() {
               <Row>
                 <div
                   className="text-left ps-4"
-                  style={{ cursor: "pointer", color: color.Success }}
+                  style={{ cursor: "pointer", color: color.Success,textDecorationLine:"underline" }}
                 >
                   {getLicenseDrone != false && (
                     <>
