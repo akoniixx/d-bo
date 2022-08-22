@@ -8,7 +8,6 @@ import DroneList from "./pages/droner/DroneList";
 import EditDroneList from "./pages/droner/EditDroneList";
 import EditDroner from "./pages/droner/EditDroner";
 import IndexDroner from "./pages/droner/IndexDroner";
-import RateDroner from "./pages/droner/RateDroner";
 import AddFarmer from "./pages/farmer/AddFarmer";
 import EditFarmer from "./pages/farmer/EditFarmer";
 import IndexFarmer from "./pages/farmer/IndexFarmer";
@@ -21,6 +20,8 @@ import AddAdmin from "./pages/admin/AddAdmin";
 import EditAdmin from "./pages/admin/EditAdmin";
 import ProtectRoute from "./ProtectRoute";
 import PublicRoute from "./PublicRoute";
+import DetailRankDroner from "./pages/droner/DetailRankDroner";
+import IndexRateDroner from "./pages/droner/IndexRateDroner";
 
 const WebRoutes: React.FC<any> = () => {
   return (
@@ -38,7 +39,8 @@ const WebRoutes: React.FC<any> = () => {
           <Route path="/AddFarmer" element={<AddFarmer />} />
           <Route path="/AddDroner" element={<AddDroner />} />
           <Route path="/DroneList" element={<DroneList />} />
-          <Route path="/RateDroner" element={<RateDroner />} />
+          <Route path="/IndexRateDroner" element={<IndexRateDroner />} />
+          <Route path="/DetailRankDroner" element={<DetailRankDroner/>} />
           <Route path="/EditDroneList" element={<EditDroneList />} />
           <Route path="/EditFarmer/:id" element={<EditFarmer />} />
           <Route path="/EditDroner" element={<EditDroner />} />
