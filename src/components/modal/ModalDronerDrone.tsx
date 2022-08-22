@@ -35,6 +35,8 @@ const ModalDrone: React.FC<ModalDroneProps> = ({
   const [droneList, setDroneList] = useState<DroneBrandEntity[]>();
   const [droneBrandId, setDroneBrandId] = useState<string>();
   const [seriesDrone, setSeriesDrone] = useState<DroneEntity[]>();
+  const [pushDrone, setPushDrone] = useState<DroneEntity>(data.drone);
+  const [pushSeries, setPushSeries] = useState<DroneBrandEntity>(data.drone.droneBrand);
   const [searchSeriesDrone, setSeatchSeriesDrone] = useState<DroneEntity[]>();
   const [saveBtnDisable, setBtnSaveDisable] = useState<boolean>(true);
 
@@ -109,38 +111,46 @@ const ModalDrone: React.FC<ModalDroneProps> = ({
   const handleBrand = (brand: string) => {
     setDroneBrandId(brand);
     let filterSeries = seriesDrone?.filter((x) => x.droneBrandId == brand);
-    const m = Map(dataDrone.drone).set("droneBrandId", brand);
-    const t = Map(dataDrone).set("drone", m.toJS());
-    setDataDrone(t.toJS());
+    const m = Map(pushDrone).set("droneBrandId", brand);
+    setPushDrone(m.toJS());
     setSeatchSeriesDrone(filterSeries);
-    checkValidate(t.toJS());
+    checkValidate(m.toJS(), pushDrone, pushSeries);
   };
   const handleSeries = (id: string) => {
+    let getSeries = seriesDrone?.filter((x) => x.id == id)[0];
     const m = Map(dataDrone).set("droneId", id);
+    const n = Map(pushSeries).set("id", id);
+    const o = Map(n.toJS()).set("name", getSeries?.droneBrand.name);
+    const p = Map(o.toJS()).set(
+      "logoImagePath",
+      getSeries?.droneBrand.logoImagePath
+    );
+    const pushDroneSeries = Map(pushDrone).set("droneBrand", p.toJS());
+    setPushDrone(pushDroneSeries.toJS());
+    setPushSeries(p.toJS());
     setDataDrone(m.toJS());
-    checkValidate(m.toJS());
+    checkValidate(m.toJS(), pushDroneSeries.toJS(), p.toJS());
   };
   const handleSerialNo = (e: any) => {
     const m = Map(dataDrone).set("serialNo", e.target.value);
     setDataDrone(m.toJS());
-    checkValidate(m.toJS());
+    checkValidate(m.toJS(), pushDrone, pushSeries);
   };
   const handleYear = (e: any) => {
     const m = Map(dataDrone).set("purchaseYear", e.target.value);
     setDataDrone(m.toJS());
-    checkValidate(m.toJS());
+    checkValidate(m.toJS(), pushDrone, pushSeries);
   };
   const handleMonth = (e: any) => {
     const m = Map(dataDrone).set("purchaseMonth", e);
     setDataDrone(m.toJS());
-    checkValidate(m.toJS());
+    checkValidate(m.toJS(), pushDrone, pushSeries);
   };
   const handleChangeStatus = (e: any) => {
     const m = Map(dataDrone).set("status", e.target.value);
     setDataDrone(m.toJS());
-    checkValidate(m.toJS());
+    checkValidate(m.toJS(), pushDrone, pushSeries);
   };
-
   //#region Image
   const onChangeLicenseDroner = async (file: any) => {
     let src = file.target.files[0];
@@ -241,30 +251,22 @@ const ModalDrone: React.FC<ModalDroneProps> = ({
 
   const handleCallBack = () => {
     const m = Map(dataDrone).set("modalDroneIndex", editIndex);
-    let filterLogo = seriesDrone?.filter((x) => x.id == dataDrone.droneId)[0]
-      .droneBrand.logoImagePath;
-    let nameDrone = seriesDrone?.filter((x) => x.id == dataDrone.droneId)[0]
-      .droneBrand.name;
-    const d = Map(m.toJS()).set("logoImagePath", filterLogo);
-    const x = Map(d.toJS()).set("droneName", nameDrone);
-    callBack(x.toJS());
+    const n = Map(m.toJS()).set("drone", pushDrone);
+    callBack(n.toJS());
   };
 
-  const checkValidate = (data: DronerDroneEntity) => {
-    if (
-      data.droneId != "" &&
-      data.droneId != undefined &&
-      data.serialNo != "" &&
-      data.purchaseYear != "" &&
-      data.purchaseMonth != "" &&
-      data.status != "" &&
-      data.drone.droneBrandId != "" &&
-      data.drone.droneBrandId != undefined
-    ) {
-      setBtnSaveDisable(false);
-    } else {
-      setBtnSaveDisable(true);
-    }
+  const checkValidate = (
+    main: DronerDroneEntity,
+    drone?: DroneEntity,
+    serise?: DroneBrandEntity
+  ) => {
+    let checkEmptyMain = [
+      main.droneId,
+      main.serialNo,
+      main.status,
+      serise?.name,
+    ].includes("");
+    setBtnSaveDisable(checkEmptyMain);
   };
 
   return (

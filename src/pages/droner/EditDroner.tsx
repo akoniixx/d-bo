@@ -11,9 +11,14 @@ import {
   Space,
   Badge,
   Tag,
+  Col,
 } from "antd";
 import emptyData from "../../resource/media/empties/iconoir_farm.png";
-import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
+import {
+  DeleteOutlined,
+  EditOutlined,
+  ZhihuCircleFilled,
+} from "@ant-design/icons";
 import { CardContainer } from "../../components/card/CardContainer";
 import color from "../../resource/color";
 import { CardHeader } from "../../components/header/CardHearder";
@@ -106,6 +111,7 @@ function EditDroner() {
   const [imgDroneList] = useState<UploadImageEntity[]>([
     UploadImageEntity_INTI,
   ]);
+  let [moreReason, setMoreReason] = useState<any>("");
 
   useEffect(() => {
     fetchDronerById();
@@ -114,14 +120,19 @@ function EditDroner() {
 
   const fetchDronerById = async () => {
     await DronerDatasource.getDronerByID(dronerId).then((res) => {
-      console.log("get", res);
+      console.log(res);
       setData(res);
       setMapPosition({
         lat: parseFloat(res.dronerArea.lat),
         lng: parseFloat(res.dronerArea.long),
       });
       setAddress(res.address);
+      var k = 0;
+      for (k; res.dronerDrone.length > k; k++) {
+        res.dronerDrone[k].modalDroneIndex = k + 1;
+      }
       setDronerDroneList(res.dronerDrone);
+
       let getPathPro = res.file.filter((x) => x.category == "PROFILE_IMAGE");
       let getPathCard = res.file.filter((x) => x.category == "ID_CARD_IMAGE");
       imgList.push(
@@ -171,8 +182,10 @@ function EditDroner() {
   };
   const handleChangeStatus = (e: any) => {
     const m = Map(data).set("status", e.target.value);
-    setData(m.toJS());
-    checkValidate(m.toJS());
+    const n = Map(m.toJS()).set("reason", [""]);
+    setMoreReason("");
+    setData(n.toJS());
+    checkValidate(n.toJS());
   };
 
   const handleExpPlant = (e: any) => {
@@ -216,6 +229,22 @@ function EditDroner() {
     }
   };
 
+  const handleCheckBoxReason = (e: any) => {
+    let checked = e.target.checked;
+    let value = e.target.value;
+    let p = Map(data).set("reason", [value]);
+    setData(p.toJS());
+    checkValidate(p.toJS());
+  };
+
+  const handelMoreReason = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setMoreReason(e.target.value);
+    checkValidate(data);
+  };
+
+  //#endregion
+
+  //#region address
   const handleProvince = async (provinceId: number) => {
     const d = Map(address).set("provinceId", provinceId);
     setAddress(d.toJS());
@@ -304,12 +333,12 @@ function EditDroner() {
     setEditDroneList(data);
   };
   const updateDrone = (data: DronerDroneEntity) => {
-    console.log(data);
     if (data.modalDroneIndex == 0) {
       const pushId = Map(data).set(
         "modalDroneIndex",
         dronerDroneList.length + 1
       );
+      console.log("result", pushId.toJS());
       setDronerDroneList([...dronerDroneList, pushId.toJS()]);
     } else {
       const m = dronerDroneList.filter(
@@ -476,6 +505,12 @@ function EditDroner() {
       data.expPlant,
       otherPlantList.filter((x) => x != "")
     );
+    console.log(moreReason.trim().length);
+
+    moreReason.trim().length != 0
+      ? data.reason.push(moreReason)
+      : data.reason.push("");
+
     const pushAddr = Map(data).set("address", address);
     const pushDronerArea = Map(pushAddr.toJS()).set("dronerArea", dronerArea);
     const pushPin = Map(pushDronerArea.toJS()).set("pin", "");
@@ -495,8 +530,11 @@ function EditDroner() {
             (x) => x.serialNo == findId.serialNo
           )[0];
 
+          console.log("start",getData.file);
+          
           for (let j = 0; getData.file.length > j; j++) {
-            let getImg = getData.file[i];
+            let getImg = getData.file[j];
+            console.log(j, getImg);
             imgDroneList?.push({
               resourceId: res.dronerDrone[i].id,
               category: getImg.category,
@@ -506,6 +544,7 @@ function EditDroner() {
             });
           }
         }
+        console.log("file", imgDroneList);
         const checkImg = imgDroneList.filter((x) => x.resourceId != "");
         for (let k = 0; checkImg.length > k; k++) {
           let getDataImg: any = checkImg[k];
@@ -519,14 +558,14 @@ function EditDroner() {
             UploadImageDatasouce.uploadImage(createImgProfile).then(res);
           i == 1 && UploadImageDatasouce.uploadImage(createImgIdCard).then(res);
         }
-        Swal.fire({
-          title: "บันทึกสำเร็จ",
-          icon: "success",
-          timer: 1500,
-          showConfirmButton: false,
-        }).then((time) => {
-          window.location.href = "/IndexDroner";
-        });
+        // Swal.fire({
+        //   title: "บันทึกสำเร็จ",
+        //   icon: "success",
+        //   timer: 1500,
+        //   showConfirmButton: false,
+        // }).then((time) => {
+        //   window.location.href = "/IndexDroner";
+        // });
       }
     });
   };
@@ -1028,30 +1067,67 @@ function EditDroner() {
             </Form.Item>
           </div>
           <div className="row">
-            <div className="form-group">
-              <label style={{ marginBottom: "10px" }}>
+            <div className="form-group col-lg-12">
+              <label style={{ marginBottom: "10px" }} className="col-lg-12">
                 สถานะ <span style={{ color: "red" }}>*</span>
               </label>
-              <Form.Item
-                name="status"
-                rules={[
-                  {
-                    required: true,
-                    message: "กรุณาเลือกสถานะ!",
-                  },
-                ]}
+              <br />
+              <Radio.Group
+                defaultValue={data.status}
+                onChange={handleChangeStatus}
+                className="col-lg-12"
               >
-                <Radio.Group
-                  defaultValue={data.status}
-                  onChange={handleChangeStatus}
-                >
-                  <Space direction="vertical">
-                    {DRONER_STATUS.filter((x) => x.value != "").map((item) => (
-                      <Radio value={item.value}>{item.name}</Radio>
-                    ))}
-                  </Space>
-                </Radio.Group>
-              </Form.Item>
+                <Space direction="vertical" className="col-lg-12">
+                  {DRONER_STATUS.filter((x) => x.value != "").map(
+                    (item, index) => (
+                      <Radio value={item.value} style={{ width: "100%" }}>
+                        {item.name}
+                        {data.status == "REJECTED" && index == 3 ? (
+                          <div className="form-group ps-3">
+                            <input
+                              type="checkbox"
+                              value="บัตรประชาชนไม่ชัดเจน/ไม่ถูกต้อง"
+                              onClick={handleCheckBoxReason}
+                              defaultValue={data.reason}
+                              defaultChecked={
+                                data.reason.map(
+                                  (x) => x == "บัตรประชาชนไม่ชัดเจน/ไม่ถูกต้อง"
+                                )
+                                  ? true
+                                  : false
+                              }
+                            />{" "}
+                            <label>บัตรประชาชนไม่ชัดเจน/ไม่ถูกต้อง</label>
+                            <br />
+                            <TextArea
+                              className="col-lg-12"
+                              rows={3}
+                              placeholder="กรอกเหตุผล/เหตุหมายเพิ่มเติม"
+                              autoComplete="off"
+                              onChange={handelMoreReason}
+                              defaultValue={data.reason.filter(
+                                (x) => x != "บัตรประชาชนไม่ชัดเจน/ไม่ถูกต้อง"
+                              )}
+                            />
+                          </div>
+                        ) : data.status == "INACTIVE" && index == 4 ? (
+                          <div>
+                            <div className="form-group ps-3">
+                              <TextArea
+                                className="col-lg-12"
+                                rows={3}
+                                placeholder="กรอกเหตุผล/เหตุหมายเพิ่มเติม"
+                                autoComplete="off"
+                                onChange={handelMoreReason}
+                              />{" "}
+                            </div>
+                          </div>
+                        ) : null}
+                      </Radio>
+                    )
+                  )}
+                </Space>
+              </Radio.Group>
             </div>
           </div>
         </Form>
@@ -1113,7 +1189,7 @@ function EditDroner() {
                       <ActionButton
                         icon={<EditOutlined />}
                         color={color.primary1}
-                        onClick={() => editDroner(item, index)}
+                        onClick={() => editDroner(item, index + 1)}
                       />
                     </div>
                     <div className="col-lg-6">
