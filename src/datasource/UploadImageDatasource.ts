@@ -1,6 +1,6 @@
 import { BASE_URL, httpClient } from "../config/develop-config";
 import { ImageEntity } from "../entities/UploadImageEntities";
-const API_URL = "https://api-dev-dnds.iconkaset.com";
+
 
 export class UploadImageDatasouce {
   static uploadImage(file: ImageEntity): Promise<any> {
@@ -11,7 +11,7 @@ export class UploadImageDatasouce {
     formDataProfile.append("resourceId", file.resourceId);
 
     return httpClient
-      .post(API_URL + "/file/upload", formDataProfile)
+      .post(BASE_URL + "/file/upload", formDataProfile)
       .then((response) => {
         return response.data;
       })
@@ -21,7 +21,7 @@ export class UploadImageDatasouce {
   }
   static getImage(path: string): Promise<any> {
     return httpClient
-      .get(API_URL + "/file/geturl?path=" + path)
+      .get(BASE_URL + "/file/geturl?path=" + path)
       .then((response) => {
         return response.data;
       })
@@ -36,7 +36,7 @@ export class UploadImageDatasouce {
       path: path,
     };
     return httpClient
-      .delete(API_URL + "/file/delete", { params })
+      .delete(BASE_URL + "/file/delete", { params })
       .then((response) => {
         return response.data;
       })
