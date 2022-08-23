@@ -59,7 +59,7 @@ function EditDroneList() {
   const fetchDronerDrone = async () => {
     await DronerDroneDatasource.getDronerDroneById(DronerDroneId).then(
       (res) => {
-        console.log(res);
+        console.log(res.reason)
         setData(res);
         setDronerId(res.dronerId);
         let getPathPro = res.droner.file.filter(
@@ -201,7 +201,7 @@ function EditDroneList() {
   };
   const onChangeReasonText = async (
     e: React.ChangeEvent<HTMLTextAreaElement>
-  ) => {
+  ) => {   
     if (e.target.value.trim().length != 0) {
       setTextReason(e.target.value);
       const checkComma = checkValidateComma(e.target.value);
@@ -353,9 +353,9 @@ function EditDroneList() {
       for (let i = 0; m.length > i; i++) {
         textReasonList.push(m[i]);
       }
+      console.log(textReasonList);
     }
-    console.log(textReasonList);
-    data.reason.push.apply(
+   data.reason.push.apply(
       data.reason,
       textReasonList.filter((x) => x != "")
     );
@@ -363,9 +363,9 @@ function EditDroneList() {
       (x) => x != ""
     );
     const pushTextReason = Map(data).set("reason", setTextReason);
-    await DronerDroneDatasource.updateDroneList(pushTextReason.toJS()).then(
+    await DronerDroneDatasource.updateDroneList(pushTextReason .toJS()).then(
       (res) => {
-        console.log(res);
+        console.log(res.reason)
         if (res != undefined) {
           var i = 0;
           for (i; 3 > i; i++) {
@@ -629,57 +629,57 @@ function EditDroneList() {
                       <Radio value={item.value}>
                         {item.name}
                         {data.status == "REJECTED" && index == 2 ? (
-                          <div className="form-group">
-                            <Form.Item>
-                              {REASON_IS_CHECK.map((item) =>
-                                _.set(
-                                  item,
-                                  "isChecked",
-                                  data?.reason
-                                    .map((x) => x)
-                                    .find((y) => y === item.reason)
-                                    ? true
-                                    : item.isChecked
-                                )
-                              ).map((x) => (
-                                <div>
-                                  <Checkbox
-                                    key={x.key}
-                                    value={x.reason}
-                                    onClick={onChangeReason}
-                                    checked={x.isChecked}
-                                  />{" "}
-                                  <label>{x.reason}</label>
-                                  <br />
-                                </div>
-                              ))}
-                            </Form.Item>
-                            <Form.Item style={{ width: "530px" }}>
-                              <TextArea
-                                rows={3}
-                                status={validateComma}
-                                onChange={onChangeReasonText}
-                                placeholder="กรอกเหตุผล/หมายเหตุเพิ่มเติม"
-                                autoComplete="off"
-                                defaultValue={data.reason
-                                  .filter(
-                                    (a) => !REASON_CHECK.some((x) => x === a)
+                            <div className="form-group">
+                              <Form.Item>
+                                {REASON_IS_CHECK.map((item) =>
+                                  _.set(
+                                    item,
+                                    "isChecked",
+                                    data?.reason
+                                      .map((x) => x)
+                                      .find((y) => y === item.reason)
+                                      ? true
+                                      : item.isChecked
                                   )
-                                  .join(",")}
-                              />
-                              {validateComma == "error" && (
-                                <p style={{ color: color.Error }}>
-                                  กรุณาใช้ (,) ให้กับการเพิ่มเหตุผลมากกว่า 1
-                                  อย่าง
-                                </p>
-                              )}
-                            </Form.Item>
-                          </div>
+                                ).map((x) => (
+                                  <div>
+                                    <Checkbox
+                                      key={x.key}
+                                      value={x.reason}
+                                      onClick={onChangeReason}
+                                      checked={x.isChecked}
+                                    />{" "}
+                                    <label>{x.reason}</label>
+                                    <br />
+                                  </div>
+                                ))}
+                              </Form.Item>
+                              <Form.Item style={{width: "530px"}}>
+                                <TextArea
+                                  rows={3}
+                                  status={validateComma}
+                                  onChange={onChangeReasonText}
+                                  placeholder="กรอกเหตุผล/หมายเหตุเพิ่มเติม"
+                                  autoComplete="off"
+                                  defaultValue={data.reason
+                                    .filter(
+                                      (a) => !REASON_CHECK.some((x) => x === a)
+                                    )
+                                    .join(",")}
+                                />
+                                {validateComma == "error" && (
+                                  <p style={{ color: color.Error }}>
+                                    กรุณาใช้ (,) ให้กับการเพิ่มเหตุผลมากกว่า 1
+                                    อย่าง
+                                  </p>
+                                )}
+                              </Form.Item>
+                            </div>
                         ) : data.status == "INACTIVE" && index == 3 ? (
                           <div>
-                            <Form.Item style={{ width: "530px" }}>
+                            <Form.Item  style={{width: "530px"}}>
                               <TextArea
-                                rows={3}
+                               rows={3}
                                 status={validateComma}
                                 // onChange={onChangeReasonText}
                                 placeholder="กรอกเหตุผล/หมายเหตุเพิ่มเติม"
