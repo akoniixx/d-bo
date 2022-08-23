@@ -55,6 +55,7 @@ export class DronerDatasource {
       delete data.dronerArea["subdistrictId"];
       delete data.dronerArea["distance"];
     }
+    console.log("json",JSON.stringify(data));
     return httpClient
       .patch(BASE_URL + "/droner/" + data.id, data)
       .then((response) => {

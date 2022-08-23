@@ -36,7 +36,9 @@ const ModalDrone: React.FC<ModalDroneProps> = ({
   const [droneBrandId, setDroneBrandId] = useState<string>();
   const [seriesDrone, setSeriesDrone] = useState<DroneEntity[]>();
   const [pushDrone, setPushDrone] = useState<DroneEntity>(data.drone);
-  const [pushSeries, setPushSeries] = useState<DroneBrandEntity>(data.drone.droneBrand);
+  const [pushSeries, setPushSeries] = useState<DroneBrandEntity>(
+    data.drone.droneBrand
+  );
   const [searchSeriesDrone, setSearchSeriesDrone] = useState<DroneEntity[]>();
   const [saveBtnDisable, setBtnSaveDisable] = useState<boolean>(true);
 

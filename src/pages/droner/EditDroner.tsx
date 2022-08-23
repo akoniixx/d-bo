@@ -11,13 +11,11 @@ import {
   Space,
   Badge,
   Tag,
-  Col,
 } from "antd";
 import emptyData from "../../resource/media/empties/iconoir_farm.png";
 import {
   DeleteOutlined,
   EditOutlined,
-  ZhihuCircleFilled,
 } from "@ant-design/icons";
 import { CardContainer } from "../../components/card/CardContainer";
 import color from "../../resource/color";
@@ -523,38 +521,38 @@ function EditDroner() {
       "dronerDrone",
       dronerDroneList
     );
+    console.log(pushDroneList.toJS());
+    
     await DronerDatasource.updateDroner(pushDroneList.toJS()).then((res) => {
+      console.log("res",res);
       if (res != null) {
         for (i = 0; res.dronerDrone.length > i; i++) {
           let findId = res.dronerDrone[i];
           let getData = dronerDroneList.filter(
             (x) => x.serialNo == findId.serialNo
           )[0];
-
-          console.log("start",getData.file);
-          
           for (let j = 0; getData.file.length > j; j++) {
             let getImg = getData.file[j];
             console.log(j, getImg);
             imgDroneList?.push({
               resourceId: res.dronerDrone[i].id,
               category: getImg.category,
-              file: getImg.file,
+              file: getImg,
               resource: getImg.resource,
               path: " ",
             });
           }
         }
-        console.log("file", imgDroneList);
+        //console.log("file", imgDroneList);
         const checkImg = imgDroneList.filter((x) => x.resourceId != "");
         for (let k = 0; checkImg.length > k; k++) {
           let getDataImg: any = checkImg[k];
-          console.log(getDataImg);
+          //console.log(getDataImg);
           UploadImageDatasouce.uploadImage(getDataImg).then(res);
         }
         var i = 0;
         for (i; 2 > i; i++) {
-          console.log(createImgProfile);
+          //console.log(createImgProfile);
           i == 0 &&
             UploadImageDatasouce.uploadImage(createImgProfile).then(res);
           i == 1 && UploadImageDatasouce.uploadImage(createImgIdCard).then(res);
