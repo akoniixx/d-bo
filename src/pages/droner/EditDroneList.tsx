@@ -1,15 +1,6 @@
 import React, { useEffect, useState } from "react";
 import Layout from "../../components/layout/Layout";
-import {
-  Row,
-  Form,
-  Input,
-  Select,
-  Radio,
-  Space,
-  Tag,
-  Checkbox,
-} from "antd";
+import { Row, Form, Input, Select, Radio, Space, Tag, Checkbox } from "antd";
 
 import { CardContainer } from "../../components/card/CardContainer";
 import color from "../../resource/color";
@@ -23,12 +14,10 @@ import {
   GetDronerDroneEntity,
   GetDronerDroneEntity_INIT,
 } from "../../entities/DronerDroneEntities";
-import {
-  DRONER_DRONE_STATUS
-} from "../../definitions/DronerStatus";
+import { DRONER_DRONE_STATUS } from "../../definitions/DronerStatus";
 import {
   ImageEntity,
-  ImageEntity_INTI
+  ImageEntity_INTI,
 } from "../../entities/UploadImageEntities";
 import { UploadImageDatasouce } from "../../datasource/UploadImageDatasource";
 import bth_img_empty from "../../resource/media/empties/upload_Img_btn.png";
@@ -70,6 +59,7 @@ function EditDroneList() {
   const fetchDronerDrone = async () => {
     await DronerDroneDatasource.getDronerDroneById(DronerDroneId).then(
       (res) => {
+        console.log(res);
         setData(res);
         setDronerId(res.dronerId);
         let getPathPro = res.droner.file.filter(
@@ -193,7 +183,6 @@ function EditDroneList() {
   const onChangeReason = (e: any) => {
     let checked = e.target.checked;
     let value = e.target.value;
-  
     REASON_IS_CHECK.map((item) =>
       _.set(item, "isChecked", item.reason == value ? checked : item.isChecked)
     );
@@ -327,7 +316,7 @@ function EditDroneList() {
     const pushImg = Map(data).set("file", [
       ...data.file.filter((x) => x.file != ""),
       g.toJS(),
-    ]);   
+    ]);
 
     setData(pushImg.toJS());
     checkValidate(pushImg.toJS());
@@ -358,8 +347,25 @@ function EditDroneList() {
     checkValidate(data);
   };
   const UpdateDronerDrone = async () => {
-    await DronerDroneDatasource.updateDroneList(data).then(
+    let textReasonList: any[] = [];
+    if (textReason != undefined) {
+      let m = textReason.split(",");
+      for (let i = 0; m.length > i; i++) {
+        textReasonList.push(m[i]);
+      }
+    }
+    console.log(textReasonList);
+    data.reason.push.apply(
+      data.reason,
+      textReasonList.filter((x) => x != "")
+    );
+    const setTextReason = Array.from(new Set(data.reason)).filter(
+      (x) => x != ""
+    );
+    const pushTextReason = Map(data).set("reason", setTextReason);
+    await DronerDroneDatasource.updateDroneList(pushTextReason.toJS()).then(
       (res) => {
+        console.log(res);
         if (res != undefined) {
           var i = 0;
           for (i; 3 > i; i++) {
@@ -370,14 +376,14 @@ function EditDroneList() {
             i == 2 &&
               UploadImageDatasouce.uploadImage(createLicenseDrone).then(res);
           }
-          Swal.fire({
-            title: "บันทึกสำเร็จ",
-            icon: "success",
-            timer: 1500,
-            showConfirmButton: false,
-          }).then((time) => {
-            window.location.href = "/DroneList";
-          });
+          // Swal.fire({
+          //   title: "บันทึกสำเร็จ",
+          //   icon: "success",
+          //   timer: 1500,
+          //   showConfirmButton: false,
+          // }).then((time) => {
+          //   window.location.href = "/DroneList";
+          // });
         }
       }
     );
@@ -619,57 +625,74 @@ function EditDroneList() {
                   onChange={handleChangeStatus}
                 >
                   <Space direction="vertical">
-                    {DRONER_DRONE_STATUS.map((item: any) => (
-                      <Radio value={item.value}>{item.name}</Radio>
+                    {DRONER_DRONE_STATUS.map((item: any, index: any) => (
+                      <Radio value={item.value}>
+                        {item.name}
+                        {data.status == "REJECTED" && index == 2 ? (
+                          <div className="form-group">
+                            <Form.Item>
+                              {REASON_IS_CHECK.map((item) =>
+                                _.set(
+                                  item,
+                                  "isChecked",
+                                  data?.reason
+                                    .map((x) => x)
+                                    .find((y) => y === item.reason)
+                                    ? true
+                                    : item.isChecked
+                                )
+                              ).map((x) => (
+                                <div>
+                                  <Checkbox
+                                    key={x.key}
+                                    value={x.reason}
+                                    onClick={onChangeReason}
+                                    checked={x.isChecked}
+                                  />{" "}
+                                  <label>{x.reason}</label>
+                                  <br />
+                                </div>
+                              ))}
+                            </Form.Item>
+                            <Form.Item style={{ width: "530px" }}>
+                              <TextArea
+                                rows={3}
+                                status={validateComma}
+                                onChange={onChangeReasonText}
+                                placeholder="กรอกเหตุผล/หมายเหตุเพิ่มเติม"
+                                autoComplete="off"
+                                defaultValue={data.reason
+                                  .filter(
+                                    (a) => !REASON_CHECK.some((x) => x === a)
+                                  )
+                                  .join(",")}
+                              />
+                              {validateComma == "error" && (
+                                <p style={{ color: color.Error }}>
+                                  กรุณาใช้ (,) ให้กับการเพิ่มเหตุผลมากกว่า 1
+                                  อย่าง
+                                </p>
+                              )}
+                            </Form.Item>
+                          </div>
+                        ) : data.status == "INACTIVE" && index == 3 ? (
+                          <div>
+                            <Form.Item style={{ width: "530px" }}>
+                              <TextArea
+                                rows={3}
+                                status={validateComma}
+                                // onChange={onChangeReasonText}
+                                placeholder="กรอกเหตุผล/หมายเหตุเพิ่มเติม"
+                                autoComplete="off"
+                              />
+                            </Form.Item>
+                          </div>
+                        ) : null}
+                      </Radio>
                     ))}
                   </Space>
                 </Radio.Group>
               </Form.Item>
-              {data.status == "REJECTED" && (
-                <div style={{ marginLeft: "20px" }}>
-                  <div className="form-group">
-                     <Form.Item>
-                      {REASON_IS_CHECK.map((item) =>
-                        _.set(
-                          item,
-                          "isChecked",
-                          data?.reason
-                            .map((x) => x)
-                            .find((y) => y === item.reason)
-                            ? true
-                            : item.isChecked
-                        )
-                      ).map((x) => (
-                        <div>
-                          <Checkbox
-                            key={x.key}
-                            value={x.reason}
-                            onClick={onChangeReason}
-                            checked={x.isChecked}
-                          />{" "}
-                          <label>{x.reason}</label>
-                          <br />
-                        </div>
-                      ))}
-                    </Form.Item>
-                    <Form.Item>
-                      <TextArea
-                        rows={3}
-                        status={validateComma}
-                        onChange={onChangeReasonText}
-                        placeholder="กรอกเหตุผล/หมายเหตุเพิ่มเติม"
-                        autoComplete="off"
-                        defaultValue={data.reason}
-                      />
-                      {validateComma == "error" && (
-                        <p style={{ color: color.Error }}>
-                          กรุณาใช้ (,) ให้กับการเพิ่มเหตุผลมากกว่า 1 อย่าง
-                        </p>
-                      )} 
-                    </Form.Item>
-                  </div>
-                </div>
-              )}
             </div>
           </div>
         </Form>

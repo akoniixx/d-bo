@@ -25,14 +25,14 @@ export const DRONE_STATUS = [
 export const DRONER_DRONE_STATUS: any = [
   { value: "ACTIVE", name: "อนุมัติ" },
   { value: "PENDING", name: "รอตรวจสอบ" },
-  { value: "INACTIVE", name: "ปิดการใช้งาน" },
   { value: "REJECTED", name: "ไม่อนุมัติ" },
+  { value: "INACTIVE", name: "ปิดการใช้งาน" },
 ];
 export const DRONER_DRONE_MAPPING: any = {
   ACTIVE: "อนุมัติ",
   PENDING: "รอตรวจสอบ",
-  INACTIVE: "ปิดการใช้งาน",
   REJECTED: "ไม่อนุมัติ",
+  INACTIVE: "ปิดการใช้งาน",
 };
 
 export const STATUS_COLOR: any = {
