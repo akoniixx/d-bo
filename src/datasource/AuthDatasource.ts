@@ -1,11 +1,11 @@
 import { message } from "antd";
 import axios from "axios";
-const API_URL = "https://api-dev-dnds.iconkaset.com";
+import { httpClient, BASE_URL } from "../config/develop-config";
 
 export class AuthDatasource {
   static login(username: string, password: string) {
     return axios
-      .post(API_URL + "/auth/login-user-staff", {
+      .post(BASE_URL + "/auth/login-user-staff", {
         username,
         password,
       })

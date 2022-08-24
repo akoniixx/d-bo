@@ -21,6 +21,7 @@ export interface DronerEntity {
   idNo: string;
   telephoneNo: string;
   status: string;
+  reason : string[];
   expYear: number;
   expMonth: number;
   expPlant: string[];
@@ -40,6 +41,7 @@ export const DronerEntity_INIT: DronerEntity = {
   idNo: "",
   telephoneNo: "",
   status: "",
+  reason:[""],
   expYear: 0,
   expMonth: 0,
   expPlant: [""],

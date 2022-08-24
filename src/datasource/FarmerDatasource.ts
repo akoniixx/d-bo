@@ -1,10 +1,10 @@
-import { httpClient } from "../config/develop-config";
+import { httpClient, BASE_URL } from "../config/develop-config";
 import {
   CreateFarmerEntity,
   FarmerPageEntity,
   GetFarmerEntity,
 } from "../entities/FarmerEntities";
-const API_URL = `https://api-dev-dnds.iconkaset.com`;
+
 
 export class FarmerDatasource {
   static getFarmerList(
@@ -28,7 +28,7 @@ export class FarmerDatasource {
       sortDirection: sortDirection,
     };
     return httpClient
-      .get(API_URL + "/farmer", { params })
+      .get(BASE_URL + "/farmer", { params })
       .then((response) => {
         return response.data;
       })
@@ -43,7 +43,7 @@ export class FarmerDatasource {
     delete data.farmerPlot[id];
     delete data.farmerPlot[farmerId];
     return httpClient
-      .post(API_URL + "/farmer", data)
+      .post(BASE_URL + "/farmer", data)
       .then((response) => {
         return response.data;
       })
@@ -54,7 +54,7 @@ export class FarmerDatasource {
 
   static getFarmerById(id: string): Promise<GetFarmerEntity> {
     return httpClient
-      .get(API_URL + "/farmer/" + id)
+      .get(BASE_URL + "/farmer/" + id)
       .then((response) => {
         return response.data;
       })
@@ -65,7 +65,7 @@ export class FarmerDatasource {
 
   static updateFarmer(data: GetFarmerEntity): Promise<any> {
     return httpClient
-      .patch(API_URL + "/farmer/" + data.id, data)
+      .patch(BASE_URL + "/farmer/" + data.id, data)
       .then((response) => {
         console.log("respo", response);
         return response.data;
