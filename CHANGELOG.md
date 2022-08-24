@@ -1,4 +1,23 @@
 ## [Version - 0]
+## Fix [v0.9.1] 2022-08-24
+- create drone list page
+- create drone list edit page
+- unsuccess
+## Feature [v0.9.0] 2022-08-24
+- enhanced add droner check validate before save data
+- enhanced edit droner in modal droner drone
+- added function change status following logic
+## Fix [v0.7.1] 2022-08-15
+- fixed validate plot modal "raiAmount"
+- fixed render img when select previous img in farmer menu
+- fixed render lat & long  at map in farmer menu 
+## Feature [v0.7.0] 2022-08-10
+- enhanced upload file licenses
+- enhanced checkbox plant and input other plant
+## Fix [v0.6.2] 2022-08-06
+- fixed remove img before save in add farmer menu
+- enhanced function validate when remove plant in farmer plot
+- created function add reason when selected status 'INACTIVE'
 ## Fix [v0.6.1] 2022-08-01
 - fixed search by set state page in index farmer, droner, user staff
 ## Feature [v0.6.0] 2022-08-01

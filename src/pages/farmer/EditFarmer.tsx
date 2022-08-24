@@ -15,7 +15,7 @@ import {
 import { CardContainer } from "../../components/card/CardContainer";
 import { BackIconButton } from "../../components/button/BackButton";
 import TextArea from "antd/lib/input/TextArea";
-import { DeleteOutlined, EditOutlined, PictureFilled } from "@ant-design/icons";
+import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
 import emptyData from "../../resource/media/empties/iconoir_farm.png";
 import color from "../../resource/color";
 import FooterPage from "../../components/footer/FooterPage";
@@ -101,6 +101,7 @@ const EditFarmer = () => {
     useState<ImageEntity>(ImageEntity_INTI);
 
   let imgList: (string | boolean)[] = [];
+
   const fecthFarmer = async () => {
     await FarmerDatasource.getFarmerById(farmerId).then((res) => {
       setData(res);
@@ -146,7 +147,7 @@ const EditFarmer = () => {
     });
   }, [address.provinceId, address.districtId]);
 
-  //#region funttion farmer
+  //#region function farmer
   const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const m = Map(data).set(e.target.id, e.target.value);
     setData(m.toJS());
@@ -154,19 +155,28 @@ const EditFarmer = () => {
   };
 
   const handleOnChangeProvince = async (provinceId: number) => {
-    const d = Map(address).set("provinceId", provinceId);
+    const d = Map(address).set(
+      "provinceId",
+      provinceId == undefined ? 0 : provinceId
+    );
     setAddress(d.toJS());
     checkValidateAddr(d.toJS());
   };
 
   const handleOnChangeDistrict = async (districtId: number) => {
-    const d = Map(address).set("districtId", districtId);
+    const d = Map(address).set(
+      "districtId",
+      districtId == undefined ? 0 : districtId
+    );
     setAddress(d.toJS());
     checkValidateAddr(d.toJS());
   };
 
   const handleOnChangeSubdistrict = async (subdistrictId: number) => {
-    const d = Map(address).set("subdistrictId", subdistrictId);
+    const d = Map(address).set(
+      "subdistrictId",
+      subdistrictId == undefined ? 0 : subdistrictId
+    );
     setAddress(d.toJS());
     checkValidateAddr(d.toJS());
     await handleOnChangePostcode(d.toJS());
@@ -187,10 +197,21 @@ const EditFarmer = () => {
     checkValidateAddr(d.toJS());
   };
 
-  const handleChangePlotstatus = (e: any) => {
+  const handleChangeFarmerstatus = (e: any) => {
+    if (e.target.value != "INATIVE") {
+      data.reason = "";
+    }
     const m = Map(data).set("status", e.target.value);
     setData(m.toJS());
     checkValidate(m.toJS());
+    checkValidateReason(m.toJS());
+  };
+
+  const handleOnChangeReason = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const d = Map(data).set("reason", e.target.value);
+    setData(d.toJS());
+    checkValidateAddr(d.toJS());
+    checkValidateReason(d.toJS());
   };
   //#endregion
 
@@ -266,7 +287,12 @@ const EditFarmer = () => {
 
   const removeImg = () => {
     const getImg = data.file.filter((x) => x.category == "PROFILE_IMAGE")[0];
-    UploadImageDatasouce.deleteImage(getImg.id, getImg.path).then((res) => {});
+    if (getImg != undefined) {
+      UploadImageDatasouce.deleteImage(getImg.id, getImg.path).then(
+        (res) => {}
+      );
+    }
+    setCreateImgProfile(ImageEntity_INTI);
     setImgProfile(undefined);
     checkValidate(data);
   };
@@ -302,23 +328,32 @@ const EditFarmer = () => {
   };
   const removeImgIdCard = () => {
     const getImg = data.file.filter((x) => x.category == "ID_CARD_IMAGE")[0];
-    UploadImageDatasouce.deleteImage(getImg.id, getImg.path).then((res) => {});
+    if (getImg != undefined) {
+      UploadImageDatasouce.deleteImage(getImg.id, getImg.path).then(
+        (res) => {}
+      );
+    }
+    setCreateImgIdCrad(ImageEntity_INTI);
     setImgIdCard(undefined);
     checkValidate(data);
   };
   //#endregion
 
   const checkValidate = (data: GetFarmerEntity) => {
-    if (
-      data.firstname != "" &&
-      data.lastname != "" &&
-      data.telephoneNo != "" &&
-      data.idNo != "" &&
-      address.provinceId != 0 &&
-      address.districtId != 0 &&
-      address.subdistrictId != 0 &&
-      address.address1 != ""
-    ) {
+    let checkEmptySting = ![
+      data.firstname,
+      data.lastname,
+      data.telephoneNo,
+      data.idNo,
+      address.address1,
+    ].includes("");
+    let checkEmptyNumber = ![
+      address.provinceId,
+      address.districtId,
+      address.subdistrictId,
+    ].includes(0);
+
+    if (checkEmptySting && checkEmptyNumber) {
       setBtnSaveDisable(false);
     } else {
       setBtnSaveDisable(true);
@@ -326,27 +361,40 @@ const EditFarmer = () => {
   };
 
   const checkValidateAddr = (addr: AddressEntity) => {
-    if (
-      addr.provinceId != 0 &&
-      addr.subdistrictId != 0 &&
-      addr.districtId != 0 &&
-      addr.postcode != "" &&
-      addr.address1 != "" &&
-      data.firstname != "" &&
-      data.lastname != "" &&
-      data.telephoneNo != "" &&
-      data.idNo != ""
-    ) {
+    let checkEmptySting = ![
+      data.firstname,
+      data.lastname,
+      data.telephoneNo,
+      data.idNo,
+      address.address1,
+    ].includes("");
+    let checkEmptyNumber = ![
+      addr.provinceId,
+      addr.districtId,
+      addr.subdistrictId,
+    ].includes(0);
+
+    if (checkEmptySting && checkEmptyNumber) {
       setBtnSaveDisable(false);
     } else {
       setBtnSaveDisable(true);
     }
   };
 
+  const checkValidateReason = (data: GetFarmerEntity) => {
+    if (
+      data.status == "INACTIVE" &&
+      (data.reason == null || data.reason == "")
+    ) {
+      setBtnSaveDisable(true);
+    } else {
+      setBtnSaveDisable(false);
+    }
+  };
+
   const updateFarmer = async () => {
     const pushAddr = Map(data).set("address", address);
     const pushPin = Map(pushAddr.toJS()).set("pin", "");
-
     await FarmerDatasource.updateFarmer(pushPin.toJS()).then((res) => {
       if (res != undefined) {
         var i = 0;
@@ -389,6 +437,7 @@ const EditFarmer = () => {
                 }}
               >
                 <input
+                  key={imgProfile}
                   type="file"
                   onChange={onChangeProfile}
                   title="เลือกรูป"
@@ -544,7 +593,12 @@ const EditFarmer = () => {
                   display: imgIdCard == undefined ? "block" : "none",
                 }}
               >
-                <input type="file" onChange={onChangeIdCard} title="เลือกรูป" />
+                <input
+                  key={imgIdCard}
+                  type="file"
+                  onChange={onChangeIdCard}
+                  title="เลือกรูป"
+                />
               </div>
             </div>
           </div>
@@ -590,7 +644,7 @@ const EditFarmer = () => {
                   filterOption={(input: any, option: any) =>
                     option.children.includes(input)
                   }
-                  filterSort={(optionA : any, optionB: any) =>
+                  filterSort={(optionA: any, optionB: any) =>
                     optionA.children
                       .toLowerCase()
                       .localeCompare(optionB.children.toLowerCase())
@@ -681,7 +735,7 @@ const EditFarmer = () => {
               <br />
               <Radio.Group
                 defaultValue={data.status}
-                onChange={handleChangePlotstatus}
+                onChange={handleChangeFarmerstatus}
               >
                 <Space direction="vertical">
                   {FARMER_STATUS_SEARCH.map((item) => (
@@ -696,13 +750,14 @@ const EditFarmer = () => {
               <div className="form-group">
                 <label></label>
                 <br />
-                <Form.Item name="reason">
+                <Form.Item>
                   <TextArea
                     className="col-lg-12"
                     rows={3}
                     placeholder="กรอกเหตุผล/เหตุหมายเพิ่มเติม"
                     autoComplete="off"
-                    id="reasomText"
+                    onChange={handleOnChangeReason}
+                    defaultValue={data.reason}
                   />
                 </Form.Item>
               </div>

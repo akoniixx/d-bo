@@ -1,21 +1,11 @@
-import {
-  Avatar,
-  Badge,
-  Input,
-  Pagination,
-  Row,
-  Select,
-  Switch,
-  Table,
-  Tooltip,
-} from "antd";
+import { Avatar, Badge, Pagination, Select, Table } from "antd";
 import React, { useEffect, useState } from "react";
 import Search from "antd/lib/input/Search";
 import { Option } from "antd/lib/mentions";
 import color from "../../resource/color";
 import ActionButton from "../../components/button/ActionButton";
-import { EditOutlined, InfoCircleOutlined } from "@ant-design/icons";
-import { DronerEntity, DronerListEntity } from "../../entities/DronerEntities";
+import { EditOutlined } from "@ant-design/icons";
+import { DronerListEntity } from "../../entities/DronerEntities";
 import { DronerDatasource } from "../../datasource/DronerDatasource";
 import {
   DRONER_STATUS,
@@ -28,13 +18,10 @@ import {
   ProviceEntity,
   SubdistrictEntity,
 } from "../../entities/LocationEntities";
-import moment, { max } from "moment";
+import moment from "moment";
 import AddButtton from "../../components/button/AddButton";
 import { DroneDatasource } from "../../datasource/DroneDatasource";
 import Layouts from "../../components/layout/Layout";
-
-const _ = require("lodash");
-const { Map } = require("immutable");
 
 function IndexDroner() {
   const row = 10;
@@ -127,12 +114,6 @@ function IndexDroner() {
     setSearchStatus(status);
     setCurrent(1);
   };
-  const sorter = (a: any, b: any) => {
-    if (a === b) return 0;
-    else if (a === null) return 1;
-    else if (b === null) return -1;
-    else return a.localeCompare(b);
-  };
 
   const PageTitle = (
     <>
@@ -184,7 +165,9 @@ function IndexDroner() {
             }
           >
             {province?.map((item) => (
-              <Option value={item.provinceId.toString()}>{item.provinceName}</Option>
+              <Option value={item.provinceId.toString()}>
+                {item.provinceName}
+              </Option>
             ))}
           </Select>
         </div>
@@ -280,7 +263,6 @@ function IndexDroner() {
       dataIndex: "firstname",
       key: "firstname",
       width: "12%",
-      sorter: (a: any, b: any) => sorter(a.firstname, b.firstname),
       render: (value: any, row: any, index: number) => {
         return {
           children: (
@@ -379,7 +361,7 @@ function IndexDroner() {
         return {
           children: (
             <div className="container">
-             <span className="text-dark-75  d-block font-size-lg">
+              <span className="text-dark-75  d-block font-size-lg">
                 {droneLatest ? (
                   <Avatar
                     size={25}
@@ -401,7 +383,6 @@ function IndexDroner() {
               <span style={{ color: color.Grey, fontSize: "12px" }}>
                 {row.dronerDrone.length > 1 ? "(มากกว่า 1 ยี่ห้อ)" : null}
               </span>
-
             </div>
           ),
         };
@@ -412,7 +393,6 @@ function IndexDroner() {
       dataIndex: "status",
       key: "status",
       width: "10%",
-      sorter: (a: any, b: any) => sorter(a.status, b.status),
       render: (value: any, row: any, index: number) => {
         const countDay = () => {
           let dateToday: any = moment(Date.now());
@@ -460,6 +440,7 @@ function IndexDroner() {
       },
     },
   ];
+
   return (
     <Layouts>
       {PageTitle}
@@ -480,12 +461,13 @@ function IndexDroner() {
         }
       />
       <div className="d-flex justify-content-between pt-5">
-        <h5>รายการทั้งหมด {data?.count} รายการ</h5>
+        <p>รายการทั้งหมด {data?.count} รายการ</p>
         <Pagination
           current={current}
           total={data?.count}
           onChange={onChangePage}
           pageSize={row}
+          showSizeChanger={false}
         />
       </div>
     </Layouts>

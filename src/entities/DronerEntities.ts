@@ -21,13 +21,14 @@ export interface DronerEntity {
   idNo: string;
   telephoneNo: string;
   status: string;
+  reason : string[];
   expYear: number;
   expMonth: number;
   expPlant: string[];
   address: FullAddressEntity;
   pin: string;
   dronerDrone: DronerDroneEntity[];
-  dronerArea: string;
+  dronerArea: DronerAreaEntity;
   file: ImageEntity[];
   createdAt: string;
   updatedAt: string;
@@ -40,13 +41,14 @@ export const DronerEntity_INIT: DronerEntity = {
   idNo: "",
   telephoneNo: "",
   status: "",
+  reason:[""],
   expYear: 0,
   expMonth: 0,
   expPlant: [""],
   address: FullAddressEntiry_INIT,
   pin: "",
   dronerDrone: [DronerDroneEntity_INIT],
-  dronerArea: "",
+  dronerArea: DronerAreaEntity_INIT,
   file: [ImageEntity_INTI],
   createdAt: "",
   updatedAt: "",
@@ -73,7 +75,7 @@ export const CreateDronerEntity_INIT: CreateDronerEntity = {
   lastname: "",
   idNo: "",
   telephoneNo: "",
-  status: "OPEN",
+  status: "PENDING",
   expYear: 0,
   expMonth: 0,
   expPlant: [""],

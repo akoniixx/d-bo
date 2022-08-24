@@ -5,37 +5,27 @@ import {
   Form,
   Input,
   Select,
-  Upload,
   Button,
   Pagination,
   Radio,
   Space,
-  RadioChangeEvent,
-  Checkbox,
-  Col,
   Badge,
   Tag,
+  Avatar,
 } from "antd";
 import emptyData from "../../resource/media/empties/iconoir_farm.png";
-import {
-  SearchOutlined,
-  EditOutlined,
-  DeleteOutlined,
-} from "@ant-design/icons";
+import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
 import { CardContainer } from "../../components/card/CardContainer";
 import color from "../../resource/color";
 import { CardHeader } from "../../components/header/CardHearder";
 import FooterPage from "../../components/footer/FooterPage";
-import { Link } from "react-router-dom";
-import { BackButton, BackIconButton } from "../../components/button/BackButton";
+import { BackIconButton } from "../../components/button/BackButton";
 import TextArea from "antd/lib/input/TextArea";
-import { ModalPage } from "../../components/modal/ModalPage";
 import { DronerEntity, DronerEntity_INIT } from "../../entities/DronerEntities";
 import { DronerDatasource } from "../../datasource/DronerDatasource";
 import Swal from "sweetalert2";
 import { LocationDatasource } from "../../datasource/LocationDatasource";
-import { DefaultOptionType } from "antd/lib/select";
-import { EXP_PLANT } from "../../definitions/ExpPlant";
+import { EXP_PLANT, EXP_PLANT_CHECKBOX } from "../../definitions/ExpPlant";
 import ActionButton from "../../components/button/ActionButton";
 import {
   AddressEntity,
@@ -53,26 +43,28 @@ import {
 } from "../../entities/DronerDroneEntities";
 import ModalDrone from "../../components/modal/ModalDronerDrone";
 import {
-  DRONER_DRONE_STATUS,
+  DRONER_DRONE_MAPPING,
+  DRONER_STATUS,
   STATUS_COLOR,
 } from "../../definitions/DronerStatus";
 import {
   ImageEntity,
   ImageEntity_INTI,
+  UploadImageEntity,
+  UploadImageEntity_INTI,
 } from "../../entities/UploadImageEntities";
 import { UploadImageDatasouce } from "../../datasource/UploadImageDatasource";
 import "../farmer/Style.css";
 import uploadImg from "../../resource/media/empties/uploadImg.png";
 import bth_img_empty from "../../resource/media/empties/upload_Img_btn.png";
-import { DroneEntity } from "../../entities/DroneEntities";
 import GoogleMap from "../../components/map/GoogleMap";
 import {
   DronerAreaEntity,
   DronerAreaEntity_INIT,
 } from "../../entities/DronerAreaEntities";
 import { LAT_LNG_BANGKOK } from "../../definitions/Location";
+import { REASON_DRONER_STATUS } from "../../definitions/Reason";
 
-const { Option } = Select;
 const _ = require("lodash");
 const { Map } = require("immutable");
 let queryString = _.split(window.location.search, "=");
@@ -87,7 +79,7 @@ function EditDroner() {
   const [dronerDroneList, setDronerDroneList] = useState<DronerDroneEntity[]>([
     DronerDroneEntity_INIT,
   ]);
-
+  const [saveBtnDisable, setBtnSaveDisable] = useState<boolean>(true);
   const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [editIndex, setEditIndex] = useState(0);
@@ -105,20 +97,38 @@ function EditDroner() {
     useState<ImageEntity>(ImageEntity_INTI);
   let imgList: (string | boolean)[] = [];
   const [mapPosition, setMapPosition] = useState<{ lat: number; lng: number }>({
-    lat: parseFloat(dronerArea.lat),
-    lng: parseFloat(dronerArea.long),
+    lat: LAT_LNG_BANGKOK.lat,
+    lng: LAT_LNG_BANGKOK.lng,
   });
   const [location, setLocation] = useState<SubdistrictEntity[]>([]);
   const [searchLocation] = useState("");
+  const [validateComma, setValidateComma] = useState<any>("");
+  let [otherPlant, setOtherPlant] = useState<any>();
+  const [imgDroneList] = useState<UploadImageEntity[]>([
+    UploadImageEntity_INTI,
+  ]);
+  let [moreReason, setMoreReason] = useState<any>("");
 
   useEffect(() => {
     fetchDronerById();
-  }, []);
+    fetchLocation(searchLocation);
+  }, [searchLocation]);
+
   const fetchDronerById = async () => {
     await DronerDatasource.getDronerByID(dronerId).then((res) => {
+      console.log(res.reason);
       setData(res);
+      setMapPosition({
+        lat: parseFloat(res.dronerArea.lat),
+        lng: parseFloat(res.dronerArea.long),
+      });
       setAddress(res.address);
+      var k = 0;
+      for (k; res.dronerDrone.length > k; k++) {
+        res.dronerDrone[k].modalDroneIndex = k + 1;
+      }
       setDronerDroneList(res.dronerDrone);
+
       let getPathPro = res.file.filter((x) => x.category == "PROFILE_IMAGE");
       let getPathCard = res.file.filter((x) => x.category == "ID_CARD_IMAGE");
       imgList.push(
@@ -142,6 +152,12 @@ function EditDroner() {
       }
     });
   };
+  const fetchLocation = async (text?: string) => {
+    await LocationDatasource.getSubdistrict(0, text).then((res) => {
+      setLocation(res);
+    });
+  };
+
   useEffect(() => {
     LocationDatasource.getProvince().then((res) => {
       setProvince(res);
@@ -153,29 +169,94 @@ function EditDroner() {
       setSubdistrict(res);
     });
   }, [address.provinceId, address.districtId]);
+
+  //#region data droner
   const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const m = Map(data).set(e.target.id, e.target.value);
     setData(m.toJS());
+    checkValidate(m.toJS());
   };
   const handleChangeStatus = (e: any) => {
     const m = Map(data).set("status", e.target.value);
-    setData(m.toJS());
+    const n = Map(m.toJS()).set("reason", [""]);
+    setMoreReason("");
+    setData(n.toJS());
+    checkValidate(n.toJS());
   };
+
   const handleExpPlant = (e: any) => {
-    const m = Map(data).set("expPlant", e);
-    setData(m.toJS());
+    let checked = e.target.checked;
+    let value = e.target.value;
+    EXP_PLANT_CHECKBOX.map((item) =>
+      _.set(
+        item,
+        "isChecked",
+        item.plantName == value ? checked : item.isChecked
+      )
+    );
+    let p: any = "";
+    if (checked) {
+      p = Map(data).set(
+        "expPlant",
+        [...data.expPlant, value].filter((x) => x != "")
+      );
+    } else {
+      let removePlant = data.expPlant.filter((x) => x != value);
+      p = Map(data).set("expPlant", removePlant);
+    }
+    setData(p.toJS());
+    checkValidate(data);
   };
+
+  const handlePlantOther = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.value.trim().length != 0) {
+      setOtherPlant(e.target.value);
+      const checkComma = checkValidateComma(e.target.value);
+      if (!checkComma) {
+        setValidateComma("");
+        setBtnSaveDisable(checkComma);
+      } else {
+        setValidateComma("error");
+        setBtnSaveDisable(checkComma);
+      }
+    } else {
+      setValidateComma("");
+      setBtnSaveDisable(true);
+    }
+  };
+
+  const handleCheckBoxReason = (e: any) => {
+    let checked = e.target.checked;
+    let value = e.target.value;
+    let p = Map(data).set("reason", [value]);
+    console.log(p.toJS());
+
+    setData(p.toJS());
+    checkValidate(p.toJS());
+  };
+
+  const handelMoreReason = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setMoreReason(e.target.value);
+    checkValidate(data);
+  };
+
+  //#endregion
+
+  //#region address
   const handleProvince = async (provinceId: number) => {
     const d = Map(address).set("provinceId", provinceId);
     setAddress(d.toJS());
+    checkValidateAddr(d.toJS());
   };
   const handleDistrict = async (districtId: number) => {
     const d = Map(address).set("districtId", districtId);
     setAddress(d.toJS());
+    checkValidateAddr(d.toJS());
   };
   const handleSubDistrict = async (subdistrictId: number) => {
     const d = Map(address).set("subdistrictId", subdistrictId);
     setAddress(d.toJS());
+    checkValidateAddr(d.toJS());
     await handelPostCode(d.toJS());
   };
   const handelPostCode = (add: AddressEntity) => {
@@ -184,11 +265,16 @@ function EditDroner() {
     )[0].postcode;
     const m = Map(add).set("postcode", filterSubDistrict);
     setAddress(m.toJS());
+    checkValidateAddr(m.toJS());
   };
   const handleAddress = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const d = Map(address).set("address1", e.target.value);
     setAddress(d.toJS());
+    checkValidateAddr(d.toJS());
   };
+  //#endregion
+
+  //#region map
   const handleSearchLocation = async (value: any) => {
     if (value != undefined) {
       const a = location.filter((x) => x.subdistrictId == value)[0];
@@ -208,6 +294,7 @@ function EditDroner() {
         lat: a.lat != null ? parseFloat(a.lat) : 0,
         lng: a.long != null ? parseFloat(a.long) : 0,
       });
+      checkValidate(pushLong.toJS());
     } else {
       setMapPosition(LAT_LNG_BANGKOK);
     }
@@ -215,23 +302,59 @@ function EditDroner() {
   const handleOnChangeUrl = (value: any) => {
     const m = Map(dronerArea).set("mapUrl", value.target.value);
     setDronerArea(m.toJS());
+    checkValidate(m.toJS());
   };
+  const handleOnChangeLat = (value: any) => {
+    const m = Map(dronerArea).set("lat", value.target.value);
+    setDronerArea(m.toJS());
+    checkValidate(m.toJS());
+    setMapPosition((prev) => ({
+      lat: parseFloat(value.target.value),
+      lng: prev.lng,
+    }));
+  };
+  const handleOnChangeLng = (value: any) => {
+    const m = Map(dronerArea).set("long", value.target.value);
+    setDronerArea(m.toJS());
+    checkValidate(m.toJS());
+    setMapPosition((prev) => ({
+      lat: prev.lat,
+      lng: parseFloat(value.target.value),
+    }));
+  };
+  //#endregion
+
+  //#region modal drone
   const editDroner = (data: DronerDroneEntity, index: number) => {
     setShowEditModal((prev) => !prev);
     setEditIndex(index);
     setEditDroneList(data);
   };
-  const updateDrone = async (data: DronerDroneEntity) => {
-    const p = Map(data).set("dronerId", dronerId);
-    if (p.toJS().id != "") {
-      await DronerDroneDatasource.updateDronerDrone(p.toJS()).then();
-      setShowEditModal((prev) => !prev);
+  const updateDrone = (data: DronerDroneEntity) => {
+    if (data.modalDroneIndex == 0) {
+      const pushId = Map(data).set(
+        "modalDroneIndex",
+        dronerDroneList.length + 1
+      );
+      console.log("result", pushId.toJS());
+      setDronerDroneList([...dronerDroneList, pushId.toJS()]);
     } else {
-      await DronerDroneDatasource.updateDronerDrone(p.toJS()).then();
-      setShowAddModal((prev) => !prev);
+      const m = dronerDroneList.filter(
+        (x) => x.modalDroneIndex != data.modalDroneIndex
+      );
+      setDronerDroneList([...m, data]);
     }
-    fetchDronerById();
+    setShowAddModal(false);
+    setShowEditModal(false);
+    setEditIndex(0);
   };
+  const removeDrone = (index: number) => {
+    const newData = dronerDroneList.filter((x) => x.modalDroneIndex != index);
+    setDronerDroneList(newData);
+  };
+  //#endregion
+
+  //#region img
   const onChangeProfile = async (file: any) => {
     let src = file.target.files[0];
     src = await new Promise((resolve) => {
@@ -245,6 +368,7 @@ function EditDroner() {
     const f = Map(e.toJS()).set("category", "PROFILE_IMAGE");
     const g = Map(f.toJS()).set("resourceId", dronerId);
     setCreateImgProfile(g.toJS());
+    checkValidate(g.toJS());
   };
   const onPreviewProfile = async () => {
     let src = imgProfile;
@@ -261,11 +385,15 @@ function EditDroner() {
     imgWindow?.document.write(image.outerHTML);
   };
   const removeImg = () => {
-    const dronerImg = data.file.filter((x) => x.category == "PROFILE_IMAGE")[0];
-    UploadImageDatasouce.deleteImage(dronerImg.id, dronerImg.path).then(
-      (res) => {}
-    );
+    const getImg = data.file.filter((x) => x.category == "PROFILE_IMAGE")[0];
+    if (getImg != undefined) {
+      UploadImageDatasouce.deleteImage(getImg.id, getImg.path).then(
+        (res) => {}
+      );
+    }
+    setCreateImgProfile(ImageEntity_INTI);
     setImgProfile(undefined);
+    checkValidate(data);
   };
   const onChangeIdCard = async (file: any) => {
     let src = file.target.files[0];
@@ -280,6 +408,7 @@ function EditDroner() {
     const f = Map(e.toJS()).set("category", "ID_CARD_IMAGE");
     const g = Map(f.toJS()).set("resourceId", dronerId);
     setCreateImgIdCrad(g.toJS());
+    checkValidate(data);
   };
   const onPreviewIdCard = async () => {
     let src = imgIdCard;
@@ -296,21 +425,124 @@ function EditDroner() {
     imgWindow?.document.write(image.outerHTML);
   };
   const removeImgIdCard = () => {
-    const dronerImg = data.file.filter((x) => x.category == "ID_CARD_IMAGE")[0];
-    UploadImageDatasouce.deleteImage(dronerImg.id, dronerImg.path).then(
-      (res) => {}
-    );
-
+    const getImg = data.file.filter((x) => x.category == "ID_CARD_IMAGE")[0];
+    if (getImg != undefined) {
+      UploadImageDatasouce.deleteImage(getImg.id, getImg.path).then(
+        (res) => {}
+      );
+    }
+    setCreateImgIdCrad(ImageEntity_INTI);
     setImgIdCard(undefined);
+    checkValidate(data);
   };
+  //#endregion
+
+  const checkValidate = (data: DronerEntity) => {
+    let checkEmptySting = ![
+      data.firstname,
+      data.telephoneNo,
+      data.idNo,
+      address.address1,
+      dronerArea.lat,
+      dronerArea.long,
+    ].includes("");
+    let checkEmptyNumber = ![
+      address.provinceId,
+      address.districtId,
+      address.subdistrictId,
+    ].includes(0);
+    let checkEmptyArray = ![data.expPlant].includes([""]);
+
+    if (checkEmptySting && checkEmptyNumber && checkEmptyArray) {
+      setBtnSaveDisable(false);
+    } else {
+      setBtnSaveDisable(true);
+    }
+  };
+  const checkValidateAddr = (addr: AddressEntity) => {
+    let checkEmptySting = ![
+      data.firstname,
+      data.telephoneNo,
+      data.idNo,
+      address.address1,
+      dronerArea.lat,
+      dronerArea.long,
+    ].includes("");
+    let checkEmptyNumber = ![
+      addr.provinceId,
+      addr.districtId,
+      addr.subdistrictId,
+    ].includes(0);
+    let checkEmptyArray = ![data.expPlant].includes([""]);
+
+    if (checkEmptySting && checkEmptyNumber && checkEmptyArray) {
+      setBtnSaveDisable(false);
+    } else {
+      setBtnSaveDisable(true);
+    }
+  };
+  const checkValidateComma = (data: string) => {
+    const checkSyntax =
+      data.includes("*") ||
+      data.includes("/") ||
+      data.includes(" ") ||
+      data.includes("-") ||
+      data.includes("+");
+    return data.trim().length != 0 ? (checkSyntax ? true : false) : true;
+  };
+
   const updateDroner = async () => {
+    let otherPlantList = [];
+    if (otherPlant != undefined) {
+      let m = otherPlant.split(",");
+      for (let i = 0; m.length > i; i++) {
+        otherPlantList.push(m[i]);
+      }
+    }
+    data.expPlant.push.apply(
+      data.expPlant,
+      otherPlantList.filter((x) => x != "")
+    );
+    data.reason = moreReason;
     const pushAddr = Map(data).set("address", address);
     const pushDronerArea = Map(pushAddr.toJS()).set("dronerArea", dronerArea);
     const pushPin = Map(pushDronerArea.toJS()).set("pin", "");
-    await DronerDatasource.updateDroner(pushPin.toJS()).then((res) => {
+    const setOtherPlant = Array.from(new Set(pushPin.toJS().expPlant)).filter(
+      (x) => x != ""
+    );
+    const pushOtherPlant = Map(pushPin.toJS()).set("expPlant", setOtherPlant);
+    const pushDroneList = Map(pushOtherPlant.toJS()).set(
+      "dronerDrone",
+      dronerDroneList
+    );
+    await DronerDatasource.updateDroner(pushDroneList.toJS()).then((res) => {
       if (res != null) {
+        for (i = 0; res.dronerDrone.length > i; i++) {
+          let findId = res.dronerDrone[i];
+          let getData = dronerDroneList.filter(
+            (x) => x.serialNo == findId.serialNo
+          )[0];
+          for (let j = 0; getData.file.length > j; j++) {
+            let getImg = getData.file[j];
+            imgDroneList?.push({
+              resourceId: res.dronerDrone[i].id,
+              category: getImg.category,
+              file: getImg,
+              resource: getImg.resource,
+              path: " ",
+            });
+          }
+        }
+        //console.log("file", imgDroneList);
+        const checkImg = imgDroneList.filter((x) => x.resourceId != "");
+        for (let k = 0; checkImg.length > k; k++) {
+          let getDataImg: any = checkImg[k];
+          //console.log(getDataImg);
+          UploadImageDatasouce.uploadImage(getDataImg).then(res);
+        }
         var i = 0;
         for (i; 2 > i; i++) {
+          //console.log(createImgProfile);
           i == 0 &&
             UploadImageDatasouce.uploadImage(createImgProfile).then(res);
           i == 1 && UploadImageDatasouce.uploadImage(createImgIdCard).then(res);
@@ -326,48 +558,48 @@ function EditDroner() {
       }
     });
   };
+
   const renderFromData = (
     <div className="col-lg-7">
       <CardContainer>
         <CardHeader textHeader="ข้อมูลคนบินโดรน" />
         <Form>
           <div className="container text-center" style={{ padding: "30px" }}>
-            <div className="row">
-              <div className="form-group text-center pb-4">
-                <div
-                  className="hiddenFileInput zoom"
-                  style={{
-                    backgroundImage: `url(${
-                      imgProfile == undefined ? uploadImg : imgProfile
-                    })`,
-                  }}
-                >
-                  <input
-                    type="file"
-                    onChange={onChangeProfile}
-                    title="เลือกรูป"
-                  />
-                </div>
-                <div>
-                  {imgProfile != undefined && (
-                    <>
-                      <Tag
-                        color={color.Success}
-                        onClick={onPreviewProfile}
-                        style={{ cursor: "pointer", borderRadius: "5px" }}
-                      >
-                        View
-                      </Tag>
-                      <Tag
-                        color={color.Error}
-                        onClick={removeImg}
-                        style={{ cursor: "pointer", borderRadius: "5px" }}
-                      >
-                        Remove
-                      </Tag>
-                    </>
-                  )}
-                </div>
+            <div className="form-group text-center">
+              <div
+                className="hiddenFileInput zoom"
+                style={{
+                  backgroundImage: `url(${
+                    imgProfile == undefined ? uploadImg : imgProfile
+                  })`,
+                }}
+              >
+                <input
+                  key={imgProfile}
+                  type="file"
+                  onChange={onChangeProfile}
+                  title="เลือกรูป"
+                />
+              </div>
+              <div>
+                {imgProfile != undefined && (
+                  <>
+                    <Tag
+                      color={color.Success}
+                      onClick={onPreviewProfile}
+                      style={{ cursor: "pointer", borderRadius: "5px" }}
+                    >
+                      View
+                    </Tag>
+                    <Tag
+                      color={color.Error}
+                      onClick={removeImg}
+                      style={{ cursor: "pointer", borderRadius: "5px" }}
+                    >
+                      Remove
+                    </Tag>
+                  </>
+                )}
               </div>
             </div>
           </div>
@@ -381,7 +613,6 @@ function EditDroner() {
               </Form.Item>
             </div>
           </div>
-
           <div className="row">
             <div className="form-group col-lg-6">
               <label>
@@ -474,7 +705,7 @@ function EditDroner() {
                     display: imgIdCard != undefined ? "block" : "none",
                   }}
                 ></div>
-                <div className="text-left ps-4">
+                <div className="text-left ps-4 pt-2">
                   {imgIdCard != undefined && (
                     <>
                       <Tag
@@ -502,6 +733,7 @@ function EditDroner() {
                   }}
                 >
                   <input
+                    key={imgIdCard}
                     type="file"
                     onChange={onChangeIdCard}
                     title="เลือกรูป"
@@ -643,6 +875,7 @@ function EditDroner() {
                   placeholder="กรอกรหัสไปรษณีย์"
                   defaultValue={address.postcode}
                   key={address.subdistrictId}
+                  disabled
                 />
               </Form.Item>
             </div>
@@ -715,15 +948,7 @@ function EditDroner() {
           </div>
           <div className="form-group">
             <label>หรือ</label>
-            <Form.Item
-              name="url"
-              rules={[
-                {
-                  required: true,
-                  message: "กรุณากรอกข้อมูล Url Google Map",
-                },
-              ]}
-            >
+            <Form.Item name="url">
               <Input
                 //defaultValue={dronerArea.mapUrl}
                 placeholder="กรอกข้อมูล Url Google Map"
@@ -732,8 +957,50 @@ function EditDroner() {
               />
             </Form.Item>
           </div>
+          <div className="row">
+            <div className="form-group col-lg-6">
+              <label>Latitude (ละติจูด) </label>
+              <span style={{ color: "red" }}>*</span>
+              <Form.Item
+                rules={[
+                  {
+                    required: true,
+                    message: "กรุณากรอกละติจูด!",
+                  },
+                ]}
+                key={mapPosition.lat}
+              >
+                <Input
+                  placeholder="กรอกข้อมูล Latitude"
+                  defaultValue={mapPosition.lat}
+                  onBlur={handleOnChangeLat}
+                  autoComplete="off"
+                />
+              </Form.Item>
+            </div>
+            <div className="form-group col-lg-6">
+              <label>Longitude (ลองติจูด) </label>
+              <span style={{ color: "red" }}>*</span>
+              <Form.Item
+                rules={[
+                  {
+                    required: true,
+                    message: "กรุณากรอกลองติจูด!",
+                  },
+                ]}
+                key={mapPosition.lng}
+              >
+                <Input
+                  placeholder="กรอกข้อมูล Longitude"
+                  defaultValue={mapPosition.lng}
+                  onBlur={handleOnChangeLng}
+                  autoComplete="off"
+                />
+              </Form.Item>
+            </div>
+          </div>
           <GoogleMap
-            width="470px"
+            width="100%"
             height="300px"
             zoom={17}
             lat={mapPosition.lat}
@@ -741,66 +1008,123 @@ function EditDroner() {
           />
           <div className="form-group col-lg-6">
             <label>
-              พืชที่เคยฉีดพ่น
+              พืชที่เคยฉีดพ่น{" "}
               <span style={{ color: color.Disable }}>
                 (กรุณาเลือกอย่างน้อย 1 อย่าง)
               </span>
               <span style={{ color: "red" }}>*</span>
             </label>
-
-            <Checkbox.Group
-              onChange={handleExpPlant}
-              options={EXP_PLANT}
-              style={{ width: "220px" }}
-              defaultValue={data.expPlant}
-            >
-              <Row>
-                {EXP_PLANT.map((item) => (
-                  <Col span={8}>
-                    <Checkbox value={item}>{item}</Checkbox>
-                  </Col>
-                ))}
-              </Row>
-            </Checkbox.Group>
+            {EXP_PLANT_CHECKBOX.map((item) =>
+              _.set(
+                item,
+                "isChecked",
+                data?.expPlant.map((x) => x).find((y) => y === item.plantName)
+                  ? true
+                  : item.isChecked
+              )
+            ).map((x) => (
+              <div>
+                <input
+                  key={x.key}
+                  type="checkbox"
+                  value={x.plantName}
+                  onClick={handleExpPlant}
+                  checked={x.isChecked}
+                />{" "}
+                <label>{x.plantName}</label>
+                <br />
+              </div>
+            ))}
           </div>
-          <div className="form-group col-lg-6">
-            <Form.Item name="plantOther">
-              <Input placeholder="พืชอื่นๆ" onChange={handleExpPlant} />
+          <div className="form-group col-lg-12">
+            <label></label>
+            <Form.Item>
+              <Input
+                status={validateComma}
+                onChange={handlePlantOther}
+                placeholder="กรอกข้อมูลพืชอื่นๆ เช่น ส้ม,มะขาม (กรุณาใช้ (,) ให้กับการเพิ่มพืชมากกว่า 1 อย่าง)"
+                autoComplete="off"
+                defaultValue={data.expPlant
+                  .filter((a) => !EXP_PLANT.some((x) => x === a))
+                  .join(",")}
+              />
+              {validateComma == "error" && (
+                <p style={{ color: color.Error }}>
+                  กรุณาใช้ (,) ให้กับการเพิ่มพืชมากกว่า 1 อย่าง
+                </p>
+              )}
             </Form.Item>
           </div>
           <div className="row">
-            <div className="form-group">
-              <label style={{ marginBottom: "10px" }}>
+            <div className="form-group col-lg-12">
+              <label style={{ marginBottom: "10px" }} className="col-lg-12">
                 สถานะ <span style={{ color: "red" }}>*</span>
               </label>
-              <Form.Item
-                name="status"
-                rules={[
-                  {
-                    required: true,
-                    message: "กรุณาเลือกสถานะ!",
-                  },
-                ]}
+              <br />
+              <Radio.Group
+                defaultValue={data.status}
+                onChange={handleChangeStatus}
+                className="col-lg-12"
               >
-                <Radio.Group
-                  defaultValue={data.status}
-                  onChange={handleChangeStatus}
-                >
-                  <Space direction="vertical">
-                    <Radio value={"ACTIVE"}>ใช้งาน</Radio>
-                    <Radio value={"PENDING"}>รอยืนยันตัวตน</Radio>
-                    <Radio value={"INACTIVE"}>ปิดการใช้งาน</Radio>
-                    <Radio value={"REJECTED"}>ไม่อนุมัติ</Radio>
-                  </Space>
-                </Radio.Group>
-              </Form.Item>
+                <Space direction="vertical" className="col-lg-12">
+                  {DRONER_STATUS.filter((x) => x.value != "").map(
+                    (item, index) => (
+                      <Radio value={item.value} style={{ width: "100%" }}>
+                        {item.name}
+                        {data.status == "REJECTED" && index == 3 ? (
+                          <div className="form-group ps-3">
+                            <input
+                              type="checkbox"
+                              value="บัตรประชาชนไม่ชัดเจน/ไม่ถูกต้อง"
+                              onClick={handleCheckBoxReason}
+                              defaultValue={data.reason}
+                              defaultChecked={
+                                data.reason.map(
+                                  (x) => x == "บัตรประชาชนไม่ชัดเจน/ไม่ถูกต้อง"
+                                )
+                                  ? true
+                                  : false
+                              }
+                            />{" "}
+                            <label>บัตรประชาชนไม่ชัดเจน/ไม่ถูกต้อง</label>
+                            <br />
+                            <TextArea
+                              className="col-lg-12"
+                              rows={3}
+                              placeholder="กรอกเหตุผล/เหตุหมายเพิ่มเติม"
+                              autoComplete="off"
+                              onChange={handelMoreReason}
+                              defaultValue={data.reason.filter(
+                                (x) => x != "บัตรประชาชนไม่ชัดเจน/ไม่ถูกต้อง"
+                              )}
+                            />
+                          </div>
+                        ) : data.status == "INACTIVE" && index == 4 ? (
+                          <div>
+                            <div className="form-group ps-3">
+                              <TextArea
+                                className="col-lg-12"
+                                rows={3}
+                                placeholder="กรอกเหตุผล/เหตุหมายเพิ่มเติม"
+                                autoComplete="off"
+                                onChange={handelMoreReason}
+                              />{" "}
+                            </div>
+                          </div>
+                        ) : null}
+                      </Radio>
+                    )
+                  )}
+                </Space>
+              </Radio.Group>
             </div>
           </div>
         </Form>
       </CardContainer>
     </div>
   );
-  const renderLand = (
+
+  const renderDrone = (
     <div className="col-lg-4">
       <CardContainer>
         <div
@@ -832,33 +1156,37 @@ function EditDroner() {
             <div className="container">
               {dronerDroneList.map((item, index) => (
                 <div className="row pt-3 pb-3">
-                  <div className="col-lg-2">
-                    <img
-                      src={item.logoImagePath}
-                      width={"25px"}
-                      height={"25px"}
+                  <div className="col-lg-1">
+                    <Avatar
+                      size={25}
+                      src={item.drone.droneBrand.logoImagePath}
+                      style={{ marginRight: "5px" }}
                     />
                   </div>
-                  <div className="col-lg-4">
-                    <span style={{ fontSize: "12px" }}>
-                      {item.droneName}
-                      <br />
-                      {item.droneId}
-                    </span>
+                  <div className="col-lg-5">
+                    <h6>{item.drone.droneBrand.name}</h6>
+                    <p style={{ color: "#ccc" }}>{item.serialNo}</p>
                   </div>
                   <div className="col-lg-4">
                     <span style={{ color: STATUS_COLOR[item.status] }}>
                       <Badge color={STATUS_COLOR[item.status]} />
-                      {DRONER_DRONE_STATUS[item.status]}
+                      {DRONER_DRONE_MAPPING[item.status]}
                       <br />
                     </span>
                   </div>
-                  <div className="col-lg-3 d-flex justify-content-between">
+                  <div className="col-lg-2 d-flex justify-content-between">
                     <div className="col-lg-6">
                       <ActionButton
                         icon={<EditOutlined />}
                         color={color.primary1}
-                        onClick={() => editDroner(item, index)}
+                        onClick={() => editDroner(item, index + 1)}
+                      />
+                    </div>
+                    <div className="col-lg-6">
+                      <ActionButton
+                        icon={<DeleteOutlined />}
+                        color={color.Error}
+                        onClick={() => removeDrone(index + 1)}
                       />
                     </div>
                   </div>
@@ -873,13 +1201,14 @@ function EditDroner() {
           )}
         </Form>
       </CardContainer>
-      <div className="d-flex justify-content-between pt-5">
-        <h5>รายการทั้งหมด {dronerDroneList.length} รายการ</h5>
+      <div className="d-flex justify-content-between pt-3">
+        <p>รายการทั้งหมด {dronerDroneList.length} รายการ</p>
         {dronerDroneList.length < 10 ? null : (
           <Pagination defaultCurrent={1} total={1} />
         )}
-
-        <Pagination defaultCurrent={1} total={1} />
+        {dronerDroneList.length > 10 && (
+          <Pagination defaultCurrent={1} total={1} />
+        )}
       </div>
     </div>
   );
@@ -896,12 +1225,12 @@ function EditDroner() {
       </Row>
       <Row className="d-flex justify-content-around" key={data.id}>
         {renderFromData}
-        {renderLand}
+        {renderDrone}
       </Row>
       <FooterPage
         onClickBack={() => (window.location.href = "/IndexDroner")}
         onClickSave={updateDroner}
-        //disableSaveBtn={showBtn}
+        disableSaveBtn={saveBtnDisable}
       />
       {showAddModal && (
         <ModalDrone
