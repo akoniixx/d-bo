@@ -13,7 +13,7 @@ import {
 import color from "../../resource/color";
 import { FileTextFilled } from "@ant-design/icons";
 
-export default function IndexRateDroner() {
+export default function IndexRankDroner() {
   const [searchText, setSearchText] = useState<string>();
   const [searchProvince, setSearchProvince] = useState<any>();
   const [searchDistrict, setSearchDistrict] = useState<any>();
@@ -262,7 +262,8 @@ export default function IndexRateDroner() {
               <ActionButton
                 icon={<FileTextFilled />}
                 color={color.primary1}
-                onClick={() => (window.location.href = "/DetailRankDroner")}
+                onClick={() =>  (window.location.href = "/DetailRankDroner")}
+               
               />
             </div>
           ),
