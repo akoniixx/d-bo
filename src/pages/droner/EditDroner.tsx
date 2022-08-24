@@ -11,12 +11,10 @@ import {
   Space,
   Badge,
   Tag,
+  Avatar,
 } from "antd";
 import emptyData from "../../resource/media/empties/iconoir_farm.png";
-import {
-  DeleteOutlined,
-  EditOutlined,
-} from "@ant-design/icons";
+import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
 import { CardContainer } from "../../components/card/CardContainer";
 import color from "../../resource/color";
 import { CardHeader } from "../../components/header/CardHearder";
@@ -46,7 +44,6 @@ import {
 import ModalDrone from "../../components/modal/ModalDronerDrone";
 import {
   DRONER_DRONE_MAPPING,
-  DRONER_DRONE_STATUS,
   DRONER_STATUS,
   STATUS_COLOR,
 } from "../../definitions/DronerStatus";
@@ -66,8 +63,8 @@ import {
   DronerAreaEntity_INIT,
 } from "../../entities/DronerAreaEntities";
 import { LAT_LNG_BANGKOK } from "../../definitions/Location";
+import { REASON_DRONER_STATUS } from "../../definitions/Reason";
 
-const { Option } = Select;
 const _ = require("lodash");
 const { Map } = require("immutable");
 let queryString = _.split(window.location.search, "=");
@@ -119,7 +116,7 @@ function EditDroner() {
 
   const fetchDronerById = async () => {
     await DronerDatasource.getDronerByID(dronerId).then((res) => {
-      console.log(res);
+      console.log(res.reason);
       setData(res);
       setMapPosition({
         lat: parseFloat(res.dronerArea.lat),
@@ -232,6 +229,8 @@ function EditDroner() {
     let checked = e.target.checked;
     let value = e.target.value;
     let p = Map(data).set("reason", [value]);
+    console.log(p.toJS());
+
     setData(p.toJS());
     checkValidate(p.toJS());
   };
@@ -504,12 +503,7 @@ function EditDroner() {
       data.expPlant,
       otherPlantList.filter((x) => x != "")
     );
-    console.log(moreReason.trim().length);
-
-    moreReason.trim().length != 0
-      ? data.reason.push(moreReason)
-      : data.reason.push("");
-
+    data.reason = moreReason;
     const pushAddr = Map(data).set("address", address);
     const pushDronerArea = Map(pushAddr.toJS()).set("dronerArea", dronerArea);
     const pushPin = Map(pushDronerArea.toJS()).set("pin", "");
@@ -521,10 +515,7 @@ function EditDroner() {
       "dronerDrone",
       dronerDroneList
     );
-    console.log(pushDroneList.toJS());
-    
     await DronerDatasource.updateDroner(pushDroneList.toJS()).then((res) => {
-      console.log("res",res);
       if (res != null) {
         for (i = 0; res.dronerDrone.length > i; i++) {
           let findId = res.dronerDrone[i];
@@ -533,7 +524,6 @@ function EditDroner() {
           )[0];
           for (let j = 0; getData.file.length > j; j++) {
             let getImg = getData.file[j];
-            console.log(j, getImg);
             imgDroneList?.push({
               resourceId: res.dronerDrone[i].id,
               category: getImg.category,
@@ -557,14 +547,14 @@ function EditDroner() {
             UploadImageDatasouce.uploadImage(createImgProfile).then(res);
           i == 1 && UploadImageDatasouce.uploadImage(createImgIdCard).then(res);
         }
-        // Swal.fire({
-        //   title: "บันทึกสำเร็จ",
-        //   icon: "success",
-        //   timer: 1500,
-        //   showConfirmButton: false,
-        // }).then((time) => {
-        //   window.location.href = "/IndexDroner";
-        // });
+        Swal.fire({
+          title: "บันทึกสำเร็จ",
+          icon: "success",
+          timer: 1500,
+          showConfirmButton: false,
+        }).then((time) => {
+          window.location.href = "/IndexDroner";
+        });
       }
     });
   };
@@ -1133,6 +1123,7 @@ function EditDroner() {
       </CardContainer>
     </div>
   );
+
   const renderDrone = (
     <div className="col-lg-4">
       <CardContainer>
@@ -1166,10 +1157,10 @@ function EditDroner() {
               {dronerDroneList.map((item, index) => (
                 <div className="row pt-3 pb-3">
                   <div className="col-lg-1">
-                    <img
+                    <Avatar
+                      size={25}
                       src={item.drone.droneBrand.logoImagePath}
-                      width={"25px"}
-                      height={"25px"}
+                      style={{ marginRight: "5px" }}
                     />
                   </div>
                   <div className="col-lg-5">

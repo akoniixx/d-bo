@@ -113,11 +113,10 @@ const ModalDrone: React.FC<ModalDroneProps> = ({
   const handleBrand = (brand: string) => {
     setDroneBrandId(brand);
     let filterSeries = seriesDrone?.filter((x) => x.droneBrandId == brand);
-    const m = Map(dataDrone.drone).set("droneBrandId", brand);
-    const t = Map(dataDrone).set("drone", m.toJS());
-    setDataDrone(t.toJS());
+    const m = Map(pushDrone).set("droneBrandId", brand);
+    setPushDrone(m.toJS());
     setSearchSeriesDrone(filterSeries);
-    checkValidate(t.toJS());
+    checkValidate(data, m.toJS());
   };
   const handleSeries = (id: string) => {
     let getSeries = seriesDrone?.filter((x) => x.id == id)[0];
@@ -136,16 +135,19 @@ const ModalDrone: React.FC<ModalDroneProps> = ({
   };
   const handleSerialNo = (e: any) => {
     const m = Map(dataDrone).set("serialNo", e.target.value);
+
     setDataDrone(m.toJS());
     checkValidate(m.toJS(), pushDrone, pushSeries);
   };
   const handleYear = (e: any) => {
     const m = Map(dataDrone).set("purchaseYear", e.target.value);
+
     setDataDrone(m.toJS());
     checkValidate(m.toJS(), pushDrone, pushSeries);
   };
   const handleMonth = (e: any) => {
     const m = Map(dataDrone).set("purchaseMonth", e);
+
     setDataDrone(m.toJS());
     checkValidate(m.toJS(), pushDrone, pushSeries);
   };
