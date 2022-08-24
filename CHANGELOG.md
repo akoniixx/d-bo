@@ -1,4 +1,8 @@
 ## [Version - 0]
+## Feature [v0.9.0] 2022-08-24
+- enhanced add droner check validate before save data
+- enhanced edit droner in modal droner drone
+- added function change status following logic
 ## Fix [v0.7.1] 2022-08-15
 - fixed validate plot modal "raiAmount"
 - fixed render img when select previous img in farmer menu

@@ -1,9 +1,9 @@
-import { httpClient } from "../config/develop-config";
+import { httpClient,BASE_URL } from "../config/develop-config";
 import {
   UserStaffEntity,
   UserStaffPageEntity,
 } from "../entities/UserStaffEntities";
-const API_URL = "https://api-dev-dnds.iconkaset.com";
+
 
 export class AdminDatasource {
   static getAdminList(
@@ -19,7 +19,7 @@ export class AdminDatasource {
       limit: row,
     };
     return httpClient
-      .get(API_URL + "/user-staff", { params })
+      .get(BASE_URL + "/user-staff", { params })
       .then((response) => {
         return response.data;
       })
@@ -30,7 +30,7 @@ export class AdminDatasource {
 
   static getAdminById(id: string): Promise<UserStaffEntity> {
     return httpClient
-      .get(API_URL + "/user-staff/" + id)
+      .get(BASE_URL + "/user-staff/" + id)
       .then((response) => {
         return response.data;
       })
@@ -50,7 +50,7 @@ export class AdminDatasource {
       isActive: data.isActive,
     };
     return httpClient
-      .post(API_URL + "/user-staff", params)
+      .post(BASE_URL + "/user-staff", params)
       .then((response) => {
         return response.data;
       })
@@ -69,7 +69,7 @@ export class AdminDatasource {
       isActive: data.isActive,
     };
     return httpClient
-      .patch(API_URL + "/user-staff/" + data.id, params)
+      .patch(BASE_URL + "/user-staff/" + data.id, params)
       .then((response) => {
         return response.data;
       })

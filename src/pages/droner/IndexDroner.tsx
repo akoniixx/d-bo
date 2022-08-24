@@ -114,12 +114,6 @@ function IndexDroner() {
     setSearchStatus(status);
     setCurrent(1);
   };
-  const sorter = (a: any, b: any) => {
-    if (a === b) return 0;
-    else if (a === null) return 1;
-    else if (b === null) return -1;
-    else return a.localeCompare(b);
-  };
 
   const PageTitle = (
     <>
@@ -269,7 +263,6 @@ function IndexDroner() {
       dataIndex: "firstname",
       key: "firstname",
       width: "12%",
-      sorter: (a: any, b: any) => sorter(a.firstname, b.firstname),
       render: (value: any, row: any, index: number) => {
         return {
           children: (
@@ -400,7 +393,6 @@ function IndexDroner() {
       dataIndex: "status",
       key: "status",
       width: "10%",
-      sorter: (a: any, b: any) => sorter(a.status, b.status),
       render: (value: any, row: any, index: number) => {
         const countDay = () => {
           let dateToday: any = moment(Date.now());
@@ -469,12 +461,13 @@ function IndexDroner() {
         }
       />
       <div className="d-flex justify-content-between pt-5">
-        <h5>รายการทั้งหมด {data?.count} รายการ</h5>
+        <p>รายการทั้งหมด {data?.count} รายการ</p>
         <Pagination
           current={current}
           total={data?.count}
           onChange={onChangePage}
           pageSize={row}
+          showSizeChanger={false}
         />
       </div>
     </Layouts>

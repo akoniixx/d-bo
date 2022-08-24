@@ -32,7 +32,7 @@ import FooterPage from "../../components/footer/FooterPage";
 import { EXP_PLANT } from "../../definitions/ExpPlant";
 import ActionButton from "../../components/button/ActionButton";
 import {
-  DRONER_DRONE_STATUS,
+  DRONER_DRONE_MAPPING,
   STATUS_COLOR,
 } from "../../definitions/DronerStatus";
 import { DronerDatasource } from "../../datasource/DronerDatasource";
@@ -106,12 +106,13 @@ function AddDroner() {
   const [createImgIdCard, setCreateImgIdCard] = useState<UploadImageEntity>(
     UploadImageEntity_INTI
   );
-  const [mapPosition, setMapPosition] = useState<{ lat: number; lng: number }>({
-    lat: parseFloat(data.dronerArea.lat),
-    lng: parseFloat(data.dronerArea.long),
-  });
+  const [mapPosition, setMapPosition] = useState<{ lat: number; lng: number }>(
+    LAT_LNG_BANGKOK
+  );
   const [location, setLocation] = useState<SubdistrictEntity[]>([]);
   const [searchLocation] = useState("");
+  const [validateComma, setValidateComma] = useState<any>("");
+  let [otherPlant, setOtherPlant] = useState<any>();
 
   useEffect(() => {
     fetchProvince();
@@ -133,45 +134,7 @@ function AddDroner() {
   const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const m = Map(data).set(e.target.id, e.target.value);
     setData(m.toJS());
-    checkValidate(m.toJS());
-  };
-  const handleAddress = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    const m = Map(address).set(e.target.id, e.target.value);
-    setAddress(m.toJS());
-    checkValidateAddr(m.toJS());
-  };
-  const handleOnChangeProvince = async (provinceId: number) => {
-    await getProvince(provinceId, CreateAddressEntity_INIT);
-  };
-  const getProvince = async (provinceId: number, addr: CreateAddressEntity) => {
-    const d = Map(addr).set("provinceId", provinceId);
-    setAddress(d.toJS());
-    checkValidateAddr(d.toJS());
-    await LocationDatasource.getDistrict(provinceId).then((res) => {
-      setDistrict(res);
-    });
-  };
-  const handleOnChangeDistrict = async (districtId: number) => {
-    const d = Map(address).set("districtId", districtId);
-    setAddress(d.toJS());
-    checkValidateAddr(d.toJS());
-    await LocationDatasource.getSubdistrict(districtId).then((res) => {
-      setSubdistrict(res);
-    });
-  };
-  const handleOnChangeSubdistrict = async (subdistrictId: number) => {
-    const d = Map(address).set("subdistrictId", subdistrictId);
-    setAddress(d.toJS());
-    checkValidateAddr(d.toJS());
-    await handleOnChangePostcode(d.toJS());
-  };
-  const handleOnChangePostcode = (addr: CreateAddressEntity) => {
-    let getPostcode = subdistrict.filter(
-      (x) => x.subdistrictId == addr.subdistrictId
-    )[0].postcode;
-    const c = Map(addr).set("postcode", getPostcode);
-    setAddress(c.toJS());
-    checkValidateAddr(c.toJS());
+    checkValidate(m.toJS(), address, dronerArea);
   };
   const handleExpPlant = (e: any) => {
     let checked = e.target.checked;
@@ -187,34 +150,64 @@ function AddDroner() {
       p = Map(data).set("expPlant", removePlant);
     }
     setData(p.toJS());
-    checkValidate(data);
+    checkValidate(p.toJS(), address, dronerArea);
   };
-  const handlePlantOther = (e: React.ChangeEvent<HTMLInputElement>) => {
-    let otherPlant = [];
-    const checkComma = checkValidateComma(e.target.value);
-    if (checkComma) {
-      let m = e.target.value.split(",");
-      for (let i = 0; m.length > i; i++) {
-        otherPlant.push(m[i]);
+  const handlePlantOther = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.value.trim().length != 0) {
+      setOtherPlant(e.target.value);
+      const checkComma = checkValidateComma(e.target.value);
+      if (!checkComma) {
+        setValidateComma("");
+        setBtnSaveDisable(checkComma);
+      } else {
+        setValidateComma("error");
+        setBtnSaveDisable(checkComma);
       }
     } else {
+      setValidateComma("");
+      setBtnSaveDisable(true);
     }
-    data.expPlant.push.apply(
-      data.expPlant,
-      otherPlant.filter((x) => x != "")
-    );
   };
+  //#endregion
 
-  const checkValidateComma = (data: string) => {
-    const a = data.indexOf(" ");
-    const b = data.indexOf("/");
-    const c = data.indexOf("-");
-    const d = data.indexOf("*");
-    if (a > -1 || b > -1 || c > -1 || d > -1) {
-      return false;
-    } else {
-      return true;
-    }
+  //#region address
+  const handleAddress = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const m = Map(address).set(e.target.id, e.target.value);
+    setAddress(m.toJS());
+    checkValidate(data, m.toJS(), dronerArea);
+  };
+  const handleOnChangeProvince = async (provinceId: number) => {
+    await getProvince(provinceId, CreateAddressEntity_INIT);
+  };
+  const getProvince = async (provinceId: number, addr: CreateAddressEntity) => {
+    const d = Map(addr).set("provinceId", provinceId);
+    setAddress(d.toJS());
+    checkValidate(data, d.toJS(), dronerArea);
+    await LocationDatasource.getDistrict(provinceId).then((res) => {
+      setDistrict(res);
+    });
+  };
+  const handleOnChangeDistrict = async (districtId: number) => {
+    const d = Map(address).set("districtId", districtId);
+    setAddress(d.toJS());
+    checkValidate(data, d.toJS(), dronerArea);
+    await LocationDatasource.getSubdistrict(districtId).then((res) => {
+      setSubdistrict(res);
+    });
+  };
+  const handleOnChangeSubdistrict = async (subdistrictId: number) => {
+    const d = Map(address).set("subdistrictId", subdistrictId);
+    setAddress(d.toJS());
+    checkValidate(data, d.toJS(), dronerArea);
+    await handleOnChangePostcode(d.toJS());
+  };
+  const handleOnChangePostcode = (addr: CreateAddressEntity) => {
+    let getPostcode = subdistrict.filter(
+      (x) => x.subdistrictId == addr.subdistrictId
+    )[0].postcode;
+    const c = Map(addr).set("postcode", getPostcode);
+    setAddress(c.toJS());
+    checkValidate(data, c.toJS(), dronerArea);
   };
   //#endregion
 
@@ -360,21 +353,32 @@ function AddDroner() {
   };
   //#endregion
 
-  const checkValidate = (data: CreateDronerEntity) => {
+  const checkValidate = (
+    data?: CreateDronerEntity,
+    addr?: CreateAddressEntity,
+    area?: DronerAreaEntity
+  ) => {
     let checkEmptySting = ![
-      data.firstname,
-      data.telephoneNo,
-      data.idNo,
-      address.address1,
-      dronerArea.lat,
-      dronerArea.long,
+      data?.firstname,
+      data?.telephoneNo,
+      data?.idNo,
+      addr?.address1,
+      area?.lat,
+      area?.long,
     ].includes("");
     let checkEmptyNumber = ![
-      address.provinceId,
-      address.districtId,
-      address.subdistrictId,
+      addr?.provinceId,
+      addr?.districtId,
+      addr?.subdistrictId,
     ].includes(0);
-    let checkEmptyArray = ![data.expPlant].includes([""]);
+
+    let checkEmptyArray = false;
+    if (data?.expPlant !== undefined) {
+      checkEmptyArray =
+        ![data?.expPlant][0]?.includes("") &&
+        data?.expPlant.length !== 0 &&
+        data?.expPlant !== undefined;
+    }
 
     if (checkEmptySting && checkEmptyNumber && checkEmptyArray) {
       setBtnSaveDisable(false);
@@ -382,30 +386,29 @@ function AddDroner() {
       setBtnSaveDisable(true);
     }
   };
-  const checkValidateAddr = (addr: CreateAddressEntity) => {
-    let checkEmptySting = ![
-      data.firstname,
-      data.telephoneNo,
-      data.idNo,
-      address.address1,
-      dronerArea.lat,
-      dronerArea.long,
-    ].includes("");
-    let checkEmptyNumber = ![
-      addr.provinceId,
-      addr.districtId,
-      addr.subdistrictId,
-    ].includes(0);
-    let checkEmptyArray = ![data.expPlant].includes([""]);
 
-    if (checkEmptySting && checkEmptyNumber && checkEmptyArray) {
-      setBtnSaveDisable(false);
-    } else {
-      setBtnSaveDisable(true);
-    }
+  const checkValidateComma = (data: string) => {
+    const checkSyntax =
+      data.includes("*") ||
+      data.includes("/") ||
+      data.includes(" ") ||
+      data.includes("-") ||
+      data.includes("+");
+    return data.trim().length != 0 ? (checkSyntax ? true : false) : true;
   };
 
   const insertDroner = async () => {
+    let otherPlantList = [];
+    if (otherPlant != undefined) {
+      let m = otherPlant.split(",");
+      for (let i = 0; m.length > i; i++) {
+        otherPlantList.push(m[i]);
+      }
+    }
+    data.expPlant.push.apply(
+      data.expPlant,
+      otherPlantList.filter((x) => x != "")
+    );
     const pushAdd = Map(data).set("address", address);
     const pushDronerArea = Map(pushAdd.toJS()).set("dronerArea", dronerArea);
     const pushDroneList = Map(pushDronerArea.toJS()).set(
@@ -420,7 +423,7 @@ function AddDroner() {
       "expPlant",
       setOtherPlant
     );
-    
+
     await DronerDatasource.createDronerList(pushOtherPlant.toJS()).then(
       (res) => {
         if (res.id != null) {
@@ -739,6 +742,7 @@ function AddDroner() {
                   placeholder="กรอกรหัสไปรษณีย์"
                   defaultValue={address?.postcode}
                   key={address.subdistrictId}
+                  disabled
                 />
               </Form.Item>
             </div>
@@ -822,7 +826,6 @@ function AddDroner() {
               <label>Latitude (ละติจูด) </label>
               <span style={{ color: "red" }}>*</span>
               <Form.Item
-                name="lat"
                 rules={[
                   {
                     required: true,
@@ -843,7 +846,6 @@ function AddDroner() {
               <label>Longitude (ลองติจูด) </label>
               <span style={{ color: "red" }}>*</span>
               <Form.Item
-                name="long"
                 rules={[
                   {
                     required: true,
@@ -868,44 +870,38 @@ function AddDroner() {
             lat={mapPosition.lat}
             lng={mapPosition.lng}
           />
-          <div className="row">
-            <div className="form-group col-lg-6">
-              <label>
-                พืชที่เคยฉีดพ่น{" "}
-                <span style={{ color: color.Disable }}>
-                  (กรุณาเลือกอย่างน้อย 1 อย่าง)
-                </span>
-                <span style={{ color: "red" }}>*</span>
-              </label>
-              {EXP_PLANT.map((item) => (
-                <div>
-                  <input
-                    type="checkbox"
-                    value={item}
-                    onClick={handleExpPlant}
-                  />{" "}
-                  <label>{item}</label>
-                </div>
-              ))}
-            </div>
-          </div>
           <div className="form-group col-lg-6">
+            <label>
+              พืชที่เคยฉีดพ่น{" "}
+              <span style={{ color: color.Disable }}>
+                (กรุณาเลือกอย่างน้อย 1 อย่าง)
+              </span>
+              <span style={{ color: "red" }}>*</span>
+            </label>
+            {EXP_PLANT.map((item) => (
+              <div>
+                <input type="checkbox" value={item} onClick={handleExpPlant} />{" "}
+                <label>{item}</label>
+              </div>
+            ))}
+          </div>
+          <div className="form-group col-lg-12">
             <label></label>
-            <Form.Item
-              name="otherPlant"
-              rules={[
-                {
-                  required: true,
-                  message: "กรุณากรอกข้อมูลแล้วคั่นด้วย (,)",
-                },
-              ]}
-            >
+            <Form.Item>
               <Input
-                pattern="[+-]?\d+(?:[,]\d+)?"
-                onBlur={handlePlantOther}
-                placeholder="พืชอื่นๆ เช่น ส้ม มะละกอ มะพร้าว"
+                status={validateComma}
+                onChange={handlePlantOther}
+                placeholder="กรอกข้อมูลพืชอื่นๆ เช่น ส้ม,มะขาม (กรุณาใช้ (,) ให้กับการเพิ่มพืชมากกว่า 1 อย่าง)"
                 autoComplete="off"
+                defaultValue={data.expPlant
+                  .filter((a) => !EXP_PLANT.some((x) => x === a))
+                  .join(",")}
               />
+              {validateComma == "error" && (
+                <p style={{ color: color.Error }}>
+                  กรุณาใช้ (,) ให้กับการเพิ่มพืชมากกว่า 1 อย่าง
+                </p>
+              )}
             </Form.Item>
           </div>
         </Form>
@@ -950,18 +946,18 @@ function AddDroner() {
                     <div className="col-lg-1 text-center">
                       <Avatar
                         size={25}
-                        src={item.logoImagePath}
+                        src={item.drone.droneBrand.logoImagePath}
                         style={{ marginRight: "5px" }}
                       />
                     </div>
                     <div className="col-lg-5">
-                      <h6>{item.droneName}</h6>
+                      <h6>{item.drone.droneBrand.name}</h6>
                       <p style={{ color: "#ccc" }}>{item.serialNo}</p>
                     </div>
                     <div className="col-lg-4">
                       <span style={{ color: STATUS_COLOR[item.status] }}>
                         <Badge color={STATUS_COLOR[item.status]} />
-                        {DRONER_DRONE_STATUS[item.status]}
+                        {DRONER_DRONE_MAPPING[item.status]}
                       </span>
                     </div>
                     <div className="col-lg-2">
