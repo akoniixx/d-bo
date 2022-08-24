@@ -21,7 +21,7 @@ import EditAdmin from "./pages/admin/EditAdmin";
 import ProtectRoute from "./ProtectRoute";
 import PublicRoute from "./PublicRoute";
 import DetailRankDroner from "./pages/droner/DetailRankDroner";
-import IndexRateDroner from "./pages/droner/IndexRateDroner";
+import IndexRankDroner from "./pages/droner/IndexRankDroner";
 
 const WebRoutes: React.FC<any> = () => {
   return (
@@ -39,7 +39,7 @@ const WebRoutes: React.FC<any> = () => {
           <Route path="/AddFarmer" element={<AddFarmer />} />
           <Route path="/AddDroner" element={<AddDroner />} />
           <Route path="/DroneList" element={<DroneList />} />
-          <Route path="/IndexRateDroner" element={<IndexRateDroner />} />
+          <Route path="/IndexRankDroner" element={<IndexRankDroner />} />
           <Route path="/DetailRankDroner" element={<DetailRankDroner/>} />
           <Route path="/EditDroneList" element={<EditDroneList />} />
           <Route path="/EditFarmer/:id" element={<EditFarmer />} />
