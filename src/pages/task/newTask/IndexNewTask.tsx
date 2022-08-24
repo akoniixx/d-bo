@@ -1,15 +1,33 @@
-import { DownOutlined } from "@ant-design/icons";
+import { DeleteOutlined, DownOutlined, EditOutlined } from "@ant-design/icons";
 import { Button, DatePicker, Dropdown, Menu, Select, Space, Table } from "antd";
 import Search from "antd/lib/input/Search";
 import moment from "moment";
 import React, { useEffect, useState } from "react";
+import ActionButton from "../../../components/button/ActionButton";
 import { CardContainer } from "../../../components/card/CardContainer";
 import Layouts from "../../../components/layout/Layout";
+import { TaskDatasource } from "../../../datasource/TaskDatasource";
+import { NewTaskPageEntity } from "../../../entities/NewTaskEntities";
 import { color } from "../../../resource";
+import { DateTimeUtil } from "../../../utilities/DateTimeUtil";
 const { RangePicker } = DatePicker;
 const dateFormat = "YYYY-MM-DD";
 
 const IndexNewTask = () => {
+  const row = 10;
+  const [data, setData] = useState<NewTaskPageEntity>();
+
+  const fetchNewTaskList = async () => {
+    await TaskDatasource.getNewTaskList(row, 1).then((res) => {
+      console.log(res.data);
+      setData(res);
+    });
+  };
+
+  useEffect(() => {
+    fetchNewTaskList();
+  }, []);
+
   const menu = (
     <Menu
       items={[
@@ -85,38 +103,88 @@ const IndexNewTask = () => {
   const columns = [
     {
       title: "วัน/เวลานัดหมาย",
-      dataIndex: "firstname",
-      key: "firstname",
+      dataIndex: "date_appointment",
+      key: "date_appointment",
+      render: (value: any, row: any, index: number) => {
+        return {
+          children: <span>{DateTimeUtil.formatDateTime(value)}</span>,
+        };
+      },
     },
     {
       title: "ชื่อเกษตรกร",
-      dataIndex: "username",
-      key: "username",
+      dataIndex: "fullname",
+      key: "fullname",
+      render: (value: any, row: any, index: number) => {
+        return {
+          children: <span>{row.firstname + " " + row.lastname}</span>,
+        };
+      },
     },
     {
       title: "พื้นที่แปลงเกษตร",
-      dataIndex: "email",
-      key: "email",
+      render: (value: any, row: any, index: number) => {
+        const checkAddress = () => {
+          let province =
+            row.province_name == null ? "" : row.province_name + "/";
+          let district =
+            row.district_name == null ? "" : row.district_name + "/";
+          let subdistrict =
+            row.subdistrict_name == null ? "" : row.subdistrict_name + "/";
+          return province + district + subdistrict;
+        };
+        return {
+          children: <span>{checkAddress()}</span>,
+        };
+      },
     },
     {
       title: "ค่าบริการ",
-      dataIndex: "role",
-      key: "role",
+      dataIndex: "total_price",
+      key: "total_price",
+      render: (value: any, row: any, index: number) => {
+        return {
+          children: (
+            <span>
+              {row.total_price == null ? 0 + " บาท" : row.total_price + " บาท"}
+            </span>
+          ),
+        };
+      },
     },
     {
       title: "นักบินโดรน",
-      dataIndex: "role",
-      key: "role",
+      dataIndex: "count_droner",
+      key: "count_droner",
+      render: (value: any, row: any, index: number) => {
+        return {
+          children: <span>จำนวน {row.count_droner} ราย</span>,
+        };
+      },
     },
     {
       title: "สถานะ",
-      dataIndex: "role",
-      key: "role",
+      dataIndex: "task_status",
+      key: "task_status",
     },
     {
       title: "",
-      dataIndex: "role",
-      key: "role",
+      dataIndex: "Action",
+      key: "Action",
+      render: (value: any, row: any, index: number) => {
+        return {
+          children: (
+            <div className="d-flex flex-row justify-content-center">
+              <div className="col-lg-6">
+                <ActionButton icon={<EditOutlined />} color={color.primary1} />
+              </div>
+              <div className="col-lg-6">
+                <ActionButton icon={<DeleteOutlined />} color={color.Error} />
+              </div>
+            </div>
+          ),
+        };
+      },
     },
   ];
 
@@ -125,6 +193,7 @@ const IndexNewTask = () => {
       {pageTitle}
       <CardContainer>
         <Table
+          dataSource={data?.data}
           columns={columns}
           pagination={false}
           size="large"

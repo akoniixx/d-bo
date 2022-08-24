@@ -1,11 +1,28 @@
-import { httpClient } from "../config/develop-config";
+import { BASE_URL, httpClient } from "../config/develop-config";
 import { FarmerEntity } from "../entities/FarmerEntities";
-const API_URL = "https://api-dev-dnds.iconkaset.com";
+import { NewTaskPageEntity } from "../entities/NewTaskEntities";
 
 export class TaskDatasource {
-  static getFarmerList(text? : string): Promise<FarmerEntity[]> {
+  static getNewTaskList(
+    take: number,
+    page: number
+  ): Promise<NewTaskPageEntity> {
+    const params = {
+      take: take,
+      page: page,
+    };
     return httpClient
-      .get(API_URL + "/tasks/farmer?search=" + text)
+      .get(BASE_URL + "/tasks/task", { params })
+      .then((response) => {
+        return response.data;
+      })
+      .catch((err) => {
+        console.log(err, "err getnewtask");
+      });
+  }
+  static getFarmerList(text?: string): Promise<FarmerEntity[]> {
+    return httpClient
+      .get(BASE_URL + "/tasks/farmer?search=" + text)
       .then((response) => {
         return response.data;
       })
