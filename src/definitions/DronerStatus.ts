@@ -8,10 +8,10 @@ export const DRONER_STATUS_MAPPING: any = {
 };
 export const DRONER_STATUS = [
   { value: "", name: "ทั้งหมด" },
-  { value: "OPEN", name: "ข้อมูลไม่ครบถ้วน" },
-  { value: "PENDING", name: "รอตรวจสอบ" },
-  { value: "REJECTED", name: "ไม่อนุมัติ" },
+  { value: "OPEN", name: "ยังไม่เปิดใช้งาน" },
+  { value: "PENDING", name: "รอยืนยันตัวตน" },
   { value: "ACTIVE", name: "ใช้งาน" },
+  { value: "REJECTED", name: "ไม่อนุมัติ" },
   { value: "INACTIVE", name: "ปิดการใช้งาน" },
 ];
 export const DRONE_STATUS = [
@@ -42,3 +42,5 @@ export const STATUS_COLOR: any = {
   OPEN: color.Disable,
   REJECTED: color.Error,
 };
+
+

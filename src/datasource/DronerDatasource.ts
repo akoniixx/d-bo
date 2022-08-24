@@ -48,6 +48,20 @@ export class DronerDatasource {
   }
 
   static updateDroner(data: DronerEntity): Promise<any> {
+    for (let i = 0; data.dronerDrone.length > i; i++) {
+      let checkIdDronerDrone = data.dronerDrone[i].id;
+      checkIdDronerDrone == "" && delete data.dronerDrone[i].dronerId;
+      delete data.dronerDrone[i].id;
+    }
+
+    if (data.dronerArea.provinceId == 0) {
+      delete data.dronerArea["provinceId"];
+      delete data.dronerArea["dronerId"];
+      delete data.dronerArea["districtId"];
+      delete data.dronerArea["subdistrictId"];
+      delete data.dronerArea["distance"];
+    }
+    console.log("base", data);
     return httpClient
       .patch(BASE_URL + "/droner/" + data.id, data)
       .then((response) => {
@@ -64,9 +78,16 @@ export class DronerDatasource {
       delete data.dronerDrone[i].id;
       delete data.dronerDrone[i].logoImagePath;
       delete data.dronerDrone[i].dronerId;
-      for(let j = 0; data.dronerDrone[i].file.length > j; j++){
+      for (let j = 0; data.dronerDrone[i].file.length > j; j++) {
         delete data.dronerDrone[i].file[j];
       }
+    }
+    if (data.dronerArea.provinceId == 0) {
+      delete data.dronerArea["provinceId"];
+      delete data.dronerArea["dronerId"];
+      delete data.dronerArea["districtId"];
+      delete data.dronerArea["subdistrictId"];
+      delete data.dronerArea["distance"];
     }
     return httpClient
       .post(BASE_URL + "/droner", data)

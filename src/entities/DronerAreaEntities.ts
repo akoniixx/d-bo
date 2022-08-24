@@ -1,12 +1,12 @@
 import { LAT_LNG_BANGKOK } from "./../definitions/Location";
 export interface DronerAreaEntity {
-  dronerId: string;
-  provinceId: 0;
-  districtId: 0;
-  subdistrictId: 0;
+  dronerId?: string;
+  provinceId?: 0;
+  districtId?: 0;
+  subdistrictId?: 0;
   lat: string;
   long: string;
-  distance: string;
+  distance?: string;
 }
 export const DronerAreaEntity_INIT: DronerAreaEntity = {
   dronerId: "",
