@@ -1,4 +1,8 @@
 ## [Version - 0]
+## Fix [v0.9.1] 2022-08-24
+- create drone list page
+- create drone list edit page
+- unsuccess
 ## Feature [v0.9.0] 2022-08-24
 - enhanced add droner check validate before save data
 - enhanced edit droner in modal droner drone
