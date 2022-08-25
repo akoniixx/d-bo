@@ -5,11 +5,19 @@ import { NewTaskPageEntity } from "../entities/NewTaskEntities";
 export class TaskDatasource {
   static getNewTaskList(
     take: number,
-    page: number
+    page: number,
+    status?: string,
+    search?: string,
+    startDate?: string,
+    endDate?: string
   ): Promise<NewTaskPageEntity> {
     const params = {
       take: take,
       page: page,
+      status: status,
+      search: search,
+      startDate: startDate,
+      endDate: endDate,
     };
     return httpClient
       .get(BASE_URL + "/tasks/task", { params })

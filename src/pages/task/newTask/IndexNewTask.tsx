@@ -1,32 +1,97 @@
-import { DeleteOutlined, DownOutlined, EditOutlined } from "@ant-design/icons";
-import { Button, DatePicker, Dropdown, Menu, Select, Space, Table } from "antd";
+import {
+  DeleteOutlined,
+  DownOutlined,
+  EditOutlined,
+  UserOutlined,
+} from "@ant-design/icons";
+import {
+  Badge,
+  Button,
+  DatePicker,
+  Dropdown,
+  Menu,
+  Select,
+  Table,
+} from "antd";
 import Search from "antd/lib/input/Search";
 import moment from "moment";
 import React, { useEffect, useState } from "react";
 import ActionButton from "../../../components/button/ActionButton";
 import { CardContainer } from "../../../components/card/CardContainer";
 import Layouts from "../../../components/layout/Layout";
+import ModalDronerList from "../../../components/modal/task/newTask/ModalDronerList";
+import ModalMapPlot from "../../../components/modal/task/newTask/ModalMapPlot";
 import { TaskDatasource } from "../../../datasource/TaskDatasource";
+import {
+  NEWTASK_STATUS_SEARCH,
+  STATUS_NEWTASK_COLOR_MAPPING,
+  STATUS_NEWTASK_MAPPING,
+} from "../../../definitions/Status";
 import { NewTaskPageEntity } from "../../../entities/NewTaskEntities";
 import { color } from "../../../resource";
 import { DateTimeUtil } from "../../../utilities/DateTimeUtil";
 const { RangePicker } = DatePicker;
-const dateFormat = "YYYY-MM-DD";
+const dateFormat = "DD-MM-YYYY";
+const dateSearchFormat = "YYYY-MM-DD";
 
 const IndexNewTask = () => {
   const row = 10;
+  const [current, setCurrent] = useState(1);
   const [data, setData] = useState<NewTaskPageEntity>();
+  const [searchStatus, setSearchStatus] = useState<string>("");
+  const [searchText, setSearchText] = useState<string>("");
+  const [searchStartDate, setSearchStartDate] = useState<any>(null);
+  const [searchEndDate, setSearchEndDate] = useState<any>(null);
+  const [showModalMap, setShowModalMap] = useState<boolean>(false);
+  const [showModalDroner, setShowModalDroner] = useState<boolean>(false);
+
+  const [plotId, setPlotId] = useState<string>("");
+  const [taskId, setTaskId] = useState<string>("");
 
   const fetchNewTaskList = async () => {
-    await TaskDatasource.getNewTaskList(row, 1).then((res) => {
-      console.log(res.data);
+    await TaskDatasource.getNewTaskList(
+      row,
+      current,
+      searchStatus,
+      searchText,
+      searchStartDate,
+      searchEndDate
+    ).then((res) => {
       setData(res);
     });
   };
 
   useEffect(() => {
     fetchNewTaskList();
-  }, []);
+  }, [searchStatus, searchText, searchStartDate, searchEndDate]);
+
+  const handleSearchStatus = (status: any) => {
+    setSearchStatus(status);
+    setCurrent(1);
+  };
+  const handleSearchText = (e: string) => {
+    setSearchText(e);
+    setCurrent(1);
+  };
+  const handleSearchDate = (e: any) => {
+    if (e != null) {
+      setSearchStartDate(moment(new Date(e[0])).format(dateSearchFormat));
+      setSearchEndDate(moment(new Date(e[1])).format(dateSearchFormat));
+    } else {
+      setSearchStartDate(e);
+      setSearchEndDate(e);
+    }
+    setCurrent(1);
+  };
+
+  const handleModalMap = (plotId: string) => {
+    setShowModalMap((prev) => !prev);
+    setPlotId(plotId);
+  };
+  const handleModalDronerList = (taskId: string) => {
+    setShowModalDroner((prev) => !prev);
+    setTaskId(taskId);
+  };
 
   const menu = (
     <Menu
@@ -62,23 +127,26 @@ const IndexNewTask = () => {
         <Search
           placeholder="ค้นหาชื่อเกษตรกร หรือเบอร์โทร"
           className="col-lg-12 p-1"
+          onSearch={handleSearchText}
         />
       </div>
       <div className="col-lg-2">
-        <Select className="col-lg-12 p-1" defaultValue="สถานะทั้งหมด">
-          <option value="" selected={true}>
-            สถานะทั้งหมด
-          </option>
-          <option value="true">ใช้งาน</option>
-          <option value="false">ไม่ได้ใช้งาน</option>
+        <Select
+          className="col-lg-12 p-1"
+          placeholder="สถานะทั้งหมด"
+          onChange={handleSearchStatus}
+          allowClear
+        >
+          {NEWTASK_STATUS_SEARCH.map((item) => (
+            <option value={item.name}>{item.name}</option>
+          ))}
         </Select>
       </div>
       <div className="col-lg-3 p-1">
         <RangePicker
-          defaultValue={[
-            moment("2019-09-03", dateFormat),
-            moment("2019-11-22", dateFormat),
-          ]}
+          allowClear
+          onCalendarChange={(val) => handleSearchDate(val)}
+          format={dateFormat}
         />
       </div>
       <div className="col-lg-2 p-1">
@@ -105,9 +173,16 @@ const IndexNewTask = () => {
       title: "วัน/เวลานัดหมาย",
       dataIndex: "date_appointment",
       key: "date_appointment",
+      width: "20%",
       render: (value: any, row: any, index: number) => {
         return {
-          children: <span>{DateTimeUtil.formatDateTime(value)}</span>,
+          children: (
+            <>
+              <span>{DateTimeUtil.formatDateTime(value)}</span>
+              <br />
+              <span style={{ color: color.Grey }}>{row.task_no}</span>
+            </>
+          ),
         };
       },
     },
@@ -117,7 +192,13 @@ const IndexNewTask = () => {
       key: "fullname",
       render: (value: any, row: any, index: number) => {
         return {
-          children: <span>{row.firstname + " " + row.lastname}</span>,
+          children: (
+            <>
+              <span>{row.firstname + " " + row.lastname}</span>
+              <br />
+              <span style={{ color: color.Grey }}>{row.telephone_no}</span>
+            </>
+          ),
         };
       },
     },
@@ -134,7 +215,18 @@ const IndexNewTask = () => {
           return province + district + subdistrict;
         };
         return {
-          children: <span>{checkAddress()}</span>,
+          children: (
+            <>
+              <span>{checkAddress()}</span>
+              <br />
+              <a
+                onClick={() => handleModalMap(row.farmer_plot_id)}
+                style={{ color: color.primary1 }}
+              >
+                ดูแผนที่แปลง
+              </a>
+            </>
+          ),
         };
       },
     },
@@ -145,9 +237,17 @@ const IndexNewTask = () => {
       render: (value: any, row: any, index: number) => {
         return {
           children: (
-            <span>
-              {row.total_price == null ? 0 + " บาท" : row.total_price + " บาท"}
-            </span>
+            <>
+              <span>
+                {row.total_price == null
+                  ? 0 + " บาท"
+                  : row.total_price + " บาท"}
+              </span>
+              <br />
+              <span style={{ color: color.Grey }}>
+                จำนวน {row.count_droner} ไร่
+              </span>
+            </>
           ),
         };
       },
@@ -158,7 +258,18 @@ const IndexNewTask = () => {
       key: "count_droner",
       render: (value: any, row: any, index: number) => {
         return {
-          children: <span>จำนวน {row.count_droner} ราย</span>,
+          children: (
+            <>
+              <span>จำนวน {row.count_droner} ราย</span>
+              <br />
+              <a
+                onClick={() => handleModalDronerList(row.id)}
+                style={{ color: color.primary1 }}
+              >
+                ดูรายชื่อนักบินโดรน
+              </a>
+            </>
+          ),
         };
       },
     },
@@ -166,11 +277,29 @@ const IndexNewTask = () => {
       title: "สถานะ",
       dataIndex: "task_status",
       key: "task_status",
+      render: (value: any, row: any, index: number) => {
+        return {
+          children: (
+            <>
+              <span style={{ color: STATUS_NEWTASK_COLOR_MAPPING[row.status] }}>
+                <Badge color={STATUS_NEWTASK_COLOR_MAPPING[row.status]} />
+                {STATUS_NEWTASK_MAPPING[row.status]}
+              </span>
+              <br />
+              <span style={{ color: color.Grey }}>
+                <UserOutlined style={{ padding: "0 4px 0 0" }} />
+                {row.create_by}
+              </span>
+            </>
+          ),
+        };
+      },
     },
     {
       title: "",
       dataIndex: "Action",
       key: "Action",
+      width: "9%",
       render: (value: any, row: any, index: number) => {
         return {
           children: (
@@ -189,18 +318,41 @@ const IndexNewTask = () => {
   ];
 
   return (
-    <Layouts>
-      {pageTitle}
-      <CardContainer>
-        <Table
-          dataSource={data?.data}
-          columns={columns}
-          pagination={false}
-          size="large"
-          tableLayout="fixed"
-        />
-      </CardContainer>
-    </Layouts>
+    <>
+      <Layouts>
+        {pageTitle}
+        <CardContainer>
+          <Table
+            dataSource={data?.data}
+            columns={columns}
+            pagination={false}
+            size="large"
+            tableLayout="fixed"
+            rowClassName={(a) =>
+              a.status == "WAIT_RECEIVE"
+                ? "table-row-older"
+                : "table-row-lasted"
+            }
+          />
+        </CardContainer>
+        {showModalMap && (
+          <ModalMapPlot
+            show={showModalMap}
+            backButton={() => setShowModalMap((prev) => !prev)}
+            title="แผนที่แปลงเกษตร"
+            plotId={plotId}
+          />
+        )}
+        {showModalDroner && (
+          <ModalDronerList
+            show={showModalDroner}
+            backButton={() => setShowModalDroner((prev) => !prev)}
+            title="รายชื่อนักโดรนบิน"
+            taskId={taskId}
+          />
+        )}
+      </Layouts>
+    </>
   );
 };
 
