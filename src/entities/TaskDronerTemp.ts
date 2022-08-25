@@ -7,3 +7,8 @@ export interface TaskDronerTempEntity {
   createdAt: string;
   dronerDetail: string;
 }
+export interface CreateDronerTempEntity {
+  dronerId: string;
+  status: string;
+  dronerDetail: string;
+}

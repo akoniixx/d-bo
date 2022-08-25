@@ -1,3 +1,5 @@
+import { CreateDronerTempEntity } from "./TaskDronerTemp";
+
 export interface NewTaskEntity {
   id: string;
   farmer_plot_id: string;
@@ -21,4 +23,17 @@ export interface NewTaskEntity {
 export interface NewTaskPageEntity {
   data: NewTaskEntity[];
   count: number;
+}
+export interface CreateNewTaskEntity {
+  farmerId: string;
+  farmerPlotId: string;
+  farmAreaAmount: string;
+  dronerId: string;
+  dateAppointment: string;
+  targetSpray: string;
+  preparationSprayId: string;
+  taskDronerTemp: CreateDronerTempEntity[];
+  status: string;
+  statusRemark: string;
+  createBy: string;
 }

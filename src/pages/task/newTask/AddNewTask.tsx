@@ -1,7 +1,4 @@
-import {
-  DownOutlined,
-  StarFilled,
-} from "@ant-design/icons";
+import { DownOutlined, StarFilled } from "@ant-design/icons";
 import {
   AutoComplete,
   Badge,
@@ -35,16 +32,24 @@ import { CardHeader } from "../../../components/header/CardHearder";
 import Layouts from "../../../components/layout/Layout";
 import color from "../../../resource/color";
 import { TaskDatasource } from "../../../datasource/TaskDatasource";
-import { FarmerEntity, FarmerEntity_INIT } from "../../../entities/FarmerEntities";
+import {
+  FarmerEntity,
+  FarmerEntity_INIT,
+} from "../../../entities/FarmerEntities";
 import { FarmerPlotEntity } from "../../../entities/FarmerPlotEntities";
 import GooleMap from "../../../components/map/GoogleMap";
 import { LAT_LNG_BANGKOK } from "../../../definitions/Location";
 import { RowSelectionType } from "antd/lib/table/interface";
 import Search from "antd/lib/input/Search";
+import { CreateNewTaskEntity } from "../../../entities/NewTaskEntities";
+import { CropPurposeSpayEntity } from "../../../entities/CropEntities";
+import { CropDatasource } from "../../../datasource/CropDatasource";
 const { Step } = Steps;
 const { Option } = Select;
-const dateFormat = "YYYY-MM-DD";
+const dateFormat = "DD-MM-YYYY";
+const dateCreateFormat = "YYYY-MM-DD";
 const timeFormat = "HH:mm";
+const timeCreateFormat = "HH:mm:ss";
 
 const _ = require("lodash");
 const { Map } = require("immutable");
@@ -52,32 +57,40 @@ const { Map } = require("immutable");
 let queryString = _.split(window.location.pathname, "=");
 
 const AddNewTask = () => {
-  const [data, setData] = useState<FarmerEntity>();
   const [current, setCurrent] = useState(0);
-  const [farmerList, setFarmerList] = useState<FarmerEntity[]>();
+  const [createNewTask, setCreateNewTask] = useState<CreateNewTaskEntity>();
 
+  const [dataFarmer, setDataFarmer] = useState<FarmerEntity>();
+  const [farmerList, setFarmerList] = useState<FarmerEntity[]>();
   const [farmerSelected, setFarmerSelected] = useState<FarmerEntity>();
   const [farmerPlotSeleced, setFarmerPlotSelected] =
     useState<FarmerPlotEntity>();
   const [selectionType] = useState<RowSelectionType>(queryString[1]);
-  const [text, setText] = useState<string>();
+  const [searchFarmer, setSearchFarmer] = useState<string>();
+  const [checkSelectPlot, setCheckSelectPlot] = useState<any>("error");
 
-  const sprayList = ["หญ้า", "ฮอร์โมน", "แมลง", "เชื้อรา"];
+  const sprayList = ["หญ้า", "ฮอร์โมน", "แมลง", "เชื้อรา", "อื่น"];
+  const [cropSelected, setCropSelected] = useState<any>("");
+  const [periodSpay, setPeriodSpay] = useState<CropPurposeSpayEntity>();
 
   const fetchFarmerList = async (text?: string) => {
     await TaskDatasource.getFarmerList(text).then((res) => {
-      console.log(res);
       setFarmerList(res);
+    });
+  };
+  const fetchPurposeSpay = async () => {
+    await CropDatasource.getPurposeByCroupName(cropSelected).then((res) => {
+      setPeriodSpay(res);
     });
   };
 
   useEffect(() => {
-    fetchFarmerList(text);
-  }, [text]);
+    fetchFarmerList(searchFarmer);
+    fetchPurposeSpay();
+  }, [searchFarmer, cropSelected]);
 
   //#region Step1 & Step3
   const handleSearchFarmer = (value: any) => {
-    console.log(value);
     if (value != undefined) {
       setFarmerSelected(farmerList?.filter((x) => x.id == value)[0]);
     } else {
@@ -85,21 +98,45 @@ const AddNewTask = () => {
     }
   };
   const handleSelectFarmer = () => {
-    console.log(farmerSelected);
-    setData(farmerSelected);
+    const f = Map(createNewTask).set("farmerId", farmerSelected?.id);
+    setCheckSelectPlot("error");
+    setCreateNewTask(f.toJS());
+    setDataFarmer(farmerSelected);
   };
   const handleSelectFarmerPlot = (value: any) => {
-    setFarmerPlotSelected(
-      farmerSelected?.farmerPlot.filter((x) => x.id == value)[0]
-    );
+    let plotSelected = farmerSelected?.farmerPlot.filter(
+      (x) => x.id == value
+    )[0];
+    const f = Map(createNewTask).set("farmerPlotId", plotSelected?.id);
+    const g = Map(f.toJS()).set("farmAreaAmount", plotSelected?.raiAmount);
+    setCropSelected(plotSelected?.plantName);
+    setCheckSelectPlot("");
+    setCreateNewTask(g.toJS());
+    setFarmerPlotSelected(plotSelected);
   };
 
   const onSelectFarmer = (e: any) => {
-    console.log("need", e);
-    //setText("");
     setFarmerSelected(undefined);
     const findFarmer = farmerList?.filter((x) => x.id == e)[0];
     setFarmerSelected(findFarmer);
+  };
+  const handleDateAppointment = (e: any) => {
+    const d = Map(createNewTask).set(
+      "dateAppointment",
+      moment(new Date(e)).format(dateCreateFormat)
+    );
+    setCreateNewTask(d.toJS());
+  };
+  const handleTimeAppointment = (e: any) => {
+    console.log(moment(new Date(e)).format(timeCreateFormat));
+  };
+  const handlePeriodSpay = (e: any) => {
+    const d = Map(createNewTask).set("purposeSprayId", e);
+    setCreateNewTask(d.toJS());
+  };
+  const handlePreparation = (e: any) => {
+    const d = Map(createNewTask).set("preparationBy", e.target.value);
+    setCreateNewTask(d.toJS());
   };
 
   const renderFormSearchFarmer = (
@@ -118,10 +155,10 @@ const AddNewTask = () => {
                       }}
                       allowClear
                       placeholder="ค้นหาชื่อเกษตรกร/เบอร์โทร/เลขบัตรปชช"
-                      onSearch={(e: any) => setText(e)}
+                      onSearch={(e: any) => setSearchFarmer(e)}
                       onSelect={onSelectFarmer}
                       onChange={handleSearchFarmer}
-                     // defaultValue={farmerSelected?.firstname + ' ' + farmerSelected?.lastname}
+                      // defaultValue={farmerSelected?.firstname + ' ' + farmerSelected?.lastname}
                     >
                       {farmerList?.map((item) => (
                         <Option value={item.id}>
@@ -147,14 +184,14 @@ const AddNewTask = () => {
               </div>
             </div>
           )}
-          {data && (
+          {dataFarmer && (
             <div className="col-lg-12">
               <div className="row">
                 <div className="form-group col-lg-4">
                   <Form.Item>
                     <label>ชื่อ-นามสกุล</label>
                     <Input
-                      value={data?.firstname + " " + data.lastname}
+                      value={dataFarmer?.firstname + " " + dataFarmer.lastname}
                       disabled
                     />
                   </Form.Item>
@@ -162,7 +199,7 @@ const AddNewTask = () => {
                 <div className="form-group col-lg-4">
                   <label>เบอร์โทร</label>
                   <Form.Item>
-                    <Input value={data?.telephoneNo} disabled />
+                    <Input value={dataFarmer?.telephoneNo} disabled />
                   </Form.Item>
                 </div>
               </div>
@@ -171,14 +208,18 @@ const AddNewTask = () => {
                   <label>แปลง</label>
                   <Form.Item>
                     <Select
+                      status={checkSelectPlot}
                       placeholder="เลือกแปลง"
                       onChange={handleSelectFarmerPlot}
                       disabled={current == 2}
                     >
-                      {data.farmerPlot.map((item) => (
+                      {dataFarmer.farmerPlot.map((item) => (
                         <option value={item.id}>{item.plotName}</option>
                       ))}
                     </Select>
+                    {checkSelectPlot == "error" && (
+                      <span style={{ color: color.Error }}>กรุณาเลือกแปลง</span>
+                    )}
                   </Form.Item>
                 </div>
                 <div className="form-group col-lg-4">
@@ -196,7 +237,7 @@ const AddNewTask = () => {
               </div>
               <div className="row">
                 <div className="form-group">
-                  <label>พื่นที่แปลงเกษตร</label>
+                  <label>พื้นที่แปลงเกษตร</label>
                   <Form.Item>
                     <Input value={farmerPlotSeleced?.landmark} disabled />
                   </Form.Item>
@@ -208,8 +249,16 @@ const AddNewTask = () => {
                     width="100%"
                     height="350px"
                     zoom={17}
-                    lat={farmerPlotSeleced?.lat != undefined ? parseFloat(farmerPlotSeleced.lat) : LAT_LNG_BANGKOK.lat}
-                    lng={farmerPlotSeleced?.long != undefined ? parseFloat(farmerPlotSeleced.long) : LAT_LNG_BANGKOK.lng}
+                    lat={
+                      farmerPlotSeleced?.lat != undefined
+                        ? parseFloat(farmerPlotSeleced.lat)
+                        : LAT_LNG_BANGKOK.lat
+                    }
+                    lng={
+                      farmerPlotSeleced?.long != undefined
+                        ? parseFloat(farmerPlotSeleced.long)
+                        : LAT_LNG_BANGKOK.lng
+                    }
                   ></GooleMap>
                 </div>
               </div>
@@ -220,7 +269,6 @@ const AddNewTask = () => {
     </CardContainer>
   );
   //#region Appointment
-
   const renderFormAppointment = (
     <CardContainer>
       <CardHeader textHeader="นัดหมายบริการ" />
@@ -232,7 +280,7 @@ const AddNewTask = () => {
                 วันที่นัดหมาย <span style={{ color: "red" }}>*</span>
               </label>
               <Form.Item
-                name="firstname"
+                name="dateAppointment"
                 rules={[
                   {
                     required: true,
@@ -241,9 +289,10 @@ const AddNewTask = () => {
                 ]}
               >
                 <DatePicker
-                  defaultValue={moment("2015-06-06", dateFormat)}
+                  format={dateFormat}
                   className="col-lg-12"
-                  disabled={current == 2}
+                  disabled={current == 2 || checkSelectPlot == "error"}
+                  onChange={handleDateAppointment}
                 />
               </Form.Item>
             </div>
@@ -261,9 +310,9 @@ const AddNewTask = () => {
                 ]}
               >
                 <TimePicker
-                  defaultValue={moment("12:08", timeFormat)}
                   format={timeFormat}
-                  disabled={current == 2}
+                  disabled={current == 2 || checkSelectPlot == "error"}
+                  onChange={handleTimeAppointment}
                 />
               </Form.Item>
             </div>
@@ -273,22 +322,42 @@ const AddNewTask = () => {
               ช่วงเวลาการพ่น <span style={{ color: "red" }}>*</span>
             </label>
             <Form.Item name="searchAddress">
-              <Select placeholder="-" disabled={current == 2}></Select>
+              <Select
+                placeholder="-"
+                disabled={current == 2 || checkSelectPlot == "error"}
+                onChange={handlePeriodSpay}
+              >
+                {periodSpay?.purposeSpray?.length ? (
+                  periodSpay?.purposeSpray?.map((item) => (
+                    <Option value={item.id}>{item.purposeSprayName}</Option>
+                  ))
+                ) : (
+                  <Option>-</Option>
+                )}
+              </Select>
             </Form.Item>
           </div>
           <div className="row form-group col-lg-6 p-2">
             <label>
               เป้าหมายการฉีดพ่น <span style={{ color: "red" }}>*</span>
             </label>
-            <Checkbox.Group options={sprayList} disabled={current == 2} />
-            <Checkbox.Group options={["อื่นๆ"]} disabled={current == 2} />
+            {sprayList.map((item) => (
+              <div>
+                <input
+                  type="checkbox"
+                  value={item}
+                  disabled={current == 2 || checkSelectPlot == "error"}
+                />{" "}
+                <label>{item}</label>
+              </div>
+            ))}
           </div>
           <div className="row form-group col-lg-6 p-2">
             <label>
               การเตรียมยา <span style={{ color: "red" }}>*</span>
             </label>
-            <Radio.Group disabled={current == 2}>
-              <Space direction="vertical">
+            <Radio.Group disabled={current == 2 || checkSelectPlot == "error"}>
+              <Space direction="vertical" onChange={handlePreparation}>
                 <Radio value="เกษตรกรเตรียมยาเอง">เกษตรกรเตรียมยาเอง</Radio>
                 <Radio value="นักบินโดรนเตรียมให้">นักบินโดรนเตรียมให้</Radio>
               </Space>
@@ -299,7 +368,6 @@ const AddNewTask = () => {
     </CardContainer>
   );
   //#endregion
-
   //#endregion
 
   //#region Step2
@@ -600,7 +668,11 @@ const AddNewTask = () => {
             ถัดไป
           </Button>
         )}
-        {current === titleStep.length - 1 && <SaveButton onClick={() => (window.location.href = "/IndexNewTask")}/>}
+        {current === titleStep.length - 1 && (
+          <SaveButton
+            onClick={() => (window.location.href = "/IndexNewTask")}
+          />
+        )}
       </Row>
     </>
   );
