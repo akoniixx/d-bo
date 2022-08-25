@@ -262,8 +262,7 @@ export default function IndexRankDroner() {
               <ActionButton
                 icon={<FileTextFilled />}
                 color={color.primary1}
-                onClick={() =>  (window.location.href = "/DetailRankDroner")}
-               
+                onClick={() => (window.location.href = "/DetailRankDroner")}
               />
             </div>
           ),

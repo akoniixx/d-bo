@@ -20,6 +20,7 @@ import AddAdmin from "./pages/admin/AddAdmin";
 import EditAdmin from "./pages/admin/EditAdmin";
 import ProtectRoute from "./ProtectRoute";
 import PublicRoute from "./PublicRoute";
+import DetailWorkDroner from "./pages/droner/DetailWorkDroner";
 import DetailRankDroner from "./pages/droner/DetailRankDroner";
 import IndexRankDroner from "./pages/droner/IndexRankDroner";
 
@@ -41,6 +42,7 @@ const WebRoutes: React.FC<any> = () => {
           <Route path="/DroneList" element={<DroneList />} />
           <Route path="/IndexRankDroner" element={<IndexRankDroner />} />
           <Route path="/DetailRankDroner" element={<DetailRankDroner/>} />
+          <Route path="/DetailWorkDroner" element={<DetailWorkDroner/>} />
           <Route path="/EditDroneList" element={<EditDroneList />} />
           <Route path="/EditFarmer/:id" element={<EditFarmer />} />
           <Route path="/EditDroner" element={<EditDroner />} />
