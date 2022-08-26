@@ -1,8 +1,8 @@
 import { BASE_URL, httpClient } from "../config/develop-config";
-import { CropPurposeSpayEntity } from "../entities/CropEntities";
+import { CropPurposeSprayEntity } from "../entities/CropEntities";
 
 export class CropDatasource {
-  static getPurposeByCroupName(name: string): Promise<CropPurposeSpayEntity> {
+  static getPurposeByCroupName(name: string): Promise<CropPurposeSprayEntity> {
     return httpClient
       .get(BASE_URL + "/tasks/crop/crop-name?name=" + name)
       .then((response) => {

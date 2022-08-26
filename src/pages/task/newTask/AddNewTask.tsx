@@ -41,8 +41,11 @@ import GooleMap from "../../../components/map/GoogleMap";
 import { LAT_LNG_BANGKOK } from "../../../definitions/Location";
 import { RowSelectionType } from "antd/lib/table/interface";
 import Search from "antd/lib/input/Search";
-import { CreateNewTaskEntity } from "../../../entities/NewTaskEntities";
-import { CropPurposeSpayEntity } from "../../../entities/CropEntities";
+import {
+  CreateNewTaskEntity,
+  CreateNewTaskEntity_INIT,
+} from "../../../entities/NewTaskEntities";
+import { CropPurposeSprayEntity } from "../../../entities/CropEntities";
 import { CropDatasource } from "../../../datasource/CropDatasource";
 const { Step } = Steps;
 const { Option } = Select;
@@ -58,7 +61,9 @@ let queryString = _.split(window.location.pathname, "=");
 
 const AddNewTask = () => {
   const [current, setCurrent] = useState(0);
-  const [createNewTask, setCreateNewTask] = useState<CreateNewTaskEntity>();
+  const [createNewTask, setCreateNewTask] = useState<CreateNewTaskEntity>(
+    CreateNewTaskEntity_INIT
+  );
 
   const [dataFarmer, setDataFarmer] = useState<FarmerEntity>();
   const [farmerList, setFarmerList] = useState<FarmerEntity[]>();
@@ -69,24 +74,36 @@ const AddNewTask = () => {
   const [searchFarmer, setSearchFarmer] = useState<string>();
   const [checkSelectPlot, setCheckSelectPlot] = useState<any>("error");
 
-  const sprayList = ["หญ้า", "ฮอร์โมน", "แมลง", "เชื้อรา", "อื่น"];
+  const sprayList = ["หญ้า", "ฮอร์โมน", "แมลง", "เชื้อรา", "อื่นๆ"];
   const [cropSelected, setCropSelected] = useState<any>("");
-  const [periodSpay, setPeriodSpay] = useState<CropPurposeSpayEntity>();
+  const [periodSpray, setPeriodSpray] = useState<CropPurposeSprayEntity>();
+  const [checkCrop, setCheckCrop] = useState<boolean>(true);
+  const [validateComma, setValidateComma] = useState<{
+    status: any;
+    message: string;
+  }>({
+    status: "",
+    message: "",
+  });
+
+  const [dateAppointment, setDateAppointment] = useState<string>();
+  const [timeAppointment, setTimeAppointment] = useState<string>();
+  const [disableBtn1, setDisableBtn1] = useState<boolean>(true);
 
   const fetchFarmerList = async (text?: string) => {
     await TaskDatasource.getFarmerList(text).then((res) => {
       setFarmerList(res);
     });
   };
-  const fetchPurposeSpay = async () => {
+  const fetchPurposeSpray = async () => {
     await CropDatasource.getPurposeByCroupName(cropSelected).then((res) => {
-      setPeriodSpay(res);
+      setPeriodSpray(res);
     });
   };
 
   useEffect(() => {
     fetchFarmerList(searchFarmer);
-    fetchPurposeSpay();
+    fetchPurposeSpray();
   }, [searchFarmer, cropSelected]);
 
   //#region Step1 & Step3
@@ -102,6 +119,7 @@ const AddNewTask = () => {
     setCheckSelectPlot("error");
     setCreateNewTask(f.toJS());
     setDataFarmer(farmerSelected);
+    checkValidateStep1(f.toJS());
   };
   const handleSelectFarmerPlot = (value: any) => {
     let plotSelected = farmerSelected?.farmerPlot.filter(
@@ -113,30 +131,77 @@ const AddNewTask = () => {
     setCheckSelectPlot("");
     setCreateNewTask(g.toJS());
     setFarmerPlotSelected(plotSelected);
+    checkValidateStep1(g.toJS());
   };
-
   const onSelectFarmer = (e: any) => {
     setFarmerSelected(undefined);
     const findFarmer = farmerList?.filter((x) => x.id == e)[0];
     setFarmerSelected(findFarmer);
   };
-  const handleDateAppointment = (e: any) => {
-    const d = Map(createNewTask).set(
-      "dateAppointment",
-      moment(new Date(e)).format(dateCreateFormat)
-    );
-    setCreateNewTask(d.toJS());
-  };
-  const handleTimeAppointment = (e: any) => {
-    console.log(moment(new Date(e)).format(timeCreateFormat));
-  };
-  const handlePeriodSpay = (e: any) => {
+  const handlePeriodSpray = (e: any) => {
     const d = Map(createNewTask).set("purposeSprayId", e);
     setCreateNewTask(d.toJS());
+    checkValidateStep1(d.toJS());
+  };
+  const handlePurposeSpray = (e: any) => {
+    let checked = e.target.checked;
+    let value = e.target.value;
+    setCheckCrop(value == "อื่นๆ" ? !checked : true);
+    let p: any = "";
+    if (checked) {
+      p = Map(createNewTask).set(
+        "targetSpray",
+        [...createNewTask?.targetSpray, value].filter((x) => x != "")
+      );
+    } else {
+      let removePlant = createNewTask?.targetSpray.filter((x) => x != value);
+      p = Map(createNewTask).set("targetSpray", removePlant);
+    }
+    setCreateNewTask(p.toJS());
+    checkValidateStep1(p.toJS());
+  };
+  const handleOtherSpray = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.value.trim().length != 0) {
+      let checkComma = checkValidateComma(e.target.value);
+      if (!checkComma) {
+        setValidateComma({ status: "", message: "" });
+      } else {
+        setValidateComma({
+          status: "error",
+          message: "กรุณาใช้ (,) ให้กับการเพิ่มมากกว่า 1 อย่าง",
+        });
+      }
+    } else {
+      setValidateComma({
+        status: "error",
+        message: "โปรดระบุ",
+      });
+    }
   };
   const handlePreparation = (e: any) => {
     const d = Map(createNewTask).set("preparationBy", e.target.value);
+    console.log(d.toJS());
     setCreateNewTask(d.toJS());
+  };
+
+  const checkValidateComma = (data: string) => {
+    const checkSyntax =
+      data.includes("*") ||
+      data.includes("/") ||
+      data.includes(" ") ||
+      data.includes("-") ||
+      data.includes("+");
+    return data.trim().length != 0 ? (checkSyntax ? true : false) : true;
+  };
+  const checkValidateStep1 = (data: CreateNewTaskEntity) => {
+    let checkEmptySting = ![
+      data?.farmerId,
+      data?.farmerPlotId,
+      data?.dateAppointment,
+      data?.purposeSprayId,
+      data?.preparationBy,
+    ].includes("");
+    console.log(checkEmptySting);
   };
 
   const renderFormSearchFarmer = (
@@ -268,7 +333,7 @@ const AddNewTask = () => {
       </div>
     </CardContainer>
   );
-  //#region Appointment
+
   const renderFormAppointment = (
     <CardContainer>
       <CardHeader textHeader="นัดหมายบริการ" />
@@ -292,7 +357,11 @@ const AddNewTask = () => {
                   format={dateFormat}
                   className="col-lg-12"
                   disabled={current == 2 || checkSelectPlot == "error"}
-                  onChange={handleDateAppointment}
+                  onChange={(e: any) =>
+                    setDateAppointment(
+                      moment(new Date(e)).format(dateCreateFormat)
+                    )
+                  }
                 />
               </Form.Item>
             </div>
@@ -312,7 +381,11 @@ const AddNewTask = () => {
                 <TimePicker
                   format={timeFormat}
                   disabled={current == 2 || checkSelectPlot == "error"}
-                  onChange={handleTimeAppointment}
+                  onChange={(e: any) =>
+                    setTimeAppointment(
+                      moment(new Date(e)).format(timeCreateFormat)
+                    )
+                  }
                 />
               </Form.Item>
             </div>
@@ -325,10 +398,10 @@ const AddNewTask = () => {
               <Select
                 placeholder="-"
                 disabled={current == 2 || checkSelectPlot == "error"}
-                onChange={handlePeriodSpay}
+                onChange={handlePeriodSpray}
               >
-                {periodSpay?.purposeSpray?.length ? (
-                  periodSpay?.purposeSpray?.map((item) => (
+                {periodSpray?.purposeSpray?.length ? (
+                  periodSpray?.purposeSpray?.map((item) => (
                     <Option value={item.id}>{item.purposeSprayName}</Option>
                   ))
                 ) : (
@@ -341,14 +414,31 @@ const AddNewTask = () => {
             <label>
               เป้าหมายการฉีดพ่น <span style={{ color: "red" }}>*</span>
             </label>
-            {sprayList.map((item) => (
-              <div>
+            {sprayList.map((item, index) => (
+              <div className="form-group">
                 <input
                   type="checkbox"
                   value={item}
                   disabled={current == 2 || checkSelectPlot == "error"}
+                  onChange={handlePurposeSpray}
                 />{" "}
-                <label>{item}</label>
+                <label style={{ padding: "0 8px 0 0" }}>{item}</label>
+                {index == 4 && (
+                  <>
+                    <Input
+                      status={validateComma.status}
+                      className="col-lg-5"
+                      disabled={current == 2 || checkCrop}
+                      placeholder="โปรดระบุ เช่น เพลี้ย, หอย"
+                      onChange={handleOtherSpray}
+                    />
+                    {validateComma.status == "error" && (
+                      <p style={{ color: color.Error, padding: "0 0 0 55px" }}>
+                        {validateComma.message}
+                      </p>
+                    )}
+                  </>
+                )}
               </div>
             ))}
           </div>
@@ -368,13 +458,13 @@ const AddNewTask = () => {
     </CardContainer>
   );
   //#endregion
-  //#endregion
 
   //#region Step2
   const mockData = [
     { firstname: "ไหม", telephone: "0938355808", amountService: 5 },
     { firstname: "สายไหม", telephone: "0938355808", amountService: 10 },
   ];
+
   const ratingStar = (
     <Menu
       items={[
@@ -436,14 +526,17 @@ const AddNewTask = () => {
       ]}
     />
   );
+
   const [visible, setVisible] = useState(false);
   const handleVisibleChange = (newVisible: any) => {
     setVisible(newVisible);
   };
+
   const [inputValue, setInputValue] = useState(0);
   const onChange = (newValue: any) => {
     setInputValue(newValue);
   };
+
   const searchSection = (
     <div className="d-flex justify-content-between" style={{ padding: "10px" }}>
       <div className="col-lg-3"></div>
@@ -499,6 +592,7 @@ const AddNewTask = () => {
       </div>
     </div>
   );
+
   const dronerSelectedList = (
     <div className="d-flex justify-content-end">
       <div className="p-1">
@@ -658,11 +752,12 @@ const AddNewTask = () => {
         {current < titleStep.length - 1 && (
           <Button
             style={{
-              backgroundColor: color.Success,
-              borderColor: color.Success,
+              backgroundColor: disableBtn1 ? color.Grey : color.Success,
+              borderColor: disableBtn1 ? color.Grey : color.Success,
               borderRadius: "5px",
               color: color.BG,
             }}
+            disabled={disableBtn1}
             onClick={() => setCurrent(current + 1)}
           >
             ถัดไป

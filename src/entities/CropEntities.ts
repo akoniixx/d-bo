@@ -1,11 +1,11 @@
-export interface PurposeSpayEntity {
+export interface PurposeSprayEntity {
   id: string;
   cropId: string;
   purposeSprayName: string;
 }
 
-export interface CropPurposeSpayEntity {
+export interface CropPurposeSprayEntity {
   id: string;
   cropName: string;
-  purposeSpray: PurposeSpayEntity[];
+  purposeSpray: PurposeSprayEntity[];
 }

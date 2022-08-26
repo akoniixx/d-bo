@@ -12,3 +12,8 @@ export interface CreateDronerTempEntity {
   status: string;
   dronerDetail: string;
 }
+export const CreateDronerTempEntity_INIT: CreateDronerTempEntity = {
+  dronerId: "",
+  status: "",
+  dronerDetail: "",
+};

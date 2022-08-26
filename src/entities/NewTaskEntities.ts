@@ -1,4 +1,4 @@
-import { CreateDronerTempEntity } from "./TaskDronerTemp";
+import { CreateDronerTempEntity, CreateDronerTempEntity_INIT } from "./TaskDronerTemp";
 
 export interface NewTaskEntity {
   id: string;
@@ -30,10 +30,25 @@ export interface CreateNewTaskEntity {
   farmAreaAmount: string;
   dronerId: string;
   dateAppointment: string;
-  targetSpray: string;
-  preparationSprayId: string;
+  targetSpray: string[];
+  preparationBy: string;
+  purposeSprayId: string;
   taskDronerTemp: CreateDronerTempEntity[];
   status: string;
   statusRemark: string;
   createBy: string;
 }
+export const CreateNewTaskEntity_INIT: CreateNewTaskEntity = {
+  farmerId: "",
+  farmerPlotId: "",
+  farmAreaAmount: "",
+  dronerId: "",
+  dateAppointment: "",
+  targetSpray: [""],
+  preparationBy: "",
+  purposeSprayId: "",
+  taskDronerTemp: [CreateDronerTempEntity_INIT],
+  status: "OPEN",
+  statusRemark: "",
+  createBy: "",
+};
