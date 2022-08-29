@@ -14,7 +14,10 @@ import {
   GetDronerDroneEntity,
   GetDronerDroneEntity_INIT,
 } from "../../entities/DronerDroneEntities";
-import { DRONER_DRONE_STATUS, DRONER_STATUS } from "../../definitions/DronerStatus";
+import {
+  DRONER_DRONE_STATUS,
+  DRONER_STATUS,
+} from "../../definitions/DronerStatus";
 import {
   ImageEntity,
   ImageEntity_INTI,
@@ -53,8 +56,9 @@ function EditDroneList() {
   let imgList: (string | boolean)[] = [];
   const [imgLicenseDroner, setImgLicenseDroner] = useState<any>(false);
   const [imgLicenseDrone, setImgLicenseDrone] = useState<any>(false);
-  const [validateComma, setValidateComma] = useState<any>("");
+  const [validateReason, setValidateReason] = useState<any>("");
   let [textReason, setTextReason] = useState<any>();
+  let [textReasonMore, setTextReasonMore] = useState<any>();
 
   const fetchDronerDrone = async () => {
     await DronerDroneDatasource.getDronerDroneById(DronerDroneId).then(
@@ -136,8 +140,11 @@ function EditDroneList() {
   };
   const handleChangeStatus = (e: any) => {
     const m = Map(data).set("status", e.target.value);
-    setData(m.toJS());
-    checkValidate(m.toJS());
+    const n = Map(m.toJS()).set("reason", []);
+    setTextReason([""]);
+    setTextReasonMore([""]);
+    setData(n.toJS());
+    checkValidate(n.toJS());
   };
   const handleMonth = async (e: any) => {
     const m = Map(data).set("purchaseMonth", e);
@@ -148,22 +155,6 @@ function EditDroneList() {
     const m = Map(data).set("purchaseYear", e.target.value);
     setData(m.toJS());
     checkValidate(m.toJS());
-  };
-  const checkValidate = (data: GetDronerDroneEntity) => {
-    if (
-      data.droneId != "" &&
-      data.droneId != undefined &&
-      data.serialNo != "" &&
-      data.purchaseYear != "" &&
-      data.purchaseMonth != "" &&
-      data.status != "" &&
-      data.drone.droneBrandId != "" &&
-      data.drone.droneBrandId != undefined
-    ) {
-      setBtnSaveDisable(false);
-    } else {
-      setBtnSaveDisable(true);
-    }
   };
   const onChangeProfile = async (file: any) => {
     let src = file.target.files[0];
@@ -184,11 +175,7 @@ function EditDroneList() {
     let checked = e.target.checked;
     let value = e.target.value;
     REASON_IS_CHECK.map((item) =>
-      _.set(
-        item,
-        "isChecked",
-        item.reason == value ? checked : item.isChecked
-      )
+      _.set(item, "isChecked", item.reason == value ? checked : item.isChecked)
     );
     let p: any = "";
     if (checked) {
@@ -200,25 +187,43 @@ function EditDroneList() {
       let removeReason = data.reason.filter((x) => x != value);
       p = Map(data).set("reason", removeReason);
     }
+    console.log(p.toJS().reason);
     setData(p.toJS());
     checkValidate(data);
   };
   const onChangeReasonText = async (
     e: React.ChangeEvent<HTMLTextAreaElement>
   ) => {
-    setTextReason(e.target.value);
-    checkValidate(data);
+    let value = e.target.value;
+    let p: any = "";
+    if (value) {
+      p = Map(data).set(
+        "reason",
+        [...data.reason, value].filter((x) => x != "")
+      );
+      console.log("p1", p.toJS());
+    } else {
+      let removeReason = data.reason.filter((x) => x != value);
+      p = Map(data).set("reason", removeReason);
+    }
+    setData(p.toJS());
   };
-  const checkValidateComma = (data: string) => {
-    const checkSyntax =
-      data.includes("*") ||
-      data.includes("/") ||
-      data.includes(" ") ||
-      data.includes("-") ||
-      data.includes("+");
-    return data.trim().length != 0 ? (checkSyntax ? true : false) : true;
+  const onChangeReasonTextMore = async (
+    e: React.ChangeEvent<HTMLTextAreaElement>
+  ) => {
+    let p: any = "";
+    if (e.target.value) {
+      p = Map(data).set(
+        "reason",
+        [...data.reason, e.target.value].filter((x) => x != "")
+      );
+    } else {
+      let removeReason = data.reason.filter((x) => x != e.target.value);
+      p = Map(data).set("reason", removeReason);
+    }
+    console.log(p.toJS());
+    setData(p.toJS());
   };
-
   const onPreviewProfile = async () => {
     let src = imgProfile;
     if (!src) {
@@ -291,7 +296,6 @@ function EditDroneList() {
     setImgLicenseDroner(false);
     checkValidate(data);
   };
-
   const onChangeLicenseDrone = async (file: any) => {
     let src = file.target.files[0];
     src = await new Promise((resolve) => {
@@ -338,26 +342,38 @@ function EditDroneList() {
     setImgLicenseDrone(false);
     checkValidate(data);
   };
-  const UpdateDronerDrone = async () => {
-    // let textReasonList = [];
-    // if (textReason != undefined) {
-    //   let m = textReason.split(",");
-    //   for (let i = 0; m.length > i; i++) {
-    //     textReasonList.push(m[i]);
-    //   }
+  const checkValidate = (data: GetDronerDroneEntity) => {
+    let checkEmptySting = ![
+      data.droneId,
+      data.serialNo,
+      data.purchaseMonth,
+      data.purchaseYear,
+      data.status,
+    ].includes("");
+    if (checkEmptySting) {
+      setBtnSaveDisable(false);
+    } else {
+      setBtnSaveDisable(true);
+    }
+    let checkEmptyArray = false;
+    // if (data.status == "REJECTED" || data.status == "INACTIVE") {
+    // if (data?.reason !== undefined) {
+    //   checkEmptyArray =
+    //     ![data?.reason][0]?.includes("") &&
+    //     data?.reason.length !== 0 &&
+    //     data?.reason !== undefined;
     // }
-    // console.log(textReasonList);
-    // data.reason.push.apply(
-    //   data.reason,
-    //   textReasonList.filter((x) => x != "")
-    // );
-    // const setTextReason = Array.from(new Set(data.reason)).filter(
-    //   (x) => x != ""
-    // );
-    // const pushTextReason = Map(data).set("reason", setTextReason);
+    // }
+    if (checkEmptySting) {
+      setBtnSaveDisable(false);
+    } else {
+      setBtnSaveDisable(true);
+    }
+  };
+  const UpdateDronerDrone = async () => {
     await DronerDroneDatasource.updateDroneList(data).then((res) => {
-      console.log(res.reason)
-      if (res != undefined) {
+      console.log(res);
+      if (res != null) {
         var i = 0;
         for (i; 3 > i; i++) {
           i == 0 &&
@@ -367,14 +383,14 @@ function EditDroneList() {
           i == 2 &&
             UploadImageDatasouce.uploadImage(createLicenseDrone).then(res);
         }
-        // Swal.fire({
-        //   title: "บันทึกสำเร็จ",
-        //   icon: "success",
-        //   timer: 1500,
-        //   showConfirmButton: false,
-        // }).then((time) => {
-        //   window.location.href = "/DroneList";
-        // });
+        Swal.fire({
+          title: "บันทึกสำเร็จ",
+          icon: "success",
+          timer: 1500,
+          showConfirmButton: false,
+        }).then((time) => {
+          window.location.href = "/DroneList";
+        });
       }
     });
   };
@@ -601,15 +617,7 @@ function EditDroneList() {
               <label style={{ marginBottom: "10px" }}>
                 สถานะ <span style={{ color: "red" }}>*</span>
               </label>
-              <Form.Item
-                name="status"
-                rules={[
-                  {
-                    required: true,
-                    message: "กรุณาเลือกสถานะ!",
-                  },
-                ]}
-              >
+              <Form.Item name="status">
                 <div className="row">
                   <div className="form-group col-lg-12">
                     <Radio.Group
@@ -617,137 +625,72 @@ function EditDroneList() {
                       onChange={handleChangeStatus}
                       className="col-lg-12"
                     >
-                      <Space direction="vertical" className="col-lg-12">
-                        {DRONER_DRONE_STATUS.filter(
-                          (x: any) => x.value != ""
-                        ).map((item: any, index: any) => (
-                          <Radio value={item.value} style={{ width: "100%" }}>
-                            {item.name}
-                            {data.status == "REJECTED" && index == 2 ? (
-                              <div className="form-group">
-                                 <Form.Item style={{ width: "530px" }}>
-                                 {REASON_IS_CHECK.map((item: any) =>
-                                  _.set(
-                                    item,
-                                    "isChecked",
-                                    data?.reason
-                                      .map((x) => x)
-                                      .find((y) => y === item.reason)
-                                      ? true
-                                      : item.isChecked
-                                  )
-                                ).map((x: any) => (
-                                  <div>
-                                    <Checkbox
-                                      key={x.key}
-                                      value={x.reason}
-                                      onClick={onChangeReason}
-                                      checked={x.isChecked}
-                                    />{" "}
-                                    <label>{x.reason}</label>
-                                    <br />
-                                  </div>
-                                ))}
-                                 </Form.Item>
-                                <br />
-                                <TextArea
-                                  className="col-lg-12"
-                                  rows={3}
-                                  placeholder="กรอกเหตุผล/เหตุหมายเพิ่มเติม"
-                                  autoComplete="off"
-                                  onChange={onChangeReasonText}
-                                  defaultValue={data.reason
-                                    .filter(
-                                      (a) => !REASON_CHECK.some((x) => x === a)
-                                    )
-                                    .join(",")
-                                  }
-                                />
-                              </div>
-                            ) : data.status == "INACTIVE" && index == 3 ? (
-                              <div>
-                                <div className="form-group ps-3">
-                                  <TextArea
-                                  
-                                    className="col-lg-12"
-                                    rows={3}
-                                    placeholder="กรอกเหตุผล/เหตุหมายเพิ่มเติม"
-                                    autoComplete="off"
-                                    // onChange={handelMoreReason}
-                                  />{" "}
+                      <Space direction="vertical">
+                        {DRONER_DRONE_STATUS.filter((x: any) => x != "").map(
+                          (item: any, index: any) => (
+                            <Radio value={item.value}>
+                              {item.name}
+                              {data.status == "REJECTED" && index == 2 ? (
+                                <div style={{ marginLeft: "20px" }}>
+                                  <Form.Item style={{ width: "530px" }}>
+                                    {REASON_IS_CHECK.map((item) =>
+                                      _.set(
+                                        item,
+                                        "isChecked",
+                                        data?.reason
+                                          .map((x) => x)
+                                          .find((y) => y === item.reason)
+                                          ? true
+                                          : item.isChecked
+                                      )
+                                    ).map((x) => (
+                                      <div>
+                                        <Checkbox
+                                          key={x.key}
+                                          value={x.reason}
+                                          onClick={onChangeReason}
+                                          checked={x.isChecked}
+                                        />{" "}
+                                        <label>{x.reason}</label>
+                                        <br />
+                                      </div>
+                                    ))}
+                                  </Form.Item>
+                                  <Form.Item style={{ width: "530px" }}>
+                                    <TextArea
+                                      rows={3}
+                                      onBlur={onChangeReasonText}
+                                      placeholder="กรอกเหตุผล/หมายเหตุเพิ่มเติม"
+                                      autoComplete="off"
+                                      defaultValue={data.reason.filter(
+                                        (a) =>
+                                          !REASON_CHECK.some((x) => x === a)
+                                      )}
+                                    />
+                                  </Form.Item>
                                 </div>
-                              </div>
-                            ) : null}
-                          </Radio>
-                        ))}
+                              ) : data.status == "INACTIVE" && index == 3 ? (
+                                <div>
+                                  <div className="form-group ps-3">
+                                    <TextArea
+                                      style={{ width: "530px" }}
+                                      className="col-lg-12"
+                                      rows={3}
+                                      onBlur={onChangeReasonTextMore}
+                                      placeholder="กรอกเหตุผล/หมายเหตุเพิ่มเติม"
+                                      autoComplete="off"
+                                      defaultValue={data.reason}
+                                    />
+                                  </div>
+                                </div>
+                              ) : null}
+                            </Radio>
+                          )
+                        )}
                       </Space>
                     </Radio.Group>
                   </div>
                 </div>
-                {/* <Radio.Group
-                  defaultValue={data.status}
-                  onChange={handleChangeStatus}
-                >
-                  <Space direction="vertical">
-                    {DRONER_DRONE_STATUS.map((item: any, index: any) => (
-                      <Radio value={item.value}>
-                        {item.name}
-                        {data.status == "REJECTED" && index == 2 ? (
-                          <div style={{ marginLeft: "20px" }}>
-                            <div className="form-group">
-                              <Form.Item style={{ width: "530px" }}>
-                                {REASON_IS_CHECK.map((item) =>
-                                  _.set(
-                                    item,
-                                    "isChecked",
-                                    data?.reason
-                                      .map((x) => x)
-                                      .find((y) => y === item.reason)
-                                      ? true
-                                      : item.isChecked
-                                  )
-                                ).map((x) => (
-                                  <div>
-                                    <Checkbox
-                                      key={x.key}
-                                      value={x.reason}
-                                      onClick={onChangeReason}
-                                      checked={x.isChecked}
-                                    />{" "}
-                                    <label>{x.reason}</label>
-                                    <br />
-                                  </div>
-                                ))}
-                              </Form.Item>
-                              <Form.Item>
-                                <TextArea
-                                  rows={3}
-                                  status={validateComma}
-                                  onChange={onChangeReasonText}
-                                  placeholder="กรอกเหตุผล/หมายเหตุเพิ่มเติม"
-                                  autoComplete="off"
-                                  defaultValue={data.reason
-                                    // .filter(
-                                    //   (a) => !REASON_CHECK.some((x) => x === a)
-                                    // )
-                                    // .join(",")
-                                  }
-
-                                />
-                                {validateComma == "error" && (
-                                  <p style={{ color: color.Error }}>
-                                    กรุณาใช้ (,) ให้กับการเพิ่มเหตุผลมากกว่า 1
-                                    อย่าง
-                                  </p>
-                                )}
-                              </Form.Item>
-                            </div>
-                          </div>
-                        ) : null}
-                      </Radio>
-                    ))}
-                  </Space>
-                </Radio.Group> */}
               </Form.Item>
             </div>
           </div>
