@@ -1,4 +1,6 @@
 ## [Version - 0]
+## Fix [v0.9.2] 2022-08-29
+- create function add reason when selected status 'INACTIVE' and 'REJECTED'
 ## Fix [v0.9.1] 2022-08-24
 - create drone list page
 - create drone list edit page
