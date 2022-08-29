@@ -1,4 +1,7 @@
-import { CreateDronerTempEntity, CreateDronerTempEntity_INIT } from "./TaskDronerTemp";
+import {
+  CreateDronerTempEntity,
+  CreateDronerTempEntity_INIT,
+} from "./TaskDronerTemp";
 
 export interface NewTaskEntity {
   id: string;
