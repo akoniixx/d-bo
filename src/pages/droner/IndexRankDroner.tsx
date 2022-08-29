@@ -12,9 +12,21 @@ import {
 } from "../../entities/LocationEntities";
 import color from "../../resource/color";
 import { FileTextFilled } from "@ant-design/icons";
+import { DronerRankDatasource } from "../../datasource/DronerRankDatasource";
+import {
+  DronerRankEntity,
+  DronerRankListEntity,
+} from "../../entities/DronerRankEntities";
 
 export default function IndexRankDroner() {
+  const row = 10;
+  const [current, setCurrent] = useState(1);
+  const [data, setData] = useState<DronerRankListEntity>();
   const [searchText, setSearchText] = useState<string>();
+  const [ratingMing, setRatingMing] = useState<any>();
+  const [ratingMax, setRatingMax] = useState<any>();
+  const [startDate, setStartDate] = useState<any>();
+  const [endDate, setEndDate] = useState<any>();
   const [searchProvince, setSearchProvince] = useState<any>();
   const [searchDistrict, setSearchDistrict] = useState<any>();
   const [searchSubdistrict, setSearchSubdistrict] = useState<any>();
@@ -23,6 +35,24 @@ export default function IndexRankDroner() {
   const [subdistrict, setSubdistrict] = useState<SubdistrictEntity[]>();
   const { RangePicker } = DatePicker;
   const dateFormat = "DD/MM/YYYY";
+
+  const fetchDronerRank = async () => {
+    await DronerRankDatasource.getDronerRank(
+      current,
+      row,
+      searchSubdistrict,
+      searchDistrict,
+      searchProvince,
+      ratingMing,
+      ratingMax,
+      startDate,
+      endDate,
+      searchText
+    ).then((res: DronerRankListEntity) => {
+      console.log(res);
+      setData(res);
+    });
+  };
 
   const fecthProvince = async () => {
     await LocationDatasource.getProvince().then((res) => {
@@ -39,33 +69,33 @@ export default function IndexRankDroner() {
       setSubdistrict(res);
     });
   };
+  const changeTextSearch = (value: string) => {
+    setSearchText(value);
+    setCurrent(1);
+  };
+  const onChangePage = (page: number) => {
+    setCurrent(page);
+  };
   useEffect(() => {
+    fetchDronerRank();
     fecthProvince();
     fetchDistrict();
     fetchSubdistrict();
-  }, [searchText, searchProvince, searchDistrict, searchSubdistrict]);
-
-  const handleSearchText = (e: string) => {
-    setSearchText(e);
-  };
-  const handleSearchProvince = (provinceId: number) => {
+  }, [current, searchText, searchProvince, searchDistrict, searchSubdistrict]);
+  const handleProvince = (provinceId: number) => {
     setSearchProvince(provinceId);
+    setCurrent(1);
   };
-  const handleSearchDistrict = (districtId: number) => {
+  const handleDistrict = (districtId: number) => {
     setSearchDistrict(districtId);
+    setCurrent(1);
   };
-  const handleSearchSubdistrict = (subdistrictId: number) => {
+  const handleSubDistrict = (subdistrictId: any) => {
     setSearchSubdistrict(subdistrictId);
+    setCurrent(1);
   };
 
-  //mockData
-  const dataSource = [
-    {
-      key: "1",
-      name: "Mike",
-    },
-  ];
-  const pageTitle = (
+  const PageTitle = (
     <>
       <div
         className="container d-flex justify-content-between"
@@ -97,7 +127,7 @@ export default function IndexRankDroner() {
           <Search
             placeholder="ค้นหาชื่อนักบินโดรน/เบอร์โทร/ID นักบินโดรน"
             className="col-lg-12 p-1"
-            onSearch={handleSearchText}
+            onSearch={changeTextSearch}
           />
         </div>
         <div className="col-lg-2">
@@ -105,7 +135,7 @@ export default function IndexRankDroner() {
             allowClear
             className="col-lg-12 p-1"
             placeholder="เลือกจังหวัด"
-            onChange={handleSearchProvince}
+            onChange={handleProvince}
             showSearch
             optionFilterProp="children"
             filterOption={(input: any, option: any) =>
@@ -129,7 +159,7 @@ export default function IndexRankDroner() {
             allowClear
             className="col-lg-12 p-1"
             placeholder="เลือกอำเภอ"
-            onChange={handleSearchDistrict}
+            onChange={handleDistrict}
             showSearch
             optionFilterProp="children"
             filterOption={(input: any, option: any) =>
@@ -154,7 +184,7 @@ export default function IndexRankDroner() {
             allowClear
             className="col-lg-12 p-1"
             placeholder="เลือกตำบล"
-            onChange={handleSearchSubdistrict}
+            onChange={handleSubDistrict}
             showSearch
             optionFilterProp="children"
             filterOption={(input: any, option: any) =>
@@ -188,66 +218,122 @@ export default function IndexRankDroner() {
   const columns = [
     {
       title: "ชื่อนักบินโดรน",
-      dataIndex: "name",
-      key: "name",
+      dataIndex: "firstname",
+      key: "firstname",
       render: (value: any, row: any, index: number) => {
         return {
-          children: <></>,
+          children: (
+            <>
+              <span className="text-dark-75  d-block font-size-lg">
+                {row.firstname + " " + row.lastname}
+              </span>
+            </>
+          ),
         };
       },
     },
     {
       title: "เบอร์โทร",
-      dataIndex: "phone",
-      key: "phone",
+      dataIndex: "telephoneNo",
+      key: "telephoneNo",
     },
     {
       title: "จำนวนให้บริการ",
-      dataIndex: "",
-      key: "",
+      dataIndex: "totalTaskCount",
+      key: "totalTaskCount",
       render: (value: any, row: any, index: number) => {
-        return {};
+        return {
+          children: (
+            <>
+              <span className="text-dark-75  d-block font-size-lg">
+                {row.totalTaskCount + " " + "งาน"}
+              </span>
+            </>
+          ),
+        };
       },
     },
     {
       title: "จำนวนไร่",
-      dataIndex: "",
-      key: "",
+      dataIndex: "totalRaiCount",
+      key: "totalRaiCount",
       render: (value: any, row: any, index: number) => {
-        return {};
+        return {
+          children: (
+            <>
+              <span className="text-dark-75  d-block font-size-lg">
+                {row.totalRaiCount + " " + "ไร่"}
+              </span>
+            </>
+          ),
+        };
       },
     },
     {
       title: "คะแนน Rating",
-      dataIndex: "",
-      key: "",
+      dataIndex: "avgrating",
+      key: "avgrating",
       render: (value: any, row: any, index: number) => {
-        return {};
+        return {
+          children: (
+            <>
+              <span className="text-dark-75  d-block font-size-lg">
+                {/* {row.avgrating} */}
+              </span>
+            </>
+          ),
+        };
       },
     },
     {
       title: "ตำบล",
-      dataIndex: "",
-      key: "",
+      dataIndex: "subdistrict",
+      key: "subdistrict",
+      // width: "10%",
       render: (value: any, row: any, index: number) => {
-        return {};
+        const subdistrict = row.address.subdistrict;
+        return {
+          children: (
+            <span className="text-dark-75  d-block font-size-lg">
+              {subdistrict !== undefined ? subdistrict.subdistrictName : null}
+            </span>
+          ),
+        };
       },
     },
     {
       title: "อำเภอ",
-      dataIndex: "",
-      key: "",
+      dataIndex: "district",
+      key: "district",
+      // width: "10%",
       render: (value: any, row: any, index: number) => {
-        return {};
+        const district = row.address.district;
+        return {
+          children: (
+            <div className="container">
+              <span className="text-dark-75  d-block font-size-lg">
+                {district !== undefined ? district.districtName : null}
+              </span>
+            </div>
+          ),
+        };
       },
     },
     {
       title: "จังหวัด",
-      dataIndex: "",
-      key: "",
+      dataIndex: "province",
+      key: "province",
+      // width: "10%",
       render: (value: any, row: any, index: number) => {
+        const province = row.address.province;
         return {
-          children: <></>,
+          children: (
+            <div className="container">
+              <span className="text-dark-75  d-block font-size-lg">
+                {province !== undefined ? province.region : null}
+              </span>
+            </div>
+          ),
         };
       },
     },
@@ -262,7 +348,9 @@ export default function IndexRankDroner() {
               <ActionButton
                 icon={<FileTextFilled />}
                 color={color.primary1}
-                onClick={() => (window.location.href = "/DetailRankDroner")}
+                onClick={() =>
+                  (window.location.href = "/DetailRankDroner?=" + row.id)
+                }
               />
             </div>
           ),
@@ -272,9 +360,19 @@ export default function IndexRankDroner() {
   ];
   return (
     <Layouts>
-      {pageTitle}
+      {PageTitle}
       <br />
-      <Table columns={columns} dataSource={dataSource} pagination={false} />
+      <Table columns={columns} dataSource={data?.data} pagination={false} />
+      <div className="d-flex justify-content-between pt-5">
+        <p>รายการทั้งหมด {data?.count} รายการ</p>
+        <Pagination
+          current={current}
+          total={data?.count}
+          onChange={onChangePage}
+          pageSize={row}
+          showSizeChanger={false}
+        />
+      </div>
     </Layouts>
   );
 }
