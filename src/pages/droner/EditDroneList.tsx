@@ -56,14 +56,12 @@ function EditDroneList() {
   let imgList: (string | boolean)[] = [];
   const [imgLicenseDroner, setImgLicenseDroner] = useState<any>(false);
   const [imgLicenseDrone, setImgLicenseDrone] = useState<any>(false);
-  const [validateReason, setValidateReason] = useState<any>("");
   let [textReason, setTextReason] = useState<any>();
   let [textReasonMore, setTextReasonMore] = useState<any>();
 
   const fetchDronerDrone = async () => {
     await DronerDroneDatasource.getDronerDroneById(DronerDroneId).then(
       (res) => {
-        console.log(res);
         setData(res);
         setDronerId(res.dronerId);
         let getPathPro = res.droner.file.filter(
@@ -187,7 +185,6 @@ function EditDroneList() {
       let removeReason = data.reason.filter((x) => x != value);
       p = Map(data).set("reason", removeReason);
     }
-    console.log(p.toJS().reason);
     setData(p.toJS());
     checkValidate(data);
   };
@@ -201,12 +198,12 @@ function EditDroneList() {
         "reason",
         [...data.reason, value].filter((x) => x != "")
       );
-      console.log("p1", p.toJS());
     } else {
       let removeReason = data.reason.filter((x) => x != value);
       p = Map(data).set("reason", removeReason);
     }
     setData(p.toJS());
+    checkValidate(data);
   };
   const onChangeReasonTextMore = async (
     e: React.ChangeEvent<HTMLTextAreaElement>
@@ -221,8 +218,8 @@ function EditDroneList() {
       let removeReason = data.reason.filter((x) => x != e.target.value);
       p = Map(data).set("reason", removeReason);
     }
-    console.log(p.toJS());
     setData(p.toJS());
+    checkValidate(data);
   };
   const onPreviewProfile = async () => {
     let src = imgProfile;
@@ -350,21 +347,8 @@ function EditDroneList() {
       data.purchaseYear,
       data.status,
     ].includes("");
-    if (checkEmptySting) {
-      setBtnSaveDisable(false);
-    } else {
-      setBtnSaveDisable(true);
-    }
-    let checkEmptyArray = false;
-    // if (data.status == "REJECTED" || data.status == "INACTIVE") {
-    // if (data?.reason !== undefined) {
-    //   checkEmptyArray =
-    //     ![data?.reason][0]?.includes("") &&
-    //     data?.reason.length !== 0 &&
-    //     data?.reason !== undefined;
-    // }
-    // }
-    if (checkEmptySting) {
+    let checkArrayEmpty = ![data.reason].includes([]);
+    if (checkEmptySting && checkArrayEmpty) {
       setBtnSaveDisable(false);
     } else {
       setBtnSaveDisable(true);
@@ -372,7 +356,6 @@ function EditDroneList() {
   };
   const UpdateDronerDrone = async () => {
     await DronerDroneDatasource.updateDroneList(data).then((res) => {
-      console.log(res);
       if (res != null) {
         var i = 0;
         for (i; 3 > i; i++) {
