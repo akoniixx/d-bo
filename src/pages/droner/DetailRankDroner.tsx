@@ -8,6 +8,16 @@ import { CardHeader } from "../../components/header/CardHearder";
 import { BackIconButton } from "../../components/button/BackButton";
 import icon from "../../resource/icon";
 import ActionButton from "../../components/button/ActionButton";
+import { UploadImageDatasouce } from "../../datasource/UploadImageDatasource";
+import { DronerRankDatasource } from "../../datasource/DronerRankDatasource";
+import { DronerRankDetailEntity, DronerRankDetailEntity_INIT} from "../../entities/DronerRankEntities";
+import uploadImg from "../../resource/media/empties/uploadImg.png";
+import { LocationDatasource } from "../../datasource/LocationDatasource";
+import { DistrictEntity, ProviceEntity, SubdistrictEntity } from "../../entities/LocationEntities";
+import { AddressEntity, AddressEntity_INIT, FullAddressEntiry_INIT, FullAddressEntity } from "../../entities/AddressEntities";
+import { taskEntity, taskEntity_INIT } from "../../entities/TaskEnities";
+const _ = require("lodash");
+let queryString = _.split(window.location.search, "=");
 
 function DetailRankDroner() {
   const style: React.CSSProperties = {
@@ -17,9 +27,27 @@ function DetailRankDroner() {
     margin: "5px",
     padding: "10px",
   };
+  const dronerId = queryString[1];
+  const [data, setData] = useState<DronerRankDetailEntity>(DronerRankDetailEntity_INIT);
+  const [listDetail, setListDetail] = useState<taskEntity[]>([taskEntity_INIT]);
+  let imgList: (string | boolean)[] = [];
+  const [imgProfile, setImgProfile] = useState<any>();
+
+  useEffect(() => {
+    fetchDronerById();
+  }, []);
+
+  const fetchDronerById = async () => {
+    await DronerRankDatasource.getDronerRankById(dronerId).then((res) => {
+      console.log(res)
+      setData(res);
+      setListDetail(res.task)
+    });
+  };
+
   const renderDroner = (
     <div className="col-lg-4">
-      <CardContainer>
+      <CardContainer key={data.id}>
         <CardHeader textHeader="ข้อมูลนักบินโดรน" />
         <div
           className="form-group col-lg-12 text-start container"
@@ -28,17 +56,13 @@ function DetailRankDroner() {
           <div className="row">
             <div className="form-group text-center pb-4">
               <div
-              // className="hiddenFileInput zoom"
-              // style={{
-              //   backgroundImage: `url(${
-              //     imgProfile == undefined ? img_empty : imgProfile
-              //   })`,
-              // }}
+              className="hiddenFileInput zoom"
+              style={{
+                backgroundImage: `url(${
+                  imgProfile == undefined ? uploadImg : imgProfile
+                })`,
+              }}
               >
-                <Image
-                  width={200}
-                  src="https://blog.masii.co.th/wp-content/uploads/2019/08/dr1-e1566030486441.jpg"
-                />
               </div>
             </div>
           </div>
@@ -46,19 +70,19 @@ function DetailRankDroner() {
             <CardContainer style={style}>
               <span>จำนวนบริการ</span>
               <br />
-              <span style={{ color: color.Success }}>10 งาน</span>
+              <span style={{ color: color.Success }}>{data.totalTaskCount + " " + "งาน"}</span>
             </CardContainer>
             <CardContainer style={style}>
               <span>จำนวนไร่</span>
               <br />
-              <span style={{ color: color.Success }}>100 ไร่</span>
+              <span style={{ color: color.Success }}>{data.totalRaiCount + " " + "ไร่"}</span>
             </CardContainer>
             <CardContainer style={style}>
               <span>คะแนน Rating</span>
               <br />
-
               <span style={{ color: color.Success }}>
-                <img alt="logo" src={icon.iconStar} width={"20%"} /> 4.0 (10)
+                <img alt="logo" src={icon.iconStar} width={"20%"} />
+                {data.avgrating}
               </span>
             </CardContainer>
           </div>
@@ -66,48 +90,48 @@ function DetailRankDroner() {
             <label>Droner ID</label>
             <div className="row">
               <Form.Item name="droneId">
-                <Input disabled placeholder="DN000001" />
+              <Input disabled defaultValue={data.id} />
               </Form.Item>
             </div>
             <div className="row">
               <div className="col-lg-6">
                 <label>ชื่อ</label>
                 <Form.Item name="firstname">
-                  <Input disabled placeholder="วิภาพร" />
+                  <Input disabled defaultValue={data.firstname} />
                 </Form.Item>
               </div>
               <div className="col-lg-6">
                 <label>นามสกุล</label>
                 <Form.Item name="lastname">
-                  <Input disabled placeholder="สมคิด" />
+                  <Input disabled defaultValue={data.lastname} />
                 </Form.Item>
               </div>
             </div>
             <div className="row">
               <div className="col-lg-6">
                 <label>เบอร์โทร</label>
-                <Form.Item name="firstname">
-                  <Input disabled placeholder="0989284761" />
+                <Form.Item name="telephoneNo">
+                  <Input disabled defaultValue={data.telephoneNo} />
                 </Form.Item>
               </div>
-              <div className="col-lg-6">
+              <div className="col-lg-6" >
                 <label>ตำบล</label>
-                <Form.Item name="lastname">
-                  <Input disabled placeholder="ปากเพรียว" />
+                <Form.Item name="subdistrictName">
+                  <Input disabled defaultValue={data.address.subdistrict.subdistrictName}/>
                 </Form.Item>
               </div>
             </div>
             <div className="row">
-              <div className="col-lg-6">
+              <div className="col-lg-6" >
                 <label>อำเภอ</label>
-                <Form.Item name="firstname">
-                  <Input disabled placeholder="เมืองสระบุรี" />
+                <Form.Item name="districtName">
+                  <Input disabled defaultValue={data.address.district.districtName} />
                 </Form.Item>
               </div>
-              <div className="col-lg-6">
+              <div className="col-lg-6" >
                 <label>จังหวัด</label>
-                <Form.Item name="lastname">
-                  <Input disabled placeholder="สระบุรี" />
+                <Form.Item name="provinceName">
+                  <Input disabled defaultValue={data.address.province.region} />
                 </Form.Item>
               </div>
             </div>
@@ -120,7 +144,7 @@ function DetailRankDroner() {
     <div className="col-lg-7">
       <CardContainer>
         <CardHeader textHeader="รายละเอียดการบริการ" />
-        <Form>
+        {/* <Form>
           <div className="container " style={{ backgroundColor: color.BG }}>
             <div className="row pt-3">
               <div className="col-lg-3">
@@ -177,7 +201,56 @@ function DetailRankDroner() {
               </div>
             </div>
           </div>
-        </Form>
+        </Form> */}
+            {/* <Form>
+          {listDetail.length != 0 ? (
+            <div className="container">
+              {listDetail.map((item, index) => (
+                <div className="row pt-3 pb-3">
+                  <div className="col-lg-1">
+                    <Avatar
+                      size={25}
+                      src={item.drone.droneBrand.logoImagePath}
+                      style={{ marginRight: "5px" }}
+                    />
+                  </div>
+                  <div className="col-lg-5">
+                    <h6>{item.drone.droneBrand.name}</h6>
+                    <p style={{ color: "#ccc" }}>{item.serialNo}</p>
+                  </div>
+                  <div className="col-lg-4">
+                    <span style={{ color: STATUS_COLOR[item.status] }}>
+                      <Badge color={STATUS_COLOR[item.status]} />
+                      {DRONER_DRONE_MAPPING[item.status]}
+                      <br />
+                    </span>
+                  </div>
+                  <div className="col-lg-2 d-flex justify-content-between">
+                    <div className="col-lg-6">
+                      <ActionButton
+                        icon={<EditOutlined />}
+                        color={color.primary1}
+                        onClick={() => editDroner(item, index + 1)}
+                      />
+                    </div>
+                    <div className="col-lg-6">
+                      <ActionButton
+                        icon={<DeleteOutlined />}
+                        color={color.Error}
+                        onClick={() => removeDrone(index + 1)}
+                      />
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="container text-center" style={{ padding: "80px" }}>
+              <img src={emptyData}></img>
+              <p>ยังไม่มีแปลงเกษตร</p>
+            </div>
+          )}
+        </Form> */}
 
         <div className="d-flex container justify-content-between pt-5 ">
           <p>รายการทั้งหมด 1 รายการ</p>

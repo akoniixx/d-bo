@@ -1,4 +1,15 @@
-import { DatePicker, Pagination, Select, Table } from "antd";
+import {
+  Button,
+  Cascader as Cascaded,
+  Checkbox,
+  DatePicker,
+  Dropdown,
+  Menu,
+  Pagination,
+  Rate,
+  Select,
+  Table,
+} from "antd";
 import Search from "antd/lib/input/Search";
 import moment from "moment";
 import React, { useEffect, useState } from "react";
@@ -11,12 +22,12 @@ import {
   SubdistrictEntity,
 } from "../../entities/LocationEntities";
 import color from "../../resource/color";
-import { FileTextFilled } from "@ant-design/icons";
+import { DownOutlined, FileTextOutlined, StarFilled } from "@ant-design/icons";
 import { DronerRankDatasource } from "../../datasource/DronerRankDatasource";
 import {
-  DronerRankEntity,
   DronerRankListEntity,
 } from "../../entities/DronerRankEntities";
+import icon from "../../resource/icon";
 
 export default function IndexRankDroner() {
   const row = 10;
@@ -53,8 +64,17 @@ export default function IndexRankDroner() {
       setData(res);
     });
   };
-
-  const fecthProvince = async () => {
+  const SearchDate = (e: any) => {
+    if (e != null) {
+      setStartDate(moment(new Date(e[0])).format(dateFormat));
+      setEndDate(moment(new Date(e[1])).format(dateFormat));
+    } else {
+      setStartDate(e);
+      setEndDate(e);
+    }
+    setCurrent(1);
+  };
+  const fetchProvince = async () => {
     await LocationDatasource.getProvince().then((res) => {
       setProvince(res);
     });
@@ -78,7 +98,7 @@ export default function IndexRankDroner() {
   };
   useEffect(() => {
     fetchDronerRank();
-    fecthProvince();
+    fetchProvince();
     fetchDistrict();
     fetchSubdistrict();
   }, [current, searchText, searchProvince, searchDistrict, searchSubdistrict]);
@@ -94,6 +114,101 @@ export default function IndexRankDroner() {
     setSearchSubdistrict(subdistrictId);
     setCurrent(1);
   };
+  const handlerStar = (e: any) => {
+    let checked = e.target.checked;
+    console.log(checked);
+  };
+  const ratingStar = (
+    <Menu
+      items={[
+        {
+          label: (
+            <div
+              style={{
+                color: "#FFCA37",
+                fontSize: "16px",
+                marginBottom: "10px",
+              }}
+            >
+              <StarFilled />
+              <StarFilled />
+              <StarFilled />
+              <StarFilled />
+              <StarFilled />
+            </div>
+          ),
+          key: "1",
+          icon: <Checkbox value={5} onChange={handlerStar}></Checkbox>,
+        },
+        {
+          label: (
+            <div
+              style={{
+                color: "#FFCA37",
+                fontSize: "16px",
+                marginBottom: "10px",
+              }}
+            >
+              <StarFilled />
+              <StarFilled />
+              <StarFilled />
+              <StarFilled />
+            </div>
+          ),
+          key: "2",
+          icon: <Checkbox value={4} onChange={handlerStar}></Checkbox>,
+        },
+        {
+          label: (
+            <div
+              style={{
+                color: "#FFCA37",
+                fontSize: "16px",
+                marginBottom: "10px",
+              }}
+            >
+              <StarFilled />
+              <StarFilled />
+              <StarFilled />
+            </div>
+          ),
+          key: "3",
+          icon: <Checkbox value={3} onChange={handlerStar}></Checkbox>,
+        },
+        {
+          label: (
+            <div
+              style={{
+                color: "#FFCA37",
+                fontSize: "16px",
+                marginBottom: "10px",
+              }}
+            >
+              <StarFilled />
+              <StarFilled />
+            </div>
+          ),
+          key: "4",
+          icon: <Checkbox value={2} onChange={handlerStar}></Checkbox>,
+        },
+        {
+          label: (
+            <div
+              style={{
+                color: "#FFCA37",
+                fontSize: "16px",
+                marginBottom: "10px",
+              }}
+            >
+              <StarFilled />
+            </div>
+          ),
+          key: "5",
+          icon: <Checkbox value={1} onChange={handlerStar}></Checkbox>,
+        },
+      ]}
+    />
+  );
 
   const PageTitle = (
     <>
@@ -111,10 +226,8 @@ export default function IndexRankDroner() {
         </div>
         <div style={{ color: color.Error }}>
           <RangePicker
-            defaultValue={[
-              moment("01/01/2565", dateFormat),
-              moment("01/01/2565", dateFormat),
-            ]}
+            allowClear
+            onCalendarChange={(val) => SearchDate(val)}
             format={dateFormat}
           />
         </div>
@@ -204,13 +317,13 @@ export default function IndexRankDroner() {
             ))}
           </Select>
         </div>
-        <div className="col-lg-2">
-          <Select
-            allowClear
-            className="col-lg-12 p-1"
-            placeholder="เลือกคะแนน Rating"
-            // onChange={}
-          ></Select>
+        <div className="col-lg-2 p-1">
+          <Dropdown overlay={ratingStar} className="col-lg-12">
+            <Button style={{ color: color.Disable }}>
+              เลือกคะแนน Rating
+              <DownOutlined />
+            </Button>
+          </Dropdown>
         </div>
       </div>
     </>
@@ -225,7 +338,7 @@ export default function IndexRankDroner() {
           children: (
             <>
               <span className="text-dark-75  d-block font-size-lg">
-                {row.firstname + " " + row.lastname}
+                {row.droner_firstname + " " + row.droner_lastname}
               </span>
             </>
           ),
@@ -234,8 +347,8 @@ export default function IndexRankDroner() {
     },
     {
       title: "เบอร์โทร",
-      dataIndex: "telephoneNo",
-      key: "telephoneNo",
+      dataIndex: "droner_telephone_no",
+      key: "droner_telephone_no",
     },
     {
       title: "จำนวนให้บริการ",
@@ -274,11 +387,20 @@ export default function IndexRankDroner() {
       dataIndex: "avgrating",
       key: "avgrating",
       render: (value: any, row: any, index: number) => {
+        // const Rating = row.avgrating;
+        // const calRate = Rating.toFixed(2);
+        // console.log("asd",calRate);
         return {
           children: (
             <>
               <span className="text-dark-75  d-block font-size-lg">
-                {/* {row.avgrating} */}
+                <img
+                  alt="logo"
+                  src={icon.iconStar}
+                  width={"15px"}
+                  style={{ marginRight: "20px", marginBottom: "2px" }}
+                />
+                {row.avgrating}
               </span>
             </>
           ),
@@ -287,15 +409,15 @@ export default function IndexRankDroner() {
     },
     {
       title: "ตำบล",
-      dataIndex: "subdistrict",
-      key: "subdistrict",
-      // width: "10%",
+      dataIndex: "subdistrict_subdistrict_name",
+      key: "subdistrict_subdistrict_name",
+      width: "10%",
       render: (value: any, row: any, index: number) => {
-        const subdistrict = row.address.subdistrict;
+        const subdistrict = row.subdistrict_subdistrict_name;
         return {
           children: (
             <span className="text-dark-75  d-block font-size-lg">
-              {subdistrict !== undefined ? subdistrict.subdistrictName : null}
+              {subdistrict !== undefined ? subdistrict : null}
             </span>
           ),
         };
@@ -303,16 +425,16 @@ export default function IndexRankDroner() {
     },
     {
       title: "อำเภอ",
-      dataIndex: "district",
-      key: "district",
-      // width: "10%",
+      dataIndex: "district_district_name",
+      key: "district_district_name",
+      width: "10%",
       render: (value: any, row: any, index: number) => {
-        const district = row.address.district;
+        const district = row.district_district_name;
         return {
           children: (
             <div className="container">
               <span className="text-dark-75  d-block font-size-lg">
-                {district !== undefined ? district.districtName : null}
+                {district !== undefined ? district : null}
               </span>
             </div>
           ),
@@ -321,16 +443,16 @@ export default function IndexRankDroner() {
     },
     {
       title: "จังหวัด",
-      dataIndex: "province",
-      key: "province",
-      // width: "10%",
+      dataIndex: "province_region",
+      key: "province_region",
+      width: "10%",
       render: (value: any, row: any, index: number) => {
-        const province = row.address.province;
+        const province = row.province_region;
         return {
           children: (
             <div className="container">
               <span className="text-dark-75  d-block font-size-lg">
-                {province !== undefined ? province.region : null}
+                {province !== undefined ? province : null}
               </span>
             </div>
           ),
@@ -346,10 +468,10 @@ export default function IndexRankDroner() {
           children: (
             <div className="d-flex flex-row justify-content-between">
               <ActionButton
-                icon={<FileTextFilled />}
+                icon={<FileTextOutlined />}
                 color={color.primary1}
                 onClick={() =>
-                  (window.location.href = "/DetailRankDroner?=" + row.id)
+                  (window.location.href = "/DetailRankDroner?=" + row.droner_id)
                 }
               />
             </div>
