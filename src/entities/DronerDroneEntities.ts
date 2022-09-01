@@ -95,7 +95,7 @@ export const GetDronerDroneEntity_INIT: GetDronerDroneEntity = {
   status: "",
   purchaseYear: "",
   purchaseMonth: "",
-  reason: [""],
+  reason: [],
   drone: DroneEntity_INIT,
   droner: DronerEntity_INIT,
   file: [ImageEntity_INTI],
