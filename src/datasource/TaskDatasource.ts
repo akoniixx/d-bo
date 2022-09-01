@@ -1,6 +1,9 @@
 import { BASE_URL, httpClient } from "../config/develop-config";
 import { FarmerEntity } from "../entities/FarmerEntities";
-import { NewTaskPageEntity } from "../entities/NewTaskEntities";
+import {
+  CreateNewTaskEntity,
+  NewTaskPageEntity,
+} from "../entities/NewTaskEntities";
 
 export class TaskDatasource {
   static getNewTaskList(
@@ -36,6 +39,17 @@ export class TaskDatasource {
       })
       .catch((err) => {
         console.log(err, "err getAdmin");
+      });
+  }
+  static insertNewTask(data: CreateNewTaskEntity): Promise<any> {
+    return httpClient
+      .post(BASE_URL + "/tasks/task", data)
+      .then((response) => {
+        console.log("response", response.data);
+        return response.data;
+      })
+      .catch((error) => {
+        console.log(error);
       });
   }
 }

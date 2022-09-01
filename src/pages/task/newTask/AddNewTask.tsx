@@ -44,14 +44,19 @@ import {
 } from "../../../entities/NewTaskEntities";
 import { CropPurposeSprayEntity } from "../../../entities/CropEntities";
 import { CropDatasource } from "../../../datasource/CropDatasource";
-import { DefaultValue, readOnlySelector } from "recoil";
 import {
   PURPOSE_SPRAY,
   PURPOSE_SPRAY_CHECKBOX,
 } from "../../../definitions/PurposeSpray";
-import { TaskSearchDroner } from "../../../entities/TaskSearchDroner";
+import {
+  TaskSearchDroner,
+  TaskSearchDroner_INIT,
+} from "../../../entities/TaskSearchDroner";
 import { TaskSearchDronerDatasource } from "../../../datasource/TaskSearchDronerDatasource";
-import DroneList from "../../droner/DroneList";
+import ModalSelectedDroner from "../../../components/modal/task/newTask/ModalSelectedDroner";
+import { CreateDronerTempEntity } from "../../../entities/TaskDronerTemp";
+import TextArea from "antd/lib/input/TextArea";
+import Swal from "sweetalert2";
 const { Step } = Steps;
 const { Option } = Select;
 const dateFormat = "DD-MM-YYYY";
@@ -65,6 +70,7 @@ const { Map } = require("immutable");
 let queryString = _.split(window.location.pathname, "=");
 
 const AddNewTask = () => {
+  const profile = JSON.parse(localStorage.getItem("profile") || "{  }");
   const [current, setCurrent] = useState(0);
   const [createNewTask, setCreateNewTask] = useState<CreateNewTaskEntity>(
     CreateNewTaskEntity_INIT
@@ -97,7 +103,7 @@ const AddNewTask = () => {
   const [timeAppointment, setTimeAppointment] = useState<any>(
     moment(undefined)
   );
-  const [disableBtn1, setDisableBtn1] = useState<boolean>(true);
+  const [disableBtn, setDisableBtn] = useState<boolean>(true);
 
   const fetchFarmerList = async (text?: string) => {
     await TaskDatasource.getFarmerList(text).then((res) => {
@@ -110,21 +116,14 @@ const AddNewTask = () => {
     });
   };
 
-  const [dataDronerList, setDronerList] = useState<TaskSearchDroner[]>();
-  const fetchDronerList = async (
-    farmerId: string,
-    plotId: string,
-    date: string
-  ) => {
-    await TaskSearchDronerDatasource.getTaskDronerList(
-      farmerId,
-      plotId,
-      date
-    ).then((res) => {
-      console.log(res);
-      setDronerList(res);
-    });
-  };
+  const [dataDronerList, setDataDronerList] = useState<TaskSearchDroner[]>([
+    TaskSearchDroner_INIT,
+  ]);
+  const [dronerSelected, setDronerSelected] = useState<TaskSearchDroner[]>([
+    TaskSearchDroner_INIT,
+  ]);
+  const [showModalSelectedDroner, setShowModalSelectedDroner] =
+    useState<boolean>(false);
 
   useEffect(() => {
     fetchFarmerList(searchFarmer);
@@ -213,6 +212,25 @@ const AddNewTask = () => {
     setCreateNewTask(d.toJS());
     checkValidateStep1(d.toJS());
   };
+  const handleCalServiceCharge = (e: any) => {
+    if (e.target.id == "unitPrice") {
+      let calUnitPrice =
+        parseFloat(createNewTask.farmAreaAmount) * e.target.value;
+      const d = Map(createNewTask).set("unitPrice", e.target.value);
+      const pushCal = Map(d.toJS()).set("price", calUnitPrice);
+      setCreateNewTask(pushCal.toJS());
+    } else {
+      let calUnitPrice =
+        e.target.value / parseFloat(createNewTask.farmAreaAmount);
+      const d = Map(createNewTask).set("price", e.target.value);
+      const pushCal = Map(d.toJS()).set("unitPrice", calUnitPrice);
+      setCreateNewTask(pushCal.toJS());
+    }
+  };
+  const handleComment = (e: any) => {
+    const d = Map(createNewTask).set("comment", e.target.value);
+    setCreateNewTask(d.toJS());
+  };
   const checkValidateComma = (data: string) => {
     const checkSyntax =
       data.includes("*") ||
@@ -238,31 +256,10 @@ const AddNewTask = () => {
     }
     let checkDateTime = ![dateAppointment, timeAppointment].includes("");
     if (checkEmptySting && checkEmptyArray && checkDateTime) {
-      setDisableBtn1(false);
+      setDisableBtn(false);
     } else {
-      setDisableBtn1(true);
+      setDisableBtn(true);
     }
-  };
-  const nextStep = () => {
-    setCurrent(current + 1);
-    let otherSprayList = [];
-    if (otherSpray != undefined) {
-      let m = otherSpray.split(",");
-      for (let i = 0; m.length > i; i++) {
-        otherSprayList.push(m[i]);
-      }
-    }
-    createNewTask.targetSpray.push.apply(
-      createNewTask.targetSpray,
-      otherSprayList.filter((x) => x != "")
-    );
-    const d = Map(createNewTask).set(
-      "dateAppointment",
-      moment(dateAppointment + " " + timeAppointment).toISOString()
-    );
-    console.log(d.toJS());
-    setCreateNewTask(d.toJS());
-    fetchDronerList(d.toJS().farmerId, d.toJS().farmerPlotId, dateAppointment);
   };
 
   const renderFormSearchFarmer = (
@@ -371,6 +368,20 @@ const AddNewTask = () => {
                 </div>
               </div>
               <div className="row">
+                <div className="form-group col-lg-6">
+                  <Form.Item>
+                    <label>Latitude (ละติจูด)</label>
+                    <Input value={farmerPlotSeleced?.lat} disabled />
+                  </Form.Item>
+                </div>
+                <div className="form-group col-lg-6">
+                  <label>Longitude</label>
+                  <Form.Item>
+                    <Input value={farmerPlotSeleced?.long} disabled />
+                  </Form.Item>
+                </div>
+              </div>
+              <div className="row">
                 <div className="form-group col-lg-12">
                   <GooleMap
                     width="100%"
@@ -386,16 +397,59 @@ const AddNewTask = () => {
                         ? parseFloat(farmerPlotSeleced.long)
                         : LAT_LNG_BANGKOK.lng
                     }
-                  ></GooleMap>
+                  />
+                  <div className="row">
+                    <div className="form-group">
+                      <label>จุดสังเกต</label>
+                      <Form.Item>
+                        <Input value={farmerPlotSeleced?.landmark} disabled />
+                      </Form.Item>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
+          )}
+          {dataFarmer && (
+            <CardContainer
+              style={{ backgroundColor: "rgba(33, 150, 83, 0.1)" }}
+            >
+              <Form style={{ padding: "20px" }}>
+                <label>ยอดรวมค่าบริการ</label>
+                <div className="row">
+                  <div className="form-group col-lg-4">
+                    <Form.Item>
+                      <label>ค่าบริการ/ไร่</label>{" "}
+                      <span style={{ color: "red" }}>*</span>
+                      <Input
+                        suffix="บาท/ไร่"
+                        id="unitPrice"
+                        value={createNewTask.unitPrice}
+                        onChange={handleCalServiceCharge}
+                        disabled={current == 2 || checkSelectPlot == "error"}
+                      />
+                    </Form.Item>
+                  </div>
+                  <div className="form-group col-lg-4">
+                    <label>คำนวณยอดรวม</label>{" "}
+                    <span style={{ color: "red" }}>*</span>
+                    <Form.Item>
+                      <Input
+                        suffix="บาท"
+                        value={createNewTask.price}
+                        onChange={handleCalServiceCharge}
+                        disabled={current == 2 || checkSelectPlot == "error"}
+                      />
+                    </Form.Item>
+                  </div>
+                </div>
+              </Form>
+            </CardContainer>
           )}
         </Form>
       </div>
     </CardContainer>
   );
-
   const renderFormAppointment = (
     <CardContainer>
       <CardHeader textHeader="นัดหมายบริการ" />
@@ -539,6 +593,15 @@ const AddNewTask = () => {
               </Space>
             </Radio.Group>
           </div>
+          <div className="form-group">
+            <label>หมายเหตุ</label>
+            <TextArea
+              placeholder="ระบุหมายเหตุเพื่อแจ้งนักบินโดรน เช่น เกษตรกรจะเตรียมยาให้, ฝากนักบินเลือกยาราคาไม่แพงมาให้หน่อย เป็นต้น"
+              disabled={current == 2 || checkSelectPlot == "error"}
+              onChange={handleComment}
+              defaultValue={createNewTask.comment}
+            />
+          </div>
         </Form>
       </div>
     </CardContainer>
@@ -546,7 +609,30 @@ const AddNewTask = () => {
   //#endregion
 
   //#region Step2
-
+  const fetchDronerList = async (
+    farmerId: string,
+    plotId: string,
+    date: string
+  ) => {
+    await TaskSearchDronerDatasource.getTaskDronerList(
+      farmerId,
+      plotId,
+      date
+    ).then((res) => {
+      res.map((item) =>
+        _.set(
+          item,
+          "isChecked",
+          dronerSelected
+            ?.map((x) => x)
+            .find((y) => y.droner_id === item.droner_id)
+            ? true
+            : false
+        )
+      );
+      setDataDronerList(res);
+    });
+  };
   const ratingStar = (
     <Menu
       items={[
@@ -608,17 +694,52 @@ const AddNewTask = () => {
       ]}
     />
   );
-
   const [visible, setVisible] = useState(false);
   const handleVisibleChange = (newVisible: any) => {
     setVisible(newVisible);
   };
-
   const [inputValue, setInputValue] = useState(0);
   const onChange = (newValue: any) => {
     setInputValue(newValue);
   };
-
+  const handleSelectDroner = (e: any, data: any) => {
+    let checked = e.target.checked;
+    let d = dataDronerList.map((item) =>
+      _.set(
+        item,
+        "isChecked",
+        item.droner_id == data.droner_id ? checked : item.isChecked
+      )
+    );
+    setDataDronerList(d);
+    setDronerSelected(d.filter((x) => x.isChecked == true));
+  };
+  const handleAllSelectDroner = (e: any) => {
+    let checked = e.target.checked;
+    let d = dataDronerList.map((item) =>
+      _.set(
+        item,
+        "isChecked",
+        item.droner_status == "ไม่สะดวก" ? false : checked
+      )
+    );
+    setDataDronerList(d);
+    setDronerSelected(d.filter((x) => x.isChecked == true));
+  };
+  const callBackDronerSelected = (data: TaskSearchDroner[]) => {
+    let d = dataDronerList.map((item) =>
+      _.set(
+        item,
+        "isChecked",
+        data?.map((x) => x).find((y) => y.droner_id === item.droner_id)
+          ? true
+          : false
+      )
+    );
+    setDataDronerList(d);
+    setDronerSelected(d.filter((x) => x.isChecked == true));
+    setShowModalSelectedDroner((prev) => !prev);
+  };
   const searchSection = (
     <div className="d-flex justify-content-between" style={{ padding: "10px" }}>
       <div className="col-lg-3"></div>
@@ -674,11 +795,13 @@ const AddNewTask = () => {
       </div>
     </div>
   );
-
   const dronerSelectedList = (
     <div className="d-flex justify-content-end">
       <div className="p-1">
-        <p>จำนวนนักบินโดรนที่เลือก {0} คน</p>
+        <p>
+          จำนวนนักบินโดรนที่เลือก{" "}
+          {dronerSelected.filter((x) => x.isChecked != false).length} คน
+        </p>
       </div>
       <div>
         <Button
@@ -687,14 +810,41 @@ const AddNewTask = () => {
             borderRadius: "5px",
             color: color.Success,
           }}
+          onClick={() => setShowModalSelectedDroner((prev) => !prev)}
         >
           ดูรายชื่อนักบินโดรนที่เลือก
         </Button>
       </div>
     </div>
   );
-
   const columns = [
+    {
+      title: (
+        <input
+          type={selectionType}
+          onChange={handleAllSelectDroner}
+          checked={dataDronerList
+            .filter((x) => x.droner_status != "ไม่สะดวก")
+            .every((x) => x.isChecked)}
+          style={{ width: "18px", height: "18px" }}
+        />
+      ),
+      render: (value: any, row: any, index: number) => {
+        return {
+          children: (
+            <>
+              <input
+                type={selectionType}
+                onChange={(e) => handleSelectDroner(e, row)}
+                checked={row.isChecked}
+                disabled={row.droner_status != "ไม่สะดวก" ? false : true}
+                style={{ width: "18px", height: "18px" }}
+              />
+            </>
+          ),
+        };
+      },
+    },
     {
       title: "ชื่อนักบินโดรน",
       dataIndex: "fullname",
@@ -788,8 +938,17 @@ const AddNewTask = () => {
         return {
           children: (
             <>
-              <span style={{ color: "สะดวก" ? color.Success : color.Error }}>
-                <Badge color={"สะดวก" ? color.Success : color.Error} />
+              <span
+                style={{
+                  color:
+                    row.droner_status == "สะดวก" ? color.Success : color.Error,
+                }}
+              >
+                <Badge
+                  color={
+                    row.droner_status == "สะดวก" ? color.Success : color.Error
+                  }
+                />
                 {row.droner_status}
                 <br />
               </span>
@@ -805,9 +964,6 @@ const AddNewTask = () => {
       {dronerSelectedList}
       <CardContainer>
         <Table
-          rowSelection={{
-            type: selectionType,
-          }}
           columns={columns}
           dataSource={dataDronerList}
           pagination={false}
@@ -823,31 +979,127 @@ const AddNewTask = () => {
       <CardHeader textHeader="รายชื่อนักบินโดรน" />
       <Form>
         <div className="container">
-          <div className="row pt-3">
-            <div className="col-lg-3">
-              บินไปให้สุด
-              <br />
-              <p style={{ fontSize: "12px", color: color.Grey }}>ID25648-96</p>
+          {createNewTask.taskDronerTemp?.map((item) => (
+            <div className="row pt-3">
+              {item.dronerDetail[0] != "" &&
+                item.dronerDetail.map((x) => (
+                  <>
+                    <div className="col-lg-3">
+                      {JSON.parse(x).firstname} {JSON.parse(x).lastname}
+                      <br />
+                      <p style={{ fontSize: "12px", color: color.Grey }}>
+                        {JSON.parse(x).droner_code}
+                      </p>
+                    </div>
+                    <div className="col-lg-2">{JSON.parse(x).telephone_no}</div>
+                    <div className="col-lg-3">
+                      {JSON.parse(x).district_name}/
+                      {JSON.parse(x).subdistrict_name}/
+                      {JSON.parse(x).province_name}
+                    </div>
+                    <div className="col-lg-2">
+                      {JSON.parse(x).drone_brand}
+                      <br />
+                      <p style={{ fontSize: "12px", color: color.Grey }}>
+                        {/* (มากกว่า 1 ยี่ห้อ) */}
+                      </p>
+                    </div>
+                    <div className="col-lg-2">
+                      <span
+                        style={{
+                          color:
+                            JSON.parse(x).droner_status == "สะดวก"
+                              ? color.Success
+                              : color.Error,
+                        }}
+                      >
+                        <Badge
+                          color={
+                            JSON.parse(x).droner_status == "สะดวก"
+                              ? color.Success
+                              : color.Error
+                          }
+                        />
+                        {JSON.parse(x).droner_status}
+                        <br />
+                      </span>
+                    </div>
+                  </>
+                ))}
             </div>
-            <div className="col-lg-2">0938355808</div>
-            <div className="col-lg-3">คลองเตย/คลองตัน/กรุงเทพฯ</div>
-            <div className="col-lg-2">
-              DJI
-              <br />
-              <p style={{ fontSize: "12px", color: color.Grey }}>
-                (มากกว่า 1 ยี่ห้อ)
-              </p>
-            </div>
-            <div className="col-lg-2">
-              <Badge color={color.Success} />
-              สะดวก
-            </div>
-          </div>
+          ))}
         </div>
       </Form>
     </CardContainer>
   );
   //#endregion
+
+  const nextStep = () => {
+    if (current == 0) {
+      let otherSprayList = [];
+      if (otherSpray != undefined) {
+        let m = otherSpray.split(",");
+        for (let i = 0; m.length > i; i++) {
+          otherSprayList.push(m[i]);
+        }
+      }
+      createNewTask.targetSpray.push.apply(
+        createNewTask.targetSpray,
+        otherSprayList.filter((x) => x != "")
+      );
+      const d = Map(createNewTask).set(
+        "dateAppointment",
+        moment(dateAppointment + " " + timeAppointment).toISOString()
+      );
+      const p = Map(d.toJS()).set(
+        "createBy",
+        profile.firstname + " " + profile.lastname
+      );
+      setCreateNewTask(p.toJS());
+      fetchDronerList(
+        p.toJS().farmerId,
+        p.toJS().farmerPlotId,
+        dateAppointment
+      );
+      setDisableBtn(true);
+    } else {
+      if (selectionType == "checkbox") {
+        let pushDronerList: CreateDronerTempEntity[] = [];
+        for (let i: number = 0; dronerSelected.length > i; i++) {
+          pushDronerList.push({
+            dronerId: dronerSelected[i].droner_id,
+            status: "WAIT_RECEIVE",
+            dronerDetail: [JSON.stringify(dronerSelected[i])],
+          });
+        }
+        const s = Map(createNewTask).set("status", "WAIT_RECEIVE");
+        const d = Map(s.toJS()).set("taskDronerTemp", pushDronerList);
+        setCreateNewTask(d.toJS());
+      }
+      console.log(2);
+    }
+    setCurrent(current + 1);
+  };
+
+  const insertNewTask = async () => {
+    console.log(createNewTask);
+    if (selectionType == "checkbox") {
+      delete createNewTask["dronerId"];
+    } else {
+      delete createNewTask["taskDronerTemp"];
+    }
+    await TaskDatasource.insertNewTask(createNewTask).then((res) => {
+      console.log(res);
+      // Swal.fire({
+      //   title: "บันทึกสำเร็จ",
+      //   icon: "success",
+      //   timer: 1500,
+      //   showConfirmButton: false,
+      // }).then((time) => {
+      //   window.location.href = "/IndexNewTask";
+      // });
+    });
+  };
 
   const titleStep = [
     {
@@ -893,38 +1145,47 @@ const AddNewTask = () => {
         {current < titleStep.length - 1 && (
           <Button
             style={{
-              backgroundColor: disableBtn1 ? color.Grey : color.Success,
-              borderColor: disableBtn1 ? color.Grey : color.Success,
+              backgroundColor: disableBtn ? color.Grey : color.Success,
+              borderColor: disableBtn ? color.Grey : color.Success,
               borderRadius: "5px",
               color: color.BG,
             }}
-            disabled={disableBtn1}
+            disabled={false}
             onClick={nextStep}
           >
             ถัดไป
           </Button>
         )}
         {current === titleStep.length - 1 && (
-          <SaveButton
-            onClick={() => (window.location.href = "/IndexNewTask")}
-          />
+          <SaveButton onClick={() => insertNewTask} />
         )}
       </Row>
     </>
   );
 
   return (
-    <Layouts>
-      <Row>
-        <BackIconButton
-          onClick={() => (window.location.href = "/IndexNewTask")}
+    <>
+      <Layouts>
+        <Row>
+          <BackIconButton
+            onClick={() => (window.location.href = "/IndexNewTask")}
+          />
+          <span className="pt-3">
+            <strong style={{ fontSize: "20px" }}>เพิ่มงานบินใหม่</strong>
+          </span>
+        </Row>
+        {renderStep}
+      </Layouts>
+      {showModalSelectedDroner && (
+        <ModalSelectedDroner
+          show={showModalSelectedDroner}
+          dataDroner={dronerSelected}
+          title="รายชื่อนักบินโดรน"
+          backButton={() => setShowModalSelectedDroner((prev) => !prev)}
+          callBack={callBackDronerSelected}
         />
-        <span className="pt-3">
-          <strong style={{ fontSize: "20px" }}>เพิ่มงานบินใหม่</strong>
-        </span>
-      </Row>
-      {renderStep}
-    </Layouts>
+      )}
+    </>
   );
 };
 

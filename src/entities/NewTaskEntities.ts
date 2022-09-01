@@ -31,15 +31,20 @@ export interface CreateNewTaskEntity {
   farmerId: string;
   farmerPlotId: string;
   farmAreaAmount: string;
-  dronerId: string;
+  dronerId?: string;
   dateAppointment: string;
   targetSpray: string[];
   preparationBy: string;
   purposeSprayId: string;
-  taskDronerTemp: CreateDronerTempEntity[];
+  taskDronerTemp?: CreateDronerTempEntity[];
   status: string;
   statusRemark: string;
   createBy: string;
+  unitPriceStandard: number;
+  priceStandard: number;
+  unitPrice: number;
+  price: number;
+  comment: string;
 }
 export const CreateNewTaskEntity_INIT: CreateNewTaskEntity = {
   farmerId: "",
@@ -51,7 +56,12 @@ export const CreateNewTaskEntity_INIT: CreateNewTaskEntity = {
   preparationBy: "",
   purposeSprayId: "",
   taskDronerTemp: [CreateDronerTempEntity_INIT],
-  status: "OPEN",
+  status: "",
   statusRemark: "",
   createBy: "",
+  unitPriceStandard: 0,
+  priceStandard: 0,
+  unitPrice: 0,
+  price: 0,
+  comment: "",
 };
