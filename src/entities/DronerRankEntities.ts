@@ -1,5 +1,5 @@
+import { taskByDronerEntity, taskByDronerEntity_INIT } from './TaskEnities';
 import { FullAddressEntiry_INIT, FullAddressEntity } from "./AddressEntities";
-import { taskEntity, taskEntity_INIT } from "./TaskEnities";
 
 export interface AllDronerRankEntity {
   droner_id: null;
@@ -112,7 +112,7 @@ export interface DronerRankDetailEntity {
   createdAt: string;
   updatedAt: string;
   address: FullAddressEntity;
-  task: taskEntity[];
+  task: taskByDronerEntity[];
   avgrating: string;
   totalTaskCount: string;
   totalRaiCount: string;
@@ -134,7 +134,7 @@ export const  DronerRankDetailEntity_INIT: DronerRankDetailEntity = {
   createdAt: "",
   updatedAt: "",
   address: FullAddressEntiry_INIT,
-  task: [taskEntity_INIT],
+  task: [taskByDronerEntity_INIT],
   avgrating: "",
   totalTaskCount: "",
   totalRaiCount: "",

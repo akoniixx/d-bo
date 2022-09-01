@@ -24,9 +24,7 @@ import {
 import color from "../../resource/color";
 import { DownOutlined, FileTextOutlined, StarFilled } from "@ant-design/icons";
 import { DronerRankDatasource } from "../../datasource/DronerRankDatasource";
-import {
-  DronerRankListEntity,
-} from "../../entities/DronerRankEntities";
+import { DronerRankListEntity } from "../../entities/DronerRankEntities";
 import icon from "../../resource/icon";
 
 export default function IndexRankDroner() {
@@ -96,6 +94,10 @@ export default function IndexRankDroner() {
   const onChangePage = (page: number) => {
     setCurrent(page);
   };
+  const financial = (e: any) => {
+    return Number.parseFloat(e).toFixed(1);
+  };
+
   useEffect(() => {
     fetchDronerRank();
     fetchProvince();
@@ -387,18 +389,16 @@ export default function IndexRankDroner() {
       dataIndex: "avgrating",
       key: "avgrating",
       render: (value: any, row: any, index: number) => {
-        // const Rating = row.avgrating;
-        // const calRate = Rating.toFixed(2);
-        // console.log("asd",calRate);
         return {
           children: (
             <>
               <span className="text-dark-75  d-block font-size-lg">
-                <img
-                  alt="logo"
-                  src={icon.iconStar}
-                  width={"15px"}
-                  style={{ marginRight: "20px", marginBottom: "2px" }}
+                <StarFilled
+                  style={{
+                    color: "#FFCA37",
+                    fontSize: "20px",
+                    marginRight: "10px",
+                  }}
                 />
                 {row.avgrating}
               </span>
