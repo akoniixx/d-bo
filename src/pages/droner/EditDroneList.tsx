@@ -42,6 +42,7 @@ import { MONTH_SALE } from "../../definitions/Month";
 import { REASON_CHECK, REASON_IS_CHECK } from "../../definitions/Reason";
 import img_empty from "../../resource/media/empties/uploadImg.png";
 import moment from "moment";
+import image from "../../resource/image";
 const { Option } = Select;
 const _ = require("lodash");
 const { Map } = require("immutable");
@@ -676,7 +677,7 @@ function EditDroneList() {
                   className="hiddenFileInput zoom"
                   style={{
                     backgroundImage: `url(${
-                      imgProfile == undefined ? img_empty : imgProfile
+                      imgProfile == undefined ? image.empty_img : imgProfile
                     })`,
                   }}
                 ></div>
