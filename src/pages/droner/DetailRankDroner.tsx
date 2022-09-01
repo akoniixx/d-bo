@@ -13,15 +13,14 @@ import { DronerRankDatasource } from "../../datasource/DronerRankDatasource";
 import {
   DronerRankDetailEntity,
   DronerRankDetailEntity_INIT,
+  taskByDronerEntity,
+  taskByDronerEntity_INIT,
 } from "../../entities/DronerRankEntities";
 import uploadImg from "../../resource/media/empties/uploadImg.png";
 import emptyData from "../../resource/media/empties/iconoir_farm.png";
-import {
-  taskByDronerEntity,
-  taskByDronerEntity_INIT,
-} from "../../entities/TaskEnities";
-import { StarFilled , FileTextOutlined } from "@ant-design/icons";
+import { StarFilled, FileTextOutlined } from "@ant-design/icons";
 import moment from "moment";
+
 const _ = require("lodash");
 let queryString = _.split(window.location.search, "=");
 const dateFormat = "DD/MM/YYYY";
@@ -175,9 +174,9 @@ function DetailRankDroner() {
     <div className="col-lg-7">
       <CardContainer>
         <CardHeader textHeader="รายละเอียดการบริการ" />
-        {/* <Form>
-          <div className="container " style={{ backgroundColor: color.BG }}>
-            <div className="row pt-3">
+        <Form>
+          <div style={{ backgroundColor: color.BG, padding: "10px" }}>
+            <div className="row">
               <div className="col-lg-3">
                 <span>วันเวลานัดหมาย</span>
               </div>
@@ -196,43 +195,7 @@ function DetailRankDroner() {
               <div className="col-lg"></div>
             </div>
           </div>
-          <div className="container">
-            <div className="row pt-3">
-              <div className="col-lg-3">
-                <span>23/08/2565, 13:00</span>
-                <br />
-                <p style={{ fontSize: "12px", color: color.Grey }}>
-                  TK00000001
-                </p>
-              </div>
-              <div className="col-lg-3">
-                <span>เกษตรกรชาวนาดี 1</span>
-                <br />
-                <p style={{ fontSize: "12px", color: color.Grey }}>
-                  0989284761
-                </p>
-              </div>
-              <div className="col-lg">
-                <span>10.0 ไร่</span>
-              </div>
-              <div className="col-lg">
-                <span>กรุงเทพมหานคร</span>
-              </div>
-              <div className="col-lg">
-                <span>
-                  <img alt="logo" src={icon.iconStar} width={"30%"} /> 4.0
-                </span>
-              </div>
-              <div className="col-lg">
-                <ActionButton
-                  icon={<FileTextFilled />}
-                  color={color.primary1}
-                  onClick={() => (window.location.href = "/DetailWorkDroner")}
-                />
-              </div>
-            </div>
-          </div>
-        </Form> */}
+        </Form>
         <Form>
           {listDetail.length != 0 ? (
             <div className="container">
@@ -242,42 +205,52 @@ function DetailRankDroner() {
                     <span>
                       {moment(new Date(item.dateAppointment)).format(
                         dateFormat
-                      )}, {" "}
-                         {moment(new Date(item.dateAppointment)).format(
+                      )}
+                      ,{" "}
+                      {moment(new Date(item.dateAppointment)).format(
                         timeFormat
                       )}
-                    </span><br/>
-                    <span style={{color: color.Disable, fontSize:"12px"}}>{item.taskNo}</span>
+                    </span>
+                    <br />
+                    <span style={{ color: color.Disable, fontSize: "12px" }}>
+                      {item.taskNo}
+                    </span>
+                  </div>
+                  <div className="col-lg-3">
+                    <span>
+                      {item.farmer.firstname + " " + item.farmer.lastname}
+                    </span>
+                    <br />
+                    <span style={{ color: color.Disable, fontSize: "12px" }}>
+                      {item.farmer.telephoneNo}
+                    </span>
                   </div>
                   <div className="col-lg">
-                    <span>ชื่อ</span><br/>
-                    <span>เบอร์</span>
+                    <span>10.0 ไร่</span>
                   </div>
-                  <div className="col-lg-2">
-                    <span>จำนวนไร่เกษตร</span>
+                  <div className="col-lg">
+                    <span>กรุงเทพมหานคร</span>
                   </div>
-                  <div className="col-lg-2">
-                    <span>จังหวัดเกษตรกร</span>
-                  </div>
-                  <div className="col-lg-2">
+                  <div className="col-lg">
                     <span>
-                    <StarFilled
-                  style={{
-                    color: "#FFCA37",
-                    fontSize: "20px",
-                    marginRight: "10px",
-                  }}
-                />
-                {financial(item.reviewDronerAvg)}</span>
+                      <StarFilled
+                        style={{
+                          color: "#FFCA37",
+                          fontSize: "20px",
+                          marginRight: "10px",
+                        }}
+                      />
+                      {financial(item.reviewDronerAvg)}
+                    </span>
                   </div>
-                  <div className="col-lg-2">
-                  <ActionButton
-                icon={<FileTextOutlined />}
-                color={color.primary1}
-                onClick={() =>
-                  (window.location.href = "/DetailWorkDroner?="+ item.id )
-                }
-              />
+                  <div className="col-lg">
+                    <ActionButton
+                      icon={<FileTextOutlined />}
+                      color={color.primary1}
+                      onClick={() =>
+                        (window.location.href = "/DetailWorkDroner?=" + item.id)
+                      }
+                    />
                   </div>
                 </div>
               ))}

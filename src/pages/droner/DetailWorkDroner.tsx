@@ -21,18 +21,32 @@ import bth_img_empty from "../../resource/media/empties/upload_Img_btn.png";
 import TextArea from "antd/lib/input/TextArea";
 import icon from "../../resource/icon";
 import moment from "moment";
+import { taskDetailEntity, taskDetailEntity_INIT } from "../../entities/DronerRankEntities";
+import { DronerRankDatasource } from "../../datasource/DronerRankDatasource";
 
+const _ = require("lodash");
+let queryString = _.split(window.location.search, "=");
 function DetailWorkDroner() {
+  const taskId = queryString[1];
+  const [data, setData] = useState<taskDetailEntity>(
+    taskDetailEntity_INIT
+  );
   const [imgWorkDroner, setImgWorkDroner] = useState<any>(false);
   const [mapPosition, setMapPosition] = useState<{ lat: number; lng: number }>({
     lat: LAT_LNG_BANGKOK.lat,
     lng: LAT_LNG_BANGKOK.lng,
   });
 
-  const onChangeDroner = () => {};
-  const previewDroner = () => {};
-  const removeDroner = () => {};
+  const fetchTask = async() => {
+    await DronerRankDatasource.getTaskDetail(taskId).then((res) => {
+      console.log(res)
 
+    })
+  }
+
+  useEffect(() => {
+    fetchTask();
+  }, []);
   const renderAppointment = (
     <Form style={{ padding: "32px" }}>
       <div className="row">
@@ -78,43 +92,9 @@ function DetailWorkDroner() {
               className="hiddenFileInput"
               style={{
                 backgroundImage: `url(${imgWorkDroner})`,
-                display: imgWorkDroner != false ? "block" : "none",
+                display: imgWorkDroner != false ? imgWorkDroner : false,
               }}
             ></div>
-          </div>
-          <div className="text-left ps-4">
-            {imgWorkDroner != false && (
-              <>
-                <Tag
-                  color={color.Success}
-                  onClick={previewDroner}
-                  style={{ cursor: "pointer", borderRadius: "5px" }}
-                >
-                  View
-                </Tag>
-                <Tag
-                  color={color.Error}
-                  onClick={removeDroner}
-                  style={{ cursor: "pointer", borderRadius: "5px" }}
-                >
-                  Remove
-                </Tag>
-              </>
-            )}
-          </div>
-          <div
-            className="hiddenFileBtn"
-            style={{
-              backgroundImage: `url(${bth_img_empty})`,
-              display: imgWorkDroner == false ? "block" : "none",
-            }}
-          >
-            <input
-              required
-              type="file"
-              title="เลือกรูป"
-              onChange={onChangeDroner}
-            />
           </div>
         </div>
         <div className="col-lg-1"></div>
@@ -279,7 +259,7 @@ function DetailWorkDroner() {
         />
         <span className="pt-4">
           <strong style={{ fontSize: "20px" }}>
-            รายละเอียดงาน #TK00000001
+            รายละเอียดงาน 
           </strong>
         </span>
       </Row>

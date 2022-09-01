@@ -1,4 +1,6 @@
-import { taskByDronerEntity, taskByDronerEntity_INIT } from './TaskEnities';
+import { DronerEntity, DronerEntity_INIT } from './DronerEntities';
+import { FarmerPlotEntity, FarmerPlotEntity_INIT } from './FarmerPlotEntities';
+import { FarmerEntity, FarmerEntity_INIT } from "./FarmerEntities";
 import { FullAddressEntiry_INIT, FullAddressEntity } from "./AddressEntities";
 
 export interface AllDronerRankEntity {
@@ -95,6 +97,86 @@ export const AllDronerRankEntity_INIT: AllDronerRankEntity = {
   totalTaskCount: 0,
   totalRaiCount: 0,
 };
+export interface taskByDronerEntity {
+  id: string;
+  taskNo: string;
+  farmerId: string;
+  farmerPlotId: string;
+  farmAreaAmount: string;
+  dronerId: string;
+  purposeSprayId: null;
+  dateAppointment: string;
+  targetSpray: string;
+  preparationBy: string;
+  createdAt: string;
+  updatedAt: string;
+  createBy: string;
+  updateBy: string;
+  distance: string;
+  status: string;
+  statusRemark: string;
+  reviewDronerAvg: string;
+  reviewDronerDetail: {
+    avg: number;
+    taskId: string;
+    comment: string;
+    canReview: string;
+    punctuality: string;
+    pilotEtiquette: string;
+    sprayExpertise: string;
+  };
+  unitPriceStandard: null;
+  priceStandard: null;
+  unitPrice: null;
+  price: null;
+  totalPrice: null;
+  fee: null;
+  discountFee: null;
+  reviewFarmerScore: string;
+  reviewFarmerComment: string;
+  imagePathFinishTask: string;
+  farmer: FarmerEntity;
+}
+export const taskByDronerEntity_INIT: taskByDronerEntity = {
+  id: "",
+  taskNo: "",
+  farmerId: "",
+  farmerPlotId: "",
+  farmAreaAmount: "",
+  dronerId: "",
+  purposeSprayId: null,
+  dateAppointment: "",
+  targetSpray: "",
+  preparationBy: "",
+  createdAt: "",
+  updatedAt: "",
+  createBy: "",
+  updateBy: "",
+  distance: "",
+  status: "",
+  statusRemark: "",
+  reviewDronerAvg: "",
+  reviewDronerDetail: {
+    avg: 0,
+    taskId: "",
+    comment: "",
+    canReview: "",
+    punctuality: "",
+    pilotEtiquette: "",
+    sprayExpertise: "",
+  },
+  unitPriceStandard: null,
+  priceStandard: null,
+  unitPrice: null,
+  price: null,
+  totalPrice: null,
+  fee: null,
+  discountFee: null,
+  reviewFarmerScore: "",
+  reviewFarmerComment: "",
+  imagePathFinishTask: "",
+  farmer: FarmerEntity_INIT,
+};
 export interface DronerRankDetailEntity {
   id: string;
   dronerCode: null;
@@ -104,8 +186,8 @@ export interface DronerRankDetailEntity {
   telephoneNo: string;
   status: string;
   reason: null;
-  expYear: 0;
-  expMonth: 0;
+  expYear: number;
+  expMonth: number;
   expPlant: string[];
   addressId: string;
   dronerAreaId: string;
@@ -117,7 +199,7 @@ export interface DronerRankDetailEntity {
   totalTaskCount: string;
   totalRaiCount: string;
 }
-export const  DronerRankDetailEntity_INIT: DronerRankDetailEntity = {
+export const DronerRankDetailEntity_INIT: DronerRankDetailEntity = {
   id: "",
   dronerCode: null,
   firstname: "",
@@ -138,9 +220,95 @@ export const  DronerRankDetailEntity_INIT: DronerRankDetailEntity = {
   avgrating: "",
   totalTaskCount: "",
   totalRaiCount: "",
-
-}
+};
 export interface DronerRankListEntity {
   data: AllDronerRankEntity[];
   count: number;
+}
+export interface taskDetailEntity {
+  id: string;
+  taskNo: string;
+  farmerId: string;
+  farmerPlotId: string;
+  farmAreaAmount: string;
+  dronerId: string;
+  purposeSprayId: string;
+  dateAppointment:string;
+  targetSpray: null;
+  preparationBy: string;
+  createdAt: string;
+  updatedAt: string;
+  createBy: string;
+  updateBy: string;
+  distance: null;
+  status: string;
+  statusRemark: string;
+  reviewDronerAvg: string;
+  reviewDronerDetail: {
+    avg: number;
+    taskId: string;
+    comment:string;
+    canReview: string;
+    punctuality: string;
+    pilotEtiquette: string;
+    sprayExpertise: string;
+  };
+  unitPriceStandard: null;
+  priceStandard: null;
+  unitPrice: null;
+  price: null;
+  totalPrice: null;
+  fee: null;
+  discountFee: null;
+  reviewFarmerScore: null;
+  reviewFarmerComment: null;
+  imagePathFinishTask: null;
+  comment: null;
+  farmer:FarmerEntity;
+  farmerPlot: FarmerPlotEntity;
+  droner: DronerEntity;
+}
+export const taskDetailEntity_INIT : taskDetailEntity = {
+  id: "",
+  taskNo: "",
+  farmerId: "",
+  farmerPlotId: "",
+  farmAreaAmount: "",
+  dronerId: "",
+  purposeSprayId: "",
+  dateAppointment:"",
+  targetSpray: null,
+  preparationBy: "",
+  createdAt: "",
+  updatedAt: "",
+  createBy: "",
+  updateBy: "",
+  distance: null,
+  status: "",
+  statusRemark: "",
+  reviewDronerAvg: "",
+  reviewDronerDetail: {
+    avg: 0,
+    taskId: "",
+    comment:"",
+    canReview: "",
+    punctuality: "",
+    pilotEtiquette: "",
+    sprayExpertise: "",
+  },
+  unitPriceStandard: null,
+  priceStandard: null,
+  unitPrice: null,
+  price: null,
+  totalPrice: null,
+  fee: null,
+  discountFee: null,
+  reviewFarmerScore: null,
+  reviewFarmerComment: null,
+  imagePathFinishTask: null,
+  comment: null,
+  farmer:FarmerEntity_INIT,
+  farmerPlot: FarmerPlotEntity_INIT,
+  droner: DronerEntity_INIT
+
 }

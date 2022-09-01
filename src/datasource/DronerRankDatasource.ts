@@ -1,4 +1,4 @@
-import { DronerRankDetailEntity, DronerRankListEntity} from './../entities/DronerRankEntities';
+import { DronerRankDetailEntity, DronerRankListEntity, taskDetailEntity } from './../entities/DronerRankEntities';
 import { BASE_URL, httpClient } from "../config/develop-config";
 export class DronerRankDatasource {
   static getDronerRank(
@@ -39,6 +39,16 @@ export class DronerRankDatasource {
   static getDronerRankById(id: string): Promise<DronerRankDetailEntity> {
     return httpClient
       .get(BASE_URL + "/tasks/droner-ranking/get-droner-detail/" + id)
+      .then((response) => {
+        return response.data;
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  }
+  static getTaskDetail(id: string): Promise<taskDetailEntity> {
+    return httpClient
+      .get(BASE_URL + "/tasks/droner-ranking/get-task-detail/" + id)
       .then((response) => {
         return response.data;
       })
