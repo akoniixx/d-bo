@@ -327,7 +327,6 @@ function EditDroneList() {
       (x) => x != ""
     );
     const pushTextReasons = Map(data).set("reason", setTextReason);
-    console.log(pushTextReasons.toJS());
     await DronerDroneDatasource.updateDroneList(pushTextReasons.toJS()).then(
       (res) => {
         if (res != undefined) {
