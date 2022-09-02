@@ -21,6 +21,7 @@ import AddAdmin from "./pages/admin/AddAdmin";
 import EditAdmin from "./pages/admin/EditAdmin";
 import ProtectRoute from "./ProtectRoute";
 import PublicRoute from "./PublicRoute";
+import IndexFinishTask from "./pages/followWork/IndexFinishTask";
 
 const WebRoutes: React.FC<any> = () => {
   return (
@@ -30,6 +31,7 @@ const WebRoutes: React.FC<any> = () => {
           <Route path="*" element={<Navigate to="/HomePage" />} />
           <Route path="/HomePage" element={<HomePage />} />
           <Route path="/OverviewPage" element={<OverviewPage />} />
+          <Route path="/IndexFinishTask" element={<IndexFinishTask />} />
           <Route path="/IndexDroner" element={<IndexDroner />} />
           <Route path="/IndexFarmer" element={<IndexFarmer />} />
           <Route path="/TotalIncomePage" element={<TotalIncomePage />} />
