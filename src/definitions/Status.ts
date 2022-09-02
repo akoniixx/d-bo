@@ -34,8 +34,9 @@ export const STATUS_NEWTASK_MAPPING: any = {
 };
 export const NEWTASK_STATUS_SEARCH = [
   { value: "WAIT_RECEIVE", name: "ไม่มีนักบินรับงาน" },
-  { value: "WAIT_START", name: "รอนักบินโดรนรับงาน" },
+  { value: "WAIT_RECEIVE", name: "รอนักบินโดรนรับงาน" },
 ];
 export const STATUS_NEWTASK_COLOR_MAPPING: any = {
-  WAIT_RECEIVE: color.Error,
+  ไม่มีนักบินรับงาน: color.Error,
+  รอนักบินโดรนรับงาน: "#EA973E",
 };

@@ -106,8 +106,17 @@ const ModalSelectedDroner: React.FC<ModalSelectedDronerProps> = ({
         return {
           children: (
             <>
-              <span style={{ color: "สะดวก" ? color.Success : color.Error }}>
-                <Badge color={"สะดวก" ? color.Success : color.Error} />
+              <span
+                style={{
+                  color:
+                    row.droner_status == "สะดวก" ? color.Success : color.Error,
+                }}
+              >
+                <Badge
+                  color={
+                    row.droner_status == "สะดวก" ? color.Success : color.Error
+                  }
+                />
                 {row.droner_status}
                 <br />
               </span>

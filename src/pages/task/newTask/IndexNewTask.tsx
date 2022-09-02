@@ -4,15 +4,7 @@ import {
   EditOutlined,
   UserOutlined,
 } from "@ant-design/icons";
-import {
-  Badge,
-  Button,
-  DatePicker,
-  Dropdown,
-  Menu,
-  Select,
-  Table,
-} from "antd";
+import { Badge, Button, DatePicker, Dropdown, Menu, Select, Table } from "antd";
 import Search from "antd/lib/input/Search";
 import moment from "moment";
 import React, { useEffect, useState } from "react";
@@ -109,7 +101,6 @@ const IndexNewTask = () => {
       ]}
     />
   );
-
   const pageTitle = (
     <div
       className="container d-flex justify-content-between"
@@ -167,7 +158,6 @@ const IndexNewTask = () => {
       </div>
     </div>
   );
-
   const columns = [
     {
       title: "วัน/เวลานัดหมาย",
@@ -281,9 +271,11 @@ const IndexNewTask = () => {
         return {
           children: (
             <>
-              <span style={{ color: STATUS_NEWTASK_COLOR_MAPPING[row.status] }}>
-                <Badge color={STATUS_NEWTASK_COLOR_MAPPING[row.status]} />
-                {STATUS_NEWTASK_MAPPING[row.status]}
+              <span
+                style={{ color: STATUS_NEWTASK_COLOR_MAPPING[row.task_status] }}
+              >
+                <Badge color={STATUS_NEWTASK_COLOR_MAPPING[row.task_status]} />
+                {row.task_status}
               </span>
               <br />
               <span style={{ color: color.Grey }}>
@@ -329,7 +321,7 @@ const IndexNewTask = () => {
             size="large"
             tableLayout="fixed"
             rowClassName={(a) =>
-              a.status == "WAIT_RECEIVE"
+              a.task_status == "ไม่มีนักบินรับงาน"
                 ? "table-row-older"
                 : "table-row-lasted"
             }

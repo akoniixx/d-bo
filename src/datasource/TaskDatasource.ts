@@ -45,7 +45,6 @@ export class TaskDatasource {
     return httpClient
       .post(BASE_URL + "/tasks/task", data)
       .then((response) => {
-        console.log("response", response.data);
         return response.data;
       })
       .catch((error) => {
