@@ -1,6 +1,16 @@
 import React, { useEffect, useState } from "react";
 import Layout from "../../components/layout/Layout";
-import { Row, Form, Input, Select, Radio, Space, Tag, Checkbox } from "antd";
+import {
+  Row,
+  Form,
+  Input,
+  Select,
+  Radio,
+  Space,
+  Tag,
+  Checkbox,
+  message,
+} from "antd";
 
 import { CardContainer } from "../../components/card/CardContainer";
 import color from "../../resource/color";
@@ -31,6 +41,8 @@ import { formatDate } from "../../utilities/TextFormatter";
 import { MONTH_SALE } from "../../definitions/Month";
 import { REASON_CHECK, REASON_IS_CHECK } from "../../definitions/Reason";
 import img_empty from "../../resource/media/empties/uploadImg.png";
+import moment from "moment";
+import image from "../../resource/image";
 const { Option } = Select;
 const _ = require("lodash");
 const { Map } = require("immutable");
@@ -47,8 +59,6 @@ function EditDroneList() {
   const [searchSeriesDrone, setSearchSeriesDrone] = useState<DroneEntity[]>();
   const [saveBtnDisable, setBtnSaveDisable] = useState<boolean>(true);
   const [imgProfile, setImgProfile] = useState<any>();
-  const [createImgProfile, setCreateImgProfile] =
-    useState<ImageEntity>(ImageEntity_INTI);
   const [createLicenseDroner, setCreateLicenseDroner] =
     useState<ImageEntity>(ImageEntity_INTI);
   const [createLicenseDrone, setCreateLicenseDrone] =
@@ -119,55 +129,55 @@ function EditDroneList() {
     fetchDroneSeries();
   }, []);
   const handleBrand = (brand: string) => {
+    {
+      !brand || data.id !== brand
+        ? setBtnSaveDisable(true)
+        : setBtnSaveDisable(false);
+    }
     let filterSeries = seriesDrone?.filter((x) => x.droneBrandId == brand);
     setSearchSeriesDrone(filterSeries);
     const m = Map(data.drone).set("droneBrandId", brand);
     const t = Map(data).set("drone", m.toJS());
     setData(t.toJS());
-    checkValidate(m.toJS());
   };
   const handleSeries = async (id: string) => {
+    {
+      !id ? setBtnSaveDisable(true) : setBtnSaveDisable(false);
+    }
     const m = Map(data).set("droneId", id);
     setData(m.toJS());
-    checkValidate(m.toJS());
   };
   const handleSerialNo = async (e: any) => {
+    {
+      !e.target.value ? setBtnSaveDisable(true) : setBtnSaveDisable(false);
+    }
     const m = Map(data).set("serialNo", e.target.value);
     setData(m.toJS());
-    checkValidate(m.toJS());
   };
   const handleChangeStatus = (e: any) => {
+    {
+      e.target.value == "REJECTED" || e.target.value == "INACTIVE"
+        ? setBtnSaveDisable(true)
+        : setBtnSaveDisable(false);
+    }
     const m = Map(data).set("status", e.target.value);
     const n = Map(m.toJS()).set("reason", []);
-    setTextReason([""]);
-    setTextReasonMore([""]);
     setData(n.toJS());
-    checkValidate(n.toJS());
   };
   const handleMonth = async (e: any) => {
     const m = Map(data).set("purchaseMonth", e);
     setData(m.toJS());
-    checkValidate(m.toJS());
+    setBtnSaveDisable(false);
   };
   const handleYear = async (e: any) => {
+    let year = moment().add(543, "year").format("YYYY");
+    {
+      e.target.value > year
+        ? setBtnSaveDisable(true)
+        : setBtnSaveDisable(false);
+    }
     const m = Map(data).set("purchaseYear", e.target.value);
     setData(m.toJS());
-    checkValidate(m.toJS());
-  };
-  const onChangeProfile = async (file: any) => {
-    let src = file.target.files[0];
-    src = await new Promise((resolve) => {
-      const reader = new FileReader();
-      reader.readAsDataURL(src);
-      reader.onload = () => resolve(reader.result);
-    });
-    setImgProfile(src);
-    checkValidate(data);
-    const d = Map(createImgProfile).set("file", file.target.files[0]);
-    const e = Map(d.toJS()).set("resource", "DRONER");
-    const f = Map(e.toJS()).set("category", "PROFILE_IMAGE");
-    const g = Map(f.toJS()).set("resourceId", dronerId);
-    setCreateImgProfile(g.toJS());
   };
   const onChangeReason = (e: any) => {
     let checked = e.target.checked;
@@ -181,72 +191,33 @@ function EditDroneList() {
         "reason",
         [...data.reason, value].filter((x) => x != "")
       );
+      setBtnSaveDisable(false);
     } else {
       let removeReason = data.reason.filter((x) => x != value);
       p = Map(data).set("reason", removeReason);
+      setBtnSaveDisable(true);
     }
     setData(p.toJS());
-    checkValidate(data);
   };
   const onChangeReasonText = async (
     e: React.ChangeEvent<HTMLTextAreaElement>
   ) => {
-    let value = e.target.value;
-    let p: any = "";
-    if (value) {
-      p = Map(data).set(
-        "reason",
-        [...data.reason, value].filter((x) => x != "")
-      );
+    if (e.target.value.trim().length != 0) {
+      setTextReason(e.target.value);
+      setBtnSaveDisable(false);
     } else {
-      let removeReason = data.reason.filter((x) => x != value);
-      p = Map(data).set("reason", removeReason);
+      setBtnSaveDisable(true);
     }
-    setData(p.toJS());
-    checkValidate(data);
   };
   const onChangeReasonTextMore = async (
     e: React.ChangeEvent<HTMLTextAreaElement>
   ) => {
-    let p: any = "";
-    if (e.target.value) {
-      p = Map(data).set(
-        "reason",
-        [...data.reason, e.target.value].filter((x) => x != "")
-      );
+    if (e.target.value.trim().length != 0) {
+      setTextReasonMore(e.target.value);
+      setBtnSaveDisable(false);
     } else {
-      let removeReason = data.reason.filter((x) => x != e.target.value);
-      p = Map(data).set("reason", removeReason);
+      setBtnSaveDisable(true);
     }
-    setData(p.toJS());
-    checkValidate(data);
-  };
-  const onPreviewProfile = async () => {
-    let src = imgProfile;
-    if (!src) {
-      src = await new Promise((resolve) => {
-        const reader = new FileReader();
-        reader.readAsDataURL(imgProfile);
-        reader.onload = () => resolve(reader.result);
-      });
-    }
-    const image = new Image();
-    image.src = src;
-    const imgWindow = window.open(src);
-    imgWindow?.document.write(image.outerHTML);
-  };
-  const removeImg = () => {
-    const getImg = data.droner.file.filter(
-      (x) => x.category == "PROFILE_IMAGE"
-    )[0];
-    if (getImg != undefined) {
-      UploadImageDatasouce.deleteImage(getImg.id, getImg.path).then(
-        (res) => {}
-      );
-    }
-    setCreateImgProfile(ImageEntity_INTI);
-    setImgProfile(undefined);
-    checkValidate(data);
   };
   const onChangeLicenseDroner = async (file: any) => {
     let src = file.target.files[0];
@@ -266,7 +237,7 @@ function EditDroneList() {
       g.toJS(),
     ]);
     setData(pushImg.toJS());
-    checkValidate(pushImg.toJS());
+    setBtnSaveDisable(false);
   };
   const previewLicenseDroner = async () => {
     let src = imgLicenseDroner;
@@ -283,15 +254,13 @@ function EditDroneList() {
     imgWindow?.document.write(image.outerHTML);
   };
   const removeLicenseDroner = () => {
-    const getImg = data.file.filter((x) => x.category == "DRONER_LICENSE")[0];
-    if (getImg != undefined) {
-      UploadImageDatasouce.deleteImage(getImg.id, getImg.path).then(
-        (res) => {}
-      );
-    }
-    setCreateLicenseDroner(ImageEntity_INTI);
+    const removeImg = data.file?.filter(
+      (x) => x.category != "DRONER_LICENSE"
+    )[0];
+    const d = Map(data).set("file", removeImg == undefined ? [] : [removeImg]);
+    setData(d.toJS());
     setImgLicenseDroner(false);
-    checkValidate(data);
+    setBtnSaveDisable(true);
   };
   const onChangeLicenseDrone = async (file: any) => {
     let src = file.target.files[0];
@@ -310,9 +279,8 @@ function EditDroneList() {
       ...data.file.filter((x) => x.file != ""),
       g.toJS(),
     ]);
-
     setData(pushImg.toJS());
-    checkValidate(pushImg.toJS());
+    setBtnSaveDisable(false);
   };
   const previewLicenseDrone = async () => {
     let src = imgLicenseDrone;
@@ -329,58 +297,62 @@ function EditDroneList() {
     imgWindow?.document.write(image.outerHTML);
   };
   const removeLicenseDrone = () => {
-    const getImg = data.file.filter((x) => x.category == "DRONE_LICENSE")[0];
-    if (getImg != undefined) {
-      UploadImageDatasouce.deleteImage(getImg.id, getImg.path).then(
-        (res) => {}
-      );
-    }
-    setCreateLicenseDrone(ImageEntity_INTI);
+    const removeImg = data.file?.filter(
+      (x) => x.category != "DRONE_LICENSE"
+    )[0];
+    const d = Map(data).set("file", removeImg == undefined ? [] : [removeImg]);
+    setData(d.toJS());
     setImgLicenseDrone(false);
-    checkValidate(data);
-  };
-  const checkValidate = (data: GetDronerDroneEntity) => {
-    let checkEmptySting = ![
-      data.droneId,
-      data.serialNo,
-      data.purchaseMonth,
-      data.purchaseYear,
-      data.status,
-    ].includes("");
-    let checkArrayEmpty = ![data.reason].includes([]);
-    if (checkEmptySting && checkArrayEmpty) {
-      setBtnSaveDisable(false);
-    } else {
-      setBtnSaveDisable(true);
-    }
+    setBtnSaveDisable(true);
   };
   const UpdateDronerDrone = async () => {
-    await DronerDroneDatasource.updateDroneList(data).then((res) => {
-      if (res != null) {
-        var i = 0;
-        for (i; 3 > i; i++) {
-          i == 0 &&
-            UploadImageDatasouce.uploadImage(createImgProfile).then(res);
-          i == 1 &&
-            UploadImageDatasouce.uploadImage(createLicenseDroner).then(res);
-          i == 2 &&
-            UploadImageDatasouce.uploadImage(createLicenseDrone).then(res);
-        }
-        Swal.fire({
-          title: "บันทึกสำเร็จ",
-          icon: "success",
-          timer: 1500,
-          showConfirmButton: false,
-        }).then((time) => {
-          window.location.href = "/DroneList";
-        });
+    let textReasonList = [];
+    if (textReason != undefined) {
+      let m = textReason.split(",");
+      for (let i = 0; m.length > i; i++) {
+        textReasonList.push(m[i]);
       }
-    });
+    }
+    if (textReasonMore != undefined) {
+      let m = textReasonMore.split(",");
+      for (let i = 0; m.length > i; i++) {
+        textReasonList.push(m[i]);
+      }
+    }
+    data.reason.push.apply(
+      data.reason,
+      textReasonList.filter((x) => x != "")
+    );
+    const setTextReason = Array.from(new Set(data.reason)).filter(
+      (x) => x != ""
+    );
+    const pushTextReasons = Map(data).set("reason", setTextReason);
+    await DronerDroneDatasource.updateDroneList(pushTextReasons.toJS()).then(
+      (res) => {
+        if (res != undefined) {
+          var i = 0;
+          for (i; 2 > i; i++) {
+            i == 0 &&
+              UploadImageDatasouce.uploadImage(createLicenseDroner).then(res);
+            i == 1 &&
+              UploadImageDatasouce.uploadImage(createLicenseDrone).then(res);
+          }
+          Swal.fire({
+            title: "บันทึกสำเร็จ",
+            icon: "success",
+            timer: 1500,
+            showConfirmButton: false,
+          }).then((time) => {
+            window.location.href = "/DroneList";
+          });
+        }
+      }
+    );
   };
   const renderFromData = (
     <div className="col-lg-7">
       <CardContainer>
-        <CardHeader textHeader="ข้อมูลโดรนเกษตรกร" />
+        <CardHeader textHeader="ข้อมูลโดรนเกษตร" />
         <Form key={data.droneId} style={{ padding: "32px" }}>
           <div className="row">
             <div className="form-group col-lg-6">
@@ -396,7 +368,7 @@ function EditDroneList() {
                 ยี่ห้อโดรนที่ฉีดพ่น <span style={{ color: "red" }}>*</span>
               </label>
               <Form.Item
-                name="droneId"
+                name="droneBrand"
                 rules={[
                   {
                     required: true,
@@ -497,6 +469,7 @@ function EditDroneList() {
           <div className="row">
             <div className="form-group col-lg-6 pb-5">
               <label>ใบอนุญาตนักบิน</label>
+              <span style={{ color: "red" }}>*</span>
               <span style={{ color: color.Disable }}> (ไฟล์รูป หรือ pdf.)</span>
               <br />
               <div className="pb-2">
@@ -536,6 +509,7 @@ function EditDroneList() {
                 }}
               >
                 <input
+                  key={imgLicenseDroner}
                   type="file"
                   onChange={onChangeLicenseDroner}
                   title="เลือกรูป"
@@ -586,6 +560,7 @@ function EditDroneList() {
                 }}
               >
                 <input
+                  key={imgLicenseDrone}
                   required
                   type="file"
                   onChange={onChangeLicenseDrone}
@@ -600,7 +575,15 @@ function EditDroneList() {
               <label style={{ marginBottom: "10px" }}>
                 สถานะ <span style={{ color: "red" }}>*</span>
               </label>
-              <Form.Item name="status">
+              <Form.Item
+                name="status"
+                rules={[
+                  {
+                    required: true,
+                    message: "กรุณากรอกหมายเหตุ",
+                  },
+                ]}
+              >
                 <div className="row">
                   <div className="form-group col-lg-12">
                     <Radio.Group
@@ -642,7 +625,7 @@ function EditDroneList() {
                                   <Form.Item style={{ width: "530px" }}>
                                     <TextArea
                                       rows={3}
-                                      onBlur={onChangeReasonText}
+                                      onChange={onChangeReasonText}
                                       placeholder="กรอกเหตุผล/หมายเหตุเพิ่มเติม"
                                       autoComplete="off"
                                       defaultValue={data.reason.filter(
@@ -659,7 +642,7 @@ function EditDroneList() {
                                       style={{ width: "530px" }}
                                       className="col-lg-12"
                                       rows={3}
-                                      onBlur={onChangeReasonTextMore}
+                                      onChange={onChangeReasonTextMore}
                                       placeholder="กรอกเหตุผล/หมายเหตุเพิ่มเติม"
                                       autoComplete="off"
                                       defaultValue={data.reason}
@@ -693,36 +676,10 @@ function EditDroneList() {
                   className="hiddenFileInput zoom"
                   style={{
                     backgroundImage: `url(${
-                      imgProfile == undefined ? img_empty : imgProfile
+                      imgProfile == undefined ? image.empty_img : imgProfile
                     })`,
                   }}
-                >
-                  <input
-                    type="file"
-                    onChange={onChangeProfile}
-                    title="เลือกรูป"
-                  />
-                </div>
-                <div>
-                  {imgProfile != undefined && (
-                    <>
-                      <Tag
-                        color={color.Success}
-                        onClick={onPreviewProfile}
-                        style={{ cursor: "pointer", borderRadius: "5px" }}
-                      >
-                        View
-                      </Tag>
-                      <Tag
-                        color={color.Error}
-                        onClick={removeImg}
-                        style={{ cursor: "pointer", borderRadius: "5px" }}
-                      >
-                        Remove
-                      </Tag>
-                    </>
-                  )}
-                </div>
+                ></div>
               </div>
             </div>
             <div className="row">
