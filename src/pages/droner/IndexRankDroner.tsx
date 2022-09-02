@@ -389,6 +389,7 @@ export default function IndexRankDroner() {
       dataIndex: "avgrating",
       key: "avgrating",
       render: (value: any, row: any, index: number) => {
+        let rate = row.avgrating
         return {
           children: (
             <>
@@ -400,7 +401,7 @@ export default function IndexRankDroner() {
                     marginRight: "10px",
                   }}
                 />
-                {row.avgrating}
+                {rate != null? financial(row.avgrating) : 0}
               </span>
             </>
           ),
@@ -417,7 +418,7 @@ export default function IndexRankDroner() {
         return {
           children: (
             <span className="text-dark-75  d-block font-size-lg">
-              {subdistrict !== undefined ? subdistrict : null}
+              {subdistrict != null ? subdistrict : "-"}
             </span>
           ),
         };
@@ -434,7 +435,7 @@ export default function IndexRankDroner() {
           children: (
             <div className="container">
               <span className="text-dark-75  d-block font-size-lg">
-                {district !== undefined ? district : null}
+                {district !== null ? district : "-"}
               </span>
             </div>
           ),
@@ -452,7 +453,7 @@ export default function IndexRankDroner() {
           children: (
             <div className="container">
               <span className="text-dark-75  d-block font-size-lg">
-                {province !== undefined ? province : null}
+                {province !== null ? province : "-"}
               </span>
             </div>
           ),

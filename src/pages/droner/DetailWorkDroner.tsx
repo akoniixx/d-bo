@@ -1,52 +1,82 @@
 import Layout from "../../components/layout/Layout";
 import React, { useEffect, useState } from "react";
-import {
-  Badge,
-  DatePicker,
-  Form,
-  Image,
-  Input,
-  Row,
-  Select,
-  Tag,
-  TimePicker,
-} from "antd";
+import { Badge, Form, Image, Input, Row, Select, Tag, Upload } from "antd";
 import { BackIconButton } from "../../components/button/BackButton";
 import { CardContainer } from "../../components/card/CardContainer";
 import { CardHeader } from "../../components/header/CardHearder";
 import color from "../../resource/color";
 import GoogleMap from "../../components/map/GoogleMap";
 import { LAT_LNG_BANGKOK } from "../../definitions/Location";
-import bth_img_empty from "../../resource/media/empties/upload_Img_btn.png";
 import TextArea from "antd/lib/input/TextArea";
-import icon from "../../resource/icon";
 import moment from "moment";
-import { taskDetailEntity, taskDetailEntity_INIT } from "../../entities/DronerRankEntities";
+import {
+  taskDetailEntity,
+  taskDetailEntity_INIT,
+} from "../../entities/DronerRankEntities";
 import { DronerRankDatasource } from "../../datasource/DronerRankDatasource";
-
+import {
+  AddressEntity,
+  AddressEntity_INIT,
+} from "../../entities/AddressEntities";
+import {
+  StarFilled,
+  CalendarOutlined,
+  ClockCircleOutlined,
+} from "@ant-design/icons";
 const _ = require("lodash");
 let queryString = _.split(window.location.search, "=");
+const dateFormat = "DD/MM/YYYY";
+const timeFormat = "HH:mm";
+
 function DetailWorkDroner() {
   const taskId = queryString[1];
-  const [data, setData] = useState<taskDetailEntity>(
-    taskDetailEntity_INIT
-  );
-  const [imgWorkDroner, setImgWorkDroner] = useState<any>(false);
+  const [data, setData] = useState<taskDetailEntity>(taskDetailEntity_INIT);
+  const [address, setAddress] = useState<AddressEntity>(AddressEntity_INIT);
+  let imgList: (string | boolean)[] = [];
   const [mapPosition, setMapPosition] = useState<{ lat: number; lng: number }>({
     lat: LAT_LNG_BANGKOK.lat,
     lng: LAT_LNG_BANGKOK.lng,
   });
 
-  const fetchTask = async() => {
+  const fetchTask = async () => {
     await DronerRankDatasource.getTaskDetail(taskId).then((res) => {
-      console.log(res)
-
-    })
-  }
+      console.log(res);
+      setData(res);
+      setAddress(res.droner.address);
+      setMapPosition({
+        lat: parseFloat(res.farmerPlot.lat),
+        lng: parseFloat(res.farmerPlot.long),
+      });
+    });
+  };
 
   useEffect(() => {
     fetchTask();
   }, []);
+
+  const financial = (e: any) => {
+    return Number.parseFloat(e).toFixed(1);
+  };
+  const formatNumber = (e: any) => {
+    let formatNumber = Number(e)
+      .toFixed(1)
+      .replace(/\d(?=(\d{3})+\.)/g, "$&,");
+    let splitArray = formatNumber.split(".");
+    if (splitArray.length > 1) {
+      formatNumber = splitArray[0];
+    }
+    return formatNumber;
+  };
+  const starIcon = (
+    <StarFilled
+      style={{
+        color: "#FFCA37",
+        fontSize: "20px",
+        marginRight: "10px",
+      }}
+    />
+  );
+
   const renderAppointment = (
     <Form style={{ padding: "32px" }}>
       <div className="row">
@@ -55,20 +85,26 @@ function DetailWorkDroner() {
             <div className="col-lg-6">
               <label>วันที่นัดหมาย</label>
               <Form.Item>
-                <DatePicker
+                <Input
                   style={{ width: "100%" }}
-                  placeholder="18/05/2565"
+                  value={moment(new Date(data.dateAppointment)).format(
+                    dateFormat
+                  )}
                   disabled
+                  suffix={<CalendarOutlined />}
                 />
               </Form.Item>
             </div>
             <div className="col-lg-6">
               <label>เวลานัดหมาย</label>
               <Form.Item>
-                <TimePicker
+                <Input
                   style={{ width: "100%" }}
-                  placeholder="11:00"
+                  value={moment(new Date(data.dateAppointment)).format(
+                    timeFormat
+                  )}
                   disabled
+                  suffix={<ClockCircleOutlined />}
                 />
               </Form.Item>
             </div>
@@ -79,11 +115,15 @@ function DetailWorkDroner() {
           </Form.Item>
           <label>เป้าหมายการฉีดพ่น</label>
           <Form.Item>
-            <span style={{ color: color.Grey }}>หญ้า, หนอน</span>
+            <span style={{ color: color.Grey }}>
+              {data.targetSpray ? data.targetSpray : "-"}
+            </span>
           </Form.Item>
           <label>การเตรียมยา</label>
           <Form.Item>
-            <span style={{ color: color.Grey }}>เกษตรกรเตรียมยาเอง</span>
+            <span style={{ color: color.Grey }}>
+              {data.preparationBy ? data.preparationBy : "-"}
+            </span>
           </Form.Item>
           <label>ภาพงานจากนักบินโดรน</label>
           <br />
@@ -91,52 +131,86 @@ function DetailWorkDroner() {
             <div
               className="hiddenFileInput"
               style={{
-                backgroundImage: `url(${imgWorkDroner})`,
-                display: imgWorkDroner != false ? imgWorkDroner : false,
+                backgroundImage: `url(${data.imagePathFinishTask})`,
+                display: data.imagePathFinishTask != false ? "block" : "none",
               }}
             ></div>
           </div>
+
+          <br />
+          <label>หมายเหตุ</label>
+          <Form.Item>
+            <span style={{ color: color.Grey }}>
+              {" "}
+              -{/* {data.preparationBy ? data.preparationBy : "-"} */}
+            </span>
+          </Form.Item>
         </div>
         <div className="col-lg-1"></div>
         <div className="col-lg-5">
           <label>ค่าบริการ</label>
-          <Form.Item style={{ color: color.Grey, margin: "10px" }}>
-            <span>1,000 บาท (จำนวน 20 ไร่)</span>
-          </Form.Item>
-          <label style={{ marginRight: "30px" }}>คะแนนรีวิว </label>
-          <span>
-            {" "}
-            <img alt="logo" src={icon.iconStar} width="5%" /> 4.0
-          </span>
-          <Form.Item style={{ color: color.Grey, margin: "10px" }}>
-            <div className="row">
-              <div className="col-lg-6">1. มารยาทนักบิน </div>
-              <div className="col-lg-6">
-                <img alt="logo" src={icon.iconStar} width="10%" /> 4.0
-              </div>
-            </div>
-            <div className="row">
-              <div className="col-lg-6">2. ความตรงต่อเวลา </div>
-              <div className="col-lg-6">
-                <img alt="logo" src={icon.iconStar} width="10%" /> 4.0
-              </div>
-            </div>
-            <div className="row">
-              <div className="col-lg-6">3. ความเชี่ยวชาญในการพ่น </div>
-              <div className="col-lg-6">
-                <img alt="logo" src={icon.iconStar} width="10%" /> 4.0
-              </div>
-            </div>
-          </Form.Item>
-          <label></label>
           <Form.Item style={{ color: color.Grey }}>
-            <TextArea rows={3} disabled placeholder="นักบินทำงานดี" />
+            <span>{financial(data.unitPrice) + " " + "บาท"}</span>{" "}
+            <span>{"(จำนวน" + " " + data.farmAreaAmount + " " + "ไร่)"}</span>
+          </Form.Item>
+          <br />
+          <Form.Item>
+            <label style={{ marginRight: "30px" }}>คะแนนรีวิว </label>
+            <span>
+              {" "}
+              {starIcon}
+              {financial(data.reviewDronerAvg)}
+            </span>
+            <div className="row">
+              <div className="col-lg-6" style={{ color: color.Grey }}>
+                1. มารยาทนักบิน{" "}
+              </div>
+              <div className="col-lg-6">
+                {starIcon}
+                {data.reviewDronerDetail != null
+                  ? financial(data.reviewDronerDetail.pilotEtiquette)
+                  : 0}
+              </div>
+            </div>
+            <div className="row">
+              <div className="col-lg-6" style={{ color: color.Grey }}>
+                2. ความตรงต่อเวลา{" "}
+              </div>
+              <div className="col-lg-6">
+                {starIcon}
+                {data.reviewDronerDetail != null
+                  ? financial(data.reviewDronerDetail.punctuality)
+                  : 0}
+              </div>
+            </div>
+            <div className="row">
+              <div className="col-lg-6" style={{ color: color.Grey }}>
+                3. ความเชี่ยวชาญในการพ่น{" "}
+              </div>
+              <div className="col-lg-6">
+                {starIcon}
+                {data.reviewDronerDetail != null
+                  ? financial(data.reviewDronerDetail.sprayExpertise)
+                  : 0}
+              </div>
+            </div>
+          </Form.Item>
+          <Form.Item>
+            <TextArea
+              rows={3}
+              disabled
+              value={
+                data.reviewDronerDetail != null
+                  ? data.reviewDronerDetail.comment
+                  : undefined
+              }
+            />
           </Form.Item>
           <label>สถานะ</label>
           <Form.Item>
             <span style={{ color: color.Success }}>
               <Badge color={color.Success} />
-              เสร็จสิ้น
+              {data.status == "DONE" ? "เสร็จสิ้น" : null}
               <br />
             </span>
           </Form.Item>
@@ -145,19 +219,24 @@ function DetailWorkDroner() {
     </Form>
   );
   const renderFarmer = (
-    <Form>
+    <Form key={data.farmerId}>
       <div className="container text-center" style={{ padding: "30px" }}>
         <div className="row">
           <div className="col-lg-4 text-start">
             <label>ชื่อ-นามสกุล</label>
             <Form.Item>
-              <Input disabled placeholder="นามี มีนาเยอะ" />
+              <Input
+                disabled
+                defaultValue={
+                  data.farmer.firstname + " " + data.farmer.lastname
+                }
+              />
             </Form.Item>
           </div>
           <div className="col-lg-4 text-start">
             <label>เบอร์โทร</label>
             <Form.Item>
-              <Input disabled placeholder="0989284761" />
+              <Input disabled defaultValue={data.farmer.telephoneNo} />
             </Form.Item>
           </div>
         </div>
@@ -165,19 +244,23 @@ function DetailWorkDroner() {
           <div className="col-lg-4 text-start">
             <label>แปลง</label>
             <Form.Item>
-              <Select disabled placeholder="นามี มีนาเยอะ 1" />
+              <Select disabled defaultValue={data.farmerPlot.plotName} />
             </Form.Item>
           </div>
           <div className="col-lg-4 text-start">
             <label>พืชที่ปลูก</label>
             <Form.Item>
-              <Input disabled placeholder="ข้าว" />
+              <Input disabled defaultValue={data.farmerPlot.plantName} />
             </Form.Item>
           </div>
           <div className="col-lg-4 text-start">
             <label>จำนวนไร่</label>
             <Form.Item>
-              <Input disabled placeholder="100 ไร่" />
+              <Input
+                disabled
+                defaultValue={data.farmerPlot.raiAmount}
+                suffix="ไร่"
+              />
             </Form.Item>
           </div>
         </div>
@@ -214,10 +297,7 @@ function DetailWorkDroner() {
           <div className="col-lg-12 text-start">
             <label>จุดสังเกต</label>
             <Form.Item>
-              <Input
-                disabled
-                placeholder="ข้างโรงเรียน บ้านน้อยซอยลึก วิทยาคม"
-              />
+              <Input disabled value={data.farmerPlot.landmark} />
             </Form.Item>
           </div>
         </div>
@@ -229,16 +309,21 @@ function DetailWorkDroner() {
       <div className="row">
         <div className="col-lg-3">
           <span>
-            โดรนเนอร์ พ่นปุ๋ย 2
+            {data.droner.firstname + " " + data.droner.lastname}
             <br />
-            <p style={{ fontSize: "12px", color: color.Grey }}>DN00000001</p>
+            <p style={{ fontSize: "12px", color: color.Grey }}>
+              {data.droner.dronerCode}
+            </p>
           </span>
         </div>
         <div className="col-lg-3">
-          <span>0989284761</span>
+          <span>{data.droner.telephoneNo}</span>
         </div>
         <div className="col-lg-4">
           <span>สวนพริกไทย, เมืองปทุมธานี, กรุงเทพมหานคร</span>
+          {/* {data.address != null
+              ? data.address.subdistrict.subdistrictName
+              : "-"} */}
         </div>
         <div className="col-lg">
           <span>DJI</span>
@@ -250,16 +335,73 @@ function DetailWorkDroner() {
       </div>
     </Form>
   );
+  const renderPrice = (
+    <Form style={{ padding: "20px" }}>
+      <Form style={{ padding: "20px", backgroundColor: "#2196531A" }}>
+        <div className="row">
+          <div className="col-lg">
+            <Form.Item>
+              <span>
+                ยอดรวมค่าบริการ (หลังรวมค่าธรรมเนียม)
+                <br />
+                <b style={{ fontSize: "20px", color: color.Success }}>
+                  {formatNumber(data.totalPrice) + " " + "บาท"}
+                </b>
+              </span>
+            </Form.Item>
+          </div>
+        </div>
+        <div className="row">
+          <div className="col-lg-4">
+            <Form.Item>
+              <label>ค่าบริการ (ก่อนคิดค่าคำนวณ)</label>
+              <Input
+                disabled
+                value={
+                  data.totalPrice != undefined
+                    ? formatNumber(data.totalPrice)
+                    : undefined
+                }
+                suffix="บาท"
+              />
+            </Form.Item>
+          </div>
+          <div className="col-lg-4">
+            <Form.Item>
+              <label>ค่าธรรมเนียม (คิด 5% ของราคารวม)</label>
+              <Input disabled placeholder="0.0" suffix="บาท" />
+            </Form.Item>
+          </div>
+          <div className="col-lg-4">
+            <Form.Item>
+              <label>ส่วนลดค่าธรรมเนียม</label>
+              <Input
+                disabled
+                value={
+                  data.discountFee != undefined
+                    ? financial(data.discountFee)
+                    : undefined
+                }
+                suffix="บาท"
+              />
+            </Form.Item>
+          </div>
+        </div>
+      </Form>
+    </Form>
+  );
 
   return (
     <Layout>
       <Row>
         <BackIconButton
-          onClick={() => (window.location.href = "/DetailRankDroner")}
+          onClick={() =>
+            (window.location.href = "/DetailRankDroner?=" + data.dronerId)
+          }
         />
         <span className="pt-4">
           <strong style={{ fontSize: "20px" }}>
-            รายละเอียดงาน 
+            รายละเอียดงาน #{data.taskNo}
           </strong>
         </span>
       </Row>
@@ -276,6 +418,11 @@ function DetailWorkDroner() {
       <CardContainer>
         <CardHeader textHeader="รายชื่อนักบินโดรน" />
         {renderDroner}
+      </CardContainer>
+      <br />
+      <CardContainer>
+        <CardHeader textHeader="ยอดรวมค่าบริการ" />
+        {renderPrice}
       </CardContainer>
     </Layout>
   );

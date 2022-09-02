@@ -30,6 +30,7 @@ export interface DronerEntity {
   dronerDrone: DronerDroneEntity[];
   dronerArea: DronerAreaEntity;
   file: ImageEntity[];
+  dronerCode: null;
   createdAt: string;
   updatedAt: string;
   totalDroneCount: number;
@@ -50,6 +51,7 @@ export const DronerEntity_INIT: DronerEntity = {
   dronerDrone: [DronerDroneEntity_INIT],
   dronerArea: DronerAreaEntity_INIT,
   file: [ImageEntity_INTI],
+  dronerCode: null,
   createdAt: "",
   updatedAt: "",
   totalDroneCount: 0,

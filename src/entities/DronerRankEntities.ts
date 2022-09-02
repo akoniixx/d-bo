@@ -1,5 +1,6 @@
-import { DronerEntity, DronerEntity_INIT } from './DronerEntities';
-import { FarmerPlotEntity, FarmerPlotEntity_INIT } from './FarmerPlotEntities';
+import { ImageEntity, ImageEntity_INTI } from './UploadImageEntities';
+import { DronerEntity, DronerEntity_INIT } from "./DronerEntities";
+import { FarmerPlotEntity, FarmerPlotEntity_INIT } from "./FarmerPlotEntities";
 import { FarmerEntity, FarmerEntity_INIT } from "./FarmerEntities";
 import { FullAddressEntiry_INIT, FullAddressEntity } from "./AddressEntities";
 
@@ -195,6 +196,8 @@ export interface DronerRankDetailEntity {
   updatedAt: string;
   address: FullAddressEntity;
   task: taskByDronerEntity[];
+  farmer: FarmerEntity;
+  file: ImageEntity[];
   avgrating: string;
   totalTaskCount: string;
   totalRaiCount: string;
@@ -217,6 +220,8 @@ export const DronerRankDetailEntity_INIT: DronerRankDetailEntity = {
   updatedAt: "",
   address: FullAddressEntiry_INIT,
   task: [taskByDronerEntity_INIT],
+  file: [ImageEntity_INTI],
+  farmer : FarmerEntity_INIT,
   avgrating: "",
   totalTaskCount: "",
   totalRaiCount: "",
@@ -233,7 +238,7 @@ export interface taskDetailEntity {
   farmAreaAmount: string;
   dronerId: string;
   purposeSprayId: string;
-  dateAppointment:string;
+  dateAppointment: string;
   targetSpray: null;
   preparationBy: string;
   createdAt: string;
@@ -247,7 +252,7 @@ export interface taskDetailEntity {
   reviewDronerDetail: {
     avg: number;
     taskId: string;
-    comment:string;
+    comment: string;
     canReview: string;
     punctuality: string;
     pilotEtiquette: string;
@@ -264,11 +269,11 @@ export interface taskDetailEntity {
   reviewFarmerComment: null;
   imagePathFinishTask: null;
   comment: null;
-  farmer:FarmerEntity;
+  farmer: FarmerEntity;
   farmerPlot: FarmerPlotEntity;
   droner: DronerEntity;
 }
-export const taskDetailEntity_INIT : taskDetailEntity = {
+export const taskDetailEntity_INIT: taskDetailEntity = {
   id: "",
   taskNo: "",
   farmerId: "",
@@ -276,7 +281,7 @@ export const taskDetailEntity_INIT : taskDetailEntity = {
   farmAreaAmount: "",
   dronerId: "",
   purposeSprayId: "",
-  dateAppointment:"",
+  dateAppointment: "",
   targetSpray: null,
   preparationBy: "",
   createdAt: "",
@@ -290,7 +295,7 @@ export const taskDetailEntity_INIT : taskDetailEntity = {
   reviewDronerDetail: {
     avg: 0,
     taskId: "",
-    comment:"",
+    comment: "",
     canReview: "",
     punctuality: "",
     pilotEtiquette: "",
@@ -307,8 +312,7 @@ export const taskDetailEntity_INIT : taskDetailEntity = {
   reviewFarmerComment: null,
   imagePathFinishTask: null,
   comment: null,
-  farmer:FarmerEntity_INIT,
+  farmer: FarmerEntity_INIT,
   farmerPlot: FarmerPlotEntity_INIT,
-  droner: DronerEntity_INIT
-
-}
+  droner: DronerEntity_INIT,
+};

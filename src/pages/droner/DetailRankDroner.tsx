@@ -121,13 +121,19 @@ function DetailRankDroner() {
               <div className="col-lg-6">
                 <label>ชื่อ</label>
                 <Form.Item name="firstname">
-                  <Input disabled defaultValue={data.firstname} />
+                  <Input
+                    disabled
+                    defaultValue={data.firstname != null ? data.firstname : "-"}
+                  />
                 </Form.Item>
               </div>
               <div className="col-lg-6">
                 <label>นามสกุล</label>
                 <Form.Item name="lastname">
-                  <Input disabled defaultValue={data.lastname} />
+                  <Input
+                    disabled
+                    defaultValue={data.lastname != null ? data.lastname : "-"}
+                  />
                 </Form.Item>
               </div>
             </div>
@@ -135,7 +141,12 @@ function DetailRankDroner() {
               <div className="col-lg-6">
                 <label>เบอร์โทร</label>
                 <Form.Item name="telephoneNo">
-                  <Input disabled defaultValue={data.telephoneNo} />
+                  <Input
+                    disabled
+                    defaultValue={
+                      data.telephoneNo != null ? data.telephoneNo : "-"
+                    }
+                  />
                 </Form.Item>
               </div>
               <div className="col-lg-6">
@@ -143,7 +154,11 @@ function DetailRankDroner() {
                 <Form.Item name="subdistrictName">
                   <Input
                     disabled
-                    defaultValue={data.address.subdistrict.subdistrictName}
+                    defaultValue={
+                      data.address != null
+                        ? data.address.subdistrict.subdistrictName
+                        : "-"
+                    }
                   />
                 </Form.Item>
               </div>
@@ -154,14 +169,23 @@ function DetailRankDroner() {
                 <Form.Item name="districtName">
                   <Input
                     disabled
-                    defaultValue={data.address.district.districtName}
+                    defaultValue={
+                      data.address != null
+                        ? data.address.district.districtName
+                        : "-"
+                    }
                   />
                 </Form.Item>
               </div>
               <div className="col-lg-6">
                 <label>จังหวัด</label>
                 <Form.Item name="provinceName">
-                  <Input disabled defaultValue={data.address.province.region} />
+                  <Input
+                    disabled
+                    defaultValue={
+                      data.address != null ? data.address.province.region : "-"
+                    }
+                  />
                 </Form.Item>
               </div>
             </div>
@@ -226,7 +250,7 @@ function DetailRankDroner() {
                     </span>
                   </div>
                   <div className="col-lg">
-                    <span>10.0 ไร่</span>
+                    <span>{financial(item.farmAreaAmount) + " " + "ไร่"}</span>
                   </div>
                   <div className="col-lg">
                     <span>กรุงเทพมหานคร</span>
