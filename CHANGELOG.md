@@ -1,4 +1,11 @@
 ## [Version - 0]
+## Fix [v0.9.3] 2022-09-01
+- fixed disable button when data is incomplete
+- fixed edit image license droner,drone
+- fixed wording
+- fixed reason in status
+## Fix [v0.9.2] 2022-08-29
+- create function add reason when selected status 'INACTIVE' and 'REJECTED'
 ## Fix [v0.9.1] 2022-08-24
 - create drone list page
 - create drone list edit page

@@ -116,7 +116,6 @@ function EditDroner() {
 
   const fetchDronerById = async () => {
     await DronerDatasource.getDronerByID(dronerId).then((res) => {
-      console.log(res.reason);
       setData(res);
       setMapPosition({
         lat: parseFloat(res.dronerArea.lat),
@@ -229,7 +228,6 @@ function EditDroner() {
     let checked = e.target.checked;
     let value = e.target.value;
     let p = Map(data).set("reason", [value]);
-    console.log(p.toJS());
 
     setData(p.toJS());
     checkValidate(p.toJS());
@@ -336,7 +334,6 @@ function EditDroner() {
         "modalDroneIndex",
         dronerDroneList.length + 1
       );
-      console.log("result", pushId.toJS());
       setDronerDroneList([...dronerDroneList, pushId.toJS()]);
     } else {
       const m = dronerDroneList.filter(
