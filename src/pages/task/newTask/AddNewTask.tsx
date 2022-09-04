@@ -132,18 +132,13 @@ const AddNewTask = () => {
 
   //#region Step1 & Step3
   const handleSearchFarmer = (value: any, id: any) => {
-    console.log(farmerList?.filter((x) => x.id == id.id)[0]);
-    console.log(value);
     if (value != undefined) {
-      console.log(0);
       setFarmerSelected(farmerList?.filter((x) => x.id == id.id)[0]);
     } else {
-      console.log(1);
       setFarmerSelected(undefined);
     }
   };
   const handleSelectFarmer = () => {
-    console.log(farmerSelected?.id);
     const f = Map(createNewTask).set("farmerId", farmerSelected?.id);
     setCheckSelectPlot("error");
     setCreateNewTask(f.toJS());
@@ -162,9 +157,9 @@ const AddNewTask = () => {
     setFarmerPlotSelected(plotSelected);
     checkValidateStep(g.toJS(), current);
   };
-  const onSelectFarmer = (e: any) => {
+  const onSelectFarmer = (e: any, id: any) => {
     setFarmerSelected(undefined);
-    const findFarmer = farmerList?.filter((x) => x.id == e)[0];
+    const findFarmer = farmerList?.filter((x) => x.id == id.id)[0];
     setFarmerSelected(findFarmer);
   };
   const handlePeriodSpray = (e: any) => {
@@ -267,11 +262,10 @@ const AddNewTask = () => {
                         width: "100%",
                       }}
                       allowClear
-                      placeholder="ค้นหาชื่อเกษตรกร/เบอร์โทร/เลขบัตรปชช"
+                      placeholder="ค้นหาชื่อเกษตรกร/เบอร์โทร/เลขบัตรปชช."
                       onSearch={(e: any) => setSearchFarmer(e)}
                       onSelect={onSelectFarmer}
                       onChange={handleSearchFarmer}
-                      // defaultValue={farmerSelected?.firstname + ' ' + farmerSelected?.lastname}
                     >
                       {farmerList?.map((item) => (
                         <Option
@@ -856,7 +850,13 @@ const AddNewTask = () => {
                 type={selectionType}
                 onChange={(e) => handleSelectDroner(e, row)}
                 checked={row.isChecked}
-                disabled={row.droner_status != "ไม่สะดวก" ? false : true}
+                disabled={
+                  selectionType == "checkbox"
+                    ? row.droner_status != "ไม่สะดวก"
+                      ? false
+                      : true
+                    : false
+                }
                 style={{ width: "18px", height: "18px" }}
               />
             </>
