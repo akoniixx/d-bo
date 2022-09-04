@@ -32,7 +32,7 @@ export default function IndexRankDroner() {
   const [current, setCurrent] = useState(1);
   const [data, setData] = useState<DronerRankListEntity>();
   const [searchText, setSearchText] = useState<string>();
-  const [ratingMing, setRatingMing] = useState<any>();
+  const [ratingMin, setRatingMin] = useState<any>();
   const [ratingMax, setRatingMax] = useState<any>();
   const [startDate, setStartDate] = useState<any>();
   const [endDate, setEndDate] = useState<any>();
@@ -52,7 +52,7 @@ export default function IndexRankDroner() {
       searchSubdistrict,
       searchDistrict,
       searchProvince,
-      ratingMing,
+      ratingMin,
       ratingMax,
       startDate,
       endDate,
@@ -103,7 +103,15 @@ export default function IndexRankDroner() {
     fetchProvince();
     fetchDistrict();
     fetchSubdistrict();
-  }, [current, searchText, searchProvince, searchDistrict, searchSubdistrict]);
+  }, [
+    current,
+    searchText,
+    searchProvince,
+    searchDistrict,
+    searchSubdistrict,
+    ratingMax,
+    ratingMin,
+  ]);
   const handleProvince = (provinceId: number) => {
     setSearchProvince(provinceId);
     setCurrent(1);
@@ -116,10 +124,20 @@ export default function IndexRankDroner() {
     setSearchSubdistrict(subdistrictId);
     setCurrent(1);
   };
+
   const handlerStar = (e: any) => {
+    let value = e.target.value;
     let checked = e.target.checked;
-    console.log(checked);
+    for (let i = 1; i <= value; i++) {
+      setRatingMax(value)
+  }
+    // if (value <= 5 || value >= 4 || value >= 3 || value >= 2 || value >= 1) {
+    //   setRatingMax(value);
+    // } else if(value >= 5){
+    //   setRatingMin(value);
+    // }
   };
+
   const ratingStar = (
     <Menu
       items={[
@@ -139,7 +157,7 @@ export default function IndexRankDroner() {
               <StarFilled />
             </div>
           ),
-          key: "1",
+          key: "5",
           icon: <Checkbox value={5} onChange={handlerStar}></Checkbox>,
         },
         {
@@ -157,7 +175,7 @@ export default function IndexRankDroner() {
               <StarFilled />
             </div>
           ),
-          key: "2",
+          key: "4",
           icon: <Checkbox value={4} onChange={handlerStar}></Checkbox>,
         },
         {
@@ -190,7 +208,7 @@ export default function IndexRankDroner() {
               <StarFilled />
             </div>
           ),
-          key: "4",
+          key: "2",
           icon: <Checkbox value={2} onChange={handlerStar}></Checkbox>,
         },
         {
@@ -205,7 +223,7 @@ export default function IndexRankDroner() {
               <StarFilled />
             </div>
           ),
-          key: "5",
+          key: "1",
           icon: <Checkbox value={1} onChange={handlerStar}></Checkbox>,
         },
       ]}
@@ -342,6 +360,9 @@ export default function IndexRankDroner() {
               <span className="text-dark-75  d-block font-size-lg">
                 {row.droner_firstname + " " + row.droner_lastname}
               </span>
+              <span style={{ color: color.Grey, fontSize: "13px" }}>
+                {row.droner_droner_code}
+              </span>
             </>
           ),
         };
@@ -389,7 +410,7 @@ export default function IndexRankDroner() {
       dataIndex: "avgrating",
       key: "avgrating",
       render: (value: any, row: any, index: number) => {
-        let rate = row.avgrating
+        let rate = row.avgrating;
         return {
           children: (
             <>
@@ -401,7 +422,7 @@ export default function IndexRankDroner() {
                     marginRight: "10px",
                   }}
                 />
-                {rate != null? financial(row.avgrating) : 0}
+                {rate != null ? financial(row.avgrating) : 0}
               </span>
             </>
           ),

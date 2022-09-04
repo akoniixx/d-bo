@@ -132,9 +132,10 @@ function DetailWorkDroner() {
               className="hiddenFileInput"
               style={{
                 backgroundImage: `url(${data.imagePathFinishTask})`,
-                display: data.imagePathFinishTask != false ? "block" : "none",
+                display: data.imagePathFinishTask != null ? `url(${data.imagePathFinishTask})` : undefined,
               }}
-            ></div>
+            >
+            </div>
           </div>
 
           <br />
@@ -393,6 +394,7 @@ function DetailWorkDroner() {
 
   return (
     <Layout>
+      {console.log(data.imagePathFinishTask)}
       <Row>
         <BackIconButton
           onClick={() =>

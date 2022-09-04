@@ -20,6 +20,7 @@ import uploadImg from "../../resource/media/empties/uploadImg.png";
 import emptyData from "../../resource/media/empties/iconoir_farm.png";
 import { StarFilled, FileTextOutlined } from "@ant-design/icons";
 import moment from "moment";
+import image from "../../resource/image";
 
 const _ = require("lodash");
 let queryString = _.split(window.location.search, "=");
@@ -74,7 +75,7 @@ function DetailRankDroner() {
                 className="hiddenFileInput zoom"
                 style={{
                   backgroundImage: `url(${
-                    imgProfile == undefined ? uploadImg : imgProfile
+                    imgProfile == undefined ? image.empty_img : imgProfile
                   })`,
                 }}
               ></div>
@@ -114,7 +115,10 @@ function DetailRankDroner() {
             <label>Droner ID</label>
             <div className="row">
               <Form.Item name="droneId">
-                <Input disabled defaultValue={data.id} />
+                <Input
+                  disabled
+                  defaultValue={data.dronerCode != null ? data.dronerCode : "-"}
+                />
               </Form.Item>
             </div>
             <div className="row">
@@ -296,7 +300,6 @@ function DetailRankDroner() {
       </CardContainer>
     </div>
   );
-
   return (
     <Layout>
       <Row>
@@ -312,6 +315,7 @@ function DetailRankDroner() {
       <Row className="d-flex justify-content-around">
         {renderDroner}
         {renderFromData}
+       
       </Row>
     </Layout>
   );

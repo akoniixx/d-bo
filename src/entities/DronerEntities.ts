@@ -16,6 +16,7 @@ import {
 
 export interface DronerEntity {
   id: string;
+  dronerCode: string;
   firstname: string;
   lastname: string;
   idNo: string;
@@ -30,13 +31,13 @@ export interface DronerEntity {
   dronerDrone: DronerDroneEntity[];
   dronerArea: DronerAreaEntity;
   file: ImageEntity[];
-  dronerCode: null;
   createdAt: string;
   updatedAt: string;
   totalDroneCount: number;
 }
 export const DronerEntity_INIT: DronerEntity = {
   id: "",
+  dronerCode: "",
   firstname: "",
   lastname: "",
   idNo: "",
@@ -51,7 +52,6 @@ export const DronerEntity_INIT: DronerEntity = {
   dronerDrone: [DronerDroneEntity_INIT],
   dronerArea: DronerAreaEntity_INIT,
   file: [ImageEntity_INTI],
-  dronerCode: null,
   createdAt: "",
   updatedAt: "",
   totalDroneCount: 0,
