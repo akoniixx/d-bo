@@ -13,6 +13,8 @@ export interface FarmerPlotEntity {
   isActive: boolean;
   plotId: number;
   farmerId?: string;
+  plotAreaId: number;
+  locationName: string;
 }
 export const FarmerPlotEntity_INIT: FarmerPlotEntity = {
   id: "",
@@ -27,4 +29,6 @@ export const FarmerPlotEntity_INIT: FarmerPlotEntity = {
   isActive: true,
   plotId: 0,
   farmerId: "",
+  plotAreaId: 0,
+  locationName: "",
 };

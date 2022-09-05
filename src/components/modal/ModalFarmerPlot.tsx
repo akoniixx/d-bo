@@ -69,8 +69,15 @@ const ModalFarmerPlot: React.FC<ModalFarmerPlotProps> = ({
   const handleSearchLocation = async (value: any) => {
     if (value != undefined) {
       const a = location.filter((x) => x.subdistrictId == value)[0];
-      const pushLat = Map(farmerPlot).set("lat", a.lat);
-      const pushLong = Map(pushLat.toJS()).set("long", a.long);
+      const pushAreaId = Map(farmerPlot).set("plotAreaId", a.subdistrictId);
+      const pushLat = Map(pushAreaId.toJS()).set(
+        "lat",
+        a.lat != null ? parseFloat(a.lat) : 0
+      );
+      const pushLong = Map(pushLat.toJS()).set(
+        "long",
+        a.long != null ? parseFloat(a.long) : 0
+      );
       setFarmerPlot(pushLong.toJS());
       setMapPosition({
         lat: a.lat != null ? parseFloat(a.lat) : 0,
@@ -107,9 +114,30 @@ const ModalFarmerPlot: React.FC<ModalFarmerPlotProps> = ({
     }));
   };
 
-  const handelCallBack = () => {
+  const handelCallBack = async () => {
     const m = Map(farmerPlot).set("plotId", editIndex);
-    callBack(m.toJS());
+    let locationName = "";
+    let geocoder = new google.maps.Geocoder();
+    const latlng = {
+      lat: parseFloat(m.toJS().lat),
+      lng: parseFloat(m.toJS().long),
+    };
+    await geocoder
+      .geocode({
+        location: latlng,
+        region: "th",
+      })
+      .then((res) => {
+        let location = res.results[0].address_components;
+        locationName =
+          location[1].short_name +
+          " " +
+          location[2].short_name +
+          " " +
+          location[3].long_name;
+      });
+    const l = Map(m.toJS()).set("locationName", locationName);
+    callBack(l.toJS());
   };
 
   const checkValidate = (data: FarmerPlotEntity) => {
@@ -117,11 +145,10 @@ const ModalFarmerPlot: React.FC<ModalFarmerPlotProps> = ({
       data.plantName,
       data.plotName,
       data.landmark,
-      data.lat,
-      data.long,
-      data.raiAmount
+      data.raiAmount,
     ].includes("");
-    if (checkEmpty) {
+    let checkEmptyNumber = ![data.plotAreaId, data.lat, data.long].includes(0);
+    if (checkEmpty && checkEmptyNumber) {
       setBtnSaveDisable(false);
     } else {
       setBtnSaveDisable(true);
@@ -214,6 +241,7 @@ const ModalFarmerPlot: React.FC<ModalFarmerPlotProps> = ({
           </div>
           <div className="form-group">
             <label>พื้นที่แปลงเกษตร</label>
+            <span style={{ color: "red" }}>*</span>
             <Form.Item name="searchAddress">
               <Select
                 allowClear
@@ -229,6 +257,7 @@ const ModalFarmerPlot: React.FC<ModalFarmerPlotProps> = ({
                 filterOption={(input: any, option: any) =>
                   option.children.includes(input)
                 }
+                defaultValue={data.plotAreaId == 0 ? null : data.plotAreaId}
               >
                 {location.map((item) => (
                   <Option value={item.subdistrictId}>
