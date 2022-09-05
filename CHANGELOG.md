@@ -1,4 +1,6 @@
 ## [Version - 0]
+## Fix [v0.9.4] 2022-09-05
+- enhaced farmer plot added function geocoder from google map for collect "locationName"
 ## Fix [v0.9.3] 2022-09-01
 - fixed disable button when data is incomplete
 - fixed edit image license droner,drone
