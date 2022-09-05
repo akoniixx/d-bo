@@ -1,7 +1,7 @@
 import {
   Badge,
   Button,
-  Cascader as Cascaded,
+  Cascader,
   Checkbox,
   DatePicker,
   Dropdown,
@@ -24,7 +24,7 @@ import {
 } from "../../entities/LocationEntities";
 import color from "../../resource/color";
 import {
-  DownOutlined,
+  EditOutlined,
   FileTextOutlined,
   StarFilled,
   UserOutlined,
@@ -118,7 +118,6 @@ export default function IndexFinishTask() {
     });
   };
   const changeTextSearch = (value: string) => {
-    console.log(value);
     setSearchText(value);
     setCurrent(1);
   };
@@ -159,6 +158,31 @@ export default function IndexFinishTask() {
     let checked = e.target.checked;
     console.log(checked);
   };
+  const options = [
+    {
+      label: "เสร็จสิ้น",
+      value: "DONE",
+    },
+    {
+      label: "รอรีวิว",
+      value: "WAIT_REVIEW",
+    },
+    {
+      label: "ยกเลิก",
+      value: "CANCELED",
+      children: [
+        {
+          label: "รอเริ่มงาน",
+          value: "รอเริ่มงาน",
+        },
+        {
+          label: "รอดำเนินงาน",
+          value: "รอดำเนินงาน",
+        },
+      ],
+    },
+  ];
+
   const ratingStar = (
     <Menu
       items={[
@@ -360,7 +384,7 @@ export default function IndexFinishTask() {
           </Select>
         </div>
         <div className="col-lg-2 p-1">
-          <Select
+          {/* <Select
             allowClear
             className="col-lg-12"
             placeholder="เลือกสถานะ"
@@ -369,7 +393,17 @@ export default function IndexFinishTask() {
             {FINISH_TASK_SEARCH.map((item) => (
               <option value={item.value}>{item.name}</option>
             ))}
-          </Select>
+          </Select> */}
+          <Cascader
+            placeholder="เลือกสถานะ"
+            style={{
+              width: "100%",
+            }}
+            options={options}
+            onChange={handleStatus}
+            multiple
+            // maxTagCount="responsive"
+          />
         </div>
       </div>
     </>
@@ -495,10 +529,8 @@ export default function IndexFinishTask() {
                   : "-"}
               </span>
               <span style={{ color: color.Disable, fontSize: "12px" }}>
-                {" "}
-                ขาดข้อมูลจำนวนไร่
+                {"จำนวน" + " " + row.farmAreaAmount + " " + "ไร่"}
               </span>
-              {/* <span style={{ color: color.Disable, fontSize: "12px" }}>{"จำนวน" + " " + - + " " + "ไร่"}</span> */}
             </>
           ),
         };
@@ -535,13 +567,23 @@ export default function IndexFinishTask() {
         return {
           children: (
             <div className="d-flex flex-row justify-content-between">
-              <ActionButton
-                icon={<FileTextOutlined />}
-                color={color.primary1}
-                onClick={() =>
-                  (window.location.href = "/DetailFinishTask?=" + row.id)
-                }
-              />
+              {row.status == "WAIT_REVIEW" ? (
+                <ActionButton
+                  icon={<EditOutlined />}
+                  color={color.primary1}
+                  onClick={() =>
+                    (window.location.href = "/DetailFinishTasks?=" + row.id)
+                  }
+                />
+              ) : (
+                <ActionButton
+                  icon={<FileTextOutlined />}
+                  color={color.primary1}
+                  onClick={() =>
+                    (window.location.href = "/DetailFinishTasks?=" + row.id)
+                  }
+                />
+              )}
             </div>
           ),
         };

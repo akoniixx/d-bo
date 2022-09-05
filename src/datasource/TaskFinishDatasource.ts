@@ -33,4 +33,14 @@ export class TaskFinishedDatasource {
         console.log(error);
       });
   }
+  static getDetailFinishTaskById(id: string): Promise<any> {
+    return httpClient
+      .get(`${BASE_URL}/tasks/task-finish/get-task-detail/${id}`)
+      .then((res) => {
+        return res.data;
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }
 }

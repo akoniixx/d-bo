@@ -8,12 +8,6 @@ import color from "../../resource/color";
 import GoogleMap from "../../components/map/GoogleMap";
 import { LAT_LNG_BANGKOK } from "../../definitions/Location";
 import TextArea from "antd/lib/input/TextArea";
-import moment from "moment";
-// import {
-//   taskDetailEntity,
-//   taskDetailEntity_INIT,
-// } from "../../entities/DronerRankEntities";
-// import { DronerRankDatasource } from "../../datasource/DronerRankDatasource";
 import {
   AddressEntity,
   AddressEntity_INIT,
@@ -23,14 +17,20 @@ import {
   CalendarOutlined,
   ClockCircleOutlined,
 } from "@ant-design/icons";
+import {
+  DetailFinishTask,
+  DetailFinishTask_INIT,
+} from "../../entities/TaskFinishEntities";
+import { TaskFinishedDatasource } from "../../datasource/TaskFinishDatasource";
+import moment from "moment";
 const _ = require("lodash");
 let queryString = _.split(window.location.search, "=");
 const dateFormat = "DD/MM/YYYY";
 const timeFormat = "HH:mm";
 
-function DetailFinishTask() {
+function DetailFinishTasks() {
   const taskId = queryString[1];
-  //   const [data, setData] = useState<taskDetailEntity>(taskDetailEntity_INIT);
+  const [data, setData] = useState<DetailFinishTask>(DetailFinishTask_INIT);
   const [address, setAddress] = useState<AddressEntity>(AddressEntity_INIT);
   let imgList: (string | boolean)[] = [];
   const [mapPosition, setMapPosition] = useState<{ lat: number; lng: number }>({
@@ -38,35 +38,28 @@ function DetailFinishTask() {
     lng: LAT_LNG_BANGKOK.lng,
   });
 
-  const fetchTask = async () => {
-    // await DronerRankDatasource.getTaskDetail(taskId).then((res) => {
-    //   console.log(res);
-    //   setData(res);
-    //   setAddress(res.droner.address);
-    //   setMapPosition({
-    //     lat: parseFloat(res.farmerPlot.lat),
-    //     lng: parseFloat(res.farmerPlot.long),
-    //   });
-    // });
+  const fetchDetailTask = async () => {
+    await TaskFinishedDatasource.getDetailFinishTaskById(taskId).then((res) => {
+      console.log(res);
+      setData(res);
+    });
   };
 
   useEffect(() => {
-    fetchTask();
+    fetchDetailTask();
   }, []);
 
   const financial = (e: any) => {
     return Number.parseFloat(e).toFixed(1);
   };
-  const formatNumber = (e: any) => {
-    let formatNumber = Number(e)
-      .toFixed(1)
-      .replace(/\d(?=(\d{3})+\.)/g, "$&,");
-    let splitArray = formatNumber.split(".");
-    if (splitArray.length > 1) {
-      formatNumber = splitArray[0];
-    }
-    return formatNumber;
+
+  const formatCurrency = (e: any) => {
+    e = parseFloat(e);
+    return e.toFixed(2).replace(/./g, function (c: any, i: any, a: any) {
+      return i > 0 && c !== "." && (a.length - i) % 3 === 0 ? "," + c : c;
+    });
   };
+
   const starIcon = (
     <StarFilled
       style={{
@@ -87,9 +80,9 @@ function DetailFinishTask() {
               <Form.Item>
                 <Input
                   style={{ width: "100%" }}
-                  //   value={moment(new Date(data.dateAppointment)).format(
-                  //     dateFormat
-                  //   )}
+                  value={moment(new Date(data.data.dateAppointment)).format(
+                    dateFormat
+                  )}
                   disabled
                   suffix={<CalendarOutlined />}
                 />
@@ -100,9 +93,9 @@ function DetailFinishTask() {
               <Form.Item>
                 <Input
                   style={{ width: "100%" }}
-                  //   value={moment(new Date(data.dateAppointment)).format(
-                  //     timeFormat
-                  //   )}
+                  value={moment(new Date(data.data.dateAppointment)).format(
+                    timeFormat
+                  )}
                   disabled
                   suffix={<ClockCircleOutlined />}
                 />
@@ -122,7 +115,7 @@ function DetailFinishTask() {
           <label>การเตรียมยา</label>
           <Form.Item>
             <span style={{ color: color.Grey }}>
-              {/* {data.preparationBy ? data.preparationBy : "-"} */}
+              {data.data.preparationBy ? data.data.preparationBy : "-"}
             </span>
           </Form.Item>
           <label>ภาพงานจากนักบินโดรน</label>
@@ -142,7 +135,7 @@ function DetailFinishTask() {
           <Form.Item>
             <span style={{ color: color.Grey }}>
               {" "}
-              -{/* {data.preparationBy ? data.preparationBy : "-"} */}
+              {data.data.preparationBy ? data.data.preparationBy : "-"}
             </span>
           </Form.Item>
         </div>
@@ -150,8 +143,10 @@ function DetailFinishTask() {
         <div className="col-lg-5">
           <label>ค่าบริการ</label>
           <Form.Item style={{ color: color.Grey }}>
-            {/* <span>{financial(data.unitPrice) + " " + "บาท"}</span>{" "} */}
-            {/* <span>{"(จำนวน" + " " + data.farmAreaAmount + " " + "ไร่)"}</span> */}
+            <span>{financial(data.data.price) + " " + "บาท"}</span>{" "}
+            <span>
+              {"(จำนวน" + " " + data.data.farmAreaAmount + " " + "ไร่)"}
+            </span>
           </Form.Item>
           <br />
           <Form.Item>
@@ -159,7 +154,7 @@ function DetailFinishTask() {
             <span>
               {" "}
               {starIcon}
-              {/* {financial(data.reviewDronerAvg)} */}
+              {financial(data.data.reviewDronerAvg)}
             </span>
             <div className="row">
               <div className="col-lg-6" style={{ color: color.Grey }}>
@@ -167,9 +162,9 @@ function DetailFinishTask() {
               </div>
               <div className="col-lg-6">
                 {starIcon}
-                {/* {data.reviewDronerDetail != null
-                  ? financial(data.reviewDronerDetail.pilotEtiquette)
-                  : 0} */}
+                {data.data.reviewDronerDetail != null
+                  ? financial(data.data.reviewDronerDetail.pilotEtiquette)
+                  : 0}
               </div>
             </div>
             <div className="row">
@@ -178,9 +173,9 @@ function DetailFinishTask() {
               </div>
               <div className="col-lg-6">
                 {starIcon}
-                {/* {data.reviewDronerDetail != null
-                  ? financial(data.reviewDronerDetail.punctuality)
-                  : 0} */}
+                {data.data.reviewDronerDetail != null
+                  ? financial(data.data.reviewDronerDetail.punctuality)
+                  : 0}
               </div>
             </div>
             <div className="row">
@@ -189,9 +184,9 @@ function DetailFinishTask() {
               </div>
               <div className="col-lg-6">
                 {starIcon}
-                {/* {data.reviewDronerDetail != null
-                  ? financial(data.reviewDronerDetail.sprayExpertise)
-                  : 0} */}
+                {data.data.reviewDronerDetail != null
+                  ? financial(data.data.reviewDronerDetail.sprayExpertise)
+                  : 0}
               </div>
             </div>
           </Form.Item>
@@ -199,18 +194,18 @@ function DetailFinishTask() {
             <TextArea
               rows={3}
               disabled
-              //   value={
-              //     data.reviewDronerDetail != null
-              //       ? data.reviewDronerDetail.comment
-              //       : undefined
-              //   }
+              value={
+                data.data.reviewDronerDetail != null
+                  ? data.data.reviewDronerDetail.comment
+                  : undefined
+              }
             />
           </Form.Item>
           <label>สถานะ</label>
           <Form.Item>
             <span style={{ color: color.Success }}>
               <Badge color={color.Success} />
-              {/* {data.status == "DONE" ? "เสร็จสิ้น" : null} */}
+              {data.data.status == "DONE" ? "เสร็จสิ้น" : null}
               <br />
             </span>
           </Form.Item>
@@ -219,9 +214,7 @@ function DetailFinishTask() {
     </Form>
   );
   const renderFarmer = (
-    <Form
-    //  key={data.farmerId}
-    >
+    <Form key={data.data.farmerId}>
       <div className="container text-center" style={{ padding: "30px" }}>
         <div className="row">
           <div className="col-lg-4 text-start">
@@ -229,19 +222,16 @@ function DetailFinishTask() {
             <Form.Item>
               <Input
                 disabled
-                // defaultValue={
-                //   data.farmer.firstname + " " + data.farmer.lastname
-                // }
+                defaultValue={
+                  data.data.farmer.firstname + " " + data.data.farmer.lastname
+                }
               />
             </Form.Item>
           </div>
           <div className="col-lg-4 text-start">
             <label>เบอร์โทร</label>
             <Form.Item>
-              <Input
-                disabled
-                //   defaultValue={data.farmer.telephoneNo}
-              />
+              <Input disabled defaultValue={data.data.farmer.telephoneNo} />
             </Form.Item>
           </div>
         </div>
@@ -251,7 +241,7 @@ function DetailFinishTask() {
             <Form.Item>
               <Select
                 disabled
-                //    defaultValue={data.farmerPlot.plotName}
+                //  defaultValue={data.farmerPlot.plotName}
               />
             </Form.Item>
           </div>
@@ -320,7 +310,7 @@ function DetailFinishTask() {
       <div className="row">
         <div className="col-lg-3">
           <span>
-            {/* {data.droner.firstname + " " + data.droner.lastname} */}
+            {data.data.droner.firstname + " " + data.data.droner.lastname}
             <br />
             <p style={{ fontSize: "12px", color: color.Grey }}>
               {/* {data.droner.dronerCode} */}
@@ -328,7 +318,7 @@ function DetailFinishTask() {
           </span>
         </div>
         <div className="col-lg-3">
-          {/* <span>{data.droner.telephoneNo}</span> */}
+          <span>{data.data.droner.telephoneNo}</span>
         </div>
         <div className="col-lg-4">
           <span>สวนพริกไทย, เมืองปทุมธานี, กรุงเทพมหานคร</span>
@@ -356,7 +346,7 @@ function DetailFinishTask() {
                 ยอดรวมค่าบริการ (หลังรวมค่าธรรมเนียม)
                 <br />
                 <b style={{ fontSize: "20px", color: color.Success }}>
-                  {/* {formatNumber(data.totalPrice) + " " + "บาท"} */}
+                  {formatCurrency(data.data.totalPrice) + " " + "บาท"}
                 </b>
               </span>
             </Form.Item>
@@ -368,11 +358,11 @@ function DetailFinishTask() {
               <label>ค่าบริการ (ก่อนคิดค่าคำนวณ)</label>
               <Input
                 disabled
-                // value={
-                //   data.totalPrice != undefined
-                //     ? formatNumber(data.totalPrice)
-                //     : undefined
-                // }
+                value={
+                  data.data.price != undefined
+                    ? formatCurrency(data.data.price)
+                    : undefined
+                }
                 suffix="บาท"
               />
             </Form.Item>
@@ -380,7 +370,12 @@ function DetailFinishTask() {
           <div className="col-lg-4">
             <Form.Item>
               <label>ค่าธรรมเนียม (คิด 5% ของราคารวม)</label>
-              <Input disabled placeholder="0.0" suffix="บาท" />
+              <Input
+                disabled
+                placeholder="0.0"
+                value={formatCurrency(data.data.discountFee)}
+                suffix="บาท"
+              />
             </Form.Item>
           </div>
           <div className="col-lg-4">
@@ -388,11 +383,11 @@ function DetailFinishTask() {
               <label>ส่วนลดค่าธรรมเนียม</label>
               <Input
                 disabled
-                // value={
-                //   data.discountFee != undefined
-                //     ? financial(data.discountFee)
-                //     : undefined
-                // }
+                value={
+                  data.data.fee != undefined
+                    ? formatCurrency(data.data.fee)
+                    : undefined
+                }
                 suffix="บาท"
               />
             </Form.Item>
@@ -410,7 +405,7 @@ function DetailFinishTask() {
         />
         <span className="pt-4">
           <strong style={{ fontSize: "20px" }}>
-            {/* รายละเอียดงาน #{data.taskNo} */}
+            รายละเอียดงาน #{data.data.taskNo}
           </strong>
         </span>
       </Row>
@@ -437,4 +432,4 @@ function DetailFinishTask() {
   );
 }
 
-export default DetailFinishTask;
+export default DetailFinishTasks;
