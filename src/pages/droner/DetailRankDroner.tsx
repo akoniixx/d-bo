@@ -256,8 +256,8 @@ function DetailRankDroner() {
                   <div className="col-lg">
                     <span>{financial(item.farmAreaAmount) + " " + "ไร่"}</span>
                   </div>
-                  <div className="col-lg">
-                    <span>กรุงเทพมหานคร</span>
+                  <div className="col-lg-2">
+                    <span>{item.farmer.address.province.region}</span>
                   </div>
                   <div className="col-lg">
                     <span>

@@ -1,6 +1,6 @@
 import {
   Button,
-  Cascader as Cascaded,
+  Cascader,
   Checkbox,
   DatePicker,
   Dropdown,
@@ -25,7 +25,6 @@ import color from "../../resource/color";
 import { DownOutlined, FileTextOutlined, StarFilled } from "@ant-design/icons";
 import { DronerRankDatasource } from "../../datasource/DronerRankDatasource";
 import { DronerRankListEntity } from "../../entities/DronerRankEntities";
-import icon from "../../resource/icon";
 
 export default function IndexRankDroner() {
   const row = 10;
@@ -34,8 +33,8 @@ export default function IndexRankDroner() {
   const [searchText, setSearchText] = useState<string>();
   const [ratingMin, setRatingMin] = useState<any>();
   const [ratingMax, setRatingMax] = useState<any>();
-  const [startDate, setStartDate] = useState<any>();
-  const [endDate, setEndDate] = useState<any>();
+  const [startDate, setStartDate] = useState<any>(null);
+  const [endDate, setEndDate] = useState<any>(null);
   const [searchProvince, setSearchProvince] = useState<any>();
   const [searchDistrict, setSearchDistrict] = useState<any>();
   const [searchSubdistrict, setSearchSubdistrict] = useState<any>();
@@ -44,7 +43,23 @@ export default function IndexRankDroner() {
   const [subdistrict, setSubdistrict] = useState<SubdistrictEntity[]>();
   const { RangePicker } = DatePicker;
   const dateFormat = "DD/MM/YYYY";
-
+  const dateSearchFormat = "YYYY-MM-DD";
+  useEffect(() => {
+    fetchDronerRank();
+    fetchProvince();
+    fetchDistrict();
+    fetchSubdistrict();
+  }, [
+    current,
+    searchText,
+    searchProvince,
+    searchDistrict,
+    searchSubdistrict,
+    ratingMax,
+    ratingMin,
+    startDate,
+    endDate,
+  ]);
   const fetchDronerRank = async () => {
     await DronerRankDatasource.getDronerRank(
       current,
@@ -61,16 +76,6 @@ export default function IndexRankDroner() {
       console.log(res);
       setData(res);
     });
-  };
-  const SearchDate = (e: any) => {
-    if (e != null) {
-      setStartDate(moment(new Date(e[0])).format(dateFormat));
-      setEndDate(moment(new Date(e[1])).format(dateFormat));
-    } else {
-      setStartDate(e);
-      setEndDate(e);
-    }
-    setCurrent(1);
   };
   const fetchProvince = async () => {
     await LocationDatasource.getProvince().then((res) => {
@@ -97,21 +102,6 @@ export default function IndexRankDroner() {
   const financial = (e: any) => {
     return Number.parseFloat(e).toFixed(1);
   };
-
-  useEffect(() => {
-    fetchDronerRank();
-    fetchProvince();
-    fetchDistrict();
-    fetchSubdistrict();
-  }, [
-    current,
-    searchText,
-    searchProvince,
-    searchDistrict,
-    searchSubdistrict,
-    ratingMax,
-    ratingMin,
-  ]);
   const handleProvince = (provinceId: number) => {
     setSearchProvince(provinceId);
     setCurrent(1);
@@ -124,20 +114,26 @@ export default function IndexRankDroner() {
     setSearchSubdistrict(subdistrictId);
     setCurrent(1);
   };
+  const SearchDate = (e: any) => {
+    if (e != null) {
+      setStartDate(moment(new Date(e[0])).format(dateSearchFormat));
+      setEndDate(moment(new Date(e[1])).format(dateSearchFormat));
+    } else {
+      setStartDate(e);
+      setEndDate(e);
+    }
+    setCurrent(1);
+  };
 
   const handlerStar = (e: any) => {
     let value = e.target.value;
+    console.log(e.target.value)
     let checked = e.target.checked;
+    console.log(checked);
     for (let i = 1; i <= value; i++) {
-      setRatingMax(value)
-  }
-    // if (value <= 5 || value >= 4 || value >= 3 || value >= 2 || value >= 1) {
-    //   setRatingMax(value);
-    // } else if(value >= 5){
-    //   setRatingMin(value);
-    // }
+      setRatingMax(value);
+    }
   };
-
   const ratingStar = (
     <Menu
       items={[
@@ -229,7 +225,6 @@ export default function IndexRankDroner() {
       ]}
     />
   );
-
   const PageTitle = (
     <>
       <div
@@ -247,7 +242,7 @@ export default function IndexRankDroner() {
         <div style={{ color: color.Error }}>
           <RangePicker
             allowClear
-            onCalendarChange={(val) => SearchDate(val)}
+            onCalendarChange={SearchDate}
             format={dateFormat}
           />
         </div>

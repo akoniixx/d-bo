@@ -44,4 +44,15 @@ export class UploadImageDatasouce {
         console.log(err, "err getImg");
       });
   }
+
+  static getImageFinish(path: string): Promise<any> {
+    return httpClient
+      .get(BASE_URL + "/tasks/file/geturl?path=" + path)
+      .then((response) => {
+        return response.data;
+      })
+      .catch((err) => {
+        console.log(err, "err getImg");
+      });
+  }
 }

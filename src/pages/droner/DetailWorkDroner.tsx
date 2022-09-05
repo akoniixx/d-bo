@@ -1,6 +1,6 @@
 import Layout from "../../components/layout/Layout";
 import React, { useEffect, useState } from "react";
-import { Badge, Form, Image, Input, Row, Select, Tag, Upload } from "antd";
+import { Avatar, Badge, Form, Input, Row, Select, Tag } from "antd";
 import { BackIconButton } from "../../components/button/BackButton";
 import { CardContainer } from "../../components/card/CardContainer";
 import { CardHeader } from "../../components/header/CardHearder";
@@ -23,6 +23,7 @@ import {
   CalendarOutlined,
   ClockCircleOutlined,
 } from "@ant-design/icons";
+import { UploadImageDatasouce } from "../../datasource/UploadImageDatasource";
 const _ = require("lodash");
 let queryString = _.split(window.location.search, "=");
 const dateFormat = "DD/MM/YYYY";
@@ -37,6 +38,7 @@ function DetailWorkDroner() {
     lat: LAT_LNG_BANGKOK.lat,
     lng: LAT_LNG_BANGKOK.lng,
   });
+  const [imgFinish, setImgFinish] = useState<any>();
 
   const fetchTask = async () => {
     await DronerRankDatasource.getTaskDetail(taskId).then((res) => {
@@ -47,6 +49,17 @@ function DetailWorkDroner() {
         lat: parseFloat(res.farmerPlot.lat),
         lng: parseFloat(res.farmerPlot.long),
       });
+      let getImgFinish = res.imagePathFinishTask;
+      imgList.push(getImgFinish != null ? getImgFinish : "");
+      var i = 0;
+      for (i; imgList.length > i; i++) {
+        i == 0 &&
+          UploadImageDatasouce.getImageFinish(imgList[i].toString()).then(
+            (resImg) => {
+              setImgFinish(resImg.url);
+            }
+          );
+      }
     });
   };
 
@@ -57,15 +70,25 @@ function DetailWorkDroner() {
   const financial = (e: any) => {
     return Number.parseFloat(e).toFixed(1);
   };
-  const formatNumber = (e: any) => {
-    let formatNumber = Number(e)
-      .toFixed(1)
-      .replace(/\d(?=(\d{3})+\.)/g, "$&,");
-    let splitArray = formatNumber.split(".");
-    if (splitArray.length > 1) {
-      formatNumber = splitArray[0];
+  const formatCurrency = (e: any) => {
+    e = parseFloat(e);
+    return e.toFixed(2).replace(/./g, function (c: any, i: any, a: any) {
+      return i > 0 && c !== "." && (a.length - i) % 3 === 0 ? "," + c : c;
+    });
+  };
+  const onPreviewImg = async () => {
+    let src = imgFinish;
+    if (!src) {
+      src = await new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(imgFinish);
+        reader.onload = () => resolve(reader.result);
+      });
     }
-    return formatNumber;
+    const image = new Image();
+    image.src = src;
+    const imgWindow = window.open(src);
+    imgWindow?.document.write(image.outerHTML);
   };
   const starIcon = (
     <StarFilled
@@ -76,7 +99,6 @@ function DetailWorkDroner() {
       }}
     />
   );
-
   const renderAppointment = (
     <Form style={{ padding: "32px" }}>
       <div className="row">
@@ -131,10 +153,22 @@ function DetailWorkDroner() {
             <div
               className="hiddenFileInput"
               style={{
-                backgroundImage: `url(${data.imagePathFinishTask})`,
-                display: data.imagePathFinishTask != null ? `url(${data.imagePathFinishTask})` : undefined,
+                backgroundImage: `url(${imgFinish})`,
+                display: imgFinish != null ? `url(${imgFinish})` : undefined,
               }}
-            >
+            ></div>
+            <div className="ps-5">
+              {imgFinish != undefined && (
+                <>
+                  <Tag
+                    color={color.Success}
+                    onClick={onPreviewImg}
+                    style={{ cursor: "pointer", borderRadius: "5px" }}
+                  >
+                    View
+                  </Tag>
+                </>
+              )}
             </div>
           </div>
 
@@ -143,7 +177,7 @@ function DetailWorkDroner() {
           <Form.Item>
             <span style={{ color: color.Grey }}>
               {" "}
-              -{/* {data.preparationBy ? data.preparationBy : "-"} */}
+              {data.statusRemark ? data.statusRemark : "-"}
             </span>
           </Form.Item>
         </div>
@@ -151,7 +185,7 @@ function DetailWorkDroner() {
         <div className="col-lg-5">
           <label>ค่าบริการ</label>
           <Form.Item style={{ color: color.Grey }}>
-            <span>{financial(data.unitPrice) + " " + "บาท"}</span>{" "}
+            <span>{formatCurrency(data.price) + " " + "บาท"}</span>{" "}
             <span>{"(จำนวน" + " " + data.farmAreaAmount + " " + "ไร่)"}</span>
           </Form.Item>
           <br />
@@ -221,7 +255,7 @@ function DetailWorkDroner() {
   );
   const renderFarmer = (
     <Form key={data.farmerId}>
-      <div className="container text-center" style={{ padding: "30px" }}>
+      <div style={{ padding: "30px" }}>
         <div className="row">
           <div className="col-lg-4 text-start">
             <label>ชื่อ-นามสกุล</label>
@@ -327,11 +361,24 @@ function DetailWorkDroner() {
               : "-"} */}
         </div>
         <div className="col-lg">
-          <span>DJI</span>
+          <span>
+            <Avatar
+              size={25}
+              src={
+                data.droner.dronerDrone[0] != null
+                  ? data.droner.dronerDrone[0].drone.droneBrand.logoImagePath
+                  : null
+              }
+              style={{ marginRight: "5px" }}
+            />
+            {data.droner.dronerDrone[0] != null
+              ? data.droner.dronerDrone[0].drone.droneBrand.name
+              : null}
+          </span>
           <br />
-          <p style={{ fontSize: "12px", color: color.Grey }}>
-            (มากกว่า 1 ยี่ห้อ)
-          </p>
+          <span style={{ color: color.Grey, fontSize: "12px" }}>
+            {data.droner.dronerDrone.length > 1 ? "(มากกว่า 1 ยี่ห้อ)" : null}
+          </span>
         </div>
       </div>
     </Form>
@@ -346,7 +393,7 @@ function DetailWorkDroner() {
                 ยอดรวมค่าบริการ (หลังรวมค่าธรรมเนียม)
                 <br />
                 <b style={{ fontSize: "20px", color: color.Success }}>
-                  {formatNumber(data.totalPrice) + " " + "บาท"}
+                  {formatCurrency(data.totalPrice) + " " + "บาท"}
                 </b>
               </span>
             </Form.Item>
@@ -359,8 +406,8 @@ function DetailWorkDroner() {
               <Input
                 disabled
                 value={
-                  data.totalPrice != undefined
-                    ? formatNumber(data.totalPrice)
+                  data.price != undefined
+                    ? formatCurrency(data.price)
                     : undefined
                 }
                 suffix="บาท"
@@ -370,7 +417,16 @@ function DetailWorkDroner() {
           <div className="col-lg-4">
             <Form.Item>
               <label>ค่าธรรมเนียม (คิด 5% ของราคารวม)</label>
-              <Input disabled placeholder="0.0" suffix="บาท" />
+              <Input
+                disabled
+                placeholder="0.0"
+                value={
+                  data.discountFee != undefined
+                    ? formatCurrency(data.discountFee)
+                    : undefined
+                }
+                suffix="บาท"
+              />
             </Form.Item>
           </div>
           <div className="col-lg-4">
@@ -379,9 +435,7 @@ function DetailWorkDroner() {
               <Input
                 disabled
                 value={
-                  data.discountFee != undefined
-                    ? financial(data.discountFee)
-                    : undefined
+                  data.fee != undefined ? formatCurrency(data.fee) : undefined
                 }
                 suffix="บาท"
               />
@@ -394,7 +448,6 @@ function DetailWorkDroner() {
 
   return (
     <Layout>
-      {console.log(data.imagePathFinishTask)}
       <Row>
         <BackIconButton
           onClick={() =>
