@@ -57,6 +57,7 @@ import ModalSelectedDroner from "../../../components/modal/task/newTask/ModalSel
 import { CreateDronerTempEntity } from "../../../entities/TaskDronerTemp";
 import TextArea from "antd/lib/input/TextArea";
 import Swal from "sweetalert2";
+import { numberWithCommas } from "../../../utilities/TextFormatter";
 const { Step } = Steps;
 const { Option } = Select;
 const dateFormat = "DD-MM-YYYY";
@@ -1051,6 +1052,62 @@ const AddNewTask = () => {
       </Form>
     </CardContainer>
   );
+  const renderServiceCharge = (
+    <CardContainer>
+      <CardHeader textHeader="ยอดรวมค่าบริการ" />
+      <Form style={{ padding: "20px" }}>
+        <CardContainer style={{ backgroundColor: "rgba(33, 150, 83, 0.1)" }}>
+          <Form style={{ padding: "20px" }}>
+            <label>ยอดรวมค่าบริการ (หลังรวมค่าธรรมเนียม)</label>
+            <h5 style={{ color: color.primary1 }} className="p-2">
+              {numberWithCommas(createNewTask.price)} บาท
+            </h5>
+            <div className="row">
+              <div className="form-group col-lg-4">
+                <label>ค่าบริการ (ก่อนคิดค่าธรรมเนียม)</label>
+                <Form.Item>
+                  <Input
+                    suffix="บาท"
+                    value={createNewTask.price}
+                    onChange={handleCalServiceCharge}
+                    disabled={current == 2 || checkSelectPlot == "error"}
+                    autoComplete="off"
+                    step="0.01"
+                  />
+                </Form.Item>
+              </div>
+              <div className="form-group col-lg-4">
+                <label>ค่าธรรมเนียม (คิด 5% ของราคารวม)</label>
+                <Form.Item>
+                  <Input
+                    suffix="บาท"
+                    value={createNewTask.price}
+                    onChange={handleCalServiceCharge}
+                    disabled={current == 2 || checkSelectPlot == "error"}
+                    autoComplete="off"
+                    step="0.01"
+                  />
+                </Form.Item>
+              </div>
+              <div className="form-group col-lg-4">
+                <label>ส่วนลดค่าธรรมเนียม</label>
+                <Form.Item>
+                  <Input
+                    suffix="บาท"
+                    value={0.0}
+                    onChange={handleCalServiceCharge}
+                    autoComplete="off"
+                    step="0.01"
+                  />
+                </Form.Item>
+              </div>
+            </div>
+          </Form>
+        </CardContainer>
+      </Form>
+    </CardContainer>
+  );
+
   //#endregion
 
   const checkValidateStep = (
@@ -1204,6 +1261,8 @@ const AddNewTask = () => {
           {renderFormAppointment}
           <br />
           {renderDronerSelectedList}
+          <br />
+          {renderServiceCharge}
         </>
       ),
     },

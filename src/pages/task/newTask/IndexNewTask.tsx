@@ -75,7 +75,6 @@ const IndexNewTask = () => {
     }
     setCurrent(1);
   };
-
   const handleModalMap = (plotId: string) => {
     setShowModalMap((prev) => !prev);
     setPlotId(plotId);
@@ -84,7 +83,6 @@ const IndexNewTask = () => {
     setShowModalDroner((prev) => !prev);
     setTaskId(taskId);
   };
-
   const menu = (
     <Menu
       items={[
@@ -297,7 +295,13 @@ const IndexNewTask = () => {
           children: (
             <div className="d-flex flex-row justify-content-center">
               <div className="col-lg-6">
-                <ActionButton icon={<EditOutlined />} color={color.primary1} />
+                <ActionButton
+                  icon={<EditOutlined />}
+                  color={color.primary1}
+                  onClick={() =>
+                    (window.location.href = "/EditNewTask/id=" + row.id)
+                  }
+                />
               </div>
               <div className="col-lg-6">
                 <ActionButton icon={<DeleteOutlined />} color={color.Error} />

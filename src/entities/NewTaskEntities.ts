@@ -1,3 +1,5 @@
+import { CropPurposeSprayEntity } from "./CropEntities";
+import { GetFarmerEntity } from "./FarmerEntities";
 import {
   CreateDronerTempEntity,
   CreateDronerTempEntity_INIT,
@@ -65,3 +67,41 @@ export const CreateNewTaskEntity_INIT: CreateNewTaskEntity = {
   price: 0,
   comment: "",
 };
+export interface GetNewTaskEntity {
+  data: {
+    id: string;
+    taskNo: string;
+    farmerId: string;
+    farmerPlotId: string;
+    farmAreaAmount: string;
+    dronerId: string;
+    purposeSprayId: string;
+    dateAppointment: string;
+    targetSpray: string[];
+    preparationBy: string;
+    createdAt: string;
+    updatedAt: string;
+    distance: string;
+    status: string;
+    statusRemark: string;
+    reviewDronerAvg: string;
+    reviewDronerDetail: string;
+    unitPriceStandard: string;
+    priceStandard: string;
+    unitPrice: string;
+    price: string;
+    totalPrice: string;
+    fee: string;
+    discountFee: string;
+    reviewFarmerScore: string;
+    reviewFarmerComment: string;
+    imagePathFinishTask: string;
+    comment: string;
+    purposeSpray: CropPurposeSprayEntity;
+    farmer: GetFarmerEntity;
+    droner:string;
+    farmerPlot:{
+      
+    }
+  };
+}
