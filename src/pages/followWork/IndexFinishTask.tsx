@@ -1,4 +1,5 @@
 import {
+  Badge,
   Button,
   Cascader as Cascaded,
   Checkbox,
@@ -22,13 +23,24 @@ import {
   SubdistrictEntity,
 } from "../../entities/LocationEntities";
 import color from "../../resource/color";
-import { DownOutlined, FileTextOutlined, StarFilled } from "@ant-design/icons";
-import icon from "../../resource/icon";
+import {
+  DownOutlined,
+  FileTextOutlined,
+  StarFilled,
+  UserOutlined,
+} from "@ant-design/icons";
 import { TaskFinishedDatasource } from "../../datasource/TaskFinishDatasource";
-import { TaskFinishListEntity, TaskFinish_INIT } from "../../entities/TaskFinishEntities";
+import {
+  TaskFinishListEntity,
+  TaskFinish_INIT,
+} from "../../entities/TaskFinishEntities";
 import { FarmerPlotEntity } from "../../entities/FarmerPlotEntities";
 import { Option } from "antd/lib/mentions";
-
+import {
+  FINISH_TASK,
+  FINISH_TASK_SEARCH,
+  STATUS_COLOR_TASK,
+} from "../../definitions/FinishTask";
 
 export default function IndexFinishTask() {
   const row = 10;
@@ -36,8 +48,9 @@ export default function IndexFinishTask() {
   const [data, setData] = useState<TaskFinishListEntity>();
   const [plotArea, setPlotArea] = useState<FarmerPlotEntity>();
   const [searchText, setSearchText] = useState<string>();
-  const [startDate, setStartDate] = useState<any>();
-  const [endDate, setEndDate] = useState<any>();
+  const [searchStatus, setSearchStatus] = useState<string>();
+  const [startDate, setStartDate] = useState<any>(null);
+  const [endDate, setEndDate] = useState<any>(null);
   const [searchProvince, setSearchProvince] = useState<any>();
   const [searchDistrict, setSearchDistrict] = useState<any>();
   const [searchSubdistrict, setSearchSubdistrict] = useState<any>();
@@ -47,7 +60,22 @@ export default function IndexFinishTask() {
   const { RangePicker } = DatePicker;
   const dateFormat = "DD/MM/YYYY";
   const timeFormat = "HH:mm";
+  const dateSearchFormat = "YYYY-MM-DD";
 
+  useEffect(() => {
+    fetchTaskFinish();
+    fetchProvince();
+    fetchDistrict();
+    fetchSubdistrict();
+  }, [
+    searchSubdistrict,
+    searchDistrict,
+    searchProvince,
+    startDate,
+    endDate,
+    searchStatus,
+    searchText,
+  ]);
   const fetchTaskFinish = async () => {
     await TaskFinishedDatasource.getTaskFinishList(
       current,
@@ -57,17 +85,17 @@ export default function IndexFinishTask() {
       searchProvince,
       startDate,
       endDate,
+      searchStatus,
       searchText
     ).then((res: TaskFinishListEntity) => {
       console.log(res);
       setData(res);
-     
     });
   };
   const SearchDate = (e: any) => {
     if (e != null) {
-      setStartDate(moment(new Date(e[0])).format(dateFormat));
-      setEndDate(moment(new Date(e[1])).format(dateFormat));
+      setStartDate(moment(new Date(e[0])).format(dateSearchFormat));
+      setEndDate(moment(new Date(e[1])).format(dateSearchFormat));
     } else {
       setStartDate(e);
       setEndDate(e);
@@ -90,11 +118,16 @@ export default function IndexFinishTask() {
     });
   };
   const changeTextSearch = (value: string) => {
+    console.log(value);
     setSearchText(value);
     setCurrent(1);
   };
   const onChangePage = (page: number) => {
     setCurrent(page);
+  };
+  const handleStatus = (status: any) => {
+    setSearchStatus(status);
+    setCurrent(1);
   };
   const financial = (e: any) => {
     return Number.parseFloat(e).toFixed(1);
@@ -110,12 +143,6 @@ export default function IndexFinishTask() {
     return formatNumber;
   };
 
-  useEffect(() => {
-    fetchTaskFinish();
-    fetchProvince();
-    fetchDistrict();
-    fetchSubdistrict();
-  }, [current, searchText, searchProvince, searchDistrict, searchSubdistrict]);
   const handleProvince = (provinceId: number) => {
     setSearchProvince(provinceId);
     setCurrent(1);
@@ -241,7 +268,8 @@ export default function IndexFinishTask() {
         <div style={{ color: color.Error }}>
           <RangePicker
             allowClear
-            onCalendarChange={(val) => SearchDate(val)}
+            // onCalendarChange={(val) => SearchDate(val)}
+            onCalendarChange={SearchDate}
             format={dateFormat}
           />
         </div>
@@ -333,13 +361,14 @@ export default function IndexFinishTask() {
         </div>
         <div className="col-lg-2 p-1">
           <Select
-            className="col-lg-12 p-1"
+            allowClear
+            className="col-lg-12"
             placeholder="เลือกสถานะ"
-            // onChange={handleStatus}
+            onChange={handleStatus}
           >
-            {/* {DRONER_STATUS.map((item) => (
+            {FINISH_TASK_SEARCH.map((item) => (
               <option value={item.value}>{item.name}</option>
-            ))} */}
+            ))}
           </Select>
         </div>
       </div>
@@ -355,15 +384,12 @@ export default function IndexFinishTask() {
           children: (
             <>
               <span className="text-dark-75  d-block font-size-lg">
-              {moment(new Date(row.dateAppointment)).format(
-                        dateFormat
-                      )}
-                      ,{" "}
-                      {moment(new Date(row.dateAppointment)).format(
-                        timeFormat
-                      )}
+                {moment(new Date(row.dateAppointment)).format(dateFormat)},{" "}
+                {moment(new Date(row.dateAppointment)).format(timeFormat)}
               </span>
-              <span style={{ color: color.Disable, fontSize: "12px" }}>{row.taskNo}</span>
+              <span style={{ color: color.Disable, fontSize: "12px" }}>
+                {row.taskNo}
+              </span>
             </>
           ),
         };
@@ -380,7 +406,9 @@ export default function IndexFinishTask() {
               <span className="text-dark-75  d-block font-size-lg">
                 {row.droner.firstname + " " + row.droner.lastname}
               </span>
-              <span style={{ color: color.Disable, fontSize: "12px" }}>{row.droner.telephoneNo}</span>
+              <span style={{ color: color.Disable, fontSize: "12px" }}>
+                {row.droner.telephoneNo}
+              </span>
             </>
           ),
         };
@@ -394,10 +422,12 @@ export default function IndexFinishTask() {
         return {
           children: (
             <>
-               <span className="text-dark-75  d-block font-size-lg">
+              <span className="text-dark-75  d-block font-size-lg">
                 {row.farmer.firstname + " " + row.farmer.lastname}
               </span>
-              <span style={{ color: color.Disable, fontSize: "12px" }}>{row.farmer.telephoneNo}</span>
+              <span style={{ color: color.Disable, fontSize: "12px" }}>
+                {row.farmer.telephoneNo}
+              </span>
             </>
           ),
         };
@@ -415,7 +445,9 @@ export default function IndexFinishTask() {
           children: (
             <>
               <span className="text-dark-75  d-block font-size-lg">
-                {subdistrict != undefined ? subdistrict.subdistrictName + "/" : null}
+                {subdistrict != undefined
+                  ? subdistrict.subdistrictName + "/"
+                  : null}
                 {district != undefined ? district.districtName + "/" : null}
                 {province != undefined ? province.provinceName + "/" : null}
               </span>
@@ -452,17 +484,22 @@ export default function IndexFinishTask() {
       title: "ค่าบริการ",
       dataIndex: "subdistrict_subdistrict_name",
       key: "subdistrict_subdistrict_name",
-      width: "10%",
+      // width: "10%",
       render: (value: any, row: any, index: number) => {
         return {
           children: (
             <>
-             <span className="text-dark-75  d-block font-size-lg">
-              {row.totalPrice != null ? formatNumber(row.totalPrice) + " " + "บาท"  : "-"}
-            </span>
-            <span style={{ color: color.Disable, fontSize: "12px" }}> ขาดข้อมูลจำนวนไร่</span>
-            {/* <span style={{ color: color.Disable, fontSize: "12px" }}>{"จำนวน" + " " + - + " " + "ไร่"}</span> */}
-            </>  
+              <span className="text-dark-75  d-block font-size-lg">
+                {row.totalPrice != null
+                  ? formatNumber(row.totalPrice) + " " + "บาท"
+                  : "-"}
+              </span>
+              <span style={{ color: color.Disable, fontSize: "12px" }}>
+                {" "}
+                ขาดข้อมูลจำนวนไร่
+              </span>
+              {/* <span style={{ color: color.Disable, fontSize: "12px" }}>{"จำนวน" + " " + - + " " + "ไร่"}</span> */}
+            </>
           ),
         };
       },
@@ -471,15 +508,21 @@ export default function IndexFinishTask() {
       title: "สถานะ",
       dataIndex: "district_district_name",
       key: "district_district_name",
-      width: "10%",
+      // width: "10%",
       render: (value: any, row: any, index: number) => {
         return {
           children: (
-            <div className="container">
-              <span className="text-dark-75  d-block font-size-lg">
-                {row.status == "DONE" ? "เสร็จสิ้น" : "รอรีวิว"}
+            <>
+              <span style={{ color: STATUS_COLOR_TASK[row.status] }}>
+                <Badge color={STATUS_COLOR_TASK[row.status]} />
+                {FINISH_TASK[row.status]}
+                <br />
               </span>
-            </div>
+              <span style={{ color: color.Disable, fontSize: "12px" }}>
+                <UserOutlined style={{ padding: "0 4px 0 0" }} />
+                {row.createBy}
+              </span>
+            </>
           ),
         };
       },
@@ -496,7 +539,7 @@ export default function IndexFinishTask() {
                 icon={<FileTextOutlined />}
                 color={color.primary1}
                 onClick={() =>
-                  (window.location.href = "/")
+                  (window.location.href = "/DetailFinishTask?=" + row.id)
                 }
               />
             </div>
@@ -509,7 +552,16 @@ export default function IndexFinishTask() {
     <Layouts>
       {PageTitle}
       <br />
-      <Table columns={columns} dataSource={data?.data} pagination={false} />
+      <Table
+        columns={columns}
+        dataSource={data?.data}
+        pagination={false}
+        rowClassName={(a) =>
+          a.status == "WAIT_REVIEW"
+            ? "table-row-wait-review"
+            : "table-row-lasted"
+        }
+      />
       <div className="d-flex justify-content-between pt-5">
         <p>รายการทั้งหมด {data?.count} รายการ</p>
         <Pagination

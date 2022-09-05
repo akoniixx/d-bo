@@ -41,3 +41,6 @@ table tr td {
 .table-row-lasted {
   background-color: rgb(255, 255, 255);
 }
+.table-row-wait-review td {
+  background-color: #2f80ed1a;
+}
