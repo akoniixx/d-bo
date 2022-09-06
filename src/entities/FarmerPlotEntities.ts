@@ -17,7 +17,6 @@ export interface FarmerPlotEntity {
   plotId: number;
   farmerId?: string;
   plotAreaId: number;
-  locationName: string;
 }
 export const FarmerPlotEntity_INIT: FarmerPlotEntity = {
   id: "",
@@ -35,5 +34,4 @@ export const FarmerPlotEntity_INIT: FarmerPlotEntity = {
   plotId: 0,
   farmerId: "",
   plotAreaId: 0,
-  locationName: "",
 };
