@@ -1,3 +1,4 @@
+import { FarmerPlotEntity, FarmerPlotEntity_INIT } from './FarmerPlotEntities';
 import { DronerEntity_INIT } from "./DronerEntities";
 import {
   reviewDronerDetail,
@@ -37,6 +38,7 @@ export interface TaskFinish {
   imagePathFinishTask: string;
   comment: null;
   farmer: FarmerEntity;
+  farmerPlot: FarmerPlotEntity;
   droner: DronerEntity;
 }
 export const TaskFinish_INIT: TaskFinish = {
@@ -70,6 +72,7 @@ export const TaskFinish_INIT: TaskFinish = {
   reviewFarmerComment: "",
   imagePathFinishTask: "",
   comment: null,
+  farmerPlot: FarmerPlotEntity_INIT,
   farmer: FarmerEntity_INIT,
   droner: DronerEntity_INIT,
 };

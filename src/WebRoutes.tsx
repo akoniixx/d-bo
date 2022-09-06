@@ -22,7 +22,9 @@ import EditAdmin from "./pages/admin/EditAdmin";
 import ProtectRoute from "./ProtectRoute";
 import PublicRoute from "./PublicRoute";
 import IndexFinishTask from "./pages/followWork/IndexFinishTask";
-import DetailFinishTasks from "./pages/followWork/DetailFinishTask";
+import FinishTasks from "./pages/followWork/DetailTaskPage.tsx/FinishTask";
+import ReviewTask from "./pages/followWork/DetailTaskPage.tsx/ReviewTask";
+import CancelTask from "./pages/followWork/DetailTaskPage.tsx/CancelTask";
 
 const WebRoutes: React.FC<any> = () => {
   return (
@@ -33,7 +35,9 @@ const WebRoutes: React.FC<any> = () => {
           <Route path="/HomePage" element={<HomePage />} />
           <Route path="/OverviewPage" element={<OverviewPage />} />
           <Route path="/IndexFinishTask" element={<IndexFinishTask />} />
-          <Route path="/DetailFinishTasks" element={<DetailFinishTasks />} />
+          <Route path="/FinishTasks" element={<FinishTasks />} />
+          <Route path="/ReviewTask" element={<ReviewTask />} />
+          <Route path="/CancelTask" element={<CancelTask />} />
           <Route path="/IndexDroner" element={<IndexDroner />} />
           <Route path="/IndexFarmer" element={<IndexFarmer />} />
           <Route path="/TotalIncomePage" element={<TotalIncomePage />} />

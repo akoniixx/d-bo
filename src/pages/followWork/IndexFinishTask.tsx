@@ -384,7 +384,7 @@ export default function IndexFinishTask() {
           </Select>
         </div>
         <div className="col-lg-2 p-1">
-          {/* <Select
+          <Select
             allowClear
             className="col-lg-12"
             placeholder="เลือกสถานะ"
@@ -393,8 +393,8 @@ export default function IndexFinishTask() {
             {FINISH_TASK_SEARCH.map((item) => (
               <option value={item.value}>{item.name}</option>
             ))}
-          </Select> */}
-          <Cascader
+          </Select>
+          {/* <Cascader
             placeholder="เลือกสถานะ"
             style={{
               width: "100%",
@@ -403,7 +403,7 @@ export default function IndexFinishTask() {
             onChange={handleStatus}
             multiple
             // maxTagCount="responsive"
-          />
+          /> */}
         </div>
       </div>
     </>
@@ -572,18 +572,24 @@ export default function IndexFinishTask() {
                   icon={<EditOutlined />}
                   color={color.primary1}
                   onClick={() =>
-                    (window.location.href = "/DetailFinishTasks?=" + row.id)
+                    (window.location.href = "/ReviewTask?=" + row.id)
                   }
                 />
-              ) : (
+              ) : row.status == "CANCELED" ? (
+                <ActionButton
+                  icon={<FileTextOutlined />}
+                  color={color.primary1}
+                  onClick={() => (window.location.href = "/CancelTasks")}
+                />
+              ) : row.status == "DONE" ? (
                 <ActionButton
                   icon={<FileTextOutlined />}
                   color={color.primary1}
                   onClick={() =>
-                    (window.location.href = "/DetailFinishTasks?=" + row.id)
+                    (window.location.href = "/FinishTasks?=" + row.id)
                   }
                 />
-              )}
+              ) : null}
             </div>
           ),
         };

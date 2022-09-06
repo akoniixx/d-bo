@@ -16,3 +16,10 @@ export const STATUS_COLOR_TASK: any = {
     DONE: color.Success,
     CANCELED: color.Error,
   };
+  export const RATE_SELECT: any = [
+    { value: "1", name: "1" },
+    { value: "2", name: "2" },
+    { value: "3", name: "3" },
+    { value: "4", name: "4" },
+    { value: "5", name: "5" },
+  ];

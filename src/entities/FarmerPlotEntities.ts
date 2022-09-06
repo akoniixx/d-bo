@@ -13,6 +13,7 @@ export interface FarmerPlotEntity {
   lat: string;
   long: string;
   isActive: boolean;
+  locationName: string;
   plotId: number;
   farmerId?: string;
 }
@@ -28,6 +29,7 @@ export const FarmerPlotEntity_INIT: FarmerPlotEntity = {
   lat: LAT_LNG_BANGKOK.lat,
   long: LAT_LNG_BANGKOK.lng,
   isActive: true,
+  locationName: "",
   plotId: 0,
   farmerId: "",
 };
