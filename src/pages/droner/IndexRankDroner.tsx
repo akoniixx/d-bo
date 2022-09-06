@@ -44,6 +44,8 @@ export default function IndexRankDroner() {
   const { RangePicker } = DatePicker;
   const dateFormat = "DD/MM/YYYY";
   const dateSearchFormat = "YYYY-MM-DD";
+  const [lang, setLang] = useState<any>([]);
+
   useEffect(() => {
     fetchDronerRank();
     fetchProvince();
@@ -124,18 +126,32 @@ export default function IndexRankDroner() {
     }
     setCurrent(1);
   };
+  const sorter = (a: any, b: any) => {
+    if (a === b) return 0;
+    else if (a === null) return 1;
+    else if (b === null) return -1;
+    else return a.localeCompare(b);
+  };
 
   const handlerStar = (e: any) => {
-    let value = e.target.value;
-    console.log(e.target.value)
-    let checked = e.target.checked;
+    const { value, checked } = e.target;
+    console.log(value);
     console.log(checked);
-    for (let i = 1; i <= value; i++) {
+    if (checked) {
       setRatingMax(value);
+    } else {
+      setRatingMax("");
     }
+    // if (checked) {
+    //   setRatingMin(value)
+    // }else {
+    //   setRatingMin("");
+    // }
   };
+
   const ratingStar = (
     <Menu
+      onChange={handlerStar}
       items={[
         {
           label: (
@@ -154,7 +170,7 @@ export default function IndexRankDroner() {
             </div>
           ),
           key: "5",
-          icon: <Checkbox value={5} onChange={handlerStar}></Checkbox>,
+          icon: <Checkbox value={5}></Checkbox>,
         },
         {
           label: (
@@ -172,7 +188,7 @@ export default function IndexRankDroner() {
             </div>
           ),
           key: "4",
-          icon: <Checkbox value={4} onChange={handlerStar}></Checkbox>,
+          icon: <Checkbox value={4}></Checkbox>,
         },
         {
           label: (
@@ -189,7 +205,7 @@ export default function IndexRankDroner() {
             </div>
           ),
           key: "3",
-          icon: <Checkbox value={3} onChange={handlerStar}></Checkbox>,
+          icon: <Checkbox value={3}></Checkbox>,
         },
         {
           label: (
@@ -205,7 +221,7 @@ export default function IndexRankDroner() {
             </div>
           ),
           key: "2",
-          icon: <Checkbox value={2} onChange={handlerStar}></Checkbox>,
+          icon: <Checkbox value={2}></Checkbox>,
         },
         {
           label: (
@@ -220,7 +236,7 @@ export default function IndexRankDroner() {
             </div>
           ),
           key: "1",
-          icon: <Checkbox value={1} onChange={handlerStar}></Checkbox>,
+          icon: <Checkbox value={1}></Checkbox>,
         },
       ]}
     />
@@ -372,6 +388,7 @@ export default function IndexRankDroner() {
       title: "จำนวนให้บริการ",
       dataIndex: "totalTaskCount",
       key: "totalTaskCount",
+      sorter: (a: any, b: any) => sorter(a.totalTaskCount, b.totalTaskCount),
       render: (value: any, row: any, index: number) => {
         return {
           children: (
@@ -388,6 +405,7 @@ export default function IndexRankDroner() {
       title: "จำนวนไร่",
       dataIndex: "totalRaiCount",
       key: "totalRaiCount",
+      sorter: (a: any, b: any) => sorter(a.totalRaiCount, b.totalRaiCount),
       render: (value: any, row: any, index: number) => {
         return {
           children: (
@@ -404,6 +422,7 @@ export default function IndexRankDroner() {
       title: "คะแนน Rating",
       dataIndex: "avgrating",
       key: "avgrating",
+      sorter: (a: any, b: any) => sorter(a.avgrating, b.avgrating),
       render: (value: any, row: any, index: number) => {
         let rate = row.avgrating;
         return {

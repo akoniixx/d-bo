@@ -17,6 +17,8 @@ import { DronerRankDatasource } from "../../datasource/DronerRankDatasource";
 import {
   AddressEntity,
   AddressEntity_INIT,
+  FullAddressEntiry_INIT,
+  FullAddressEntity,
 } from "../../entities/AddressEntities";
 import {
   StarFilled,
@@ -24,6 +26,8 @@ import {
   ClockCircleOutlined,
 } from "@ant-design/icons";
 import { UploadImageDatasouce } from "../../datasource/UploadImageDatasource";
+import { DistrictEntity, DistrictEntity_INIT, ProviceEntity, ProvinceEntity_INIT, SubdistrictEntity, SubdistrictEntity_INIT } from "../../entities/LocationEntities";
+import { LocationDatasource } from "../../datasource/LocationDatasource";
 const _ = require("lodash");
 let queryString = _.split(window.location.search, "=");
 const dateFormat = "DD/MM/YYYY";
@@ -32,7 +36,7 @@ const timeFormat = "HH:mm";
 function DetailWorkDroner() {
   const taskId = queryString[1];
   const [data, setData] = useState<taskDetailEntity>(taskDetailEntity_INIT);
-  const [address, setAddress] = useState<AddressEntity>(AddressEntity_INIT);
+  const [address, setAddress] = useState<FullAddressEntity>(FullAddressEntiry_INIT);
   let imgList: (string | boolean)[] = [];
   const [mapPosition, setMapPosition] = useState<{ lat: number; lng: number }>({
     lat: LAT_LNG_BANGKOK.lat,
@@ -66,6 +70,12 @@ function DetailWorkDroner() {
   useEffect(() => {
     fetchTask();
   }, []);
+
+  const filterAddress = (addressId : string) => {
+    // console.log(addressId)
+    // let filterData =  
+    // console.log(filterData);
+  }
 
   const financial = (e: any) => {
     return Number.parseFloat(e).toFixed(1);
@@ -303,7 +313,9 @@ function DetailWorkDroner() {
           <div className="col-lg-12 text-start">
             <label>พื้นที่แปลงเกษตร</label>
             <Form.Item>
-              <Input disabled placeholder="ต.สันผักหวาน/อ.หางดง/จ.เชียงใหม่" />
+              <Input 
+              disabled 
+              defaultValue={data.farmerPlot.locationName}/>
             </Form.Item>
           </div>
         </div>
@@ -355,10 +367,7 @@ function DetailWorkDroner() {
           <span>{data.droner.telephoneNo}</span>
         </div>
         <div className="col-lg-4">
-          <span>สวนพริกไทย, เมืองปทุมธานี, กรุงเทพมหานคร</span>
-          {/* {data.address != null
-              ? data.address.subdistrict.subdistrictName
-              : "-"} */}
+          {/* {data.droner.address.subdistrictId} */}
         </div>
         <div className="col-lg">
           <span>
