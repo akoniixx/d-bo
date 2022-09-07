@@ -44,8 +44,6 @@ export default function IndexRankDroner() {
   const { RangePicker } = DatePicker;
   const dateFormat = "DD/MM/YYYY";
   const dateSearchFormat = "YYYY-MM-DD";
-  const [lang, setLang] = useState<any>([]);
-
   useEffect(() => {
     fetchDronerRank();
     fetchProvince();
@@ -116,7 +114,7 @@ export default function IndexRankDroner() {
     setSearchSubdistrict(subdistrictId);
     setCurrent(1);
   };
-  const SearchDate = (e: any) => {
+  const handleSearchDate = (e: any) => {
     if (e != null) {
       setStartDate(moment(new Date(e[0])).format(dateSearchFormat));
       setEndDate(moment(new Date(e[1])).format(dateSearchFormat));
@@ -126,6 +124,7 @@ export default function IndexRankDroner() {
     }
     setCurrent(1);
   };
+
   const sorter = (a: any, b: any) => {
     if (a === b) return 0;
     else if (a === null) return 1;
@@ -134,19 +133,14 @@ export default function IndexRankDroner() {
   };
 
   const handlerStar = (e: any) => {
-    const { value, checked } = e.target;
-    console.log(value);
-    console.log(checked);
-    if (checked) {
+    const value = e.target.value;
+    let checked = e.target.checked;
+    if(checked){
       setRatingMax(value);
-    } else {
-      setRatingMax("");
-    }
-    // if (checked) {
-    //   setRatingMin(value)
-    // }else {
-    //   setRatingMin("");
-    // }
+    }else(
+      setRatingMax("")
+    )
+
   };
 
   const ratingStar = (
@@ -258,7 +252,7 @@ export default function IndexRankDroner() {
         <div style={{ color: color.Error }}>
           <RangePicker
             allowClear
-            onCalendarChange={SearchDate}
+            onCalendarChange={(val) => handleSearchDate(val)}
             format={dateFormat}
           />
         </div>

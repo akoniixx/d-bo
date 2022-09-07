@@ -26,7 +26,14 @@ import {
   ClockCircleOutlined,
 } from "@ant-design/icons";
 import { UploadImageDatasouce } from "../../datasource/UploadImageDatasource";
-import { DistrictEntity, DistrictEntity_INIT, ProviceEntity, ProvinceEntity_INIT, SubdistrictEntity, SubdistrictEntity_INIT } from "../../entities/LocationEntities";
+import {
+  DistrictEntity,
+  DistrictEntity_INIT,
+  ProviceEntity,
+  ProvinceEntity_INIT,
+  SubdistrictEntity,
+  SubdistrictEntity_INIT,
+} from "../../entities/LocationEntities";
 import { LocationDatasource } from "../../datasource/LocationDatasource";
 const _ = require("lodash");
 let queryString = _.split(window.location.search, "=");
@@ -36,7 +43,9 @@ const timeFormat = "HH:mm";
 function DetailWorkDroner() {
   const taskId = queryString[1];
   const [data, setData] = useState<taskDetailEntity>(taskDetailEntity_INIT);
-  const [address, setAddress] = useState<FullAddressEntity>(FullAddressEntiry_INIT);
+  const [address, setAddress] = useState<FullAddressEntity>(
+    FullAddressEntiry_INIT
+  );
   let imgList: (string | boolean)[] = [];
   const [mapPosition, setMapPosition] = useState<{ lat: number; lng: number }>({
     lat: LAT_LNG_BANGKOK.lat,
@@ -70,12 +79,6 @@ function DetailWorkDroner() {
   useEffect(() => {
     fetchTask();
   }, []);
-
-  const filterAddress = (addressId : string) => {
-    // console.log(addressId)
-    // let filterData =  
-    // console.log(filterData);
-  }
 
   const financial = (e: any) => {
     return Number.parseFloat(e).toFixed(1);
@@ -313,9 +316,7 @@ function DetailWorkDroner() {
           <div className="col-lg-12 text-start">
             <label>พื้นที่แปลงเกษตร</label>
             <Form.Item>
-              <Input 
-              disabled 
-              defaultValue={data.farmerPlot.locationName}/>
+              <Input disabled defaultValue={data.farmerPlot.locationName} />
             </Form.Item>
           </div>
         </div>
@@ -367,7 +368,9 @@ function DetailWorkDroner() {
           <span>{data.droner.telephoneNo}</span>
         </div>
         <div className="col-lg-4">
-          {/* {data.droner.address.subdistrictId} */}
+          {data.droner.address.subdistrict.subdistrictName},
+          {data.droner.address.district.districtName},
+          {data.droner.address.province.region}
         </div>
         <div className="col-lg">
           <span>
