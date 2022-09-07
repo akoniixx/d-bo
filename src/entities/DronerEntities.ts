@@ -16,6 +16,7 @@ import {
 
 export interface DronerEntity {
   id: string;
+  dronerCode: string;
   firstname: string;
   lastname: string;
   idNo: string;
@@ -36,6 +37,7 @@ export interface DronerEntity {
 }
 export const DronerEntity_INIT: DronerEntity = {
   id: "",
+  dronerCode: "",
   firstname: "",
   lastname: "",
   idNo: "",

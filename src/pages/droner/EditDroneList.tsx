@@ -68,6 +68,7 @@ function EditDroneList() {
   const [imgLicenseDrone, setImgLicenseDrone] = useState<any>(false);
   let [textReason, setTextReason] = useState<any>();
   let [textReasonMore, setTextReasonMore] = useState<any>();
+  const [validateText, setValidateText] = useState<any>("");
 
   const fetchDronerDrone = async () => {
     await DronerDroneDatasource.getDronerDroneById(DronerDroneId).then(
@@ -162,6 +163,8 @@ function EditDroneList() {
     }
     const m = Map(data).set("status", e.target.value);
     const n = Map(m.toJS()).set("reason", []);
+    setTextReason("");
+    setTextReasonMore("");
     setData(n.toJS());
   };
   const handleMonth = async (e: any) => {
@@ -191,19 +194,32 @@ function EditDroneList() {
         "reason",
         [...data.reason, value].filter((x) => x != "")
       );
-      setBtnSaveDisable(false);
     } else {
       let removeReason = data.reason.filter((x) => x != value);
       p = Map(data).set("reason", removeReason);
-      setBtnSaveDisable(true);
     }
     setData(p.toJS());
+    checkValidate(p.toJS());
   };
   const onChangeReasonText = async (
     e: React.ChangeEvent<HTMLTextAreaElement>
   ) => {
     if (e.target.value.trim().length != 0) {
       setTextReason(e.target.value);
+      setBtnSaveDisable(false);
+    } else {
+      // setBtnSaveDisable(true);
+    }
+  };
+  const checkValidate = (data?: GetDronerDroneEntity) => {
+    let checkEmptyArray = false;
+    if (data?.reason !== undefined) {
+      checkEmptyArray =
+        ![data?.reason][0]?.includes("") &&
+        data?.reason.length !== 0 &&
+        data?.reason !== undefined;
+    }
+    if (checkEmptyArray) {
       setBtnSaveDisable(false);
     } else {
       setBtnSaveDisable(true);
@@ -216,6 +232,7 @@ function EditDroneList() {
       setTextReasonMore(e.target.value);
       setBtnSaveDisable(false);
     } else {
+      setValidateText("error");
       setBtnSaveDisable(true);
     }
   };
@@ -254,13 +271,14 @@ function EditDroneList() {
     imgWindow?.document.write(image.outerHTML);
   };
   const removeLicenseDroner = () => {
-    const removeImg = data.file?.filter(
-      (x) => x.category != "DRONER_LICENSE"
-    )[0];
-    const d = Map(data).set("file", removeImg == undefined ? [] : [removeImg]);
-    setData(d.toJS());
+    const getImg = data.file.filter((x) => x.category == "DRONER_LICENSE")[0];
+    if (getImg != undefined) {
+      UploadImageDatasouce.deleteImage(getImg.id, getImg.path).then(
+        (res) => {}
+      );
+    }
     setImgLicenseDroner(false);
-    setBtnSaveDisable(true);
+    setBtnSaveDisable(false);
   };
   const onChangeLicenseDrone = async (file: any) => {
     let src = file.target.files[0];
@@ -329,7 +347,7 @@ function EditDroneList() {
     const pushTextReasons = Map(data).set("reason", setTextReason);
     await DronerDroneDatasource.updateDroneList(pushTextReasons.toJS()).then(
       (res) => {
-        if (res != undefined) {
+        if (res) {
           var i = 0;
           for (i; 2 > i; i++) {
             i == 0 &&
@@ -469,7 +487,6 @@ function EditDroneList() {
           <div className="row">
             <div className="form-group col-lg-6 pb-5">
               <label>ใบอนุญาตนักบิน</label>
-              <span style={{ color: "red" }}>*</span>
               <span style={{ color: color.Disable }}> (ไฟล์รูป หรือ pdf.)</span>
               <br />
               <div className="pb-2">
@@ -575,15 +592,7 @@ function EditDroneList() {
               <label style={{ marginBottom: "10px" }}>
                 สถานะ <span style={{ color: "red" }}>*</span>
               </label>
-              <Form.Item
-                name="status"
-                rules={[
-                  {
-                    required: true,
-                    message: "กรุณากรอกหมายเหตุ",
-                  },
-                ]}
-              >
+              <Form.Item name="status">
                 <div className="row">
                   <div className="form-group col-lg-12">
                     <Radio.Group
@@ -639,6 +648,7 @@ function EditDroneList() {
                                 <div>
                                   <div className="form-group ps-3">
                                     <TextArea
+                                      status={validateText}
                                       style={{ width: "530px" }}
                                       className="col-lg-12"
                                       rows={3}
@@ -647,6 +657,11 @@ function EditDroneList() {
                                       autoComplete="off"
                                       defaultValue={data.reason}
                                     />
+                                    {validateText == "error" && (
+                                      <p style={{ color: color.Error }}>
+                                        กรุณากรอกเหตุผลเพิ่มเติม
+                                      </p>
+                                    )}
                                   </div>
                                 </div>
                               ) : null}
@@ -686,7 +701,7 @@ function EditDroneList() {
               <div className="form-group col-lg-12 text-start">
                 <label>Droner ID</label>
                 <Form.Item name="droneId">
-                  <Input disabled defaultValue={data.dronerId} />
+                  <Input disabled defaultValue={data.droner.dronerCode} />
                 </Form.Item>
                 <label>ชื่อ</label>
                 <Form.Item name="firstname">
