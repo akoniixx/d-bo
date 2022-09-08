@@ -31,8 +31,6 @@ export default function IndexRankDroner() {
   const [current, setCurrent] = useState(1);
   const [data, setData] = useState<DronerRankListEntity>();
   const [searchText, setSearchText] = useState<string>();
-  const [ratingMin, setRatingMin] = useState<any>();
-  const [ratingMax, setRatingMax] = useState<any>();
   const [startDate, setStartDate] = useState<any>(null);
   const [endDate, setEndDate] = useState<any>(null);
   const [searchProvince, setSearchProvince] = useState<any>();
@@ -41,6 +39,12 @@ export default function IndexRankDroner() {
   const [province, setProvince] = useState<ProviceEntity[]>();
   const [district, setDistrict] = useState<DistrictEntity[]>();
   const [subdistrict, setSubdistrict] = useState<SubdistrictEntity[]>();
+  const [visibleRating, setVisibleRating] = useState(false);
+  const [accuNumber, setAccuNumber] = useState<number[]>([]);
+  const [rating, setRating] = useState<{
+    ratingMin: number;
+    ratingMax: number;
+  }>();
   const { RangePicker } = DatePicker;
   const dateFormat = "DD/MM/YYYY";
   const dateSearchFormat = "YYYY-MM-DD";
@@ -55,8 +59,8 @@ export default function IndexRankDroner() {
     searchProvince,
     searchDistrict,
     searchSubdistrict,
-    ratingMax,
-    ratingMin,
+    rating?.ratingMax,
+    rating?.ratingMin,
     startDate,
     endDate,
   ]);
@@ -67,8 +71,8 @@ export default function IndexRankDroner() {
       searchSubdistrict,
       searchDistrict,
       searchProvince,
-      ratingMin,
-      ratingMax,
+      rating?.ratingMax,
+      rating?.ratingMin,
       startDate,
       endDate,
       searchText
@@ -130,23 +134,34 @@ export default function IndexRankDroner() {
   };
 
   const handlerStar = (e: any) => {
-    const value = e.target.value;
-    console.log(value)
+    let value = e.target.value;
     let checked = e.target.checked;
-    console.log(checked)
-    if(checked){
-      setRatingMax(value);
-    }else{
-      setRatingMax("");
+    let min = 0;
+    let max = 0;
+    if (checked) {
+      min = Math.min(...accuNumber, value);
+      console.log("min",min);
+      max = Math.max(...accuNumber, value);
+     
+      console.log("max",max);
+     
+      setAccuNumber([...accuNumber, value]);
+    } else {
+      let d: number[] = accuNumber.filter((x) => x != value);
+      console.log("else", d)
+      min = Math.min(...d);
+      max = Math.max(...d);
+      setAccuNumber(d);
     }
-    console.log(ratingMax);
-    console.log(ratingMin);
-   
+    setRating({ ratingMin: min, ratingMax: max });
+    console.log("rate",rating)
+  };
+  const handleVisibleRating = (newVisible: any) => {
+    setVisibleRating(newVisible);
   };
 
   const ratingStar = (
     <Menu
-    onChange={handlerStar}
       items={[
         {
           label: (
@@ -165,7 +180,7 @@ export default function IndexRankDroner() {
             </div>
           ),
           key: "1",
-          icon: <Checkbox value={5}   ></Checkbox>,
+          icon: <Checkbox value={5} onChange={handlerStar}></Checkbox>,
         },
         {
           label: (
@@ -183,7 +198,7 @@ export default function IndexRankDroner() {
             </div>
           ),
           key: "2",
-          icon: <Checkbox value={4}  ></Checkbox>,
+          icon: <Checkbox value={4}onChange={handlerStar}   ></Checkbox>,
         },
         {
           label: (
@@ -200,7 +215,7 @@ export default function IndexRankDroner() {
             </div>
           ),
           key: "3",
-          icon: <Checkbox value={3}  ></Checkbox>,
+          icon: <Checkbox value={3} onChange={handlerStar}  ></Checkbox>,
         },
         {
           label: (
@@ -216,7 +231,7 @@ export default function IndexRankDroner() {
             </div>
           ),
           key: "4",
-          icon: <Checkbox value={2}  ></Checkbox>,
+          icon: <Checkbox value={2} onChange={handlerStar}  ></Checkbox>,
         },
         {
           label: (
@@ -231,7 +246,7 @@ export default function IndexRankDroner() {
             </div>
           ),
           key: "5",
-          icon: <Checkbox value={1}  ></Checkbox>,
+          icon: <Checkbox value={1} onChange={handlerStar}  ></Checkbox>,
         },
       ]}
     />
@@ -254,7 +269,7 @@ export default function IndexRankDroner() {
           <RangePicker
             allowClear
             onCalendarChange={(val) => handleSearchDate(val)}
-            format={dateFormat}
+            format={dateSearchFormat}
           />
         </div>
       </div>
@@ -344,7 +359,12 @@ export default function IndexRankDroner() {
           </Select>
         </div>
         <div className="col-lg-2 p-1">
-          <Dropdown overlay={ratingStar} className="col-lg-12">
+          <Dropdown 
+          overlay={ratingStar} 
+          trigger={["click"]} 
+          onVisibleChange={handleVisibleRating}
+          visible={visibleRating}
+          className="col-lg-12">
             <Button style={{ color: color.Disable }}>
               เลือกคะแนน Rating
               <DownOutlined />
