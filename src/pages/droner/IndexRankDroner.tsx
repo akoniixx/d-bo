@@ -1,12 +1,12 @@
 import {
   Button,
-  Cascader,
   Checkbox,
   DatePicker,
   Dropdown,
   Menu,
   Pagination,
   Rate,
+  Row,
   Select,
   Table,
 } from "antd";
@@ -99,9 +99,6 @@ export default function IndexRankDroner() {
   const onChangePage = (page: number) => {
     setCurrent(page);
   };
-  const financial = (e: any) => {
-    return Number.parseFloat(e).toFixed(1);
-  };
   const handleProvince = (provinceId: number) => {
     setSearchProvince(provinceId);
     setCurrent(1);
@@ -134,18 +131,22 @@ export default function IndexRankDroner() {
 
   const handlerStar = (e: any) => {
     const value = e.target.value;
+    console.log(value)
     let checked = e.target.checked;
+    console.log(checked)
     if(checked){
       setRatingMax(value);
-    }else(
-      setRatingMax("")
-    )
-
+    }else{
+      setRatingMax("");
+    }
+    console.log(ratingMax);
+    console.log(ratingMin);
+   
   };
 
   const ratingStar = (
     <Menu
-      onChange={handlerStar}
+    onChange={handlerStar}
       items={[
         {
           label: (
@@ -163,8 +164,8 @@ export default function IndexRankDroner() {
               <StarFilled />
             </div>
           ),
-          key: "5",
-          icon: <Checkbox value={5}></Checkbox>,
+          key: "1",
+          icon: <Checkbox value={5}   ></Checkbox>,
         },
         {
           label: (
@@ -181,8 +182,8 @@ export default function IndexRankDroner() {
               <StarFilled />
             </div>
           ),
-          key: "4",
-          icon: <Checkbox value={4}></Checkbox>,
+          key: "2",
+          icon: <Checkbox value={4}  ></Checkbox>,
         },
         {
           label: (
@@ -199,7 +200,7 @@ export default function IndexRankDroner() {
             </div>
           ),
           key: "3",
-          icon: <Checkbox value={3}></Checkbox>,
+          icon: <Checkbox value={3}  ></Checkbox>,
         },
         {
           label: (
@@ -214,8 +215,8 @@ export default function IndexRankDroner() {
               <StarFilled />
             </div>
           ),
-          key: "2",
-          icon: <Checkbox value={2}></Checkbox>,
+          key: "4",
+          icon: <Checkbox value={2}  ></Checkbox>,
         },
         {
           label: (
@@ -229,8 +230,8 @@ export default function IndexRankDroner() {
               <StarFilled />
             </div>
           ),
-          key: "1",
-          icon: <Checkbox value={1}></Checkbox>,
+          key: "5",
+          icon: <Checkbox value={1}  ></Checkbox>,
         },
       ]}
     />
@@ -418,19 +419,23 @@ export default function IndexRankDroner() {
       key: "avgrating",
       sorter: (a: any, b: any) => sorter(a.avgrating, b.avgrating),
       render: (value: any, row: any, index: number) => {
-        let rate = row.avgrating;
+        const checkAvgrating = () => {
+          return row.avgrating > 0 ? true : false;
+        };
         return {
           children: (
             <>
               <span className="text-dark-75  d-block font-size-lg">
-                <StarFilled
-                  style={{
-                    color: "#FFCA37",
-                    fontSize: "20px",
-                    marginRight: "10px",
-                  }}
-                />
-                {rate != null ? financial(row.avgrating) : 0}
+              {checkAvgrating() && (
+                <Row>
+                  <div style={{ color: "#FFCA37", fontSize: "16px" }}>
+                    <StarFilled />
+                  </div>
+                  <span className="pt-2 ps-1">
+                    {parseFloat(row.avgrating).toFixed(1)}
+                  </span>
+                </Row>
+              )}
               </span>
             </>
           ),

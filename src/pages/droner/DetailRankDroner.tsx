@@ -57,10 +57,6 @@ function DetailRankDroner() {
     });
   };
 
-  const financial = (e: any) => {
-    return Number.parseFloat(e).toFixed(1);
-  };
-
   const renderDroner = (
     <div className="col-lg-4">
       <CardContainer key={data.id}>
@@ -99,16 +95,18 @@ function DetailRankDroner() {
             <CardContainer style={style}>
               <span>คะแนน Rating</span>
               <br />
-              <span style={{ color: color.Success }}>
-                <StarFilled
-                  style={{
-                    color: "#FFCA37",
-                    fontSize: "20px",
-                    marginRight: "10px",
-                  }}
-                />
-                {financial(data.avgrating)}
-              </span>
+              {data.avgrating > "0" ? (
+                <span style={{ color: color.Success, padding: "7px" }}>
+                  <StarFilled
+                    style={{
+                      color: "#FFCA37",
+                      fontSize: "20px",
+                      marginRight: "7px",
+                    }}
+                  />
+                  {parseFloat(data.avgrating).toFixed(1)}
+                </span>
+              ) : "-"}
             </CardContainer>
           </div>
           <div className="row">
@@ -254,21 +252,25 @@ function DetailRankDroner() {
                     </span>
                   </div>
                   <div className="col-lg">
-                    <span>{financial(item.farmAreaAmount) + " " + "ไร่"}</span>
+                    <span>
+                      {parseFloat(item.farmAreaAmount).toFixed(1) + " " + "ไร่"}
+                    </span>
                   </div>
                   <div className="col-lg-2">
                     <span>{item.farmer.address.province.region}</span>
                   </div>
                   <div className="col-lg">
                     <span>
-                      <StarFilled
-                        style={{
-                          color: "#FFCA37",
-                          fontSize: "20px",
-                          marginRight: "10px",
-                        }}
-                      />
-                      {financial(item.reviewDronerAvg)}
+                      {item.reviewDronerAvg > "0" ? (
+                        <Row>
+                          <div style={{ color: "#FFCA37", fontSize: "16px" }}>
+                            <StarFilled />
+                          </div>
+                          <span className="pt-1 ps-1">
+                            {parseFloat(item.reviewDronerAvg).toFixed(1)}
+                          </span>
+                        </Row>
+                      ) : null}
                     </span>
                   </div>
                   <div className="col-lg">
@@ -315,7 +317,6 @@ function DetailRankDroner() {
       <Row className="d-flex justify-content-around">
         {renderDroner}
         {renderFromData}
-       
       </Row>
     </Layout>
   );

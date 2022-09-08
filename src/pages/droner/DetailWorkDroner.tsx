@@ -80,9 +80,6 @@ function DetailWorkDroner() {
     fetchTask();
   }, []);
 
-  const financial = (e: any) => {
-    return Number.parseFloat(e).toFixed(1);
-  };
   const formatCurrency = (e: any) => {
     e = parseFloat(e);
     return e.toFixed(2).replace(/./g, function (c: any, i: any, a: any) {
@@ -203,21 +200,33 @@ function DetailWorkDroner() {
           </Form.Item>
           <br />
           <Form.Item>
-            <label style={{ marginRight: "30px" }}>คะแนนรีวิว </label>
-            <span>
-              {" "}
-              {starIcon}
-              {financial(data.reviewDronerAvg)}
-            </span>
+          <div className="row">
+          <label className="col-lg-3">คะแนนรีวิว </label>
+              <div className="col-lg-6">
+              {data.reviewDronerAvg > "0" ? (
+              <Row>
+                {starIcon}
+                <span>{parseFloat(data.reviewDronerAvg).toFixed(1)}</span>
+              </Row>
+            ) : null}
+              </div>
+            </div>
+            <br/>
             <div className="row">
               <div className="col-lg-6" style={{ color: color.Grey }}>
                 1. มารยาทนักบิน{" "}
               </div>
               <div className="col-lg-6">
-                {starIcon}
-                {data.reviewDronerDetail != null
-                  ? financial(data.reviewDronerDetail.pilotEtiquette)
-                  : 0}
+                {data.reviewDronerDetail !== null ? (
+                  <Row>
+                    {starIcon}
+                    <span>
+                      {parseFloat(
+                        data.reviewDronerDetail.pilotEtiquette
+                      ).toFixed(1)}
+                    </span>
+                  </Row>
+                ) : null}
               </div>
             </div>
             <div className="row">
@@ -225,10 +234,16 @@ function DetailWorkDroner() {
                 2. ความตรงต่อเวลา{" "}
               </div>
               <div className="col-lg-6">
-                {starIcon}
-                {data.reviewDronerDetail != null
-                  ? financial(data.reviewDronerDetail.punctuality)
-                  : 0}
+                {data.reviewDronerDetail !== null ? (
+                  <Row>
+                    {starIcon}
+                    <span>
+                      {parseFloat(data.reviewDronerDetail.punctuality).toFixed(
+                        1
+                      )}
+                    </span>
+                  </Row>
+                ) : null}
               </div>
             </div>
             <div className="row">
@@ -236,10 +251,16 @@ function DetailWorkDroner() {
                 3. ความเชี่ยวชาญในการพ่น{" "}
               </div>
               <div className="col-lg-6">
-                {starIcon}
-                {data.reviewDronerDetail != null
-                  ? financial(data.reviewDronerDetail.sprayExpertise)
-                  : 0}
+                {data.reviewDronerDetail !== null ? (
+                  <Row>
+                    {starIcon}
+                    <span>
+                      {parseFloat(
+                        data.reviewDronerDetail.sprayExpertise
+                      ).toFixed(1)}
+                    </span>
+                  </Row>
+                ) : null}
               </div>
             </div>
           </Form.Item>
