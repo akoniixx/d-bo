@@ -1,4 +1,7 @@
 ## [Version - 0]
+## Fix [v0.9.5] 2022-09-08
+- fixed droner image license is not required.
+- fixed status. if not checkbox, put a reason.
 ## Fix [v0.9.4] 2022-09-05
 - enhaced farmer plot added function geocoder from google map for collect "locationName"
 ## Fix [v0.9.3] 2022-09-01

@@ -204,22 +204,31 @@ function EditDroneList() {
   const onChangeReasonText = async (
     e: React.ChangeEvent<HTMLTextAreaElement>
   ) => {
-    if (e.target.value.trim().length != 0) {
+    if (e.target.value) {
       setTextReason(e.target.value);
       setBtnSaveDisable(false);
     } else {
-      // setBtnSaveDisable(true);
+      if (
+        REASON_IS_CHECK[0].isChecked ||
+        REASON_IS_CHECK[1].isChecked ||
+        REASON_IS_CHECK[2].isChecked
+      ) {
+        setBtnSaveDisable(false);
+      } else {
+        setBtnSaveDisable(true);
+      }
     }
   };
   const checkValidate = (data?: GetDronerDroneEntity) => {
-    let checkEmptyArray = false;
+    let checkEmptyReason = false;
     if (data?.reason !== undefined) {
-      checkEmptyArray =
+      checkEmptyReason =
         ![data?.reason][0]?.includes("") &&
         data?.reason.length !== 0 &&
+        data?.reason !== null &&
         data?.reason !== undefined;
     }
-    if (checkEmptyArray) {
+    if (checkEmptyReason) {
       setBtnSaveDisable(false);
     } else {
       setBtnSaveDisable(true);
