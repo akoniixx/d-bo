@@ -3,27 +3,39 @@ import { TaskSearchDroner } from "../entities/TaskSearchDroner";
 
 export class TaskSearchDronerDatasource {
   static getTaskDronerList(
-    farmerId: string,
-    plotId: string,
-    date: string
+    farmerId?: string,
+    plotId?: string,
+    date?: string,
+    search?: string,
+    distanceMin?: number,
+    distanceMax?: number,
+    status?: string,
+    ratingMin?: number,
+    ratingMax?: number
   ): Promise<TaskSearchDroner[]> {
     const params = {
-      farmerId: "2efc4c8f-f3c9-40e4-8feb-14f5f9f0f9f0",
-      farmerPlotId: "21269963-f8a8-4eb5-adef-ab5d3ca622bc",
-      dateAppointment: "2022-08-31",
+      farmerId: farmerId,
+      farmerPlotId: plotId,
+      dateAppointment: date,
+      search: search,
+      distanceMin: distanceMin,
+      distanceMax: distanceMax,
+      status: status,
+      ratingMin: ratingMin,
+      ratingMax: ratingMax,
     };
-    return (
-      httpClient
-        //.post(BASE_URL + "/tasks/task/search-droner", { params })
-        .post(
-          "https://api-dev-dnds.iconkaset.com/tasks/task/search-droner?farmerId=2efc4c8f-f3c9-40e4-8feb-14f5f9f0f9f0&farmerPlotId=21269963-f8a8-4eb5-adef-ab5d3ca622bc&dateAppointment=2022-09-01"
-        )
-        .then((response) => {
-          return response.data;
-        })
-        .catch((err) => {
-          console.log(err, "err getTaskDroner");
-        })
-    );
+    if (params.distanceMax == 0) {
+      delete params["distanceMin"];
+      delete params["distanceMax"];
+    }
+    console.log(params);
+    return httpClient
+      .post(BASE_URL + "/tasks/task/search-droner", params)
+      .then((response) => {
+        return response.data;
+      })
+      .catch((err) => {
+        console.log(err, "err getTaskDroner");
+      });
   }
 }

@@ -105,6 +105,7 @@ const AddNewTask = () => {
     moment(undefined)
   );
   const [disableBtn, setDisableBtn] = useState<boolean>(true);
+  const [searchTextDroner, setSearchTextDroner] = useState<string>("");
 
   const fetchFarmerList = async (text?: string) => {
     await TaskDatasource.getFarmerList(text).then((res) => {
@@ -602,15 +603,26 @@ const AddNewTask = () => {
 
   //#region Step2
   const fetchDronerList = async (
-    farmerId: string,
-    plotId: string,
-    date: string
+    farmerId?: string,
+    plotId?: string,
+    date?: string,
+    search?: string,
+    status?: string,
+    ratingMin?: number,
+    ratingMax?: number
   ) => {
     await TaskSearchDronerDatasource.getTaskDronerList(
       farmerId,
       plotId,
-      date
+      date,
+      search,
+      distrance.min,
+      distrance.max,
+      status,
+      ratingMin,
+      ratingMax
     ).then((res) => {
+      console.log("res", res);
       res.map((item) =>
         _.set(
           item,
@@ -639,7 +651,7 @@ const AddNewTask = () => {
             </div>
           ),
           key: "1",
-          icon: <Checkbox></Checkbox>,
+          icon: <Checkbox value={5} onClick={(e) => onChangeRating(e)} />,
         },
         {
           label: (
@@ -651,7 +663,7 @@ const AddNewTask = () => {
             </div>
           ),
           key: "2",
-          icon: <Checkbox></Checkbox>,
+          icon: <Checkbox value={4} onClick={(e) => onChangeRating(e)} />,
         },
         {
           label: (
@@ -662,7 +674,7 @@ const AddNewTask = () => {
             </div>
           ),
           key: "3",
-          icon: <Checkbox></Checkbox>,
+          icon: <Checkbox value={3} onClick={(e) => onChangeRating(e)} />,
         },
         {
           label: (
@@ -672,7 +684,7 @@ const AddNewTask = () => {
             </div>
           ),
           key: "4",
-          icon: <Checkbox></Checkbox>,
+          icon: <Checkbox value={2} onClick={(e) => onChangeRating(e)} />,
         },
         {
           label: (
@@ -681,23 +693,61 @@ const AddNewTask = () => {
             </div>
           ),
           key: "5",
-          icon: <Checkbox></Checkbox>,
+          icon: <Checkbox value={1} onClick={(e) => onChangeRating(e)} />,
         },
       ]}
     />
   );
-  const [visible, setVisible] = useState(false);
-  const handleVisibleChange = (newVisible: any) => {
-    setVisible(newVisible);
+  const [visibleSlider, setVisibleSlider] = useState(false);
+  const [visibleRating, setVisibleRating] = useState(false);
+  const [distrance, setDistrance] = useState<{ min: number; max: number }>({
+    min: 0,
+    max: 0,
+  });
+  const [rating, setRating] = useState<{
+    ratingMin: number;
+    ratingMax: number;
+  }>();
+  const [statusDroner, setStatusDroner] = useState<string>();
+
+  const handleVisibleSlider = (newVisible: any) => {
+    setVisibleSlider(newVisible);
   };
-  const [inputValue, setInputValue] = useState(0);
-  const onChange = (newValue: any) => {
-    setInputValue(newValue);
+  const onChangeSlider = (newValue: any) => {
+    setDistrance({ min: newValue[0], max: newValue[1] });
   };
-  const handleSelectDroner = (e: any, data: any) => {
+  const onChangeDistranceMin = (e: any) => {
+    setDistrance({ min: e, max: distrance.max });
+  };
+  const onChangeDistranceMax = (e: any) => {
+    setDistrance({ min: distrance.min, max: e });
+  };
+  const onChangeStatusDroner = (e: any) => {
+    setStatusDroner(e);
+  };
+  const onChangeRating = (e: any) => {
+    let value = e.target.value;
+    let checked = e.target.checked;
+    console.log(value);
+    if (checked) {
+      compare(value);
+      //console.log("rating", rating);
+      //setRating({ ratingMin: value, ratingMax: value });
+    }
+    //setRating()
+  };
+  const compare = (i: number) => {
+    const accuNumber: number[] = [];
+    accuNumber.push(...accuNumber);
+    //accuNumber.push(i);
+    console.log("accu", accuNumber);
+    // let isBigger = i > j;
+    // console.log(isBigger);
+  };
+  const handleSelectDroner = async (e: any, data: any) => {
     let inputType = e.target.type;
     let checked = e.target.checked;
-    let d = [];
+    let d: TaskSearchDroner[] = [];
     if (inputType == "checkbox") {
       d = dataDronerList.map((item) =>
         _.set(
@@ -716,7 +766,19 @@ const AddNewTask = () => {
       );
     }
     setDataDronerList(d);
-    setDronerSelected(d.filter((x) => x.isChecked == true));
+    let checkSingleDroner = Array.from(
+      new Set(
+        d
+          .filter((x) => x.isChecked == true)
+          .map((y) => y)
+          .filter((z) => dronerSelected.map((a) => a.droner_id != z.droner_id))
+      )
+    );
+    console.log(checkSingleDroner);
+    setDronerSelected([
+      ...dronerSelected.filter((x) => x.droner_id != ""),
+      ...checkSingleDroner.filter((x) => x.droner_id != ""),
+    ]);
     checkValidateStep(
       createNewTask,
       current,
@@ -754,13 +816,17 @@ const AddNewTask = () => {
     setDronerSelected(d.filter((x) => x.isChecked == true));
     setShowModalSelectedDroner((prev) => !prev);
   };
+  const handleVisibleRating = (newVisible: any) => {
+    setVisibleRating(newVisible);
+  };
+
   const searchSection = (
     <div className="d-flex justify-content-between" style={{ padding: "10px" }}>
-      <div className="col-lg-3"></div>
       <div className="col-lg-3">
         <Search
           placeholder="ค้นหาชื่อเกษตรกร หรือเบอร์โทร"
           className="col-lg-12 p-1"
+          onChange={(e: any) => setSearchTextDroner(e.target.value)}
         />
       </div>
       <div className="col-lg-2 pt-1">
@@ -768,10 +834,12 @@ const AddNewTask = () => {
           content={
             <>
               <Slider
-                min={0}
+                range={{
+                  draggableTrack: true,
+                }}
+                value={[distrance.min, distrance.max]}
+                onChange={onChangeSlider}
                 max={200}
-                onChange={onChange}
-                value={typeof inputValue === "number" ? inputValue : 0}
               />
               <InputNumber
                 min={0}
@@ -779,22 +847,38 @@ const AddNewTask = () => {
                 style={{
                   margin: "0 16px",
                 }}
-                value={inputValue}
-                onChange={onChange}
+                value={distrance.min}
+                onChange={onChangeDistranceMin}
+              />
+              <InputNumber
+                min={0}
+                max={200}
+                style={{
+                  margin: "0 16px",
+                }}
+                id="max"
+                value={distrance.max}
+                onChange={onChangeDistranceMax}
               />
             </>
           }
           title="ระยะทาง (กิโลเมตร)"
           trigger="click"
-          visible={visible}
-          onVisibleChange={handleVisibleChange}
+          visible={visibleSlider}
+          onVisibleChange={handleVisibleSlider}
           placement="bottom"
         >
           <Button className="col-lg-12">เลือกระยะทาง</Button>
         </Popover>
       </div>
       <div className="col-lg-2 p-1">
-        <Dropdown overlay={ratingStar} className="col-lg-12">
+        <Dropdown
+          overlay={ratingStar}
+          trigger={["click"]}
+          className="col-lg-12"
+          onVisibleChange={handleVisibleRating}
+          visible={visibleRating}
+        >
           <Button>
             เลือก Rating
             <DownOutlined />
@@ -802,22 +886,40 @@ const AddNewTask = () => {
         </Dropdown>
       </div>
       <div className="col-lg-2">
-        <Select allowClear className="col-lg-12 p-1" placeholder="เลือกสถานะ">
-          <option value="true">สะดวก</option>
-          <option value="false">ไม่สะดวก</option>
+        <Select
+          allowClear
+          className="col-lg-12 p-1"
+          placeholder="เลือกสถานะ"
+          onChange={onChangeStatusDroner}
+        >
+          <option value="สะดวก">สะดวก</option>
+          <option value="ไม่สะดวก">ไม่สะดวก</option>
         </Select>
       </div>
-    </div>
-  );
-  const dronerSelectedList = (
-    <div className="d-flex justify-content-end">
-      <div className="p-1">
-        <p>
-          จำนวนนักบินโดรนที่เลือก{" "}
-          {dronerSelected.filter((x) => x.isChecked != false).length} คน
-        </p>
+      <div className="col-lg-1 pt-1">
+        <Button
+          style={{
+            borderColor: color.Success,
+            borderRadius: "5px",
+            color: color.secondary2,
+            backgroundColor: color.Success,
+          }}
+          onClick={() =>
+            fetchDronerList(
+              createNewTask.farmerId,
+              createNewTask.farmerPlotId,
+              dateAppointment,
+              searchTextDroner,
+              statusDroner,
+              rating?.ratingMin,
+              rating?.ratingMax
+            )
+          }
+        >
+          ค้นหาข้อมูล
+        </Button>
       </div>
-      <div>
+      <div className="col-lg-2 pt-1">
         <Button
           style={{
             borderColor: color.Success,
@@ -826,11 +928,13 @@ const AddNewTask = () => {
           }}
           onClick={() => setShowModalSelectedDroner((prev) => !prev)}
         >
-          ดูรายชื่อนักบินโดรนที่เลือก
+          ดูรายชื่อนักบินโดรนที่เลือก (
+          {dronerSelected.filter((x) => x.isChecked != false).length})
         </Button>
       </div>
     </div>
   );
+
   const columns = [
     {
       title: selectionType == "checkbox" && (
@@ -894,10 +998,10 @@ const AddNewTask = () => {
         return {
           children: (
             <>
-              <span>{row.total_task} งาน</span>
+              <span>{row.total_task == null ? 0 : row.total_task} งาน</span>
               <br />
               <span style={{ color: color.Grey }}>
-                รวม {row.total_area} ไร่
+                รวม {row.total_area == null ? 0 : row.total_area} ไร่
               </span>
             </>
           ),
@@ -981,7 +1085,6 @@ const AddNewTask = () => {
   const renderDronerList = (
     <>
       {searchSection}
-      {dronerSelectedList}
       <CardContainer>
         <Table
           columns={columns}
@@ -1152,6 +1255,11 @@ const AddNewTask = () => {
     if (checkCurrent == 0) {
       await checkValidateStep(createNewTask, checkCurrent);
     } else {
+      fetchDronerList(
+        createNewTask.farmerId,
+        createNewTask.farmerPlotId,
+        dateAppointment
+      );
       await checkValidateStep(createNewTask, checkCurrent, dronerSelected);
     }
     setCurrent(checkCurrent);
@@ -1179,11 +1287,6 @@ const AddNewTask = () => {
         profile.firstname + " " + profile.lastname
       );
       setCreateNewTask(p.toJS());
-      fetchDronerList(
-        p.toJS().farmerId,
-        p.toJS().farmerPlotId,
-        dateAppointment
-      );
       checkValidateStep(
         createNewTask,
         current,
@@ -1213,6 +1316,12 @@ const AddNewTask = () => {
         );
       }
     }
+    fetchDronerList(
+      createNewTask.farmerId,
+      createNewTask.farmerPlotId,
+      dateAppointment,
+      searchTextDroner
+    );
     checkValidateStep(
       createNewTask,
       current + 1,
