@@ -704,6 +704,7 @@ const AddNewTask = () => {
     min: 0,
     max: 0,
   });
+  const [accuNumber, setAccuNumber] = useState<number[]>([]);
   const [rating, setRating] = useState<{
     ratingMin: number;
     ratingMax: number;
@@ -728,21 +729,19 @@ const AddNewTask = () => {
   const onChangeRating = (e: any) => {
     let value = e.target.value;
     let checked = e.target.checked;
-    console.log(value);
+    let min = 0;
+    let max = 0;
     if (checked) {
-      compare(value);
-      //console.log("rating", rating);
-      //setRating({ ratingMin: value, ratingMax: value });
+      min = Math.min(...accuNumber, value);
+      max = Math.max(...accuNumber, value);
+      setAccuNumber([...accuNumber, value]);
+    } else {
+      let d: number[] = accuNumber.filter((x) => x != value);
+      min = Math.min(...d);
+      max = Math.max(...d);
+      setAccuNumber(d);
     }
-    //setRating()
-  };
-  const compare = (i: number) => {
-    const accuNumber: number[] = [];
-    accuNumber.push(...accuNumber);
-    //accuNumber.push(i);
-    console.log("accu", accuNumber);
-    // let isBigger = i > j;
-    // console.log(isBigger);
+    setRating({ ratingMin: min, ratingMax: max });
   };
   const handleSelectDroner = async (e: any, data: any) => {
     let inputType = e.target.type;
@@ -1019,7 +1018,7 @@ const AddNewTask = () => {
         return {
           children: (
             <>
-              {checkRating() && (
+              {checkRating() ? (
                 <Row>
                   <div style={{ color: "#FFCA37", fontSize: "16px" }}>
                     <StarFilled />
@@ -1028,7 +1027,7 @@ const AddNewTask = () => {
                     {parseFloat(row.rating_avg).toFixed(2)} ({row.count_rating})
                   </span>
                 </Row>
-              )}
+              ) : <p>-</p>}
             </>
           ),
         };
@@ -1210,7 +1209,6 @@ const AddNewTask = () => {
       </Form>
     </CardContainer>
   );
-
   //#endregion
 
   const checkValidateStep = (
