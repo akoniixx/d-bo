@@ -69,6 +69,7 @@ function EditDroneList() {
   let [textReason, setTextReason] = useState<any>();
   let [textReasonMore, setTextReasonMore] = useState<any>();
   const [validateText, setValidateText] = useState<any>("");
+  const [validateText1, setValidateText1] = useState<any>("");
 
   const fetchDronerDrone = async () => {
     await DronerDroneDatasource.getDronerDroneById(DronerDroneId).then(
@@ -215,6 +216,7 @@ function EditDroneList() {
       ) {
         setBtnSaveDisable(false);
       } else {
+        setValidateText1("error");
         setBtnSaveDisable(true);
       }
     }
@@ -643,14 +645,20 @@ function EditDroneList() {
                                   <Form.Item style={{ width: "530px" }}>
                                     <TextArea
                                       rows={3}
+                                      status={validateText1}
                                       onChange={onChangeReasonText}
-                                      placeholder="กรอกเหตุผล/หมายเหตุเพิ่มเติม"
+                                      placeholder="กรอกเหตุผล/หมายเหตุเพิ่มเติม "
                                       autoComplete="off"
                                       defaultValue={data.reason.filter(
                                         (a) =>
                                           !REASON_CHECK.some((x) => x === a)
                                       )}
                                     />
+                                    {validateText1 == "error" && (
+                                      <p style={{ color: color.Error }}>
+                                        กรุณากรอกหรือเลือกเหตุผลเพิ่มเติม
+                                      </p>
+                                    )}
                                   </Form.Item>
                                 </div>
                               ) : data.status == "INACTIVE" && index == 3 ? (
