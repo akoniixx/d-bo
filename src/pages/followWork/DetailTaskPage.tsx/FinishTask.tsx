@@ -67,10 +67,6 @@ function FinishTasks() {
     fetchDetailTask();
   }, []);
 
-  const financial = (e: any) => {
-    return Number.parseFloat(e).toFixed(1);
-  };
-
   const formatCurrency = (e: any) => {
     e = parseFloat(e);
     return e.toFixed(2).replace(/./g, function (c: any, i: any, a: any) {
@@ -141,13 +137,13 @@ function FinishTasks() {
           <label>เป้าหมายการฉีดพ่น</label>
           <Form.Item>
             <span style={{ color: color.Grey }}>
-              {/* {data.targetSpray ? data.targetSpray : "-"} */}
+              {data.data.targetSpray !== null ? data.data.targetSpray : "-"}
             </span>
           </Form.Item>
           <label>การเตรียมยา</label>
           <Form.Item>
             <span style={{ color: color.Grey }}>
-              {data.data.preparationBy ? data.data.preparationBy : "-"}
+              {data.data.preparationBy !== null ? data.data.preparationBy : "-"}
             </span>
           </Form.Item>
           <label>ภาพงานจากนักบินโดรน</label>
@@ -157,7 +153,7 @@ function FinishTasks() {
               className="hiddenFileInput"
               style={{
                 backgroundImage: `url(${imgFinish})`,
-                display: imgFinish != null ? `url(${imgFinish})` : undefined,
+                display: imgFinish !== null ? `url(${imgFinish})` : undefined,
               }}
             ></div>
             <div className="ps-5">
@@ -178,14 +174,20 @@ function FinishTasks() {
           <br />
           <label>หมายเหตุ</label>
           <Form.Item>
-            <span style={{ color: color.Grey }}>{data.data.statusRemark}</span>
+            <span style={{ color: color.Grey }}>
+              {data.data.statusRemark !== null ? data.data.statusRemark : "-"}
+            </span>
           </Form.Item>
         </div>
         <div className="col-lg-1"></div>
         <div className="col-lg-5">
           <label>ค่าบริการ</label>
           <Form.Item style={{ color: color.Grey }}>
-            <span>{financial(data.data.price) + " " + "บาท"}</span>{" "}
+            <span>
+              {data.data.price !== null
+                ? formatCurrency(data.data.price) + " " + "บาท"
+                : "0.00" + " " + "บาท"}
+            </span>{" "}
             <span>
               {"(จำนวน" + " " + data.data.farmAreaAmount + " " + "ไร่)"}
             </span>
@@ -194,19 +196,34 @@ function FinishTasks() {
           <Form.Item>
             <label style={{ marginRight: "30px" }}>คะแนนรีวิว </label>
             <span>
-              {" "}
-              {starIcon}
-              {financial(data.data.reviewDronerAvg)}
+              {data.data.reviewDronerAvg > "0" ? (
+                <Row>
+                  {starIcon}
+                  <span>
+                    {parseFloat(data.data.reviewDronerAvg).toFixed(1)}
+                  </span>
+                </Row>
+              ) : (
+                "-"
+              )}
             </span>
             <div className="row">
               <div className="col-lg-6" style={{ color: color.Grey }}>
                 1. มารยาทนักบิน{" "}
               </div>
               <div className="col-lg-6">
-                {starIcon}
-                {data.data.reviewDronerDetail != null
-                  ? financial(data.data.reviewDronerDetail.pilotEtiquette)
-                  : 0}
+                {data.data.reviewDronerDetail !== null ? (
+                  <Row>
+                    {starIcon}
+                    <span>
+                      {parseFloat(
+                        data.data.reviewDronerDetail.pilotEtiquette
+                      ).toFixed(1)}
+                    </span>
+                  </Row>
+                ) : (
+                  "-"
+                )}
               </div>
             </div>
             <div className="row">
@@ -214,10 +231,18 @@ function FinishTasks() {
                 2. ความตรงต่อเวลา{" "}
               </div>
               <div className="col-lg-6">
-                {starIcon}
-                {data.data.reviewDronerDetail != null
-                  ? financial(data.data.reviewDronerDetail.punctuality)
-                  : 0}
+                {data.data.reviewDronerDetail !== null ? (
+                  <Row>
+                    {starIcon}
+                    <span>
+                      {parseFloat(
+                        data.data.reviewDronerDetail.punctuality
+                      ).toFixed(1)}
+                    </span>
+                  </Row>
+                ) : (
+                  "-"
+                )}
               </div>
             </div>
             <div className="row">
@@ -225,10 +250,18 @@ function FinishTasks() {
                 3. ความเชี่ยวชาญในการพ่น{" "}
               </div>
               <div className="col-lg-6">
-                {starIcon}
-                {data.data.reviewDronerDetail != null
-                  ? financial(data.data.reviewDronerDetail.sprayExpertise)
-                  : 0}
+                {data.data.reviewDronerDetail !== null ? (
+                  <Row>
+                    {starIcon}
+                    <span>
+                      {parseFloat(
+                        data.data.reviewDronerDetail.sprayExpertise
+                      ).toFixed(1)}
+                    </span>
+                  </Row>
+                ) : (
+                  "-"
+                )}
               </div>
             </div>
           </Form.Item>
@@ -307,7 +340,15 @@ function FinishTasks() {
             <Form.Item>
               <Input
                 disabled
-                defaultValue={data.data.farmerPlot.locationName}
+                defaultValue={
+                  data.data.farmerPlot.plotArea !== null
+                    ? data.data.farmerPlot.plotArea.subdistrictName +
+                      "/" +
+                      data.data.farmerPlot.plotArea.districtName +
+                      "/" +
+                      data.data.farmerPlot.plotArea.provinceName
+                    : "-"
+                }
               />
             </Form.Item>
           </div>
@@ -385,7 +426,9 @@ function FinishTasks() {
                 ยอดรวมค่าบริการ (หลังรวมค่าธรรมเนียม)
                 <br />
                 <b style={{ fontSize: "20px", color: color.Success }}>
-                  {formatCurrency(data.data.totalPrice) + " " + "บาท"}
+                  {data.data.totalPrice !== null
+                    ? formatCurrency(data.data.totalPrice) + " " + "บาท"
+                    : "0.00" + " " + "บาท"}
                 </b>
               </span>
             </Form.Item>
@@ -398,9 +441,9 @@ function FinishTasks() {
               <Input
                 disabled
                 value={
-                  data.data.price != undefined
-                    ? formatCurrency(data.data.price)
-                    : undefined
+                  data.data.price !== null
+                    ? formatCurrency(data.data.price) + " " + "บาท"
+                    : "0.00" + " " + "บาท"
                 }
                 suffix="บาท"
               />
@@ -412,7 +455,11 @@ function FinishTasks() {
               <Input
                 disabled
                 placeholder="0.0"
-                value={formatCurrency(data.data.discountFee)}
+                value={
+                  data.data.discountFee !== null
+                    ? formatCurrency(data.data.discountFee) + " " + "บาท"
+                    : "0.00" + " " + "บาท"
+                }
                 suffix="บาท"
               />
             </Form.Item>
@@ -423,9 +470,9 @@ function FinishTasks() {
               <Input
                 disabled
                 value={
-                  data.data.fee != undefined
-                    ? formatCurrency(data.data.fee)
-                    : undefined
+                  data.data.fee !== null
+                    ? formatCurrency(data.data.fee) + " " + "บาท"
+                    : "0.00" + " " + "บาท"
                 }
                 suffix="บาท"
               />

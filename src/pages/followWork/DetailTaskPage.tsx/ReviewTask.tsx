@@ -37,7 +37,14 @@ import moment from "moment";
 import { UploadImageDatasouce } from "../../../datasource/UploadImageDatasource";
 import { RATE_SELECT } from "../../../definitions/FinishTask";
 import FooterPage from "../../../components/footer/FooterPage";
+import {
+  reviewDronerDetail,
+  reviewDronerDetail_INIT,
+} from "../../../entities/ReviewDronerEntities";
+import { TaskReviewDronerDatasource } from "../../../datasource/TaskReviewDronerDatasource";
 import Swal from "sweetalert2";
+
+const { Map } = require("immutable");
 const _ = require("lodash");
 let queryString = _.split(window.location.search, "=");
 const dateFormat = "DD/MM/YYYY";
@@ -46,14 +53,16 @@ const timeFormat = "HH:mm";
 function ReviewTask() {
   const taskId = queryString[1];
   const [data, setData] = useState<DetailFinishTask>(DetailFinishTask_INIT);
+  const [detailDroner, setDetailDroner] = useState<reviewDronerDetail>(
+    reviewDronerDetail_INIT
+  );
   const [address, setAddress] = useState<AddressEntity>(AddressEntity_INIT);
   let imgList: (string | boolean)[] = [];
   const [mapPosition, setMapPosition] = useState<{ lat: number; lng: number }>({
     lat: LAT_LNG_BANGKOK.lat,
     lng: LAT_LNG_BANGKOK.lng,
   });
-  const [value, setValue] = useState(1);
-
+  const [canReview, setCanReview] = useState(1);
   const [imgFinish, setImgFinish] = useState<any>();
   const fetchDetailTask = async () => {
     await TaskFinishedDatasource.getDetailFinishTaskById(taskId).then((res) => {
@@ -82,22 +91,25 @@ function ReviewTask() {
     fetchDetailTask();
   }, []);
 
-  const onChange = (e: RadioChangeEvent) => {
-    console.log("radio checked", e.target.value);
-    setValue(e.target.value);
+  const onChangeCanReview = (e: any) => {
+    console.log(e.target.value);
+    setCanReview(e.target.value);
   };
 
   const manners = (e: any) => {
-    console.log(e);
+    const m = Map(detailDroner).set("pilotEtiquette", e);
+    setDetailDroner(m.toJS());
+    console.log(m.toJS());
   };
   const punctuality = (e: any) => {
-    console.log(e);
+    const m = Map(detailDroner).set("punctuality", e);
+    setDetailDroner(m.toJS());
+    console.log(m.toJS());
   };
   const expertise = (e: any) => {
-    console.log(e);
-  };
-  const financial = (e: any) => {
-    return Number.parseFloat(e).toFixed(1);
+    const m = Map(detailDroner).set("sprayExpertise", e);
+    setDetailDroner(m.toJS());
+    console.log(m.toJS());
   };
 
   const formatCurrency = (e: any) => {
@@ -121,16 +133,24 @@ function ReviewTask() {
     imgWindow?.document.write(image.outerHTML);
   };
 
-  const starIcon = (
-    <StarFilled
-      style={{
-        color: "#FFCA37",
-        fontSize: "20px",
-        marginRight: "10px",
-      }}
-    />
-  );
-
+  const updateDroner = async () => {
+    await TaskReviewDronerDatasource.UpdateReviewDroner(detailDroner).then(
+      (res) => {
+        console.log(res);
+        //   if (res) {
+        //     Swal.fire({
+        //   title: "ยืนยันการเปลี่ยนแปลงข้อมูล",
+        //   text: "โปรดตรวจสอบรายละเอียดที่คุณต้องการเปลี่ยนแปลงข้อมูลก่อนเสมอเพราะอาจส่งผลต่อการจ้างงานในระบบ",
+        //   cancelButtonText: "ยกเลิก",
+        //   confirmButtonText: "บันทึก",
+        //   confirmButtonColor: color.Success,
+        //   showCancelButton: true,
+        //   showCloseButton: true,
+        // })
+        //   }
+      }
+    );
+  };
   const renderAppointment = (
     <Form style={{ padding: "32px" }}>
       <div className="row">
@@ -165,16 +185,25 @@ function ReviewTask() {
           </div>
           <label>ช่วงเวลาฉีดพ่น</label>
           <Form.Item>
-            <Select disabled placeholder="คุมเลน" />
+            <Select
+              disabled
+              defaultValue={
+                data.data.purposeSpray !== null
+                  ? data.data.purposeSpray.purposeSprayName
+                  : "-"
+              }
+            />
           </Form.Item>
           <label>เป้าหมายการฉีดพ่น</label>
           <Form.Item>
-            <span style={{ color: color.Grey }}>{data.data.targetSpray}</span>
+            <span style={{ color: color.Grey }}>
+              {data.data.targetSpray !== null ? data.data.targetSpray : "-"}
+            </span>
           </Form.Item>
           <label>การเตรียมยา</label>
           <Form.Item>
             <span style={{ color: color.Grey }}>
-              {data.data.preparationBy ? data.data.preparationBy : "-"}
+              {data.data.preparationBy !== null ? data.data.preparationBy : "-"}
             </span>
           </Form.Item>
           <label>ภาพงานจากนักบินโดรน</label>
@@ -201,18 +230,23 @@ function ReviewTask() {
               )}
             </div>
           </div>
-
           <br />
           <label>หมายเหตุ</label>
           <Form.Item>
-            <span style={{ color: color.Grey }}>{data.data.statusRemark}</span>
+            <span style={{ color: color.Grey }}>
+              {data.data.statusRemark !== null ? data.data.statusRemark : "-"}
+            </span>
           </Form.Item>
         </div>
         <div className="col-lg-1"></div>
         <div className="col-lg-5">
           <label>ค่าบริการ</label>
           <Form.Item style={{ color: color.Grey }}>
-            <span>{financial(data.data.price) + " " + "บาท"}</span>
+            <span>
+              {data.data.price !== null
+                ? formatCurrency(data.data.price) + " " + "บาท"
+                : "0.00" + " " + "บาท"}
+            </span>{" "}
             <span>
               {"(จำนวน" + " " + data.data.farmAreaAmount + " " + "ไร่)"}
             </span>
@@ -224,10 +258,10 @@ function ReviewTask() {
             <Radio.Group
               style={{ width: "100%" }}
               className="pt-3"
-              onChange={onChange}
-              value={value}
+              onChange={onChangeCanReview}
+              value={canReview}
             >
-              <Radio value={1}>ให้รีวิวแล้ว</Radio>
+              <Radio value={"Yes"}>ให้รีวิวแล้ว</Radio>
               <Form.Item>
                 <div className="row pt-3" style={{ color: color.Grey }}>
                   <span className="col-lg-5">1. มารยาทนักบิน</span>
@@ -254,12 +288,13 @@ function ReviewTask() {
                   </Select>
                 </div>
               </Form.Item>
-              <Radio value={2}>ไม่สะดวกรีวิว</Radio>
+              <Form.Item>
+                <TextArea rows={3} placeholder="กรอกความคิดเห็นเพิ่มเติม" />
+              </Form.Item>
+              <Radio value={"No"}>ไม่สะดวกรีวิว</Radio>
             </Radio.Group>
           </Form.Item>
-          <Form.Item>
-            <TextArea rows={3} />
-          </Form.Item>
+
           <label>สถานะ</label>
           <Form.Item>
             <span style={{ color: "#2F80ED" }}>
@@ -324,7 +359,15 @@ function ReviewTask() {
             <Form.Item>
               <Input
                 disabled
-                defaultValue={data.data.farmerPlot.locationName}
+                defaultValue={
+                  data.data.farmerPlot.plotArea !== null
+                    ? data.data.farmerPlot.plotArea.subdistrictName +
+                      "/" +
+                      data.data.farmerPlot.plotArea.districtName +
+                      "/" +
+                      data.data.farmerPlot.plotArea.provinceName
+                    : "-"
+                }
               />
             </Form.Item>
           </div>
@@ -366,15 +409,19 @@ function ReviewTask() {
       <div className="row">
         <div className="col-lg-3">
           <span>
-            {data.data.droner.firstname + " " + data.data.droner.lastname}
+            {data.data.droner !== null
+              ? data.data.droner.firstname + " " + data.data.droner.lastname
+              : null}
             <br />
             <p style={{ fontSize: "12px", color: color.Grey }}>
-              {data.data.droner.dronerCode}
+              {data.data.droner !== null ? data.data.droner.dronerCode : null}
             </p>
           </span>
         </div>
         <div className="col-lg-3">
-          <span>{data.data.droner.telephoneNo}</span>
+          <span>
+            {data.data.droner !== null ? data.data.droner.telephoneNo : null}
+          </span>
         </div>
         <div className="col-lg-4">
           <span>สวนพริกไทย, เมืองปทุมธานี, กรุงเทพมหานคร</span>
@@ -402,7 +449,9 @@ function ReviewTask() {
                 ยอดรวมค่าบริการ (หลังรวมค่าธรรมเนียม)
                 <br />
                 <b style={{ fontSize: "20px", color: color.Success }}>
-                  {formatCurrency(data.data.totalPrice) + " " + "บาท"}
+                  {data.data.totalPrice !== null
+                    ? formatCurrency(data.data.totalPrice) + " " + "บาท"
+                    : "0.00" + " " + "บาท"}
                 </b>
               </span>
             </Form.Item>
@@ -414,7 +463,11 @@ function ReviewTask() {
               <label>ค่าบริการ (ก่อนคิดค่าคำนวณ)</label>
               <Input
                 disabled
-                value={formatCurrency(data.data.price)}
+                value={
+                  data.data.price !== null
+                    ? formatCurrency(data.data.price) + " " + "บาท"
+                    : "0.00" + " " + "บาท"
+                }
                 suffix="บาท"
               />
             </Form.Item>
@@ -425,7 +478,11 @@ function ReviewTask() {
               <Input
                 disabled
                 placeholder="0.0"
-                value={formatCurrency(data.data.discountFee)}
+                value={
+                  data.data.discountFee !== null
+                    ? formatCurrency(data.data.discountFee) + " " + "บาท"
+                    : "0.00" + " " + "บาท"
+                }
                 suffix="บาท"
               />
             </Form.Item>
@@ -435,7 +492,11 @@ function ReviewTask() {
               <label>ส่วนลดค่าธรรมเนียม</label>
               <Input
                 disabled
-                value={formatCurrency(data.data.fee)}
+                value={
+                  data.data.fee !== null
+                    ? formatCurrency(data.data.fee) + " " + "บาท"
+                    : "0.00" + " " + "บาท"
+                }
                 suffix="บาท"
               />
             </Form.Item>
@@ -444,23 +505,6 @@ function ReviewTask() {
       </Form>
     </Form>
   );
-  const updateDroner = async () => {
-    Swal.fire({
-      title: "ยืนยันการเปลี่ยนแปลงข้อมูล",
-      text: "โปรดตรวจสอบรายละเอียดที่คุณต้องการเปลี่ยนแปลงข้อมูลก่อนเสมอเพราะอาจส่งผลต่อการจ้างงานในระบบ",
-      cancelButtonText: "ยกเลิก",
-      confirmButtonText: "บันทึก",
-      confirmButtonColor: color.Success,
-      showCancelButton: true,
-      showCloseButton: true,
-    }).then(async (result) => {
-      if (result.isConfirmed) {
-        //connect api
-        window.location.href = "/IndexFinishTask";
-      }
-      fetchDetailTask();
-    });
-  };
 
   return (
     <Layout>

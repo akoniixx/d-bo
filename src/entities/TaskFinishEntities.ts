@@ -13,6 +13,11 @@ export interface TaskFinish {
   farmerPlotId: string;
   farmAreaAmount: string;
   dronerId: string;
+  purposeSpray: {
+    id: string;
+    cropId: string;
+    purposeSprayName: string;
+  }
   purposeSprayId: string;
   dateAppointment: string;
   targetSpray: null;
@@ -48,6 +53,11 @@ export const TaskFinish_INIT: TaskFinish = {
   farmerPlotId: "",
   farmAreaAmount: "",
   dronerId: "",
+  purposeSpray:{
+    id: "",
+    cropId: "",
+    purposeSprayName: "",
+  },
   purposeSprayId: "",
   dateAppointment: "",
   targetSpray: null,

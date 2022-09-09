@@ -41,6 +41,8 @@ import {
   FINISH_TASK_SEARCH,
   STATUS_COLOR_TASK,
 } from "../../definitions/FinishTask";
+import { FarmerPlotDatasource } from "../../datasource/FarmerPlotDatasource";
+import ModalFarmerPlot from "../../components/modal/ModalFarmerPlot";
 
 export default function IndexFinishTask() {
   const row = 10;
@@ -57,6 +59,8 @@ export default function IndexFinishTask() {
   const [province, setProvince] = useState<ProviceEntity[]>();
   const [district, setDistrict] = useState<DistrictEntity[]>();
   const [subdistrict, setSubdistrict] = useState<SubdistrictEntity[]>();
+  const [showModalMap, setShowModalMap] = useState<boolean>(false);
+  const [plotId, setPlotId] = useState<string>("");
   const { RangePicker } = DatePicker;
   const dateFormat = "DD/MM/YYYY";
   const timeFormat = "HH:mm";
@@ -128,9 +132,6 @@ export default function IndexFinishTask() {
     setSearchStatus(status);
     setCurrent(1);
   };
-  const financial = (e: any) => {
-    return Number.parseFloat(e).toFixed(1);
-  };
   const formatNumber = (e: any) => {
     let formatNumber = Number(e)
       .toFixed(1)
@@ -158,6 +159,11 @@ export default function IndexFinishTask() {
     let checked = e.target.checked;
     console.log(checked);
   };
+  const handleModalMap = (plotId: string) => {
+    setShowModalMap((prev) => !prev);
+    setPlotId(plotId);
+  };
+
   const options = [
     {
       label: "เสร็จสิ้น",
@@ -438,10 +444,10 @@ export default function IndexFinishTask() {
           children: (
             <>
               <span className="text-dark-75  d-block font-size-lg">
-                {row.droner.firstname + " " + row.droner.lastname}
+                {row.droner !== null ? row.droner.firstname + " " + row.droner.lastname : null}
               </span>
               <span style={{ color: color.Disable, fontSize: "12px" }}>
-                {row.droner.telephoneNo}
+                {row.droner !== null ? row.droner.telephoneNo : null}
               </span>
             </>
           ),
@@ -472,9 +478,9 @@ export default function IndexFinishTask() {
       dataIndex: "plotArea",
       key: "plotArea",
       render: (value: any, row: any, index: number) => {
-        const subdistrict = row.farmer.farmerPlot[0].plotArea;
-        const district = row.farmer.farmerPlot[0].plotArea;
-        const province = row.farmer.farmerPlot[0].plotArea;
+        const subdistrict = row.farmerPlot.plotArea;
+        const district = row.farmerPlot.plotArea;
+        const province = row.farmerPlot.plotArea;
         return {
           children: (
             <>
@@ -485,6 +491,13 @@ export default function IndexFinishTask() {
                 {district != undefined ? district.districtName + "/" : null}
                 {province != undefined ? province.provinceName + "/" : null}
               </span>
+              <a
+                // onClick={() => }
+                style={{ color: color.primary1 }}
+              >
+               <b>ดูแผนที่แปลง</b> 
+              </a>
+
             </>
           ),
         };
@@ -495,19 +508,24 @@ export default function IndexFinishTask() {
       dataIndex: "avgrating",
       key: "avgrating",
       render: (value: any, row: any, index: number) => {
-        let rate = row.avgrating;
         return {
           children: (
             <>
               <span className="text-dark-75  d-block font-size-lg">
-                <StarFilled
-                  style={{
-                    color: "#FFCA37",
-                    fontSize: "20px",
-                    marginRight: "10px",
-                  }}
-                />
-                {rate != null ? financial(row.avgrating) : 0}
+                {row.reviewDronerAvg > "0" ? (
+                  <span >
+                    <StarFilled
+                      style={{
+                        color: "#FFCA37",
+                        fontSize: "20px",
+                        marginRight: "7px",
+                      }}
+                    />
+                    {parseFloat(row.reviewDronerAvg).toFixed(1)}
+                  </span>
+                ) : (
+                  "-"
+                )}
               </span>
             </>
           ),
@@ -518,7 +536,6 @@ export default function IndexFinishTask() {
       title: "ค่าบริการ",
       dataIndex: "subdistrict_subdistrict_name",
       key: "subdistrict_subdistrict_name",
-      // width: "10%",
       render: (value: any, row: any, index: number) => {
         return {
           children: (
@@ -526,7 +543,7 @@ export default function IndexFinishTask() {
               <span className="text-dark-75  d-block font-size-lg">
                 {row.totalPrice != null
                   ? formatNumber(row.totalPrice) + " " + "บาท"
-                  : "-"}
+                  : 0 + " " + "บาท"}
               </span>
               <span style={{ color: color.Disable, fontSize: "12px" }}>
                 {"จำนวน" + " " + row.farmAreaAmount + " " + "ไร่"}
@@ -540,7 +557,6 @@ export default function IndexFinishTask() {
       title: "สถานะ",
       dataIndex: "district_district_name",
       key: "district_district_name",
-      // width: "10%",
       render: (value: any, row: any, index: number) => {
         return {
           children: (
