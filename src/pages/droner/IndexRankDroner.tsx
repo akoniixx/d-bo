@@ -46,7 +46,6 @@ export default function IndexRankDroner() {
     ratingMax: number;
   }>();
   const { RangePicker } = DatePicker;
-  const dateFormat = "DD/MM/YYYY";
   const dateSearchFormat = "YYYY-MM-DD";
   useEffect(() => {
     fetchDronerRank();
@@ -133,29 +132,30 @@ export default function IndexRankDroner() {
     else return a.localeCompare(b);
   };
 
-  const handlerStar = (e: any) => {
+  const handlerRating = (e: any) => {
     let value = e.target.value;
+    console.log(value);
     let checked = e.target.checked;
     let min = 0;
     let max = 0;
     if (checked) {
+      console.log(checked);
       min = Math.min(...accuNumber, value);
-      console.log("min",min);
+      console.log(min);
       max = Math.max(...accuNumber, value);
-     
-      console.log("max",max);
-     
+      console.log(max);
+      console.log("max", max);
       setAccuNumber([...accuNumber, value]);
     } else {
       let d: number[] = accuNumber.filter((x) => x != value);
-      console.log("else", d)
       min = Math.min(...d);
       max = Math.max(...d);
       setAccuNumber(d);
     }
     setRating({ ratingMin: min, ratingMax: max });
-    console.log("rate",rating)
+    console.log("rate", rating);
   };
+
   const handleVisibleRating = (newVisible: any) => {
     setVisibleRating(newVisible);
   };
@@ -180,7 +180,7 @@ export default function IndexRankDroner() {
             </div>
           ),
           key: "1",
-          icon: <Checkbox value={5} onChange={handlerStar}></Checkbox>,
+          icon: <Checkbox value={5} onChange={handlerRating}></Checkbox>,
         },
         {
           label: (
@@ -198,7 +198,7 @@ export default function IndexRankDroner() {
             </div>
           ),
           key: "2",
-          icon: <Checkbox value={4}onChange={handlerStar}   ></Checkbox>,
+          icon: <Checkbox value={4} onChange={handlerRating}></Checkbox>,
         },
         {
           label: (
@@ -215,7 +215,7 @@ export default function IndexRankDroner() {
             </div>
           ),
           key: "3",
-          icon: <Checkbox value={3} onChange={handlerStar}  ></Checkbox>,
+          icon: <Checkbox value={3} onChange={handlerRating}></Checkbox>,
         },
         {
           label: (
@@ -231,7 +231,7 @@ export default function IndexRankDroner() {
             </div>
           ),
           key: "4",
-          icon: <Checkbox value={2} onChange={handlerStar}  ></Checkbox>,
+          icon: <Checkbox value={2} onChange={handlerRating}></Checkbox>,
         },
         {
           label: (
@@ -246,7 +246,7 @@ export default function IndexRankDroner() {
             </div>
           ),
           key: "5",
-          icon: <Checkbox value={1} onChange={handlerStar}  ></Checkbox>,
+          icon: <Checkbox value={1} onChange={handlerRating}></Checkbox>,
         },
       ]}
     />
@@ -359,18 +359,20 @@ export default function IndexRankDroner() {
           </Select>
         </div>
         <div className="col-lg-2 p-1">
-          <Dropdown 
-          overlay={ratingStar} 
-          trigger={["click"]} 
-          onVisibleChange={handleVisibleRating}
-          visible={visibleRating}
-          className="col-lg-12">
+          <Dropdown
+            overlay={ratingStar}
+            trigger={["click"]}
+            className="col-lg-12"
+            onVisibleChange={handleVisibleRating}
+            visible={visibleRating}
+          >
             <Button style={{ color: color.Disable }}>
-              เลือกคะแนน Rating
+              เลือก Rating
               <DownOutlined />
             </Button>
           </Dropdown>
         </div>
+        <div className="col-lg-1 pt-1"></div>
       </div>
     </>
   );
@@ -446,16 +448,16 @@ export default function IndexRankDroner() {
           children: (
             <>
               <span className="text-dark-75  d-block font-size-lg">
-              {checkAvgrating() && (
-                <Row>
-                  <div style={{ color: "#FFCA37", fontSize: "16px" }}>
-                    <StarFilled />
-                  </div>
-                  <span className="pt-2 ps-1">
-                    {parseFloat(row.avgrating).toFixed(1)}
-                  </span>
-                </Row>
-              )}
+                {checkAvgrating() && (
+                  <Row>
+                    <div style={{ color: "#FFCA37", fontSize: "16px" }}>
+                      <StarFilled />
+                    </div>
+                    <span className="pt-2 ps-1">
+                      {parseFloat(row.avgrating).toFixed(1)}
+                    </span>
+                  </Row>
+                )}
               </span>
             </>
           ),
