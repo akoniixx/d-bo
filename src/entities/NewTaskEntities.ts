@@ -46,6 +46,8 @@ export interface CreateNewTaskEntity {
   priceStandard: number;
   unitPrice: number;
   price: number;
+  fee: number;
+  discountFee: number;
   comment: string;
 }
 export const CreateNewTaskEntity_INIT: CreateNewTaskEntity = {
@@ -65,6 +67,8 @@ export const CreateNewTaskEntity_INIT: CreateNewTaskEntity = {
   priceStandard: 0,
   unitPrice: 0,
   price: 0,
+  fee: 0,
+  discountFee: 0,
   comment: "",
 };
 export interface GetNewTaskEntity {
@@ -99,9 +103,7 @@ export interface GetNewTaskEntity {
     comment: string;
     purposeSpray: CropPurposeSprayEntity;
     farmer: GetFarmerEntity;
-    droner:string;
-    farmerPlot:{
-      
-    }
+    droner: string;
+    farmerPlot: {};
   };
 }

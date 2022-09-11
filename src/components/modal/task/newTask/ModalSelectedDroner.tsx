@@ -1,5 +1,5 @@
 import { DeleteOutlined, StarFilled } from "@ant-design/icons";
-import { Badge, Form, Modal, Row, Table } from "antd";
+import { Avatar, Badge, Form, Modal, Row, Table } from "antd";
 import React, { useEffect, useState } from "react";
 import { TaskSearchDroner } from "../../../../entities/TaskSearchDroner";
 import { color } from "../../../../resource";
@@ -20,7 +20,10 @@ const ModalSelectedDroner: React.FC<ModalSelectedDronerProps> = ({
   title,
   callBack,
 }) => {
-  const [data, setData] = useState<TaskSearchDroner[]>(dataDroner);
+  let checkDup = Array.from(new Set(dataDroner)).filter(
+    (x) => x.droner_id != ""
+  );
+  const [data, setData] = useState<TaskSearchDroner[]>(checkDup);
   const removeDroner = (e: any) => {
     let d = data.filter((x) => x.droner_id != e.droner_id);
     setData(d);
@@ -97,6 +100,24 @@ const ModalSelectedDroner: React.FC<ModalSelectedDronerProps> = ({
       title: "ยี่หัอ",
       dataIndex: "role",
       key: "role",
+      render: (value: any, row: any, index: number) => {
+        return {
+          children: (
+            <>
+              <Avatar
+                size={25}
+                src={row.logo_drone_brand}
+                style={{ marginRight: "5px" }}
+              />
+              {row.drone_brand}
+              <br />
+              <p style={{ fontSize: "12px", color: color.Grey }}>
+                {row.count_drone > 1 && "(มากกว่า 1 ยี่หัอ)"}
+              </p>
+            </>
+          ),
+        };
+      },
     },
     {
       title: "สถานะ",
@@ -146,6 +167,7 @@ const ModalSelectedDroner: React.FC<ModalSelectedDronerProps> = ({
 
   return (
     <>
+      {console.log(data)}
       <Modal
         title={
           <div

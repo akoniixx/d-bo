@@ -1,10 +1,9 @@
-import { DeleteOutlined, StarFilled } from "@ant-design/icons";
+import { StarFilled } from "@ant-design/icons";
 import { Badge, Form, Modal, Row, Table } from "antd";
 import React, { useEffect, useState } from "react";
 import { TaskDronerTempDataSource } from "../../../../datasource/TaskDronerTempDatasource";
 import { TaskDronerTempEntity } from "../../../../entities/TaskDronerTemp";
 import { color } from "../../../../resource";
-import ActionButton from "../../../button/ActionButton";
 import { CardContainer } from "../../../card/CardContainer";
 
 interface ModalDronerListProps {
@@ -71,7 +70,7 @@ const ModalDronerList: React.FC<ModalDronerListProps> = ({
         return {
           children: (
             <>
-              {checkRating() && (
+              {checkRating() ? (
                 <Row>
                   <div style={{ color: "#FFCA37", fontSize: "16px" }}>
                     <StarFilled />
@@ -80,7 +79,7 @@ const ModalDronerList: React.FC<ModalDronerListProps> = ({
                     {parseFloat(data.rating_avg).toFixed(2)}
                   </span>
                 </Row>
-              )}
+              ):<p>-</p>}
             </>
           ),
         };
@@ -157,7 +156,6 @@ const ModalDronerList: React.FC<ModalDronerListProps> = ({
                   }
                 />
                 {data.droner_status}
-
                 <br />
               </span>
             </>

@@ -1,6 +1,7 @@
 import { DownOutlined, StarFilled } from "@ant-design/icons";
 import {
   AutoComplete,
+  Avatar,
   Badge,
   Button,
   Checkbox,
@@ -143,6 +144,7 @@ const AddNewTask = () => {
   const handleSelectFarmer = () => {
     const f = Map(createNewTask).set("farmerId", farmerSelected?.id);
     setCheckSelectPlot("error");
+    setDronerSelected([]);
     setCreateNewTask(f.toJS());
     setDataFarmer(farmerSelected);
     checkValidateStep(f.toJS(), current);
@@ -622,7 +624,6 @@ const AddNewTask = () => {
       ratingMin,
       ratingMax
     ).then((res) => {
-      console.log("res", res);
       res.map((item) =>
         _.set(
           item,
@@ -773,11 +774,13 @@ const AddNewTask = () => {
           .filter((z) => dronerSelected.map((a) => a.droner_id != z.droner_id))
       )
     );
-    console.log(checkSingleDroner);
-    setDronerSelected([
+    let checkDup = [
       ...dronerSelected.filter((x) => x.droner_id != ""),
       ...checkSingleDroner.filter((x) => x.droner_id != ""),
-    ]);
+    ];
+    setDronerSelected(
+      Array.from(new Set(checkDup)).filter((x) => x.droner_id != "")
+    );
     checkValidateStep(
       createNewTask,
       current,
@@ -1027,7 +1030,9 @@ const AddNewTask = () => {
                     {parseFloat(row.rating_avg).toFixed(2)} ({row.count_rating})
                   </span>
                 </Row>
-              ) : <p>-</p>}
+              ) : (
+                <p>-</p>
+              )}
             </>
           ),
         };
@@ -1114,19 +1119,24 @@ const AddNewTask = () => {
                       </p>
                     </div>
                     <div className="col-lg-2">{JSON.parse(x).telephone_no}</div>
-                    <div className="col-lg-3">
-                      {JSON.parse(x).district_name}/
+                    <div className="col-lg-4">
                       {JSON.parse(x).subdistrict_name}/
+                      {JSON.parse(x).district_name}/
                       {JSON.parse(x).province_name}
                     </div>
                     <div className="col-lg-2">
+                      <Avatar
+                        size={25}
+                        src={JSON.parse(x).logo_drone_brand}
+                        style={{ marginRight: "5px" }}
+                      />
                       {JSON.parse(x).drone_brand}
                       <br />
                       <p style={{ fontSize: "12px", color: color.Grey }}>
-                        {/* (มากกว่า 1 ยี่ห้อ) */}
+                        {JSON.parse(x).count_drone > 1 && "(มากกว่า 1 ยี่หัอ)"}
                       </p>
                     </div>
-                    <div className="col-lg-2">
+                    <div className="col-lg-1">
                       <span
                         style={{
                           color:
@@ -1171,7 +1181,6 @@ const AddNewTask = () => {
                   <Input
                     suffix="บาท"
                     value={createNewTask.price}
-                    onChange={handleCalServiceCharge}
                     disabled={current == 2 || checkSelectPlot == "error"}
                     autoComplete="off"
                     step="0.01"
@@ -1183,8 +1192,7 @@ const AddNewTask = () => {
                 <Form.Item>
                   <Input
                     suffix="บาท"
-                    value={createNewTask.price}
-                    onChange={handleCalServiceCharge}
+                    value={createNewTask.fee}
                     disabled={current == 2 || checkSelectPlot == "error"}
                     autoComplete="off"
                     step="0.01"
@@ -1196,8 +1204,8 @@ const AddNewTask = () => {
                 <Form.Item>
                   <Input
                     suffix="บาท"
-                    value={0.0}
-                    onChange={handleCalServiceCharge}
+                    value={createNewTask.discountFee}
+                    disabled={current == 2 || checkSelectPlot == "error"}
                     autoComplete="off"
                     step="0.01"
                   />
@@ -1302,11 +1310,21 @@ const AddNewTask = () => {
       const a = Map(createNewTask).set("taskDronerTemp", pushDronerList);
       if (selectionType == "checkbox") {
         const s = Map(a.toJS()).set("status", "WAIT_RECEIVE");
-        setCreateNewTask(s.toJS());
+        const f = Map(s.toJS()).set("fee", parseFloat(a.toJS().price) * 0.05);
+        const df = Map(f.toJS()).set(
+          "discountFee",
+          -parseFloat(a.toJS().price) * 0.05
+        );
+        setCreateNewTask(df.toJS());
       } else {
         const s = Map(a.toJS()).set("status", "WAIT_START");
         const d = Map(s.toJS()).set("dronerId", dronerSelected[0].droner_id);
-        setCreateNewTask(d.toJS());
+        const f = Map(d.toJS()).set("fee", parseFloat(a.toJS().price) * 0.05);
+        const df = Map(f.toJS()).set(
+          "discountFee",
+          -parseFloat(a.toJS().price) * 0.05
+        );
+        setCreateNewTask(df.toJS());
         checkValidateStep(
           createNewTask,
           current,
@@ -1317,8 +1335,7 @@ const AddNewTask = () => {
     fetchDronerList(
       createNewTask.farmerId,
       createNewTask.farmerPlotId,
-      dateAppointment,
-      searchTextDroner
+      dateAppointment
     );
     checkValidateStep(
       createNewTask,
@@ -1334,8 +1351,10 @@ const AddNewTask = () => {
     } else {
       delete createNewTask["taskDronerTemp"];
     }
-    console.log(createNewTask);
-    await TaskDatasource.insertNewTask(createNewTask).then((res) => {
+    let checkDupSpray = Array.from(new Set(createNewTask.targetSpray));
+    const d = Map(createNewTask).set("targetSpray", checkDupSpray);
+    setCreateNewTask(d.toJS());
+    await TaskDatasource.insertNewTask(d.toJS()).then((res) => {
       if (res.userMessage == "success") {
         Swal.fire({
           title: "บันทึกสำเร็จ",

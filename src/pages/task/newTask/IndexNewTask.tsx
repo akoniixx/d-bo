@@ -17,7 +17,6 @@ import { TaskDatasource } from "../../../datasource/TaskDatasource";
 import {
   NEWTASK_STATUS_SEARCH,
   STATUS_NEWTASK_COLOR_MAPPING,
-  STATUS_NEWTASK_MAPPING,
 } from "../../../definitions/Status";
 import { NewTaskPageEntity } from "../../../entities/NewTaskEntities";
 import { color } from "../../../resource";
@@ -49,6 +48,7 @@ const IndexNewTask = () => {
       searchStartDate,
       searchEndDate
     ).then((res) => {
+      console.log(res);
       setData(res);
     });
   };
