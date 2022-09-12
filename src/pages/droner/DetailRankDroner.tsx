@@ -21,7 +21,6 @@ import emptyData from "../../resource/media/empties/iconoir_farm.png";
 import { StarFilled, FileTextOutlined } from "@ant-design/icons";
 import moment from "moment";
 import image from "../../resource/image";
-
 const _ = require("lodash");
 let queryString = _.split(window.location.search, "=");
 const dateFormat = "DD/MM/YYYY";
@@ -59,7 +58,7 @@ function DetailRankDroner() {
 
   const fetchDronerById = async () => {
     await DronerRankDatasource.getDronerRankById(dronerId).then((res) => {
-      console.log(res);
+      console.log(res.task);
       setData(res);
       setListDetail(res.task);
     });
@@ -209,114 +208,6 @@ function DetailRankDroner() {
       </CardContainer>
     </div>
   );
-  const renderFromData = (
-    <div className="col-lg-7">
-      <CardContainer>
-        <CardHeader textHeader="รายละเอียดการบริการ" />
-        <Form>
-          <div style={{ backgroundColor: color.BG, padding: "10px" }}>
-            <div className="row">
-              <div className="col-lg-3">
-                <span>วันเวลานัดหมาย</span>
-              </div>
-              <div className="col-lg-3">
-                <span>ชื่อเกษตรกร</span>
-              </div>
-              <div className="col-lg">
-                <span>จำนวนไร่</span>
-              </div>
-              <div className="col-lg">
-                <span>จังหวัด</span>
-              </div>
-              <div className="col-lg">
-                <span>คะแนนรีวิว</span>
-              </div>
-              <div className="col-lg"></div>
-            </div>
-          </div>
-        </Form>
-        <Form>
-          {listDetail.length != 0 ? (
-            <div className="container">
-              {listDetail.map((item, index) => (
-                <div className="row pt-3 pb-3">
-                  <div className="col-lg-3">
-                    <span>
-                      {moment(new Date(item.dateAppointment)).format(
-                        dateFormat
-                      )}
-                      ,{" "}
-                      {moment(new Date(item.dateAppointment)).format(
-                        timeFormat
-                      )}
-                    </span>
-                    <br />
-                    <span style={{ color: color.Disable, fontSize: "12px" }}>
-                      {item.taskNo}
-                    </span>
-                  </div>
-                  <div className="col-lg-3">
-                    <span>
-                      {item.farmer.firstname + " " + item.farmer.lastname}
-                    </span>
-                    <br />
-                    <span style={{ color: color.Disable, fontSize: "12px" }}>
-                      {item.farmer.telephoneNo}
-                    </span>
-                  </div>
-                  <div className="col-lg">
-                    <span>
-                      {parseFloat(item.farmAreaAmount).toFixed(1) + " " + "ไร่"}
-                    </span>
-                  </div>
-                  <div className="col-lg-2">
-                    <span>{item.farmer.address.province.region}</span>
-                  </div>
-                  <div className="col-lg">
-                    <span>
-                      {item.reviewDronerAvg > "0" ? (
-                        <Row>
-                          <div style={{ color: "#FFCA37", fontSize: "16px" }}>
-                            <StarFilled />
-                          </div>
-                          <span className="pt-1 ps-1">
-                            {parseFloat(item.reviewDronerAvg).toFixed(1)}
-                          </span>
-                        </Row>
-                      ) : (
-                        "-"
-                      )}
-                    </span>
-                  </div>
-                  <div className="col-lg">
-                    <ActionButton
-                      icon={<FileTextOutlined />}
-                      color={color.primary1}
-                      onClick={() =>
-                        (window.location.href = "/DetailWorkDroner?=" + item.id)
-                      }
-                    />
-                  </div>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <div className="container text-center" style={{ padding: "80px" }}>
-              <img src={emptyData}></img>
-              <p>ยังไม่มีการให้บริการ</p>
-            </div>
-          )}
-        </Form>
-
-        <div className="d-flex container justify-content-between pt-5 ">
-          <p>รายการทั้งหมด {data.totalTaskCount} รายการ</p>
-          {data.totalTaskCount.length < 10 ? null : (
-            <Pagination defaultCurrent={1} total={1} />
-          )}
-        </div>
-      </CardContainer>
-    </div>
-  );
   const columns = [
     {
       title: "วันเวลานัดหมาย",
@@ -419,7 +310,7 @@ function DetailRankDroner() {
                 icon={<FileTextOutlined />}
                 color={color.primary1}
                 onClick={() =>
-                  (window.location.href = "//DetailWorkDroner?=" + row.id)
+                  (window.location.href = "/DetailWorkDroner?=" + row.id)
                 }
               />
             </>
@@ -445,17 +336,22 @@ function DetailRankDroner() {
         <CardContainer>
           <CardHeader textHeader="รายละเอียดการบริการ" />
           <Table columns={columns} dataSource={data.task} pagination={false} />
-          <div className="d-flex justify-content-between pt-5" style={{margin:"10px"}}>
-        <p>รายการทั้งหมด {data.task.length} รายการ</p>
-        <Pagination
-          current={current}
-          total={data.task.length}
-          onChange={onChangePage}
-          pageSize={row}
-          showSizeChanger={false}
-        />
-      </div>
         </CardContainer>
+      </Row>
+      <Row justify="end">
+        <div
+          className="d-flex justify-content-between col-lg-7"
+          style={{ margin: "10px" }}
+        >
+          <p>รายการทั้งหมด {data.task.length} รายการ</p>
+          <Pagination
+            current={current}
+            total={data.task.length}
+            onChange={onChangePage}
+            pageSize={row}
+            showSizeChanger={false}
+          />
+        </div>
       </Row>
     </Layout>
   );

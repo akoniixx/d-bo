@@ -35,6 +35,7 @@ import {
   SubdistrictEntity_INIT,
 } from "../../entities/LocationEntities";
 import { LocationDatasource } from "../../datasource/LocationDatasource";
+import { CropPurposeSprayEntity } from "../../entities/CropEntities";
 const _ = require("lodash");
 let queryString = _.split(window.location.search, "=");
 const dateFormat = "DD/MM/YYYY";
@@ -43,9 +44,6 @@ const timeFormat = "HH:mm";
 function DetailWorkDroner() {
   const taskId = queryString[1];
   const [data, setData] = useState<taskDetailEntity>(taskDetailEntity_INIT);
-  const [address, setAddress] = useState<FullAddressEntity>(
-    FullAddressEntiry_INIT
-  );
   let imgList: (string | boolean)[] = [];
   const [mapPosition, setMapPosition] = useState<{ lat: number; lng: number }>({
     lat: LAT_LNG_BANGKOK.lat,
@@ -57,7 +55,6 @@ function DetailWorkDroner() {
     await DronerRankDatasource.getTaskDetail(taskId).then((res) => {
       console.log(res);
       setData(res);
-      setAddress(res.droner.address);
       setMapPosition({
         lat: parseFloat(res.farmerPlot.lat),
         lng: parseFloat(res.farmerPlot.long),
@@ -86,6 +83,7 @@ function DetailWorkDroner() {
       return i > 0 && c !== "." && (a.length - i) % 3 === 0 ? "," + c : c;
     });
   };
+
   const onPreviewImg = async () => {
     let src = imgFinish;
     if (!src) {
@@ -146,7 +144,7 @@ function DetailWorkDroner() {
             <Select
               disabled
               defaultValue={
-                data.purposeSprayId !== null ? data.purposeSprayId : "-"
+                data.purposeSprayId !== null ? data.purposeSprayId : ""
               }
             />
           </Form.Item>
@@ -442,7 +440,7 @@ function DetailWorkDroner() {
             />
             {data.droner.dronerDrone[0] != null
               ? data.droner.dronerDrone[0].drone.droneBrand.name
-              : null}
+              : "-"}
           </span>
           <br />
           <span style={{ color: color.Grey, fontSize: "12px" }}>

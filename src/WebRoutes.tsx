@@ -20,15 +20,12 @@ import AddAdmin from "./pages/admin/AddAdmin";
 import EditAdmin from "./pages/admin/EditAdmin";
 import ProtectRoute from "./ProtectRoute";
 import PublicRoute from "./PublicRoute";
-<<<<<<< HEAD
 import DetailWorkDroner from "./pages/droner/DetailWorkDroner";
 import DetailRankDroner from "./pages/droner/DetailRankDroner";
 import IndexRankDroner from "./pages/droner/IndexRankDroner";
-=======
 import IndexNewTask from "./pages/task/newTask/IndexNewTask";
 import AddNewTask from "./pages/task/newTask/AddNewTask";
 import EditNewTask from "./pages/task/newTask/EditNewTask";
->>>>>>> develop
 
 const WebRoutes: React.FC<any> = () => {
   return (

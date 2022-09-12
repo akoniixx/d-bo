@@ -11,7 +11,7 @@ import {
   Table,
 } from "antd";
 import Search from "antd/lib/input/Search";
-import moment from "moment";
+import moment, { min } from "moment";
 import React, { useEffect, useState } from "react";
 import ActionButton from "../../components/button/ActionButton";
 import Layouts from "../../components/layout/Layout";
@@ -29,6 +29,8 @@ import { DronerRankListEntity } from "../../entities/DronerRankEntities";
 export default function IndexRankDroner() {
   const row = 10;
   const [current, setCurrent] = useState(1);
+  const [rateMax, setRateMax] = useState<any>();
+  const [rateMin, setRateMin] = useState<any>();
   const [data, setData] = useState<DronerRankListEntity>();
   const [searchText, setSearchText] = useState<string>();
   const [startDate, setStartDate] = useState<any>(null);
@@ -42,8 +44,8 @@ export default function IndexRankDroner() {
   const [visibleRating, setVisibleRating] = useState(false);
   const [accuNumber, setAccuNumber] = useState<number[]>([]);
   const [rating, setRating] = useState<{
-    ratingMin: number;
-    ratingMax: number;
+    ratingMin: any;
+    ratingMax: any;
   }>();
   const { RangePicker } = DatePicker;
   const dateSearchFormat = "YYYY-MM-DD";
@@ -54,14 +56,15 @@ export default function IndexRankDroner() {
     fetchSubdistrict();
   }, [
     current,
-    searchText,
-    searchProvince,
-    searchDistrict,
+    row,
     searchSubdistrict,
-    rating?.ratingMax,
+    searchDistrict,
+    searchProvince,
     rating?.ratingMin,
+    rating?.ratingMax,
     startDate,
     endDate,
+    searchText,
   ]);
   const fetchDronerRank = async () => {
     await DronerRankDatasource.getDronerRank(
@@ -70,8 +73,8 @@ export default function IndexRankDroner() {
       searchSubdistrict,
       searchDistrict,
       searchProvince,
-      rating?.ratingMax,
       rating?.ratingMin,
+      rating?.ratingMax,
       startDate,
       endDate,
       searchText
@@ -124,38 +127,35 @@ export default function IndexRankDroner() {
     }
     setCurrent(1);
   };
-
   const sorter = (a: any, b: any) => {
     if (a === b) return 0;
     else if (a === null) return 1;
     else if (b === null) return -1;
     else return a.localeCompare(b);
   };
-
   const handlerRating = (e: any) => {
     let value = e.target.value;
-    console.log(value);
     let checked = e.target.checked;
-    let min = 0;
-    let max = 0;
+    console.log(checked);
+    let min = undefined;
+    let max = undefined;
     if (checked) {
-      console.log(checked);
+      console.log(1);
       min = Math.min(...accuNumber, value);
-      console.log(min);
       max = Math.max(...accuNumber, value);
-      console.log(max);
-      console.log("max", max);
       setAccuNumber([...accuNumber, value]);
     } else {
-      let d: number[] = accuNumber.filter((x) => x != value);
-      min = Math.min(...d);
-      max = Math.max(...d);
-      setAccuNumber(d);
+      setRating({ ratingMin: min, ratingMax: max });
+      // console.log(2);
+      // let d: number[] = accuNumber.filter((x) => x != value);
+      // min = Math.min(...d);
+      // max = Math.max(...d);
+      // setAccuNumber(d);
     }
     setRating({ ratingMin: min, ratingMax: max });
-    console.log("rate", rating);
+    console.log(min);
+    console.log(max);
   };
-
   const handleVisibleRating = (newVisible: any) => {
     setVisibleRating(newVisible);
   };
@@ -180,7 +180,9 @@ export default function IndexRankDroner() {
             </div>
           ),
           key: "1",
-          icon: <Checkbox value={5} onChange={handlerRating}></Checkbox>,
+          icon: (
+            <Checkbox value={5} onClick={(e) => handlerRating(e)}></Checkbox>
+          ),
         },
         {
           label: (
@@ -198,7 +200,9 @@ export default function IndexRankDroner() {
             </div>
           ),
           key: "2",
-          icon: <Checkbox value={4} onChange={handlerRating}></Checkbox>,
+          icon: (
+            <Checkbox value={4} onClick={(e) => handlerRating(e)}></Checkbox>
+          ),
         },
         {
           label: (
@@ -215,7 +219,9 @@ export default function IndexRankDroner() {
             </div>
           ),
           key: "3",
-          icon: <Checkbox value={3} onChange={handlerRating}></Checkbox>,
+          icon: (
+            <Checkbox value={3} onClick={(e) => handlerRating(e)}></Checkbox>
+          ),
         },
         {
           label: (
@@ -231,7 +237,9 @@ export default function IndexRankDroner() {
             </div>
           ),
           key: "4",
-          icon: <Checkbox value={2} onChange={handlerRating}></Checkbox>,
+          icon: (
+            <Checkbox value={2} onClick={(e) => handlerRating(e)}></Checkbox>
+          ),
         },
         {
           label: (
@@ -246,7 +254,9 @@ export default function IndexRankDroner() {
             </div>
           ),
           key: "5",
-          icon: <Checkbox value={1} onChange={handlerRating}></Checkbox>,
+          icon: (
+            <Checkbox value={1} onClick={(e) => handlerRating(e)}></Checkbox>
+          ),
         },
       ]}
     />
@@ -277,14 +287,14 @@ export default function IndexRankDroner() {
         className="container d-flex justify-content-between"
         style={{ padding: "8px" }}
       >
-        <div className="col-lg-4">
+        <div className="col-lg-4" style={{ maxWidth: "1200px" }}>
           <Search
             placeholder="ค้นหาชื่อนักบินโดรน/เบอร์โทร/ID นักบินโดรน"
             className="col-lg-12 p-1"
             onSearch={changeTextSearch}
           />
         </div>
-        <div className="col-lg-2">
+        <div className="col-lg">
           <Select
             allowClear
             className="col-lg-12 p-1"
@@ -308,7 +318,7 @@ export default function IndexRankDroner() {
             ))}
           </Select>
         </div>
-        <div className="col-lg-2">
+        <div className="col-lg">
           <Select
             allowClear
             className="col-lg-12 p-1"
@@ -333,7 +343,7 @@ export default function IndexRankDroner() {
             ))}
           </Select>
         </div>
-        <div className="col-lg-2">
+        <div className="col-lg">
           <Select
             allowClear
             className="col-lg-12 p-1"
@@ -372,7 +382,19 @@ export default function IndexRankDroner() {
             </Button>
           </Dropdown>
         </div>
-        <div className="col-lg-1 pt-1"></div>
+        <div className="pt-1">
+          <Button
+            style={{
+              borderColor: color.Success,
+              borderRadius: "5px",
+              color: color.secondary2,
+              backgroundColor: color.Success,
+            }}
+            onClick={() => fetchDronerRank()}
+          >
+            ค้นหาข้อมูล
+          </Button>
+        </div>
       </div>
     </>
   );
@@ -545,6 +567,7 @@ export default function IndexRankDroner() {
   ];
   return (
     <Layouts>
+      {console.log("rating", rating)}
       {PageTitle}
       <br />
       <Table columns={columns} dataSource={data?.data} pagination={false} />
