@@ -105,7 +105,13 @@ const Layouts: React.FC<any> = ({ children }) => {
               icon={<ProfileFilled />}
               title={<span>ติดตามงาน</span>}
               key={"sub1"}
-            ></Menu.SubMenu>
+            >
+              <Menu.Item>
+                <Link to="/IndexNewTask" style={{ textDecoration: "none" }}>
+                  <span>งานใหม่ (รอนักบิน)</span>
+                </Link>
+              </Menu.Item>
+            </Menu.SubMenu>
             <Menu.Item icon={<DollarCircleFilled />}>
               <Link to="/TotalIncomePage" style={{ textDecoration: "none" }}>
                 <span>ยอดรวมรายได้</span>
