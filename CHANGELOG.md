@@ -1,4 +1,7 @@
 ## [Version - 0]
+## Feature [v0.10.0] 2022-09-11
+- added index new task menu
+- added create new task menu
 ## Fix [v0.9.5] 2022-09-08
 - fixed droner image license is not required.
 - fixed status. if not checkbox, put a reason.
