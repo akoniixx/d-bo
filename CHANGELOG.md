@@ -1,4 +1,12 @@
 ## [Version - 0]
+## Fix [v0.10.1] 2022-09-12
+- fixed validate last name in droner menu
+- fixed remove old img and add the same img
+- fixed handle check box and input action in plant
+- fixed response message when duplicate telephone and ID card
+- fixed title modal droner drone
+- fixed loop save img in droner drone
+- fixed validate save button require DRONE_LICENSE img in droner drone
 ## Feature [v0.10.0] 2022-09-11
 - added index new task menu
 - added create new task menu

@@ -22,7 +22,7 @@ export interface DronerEntity {
   idNo: string;
   telephoneNo: string;
   status: string;
-  reason : string[];
+  reason: string[];
   expYear: number;
   expMonth: number;
   expPlant: string[];
@@ -43,7 +43,7 @@ export const DronerEntity_INIT: DronerEntity = {
   idNo: "",
   telephoneNo: "",
   status: "",
-  reason:[""],
+  reason: [""],
   expYear: 0,
   expMonth: 0,
   expPlant: [""],
@@ -70,6 +70,7 @@ export interface CreateDronerEntity {
   dronerDrone: DronerDroneEntity[];
   file: ImageEntity[];
   dronerArea: DronerAreaEntity;
+  birthDate: string;
 }
 
 export const CreateDronerEntity_INIT: CreateDronerEntity = {
@@ -86,6 +87,7 @@ export const CreateDronerEntity_INIT: CreateDronerEntity = {
   dronerDrone: [DronerDroneEntity_INIT],
   file: [ImageEntity_INTI],
   dronerArea: DronerAreaEntity_INIT,
+  birthDate: "",
 };
 
 export interface DronerListEntity {
