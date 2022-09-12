@@ -289,6 +289,7 @@ function AddDroner() {
   //#region Image
   const onChangeProfile = async (file: any) => {
     let src = file.target.files[0];
+    console.log(src);
     src = await new Promise((resolve) => {
       const reader = new FileReader();
       reader.readAsDataURL(src);
@@ -317,6 +318,7 @@ function AddDroner() {
   };
   const removeImgProfile = () => {
     setImgProfile(undefined);
+    setCreateImgProfile(UploadImageEntity_INTI);
     checkValidate(data);
   };
   const onChangeIdCard = async (file: any) => {
@@ -349,6 +351,7 @@ function AddDroner() {
   };
   const removeImgIdCard = () => {
     setImgIdCard(undefined);
+    setCreateImgIdCard(UploadImageEntity_INTI);
     checkValidate(data);
   };
   //#endregion
@@ -360,6 +363,7 @@ function AddDroner() {
   ) => {
     let checkEmptySting = ![
       data?.firstname,
+      data?.lastname,
       data?.telephoneNo,
       data?.idNo,
       addr?.address1,
@@ -487,6 +491,7 @@ function AddDroner() {
                 }}
               >
                 <input
+                  key={imgProfile}
                   type="file"
                   onChange={onChangeProfile}
                   title="เลือกรูป"
@@ -642,7 +647,12 @@ function AddDroner() {
                   display: imgIdCard == undefined ? "block" : "none",
                 }}
               >
-                <input type="file" onChange={onChangeIdCard} title="เลือกรูป" />
+                <input
+                  type="file"
+                  key={imgIdCard}
+                  onChange={onChangeIdCard}
+                  title="เลือกรูป"
+                />
               </div>
             </div>
           </div>
