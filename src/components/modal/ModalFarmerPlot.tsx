@@ -53,19 +53,16 @@ const ModalFarmerPlot: React.FC<ModalFarmerPlotProps> = ({
     setFarmerPlot(m.toJS());
     checkValidate(m.toJS());
   };
-
   const handleChangePlotstatus = (e: any) => {
     const m = Map(farmerPlot).set("isActive", e.target.value);
     setFarmerPlot(m.toJS());
     checkValidate(m.toJS());
   };
-
   const handleOnChangePlantSelect = (value: any) => {
     const m = Map(farmerPlot).set("plantName", value == undefined ? "" : value);
     setFarmerPlot(m.toJS());
     checkValidate(m.toJS());
   };
-
   const handleSearchLocation = async (value: any) => {
     if (value != undefined) {
       const a = location.filter((x) => x.subdistrictId == value)[0];
@@ -93,7 +90,6 @@ const ModalFarmerPlot: React.FC<ModalFarmerPlotProps> = ({
     setFarmerPlot(m.toJS());
     checkValidate(m.toJS());
   };
-
   const handleOnChangeLat = (value: any) => {
     const m = Map(farmerPlot).set("lat", value.target.value);
     setFarmerPlot(m.toJS());
@@ -103,7 +99,6 @@ const ModalFarmerPlot: React.FC<ModalFarmerPlotProps> = ({
       lng: prev.lng,
     }));
   };
-
   const handleOnChangeLng = (value: any) => {
     const m = Map(farmerPlot).set("long", value.target.value);
     setFarmerPlot(m.toJS());
@@ -113,7 +108,6 @@ const ModalFarmerPlot: React.FC<ModalFarmerPlotProps> = ({
       lng: parseFloat(value.target.value),
     }));
   };
-
   const handelCallBack = async () => {
     const m = Map(farmerPlot).set("plotId", editIndex);
     let locationName = "";
@@ -139,7 +133,6 @@ const ModalFarmerPlot: React.FC<ModalFarmerPlotProps> = ({
     const l = Map(m.toJS()).set("locationName", locationName);
     callBack(l.toJS());
   };
-
   const checkValidate = (data: FarmerPlotEntity) => {
     let checkEmpty = ![
       data.plantName,
