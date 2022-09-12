@@ -34,4 +34,14 @@ export class FarmerPlotDatasource {
         console.log(err, "err deleteFarmerPlot");
       });
   }
+  static getFarmerPlotById(id: string): Promise<FarmerPlotEntity> {
+    return httpClient
+      .get(BASE_URL + "/farmer-plot/" + id)
+      .then((response) => {
+        return response.data;
+      })
+      .catch((err) => {
+        console.log(err, "err deleteFarmerPlot");
+      });
+  }
 }

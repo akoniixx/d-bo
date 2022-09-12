@@ -27,3 +27,16 @@ export const FARMER_STATUS_SEARCH = [
   { value: "ACTIVE", name: "ใช้งาน" },
   { value: "INACTIVE", name: "ปิดการใช้งาน" },
 ];
+
+export const STATUS_NEWTASK_MAPPING: any = {
+  WAIT_RECEIVE: "ไม่มีนักบินรับงาน",
+  WAIT_START: "รอนักบินโดรนรับงาน",
+};
+export const NEWTASK_STATUS_SEARCH = [
+  { value: "WAIT_RECEIVE", name: "ไม่มีนักบินรับงาน" },
+  { value: "WAIT_RECEIVE", name: "รอนักบินโดรนรับงาน" },
+];
+export const STATUS_NEWTASK_COLOR_MAPPING: any = {
+  ไม่มีนักบินรับงาน: color.Error,
+  รอนักบินโดรนรับงาน: "#EA973E",
+};
