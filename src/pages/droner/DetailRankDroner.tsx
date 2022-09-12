@@ -44,7 +44,15 @@ function DetailRankDroner() {
   ]);
   let imgList: (string | boolean)[] = [];
   const [imgProfile, setImgProfile] = useState<any>();
+  const row = 10;
+  const [current, setCurrent] = useState(1);
 
+  const sorter = (a: any, b: any) => {
+    if (a === b) return 0;
+    else if (a === null) return 1;
+    else if (b === null) return -1;
+    else return a.localeCompare(b);
+  };
   useEffect(() => {
     fetchDronerById();
   }, []);
@@ -55,6 +63,9 @@ function DetailRankDroner() {
       setData(res);
       setListDetail(res.task);
     });
+  };
+  const onChangePage = (page: number) => {
+    setCurrent(page);
   };
 
   const renderDroner = (
@@ -106,7 +117,9 @@ function DetailRankDroner() {
                   />
                   {parseFloat(data.avgrating).toFixed(1)}
                 </span>
-              ) : "-"}
+              ) : (
+                "-"
+              )}
             </CardContainer>
           </div>
           <div className="row">
@@ -270,7 +283,9 @@ function DetailRankDroner() {
                             {parseFloat(item.reviewDronerAvg).toFixed(1)}
                           </span>
                         </Row>
-                      ) : null}
+                      ) : (
+                        "-"
+                      )}
                     </span>
                   </div>
                   <div className="col-lg">
@@ -302,6 +317,117 @@ function DetailRankDroner() {
       </CardContainer>
     </div>
   );
+  const columns = [
+    {
+      title: "วันเวลานัดหมาย",
+      dataIndex: "dateAppointment",
+      key: "dateAppointment",
+      sorter: (a: any, b: any) => sorter(a.dateAppointment, b.dateAppointment),
+      render: (value: any, row: any, index: number) => {
+        return {
+          children: (
+            <>
+              <span>
+                {moment(new Date(row.dateAppointment)).format(dateFormat)},{" "}
+                {moment(new Date(row.dateAppointment)).format(timeFormat)}
+              </span>
+              <br />
+              <span style={{ color: color.Disable, fontSize: "12px" }}>
+                {row.taskNo}
+              </span>
+            </>
+          ),
+        };
+      },
+    },
+    {
+      title: "ชื่อเกษตรกร",
+      dataIndex: "farmer",
+      key: "farmer",
+      render: (value: any, row: any, index: number) => {
+        return {
+          children: <>{row.farmer.firstname + " " + row.farmer.lastname}</>,
+        };
+      },
+    },
+    {
+      title: "จำนวนไร่",
+      dataIndex: "farmAreaAmount",
+      key: "farmAreaAmount",
+      render: (value: any, row: any, index: number) => {
+        return {
+          children: (
+            <>
+              <span>
+                {parseFloat(row.farmAreaAmount).toFixed(1) + " " + "ไร่"}
+              </span>
+            </>
+          ),
+        };
+      },
+    },
+    {
+      title: "จังหวัด",
+      dataIndex: "province",
+      key: "province",
+      render: (value: any, row: any, index: number) => {
+        return {
+          children: (
+            <>
+              <span>{row.farmer.address.province.region}</span>
+            </>
+          ),
+        };
+      },
+    },
+    {
+      title: "คะแนนรีวิว",
+      dataIndex: "reviewDronerAvg",
+      key: "reviewDronerAvg",
+      render: (value: any, row: any, index: number) => {
+        return {
+          children: (
+            <>
+              <span>
+                {row.reviewDronerAvg > "0" ? (
+                  <Row>
+                    <div style={{ color: "#FFCA37", fontSize: "16px" }}>
+                      <StarFilled />
+                    </div>
+                    <span className="pt-1 ps-1">
+                      {parseFloat(row.reviewDronerAvg).toFixed(1)}
+                    </span>
+                  </Row>
+                ) : (
+                  "-"
+                )}
+              </span>
+            </>
+          ),
+        };
+      },
+    },
+    {
+      title: "",
+      dataIndex: "action",
+      key: "action",
+      render: (value: any, row: any, index: number) => {
+        return {
+          children: (
+            <>
+              <ActionButton
+                icon={<FileTextOutlined />}
+                color={color.primary1}
+                onClick={() =>
+                  (window.location.href = "//DetailWorkDroner?=" + row.id)
+                }
+              />
+            </>
+          ),
+        };
+      },
+    },
+  ];
   return (
     <Layout>
       <Row>
@@ -316,7 +442,20 @@ function DetailRankDroner() {
       </Row>
       <Row className="d-flex justify-content-around">
         {renderDroner}
-        {renderFromData}
+        <CardContainer>
+          <CardHeader textHeader="รายละเอียดการบริการ" />
+          <Table columns={columns} dataSource={data.task} pagination={false} />
+          <div className="d-flex justify-content-between pt-5" style={{margin:"10px"}}>
+        <p>รายการทั้งหมด {data.task.length} รายการ</p>
+        <Pagination
+          current={current}
+          total={data.task.length}
+          onChange={onChangePage}
+          pageSize={row}
+          showSizeChanger={false}
+        />
+      </div>
+        </CardContainer>
       </Row>
     </Layout>
   );

@@ -143,18 +143,23 @@ function DetailWorkDroner() {
           </div>
           <label>ช่วงเวลาฉีดพ่น</label>
           <Form.Item>
-            <Select disabled placeholder="คุมเลน" />
+            <Select
+              disabled
+              defaultValue={
+                data.purposeSprayId !== null ? data.purposeSprayId : "-"
+              }
+            />
           </Form.Item>
           <label>เป้าหมายการฉีดพ่น</label>
           <Form.Item>
             <span style={{ color: color.Grey }}>
-              {data.targetSpray ? data.targetSpray : "-"}
+              {data.targetSpray !== null ? data.targetSpray : "-"}
             </span>
           </Form.Item>
           <label>การเตรียมยา</label>
           <Form.Item>
             <span style={{ color: color.Grey }}>
-              {data.preparationBy ? data.preparationBy : "-"}
+              {data.preparationBy !== null ? data.preparationBy : "-"}
             </span>
           </Form.Item>
           <label>ภาพงานจากนักบินโดรน</label>
@@ -186,7 +191,6 @@ function DetailWorkDroner() {
           <label>หมายเหตุ</label>
           <Form.Item>
             <span style={{ color: color.Grey }}>
-              {" "}
               {data.statusRemark ? data.statusRemark : "-"}
             </span>
           </Form.Item>
@@ -195,23 +199,34 @@ function DetailWorkDroner() {
         <div className="col-lg-5">
           <label>ค่าบริการ</label>
           <Form.Item style={{ color: color.Grey }}>
-            <span>{formatCurrency(data.price) + " " + "บาท"}</span>{" "}
-            <span>{"(จำนวน" + " " + data.farmAreaAmount + " " + "ไร่)"}</span>
+            <span>
+              {" "}
+              {data.price !== null
+                ? formatCurrency(data.price) + " " + "บาท"
+                : "0.00" + " " + "บาท"}
+            </span>{" "}
+            <span>
+              {data.farmAreaAmount !== null
+                ? "(จำนวน" + " " + data.farmAreaAmount + " " + "ไร่)"
+                : "0"}
+            </span>
           </Form.Item>
           <br />
           <Form.Item>
-          <div className="row">
-          <label className="col-lg-3">คะแนนรีวิว </label>
+            <div className="row">
+              <label className="col-lg-3">คะแนนรีวิว </label>
               <div className="col-lg-6">
-              {data.reviewDronerAvg > "0" ? (
-              <Row>
-                {starIcon}
-                <span>{parseFloat(data.reviewDronerAvg).toFixed(1)}</span>
-              </Row>
-            ) : null}
+                {data.reviewDronerAvg > "0" ? (
+                  <Row>
+                    {starIcon}
+                    <span>{parseFloat(data.reviewDronerAvg).toFixed(1)}</span>
+                  </Row>
+                ) : (
+                  "-"
+                )}
               </div>
             </div>
-            <br/>
+            <br />
             <div className="row">
               <div className="col-lg-6" style={{ color: color.Grey }}>
                 1. มารยาทนักบิน{" "}
@@ -226,7 +241,9 @@ function DetailWorkDroner() {
                       ).toFixed(1)}
                     </span>
                   </Row>
-                ) : null}
+                ) : (
+                  "-"
+                )}
               </div>
             </div>
             <div className="row">
@@ -243,7 +260,9 @@ function DetailWorkDroner() {
                       )}
                     </span>
                   </Row>
-                ) : null}
+                ) : (
+                  "-"
+                )}
               </div>
             </div>
             <div className="row">
@@ -260,7 +279,9 @@ function DetailWorkDroner() {
                       ).toFixed(1)}
                     </span>
                   </Row>
-                ) : null}
+                ) : (
+                  "-"
+                )}
               </div>
             </div>
           </Form.Item>
@@ -337,7 +358,18 @@ function DetailWorkDroner() {
           <div className="col-lg-12 text-start">
             <label>พื้นที่แปลงเกษตร</label>
             <Form.Item>
-              <Input disabled defaultValue={data.farmerPlot.locationName} />
+              <Input
+                disabled
+                defaultValue={
+                  data.farmerPlot.plotArea !== null
+                    ? data.farmerPlot.plotArea.subdistrictName +
+                      "/" +
+                      data.farmerPlot.plotArea.districtName +
+                      "/" +
+                      data.farmerPlot.plotArea.provinceName
+                    : "-"
+                }
+              />
             </Form.Item>
           </div>
         </div>
@@ -389,9 +421,13 @@ function DetailWorkDroner() {
           <span>{data.droner.telephoneNo}</span>
         </div>
         <div className="col-lg-4">
-          {data.droner.address.subdistrict.subdistrictName},
-          {data.droner.address.district.districtName},
-          {data.droner.address.province.region}
+          {data.droner.address.subdistrict.subdistrictName +
+            "," +
+            " " +
+            data.droner.address.district.districtName +
+            "," +
+            " " +
+            data.droner.address.province.region}
         </div>
         <div className="col-lg">
           <span>
@@ -426,7 +462,9 @@ function DetailWorkDroner() {
                 ยอดรวมค่าบริการ (หลังรวมค่าธรรมเนียม)
                 <br />
                 <b style={{ fontSize: "20px", color: color.Success }}>
-                  {formatCurrency(data.totalPrice) + " " + "บาท"}
+                  {data.totalPrice !== null
+                    ? formatCurrency(data.totalPrice) + " " + "บาท"
+                    : "0.00" + " " + "บาท"}
                 </b>
               </span>
             </Form.Item>
@@ -439,9 +477,7 @@ function DetailWorkDroner() {
               <Input
                 disabled
                 value={
-                  data.price != undefined
-                    ? formatCurrency(data.price)
-                    : undefined
+                  data.price !== null ? formatCurrency(data.price) : "0.00"
                 }
                 suffix="บาท"
               />
@@ -454,9 +490,9 @@ function DetailWorkDroner() {
                 disabled
                 placeholder="0.0"
                 value={
-                  data.discountFee != undefined
+                  data.discountFee !== null
                     ? formatCurrency(data.discountFee)
-                    : undefined
+                    : "0.00"
                 }
                 suffix="บาท"
               />
@@ -467,9 +503,7 @@ function DetailWorkDroner() {
               <label>ส่วนลดค่าธรรมเนียม</label>
               <Input
                 disabled
-                value={
-                  data.fee != undefined ? formatCurrency(data.fee) : undefined
-                }
+                value={data.fee !== null ? formatCurrency(data.fee) : "0.00"}
                 suffix="บาท"
               />
             </Form.Item>

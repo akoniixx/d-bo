@@ -441,22 +441,23 @@ export default function IndexRankDroner() {
       key: "avgrating",
       sorter: (a: any, b: any) => sorter(a.avgrating, b.avgrating),
       render: (value: any, row: any, index: number) => {
-        const checkAvgrating = () => {
-          return row.avgrating > 0 ? true : false;
-        };
         return {
           children: (
             <>
               <span className="text-dark-75  d-block font-size-lg">
-                {checkAvgrating() && (
-                  <Row>
-                    <div style={{ color: "#FFCA37", fontSize: "16px" }}>
-                      <StarFilled />
-                    </div>
-                    <span className="pt-2 ps-1">
-                      {parseFloat(row.avgrating).toFixed(1)}
-                    </span>
-                  </Row>
+                {row.avgrating > "0" ? (
+                  <span>
+                    <StarFilled
+                      style={{
+                        color: "#FFCA37",
+                        fontSize: "20px",
+                        marginRight: "7px",
+                      }}
+                    />
+                    {parseFloat(row.avgrating).toFixed(1)}
+                  </span>
+                ) : (
+                  "-"
                 )}
               </span>
             </>
@@ -469,6 +470,8 @@ export default function IndexRankDroner() {
       dataIndex: "subdistrict_subdistrict_name",
       key: "subdistrict_subdistrict_name",
       width: "10%",
+      sorter: (a: any, b: any) =>
+        sorter(a.subdistrict_subdistrict_name, b.subdistrict_subdistrict_name),
       render: (value: any, row: any, index: number) => {
         const subdistrict = row.subdistrict_subdistrict_name;
         return {
@@ -485,6 +488,8 @@ export default function IndexRankDroner() {
       dataIndex: "district_district_name",
       key: "district_district_name",
       width: "10%",
+      sorter: (a: any, b: any) =>
+        sorter(a.district_district_name, b.district_district_name),
       render: (value: any, row: any, index: number) => {
         const district = row.district_district_name;
         return {
@@ -503,6 +508,7 @@ export default function IndexRankDroner() {
       dataIndex: "province_region",
       key: "province_region",
       width: "10%",
+      sorter: (a: any, b: any) => sorter(a.province_region, b.province_region),
       render: (value: any, row: any, index: number) => {
         const province = row.province_region;
         return {
