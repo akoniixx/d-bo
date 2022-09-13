@@ -134,22 +134,24 @@ function ReviewTask() {
   };
 
   const updateDroner = async () => {
-    await TaskReviewDronerDatasource.UpdateReviewDroner(detailDroner).then(
-      (res) => {
-        console.log(res);
-        //   if (res) {
-        //     Swal.fire({
-        //   title: "ยืนยันการเปลี่ยนแปลงข้อมูล",
-        //   text: "โปรดตรวจสอบรายละเอียดที่คุณต้องการเปลี่ยนแปลงข้อมูลก่อนเสมอเพราะอาจส่งผลต่อการจ้างงานในระบบ",
-        //   cancelButtonText: "ยกเลิก",
-        //   confirmButtonText: "บันทึก",
-        //   confirmButtonColor: color.Success,
-        //   showCancelButton: true,
-        //   showCloseButton: true,
-        // })
-        //   }
-      }
-    );
+    // await TaskReviewDronerDatasource.UpdateReviewDroner(detailDroner).then(
+    //   (res) => {
+    //     console.log(res);
+          // if (res) {
+            Swal.fire({
+          title: "ยืนยันการเปลี่ยนแปลงข้อมูล",
+          text: "โปรดตรวจสอบรายละเอียดที่คุณต้องการเปลี่ยนแปลงข้อมูลก่อนเสมอเพราะอาจส่งผลต่อการจ้างงานในระบบ",
+          cancelButtonText: "ยกเลิก",
+          confirmButtonText: "บันทึก",
+          confirmButtonColor: color.Success,
+          showCancelButton: true,
+          showCloseButton: true,
+        }).then((time) => {
+          window.location.href = "/IndexFinishTask";
+        });
+          // }
+    //   }
+    // );
   };
   const renderAppointment = (
     <Form style={{ padding: "32px" }}>

@@ -21,10 +21,16 @@ import AddAdmin from "./pages/admin/AddAdmin";
 import EditAdmin from "./pages/admin/EditAdmin";
 import ProtectRoute from "./ProtectRoute";
 import PublicRoute from "./PublicRoute";
+
 import IndexFinishTask from "./pages/followWork/IndexFinishTask";
 import FinishTasks from "./pages/followWork/DetailTaskPage.tsx/FinishTask";
 import ReviewTask from "./pages/followWork/DetailTaskPage.tsx/ReviewTask";
 import CancelTask from "./pages/followWork/DetailTaskPage.tsx/CancelTask";
+
+import IndexNewTask from "./pages/task/newTask/IndexNewTask";
+import AddNewTask from "./pages/task/newTask/AddNewTask";
+import EditNewTask from "./pages/task/newTask/EditNewTask";
+
 
 const WebRoutes: React.FC<any> = () => {
   return (
@@ -53,6 +59,9 @@ const WebRoutes: React.FC<any> = () => {
           <Route path="/IndexAdmin" element={<IndexAdmin />} />
           <Route path="/AddAdmin" element={<AddAdmin />} />
           <Route path="/EditAdmin/:id" element={<EditAdmin />} />
+          <Route path="/IndexNewTask" element={<IndexNewTask />} />
+          <Route path="/AddNewTask:type" element={<AddNewTask />} />
+          <Route path="/EditNewTask/:id" element={<EditNewTask />} />
           <Route path="*" element={<PageNotFound />} />
         </Route>
         <Route element={<PublicRoute />}>
