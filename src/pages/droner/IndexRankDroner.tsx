@@ -5,8 +5,6 @@ import {
   Dropdown,
   Menu,
   Pagination,
-  Rate,
-  Row,
   Select,
   Table,
 } from "antd";
@@ -29,8 +27,6 @@ import { DronerRankListEntity } from "../../entities/DronerRankEntities";
 export default function IndexRankDroner() {
   const row = 10;
   const [current, setCurrent] = useState(1);
-  const [rateMax, setRateMax] = useState<any>();
-  const [rateMin, setRateMin] = useState<any>();
   const [data, setData] = useState<DronerRankListEntity>();
   const [searchText, setSearchText] = useState<string>();
   const [startDate, setStartDate] = useState<any>(null);
@@ -52,34 +48,25 @@ export default function IndexRankDroner() {
   useEffect(() => {
     fetchDronerRank();
     fetchProvince();
-    fetchDistrict();
-    fetchSubdistrict();
-  }, [
-    current,
-    row,
-    searchSubdistrict,
-    searchDistrict,
-    searchProvince,
-    rating?.ratingMin,
-    rating?.ratingMax,
-    startDate,
-    endDate,
-    searchText,
-  ]);
-  const fetchDronerRank = async () => {
+  }, [current, row, startDate, endDate]);
+  const fetchDronerRank = async (
+    proId?: number,
+    disId?: number,
+    subDisId?: number,
+    text?: string
+  ) => {
     await DronerRankDatasource.getDronerRank(
       current,
       row,
-      searchSubdistrict,
-      searchDistrict,
-      searchProvince,
+      proId,
+      disId,
+      subDisId,
       rating?.ratingMin,
       rating?.ratingMax,
       startDate,
       endDate,
-      searchText
+      text
     ).then((res: DronerRankListEntity) => {
-      console.log(res);
       setData(res);
     });
   };
@@ -88,18 +75,18 @@ export default function IndexRankDroner() {
       setProvince(res);
     });
   };
-  const fetchDistrict = async () => {
-    await LocationDatasource.getDistrict(searchProvince).then((res) => {
+  const fetchDistrict = async (provinceId: number) => {
+    await LocationDatasource.getDistrict(provinceId).then((res) => {
       setDistrict(res);
     });
   };
-  const fetchSubdistrict = async () => {
-    await LocationDatasource.getSubdistrict(searchDistrict).then((res) => {
+  const fetchSubdistrict = async (districtId: number) => {
+    await LocationDatasource.getSubdistrict(districtId).then((res) => {
       setSubdistrict(res);
     });
   };
-  const changeTextSearch = (value: string) => {
-    setSearchText(value);
+  const changeTextSearch = (searchText: any) => {
+    setSearchText(searchText.target.value);
     setCurrent(1);
   };
   const onChangePage = (page: number) => {
@@ -107,9 +94,11 @@ export default function IndexRankDroner() {
   };
   const handleProvince = (provinceId: number) => {
     setSearchProvince(provinceId);
+    fetchDistrict(provinceId);
     setCurrent(1);
   };
   const handleDistrict = (districtId: number) => {
+    fetchSubdistrict(districtId);
     setSearchDistrict(districtId);
     setCurrent(1);
   };
@@ -136,26 +125,25 @@ export default function IndexRankDroner() {
   const handlerRating = (e: any) => {
     let value = e.target.value;
     let checked = e.target.checked;
-    console.log(checked);
-    let min = undefined;
-    let max = undefined;
+    let min: any = 0;
+    let max: any = 0;
     if (checked) {
-      console.log(1);
       min = Math.min(...accuNumber, value);
       max = Math.max(...accuNumber, value);
       setAccuNumber([...accuNumber, value]);
     } else {
-      setRating({ ratingMin: min, ratingMax: max });
-      // console.log(2);
-      // let d: number[] = accuNumber.filter((x) => x != value);
-      // min = Math.min(...d);
-      // max = Math.max(...d);
-      // setAccuNumber(d);
+      let d: number[] = accuNumber.filter((x) => x != value);
+      min = Math.min(...d);
+      max = Math.max(...d);
+      setAccuNumber(d);
+      if (d.length == 0) {
+        min = undefined;
+        max = undefined;
+      }
     }
     setRating({ ratingMin: min, ratingMax: max });
-    console.log(min);
-    console.log(max);
   };
+
   const handleVisibleRating = (newVisible: any) => {
     setVisibleRating(newVisible);
   };
@@ -291,7 +279,7 @@ export default function IndexRankDroner() {
           <Search
             placeholder="ค้นหาชื่อนักบินโดรน/เบอร์โทร/ID นักบินโดรน"
             className="col-lg-12 p-1"
-            onSearch={changeTextSearch}
+            onChange={changeTextSearch}
           />
         </div>
         <div className="col-lg">
@@ -390,7 +378,14 @@ export default function IndexRankDroner() {
               color: color.secondary2,
               backgroundColor: color.Success,
             }}
-            onClick={() => fetchDronerRank()}
+            onClick={() =>
+              fetchDronerRank(
+                searchSubdistrict,
+                searchDistrict,
+                searchProvince,
+                searchText
+              )
+            }
           >
             ค้นหาข้อมูล
           </Button>
@@ -567,7 +562,6 @@ export default function IndexRankDroner() {
   ];
   return (
     <Layouts>
-      {console.log("rating", rating)}
       {PageTitle}
       <br />
       <Table columns={columns} dataSource={data?.data} pagination={false} />

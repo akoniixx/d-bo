@@ -58,7 +58,6 @@ function DetailRankDroner() {
 
   const fetchDronerById = async () => {
     await DronerRankDatasource.getDronerRankById(dronerId).then((res) => {
-      console.log(res.task);
       setData(res);
       setListDetail(res.task);
     });
@@ -213,6 +212,7 @@ function DetailRankDroner() {
       title: "วันเวลานัดหมาย",
       dataIndex: "dateAppointment",
       key: "dateAppointment",
+      width: "180px",
       sorter: (a: any, b: any) => sorter(a.dateAppointment, b.dateAppointment),
       render: (value: any, row: any, index: number) => {
         return {
@@ -235,6 +235,7 @@ function DetailRankDroner() {
       title: "ชื่อเกษตรกร",
       dataIndex: "farmer",
       key: "farmer",
+      width: "160px",
       render: (value: any, row: any, index: number) => {
         return {
           children: <>{row.farmer.firstname + " " + row.farmer.lastname}</>,
@@ -245,6 +246,7 @@ function DetailRankDroner() {
       title: "จำนวนไร่",
       dataIndex: "farmAreaAmount",
       key: "farmAreaAmount",
+      width: "100px",
       render: (value: any, row: any, index: number) => {
         return {
           children: (
@@ -261,6 +263,7 @@ function DetailRankDroner() {
       title: "จังหวัด",
       dataIndex: "province",
       key: "province",
+     width: "90px",
       render: (value: any, row: any, index: number) => {
         return {
           children: (
@@ -275,6 +278,7 @@ function DetailRankDroner() {
       title: "คะแนนรีวิว",
       dataIndex: "reviewDronerAvg",
       key: "reviewDronerAvg",
+      width: "100px",
       render: (value: any, row: any, index: number) => {
         return {
           children: (
@@ -302,6 +306,7 @@ function DetailRankDroner() {
       title: "",
       dataIndex: "action",
       key: "action",
+      width: "70px",
       render: (value: any, row: any, index: number) => {
         return {
           children: (
