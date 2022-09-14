@@ -52,6 +52,7 @@ export class DronerDroneDatasource {
       });
   }
   static updateDronerDrone(data: DronerDroneEntity): Promise<any> {
+    console.log("param", data);
     return httpClient
       .patch(BASE_URL + "/droner-drone/" + data.droneId, data)
       .then((response) => {

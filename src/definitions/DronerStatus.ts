@@ -16,9 +16,9 @@ export const DRONER_STATUS = [
 ];
 export const DRONE_STATUS = [
   { value: "", name: "ทั้งหมด" },
+  { value: "ACTIVE", name: "อนุมัติ" },
   { value: "PENDING", name: "รอตรวจสอบ" },
   { value: "REJECTED", name: "ไม่อนุมัติ" },
-  { value: "ACTIVE", name: "อนุมัติ" },
   { value: "INACTIVE", name: "ปิดการใช้งาน" },
 ];
 
