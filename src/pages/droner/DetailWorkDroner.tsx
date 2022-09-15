@@ -432,19 +432,21 @@ function DetailWorkDroner() {
             <Avatar
               size={25}
               src={
-                data.droner.dronerDrone[0] != null
+                data.droner.dronerDrone && data.droner.dronerDrone[0] != null
                   ? data.droner.dronerDrone[0].drone.droneBrand.logoImagePath
                   : null
               }
               style={{ marginRight: "5px" }}
             />
-            {data.droner.dronerDrone[0] != null
+            {data.droner.dronerDrone && data.droner.dronerDrone[0] != null
               ? data.droner.dronerDrone[0].drone.droneBrand.name
               : "-"}
           </span>
           <br />
           <span style={{ color: color.Grey, fontSize: "12px" }}>
-            {data.droner.dronerDrone.length > 1 ? "(มากกว่า 1 ยี่ห้อ)" : null}
+            {data.droner.dronerDrone && data.droner.dronerDrone.length! > 1
+              ? "(มากกว่า 1 ยี่ห้อ)"
+              : null}
           </span>
         </div>
       </div>
