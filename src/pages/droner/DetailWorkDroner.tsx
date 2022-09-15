@@ -483,7 +483,7 @@ function DetailWorkDroner() {
           </div>
           <div className="col-lg-4">
             <Form.Item>
-              <label>ค่าธรรมเนียม (คิด 5% ของราคารวม)</label>
+              <label>ค่าธรรมเนียม (5% ของค่าบริการ)</label>
               <Input
                 disabled
                 placeholder="0.0"
