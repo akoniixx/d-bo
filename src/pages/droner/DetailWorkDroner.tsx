@@ -53,7 +53,6 @@ function DetailWorkDroner() {
 
   const fetchTask = async () => {
     await DronerRankDatasource.getTaskDetail(taskId).then((res) => {
-      console.log(res);
       setData(res);
       setMapPosition({
         lat: parseFloat(res.farmerPlot.lat),
@@ -142,8 +141,10 @@ function DetailWorkDroner() {
           <Form.Item>
             <Select
               disabled
-              defaultValue={
-                data.purposeSprayId !== null ? data.purposeSprayId : ""
+              value={
+                data.purposeSpray !== null
+                  ? data.purposeSpray.purposeSprayName
+                  : "-"
               }
             />
           </Form.Item>

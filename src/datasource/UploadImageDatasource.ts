@@ -47,7 +47,7 @@ export class UploadImageDatasouce {
 
   static getImageFinish(path: string): Promise<any> {
     return httpClient
-      .get(BASE_URL + "/tasks/file/geturl?path=" + path)
+      .get(BASE_URL + "/tasks/file/geturl" + path)
       .then((response) => {
         return response.data;
       })

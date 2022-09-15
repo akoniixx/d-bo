@@ -3,6 +3,7 @@ import { DronerEntity, DronerEntity_INIT } from "./DronerEntities";
 import { FarmerPlotEntity, FarmerPlotEntity_INIT } from "./FarmerPlotEntities";
 import { FarmerEntity, FarmerEntity_INIT } from "./FarmerEntities";
 import { FullAddressEntiry_INIT, FullAddressEntity } from "./AddressEntities";
+import { PurposeSprayEntity, PurposeSprayEntity_INIT } from './CropEntities';
 
 export interface AllDronerRankEntity {
   droner_id: null;
@@ -238,6 +239,7 @@ export interface taskDetailEntity {
   farmAreaAmount: string;
   dronerId: string;
   purposeSprayId: string;
+  purposeSpray: PurposeSprayEntity;
   dateAppointment: string;
   targetSpray: null;
   preparationBy: string;
@@ -281,6 +283,7 @@ export const taskDetailEntity_INIT: taskDetailEntity = {
   farmAreaAmount: "",
   dronerId: "",
   purposeSprayId: "",
+  purposeSpray: PurposeSprayEntity_INIT,
   dateAppointment: "",
   targetSpray: null,
   preparationBy: "",
