@@ -68,7 +68,6 @@ function ReviewTask() {
   const [saveRate, setSaveRate] = useState<boolean>(true);
   const fetchDetailTask = async () => {
     await TaskFinishedDatasource.getDetailFinishTaskById(taskId).then((res) => {
-      console.log(res);
       setData(res);
       setMapPosition({
         lat: parseFloat(res.data.farmerPlot.lat),
@@ -84,7 +83,6 @@ function ReviewTask() {
   const onChangeCanReview = (e: any) => {
     const m = Map(detailDroner).set("canReview",e.target.value);
     const n = Map(m.toJS()).set("taskId", taskId)
-    console.log(n.toJS());
     setDetailDroner(n.toJS());
     {!e.target.value ? setBtnSaveDisable(true) : setBtnSaveDisable(false)}
     {e.target.value == "Yes" ? setSaveRate(false) : setSaveRate(true)}
@@ -93,25 +91,21 @@ function ReviewTask() {
   const manners = (e: any) => {
     const m = Map(detailDroner).set("pilotEtiquette", parseInt(e));
      const n = Map(m.toJS()).set("taskId", taskId)
-    console.log(n.toJS());
     setDetailDroner(n.toJS());
   };
   const punctuality = (e: any) => {
     const m = Map(detailDroner).set("punctuality", parseInt(e));
      const n = Map(m.toJS()).set("taskId", taskId)
-    console.log(n.toJS());
     setDetailDroner(n.toJS());
   };
   const expertise = (e: any) => {
     const m = Map(detailDroner).set("sprayExpertise", parseInt(e));
      const n = Map(m.toJS()).set("taskId", taskId)
-    console.log(n.toJS());
     setDetailDroner(n.toJS());
   };
   const commentReview = (e: any) => {
     const m = Map(detailDroner).set("comment", e.target.value);
      const n = Map(m.toJS()).set("taskId", taskId)
-    console.log(n.toJS());
     setDetailDroner(n.toJS());
   };
 
@@ -222,7 +216,7 @@ function ReviewTask() {
               }}
             ></div>
             <div className="ps-5">
-              {data.imageTaskUrl != undefined && (
+              {!data.imageTaskUrl && (
                 <>
                   <Tag
                     color={color.Success}

@@ -35,7 +35,6 @@ function CancelTask() {
 
   const fetchDetailTask = async () => {
     await TaskFinishedDatasource.getDetailFinishTaskById(taskId).then((res) => {
-      console.log(res);
       setData(res);
       setMapPosition({
         lat: parseFloat(res.data.farmerPlot.lat),

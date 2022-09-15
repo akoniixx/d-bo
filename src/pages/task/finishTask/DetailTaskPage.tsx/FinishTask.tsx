@@ -48,7 +48,6 @@ function FinishTasks() {
   });
   const fetchDetailTask = async () => {
     await TaskFinishedDatasource.getDetailFinishTaskById(taskId).then((res) => {
-      console.log(res);
       setData(res);
       setMapPosition({
         lat: parseFloat(res.data.farmerPlot.lat),
@@ -72,8 +71,6 @@ function FinishTasks() {
     if (!src) {
       src = await new Promise((resolve) => {
         const reader = new FileReader();
-        // reader.readAsDataURL(imageTaskUrl);
-        // reader.onload = () => resolve(reader.result);
       });
     }
     const image = new Image();
@@ -161,7 +158,7 @@ function FinishTasks() {
               }}
             ></div>
             <div className="ps-5">
-              {data.imageTaskUrl !== undefined && (
+              {!data.imageTaskUrl && (
                 <>
                   <Tag
                     color={color.Success}

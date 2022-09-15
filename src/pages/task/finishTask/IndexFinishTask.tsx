@@ -24,6 +24,7 @@ import {
 } from "../../../entities/LocationEntities";
 import color from "../../../resource/color";
 import {
+  DownOutlined,
   EditOutlined,
   FileTextOutlined,
   StarFilled,
@@ -41,13 +42,17 @@ import {
   FINISH_TASK_SEARCH,
   STATUS_COLOR_TASK,
 } from "../../../definitions/FinishTask";
-import ModalMapPlot from "../../../components/modal/task/newTask/ModalMapPlot";
+import ModalMapPlot from "../../../components/modal/task/finishTask/ModalMapPlot";
 
+interface Option {
+  value: string | number;
+  label: string;
+  children?: Option[];
+}
 export default function IndexFinishTask() {
   const row = 10;
   const [current, setCurrent] = useState(1);
   const [data, setData] = useState<TaskFinishListEntity>();
-  const [plotArea, setPlotArea] = useState<FarmerPlotEntity>();
   const [searchText, setSearchText] = useState<string>();
   const [searchStatus, setSearchStatus] = useState<string>();
   const [startDate, setStartDate] = useState<any>(null);
@@ -60,6 +65,8 @@ export default function IndexFinishTask() {
   const [subdistrict, setSubdistrict] = useState<SubdistrictEntity[]>();
   const [showModalMap, setShowModalMap] = useState<boolean>(false);
   const [plotId, setPlotId] = useState<string>("");
+  const [visibleRating, setVisibleRating] = useState(false);
+  const [arrStatus, setArrStatus] = useState<string[]>([]);
   const { RangePicker } = DatePicker;
   const dateFormat = "DD/MM/YYYY";
   const timeFormat = "HH:mm";
@@ -86,7 +93,6 @@ export default function IndexFinishTask() {
       searchStatus,
       text
     ).then((res: TaskFinishListEntity) => {
-      console.log(res);
       setData(res);
     });
   };
@@ -125,8 +131,18 @@ export default function IndexFinishTask() {
     setCurrent(page);
   };
   const handleStatus = (status: any) => {
-    setSearchStatus(status);
-    setCurrent(1);
+    let value = status.target.value;
+    let checked = status.target.checked;
+    if(checked){
+      console.log(1)
+      setArrStatus([...arrStatus, value]);
+     
+    }else{
+      let d: string[] = arrStatus.filter((x) => x != value);
+      console.log(2)
+      setArrStatus(d)
+    }
+    setSearchStatus(value);
   };
   const formatNumber = (e: any) => {
     let formatNumber = Number(e)
@@ -153,103 +169,54 @@ export default function IndexFinishTask() {
     setSearchSubdistrict(subdistrictId);
     setCurrent(1);
   };
-
-  const handlerStar = (e: any) => {
-    let checked = e.target.checked;
-    console.log(checked);
-  };
   const handleModalMap = (plotId: string) => {
     setShowModalMap((prev) => !prev);
     setPlotId(plotId);
   };
-
-  const ratingStar = (
+  const handleVisibleRating = (newVisible: any) => {
+    setVisibleRating(newVisible);
+  };
+  const onChange = (status: any) => {
+    console.log(status)
+    setSearchStatus(status)
+  };
+  const options: Option[] = [
+    {
+      label: 'เสร็จสิ้น',
+      value: 'DONE',
+    },
+    {
+      label: 'รอรีวิว',
+      value: 'WAIT_REVIEW',
+    },
+    {
+      label: 'ยกเลิก',
+      value: 'CANCELED',
+    },
+  ];
+  const status = (
     <Menu
       items={[
         {
-          label: (
-            <div
-              style={{
-                color: "#FFCA37",
-                fontSize: "16px",
-                marginBottom: "10px",
-              }}
-            >
-              <StarFilled />
-              <StarFilled />
-              <StarFilled />
-              <StarFilled />
-              <StarFilled />
-            </div>
-          ),
+          label: "เสร็จสิ้น",
           key: "1",
-          icon: <Checkbox value={5} onChange={handlerStar}></Checkbox>,
+          icon: (
+            <Checkbox value="DONE" onClick={(e) => handleStatus(e)}></Checkbox>
+          ),
         },
         {
-          label: (
-            <div
-              style={{
-                color: "#FFCA37",
-                fontSize: "16px",
-                marginBottom: "10px",
-              }}
-            >
-              <StarFilled />
-              <StarFilled />
-              <StarFilled />
-              <StarFilled />
-            </div>
-          ),
+          label: "รอรีวิว",
           key: "2",
-          icon: <Checkbox value={4} onChange={handlerStar}></Checkbox>,
+          icon: (
+            <Checkbox value="WAIT_REVIEW" onClick={(e) => handleStatus(e)}></Checkbox>
+          ),
         },
         {
-          label: (
-            <div
-              style={{
-                color: "#FFCA37",
-                fontSize: "16px",
-                marginBottom: "10px",
-              }}
-            >
-              <StarFilled />
-              <StarFilled />
-              <StarFilled />
-            </div>
-          ),
+          label: "ยกเลิก",
           key: "3",
-          icon: <Checkbox value={3} onChange={handlerStar}></Checkbox>,
-        },
-        {
-          label: (
-            <div
-              style={{
-                color: "#FFCA37",
-                fontSize: "16px",
-                marginBottom: "10px",
-              }}
-            >
-              <StarFilled />
-              <StarFilled />
-            </div>
+          icon: (
+            <Checkbox value="CANCELED" onClick={(e) => handleStatus(e)}></Checkbox>
           ),
-          key: "4",
-          icon: <Checkbox value={2} onChange={handlerStar}></Checkbox>,
-        },
-        {
-          label: (
-            <div
-              style={{
-                color: "#FFCA37",
-                fontSize: "16px",
-                marginBottom: "10px",
-              }}
-            >
-              <StarFilled />
-            </div>
-          ),
-          key: "5",
-          icon: <Checkbox value={1} onChange={handlerStar}></Checkbox>,
         },
       ]}
     />
@@ -363,16 +330,26 @@ export default function IndexFinishTask() {
           </Select>
         </div>
         <div className="col-lg-2 p-1">
-          <Select
-            allowClear
+        <Cascader
+    style={{ width: '100%' }}
+    options={options}
+    onChange={onChange}
+    multiple
+    maxTagCount="responsive"
+  />
+        {/* <Dropdown
+            overlay={status}
+            trigger={["click"]}
             className="col-lg-12"
-            placeholder="เลือกสถานะ"
-            onChange={handleStatus}
+            onVisibleChange={handleVisibleRating}
+            visible={visibleRating}
           >
-            {FINISH_TASK_SEARCH.map((item) => (
-              <option value={item.value}>{item.name}</option>
-            ))}
-          </Select>
+            <Button style={{ color: color.Disable }}>
+              เลือกสถานะ
+              <DownOutlined />
+            </Button>
+          </Dropdown> */}
+
         </div>
         <div className="pt-1">
           <Button
@@ -579,7 +556,9 @@ export default function IndexFinishTask() {
                 <ActionButton
                   icon={<FileTextOutlined />}
                   color={color.primary1}
-                  onClick={() => (window.location.href = "/CancelTask?=" + row.id)}
+                  onClick={() =>
+                    (window.location.href = "/CancelTask?=" + row.id)
+                  }
                 />
               ) : row.status == "DONE" ? (
                 <ActionButton
