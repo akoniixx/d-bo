@@ -42,8 +42,9 @@ export class DronerDroneDatasource {
       });
   }
   static createDronerDrone(data: DronerDroneEntity): Promise<any> {
+    delete data["id"];
     return httpClient
-      .post(BASE_URL + "/droner-drone", { data })
+      .post(BASE_URL + "/droner-drone", data)
       .then((response) => {
         return response.data;
       })
@@ -52,9 +53,8 @@ export class DronerDroneDatasource {
       });
   }
   static updateDronerDrone(data: DronerDroneEntity): Promise<any> {
-    console.log("param", data);
     return httpClient
-      .patch(BASE_URL + "/droner-drone/" + data.droneId, data)
+      .patch(BASE_URL + "/droner-drone/" + data.id, data)
       .then((response) => {
         return response.data;
       })

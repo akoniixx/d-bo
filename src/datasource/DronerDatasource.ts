@@ -48,11 +48,12 @@ export class DronerDatasource {
   }
 
   static updateDroner(data: DronerEntity): Promise<any> {
-    for (let i = 0; data.dronerDrone.length > i; i++) {
-      let checkIdDronerDrone = data.dronerDrone[i].id;
-      checkIdDronerDrone == "" && delete data.dronerDrone[i].dronerId;
-      delete data.dronerDrone[i].id;
-    }
+    // for (let i = 0; data.dronerDrone.length > i; i++) {
+    //   let checkIdDronerDrone = data.dronerDrone[i].id;
+    //   checkIdDronerDrone == "" && delete data.dronerDrone[i].dronerId;
+    //   delete data.dronerDrone[i].id;
+    // }
+    delete data["dronerDrone"];
 
     if (data.dronerArea.provinceId == 0) {
       delete data.dronerArea["provinceId"];

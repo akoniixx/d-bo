@@ -28,7 +28,7 @@ export interface DronerEntity {
   expPlant: string[];
   address: FullAddressEntity;
   pin: string;
-  dronerDrone: DronerDroneEntity[];
+  dronerDrone?: DronerDroneEntity[];
   dronerArea: DronerAreaEntity;
   file: ImageEntity[];
   createdAt: string;

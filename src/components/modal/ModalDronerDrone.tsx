@@ -153,7 +153,6 @@ const ModalDrone: React.FC<ModalDroneProps> = ({
     checkValidate(m.toJS(), pushDrone, pushSeries, imgLicenseDrone);
   };
   const handleChangeStatus = (e: any) => {
-    console.log(e.target.value);
     let status = e.target.value;
     const m = Map(dataDrone).set("status", status);
     if (status == "REJECTED" || status == "INACTIVE") {
@@ -161,11 +160,16 @@ const ModalDrone: React.FC<ModalDroneProps> = ({
     } else {
       checkValidate(m.toJS(), pushDrone, pushSeries, imgLicenseDrone);
     }
-    setDataDrone(m.toJS());
+    const n = Map(m.toJS()).set("reason", []);
+    REASON_IS_CHECK.map((reason) => _.set(reason, "isChecked", false));
+    setDataDrone(n.toJS());
   };
   const handleCheckBoxReason = (e: any) => {
     let checked = e.target.checked;
     let value = e.target.value;
+    REASON_IS_CHECK.map((item) =>
+      _.set(item, "isChecked", value === item.reason ? checked : item.isChecked)
+    );
     let p;
     if (checked) {
       p = Map(dataDrone).set(
@@ -183,11 +187,10 @@ const ModalDrone: React.FC<ModalDroneProps> = ({
   };
   const handleMoreReason = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     let value = e.target.value;
-    const p = Map(dataDrone).set("reason", [...dataDrone.reason, value]);
-    setDataDrone(p.toJS());
     setBtnSaveDisable(
-      p.toJS().reason.length != 0 && value.trim().length != 0 ? false : true
+      dataDrone.reason != null ? false : value.trim().length != 0 ? false : true
     );
+    checkValidateReason(dataDrone);
     setMoreReason(value);
   };
 
@@ -288,18 +291,23 @@ const ModalDrone: React.FC<ModalDroneProps> = ({
   };
   //#endregion
 
-  const handleCallBack = () => {
-    const m = Map(dataDrone).set("modalDroneIndex", editIndex);
+  const handleCallBack = async () => {
+    let pushReasonChecked = [];
+    if (dataDrone.status == "REJECTED") {
+      let reasonChecked = REASON_IS_CHECK.filter((x) => x.isChecked).map(
+        (y) => y.reason
+      );
+      for (let i: number = 0; reasonChecked.length > i; i++) {
+        await pushReasonChecked.push(reasonChecked[i]);
+      }
+      pushReasonChecked.push(moreReason);
+    } else if (dataDrone.status == "INACTIVE") {
+      pushReasonChecked.push(moreReason);
+    }
+    const pushReason = Map(dataDrone).set("reason", pushReasonChecked);
+    const m = Map(pushReason.toJS()).set("modalDroneIndex", editIndex);
     const n = Map(m.toJS()).set("drone", pushDrone);
-    console.log(n.toJS());
-    const pushReason = Map(n.toJS()).set(
-      "reason",
-      [
-        data.reason.filter((x) => x == "บัตรประชาชนไม่ชัดเจน/ไม่ถูกต้อง")[0],
-        moreReason,
-      ].filter((y) => y != undefined && y != "")
-    );
-    //callBack(n.toJS());
+    callBack(n.toJS());
   };
 
   const checkValidate = (
@@ -577,14 +585,26 @@ const ModalDrone: React.FC<ModalDroneProps> = ({
                           {item.name}
                           {dataDrone.status == "REJECTED" && index == 2 ? (
                             <div className="form-group ps-3">
-                              {REASON_IS_CHECK.map((reason) => (
+                              {REASON_IS_CHECK.map((reason) =>
+                                _.set(
+                                  reason,
+                                  "isChecked",
+                                  dataDrone?.reason
+                                    .map((x) => x)
+                                    .find((y) => y === reason.reason)
+                                    ? true
+                                    : reason.isChecked
+                                )
+                              ).map((x) => (
                                 <>
                                   <input
+                                    key={x.key}
                                     type="checkbox"
-                                    value={reason.reason}
+                                    value={x.reason}
                                     onChange={handleCheckBoxReason}
+                                    checked={x.isChecked}
                                   />{" "}
-                                  <label>{reason.reason}</label>
+                                  <label>{x.reason}</label>
                                   <br />
                                 </>
                               ))}
@@ -594,6 +614,10 @@ const ModalDrone: React.FC<ModalDroneProps> = ({
                                 placeholder="กรอกเหตุผล/เหตุหมายเพิ่มเติม"
                                 autoComplete="off"
                                 onChange={handleMoreReason}
+                                defaultValue={dataDrone.reason.filter(
+                                  (a) =>
+                                    !REASON_IS_CHECK.some((x) => x.reason === a)
+                                )}
                               />
                             </div>
                           ) : dataDrone.status == "INACTIVE" && index == 3 ? (
@@ -605,6 +629,12 @@ const ModalDrone: React.FC<ModalDroneProps> = ({
                                   placeholder="กรอกเหตุผล/เหตุหมายเพิ่มเติม"
                                   autoComplete="off"
                                   onChange={handleMoreReason}
+                                  defaultValue={dataDrone.reason.filter(
+                                    (a) =>
+                                      !REASON_IS_CHECK.some(
+                                        (x) => x.reason === a
+                                      )
+                                  )}
                                 />{" "}
                               </div>
                             </div>

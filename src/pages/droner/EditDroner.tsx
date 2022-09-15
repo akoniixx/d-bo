@@ -123,16 +123,18 @@ function EditDroner() {
       console.log(res);
       setData(res);
       setMapPosition({
-        lat: parseFloat(res.dronerArea.lat),
-        lng: parseFloat(res.dronerArea.long),
+        lat: parseFloat(res.dronerArea?.lat),
+        lng: parseFloat(res.dronerArea?.long),
       });
       setAddress(res.address);
       var k = 0;
-      for (k; res.dronerDrone.length > k; k++) {
-        res.dronerDrone[k].modalDroneIndex = k + 1;
+      if (res.dronerDrone != undefined) {
+        for (k; res.dronerDrone.length > k; k++) {
+          res.dronerDrone[k].modalDroneIndex = k + 1;
+        }
+        setDronerDroneList(res.dronerDrone);
       }
-      setDronerDroneList(res.dronerDrone);
-
+      setDronerArea(res.dronerArea);
       let getPathPro = res.file.filter((x) => x.category == "PROFILE_IMAGE");
       let getPathCard = res.file.filter((x) => x.category == "ID_CARD_IMAGE");
       imgList.push(
@@ -177,6 +179,7 @@ function EditDroner() {
   //#region data droner
   const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const m = Map(data).set(e.target.id, e.target.value);
+    console.log(m.toJS());
     setData(m.toJS());
     checkValidate(m.toJS());
     checkValidateReason(m.toJS());
@@ -194,7 +197,6 @@ function EditDroner() {
       checkValidate(n.toJS());
     }
   };
-
   const handleExpPlant = (e: any) => {
     let checked = e.target.checked;
     let value = e.target.value;
@@ -215,6 +217,7 @@ function EditDroner() {
       let removePlant = data.expPlant.filter((x) => x != value);
       p = Map(data).set("expPlant", removePlant);
     }
+    console.log(p.toJS());
     setData(p.toJS());
     checkValidate(data);
   };
@@ -349,25 +352,57 @@ function EditDroner() {
     setEditDroneList(data);
   };
   const updateDrone = async (drone: DronerDroneEntity) => {
-    console.log(drone);
     const d = Map(drone).set("dronerId", dronerId);
     if (d.toJS().id != "") {
-      delete drone["droneName"];
-      delete drone["logoImagePath"];
-      await DronerDroneDatasource.updateDronerDrone(d.toJS()).then((res) => {
-        console.log(res);
-      });
+      await DronerDroneDatasource.updateDronerDrone(d.toJS()).then(
+        async (res) => {
+          if (res.id != null) {
+            for (let i: number = 0; drone.file.length > i; i++) {
+              let getImg = drone.file[i];
+              imgDroneList?.push({
+                resourceId: res.id,
+                category: getImg.category,
+                file: getImg.file,
+                resource: getImg.resource,
+                path: "",
+              });
+            }
+            const checkImg = imgDroneList.filter((x) => x.resourceId != "");
+            for (let k = 0; checkImg.length > k; k++) {
+              let getDataImg: any = checkImg[k];
+              await UploadImageDatasouce.uploadImage(getDataImg).then(res);
+            }
+          }
+        }
+      );
     } else {
-      delete drone["id"];
-      delete drone["droneName"];
-      delete drone["logoImagePath"];
-      await DronerDroneDatasource.createDronerDrone(d.toJS()).then((res) => {
-        console.log(res);
-      });
+      await DronerDroneDatasource.createDronerDrone(d.toJS()).then(
+        async (res) => {
+          if (res.id != null) {
+            for (let i: number = 0; drone.file.length > i; i++) {
+              let getImg = drone.file[i];
+              imgDroneList?.push({
+                resourceId: res.id,
+                category: getImg.category,
+                file: getImg.file,
+                resource: getImg.resource,
+                path: "",
+              });
+            }
+            const checkImg = imgDroneList.filter((x) => x.resourceId != "");
+            for (let k = 0; checkImg.length > k; k++) {
+              let getDataImg: any = checkImg[k];
+              await UploadImageDatasouce.uploadImage(getDataImg).then(res);
+            }
+          }
+        }
+      );
     }
-    // setShowAddModal(false);
-    // setShowEditModal(false);
-    // setEditIndex(0);
+    fetchDronerById();
+    setShowAddModal(false);
+    setShowEditModal(false);
+    setEditIndex(0);
+    setBtnSaveDisable(false);
   };
   const removeDrone = (index: number) => {
     const newData = dronerDroneList.filter((x) => x.modalDroneIndex != index);
@@ -467,6 +502,7 @@ function EditDroner() {
       address.address1,
       dronerArea.lat,
       dronerArea.long,
+      data.birthDate,
     ].includes("");
     let checkEmptyNumber = ![
       address.provinceId,
@@ -516,7 +552,7 @@ function EditDroner() {
     let checkEmptyReason = data.reason.filter((x) => x != "").length > 0;
     setBtnSaveDisable(!checkEmptyReason);
   };
-  
+
   const updateDroner = async () => {
     let otherPlantList = [];
     if (otherPlant != undefined) {
@@ -537,6 +573,7 @@ function EditDroner() {
       ].filter((y) => y != undefined && y != "")
     );
     const pushAddr = Map(pushReason.toJS()).set("address", address);
+    console.log(dronerArea);
     const pushDronerArea = Map(pushAddr.toJS()).set("dronerArea", dronerArea);
     const pushPin = Map(pushDronerArea.toJS()).set("pin", "");
     const setOtherPlant = Array.from(new Set(pushPin.toJS().expPlant)).filter(
@@ -549,6 +586,7 @@ function EditDroner() {
     );
     console.log("final", pushDroneList.toJS());
     await DronerDatasource.updateDroner(pushDroneList.toJS()).then((res) => {
+      console.log("res", res);
       if (res != undefined) {
         var i = 0;
         for (i; 2 > i; i++) {
@@ -669,6 +707,8 @@ function EditDroner() {
                 />
               </Form.Item>
             </div>
+          </div>
+          <div className="row">
             <div className="form-group col-lg-6">
               <label>
                 เบอร์โทร <span style={{ color: "red" }}>*</span>
@@ -981,6 +1021,7 @@ function EditDroner() {
                   filterOption={(input: any, option: any) =>
                     option.children.includes(input)
                   }
+                  defaultValue={data.dronerArea.subdistrictId}
                 >
                   {location.map((item: any, index: any) => (
                     <option key={index} value={item.subdistrictId}>
