@@ -1,4 +1,3 @@
-
 export interface reviewDronerDetail {
     avg: number;
     taskId: string;
@@ -16,4 +15,21 @@ export const reviewDronerDetail_INIT : reviewDronerDetail = {
     punctuality: "",
     pilotEtiquette: "",
     sprayExpertise: "",
+}
+
+export interface CreateReview {
+    taskId: string; 
+    canReview: string;
+    punctuality: number;
+    pilotEtiquette: number;
+    sprayExpertise: number;
+    comment: string;
+}
+export const CreateReview_INIT : CreateReview = {
+    taskId: "",
+    canReview: "",
+    punctuality: 0,
+    pilotEtiquette: 0,
+    sprayExpertise: 0,
+    comment: "",
 }

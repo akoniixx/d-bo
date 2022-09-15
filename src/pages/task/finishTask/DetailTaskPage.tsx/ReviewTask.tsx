@@ -1,4 +1,4 @@
-import Layout from "../../../components/layout/Layout";
+import Layout from "../../../../components/layout/Layout";
 import React, { useEffect, useState } from "react";
 import {
   Badge,
@@ -12,37 +12,41 @@ import {
   Tag,
   Upload,
 } from "antd";
-import { BackIconButton } from "../../../components/button/BackButton";
-import { CardContainer } from "../../../components/card/CardContainer";
-import { CardHeader } from "../../../components/header/CardHearder";
-import color from "../../../resource/color";
-import GoogleMap from "../../../components/map/GoogleMap";
-import { LAT_LNG_BANGKOK } from "../../../definitions/Location";
+import { BackIconButton } from "../../../../components/button/BackButton";
+import { CardContainer } from "../../../../components/card/CardContainer";
+import { CardHeader } from "../../../../components/header/CardHearder";
+import color from "../../../../resource/color";
+import GoogleMap from "../../../../components/map/GoogleMap";
+import { LAT_LNG_BANGKOK } from "../../../../definitions/Location";
 import TextArea from "antd/lib/input/TextArea";
 import {
   AddressEntity,
   AddressEntity_INIT,
-} from "../../../entities/AddressEntities";
+} from "../../../../entities/AddressEntities";
 import {
   StarFilled,
   CalendarOutlined,
   ClockCircleOutlined,
 } from "@ant-design/icons";
+import { TaskFinishedDatasource } from "../../../../datasource/TaskFinishDatasource";
+import moment from "moment";
+import { UploadImageDatasouce } from "../../../../datasource/UploadImageDatasource";
+import { RATE_SELECT } from "../../../../definitions/FinishTask";
+import FooterPage from "../../../../components/footer/FooterPage";
+
+import { TaskReviewDronerDatasource } from "../../../../datasource/TaskReviewDronerDatasource";
+import Swal from "sweetalert2";
 import {
+  CreateReviewDroner_INIT,
   DetailFinishTask,
   DetailFinishTask_INIT,
-} from "../../../entities/TaskFinishEntities";
-import { TaskFinishedDatasource } from "../../../datasource/TaskFinishDatasource";
-import moment from "moment";
-import { UploadImageDatasouce } from "../../../datasource/UploadImageDatasource";
-import { RATE_SELECT } from "../../../definitions/FinishTask";
-import FooterPage from "../../../components/footer/FooterPage";
+  DetailReviewTask,
+  DetailReviewTask_INIT,
+} from "../../../../entities/TaskFinishEntities";
 import {
-  reviewDronerDetail,
-  reviewDronerDetail_INIT,
-} from "../../../entities/ReviewDronerEntities";
-import { TaskReviewDronerDatasource } from "../../../datasource/TaskReviewDronerDatasource";
-import Swal from "sweetalert2";
+  CreateReview,
+  CreateReview_INIT,
+} from "../../../../entities/ReviewDronerEntities";
 
 const { Map } = require("immutable");
 const _ = require("lodash");
@@ -52,38 +56,22 @@ const timeFormat = "HH:mm";
 
 function ReviewTask() {
   const taskId = queryString[1];
-  const [data, setData] = useState<DetailFinishTask>(DetailFinishTask_INIT);
-  const [detailDroner, setDetailDroner] = useState<reviewDronerDetail>(
-    reviewDronerDetail_INIT
-  );
-  const [address, setAddress] = useState<AddressEntity>(AddressEntity_INIT);
-  let imgList: (string | boolean)[] = [];
+  const [data, setData] = useState<DetailReviewTask>(DetailReviewTask_INIT);
+  const [detailDroner, setDetailDroner] =
+    useState<CreateReview>(CreateReview_INIT);
   const [mapPosition, setMapPosition] = useState<{ lat: number; lng: number }>({
     lat: LAT_LNG_BANGKOK.lat,
     lng: LAT_LNG_BANGKOK.lng,
   });
-  const [canReview, setCanReview] = useState(1);
-  const [imgFinish, setImgFinish] = useState<any>();
   const fetchDetailTask = async () => {
     await TaskFinishedDatasource.getDetailFinishTaskById(taskId).then((res) => {
       console.log(res);
       setData(res);
+      setDetailDroner(detailDroner)
       setMapPosition({
         lat: parseFloat(res.data.farmerPlot.lat),
         lng: parseFloat(res.data.farmerPlot.long),
       });
-
-      let getImgFinish = res.imagePathFinishTask;
-      imgList.push(getImgFinish != null ? getImgFinish : "");
-      var i = 0;
-      // for (i; imgList.length > i; i++) {
-      //   i == 0 &&
-      //     UploadImageDatasouce.getImageFinish(imgList[i].toString()).then(
-      //       (resImg) => {
-      //         setImgFinish(resImg.url);
-      //       }
-      //     );
-      // }
     });
   };
 
@@ -92,24 +80,35 @@ function ReviewTask() {
   }, []);
 
   const onChangeCanReview = (e: any) => {
-    console.log(e.target.value);
-    setCanReview(e.target.value);
+    const m = Map(detailDroner).set("canReview",e.target.value);
+    const n = Map(m.toJS()).set("taskId", taskId)
+    console.log(n.toJS());
+    setDetailDroner(n.toJS());
   };
 
   const manners = (e: any) => {
-    const m = Map(detailDroner).set("pilotEtiquette", e);
-    setDetailDroner(m.toJS());
-    console.log(m.toJS());
+    const m = Map(detailDroner).set("pilotEtiquette", parseInt(e));
+     const n = Map(m.toJS()).set("taskId", taskId)
+    console.log(n.toJS());
+    setDetailDroner(n.toJS());
   };
   const punctuality = (e: any) => {
-    const m = Map(detailDroner).set("punctuality", e);
-    setDetailDroner(m.toJS());
-    console.log(m.toJS());
+    const m = Map(detailDroner).set("punctuality", parseInt(e));
+     const n = Map(m.toJS()).set("taskId", taskId)
+    console.log(n.toJS());
+    setDetailDroner(n.toJS());
   };
   const expertise = (e: any) => {
-    const m = Map(detailDroner).set("sprayExpertise", e);
-    setDetailDroner(m.toJS());
-    console.log(m.toJS());
+    const m = Map(detailDroner).set("sprayExpertise", parseInt(e));
+     const n = Map(m.toJS()).set("taskId", taskId)
+    console.log(n.toJS());
+    setDetailDroner(n.toJS());
+  };
+  const commentReview = (e: any) => {
+    const m = Map(detailDroner).set("comment", e.target.value);
+     const n = Map(m.toJS()).set("taskId", taskId)
+    console.log(n.toJS());
+    setDetailDroner(n.toJS());
   };
 
   const formatCurrency = (e: any) => {
@@ -119,12 +118,10 @@ function ReviewTask() {
     });
   };
   const onPreviewImg = async () => {
-    let src = imgFinish;
+    let src = data.imageTaskUrl;
     if (!src) {
       src = await new Promise((resolve) => {
         const reader = new FileReader();
-        reader.readAsDataURL(imgFinish);
-        reader.onload = () => resolve(reader.result);
       });
     }
     const image = new Image();
@@ -133,25 +130,25 @@ function ReviewTask() {
     imgWindow?.document.write(image.outerHTML);
   };
 
-  const updateDroner = async () => {
-    // await TaskReviewDronerDatasource.UpdateReviewDroner(detailDroner).then(
-    //   (res) => {
-    //     console.log(res);
-          // if (res) {
-            Swal.fire({
-          title: "ยืนยันการเปลี่ยนแปลงข้อมูล",
-          text: "โปรดตรวจสอบรายละเอียดที่คุณต้องการเปลี่ยนแปลงข้อมูลก่อนเสมอเพราะอาจส่งผลต่อการจ้างงานในระบบ",
-          cancelButtonText: "ยกเลิก",
-          confirmButtonText: "บันทึก",
-          confirmButtonColor: color.Success,
-          showCancelButton: true,
-          showCloseButton: true,
-        }).then((time) => {
-          window.location.href = "/IndexFinishTask";
-        });
-          // }
-    //   }
-    // );
+  const UpdateReviewDroner = async () => {
+    const pushDetailReview = Map(data.data).set("reviewDronerDetail", detailDroner);
+    await TaskReviewDronerDatasource.UpdateReviewDroner(pushDetailReview.toJS().reviewDronerDetail
+    ).then((res) => {
+      console.log(res);
+      // if (res) {
+      //   Swal.fire({
+      //     title: "ยืนยันการเปลี่ยนแปลงข้อมูล",
+      //     text: "โปรดตรวจสอบรายละเอียดที่คุณต้องการเปลี่ยนแปลงข้อมูลก่อนเสมอเพราะอาจส่งผลต่อการจ้างงานในระบบ",
+      //     cancelButtonText: "ยกเลิก",
+      //     confirmButtonText: "บันทึก",
+      //     confirmButtonColor: color.Success,
+      //     showCancelButton: true,
+      //     showCloseButton: true,
+      //   }).then((time) => {
+      //     window.location.href = "/IndexFinishTask";
+      //   });
+      // }
+    });
   };
   const renderAppointment = (
     <Form style={{ padding: "32px" }}>
@@ -189,7 +186,7 @@ function ReviewTask() {
           <Form.Item>
             <Select
               disabled
-              defaultValue={
+              value={
                 data.data.purposeSpray !== null
                   ? data.data.purposeSpray.purposeSprayName
                   : "-"
@@ -214,12 +211,15 @@ function ReviewTask() {
             <div
               className="hiddenFileInput"
               style={{
-                backgroundImage: `url(${imgFinish})`,
-                display: imgFinish != null ? `url(${imgFinish})` : undefined,
+                backgroundImage: `url(${data.imageTaskUrl})`,
+                display:
+                  data.imageTaskUrl != null
+                    ? `url(${data.imageTaskUrl})`
+                    : undefined,
               }}
             ></div>
             <div className="ps-5">
-              {imgFinish != undefined && (
+              {data.imageTaskUrl != undefined && (
                 <>
                   <Tag
                     color={color.Success}
@@ -261,7 +261,6 @@ function ReviewTask() {
               style={{ width: "100%" }}
               className="pt-3"
               onChange={onChangeCanReview}
-              value={canReview}
             >
               <Radio value={"Yes"}>ให้รีวิวแล้ว</Radio>
               <Form.Item>
@@ -291,7 +290,11 @@ function ReviewTask() {
                 </div>
               </Form.Item>
               <Form.Item>
-                <TextArea rows={3} placeholder="กรอกความคิดเห็นเพิ่มเติม" />
+                <TextArea
+                  rows={3}
+                  onChange={commentReview}
+                  placeholder="กรอกความคิดเห็นเพิ่มเติม"
+                />
               </Form.Item>
               <Radio value={"No"}>ไม่สะดวกรีวิว</Radio>
             </Radio.Group>
@@ -541,7 +544,7 @@ function ReviewTask() {
       </CardContainer>
       <FooterPage
         onClickBack={() => (window.location.href = "/IndexFinishTask")}
-        onClickSave={updateDroner}
+        onClickSave={UpdateReviewDroner}
       />
     </Layout>
   );

@@ -22,10 +22,10 @@ import EditAdmin from "./pages/admin/EditAdmin";
 import ProtectRoute from "./ProtectRoute";
 import PublicRoute from "./PublicRoute";
 
-import IndexFinishTask from "./pages/followWork/IndexFinishTask";
-import FinishTasks from "./pages/followWork/DetailTaskPage.tsx/FinishTask";
-import ReviewTask from "./pages/followWork/DetailTaskPage.tsx/ReviewTask";
-import CancelTask from "./pages/followWork/DetailTaskPage.tsx/CancelTask";
+import IndexFinishTask from "./pages/task/finishTask/IndexFinishTask";
+import FinishTasks from "./pages/task/finishTask/DetailTaskPage.tsx/FinishTask";
+import ReviewTask from "./pages/task/finishTask/DetailTaskPage.tsx/ReviewTask";
+import CancelTask from "./pages/task/finishTask/DetailTaskPage.tsx/CancelTask";
 
 import IndexNewTask from "./pages/task/newTask/IndexNewTask";
 import AddNewTask from "./pages/task/newTask/AddNewTask";

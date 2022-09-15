@@ -14,35 +14,34 @@ import {
 import Search from "antd/lib/input/Search";
 import moment from "moment";
 import React, { useEffect, useState } from "react";
-import ActionButton from "../../components/button/ActionButton";
-import Layouts from "../../components/layout/Layout";
-import { LocationDatasource } from "../../datasource/LocationDatasource";
+import ActionButton from "../../../components/button/ActionButton";
+import Layouts from "../../../components/layout/Layout";
+import { LocationDatasource } from "../../../datasource/LocationDatasource";
 import {
   DistrictEntity,
   ProviceEntity,
   SubdistrictEntity,
-} from "../../entities/LocationEntities";
-import color from "../../resource/color";
+} from "../../../entities/LocationEntities";
+import color from "../../../resource/color";
 import {
   EditOutlined,
   FileTextOutlined,
   StarFilled,
   UserOutlined,
 } from "@ant-design/icons";
-import { TaskFinishedDatasource } from "../../datasource/TaskFinishDatasource";
+import { TaskFinishedDatasource } from "../../../datasource/TaskFinishDatasource";
 import {
   TaskFinishListEntity,
   TaskFinish_INIT,
-} from "../../entities/TaskFinishEntities";
-import { FarmerPlotEntity } from "../../entities/FarmerPlotEntities";
+} from "../../../entities/TaskFinishEntities";
+import { FarmerPlotEntity } from "../../../entities/FarmerPlotEntities";
 import { Option } from "antd/lib/mentions";
 import {
   FINISH_TASK,
   FINISH_TASK_SEARCH,
   STATUS_COLOR_TASK,
-} from "../../definitions/FinishTask";
-import { FarmerPlotDatasource } from "../../datasource/FarmerPlotDatasource";
-import ModalFarmerPlot from "../../components/modal/ModalFarmerPlot";
+} from "../../../definitions/FinishTask";
+import ModalMapPlot from "../../../components/modal/task/newTask/ModalMapPlot";
 
 export default function IndexFinishTask() {
   const row = 10;
@@ -69,28 +68,23 @@ export default function IndexFinishTask() {
   useEffect(() => {
     fetchTaskFinish();
     fetchProvince();
-    fetchDistrict();
-    fetchSubdistrict();
-  }, [
-    searchSubdistrict,
-    searchDistrict,
-    searchProvince,
-    startDate,
-    endDate,
-    searchStatus,
-    searchText,
-  ]);
-  const fetchTaskFinish = async () => {
+  }, [current, row, startDate, endDate]);
+  const fetchTaskFinish = async (
+    proId?: number,
+    disId?: number,
+    subDisId?: number,
+    text?: string
+  ) => {
     await TaskFinishedDatasource.getTaskFinishList(
       current,
       row,
-      searchSubdistrict,
-      searchDistrict,
-      searchProvince,
+      proId,
+      disId,
+      subDisId,
       startDate,
       endDate,
       searchStatus,
-      searchText
+      text
     ).then((res: TaskFinishListEntity) => {
       console.log(res);
       setData(res);
@@ -111,20 +105,22 @@ export default function IndexFinishTask() {
       setProvince(res);
     });
   };
-  const fetchDistrict = async () => {
-    await LocationDatasource.getDistrict(searchProvince).then((res) => {
+  const fetchDistrict = async (provinceId: number) => {
+    await LocationDatasource.getDistrict(provinceId).then((res) => {
       setDistrict(res);
     });
   };
-  const fetchSubdistrict = async () => {
-    await LocationDatasource.getSubdistrict(searchDistrict).then((res) => {
+  const fetchSubdistrict = async (districtId: number) => {
+    await LocationDatasource.getSubdistrict(districtId).then((res) => {
       setSubdistrict(res);
     });
   };
-  const changeTextSearch = (value: string) => {
-    setSearchText(value);
+
+  const changeTextSearch = (searchText: any) => {
+    setSearchText(searchText.target.value);
     setCurrent(1);
   };
+
   const onChangePage = (page: number) => {
     setCurrent(page);
   };
@@ -145,9 +141,11 @@ export default function IndexFinishTask() {
 
   const handleProvince = (provinceId: number) => {
     setSearchProvince(provinceId);
+    fetchDistrict(provinceId);
     setCurrent(1);
   };
   const handleDistrict = (districtId: number) => {
+    fetchSubdistrict(districtId);
     setSearchDistrict(districtId);
     setCurrent(1);
   };
@@ -155,6 +153,7 @@ export default function IndexFinishTask() {
     setSearchSubdistrict(subdistrictId);
     setCurrent(1);
   };
+
   const handlerStar = (e: any) => {
     let checked = e.target.checked;
     console.log(checked);
@@ -163,31 +162,6 @@ export default function IndexFinishTask() {
     setShowModalMap((prev) => !prev);
     setPlotId(plotId);
   };
-
-  const options = [
-    {
-      label: "เสร็จสิ้น",
-      value: "DONE",
-    },
-    {
-      label: "รอรีวิว",
-      value: "WAIT_REVIEW",
-    },
-    {
-      label: "ยกเลิก",
-      value: "CANCELED",
-      children: [
-        {
-          label: "รอเริ่มงาน",
-          value: "รอเริ่มงาน",
-        },
-        {
-          label: "รอดำเนินงาน",
-          value: "รอดำเนินงาน",
-        },
-      ],
-    },
-  ];
 
   const ratingStar = (
     <Menu
@@ -298,7 +272,6 @@ export default function IndexFinishTask() {
         <div style={{ color: color.Error }}>
           <RangePicker
             allowClear
-            // onCalendarChange={(val) => SearchDate(val)}
             onCalendarChange={SearchDate}
             format={dateFormat}
           />
@@ -312,10 +285,10 @@ export default function IndexFinishTask() {
           <Search
             placeholder="ค้นหาชื่อเกษตรกร, คนบินโดรน หรือเบอร์โทร"
             className="col-lg-12 p-1"
-            onSearch={changeTextSearch}
+            onChange={changeTextSearch}
           />
         </div>
-        <div className="col-lg-2">
+        <div className="col-lg">
           <Select
             allowClear
             className="col-lg-12 p-1"
@@ -339,7 +312,7 @@ export default function IndexFinishTask() {
             ))}
           </Select>
         </div>
-        <div className="col-lg-2">
+        <div className="col-lg">
           <Select
             allowClear
             className="col-lg-12 p-1"
@@ -364,7 +337,7 @@ export default function IndexFinishTask() {
             ))}
           </Select>
         </div>
-        <div className="col-lg-2">
+        <div className="col-lg">
           <Select
             allowClear
             className="col-lg-12 p-1"
@@ -400,16 +373,26 @@ export default function IndexFinishTask() {
               <option value={item.value}>{item.name}</option>
             ))}
           </Select>
-          {/* <Cascader
-            placeholder="เลือกสถานะ"
+        </div>
+        <div className="pt-1">
+          <Button
             style={{
-              width: "100%",
+              borderColor: color.Success,
+              borderRadius: "5px",
+              color: color.secondary2,
+              backgroundColor: color.Success,
             }}
-            options={options}
-            onChange={handleStatus}
-            multiple
-            // maxTagCount="responsive"
-          /> */}
+            onClick={() =>
+              fetchTaskFinish(
+                searchSubdistrict,
+                searchDistrict,
+                searchProvince,
+                searchText
+              )
+            }
+          >
+            ค้นหาข้อมูล
+          </Button>
         </div>
       </div>
     </>
@@ -444,7 +427,9 @@ export default function IndexFinishTask() {
           children: (
             <>
               <span className="text-dark-75  d-block font-size-lg">
-                {row.droner !== null ? row.droner.firstname + " " + row.droner.lastname : null}
+                {row.droner !== null
+                  ? row.droner.firstname + " " + row.droner.lastname
+                  : null}
               </span>
               <span style={{ color: color.Disable, fontSize: "12px" }}>
                 {row.droner !== null ? row.droner.telephoneNo : null}
@@ -492,12 +477,11 @@ export default function IndexFinishTask() {
                 {province != undefined ? province.provinceName + "/" : null}
               </span>
               <a
-                // onClick={() => }
+                onClick={() => handleModalMap(row.farmerPlotId)}
                 style={{ color: color.primary1 }}
               >
-               <b>ดูแผนที่แปลง</b> 
+                ดูแผนที่แปลง
               </a>
-
             </>
           ),
         };
@@ -513,7 +497,7 @@ export default function IndexFinishTask() {
             <>
               <span className="text-dark-75  d-block font-size-lg">
                 {row.reviewDronerAvg > "0" ? (
-                  <span >
+                  <span>
                     <StarFilled
                       style={{
                         color: "#FFCA37",
@@ -636,6 +620,14 @@ export default function IndexFinishTask() {
           showSizeChanger={false}
         />
       </div>
+      {showModalMap && (
+        <ModalMapPlot
+          show={showModalMap}
+          backButton={() => setShowModalMap((prev) => !prev)}
+          title="แผนที่แปลงเกษตร"
+          plotId={plotId}
+        />
+      )}
     </Layouts>
   );
 }

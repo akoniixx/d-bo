@@ -1,17 +1,17 @@
-import Layout from "../../../components/layout/Layout";
+import Layout from "../../../../components/layout/Layout";
 import React, { useEffect, useState } from "react";
 import { Badge, Form, Input, Row, Select, Tag, Upload } from "antd";
-import { BackIconButton } from "../../../components/button/BackButton";
-import { CardContainer } from "../../../components/card/CardContainer";
-import { CardHeader } from "../../../components/header/CardHearder";
-import color from "../../../resource/color";
-import GoogleMap from "../../../components/map/GoogleMap";
-import { LAT_LNG_BANGKOK } from "../../../definitions/Location";
+import { BackIconButton } from "../../../../components/button/BackButton";
+import { CardContainer } from "../../../../components/card/CardContainer";
+import { CardHeader } from "../../../../components/header/CardHearder";
+import color from "../../../../resource/color";
+import GoogleMap from "../../../../components/map/GoogleMap";
+import { LAT_LNG_BANGKOK } from "../../../../definitions/Location";
 import TextArea from "antd/lib/input/TextArea";
 import {
   AddressEntity,
   AddressEntity_INIT,
-} from "../../../entities/AddressEntities";
+} from "../../../../entities/AddressEntities";
 import {
   StarFilled,
   CalendarOutlined,
@@ -20,10 +20,10 @@ import {
 import {
   DetailFinishTask,
   DetailFinishTask_INIT,
-} from "../../../entities/TaskFinishEntities";
-import { TaskFinishedDatasource } from "../../../datasource/TaskFinishDatasource";
+} from "../../../../entities/TaskFinishEntities";
+import { TaskFinishedDatasource } from "../../../../datasource/TaskFinishDatasource";
 import moment from "moment";
-import { UploadImageDatasouce } from "../../../datasource/UploadImageDatasource";
+import { UploadImageDatasouce } from "../../../../datasource/UploadImageDatasource";
 const _ = require("lodash");
 let queryString = _.split(window.location.search, "=");
 const dateFormat = "DD/MM/YYYY";
@@ -32,14 +32,10 @@ const timeFormat = "HH:mm";
 function FinishTasks() {
   const taskId = queryString[1];
   const [data, setData] = useState<DetailFinishTask>(DetailFinishTask_INIT);
-  const [address, setAddress] = useState<AddressEntity>(AddressEntity_INIT);
-  let imgList: (string | boolean)[] = [];
   const [mapPosition, setMapPosition] = useState<{ lat: number; lng: number }>({
     lat: LAT_LNG_BANGKOK.lat,
     lng: LAT_LNG_BANGKOK.lng,
   });
-
-  const [imgFinish, setImgFinish] = useState<any>();
   const fetchDetailTask = async () => {
     await TaskFinishedDatasource.getDetailFinishTaskById(taskId).then((res) => {
       console.log(res);
@@ -48,18 +44,6 @@ function FinishTasks() {
         lat: parseFloat(res.data.farmerPlot.lat),
         lng: parseFloat(res.data.farmerPlot.long),
       });
-
-      let getImgFinish = res.imagePathFinishTask;
-      imgList.push(getImgFinish != null ? getImgFinish : "");
-      var i = 0;
-      // for (i; imgList.length > i; i++) {
-      //   i == 0 &&
-      //     UploadImageDatasouce.getImageFinish(imgList[i].toString()).then(
-      //       (resImg) => {
-      //         setImgFinish(resImg.url);
-      //       }
-      //     );
-      // }
     });
   };
 
@@ -74,12 +58,12 @@ function FinishTasks() {
     });
   };
   const onPreviewImg = async () => {
-    let src = imgFinish;
+    let src = data.imageTaskUrl;
     if (!src) {
       src = await new Promise((resolve) => {
         const reader = new FileReader();
-        reader.readAsDataURL(imgFinish);
-        reader.onload = () => resolve(reader.result);
+        // reader.readAsDataURL(data.imageTaskUrl);
+        // reader.onload = () => resolve(reader.result);
       });
     }
     const image = new Image();
@@ -132,7 +116,11 @@ function FinishTasks() {
           </div>
           <label>ช่วงเวลาฉีดพ่น</label>
           <Form.Item>
-            <Select disabled placeholder="คุมเลน" />
+            <Select disabled  value={
+                data.data.purposeSpray !== null
+                  ? data.data.purposeSpray.purposeSprayName
+                  : "-"
+              } />
           </Form.Item>
           <label>เป้าหมายการฉีดพ่น</label>
           <Form.Item>
@@ -152,12 +140,15 @@ function FinishTasks() {
             <div
               className="hiddenFileInput"
               style={{
-                backgroundImage: `url(${imgFinish})`,
-                display: imgFinish !== null ? `url(${imgFinish})` : undefined,
+                backgroundImage: `url(${data.imageTaskUrl})`,
+                display:
+                  data.imageTaskUrl !== null
+                    ? `url(${data.imageTaskUrl})`
+                    : undefined,
               }}
             ></div>
             <div className="ps-5">
-              {imgFinish != undefined && (
+              {data.imageTaskUrl != undefined && (
                 <>
                   <Tag
                     color={color.Success}

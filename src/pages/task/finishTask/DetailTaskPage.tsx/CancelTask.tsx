@@ -1,17 +1,17 @@
-import Layout from "../../../components/layout/Layout";
+import Layout from "../../../../components/layout/Layout";
 import React, { useEffect, useState } from "react";
 import { Badge, Form, Input, Row, Select, Tag, Upload } from "antd";
-import { BackIconButton } from "../../../components/button/BackButton";
-import { CardContainer } from "../../../components/card/CardContainer";
-import { CardHeader } from "../../../components/header/CardHearder";
-import color from "../../../resource/color";
-import GoogleMap from "../../../components/map/GoogleMap";
-import { LAT_LNG_BANGKOK } from "../../../definitions/Location";
+import { BackIconButton } from "../../../../components/button/BackButton";
+import { CardContainer } from "../../../../components/card/CardContainer";
+import { CardHeader } from "../../../../components/header/CardHearder";
+import color from "../../../../resource/color";
+import GoogleMap from "../../../../components/map/GoogleMap";
+import { LAT_LNG_BANGKOK } from "../../../../definitions/Location";
 import TextArea from "antd/lib/input/TextArea";
 import {
   AddressEntity,
   AddressEntity_INIT,
-} from "../../../entities/AddressEntities";
+} from "../../../../entities/AddressEntities";
 import {
   StarFilled,
   CalendarOutlined,
@@ -20,10 +20,10 @@ import {
 import {
   DetailFinishTask,
   DetailFinishTask_INIT,
-} from "../../../entities/TaskFinishEntities";
-import { TaskFinishedDatasource } from "../../../datasource/TaskFinishDatasource";
+} from "../../../../entities/TaskFinishEntities";
+import { TaskFinishedDatasource } from "../../../../datasource/TaskFinishDatasource";
 import moment from "moment";
-import { UploadImageDatasouce } from "../../../datasource/UploadImageDatasource";
+import { UploadImageDatasouce } from "../../../../datasource/UploadImageDatasource";
 const _ = require("lodash");
 let queryString = _.split(window.location.search, "=");
 const dateFormat = "DD/MM/YYYY";
@@ -32,63 +32,31 @@ const timeFormat = "HH:mm";
 function CancelTask() {
   const taskId = queryString[1];
   const [data, setData] = useState<DetailFinishTask>(DetailFinishTask_INIT);
-  const [address, setAddress] = useState<AddressEntity>(AddressEntity_INIT);
-  let imgList: (string | boolean)[] = [];
   const [mapPosition, setMapPosition] = useState<{ lat: number; lng: number }>({
     lat: LAT_LNG_BANGKOK.lat,
     lng: LAT_LNG_BANGKOK.lng,
   });
 
-  const [imgFinish, setImgFinish] = useState<any>();
   const fetchDetailTask = async () => {
-    // await TaskFinishedDatasource.getDetailFinishTaskById(taskId).then((res) => {
-    //   console.log(res);
-    //   setData(res);
-    //   setMapPosition({
-    //     lat: parseFloat(res.data.farmerPlot.lat),
-    //     lng: parseFloat(res.data.farmerPlot.long),
-    //   });
-    //   let getImgFinish = res.imagePathFinishTask;
-    //   imgList.push(getImgFinish != null ? getImgFinish : "");
-    //   var i = 0;
-    // for (i; imgList.length > i; i++) {
-    //   i == 0 &&
-    //     UploadImageDatasouce.getImageFinish(imgList[i].toString()).then(
-    //       (resImg) => {
-    //         setImgFinish(resImg.url);
-    //       }
-    //     );
-    // }
-    // });
+    await TaskFinishedDatasource.getDetailFinishTaskById(taskId).then((res) => {
+      console.log(res);
+      setData(res);
+      setMapPosition({
+        lat: parseFloat(res.data.farmerPlot.lat),
+        lng: parseFloat(res.data.farmerPlot.long),
+      });
+    });
   };
 
   useEffect(() => {
     fetchDetailTask();
   }, []);
 
-  const financial = (e: any) => {
-    return Number.parseFloat(e).toFixed(1);
-  };
-
   const formatCurrency = (e: any) => {
     e = parseFloat(e);
     return e.toFixed(2).replace(/./g, function (c: any, i: any, a: any) {
       return i > 0 && c !== "." && (a.length - i) % 3 === 0 ? "," + c : c;
     });
-  };
-  const onPreviewImg = async () => {
-    let src = imgFinish;
-    if (!src) {
-      src = await new Promise((resolve) => {
-        const reader = new FileReader();
-        reader.readAsDataURL(imgFinish);
-        reader.onload = () => resolve(reader.result);
-      });
-    }
-    const image = new Image();
-    image.src = src;
-    const imgWindow = window.open(src);
-    imgWindow?.document.write(image.outerHTML);
   };
 
   const starIcon = (
@@ -112,9 +80,9 @@ function CancelTask() {
                 <Input
                   style={{ width: "100%" }}
                   placeholder="12/08/2565"
-                  // value={moment(new Date(data.data.dateAppointment)).format(
-                  //   dateFormat
-                  // )}
+                  value={moment(new Date(data.data.dateAppointment)).format(
+                    dateFormat
+                  )}
                   disabled
                   suffix={<CalendarOutlined />}
                 />
@@ -126,9 +94,9 @@ function CancelTask() {
                 <Input
                   style={{ width: "100%" }}
                   placeholder="16:00"
-                  // value={moment(new Date(data.data.dateAppointment)).format(
-                  //   timeFormat
-                  // )}
+                  value={moment(new Date(data.data.dateAppointment)).format(
+                    timeFormat
+                  )}
                   disabled
                   suffix={<ClockCircleOutlined />}
                 />
@@ -137,20 +105,25 @@ function CancelTask() {
           </div>
           <label>ช่วงเวลาฉีดพ่น</label>
           <Form.Item>
-            <Select disabled placeholder="คุมเลน" />
+            <Select
+              disabled
+              value={
+                data.data.purposeSpray !== null
+                  ? data.data.purposeSpray.purposeSprayName
+                  : "-"
+              }
+            />
           </Form.Item>
           <label>เป้าหมายการฉีดพ่น</label>
           <Form.Item>
             <span style={{ color: color.Grey }}>
-              กำจัดหนอน
-              {/* {data.targetSpray ? data.targetSpray : "-"} */}
+              {data.data.targetSpray !== null ? data.data.targetSpray : "-"}
             </span>
           </Form.Item>
           <label>การเตรียมยา</label>
           <Form.Item>
             <span style={{ color: color.Grey }}>
-              นักบินโดรนเตรียมให้
-              {/* {data.data.preparationBy ? data.data.preparationBy : "-"} */}
+              {data.data.preparationBy !== null ? data.data.preparationBy : "-"}
             </span>
           </Form.Item>
 
@@ -158,7 +131,7 @@ function CancelTask() {
           <label>หมายเหตุ</label>
           <Form.Item>
             <span style={{ color: color.Grey }}>
-              -{/* {data.data.statusRemark} */}
+              {data.data.statusRemark !== null ? data.data.statusRemark : "-"}
             </span>
           </Form.Item>
         </div>
@@ -167,12 +140,12 @@ function CancelTask() {
           <label>ค่าบริการ</label>
           <Form.Item style={{ color: color.Grey }}>
             <span>
-              2,000
-              {/* {financial(data.data.price) + " " + "บาท"} */}
+              {data.data.price !== null
+                ? formatCurrency(data.data.price) + " " + "บาท"
+                : "0.00" + " " + "บาท"}
             </span>{" "}
             <span>
-              (จำนวน 20 ไร่)
-              {/* {"(จำนวน" + " " + data.data.farmAreaAmount + " " + "ไร่)"} */}
+              {"(จำนวน" + " " + data.data.farmAreaAmount + " " + "ไร่)"}
             </span>
           </Form.Item>
           <br />
@@ -180,8 +153,7 @@ function CancelTask() {
           <Form.Item>
             <span style={{ color: color.Error }}>
               <Badge color={color.Error} />
-              ยกเลิก (รอเริ่มงาน)
-              {/* {data.data.status == "CANCELED" ? "ยกเลิก (รอเริ่มงาน)" : null} */}
+              {data.data.status == "CANCELED" ? "ยกเลิก (รอเริ่มงาน)" : null}
               <br />
             </span>
           </Form.Item>
@@ -190,11 +162,11 @@ function CancelTask() {
               rows={3}
               disabled
               placeholder="เกษตรกรแจ้งยกเลิกงาน เนื่องจากเกิดอุบัติเหตุทางรถยนต์"
-              // value={
-              //   data.data.reviewDronerDetail != null
-              //     ? data.data.reviewDronerDetail.comment
-              //     : undefined
-              // }
+              value={
+                data.data.reviewDronerDetail != null
+                  ? data.data.reviewDronerDetail.comment
+                  : undefined
+              }
             />
           </Form.Item>
         </div>
@@ -210,21 +182,16 @@ function CancelTask() {
             <Form.Item>
               <Input
                 disabled
-                placeholder="Spider Man"
-                // defaultValue={
-                //   data.data.farmer.firstname + " " + data.data.farmer.lastname
-                // }
+                defaultValue={
+                  data.data.farmer.firstname + " " + data.data.farmer.lastname
+                }
               />
             </Form.Item>
           </div>
           <div className="col-lg-4 text-start">
             <label>เบอร์โทร</label>
             <Form.Item>
-              <Input
-                disabled
-                placeholder="0989284761"
-                // defaultValue={data.data.farmer.telephoneNo}
-              />
+              <Input disabled defaultValue={data.data.farmer.telephoneNo} />
             </Form.Item>
           </div>
         </div>
@@ -232,21 +199,13 @@ function CancelTask() {
           <div className="col-lg-4 text-start">
             <label>แปลง</label>
             <Form.Item>
-              <Select
-                disabled
-                placeholder="Spider Man yahoo"
-                // defaultValue={data.data.farmerPlot.plotName}
-              />
+              <Select disabled defaultValue={data.data.farmerPlot.plotName} />
             </Form.Item>
           </div>
           <div className="col-lg-4 text-start">
             <label>พืชที่ปลูก</label>
             <Form.Item>
-              <Input
-                disabled
-                placeholder="นาข้าว"
-                // defaultValue={data.data.farmerPlot.plantName}
-              />
+              <Input disabled defaultValue={data.data.farmerPlot.plantName} />
             </Form.Item>
           </div>
           <div className="col-lg-4 text-start">
@@ -254,8 +213,7 @@ function CancelTask() {
             <Form.Item>
               <Input
                 disabled
-                placeholder="20"
-                // defaultValue={data.data.farmerPlot.raiAmount}
+                defaultValue={data.data.farmerPlot.raiAmount}
                 suffix="ไร่"
               />
             </Form.Item>
@@ -267,8 +225,15 @@ function CancelTask() {
             <Form.Item>
               <Input
                 disabled
-                placeholder="คลองสาน/กรุงเทพมหานคร"
-                // defaultValue={data.data.farmerPlot.locationName}
+                defaultValue={
+                  data.data.farmerPlot.plotArea !== null
+                    ? data.data.farmerPlot.plotArea.subdistrictName +
+                      "/" +
+                      data.data.farmerPlot.plotArea.districtName +
+                      "/" +
+                      data.data.farmerPlot.plotArea.provinceName
+                    : "-"
+                }
               />
             </Form.Item>
           </div>
@@ -298,11 +263,7 @@ function CancelTask() {
           <div className="col-lg-12 text-start">
             <label>จุดสังเกต</label>
             <Form.Item>
-              <Input
-                disabled
-                placeholder="ตรงข้ามสถานีตำรวจ"
-                // value={data.data.farmerPlot.landmark}
-              />
+              <Input disabled value={data.data.farmerPlot.landmark} />
             </Form.Item>
           </div>
         </div>
@@ -314,20 +275,15 @@ function CancelTask() {
       <div className="row">
         <div className="col-lg-3">
           <span>
-            Iron Man
-            {/* {data.data.droner.firstname + " " + data.data.droner.lastname} */}
+            {data.data.droner.firstname + " " + data.data.droner.lastname}
             <br />
             <p style={{ fontSize: "12px", color: color.Grey }}>
-              DN0000012
-              {/* {data.data.droner.dronerCode} */}
+              {data.data.droner.dronerCode}
             </p>
           </span>
         </div>
         <div className="col-lg-3">
-          <span>
-            0991299098
-            {/* {data.data.droner.telephoneNo} */}
-          </span>
+          <span>{data.data.droner.telephoneNo}</span>
         </div>
         <div className="col-lg-4">
           <span>สวนพริกไทย, เมืองปทุมธานี, กรุงเทพมหานคร</span>
@@ -355,8 +311,9 @@ function CancelTask() {
                 ยอดรวมค่าบริการ (หลังรวมค่าธรรมเนียม)
                 <br />
                 <b style={{ fontSize: "20px", color: color.Success }}>
-                  2,000 บาท
-                  {/* {formatCurrency(data.data.totalPrice) + " " + "บาท"} */}
+                  {data.data.totalPrice !== null
+                    ? formatCurrency(data.data.totalPrice) + " " + "บาท"
+                    : "0.00" + " " + "บาท"}
                 </b>
               </span>
             </Form.Item>
@@ -368,12 +325,11 @@ function CancelTask() {
               <label>ค่าบริการ (ก่อนคิดค่าคำนวณ)</label>
               <Input
                 disabled
-                placeholder="2,000"
-                // value={
-                //   data.data.price != undefined
-                //     ? formatCurrency(data.data.price)
-                //     : undefined
-                // }
+                value={
+                  data.data.price !== null
+                    ? formatCurrency(data.data.price) + " " + "บาท"
+                    : "0.00" + " " + "บาท"
+                }
                 suffix="บาท"
               />
             </Form.Item>
@@ -383,8 +339,11 @@ function CancelTask() {
               <label>ค่าธรรมเนียม (คิด 5% ของราคารวม)</label>
               <Input
                 disabled
-                placeholder="0.00"
-                // value={formatCurrency(data.data.discountFee)}
+                value={
+                  data.data.discountFee !== null
+                    ? formatCurrency(data.data.discountFee) + " " + "บาท"
+                    : "0.00" + " " + "บาท"
+                }
                 suffix="บาท"
               />
             </Form.Item>
@@ -394,12 +353,11 @@ function CancelTask() {
               <label>ส่วนลดค่าธรรมเนียม</label>
               <Input
                 disabled
-                placeholder="0.00"
-                // value={
-                //   data.data.fee != undefined
-                //     ? formatCurrency(data.data.fee)
-                //     : undefined
-                // }
+                value={
+                  data.data.fee !== null
+                    ? formatCurrency(data.data.fee) + " " + "บาท"
+                    : "0.00" + " " + "บาท"
+                }
                 suffix="บาท"
               />
             </Form.Item>
