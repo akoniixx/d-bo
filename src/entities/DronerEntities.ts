@@ -28,12 +28,13 @@ export interface DronerEntity {
   expPlant: string[];
   address: FullAddressEntity;
   pin: string;
-  dronerDrone: DronerDroneEntity[];
+  dronerDrone?: DronerDroneEntity[];
   dronerArea: DronerAreaEntity;
   file: ImageEntity[];
   createdAt: string;
   updatedAt: string;
   totalDroneCount: number;
+  birthDate: string;
 }
 export const DronerEntity_INIT: DronerEntity = {
   id: "",
@@ -55,6 +56,7 @@ export const DronerEntity_INIT: DronerEntity = {
   createdAt: "",
   updatedAt: "",
   totalDroneCount: 0,
+  birthDate: "",
 };
 export interface CreateDronerEntity {
   firstname: string;
