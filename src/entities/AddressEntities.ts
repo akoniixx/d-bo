@@ -39,7 +39,7 @@ export interface FullAddressEntity {
   postcode: string;
   district: DistrictEntity;
   province: ProviceEntity;
-  subdistricr: SubdistrictEntity;
+  subdistrict: SubdistrictEntity;
 }
 
 export const FullAddressEntiry_INIT: FullAddressEntity = {
@@ -53,7 +53,7 @@ export const FullAddressEntiry_INIT: FullAddressEntity = {
   postcode: "",
   district: DistrictEntity_INIT,
   province: ProvinceEntity_INIT,
-  subdistricr: SubdistrictEntity_INIT,
+  subdistrict: SubdistrictEntity_INIT,
 };
 
 export interface CreateAddressEntity {
