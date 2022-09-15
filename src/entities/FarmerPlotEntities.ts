@@ -1,3 +1,4 @@
+import { PlotAreaEntity, PlotAreaEntity_INIT } from './PlotAreaEntities';
 import { LAT_LNG_BANGKOK } from "../definitions/Location";
 
 export interface FarmerPlotEntity {
@@ -14,6 +15,7 @@ export interface FarmerPlotEntity {
   plotId: number;
   farmerId?: string;
   plotAreaId: number;
+  plotArea: PlotAreaEntity;
   locationName: string;
 }
 export const FarmerPlotEntity_INIT: FarmerPlotEntity = {
@@ -30,5 +32,6 @@ export const FarmerPlotEntity_INIT: FarmerPlotEntity = {
   plotId: 0,
   farmerId: "",
   plotAreaId: 0,
+  plotArea: PlotAreaEntity_INIT,
   locationName: "",
 };

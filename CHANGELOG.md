@@ -1,4 +1,8 @@
 ## [Version - 0]
+## Feature [v0.11.0] 2022-09-15
+- create index ranking droner page 
+- create detail ranking droner and task page 
+- connect api ranking droner
 ## Fix [v0.10.1] 2022-09-12
 - fixed validate last name in droner menu
 - fixed remove old img and add the same img
