@@ -471,7 +471,7 @@ function DetailWorkDroner() {
         <div className="row">
           <div className="col-lg-4">
             <Form.Item>
-              <label>ค่าบริการ (ก่อนคิดค่าคำนวณ)</label>
+              <label>ค่าบริการ (ก่อนคิดค่าธรรมเนียม)</label>
               <Input
                 disabled
                 value={
