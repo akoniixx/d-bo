@@ -1,6 +1,6 @@
 import Layout from "../../../../components/layout/Layout";
 import React, { useEffect, useState } from "react";
-import { Badge, Form, Input, Row, Select, Tag, Upload } from "antd";
+import { Avatar, Badge, Form, Input, Row, Select, Tag, Upload } from "antd";
 import { BackIconButton } from "../../../../components/button/BackButton";
 import { CardContainer } from "../../../../components/card/CardContainer";
 import { CardHeader } from "../../../../components/header/CardHearder";
@@ -8,10 +8,6 @@ import color from "../../../../resource/color";
 import GoogleMap from "../../../../components/map/GoogleMap";
 import { LAT_LNG_BANGKOK } from "../../../../definitions/Location";
 import TextArea from "antd/lib/input/TextArea";
-import {
-  AddressEntity,
-  AddressEntity_INIT,
-} from "../../../../entities/AddressEntities";
 import {
   StarFilled,
   CalendarOutlined,
@@ -58,16 +54,6 @@ function CancelTask() {
       return i > 0 && c !== "." && (a.length - i) % 3 === 0 ? "," + c : c;
     });
   };
-
-  const starIcon = (
-    <StarFilled
-      style={{
-        color: "#FFCA37",
-        fontSize: "20px",
-        marginRight: "10px",
-      }}
-    />
-  );
 
   const renderAppointment = (
     <Form style={{ padding: "32px" }}>
@@ -153,7 +139,7 @@ function CancelTask() {
           <Form.Item>
             <span style={{ color: color.Error }}>
               <Badge color={color.Error} />
-              {data.data.status == "CANCELED" ? "ยกเลิก (รอเริ่มงาน)" : null}
+              {data.data.status == "CANCELED" ? "ยกเลิก" : null}
               <br />
             </span>
           </Form.Item>
@@ -161,7 +147,6 @@ function CancelTask() {
             <TextArea
               rows={3}
               disabled
-              placeholder="เกษตรกรแจ้งยกเลิกงาน เนื่องจากเกิดอุบัติเหตุทางรถยนต์"
               value={
                 data.data.reviewDronerDetail != null
                   ? data.data.reviewDronerDetail.comment
@@ -286,16 +271,39 @@ function CancelTask() {
           <span>{data.data.droner.telephoneNo}</span>
         </div>
         <div className="col-lg-4">
-          <span>สวนพริกไทย, เมืองปทุมธานี, กรุงเทพมหานคร</span>
-          {/* {data.address != null
-              ? data.address.subdistrict.subdistrictName
-              : "-"} */}
+          <span>
+            {data.data.droner.address !== null
+              ? data.data.droner.address.subdistrict.subdistrictName +
+                "," +
+                " " +
+                data.data.droner.address.district.districtName +
+                "," +
+                " " +
+                data.data.droner.address.province.region
+              : null}
+          </span>
         </div>
         <div className="col-lg">
-          <span>DJI</span>
+          <span>
+            <Avatar
+              size={25}
+              src={
+                data.data.droner.dronerDrone[0] != null
+                  ? data.data.droner.dronerDrone[0].drone.droneBrand
+                      .logoImagePath
+                  : null
+              }
+              style={{ marginRight: "5px" }}
+            />
+            {data.data.droner.dronerDrone[0] != null
+              ? data.data.droner.dronerDrone[0].drone.droneBrand.name
+              : "-"}
+          </span>
           <br />
           <p style={{ fontSize: "12px", color: color.Grey }}>
-            (มากกว่า 1 ยี่ห้อ)
+            {data.data.droner.dronerDrone.length > 1
+              ? "(มากกว่า 1 ยี่ห้อ)"
+              : null}
           </p>
         </div>
       </div>
@@ -341,7 +349,7 @@ function CancelTask() {
                 disabled
                 value={
                   data.data.discountFee !== null
-                    ? formatCurrency(data.data.discountFee) + " " + "บาท"
+                    ? parseFloat(data.data.discountFee).toFixed(2) + " " + "บาท"
                     : "0.00" + " " + "บาท"
                 }
                 suffix="บาท"

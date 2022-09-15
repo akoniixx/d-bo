@@ -1,6 +1,16 @@
 import Layout from "../../../../components/layout/Layout";
 import React, { useEffect, useState } from "react";
-import { Badge, Form, Input, Row, Select, Tag, Upload } from "antd";
+import {
+  Avatar,
+  Badge,
+  Empty,
+  Form,
+  Input,
+  Row,
+  Select,
+  Tag,
+  Upload,
+} from "antd";
 import { BackIconButton } from "../../../../components/button/BackButton";
 import { CardContainer } from "../../../../components/card/CardContainer";
 import { CardHeader } from "../../../../components/header/CardHearder";
@@ -62,7 +72,7 @@ function FinishTasks() {
     if (!src) {
       src = await new Promise((resolve) => {
         const reader = new FileReader();
-        // reader.readAsDataURL(data.imageTaskUrl);
+        // reader.readAsDataURL(imageTaskUrl);
         // reader.onload = () => resolve(reader.result);
       });
     }
@@ -116,11 +126,14 @@ function FinishTasks() {
           </div>
           <label>ช่วงเวลาฉีดพ่น</label>
           <Form.Item>
-            <Select disabled  value={
+            <Select
+              disabled
+              value={
                 data.data.purposeSpray !== null
                   ? data.data.purposeSpray.purposeSprayName
                   : "-"
-              } />
+              }
+            />
           </Form.Item>
           <label>เป้าหมายการฉีดพ่น</label>
           <Form.Item>
@@ -148,7 +161,7 @@ function FinishTasks() {
               }}
             ></div>
             <div className="ps-5">
-              {data.imageTaskUrl != undefined && (
+              {data.imageTaskUrl !== undefined && (
                 <>
                   <Tag
                     color={color.Success}
@@ -185,19 +198,26 @@ function FinishTasks() {
           </Form.Item>
           <br />
           <Form.Item>
-            <label style={{ marginRight: "30px" }}>คะแนนรีวิว </label>
-            <span>
-              {data.data.reviewDronerAvg > "0" ? (
-                <Row>
-                  {starIcon}
-                  <span>
-                    {parseFloat(data.data.reviewDronerAvg).toFixed(1)}
-                  </span>
-                </Row>
-              ) : (
-                "-"
-              )}
-            </span>
+            <div className="row">
+              <div className="col-lg-3">คะแนนรีวิว </div>
+              <div className="col-lg-6">
+                {" "}
+                <span>
+                  {data.data.reviewDronerAvg > "0" ? (
+                    <Row>
+                      {starIcon}
+                      <span>
+                        {parseFloat(data.data.reviewDronerAvg).toFixed(1)}
+                      </span>
+                    </Row>
+                  ) : (
+                    "-"
+                  )}
+                </span>
+              </div>
+            </div>
+          </Form.Item>
+          <Form.Item>
             <div className="row">
               <div className="col-lg-6" style={{ color: color.Grey }}>
                 1. มารยาทนักบิน{" "}
@@ -392,16 +412,40 @@ function FinishTasks() {
           <span>{data.data.droner.telephoneNo}</span>
         </div>
         <div className="col-lg-4">
-          <span>สวนพริกไทย, เมืองปทุมธานี, กรุงเทพมหานคร</span>
-          {/* {data.address != null
-              ? data.address.subdistrict.subdistrictName
-              : "-"} */}
+          <span>
+            {" "}
+            {data.data.droner.address !== null
+              ? data.data.droner.address.subdistrict.subdistrictName +
+                "," +
+                " " +
+                data.data.droner.address.district.districtName +
+                "," +
+                " " +
+                data.data.droner.address.province.region
+              : "-"}
+          </span>
         </div>
         <div className="col-lg">
-          <span>DJI</span>
+          <span>
+            <Avatar
+              size={25}
+              src={
+                data.data.droner.dronerDrone[0] != null
+                  ? data.data.droner.dronerDrone[0].drone.droneBrand
+                      .logoImagePath
+                  : null
+              }
+              style={{ marginRight: "5px" }}
+            />
+            {data.data.droner.dronerDrone[0] != null
+              ? data.data.droner.dronerDrone[0].drone.droneBrand.name
+              : "-"}
+          </span>
           <br />
           <p style={{ fontSize: "12px", color: color.Grey }}>
-            (มากกว่า 1 ยี่ห้อ)
+            {data.data.droner.dronerDrone.length > 1
+              ? "(มากกว่า 1 ยี่ห้อ)"
+              : null}
           </p>
         </div>
       </div>
@@ -448,7 +492,7 @@ function FinishTasks() {
                 placeholder="0.0"
                 value={
                   data.data.discountFee !== null
-                    ? formatCurrency(data.data.discountFee) + " " + "บาท"
+                    ? parseFloat(data.data.discountFee).toFixed(2) + " " + "บาท"
                     : "0.00" + " " + "บาท"
                 }
                 suffix="บาท"

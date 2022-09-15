@@ -1,6 +1,7 @@
 import Layout from "../../../../components/layout/Layout";
 import React, { useEffect, useState } from "react";
 import {
+  Avatar,
   Badge,
   Form,
   Input,
@@ -63,11 +64,12 @@ function ReviewTask() {
     lat: LAT_LNG_BANGKOK.lat,
     lng: LAT_LNG_BANGKOK.lng,
   });
+  const [saveBtnDisable, setBtnSaveDisable] = useState<boolean>(true);
+  const [saveRate, setSaveRate] = useState<boolean>(true);
   const fetchDetailTask = async () => {
     await TaskFinishedDatasource.getDetailFinishTaskById(taskId).then((res) => {
       console.log(res);
       setData(res);
-      setDetailDroner(detailDroner)
       setMapPosition({
         lat: parseFloat(res.data.farmerPlot.lat),
         lng: parseFloat(res.data.farmerPlot.long),
@@ -84,6 +86,8 @@ function ReviewTask() {
     const n = Map(m.toJS()).set("taskId", taskId)
     console.log(n.toJS());
     setDetailDroner(n.toJS());
+    {!e.target.value ? setBtnSaveDisable(true) : setBtnSaveDisable(false)}
+    {e.target.value == "Yes" ? setSaveRate(false) : setSaveRate(true)}
   };
 
   const manners = (e: any) => {
@@ -134,20 +138,19 @@ function ReviewTask() {
     const pushDetailReview = Map(data.data).set("reviewDronerDetail", detailDroner);
     await TaskReviewDronerDatasource.UpdateReviewDroner(pushDetailReview.toJS().reviewDronerDetail
     ).then((res) => {
-      console.log(res);
-      // if (res) {
-      //   Swal.fire({
-      //     title: "ยืนยันการเปลี่ยนแปลงข้อมูล",
-      //     text: "โปรดตรวจสอบรายละเอียดที่คุณต้องการเปลี่ยนแปลงข้อมูลก่อนเสมอเพราะอาจส่งผลต่อการจ้างงานในระบบ",
-      //     cancelButtonText: "ยกเลิก",
-      //     confirmButtonText: "บันทึก",
-      //     confirmButtonColor: color.Success,
-      //     showCancelButton: true,
-      //     showCloseButton: true,
-      //   }).then((time) => {
-      //     window.location.href = "/IndexFinishTask";
-      //   });
-      // }
+      if (res) {
+        Swal.fire({
+          title: "ยืนยันการเปลี่ยนแปลงข้อมูล",
+          text: "โปรดตรวจสอบรายละเอียดที่คุณต้องการเปลี่ยนแปลงข้อมูลก่อนเสมอเพราะอาจส่งผลต่อการจ้างงานในระบบ",
+          cancelButtonText: "ยกเลิก",
+          confirmButtonText: "บันทึก",
+          confirmButtonColor: color.Success,
+          showCancelButton: true,
+          showCloseButton: true,
+        }).then((time) => {
+          window.location.href = "/IndexFinishTask";
+        });
+      }
     });
   };
   const renderAppointment = (
@@ -266,7 +269,7 @@ function ReviewTask() {
               <Form.Item>
                 <div className="row pt-3" style={{ color: color.Grey }}>
                   <span className="col-lg-5">1. มารยาทนักบิน</span>
-                  <Select onChange={manners} style={{ width: 75 }}>
+                  <Select onChange={manners} disabled={saveRate} allowClear style={{ width: 75 }}>
                     {RATE_SELECT.map((item: any) => (
                       <option value={item.value}>{item.name}</option>
                     ))}
@@ -274,7 +277,7 @@ function ReviewTask() {
                 </div>
                 <div className="row pt-3" style={{ color: color.Grey }}>
                   <span className="col-lg-5">2. ความตรงต่อเวลา</span>
-                  <Select onChange={punctuality} style={{ width: 75 }}>
+                  <Select onChange={punctuality} disabled={saveRate} allowClear style={{ width: 75 }}>
                     {RATE_SELECT.map((item: any) => (
                       <option value={item.value}>{item.name}</option>
                     ))}
@@ -282,7 +285,7 @@ function ReviewTask() {
                 </div>
                 <div className="row pt-3" style={{ color: color.Grey }}>
                   <span className="col-lg-5">3. ความเชี่ยวชาญในการพ่น</span>
-                  <Select onChange={expertise} style={{ width: 75 }}>
+                  <Select onChange={expertise}disabled={saveRate} allowClear style={{ width: 75 }}>
                     {RATE_SELECT.map((item: any) => (
                       <option value={item.value}>{item.name}</option>
                     ))}
@@ -291,6 +294,7 @@ function ReviewTask() {
               </Form.Item>
               <Form.Item>
                 <TextArea
+                disabled={saveRate}
                   rows={3}
                   onChange={commentReview}
                   placeholder="กรอกความคิดเห็นเพิ่มเติม"
@@ -429,16 +433,36 @@ function ReviewTask() {
           </span>
         </div>
         <div className="col-lg-4">
-          <span>สวนพริกไทย, เมืองปทุมธานี, กรุงเทพมหานคร</span>
-          {/* {data.address != null
-              ? data.address.subdistrict.subdistrictName
-              : "-"} */}
+          <span>
+            {data.data.droner.address !== null ? data.data.droner.address.subdistrict.subdistrictName +
+              "," +
+              " " +
+              data.data.droner.address.district.districtName +
+              "," +
+              " " +
+              data.data.droner.address.province.region : null}</span>
         </div>
         <div className="col-lg">
-          <span>DJI</span>
+        <span>
+            <Avatar
+              size={25}
+              src={
+                data.data.droner.dronerDrone[0] != null
+                  ? data.data.droner.dronerDrone[0].drone.droneBrand
+                      .logoImagePath
+                  : null
+              }
+              style={{ marginRight: "5px" }}
+            />
+            {data.data.droner.dronerDrone[0] != null
+              ? data.data.droner.dronerDrone[0].drone.droneBrand.name
+              : "-"}
+          </span>
           <br />
           <p style={{ fontSize: "12px", color: color.Grey }}>
-            (มากกว่า 1 ยี่ห้อ)
+            {data.data.droner.dronerDrone.length > 1
+              ? "(มากกว่า 1 ยี่ห้อ)"
+              : null}
           </p>
         </div>
       </div>
@@ -545,6 +569,7 @@ function ReviewTask() {
       <FooterPage
         onClickBack={() => (window.location.href = "/IndexFinishTask")}
         onClickSave={UpdateReviewDroner}
+        disableSaveBtn={saveBtnDisable}
       />
     </Layout>
   );

@@ -579,7 +579,7 @@ export default function IndexFinishTask() {
                 <ActionButton
                   icon={<FileTextOutlined />}
                   color={color.primary1}
-                  onClick={() => (window.location.href = "/CancelTasks")}
+                  onClick={() => (window.location.href = "/CancelTask?=" + row.id)}
                 />
               ) : row.status == "DONE" ? (
                 <ActionButton
