@@ -43,12 +43,6 @@ import {
   STATUS_COLOR_TASK,
 } from "../../../definitions/FinishTask";
 import ModalMapPlot from "../../../components/modal/task/finishTask/ModalMapPlot";
-
-interface Option {
-  value: string | number;
-  label: string;
-  children?: Option[];
-}
 export default function IndexFinishTask() {
   const row = 10;
   const [current, setCurrent] = useState(1);
@@ -65,8 +59,6 @@ export default function IndexFinishTask() {
   const [subdistrict, setSubdistrict] = useState<SubdistrictEntity[]>();
   const [showModalMap, setShowModalMap] = useState<boolean>(false);
   const [plotId, setPlotId] = useState<string>("");
-  const [visibleRating, setVisibleRating] = useState(false);
-  const [arrStatus, setArrStatus] = useState<string[]>([]);
   const { RangePicker } = DatePicker;
   const dateFormat = "DD/MM/YYYY";
   const timeFormat = "HH:mm";
@@ -131,19 +123,10 @@ export default function IndexFinishTask() {
     setCurrent(page);
   };
   const handleStatus = (status: any) => {
-    let value = status.target.value;
-    let checked = status.target.checked;
-    if(checked){
-      console.log(1)
-      setArrStatus([...arrStatus, value]);
-     
-    }else{
-      let d: string[] = arrStatus.filter((x) => x != value);
-      console.log(2)
-      setArrStatus(d)
-    }
-    setSearchStatus(value);
+    setSearchStatus(status);
+    setCurrent(1);
   };
+
   const formatNumber = (e: any) => {
     let formatNumber = Number(e)
       .toFixed(1)
@@ -173,54 +156,6 @@ export default function IndexFinishTask() {
     setShowModalMap((prev) => !prev);
     setPlotId(plotId);
   };
-  const handleVisibleRating = (newVisible: any) => {
-    setVisibleRating(newVisible);
-  };
-  const onChange = (status: any) => {
-    console.log(status)
-    setSearchStatus(status)
-  };
-  const options: Option[] = [
-    {
-      label: 'เสร็จสิ้น',
-      value: 'DONE',
-    },
-    {
-      label: 'รอรีวิว',
-      value: 'WAIT_REVIEW',
-    },
-    {
-      label: 'ยกเลิก',
-      value: 'CANCELED',
-    },
-  ];
-  const status = (
-    <Menu
-      items={[
-        {
-          label: "เสร็จสิ้น",
-          key: "1",
-          icon: (
-            <Checkbox value="DONE" onClick={(e) => handleStatus(e)}></Checkbox>
-          ),
-        },
-        {
-          label: "รอรีวิว",
-          key: "2",
-          icon: (
-            <Checkbox value="WAIT_REVIEW" onClick={(e) => handleStatus(e)}></Checkbox>
-          ),
-        },
-        {
-          label: "ยกเลิก",
-          key: "3",
-          icon: (
-            <Checkbox value="CANCELED" onClick={(e) => handleStatus(e)}></Checkbox>
-          ),
-        },
-      ]}
-    />
-  );
 
   const PageTitle = (
     <>
@@ -329,27 +264,17 @@ export default function IndexFinishTask() {
             ))}
           </Select>
         </div>
-        <div className="col-lg-2 p-1">
-        <Cascader
-    style={{ width: '100%' }}
-    options={options}
-    onChange={onChange}
-    multiple
-    maxTagCount="responsive"
-  />
-        {/* <Dropdown
-            overlay={status}
-            trigger={["click"]}
-            className="col-lg-12"
-            onVisibleChange={handleVisibleRating}
-            visible={visibleRating}
+        <div className="col-lg">
+          <Select
+            className="col-lg-12 p-1"
+            placeholder="เลือกสถานะ"
+            onChange={handleStatus}
+            allowClear
           >
-            <Button style={{ color: color.Disable }}>
-              เลือกสถานะ
-              <DownOutlined />
-            </Button>
-          </Dropdown> */}
-
+            {FINISH_TASK_SEARCH.map((item) => (
+              <option value={item.value}>{item.name}</option>
+            ))}
+          </Select>
         </div>
         <div className="pt-1">
           <Button
@@ -586,6 +511,8 @@ export default function IndexFinishTask() {
         rowClassName={(a) =>
           a.status == "WAIT_REVIEW"
             ? "table-row-wait-review"
+            : a.status === "CANCELED"
+            ? "table-row-older"
             : "table-row-lasted"
         }
       />
