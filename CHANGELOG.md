@@ -1,4 +1,12 @@
 ## [Version - 0]
+## Fix [v0.11.1] 2022-09-15
+- fixed save data droner drone in edit droner
+- fixed validate in edit droner
+- fixed status with reason in edit droner and droner drone
+## Feature [v0.11.0] 2022-09-15
+- create index ranking droner page 
+- create detail ranking droner and task page 
+- connect api ranking droner
 ## Fix [v0.10.1] 2022-09-12
 - fixed validate last name in droner menu
 - fixed remove old img and add the same img

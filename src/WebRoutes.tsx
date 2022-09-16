@@ -8,7 +8,6 @@ import DroneList from "./pages/droner/DroneList";
 import EditDroneList from "./pages/droner/EditDroneList";
 import EditDroner from "./pages/droner/EditDroner";
 import IndexDroner from "./pages/droner/IndexDroner";
-import RateDroner from "./pages/droner/RateDroner";
 import AddFarmer from "./pages/farmer/AddFarmer";
 import EditFarmer from "./pages/farmer/EditFarmer";
 import IndexFarmer from "./pages/farmer/IndexFarmer";
@@ -21,12 +20,13 @@ import AddAdmin from "./pages/admin/AddAdmin";
 import EditAdmin from "./pages/admin/EditAdmin";
 import ProtectRoute from "./ProtectRoute";
 import PublicRoute from "./PublicRoute";
-
 import IndexFinishTask from "./pages/task/finishTask/IndexFinishTask";
 import FinishTasks from "./pages/task/finishTask/DetailTaskPage.tsx/FinishTask";
 import ReviewTask from "./pages/task/finishTask/DetailTaskPage.tsx/ReviewTask";
 import CancelTask from "./pages/task/finishTask/DetailTaskPage.tsx/CancelTask";
-
+import DetailWorkDroner from "./pages/droner/DetailWorkDroner";
+import DetailRankDroner from "./pages/droner/DetailRankDroner";
+import IndexRankDroner from "./pages/droner/IndexRankDroner";
 import IndexNewTask from "./pages/task/newTask/IndexNewTask";
 import AddNewTask from "./pages/task/newTask/AddNewTask";
 import EditNewTask from "./pages/task/newTask/EditNewTask";
@@ -52,7 +52,9 @@ const WebRoutes: React.FC<any> = () => {
           <Route path="/AddFarmer" element={<AddFarmer />} />
           <Route path="/AddDroner" element={<AddDroner />} />
           <Route path="/DroneList" element={<DroneList />} />
-          <Route path="/RateDroner" element={<RateDroner />} />
+          <Route path="/IndexRankDroner" element={<IndexRankDroner />} />
+          <Route path="/DetailRankDroner" element={<DetailRankDroner/>} />
+          <Route path="/DetailWorkDroner" element={<DetailWorkDroner/>} />
           <Route path="/EditDroneList" element={<EditDroneList />} />
           <Route path="/EditFarmer/:id" element={<EditFarmer />} />
           <Route path="/EditDroner" element={<EditDroner />} />

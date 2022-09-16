@@ -1,13 +1,12 @@
-import { FarmerPlotEntity, FarmerPlotEntity_INIT } from './FarmerPlotEntities';
-import { DronerEntity_INIT } from "./DronerEntities";
+import { FarmerPlotEntity, FarmerPlotEntity_INIT } from "./FarmerPlotEntities";
 import {
   CreateReview,
   CreateReview_INIT,
   reviewDronerDetail,
   reviewDronerDetail_INIT,
 } from "./ReviewDronerEntities";
-import { DronerEntity } from "./DronerDroneEntities";
 import { FarmerEntity, FarmerEntity_INIT } from "./FarmerEntities";
+import { DronerEntity, DronerEntity_INIT } from "./DronerDroneEntities";
 export interface TaskFinish {
   id: string;
   taskNo: string;
@@ -19,7 +18,7 @@ export interface TaskFinish {
     id: string;
     cropId: string;
     purposeSprayName: string;
-  }
+  };
   purposeSprayId: string;
   dateAppointment: string;
   targetSpray: null;
@@ -55,7 +54,7 @@ export const TaskFinish_INIT: TaskFinish = {
   farmerPlotId: "",
   farmAreaAmount: "",
   dronerId: "",
-  purposeSpray:{
+  purposeSpray: {
     id: "",
     cropId: "",
     purposeSprayName: "",
@@ -94,12 +93,12 @@ export interface TaskFinishListEntity {
 }
 export interface DetailFinishTask {
   data: TaskFinish;
-  imageTaskUrl:string;
+  imageTaskUrl: string;
 }
-export const DetailFinishTask_INIT : DetailFinishTask = {
+export const DetailFinishTask_INIT: DetailFinishTask = {
   data: TaskFinish_INIT,
   imageTaskUrl: "",
-}
+};
 
 //create review droner
 export interface CreateReviewDroner {
@@ -113,7 +112,7 @@ export interface CreateReviewDroner {
     id: string;
     cropId: string;
     purposeSprayName: string;
-  }
+  };
   purposeSprayId: string;
   dateAppointment: string;
   targetSpray: null;
@@ -142,14 +141,14 @@ export interface CreateReviewDroner {
   farmerPlot: FarmerPlotEntity;
   droner: DronerEntity;
 }
-export const CreateReviewDroner_INIT : CreateReviewDroner = {
+export const CreateReviewDroner_INIT: CreateReviewDroner = {
   id: "",
   taskNo: "",
   farmerId: "",
   farmerPlotId: "",
   farmAreaAmount: "",
   dronerId: "",
-  purposeSpray:{
+  purposeSpray: {
     id: "",
     cropId: "",
     purposeSprayName: "",
@@ -184,10 +183,9 @@ export const CreateReviewDroner_INIT : CreateReviewDroner = {
 };
 export interface DetailReviewTask {
   data: CreateReviewDroner;
-  imageTaskUrl:string;
+  imageTaskUrl: string;
 }
-export const DetailReviewTask_INIT : DetailReviewTask = {
+export const DetailReviewTask_INIT: DetailReviewTask = {
   data: CreateReviewDroner_INIT,
   imageTaskUrl: "",
-}
-
+};

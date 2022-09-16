@@ -143,7 +143,7 @@ const Layouts: React.FC<any> = ({ children }) => {
                 </Link>
               </Menu.Item>
               <Menu.Item>
-                <Link to="/RateDroner" style={{ textDecoration: "none" }}>
+                <Link to="/IndexRankDroner" style={{ textDecoration: "none" }}>
                   <span>อันดับนักบินโดรน</span>
                 </Link>
               </Menu.Item>

@@ -1,4 +1,9 @@
-import { ImageEntity, ImageEntity_INTI, UploadImageEntity, UploadImageEntity_INTI } from './UploadImageEntities';
+import {
+  ImageEntity,
+  ImageEntity_INTI,
+  UploadImageEntity,
+  UploadImageEntity_INTI,
+} from "./UploadImageEntities";
 import { DroneEntity, DroneEntity_INIT } from "./DroneEntities";
 import { FullAddressEntiry_INIT, FullAddressEntity } from './AddressEntities';
 
@@ -14,9 +19,10 @@ export interface DronerDroneEntity {
   modalDroneIndex: number;
   droneName?: string;
   logoImagePath?: string;
-  createdAt: string;
-  updatedAt: string;
+  createdAt?: string;
+  updatedAt?: string;
   file: UploadImageEntity[];
+  reason: string[];
 }
 export const DronerDroneEntity_INIT: DronerDroneEntity = {
   id: "",
@@ -33,6 +39,7 @@ export const DronerDroneEntity_INIT: DronerDroneEntity = {
   createdAt: "",
   updatedAt: "",
   file: [UploadImageEntity_INTI],
+  reason: [""],
 };
 
 export interface DronerEntity {

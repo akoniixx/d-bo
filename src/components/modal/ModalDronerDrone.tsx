@@ -11,6 +11,9 @@ import FooterPage from "../footer/FooterPage";
 import bth_img_empty from "../../resource/media/empties/upload_Img_btn.png";
 import { MONTH_SALE } from "../../definitions/Month";
 import { UploadImageDatasouce } from "../../datasource/UploadImageDatasource";
+import { DRONE_STATUS } from "../../definitions/DronerStatus";
+import { REASON_IS_CHECK } from "../../definitions/Reason";
+import TextArea from "antd/lib/input/TextArea";
 
 const _ = require("lodash");
 const { Map } = require("immutable");
@@ -35,8 +38,8 @@ const ModalDrone: React.FC<ModalDroneProps> = ({
   const [droneList, setDroneList] = useState<DroneBrandEntity[]>();
   const [droneBrandId, setDroneBrandId] = useState<string>();
   const [seriesDrone, setSeriesDrone] = useState<DroneEntity[]>();
-  const [pushDrone, setPushDrone] = useState<DroneEntity>(data.drone);
-  const [pushSeries, setPushSeries] = useState<DroneBrandEntity>(
+  let [pushDrone, setPushDrone] = useState<DroneEntity>(data.drone);
+  let [pushSeries, setPushSeries] = useState<DroneBrandEntity>(
     data.drone.droneBrand
   );
   const [searchSeriesDrone, setSearchSeriesDrone] = useState<DroneEntity[]>();
@@ -55,6 +58,7 @@ const ModalDrone: React.FC<ModalDroneProps> = ({
     useState<UploadImageEntity>();
   const [createLicenseDrone, setCreateLicenseDrone] =
     useState<UploadImageEntity>();
+  let [moreReason, setMoreReason] = useState<any>("");
 
   const fetchDrone = async () => {
     await DroneDatasource.getDroneBrandList().then((res) => {
@@ -116,7 +120,7 @@ const ModalDrone: React.FC<ModalDroneProps> = ({
     const m = Map(pushDrone).set("droneBrandId", brand);
     setPushDrone(m.toJS());
     setSearchSeriesDrone(filterSeries);
-    checkValidate(dataDrone, m.toJS(), pushSeries, createLicenseDrone);
+    checkValidate(dataDrone, m.toJS(), pushSeries, imgLicenseDrone);
   };
   const handleSeries = (id: string) => {
     let getSeries = seriesDrone?.filter((x) => x.id == id)[0];
@@ -131,33 +135,65 @@ const ModalDrone: React.FC<ModalDroneProps> = ({
     setPushDrone(pushDroneSeries.toJS());
     setPushSeries(p.toJS());
     setDataDrone(m.toJS());
-    checkValidate(
-      m.toJS(),
-      pushDroneSeries.toJS(),
-      p.toJS(),
-      createLicenseDrone
-    );
+    checkValidate(m.toJS(), pushDroneSeries.toJS(), p.toJS(), imgLicenseDrone);
   };
   const handleSerialNo = (e: any) => {
     const m = Map(dataDrone).set("serialNo", e.target.value);
     setDataDrone(m.toJS());
-    checkValidate(m.toJS(), pushDrone, pushSeries, createLicenseDrone);
+    checkValidate(m.toJS(), pushDrone, pushSeries, imgLicenseDrone);
   };
   const handleYear = (e: any) => {
     const m = Map(dataDrone).set("purchaseYear", e.target.value);
     setDataDrone(m.toJS());
-    checkValidate(m.toJS(), pushDrone, pushSeries, createLicenseDrone);
+    checkValidate(m.toJS(), pushDrone, pushSeries, imgLicenseDrone);
   };
   const handleMonth = (e: any) => {
     const m = Map(dataDrone).set("purchaseMonth", e);
     setDataDrone(m.toJS());
-    checkValidate(m.toJS(), pushDrone, pushSeries, createLicenseDrone);
+    checkValidate(m.toJS(), pushDrone, pushSeries, imgLicenseDrone);
   };
   const handleChangeStatus = (e: any) => {
-    const m = Map(dataDrone).set("status", e.target.value);
-    setDataDrone(m.toJS());
-    checkValidate(m.toJS(), pushDrone, pushSeries, createLicenseDrone);
+    let status = e.target.value;
+    const m = Map(dataDrone).set("status", status);
+    if (status == "REJECTED" || status == "INACTIVE") {
+      setBtnSaveDisable(true);
+    } else {
+      checkValidate(m.toJS(), pushDrone, pushSeries, imgLicenseDrone);
+    }
+    const n = Map(m.toJS()).set("reason", []);
+    REASON_IS_CHECK.map((reason) => _.set(reason, "isChecked", false));
+    setDataDrone(n.toJS());
   };
+  const handleCheckBoxReason = (e: any) => {
+    let checked = e.target.checked;
+    let value = e.target.value;
+    REASON_IS_CHECK.map((item) =>
+      _.set(item, "isChecked", value === item.reason ? checked : item.isChecked)
+    );
+    let p;
+    if (checked) {
+      p = Map(dataDrone).set(
+        "reason",
+        [...(dataDrone.reason == null ? [""] : dataDrone.reason), value].filter(
+          (x) => x != ""
+        )
+      );
+    } else {
+      let removeReason = dataDrone.reason.filter((x) => x != value);
+      p = Map(dataDrone).set("reason", removeReason);
+    }
+    setDataDrone(p.toJS());
+    checkValidateReason(p.toJS());
+  };
+  const handleMoreReason = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    let value = e.target.value;
+    setBtnSaveDisable(
+      dataDrone.reason != null ? false : value.trim().length != 0 ? false : true
+    );
+    checkValidateReason(dataDrone);
+    setMoreReason(value);
+  };
+
   //#region Image
   const onChangeLicenseDroner = async (file: any) => {
     let src = file.target.files[0];
@@ -255,8 +291,21 @@ const ModalDrone: React.FC<ModalDroneProps> = ({
   };
   //#endregion
 
-  const handleCallBack = () => {
-    const m = Map(dataDrone).set("modalDroneIndex", editIndex);
+  const handleCallBack = async () => {
+    let pushReasonChecked = [];
+    if (dataDrone.status == "REJECTED") {
+      let reasonChecked = REASON_IS_CHECK.filter((x) => x.isChecked).map(
+        (y) => y.reason
+      );
+      for (let i: number = 0; reasonChecked.length > i; i++) {
+        await pushReasonChecked.push(reasonChecked[i]);
+      }
+      pushReasonChecked.push(moreReason);
+    } else if (dataDrone.status == "INACTIVE") {
+      pushReasonChecked.push(moreReason);
+    }
+    const pushReason = Map(dataDrone).set("reason", pushReasonChecked);
+    const m = Map(pushReason.toJS()).set("modalDroneIndex", editIndex);
     const n = Map(m.toJS()).set("drone", pushDrone);
     callBack(n.toJS());
   };
@@ -275,6 +324,10 @@ const ModalDrone: React.FC<ModalDroneProps> = ({
     ].includes("");
     let checkImg = img != undefined && img != false;
     setBtnSaveDisable(checkEmptyMain && checkImg ? false : true);
+  };
+  const checkValidateReason = (data: DronerDroneEntity) => {
+    let checkEmptyReason = data.reason.filter((x) => x != "").length > 0;
+    setBtnSaveDisable(!checkEmptyReason);
   };
 
   return (
@@ -526,10 +579,69 @@ const ModalDrone: React.FC<ModalDroneProps> = ({
                   onChange={handleChangeStatus}
                 >
                   <Space direction="vertical">
-                    <Radio value="PENDING">รอตรวจสอบ</Radio>
-                    <Radio value="ACTIVE">อนุมัติ</Radio>
-                    <Radio value="REJECTED">ไม่อนุมัติ</Radio>
-                    <Radio value="INACTIVE">ปิดการใช้งาน</Radio>
+                    {DRONE_STATUS.filter((x) => x.value != "").map(
+                      (item, index) => (
+                        <Radio value={item.value}>
+                          {item.name}
+                          {dataDrone.status == "REJECTED" && index == 2 ? (
+                            <div className="form-group ps-3">
+                              {REASON_IS_CHECK.map((reason) =>
+                                _.set(
+                                  reason,
+                                  "isChecked",
+                                  dataDrone?.reason
+                                    .map((x) => x)
+                                    .find((y) => y === reason.reason)
+                                    ? true
+                                    : reason.isChecked
+                                )
+                              ).map((x) => (
+                                <>
+                                  <input
+                                    key={x.key}
+                                    type="checkbox"
+                                    value={x.reason}
+                                    onChange={handleCheckBoxReason}
+                                    checked={x.isChecked}
+                                  />{" "}
+                                  <label>{x.reason}</label>
+                                  <br />
+                                </>
+                              ))}
+                              <TextArea
+                                className="col-lg-12"
+                                rows={3}
+                                placeholder="กรอกเหตุผล/เหตุหมายเพิ่มเติม"
+                                autoComplete="off"
+                                onChange={handleMoreReason}
+                                defaultValue={dataDrone.reason.filter(
+                                  (a) =>
+                                    !REASON_IS_CHECK.some((x) => x.reason === a)
+                                )}
+                              />
+                            </div>
+                          ) : dataDrone.status == "INACTIVE" && index == 3 ? (
+                            <div>
+                              <div className="form-group ps-3">
+                                <TextArea
+                                  className="col-lg-12"
+                                  rows={3}
+                                  placeholder="กรอกเหตุผล/เหตุหมายเพิ่มเติม"
+                                  autoComplete="off"
+                                  onChange={handleMoreReason}
+                                  defaultValue={dataDrone.reason.filter(
+                                    (a) =>
+                                      !REASON_IS_CHECK.some(
+                                        (x) => x.reason === a
+                                      )
+                                  )}
+                                />{" "}
+                              </div>
+                            </div>
+                          ) : null}
+                        </Radio>
+                      )
+                    )}
                   </Space>
                 </Radio.Group>
               </Form.Item>

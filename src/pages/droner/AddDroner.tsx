@@ -15,7 +15,7 @@ import {
 import { CardContainer } from "../../components/card/CardContainer";
 import { BackIconButton } from "../../components/button/BackButton";
 import TextArea from "antd/lib/input/TextArea";
-import emptyData from "../../resource/media/empties/iconoir_farm.png";
+import emptyData from "../../resource/media/empties/tabler_drone.png";
 import { EditOutlined } from "@ant-design/icons";
 import color from "../../resource/color";
 import { CardHeader } from "../../components/header/CardHearder";
@@ -1052,9 +1052,9 @@ function AddDroner() {
           </Form>
         ) : (
           <Form>
-            <div className="container text-center" style={{ padding: "80px" }}>
+             <div className="container text-center" style={{ padding: "80px" }}>
               <img src={emptyData}></img>
-              <p>ยังไม่มีข้อมูลโดรนเกษตร</p>
+              <p>ยังไม่มีข้อมูลโดรน</p>
             </div>
           </Form>
         )}
