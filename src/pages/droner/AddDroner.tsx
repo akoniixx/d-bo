@@ -64,7 +64,7 @@ import {
 import { LAT_LNG_BANGKOK } from "../../definitions/Location";
 import GoogleMap from "../../components/map/GoogleMap";
 import moment from "moment";
-const dateFormat = "DD-MM-YYYY";
+const dateFormat = "DD/MM/YYYY";
 const dateCreateFormat = "YYYY-MM-DD";
 
 const _ = require("lodash");
@@ -139,6 +139,13 @@ function AddDroner() {
     setData(m.toJS());
     checkValidate(m.toJS(), address, dronerArea);
   };
+  const handleOnChangeBirthday = (e: any) => {
+    const d = Map(data)
+      .set("birthDate", moment(new Date(e)).format(dateCreateFormat))
+      .toJS();
+    setData(d);
+    checkValidate(d);
+  };
   const handleExpPlant = (e: any) => {
     let checked = e.target.checked;
     let value = e.target.value;
@@ -153,7 +160,7 @@ function AddDroner() {
       p = Map(data).set("expPlant", removePlant);
     }
     setData(p.toJS());
-    checkValidate(p.toJS(), address, dronerArea);
+    checkValidate(p.toJS(), address, dronerArea, otherPlant);
   };
   const handlePlantOther = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.value.trim().length != 0) {
@@ -409,10 +416,12 @@ function AddDroner() {
         data?.expPlant.length !== 0 &&
         data?.expPlant !== undefined;
     }
-    let checkEmptyOtherPlant = otherPlant != undefined;
+    let checkEmptyOtherPlant = otherPlant != undefined && otherPlant != "";
+    let checkEmptyDate = ![data?.birthDate].includes("1970-01-01");
     if (
       checkEmptySting &&
       checkEmptyNumber &&
+      checkEmptyDate &&
       (checkEmptyArray || checkEmptyOtherPlant)
     ) {
       setBtnSaveDisable(false);
@@ -639,16 +648,7 @@ function AddDroner() {
                   placeholder="กรอกวันเดือนปีเกิด"
                   format={dateFormat}
                   className="col-lg-12"
-                  onChange={(e: any) =>
-                    setData(
-                      Map(data)
-                        .set(
-                          "birthDate",
-                          moment(new Date(e)).format(dateCreateFormat)
-                        )
-                        .toJS()
-                    )
-                  }
+                  onChange={(e: any) => handleOnChangeBirthday(e)}
                 />
               </Form.Item>
             </div>
@@ -1052,7 +1052,7 @@ function AddDroner() {
           </Form>
         ) : (
           <Form>
-             <div className="container text-center" style={{ padding: "80px" }}>
+            <div className="container text-center" style={{ padding: "80px" }}>
               <img src={emptyData}></img>
               <p>ยังไม่มีข้อมูลโดรน</p>
             </div>
