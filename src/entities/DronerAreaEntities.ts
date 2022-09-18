@@ -8,6 +8,7 @@ export interface DronerAreaEntity {
   long: string;
   distance?: string;
   locationName: string;
+  mapUrl: string;
 }
 export const DronerAreaEntity_INIT: DronerAreaEntity = {
   dronerId: "",
@@ -18,4 +19,5 @@ export const DronerAreaEntity_INIT: DronerAreaEntity = {
   long: LAT_LNG_BANGKOK.lng,
   distance: "",
   locationName: "",
+  mapUrl: "",
 };

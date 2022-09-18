@@ -120,7 +120,12 @@ function EditDroner() {
 
   const fetchDronerById = async () => {
     await DronerDatasource.getDronerByID(dronerId).then((res) => {
-      console.log(res);
+      if (res.birthDate == null) {
+        res.birthDate = "1970-01-01";
+      }
+      setOtherPlant(
+        res.expPlant.filter((a) => !EXP_PLANT.some((x) => x === a))
+      );
       setData(res);
       setMapPosition({
         lat: parseFloat(res.dronerArea?.lat),
@@ -179,10 +184,16 @@ function EditDroner() {
   //#region data droner
   const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const m = Map(data).set(e.target.id, e.target.value);
-    console.log(m.toJS());
     setData(m.toJS());
     checkValidate(m.toJS());
     checkValidateReason(m.toJS());
+  };
+  const handleOnChangeBirthday = (e: any) => {
+    const d = Map(data)
+      .set("birthDate", moment(new Date(e)).format(dateCreateFormat))
+      .toJS();
+    setData(d);
+    checkValidate(d);
   };
   const handleChangeStatus = (e: any) => {
     let status = e.target.value;
@@ -217,9 +228,8 @@ function EditDroner() {
       let removePlant = data.expPlant.filter((x) => x != value);
       p = Map(data).set("expPlant", removePlant);
     }
-    console.log(p.toJS());
     setData(p.toJS());
-    checkValidate(data);
+    checkValidate(p.toJS(), otherPlant);
   };
   const handlePlantOther = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.value.trim().length != 0) {
@@ -493,7 +503,7 @@ function EditDroner() {
   };
   //#endregion
 
-  const checkValidate = (data: DronerEntity) => {
+  const checkValidate = (data: DronerEntity, otherPlant?: any) => {
     let checkEmptySting = ![
       data.firstname,
       data.lastname,
@@ -502,7 +512,6 @@ function EditDroner() {
       address.address1,
       dronerArea.lat,
       dronerArea.long,
-      data.birthDate,
     ].includes("");
     let checkEmptyNumber = ![
       address.provinceId,
@@ -510,8 +519,15 @@ function EditDroner() {
       address.subdistrictId,
     ].includes(0);
     let checkEmptyArray = ![data.expPlant].includes([""]);
-
-    if (checkEmptySting && checkEmptyNumber && checkEmptyArray) {
+    let checkEmptyDate = ![data?.birthDate].includes("1970-01-01");
+    let checkEmptyOtherPlant = otherPlant != undefined && otherPlant != "";
+    if (
+      checkEmptySting &&
+      checkEmptyNumber &&
+      checkEmptyArray &&
+      (checkEmptyArray || checkEmptyOtherPlant) &&
+      checkEmptyDate
+    ) {
       setBtnSaveDisable(false);
     } else {
       setBtnSaveDisable(true);
@@ -532,8 +548,14 @@ function EditDroner() {
       addr.subdistrictId,
     ].includes(0);
     let checkEmptyArray = ![data.expPlant].includes([""]);
-
-    if (checkEmptySting && checkEmptyNumber && checkEmptyArray) {
+    let checkEmptyDate = ![data?.birthDate].includes("1970-01-01");
+    let checkEmptyOtherPlant = otherPlant != undefined && otherPlant != "";
+    if (
+      checkEmptySting &&
+      checkEmptyNumber &&
+      (checkEmptyArray || checkEmptyOtherPlant) &&
+      checkEmptyDate
+    ) {
       setBtnSaveDisable(false);
     } else {
       setBtnSaveDisable(true);
@@ -565,6 +587,7 @@ function EditDroner() {
       data.expPlant,
       otherPlantList.filter((x) => x != "")
     );
+
     const pushReason = Map(data).set(
       "reason",
       [
@@ -573,7 +596,6 @@ function EditDroner() {
       ].filter((y) => y != undefined && y != "")
     );
     const pushAddr = Map(pushReason.toJS()).set("address", address);
-    console.log(dronerArea);
     const pushDronerArea = Map(pushAddr.toJS()).set("dronerArea", dronerArea);
     const pushPin = Map(pushDronerArea.toJS()).set("pin", "");
     const setOtherPlant = Array.from(new Set(pushPin.toJS().expPlant)).filter(
@@ -584,9 +606,7 @@ function EditDroner() {
       "dronerDrone",
       dronerDroneList
     );
-    console.log("final", pushDroneList.toJS());
     await DronerDatasource.updateDroner(pushDroneList.toJS()).then((res) => {
-      console.log("res", res);
       if (res != undefined) {
         var i = 0;
         for (i; 2 > i; i++) {
@@ -747,16 +767,7 @@ function EditDroner() {
                   format={dateFormat}
                   className="col-lg-12"
                   value={moment(data.birthDate)}
-                  onChange={(e: any) =>
-                    setData(
-                      Map(data)
-                        .set(
-                          "birthDate",
-                          moment(new Date(e)).format(dateCreateFormat)
-                        )
-                        .toJS()
-                    )
-                  }
+                  onChange={(e: any) => handleOnChangeBirthday(e)}
                 />
               </Form.Item>
             </div>
@@ -1040,7 +1051,7 @@ function EditDroner() {
             <label>หรือ</label>
             <Form.Item name="url">
               <Input
-                //defaultValue={dronerArea.mapUrl}
+                defaultValue={dronerArea.mapUrl}
                 placeholder="กรอกข้อมูล Url Google Map"
                 onBlur={handleOnChangeUrl}
                 autoComplete="off"
@@ -1201,6 +1212,9 @@ function EditDroner() {
                                 placeholder="กรอกเหตุผล/เหตุหมายเพิ่มเติม"
                                 autoComplete="off"
                                 onChange={handleMoreReason}
+                                defaultValue={data.reason.filter(
+                                  (x) => x != "บัตรประชาชนไม่ชัดเจน/ไม่ถูกต้อง"
+                                )}
                               />{" "}
                             </div>
                           </div>

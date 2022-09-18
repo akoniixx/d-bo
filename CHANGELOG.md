@@ -1,4 +1,8 @@
 ## [Version - 0]
+## Feature [v0.12.0] 2022-09-18
+- enhanced add birthday in farmer memu
+- enhanced add birthday in droner menu
+- enhanced add urlMap in droner menu
 ## Fix [v0.11.1] 2022-09-15
 - fixed save data droner drone in edit droner
 - fixed validate in edit droner
