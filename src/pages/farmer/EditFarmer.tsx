@@ -11,6 +11,7 @@ import {
   Radio,
   Space,
   Tag,
+  DatePicker,
 } from "antd";
 import { CardContainer } from "../../components/card/CardContainer";
 import { BackIconButton } from "../../components/button/BackButton";
@@ -59,8 +60,11 @@ import {
 import "../farmer/Style.css";
 import img_empty from "../../resource/media/empties/uploadImg.png";
 import bth_img_empty from "../../resource/media/empties/upload_Img_btn.png";
-
+import moment from "moment";
 const { Option } = Select;
+
+const dateFormat = "DD/MM/YYYY";
+const dateCreateFormat = "YYYY-MM-DD";
 
 const _ = require("lodash");
 const { Map } = require("immutable");
@@ -104,6 +108,7 @@ const EditFarmer = () => {
 
   const fecthFarmer = async () => {
     await FarmerDatasource.getFarmerById(farmerId).then((res) => {
+      console.log(res);
       setData(res);
       setAddress(res.address);
       setFarmerPlotList(res.farmerPlot);
@@ -153,7 +158,13 @@ const EditFarmer = () => {
     setData(m.toJS());
     checkValidate(m.toJS());
   };
-
+  const handleOnChangeBirthday = (e: any) => {
+    const d = Map(data)
+      .set("birthDate", moment(new Date(e)).format(dateCreateFormat))
+      .toJS();
+    setData(d);
+    checkValidate(d);
+  };
   const handleOnChangeProvince = async (provinceId: number) => {
     const d = Map(address).set(
       "provinceId",
@@ -352,8 +363,8 @@ const EditFarmer = () => {
       address.districtId,
       address.subdistrictId,
     ].includes(0);
-
-    if (checkEmptySting && checkEmptyNumber) {
+    let checkEmptyDate = ![data.birthDate].includes("1970-01-01");
+    if (checkEmptySting && checkEmptyNumber && checkEmptyDate) {
       setBtnSaveDisable(false);
     } else {
       setBtnSaveDisable(true);
@@ -373,8 +384,8 @@ const EditFarmer = () => {
       addr.districtId,
       addr.subdistrictId,
     ].includes(0);
-
-    if (checkEmptySting && checkEmptyNumber) {
+    let checkEmptyDate = ![data.birthDate].includes("1970-01-01");
+    if (checkEmptySting && checkEmptyNumber && checkEmptyDate) {
       setBtnSaveDisable(false);
     } else {
       setBtnSaveDisable(true);
@@ -531,6 +542,30 @@ const EditFarmer = () => {
                 />
               </Form.Item>
             </div>
+            <div className="form-group col-lg-6">
+              <label>
+                วันเดือนปีเกิด <span style={{ color: "red" }}>*</span>
+              </label>
+              <Form.Item
+                name="birthDate"
+                rules={[
+                  {
+                    required: true,
+                    message: "กรุณากรอกวันเดือนปีเกิด",
+                  },
+                ]}
+              >
+                <DatePicker
+                  placeholder="กรอกวันเดือนปีเกิด"
+                  format={dateFormat}
+                  className="col-lg-12"
+                  onChange={(e: any) => handleOnChangeBirthday(e)}
+                  defaultValue={moment(data.birthDate)}
+                />
+              </Form.Item>
+            </div>
+          </div>
+          <div className="row">
             <div className="form-group col-lg-6">
               <label>
                 รหัสบัตรประชาชน <span style={{ color: "red" }}>*</span>
