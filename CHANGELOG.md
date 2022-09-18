@@ -1,4 +1,7 @@
 ## [Version - 0]
+## Feature [v0.13.0] 2022-09-18
+- create index and detail finish task menu
+- connect api all page in finish task menu
 ## Feature [v0.12.0] 2022-09-18
 - enhanced add birthday in farmer memu
 - enhanced add birthday in droner menu
