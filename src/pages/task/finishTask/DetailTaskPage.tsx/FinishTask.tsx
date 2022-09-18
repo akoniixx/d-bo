@@ -158,7 +158,8 @@ function FinishTasks() {
               }}
             ></div>
             <div className="ps-5">
-              {data.imageTaskUrl !== null ? (
+              {data.imageTaskUrl !== "object" &&
+              Object.keys(data.imageTaskUrl).length !== 0 ? (
                 <>
                   <Tag
                     color={color.Success}
@@ -168,7 +169,7 @@ function FinishTasks() {
                     View
                   </Tag>
                 </>
-              ) : null}
+              ) : undefined}
             </div>
           </div>
 
@@ -176,7 +177,7 @@ function FinishTasks() {
           <label>หมายเหตุ</label>
           <Form.Item>
             <span style={{ color: color.Grey }}>
-              {data.data.statusRemark !== null ? data.data.statusRemark : "-"}
+              {data.data.comment !== null ? data.data.comment : "-"}
             </span>
           </Form.Item>
         </div>
@@ -469,7 +470,7 @@ function FinishTasks() {
         <div className="row">
           <div className="col-lg-4">
             <Form.Item>
-              <label>ค่าบริการ (ก่อนคิดค่าคำนวณ)</label>
+              <label>ค่าบริการ (ก่อนคิดค่าธรรมเนียม)</label>
               <Input
                 disabled
                 value={
@@ -483,7 +484,7 @@ function FinishTasks() {
           </div>
           <div className="col-lg-4">
             <Form.Item>
-              <label>ค่าธรรมเนียม (คิด 5% ของราคารวม)</label>
+              <label>ค่าธรรมเนียม (5% ของค่าบริการ)</label>
               <Input
                 disabled
                 placeholder="0.0"

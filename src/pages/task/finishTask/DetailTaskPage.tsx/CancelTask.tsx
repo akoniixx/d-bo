@@ -116,7 +116,7 @@ function CancelTask() {
           <label>หมายเหตุ</label>
           <Form.Item>
             <span style={{ color: color.Grey }}>
-              {data.data.statusRemark !== null ? data.data.statusRemark : "-"}
+              {data.data.comment !== null ? data.data.comment : "-"}
             </span>
           </Form.Item>
         </div>
@@ -329,7 +329,7 @@ function CancelTask() {
         <div className="row">
           <div className="col-lg-4">
             <Form.Item>
-              <label>ค่าบริการ (ก่อนคิดค่าคำนวณ)</label>
+              <label>ค่าบริการ (ก่อนคิดค่าธรรมเนียม)</label>
               <Input
                 disabled
                 value={
@@ -343,7 +343,7 @@ function CancelTask() {
           </div>
           <div className="col-lg-4">
             <Form.Item>
-              <label>ค่าธรรมเนียม (คิด 5% ของราคารวม)</label>
+              <label>ค่าธรรมเนียม (5% ของค่าบริการ)</label>
               <Input
                 disabled
                 value={

@@ -1,10 +1,10 @@
 import {
   Badge,
   Button,
-  Cascader,
   Checkbox,
   DatePicker,
   Dropdown,
+  Input,
   Menu,
   Pagination,
   Rate,
@@ -27,6 +27,7 @@ import {
   DownOutlined,
   EditOutlined,
   FileTextOutlined,
+  SearchOutlined,
   StarFilled,
   UserOutlined,
 } from "@ant-design/icons";
@@ -63,7 +64,6 @@ export default function IndexFinishTask() {
   const dateFormat = "DD/MM/YYYY";
   const timeFormat = "HH:mm";
   const dateSearchFormat = "YYYY-MM-DD";
-
   useEffect(() => {
     fetchTaskFinish();
     fetchProvince();
@@ -113,12 +113,10 @@ export default function IndexFinishTask() {
       setSubdistrict(res);
     });
   };
-
   const changeTextSearch = (searchText: any) => {
     setSearchText(searchText.target.value);
     setCurrent(1);
   };
-
   const onChangePage = (page: number) => {
     setCurrent(page);
   };
@@ -126,7 +124,6 @@ export default function IndexFinishTask() {
     setSearchStatus(status);
     setCurrent(1);
   };
-
   const formatNumber = (e: any) => {
     let formatNumber = Number(e)
       .toFixed(1)
@@ -137,7 +134,6 @@ export default function IndexFinishTask() {
     }
     return formatNumber;
   };
-
   const handleProvince = (provinceId: number) => {
     setSearchProvince(provinceId);
     fetchDistrict(provinceId);
@@ -183,8 +179,9 @@ export default function IndexFinishTask() {
         className="container d-flex justify-content-between"
         style={{ padding: "8px" }}
       >
-        <div className="col-lg-4">
-          <Search
+        <div className="col-lg-4 p-1">
+          <Input
+            prefix={<SearchOutlined style={{ color: color.Disable }} />}
             placeholder="ค้นหาชื่อเกษตรกร, คนบินโดรน หรือเบอร์โทร"
             className="col-lg-12 p-1"
             onChange={changeTextSearch}

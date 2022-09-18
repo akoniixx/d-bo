@@ -81,31 +81,35 @@ function ReviewTask() {
   }, []);
 
   const onChangeCanReview = (e: any) => {
-    const m = Map(detailDroner).set("canReview",e.target.value);
-    const n = Map(m.toJS()).set("taskId", taskId)
+    const m = Map(detailDroner).set("canReview", e.target.value);
+    const n = Map(m.toJS()).set("taskId", taskId);
     setDetailDroner(n.toJS());
-    {!e.target.value ? setBtnSaveDisable(true) : setBtnSaveDisable(false)}
-    {e.target.value == "Yes" ? setSaveRate(false) : setSaveRate(true)}
+    {
+      !e.target.value ? setBtnSaveDisable(true) : setBtnSaveDisable(false);
+    }
+    {
+      e.target.value == "Yes" ? setSaveRate(false) : setSaveRate(true);
+    }
   };
 
   const manners = (e: any) => {
     const m = Map(detailDroner).set("pilotEtiquette", parseInt(e));
-     const n = Map(m.toJS()).set("taskId", taskId)
+    const n = Map(m.toJS()).set("taskId", taskId);
     setDetailDroner(n.toJS());
   };
   const punctuality = (e: any) => {
     const m = Map(detailDroner).set("punctuality", parseInt(e));
-     const n = Map(m.toJS()).set("taskId", taskId)
+    const n = Map(m.toJS()).set("taskId", taskId);
     setDetailDroner(n.toJS());
   };
   const expertise = (e: any) => {
     const m = Map(detailDroner).set("sprayExpertise", parseInt(e));
-     const n = Map(m.toJS()).set("taskId", taskId)
+    const n = Map(m.toJS()).set("taskId", taskId);
     setDetailDroner(n.toJS());
   };
   const commentReview = (e: any) => {
     const m = Map(detailDroner).set("comment", e.target.value);
-     const n = Map(m.toJS()).set("taskId", taskId)
+    const n = Map(m.toJS()).set("taskId", taskId);
     setDetailDroner(n.toJS());
   };
 
@@ -129,8 +133,12 @@ function ReviewTask() {
   };
 
   const UpdateReviewDroner = async () => {
-    const pushDetailReview = Map(data.data).set("reviewDronerDetail", detailDroner);
-    await TaskReviewDronerDatasource.UpdateReviewDroner(pushDetailReview.toJS().reviewDronerDetail
+    const pushDetailReview = Map(data.data).set(
+      "reviewDronerDetail",
+      detailDroner
+    );
+    await TaskReviewDronerDatasource.UpdateReviewDroner(
+      pushDetailReview.toJS().reviewDronerDetail
     ).then((res) => {
       if (res) {
         Swal.fire({
@@ -216,7 +224,8 @@ function ReviewTask() {
               }}
             ></div>
             <div className="ps-5">
-              {!data.imageTaskUrl && (
+              {data.imageTaskUrl !== "object" &&
+              Object.keys(data.imageTaskUrl).length !== 0 ? (
                 <>
                   <Tag
                     color={color.Success}
@@ -226,14 +235,14 @@ function ReviewTask() {
                     View
                   </Tag>
                 </>
-              )}
+              ) : undefined}
             </div>
           </div>
           <br />
           <label>หมายเหตุ</label>
           <Form.Item>
             <span style={{ color: color.Grey }}>
-              {data.data.statusRemark !== null ? data.data.statusRemark : "-"}
+              {data.data.comment !== null ? data.data.comment : "-"}
             </span>
           </Form.Item>
         </div>
@@ -263,7 +272,12 @@ function ReviewTask() {
               <Form.Item>
                 <div className="row pt-3" style={{ color: color.Grey }}>
                   <span className="col-lg-5">1. มารยาทนักบิน</span>
-                  <Select onChange={manners} disabled={saveRate} allowClear style={{ width: 75 }}>
+                  <Select
+                    onChange={manners}
+                    disabled={saveRate}
+                    allowClear
+                    style={{ width: 75 }}
+                  >
                     {RATE_SELECT.map((item: any) => (
                       <option value={item.value}>{item.name}</option>
                     ))}
@@ -271,7 +285,12 @@ function ReviewTask() {
                 </div>
                 <div className="row pt-3" style={{ color: color.Grey }}>
                   <span className="col-lg-5">2. ความตรงต่อเวลา</span>
-                  <Select onChange={punctuality} disabled={saveRate} allowClear style={{ width: 75 }}>
+                  <Select
+                    onChange={punctuality}
+                    disabled={saveRate}
+                    allowClear
+                    style={{ width: 75 }}
+                  >
                     {RATE_SELECT.map((item: any) => (
                       <option value={item.value}>{item.name}</option>
                     ))}
@@ -279,7 +298,12 @@ function ReviewTask() {
                 </div>
                 <div className="row pt-3" style={{ color: color.Grey }}>
                   <span className="col-lg-5">3. ความเชี่ยวชาญในการพ่น</span>
-                  <Select onChange={expertise}disabled={saveRate} allowClear style={{ width: 75 }}>
+                  <Select
+                    onChange={expertise}
+                    disabled={saveRate}
+                    allowClear
+                    style={{ width: 75 }}
+                  >
                     {RATE_SELECT.map((item: any) => (
                       <option value={item.value}>{item.name}</option>
                     ))}
@@ -288,7 +312,7 @@ function ReviewTask() {
               </Form.Item>
               <Form.Item>
                 <TextArea
-                disabled={saveRate}
+                  disabled={saveRate}
                   rows={3}
                   onChange={commentReview}
                   placeholder="กรอกความคิดเห็นเพิ่มเติม"
@@ -428,16 +452,19 @@ function ReviewTask() {
         </div>
         <div className="col-lg-4">
           <span>
-            {data.data.droner.address !== null ? data.data.droner.address.subdistrict.subdistrictName +
-              "," +
-              " " +
-              data.data.droner.address.district.districtName +
-              "," +
-              " " +
-              data.data.droner.address.province.region : null}</span>
+            {data.data.droner.address !== null
+              ? data.data.droner.address.subdistrict.subdistrictName +
+                "," +
+                " " +
+                data.data.droner.address.district.districtName +
+                "," +
+                " " +
+                data.data.droner.address.province.region
+              : null}
+          </span>
         </div>
         <div className="col-lg">
-        <span>
+          <span>
             <Avatar
               size={25}
               src={
@@ -483,7 +510,7 @@ function ReviewTask() {
         <div className="row">
           <div className="col-lg-4">
             <Form.Item>
-              <label>ค่าบริการ (ก่อนคิดค่าคำนวณ)</label>
+              <label>ค่าบริการ (ก่อนคิดค่าธรรมเนียม)</label>
               <Input
                 disabled
                 value={
@@ -497,7 +524,7 @@ function ReviewTask() {
           </div>
           <div className="col-lg-4">
             <Form.Item>
-              <label>ค่าธรรมเนียม (คิด 5% ของราคารวม)</label>
+              <label>ค่าธรรมเนียม (5% ของค่าบริการ)</label>
               <Input
                 disabled
                 placeholder="0.0"
