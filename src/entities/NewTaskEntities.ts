@@ -1,8 +1,14 @@
-import { CropPurposeSprayEntity } from "./CropEntities";
-import { GetFarmerEntity } from "./FarmerEntities";
+import {
+  CropPurposeSprayEntity,
+  CropPurposeSprayEntity_INT,
+} from "./CropEntities";
+import { GetFarmerEntity, GetFarmerEntity_INIT } from "./FarmerEntities";
+import { FarmerPlotEntity, FarmerPlotEntity_INIT } from "./FarmerPlotEntities";
 import {
   CreateDronerTempEntity,
   CreateDronerTempEntity_INIT,
+  TaskDronerTempEntity,
+  TaskDronerTempEntity_INIT,
 } from "./TaskDronerTemp";
 
 export interface NewTaskEntity {
@@ -82,6 +88,7 @@ export interface GetNewTaskEntity {
     purposeSprayId: string;
     dateAppointment: string;
     targetSpray: string[];
+    taskDronerTemp: TaskDronerTempEntity[];
     preparationBy: string;
     createdAt: string;
     updatedAt: string;
@@ -101,9 +108,58 @@ export interface GetNewTaskEntity {
     reviewFarmerComment: string;
     imagePathFinishTask: string;
     comment: string;
+    isProblem: boolean;
+    problemRemark: string;
+    dateRemark: string;
+    dateDelay: string;
+    statusDelay: string;
+    delayRejectRemark: string;
     purposeSpray: CropPurposeSprayEntity;
     farmer: GetFarmerEntity;
     droner: string;
-    farmerPlot: {};
+    farmerPlot: FarmerPlotEntity;
   };
 }
+export const GetNewTaskEntity_INIT: GetNewTaskEntity = {
+  data: {
+    id: "",
+    taskNo: "",
+    farmerId: "",
+    farmerPlotId: "",
+    farmAreaAmount: "",
+    dronerId: "",
+    purposeSprayId: "",
+    dateAppointment: "",
+    targetSpray: [""],
+    taskDronerTemp: [TaskDronerTempEntity_INIT],
+    preparationBy: "",
+    createdAt: "",
+    updatedAt: "",
+    distance: "",
+    status: "",
+    statusRemark: "",
+    reviewDronerAvg: "",
+    reviewDronerDetail: "",
+    unitPriceStandard: "",
+    priceStandard: "",
+    unitPrice: "",
+    price: "",
+    totalPrice: "",
+    fee: "",
+    discountFee: "",
+    reviewFarmerScore: "",
+    reviewFarmerComment: "",
+    imagePathFinishTask: "",
+    comment: "",
+    isProblem: false,
+    problemRemark: "",
+    dateRemark: "",
+    dateDelay: "",
+    statusDelay: "",
+    delayRejectRemark: "",
+    purposeSpray: CropPurposeSprayEntity_INT,
+    farmer: GetFarmerEntity_INIT,
+    droner: "",
+    farmerPlot: FarmerPlotEntity_INIT,
+  },
+};

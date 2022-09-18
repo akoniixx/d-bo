@@ -2,6 +2,7 @@ import { BASE_URL, httpClient } from "../config/develop-config";
 import { FarmerEntity } from "../entities/FarmerEntities";
 import {
   CreateNewTaskEntity,
+  GetNewTaskEntity,
   NewTaskPageEntity,
 } from "../entities/NewTaskEntities";
 
@@ -49,6 +50,16 @@ export class TaskDatasource {
       })
       .catch((error) => {
         console.log(error);
+      });
+  }
+  static getNewTaskById(id: string): Promise<GetNewTaskEntity> {
+    return httpClient
+      .get(BASE_URL + "/tasks/task/" + id)
+      .then((response) => {
+        return response.data;
+      })
+      .catch((err) => {
+        console.log(err, "err getnewtaskbyid");
       });
   }
 }

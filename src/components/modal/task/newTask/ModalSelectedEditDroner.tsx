@@ -1,19 +1,19 @@
 import { DeleteOutlined, StarFilled } from "@ant-design/icons";
 import { Avatar, Badge, Form, Modal, Row, Table } from "antd";
-import React, { useEffect, useState } from "react";
-import { TaskSearchDroner } from "../../../../entities/TaskSearchDroner";
+import React, { useState } from "react";
+import { TaskDronerTempEntity } from "../../../../entities/TaskDronerTemp";
 import { color } from "../../../../resource";
 import ActionButton from "../../../button/ActionButton";
 import { CardContainer } from "../../../card/CardContainer";
 import FooterPage from "../../../footer/FooterPage";
-interface ModalSelectedDronerProps {
+interface ModalSelectedEditDronerProps {
   show: boolean;
   backButton: () => void;
-  dataDroner: TaskSearchDroner[];
+  dataDroner: TaskDronerTempEntity[];
   title: string;
-  callBack: (data: TaskSearchDroner[]) => void;
+  callBack: (data: TaskDronerTempEntity[]) => void;
 }
-const ModalSelectedDroner: React.FC<ModalSelectedDronerProps> = ({
+const ModalSelectedEditDroner: React.FC<ModalSelectedEditDronerProps> = ({
   show,
   backButton,
   dataDroner,
@@ -21,12 +21,11 @@ const ModalSelectedDroner: React.FC<ModalSelectedDronerProps> = ({
   callBack,
 }) => {
   let checkDup = Array.from(new Set(dataDroner)).filter(
-    (x) => x.droner_id != ""
+    (x) => x.dronerId != ""
   );
-  console.log(checkDup);
-  const [data, setData] = useState<TaskSearchDroner[]>(checkDup);
+  const [data, setData] = useState<TaskDronerTempEntity[]>(checkDup);
   const removeDroner = (e: any) => {
-    let d = data.filter((x) => x.droner_id != e.droner_id);
+    let d = data.filter((x) => x.dronerId != e.droner_id);
     setData(d);
   };
   const handelCallBack = () => {
@@ -40,10 +39,11 @@ const ModalSelectedDroner: React.FC<ModalSelectedDronerProps> = ({
       dataIndex: "fullname",
       key: "fullname",
       render: (value: any, row: any, index: number) => {
+        let data = JSON.parse(row.dronerDetail[0]);
         return {
           children: (
             <>
-              <span>{row.firstname + " " + row.lastname}</span>
+              <span>{data.firstname + " " + data.lastname}</span>
               <br />
               <span style={{ color: color.Grey }}></span>
             </>
@@ -55,14 +55,25 @@ const ModalSelectedDroner: React.FC<ModalSelectedDronerProps> = ({
       title: "เบอร์โทร",
       dataIndex: "telephone_no",
       key: "telephone_no",
+      render: (value: any, row: any, index: number) => {
+        let data = JSON.parse(row.dronerDetail[0]);
+        return {
+          children: (
+            <>
+              <span>{data.telephone_no}</span>
+            </>
+          ),
+        };
+      },
     },
     {
       title: "Rating",
       dataIndex: "rating_avg",
       key: "rating_avg",
       render: (value: any, row: any, index: number) => {
+        let data = JSON.parse(row.dronerDetail[0]);
         const checkRating = () => {
-          return row.rating_avg > 0 ? true : false;
+          return data.rating_avg > 0 ? true : false;
         };
         return {
           children: (
@@ -73,7 +84,7 @@ const ModalSelectedDroner: React.FC<ModalSelectedDronerProps> = ({
                     <StarFilled />
                   </div>
                   <span className="pt-2 ps-1">
-                    {parseFloat(row.rating_avg).toFixed(2)}
+                    {parseFloat(data.rating_avg).toFixed(1)}
                   </span>
                 </Row>
               )}
@@ -86,34 +97,65 @@ const ModalSelectedDroner: React.FC<ModalSelectedDronerProps> = ({
       title: "ตำบล",
       dataIndex: "subdistrict_name",
       key: "subdistrict_name",
+      render: (value: any, row: any, index: number) => {
+        let data = JSON.parse(row.dronerDetail[0]);
+        return {
+          children: (
+            <>
+              <span>{data.subdistrict_name}</span>
+            </>
+          ),
+        };
+      },
     },
     {
       title: "อำเภอ",
       dataIndex: "district_name",
       key: "district_name",
+      render: (value: any, row: any, index: number) => {
+        let data = JSON.parse(row.dronerDetail[0]);
+        return {
+          children: (
+            <>
+              <span>{data.district_name}</span>
+            </>
+          ),
+        };
+      },
     },
     {
       title: "จังหวัด",
       dataIndex: "province_name",
       key: "province_name",
+      render: (value: any, row: any, index: number) => {
+        let data = JSON.parse(row.dronerDetail[0]);
+        return {
+          children: (
+            <>
+              <span>{data.province_name}</span>
+            </>
+          ),
+        };
+      },
     },
     {
       title: "ยี่หัอ",
       dataIndex: "role",
       key: "role",
       render: (value: any, row: any, index: number) => {
+        let data = JSON.parse(row.dronerDetail[0]);
         return {
           children: (
             <>
               <Avatar
                 size={25}
-                src={row.logo_drone_brand}
+                src={data.logo_drone_brand}
                 style={{ marginRight: "5px" }}
               />
-              {row.drone_brand}
+              {data.drone_brand}
               <br />
               <p style={{ fontSize: "12px", color: color.Grey }}>
-                {row.count_drone > 1 && "(มากกว่า 1 ยี่หัอ)"}
+                {data.count_drone > 1 && "(มากกว่า 1 ยี่หัอ)"}
               </p>
             </>
           ),
@@ -125,21 +167,22 @@ const ModalSelectedDroner: React.FC<ModalSelectedDronerProps> = ({
       dataIndex: "droner_status",
       key: "droner_status",
       render: (value: any, row: any, index: number) => {
+        let data = JSON.parse(row.dronerDetail[0]);
         return {
           children: (
             <>
               <span
                 style={{
                   color:
-                    row.droner_status == "สะดวก" ? color.Success : color.Error,
+                    data.droner_status == "สะดวก" ? color.Success : color.Error,
                 }}
               >
                 <Badge
                   color={
-                    row.droner_status == "สะดวก" ? color.Success : color.Error
+                    data.droner_status == "สะดวก" ? color.Success : color.Error
                   }
                 />
-                {row.droner_status}
+                {data.droner_status}
                 <br />
               </span>
             </>
@@ -151,13 +194,14 @@ const ModalSelectedDroner: React.FC<ModalSelectedDronerProps> = ({
       title: "",
       width: "7%",
       render: (value: any, row: any, index: number) => {
+        let data = JSON.parse(row.dronerDetail[0]);
         return {
           children: (
             <div className="d-flex flex-row justify-content-between">
               <ActionButton
                 icon={<DeleteOutlined />}
                 color={color.Error}
-                onClick={() => removeDroner(row)}
+                onClick={() => removeDroner(data)}
               />
             </div>
           ),
@@ -168,7 +212,6 @@ const ModalSelectedDroner: React.FC<ModalSelectedDronerProps> = ({
 
   return (
     <>
-      {console.log(data)}
       <Modal
         title={
           <div
@@ -206,4 +249,4 @@ const ModalSelectedDroner: React.FC<ModalSelectedDronerProps> = ({
     </>
   );
 };
-export default ModalSelectedDroner;
+export default ModalSelectedEditDroner;

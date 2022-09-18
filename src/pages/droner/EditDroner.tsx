@@ -120,7 +120,6 @@ function EditDroner() {
 
   const fetchDronerById = async () => {
     await DronerDatasource.getDronerByID(dronerId).then((res) => {
-      console.log(res);
       setData(res);
       setMapPosition({
         lat: parseFloat(res.dronerArea?.lat),
@@ -573,7 +572,6 @@ function EditDroner() {
       ].filter((y) => y != undefined && y != "")
     );
     const pushAddr = Map(pushReason.toJS()).set("address", address);
-    console.log(dronerArea);
     const pushDronerArea = Map(pushAddr.toJS()).set("dronerArea", dronerArea);
     const pushPin = Map(pushDronerArea.toJS()).set("pin", "");
     const setOtherPlant = Array.from(new Set(pushPin.toJS().expPlant)).filter(
@@ -584,9 +582,7 @@ function EditDroner() {
       "dronerDrone",
       dronerDroneList
     );
-    console.log("final", pushDroneList.toJS());
     await DronerDatasource.updateDroner(pushDroneList.toJS()).then((res) => {
-      console.log("res", res);
       if (res != undefined) {
         var i = 0;
         for (i; 2 > i; i++) {

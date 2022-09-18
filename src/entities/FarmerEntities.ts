@@ -38,6 +38,7 @@ export const FarmerEntity_INIT: FarmerEntity = {
 
 export interface GetFarmerEntity {
   id: string;
+  farmerCode: string;
   firstname: string;
   lastname: string;
   idNo: string;
@@ -50,6 +51,7 @@ export interface GetFarmerEntity {
 }
 export const GetFarmerEntity_INIT: GetFarmerEntity = {
   id: "",
+  farmerCode: "",
   firstname: "",
   lastname: "",
   idNo: "",
