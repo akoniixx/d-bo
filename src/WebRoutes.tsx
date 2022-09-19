@@ -20,12 +20,17 @@ import AddAdmin from "./pages/admin/AddAdmin";
 import EditAdmin from "./pages/admin/EditAdmin";
 import ProtectRoute from "./ProtectRoute";
 import PublicRoute from "./PublicRoute";
+import IndexFinishTask from "./pages/task/finishTask/IndexFinishTask";
+import FinishTasks from "./pages/task/finishTask/DetailTaskPage.tsx/FinishTask";
+import ReviewTask from "./pages/task/finishTask/DetailTaskPage.tsx/ReviewTask";
+import CancelTask from "./pages/task/finishTask/DetailTaskPage.tsx/CancelTask";
 import DetailWorkDroner from "./pages/droner/DetailWorkDroner";
 import DetailRankDroner from "./pages/droner/DetailRankDroner";
 import IndexRankDroner from "./pages/droner/IndexRankDroner";
 import IndexNewTask from "./pages/task/newTask/IndexNewTask";
 import AddNewTask from "./pages/task/newTask/AddNewTask";
 import EditNewTask from "./pages/task/newTask/EditNewTask";
+
 
 const WebRoutes: React.FC<any> = () => {
   return (
@@ -35,6 +40,10 @@ const WebRoutes: React.FC<any> = () => {
           <Route path="*" element={<Navigate to="/HomePage" />} />
           <Route path="/HomePage" element={<HomePage />} />
           <Route path="/OverviewPage" element={<OverviewPage />} />
+          <Route path="/IndexFinishTask" element={<IndexFinishTask />} />
+          <Route path="/FinishTasks" element={<FinishTasks />} />
+          <Route path="/ReviewTask" element={<ReviewTask />} />
+          <Route path="/CancelTask" element={<CancelTask />} />
           <Route path="/IndexDroner" element={<IndexDroner />} />
           <Route path="/IndexFarmer" element={<IndexFarmer />} />
           <Route path="/TotalIncomePage" element={<TotalIncomePage />} />
@@ -57,7 +66,6 @@ const WebRoutes: React.FC<any> = () => {
           <Route path="/EditNewTask/:id" element={<EditNewTask />} />
           <Route path="*" element={<PageNotFound />} />
         </Route>
-
         <Route element={<PublicRoute />}>
           <Route index element={<AuthPage />} />
           <Route path="/ErrorLoginPage" element={<ErrorLoginPage />} />
