@@ -7,6 +7,15 @@ export interface TaskDronerTempEntity {
   createdAt: string;
   dronerDetail: string;
 }
+export const TaskDronerTempEntity_INIT : TaskDronerTempEntity = {
+  id: "",
+  taskId: "",
+  dronerId: "",
+  status: "",
+  distance: "",
+  createdAt: "",
+  dronerDetail: "",
+}
 export interface CreateDronerTempEntity {
   dronerId: string;
   status: string;

@@ -14,3 +14,8 @@ export interface CropPurposeSprayEntity {
   cropName: string;
   purposeSpray: PurposeSprayEntity[];
 }
+export const CropPurposeSprayEntity_INIT : CropPurposeSprayEntity = {
+  id: "",
+  cropName: "",
+  purposeSpray: [PurposeSprayEntity_INIT],
+}

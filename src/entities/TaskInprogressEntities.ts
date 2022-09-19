@@ -1,5 +1,8 @@
-import { DronerEntity,DronerEntity_INIT } from "./DronerEntities";
+import { FarmerPlotEntity, FarmerPlotEntity_INIT } from "./FarmerPlotEntities";
+import { DronerEntity, DronerEntity_INIT } from "./DronerEntities";
 import { FarmerEntity, FarmerEntity_INIT } from "./FarmerEntities";
+import { TaskDronerTempEntity, TaskDronerTempEntity_INIT } from "./TaskDronerTemp";
+import { CropPurposeSprayEntity, CropPurposeSprayEntity_INIT } from "./CropEntities";
 export interface TaskInprogressEntity {
   count: number;
   summary: {
@@ -42,9 +45,9 @@ export interface TaskInprogressEntity {
       reviewFarmerComment: null;
       imagePathFinishTask: null;
       comment: string;
-      isProblem: false;
+      isProblem: boolean;
       problemRemark: null;
-      isDelay: false;
+      isDelay: boolean;
       delayRemark: null;
       dateDelay: null;
       statusDelay: null;
@@ -54,60 +57,60 @@ export interface TaskInprogressEntity {
     }
   ];
 }
-export const TaskInprogressEntity_INIT : TaskInprogressEntity = {
-    count: 0,
-    summary: {
-      inprogressnormal: "",
-      inprogressproblem: "",
-      waitstartnormal: "",
-      waitstartproblem: "",
-      waitapprovedelay: "",
-      extended: "",
+export const TaskInprogressEntity_INIT: TaskInprogressEntity = {
+  count: 0,
+  summary: {
+    inprogressnormal: "",
+    inprogressproblem: "",
+    waitstartnormal: "",
+    waitstartproblem: "",
+    waitapprovedelay: "",
+    extended: "",
+  },
+  data: [
+    {
+      id: "",
+      taskNo: "",
+      farmerId: "",
+      farmerPlotId: "",
+      farmAreaAmount: "",
+      dronerId: "",
+      purposeSprayId: null,
+      dateAppointment: "",
+      targetSpray: [""],
+      preparationBy: "",
+      createdAt: "",
+      updatedAt: "",
+      createBy: "",
+      updateBy: null,
+      distance: "",
+      status: "",
+      statusRemark: "",
+      reviewDronerAvg: null,
+      reviewDronerDetail: null,
+      unitPriceStandard: "",
+      priceStandard: "",
+      unitPrice: "",
+      price: "",
+      totalPrice: "",
+      fee: "",
+      discountFee: "",
+      reviewFarmerScore: null,
+      reviewFarmerComment: null,
+      imagePathFinishTask: null,
+      comment: "",
+      isProblem: true,
+      problemRemark: null,
+      isDelay: true,
+      delayRemark: null,
+      dateDelay: null,
+      statusDelay: null,
+      delayRejectRemark: null,
+      farmer: FarmerEntity_INIT,
+      droner: DronerEntity_INIT,
     },
-    data: [
-      {
-        id: "",
-        taskNo: "",
-        farmerId: "",
-        farmerPlotId: "",
-        farmAreaAmount: "",
-        dronerId: "",
-        purposeSprayId: null,
-        dateAppointment: "",
-        targetSpray: [""],
-        preparationBy: "",
-        createdAt: "",
-        updatedAt: "",
-        createBy: "",
-        updateBy: null,
-        distance: "",
-        status: "",
-        statusRemark: "",
-        reviewDronerAvg: null,
-        reviewDronerDetail: null,
-        unitPriceStandard: "",
-        priceStandard: "",
-        unitPrice: "",
-        price: "",
-        totalPrice: "",
-        fee: "",
-        discountFee: "",
-        reviewFarmerScore: null,
-        reviewFarmerComment: null,
-        imagePathFinishTask: null,
-        comment: "",
-        isProblem: false,
-        problemRemark: null,
-        isDelay: false,
-        delayRemark: null,
-        dateDelay: null,
-        statusDelay: null,
-        delayRejectRemark: null,
-        farmer: FarmerEntity_INIT,
-        droner: DronerEntity_INIT,
-      }
-    ]
-}
+  ],
+};
 export interface summaryEntity {
   inprogressnormal: string;
   inprogressproblem: string;
@@ -116,16 +119,105 @@ export interface summaryEntity {
   waitapprovedelay: string;
   extended: string;
 }
-export const summaryEntity_INIT : summaryEntity = {
+export const summaryEntity_INIT: summaryEntity = {
   inprogressnormal: "",
   inprogressproblem: "",
   waitstartnormal: "",
   waitstartproblem: "",
   waitapprovedelay: "",
   extended: "",
-}
+};
 export interface TaskTodayListEntity {
   data: TaskInprogressEntity[];
   count: number;
-  summary: summaryEntity
+  summary: summaryEntity;
+}
+export interface TaskDetailEntity {
+  id: string;
+  taskNo: string;
+  farmerId: string;
+  farmerPlotId: string;
+  farmAreaAmount: string;
+  dronerId: string;
+  purposeSprayId: null;
+  dateAppointment: string;
+  targetSpray: string[];
+  preparationBy: string;
+  createdAt: string;
+  updatedAt: string;
+  createBy: string;
+  updateBy: null;
+  distance: string;
+  status: string;
+  statusRemark: string;
+  reviewDronerAvg: null;
+  reviewDronerDetail: null;
+  unitPriceStandard: string;
+  priceStandard: string;
+  unitPrice: string;
+  price: string;
+  totalPrice: string;
+  fee: string;
+  discountFee: string;
+  reviewFarmerScore: null;
+  reviewFarmerComment: null;
+  imagePathFinishTask: null;
+  comment: string;
+  isProblem: boolean;
+  problemRemark: null;
+  isDelay: boolean;
+  delayRemark: null;
+  dateDelay: null;
+  statusDelay: null;
+  delayRejectRemark: null;
+  purposeSpray: CropPurposeSprayEntity;
+  farmer: FarmerEntity;
+  droner: DronerEntity;
+  farmerPlot: FarmerPlotEntity;
+  taskDronerTemp: TaskDronerTempEntity;
+}
+export const TaskDetailEntity_INIT : TaskDetailEntity = {
+  id: "",
+  taskNo: "",
+  farmerId: "",
+  farmerPlotId: "",
+  farmAreaAmount: "",
+  dronerId: "",
+  purposeSprayId: null,
+  dateAppointment: "",
+  targetSpray: [""],
+  preparationBy: "",
+  createdAt: "",
+  updatedAt: "",
+  createBy: "",
+  updateBy: null,
+  distance: "",
+  status: "",
+  statusRemark: "",
+  reviewDronerAvg: null,
+  reviewDronerDetail: null,
+  unitPriceStandard: "",
+  priceStandard: "",
+  unitPrice: "",
+  price: "",
+  totalPrice: "",
+  fee: "",
+  discountFee: "",
+  reviewFarmerScore: null,
+  reviewFarmerComment: null,
+  imagePathFinishTask: null,
+  comment: "",
+  isProblem: true,
+  problemRemark: null,
+  isDelay: true,
+  delayRemark: null,
+  dateDelay: null,
+  statusDelay: null,
+  delayRejectRemark: null,
+  purposeSpray: CropPurposeSprayEntity_INIT,
+  farmer: FarmerEntity_INIT,
+  droner: DronerEntity_INIT,
+  farmerPlot: FarmerPlotEntity_INIT,
+  taskDronerTemp: TaskDronerTempEntity_INIT,
+
 }

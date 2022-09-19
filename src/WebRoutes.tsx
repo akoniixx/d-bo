@@ -27,6 +27,7 @@ import IndexNewTask from "./pages/task/newTask/IndexNewTask";
 import AddNewTask from "./pages/task/newTask/AddNewTask";
 import EditNewTask from "./pages/task/newTask/EditNewTask";
 import IndexTodayTask from "./pages/task/todayTask/IndexTaskToday";
+import WaitStartNormal from "./pages/task/todayTask/EditeDetailTask/WaitStartNormal";
 
 const WebRoutes: React.FC<any> = () => {
   return (
@@ -57,6 +58,7 @@ const WebRoutes: React.FC<any> = () => {
           <Route path="/AddNewTask:type" element={<AddNewTask />} />
           <Route path="/EditNewTask/:id" element={<EditNewTask />} />
           <Route path="/IndexTodayTask" element={<IndexTodayTask />} />
+          <Route path="/WaitStartNormal" element={<WaitStartNormal/>} />
           <Route path="*" element={<PageNotFound />} />
         </Route>
 

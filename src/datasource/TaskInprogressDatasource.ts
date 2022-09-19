@@ -1,11 +1,11 @@
 import { BASE_URL, httpClient } from "../config/develop-config";
-import { TaskInprogressEntity, TaskTodayListEntity } from "../entities/TaskInprogressEntities";
+import { TaskDetailEntity, TaskTodayListEntity } from "../entities/TaskInprogressEntities";
 
 export class TaskInprogressDatasource {
   static getAllTaskToday(
     page: number,
     row: number,
-    taskStatus?: string,
+    status?: string[],
     subdistrictId?: number,
     districtId?: number,
     provinceId?: number,
@@ -17,7 +17,7 @@ export class TaskInprogressDatasource {
     const params = {
       page: page,
       take: row,
-      taskStatus: ["WAIT_START", "IN_PROGRESS"],
+      status: status,
       subdistrictId: subdistrictId,
       districtId: districtId,
       provinceId: provinceId,
@@ -28,6 +28,16 @@ export class TaskInprogressDatasource {
     };
     return httpClient
       .get(BASE_URL + "/tasks/task-inprogress/get-all-task-today", { params })
+      .then((response) => {
+        return response.data;
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  }
+  static getTaskDetailById(id: string): Promise<TaskDetailEntity> {
+    return httpClient
+      .get(BASE_URL + "/tasks/task-inprogress/get-task-detail/" + id)
       .then((response) => {
         return response.data;
       })

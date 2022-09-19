@@ -45,6 +45,10 @@ export const TASK_TODAY_STATUS : any = {
   WAIT_START : "รอเริ่มงาน",
   IN_PROGRESS : "กำลังดำเนินงาน"
 }
+export const TASKTODAY_STATUS: any = [
+  { value: "WAIT_START", name: "รอเริ่มงาน" },
+  { value: "IN_PROGRESS", name: "กำลังดำเนินงาน" },
+];
 
 export const STATUS_COLOR_TASK_TODAY: any = {
   WAIT_START: color.secondary3,

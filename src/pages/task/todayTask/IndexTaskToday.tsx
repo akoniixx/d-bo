@@ -1,4 +1,9 @@
-import { DownOutlined, EditOutlined, SearchOutlined, UserOutlined } from "@ant-design/icons";
+import {
+  DownOutlined,
+  EditOutlined,
+  SearchOutlined,
+  UserOutlined,
+} from "@ant-design/icons";
 import {
   Badge,
   Button,
@@ -60,31 +65,27 @@ export default function IndexTodayTask() {
   useEffect(() => {
     fetchAllTaskToday();
     fetchProvince();
-  }, [current, row, searchText]);
+  }, [current, row]);
 
   const fetchAllTaskToday = async (
-    // proId?: number,
-    // disId?: number,
-    // subDisId?: number,
+    proId?: number,
+    disId?: number,
+    subDisId?: number,
     text?: string
   ) => {
     await TaskInprogressDatasource.getAllTaskToday(
       current,
       row,
       searchStatus,
-      searchProvince,
-      searchDistrict,
-      searchSubdistrict,
-      // proId,
-      // disId,
-      // subDisId,
+      proId,
+      disId,
+      subDisId,
       isProblem,
       isDelay,
       statusDelay,
-      searchText,
-      // text
+      text
     ).then((res: TaskTodayListEntity) => {
-      console.log(res.data);
+      console.log(res);
       setData(res);
     });
   };
@@ -104,9 +105,8 @@ export default function IndexTodayTask() {
       setSubdistrict(res);
     });
   };
-  const changeTextSearch = (value: string) => {
-    console.log(value);
-    setSearchText(value);
+  const changeTextSearch = (searchText: any) => {
+    setSearchText(searchText.target.value);
     setCurrent(1);
   };
   const onChangePage = (page: any) => {
@@ -184,13 +184,13 @@ export default function IndexTodayTask() {
         style={{ padding: "8px" }}
       >
         <div className="col-lg-4 p-1" style={{ maxWidth: "1200px" }}>
-          <Search
-            // prefix={<SearchOutlined style={{color: color.Disable}}/>}
+          <Input
+            prefix={<SearchOutlined style={{color: color.Disable}}/>}
             placeholder="ค้นหาชื่อนักบินโดรน หรือเบอร์โทร"
             className="col-lg-12 p-1"
-            onSearch={changeTextSearch}
+            onChange={changeTextSearch}
           />
-        </div>  
+        </div>
         <div className="col-lg">
           <Select
             allowClear
@@ -266,7 +266,7 @@ export default function IndexTodayTask() {
           </Select>
         </div>
         <div className="col-lg-2 p-1">
-          {/* <Dropdown
+          <Dropdown
             overlay={status}
             trigger={["click"]}
             className="col-lg-12"
@@ -277,7 +277,7 @@ export default function IndexTodayTask() {
               เลือกสถานะ
               <DownOutlined />
             </Button>
-          </Dropdown> */}
+          </Dropdown>
         </div>
         <div className="pt-1">
           <Button
@@ -289,9 +289,9 @@ export default function IndexTodayTask() {
             }}
             onClick={() =>
               fetchAllTaskToday(
-                // searchSubdistrict,
-                // searchDistrict,
-                // searchProvince,
+                searchSubdistrict,
+                searchDistrict,
+                searchProvince,
                 searchText
               )
             }
@@ -329,7 +329,8 @@ export default function IndexTodayTask() {
       title: "ชื่อนักบินโดรน",
       dataIndex: "droner",
       key: "droner",
-      sorter: (a: any, b: any) => sorter(a.droner.firstname, b.droner.firstname),
+      sorter: (a: any, b: any) =>
+        sorter(a.droner.firstname, b.droner.firstname),
       render: (value: any, row: any, index: number) => {
         return {
           children: (
@@ -348,7 +349,8 @@ export default function IndexTodayTask() {
       title: "ชื่อเกษตรกร",
       dataIndex: "farmer",
       key: "farmer",
-      sorter: (a: any, b: any) => sorter(a.farmer.firstname, b.farmer.firstname),
+      sorter: (a: any, b: any) =>
+        sorter(a.farmer.firstname, b.farmer.firstname),
       render: (value: any, row: any, index: number) => {
         return {
           children: (
@@ -400,7 +402,11 @@ export default function IndexTodayTask() {
         return {
           children: (
             <>
-              <span>{row.totalPrice !=null ? formatCurrency(row.totalPrice) + " " + "บาท" : "0.00" + " " + "บาท"}</span>
+              <span>
+                {row.totalPrice != null
+                  ? formatCurrency(row.totalPrice) + " " + "บาท"
+                  : "0.00" + " " + "บาท"}
+              </span>
               <br />
               <span style={{ color: color.Disable, fontSize: "12px" }}>
                 {"จำนวน" + " " + row.farmAreaAmount + " " + "ไร่"}
@@ -443,7 +449,9 @@ export default function IndexTodayTask() {
               <ActionButton
                 icon={<EditOutlined />}
                 color={color.primary1}
-                onClick={() => (window.location.href = "/")}
+                onClick={() =>
+                  (window.location.href = "/WaitStartNormal?=" + row.id)
+                }
               />
             </div>
           ),
@@ -488,7 +496,11 @@ export default function IndexTodayTask() {
                 style={{ color: color.White }}
               >
                 <strong>ปกติ</strong>
-                <strong>{data?.summary.waitstartnormal}</strong>
+                <strong>
+                  {data?.summary != undefined
+                    ? data?.summary.waitstartnormal
+                    : null}
+                </strong>
               </div>
             </CardContainer>
             <CardContainer
@@ -504,7 +516,11 @@ export default function IndexTodayTask() {
                 style={{ color: color.White }}
               >
                 <strong>งานมีปัญหา</strong>
-                <strong>{data?.summary.waitstartproblem}</strong>
+                <strong>
+                  {data?.summary != undefined
+                    ? data?.summary.waitstartproblem
+                    : null}
+                </strong>
               </div>
             </CardContainer>
           </div>
@@ -527,7 +543,11 @@ export default function IndexTodayTask() {
                 style={{ color: color.White }}
               >
                 <strong>ปกติ</strong>
-                <strong>{data?.summary.inprogressnormal}</strong>
+                <strong>
+                  {data?.summary != undefined
+                    ? data?.summary.inprogressnormal
+                    : null}
+                </strong>
               </div>
             </CardContainer>
             <CardContainer
@@ -543,7 +563,11 @@ export default function IndexTodayTask() {
                 style={{ color: color.White }}
               >
                 <strong>รออนุมัติขยายเวลา</strong>
-                <strong>{data?.summary.waitapprovedelay}</strong>
+                <strong>
+                  {data?.summary != undefined
+                    ? data?.summary.waitapprovedelay
+                    : null}
+                </strong>
               </div>
             </CardContainer>
             <CardContainer
@@ -559,7 +583,9 @@ export default function IndexTodayTask() {
                 style={{ color: color.White }}
               >
                 <strong>อนุมัติขยายเวลา</strong>
-                <strong>{data?.summary.extended}</strong>
+                <strong>
+                  {data?.summary != undefined ? data?.summary.extended : null}
+                </strong>
               </div>
             </CardContainer>
             <CardContainer
@@ -575,7 +601,11 @@ export default function IndexTodayTask() {
                 style={{ color: color.White }}
               >
                 <strong>งานมีปัญหา</strong>
-                <strong>{data?.summary.inprogressproblem}</strong>
+                <strong>
+                  {data?.summary != undefined
+                    ? data?.summary.inprogressproblem
+                    : null}
+                </strong>
               </div>
             </CardContainer>
           </div>
