@@ -1,7 +1,6 @@
 import { BASE_URL, httpClient } from "../config/develop-config";
 import { ImageEntity } from "../entities/UploadImageEntities";
 
-
 export class UploadImageDatasouce {
   static uploadImage(file: ImageEntity): Promise<any> {
     const formDataProfile = new FormData();
@@ -46,8 +45,11 @@ export class UploadImageDatasouce {
   }
 
   static getImageFinish(path: string): Promise<any> {
+    const params = {
+      path: path,
+    };
     return httpClient
-      .get(BASE_URL + "/tasks/file/geturl" + path)
+      .get(BASE_URL + "/tasks/file/geturl", { params })
       .then((response) => {
         return response.data;
       })

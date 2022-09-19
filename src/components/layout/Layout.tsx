@@ -106,6 +106,11 @@ const Layouts: React.FC<any> = ({ children }) => {
               title={<span>ติดตามงาน</span>}
               key={"sub1"}
             >
+                <Menu.Item>
+                <Link to="/IndexFinishTask" style={{ textDecoration: "none" }}>
+                  <span>งานที่เสร็จแล้ว</span>
+                  </Link>
+                  </Menu.Item>
               <Menu.Item>
                 <Link to="/IndexNewTask" style={{ textDecoration: "none" }}>
                   <span>งานใหม่ (รอนักบิน)</span>
