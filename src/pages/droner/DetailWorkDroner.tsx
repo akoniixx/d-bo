@@ -54,7 +54,6 @@ function DetailWorkDroner() {
   const fetchTask = async () => {
     await DronerRankDatasource.getTaskDetail(taskId).then((res) => {
       setData(res);
-      console.log(res)
       setMapPosition({
         lat: parseFloat(res.farmerPlot.lat),
         lng: parseFloat(res.farmerPlot.long),
@@ -190,7 +189,7 @@ function DetailWorkDroner() {
           <label>หมายเหตุ</label>
           <Form.Item>
             <span style={{ color: color.Grey }}>
-              {data.statusRemark ? data.statusRemark : "-"}
+              {data.comment ? data.comment : "-"}
             </span>
           </Form.Item>
         </div>
