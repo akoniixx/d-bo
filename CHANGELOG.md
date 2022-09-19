@@ -1,4 +1,8 @@
 ## [Version - 0]
+## Fix [v0.13.1] 2022-09-19
+- fixed button search index
+- fixed change field comment
+- fixed image droner and image finish task
 ## Feature [v0.13.0] 2022-09-18
 - create index and detail finish task menu
 - connect api all page in finish task menu

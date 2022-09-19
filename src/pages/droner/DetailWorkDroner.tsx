@@ -54,11 +54,6 @@ function DetailWorkDroner() {
   const fetchTask = async () => {
     await DronerRankDatasource.getTaskDetail(taskId).then((res) => {
       setData(res);
-<<<<<<< HEAD
-      console.log(res);
-=======
-      console.log(res)
->>>>>>> develop
       setMapPosition({
         lat: parseFloat(res.farmerPlot.lat),
         lng: parseFloat(res.farmerPlot.long),

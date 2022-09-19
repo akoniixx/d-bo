@@ -69,7 +69,6 @@ function DetailRankDroner() {
   };
   const fetchDronerById = async () => {
     await DronerRankDatasource.getDronerRankById(dronerId).then((res) => {
-      console.log(res);
       setData(res);
       let getPathPro = res.file.filter((x) => x.category == "PROFILE_IMAGE");
       imgList.push(getPathPro.length >= 1 ? getPathPro[0].path : "");
