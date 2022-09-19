@@ -5,6 +5,7 @@ import {
   UploadImageEntity_INTI,
 } from "./UploadImageEntities";
 import { DroneEntity, DroneEntity_INIT } from "./DroneEntities";
+import { FullAddressEntiry_INIT, FullAddressEntity } from './AddressEntities';
 
 export interface DronerDroneEntity {
   id?: string;
@@ -52,7 +53,7 @@ export interface DronerEntity {
   expYear: number;
   expMonth: number;
   expPlant: string[];
-  // address: FullAddressEntity;
+  address: FullAddressEntity;
   pin: string;
   dronerDrone: DronerDroneEntity[];
   // dronerArea: DronerAreaEntity;
@@ -72,7 +73,7 @@ export const DronerEntity_INIT: DronerEntity = {
   expYear: 0,
   expMonth: 0,
   expPlant: [""],
-  // address: FullAddressEntiry_INIT,
+  address: FullAddressEntiry_INIT,
   pin: "",
   dronerDrone: [DronerDroneEntity_INIT],
   // dronerArea: DronerAreaEntity_INIT,

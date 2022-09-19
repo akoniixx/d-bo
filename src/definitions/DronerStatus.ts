@@ -38,7 +38,7 @@ export const DRONER_DRONE_MAPPING: any = {
 export const STATUS_COLOR: any = {
   PENDING: color.Warning,
   ACTIVE: color.Success,
-  INACTIVE: color.Grey,
+  INACTIVE: color.Error,
   OPEN: color.Disable,
   REJECTED: color.Error,
 };
