@@ -19,7 +19,8 @@ import { CropPurposeSprayEntity } from "../../../../entities/CropEntities";
 import { CropDatasource } from "../../../../datasource/CropDatasource";
 import { PURPOSE_SPRAY, PURPOSE_SPRAY_CHECKBOX } from "../../../../definitions/PurposeSpray";
 import TextArea from "antd/lib/input/TextArea";
-import { TASKTODAY_STATUS, TASK_TODAY_STATUS } from "../../../../definitions/Status";
+import { TASKTODAY_STATUS } from "../../../../definitions/Status";
+import { Option } from "antd/lib/mentions";
 const { Map } = require("immutable");
 const _ = require("lodash");
 let queryString = _.split(window.location.search, "=");
@@ -36,6 +37,7 @@ function WaitStartNormal() {
   const [periodSpray, setPeriodSpray] = useState<CropPurposeSprayEntity>();
   const [cropSelected, setCropSelected] = useState<any>("");
   const [saveBtnDisable, setBtnSaveDisable] = useState<boolean>(true);
+  const [Cdate, setDate] = useState(new Date().toLocaleDateString('fr-FR'));
   const [validateComma, setValidateComma] = useState<{
     status: any;
     message: string;
@@ -56,9 +58,13 @@ function WaitStartNormal() {
   };
   const fetchPurposeSpray = async () => {
     await CropDatasource.getPurposeByCroupName(cropSelected).then((res) => {
+      console.log(res)
       setPeriodSpray(res);
     });
   };
+  const fetchCrop = () => {
+    
+  }
 
   useEffect(() => {
     fetchTaskDetail();
@@ -71,6 +77,10 @@ function WaitStartNormal() {
       return i > 0 && c !== "." && (a.length - i) % 3 === 0 ? "," + c : c;
     });
   };
+  const handlerDate = (e:any) => {
+    console.log(e);
+
+  }
   const handlePeriodSpray = (e: any) => {
     const d = Map(data).set("purposeSprayId", e);
     setData(d.toJS());
@@ -106,6 +116,34 @@ function WaitStartNormal() {
       data.includes("+");
     return data.trim().length != 0 ? (checkSyntax ? true : false) : true;
   };
+  const handlePurposeSpray = (e:any) => {
+    let checked = e.target.checked;
+    console.log(checked)
+    let value = e.target.value;
+    // setCheckCrop(
+    //   value == "อื่นๆ" ? !checked : otherSpray != null ? false : true
+    // );
+    PURPOSE_SPRAY_CHECKBOX.map((item) =>
+      _.set(item, "isChecked", item.crop == value ? checked : item.isChecked)
+    );
+    let p: any = "";
+
+    if (checked) {
+      p = Map(data).set(
+        "targetSpray",
+        [...data?.targetSpray, value].filter((x) => x != "")
+      );
+    } else {
+      let removePlant = data?.targetSpray.filter((x) => x != value);
+      p = Map(data).set("targetSpray", removePlant);
+    }
+    setData(p.toJS());
+   console.log(p.toJS())
+  }
+  const handlePreparation = (e: any) => {
+    const d = Map(data).set("preparationBy", e.target.value);
+    setData(d.toJS());
+  };
 
   const renderAppointment = (
     <Form style={{ padding: "32px" }}>
@@ -119,13 +157,16 @@ function WaitStartNormal() {
                   format={dateFormat}
                   style={{ width: "100%" }}
                   value={moment(new Date(data.dateAppointment))}
+
                 />
               </Form.Item>
             </div>
             <div className="col-lg-6">
               <label>เวลานัดหมาย</label>
               <Form.Item>
+                
                 <TimePicker
+                   name="dateAppointment"
                   format={timeFormat}
                   style={{ width: "100%" }}
                   value={moment(new Date(data.dateAppointment))}
@@ -138,20 +179,19 @@ function WaitStartNormal() {
             ช่วงเวลาการพ่น <span style={{ color: "red" }}>*</span>
           </label>
           <Form.Item name="searchAddress">
-            <Select
-              onChange={handlePeriodSpray}
-              defaultValue={data.purposeSprayId}
-            >
-              {periodSpray?.purposeSpray?.length ? (
-                periodSpray?.purposeSpray?.map((item) => (
-                  <option defaultValue={item.id}>
-                    {item.purposeSprayName}
-                  </option>
-                ))
-              ) : (
-                <option></option>
-              )}
-            </Select>
+          <Select
+                placeholder="-"
+                onChange={handlePeriodSpray}
+                defaultValue={data.purposeSprayId}
+              >
+                {periodSpray?.purposeSpray?.length ? (
+                  periodSpray?.purposeSpray?.map((item) => (
+                    <Option value={item.id}>{item.purposeSprayName}</Option>
+                  ))
+                ) : (
+                  <Option>-</Option>
+                )}
+              </Select>
           </Form.Item>
           <div className="row form-group col-lg p-2">
             <label>
@@ -171,7 +211,7 @@ function WaitStartNormal() {
               <div className="form-group">
                 <Checkbox
                   value={x.crop}
-                  // onChange={handlePurposeSpray}
+                  onChange={handlePurposeSpray}
                   checked={x.isChecked}
                 />{" "}
                 <label >{x.crop}</label>
@@ -189,11 +229,7 @@ function WaitStartNormal() {
                         )
                       )}
                     />
-                    {/* {validateComma.status == "error" && (
-                      <p style={{ color: color.Error, padding: "0 0 0 55px" }}>
-                        {validateComma.message}
-                      </p>
-                    )} */}
+
                   </>
                 )}
               </div>
@@ -207,9 +243,7 @@ function WaitStartNormal() {
             <Radio.Group
               defaultValue={data.preparationBy}
             >
-              <Space direction="vertical"
-              //  onChange={handlePreparation}
-              >
+              <Space direction="vertical" onChange={handlePreparation}>
                 <Radio value="เกษตรกรเตรียมยาเอง">เกษตรกรเตรียมยาเอง</Radio>
                 <Radio value="นักบินโดรนเตรียมให้">นักบินโดรนเตรียมให้</Radio>
               </Space>
