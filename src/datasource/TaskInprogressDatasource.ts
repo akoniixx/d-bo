@@ -48,7 +48,7 @@ export class TaskInprogressDatasource {
   static UpdateTask(id: string): Promise<UpdateTask> {
     return httpClient
       .patch(BASE_URL + "/tasks/task/" + id)
-      .then((response) => {
+      .then((response) => { 
         return response.data
       })
       .catch((error) => {

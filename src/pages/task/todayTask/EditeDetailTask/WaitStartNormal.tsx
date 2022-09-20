@@ -1,5 +1,17 @@
 import { CalendarOutlined, ClockCircleOutlined } from "@ant-design/icons";
-import { Avatar, Checkbox, DatePicker, Form, Input, Radio, Row, Select, Space, TimePicker } from "antd";
+import {
+  Avatar,
+  Badge,
+  Checkbox,
+  DatePicker,
+  Form,
+  Input,
+  Radio,
+  Row,
+  Select,
+  Space,
+  TimePicker,
+} from "antd";
 import moment from "moment";
 import React, { useEffect, useState } from "react";
 import GoogleMap from "../../../../components/map/GoogleMap";
@@ -17,9 +29,16 @@ import { TaskInprogressDatasource } from "../../../../datasource/TaskInprogressD
 import FooterPage from "../../../../components/footer/FooterPage";
 import { CropPurposeSprayEntity } from "../../../../entities/CropEntities";
 import { CropDatasource } from "../../../../datasource/CropDatasource";
-import { PURPOSE_SPRAY, PURPOSE_SPRAY_CHECKBOX } from "../../../../definitions/PurposeSpray";
+import {
+  PURPOSE_SPRAY,
+  PURPOSE_SPRAY_CHECKBOX,
+} from "../../../../definitions/PurposeSpray";
 import TextArea from "antd/lib/input/TextArea";
-import { TASKTODAY_STATUS } from "../../../../definitions/Status";
+import {
+  STATUS_COLOR_MAPPING,
+  TASKTODAY_STATUS,
+  TASK_TODAY_STATUS_MAPPING,
+} from "../../../../definitions/Status";
 import { Option } from "antd/lib/mentions";
 import Swal from "sweetalert2";
 const { Map } = require("immutable");
@@ -58,15 +77,17 @@ function WaitStartNormal() {
     });
   };
   const fetchPurposeSpray = async () => {
-    await CropDatasource.getPurposeByCroupName(cropSelected).then((res) => {
-      setPeriodSpray(res);
-    });
+    await CropDatasource.getPurposeByCroupName(data.farmerPlot.plantName).then(
+      (res) => {
+        setPeriodSpray(res);
+      }
+    );
   };
 
   useEffect(() => {
     fetchTaskDetail();
     fetchPurposeSpray();
-  }, [cropSelected]);
+  }, []);
 
   const formatCurrency = (e: any) => {
     e = parseFloat(e);
@@ -74,14 +95,14 @@ function WaitStartNormal() {
       return i > 0 && c !== "." && (a.length - i) % 3 === 0 ? "," + c : c;
     });
   };
-  const handlerDate = (e:any) => {
+  const handlerDate = (e: any) => {
     const d = Map(data).set("dateAppointment", e);
-    const m = Map(d.toJS()).set("dateAppointment", e)
+    const m = Map(d.toJS()).set("dateAppointment", e);
     setData(m.toJS());
-    console.log(m.toJS())
-  }
+    console.log(m.toJS());
+  };
   const handlePeriodSpray = (e: any) => {
-    const d = Map(data).set("purposeSprayId", e);
+    const d = Map(data).set("purposeSprayName", e);
     setData(d.toJS());
   };
   const handleOtherSpray = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -115,9 +136,9 @@ function WaitStartNormal() {
       data.includes("+");
     return data.trim().length != 0 ? (checkSyntax ? true : false) : true;
   };
-  const handlePurposeSpray = (e:any) => {
+  const handlePurposeSpray = (e: any) => {
     let checked = e.target.checked;
-    console.log(checked)
+    console.log(checked);
     let value = e.target.value;
     setCheckCrop(
       value == "อื่นๆ" ? !checked : otherSpray != null ? false : true
@@ -137,23 +158,23 @@ function WaitStartNormal() {
       p = Map(data).set("targetSpray", removePlant);
     }
     setData(p.toJS());
-   console.log(p.toJS())
-  }
+    console.log(p.toJS());
+  };
   const handlePreparation = (e: any) => {
     const d = Map(data).set("preparationBy", e.target.value);
     setData(d.toJS());
-    console.log(d.toJS())
+    console.log(d.toJS());
   };
   const handleComment = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const d = Map(data).set("comment", e.target.value);
     setData(d.toJS());
-    console.log(d.toJS())
-  }
-  const handleChangeStatus = (e:any) => {
+    console.log(d.toJS());
+  };
+  const handleChangeStatus = (e: any) => {
     const d = Map(data).set("status", e.target.value);
     setData(d.toJS());
-    console.log(d.toJS())
-  }
+    console.log(d.toJS());
+  };
 
   const renderAppointment = (
     <Form style={{ padding: "32px" }}>
@@ -166,21 +187,19 @@ function WaitStartNormal() {
                 <DatePicker
                   format={dateFormat}
                   style={{ width: "100%" }}
-                  value={moment((data.dateAppointment))}
+                  value={moment(new Date(data.dateAppointment))}
                   onChange={handlerDate}
-
                 />
               </Form.Item>
             </div>
             <div className="col-lg-6">
               <label>เวลานัดหมาย</label>
               <Form.Item>
-                
                 <TimePicker
-                   name="dateAppointment"
+                  name="dateAppointment"
                   format={timeFormat}
                   style={{ width: "100%" }}
-                  value={moment((data.dateAppointment))}
+                  value={moment(new Date(data.dateAppointment))}
                   onChange={handlerDate}
                 />
               </Form.Item>
@@ -191,113 +210,98 @@ function WaitStartNormal() {
             ช่วงเวลาการพ่น <span style={{ color: "red" }}>*</span>
           </label>
           <Form.Item name="searchAddress">
-          <Select
-                placeholder="-"
-                onChange={handlePeriodSpray}
-                defaultValue={data.purposeSprayId}
-              >
-                {periodSpray?.purposeSpray?.length ? (
-                  periodSpray?.purposeSpray?.map((item) => (
-                    <Option value={item.id}>{item.purposeSprayName}</Option>
-                  ))
-                ) : (
-                  <Option>-</Option>
-                )}
-              </Select>
+            <Select onChange={handlePeriodSpray} value={data.purposeSprayId}>
+              {periodSpray?.purposeSpray?.length ? (
+                periodSpray?.purposeSpray?.map((item) => (
+                  <Option value={item.id}>{item.purposeSprayName}</Option>
+                ))
+              ) : (
+                <Option>-</Option>
+              )}
+            </Select>
           </Form.Item>
-          <div className="row form-group col-lg-12">
+          <div className="form-group col-lg-12">
             <label>
-              เป้าหมายการฉีดพ่น <span style={{ color: "red" }}>*</span>
+              เป้าหมายการฉีดพ่น
+              <span style={{ color: "red" }}>*</span>
             </label>
             {PURPOSE_SPRAY_CHECKBOX.map((item) =>
               _.set(
                 item,
                 "isChecked",
-                data?.targetSpray
-                  .map((x) => x)
-                  .find((y) => y === item.crop)
+                data?.targetSpray.map((x) => x).find((y) => y === item.crop)
                   ? true
                   : item.isChecked
               )
-            ).map((x, index) => (
-              <div className="form-group col-lg-5">
+            ).map((x) => (
+              <div>
                 <Checkbox
+                  key={x.key}
                   value={x.crop}
-                  onChange={handlePurposeSpray}
+                  onClick={handlePurposeSpray}
                   checked={x.isChecked}
                 />{" "}
-                <label >{x.crop}</label>
-                {index == 4 && (
-                  <>
-                    <Input
-                      className="col-lg"
-                      disabled={checkCrop}
-                      placeholder="โปรดระบุ เช่น เพลี้ย,หอย"
-                      onChange={handleOtherSpray}
-                      defaultValue={Array.from(
-                        new Set(
-                          data.targetSpray.filter(
-                            (a) => !PURPOSE_SPRAY.some((x) => x === a)
-                          )
-                        )
-                      )}
-                    />
-
-                  </>
-                )}
+                <label>{x.crop}</label>
+                <br />
               </div>
             ))}
+          </div>
+          <div className="form-group col-lg-12">
+            <label></label>
+            <Form.Item>
+              <Input
+                onChange={handleOtherSpray}
+                placeholder="โปรดระบุ เช่น เพลี้ย,หอย"
+                autoComplete="off"
+                defaultValue={data.targetSpray
+                  .filter((a) => !PURPOSE_SPRAY.some((x) => x === a))
+                  .join(",")}
+              />
+            </Form.Item>
           </div>
           <div className="row form-group col-lg-6 p-2">
             <label>
               การเตรียมยา <span style={{ color: "red" }}>*</span>
             </label>
-            <Form.Item name="preparationBy">
-            <Radio.Group
-              value={data.preparationBy}
-            >
-              <Space direction="vertical" onChange={handlePreparation}>
-                <Radio value="เกษตรกรเตรียมยาเอง">เกษตรกรเตรียมยาเอง</Radio>
-                <Radio value="นักบินโดรนเตรียมให้">นักบินโดรนเตรียมให้</Radio>
-              </Space>
-            </Radio.Group>
+            <Form.Item>
+              <Radio.Group
+                value={data.preparationBy}
+                onChange={handlePreparation}
+              >
+                <Space direction="vertical">
+                  <Radio value="เกษตรกรเตรียมยาเอง">เกษตรกรเตรียมยาเอง</Radio>
+                  <Radio value="นักบินโดรนเตรียมให้">นักบินโดรนเตรียมให้</Radio>
+                </Space>
+              </Radio.Group>
             </Form.Item>
-          
           </div>
           <div className="form-group">
             <label>หมายเหตุ</label>
-            <TextArea
-            onChange={handleComment}
-            value={data.comment}
-            />
+            <TextArea onChange={handleComment} value={data.comment} />
           </div>
         </div>
         <div className="col-lg-1"></div>
         <div className="col-lg-5">
-        <label style={{ marginBottom: "10px" }}>
-                สถานะ <span style={{ color: "red" }}>*</span>
-              </label>
-              <Form.Item name="status">
-                <div className="row">
-                  <div className="form-group col-lg-12">
-                    <Radio.Group
-                      value={data.status}
-                      onChange={handleChangeStatus}
-                      className="col-lg-12"
-                    >
-                      <Space direction="vertical">
-                        {TASKTODAY_STATUS.map(
-                          (item: any, index: any) => (
-                            <Radio value={item.value}>
-                              {item.name}
-                            </Radio>
-                          )
-                        )}
-                      </Space>
-                    </Radio.Group>
-                  </div>
-                </div>
-              </Form.Item>
+          <label style={{ marginBottom: "10px" }}>
+            สถานะ <span style={{ color: "red" }}>*</span>
+          </label>
+          <Form.Item name="status">
+            <div className="row">
+              <div className="form-group col-lg-12">
+                <Radio.Group
+                  value={data.status}
+                  onChange={handleChangeStatus}
+                  className="col-lg-12"
+                >
+                  <Space direction="vertical">
+                    {TASKTODAY_STATUS.map((item: any, index: any) => (
+                      <Radio value={item.value}>{item.name}</Radio>
+                    ))}
+                  </Space>
+                </Radio.Group>
+              </div>
+            </div>
+          </Form.Item>
         </div>
       </div>
     </Form>
@@ -445,6 +449,19 @@ function WaitStartNormal() {
               : null}
           </span>
         </div>
+        <div className="col-lg">
+          {data.droner.status == "ACTIVE" ? (
+            <span style={{ color: STATUS_COLOR_MAPPING[data.droner.status] }}>
+              <Badge color={STATUS_COLOR_MAPPING[data.droner.status]} />
+              {TASK_TODAY_STATUS_MAPPING[data.droner.status]}
+            </span>
+          ) : (
+            <span style={{ color: STATUS_COLOR_MAPPING[data.droner.status] }}>
+              <Badge color={STATUS_COLOR_MAPPING[data.droner.status]} />
+              {TASK_TODAY_STATUS_MAPPING[data.droner.status]}
+            </span>
+          )}
+        </div>
       </div>
     </Form>
   );
@@ -510,7 +527,7 @@ function WaitStartNormal() {
   );
   const UpdateTaskWaitStart = async () => {
     await TaskInprogressDatasource.UpdateTask(taskId).then((res) => {
-      console.log(res)
+      console.log(res);
       // if (res) {
       //   Swal.fire({
       //     title: "ยืนยันการแก้ไข",
@@ -524,8 +541,7 @@ function WaitStartNormal() {
       //     window.location.href = "/IndexTodayTask";
       //   });
       // }
-
-    })
+    });
   };
 
   return (

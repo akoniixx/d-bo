@@ -45,6 +45,10 @@ export const TASK_TODAY_STATUS : any = {
   WAIT_START : "รอเริ่มงาน",
   IN_PROGRESS : "กำลังดำเนินงาน"
 }
+export const TASK_TODAY_STATUS_MAPPING : any = {
+  ACTIVE : "สะดวก",
+  INACTIVE : "ไม่สะดวก"
+}
 export const TASKTODAY_STATUS: any = [
   { value: "WAIT_START", name: "รอเริ่มงาน" },
   { value: "IN_PROGRESS", name: "กำลังดำเนินงาน" },
