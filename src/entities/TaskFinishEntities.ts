@@ -21,7 +21,7 @@ export interface TaskFinish {
   };
   purposeSprayId: string;
   dateAppointment: string;
-  targetSpray: null;
+  targetSpray: string[];
   preparationBy: string;
   createdAt: string;
   updatedAt: string;
@@ -61,7 +61,7 @@ export const TaskFinish_INIT: TaskFinish = {
   },
   purposeSprayId: "",
   dateAppointment: "",
-  targetSpray: null,
+  targetSpray: [""],
   preparationBy: "",
   createdAt: "",
   updatedAt: "",
@@ -115,7 +115,7 @@ export interface CreateReviewDroner {
   };
   purposeSprayId: string;
   dateAppointment: string;
-  targetSpray: null;
+  targetSpray: string[];
   preparationBy: string;
   createdAt: string;
   updatedAt: string;
@@ -155,7 +155,7 @@ export const CreateReviewDroner_INIT: CreateReviewDroner = {
   },
   purposeSprayId: "",
   dateAppointment: "",
-  targetSpray: null,
+  targetSpray: [""],
   preparationBy: "",
   createdAt: "",
   updatedAt: "",

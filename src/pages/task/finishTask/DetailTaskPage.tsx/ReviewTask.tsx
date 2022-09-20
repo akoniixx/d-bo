@@ -201,7 +201,7 @@ function ReviewTask() {
           <label>เป้าหมายการฉีดพ่น</label>
           <Form.Item>
             <span style={{ color: color.Grey }}>
-              {data.data.targetSpray !== null ? data.data.targetSpray : "-"}
+            {data.data.targetSpray !== null ? data.data.targetSpray.join(",") : "-"}
             </span>
           </Form.Item>
           <label>การเตรียมยา</label>
@@ -529,8 +529,8 @@ function ReviewTask() {
                 disabled
                 placeholder="0.0"
                 value={
-                  data.data.discountFee !== null
-                    ? formatCurrency(data.data.discountFee) + " " + "บาท"
+                  data.data.fee !== null
+                    ? formatCurrency(data.data.fee) + " " + "บาท"
                     : "0.00" + " " + "บาท"
                 }
                 suffix="บาท"
@@ -543,8 +543,8 @@ function ReviewTask() {
               <Input
                 disabled
                 value={
-                  data.data.fee !== null
-                    ? formatCurrency(data.data.fee) + " " + "บาท"
+                  data.data.discountFee !== null
+                    ? formatCurrency(data.data.discountFee) + " " + "บาท"
                     : "0.00" + " " + "บาท"
                 }
                 suffix="บาท"

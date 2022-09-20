@@ -44,6 +44,7 @@ import {
   STATUS_COLOR_TASK,
 } from "../../../definitions/FinishTask";
 import ModalMapPlot from "../../../components/modal/task/finishTask/ModalMapPlot";
+import { STATUS_INDEX_FINISHTASK } from "../../../definitions/Status";
 export default function IndexFinishTask() {
   const row = 10;
   const [current, setCurrent] = useState(1);
@@ -85,6 +86,7 @@ export default function IndexFinishTask() {
       searchStatus,
       text
     ).then((res: TaskFinishListEntity) => {
+      console.log(res)
       setData(res);
     });
   };

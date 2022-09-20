@@ -135,7 +135,7 @@ function FinishTasks() {
           <label>เป้าหมายการฉีดพ่น</label>
           <Form.Item>
             <span style={{ color: color.Grey }}>
-              {data.data.targetSpray !== null ? data.data.targetSpray : "-"}
+            {data.data.targetSpray !== null ? data.data.targetSpray.join(",") : "-"}
             </span>
           </Form.Item>
           <label>การเตรียมยา</label>
@@ -489,8 +489,8 @@ function FinishTasks() {
                 disabled
                 placeholder="0.0"
                 value={
-                  data.data.discountFee !== null
-                    ? parseFloat(data.data.discountFee).toFixed(2) + " " + "บาท"
+                  data.data.fee !== null
+                    ? parseFloat(data.data.fee).toFixed(2) + " " + "บาท"
                     : "0.00" + " " + "บาท"
                 }
                 suffix="บาท"
@@ -503,8 +503,8 @@ function FinishTasks() {
               <Input
                 disabled
                 value={
-                  data.data.fee !== null
-                    ? formatCurrency(data.data.fee) + " " + "บาท"
+                  data.data.discountFee !== null
+                    ? formatCurrency(data.data.discountFee) + " " + "บาท"
                     : "0.00" + " " + "บาท"
                 }
                 suffix="บาท"
