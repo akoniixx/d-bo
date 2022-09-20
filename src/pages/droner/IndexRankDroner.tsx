@@ -3,6 +3,7 @@ import {
   Checkbox,
   DatePicker,
   Dropdown,
+  Input,
   Menu,
   Pagination,
   Select,
@@ -20,7 +21,7 @@ import {
   SubdistrictEntity,
 } from "../../entities/LocationEntities";
 import color from "../../resource/color";
-import { DownOutlined, FileTextOutlined, StarFilled } from "@ant-design/icons";
+import { DownOutlined, FileTextOutlined, SearchOutlined, StarFilled } from "@ant-design/icons";
 import { DronerRankDatasource } from "../../datasource/DronerRankDatasource";
 import { DronerRankListEntity } from "../../entities/DronerRankEntities";
 
@@ -275,8 +276,9 @@ export default function IndexRankDroner() {
         className="container d-flex justify-content-between"
         style={{ padding: "8px" }}
       >
-        <div className="col-lg-4" style={{ maxWidth: "1200px" }}>
-          <Search
+        <div className="col-lg-4 p-1" style={{ maxWidth: "1200px" }}>
+          <Input
+            prefix={<SearchOutlined style={{color: color.Disable}}/>}
             placeholder="ค้นหาชื่อนักบินโดรน/เบอร์โทร/ID นักบินโดรน"
             className="col-lg-12 p-1"
             onChange={changeTextSearch}
