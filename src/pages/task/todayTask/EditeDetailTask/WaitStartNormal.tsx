@@ -21,6 +21,7 @@ import { PURPOSE_SPRAY, PURPOSE_SPRAY_CHECKBOX } from "../../../../definitions/P
 import TextArea from "antd/lib/input/TextArea";
 import { TASKTODAY_STATUS } from "../../../../definitions/Status";
 import { Option } from "antd/lib/mentions";
+import Swal from "sweetalert2";
 const { Map } = require("immutable");
 const _ = require("lodash");
 let queryString = _.split(window.location.search, "=");
@@ -36,8 +37,8 @@ function WaitStartNormal() {
   const [data, setData] = useState<TaskDetailEntity>(TaskDetailEntity_INIT);
   const [periodSpray, setPeriodSpray] = useState<CropPurposeSprayEntity>();
   const [cropSelected, setCropSelected] = useState<any>("");
+  const [checkCrop, setCheckCrop] = useState<boolean>(true);
   const [saveBtnDisable, setBtnSaveDisable] = useState<boolean>(true);
-  const [Cdate, setDate] = useState(new Date().toLocaleDateString('fr-FR'));
   const [validateComma, setValidateComma] = useState<{
     status: any;
     message: string;
@@ -58,13 +59,9 @@ function WaitStartNormal() {
   };
   const fetchPurposeSpray = async () => {
     await CropDatasource.getPurposeByCroupName(cropSelected).then((res) => {
-      console.log(res)
       setPeriodSpray(res);
     });
   };
-  const fetchCrop = () => {
-    
-  }
 
   useEffect(() => {
     fetchTaskDetail();
@@ -78,8 +75,10 @@ function WaitStartNormal() {
     });
   };
   const handlerDate = (e:any) => {
-    console.log(e);
-
+    const d = Map(data).set("dateAppointment", e);
+    const m = Map(d.toJS()).set("dateAppointment", e)
+    setData(m.toJS());
+    console.log(m.toJS())
   }
   const handlePeriodSpray = (e: any) => {
     const d = Map(data).set("purposeSprayId", e);
@@ -120,9 +119,9 @@ function WaitStartNormal() {
     let checked = e.target.checked;
     console.log(checked)
     let value = e.target.value;
-    // setCheckCrop(
-    //   value == "อื่นๆ" ? !checked : otherSpray != null ? false : true
-    // );
+    setCheckCrop(
+      value == "อื่นๆ" ? !checked : otherSpray != null ? false : true
+    );
     PURPOSE_SPRAY_CHECKBOX.map((item) =>
       _.set(item, "isChecked", item.crop == value ? checked : item.isChecked)
     );
@@ -143,7 +142,18 @@ function WaitStartNormal() {
   const handlePreparation = (e: any) => {
     const d = Map(data).set("preparationBy", e.target.value);
     setData(d.toJS());
+    console.log(d.toJS())
   };
+  const handleComment = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const d = Map(data).set("comment", e.target.value);
+    setData(d.toJS());
+    console.log(d.toJS())
+  }
+  const handleChangeStatus = (e:any) => {
+    const d = Map(data).set("status", e.target.value);
+    setData(d.toJS());
+    console.log(d.toJS())
+  }
 
   const renderAppointment = (
     <Form style={{ padding: "32px" }}>
@@ -156,7 +166,8 @@ function WaitStartNormal() {
                 <DatePicker
                   format={dateFormat}
                   style={{ width: "100%" }}
-                  value={moment(new Date(data.dateAppointment))}
+                  value={moment((data.dateAppointment))}
+                  onChange={handlerDate}
 
                 />
               </Form.Item>
@@ -169,7 +180,8 @@ function WaitStartNormal() {
                    name="dateAppointment"
                   format={timeFormat}
                   style={{ width: "100%" }}
-                  value={moment(new Date(data.dateAppointment))}
+                  value={moment((data.dateAppointment))}
+                  onChange={handlerDate}
                 />
               </Form.Item>
             </div>
@@ -193,7 +205,7 @@ function WaitStartNormal() {
                 )}
               </Select>
           </Form.Item>
-          <div className="row form-group col-lg p-2">
+          <div className="row form-group col-lg-12">
             <label>
               เป้าหมายการฉีดพ่น <span style={{ color: "red" }}>*</span>
             </label>
@@ -208,7 +220,7 @@ function WaitStartNormal() {
                   : item.isChecked
               )
             ).map((x, index) => (
-              <div className="form-group">
+              <div className="form-group col-lg-5">
                 <Checkbox
                   value={x.crop}
                   onChange={handlePurposeSpray}
@@ -219,6 +231,7 @@ function WaitStartNormal() {
                   <>
                     <Input
                       className="col-lg"
+                      disabled={checkCrop}
                       placeholder="โปรดระบุ เช่น เพลี้ย,หอย"
                       onChange={handleOtherSpray}
                       defaultValue={Array.from(
@@ -241,7 +254,7 @@ function WaitStartNormal() {
             </label>
             <Form.Item name="preparationBy">
             <Radio.Group
-              defaultValue={data.preparationBy}
+              value={data.preparationBy}
             >
               <Space direction="vertical" onChange={handlePreparation}>
                 <Radio value="เกษตรกรเตรียมยาเอง">เกษตรกรเตรียมยาเอง</Radio>
@@ -254,8 +267,8 @@ function WaitStartNormal() {
           <div className="form-group">
             <label>หมายเหตุ</label>
             <TextArea
-              // onChange={handleComment}
-              defaultValue={data.comment}
+            onChange={handleComment}
+            value={data.comment}
             />
           </div>
         </div>
@@ -269,7 +282,7 @@ function WaitStartNormal() {
                   <div className="form-group col-lg-12">
                     <Radio.Group
                       value={data.status}
-                      // onChange={handleChangeStatus}
+                      onChange={handleChangeStatus}
                       className="col-lg-12"
                     >
                       <Space direction="vertical">
@@ -495,7 +508,25 @@ function WaitStartNormal() {
       </Form>
     </Form>
   );
-  const UpdateTaskWaitStart = async () => {};
+  const UpdateTaskWaitStart = async () => {
+    await TaskInprogressDatasource.UpdateTask(taskId).then((res) => {
+      console.log(res)
+      // if (res) {
+      //   Swal.fire({
+      //     title: "ยืนยันการแก้ไข",
+      //     text: "โปรดตรวจสอบรายละเอียดที่คุณต้องการแก้ไขข้อมูลก่อนเสมอ เพราะอาจส่งผลต่อการจ้างงานในระบบ",
+      //     cancelButtonText: "ยกเลิก",
+      //     confirmButtonText: "บันทึก",
+      //     confirmButtonColor: color.Success,
+      //     showCancelButton: true,
+      //     showCloseButton: true,
+      //   }).then((time) => {
+      //     window.location.href = "/IndexTodayTask";
+      //   });
+      // }
+
+    })
+  };
 
   return (
     <Layouts>
@@ -531,7 +562,7 @@ function WaitStartNormal() {
       <FooterPage
         onClickBack={() => (window.location.href = "/IndexTodayTask")}
         onClickSave={UpdateTaskWaitStart}
-        disableSaveBtn={saveBtnDisable}
+        // disableSaveBtn={saveBtnDisable}
       />
     </Layouts>
   );

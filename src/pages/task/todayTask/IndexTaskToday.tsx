@@ -25,7 +25,7 @@ import ActionButton from "../../../components/button/ActionButton";
 import { CardContainer } from "../../../components/card/CardContainer";
 import { CardHeader } from "../../../components/header/CardHearder";
 import Layouts from "../../../components/layout/Layout";
-import ModalMapPlot from "../../../components/modal/task/newTask/ModalMapPlot";
+import ModalMapPlot from "../../../components/modal/task/finishTask/ModalMapPlot";
 import { LocationDatasource } from "../../../datasource/LocationDatasource";
 import { TaskInprogressDatasource } from "../../../datasource/TaskInprogressDatasource";
 import { STATUS_COLOR } from "../../../definitions/DronerStatus";

@@ -176,7 +176,7 @@ export interface TaskDetailEntity {
   farmerPlot: FarmerPlotEntity;
   taskDronerTemp: TaskDronerTempEntity;
 }
-export const TaskDetailEntity_INIT : TaskDetailEntity = {
+export const TaskDetailEntity_INIT: TaskDetailEntity = {
   id: "",
   taskNo: "",
   farmerId: "",
@@ -219,5 +219,28 @@ export const TaskDetailEntity_INIT : TaskDetailEntity = {
   droner: DronerEntity_INIT,
   farmerPlot: FarmerPlotEntity_INIT,
   taskDronerTemp: TaskDronerTempEntity_INIT,
-
+};
+export interface UpdateTask {
+  id: string;
+  farmerId: string;
+  farmerPlotId: string;
+  farmAreaAmount: string;
+  dronerId: string;
+  dateAppointment: string;
+  targetSpray: [string];
+  preparationBy: string;
+  purposeSprayId: string;
+  status: string;
+  statusRemark: string;
+  updateBy: string;
+  unitPriceStandard: string;
+  priceStandard: string;
+  unitPrice: string;
+  price: string;
+  comment: string;
+  isProblem: boolean;
+  problemRemark: string;
+  isDelay: boolean;
+  delayRemark: string;
+  dateDelay: string;
 }

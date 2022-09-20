@@ -1,5 +1,5 @@
 import { BASE_URL, httpClient } from "../config/develop-config";
-import { TaskDetailEntity, TaskTodayListEntity } from "../entities/TaskInprogressEntities";
+import { TaskDetailEntity, TaskTodayListEntity, UpdateTask } from "../entities/TaskInprogressEntities";
 
 export class TaskInprogressDatasource {
   static getAllTaskToday(
@@ -44,5 +44,16 @@ export class TaskInprogressDatasource {
       .catch((error) => {
         console.log(error);
       });
+  }
+  static UpdateTask(id: string): Promise<UpdateTask> {
+    return httpClient
+      .patch(BASE_URL + "/tasks/task/" + id)
+      .then((response) => {
+        return response.data
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+      
   }
 }
