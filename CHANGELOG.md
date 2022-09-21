@@ -1,4 +1,6 @@
 ## [Version - 0]
+## Fix [v0.13.2] 2022-09-20
+- fixed separate data with commas.
 ## Fix [v0.13.1] 2022-09-19
 - fixed button search index
 - fixed change field comment
