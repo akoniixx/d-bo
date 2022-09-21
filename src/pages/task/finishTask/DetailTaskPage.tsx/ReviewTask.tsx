@@ -69,7 +69,6 @@ function ReviewTask() {
   const [saveRate, setSaveRate] = useState<boolean>(true);
   const fetchDetailTask = async () => {
     await TaskFinishedDatasource.getDetailFinishTaskById(taskId).then((res) => {
-
       setData(res);
       setMapPosition({
         lat: parseFloat(res.data.farmerPlot.lat),
@@ -86,29 +85,33 @@ function ReviewTask() {
     const m = Map(detailDroner).set("canReview", e.target.value);
     const n = Map(m.toJS()).set("taskId", taskId);
     setDetailDroner(n.toJS());
-    {
-      !e.target.value ? setBtnSaveDisable(true) : setBtnSaveDisable(false);
+    if(e.target.value == "Yes"){
+      setBtnSaveDisable(true);
+      setSaveRate(false);
+    }else{
+      setBtnSaveDisable(false);
+      setSaveRate(false);
     }
-    {
-      e.target.value == "Yes" ?   setSaveRate(false) : setSaveRate(true);
-    }
-    
   };
 
   const manners = (e: any) => {
     const m = Map(detailDroner).set("pilotEtiquette", parseInt(e));
     const n = Map(m.toJS()).set("taskId", taskId);
     setDetailDroner(n.toJS());
+     setBtnSaveDisable(false);
   };
   const punctuality = (e: any) => {
     const m = Map(detailDroner).set("punctuality", parseInt(e));
     const n = Map(m.toJS()).set("taskId", taskId);
     setDetailDroner(n.toJS());
+     setBtnSaveDisable(false);
   };
   const expertise = (e: any) => {
     const m = Map(detailDroner).set("sprayExpertise", parseInt(e));
     const n = Map(m.toJS()).set("taskId", taskId);
     setDetailDroner(n.toJS());
+    {e == 0 ?  setBtnSaveDisable(true) :  setBtnSaveDisable(false); }
+    
   };
   const commentReview = (e: any) => {
     const m = Map(detailDroner).set("comment", e.target.value);
@@ -286,7 +289,6 @@ function ReviewTask() {
                   <Select
                     onChange={manners}
                     disabled={saveRate}
-                    allowClear
                     style={{ width: 75 }}
                   >
                     {RATE_SELECT.map((item: any) => (
@@ -299,7 +301,6 @@ function ReviewTask() {
                   <Select
                     onChange={punctuality}
                     disabled={saveRate}
-                    allowClear
                     style={{ width: 75 }}
                   >
                     {RATE_SELECT.map((item: any) => (
@@ -312,7 +313,6 @@ function ReviewTask() {
                   <Select
                     onChange={expertise}
                     disabled={saveRate}
-                    allowClear
                     style={{ width: 75 }}
                   >
                     {RATE_SELECT.map((item: any) => (
