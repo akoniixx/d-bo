@@ -35,6 +35,8 @@ import {
 } from "../../../../definitions/PurposeSpray";
 import TextArea from "antd/lib/input/TextArea";
 import {
+  REDIO_IN_PROGRESS,
+  REDIO_WAIT_START,
   STATUS_COLOR_MAPPING,
   TASKTODAY_STATUS,
   TASK_TODAY_STATUS_MAPPING,
@@ -47,7 +49,7 @@ let queryString = _.split(window.location.search, "=");
 const dateFormat = "DD/MM/YYYY";
 const timeFormat = "HH:mm";
 
-function WaitStartNormal() {
+function EditInProgress() {
   const taskId = queryString[1];
   const [mapPosition, setMapPosition] = useState<{ lat: number; lng: number }>({
     lat: LAT_LNG_BANGKOK.lat,
@@ -55,7 +57,6 @@ function WaitStartNormal() {
   });
   const [data, setData] = useState<TaskDetailEntity>(TaskDetailEntity_INIT);
   const [periodSpray, setPeriodSpray] = useState<CropPurposeSprayEntity>();
-  const [cropSelected, setCropSelected] = useState<any>("");
   const [checkCrop, setCheckCrop] = useState<boolean>(true);
   const [saveBtnDisable, setBtnSaveDisable] = useState<boolean>(true);
   const [validateComma, setValidateComma] = useState<{
@@ -185,6 +186,7 @@ function WaitStartNormal() {
               <label>วันที่นัดหมาย</label>
               <Form.Item>
                 <DatePicker
+                disabled
                   format={dateFormat}
                   style={{ width: "100%" }}
                   value={moment(new Date(data.dateAppointment))}
@@ -196,6 +198,7 @@ function WaitStartNormal() {
               <label>เวลานัดหมาย</label>
               <Form.Item>
                 <TimePicker
+                disabled
                   name="dateAppointment"
                   format={timeFormat}
                   style={{ width: "100%" }}
@@ -205,12 +208,16 @@ function WaitStartNormal() {
               </Form.Item>
             </div>
           </div>
-
           <label>
             ช่วงเวลาการพ่น <span style={{ color: "red" }}>*</span>
           </label>
           <Form.Item name="searchAddress">
-            <Select onChange={handlePeriodSpray} value={data.purposeSprayId}>
+            <Select
+            disabled
+              key={data.purposeSprayId}
+              placeholder="-"
+              defaultValue={data.purposeSprayId}
+            >
               {periodSpray?.purposeSpray?.length ? (
                 periodSpray?.purposeSpray?.map((item) => (
                   <Option value={item.id}>{item.purposeSprayName}</Option>
@@ -221,59 +228,18 @@ function WaitStartNormal() {
             </Select>
           </Form.Item>
           <div className="form-group col-lg-12">
-            <label>
-              เป้าหมายการฉีดพ่น
-              <span style={{ color: "red" }}>*</span>
-            </label>
-            {PURPOSE_SPRAY_CHECKBOX.map((item) =>
-              _.set(
-                item,
-                "isChecked",
-                data?.targetSpray.map((x) => x).find((y) => y === item.crop)
-                  ? true
-                  : item.isChecked
-              )
-            ).map((x) => (
-              <div>
-                <Checkbox
-                  key={x.key}
-                  value={x.crop}
-                  onClick={handlePurposeSpray}
-                  checked={x.isChecked}
-                />{" "}
-                <label>{x.crop}</label>
-                <br />
-              </div>
-            ))}
-          </div>
-          <div className="form-group col-lg-12">
-            <label></label>
-            <Form.Item>
-              <Input
-                onChange={handleOtherSpray}
-                placeholder="โปรดระบุ เช่น เพลี้ย,หอย"
-                autoComplete="off"
-                defaultValue={data.targetSpray
-                  .filter((a) => !PURPOSE_SPRAY.some((x) => x === a))
-                  .join(",")}
-              />
-            </Form.Item>
-          </div>
-          <div className="row form-group col-lg-6 p-2">
-            <label>
-              การเตรียมยา <span style={{ color: "red" }}>*</span>
-            </label>
-            <Form.Item>
-              <Radio.Group
-                value={data.preparationBy}
-                onChange={handlePreparation}
-              >
-                <Space direction="vertical">
-                  <Radio value="เกษตรกรเตรียมยาเอง">เกษตรกรเตรียมยาเอง</Radio>
-                  <Radio value="นักบินโดรนเตรียมให้">นักบินโดรนเตรียมให้</Radio>
-                </Space>
-              </Radio.Group>
-            </Form.Item>
+          <label>เป้าหมายการฉีดพ่น</label>
+          <Form.Item>
+            <span style={{ color: color.Grey }}>
+              {data.targetSpray !== null ? data.targetSpray.join(",") : "-"}
+            </span>
+          </Form.Item>
+          <label>การเตรียมยา</label>
+          <Form.Item>
+            <span style={{ color: color.Grey }}>
+              {data.preparationBy !== null ? data.preparationBy : "-"}
+            </span>
+          </Form.Item>
           </div>
           <div className="form-group">
             <label>หมายเหตุ</label>
@@ -295,7 +261,53 @@ function WaitStartNormal() {
                 >
                   <Space direction="vertical">
                     {TASKTODAY_STATUS.map((item: any, index: any) => (
-                      <Radio value={item.value}>{item.name}</Radio>
+                      <Radio value={item.value}>
+                        {item.name}
+                        {data.status == "WAIT_START" && index == 0 ? (
+                          <div style={{ marginLeft: "20px" }}>
+                            <Form.Item style={{ width: "530px" }}>
+                              {REDIO_WAIT_START.map((item) =>
+                                _.set(
+                                  item,
+                                  "isChecked",
+                                  data.isDelay,
+                                  data.isProblem ? true : item.isChecked
+                                )
+                              ).map((x) => (
+                                <div>
+                                  <Radio
+                                    key={x.key}
+                                    value={x.name}
+                                    //  onClick={}
+                                    checked={x.isChecked}
+                                  />{" "}
+                                  <label>{x.name}</label>
+                                  <br />
+                                </div>
+                              ))}
+                            </Form.Item>
+                          </div>
+                        ) : data.status == "IN_PROGRESS" && index == 1 ? (
+                          <div style={{ marginLeft: "20px" }}>
+                            <Form.Item style={{ width: "530px" }}>
+                              {REDIO_IN_PROGRESS.map((item) =>
+                                _.set(item, "isChecked", data.status)
+                              ).map((x) => (
+                                <div>
+                                  <Radio
+                                    key={x.key}
+                                    value={x.name}
+                                    //  onClick={}
+                                    checked={x.isChecked}
+                                  />{" "}
+                                  <label>{x.name}</label>
+                                  <br />
+                                </div>
+                              ))}
+                            </Form.Item>
+                          </div>
+                        ) : null}
+                      </Radio>
                     ))}
                   </Space>
                 </Radio.Group>
@@ -415,17 +427,17 @@ function WaitStartNormal() {
             </p>
           </span>
         </div>
-        <div className="col-lg-3">
+        <div className="col-lg-2">
           <span>{data.droner.telephoneNo}</span>
         </div>
         <div className="col-lg-4">
-          {/* {data.droner.address.subdistrict.subdistrictName +
+          {data.droner.address.subdistrict.subdistrictName +
             "," +
             " " +
             data.droner.address.district.districtName +
             "," +
             " " +
-            data.droner.address.province.region} */}
+            data.droner.address.province.region}
         </div>
         <div className="col-lg">
           <span>
@@ -502,11 +514,7 @@ function WaitStartNormal() {
               <Input
                 disabled
                 placeholder="0.0"
-                value={
-                  data.discountFee !== null
-                    ? formatCurrency(data.discountFee)
-                    : "0.00"
-                }
+                value={data.fee !== null ? formatCurrency(data.fee) : "0.00"}
                 suffix="บาท"
               />
             </Form.Item>
@@ -516,7 +524,11 @@ function WaitStartNormal() {
               <label>ส่วนลดค่าธรรมเนียม</label>
               <Input
                 disabled
-                value={data.fee !== null ? formatCurrency(data.fee) : "0.00"}
+                value={
+                  data.discountFee !== null
+                    ? formatCurrency(data.discountFee)
+                    : "0.00"
+                }
                 suffix="บาท"
               />
             </Form.Item>
@@ -525,22 +537,21 @@ function WaitStartNormal() {
       </Form>
     </Form>
   );
-  const UpdateTaskWaitStart = async () => {
-    await TaskInprogressDatasource.UpdateTask(taskId).then((res) => {
-      console.log(res);
-      // if (res) {
-      //   Swal.fire({
-      //     title: "ยืนยันการแก้ไข",
-      //     text: "โปรดตรวจสอบรายละเอียดที่คุณต้องการแก้ไขข้อมูลก่อนเสมอ เพราะอาจส่งผลต่อการจ้างงานในระบบ",
-      //     cancelButtonText: "ยกเลิก",
-      //     confirmButtonText: "บันทึก",
-      //     confirmButtonColor: color.Success,
-      //     showCancelButton: true,
-      //     showCloseButton: true,
-      //   }).then((time) => {
-      //     window.location.href = "/IndexTodayTask";
-      //   });
-      // }
+  const UpdateTaskWaitStart = async (data: TaskDetailEntity) => {
+    await TaskInprogressDatasource.UpdateTask(data).then((res) => {
+      if (res) {
+        Swal.fire({
+          title: "ยืนยันการแก้ไข",
+          text: "โปรดตรวจสอบรายละเอียดที่คุณต้องการแก้ไขข้อมูลก่อนเสมอ เพราะอาจส่งผลต่อการจ้างงานในระบบ",
+          cancelButtonText: "ยกเลิก",
+          confirmButtonText: "บันทึก",
+          confirmButtonColor: color.Success,
+          showCancelButton: true,
+          showCloseButton: true,
+        }).then((time) => {
+          window.location.href = "/IndexTodayTask";
+        });
+      }
     });
   };
 
@@ -577,11 +588,11 @@ function WaitStartNormal() {
       </CardContainer>
       <FooterPage
         onClickBack={() => (window.location.href = "/IndexTodayTask")}
-        onClickSave={UpdateTaskWaitStart}
+        onClickSave={() => UpdateTaskWaitStart(data)}
         // disableSaveBtn={saveBtnDisable}
       />
     </Layouts>
   );
 }
 
-export default WaitStartNormal;
+export default EditInProgress;

@@ -31,6 +31,8 @@ import { TaskInprogressDatasource } from "../../../datasource/TaskInprogressData
 import { STATUS_COLOR } from "../../../definitions/DronerStatus";
 import {
   STATUS_COLOR_TASK_TODAY,
+  STATUS_IS_PROBLEM,
+  TASKTODAY_STATUS,
   TASK_TODAY_STATUS,
 } from "../../../definitions/Status";
 import {
@@ -68,22 +70,22 @@ export default function IndexTodayTask() {
   }, [current, row]);
 
   const fetchAllTaskToday = async (
+    text?: string,
     proId?: number,
     disId?: number,
     subDisId?: number,
-    text?: string
   ) => {
     await TaskInprogressDatasource.getAllTaskToday(
       current,
       row,
       searchStatus,
+      text,
+      statusDelay,
       proId,
       disId,
       subDisId,
       isProblem,
-      isDelay,
-      statusDelay,
-      text
+      isDelay
     ).then((res: TaskTodayListEntity) => {
       console.log(res);
       setData(res);
@@ -126,9 +128,14 @@ export default function IndexTodayTask() {
     setSearchSubdistrict(subdistrictId);
     setCurrent(1);
   };
-  const handleStatus = (searchStatus: any) => {
-    setSearchStatus(searchStatus);
-    setCurrent(1);
+  const handleStatus = (e: any) => {
+    let value = e.target.value;
+    let checked = e.target.checked;
+    if(checked){
+      setSearchStatus(value);
+    }else{
+      setSearchStatus("");
+    }
   };
 
   const sorter = (a: any, b: any) => {
@@ -159,7 +166,7 @@ export default function IndexTodayTask() {
           key: "1",
           icon: (
             <Checkbox
-              value={"WAIT_START"}
+              value="WAIT_START"
               onClick={(e) => handleStatus(e)}
             ></Checkbox>
           ),
@@ -169,7 +176,7 @@ export default function IndexTodayTask() {
           key: "2",
           icon: (
             <Checkbox
-              value={"IN_PROGRESS"}
+              value="IN_PROGRESS"
               onClick={(e) => handleStatus(e)}
             ></Checkbox>
           ),
@@ -185,7 +192,8 @@ export default function IndexTodayTask() {
       >
         <div className="col-lg-4 p-1" style={{ maxWidth: "1200px" }}>
           <Input
-            prefix={<SearchOutlined style={{color: color.Disable}}/>}
+            allowClear
+            prefix={<SearchOutlined style={{ color: color.Disable }} />}
             placeholder="ค้นหาชื่อนักบินโดรน หรือเบอร์โทร"
             className="col-lg-12 p-1"
             onChange={changeTextSearch}
@@ -289,10 +297,11 @@ export default function IndexTodayTask() {
             }}
             onClick={() =>
               fetchAllTaskToday(
+                searchText,
                 searchSubdistrict,
                 searchDistrict,
                 searchProvince,
-                searchText
+               
               )
             }
           >
@@ -427,6 +436,7 @@ export default function IndexTodayTask() {
               <span style={{ color: STATUS_COLOR_TASK_TODAY[row.status] }}>
                 <Badge color={STATUS_COLOR_TASK_TODAY[row.status]} />
                 {TASK_TODAY_STATUS[row.status]}
+                {/* {"(" + STATUS_IS_PROBLEM[row.isDelay] + ")"} */}
                 <br />
               </span>
               <span style={{ color: color.Disable, fontSize: "12px" }}>
@@ -446,13 +456,22 @@ export default function IndexTodayTask() {
         return {
           children: (
             <div className="d-flex flex-row justify-content-between">
-              <ActionButton
+              {row.status == "IN_PROGRESS" ?  
+               <ActionButton
                 icon={<EditOutlined />}
                 color={color.primary1}
                 onClick={() =>
-                  (window.location.href = "/WaitStartNormal?=" + row.id)
+                  (window.location.href = "/EditInProgress?=" + row.id)
                 }
-              />
+              /> : row.status == "WAIT_START" ? 
+              <ActionButton
+              icon={<EditOutlined />}
+              color={color.primary1}
+              onClick={() =>
+                (window.location.href = "/EditWaitStart?=" + row.id)
+              }
+            /> : null}
+            
             </div>
           ),
         };

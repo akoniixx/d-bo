@@ -5,26 +5,27 @@ export class TaskInprogressDatasource {
   static getAllTaskToday(
     page: number,
     row: number,
-    status?: string[],
+    status?: [string],
+    searchText?: string,
+    statusDelay?: string,
     subdistrictId?: number,
     districtId?: number,
     provinceId?: number,
     isProblem?: boolean,
     isDelay?: boolean,
-    statusDelay?: string,
-    search?: string
+   
   ): Promise<TaskTodayListEntity> {
     const params = {
       page: page,
       take: row,
       status: status,
+      searchText: searchText,
+      statusDelay: statusDelay,
       subdistrictId: subdistrictId,
       districtId: districtId,
       provinceId: provinceId,
       isProblem: isProblem,
       isDelay: isDelay,
-      statusDelay: statusDelay,
-      search: search,
     };
     return httpClient
       .get(BASE_URL + "/tasks/task-inprogress/get-all-task-today", { params })
@@ -45,9 +46,34 @@ export class TaskInprogressDatasource {
         console.log(error);
       });
   }
-  static UpdateTask(id: string): Promise<UpdateTask> {
+  static UpdateTask(data: TaskDetailEntity): Promise<any> {
+    const params = {
+      id: data.id,
+      farmerId: data.farmerId,
+      farmerPlotId: data.farmerPlotId,
+      farmAreaAmount: data.farmAreaAmount,
+      dronerId: data.dronerId,
+      dateAppointment: data.dateAppointment,
+      targetSpray: data.targetSpray,
+      preparationBy: data.preparationBy,
+      purposeSprayId: data.purposeSprayId,
+      status: data.status,
+      statusRemark: data.statusRemark,
+      updateBy: data.updateBy,
+      unitPriceStandard: data.unitPriceStandard,
+      priceStandard: data.priceStandard,
+      unitPrice: data.unitPrice,
+      price: data.price,
+      comment: data.comment,
+      isProblem: data.isProblem,
+      problemRemark: data.problemRemark,
+      isDelay: data.isDelay,
+      delayRemark: data.delayRemark,
+      dateDelay: data.dateDelay,
+    };
+    console.log(data.id)
     return httpClient
-      .patch(BASE_URL + "/tasks/task/" + id)
+      .patch(BASE_URL + "/tasks/task/" + data.id, params)
       .then((response) => { 
         return response.data
       })

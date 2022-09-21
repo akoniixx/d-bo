@@ -1,7 +1,7 @@
 import { FarmerPlotEntity, FarmerPlotEntity_INIT } from "./FarmerPlotEntities";
 import { DronerEntity, DronerEntity_INIT } from "./DronerEntities";
 import { FarmerEntity, FarmerEntity_INIT } from "./FarmerEntities";
-import { TaskDronerTempEntity, TaskDronerTempEntity_INIT } from "./TaskDronerTemp";
+import { TaskDronerTempEntity, TaskDronerTempEntity_INIT} from "./TaskDronerTemp";
 import { CropPurposeSprayEntity, CropPurposeSprayEntity_INIT } from "./CropEntities";
 export interface TaskInprogressEntity {
   count: number;
@@ -139,7 +139,7 @@ export interface TaskDetailEntity {
   farmerPlotId: string;
   farmAreaAmount: string;
   dronerId: string;
-  purposeSprayId: null;
+  purposeSprayId: string;
   dateAppointment: string;
   targetSpray: string[];
   preparationBy: string;
@@ -183,7 +183,7 @@ export const TaskDetailEntity_INIT: TaskDetailEntity = {
   farmerPlotId: "",
   farmAreaAmount: "",
   dronerId: "",
-  purposeSprayId: null,
+  purposeSprayId: "",
   dateAppointment: "",
   targetSpray: [""],
   preparationBy: "",
@@ -243,4 +243,28 @@ export interface UpdateTask {
   isDelay: boolean;
   delayRemark: string;
   dateDelay: string;
+}
+export const  UpdateTask_INIT : UpdateTask =  {
+  id: "",
+  farmerId: "",
+  farmerPlotId: "",
+  farmAreaAmount: "",
+  dronerId: "",
+  dateAppointment: "",
+  targetSpray: [""],
+  preparationBy: "",
+  purposeSprayId: "",
+  status: "",
+  statusRemark: "",
+  updateBy: "",
+  unitPriceStandard: "",
+  priceStandard: "",
+  unitPrice: "",
+  price: "",
+  comment: "",
+  isProblem: false,
+  problemRemark: "",
+  isDelay: false,
+  delayRemark: "",
+  dateDelay: "",
 }

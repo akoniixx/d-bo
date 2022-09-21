@@ -52,9 +52,34 @@ export const TASK_TODAY_STATUS_MAPPING : any = {
 export const TASKTODAY_STATUS: any = [
   { value: "WAIT_START", name: "รอเริ่มงาน" },
   { value: "IN_PROGRESS", name: "กำลังดำเนินงาน" },
+  { value: "CANCELED", name: "ยกเลิก" },
+];
+export const REDIO_WAIT_START = [
+  { key: 0, name: "ปกติ", isChecked: false },
+  { key: 1, name: "งานมีปัญหา", isChecked: false },
+];
+export const REDIO_IN_PROGRESS = [
+  { key: 0, name: "ปกติ", isChecked: false },
+  { key: 1, name: "รออนุมัติการขยายเวลา", isChecked: false },
+  { key: 2, name: "อนุมัติขยายเวลา", isChecked: false },
+  { key: 3, name: "งานมีปัญหา", isChecked: false },
 ];
 
 export const STATUS_COLOR_TASK_TODAY: any = {
   WAIT_START: color.secondary3,
   IN_PROGRESS: color.primary1,
 };
+export const STATUS_IS_PROBLEM: any = {
+  true: "งานมีปัญหา",
+  false: "ปกติ",
+};
+export const STATUS_IS_DELAY: any = {
+  true: "ขยายเวลา",
+  false: "ปกติ",
+};
+export const STATUS_DELAY = [
+  { value: "WAIT_APPROVE", name: "รออนุมัติขยายเวลา" },
+  { value: "APPROVE", name: "อนุมัติขยายเวลา" },
+  { value: "EXTENDED", name: "ขยายเวลา" },
+  { value: "REJECT", name: "งานมีปัญหา" },
+]
