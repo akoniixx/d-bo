@@ -146,7 +146,7 @@ export interface TaskDetailEntity {
   createdAt: string;
   updatedAt: string;
   createBy: string;
-  updateBy: null;
+  updateBy: string;
   distance: string;
   status: string;
   statusRemark: string;
@@ -190,7 +190,7 @@ export const TaskDetailEntity_INIT: TaskDetailEntity = {
   createdAt: "",
   updatedAt: "",
   createBy: "",
-  updateBy: null,
+  updateBy: "",
   distance: "",
   status: "",
   statusRemark: "",

@@ -50,6 +50,7 @@ const dateFormat = "DD/MM/YYYY";
 const timeFormat = "HH:mm";
 
 function EditWaitStart() {
+  const profile = JSON.parse(localStorage.getItem("profile") || "{  }");
   const taskId = queryString[1];
   const [mapPosition, setMapPosition] = useState<{ lat: number; lng: number }>({
     lat: LAT_LNG_BANGKOK.lat,
@@ -137,7 +138,7 @@ function EditWaitStart() {
       data.includes("+");
     return data.trim().length != 0 ? (checkSyntax ? true : false) : true;
   };
-  const handlePurposeSpray = (e: any) => {
+  const handlerTargetSpray = (e: any) => {
     let checked = e.target.checked;
     console.log(checked);
     let value = e.target.value;
@@ -176,6 +177,9 @@ function EditWaitStart() {
     setData(d.toJS());
     console.log(d.toJS());
   };
+  const handleSubStatus = (e: any) => {
+    console.log(e.target.value);
+  }
 
   const renderAppointment = (
     <Form style={{ padding: "32px" }}>
@@ -242,7 +246,7 @@ function EditWaitStart() {
                 <Checkbox
                   key={x.key}
                   value={x.crop}
-                  onClick={handlePurposeSpray}
+                  onClick={handlerTargetSpray}
                   checked={x.isChecked}
                 />{" "}
                 <label>{x.crop}</label>
@@ -251,9 +255,8 @@ function EditWaitStart() {
             ))}
           </div>
           <div className="form-group col-lg-12">
-            <label></label>
-            <Form.Item>
               <Input
+               disabled={checkCrop}
                 onChange={handleOtherSpray}
                 placeholder="โปรดระบุ เช่น เพลี้ย,หอย"
                 autoComplete="off"
@@ -261,7 +264,6 @@ function EditWaitStart() {
                   .filter((a) => !PURPOSE_SPRAY.some((x) => x === a))
                   .join(",")}
               />
-            </Form.Item>
           </div>
           <div className="row form-group col-lg-6 p-2">
             <label>
@@ -304,25 +306,25 @@ function EditWaitStart() {
                         {data.status == "WAIT_START" && index == 0 ? (
                           <div style={{ marginLeft: "20px" }}>
                             <Form.Item style={{ width: "530px" }}>
-                              {REDIO_WAIT_START.map((item) =>
+                              {/* {REDIO_WAIT_START.map((item) =>
                                 _.set(
                                   item,
                                   "isChecked",
                                   data.isDelay,
-                                  data.isProblem ? true : item.isChecked
+                                  data.isProblem 
                                 )
                               ).map((x) => (
                                 <div>
                                   <Radio
                                     key={x.key}
                                     value={x.name}
-                                    //  onClick={}
+                                    onClick={handleSubStatus}
                                     checked={x.isChecked}
                                   />{" "}
                                   <label>{x.name}</label>
                                   <br />
                                 </div>
-                              ))}
+                              ))} */}
                             </Form.Item>
                           </div>
                         ) : data.status == "IN_PROGRESS" && index == 1 ? (
@@ -576,6 +578,11 @@ function EditWaitStart() {
     </Form>
   );
   const UpdateTaskWaitStart = async (data: TaskDetailEntity) => {
+    // const p = Map(data).set(
+    //   "createBy",
+    //   profile.firstname + " " + profile.lastname
+    // );
+    // setData(p.toJS());
     await TaskInprogressDatasource.UpdateTask(data).then((res) => {
       if (res) {
         Swal.fire({
