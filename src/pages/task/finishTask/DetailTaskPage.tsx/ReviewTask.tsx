@@ -56,6 +56,7 @@ const dateFormat = "DD/MM/YYYY";
 const timeFormat = "HH:mm";
 
 function ReviewTask() {
+  const profile = JSON.parse(localStorage.getItem("profile") || "{  }");
   const taskId = queryString[1];
   const [data, setData] = useState<DetailReviewTask>(DetailReviewTask_INIT);
   const [detailDroner, setDetailDroner] =
@@ -68,6 +69,7 @@ function ReviewTask() {
   const [saveRate, setSaveRate] = useState<boolean>(true);
   const fetchDetailTask = async () => {
     await TaskFinishedDatasource.getDetailFinishTaskById(taskId).then((res) => {
+
       setData(res);
       setMapPosition({
         lat: parseFloat(res.data.farmerPlot.lat),
@@ -132,29 +134,35 @@ function ReviewTask() {
     imgWindow?.document.write(image.outerHTML);
   };
 
-  const UpdateReviewDroner = async () => {
-    const pushDetailReview = Map(data.data).set(
-      "reviewDronerDetail",
-      detailDroner
-    );
-    await TaskReviewDronerDatasource.UpdateReviewDroner(
-      pushDetailReview.toJS().reviewDronerDetail
-    ).then((res) => {
-      if (res) {
-        Swal.fire({
-          title: "ยืนยันการเปลี่ยนแปลงข้อมูล",
-          text: "โปรดตรวจสอบรายละเอียดที่คุณต้องการเปลี่ยนแปลงข้อมูลก่อนเสมอเพราะอาจส่งผลต่อการจ้างงานในระบบ",
-          cancelButtonText: "ยกเลิก",
-          confirmButtonText: "บันทึก",
-          confirmButtonColor: color.Success,
-          showCancelButton: true,
-          showCloseButton: true,
-        }).then((time) => {
-          window.location.href = "/IndexFinishTask";
-        });
+  const UpdateReviewDroner = async (data: DetailReviewTask) => {
+    Swal.fire({
+      title: "ยืนยันการเปลี่ยนแปลงข้อมูล",
+      text: "โปรดตรวจสอบรายละเอียดที่คุณต้องการเปลี่ยนแปลงข้อมูลก่อนเสมอเพราะอาจส่งผลต่อการจ้างงานในระบบ",
+      cancelButtonText: "ยกเลิก",
+      confirmButtonText: "บันทึก",
+      confirmButtonColor: color.Success,
+      showCancelButton: true,
+      showCloseButton: true,
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        const pushDetailReview = Map(data.data).set(
+          "reviewDronerDetail",
+          detailDroner
+        );
+        const p = Map(pushDetailReview.toJS().reviewDronerDetail).set(
+          "updateBy",
+          profile.firstname + " " + profile.lastname
+        );
+        await TaskReviewDronerDatasource.UpdateReviewDroner(p.toJS()).then(
+          (time) => {
+            window.location.href = "/IndexFinishTask";
+          }
+        );
       }
+      fetchDetailTask();
     });
   };
+
   const renderAppointment = (
     <Form style={{ padding: "32px" }}>
       <div className="row">
@@ -201,7 +209,9 @@ function ReviewTask() {
           <label>เป้าหมายการฉีดพ่น</label>
           <Form.Item>
             <span style={{ color: color.Grey }}>
-            {data.data.targetSpray !== null ? data.data.targetSpray.join(",") : "-"}
+              {data.data.targetSpray !== null
+                ? data.data.targetSpray.join(",")
+                : "-"}
             </span>
           </Form.Item>
           <label>การเตรียมยา</label>
@@ -589,7 +599,7 @@ function ReviewTask() {
       </CardContainer>
       <FooterPage
         onClickBack={() => (window.location.href = "/IndexFinishTask")}
-        onClickSave={UpdateReviewDroner}
+        onClickSave={() => UpdateReviewDroner(data)}
         disableSaveBtn={saveBtnDisable}
       />
     </Layout>

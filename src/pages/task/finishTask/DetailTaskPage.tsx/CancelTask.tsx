@@ -35,7 +35,6 @@ function CancelTask() {
 
   const fetchDetailTask = async () => {
     await TaskFinishedDatasource.getDetailFinishTaskById(taskId).then((res) => {
-      console.log(res)
       setData(res);
       setMapPosition({
         lat: parseFloat(res.data.farmerPlot.lat),
@@ -103,7 +102,9 @@ function CancelTask() {
           <label>เป้าหมายการฉีดพ่น</label>
           <Form.Item>
             <span style={{ color: color.Grey }}>
-            {data.data.targetSpray !== null ? data.data.targetSpray.join(",") : "-"}
+              {data.data.targetSpray !== null
+                ? data.data.targetSpray.join(",")
+                : "-"}
             </span>
           </Form.Item>
           <label>การเตรียมยา</label>
@@ -148,8 +149,8 @@ function CancelTask() {
               rows={3}
               disabled
               value={
-                data.data.reviewDronerDetail != null
-                  ? data.data.reviewDronerDetail.comment
+                data.data.statusRemark != null
+                  ? data.data.statusRemark
                   : undefined
               }
             />

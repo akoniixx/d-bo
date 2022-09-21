@@ -135,7 +135,9 @@ function FinishTasks() {
           <label>เป้าหมายการฉีดพ่น</label>
           <Form.Item>
             <span style={{ color: color.Grey }}>
-            {data.data.targetSpray !== null ? data.data.targetSpray.join(",") : "-"}
+              {data.data.targetSpray !== null
+                ? data.data.targetSpray.join(",")
+                : "-"}
             </span>
           </Form.Item>
           <label>การเตรียมยา</label>

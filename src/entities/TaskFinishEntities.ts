@@ -7,6 +7,7 @@ import {
 } from "./ReviewDronerEntities";
 import { FarmerEntity, FarmerEntity_INIT } from "./FarmerEntities";
 import { DronerEntity, DronerEntity_INIT } from "./DronerDroneEntities";
+import { HistoryEntity, HistoryEntity_INIT } from "./HistoryEntities";
 export interface TaskFinish {
   id: string;
   taskNo: string;
@@ -27,6 +28,7 @@ export interface TaskFinish {
   updatedAt: string;
   createBy: string;
   updateBy: string;
+  taskHistory: HistoryEntity;
   distance: string;
   status: string;
   statusRemark: string;
@@ -65,6 +67,7 @@ export const TaskFinish_INIT: TaskFinish = {
   preparationBy: "",
   createdAt: "",
   updatedAt: "",
+  taskHistory: HistoryEntity_INIT,
   createBy: "",
   updateBy: "",
   distance: "",

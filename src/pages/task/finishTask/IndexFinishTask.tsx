@@ -42,9 +42,9 @@ import {
   FINISH_TASK,
   FINISH_TASK_SEARCH,
   STATUS_COLOR_TASK,
+  TASK_HISTORY,
 } from "../../../definitions/FinishTask";
 import ModalMapPlot from "../../../components/modal/task/finishTask/ModalMapPlot";
-import { STATUS_INDEX_FINISHTASK } from "../../../definitions/Status";
 export default function IndexFinishTask() {
   const row = 10;
   const [current, setCurrent] = useState(1);
@@ -86,7 +86,6 @@ export default function IndexFinishTask() {
       searchStatus,
       text
     ).then((res: TaskFinishListEntity) => {
-      console.log(res)
       setData(res);
     });
   };
@@ -443,12 +442,18 @@ export default function IndexFinishTask() {
       dataIndex: "district_district_name",
       key: "district_district_name",
       render: (value: any, row: any, index: number) => {
+        const beforeValue = row.taskHistory[0];
         return {
           children: (
             <>
               <span style={{ color: STATUS_COLOR_TASK[row.status] }}>
                 <Badge color={STATUS_COLOR_TASK[row.status]} />
                 {FINISH_TASK[row.status]}
+                {beforeValue != undefined
+                  ? row.status == "CANCELED"
+                    ? " " + "(" + TASK_HISTORY[beforeValue.beforeValue] + ")" 
+                    : null
+                  : null}
                 <br />
               </span>
               <span style={{ color: color.Disable, fontSize: "12px" }}>
