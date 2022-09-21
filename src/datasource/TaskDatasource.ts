@@ -56,10 +56,23 @@ export class TaskDatasource {
     return httpClient
       .get(BASE_URL + "/tasks/task/" + id)
       .then((response) => {
-        return response.data;
+        return response.data.data;
       })
       .catch((err) => {
         console.log(err, "err getnewtaskbyid");
+      });
+  }
+  static updateNewTask(data: GetNewTaskEntity): Promise<any> {
+    let test: any = [];
+    delete data["taskDronerTemp"];
+    console.log(data);
+    return httpClient
+      .patch(BASE_URL + "/tasks/task/" + data.id, data)
+      .then((response) => {
+        return response.data;
+      })
+      .catch((error) => {
+        console.log(error);
       });
   }
 }

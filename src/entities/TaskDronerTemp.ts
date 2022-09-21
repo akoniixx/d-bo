@@ -19,12 +19,22 @@ export const TaskDronerTempEntity_INIT: TaskDronerTempEntity = {
   isChecked: false,
 };
 export interface CreateDronerTempEntity {
+  taskId?: string;
   dronerId: string;
   status: string;
   dronerDetail: string[];
 }
 export const CreateDronerTempEntity_INIT: CreateDronerTempEntity = {
+  taskId: "",
   dronerId: "",
   status: "",
   dronerDetail: [""],
 };
+export interface DeletedDronerTemp {
+  taskId: string;
+  dronerId: string;
+}
+export const DeletedDronerTemp_INIT : DeletedDronerTemp = {
+  taskId: "",
+  dronerId: "",
+}

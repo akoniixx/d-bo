@@ -20,6 +20,7 @@ const ModalSelectedEditDroner: React.FC<ModalSelectedEditDronerProps> = ({
   title,
   callBack,
 }) => {
+  console.log(dataDroner);
   let checkDup = Array.from(new Set(dataDroner)).filter(
     (x) => x.dronerId != ""
   );
@@ -43,7 +44,7 @@ const ModalSelectedEditDroner: React.FC<ModalSelectedEditDronerProps> = ({
         return {
           children: (
             <>
-              <span>{data.firstname + " " + data.lastname}</span>
+              <span key={index}>{data.firstname + " " + data.lastname}</span>
               <br />
               <span style={{ color: color.Grey }}></span>
             </>
@@ -60,7 +61,7 @@ const ModalSelectedEditDroner: React.FC<ModalSelectedEditDronerProps> = ({
         return {
           children: (
             <>
-              <span>{data.telephone_no}</span>
+              <span key={index}>{data.telephone_no}</span>
             </>
           ),
         };
@@ -79,7 +80,7 @@ const ModalSelectedEditDroner: React.FC<ModalSelectedEditDronerProps> = ({
           children: (
             <>
               {checkRating() && (
-                <Row>
+                <Row key={index}>
                   <div style={{ color: "#FFCA37", fontSize: "16px" }}>
                     <StarFilled />
                   </div>
@@ -102,7 +103,7 @@ const ModalSelectedEditDroner: React.FC<ModalSelectedEditDronerProps> = ({
         return {
           children: (
             <>
-              <span>{data.subdistrict_name}</span>
+              <span key={index}>{data.subdistrict_name}</span>
             </>
           ),
         };
@@ -117,7 +118,7 @@ const ModalSelectedEditDroner: React.FC<ModalSelectedEditDronerProps> = ({
         return {
           children: (
             <>
-              <span>{data.district_name}</span>
+              <span key={index}>{data.district_name}</span>
             </>
           ),
         };
@@ -132,7 +133,7 @@ const ModalSelectedEditDroner: React.FC<ModalSelectedEditDronerProps> = ({
         return {
           children: (
             <>
-              <span>{data.province_name}</span>
+              <span key={index}>{data.province_name}</span>
             </>
           ),
         };
@@ -148,6 +149,7 @@ const ModalSelectedEditDroner: React.FC<ModalSelectedEditDronerProps> = ({
           children: (
             <>
               <Avatar
+                key={index}
                 size={25}
                 src={data.logo_drone_brand}
                 style={{ marginRight: "5px" }}
@@ -176,6 +178,7 @@ const ModalSelectedEditDroner: React.FC<ModalSelectedEditDronerProps> = ({
                   color:
                     data.droner_status == "สะดวก" ? color.Success : color.Error,
                 }}
+                key={index}
               >
                 <Badge
                   color={
@@ -197,7 +200,10 @@ const ModalSelectedEditDroner: React.FC<ModalSelectedEditDronerProps> = ({
         let data = JSON.parse(row.dronerDetail[0]);
         return {
           children: (
-            <div className="d-flex flex-row justify-content-between">
+            <div
+              className="d-flex flex-row justify-content-between"
+              key={index}
+            >
               <ActionButton
                 icon={<DeleteOutlined />}
                 color={color.Error}

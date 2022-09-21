@@ -28,7 +28,6 @@ export class TaskSearchDronerDatasource {
       delete params["distanceMin"];
       delete params["distanceMax"];
     }
-    console.log(params);
     return httpClient
       .post(BASE_URL + "/tasks/task/search-droner", params)
       .then((response) => {

@@ -1322,7 +1322,7 @@ const AddNewTask = () => {
         const f = Map(d.toJS()).set("fee", parseFloat(a.toJS().price) * 0.05);
         const df = Map(f.toJS()).set(
           "discountFee",
-          -parseFloat(a.toJS().price) * 0.05
+          parseFloat(a.toJS().price) * 0.05
         );
         setCreateNewTask(df.toJS());
         checkValidateStep(
