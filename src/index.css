@@ -41,6 +41,11 @@ table tr td {
 .table-row-lasted {
   background-color: rgb(255, 255, 255);
 }
+
+.table-row-wait-review td {
+  background-color: #2f80ed1a;
+}
+
 .custom-steps .ant-steps-item-process>.ant-steps-item-container>.ant-steps-item-icon {
   background-color: #219653;
   border-color: #219653;
@@ -59,3 +64,4 @@ table tr td {
 .custom-steps .ant-steps-item-finish>.ant-steps-item-container>.ant-steps-item-content>.ant-steps-item-title:after {
   background-color: #219653;
 }
+

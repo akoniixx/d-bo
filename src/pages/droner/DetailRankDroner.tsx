@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import Layout from "../../components/layout/Layout";
-import { Row, Form, Input, Image, Pagination, Table } from "antd";
+import { Row, Form, Input, Pagination, Table, Tag } from "antd";
 import { FileTextFilled } from "@ant-design/icons";
 import { CardContainer } from "../../components/card/CardContainer";
 import color from "../../resource/color";
@@ -38,9 +38,6 @@ function DetailRankDroner() {
   const [data, setData] = useState<DronerRankDetailEntity>(
     DronerRankDetailEntity_INIT
   );
-  const [listDetail, setListDetail] = useState<taskByDronerEntity[]>([
-    taskByDronerEntity_INIT,
-  ]);
   let imgList: (string | boolean)[] = [];
   const [imgProfile, setImgProfile] = useState<any>();
   const row = 10;
@@ -56,10 +53,34 @@ function DetailRankDroner() {
     fetchDronerById();
   }, []);
 
+  const previewImg = async () => {
+    let src = imgProfile;
+    if (!src) {
+      src = await new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(imgProfile);
+        reader.onload = () => resolve(reader.result);
+      });
+    }
+    const image = new Image();
+    image.src = src;
+    const imgWindow = window.open(src);
+    imgWindow?.document.write(image.outerHTML);
+  };
   const fetchDronerById = async () => {
     await DronerRankDatasource.getDronerRankById(dronerId).then((res) => {
       setData(res);
-      setListDetail(res.task);
+      let getPathPro = res.file.filter((x) => x.category == "PROFILE_IMAGE");
+      imgList.push(getPathPro.length >= 1 ? getPathPro[0].path : "");
+      var i = 0;
+      for (i; imgList.length > i; i++) {
+        i == 0 &&
+          UploadImageDatasouce.getImage(imgList[i].toString()).then(
+            (resImg) => {
+              setImgProfile(resImg.url);
+            }
+          );
+      }
     });
   };
   const onChangePage = (page: number) => {
@@ -84,8 +105,22 @@ function DetailRankDroner() {
                   })`,
                 }}
               ></div>
+              <div className="text-left ps-4">
+                {imgProfile !== undefined && (
+                  <>
+                    <Tag
+                      color={color.Success}
+                      onClick={previewImg}
+                      style={{ cursor: "pointer", borderRadius: "5px" }}
+                    >
+                      View
+                    </Tag>
+                  </>
+                )}
+              </div>
             </div>
           </div>
+
           <div className="row text-center">
             <CardContainer style={style}>
               <span>จำนวนบริการ</span>
@@ -263,7 +298,7 @@ function DetailRankDroner() {
       title: "จังหวัด",
       dataIndex: "province",
       key: "province",
-     width: "90px",
+      width: "90px",
       render: (value: any, row: any, index: number) => {
         return {
           children: (

@@ -1,4 +1,13 @@
 ## [Version - 0]
+## Fix [v0.13.2] 2022-09-20
+- fixed separate data with commas.
+## Fix [v0.13.1] 2022-09-19
+- fixed button search index
+- fixed change field comment
+- fixed image droner and image finish task
+## Feature [v0.13.0] 2022-09-18
+- create index and detail finish task menu
+- connect api all page in finish task menu
 ## Feature [v0.12.0] 2022-09-18
 - enhanced add birthday in farmer memu
 - enhanced add birthday in droner menu

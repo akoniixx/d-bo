@@ -1,4 +1,5 @@
 import {
+  Badge,
   Button,
   Checkbox,
   DatePicker,
@@ -6,30 +7,49 @@ import {
   Input,
   Menu,
   Pagination,
+  Rate,
   Select,
   Table,
 } from "antd";
 import Search from "antd/lib/input/Search";
-import moment, { min } from "moment";
+import moment from "moment";
 import React, { useEffect, useState } from "react";
-import ActionButton from "../../components/button/ActionButton";
-import Layouts from "../../components/layout/Layout";
-import { LocationDatasource } from "../../datasource/LocationDatasource";
+import ActionButton from "../../../components/button/ActionButton";
+import Layouts from "../../../components/layout/Layout";
+import { LocationDatasource } from "../../../datasource/LocationDatasource";
 import {
   DistrictEntity,
   ProviceEntity,
   SubdistrictEntity,
-} from "../../entities/LocationEntities";
-import color from "../../resource/color";
-import { DownOutlined, FileTextOutlined, SearchOutlined, StarFilled } from "@ant-design/icons";
-import { DronerRankDatasource } from "../../datasource/DronerRankDatasource";
-import { DronerRankListEntity } from "../../entities/DronerRankEntities";
-
-export default function IndexRankDroner() {
+} from "../../../entities/LocationEntities";
+import color from "../../../resource/color";
+import {
+  DownOutlined,
+  EditOutlined,
+  FileTextOutlined,
+  SearchOutlined,
+  StarFilled,
+  UserOutlined,
+} from "@ant-design/icons";
+import { TaskFinishedDatasource } from "../../../datasource/TaskFinishDatasource";
+import {
+  TaskFinishListEntity,
+  TaskFinish_INIT,
+} from "../../../entities/TaskFinishEntities";
+import { FarmerPlotEntity } from "../../../entities/FarmerPlotEntities";
+import { Option } from "antd/lib/mentions";
+import {
+  FINISH_TASK,
+  FINISH_TASK_SEARCH,
+  STATUS_COLOR_TASK,
+} from "../../../definitions/FinishTask";
+import ModalMapPlot from "../../../components/modal/task/finishTask/ModalMapPlot";
+export default function IndexFinishTask() {
   const row = 10;
   const [current, setCurrent] = useState(1);
-  const [data, setData] = useState<DronerRankListEntity>();
+  const [data, setData] = useState<TaskFinishListEntity>();
   const [searchText, setSearchText] = useState<string>();
+  const [searchStatus, setSearchStatus] = useState<string>();
   const [startDate, setStartDate] = useState<any>(null);
   const [endDate, setEndDate] = useState<any>(null);
   const [searchProvince, setSearchProvince] = useState<any>();
@@ -38,38 +58,45 @@ export default function IndexRankDroner() {
   const [province, setProvince] = useState<ProviceEntity[]>();
   const [district, setDistrict] = useState<DistrictEntity[]>();
   const [subdistrict, setSubdistrict] = useState<SubdistrictEntity[]>();
-  const [visibleRating, setVisibleRating] = useState(false);
-  const [accuNumber, setAccuNumber] = useState<number[]>([]);
-  const [rating, setRating] = useState<{
-    ratingMin: any;
-    ratingMax: any;
-  }>();
+  const [showModalMap, setShowModalMap] = useState<boolean>(false);
+  const [plotId, setPlotId] = useState<string>("");
   const { RangePicker } = DatePicker;
+  const dateFormat = "DD/MM/YYYY";
+  const timeFormat = "HH:mm";
   const dateSearchFormat = "YYYY-MM-DD";
   useEffect(() => {
-    fetchDronerRank();
+    fetchTaskFinish();
     fetchProvince();
   }, [current, row, startDate, endDate]);
-  const fetchDronerRank = async (
+  const fetchTaskFinish = async (
     proId?: number,
     disId?: number,
     subDisId?: number,
     text?: string
   ) => {
-    await DronerRankDatasource.getDronerRank(
+    await TaskFinishedDatasource.getTaskFinishList(
       current,
       row,
       proId,
       disId,
       subDisId,
-      rating?.ratingMin,
-      rating?.ratingMax,
       startDate,
       endDate,
+      searchStatus,
       text
-    ).then((res: DronerRankListEntity) => {
+    ).then((res: TaskFinishListEntity) => {
       setData(res);
     });
+  };
+  const SearchDate = (e: any) => {
+    if (e != null) {
+      setStartDate(moment(new Date(e[0])).format(dateSearchFormat));
+      setEndDate(moment(new Date(e[1])).format(dateSearchFormat));
+    } else {
+      setStartDate(e);
+      setEndDate(e);
+    }
+    setCurrent(1);
   };
   const fetchProvince = async () => {
     await LocationDatasource.getProvince().then((res) => {
@@ -93,6 +120,20 @@ export default function IndexRankDroner() {
   const onChangePage = (page: number) => {
     setCurrent(page);
   };
+  const handleStatus = (status: any) => {
+    setSearchStatus(status);
+    setCurrent(1);
+  };
+  const formatNumber = (e: any) => {
+    let formatNumber = Number(e)
+      .toFixed(1)
+      .replace(/\d(?=(\d{3})+\.)/g, "$&,");
+    let splitArray = formatNumber.split(".");
+    if (splitArray.length > 1) {
+      formatNumber = splitArray[0];
+    }
+    return formatNumber;
+  };
   const handleProvince = (provinceId: number) => {
     setSearchProvince(provinceId);
     fetchDistrict(provinceId);
@@ -107,149 +148,11 @@ export default function IndexRankDroner() {
     setSearchSubdistrict(subdistrictId);
     setCurrent(1);
   };
-  const handleSearchDate = (e: any) => {
-    if (e != null) {
-      setStartDate(moment(new Date(e[0])).format(dateSearchFormat));
-      setEndDate(moment(new Date(e[1])).format(dateSearchFormat));
-    } else {
-      setStartDate(e);
-      setEndDate(e);
-    }
-    setCurrent(1);
-  };
-  const sorter = (a: any, b: any) => {
-    if (a === b) return 0;
-    else if (a === null) return 1;
-    else if (b === null) return -1;
-    else return a.localeCompare(b);
-  };
-  const handlerRating = (e: any) => {
-    let value = e.target.value;
-    let checked = e.target.checked;
-    let min: any = 0;
-    let max: any = 0;
-    if (checked) {
-      min = Math.min(...accuNumber, value);
-      max = Math.max(...accuNumber, value);
-      setAccuNumber([...accuNumber, value]);
-    } else {
-      let d: number[] = accuNumber.filter((x) => x != value);
-      min = Math.min(...d);
-      max = Math.max(...d);
-      setAccuNumber(d);
-      if (d.length == 0) {
-        min = undefined;
-        max = undefined;
-      }
-    }
-    setRating({ ratingMin: min, ratingMax: max });
+  const handleModalMap = (plotId: string) => {
+    setShowModalMap((prev) => !prev);
+    setPlotId(plotId);
   };
 
-  const handleVisibleRating = (newVisible: any) => {
-    setVisibleRating(newVisible);
-  };
-
-  const ratingStar = (
-    <Menu
-      items={[
-        {
-          label: (
-            <div
-              style={{
-                color: "#FFCA37",
-                fontSize: "16px",
-                marginBottom: "10px",
-              }}
-            >
-              <StarFilled />
-              <StarFilled />
-              <StarFilled />
-              <StarFilled />
-              <StarFilled />
-            </div>
-          ),
-          key: "1",
-          icon: (
-            <Checkbox value={5} onClick={(e) => handlerRating(e)}></Checkbox>
-          ),
-        },
-        {
-          label: (
-            <div
-              style={{
-                color: "#FFCA37",
-                fontSize: "16px",
-                marginBottom: "10px",
-              }}
-            >
-              <StarFilled />
-              <StarFilled />
-              <StarFilled />
-              <StarFilled />
-            </div>
-          ),
-          key: "2",
-          icon: (
-            <Checkbox value={4} onClick={(e) => handlerRating(e)}></Checkbox>
-          ),
-        },
-        {
-          label: (
-            <div
-              style={{
-                color: "#FFCA37",
-                fontSize: "16px",
-                marginBottom: "10px",
-              }}
-            >
-              <StarFilled />
-              <StarFilled />
-              <StarFilled />
-            </div>
-          ),
-          key: "3",
-          icon: (
-            <Checkbox value={3} onClick={(e) => handlerRating(e)}></Checkbox>
-          ),
-        },
-        {
-          label: (
-            <div
-              style={{
-                color: "#FFCA37",
-                fontSize: "16px",
-                marginBottom: "10px",
-              }}
-            >
-              <StarFilled />
-              <StarFilled />
-            </div>
-          ),
-          key: "4",
-          icon: (
-            <Checkbox value={2} onClick={(e) => handlerRating(e)}></Checkbox>
-          ),
-        },
-        {
-          label: (
-            <div
-              style={{
-                color: "#FFCA37",
-                fontSize: "16px",
-                marginBottom: "10px",
-              }}
-            >
-              <StarFilled />
-            </div>
-          ),
-          key: "5",
-          icon: (
-            <Checkbox value={1} onClick={(e) => handlerRating(e)}></Checkbox>
-          ),
-        },
-      ]}
-    />
-  );
   const PageTitle = (
     <>
       <div
@@ -261,14 +164,14 @@ export default function IndexRankDroner() {
             className="card-label font-weight-bolder text-dark"
             style={{ fontSize: 22, fontWeight: "bold", padding: "8px" }}
           >
-            <strong>อันดับนักบินโดรน (Ranking Droner)</strong>
+            <strong>งานที่เสร็จแล้ว</strong>
           </span>
         </div>
         <div style={{ color: color.Error }}>
           <RangePicker
             allowClear
-            onCalendarChange={(val) => handleSearchDate(val)}
-            format={dateSearchFormat}
+            onCalendarChange={SearchDate}
+            format={dateFormat}
           />
         </div>
       </div>
@@ -276,10 +179,10 @@ export default function IndexRankDroner() {
         className="container d-flex justify-content-between"
         style={{ padding: "8px" }}
       >
-        <div className="col-lg-4 p-1" style={{ maxWidth: "1200px" }}>
+        <div className="col-lg-4 p-1">
           <Input
-            prefix={<SearchOutlined style={{color: color.Disable}}/>}
-            placeholder="ค้นหาชื่อนักบินโดรน/เบอร์โทร/ID นักบินโดรน"
+            prefix={<SearchOutlined style={{ color: color.Disable }} />}
+            placeholder="ค้นหาชื่อเกษตรกร, คนบินโดรน หรือเบอร์โทร"
             className="col-lg-12 p-1"
             onChange={changeTextSearch}
           />
@@ -358,19 +261,17 @@ export default function IndexRankDroner() {
             ))}
           </Select>
         </div>
-        <div className="col-lg-2 p-1">
-          <Dropdown
-            overlay={ratingStar}
-            trigger={["click"]}
-            className="col-lg-12"
-            onVisibleChange={handleVisibleRating}
-            visible={visibleRating}
+        <div className="col-lg">
+          <Select
+            className="col-lg-12 p-1"
+            placeholder="เลือกสถานะ"
+            onChange={handleStatus}
+            allowClear
           >
-            <Button style={{ color: color.Disable }}>
-              เลือก Rating
-              <DownOutlined />
-            </Button>
-          </Dropdown>
+            {FINISH_TASK_SEARCH.map((item) => (
+              <option value={item.value}>{item.name}</option>
+            ))}
+          </Select>
         </div>
         <div className="pt-1">
           <Button
@@ -381,7 +282,7 @@ export default function IndexRankDroner() {
               backgroundColor: color.Success,
             }}
             onClick={() =>
-              fetchDronerRank(
+              fetchTaskFinish(
                 searchSubdistrict,
                 searchDistrict,
                 searchProvince,
@@ -397,18 +298,40 @@ export default function IndexRankDroner() {
   );
   const columns = [
     {
+      title: "วัน/เวลา นัดหมาย",
+      dataIndex: "dateAppointment",
+      key: "dateAppointment",
+      render: (value: any, row: any, index: number) => {
+        return {
+          children: (
+            <>
+              <span className="text-dark-75  d-block font-size-lg">
+                {moment(new Date(row.dateAppointment)).format(dateFormat)},{" "}
+                {moment(new Date(row.dateAppointment)).format(timeFormat)}
+              </span>
+              <span style={{ color: color.Disable, fontSize: "12px" }}>
+                {row.taskNo}
+              </span>
+            </>
+          ),
+        };
+      },
+    },
+    {
       title: "ชื่อนักบินโดรน",
-      dataIndex: "firstname",
-      key: "firstname",
+      dataIndex: "droner",
+      key: "droner",
       render: (value: any, row: any, index: number) => {
         return {
           children: (
             <>
               <span className="text-dark-75  d-block font-size-lg">
-                {row.droner_firstname + " " + row.droner_lastname}
+                {row.droner !== null
+                  ? row.droner.firstname + " " + row.droner.lastname
+                  : null}
               </span>
-              <span style={{ color: color.Grey, fontSize: "13px" }}>
-                {row.droner_droner_code}
+              <span style={{ color: color.Disable, fontSize: "12px" }}>
+                {row.droner !== null ? row.droner.telephoneNo : null}
               </span>
             </>
           ),
@@ -416,21 +339,18 @@ export default function IndexRankDroner() {
       },
     },
     {
-      title: "เบอร์โทร",
-      dataIndex: "droner_telephone_no",
-      key: "droner_telephone_no",
-    },
-    {
-      title: "จำนวนให้บริการ",
-      dataIndex: "totalTaskCount",
-      key: "totalTaskCount",
-      sorter: (a: any, b: any) => sorter(a.totalTaskCount, b.totalTaskCount),
+      title: "ชื่อเกษตรกร",
+      dataIndex: "farmer",
+      key: "farmer",
       render: (value: any, row: any, index: number) => {
         return {
           children: (
             <>
               <span className="text-dark-75  d-block font-size-lg">
-                {row.totalTaskCount + " " + "งาน"}
+                {row.farmer.firstname + " " + row.farmer.lastname}
+              </span>
+              <span style={{ color: color.Disable, fontSize: "12px" }}>
+                {row.farmer.telephoneNo}
               </span>
             </>
           ),
@@ -438,33 +358,44 @@ export default function IndexRankDroner() {
       },
     },
     {
-      title: "จำนวนไร่",
-      dataIndex: "totalRaiCount",
-      key: "totalRaiCount",
-      sorter: (a: any, b: any) => sorter(a.totalRaiCount, b.totalRaiCount),
+      title: "พื้นที่แปลงเกษตร",
+      dataIndex: "plotArea",
+      key: "plotArea",
       render: (value: any, row: any, index: number) => {
+        const subdistrict = row.farmerPlot.plotArea;
+        const district = row.farmerPlot.plotArea;
+        const province = row.farmerPlot.plotArea;
         return {
           children: (
             <>
               <span className="text-dark-75  d-block font-size-lg">
-                {row.totalRaiCount + " " + "ไร่"}
+                {subdistrict != undefined
+                  ? subdistrict.subdistrictName + "/"
+                  : null}
+                {district != undefined ? district.districtName + "/" : null}
+                {province != undefined ? province.provinceName + "/" : null}
               </span>
+              <a
+                onClick={() => handleModalMap(row.farmerPlotId)}
+                style={{ color: color.primary1 }}
+              >
+                ดูแผนที่แปลง
+              </a>
             </>
           ),
         };
       },
     },
     {
-      title: "คะแนน Rating",
+      title: "Rating",
       dataIndex: "avgrating",
       key: "avgrating",
-      sorter: (a: any, b: any) => sorter(a.avgrating, b.avgrating),
       render: (value: any, row: any, index: number) => {
         return {
           children: (
             <>
               <span className="text-dark-75  d-block font-size-lg">
-                {row.avgrating > "0" ? (
+                {row.reviewDronerAvg > "0" ? (
                   <span>
                     <StarFilled
                       style={{
@@ -473,7 +404,7 @@ export default function IndexRankDroner() {
                         marginRight: "7px",
                       }}
                     />
-                    {parseFloat(row.avgrating).toFixed(1)}
+                    {parseFloat(row.reviewDronerAvg).toFixed(1)}
                   </span>
                 ) : (
                   "-"
@@ -485,58 +416,44 @@ export default function IndexRankDroner() {
       },
     },
     {
-      title: "ตำบล",
+      title: "ค่าบริการ",
       dataIndex: "subdistrict_subdistrict_name",
       key: "subdistrict_subdistrict_name",
-      width: "10%",
-      sorter: (a: any, b: any) =>
-        sorter(a.subdistrict_subdistrict_name, b.subdistrict_subdistrict_name),
       render: (value: any, row: any, index: number) => {
-        const subdistrict = row.subdistrict_subdistrict_name;
         return {
           children: (
-            <span className="text-dark-75  d-block font-size-lg">
-              {subdistrict != null ? subdistrict : "-"}
-            </span>
+            <>
+              <span className="text-dark-75  d-block font-size-lg">
+                {row.totalPrice != null
+                  ? formatNumber(row.totalPrice) + " " + "บาท"
+                  : 0 + " " + "บาท"}
+              </span>
+              <span style={{ color: color.Disable, fontSize: "12px" }}>
+                {"จำนวน" + " " + row.farmAreaAmount + " " + "ไร่"}
+              </span>
+            </>
           ),
         };
       },
     },
     {
-      title: "อำเภอ",
+      title: "สถานะ",
       dataIndex: "district_district_name",
       key: "district_district_name",
-      width: "10%",
-      sorter: (a: any, b: any) =>
-        sorter(a.district_district_name, b.district_district_name),
       render: (value: any, row: any, index: number) => {
-        const district = row.district_district_name;
         return {
           children: (
-            <div className="container">
-              <span className="text-dark-75  d-block font-size-lg">
-                {district !== null ? district : "-"}
+            <>
+              <span style={{ color: STATUS_COLOR_TASK[row.status] }}>
+                <Badge color={STATUS_COLOR_TASK[row.status]} />
+                {FINISH_TASK[row.status]}
+                <br />
               </span>
-            </div>
-          ),
-        };
-      },
-    },
-    {
-      title: "จังหวัด",
-      dataIndex: "province_region",
-      key: "province_region",
-      width: "10%",
-      sorter: (a: any, b: any) => sorter(a.province_region, b.province_region),
-      render: (value: any, row: any, index: number) => {
-        const province = row.province_region;
-        return {
-          children: (
-            <div className="container">
-              <span className="text-dark-75  d-block font-size-lg">
-                {province !== null ? province : "-"}
+              <span style={{ color: color.Disable, fontSize: "12px" }}>
+                <UserOutlined style={{ padding: "0 4px 0 0" }} />
+                {row.createBy}
               </span>
-            </div>
+            </>
           ),
         };
       },
@@ -549,13 +466,31 @@ export default function IndexRankDroner() {
         return {
           children: (
             <div className="d-flex flex-row justify-content-between">
-              <ActionButton
-                icon={<FileTextOutlined />}
-                color={color.primary1}
-                onClick={() =>
-                  (window.location.href = "/DetailRankDroner?=" + row.droner_id)
-                }
-              />
+              {row.status == "WAIT_REVIEW" ? (
+                <ActionButton
+                  icon={<EditOutlined />}
+                  color={color.primary1}
+                  onClick={() =>
+                    (window.location.href = "/ReviewTask?=" + row.id)
+                  }
+                />
+              ) : row.status == "CANCELED" ? (
+                <ActionButton
+                  icon={<FileTextOutlined />}
+                  color={color.primary1}
+                  onClick={() =>
+                    (window.location.href = "/CancelTask?=" + row.id)
+                  }
+                />
+              ) : row.status == "DONE" ? (
+                <ActionButton
+                  icon={<FileTextOutlined />}
+                  color={color.primary1}
+                  onClick={() =>
+                    (window.location.href = "/FinishTasks?=" + row.id)
+                  }
+                />
+              ) : null}
             </div>
           ),
         };
@@ -566,7 +501,18 @@ export default function IndexRankDroner() {
     <Layouts>
       {PageTitle}
       <br />
-      <Table columns={columns} dataSource={data?.data} pagination={false} />
+      <Table
+        columns={columns}
+        dataSource={data?.data}
+        pagination={false}
+        rowClassName={(a) =>
+          a.status == "WAIT_REVIEW"
+            ? "table-row-wait-review"
+            : a.status === "CANCELED"
+            ? "table-row-older"
+            : "table-row-lasted"
+        }
+      />
       <div className="d-flex justify-content-between pt-5">
         <p>รายการทั้งหมด {data?.count} รายการ</p>
         <Pagination
@@ -577,6 +523,14 @@ export default function IndexRankDroner() {
           showSizeChanger={false}
         />
       </div>
+      {showModalMap && (
+        <ModalMapPlot
+          show={showModalMap}
+          backButton={() => setShowModalMap((prev) => !prev)}
+          title="แผนที่แปลงเกษตร"
+          plotId={plotId}
+        />
+      )}
     </Layouts>
   );
 }
