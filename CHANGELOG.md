@@ -1,4 +1,10 @@
 ## [Version - 0]
+## Fix [v0.13.3] 2022-09-21
+- fixed sub status in index finish task
+- fixed separate data with commas.
+- fixed field discount fee, fee
+- fixed updateby edit task
+- fixed Press cancel. Save system.
 ## Fix [v0.13.2] 2022-09-20
 - fixed separate data with commas.
 ## Fix [v0.13.1] 2022-09-19

@@ -90,8 +90,9 @@ function ReviewTask() {
       !e.target.value ? setBtnSaveDisable(true) : setBtnSaveDisable(false);
     }
     {
-      e.target.value == "Yes" ? setSaveRate(false) : setSaveRate(true);
+      e.target.value == "Yes" ?   setSaveRate(false) : setSaveRate(true);
     }
+    
   };
 
   const manners = (e: any) => {
