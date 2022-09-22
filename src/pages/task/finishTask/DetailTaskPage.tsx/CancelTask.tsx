@@ -20,6 +20,11 @@ import {
 import { TaskFinishedDatasource } from "../../../../datasource/TaskFinishDatasource";
 import moment from "moment";
 import { UploadImageDatasouce } from "../../../../datasource/UploadImageDatasource";
+import { FINISH_TASK, TASK_HISTORY } from "../../../../definitions/FinishTask";
+import {
+  HistoryEntity,
+  HistoryEntity_INIT,
+} from "../../../../entities/HistoryEntities";
 const _ = require("lodash");
 let queryString = _.split(window.location.search, "=");
 const dateFormat = "DD/MM/YYYY";
@@ -28,13 +33,14 @@ const timeFormat = "HH:mm";
 function CancelTask() {
   const taskId = queryString[1];
   const [data, setData] = useState<DetailFinishTask>(DetailFinishTask_INIT);
+  const [history, setHistory] = useState<HistoryEntity>(HistoryEntity_INIT);
   const [mapPosition, setMapPosition] = useState<{ lat: number; lng: number }>({
     lat: LAT_LNG_BANGKOK.lat,
     lng: LAT_LNG_BANGKOK.lng,
   });
-
   const fetchDetailTask = async () => {
     await TaskFinishedDatasource.getDetailFinishTaskById(taskId).then((res) => {
+      setHistory(res.data.taskHistory[0]);
       setData(res);
       setMapPosition({
         lat: parseFloat(res.data.farmerPlot.lat),
@@ -102,7 +108,9 @@ function CancelTask() {
           <label>เป้าหมายการฉีดพ่น</label>
           <Form.Item>
             <span style={{ color: color.Grey }}>
-              {data.data.targetSpray !== null ? data.data.targetSpray : "-"}
+              {data.data.targetSpray !== null
+                ? data.data.targetSpray.join(",")
+                : "-"}
             </span>
           </Form.Item>
           <label>การเตรียมยา</label>
@@ -138,7 +146,10 @@ function CancelTask() {
           <Form.Item>
             <span style={{ color: color.Error }}>
               <Badge color={color.Error} />
-              {data.data.status == "CANCELED" ? "ยกเลิก" : null}
+              {FINISH_TASK[data.data.status]}
+              {history != null
+                ? " " + "(" + TASK_HISTORY[history.beforeValue] + ")"
+                : null}
               <br />
             </span>
           </Form.Item>
@@ -147,8 +158,8 @@ function CancelTask() {
               rows={3}
               disabled
               value={
-                data.data.reviewDronerDetail != null
-                  ? data.data.reviewDronerDetail.comment
+                data.data.statusRemark != null
+                  ? data.data.statusRemark
                   : undefined
               }
             />
@@ -347,8 +358,8 @@ function CancelTask() {
               <Input
                 disabled
                 value={
-                  data.data.discountFee !== null
-                    ? parseFloat(data.data.discountFee).toFixed(2) + " " + "บาท"
+                  data.data.fee !== null
+                    ? parseFloat(data.data.fee).toFixed(2) + " " + "บาท"
                     : "0.00" + " " + "บาท"
                 }
                 suffix="บาท"
@@ -361,8 +372,8 @@ function CancelTask() {
               <Input
                 disabled
                 value={
-                  data.data.fee !== null
-                    ? formatCurrency(data.data.fee) + " " + "บาท"
+                  data.data.discountFee !== null
+                    ? formatCurrency(data.data.discountFee) + " " + "บาท"
                     : "0.00" + " " + "บาท"
                 }
                 suffix="บาท"

@@ -23,3 +23,7 @@ export const STATUS_COLOR_TASK: any = {
     { value: "4", name: "4" },
     { value: "5", name: "5" },
   ];
+  export const TASK_HISTORY: any = {
+    WAIT_START: "รอเริ่มงาน",
+    IN_PROGRESS: "กำลังดำเนินงาน",
+  };
