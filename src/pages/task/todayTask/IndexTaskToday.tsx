@@ -87,7 +87,6 @@ export default function IndexTodayTask() {
       isProblem,
       isDelay
     ).then((res: TaskTodayListEntity) => {
-      console.log(res);
       setData(res);
     });
   };

@@ -55,6 +55,11 @@ export const TASKTODAY_STATUS: any = [
   { value: "IN_PROGRESS", name: "กำลังดำเนินงาน" },
   { value: "CANCELED", name: "ยกเลิก" },
 ];
+export const TASKTODAY_STATUS1: any = [
+
+  { value: "IN_PROGRESS", name: "กำลังดำเนินงาน" },
+  { value: "CANCELED", name: "ยกเลิก" },
+];
 export const REDIO_WAIT_START = [
   { key: 0, name: "ปกติ", isChecked: false },
   { key: 1, name: "งานมีปัญหา", isChecked: false },
@@ -84,3 +89,22 @@ export const STATUS_DELAY = [
   { value: "EXTENDED", name: "ขยายเวลา" },
   { value: "REJECT", name: "งานมีปัญหา" },
 ]
+export const STATUS_SUMMARY = [
+  { value: "inprogressnormal", name: "ปกติ" },
+  { value: "inprogressproblem", name: "งานมีปัญหา" },
+  { value: "waitstartnormal", name: "ปกติ" },
+  { value: "waitstartproblem", name: "งานมีปัญหา" },
+  { value: "waitapprovedelay", name: "รออนุมัติขยายเวลา" },
+  { value: "extended", name: "อนุมัติขยายเวลา" },
+]
+export const STATUS_INPROGRESS = [
+  { value: "inprogressnormal", name: "ปกติ", isChecked: false },
+  { value: "waitapprovedelay", name: "รออนุมัติขยายเวลา", isChecked: false },
+  { value: "extended", name: "อนุมัติขยายเวลา", isChecked: false },
+  { value: "inprogressproblem", name: "งานมีปัญหา", isChecked: false },
+];
+export const STATUS_WAITSTART = [
+  { value: "waitstartnormal", name: "ปกติ", isChecked: false },
+  { value: "waitstartproblem", name: "งานมีปัญหา", isChecked: false },
+];
+

@@ -34,15 +34,15 @@ import {
   PURPOSE_SPRAY_CHECKBOX,
 } from "../../../../definitions/PurposeSpray";
 import TextArea from "antd/lib/input/TextArea";
-import {
-  REDIO_IN_PROGRESS,
-  REDIO_WAIT_START,
-  STATUS_COLOR_MAPPING,
-  TASKTODAY_STATUS,
-  TASK_TODAY_STATUS_MAPPING,
-} from "../../../../definitions/Status";
+
 import { Option } from "antd/lib/mentions";
 import Swal from "sweetalert2";
+import {
+  STATUS_COLOR_MAPPING,
+  TASKTODAY_STATUS,
+  TASKTODAY_STATUS1,
+  TASK_TODAY_STATUS_MAPPING,
+} from "../../../../definitions/Status";
 const { Map } = require("immutable");
 const _ = require("lodash");
 let queryString = _.split(window.location.search, "=");
@@ -97,93 +97,43 @@ function EditInProgress() {
       return i > 0 && c !== "." && (a.length - i) % 3 === 0 ? "," + c : c;
     });
   };
-  const handlerDate = (e: any) => {
-    const d = Map(data).set("dateAppointment", e);
-    const m = Map(d.toJS()).set("dateAppointment", e);
-    setData(m.toJS());
-    console.log(m.toJS());
-  };
-  const handlePeriodSpray = (e: any) => {
-    const d = Map(data).set("purposeSprayName", e);
-    setData(d.toJS());
-  };
-  const handleOtherSpray = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.value.trim().length != 0) {
-      setOtherSpray(e.target.value);
-      let checkComma = checkValidateComma(e.target.value);
-      if (!checkComma) {
-        setValidateComma({ status: "", message: "" });
-        setBtnSaveDisable(false);
-      } else {
-        setValidateComma({
-          status: "error",
-          message: "กรุณาใช้ (,) ให้กับการเพิ่มมากกว่า 1 อย่าง",
-        });
-        setBtnSaveDisable(true);
-      }
-    } else {
-      setValidateComma({
-        status: "error",
-        message: "โปรดระบุ",
-      });
-      setBtnSaveDisable(true);
-    }
-  };
-  const checkValidateComma = (data: string) => {
-    const checkSyntax =
-      data.includes("*") ||
-      data.includes("/") ||
-      data.includes(" ") ||
-      data.includes("-") ||
-      data.includes("+");
-    return data.trim().length != 0 ? (checkSyntax ? true : false) : true;
-  };
-  const handlePurposeSpray = (e: any) => {
-    let checked = e.target.checked;
-    console.log(checked);
-    let value = e.target.value;
-    setCheckCrop(
-      value == "อื่นๆ" ? !checked : otherSpray != null ? false : true
-    );
-    PURPOSE_SPRAY_CHECKBOX.map((item) =>
-      _.set(item, "isChecked", item.crop == value ? checked : item.isChecked)
-    );
-    let p: any = "";
 
-    if (checked) {
-      p = Map(data).set(
-        "targetSpray",
-        [...data?.targetSpray, value].filter((x) => x != "")
-      );
-    } else {
-      let removePlant = data?.targetSpray.filter((x) => x != value);
-      p = Map(data).set("targetSpray", removePlant);
-    }
-    setData(p.toJS());
-    console.log(p.toJS());
-  };
-  const handlePreparation = (e: any) => {
-    const d = Map(data).set("preparationBy", e.target.value);
-    setData(d.toJS());
-    console.log(d.toJS());
-  };
   const handleComment = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const d = Map(data).set("comment", e.target.value);
     setData(d.toJS());
-    console.log(d.toJS());
+    setBtnSaveDisable(false);
   };
   const handleChangeStatus = (e: any) => {
     const d = Map(data).set("status", e.target.value);
     setData(d.toJS());
-    console.log(d.toJS());
+    setBtnSaveDisable(true);
   };
   const handleChangeIsProblem = (e: any) => {
     const m = Map(data).set("isProblem", e.target.value);
     setData(m.toJS());
+    if (e.target.value == true) {
+      if (data.problemRemark != null) {
+        setBtnSaveDisable(true);
+      } else {
+        setBtnSaveDisable(true);
+      }
+      setBtnSaveDisable(true);
+    } else {
+      setBtnSaveDisable(false);
+    }
   };
-  const onChangeProblemText = (e: any) => {
+  const onChangeProblemText = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const m = Map(data).set("problemRemark", e.target.value);
     setData(m.toJS());
+    {
+      !e.target.value ? setBtnSaveDisable(true) : setBtnSaveDisable(false);
+    }
+  };
+  const onChangeCanCelText = (e: any) => {
+    console.log(e.target.value);
+    {
+      !e.target.value ? setBtnSaveDisable(true) : setBtnSaveDisable(false);
+    }
   };
   const renderAppointment = (
     <Form style={{ padding: "32px" }}>
@@ -194,11 +144,10 @@ function EditInProgress() {
               <label>วันที่นัดหมาย</label>
               <Form.Item>
                 <DatePicker
-                disabled
+                  disabled
                   format={dateFormat}
                   style={{ width: "100%" }}
                   value={moment(new Date(data.dateAppointment))}
-                  onChange={handlerDate}
                 />
               </Form.Item>
             </div>
@@ -206,51 +155,45 @@ function EditInProgress() {
               <label>เวลานัดหมาย</label>
               <Form.Item>
                 <TimePicker
-                disabled
+                  disabled
                   name="dateAppointment"
                   format={timeFormat}
                   style={{ width: "100%" }}
                   value={moment(new Date(data.dateAppointment))}
-                  onChange={handlerDate}
                 />
               </Form.Item>
             </div>
           </div>
           <div className="col-lg-10">
-          <label>
-            ช่วงเวลาการพ่น <span style={{ color: "red" }}>*</span>
-          </label>
-          <Form.Item name="searchAddress">
-            <Select
-            disabled
-              key={data.purposeSprayId}
-              placeholder="-"
-              defaultValue={data.purposeSprayId}
-            >
-              {periodSpray?.purposeSpray?.length ? (
-                periodSpray?.purposeSpray?.map((item) => (
-                  <Option value={item.id}>{item.purposeSprayName}</Option>
-                ))
-              ) : (
-                <Option>-</Option>
-              )}
-            </Select>
-          </Form.Item>
+            <label>
+              ช่วงเวลาการพ่น <span style={{ color: "red" }}>*</span>
+            </label>
+            <Form.Item name="searchAddress">
+              <Select
+                key={data.purposeSprayId}
+                disabled
+                defaultValue={
+                  data.purposeSpray != null
+                    ? data.purposeSpray.purposeSprayName
+                    : "-"
+                }
+              ></Select>
+            </Form.Item>
           </div>
-       
+
           <div className="form-group col-lg-10">
-          <label>เป้าหมายการฉีดพ่น</label>
-          <Form.Item>
-            <span style={{ color: color.Grey }}>
-              {data.targetSpray !== null ? data.targetSpray.join(",") : "-"}
-            </span>
-          </Form.Item>
-          <label>การเตรียมยา</label>
-          <Form.Item>
-            <span style={{ color: color.Grey }}>
-              {data.preparationBy !== null ? data.preparationBy : "-"}
-            </span>
-          </Form.Item>
+            <label>เป้าหมายการฉีดพ่น</label>
+            <Form.Item>
+              <span style={{ color: color.Grey }}>
+                {data.targetSpray !== null ? data.targetSpray.join(",") : "-"}
+              </span>
+            </Form.Item>
+            <label>การเตรียมยา</label>
+            <Form.Item>
+              <span style={{ color: color.Grey }}>
+                {data.preparationBy !== null ? data.preparationBy : "-"}
+              </span>
+            </Form.Item>
           </div>
           <div className="form-group col-lg-10">
             <label>หมายเหตุ</label>
@@ -270,37 +213,61 @@ function EditInProgress() {
                   className="col-lg-4"
                 >
                   <Space direction="vertical">
-                    {TASKTODAY_STATUS.map((item: any, index: any) => (
-                      <Radio  value={item.value}>
+                    <Radio disabled>รอเริ่มงาน</Radio>
+                    {TASKTODAY_STATUS1.map((item: any, index: any) => (
+                      <Radio value={item.value}>
                         {item.name}
-                        {data.status == "IN_PROGRESS" && index == 1 ? (
+                        {data.status == "IN_PROGRESS" && index == 0 ? (
                           <div style={{ marginLeft: "20px" }}>
                             <Form.Item style={{ width: "500px" }}>
-                            <Radio.Group
+                              <Radio.Group
                                 value={data.isProblem}
                                 onChange={handleChangeIsProblem}
                               >
                                 <Space direction="vertical">
-                                  <Radio  value={false}>งานปกติ</Radio>
-                                  <Radio disabled >รออนุมัติขยายเวลา</Radio>
-                                  <Radio disabled >อนุมัติขยายเวลา {" "}
-                                  <span style={{color : color.Error}}>
-                                  *ต้องโทรหาเกษตกรเพื่อคอนเฟิร์มการอนุมัติ/ปฏิเสธ*</span></Radio>
+                                  <Radio value={false}>งานปกติ</Radio>
+                                  <Radio disabled>รออนุมัติขยายเวลา</Radio>
+                                  <Radio disabled>
+                                    อนุมัติขยายเวลา{" "}
+                                    <span style={{ color: color.Error }}>
+                                      *ต้องโทรหาเกษตกรเพื่อคอนเฟิร์มการอนุมัติ/ปฏิเสธ*
+                                    </span>
+                                  </Radio>
                                   <Radio value={true}>งานมีปัญหา</Radio>
                                 </Space>
                               </Radio.Group>
                             </Form.Item>
-                            {data.isProblem == true  ?
-                             <Form.Item>
-                             <TextArea
-                              rows={3}
-                              onChange={onChangeProblemText}
-                              placeholder="รายละเอียดปัญหา"
-                              autoComplete="off"
-                              defaultValue={data.problemRemark != null ? data.problemRemark : undefined}
-                             />
-                           </Form.Item>
-                            : null}
+                            {data.isProblem == true ? (
+                              <Form.Item>
+                                <TextArea
+                                  rows={3}
+                                  onChange={onChangeProblemText}
+                                  placeholder="รายละเอียดปัญหา"
+                                  autoComplete="off"
+                                  defaultValue={
+                                    data.problemRemark != null
+                                      ? data.problemRemark
+                                      : undefined
+                                  }
+                                />
+                              </Form.Item>
+                            ) : null}
+                          </div>
+                        ) : data.status == "CANCELED" && index == 1 ? (
+                          <div style={{ marginLeft: "20px" }}>
+                            <Form.Item style={{ width: "500px" }}>
+                              <TextArea
+                                rows={3}
+                                onChange={onChangeCanCelText}
+                                placeholder="รายละเอียดการยกเลิก"
+                                autoComplete="off"
+                                // defaultValue={
+                                //   data.problemRemark != null
+                                //     ? data.problemRemark
+                                //     : undefined
+                                // }
+                              />
+                            </Form.Item>
                           </div>
                         ) : null}
                       </Radio>
@@ -544,15 +511,19 @@ function EditInProgress() {
       showCloseButton: true,
     }).then(async (result) => {
       if (result.isConfirmed) {
-        const pushUpdateBy = Map(data).set("updateBy",  profile.firstname + " " + profile.lastname);
-        await TaskInprogressDatasource.UpdateTask(pushUpdateBy.toJS()).then((time) => {
-          window.location.href = "/IndexTodayTask";
-        });
+        const pushUpdateBy = Map(data).set(
+          "updateBy",
+          profile.firstname + " " + profile.lastname
+        );
+        await TaskInprogressDatasource.UpdateTask(pushUpdateBy.toJS()).then(
+          (time) => {
+            window.location.href = "/IndexTodayTask";
+          }
+        );
       }
       fetchTaskDetail();
     });
   };
-
 
   return (
     <Layouts>
@@ -588,7 +559,7 @@ function EditInProgress() {
       <FooterPage
         onClickBack={() => (window.location.href = "/IndexTodayTask")}
         onClickSave={() => UpdateTaskWaitStart(data)}
-        // disableSaveBtn={saveBtnDisable}
+        disableSaveBtn={saveBtnDisable}
       />
     </Layouts>
   );

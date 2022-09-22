@@ -38,7 +38,9 @@ import {
   REDIO_IN_PROGRESS,
   REDIO_WAIT_START,
   STATUS_COLOR_MAPPING,
+  STATUS_INPROGRESS,
   STATUS_IS_PROBLEM,
+  STATUS_WAITSTART,
   TASKTODAY_STATUS,
   TASK_TODAY_STATUS_MAPPING,
 } from "../../../../definitions/Status";
@@ -61,6 +63,7 @@ function EditWaitStart() {
   const [periodSpray, setPeriodSpray] = useState<CropPurposeSprayEntity>();
   const [checkCrop, setCheckCrop] = useState<boolean>(true);
   const [saveBtnDisable, setBtnSaveDisable] = useState<boolean>(true);
+
   const [validateComma, setValidateComma] = useState<{
     status: any;
     message: string;
@@ -73,23 +76,21 @@ function EditWaitStart() {
     await TaskInprogressDatasource.getTaskDetailById(taskId).then((res) => {
       console.log(res);
       setData(res);
+      fetchPurposeSpray(res.farmerPlot.plantName);
       setMapPosition({
         lat: parseFloat(res.farmerPlot.lat),
         lng: parseFloat(res.farmerPlot.long),
       });
     });
   };
-  const fetchPurposeSpray = async () => {
-    await CropDatasource.getPurposeByCroupName(data.farmerPlot.plantName).then(
-      (res) => {
-        setPeriodSpray(res);
-      }
-    );
+  const fetchPurposeSpray = async (crop: string) => {
+    await CropDatasource.getPurposeByCroupName(crop).then((res) => {
+      setPeriodSpray(res);
+    });
   };
 
   useEffect(() => {
     fetchTaskDetail();
-    fetchPurposeSpray();
   }, []);
 
   const formatCurrency = (e: any) => {
@@ -102,10 +103,10 @@ function EditWaitStart() {
     const d = Map(data).set("dateAppointment", e);
     const m = Map(d.toJS()).set("dateAppointment", e);
     setData(m.toJS());
-    console.log(m.toJS());
   };
   const handleOtherSpray = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.value.trim().length != 0) {
+    console.log(e.target.value);
+    if (e.target.value) {
       setOtherSpray(e.target.value);
       let checkComma = checkValidateComma(e.target.value);
       if (!checkComma) {
@@ -119,10 +120,93 @@ function EditWaitStart() {
         setBtnSaveDisable(true);
       }
     } else {
-      setValidateComma({
-        status: "error",
-        message: "โปรดระบุ",
-      });
+      setBtnSaveDisable(true);
+    }
+  };
+
+  const handlerTargetSpray = (e: any) => {
+    let checked = e.target.checked;
+    let value = e.target.value;
+    setCheckCrop(
+      value == "อื่นๆ" ? !checked : otherSpray != null ? false : true
+    );
+    PURPOSE_SPRAY_CHECKBOX.map((item) =>
+      _.set(item, "isChecked", item.crop == value ? checked : item.isChecked)
+    );
+    let p: any = "";
+    if (checked) {
+      p = Map(data).set(
+        "targetSpray",
+        [...data?.targetSpray, value].filter((x) => x != "")
+      );
+    } else {
+      let removeTarget = data?.targetSpray.filter((x) => x != value);
+      p = Map(data).set("targetSpray", removeTarget);
+    }
+    setData(p.toJS());
+    console.log(p.toJS());
+    checkValidate(p.toJS());
+  };
+  const handlerPurposeSpray = (e: any) => {
+    const d = Map(data).set("purposeSprayId", e);
+    setData(d.toJS());
+    {
+      e != null ? setBtnSaveDisable(false) : setBtnSaveDisable(true);
+    }
+  };
+  const handlePreparation = (e: any) => {
+    const d = Map(data).set("preparationBy", e.target.value);
+    setData(d.toJS());
+    setBtnSaveDisable(false);
+  };
+  const handleComment = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const d = Map(data).set("comment", e.target.value);
+    setData(d.toJS());
+    setBtnSaveDisable(false);
+  };
+  const handleChangeStatus = (e: any) => {
+    const d = Map(data).set("status", e.target.value);
+    setData(d.toJS());
+    setBtnSaveDisable(false);
+  };
+  const handleChangeIsProblem = (e: any) => {
+    const m = Map(data).set("isProblem", e.target.value);
+    setData(m.toJS());
+    if (e.target.value == true) {
+      if (data.problemRemark != null) {
+        setBtnSaveDisable(true);
+      } else {
+        setBtnSaveDisable(true);
+      }
+      setBtnSaveDisable(true);
+    } else {
+      setBtnSaveDisable(false);
+    }
+  };
+  const onChangeProblemText = (e: any) => {
+    const m = Map(data).set("problemRemark", e.target.value);
+    setData(m.toJS());
+    {
+      !e.target.value ? setBtnSaveDisable(true) : setBtnSaveDisable(false);
+    }
+  };
+  const onChangeCanCelText = (e: any) => {
+    // const m = Map(data).set("problemRemark", e.target.value);
+    // setData(m.toJS());
+  };
+
+  const checkValidate = (data?: TaskDetailEntity) => {
+    let checkEmptyTarget = false;
+    if (data?.targetSpray !== undefined) {
+      checkEmptyTarget =
+        ![data?.targetSpray][0]?.includes("") &&
+        data?.targetSpray.length !== 0 &&
+        data?.targetSpray !== null &&
+        data?.targetSpray !== undefined;
+    }
+    if (checkEmptyTarget) {
+      setBtnSaveDisable(false);
+    } else {
       setBtnSaveDisable(true);
     }
   };
@@ -135,63 +219,6 @@ function EditWaitStart() {
       data.includes("+");
     return data.trim().length != 0 ? (checkSyntax ? true : false) : true;
   };
-  const handlerTargetSpray = (e: any) => {
-    let checked = e.target.checked;
-    console.log(checked);
-    let value = e.target.value;
-    setCheckCrop(
-      value == "อื่นๆ" ? !checked : otherSpray != null ? false : true
-    );
-    PURPOSE_SPRAY_CHECKBOX.map((item) =>
-      _.set(item, "isChecked", item.crop == value ? checked : item.isChecked)
-    );
-    let p: any = "";
-
-    if (checked) {
-      p = Map(data).set(
-        "targetSpray",
-        [...data?.targetSpray, value].filter((x) => x != "")
-      );
-    } else {
-      let removePlant = data?.targetSpray.filter((x) => x != value);
-      p = Map(data).set("targetSpray", removePlant);
-    }
-    setData(p.toJS());
-    console.log(p.toJS());
-  };
-  const handlerPurposeSpray = (e:any) => {
-    const d = Map(data.purposeSpray).set("purposeSprayName", e.target.value);
-    setData(d.toJS());
-    console.log(d.toJS());
-  }
-  const handlePreparation = (e: any) => {
-    const d = Map(data).set("preparationBy", e.target.value);
-    setData(d.toJS());
-    console.log(d.toJS());
-  };
-  const handleComment = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    const d = Map(data).set("comment", e.target.value);
-    setData(d.toJS());
-    console.log(d.toJS());
-  };
-  const handleChangeStatus = (e: any) => {
-    const d = Map(data).set("status", e.target.value);
-    setData(d.toJS());
-    console.log(d.toJS()); 
-  };
-  const handleChangeIsProblem = (e: any) => {
-    const m = Map(data).set("isProblem", e.target.value);
-    setData(m.toJS());
-  };
-  const onChangeProblemText = (e: any) => {
-    const m = Map(data).set("problemRemark", e.target.value);
-    setData(m.toJS());
-  };
-  const onChangeCanCelText = (e:any) => {
-    // const m = Map(data).set("problemRemark", e.target.value);
-    // setData(m.toJS());
-  }
-
   const renderAppointment = (
     <Form style={{ padding: "32px" }}>
       <div className="row">
@@ -225,11 +252,24 @@ function EditWaitStart() {
             <label>
               ช่วงเวลาการพ่น <span style={{ color: "red" }}>*</span>
             </label>
-            <Form.Item name="searchAddress">
+            <Form.Item
+              name="purposeSprayId"
+              rules={[
+                {
+                  required: true,
+                  message: "กรุณาเลือกช่วงเวลาการฉีดพ่น",
+                },
+              ]}
+            >
               <Select
-              onChange={handlerPurposeSpray}
+                allowClear
+                onChange={handlerPurposeSpray}
                 key={data.purposeSprayId}
-                defaultValue={data.purposeSprayId}
+                defaultValue={
+                  data.purposeSpray != null
+                    ? data.purposeSpray.purposeSprayName
+                    : null
+                }
               >
                 {periodSpray?.purposeSpray?.length ? (
                   periodSpray?.purposeSpray?.map((item) => (
@@ -241,56 +281,65 @@ function EditWaitStart() {
               </Select>
             </Form.Item>
           </div>
-
-          <div className="form-group col-lg-5">
+          <div className="form-group col-lg-10">
             <label>
               เป้าหมายการฉีดพ่น
               <span style={{ color: "red" }}>*</span>
             </label>
-            {data.targetSpray != null && data.targetSpray
-              ? PURPOSE_SPRAY_CHECKBOX.map((item) =>
-                  _.set(
-                    item,
-                    "isChecked",
-                    data.targetSpray.map((x) => x).find((y) => y === item.crop)
-                      ? true
-                      : item.isChecked
-                  )
-                ).map((x) => (
-                  <div>
-                    <Checkbox
-                      key={x.key}
-                      value={x.crop}
-                      onClick={handlerTargetSpray}
-                      checked={x.isChecked}
-                    />{" "}
-                    <label>{x.crop}</label>
-                    <br />
-                  </div>
-                ))
-              : null}
+            {PURPOSE_SPRAY_CHECKBOX.map((item) =>
+              _.set(
+                item,
+                "isChecked",
+                data?.targetSpray.map((x) => x).find((y) => y === item.crop)
+                  ? true
+                  : item.isChecked
+              )
+            ).map((x, index) => (
+              <div className="form-group">
+                <Checkbox
+                  key={data.targetSpray[0]}
+                  value={x.crop}
+                  onClick={handlerTargetSpray}
+                  checked={x.isChecked}
+                />{" "}
+                <label>{x.crop}</label>
+                <br />
+                {index == 4 && (
+                  <>
+                    <Input
+                      key={data.targetSpray[0]}
+                      onChange={handleOtherSpray}
+                      placeholder="โปรดระบุ เช่น เพลี้ย,หอย"
+                      autoComplete="off"
+                      defaultValue={data.targetSpray.filter(
+                        (a) => !PURPOSE_SPRAY.some((x) => x === a)
+                      )}
+                      // defaultValue={Array.from(
+                      //   new Set(
+                      //     data?.targetSpray.filter(
+                      //       (a) => !PURPOSE_SPRAY.some((x) => x === a)
+                      //     )
+                      //   )
+                      // ).join(",")}
+                    />
+                    {validateComma.status == "error" && (
+                      <p style={{ color: color.Error }}>
+                        {validateComma.message}
+                      </p>
+                    )}
+                  </>
+                )}
+              </div>
+            ))}
           </div>
-          <div className="form-group col-lg-10">
-            <Input
-              disabled={checkCrop}
-              onChange={handleOtherSpray}
-              placeholder="โปรดระบุ เช่น เพลี้ย,หอย"
-              autoComplete="off"
-              defaultValue={
-                data.targetSpray != null
-                  ? data.targetSpray
-                      .filter((a) => !PURPOSE_SPRAY.some((x) => x === a))
-                      .join(",")
-                  : "-"
-              }
-            />
-          </div>
+
           <div className="row form-group col-lg-6 p-2">
             <label>
               การเตรียมยา <span style={{ color: "red" }}>*</span>
             </label>
             <Form.Item>
               <Radio.Group
+                key={data.preparationBy}
                 value={data.preparationBy}
                 onChange={handlePreparation}
               >
@@ -351,7 +400,7 @@ function EditWaitStart() {
                                       ? data.problemRemark
                                       : undefined
                                   }
-                                /> 
+                                />
                               </Form.Item>
                             ) : null}
                           </div>
@@ -363,9 +412,14 @@ function EditWaitStart() {
                                 onChange={handleChangeIsProblem}
                               >
                                 <Space direction="vertical">
-                                  <Radio value={false}>งานปกติ</Radio>
-                                  <Radio value={true}>รออนุมัติขยายเวลา</Radio>
-                                  <Radio value={true}>อนุมัติขยายเวลา</Radio>
+                                <Radio value={false}>งานปกติ</Radio>
+                                  <Radio disabled>รออนุมัติขยายเวลา</Radio>
+                                  <Radio disabled>
+                                    อนุมัติขยายเวลา{" "}
+                                    <span style={{ color: color.Error }}>
+                                      *ต้องโทรหาเกษตกรเพื่อคอนเฟิร์มการอนุมัติ/ปฏิเสธ*
+                                    </span>
+                                  </Radio>
                                   <Radio value={true}>งานมีปัญหา</Radio>
                                 </Space>
                               </Radio.Group>
@@ -374,19 +428,17 @@ function EditWaitStart() {
                         ) : data.status == "CANCELED" && index == 2 ? (
                           <div style={{ marginLeft: "20px" }}>
                             <Form.Item style={{ width: "500px" }}>
-                       
-                                <TextArea
-                                  rows={3}
-                                  onChange={onChangeCanCelText}
-                                  placeholder="รายละเอียดการยกเลิก"
-                                  autoComplete="off"
-                                  // defaultValue={
-                                  //   data.problemRemark != null
-                                  //     ? data.problemRemark
-                                  //     : undefined
-                                  // }
-                                /> 
-                            
+                              <TextArea
+                                rows={3}
+                                onChange={onChangeCanCelText}
+                                placeholder="รายละเอียดการยกเลิก"
+                                autoComplete="off"
+                                // defaultValue={
+                                //   data.problemRemark != null
+                                //     ? data.problemRemark
+                                //     : undefined
+                                // }
+                              />
                             </Form.Item>
                           </div>
                         ) : null}
@@ -621,6 +673,7 @@ function EditWaitStart() {
     </Form>
   );
   const UpdateTaskWaitStart = async (data: TaskDetailEntity) => {
+    console.log(data);
     Swal.fire({
       title: "ยืนยันการแก้ไข",
       text: "โปรดตรวจสอบรายละเอียดที่คุณต้องการแก้ไขข้อมูลก่อนเสมอ เพราะอาจส่งผลต่อการจ้างงานในระบบ",
@@ -631,10 +684,30 @@ function EditWaitStart() {
       showCloseButton: true,
     }).then(async (result) => {
       if (result.isConfirmed) {
-        const pushUpdateBy = Map(data).set("updateBy",  profile.firstname + " " + profile.lastname);
-        await TaskInprogressDatasource.UpdateTask(pushUpdateBy.toJS()).then((time) => {
-          window.location.href = "/IndexTodayTask";
-        });
+        let otherSprayList = [];
+        if (otherSpray != undefined) {
+          let m = otherSpray.split(",");
+          for (let i = 0; m.length > i; i++) {
+            otherSprayList.push(m[i]);
+          }
+        }
+        data.targetSpray.push.apply(
+          data.targetSpray,
+          otherSprayList.filter((x) => x != "")
+        );
+        const setTarget = Array.from(new Set(data.targetSpray)).filter(
+          (x) => x != ""
+        );
+        const pushTextTarget = Map(data).set("targetSpray", setTarget);
+        const pushUpdateBy = Map(pushTextTarget.toJS()).set(
+          "updateBy",
+          profile.firstname + " " + profile.lastname
+        );
+        await TaskInprogressDatasource.UpdateTask(pushUpdateBy.toJS()).then(
+          (time) => {
+            window.location.href = "/IndexTodayTask";
+          }
+        );
       }
       fetchTaskDetail();
     });
@@ -674,7 +747,7 @@ function EditWaitStart() {
       <FooterPage
         onClickBack={() => (window.location.href = "/IndexTodayTask")}
         onClickSave={() => UpdateTaskWaitStart(data)}
-        // disableSaveBtn={saveBtnDisable}
+        disableSaveBtn={saveBtnDisable}
       />
     </Layouts>
   );
