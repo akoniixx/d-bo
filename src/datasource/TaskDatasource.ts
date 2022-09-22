@@ -73,4 +73,14 @@ export class TaskDatasource {
         console.log(error);
       });
   }
+  static deleteTask(id:string) :Promise<any>{
+    return httpClient
+    .delete(BASE_URL + "/tasks/task/" + id)
+    .then((response) => {
+      return response.data;
+    })
+    .catch((error) => {
+      console.log(error);
+    });
+  }
 }
