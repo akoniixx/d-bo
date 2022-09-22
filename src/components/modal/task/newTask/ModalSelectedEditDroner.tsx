@@ -20,7 +20,8 @@ const ModalSelectedEditDroner: React.FC<ModalSelectedEditDronerProps> = ({
   title,
   callBack,
 }) => {
-  let checkDup = Array.from(new Set(dataDroner)).filter(
+  console.log(dataDroner);
+   let checkDup = Array.from(new Set(dataDroner)).filter(
     (x) => x.dronerId != ""
   );
   const [data, setData] = useState<TaskDronerTempEntity[]>(checkDup);

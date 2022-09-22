@@ -1,4 +1,11 @@
 ## [Version - 0]
+## Feature [v0.14.0] 2022-09-22
+- edit new task
+- selected droner
+- enhanced index new task
+- enhanced status receive task for droner
+- removed new task
+- click botton navigate to google map in modal plot
 ## Fix [v0.13.3] 2022-09-21
 - fixed sub status in index finish task
 - fixed separate data with commas.
