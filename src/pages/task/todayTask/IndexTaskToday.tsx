@@ -301,7 +301,6 @@ export default function IndexTodayTask() {
                 searchSubdistrict,
                 searchDistrict,
                 searchProvince,
-               
               )
             }
           >
@@ -436,9 +435,12 @@ export default function IndexTodayTask() {
               <span style={{ color: STATUS_COLOR_TASK_TODAY[row.status] }}>
                 <Badge color={STATUS_COLOR_TASK_TODAY[row.status]} />
                 {TASK_TODAY_STATUS[row.status]}
-                {/* {"(" + STATUS_IS_PROBLEM[row.isDelay] + ")"} */}
+                <span style={{ color: color.Error }}>
+                { row.isProblem == true ? " " + "(" + "งานมีปัญหา" + ")" : null}
+              </span>
                 <br />
               </span>
+            
               <span style={{ color: color.Disable, fontSize: "12px" }}>
                 <UserOutlined style={{ padding: "0 4px 0 0" }} />
                 {row.createBy}

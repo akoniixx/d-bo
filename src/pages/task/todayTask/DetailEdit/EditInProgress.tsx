@@ -50,6 +50,7 @@ const dateFormat = "DD/MM/YYYY";
 const timeFormat = "HH:mm";
 
 function EditInProgress() {
+  const profile = JSON.parse(localStorage.getItem("profile") || "{  }");
   const taskId = queryString[1];
   const [mapPosition, setMapPosition] = useState<{ lat: number; lng: number }>({
     lat: LAT_LNG_BANGKOK.lat,
@@ -176,13 +177,20 @@ function EditInProgress() {
     setData(d.toJS());
     console.log(d.toJS());
   };
-
+  const handleChangeIsProblem = (e: any) => {
+    const m = Map(data).set("isProblem", e.target.value);
+    setData(m.toJS());
+  };
+  const onChangeProblemText = (e: any) => {
+    const m = Map(data).set("problemRemark", e.target.value);
+    setData(m.toJS());
+  };
   const renderAppointment = (
     <Form style={{ padding: "32px" }}>
       <div className="row">
         <div className="col-lg-6">
           <div className="row">
-            <div className="col-lg-6">
+            <div className="col-lg-5">
               <label>วันที่นัดหมาย</label>
               <Form.Item>
                 <DatePicker
@@ -194,7 +202,7 @@ function EditInProgress() {
                 />
               </Form.Item>
             </div>
-            <div className="col-lg-6">
+            <div className="col-lg-5">
               <label>เวลานัดหมาย</label>
               <Form.Item>
                 <TimePicker
@@ -208,6 +216,7 @@ function EditInProgress() {
               </Form.Item>
             </div>
           </div>
+          <div className="col-lg-10">
           <label>
             ช่วงเวลาการพ่น <span style={{ color: "red" }}>*</span>
           </label>
@@ -227,7 +236,9 @@ function EditInProgress() {
               )}
             </Select>
           </Form.Item>
-          <div className="form-group col-lg-12">
+          </div>
+       
+          <div className="form-group col-lg-10">
           <label>เป้าหมายการฉีดพ่น</label>
           <Form.Item>
             <span style={{ color: color.Grey }}>
@@ -241,70 +252,55 @@ function EditInProgress() {
             </span>
           </Form.Item>
           </div>
-          <div className="form-group">
+          <div className="form-group col-lg-10">
             <label>หมายเหตุ</label>
-            <TextArea onChange={handleComment} value={data.comment} />
+            <TextArea rows={3} onChange={handleComment} value={data.comment} />
           </div>
         </div>
-        <div className="col-lg-1"></div>
-        <div className="col-lg-5">
+        <div className="col-lg-6">
           <label style={{ marginBottom: "10px" }}>
             สถานะ <span style={{ color: "red" }}>*</span>
           </label>
           <Form.Item name="status">
             <div className="row">
-              <div className="form-group col-lg-12">
+              <div className="form-group col-lg-4">
                 <Radio.Group
                   value={data.status}
                   onChange={handleChangeStatus}
-                  className="col-lg-12"
+                  className="col-lg-4"
                 >
                   <Space direction="vertical">
                     {TASKTODAY_STATUS.map((item: any, index: any) => (
-                      <Radio value={item.value}>
+                      <Radio  value={item.value}>
                         {item.name}
-                        {data.status == "WAIT_START" && index == 0 ? (
+                        {data.status == "IN_PROGRESS" && index == 1 ? (
                           <div style={{ marginLeft: "20px" }}>
-                            <Form.Item style={{ width: "530px" }}>
-                              {REDIO_WAIT_START.map((item) =>
-                                _.set(
-                                  item,
-                                  "isChecked",
-                                  data.isDelay,
-                                  data.isProblem ? true : item.isChecked
-                                )
-                              ).map((x) => (
-                                <div>
-                                  <Radio
-                                    key={x.key}
-                                    value={x.name}
-                                    //  onClick={}
-                                    checked={x.isChecked}
-                                  />{" "}
-                                  <label>{x.name}</label>
-                                  <br />
-                                </div>
-                              ))}
+                            <Form.Item style={{ width: "500px" }}>
+                            <Radio.Group
+                                value={data.isProblem}
+                                onChange={handleChangeIsProblem}
+                              >
+                                <Space direction="vertical">
+                                  <Radio  value={false}>งานปกติ</Radio>
+                                  <Radio disabled >รออนุมัติขยายเวลา</Radio>
+                                  <Radio disabled >อนุมัติขยายเวลา {" "}
+                                  <span style={{color : color.Error}}>
+                                  *ต้องโทรหาเกษตกรเพื่อคอนเฟิร์มการอนุมัติ/ปฏิเสธ*</span></Radio>
+                                  <Radio value={true}>งานมีปัญหา</Radio>
+                                </Space>
+                              </Radio.Group>
                             </Form.Item>
-                          </div>
-                        ) : data.status == "IN_PROGRESS" && index == 1 ? (
-                          <div style={{ marginLeft: "20px" }}>
-                            <Form.Item style={{ width: "530px" }}>
-                              {REDIO_IN_PROGRESS.map((item) =>
-                                _.set(item, "isChecked", data.status)
-                              ).map((x) => (
-                                <div>
-                                  <Radio
-                                    key={x.key}
-                                    value={x.name}
-                                    //  onClick={}
-                                    checked={x.isChecked}
-                                  />{" "}
-                                  <label>{x.name}</label>
-                                  <br />
-                                </div>
-                              ))}
-                            </Form.Item>
+                            {data.isProblem == true  ?
+                             <Form.Item>
+                             <TextArea
+                              rows={3}
+                              onChange={onChangeProblemText}
+                              placeholder="รายละเอียดปัญหา"
+                              autoComplete="off"
+                              defaultValue={data.problemRemark != null ? data.problemRemark : undefined}
+                             />
+                           </Form.Item>
+                            : null}
                           </div>
                         ) : null}
                       </Radio>
@@ -538,22 +534,25 @@ function EditInProgress() {
     </Form>
   );
   const UpdateTaskWaitStart = async (data: TaskDetailEntity) => {
-    await TaskInprogressDatasource.UpdateTask(data).then((res) => {
-      if (res) {
-        Swal.fire({
-          title: "ยืนยันการแก้ไข",
-          text: "โปรดตรวจสอบรายละเอียดที่คุณต้องการแก้ไขข้อมูลก่อนเสมอ เพราะอาจส่งผลต่อการจ้างงานในระบบ",
-          cancelButtonText: "ยกเลิก",
-          confirmButtonText: "บันทึก",
-          confirmButtonColor: color.Success,
-          showCancelButton: true,
-          showCloseButton: true,
-        }).then((time) => {
+    Swal.fire({
+      title: "ยืนยันการแก้ไข",
+      text: "โปรดตรวจสอบรายละเอียดที่คุณต้องการแก้ไขข้อมูลก่อนเสมอ เพราะอาจส่งผลต่อการจ้างงานในระบบ",
+      cancelButtonText: "ยกเลิก",
+      confirmButtonText: "บันทึก",
+      confirmButtonColor: color.Success,
+      showCancelButton: true,
+      showCloseButton: true,
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        const pushUpdateBy = Map(data).set("updateBy",  profile.firstname + " " + profile.lastname);
+        await TaskInprogressDatasource.UpdateTask(pushUpdateBy.toJS()).then((time) => {
           window.location.href = "/IndexTodayTask";
         });
       }
+      fetchTaskDetail();
     });
   };
+
 
   return (
     <Layouts>

@@ -38,6 +38,7 @@ import {
   REDIO_IN_PROGRESS,
   REDIO_WAIT_START,
   STATUS_COLOR_MAPPING,
+  STATUS_IS_PROBLEM,
   TASKTODAY_STATUS,
   TASK_TODAY_STATUS_MAPPING,
 } from "../../../../definitions/Status";
@@ -103,10 +104,6 @@ function EditWaitStart() {
     setData(m.toJS());
     console.log(m.toJS());
   };
-  const handlePeriodSpray = (e: any) => {
-    const d = Map(data).set("purposeSprayName", e);
-    setData(d.toJS());
-  };
   const handleOtherSpray = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.value.trim().length != 0) {
       setOtherSpray(e.target.value);
@@ -162,6 +159,11 @@ function EditWaitStart() {
     setData(p.toJS());
     console.log(p.toJS());
   };
+  const handlerPurposeSpray = (e:any) => {
+    const d = Map(data.purposeSpray).set("purposeSprayName", e.target.value);
+    setData(d.toJS());
+    console.log(d.toJS());
+  }
   const handlePreparation = (e: any) => {
     const d = Map(data).set("preparationBy", e.target.value);
     setData(d.toJS());
@@ -175,10 +177,19 @@ function EditWaitStart() {
   const handleChangeStatus = (e: any) => {
     const d = Map(data).set("status", e.target.value);
     setData(d.toJS());
-    console.log(d.toJS());
+    console.log(d.toJS()); 
   };
-  const handleSubStatus = (e: any) => {
-    console.log(e.target.value);
+  const handleChangeIsProblem = (e: any) => {
+    const m = Map(data).set("isProblem", e.target.value);
+    setData(m.toJS());
+  };
+  const onChangeProblemText = (e: any) => {
+    const m = Map(data).set("problemRemark", e.target.value);
+    setData(m.toJS());
+  };
+  const onChangeCanCelText = (e:any) => {
+    // const m = Map(data).set("problemRemark", e.target.value);
+    // setData(m.toJS());
   }
 
   const renderAppointment = (
@@ -186,7 +197,7 @@ function EditWaitStart() {
       <div className="row">
         <div className="col-lg-6">
           <div className="row">
-            <div className="col-lg-6">
+            <div className="col-lg-5">
               <label>วันที่นัดหมาย</label>
               <Form.Item>
                 <DatePicker
@@ -197,7 +208,7 @@ function EditWaitStart() {
                 />
               </Form.Item>
             </div>
-            <div className="col-lg-6">
+            <div className="col-lg-5">
               <label>เวลานัดหมาย</label>
               <Form.Item>
                 <TimePicker
@@ -210,60 +221,69 @@ function EditWaitStart() {
               </Form.Item>
             </div>
           </div>
-          <label>
-            ช่วงเวลาการพ่น <span style={{ color: "red" }}>*</span>
-          </label>
-          <Form.Item name="searchAddress">
-            <Select
-              key={data.purposeSprayId}
-              placeholder="-"
-              defaultValue={data.purposeSprayId}
-            >
-              {periodSpray?.purposeSpray?.length ? (
-                periodSpray?.purposeSpray?.map((item) => (
-                  <Option value={item.id}>{item.purposeSprayName}</Option>
-                ))
-              ) : (
-                <Option>-</Option>
-              )}
-            </Select>
-          </Form.Item>
-          <div className="form-group col-lg-12">
+          <div className="col-lg-10">
+            <label>
+              ช่วงเวลาการพ่น <span style={{ color: "red" }}>*</span>
+            </label>
+            <Form.Item name="searchAddress">
+              <Select
+              onChange={handlerPurposeSpray}
+                key={data.purposeSprayId}
+                defaultValue={data.purposeSprayId}
+              >
+                {periodSpray?.purposeSpray?.length ? (
+                  periodSpray?.purposeSpray?.map((item) => (
+                    <Option value={item.id}>{item.purposeSprayName}</Option>
+                  ))
+                ) : (
+                  <Option>-</Option>
+                )}
+              </Select>
+            </Form.Item>
+          </div>
+
+          <div className="form-group col-lg-5">
             <label>
               เป้าหมายการฉีดพ่น
               <span style={{ color: "red" }}>*</span>
             </label>
-            {PURPOSE_SPRAY_CHECKBOX.map((item) =>
-              _.set(
-                item,
-                "isChecked",
-                data.targetSpray.map((x) => x).find((y) => y === item.crop)
-                  ? true
-                  : item.isChecked
-              )
-            ).map((x) => (
-              <div>
-                <Checkbox
-                  key={x.key}
-                  value={x.crop}
-                  onClick={handlerTargetSpray}
-                  checked={x.isChecked}
-                />{" "}
-                <label>{x.crop}</label>
-                <br />
-              </div>
-            ))}
+            {data.targetSpray != null && data.targetSpray
+              ? PURPOSE_SPRAY_CHECKBOX.map((item) =>
+                  _.set(
+                    item,
+                    "isChecked",
+                    data.targetSpray.map((x) => x).find((y) => y === item.crop)
+                      ? true
+                      : item.isChecked
+                  )
+                ).map((x) => (
+                  <div>
+                    <Checkbox
+                      key={x.key}
+                      value={x.crop}
+                      onClick={handlerTargetSpray}
+                      checked={x.isChecked}
+                    />{" "}
+                    <label>{x.crop}</label>
+                    <br />
+                  </div>
+                ))
+              : null}
           </div>
-          <div className="form-group col-lg-12">
-              <Input
-               disabled={checkCrop}
-                onChange={handleOtherSpray}
-                placeholder="โปรดระบุ เช่น เพลี้ย,หอย"
-                autoComplete="off"
-                defaultValue={data.targetSpray
-                  .filter((a) => !PURPOSE_SPRAY.some((x) => x === a))
-                  .join(",")}
-              />
+          <div className="form-group col-lg-10">
+            <Input
+              disabled={checkCrop}
+              onChange={handleOtherSpray}
+              placeholder="โปรดระบุ เช่น เพลี้ย,หอย"
+              autoComplete="off"
+              defaultValue={
+                data.targetSpray != null
+                  ? data.targetSpray
+                      .filter((a) => !PURPOSE_SPRAY.some((x) => x === a))
+                      .join(",")
+                  : "-"
+              }
+            />
           </div>
           <div className="row form-group col-lg-6 p-2">
             <label>
@@ -281,69 +301,92 @@ function EditWaitStart() {
               </Radio.Group>
             </Form.Item>
           </div>
-          <div className="form-group">
+          <div className="form-group col-lg-10">
             <label>หมายเหตุ</label>
-            <TextArea onChange={handleComment} value={data.comment} />
+            <TextArea rows={3} onChange={handleComment} value={data.comment} />
           </div>
         </div>
-        <div className="col-lg-1"></div>
-        <div className="col-lg-5">
+
+        <div className="col-lg-6">
           <label style={{ marginBottom: "10px" }}>
             สถานะ <span style={{ color: "red" }}>*</span>
           </label>
           <Form.Item name="status">
             <div className="row">
-              <div className="form-group col-lg-12">
+              <div className="form-group col-lg-4">
                 <Radio.Group
                   value={data.status}
                   onChange={handleChangeStatus}
-                  className="col-lg-12"
+                  className="col-lg-4"
                 >
                   <Space direction="vertical">
                     {TASKTODAY_STATUS.map((item: any, index: any) => (
                       <Radio value={item.value}>
                         {item.name}
                         {data.status == "WAIT_START" && index == 0 ? (
-                          <div style={{ marginLeft: "20px" }}>
+                          <div
+                            style={{ marginLeft: "20px" }}
+                            className="col-lg-10"
+                          >
                             <Form.Item style={{ width: "530px" }}>
-                              {/* {REDIO_WAIT_START.map((item) =>
-                                _.set(
-                                  item,
-                                  "isChecked",
-                                  data.isDelay,
-                                  data.isProblem 
-                                )
-                              ).map((x) => (
-                                <div>
-                                  <Radio
-                                    key={x.key}
-                                    value={x.name}
-                                    onClick={handleSubStatus}
-                                    checked={x.isChecked}
-                                  />{" "}
-                                  <label>{x.name}</label>
-                                  <br />
-                                </div>
-                              ))} */}
+                              <Radio.Group
+                                value={data.isProblem}
+                                onChange={handleChangeIsProblem}
+                              >
+                                <Space direction="vertical">
+                                  <Radio value={false}>งานปกติ</Radio>
+                                  <Radio value={true}>งานมีปัญหา</Radio>
+                                </Space>
+                              </Radio.Group>
                             </Form.Item>
+                            {data.isProblem == true ? (
+                              <Form.Item>
+                                <TextArea
+                                  rows={3}
+                                  onChange={onChangeProblemText}
+                                  placeholder="รายละเอียดปัญหา"
+                                  autoComplete="off"
+                                  defaultValue={
+                                    data.problemRemark != null
+                                      ? data.problemRemark
+                                      : undefined
+                                  }
+                                /> 
+                              </Form.Item>
+                            ) : null}
                           </div>
                         ) : data.status == "IN_PROGRESS" && index == 1 ? (
                           <div style={{ marginLeft: "20px" }}>
                             <Form.Item style={{ width: "530px" }}>
-                              {REDIO_IN_PROGRESS.map((item) =>
-                                _.set(item, "isChecked", data.status)
-                              ).map((x) => (
-                                <div>
-                                  <Radio
-                                    key={x.key}
-                                    value={x.name}
-                                    //  onClick={}
-                                    checked={x.isChecked}
-                                  />{" "}
-                                  <label>{x.name}</label>
-                                  <br />
-                                </div>
-                              ))}
+                              <Radio.Group
+                                value={data.isProblem}
+                                onChange={handleChangeIsProblem}
+                              >
+                                <Space direction="vertical">
+                                  <Radio value={false}>งานปกติ</Radio>
+                                  <Radio value={true}>รออนุมัติขยายเวลา</Radio>
+                                  <Radio value={true}>อนุมัติขยายเวลา</Radio>
+                                  <Radio value={true}>งานมีปัญหา</Radio>
+                                </Space>
+                              </Radio.Group>
+                            </Form.Item>
+                          </div>
+                        ) : data.status == "CANCELED" && index == 2 ? (
+                          <div style={{ marginLeft: "20px" }}>
+                            <Form.Item style={{ width: "500px" }}>
+                       
+                                <TextArea
+                                  rows={3}
+                                  onChange={onChangeCanCelText}
+                                  placeholder="รายละเอียดการยกเลิก"
+                                  autoComplete="off"
+                                  // defaultValue={
+                                  //   data.problemRemark != null
+                                  //     ? data.problemRemark
+                                  //     : undefined
+                                  // }
+                                /> 
+                            
                             </Form.Item>
                           </div>
                         ) : null}
@@ -578,25 +621,22 @@ function EditWaitStart() {
     </Form>
   );
   const UpdateTaskWaitStart = async (data: TaskDetailEntity) => {
-    // const p = Map(data).set(
-    //   "createBy",
-    //   profile.firstname + " " + profile.lastname
-    // );
-    // setData(p.toJS());
-    await TaskInprogressDatasource.UpdateTask(data).then((res) => {
-      if (res) {
-        Swal.fire({
-          title: "ยืนยันการแก้ไข",
-          text: "โปรดตรวจสอบรายละเอียดที่คุณต้องการแก้ไขข้อมูลก่อนเสมอ เพราะอาจส่งผลต่อการจ้างงานในระบบ",
-          cancelButtonText: "ยกเลิก",
-          confirmButtonText: "บันทึก",
-          confirmButtonColor: color.Success,
-          showCancelButton: true,
-          showCloseButton: true,
-        }).then((time) => {
+    Swal.fire({
+      title: "ยืนยันการแก้ไข",
+      text: "โปรดตรวจสอบรายละเอียดที่คุณต้องการแก้ไขข้อมูลก่อนเสมอ เพราะอาจส่งผลต่อการจ้างงานในระบบ",
+      cancelButtonText: "ยกเลิก",
+      confirmButtonText: "บันทึก",
+      confirmButtonColor: color.Success,
+      showCancelButton: true,
+      showCloseButton: true,
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        const pushUpdateBy = Map(data).set("updateBy",  profile.firstname + " " + profile.lastname);
+        await TaskInprogressDatasource.UpdateTask(pushUpdateBy.toJS()).then((time) => {
           window.location.href = "/IndexTodayTask";
         });
       }
+      fetchTaskDetail();
     });
   };
 

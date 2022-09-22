@@ -99,9 +99,9 @@ export const TaskInprogressEntity_INIT: TaskInprogressEntity = {
       reviewFarmerComment: null,
       imagePathFinishTask: null,
       comment: "",
-      isProblem: true,
+      isProblem: false,
       problemRemark: null,
-      isDelay: true,
+      isDelay: false,
       delayRemark: null,
       dateDelay: null,
       statusDelay: null,
@@ -149,7 +149,7 @@ export interface TaskDetailEntity {
   updateBy: string;
   distance: string;
   status: string;
-  statusRemark: string;
+  statusRemark: null;
   reviewDronerAvg: null;
   reviewDronerDetail: null;
   unitPriceStandard: string;
@@ -169,7 +169,7 @@ export interface TaskDetailEntity {
   delayRemark: null;
   dateDelay: null;
   statusDelay: null;
-  delayRejectRemark: null;
+  delayRejectRemark: string;
   purposeSpray: CropPurposeSprayEntity;
   farmer: FarmerEntity;
   droner: DronerEntity;
@@ -193,7 +193,7 @@ export const TaskDetailEntity_INIT: TaskDetailEntity = {
   updateBy: "",
   distance: "",
   status: "",
-  statusRemark: "",
+  statusRemark: null,
   reviewDronerAvg: null,
   reviewDronerDetail: null,
   unitPriceStandard: "",
@@ -207,13 +207,13 @@ export const TaskDetailEntity_INIT: TaskDetailEntity = {
   reviewFarmerComment: null,
   imagePathFinishTask: null,
   comment: "",
-  isProblem: true,
+  isProblem: false,
   problemRemark: null,
-  isDelay: true,
+  isDelay: false,
   delayRemark: null,
   dateDelay: null,
   statusDelay: null,
-  delayRejectRemark: null,
+  delayRejectRemark: "",
   purposeSpray: CropPurposeSprayEntity_INIT,
   farmer: FarmerEntity_INIT,
   droner: DronerEntity_INIT,
