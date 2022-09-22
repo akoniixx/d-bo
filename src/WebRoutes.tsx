@@ -31,9 +31,9 @@ import IndexNewTask from "./pages/task/newTask/IndexNewTask";
 import AddNewTask from "./pages/task/newTask/AddNewTask";
 import EditNewTask from "./pages/task/newTask/EditNewTask";
 import IndexTodayTask from "./pages/task/todayTask/IndexTaskToday";
+import EditCancel from "./pages/task/todayTask/DetailEdit/EditCancel";
 import EditWaitStart from "./pages/task/todayTask/DetailEdit/EditWaitStart";
 import EditInProgress from "./pages/task/todayTask/DetailEdit/EditInProgress";
-import EditCancel from "./pages/task/todayTask/DetailEdit/EditCancel";
 
 
 

@@ -36,6 +36,7 @@ import {
 } from "../../entities/LocationEntities";
 import { LocationDatasource } from "../../datasource/LocationDatasource";
 import { CropPurposeSprayEntity } from "../../entities/CropEntities";
+import { PURPOSE_SPRAY } from "../../definitions/PurposeSpray";
 const _ = require("lodash");
 let queryString = _.split(window.location.search, "=");
 const dateFormat = "DD/MM/YYYY";
@@ -151,7 +152,7 @@ function DetailWorkDroner() {
           <label>เป้าหมายการฉีดพ่น</label>
           <Form.Item>
             <span style={{ color: color.Grey }}>
-              {data.targetSpray !== null ? data.targetSpray : "-"}
+              {data.targetSpray !== null ? data.targetSpray.join(",") : "-"}
             </span>
           </Form.Item>
           <label>การเตรียมยา</label>
@@ -489,11 +490,7 @@ function DetailWorkDroner() {
               <Input
                 disabled
                 placeholder="0.0"
-                value={
-                  data.discountFee !== null
-                    ? formatCurrency(data.discountFee)
-                    : "0.00"
-                }
+                value={data.fee !== null ? formatCurrency(data.fee) : "0.00"}
                 suffix="บาท"
               />
             </Form.Item>
@@ -503,7 +500,11 @@ function DetailWorkDroner() {
               <label>ส่วนลดค่าธรรมเนียม</label>
               <Input
                 disabled
-                value={data.fee !== null ? formatCurrency(data.fee) : "0.00"}
+                value={
+                  data.discountFee !== null
+                    ? formatCurrency(data.discountFee)
+                    : "0.00"
+                }
                 suffix="บาท"
               />
             </Form.Item>

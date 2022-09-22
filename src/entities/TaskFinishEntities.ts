@@ -7,6 +7,7 @@ import {
 } from "./ReviewDronerEntities";
 import { FarmerEntity, FarmerEntity_INIT } from "./FarmerEntities";
 import { DronerEntity, DronerEntity_INIT } from "./DronerDroneEntities";
+import { HistoryEntity, HistoryEntity_INIT } from "./HistoryEntities";
 export interface TaskFinish {
   id: string;
   taskNo: string;
@@ -21,12 +22,13 @@ export interface TaskFinish {
   };
   purposeSprayId: string;
   dateAppointment: string;
-  targetSpray: null;
+  targetSpray: string[];
   preparationBy: string;
   createdAt: string;
   updatedAt: string;
   createBy: string;
   updateBy: string;
+  taskHistory: HistoryEntity;
   distance: string;
   status: string;
   statusRemark: string;
@@ -61,10 +63,11 @@ export const TaskFinish_INIT: TaskFinish = {
   },
   purposeSprayId: "",
   dateAppointment: "",
-  targetSpray: null,
+  targetSpray: [""],
   preparationBy: "",
   createdAt: "",
   updatedAt: "",
+  taskHistory: HistoryEntity_INIT,
   createBy: "",
   updateBy: "",
   distance: "",
@@ -115,7 +118,7 @@ export interface CreateReviewDroner {
   };
   purposeSprayId: string;
   dateAppointment: string;
-  targetSpray: null;
+  targetSpray: string[];
   preparationBy: string;
   createdAt: string;
   updatedAt: string;
@@ -155,7 +158,7 @@ export const CreateReviewDroner_INIT: CreateReviewDroner = {
   },
   purposeSprayId: "",
   dateAppointment: "",
-  targetSpray: null,
+  targetSpray: [""],
   preparationBy: "",
   createdAt: "",
   updatedAt: "",

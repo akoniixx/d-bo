@@ -56,6 +56,7 @@ const dateFormat = "DD/MM/YYYY";
 const timeFormat = "HH:mm";
 
 function ReviewTask() {
+  const profile = JSON.parse(localStorage.getItem("profile") || "{  }");
   const taskId = queryString[1];
   const [data, setData] = useState<DetailReviewTask>(DetailReviewTask_INIT);
   const [detailDroner, setDetailDroner] =
@@ -84,11 +85,12 @@ function ReviewTask() {
     const m = Map(detailDroner).set("canReview", e.target.value);
     const n = Map(m.toJS()).set("taskId", taskId);
     setDetailDroner(n.toJS());
-    {
-      !e.target.value ? setBtnSaveDisable(true) : setBtnSaveDisable(false);
-    }
-    {
-      e.target.value == "Yes" ? setSaveRate(false) : setSaveRate(true);
+    if(e.target.value == "Yes"){
+      setBtnSaveDisable(true);
+      setSaveRate(false);
+    }else{
+      setBtnSaveDisable(false);
+      setSaveRate(false);
     }
   };
 
@@ -96,16 +98,20 @@ function ReviewTask() {
     const m = Map(detailDroner).set("pilotEtiquette", parseInt(e));
     const n = Map(m.toJS()).set("taskId", taskId);
     setDetailDroner(n.toJS());
+     setBtnSaveDisable(false);
   };
   const punctuality = (e: any) => {
     const m = Map(detailDroner).set("punctuality", parseInt(e));
     const n = Map(m.toJS()).set("taskId", taskId);
     setDetailDroner(n.toJS());
+     setBtnSaveDisable(false);
   };
   const expertise = (e: any) => {
     const m = Map(detailDroner).set("sprayExpertise", parseInt(e));
     const n = Map(m.toJS()).set("taskId", taskId);
     setDetailDroner(n.toJS());
+    {e == 0 ?  setBtnSaveDisable(true) :  setBtnSaveDisable(false); }
+    
   };
   const commentReview = (e: any) => {
     const m = Map(detailDroner).set("comment", e.target.value);
@@ -132,29 +138,35 @@ function ReviewTask() {
     imgWindow?.document.write(image.outerHTML);
   };
 
-  const UpdateReviewDroner = async () => {
-    const pushDetailReview = Map(data.data).set(
-      "reviewDronerDetail",
-      detailDroner
-    );
-    await TaskReviewDronerDatasource.UpdateReviewDroner(
-      pushDetailReview.toJS().reviewDronerDetail
-    ).then((res) => {
-      if (res) {
-        Swal.fire({
-          title: "ยืนยันการเปลี่ยนแปลงข้อมูล",
-          text: "โปรดตรวจสอบรายละเอียดที่คุณต้องการเปลี่ยนแปลงข้อมูลก่อนเสมอเพราะอาจส่งผลต่อการจ้างงานในระบบ",
-          cancelButtonText: "ยกเลิก",
-          confirmButtonText: "บันทึก",
-          confirmButtonColor: color.Success,
-          showCancelButton: true,
-          showCloseButton: true,
-        }).then((time) => {
-          window.location.href = "/IndexFinishTask";
-        });
+  const UpdateReviewDroner = async (data: DetailReviewTask) => {
+    Swal.fire({
+      title: "ยืนยันการเปลี่ยนแปลงข้อมูล",
+      text: "โปรดตรวจสอบรายละเอียดที่คุณต้องการเปลี่ยนแปลงข้อมูลก่อนเสมอเพราะอาจส่งผลต่อการจ้างงานในระบบ",
+      cancelButtonText: "ยกเลิก",
+      confirmButtonText: "บันทึก",
+      confirmButtonColor: color.Success,
+      showCancelButton: true,
+      showCloseButton: true,
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        const pushDetailReview = Map(data.data).set(
+          "reviewDronerDetail",
+          detailDroner
+        );
+        const p = Map(pushDetailReview.toJS().reviewDronerDetail).set(
+          "updateBy",
+          profile.firstname + " " + profile.lastname
+        );
+        await TaskReviewDronerDatasource.UpdateReviewDroner(p.toJS()).then(
+          (time) => {
+            window.location.href = "/IndexFinishTask";
+          }
+        );
       }
+      fetchDetailTask();
     });
   };
+
   const renderAppointment = (
     <Form style={{ padding: "32px" }}>
       <div className="row">
@@ -201,7 +213,9 @@ function ReviewTask() {
           <label>เป้าหมายการฉีดพ่น</label>
           <Form.Item>
             <span style={{ color: color.Grey }}>
-              {data.data.targetSpray !== null ? data.data.targetSpray : "-"}
+              {data.data.targetSpray !== null
+                ? data.data.targetSpray.join(",")
+                : "-"}
             </span>
           </Form.Item>
           <label>การเตรียมยา</label>
@@ -275,7 +289,6 @@ function ReviewTask() {
                   <Select
                     onChange={manners}
                     disabled={saveRate}
-                    allowClear
                     style={{ width: 75 }}
                   >
                     {RATE_SELECT.map((item: any) => (
@@ -288,7 +301,6 @@ function ReviewTask() {
                   <Select
                     onChange={punctuality}
                     disabled={saveRate}
-                    allowClear
                     style={{ width: 75 }}
                   >
                     {RATE_SELECT.map((item: any) => (
@@ -301,7 +313,6 @@ function ReviewTask() {
                   <Select
                     onChange={expertise}
                     disabled={saveRate}
-                    allowClear
                     style={{ width: 75 }}
                   >
                     {RATE_SELECT.map((item: any) => (
@@ -529,8 +540,8 @@ function ReviewTask() {
                 disabled
                 placeholder="0.0"
                 value={
-                  data.data.discountFee !== null
-                    ? formatCurrency(data.data.discountFee) + " " + "บาท"
+                  data.data.fee !== null
+                    ? formatCurrency(data.data.fee) + " " + "บาท"
                     : "0.00" + " " + "บาท"
                 }
                 suffix="บาท"
@@ -543,8 +554,8 @@ function ReviewTask() {
               <Input
                 disabled
                 value={
-                  data.data.fee !== null
-                    ? formatCurrency(data.data.fee) + " " + "บาท"
+                  data.data.discountFee !== null
+                    ? formatCurrency(data.data.discountFee) + " " + "บาท"
                     : "0.00" + " " + "บาท"
                 }
                 suffix="บาท"
@@ -589,7 +600,7 @@ function ReviewTask() {
       </CardContainer>
       <FooterPage
         onClickBack={() => (window.location.href = "/IndexFinishTask")}
-        onClickSave={UpdateReviewDroner}
+        onClickSave={() => UpdateReviewDroner(data)}
         disableSaveBtn={saveBtnDisable}
       />
     </Layout>

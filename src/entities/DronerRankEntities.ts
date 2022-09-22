@@ -1,9 +1,9 @@
-import { ImageEntity, ImageEntity_INTI } from './UploadImageEntities';
+import { ImageEntity, ImageEntity_INTI } from "./UploadImageEntities";
 import { DronerEntity, DronerEntity_INIT } from "./DronerEntities";
 import { FarmerPlotEntity, FarmerPlotEntity_INIT } from "./FarmerPlotEntities";
 import { FarmerEntity, FarmerEntity_INIT } from "./FarmerEntities";
 import { FullAddressEntiry_INIT, FullAddressEntity } from "./AddressEntities";
-import { PurposeSprayEntity, PurposeSprayEntity_INIT } from './CropEntities';
+import { PurposeSprayEntity, PurposeSprayEntity_INIT } from "./CropEntities";
 
 export interface AllDronerRankEntity {
   droner_id: null;
@@ -222,7 +222,7 @@ export const DronerRankDetailEntity_INIT: DronerRankDetailEntity = {
   address: FullAddressEntiry_INIT,
   task: [taskByDronerEntity_INIT],
   file: [ImageEntity_INTI],
-  farmer : FarmerEntity_INIT,
+  farmer: FarmerEntity_INIT,
   avgrating: "",
   totalTaskCount: "",
   totalRaiCount: "",
@@ -241,7 +241,7 @@ export interface taskDetailEntity {
   purposeSprayId: string;
   purposeSpray: PurposeSprayEntity;
   dateAppointment: string;
-  targetSpray: null;
+  targetSpray: string[];
   preparationBy: string;
   createdAt: string;
   updatedAt: string;
@@ -285,7 +285,7 @@ export const taskDetailEntity_INIT: taskDetailEntity = {
   purposeSprayId: "",
   purposeSpray: PurposeSprayEntity_INIT,
   dateAppointment: "",
-  targetSpray: null,
+  targetSpray: [""],
   preparationBy: "",
   createdAt: "",
   updatedAt: "",
