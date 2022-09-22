@@ -30,6 +30,9 @@ const ModalMapPlot: React.FC<ModalMapPlotProps> = ({
       setData(res);
     });
   };
+  const showInMapClicked = () => {
+    window.open("https://maps.google.com?q=" + data?.lat + "," + data?.long);
+  };
 
   useEffect(() => {
     fetchFarmerPlot();
@@ -59,6 +62,7 @@ const ModalMapPlot: React.FC<ModalMapPlotProps> = ({
               borderColor: color.Success,
               borderRadius: "5px",
             }}
+            onClick={showInMapClicked}
           >
             ดูข้อมูล Google Map
           </Button>
@@ -68,7 +72,18 @@ const ModalMapPlot: React.FC<ModalMapPlotProps> = ({
           <div className="form-group">
             <label>พื้นที่แปลงเกษตร</label>
             <Form.Item key={data?.plotName}>
-              <Input defaultValue={data?.plotName} disabled />
+              <Input
+                defaultValue={
+                  data?.plotArea !== null
+                    ? data?.plotArea.subdistrictName +
+                      "/" +
+                      data?.plotArea.districtName +
+                      "/" +
+                      data?.plotArea.provinceName
+                    : "-"
+                }
+                disabled
+              />
             </Form.Item>
           </div>
           <div className="row">

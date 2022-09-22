@@ -1,4 +1,9 @@
-import { DownOutlined, StarFilled } from "@ant-design/icons";
+import {
+  CheckCircleFilled,
+  DownOutlined,
+  EditFilled,
+  StarFilled,
+} from "@ant-design/icons";
 import {
   AutoComplete,
   Avatar,
@@ -20,6 +25,7 @@ import {
   Steps,
   Table,
   TimePicker,
+  Tooltip,
 } from "antd";
 import TextArea from "antd/lib/input/TextArea";
 import { RowSelectionType } from "antd/lib/table/interface";
@@ -141,10 +147,11 @@ const EditNewTask = () => {
 
   const fetchNewTask = async () => {
     await TaskDatasource.getNewTaskById(queryString[1]).then((res) => {
+      delete res["updatedAt"];
       res.farmer.farmerPlot = [res.farmerPlot];
       res?.taskDronerTemp?.map((item) => _.set(item, "isChecked", true));
       res.taskDronerTemp && setDronerSelectedList(res?.taskDronerTemp);
-      setDateAppointment(res.dateAppointment);
+      setDateAppointment(new Date(res.dateAppointment).toUTCString());
       setTimeAppointment(new Date(res.dateAppointment).getTime());
       setDataFarmer(res.farmer);
       setFarmerSelected(res.farmer);
@@ -195,7 +202,6 @@ const EditNewTask = () => {
     newData.taskDronerTemp = [];
     newData.preparationBy = "";
     newData.createdAt = data.createdAt;
-    newData.updatedAt = data.updatedAt;
     newData.distance = data.distance;
     newData.status = data.status;
     newData.statusRemark = data.statusRemark;
@@ -318,6 +324,16 @@ const EditNewTask = () => {
       data.includes("-") ||
       data.includes("+");
     return data.trim().length != 0 ? (checkSyntax ? true : false) : true;
+  };
+  const handleDate = (e: any) => {
+    let dateSelect = new Date(e);
+    setDateAppointment(
+      dateSelect.getFullYear() +
+        "/" +
+        (dateSelect.getMonth() + 1) +
+        "/" +
+        dateSelect.getDate()
+    );
   };
   const handleTime = (e: any) => {
     setTimeAppointment(new Date(e).getTime());
@@ -549,11 +565,7 @@ const EditNewTask = () => {
                   format={dateFormat}
                   className="col-lg-12"
                   disabled={current == 2 || checkSelectPlot == "error"}
-                  onSelect={(e: any) =>
-                    setDateAppointment(
-                      moment(new Date(e)).format(dateCreateFormat)
-                    )
-                  }
+                  onChange={(e: any) => handleDate(e)}
                   defaultValue={moment(dateAppointment)}
                 />
               </Form.Item>
@@ -705,6 +717,7 @@ const EditNewTask = () => {
       ratingMin,
       ratingMax
     ).then((res) => {
+      console.log(res);
       res.map((item) =>
         _.set(
           item,
@@ -885,18 +898,33 @@ const EditNewTask = () => {
     setDataDronerList(d);
     setDronerSelectedList(d.filter((x) => x.isChecked == true));
   };
-  const callBackDronerSelected = (data: TaskDronerTempEntity[]) => {
-    let d = dataDronerList.map((item) =>
-      _.set(
-        item,
-        "isChecked",
-        data?.map((x) => x).find((y) => y.dronerId === item.droner_id)
-          ? true
-          : false
-      )
+  const callBackDronerSelected = async (data: TaskDronerTempEntity[]) => {
+    let compareData = dronerSelectedList.filter(
+      (x) => !data.map((y) => y.id).includes(x.id)
     );
-    setDataDronerList(d);
-    setDronerSelectedList(d.filter((x) => x.isChecked == true));
+    for (let i: number = 0; compareData.length > i; i++) {
+      let deleteDroner: DeletedDronerTemp = DeletedDronerTemp_INIT;
+      deleteDroner.taskId = queryString[1];
+      deleteDroner.dronerId = compareData[i].dronerId;
+      await TaskDronerTempDataSource.deleteDronerTemp(deleteDroner).then(
+        (res) => {
+          let droner = dataDronerList.map((item) =>
+            _.set(
+              item,
+              "isChecked",
+              res.responseData
+                .map((x: any) => x)
+                .find((y: any) => y.dronerId === item.droner_id)
+                ? true
+                : false
+            )
+          );
+          setDataDronerList(droner);
+          setDronerSelectedList(res.responseData);
+        }
+      );
+    }
+    setShowModalSelectedDroner((prev) => !prev);
   };
   const handleVisibleRating = (newVisible: any) => {
     setVisibleRating(newVisible);
@@ -1055,13 +1083,29 @@ const EditNewTask = () => {
       title: "ชื่อนักบินโดรน",
       dataIndex: "fullname",
       key: "fullname",
+      width: "18%",
       render: (value: any, row: any, index: number) => {
+        let tooltipTitle = (
+          <>
+            {"เคยให้บริการเกษตรกรท่านนี้,"}
+            <br />
+            {"คะแนนรีวิวล่าสุด "}
+            <StarFilled style={{ color: "#FFCA37", fontSize: "16px" }} />{" "}
+            {parseFloat(row.rating_avg).toFixed(1)}
+          </>
+        );
         return {
           children: (
             <>
               <span>{row.firstname + " " + row.lastname}</span>
+              {row.rating_avg != null && (
+                <Tooltip title={tooltipTitle} className="p-2">
+                  <EditFilled style={{ color: color.Success }} />
+                </Tooltip>
+              )}
+
               <br />
-              <span style={{ color: color.Grey }}></span>
+              <span style={{ color: color.Grey }}>{row.droner_code}</span>
             </>
           ),
         };
@@ -1135,8 +1179,28 @@ const EditNewTask = () => {
     },
     {
       title: "ยี่หัอ",
-      dataIndex: "role",
-      key: "role",
+      dataIndex: "brand",
+      key: "brand",
+      render: (value: any, row: any, index: number) => {
+        return {
+          children: (
+            <>
+              <Avatar
+                size={25}
+                src={row.logo_drone_brand}
+                style={{ marginRight: "5px" }}
+              />
+              <span>{row.drone_brand}</span>
+              <br />
+              {row.count_drone > 1 && (
+                <p style={{ fontSize: "12px", color: color.Grey }}>
+                  (มากกว่า 1 ยี่ห้อ)
+                </p>
+              )}
+            </>
+          ),
+        };
+      },
     },
     {
       title: "สะดวก/ไม่สะดวก",
@@ -1260,7 +1324,10 @@ const EditNewTask = () => {
           <Form style={{ padding: "20px" }}>
             <label>ยอดรวมค่าบริการ (หลังรวมค่าธรรมเนียม)</label>
             <h5 style={{ color: color.primary1 }} className="p-2">
-              {numberWithCommas(parseFloat(data?.price))} บาท
+              {parseFloat(
+                numberWithCommas(parseFloat(data?.price)).toString()
+              ).toFixed(2)}{" "}
+              บาท
             </h5>
             <div className="row">
               <div className="form-group col-lg-4">
@@ -1268,7 +1335,7 @@ const EditNewTask = () => {
                 <Form.Item>
                   <Input
                     suffix="บาท"
-                    value={data?.price}
+                    value={parseFloat(data?.price).toFixed(2)}
                     disabled={current == 2}
                     autoComplete="off"
                     step="0.01"
@@ -1280,7 +1347,7 @@ const EditNewTask = () => {
                 <Form.Item>
                   <Input
                     suffix="บาท"
-                    value={data?.fee}
+                    value={parseFloat(data?.fee).toFixed(2)}
                     disabled={current == 2}
                     autoComplete="off"
                     step="0.01"
@@ -1292,7 +1359,7 @@ const EditNewTask = () => {
                 <Form.Item>
                   <Input
                     suffix="บาท"
-                    value={data?.discountFee}
+                    value={parseFloat(data?.discountFee).toFixed(2)}
                     disabled={current == 2}
                     autoComplete="off"
                     step="0.01"
@@ -1310,6 +1377,7 @@ const EditNewTask = () => {
   const nextStep = () => {
     if (current == 0) {
       let changeTimeFormat = moment(timeAppointment).format(timeCreateFormat);
+      let changeDateFormat = moment(dateAppointment).format(dateCreateFormat);
       let otherSprayList = [];
       if (otherSpray != undefined) {
         let m = otherSpray.split(",");
@@ -1323,7 +1391,7 @@ const EditNewTask = () => {
       );
       const d = Map(data).set(
         "dateAppointment",
-        moment(dateAppointment + " " + changeTimeFormat).toISOString()
+        moment(changeDateFormat + " " + changeTimeFormat).toISOString()
       );
       const p = Map(d.toJS()).set(
         "createBy",
@@ -1427,7 +1495,9 @@ const EditNewTask = () => {
             onClick={() => (window.location.href = "/IndexNewTask")}
           />
           <span className="pt-3">
-            <strong style={{ fontSize: "20px" }}>แก้ไขงานบินใหม่</strong>
+            <strong style={{ fontSize: "20px" }}>
+              แก้ไขงานบินใหม่ {data.taskNo}
+            </strong>
           </span>
         </Row>
         {renderStep}

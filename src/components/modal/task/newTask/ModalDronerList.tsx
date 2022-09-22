@@ -1,5 +1,5 @@
 import { StarFilled } from "@ant-design/icons";
-import { Badge, Form, Modal, Row, Table } from "antd";
+import { Avatar, Badge, Form, Modal, Row, Table } from "antd";
 import React, { useEffect, useState } from "react";
 import { TaskDronerTempDataSource } from "../../../../datasource/TaskDronerTempDatasource";
 import { TaskDronerTempEntity } from "../../../../entities/TaskDronerTemp";
@@ -79,7 +79,9 @@ const ModalDronerList: React.FC<ModalDronerListProps> = ({
                     {parseFloat(data.rating_avg).toFixed(2)}
                   </span>
                 </Row>
-              ):<p>-</p>}
+              ) : (
+                <p>-</p>
+              )}
             </>
           ),
         };
@@ -92,7 +94,7 @@ const ModalDronerList: React.FC<ModalDronerListProps> = ({
         return {
           children: (
             <>
-              <span>{data.district_name}</span>
+              <span>{data.subdistrict_name}</span>
             </>
           ),
         };
@@ -105,7 +107,7 @@ const ModalDronerList: React.FC<ModalDronerListProps> = ({
         return {
           children: (
             <>
-              <span>{data.subdistrict_name}</span>
+              <span>{data.district_name}</span>
             </>
           ),
         };
@@ -131,6 +133,11 @@ const ModalDronerList: React.FC<ModalDronerListProps> = ({
         return {
           children: (
             <>
+              <Avatar
+                size={25}
+                src={data.logo_drone_brand}
+                style={{ marginRight: "5px" }}
+              />
               <span>{data.drone_brand}</span>
             </>
           ),
@@ -140,22 +147,26 @@ const ModalDronerList: React.FC<ModalDronerListProps> = ({
     {
       title: "สถานะ",
       render: (value: any, row: any, index: number) => {
-        let data = JSON.parse(row.dronerDetail[0]);
+        const STATUS_MAPPING: any = {
+          WAIT_RECEIVE: "รอรับงาน",
+          REJECTED: "ไม่รับงาน",
+          CANCELED: "ยกเลิก",
+        };
         return {
           children: (
             <>
               <span
                 style={{
                   color:
-                    data.droner_status == "สะดวก" ? color.Success : color.Error,
+                    row.status == "WAIT_RECEIVE" ? color.Warning : color.Error,
                 }}
               >
                 <Badge
                   color={
-                    data.droner_status == "สะดวก" ? color.Success : color.Error
+                    row.status == "WAIT_RECEIVE" ? color.Warning : color.Error
                   }
                 />
-                {data.droner_status}
+                {STATUS_MAPPING[row.status]}
                 <br />
               </span>
             </>

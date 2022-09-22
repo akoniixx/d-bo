@@ -48,7 +48,6 @@ const IndexNewTask = () => {
       searchStartDate,
       searchEndDate
     ).then((res) => {
-      console.log(res);
       setData(res);
     });
   };
@@ -83,6 +82,10 @@ const IndexNewTask = () => {
     setShowModalDroner((prev) => !prev);
     setTaskId(taskId);
   };
+  const removeNewTask = (e: string) => {
+    console.log(e);
+  };
+
   const menu = (
     <Menu
       items={[
@@ -304,7 +307,11 @@ const IndexNewTask = () => {
                 />
               </div>
               <div className="col-lg-6">
-                <ActionButton icon={<DeleteOutlined />} color={color.Error} />
+                <ActionButton
+                  icon={<DeleteOutlined />}
+                  color={color.Error}
+                  onClick={() => removeNewTask(row.id)}
+                />
               </div>
             </div>
           ),

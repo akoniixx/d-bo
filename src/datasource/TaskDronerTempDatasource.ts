@@ -30,7 +30,6 @@ export class TaskDronerTempDataSource {
     return httpClient
       .delete(BASE_URL + "/tasks/task-droner-temp", { data })
       .then((response) => {
-        console.log(response.data);
         return response.data;
       })
       .catch((err) => {

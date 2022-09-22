@@ -95,7 +95,6 @@ export interface GetNewTaskEntity {
   taskDronerTemp?: TaskDronerTempEntity[];
   preparationBy: string;
   createdAt: string;
-  updatedAt: string;
   distance: string;
   status: string;
   statusRemark: string;
@@ -122,6 +121,7 @@ export interface GetNewTaskEntity {
   farmer: FarmerEntity;
   droner: string;
   farmerPlot: FarmerPlotEntity;
+  updatedAt?:string;
 }
 export const GetNewTaskEntity_INIT: GetNewTaskEntity = {
   id: "",
@@ -136,7 +136,6 @@ export const GetNewTaskEntity_INIT: GetNewTaskEntity = {
   taskDronerTemp: [TaskDronerTempEntity_INIT],
   preparationBy: "",
   createdAt: "",
-  updatedAt: "",
   distance: "",
   status: "",
   statusRemark: "",
@@ -163,4 +162,5 @@ export const GetNewTaskEntity_INIT: GetNewTaskEntity = {
   farmer: FarmerEntity_INIT,
   droner: "",
   farmerPlot: FarmerPlotEntity_INIT,
+  updatedAt:"",
 };

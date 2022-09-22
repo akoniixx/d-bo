@@ -20,7 +20,6 @@ const ModalSelectedEditDroner: React.FC<ModalSelectedEditDronerProps> = ({
   title,
   callBack,
 }) => {
-  console.log(dataDroner);
   let checkDup = Array.from(new Set(dataDroner)).filter(
     (x) => x.dronerId != ""
   );
@@ -79,7 +78,7 @@ const ModalSelectedEditDroner: React.FC<ModalSelectedEditDronerProps> = ({
         return {
           children: (
             <>
-              {checkRating() && (
+              {checkRating() ? (
                 <Row key={index}>
                   <div style={{ color: "#FFCA37", fontSize: "16px" }}>
                     <StarFilled />
@@ -88,6 +87,8 @@ const ModalSelectedEditDroner: React.FC<ModalSelectedEditDronerProps> = ({
                     {parseFloat(data.rating_avg).toFixed(1)}
                   </span>
                 </Row>
+              ) : (
+                "-"
               )}
             </>
           ),
@@ -194,6 +195,38 @@ const ModalSelectedEditDroner: React.FC<ModalSelectedEditDronerProps> = ({
       },
     },
     {
+      title: "สถานะงาน",
+      dataIndex: "status",
+      key: "status",
+      render: (value: any, row: any, index: number) => {
+        const STATUS_MAPPING: any = {
+          WAIT_RECEIVE: "รอรับงาน",
+          REJECTED: "ไม่รับงาน",
+          CANCELED: "ยกเลิก",
+        };
+        return {
+          children: (
+            <>
+              <span
+                style={{
+                  color:
+                    row.status == "WAIT_RECEIVE" ? color.Warning : color.Error,
+                }}
+              >
+                <Badge
+                  color={
+                    row.status == "WAIT_RECEIVE" ? color.Warning : color.Error
+                  }
+                />
+                {STATUS_MAPPING[row.status]}
+                <br />
+              </span>
+            </>
+          ),
+        };
+      },
+    },
+    {
       title: "",
       width: "7%",
       render: (value: any, row: any, index: number) => {
@@ -204,11 +237,13 @@ const ModalSelectedEditDroner: React.FC<ModalSelectedEditDronerProps> = ({
               className="d-flex flex-row justify-content-between"
               key={index}
             >
-              <ActionButton
-                icon={<DeleteOutlined />}
-                color={color.Error}
-                onClick={() => removeDroner(data)}
-              />
+              {row.status != "REJECTED" && (
+                <ActionButton
+                  icon={<DeleteOutlined />}
+                  color={color.Error}
+                  onClick={() => removeDroner(data)}
+                />
+              )}
             </div>
           ),
         };

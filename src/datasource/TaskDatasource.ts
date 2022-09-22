@@ -63,9 +63,7 @@ export class TaskDatasource {
       });
   }
   static updateNewTask(data: GetNewTaskEntity): Promise<any> {
-    let test: any = [];
     delete data["taskDronerTemp"];
-    console.log(data);
     return httpClient
       .patch(BASE_URL + "/tasks/task/" + data.id, data)
       .then((response) => {

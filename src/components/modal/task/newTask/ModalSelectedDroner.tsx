@@ -168,7 +168,6 @@ const ModalSelectedDroner: React.FC<ModalSelectedDronerProps> = ({
 
   return (
     <>
-      {console.log(data)}
       <Modal
         title={
           <div
