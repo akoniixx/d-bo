@@ -40,3 +40,9 @@ export const STATUS_NEWTASK_COLOR_MAPPING: any = {
   ไม่มีนักบินรับงาน: color.Error,
   รอนักบินโดรนรับงาน: "#EA973E",
 };
+
+
+export const STATUS_INDEX_FINISHTASK = [
+  { value: "WAIT_START", name: "รอเริ่มงาน" },
+  { value: "IN_PROGRESS", name: "กำลังดำเนินงาน" }
+];
