@@ -1,5 +1,9 @@
 import { BASE_URL, httpClient } from "../config/develop-config";
-import { TaskDronerTempEntity } from "../entities/TaskDronerTemp";
+import {
+  CreateDronerTempEntity,
+  DeletedDronerTemp,
+  TaskDronerTempEntity,
+} from "../entities/TaskDronerTemp";
 
 export class TaskDronerTempDataSource {
   static getDronerList(taskId: string): Promise<TaskDronerTempEntity[]> {
@@ -9,7 +13,27 @@ export class TaskDronerTempDataSource {
         return response.data;
       })
       .catch((err) => {
-        console.log(err, "err getAdmin");
+        console.log(err, "err getdronertemp");
+      });
+  }
+  static createDronerTemp(data: CreateDronerTempEntity): Promise<any> {
+    return httpClient
+      .post(BASE_URL + "/tasks/task-droner-temp/", data)
+      .then((response) => {
+        return response.data;
+      })
+      .catch((err) => {
+        console.log(err, "err createdronertemp");
+      });
+  }
+  static deleteDronerTemp(data: DeletedDronerTemp): Promise<any> {
+    return httpClient
+      .delete(BASE_URL + "/tasks/task-droner-temp", { data })
+      .then((response) => {
+        return response.data;
+      })
+      .catch((err) => {
+        console.log(err, "err deletedronertemp");
       });
   }
 }
