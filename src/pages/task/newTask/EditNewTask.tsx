@@ -3,6 +3,7 @@ import {
   DownOutlined,
   EditFilled,
   StarFilled,
+  TeamOutlined,
 } from "@ant-design/icons";
 import {
   AutoComplete,
@@ -717,7 +718,6 @@ const EditNewTask = () => {
       ratingMin,
       ratingMax
     ).then((res) => {
-      console.log(res);
       res.map((item) =>
         _.set(
           item,
@@ -886,17 +886,60 @@ const EditNewTask = () => {
       );
     }
   };
-  const handleAllSelectDroner = (e: any) => {
+  const handleAllSelectDroner = async (e: any) => {
+    let dronerSelected: CreateDronerTempEntity = CreateDronerTempEntity_INIT;
+    let deleteDroner: DeletedDronerTemp = DeletedDronerTemp_INIT;
     let checked = e.target.checked;
-    let d = dataDronerList.map((item) =>
-      _.set(
-        item,
-        "isChecked",
-        item.droner_status == "ไม่สะดวก" ? false : checked
-      )
-    );
-    setDataDronerList(d);
-    setDronerSelectedList(d.filter((x) => x.isChecked == true));
+    if (checked) {
+      let compareData = dataDronerList.filter(
+        (x) => !dronerSelectedList.map((y) => y.dronerId).includes(x.droner_id)
+      );
+      for (let i: number = 0; compareData.length > i; i++) {
+        dronerSelected.taskId = queryString[1];
+        dronerSelected.dronerId = compareData[i].droner_id;
+        dronerSelected.status = "WAIT_RECEIVE";
+        dronerSelected.dronerDetail = [JSON.stringify(compareData[i])];
+        await TaskDronerTempDataSource.createDronerTemp(dronerSelected).then(
+          (res) => {
+            let droner = dataDronerList.map((item) =>
+              _.set(
+                item,
+                "isChecked",
+                res.responseData
+                  .map((x: any) => x)
+                  .find((y: any) => y.dronerId === item.droner_id)
+                  ? true
+                  : false
+              )
+            );
+            setDataDronerList(droner);
+            setDronerSelectedList(res.responseData);
+          }
+        );
+      }
+    } else {
+      for (let i: number = 0; dataDronerList.length > i; i++) {
+        deleteDroner.taskId = queryString[1];
+        deleteDroner.dronerId = dataDronerList[i].droner_id;
+        await TaskDronerTempDataSource.deleteDronerTemp(deleteDroner).then(
+          (res) => {
+            let droner = dataDronerList.map((item) =>
+              _.set(
+                item,
+                "isChecked",
+                res.responseData
+                  .map((x: any) => x)
+                  .find((y: any) => y.dronerId === item.droner_id)
+                  ? true
+                  : false
+              )
+            );
+            setDataDronerList(droner);
+            setDronerSelectedList(res.responseData);
+          }
+        );
+      }
+    }
   };
   const callBackDronerSelected = async (data: TaskDronerTempEntity[]) => {
     let compareData = dronerSelectedList.filter(
@@ -1044,7 +1087,6 @@ const EditNewTask = () => {
       </div>
     </div>
   );
-
   const columns = [
     {
       title: selectionType == "checkbox" && (
@@ -1100,7 +1142,9 @@ const EditNewTask = () => {
               <span>{row.firstname + " " + row.lastname}</span>
               {row.rating_avg != null && (
                 <Tooltip title={tooltipTitle} className="p-2">
-                  <EditFilled style={{ color: color.Success }} />
+                  <TeamOutlined
+                    style={{ color: color.Success, fontSize: "18px" }}
+                  />
                 </Tooltip>
               )}
 
@@ -1408,15 +1452,20 @@ const EditNewTask = () => {
     setCurrent(current + 1);
   };
   const updateNewTask = async () => {
-    await TaskDatasource.updateNewTask(data).then((res) => {
-      if (res.userMessage == "success") {
-        Swal.fire({
-          title: "บันทึกสำเร็จ",
-          icon: "success",
-          timer: 1500,
-          showConfirmButton: false,
-        }).then((time) => {
-          window.location.href = "/IndexNewTask";
+    Swal.fire({
+      title: "ยืนยันการแก้ไข",
+      text: "โปรดตรวจสอบรายละเอียดที่คุณต้องการแก้ไขข้อมูลก่อนเสมอ เพราะอาจส่งผลต่อการจ้างงานในระบบ",
+      cancelButtonText: "ยกเลิก",
+      confirmButtonText: "ยืนยัน",
+      confirmButtonColor: color.Success,
+      showCancelButton: true,
+      showCloseButton: true,
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        await TaskDatasource.updateNewTask(data).then((res) => {
+          if (res.userMessage == "success") {
+            window.location.href = "/IndexNewTask";
+          }
         });
       }
     });

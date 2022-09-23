@@ -196,7 +196,7 @@ const ModalSelectedEditDroner: React.FC<ModalSelectedEditDronerProps> = ({
       },
     },
     {
-      title: "สถานะงาน",
+      title: "สถานะนักบิน",
       dataIndex: "status",
       key: "status",
       render: (value: any, row: any, index: number) => {
@@ -279,11 +279,12 @@ const ModalSelectedEditDroner: React.FC<ModalSelectedEditDronerProps> = ({
         <Form>
           <CardContainer>
             <Table
-              dataSource={data.filter((x) => x.isChecked)}
+              dataSource={data}
               columns={columns}
               pagination={false}
               size="large"
               tableLayout="fixed"
+              rowKey={data => data.id}
             />
           </CardContainer>
         </Form>
