@@ -74,8 +74,12 @@ function EditWaitStart() {
   let [otherSpray, setOtherSpray] = useState<any>();
   const fetchTaskDetail = async () => {
     await TaskInprogressDatasource.getTaskDetailById(taskId).then((res) => {
-      console.log(res);
       setData(res);
+      setOtherSpray(
+        res.targetSpray
+          .filter((a) => !PURPOSE_SPRAY.some((x) => x === a))
+          .join(",")
+      );
       fetchPurposeSpray(res.farmerPlot.plantName);
       setMapPosition({
         lat: parseFloat(res.farmerPlot.lat),
@@ -103,10 +107,9 @@ function EditWaitStart() {
     const d = Map(data).set("dateAppointment", e);
     const m = Map(d.toJS()).set("dateAppointment", e);
     setData(m.toJS());
-    setBtnSaveDisable(false)
+    setBtnSaveDisable(false);
   };
   const handleOtherSpray = (e: React.ChangeEvent<HTMLInputElement>) => {
-    console.log(e.target.value.trim().length);
     if (e.target.value.trim().length != 0) {
       setOtherSpray(e.target.value);
       let checkComma = checkValidateComma(e.target.value);
@@ -127,7 +130,6 @@ function EditWaitStart() {
   const handlerTargetSpray = (e: any) => {
     let checked = e.target.checked;
     let value = e.target.value;
-    console.log(value)
     setCheckCrop(
       value == "อื่นๆ" ? !checked : otherSpray != null ? false : true
     );
@@ -145,7 +147,6 @@ function EditWaitStart() {
       p = Map(data).set("targetSpray", removeTarget);
     }
     setData(p.toJS());
-    console.log(p.toJS().targetSpray);
     checkValidate(p.toJS());
   };
   const handlerPurposeSpray = (e: any) => {
@@ -234,7 +235,11 @@ function EditWaitStart() {
                 <DatePicker
                   format={dateFormat}
                   style={{ width: "100%" }}
-                  value={moment(new Date(data.dateAppointment))}
+                  value={
+                    data.dateAppointment != undefined
+                      ? moment(new Date(data.dateAppointment))
+                      : null
+                  }
                   onChange={handlerDate}
                 />
               </Form.Item>
@@ -302,23 +307,24 @@ function EditWaitStart() {
                 ).map((x, index) => (
                   <div className="form-group">
                     <Checkbox
-                      key={data.targetSpray[0]}
+                      key={x.key}
                       value={x.crop}
                       onClick={handlerTargetSpray}
                       checked={x.isChecked}
-                    />{" "}                    
+                    />{" "}
                     <label>{x.crop}</label>
                     <br />
                     {index == 4 && (
                       <>
                         <Input
+                          disabled={checkCrop}
                           key={data.targetSpray[0]}
                           onChange={handleOtherSpray}
                           placeholder="โปรดระบุ เช่น เพลี้ย,หอย"
                           autoComplete="off"
-                          defaultValue={data.targetSpray.filter(
-                            (a) => !PURPOSE_SPRAY.some((x) => x === a)
-                          ).join(",")}
+                          defaultValue={data.targetSpray
+                            .filter((a) => !PURPOSE_SPRAY.some((x) => x === a))
+                            .join(",")}
                         />
                         {validateComma.status == "error" && (
                           <p style={{ color: color.Error }}>
@@ -686,7 +692,6 @@ function EditWaitStart() {
     </Form>
   );
   const UpdateTaskWaitStart = async (data: TaskDetailEntity) => {
-    console.log(data);
     Swal.fire({
       title: "ยืนยันการแก้ไข",
       text: "โปรดตรวจสอบรายละเอียดที่คุณต้องการแก้ไขข้อมูลก่อนเสมอ เพราะอาจส่งผลต่อการจ้างงานในระบบ",
@@ -708,10 +713,10 @@ function EditWaitStart() {
           data.targetSpray,
           otherSprayList.filter((x) => x != "")
         );
-        const setTarget = Array.from(new Set(data.targetSpray)).filter(
+        const setOtherSpray = Array.from(new Set(data.targetSpray)).filter(
           (x) => x != ""
         );
-        const pushTextTarget = Map(data).set("targetSpray", setTarget);
+        const pushTextTarget = Map(data).set("targetSpray", setOtherSpray);
         const pushUpdateBy = Map(pushTextTarget.toJS()).set(
           "updateBy",
           profile.firstname + " " + profile.lastname

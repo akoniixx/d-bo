@@ -70,7 +70,6 @@ function EditInProgress() {
   let [otherSpray, setOtherSpray] = useState<any>();
   const fetchTaskDetail = async () => {
     await TaskInprogressDatasource.getTaskDetailById(taskId).then((res) => {
-      console.log(res);
       setData(res);
       setMapPosition({
         lat: parseFloat(res.farmerPlot.lat),
@@ -198,7 +197,7 @@ function EditInProgress() {
           </div>
           <div className="form-group col-lg-10">
             <label>หมายเหตุ</label>
-            <TextArea rows={3} onChange={handleComment} value={data.comment} />
+            <TextArea onChange={handleComment} value={data.comment} />
           </div>
         </div>
         <div className="col-lg-6">

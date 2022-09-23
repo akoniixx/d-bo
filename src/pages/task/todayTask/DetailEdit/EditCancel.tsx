@@ -69,7 +69,6 @@ function EditCancel() {
   let [otherSpray, setOtherSpray] = useState<any>();
   const fetchTaskDetail = async () => {
     await TaskInprogressDatasource.getTaskDetailById(taskId).then((res) => {
-      console.log(res);
       setData(res);
       setMapPosition({
         lat: parseFloat(res.farmerPlot.lat),
@@ -100,33 +99,6 @@ function EditCancel() {
     const d = Map(data).set("dateAppointment", e);
     const m = Map(d.toJS()).set("dateAppointment", e);
     setData(m.toJS());
-    console.log(m.toJS());
-  };
-  const handlePeriodSpray = (e: any) => {
-    const d = Map(data).set("purposeSprayName", e);
-    setData(d.toJS());
-  };
-  const handleOtherSpray = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.value.trim().length != 0) {
-      setOtherSpray(e.target.value);
-      let checkComma = checkValidateComma(e.target.value);
-      if (!checkComma) {
-        setValidateComma({ status: "", message: "" });
-        setBtnSaveDisable(false);
-      } else {
-        setValidateComma({
-          status: "error",
-          message: "กรุณาใช้ (,) ให้กับการเพิ่มมากกว่า 1 อย่าง",
-        });
-        setBtnSaveDisable(true);
-      }
-    } else {
-      setValidateComma({
-        status: "error",
-        message: "โปรดระบุ",
-      });
-      setBtnSaveDisable(true);
-    }
   };
   const checkValidateComma = (data: string) => {
     const checkSyntax =
@@ -137,44 +109,13 @@ function EditCancel() {
       data.includes("+");
     return data.trim().length != 0 ? (checkSyntax ? true : false) : true;
   };
-  const handlePurposeSpray = (e: any) => {
-    let checked = e.target.checked;
-    console.log(checked);
-    let value = e.target.value;
-    setCheckCrop(
-      value == "อื่นๆ" ? !checked : otherSpray != null ? false : true
-    );
-    PURPOSE_SPRAY_CHECKBOX.map((item) =>
-      _.set(item, "isChecked", item.crop == value ? checked : item.isChecked)
-    );
-    let p: any = "";
-
-    if (checked) {
-      p = Map(data).set(
-        "targetSpray",
-        [...data?.targetSpray, value].filter((x) => x != "")
-      );
-    } else {
-      let removePlant = data?.targetSpray.filter((x) => x != value);
-      p = Map(data).set("targetSpray", removePlant);
-    }
-    setData(p.toJS());
-    console.log(p.toJS());
-  };
-  const handlePreparation = (e: any) => {
-    const d = Map(data).set("preparationBy", e.target.value);
-    setData(d.toJS());
-    console.log(d.toJS());
-  };
   const handleComment = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const d = Map(data).set("comment", e.target.value);
     setData(d.toJS());
-    console.log(d.toJS());
   };
   const handleChangeStatus = (e: any) => {
     const d = Map(data).set("status", e.target.value);
     setData(d.toJS());
-    console.log(d.toJS());
   };
 
   const renderAppointment = (

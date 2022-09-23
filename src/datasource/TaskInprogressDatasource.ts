@@ -63,7 +63,6 @@ export class TaskInprogressDatasource {
       delayRemark: data.delayRemark,
       dateDelay: data.dateDelay,
     };
-    console.log(params)
     return httpClient
       .patch(BASE_URL + "/tasks/task/" + data.id, params)
       .then((response) => { 

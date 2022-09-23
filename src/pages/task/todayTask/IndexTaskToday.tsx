@@ -95,7 +95,6 @@ export default function IndexTodayTask() {
       isProblem,
       isDelay
     ).then((res: TaskTodayListEntity) => {
-      console.log(res);
       setData(res);
     });
   };
@@ -138,15 +137,12 @@ export default function IndexTodayTask() {
   };
   const handleStatus = (e: any) => {
     let value = e.target.value;
-    console.log(value);
     let checked = e.target.checked;
     let arr: any = 0;
     if (checked) {
-      console.log(1);
       arr = [...statusArr, value];
       setStatusArr([...statusArr, value]);
     } else {
-      console.log(2);
       let d: string[] = statusArr.filter((x) => x != value);
       arr = [...d];
       setStatusArr(d);
@@ -158,7 +154,6 @@ export default function IndexTodayTask() {
   };
   const handleIsProblem = (e: any) => {
     let value = e.target.value;
-    console.log(value);
     let checked = e.target.checked;
     if (checked) {
       if (searchStatus == "WAIT_START" && value == "waitstartnormal") {
