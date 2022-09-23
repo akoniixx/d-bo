@@ -15,6 +15,7 @@ import {
   Input,
   Menu,
   Pagination,
+  Radio,
   Row,
   Select,
   Table,
@@ -68,8 +69,10 @@ export default function IndexTodayTask() {
   const [visibleRating, setVisibleRating] = useState(false);
   const [showModalMap, setShowModalMap] = useState<boolean>(false);
   const [plotId, setPlotId] = useState<string>("");
+  const [statusArr, setStatusArr] = useState<string[]>([]);
   const dateFormat = "DD/MM/YYYY";
   const timeFormat = "HH:mm";
+
   useEffect(() => {
     fetchAllTaskToday();
     fetchProvince();
@@ -137,13 +140,44 @@ export default function IndexTodayTask() {
     let value = e.target.value;
     console.log(value);
     let checked = e.target.checked;
-    console.log(checked);
+    let arr: any = 0;
     if (checked) {
-      if (value == "WAIT_START" || value == "IN_PROGRESS") {
-        setSearchStatus(value);
+      console.log(1);
+      arr = [...statusArr, value];
+      setStatusArr([...statusArr, value]);
+    } else {
+      console.log(2);
+      let d: string[] = statusArr.filter((x) => x != value);
+      arr = [...d];
+      setStatusArr(d);
+      if (d.length == 0) {
+        arr = undefined;
+      }
+    }
+    setSearchStatus(arr);
+  };
+  const handleIsProblem = (e: any) => {
+    let value = e.target.value;
+    console.log(value);
+    let checked = e.target.checked;
+    if (checked) {
+      if (searchStatus == "WAIT_START" && value == "waitstartnormal") {
+        setIsProblem(false);
+      } else if (searchStatus == "WAIT_START" && value == "waitstartproblem") {
+        setIsProblem(true);
+      } else if (searchStatus == "IN_PROGRESS" && value == "inprogressnormal") {
+        setIsProblem(false);
+      } else if (
+        searchStatus == "IN_PROGRESS" &&
+        value == "inprogressproblem"
+      ) {
+        setIsProblem(true);
+      } else {
+        setIsProblem(undefined);
       }
     } else {
-      setSearchStatus(undefined);
+      setSearchStatus(searchStatus);
+      setIsProblem(undefined);
     }
   };
 
@@ -187,7 +221,7 @@ export default function IndexTodayTask() {
             <Checkbox
               style={{ marginLeft: "20px" }}
               value="waitstartnormal"
-              onClick={(e) => handleStatus(e)}
+              onClick={(e) => handleIsProblem(e)}
             ></Checkbox>
           ),
         },
@@ -198,7 +232,7 @@ export default function IndexTodayTask() {
             <Checkbox
               style={{ marginLeft: "20px" }}
               value="waitstartproblem"
-              onClick={(e) => handleStatus(e)}
+              onClick={(e) => handleIsProblem(e)}
             ></Checkbox>
           ),
         },
@@ -219,7 +253,7 @@ export default function IndexTodayTask() {
             <Checkbox
               style={{ marginLeft: "20px" }}
               value="inprogressnormal"
-              onClick={(e) => handleStatus(e)}
+              onClick={(e) => handleIsProblem(e)}
             ></Checkbox>
           ),
         },
@@ -231,7 +265,7 @@ export default function IndexTodayTask() {
               disabled
               style={{ marginLeft: "20px" }}
               value="waitapprovedelay"
-              onClick={(e) => handleStatus(e)}
+              onClick={(e) => handleIsProblem(e)}
             ></Checkbox>
           ),
         },
@@ -243,7 +277,7 @@ export default function IndexTodayTask() {
               disabled
               style={{ marginLeft: "20px" }}
               value="extended"
-              onClick={(e) => handleStatus(e)}
+              onClick={(e) => handleIsProblem(e)}
             ></Checkbox>
           ),
         },
@@ -254,7 +288,7 @@ export default function IndexTodayTask() {
             <Checkbox
               style={{ marginLeft: "20px" }}
               value="inprogressproblem"
-              onClick={(e) => handleStatus(e)}
+              onClick={(e) => handleIsProblem(e)}
             ></Checkbox>
           ),
         },
@@ -424,11 +458,11 @@ export default function IndexTodayTask() {
               <span>{row.droner.firstname + " " + row.droner.lastname}</span>
               {changeDroner != undefined ? (
                 <Tooltip
+                  style={{ fontSize: "18px" }}
                   title="มีการเปลี่ยนแปลงนักบินโดรนคนใหม่"
                   className="p-2"
-                  style={{ marginBottom: "90px" }}
                 >
-                  <img src={icon.iconChangeDroner} width={"20%"} />
+                  <img src={icon.iconChangeDroner} />
                 </Tooltip>
               ) : null}
               <br />
