@@ -103,10 +103,11 @@ function EditWaitStart() {
     const d = Map(data).set("dateAppointment", e);
     const m = Map(d.toJS()).set("dateAppointment", e);
     setData(m.toJS());
+    setBtnSaveDisable(false)
   };
   const handleOtherSpray = (e: React.ChangeEvent<HTMLInputElement>) => {
-    console.log(e.target.value);
-    if (e.target.value) {
+    console.log(e.target.value.trim().length);
+    if (e.target.value.trim().length != 0) {
       setOtherSpray(e.target.value);
       let checkComma = checkValidateComma(e.target.value);
       if (!checkComma) {
@@ -123,10 +124,10 @@ function EditWaitStart() {
       setBtnSaveDisable(true);
     }
   };
-
   const handlerTargetSpray = (e: any) => {
     let checked = e.target.checked;
     let value = e.target.value;
+    console.log(value)
     setCheckCrop(
       value == "อื่นๆ" ? !checked : otherSpray != null ? false : true
     );
@@ -144,7 +145,7 @@ function EditWaitStart() {
       p = Map(data).set("targetSpray", removeTarget);
     }
     setData(p.toJS());
-    console.log(p.toJS());
+    console.log(p.toJS().targetSpray);
     checkValidate(p.toJS());
   };
   const handlerPurposeSpray = (e: any) => {
@@ -191,8 +192,11 @@ function EditWaitStart() {
     }
   };
   const onChangeCanCelText = (e: any) => {
-    // const m = Map(data).set("problemRemark", e.target.value);
-    // setData(m.toJS());
+    const m = Map(data).set("statusRemark", e.target.value);
+    setData(m.toJS());
+    {
+      !e.target.value ? setBtnSaveDisable(true) : setBtnSaveDisable(false);
+    }
   };
 
   const checkValidate = (data?: TaskDetailEntity) => {
@@ -286,53 +290,47 @@ function EditWaitStart() {
               เป้าหมายการฉีดพ่น
               <span style={{ color: "red" }}>*</span>
             </label>
-            {PURPOSE_SPRAY_CHECKBOX.map((item) =>
-              _.set(
-                item,
-                "isChecked",
-                data?.targetSpray.map((x) => x).find((y) => y === item.crop)
-                  ? true
-                  : item.isChecked
-              )
-            ).map((x, index) => (
-              <div className="form-group">
-                <Checkbox
-                  key={data.targetSpray[0]}
-                  value={x.crop}
-                  onClick={handlerTargetSpray}
-                  checked={x.isChecked}
-                />{" "}
-                <label>{x.crop}</label>
-                <br />
-                {index == 4 && (
-                  <>
-                    <Input
+            {data.targetSpray != null
+              ? PURPOSE_SPRAY_CHECKBOX.map((item) =>
+                  _.set(
+                    item,
+                    "isChecked",
+                    data?.targetSpray.map((x) => x).find((y) => y === item.crop)
+                      ? true
+                      : item.isChecked
+                  )
+                ).map((x, index) => (
+                  <div className="form-group">
+                    <Checkbox
                       key={data.targetSpray[0]}
-                      onChange={handleOtherSpray}
-                      placeholder="โปรดระบุ เช่น เพลี้ย,หอย"
-                      autoComplete="off"
-                      defaultValue={data.targetSpray.filter(
-                        (a) => !PURPOSE_SPRAY.some((x) => x === a)
-                      )}
-                      // defaultValue={Array.from(
-                      //   new Set(
-                      //     data?.targetSpray.filter(
-                      //       (a) => !PURPOSE_SPRAY.some((x) => x === a)
-                      //     )
-                      //   )
-                      // ).join(",")}
-                    />
-                    {validateComma.status == "error" && (
-                      <p style={{ color: color.Error }}>
-                        {validateComma.message}
-                      </p>
+                      value={x.crop}
+                      onClick={handlerTargetSpray}
+                      checked={x.isChecked}
+                    />{" "}                    
+                    <label>{x.crop}</label>
+                    <br />
+                    {index == 4 && (
+                      <>
+                        <Input
+                          key={data.targetSpray[0]}
+                          onChange={handleOtherSpray}
+                          placeholder="โปรดระบุ เช่น เพลี้ย,หอย"
+                          autoComplete="off"
+                          defaultValue={data.targetSpray.filter(
+                            (a) => !PURPOSE_SPRAY.some((x) => x === a)
+                          ).join(",")}
+                        />
+                        {validateComma.status == "error" && (
+                          <p style={{ color: color.Error }}>
+                            {validateComma.message}
+                          </p>
+                        )}
+                      </>
                     )}
-                  </>
-                )}
-              </div>
-            ))}
+                  </div>
+                ))
+              : null}
           </div>
-
           <div className="row form-group col-lg-6 p-2">
             <label>
               การเตรียมยา <span style={{ color: "red" }}>*</span>
@@ -406,13 +404,13 @@ function EditWaitStart() {
                           </div>
                         ) : data.status == "IN_PROGRESS" && index == 1 ? (
                           <div style={{ marginLeft: "20px" }}>
-                            <Form.Item style={{ width: "530px" }}>
+                            <Form.Item style={{ width: "500px" }}>
                               <Radio.Group
                                 value={data.isProblem}
                                 onChange={handleChangeIsProblem}
                               >
                                 <Space direction="vertical">
-                                <Radio value={false}>งานปกติ</Radio>
+                                  <Radio value={false}>งานปกติ</Radio>
                                   <Radio disabled>รออนุมัติขยายเวลา</Radio>
                                   <Radio disabled>
                                     อนุมัติขยายเวลา{" "}
@@ -424,6 +422,21 @@ function EditWaitStart() {
                                 </Space>
                               </Radio.Group>
                             </Form.Item>
+                            {data.isProblem == true ? (
+                              <Form.Item>
+                                <TextArea
+                                  rows={3}
+                                  onChange={onChangeProblemText}
+                                  placeholder="รายละเอียดปัญหา"
+                                  autoComplete="off"
+                                  defaultValue={
+                                    data.problemRemark != null
+                                      ? data.problemRemark
+                                      : undefined
+                                  }
+                                />
+                              </Form.Item>
+                            ) : null}
                           </div>
                         ) : data.status == "CANCELED" && index == 2 ? (
                           <div style={{ marginLeft: "20px" }}>
@@ -433,11 +446,11 @@ function EditWaitStart() {
                                 onChange={onChangeCanCelText}
                                 placeholder="รายละเอียดการยกเลิก"
                                 autoComplete="off"
-                                // defaultValue={
-                                //   data.problemRemark != null
-                                //     ? data.problemRemark
-                                //     : undefined
-                                // }
+                                defaultValue={
+                                  data.statusRemark != null
+                                    ? data.statusRemark
+                                    : undefined
+                                }
                               />
                             </Form.Item>
                           </div>

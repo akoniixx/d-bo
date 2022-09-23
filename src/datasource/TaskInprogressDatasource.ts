@@ -3,9 +3,9 @@ import { TaskDetailEntity, TaskTodayListEntity, UpdateTask } from "../entities/T
 
 export class TaskInprogressDatasource {
   static getAllTaskToday(
+    taskStatus: [string],
     page: number,
     row: number,
-    status?: [string],
     searchText?: string,
     statusDelay?: string,
     subdistrictId?: number,
@@ -16,9 +16,9 @@ export class TaskInprogressDatasource {
    
   ): Promise<TaskTodayListEntity> {
     const params = {
+      taskStatus: taskStatus,
       page: page,
       take: row,
-      status: status,
       searchText: searchText,
       statusDelay: statusDelay,
       subdistrictId: subdistrictId,
@@ -49,10 +49,6 @@ export class TaskInprogressDatasource {
   static UpdateTask(data: TaskDetailEntity): Promise<any> {
     const params = {
       id: data.id,
-      farmerId: data.farmerId,
-      farmerPlotId: data.farmerPlotId,
-      farmAreaAmount: data.farmAreaAmount,
-      dronerId: data.dronerId,
       dateAppointment: data.dateAppointment,
       targetSpray: data.targetSpray,
       preparationBy: data.preparationBy,
@@ -60,10 +56,6 @@ export class TaskInprogressDatasource {
       status: data.status,
       statusRemark: data.statusRemark,
       updateBy: data.updateBy,
-      unitPriceStandard: data.unitPriceStandard,
-      priceStandard: data.priceStandard,
-      unitPrice: data.unitPrice,
-      price: data.price,
       comment: data.comment,
       isProblem: data.isProblem,
       problemRemark: data.problemRemark,
@@ -71,6 +63,7 @@ export class TaskInprogressDatasource {
       delayRemark: data.delayRemark,
       dateDelay: data.dateDelay,
     };
+    console.log(params)
     return httpClient
       .patch(BASE_URL + "/tasks/task/" + data.id, params)
       .then((response) => { 

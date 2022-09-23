@@ -130,7 +130,8 @@ function EditInProgress() {
     }
   };
   const onChangeCanCelText = (e: any) => {
-    console.log(e.target.value);
+    const m = Map(data).set("statusRemark", e.target.value);
+    setData(m.toJS());
     {
       !e.target.value ? setBtnSaveDisable(true) : setBtnSaveDisable(false);
     }
@@ -168,7 +169,7 @@ function EditInProgress() {
             <label>
               ช่วงเวลาการพ่น <span style={{ color: "red" }}>*</span>
             </label>
-            <Form.Item name="searchAddress">
+            <Form.Item name="purposeSpray">
               <Select
                 key={data.purposeSprayId}
                 disabled
@@ -261,11 +262,11 @@ function EditInProgress() {
                                 onChange={onChangeCanCelText}
                                 placeholder="รายละเอียดการยกเลิก"
                                 autoComplete="off"
-                                // defaultValue={
-                                //   data.problemRemark != null
-                                //     ? data.problemRemark
-                                //     : undefined
-                                // }
+                                defaultValue={
+                                  data.statusRemark != null
+                                    ? data.statusRemark
+                                    : undefined
+                                }
                               />
                             </Form.Item>
                           </div>

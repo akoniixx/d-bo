@@ -10,6 +10,7 @@ import {
   Card,
   Checkbox,
   Dropdown,
+  Form,
   Grid,
   Input,
   Menu,
@@ -17,6 +18,7 @@ import {
   Row,
   Select,
   Table,
+  Tooltip,
 } from "antd";
 import Search from "antd/lib/input/Search";
 import moment from "moment";
@@ -40,8 +42,12 @@ import {
   ProviceEntity,
   SubdistrictEntity,
 } from "../../../entities/LocationEntities";
-import { TaskTodayListEntity } from "../../../entities/TaskInprogressEntities";
+import {
+  summaryEntity,
+  TaskTodayListEntity,
+} from "../../../entities/TaskInprogressEntities";
 import color from "../../../resource/color";
+import icon from "../../../resource/icon";
 import { formatDate } from "../../../utilities/TextFormatter";
 
 export default function IndexTodayTask() {
@@ -68,17 +74,16 @@ export default function IndexTodayTask() {
     fetchAllTaskToday();
     fetchProvince();
   }, [current, row]);
-
   const fetchAllTaskToday = async (
     text?: string,
     proId?: number,
     disId?: number,
-    subDisId?: number,
+    subDisId?: number
   ) => {
     await TaskInprogressDatasource.getAllTaskToday(
+      searchStatus,
       current,
       row,
-      searchStatus,
       text,
       statusDelay,
       proId,
@@ -87,6 +92,7 @@ export default function IndexTodayTask() {
       isProblem,
       isDelay
     ).then((res: TaskTodayListEntity) => {
+      console.log(res);
       setData(res);
     });
   };
@@ -129,11 +135,15 @@ export default function IndexTodayTask() {
   };
   const handleStatus = (e: any) => {
     let value = e.target.value;
+    console.log(value);
     let checked = e.target.checked;
-    if(checked){
-      setSearchStatus(value);
-    }else{
-      setSearchStatus("");
+    console.log(checked);
+    if (checked) {
+      if (value == "WAIT_START" || value == "IN_PROGRESS") {
+        setSearchStatus(value);
+      }
+    } else {
+      setSearchStatus(undefined);
     }
   };
 
@@ -171,11 +181,79 @@ export default function IndexTodayTask() {
           ),
         },
         {
-          label: "กำลังดำเนินงาน",
+          label: "งานปกติ",
           key: "2",
           icon: (
             <Checkbox
+              style={{ marginLeft: "20px" }}
+              value="waitstartnormal"
+              onClick={(e) => handleStatus(e)}
+            ></Checkbox>
+          ),
+        },
+        {
+          label: "งานมีปัญหา",
+          key: "3",
+          icon: (
+            <Checkbox
+              style={{ marginLeft: "20px" }}
+              value="waitstartproblem"
+              onClick={(e) => handleStatus(e)}
+            ></Checkbox>
+          ),
+        },
+        {
+          label: "กำลังดำเนินงาน",
+          key: "4",
+          icon: (
+            <Checkbox
               value="IN_PROGRESS"
+              onClick={(e) => handleStatus(e)}
+            ></Checkbox>
+          ),
+        },
+        {
+          label: "ปกติ",
+          key: "5",
+          icon: (
+            <Checkbox
+              style={{ marginLeft: "20px" }}
+              value="inprogressnormal"
+              onClick={(e) => handleStatus(e)}
+            ></Checkbox>
+          ),
+        },
+        {
+          label: "รออนุมัติขยายเวลา",
+          key: "6",
+          icon: (
+            <Checkbox
+              disabled
+              style={{ marginLeft: "20px" }}
+              value="waitapprovedelay"
+              onClick={(e) => handleStatus(e)}
+            ></Checkbox>
+          ),
+        },
+        {
+          label: "ขยายเวลา",
+          key: "7",
+          icon: (
+            <Checkbox
+              disabled
+              style={{ marginLeft: "20px" }}
+              value="extended"
+              onClick={(e) => handleStatus(e)}
+            ></Checkbox>
+          ),
+        },
+        {
+          label: "งานมีปัญหา",
+          key: "8",
+          icon: (
+            <Checkbox
+              style={{ marginLeft: "20px" }}
+              value="inprogressproblem"
               onClick={(e) => handleStatus(e)}
             ></Checkbox>
           ),
@@ -193,7 +271,7 @@ export default function IndexTodayTask() {
           <Input
             allowClear
             prefix={<SearchOutlined style={{ color: color.Disable }} />}
-            placeholder="ค้นหาชื่อนักบินโดรน หรือเบอร์โทร"
+            placeholder="ค้นหาชื่อเกษตรกร, คนบินโดรน หรือเบอร์โทร"
             className="col-lg-12 p-1"
             onChange={changeTextSearch}
           />
@@ -299,7 +377,7 @@ export default function IndexTodayTask() {
                 searchText,
                 searchSubdistrict,
                 searchDistrict,
-                searchProvince,
+                searchProvince
               )
             }
           >
@@ -339,10 +417,20 @@ export default function IndexTodayTask() {
       sorter: (a: any, b: any) =>
         sorter(a.droner.firstname, b.droner.firstname),
       render: (value: any, row: any, index: number) => {
+        const changeDroner = row.taskHistory[0];
         return {
           children: (
             <>
               <span>{row.droner.firstname + " " + row.droner.lastname}</span>
+              {changeDroner != undefined ? (
+                <Tooltip
+                  title="มีการเปลี่ยนแปลงนักบินโดรนคนใหม่"
+                  className="p-2"
+                  style={{ marginBottom: "90px" }}
+                >
+                  <img src={icon.iconChangeDroner} width={"20%"} />
+                </Tooltip>
+              ) : null}
               <br />
               <span style={{ color: color.Disable, fontSize: "12px" }}>
                 {row.droner.telephoneNo}
@@ -435,11 +523,13 @@ export default function IndexTodayTask() {
                 <Badge color={STATUS_COLOR_TASK_TODAY[row.status]} />
                 {TASK_TODAY_STATUS[row.status]}
                 <span style={{ color: color.Error }}>
-                { row.isProblem == true ? " " + "(" + "งานมีปัญหา" + ")" : null}
-              </span>
+                  {row.isProblem == true
+                    ? " " + "(" + "งานมีปัญหา" + ")"
+                    : null}
+                </span>
                 <br />
               </span>
-            
+
               <span style={{ color: color.Disable, fontSize: "12px" }}>
                 <UserOutlined style={{ padding: "0 4px 0 0" }} />
                 {row.createBy}
@@ -457,22 +547,23 @@ export default function IndexTodayTask() {
         return {
           children: (
             <div className="d-flex flex-row justify-content-between">
-              {row.status == "IN_PROGRESS" ?  
-               <ActionButton
-                icon={<EditOutlined />}
-                color={color.primary1}
-                onClick={() =>
-                  (window.location.href = "/EditInProgress?=" + row.id)
-                }
-              /> : row.status == "WAIT_START" ? 
-              <ActionButton
-              icon={<EditOutlined />}
-              color={color.primary1}
-              onClick={() =>
-                (window.location.href = "/EditWaitStart?=" + row.id)
-              }
-            /> : null}
-            
+              {row.status == "IN_PROGRESS" ? (
+                <ActionButton
+                  icon={<EditOutlined />}
+                  color={color.primary1}
+                  onClick={() =>
+                    (window.location.href = "/EditInProgress?=" + row.id)
+                  }
+                />
+              ) : row.status == "WAIT_START" ? (
+                <ActionButton
+                  icon={<EditOutlined />}
+                  color={color.primary1}
+                  onClick={() =>
+                    (window.location.href = "/EditWaitStart?=" + row.id)
+                  }
+                />
+              ) : null}
             </div>
           ),
         };

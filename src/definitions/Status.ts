@@ -43,8 +43,7 @@ export const STATUS_NEWTASK_COLOR_MAPPING: any = {
 
 export const TASK_TODAY_STATUS : any = {
   WAIT_START : "รอเริ่มงาน",
-  IN_PROGRESS : "กำลังดำเนินงาน"
-  
+  IN_PROGRESS : "กำลังดำเนินงาน",
 }
 export const TASK_TODAY_STATUS_MAPPING : any = {
   ACTIVE : "สะดวก",
