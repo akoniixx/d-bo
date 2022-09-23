@@ -3,11 +3,11 @@ export interface PurposeSprayEntity {
   cropId: string;
   purposeSprayName: string;
 }
-export const PurposeSprayEntity_INIT : PurposeSprayEntity = {
+export const PurposeSprayEntity_INIT: PurposeSprayEntity = {
   id: "",
   cropId: "",
   purposeSprayName: "",
-}
+};
 
 export interface CropPurposeSprayEntity {
   id: string;
@@ -15,9 +15,9 @@ export interface CropPurposeSprayEntity {
   purposeSpray: PurposeSprayEntity[];
   purposeSprayName: string;
 }
-export const CropPurposeSprayEntity_INIT : CropPurposeSprayEntity = {
+export const CropPurposeSprayEntity_INT: CropPurposeSprayEntity = {
   id: "",
   cropName: "",
   purposeSpray: [PurposeSprayEntity_INIT],
   purposeSprayName: "",
-}
+};

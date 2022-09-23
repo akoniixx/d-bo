@@ -2,7 +2,7 @@ import { FarmerPlotEntity, FarmerPlotEntity_INIT } from "./FarmerPlotEntities";
 import { DronerEntity, DronerEntity_INIT } from "./DronerEntities";
 import { FarmerEntity, FarmerEntity_INIT } from "./FarmerEntities";
 import { TaskDronerTempEntity, TaskDronerTempEntity_INIT} from "./TaskDronerTemp";
-import { CropPurposeSprayEntity, CropPurposeSprayEntity_INIT } from "./CropEntities";
+import { CropPurposeSprayEntity, CropPurposeSprayEntity_INT } from "./CropEntities";
 export interface TaskInprogressEntity {
   count: number;
   summary: {
@@ -214,7 +214,7 @@ export const TaskDetailEntity_INIT: TaskDetailEntity = {
   dateDelay: null,
   statusDelay: null,
   delayRejectRemark: "",
-  purposeSpray: CropPurposeSprayEntity_INIT,
+  purposeSpray: CropPurposeSprayEntity_INT,
   farmer: FarmerEntity_INIT,
   droner: DronerEntity_INIT,
   farmerPlot: FarmerPlotEntity_INIT,

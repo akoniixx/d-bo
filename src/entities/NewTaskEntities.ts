@@ -1,8 +1,19 @@
-import { CropPurposeSprayEntity } from "./CropEntities";
-import { GetFarmerEntity } from "./FarmerEntities";
+import {
+  CropPurposeSprayEntity,
+  CropPurposeSprayEntity_INT,
+} from "./CropEntities";
+import {
+  FarmerEntity,
+  FarmerEntity_INIT,
+  GetFarmerEntity,
+  GetFarmerEntity_INIT,
+} from "./FarmerEntities";
+import { FarmerPlotEntity, FarmerPlotEntity_INIT } from "./FarmerPlotEntities";
 import {
   CreateDronerTempEntity,
   CreateDronerTempEntity_INIT,
+  TaskDronerTempEntity,
+  TaskDronerTempEntity_INIT,
 } from "./TaskDronerTemp";
 
 export interface NewTaskEntity {
@@ -72,38 +83,84 @@ export const CreateNewTaskEntity_INIT: CreateNewTaskEntity = {
   comment: "",
 };
 export interface GetNewTaskEntity {
-  data: {
-    id: string;
-    taskNo: string;
-    farmerId: string;
-    farmerPlotId: string;
-    farmAreaAmount: string;
-    dronerId: string;
-    purposeSprayId: string;
-    dateAppointment: string;
-    targetSpray: string[];
-    preparationBy: string;
-    createdAt: string;
-    updatedAt: string;
-    distance: string;
-    status: string;
-    statusRemark: string;
-    reviewDronerAvg: string;
-    reviewDronerDetail: string;
-    unitPriceStandard: string;
-    priceStandard: string;
-    unitPrice: string;
-    price: string;
-    totalPrice: string;
-    fee: string;
-    discountFee: string;
-    reviewFarmerScore: string;
-    reviewFarmerComment: string;
-    imagePathFinishTask: string;
-    comment: string;
-    purposeSpray: CropPurposeSprayEntity;
-    farmer: GetFarmerEntity;
-    droner: string;
-    farmerPlot: {};
-  };
+  id: string;
+  taskNo: string;
+  farmerId: string;
+  farmerPlotId: string;
+  farmAreaAmount: string;
+  dronerId: string;
+  purposeSprayId: string;
+  dateAppointment: string;
+  targetSpray: string[];
+  taskDronerTemp?: TaskDronerTempEntity[];
+  preparationBy: string;
+  createdAt: string;
+  distance: string;
+  status: string;
+  statusRemark: string;
+  reviewDronerAvg: string;
+  reviewDronerDetail: string;
+  unitPriceStandard: string;
+  priceStandard: string;
+  unitPrice: string;
+  price: string;
+  totalPrice: string;
+  fee: string;
+  discountFee: string;
+  reviewFarmerScore: string;
+  reviewFarmerComment: string;
+  imagePathFinishTask: string;
+  comment: string;
+  isProblem: boolean;
+  problemRemark: string;
+  dateRemark: string;
+  dateDelay: string;
+  statusDelay: string;
+  delayRejectRemark: string;
+  purposeSpray: CropPurposeSprayEntity;
+  farmer: FarmerEntity;
+  droner: string;
+  farmerPlot: FarmerPlotEntity;
+  updatedAt?:string;
 }
+export const GetNewTaskEntity_INIT: GetNewTaskEntity = {
+  id: "",
+  taskNo: "",
+  farmerId: "",
+  farmerPlotId: "",
+  farmAreaAmount: "",
+  dronerId: "",
+  purposeSprayId: "",
+  dateAppointment: "",
+  targetSpray: [""],
+  taskDronerTemp: [TaskDronerTempEntity_INIT],
+  preparationBy: "",
+  createdAt: "",
+  distance: "",
+  status: "",
+  statusRemark: "",
+  reviewDronerAvg: "",
+  reviewDronerDetail: "",
+  unitPriceStandard: "",
+  priceStandard: "",
+  unitPrice: "",
+  price: "",
+  totalPrice: "",
+  fee: "",
+  discountFee: "",
+  reviewFarmerScore: "",
+  reviewFarmerComment: "",
+  imagePathFinishTask: "",
+  comment: "",
+  isProblem: false,
+  problemRemark: "",
+  dateRemark: "",
+  dateDelay: "",
+  statusDelay: "",
+  delayRejectRemark: "",
+  purposeSpray: CropPurposeSprayEntity_INT,
+  farmer: FarmerEntity_INIT,
+  droner: "",
+  farmerPlot: FarmerPlotEntity_INIT,
+  updatedAt:"",
+};

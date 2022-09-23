@@ -66,7 +66,7 @@ import {
 import { LAT_LNG_BANGKOK } from "../../definitions/Location";
 import { REASON_DRONER_STATUS } from "../../definitions/Reason";
 import moment from "moment";
-const dateFormat = "DD-MM-YYYY";
+const dateFormat = "DD/MM/YYYY";
 const dateCreateFormat = "YYYY-MM-DD";
 
 const _ = require("lodash");
@@ -271,6 +271,7 @@ function EditDroner() {
     );
     setMoreReason(value);
   };
+
   //#endregion
 
   //#region address
@@ -754,7 +755,6 @@ function EditDroner() {
                 วันเดือนปีเกิด <span style={{ color: "red" }}>*</span>
               </label>
               <Form.Item
-                name="birthDate"
                 rules={[
                   {
                     required: true,
@@ -766,7 +766,7 @@ function EditDroner() {
                   placeholder="กรอกวันเดือนปีเกิด"
                   format={dateFormat}
                   className="col-lg-12"
-                  value={moment(data.birthDate)}
+                  defaultValue={moment(data.birthDate)}
                   onChange={(e: any) => handleOnChangeBirthday(e)}
                 />
               </Form.Item>
@@ -1322,6 +1322,7 @@ function EditDroner() {
 
   return (
     <Layout>
+      {console.log(moment(data.birthDate).format(dateFormat))}
       <Row>
         <BackIconButton
           onClick={() => (window.location.href = "/IndexDroner")}

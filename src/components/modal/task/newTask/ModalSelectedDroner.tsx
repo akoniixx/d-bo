@@ -23,6 +23,7 @@ const ModalSelectedDroner: React.FC<ModalSelectedDronerProps> = ({
   let checkDup = Array.from(new Set(dataDroner)).filter(
     (x) => x.droner_id != ""
   );
+  console.log(checkDup);
   const [data, setData] = useState<TaskSearchDroner[]>(checkDup);
   const removeDroner = (e: any) => {
     let d = data.filter((x) => x.droner_id != e.droner_id);
@@ -167,7 +168,6 @@ const ModalSelectedDroner: React.FC<ModalSelectedDronerProps> = ({
 
   return (
     <>
-      {console.log(data)}
       <Modal
         title={
           <div
