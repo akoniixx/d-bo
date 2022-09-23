@@ -124,7 +124,7 @@ function EditDroner() {
         res.birthDate = "1970-01-01";
       }
       setOtherPlant(
-        res.expPlant.filter((a) => !EXP_PLANT.some((x) => x === a))
+        res.expPlant.filter((a) => !EXP_PLANT.some((x) => x === a)).join(",")
       );
       setData(res);
       setMapPosition({
@@ -588,14 +588,19 @@ function EditDroner() {
       data.expPlant,
       otherPlantList.filter((x) => x != "")
     );
+    let pushReason: any = undefined;
+    data.reason != null
+      ? (pushReason = Map(data).set(
+          "reason",
+          [
+            data.reason.filter(
+              (x) => x == "บัตรประชาชนไม่ชัดเจน/ไม่ถูกต้อง"
+            )[0],
+            moreReason,
+          ].filter((y) => y != undefined && y != "")
+        ))
+      : (pushReason = Map(data).set("reason", []));
 
-    const pushReason = Map(data).set(
-      "reason",
-      [
-        data.reason.filter((x) => x == "บัตรประชาชนไม่ชัดเจน/ไม่ถูกต้อง")[0],
-        moreReason,
-      ].filter((y) => y != undefined && y != "")
-    );
     const pushAddr = Map(pushReason.toJS()).set("address", address);
     const pushDronerArea = Map(pushAddr.toJS()).set("dronerArea", dronerArea);
     const pushPin = Map(pushDronerArea.toJS()).set("pin", "");
@@ -1322,7 +1327,6 @@ function EditDroner() {
 
   return (
     <Layout>
-      {console.log(moment(data.birthDate).format(dateFormat))}
       <Row>
         <BackIconButton
           onClick={() => (window.location.href = "/IndexDroner")}

@@ -1,4 +1,7 @@
 ## [Version - 0]
+## Fix [v0.14.2] 2022-09-22
+- fixed defect fill reason with status in droner
+- fixed defect validate reason with status in droner drone
 ## Fix [v0.14.1] 2022-09-22
 - fixed defect index new task
 - fixed birthDate and format in farmer & droner

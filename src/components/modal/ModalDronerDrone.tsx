@@ -190,7 +190,7 @@ const ModalDrone: React.FC<ModalDroneProps> = ({
     setBtnSaveDisable(
       dataDrone.reason != null ? false : value.trim().length != 0 ? false : true
     );
-    checkValidateReason(dataDrone);
+    checkValidateReason(dataDrone, value);
     setMoreReason(value);
   };
 
@@ -325,9 +325,12 @@ const ModalDrone: React.FC<ModalDroneProps> = ({
     let checkImg = img != undefined && img != false;
     setBtnSaveDisable(checkEmptyMain && checkImg ? false : true);
   };
-  const checkValidateReason = (data: DronerDroneEntity) => {
-    let checkEmptyReason = data.reason.filter((x) => x != "").length > 0;
-    setBtnSaveDisable(!checkEmptyReason);
+  const checkValidateReason = (
+    data: DronerDroneEntity,
+    moreReason?: string
+  ) => {
+    let checkEmptyMoreReason = [moreReason].includes("");
+    setBtnSaveDisable(checkEmptyMoreReason);
   };
 
   return (
