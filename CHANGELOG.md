@@ -1,4 +1,9 @@
 ## [Version - 0]
+## Fix [v0.14.3] 2022-09-22
+- fixed defect plot name in add new task
+- fixed defect duplicate muti droner and single droner in new task
+- fixed defect message before save task
+- fixed defect validate data in new task
 ## Fix [v0.14.2] 2022-09-22
 - fixed defect fill reason with status in droner
 - fixed defect validate reason with status in droner drone

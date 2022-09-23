@@ -246,8 +246,8 @@ const IndexNewTask = () => {
             <>
               <span>
                 {row.total_price == null
-                  ? 0 + " บาท"
-                  : row.total_price + " บาท"}
+                  ? 0.00 + " บาท"
+                  : parseFloat(row.total_price).toFixed(2) + " บาท"}
               </span>
               <br />
               <span style={{ color: color.Grey }}>
