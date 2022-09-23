@@ -1,4 +1,4 @@
-import { DownOutlined, StarFilled } from "@ant-design/icons";
+import { DownOutlined, StarFilled, TeamOutlined } from "@ant-design/icons";
 import {
   AutoComplete,
   Avatar,
@@ -20,6 +20,7 @@ import {
   Steps,
   Table,
   TimePicker,
+  Tooltip,
 } from "antd";
 import moment from "moment";
 import React, { useEffect, useState } from "react";
@@ -61,7 +62,7 @@ import Swal from "sweetalert2";
 import { numberWithCommas } from "../../../utilities/TextFormatter";
 const { Step } = Steps;
 const { Option } = Select;
-const dateFormat = "DD-MM-YYYY";
+const dateFormat = "DD/MM/YYYY";
 const dateCreateFormat = "YYYY-MM-DD";
 const timeFormat = "HH:mm";
 const timeCreateFormat = "HH:mm:ss";
@@ -153,6 +154,7 @@ const AddNewTask = () => {
     let plotSelected = farmerSelected?.farmerPlot.filter(
       (x) => x.id == value
     )[0];
+    console.log(plotSelected);
     const f = Map(createNewTask).set("farmerPlotId", plotSelected?.id);
     const g = Map(f.toJS()).set("farmAreaAmount", plotSelected?.raiAmount);
     setCropSelected(plotSelected?.plantName);
@@ -228,14 +230,14 @@ const AddNewTask = () => {
       const d = Map(createNewTask).set("unitPrice", e.target.value);
       const pushCal = Map(d.toJS()).set("price", calUnitPrice.toFixed(2));
       setCreateNewTask(pushCal.toJS());
-      checkValidateStep(pushCal.toJS());
+      checkValidateStep(pushCal.toJS(), current);
     } else {
       let calUnitPrice =
         e.target.value / parseFloat(createNewTask.farmAreaAmount);
       const d = Map(createNewTask).set("price", e.target.value);
       const pushCal = Map(d.toJS()).set("unitPrice", calUnitPrice);
       setCreateNewTask(pushCal.toJS());
-      checkValidateStep(pushCal.toJS());
+      checkValidateStep(pushCal.toJS(), current);
     }
   };
   const handleComment = (e: any) => {
@@ -354,7 +356,16 @@ const AddNewTask = () => {
                 <div className="form-group">
                   <label>พื้นที่แปลงเกษตร</label>
                   <Form.Item>
-                    <Input value={farmerPlotSeleced?.landmark} disabled />
+                    <Input
+                      value={
+                        farmerPlotSeleced?.plotArea.subdistrictName +
+                        "/" +
+                        farmerPlotSeleced?.plotArea.districtName +
+                        "/" +
+                        farmerPlotSeleced?.plotArea.provinceName
+                      }
+                      disabled
+                    />
                   </Form.Item>
                 </div>
               </div>
@@ -366,7 +377,7 @@ const AddNewTask = () => {
                   </Form.Item>
                 </div>
                 <div className="form-group col-lg-6">
-                  <label>Longitude</label>
+                  <label>Longitude (ลองติจูด)</label>
                   <Form.Item>
                     <Input value={farmerPlotSeleced?.long} disabled />
                   </Form.Item>
@@ -745,9 +756,11 @@ const AddNewTask = () => {
     setRating({ ratingMin: min, ratingMax: max });
   };
   const handleSelectDroner = async (e: any, data: any) => {
+    console.log(data);
     let inputType = e.target.type;
     let checked = e.target.checked;
     let d: TaskSearchDroner[] = [];
+    let checkDup = [];
     if (inputType == "checkbox") {
       d = dataDronerList.map((item) =>
         _.set(
@@ -771,13 +784,18 @@ const AddNewTask = () => {
         d
           .filter((x) => x.isChecked == true)
           .map((y) => y)
-          .filter((z) => dronerSelected.map((a) => a.droner_id != z.droner_id))
+          .filter(
+            (z) => !dronerSelected.map((a) => a.droner_id).includes(z.droner_id)
+          )
       )
     );
-    let checkDup = [
-      ...dronerSelected.filter((x) => x.droner_id != ""),
-      ...checkSingleDroner.filter((x) => x.droner_id != ""),
-    ];
+    checkDup =
+      inputType == "checkbox"
+        ? (checkDup = [
+            ...dronerSelected.filter((x) => x.droner_id != ""),
+            ...checkSingleDroner.filter((x) => x.droner_id != ""),
+          ])
+        : [...checkSingleDroner.filter((x) => x.droner_id != "")];
     setDronerSelected(
       Array.from(new Set(checkDup)).filter((x) => x.droner_id != "")
     );
@@ -817,6 +835,11 @@ const AddNewTask = () => {
     setDataDronerList(d);
     setDronerSelected(d.filter((x) => x.isChecked == true));
     setShowModalSelectedDroner((prev) => !prev);
+    checkValidateStep(
+      createNewTask,
+      current,
+      d.filter((x) => x.isChecked == true)
+    );
   };
   const handleVisibleRating = (newVisible: any) => {
     setVisibleRating(newVisible);
@@ -824,14 +847,14 @@ const AddNewTask = () => {
 
   const searchSection = (
     <div className="d-flex justify-content-between" style={{ padding: "10px" }}>
-      <div className="col-lg-3">
-        <Search
+      <div className="col-lg-3 p-1">
+        <Input
           placeholder="ค้นหาชื่อเกษตรกร หรือเบอร์โทร"
-          className="col-lg-12 p-1"
+          className="col-lg-12"
           onChange={(e: any) => setSearchTextDroner(e.target.value)}
         />
       </div>
-      <div className="col-lg-2 pt-1">
+      <div className="col-lg-2 p-1">
         <Popover
           content={
             <>
@@ -898,7 +921,7 @@ const AddNewTask = () => {
           <option value="ไม่สะดวก">ไม่สะดวก</option>
         </Select>
       </div>
-      <div className="col-lg-1 pt-1">
+      <div className="col-lg-1 p-1">
         <Button
           style={{
             borderColor: color.Success,
@@ -976,12 +999,28 @@ const AddNewTask = () => {
       dataIndex: "fullname",
       key: "fullname",
       render: (value: any, row: any, index: number) => {
+        let tooltipTitle = (
+          <>
+            {"เคยให้บริการเกษตรกรท่านนี้,"}
+            <br />
+            {"คะแนนรีวิวล่าสุด "}
+            <StarFilled style={{ color: "#FFCA37", fontSize: "16px" }} />{" "}
+            {parseFloat(row.rating_avg).toFixed(1)}
+          </>
+        );
         return {
           children: (
             <>
               <span>{row.firstname + " " + row.lastname}</span>
+              {row.rating_avg != null && (
+                <Tooltip title={tooltipTitle} className="p-2">
+                  <TeamOutlined
+                    style={{ color: color.Success, fontSize: "18px" }}
+                  />
+                </Tooltip>
+              )}
               <br />
-              <span style={{ color: color.Grey }}></span>
+              <span style={{ color: color.Grey }}>{row.droner_code}</span>
             </>
           ),
         };
@@ -1027,7 +1066,7 @@ const AddNewTask = () => {
                     <StarFilled />
                   </div>
                   <span className="pt-2 ps-1">
-                    {parseFloat(row.rating_avg).toFixed(2)} ({row.count_rating})
+                    {parseFloat(row.rating_avg).toFixed(1)} ({row.count_rating})
                   </span>
                 </Row>
               ) : (
@@ -1055,8 +1094,28 @@ const AddNewTask = () => {
     },
     {
       title: "ยี่หัอ",
-      dataIndex: "role",
-      key: "role",
+      dataIndex: "brand",
+      key: "brand",
+      render: (value: any, row: any, index: number) => {
+        return {
+          children: (
+            <>
+              <Avatar
+                size={25}
+                src={row.logo_drone_brand}
+                style={{ marginRight: "5px" }}
+              />
+              <span>{row.drone_brand}</span>
+              <br />
+              {row.count_drone > 1 && (
+                <p style={{ fontSize: "12px", color: color.Grey }}>
+                  (มากกว่า 1 ยี่ห้อ)
+                </p>
+              )}
+            </>
+          ),
+        };
+      },
     },
     {
       title: "สะดวก/ไม่สะดวก",
@@ -1251,6 +1310,7 @@ const AddNewTask = () => {
         setDisableBtn(true);
       }
     } else {
+      console.log(dataDroner);
       let checkDroner = dataDroner?.length != 0;
       checkDroner ? setDisableBtn(false) : setDisableBtn(true);
     }
@@ -1313,7 +1373,7 @@ const AddNewTask = () => {
         const f = Map(s.toJS()).set("fee", parseFloat(a.toJS().price) * 0.05);
         const df = Map(f.toJS()).set(
           "discountFee",
-          -parseFloat(a.toJS().price) * 0.05
+          parseFloat(a.toJS().price) * 0.05
         );
         setCreateNewTask(df.toJS());
       } else {
@@ -1354,15 +1414,20 @@ const AddNewTask = () => {
     let checkDupSpray = Array.from(new Set(createNewTask.targetSpray));
     const d = Map(createNewTask).set("targetSpray", checkDupSpray);
     setCreateNewTask(d.toJS());
-    await TaskDatasource.insertNewTask(d.toJS()).then((res) => {
-      if (res.userMessage == "success") {
-        Swal.fire({
-          title: "บันทึกสำเร็จ",
-          icon: "success",
-          timer: 1500,
-          showConfirmButton: false,
-        }).then((time) => {
-          window.location.href = "/IndexNewTask";
+    Swal.fire({
+      title: "ยืนยันการสร้างงาน",
+      text: "โปรดตรวจสอบรายละเอียดที่คุณต้องการแก้ไขข้อมูลก่อนเสมอ เพราะอาจส่งผลต่อการจ้างงานในระบบ",
+      cancelButtonText: "ยกเลิก",
+      confirmButtonText: "ยืนยัน",
+      confirmButtonColor: color.Success,
+      showCancelButton: true,
+      showCloseButton: true,
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        await TaskDatasource.insertNewTask(d.toJS()).then((res) => {
+          if (res.userMessage == "success") {
+            window.location.href = "/IndexNewTask";
+          }
         });
       }
     });
