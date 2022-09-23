@@ -58,7 +58,7 @@ import img_empty from "../../resource/media/empties/uploadImg.png";
 import bth_img_empty from "../../resource/media/empties/upload_Img_btn.png";
 import moment from "moment";
 
-const dateFormat = "DD-MM-YYYY";
+const dateFormat = "DD/MM/YYYY";
 const dateCreateFormat = "YYYY-MM-DD";
 
 const { Option } = Select;
