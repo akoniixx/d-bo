@@ -1038,7 +1038,7 @@ function EditDroner() {
                     <option key={index} value={item.subdistrictId}>
                       {item.subdistrictName +
                         "/" +
-                        item.subdistrictName +
+                        item.districtName +
                         "/" +
                         item.provinceName}
                     </option>
