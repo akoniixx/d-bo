@@ -251,7 +251,7 @@ const IndexNewTask = () => {
               </span>
               <br />
               <span style={{ color: color.Grey }}>
-                จำนวน {row.count_droner} ไร่
+                จำนวน {row.farm_area_amount} ไร่
               </span>
             </>
           ),

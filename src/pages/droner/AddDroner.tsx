@@ -417,7 +417,11 @@ function AddDroner() {
         data?.expPlant !== undefined;
     }
     let checkEmptyOtherPlant = otherPlant != undefined && otherPlant != "";
-    let checkEmptyDate = ![data?.birthDate].includes("1970-01-01");
+    let checkEmptyDate =
+      ![data?.birthDate].includes("1970-01-01") &&
+      (data?.birthDate && data?.birthDate?.trim().length > 0)
+        ? true
+        : false;
     if (
       checkEmptySting &&
       checkEmptyNumber &&

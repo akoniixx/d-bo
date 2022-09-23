@@ -21,7 +21,6 @@ const ModalDronerList: React.FC<ModalDronerListProps> = ({
   const [data, setData] = useState<TaskDronerTempEntity[]>();
   const fetchDronerList = async () => {
     await TaskDronerTempDataSource.getDronerList(taskId).then((res) => {
-      console.log(res);
       setData(res);
     });
   };
@@ -36,6 +35,7 @@ const ModalDronerList: React.FC<ModalDronerListProps> = ({
       width: "20%",
       render: (value: any, row: any, index: number) => {
         let data = JSON.parse(row.dronerDetail[0]);
+        console.log(data);
         return {
           children: (
             <>
@@ -139,6 +139,9 @@ const ModalDronerList: React.FC<ModalDronerListProps> = ({
                 style={{ marginRight: "5px" }}
               />
               <span>{data.drone_brand}</span>
+              {data.count_drone > 1 && (
+                <p style={{ color: color.Grey }}>(มากกว่า 1 ยี่ห้อ)</p>
+              )}
             </>
           ),
         };
