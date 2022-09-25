@@ -110,6 +110,10 @@ const IndexInprogressTask = () => {
     setSearchDistrict(districtId);
     setCurrent(1);
   };
+  const handleSubDistrict = (subdistrictId: any) => {
+    setSearchSubdistrict(subdistrictId);
+    setCurrent(1);
+  };
 
   const PageTitle = (
     <>
@@ -206,6 +210,7 @@ const IndexInprogressTask = () => {
                 .toLowerCase()
                 .localeCompare(optionB.children.toLowerCase())
             }
+            onChange={handleSubDistrict}
             disabled={searchDistrict == undefined}
           >
             {subdistrict?.map((item) => (
@@ -376,7 +381,13 @@ const IndexInprogressTask = () => {
         return {
           children: (
             <div className="d-flex flex-row justify-content-between">
-              <ActionButton icon={<EditOutlined />} color={color.primary1} />
+              <ActionButton
+                icon={<EditOutlined />}
+                color={color.primary1}
+                onClick={() =>
+                  (window.location.href = "/EditInprogressTask/id=" + row.id)
+                }
+              />
             </div>
           ),
         };
