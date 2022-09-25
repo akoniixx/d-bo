@@ -4,7 +4,16 @@ import {
   EditOutlined,
   UserOutlined,
 } from "@ant-design/icons";
-import { Badge, Button, DatePicker, Dropdown, Menu, Select, Table } from "antd";
+import {
+  Badge,
+  Button,
+  DatePicker,
+  Dropdown,
+  Menu,
+  Pagination,
+  Select,
+  Table,
+} from "antd";
 import Search from "antd/lib/input/Search";
 import moment from "moment";
 import React, { useEffect, useState } from "react";
@@ -49,7 +58,6 @@ const IndexNewTask = () => {
       searchStartDate,
       searchEndDate
     ).then((res) => {
-      console.log(res);
       setData(res);
     });
   };
@@ -99,6 +107,9 @@ const IndexNewTask = () => {
       }
       fetchNewTaskList();
     });
+  };
+  const onChangePage = (page: number) => {
+    setCurrent(page);
   };
 
   const menu = (
@@ -246,7 +257,7 @@ const IndexNewTask = () => {
             <>
               <span>
                 {row.total_price == null
-                  ? 0.00 + " บาท"
+                  ? 0.0 + " บาท"
                   : parseFloat(row.total_price).toFixed(2) + " บาท"}
               </span>
               <br />
@@ -353,6 +364,16 @@ const IndexNewTask = () => {
             }
           />
         </CardContainer>
+        <div className="d-flex justify-content-between pt-4">
+          <p>รายการทั้งหมด {data?.count} รายการ</p>
+          <Pagination
+            current={current}
+            total={data?.count}
+            onChange={onChangePage}
+            pageSize={row}
+            showSizeChanger={false}
+          />
+        </div>
         {showModalMap && (
           <ModalMapPlot
             show={showModalMap}

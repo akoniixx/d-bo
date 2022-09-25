@@ -30,6 +30,7 @@ import IndexRankDroner from "./pages/droner/IndexRankDroner";
 import IndexNewTask from "./pages/task/newTask/IndexNewTask";
 import AddNewTask from "./pages/task/newTask/AddNewTask";
 import EditNewTask from "./pages/task/newTask/EditNewTask";
+import IndexInprogressTask from "./pages/task/improgressTask/IndexInprogressTask";
 
 
 const WebRoutes: React.FC<any> = () => {
@@ -64,6 +65,7 @@ const WebRoutes: React.FC<any> = () => {
           <Route path="/IndexNewTask" element={<IndexNewTask />} />
           <Route path="/AddNewTask:type" element={<AddNewTask />} />
           <Route path="/EditNewTask/:id" element={<EditNewTask />} />
+          <Route path="/IndexInprogressTask" element={<IndexInprogressTask />} />
           <Route path="*" element={<PageNotFound />} />
         </Route>
         <Route element={<PublicRoute />}>

@@ -5,6 +5,7 @@ import {
   GetNewTaskEntity,
   NewTaskPageEntity,
 } from "../entities/NewTaskEntities";
+import { TaskInprogressPageEntity } from "../entities/TaskInprogress";
 
 export class TaskDatasource {
   static getNewTaskList(
@@ -73,14 +74,45 @@ export class TaskDatasource {
         console.log(error);
       });
   }
-  static deleteTask(id:string) :Promise<any>{
+  static deleteTask(id: string): Promise<any> {
     return httpClient
-    .delete(BASE_URL + "/tasks/task/" + id)
-    .then((response) => {
-      return response.data;
-    })
-    .catch((error) => {
-      console.log(error);
-    });
+      .delete(BASE_URL + "/tasks/task/" + id)
+      .then((response) => {
+        return response.data;
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  }
+  static getInprogressTaskList(
+    take: number,
+    page: number,
+    provinceId?: number,
+    districtId?: number,
+    subdisId?: number,
+    text?: string,
+    dateAppointmentStart?: string,
+    dateAppointmentEnd?: string
+  ): Promise<TaskInprogressPageEntity> {
+    const params = {
+      take: take,
+      page: page,
+      provinceId: provinceId,
+      districtId: districtId,
+      subdistrictId: subdisId,
+      searchText: text,
+      dateAppointmentStart: dateAppointmentStart,
+      dateAppointmentEnd: dateAppointmentEnd,
+    };
+    return httpClient
+      .get(BASE_URL + "/tasks/task-inprogress/get-all-task-wait-start", {
+        params,
+      })
+      .then((response) => {
+        return response.data;
+      })
+      .catch((err) => {
+        console.log(err, "err getinprogresstask");
+      });
   }
 }
