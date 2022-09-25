@@ -6,6 +6,7 @@ import {
   NewTaskPageEntity,
 } from "../entities/NewTaskEntities";
 import {
+  GetTaskInprogressEntity,
   TaskInprogressEntity,
   TaskInprogressPageEntity,
 } from "../entities/TaskInprogress";
@@ -118,11 +119,11 @@ export class TaskDatasource {
         console.log(err, "err getinprogresstask");
       });
   }
-  static getInprogressTaskById(id: string): Promise<TaskInprogressEntity> {
+  static getInprogressTaskById(id: string): Promise<GetTaskInprogressEntity> {
     return httpClient
       .get(BASE_URL + "/tasks/task-inprogress/get-task-detail/" + id)
       .then((response) => {
-        return response.data.data;
+        return response.data;
       })
       .catch((err) => {
         console.log(err, "err getinprogresstaskbyid");

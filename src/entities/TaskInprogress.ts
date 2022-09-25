@@ -1,4 +1,8 @@
+import { DronerAreaEntity } from "./DronerAreaEntities";
+import { DronerDroneEntity, DronerEntity } from "./DronerDroneEntities";
 import { FarmerEntity } from "./FarmerEntities";
+import { FarmerPlotEntity } from "./FarmerPlotEntities";
+import { TaskDronerTempEntity } from "./TaskDronerTemp";
 
 export interface TaskInprogressEntity {
   id: string;
@@ -8,7 +12,7 @@ export interface TaskInprogressEntity {
   farmAreaAmount: string;
   dronerId: string;
   purposeSprayId: string;
-  dateAppoinment: string;
+  dateAppointment: string;
   tragetSpray: string[];
   preparationBy: string;
   createdAt: string;
@@ -42,4 +46,13 @@ export interface TaskInprogressEntity {
 export interface TaskInprogressPageEntity {
   count: number;
   data: TaskInprogressEntity[];
+}
+
+export interface GetTaskInprogressEntity extends TaskInprogressEntity {
+  droner: DronerEntity;
+  dronerArea: DronerAreaEntity;
+  dronerDrone: DronerDroneEntity[];
+  farmerPlot: FarmerPlotEntity;
+  taskDronerTemp: TaskDronerTempEntity[];
+  taskHistory: [];
 }
