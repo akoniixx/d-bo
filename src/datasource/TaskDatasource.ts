@@ -96,7 +96,8 @@ export class TaskDatasource {
     subdisId?: number,
     text?: string,
     dateAppointmentStart?: string,
-    dateAppointmentEnd?: string
+    dateAppointmentEnd?: string,
+    problem?: boolean
   ): Promise<TaskInprogressPageEntity> {
     const params = {
       take: take,
@@ -107,6 +108,7 @@ export class TaskDatasource {
       searchText: text,
       dateAppointmentStart: dateAppointmentStart,
       dateAppointmentEnd: dateAppointmentEnd,
+      isProblem: problem,
     };
     return httpClient
       .get(BASE_URL + "/tasks/task-inprogress/get-all-task-wait-start", {

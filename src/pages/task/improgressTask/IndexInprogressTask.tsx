@@ -1,5 +1,13 @@
-import { EditOutlined, SearchOutlined } from "@ant-design/icons";
-import { Button, DatePicker, Input, Pagination, Select, Table } from "antd";
+import { EditOutlined, SearchOutlined, UserOutlined } from "@ant-design/icons";
+import {
+  Badge,
+  Button,
+  DatePicker,
+  Input,
+  Pagination,
+  Select,
+  Table,
+} from "antd";
 import moment from "moment";
 import React, { useEffect, useState } from "react";
 import ActionButton from "../../../components/button/ActionButton";
@@ -32,6 +40,7 @@ const IndexInprogressTask = () => {
   const [searchProvince, setSearchProvince] = useState<any>();
   const [searchDistrict, setSearchDistrict] = useState<any>();
   const [searchSubdistrict, setSearchSubdistrict] = useState<any>();
+  const [searchStatus, setSearchStatus] = useState<any>();
   const [province, setProvince] = useState<ProviceEntity[]>();
   const [district, setDistrict] = useState<DistrictEntity[]>();
   const [subdistrict, setSubdistrict] = useState<SubdistrictEntity[]>();
@@ -39,11 +48,17 @@ const IndexInprogressTask = () => {
   const [startDate, setStartDate] = useState<any>(null);
   const [endDate, setEndDate] = useState<any>(null);
 
+  const statusSearch = [
+    { value: "false", name: "รอดำเนินงาน" },
+    { value: "true", name: "งานมีปัญหา" },
+  ];
+
   const fetchInprogressTask = async (
     proId?: number,
     disId?: number,
     subDisId?: number,
-    text?: string
+    text?: string,
+    problem?: boolean
   ) => {
     await TaskDatasource.getInprogressTaskList(
       row,
@@ -53,9 +68,9 @@ const IndexInprogressTask = () => {
       subDisId,
       text,
       startDate,
-      endDate
+      endDate,
+      problem
     ).then((res) => {
-      console.log(res);
       setData(res);
     });
   };
@@ -112,6 +127,11 @@ const IndexInprogressTask = () => {
   };
   const handleSubDistrict = (subdistrictId: any) => {
     setSearchSubdistrict(subdistrictId);
+    setCurrent(1);
+  };
+
+  const handleStatus = (status: boolean) => {
+    setSearchStatus(status);
     setCurrent(1);
   };
 
@@ -222,8 +242,13 @@ const IndexInprogressTask = () => {
           <Select
             className="col-lg-12 p-1"
             placeholder="เลือกสถานะ"
+            onChange={handleStatus}
             allowClear
-          ></Select>
+          >
+            {statusSearch.map((item) => (
+              <option value={item.value}>{item.name}</option>
+            ))}
+          </Select>
         </div>
         <div className="pt-1">
           <Button
@@ -238,7 +263,8 @@ const IndexInprogressTask = () => {
                 searchProvince,
                 searchDistrict,
                 searchSubdistrict,
-                searchText
+                searchText,
+                searchStatus
               )
             }
           >
@@ -258,8 +284,9 @@ const IndexInprogressTask = () => {
           children: (
             <>
               <span className="text-dark-75  d-block font-size-lg">
-                {moment(new Date(row.dateAppointment)).format(dateFormat)},{" "}
-                {moment(new Date(row.dateAppointment)).format(timeFormat)}
+                {moment(new Date(row.task_date_appointment)).format(dateFormat)}
+                ,{" "}
+                {moment(new Date(row.task_date_appointment)).format(timeFormat)}
               </span>
               <span style={{ color: color.Disable, fontSize: "12px" }}>
                 {row.taskNo}
@@ -279,11 +306,11 @@ const IndexInprogressTask = () => {
             <>
               <span className="text-dark-75  d-block font-size-lg">
                 {row.droner !== null
-                  ? row.droner.firstname + " " + row.droner.lastname
+                  ? row.droner_firstname + " " + row.droner_lastname
                   : null}
               </span>
               <span style={{ color: color.Disable, fontSize: "12px" }}>
-                {row.droner !== null ? row.droner.telephoneNo : null}
+                {row.droner !== null ? row.droner_telephone_no : null}
               </span>
             </>
           ),
@@ -299,10 +326,10 @@ const IndexInprogressTask = () => {
           children: (
             <>
               <span className="text-dark-75  d-block font-size-lg">
-                {row.farmer.firstname + " " + row.farmer.lastname}
+                {row.farmer_firstname + " " + row.farmer_lastname}
               </span>
               <span style={{ color: color.Disable, fontSize: "12px" }}>
-                {row.farmer.telephoneNo}
+                {row.farmer_telephone_no}
               </span>
             </>
           ),
@@ -314,25 +341,18 @@ const IndexInprogressTask = () => {
       dataIndex: "plotArea",
       key: "plotArea",
       render: (value: any, row: any, index: number) => {
-        const findDataPlot = row.farmer.farmerPlot.filter(
-          (x: any) => x.id == row.farmerPlotId
-        )[0];
         return {
           children: (
             <>
               <span className="text-dark-75  d-block font-size-lg">
-                {findDataPlot != undefined
-                  ? findDataPlot.plotArea.subdistrictName + "/"
-                  : null}
-                {findDataPlot != undefined
-                  ? findDataPlot.plotArea.districtName + "/"
-                  : null}
-                {findDataPlot != undefined
-                  ? findDataPlot.plotArea.provinceName
-                  : null}
+                {row.plotArea_subdistrict_name +
+                  "/" +
+                  row.plotArea_district_name +
+                  "/" +
+                  row.plotArea_province_name}
               </span>
               <a
-                onClick={() => handleModalMap(row.farmerPlotId)}
+                onClick={() => handleModalMap(row.farmerPlot_farmer_id)}
                 style={{ color: color.primary1 }}
               >
                 ดูแผนที่แปลง
@@ -344,19 +364,21 @@ const IndexInprogressTask = () => {
     },
     {
       title: "ค่าบริการ",
-      dataIndex: "subdistrict_subdistrict_name",
-      key: "subdistrict_subdistrict_name",
+      dataIndex: "subdistrict_name",
+      key: "subdistrict_name",
       render: (value: any, row: any, index: number) => {
         return {
           children: (
             <>
               <span className="text-dark-75  d-block font-size-lg">
-                {row.totalPrice != null
-                  ? numberWithCommas(parseFloat(row.totalPrice)) + " " + "บาท"
+                {row.task_total_price != null
+                  ? numberWithCommas(parseFloat(row.task_total_price)) +
+                    " " +
+                    "บาท"
                   : "0 บาท"}
               </span>
               <span style={{ color: color.Disable, fontSize: "12px" }}>
-                {"จำนวน" + " " + row.farmAreaAmount + " " + "ไร่"}
+                {"จำนวน" + " " + row.task_farm_area_amount + " " + "ไร่"}
               </span>
             </>
           ),
@@ -365,11 +387,26 @@ const IndexInprogressTask = () => {
     },
     {
       title: "สถานะ",
-      dataIndex: "district_district_name",
-      key: "district_district_name",
+      dataIndex: "status",
+      key: "status",
       render: (value: any, row: any, index: number) => {
+        let statusColor: { text?: string; color?: any } = {};
+        statusColor.text = !row.task_is_problem ? "รอดำเนินงาน" : "งานมีปัญหา";
+        statusColor.color = !row.task_is_problem ? color.Warning : color.Error;
         return {
-          children: <></>,
+          children: (
+            <>
+              <span style={{ color: statusColor.color }}>
+                <Badge color={statusColor.color} />
+                {statusColor.text}
+              </span>
+              <br />
+              <span style={{ color: color.Disable, fontSize: "12px" }}>
+                <UserOutlined style={{ padding: "0 4px 0 0" }} />
+                {row.task_create_by}
+              </span>
+            </>
+          ),
         };
       },
     },
@@ -385,7 +422,8 @@ const IndexInprogressTask = () => {
                 icon={<EditOutlined />}
                 color={color.primary1}
                 onClick={() =>
-                  (window.location.href = "/EditInprogressTask/id=" + row.id)
+                  (window.location.href =
+                    "/EditInprogressTask/id=" + row.task_id)
                 }
               />
             </div>
@@ -400,7 +438,14 @@ const IndexInprogressTask = () => {
       <Layouts>
         {PageTitle}
         <CardContainer>
-          <Table columns={columns} dataSource={data?.data} pagination={false} />
+          <Table
+            columns={columns}
+            dataSource={data?.data}
+            pagination={false}
+            rowClassName={(a) =>
+              a.task_is_problem == true ? "table-row-older" : "table-row"
+            }
+          />
         </CardContainer>
         <div className="d-flex justify-content-between pt-4">
           <p>รายการทั้งหมด {data?.count} รายการ</p>

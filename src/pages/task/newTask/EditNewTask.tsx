@@ -464,7 +464,7 @@ const EditNewTask = () => {
                   </Form.Item>
                 </div>
                 <div className="form-group col-lg-6">
-                  <label>Longitude</label>
+                  <label>Longitude (ลองติจูด)</label>
                   <Form.Item>
                     <Input value={farmerPlotSeleced?.long} disabled />
                   </Form.Item>
@@ -623,7 +623,6 @@ const EditNewTask = () => {
               _.set(
                 item,
                 "isChecked",
-
                 data?.targetSpray.map((x) => x).find((y) => y === item.crop)
                   ? true
                   : item.isChecked

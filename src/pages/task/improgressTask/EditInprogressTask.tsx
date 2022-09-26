@@ -17,6 +17,7 @@ import FooterPage from "../../../components/footer/FooterPage";
 import { CardHeader } from "../../../components/header/CardHearder";
 import Layouts from "../../../components/layout/Layout";
 import GooleMap from "../../../components/map/GoogleMap";
+import { CropDatasource } from "../../../datasource/CropDatasource";
 import { TaskDatasource } from "../../../datasource/TaskDatasource";
 import { LAT_LNG_BANGKOK } from "../../../definitions/Location";
 import {
@@ -24,9 +25,14 @@ import {
   PURPOSE_SPRAY_CHECKBOX,
 } from "../../../definitions/PurposeSpray";
 import { STATUS_INPROGRESS_CHECKBOX } from "../../../definitions/Status";
-import { GetTaskInprogressEntity } from "../../../entities/TaskInprogress";
+import { CropPurposeSprayEntity } from "../../../entities/CropEntities";
+import {
+  GetTaskInprogressEntity,
+  GetTaskInprogressEntity_INIT,
+} from "../../../entities/TaskInprogress";
 import { color } from "../../../resource";
 import { numberWithCommas } from "../../../utilities/TextFormatter";
+const { Option } = Select;
 
 const dateFormat = "DD/MM/YYYY";
 const dateCreateFormat = "YYYY-MM-DD";
@@ -38,7 +44,9 @@ const { Map } = require("immutable");
 let queryString = _.split(window.location.pathname, "=");
 
 const EditInprogressTask = () => {
-  const [data, setData] = useState<GetTaskInprogressEntity>();
+  const [data, setData] = useState<GetTaskInprogressEntity>(
+    GetTaskInprogressEntity_INIT
+  );
   const [dateAppointment, setDateAppointment] = useState<any>(
     moment(undefined)
   );
@@ -46,13 +54,21 @@ const EditInprogressTask = () => {
     moment(undefined)
   );
   const [saveBtnDisable, setBtnSaveDisable] = useState<boolean>(true);
+  const [periodSpray, setPeriodSpray] = useState<CropPurposeSprayEntity>();
 
   const fetchInprogressTask = async () => {
     await TaskDatasource.getInprogressTaskById(queryString[1]).then((res) => {
       console.log(res);
       setDateAppointment(new Date(res.dateAppointment).toUTCString());
       setTimeAppointment(new Date(res.dateAppointment).getTime());
+      fetchPurposeSpray(res.farmerPlot.plantName);
       setData(res);
+    });
+  };
+
+  const fetchPurposeSpray = async (crop: string) => {
+    await CropDatasource.getPurposeByCroupName(crop).then((res) => {
+      setPeriodSpray(res);
     });
   };
 
@@ -112,42 +128,57 @@ const EditInprogressTask = () => {
                   ช่วงเวลาการพ่น <span style={{ color: "red" }}>*</span>
                 </label>
                 <Form.Item name="searchAddress">
-                  <Select placeholder="-"></Select>
+                  <Select placeholder="-" defaultValue={data?.purposeSprayId}>
+                    {periodSpray?.purposeSpray?.length ? (
+                      periodSpray?.purposeSpray?.map((item) => (
+                        <Option value={item.id}>{item.purposeSprayName}</Option>
+                      ))
+                    ) : (
+                      <Option>-</Option>
+                    )}
+                  </Select>
                 </Form.Item>
               </div>
               <div className="row form-group col-lg-6 p-2">
                 <label>
                   เป้าหมายการฉีดพ่น <span style={{ color: "red" }}>*</span>
                 </label>
-                {/* {PURPOSE_SPRAY_CHECKBOX.map((item) =>
-              _.set(
-                item,
-                "isChecked",
-                data?.tragetSpray.map((x) => x).find((y) => y === item.crop)
-                  ? true
-                  : item.isChecked
-              )
-            ).map((x, index) => (
-              <div className="form-group">
-                <input type="checkbox" value={x.crop} checked={x.isChecked} />{" "}
-                <label style={{ padding: "0 8px 0 0" }}>{x.crop}</label>
-                {index == 4 && (
-                  <>
-                    <Input
-                      className="col-lg-5"
-                      placeholder="โปรดระบุ เช่น เพลี้ย,หอย"
-                      defaultValue={Array.from(
-                        new Set(
-                          data?.tragetSpray.filter(
-                            (a) => !PURPOSE_SPRAY.some((x) => x === a)
-                          )
-                        )
-                      )}
-                    />
-                  </>
-                )}
-              </div>
-            ))} */}
+                {PURPOSE_SPRAY_CHECKBOX.map((item) =>
+                  _.set(
+                    item,
+                    "isChecked",
+                    data?.targetSpray
+                      ?.map((x) => x)
+                      .find((y) => y === item.crop)
+                      ? true
+                      : item.isChecked
+                  )
+                ).map((x, index) => (
+                  <div className="form-group">
+                    <input
+                      key={data?.targetSpray[0]}
+                      type="checkbox"
+                      value={x.crop}
+                      checked={x.isChecked}
+                    />{" "}
+                    <label style={{ padding: "0 8px 0 0" }}>{x.crop}</label>
+                    {index == 4 && (
+                      <>
+                        <Input
+                          className="col-lg-9"
+                          placeholder="โปรดระบุ เช่น เพลี้ย,หอย"
+                          defaultValue={Array.from(
+                            new Set(
+                              data?.targetSpray.filter(
+                                (a) => !PURPOSE_SPRAY.some((x) => x === a)
+                              )
+                            )
+                          )}
+                        />
+                      </>
+                    )}
+                  </div>
+                ))}
               </div>
               <div className="row form-group p-2">
                 <label>
@@ -184,13 +215,29 @@ const EditInprogressTask = () => {
                   {data?.totalPrice} บาท (จำนวน {data?.farmAreaAmount} ไร่)
                 </p>
               </div>
-              <div className="form-group col-lg-6">
+              <div className="form-group col-lg-12">
                 <label>สถานะ</label>
-                {STATUS_INPROGRESS_CHECKBOX.map((item) => (
-                  <Radio value={item.key} style={{ width: "100%" }}>
-                    {item.name}
-                  </Radio>
-                ))}
+                <br />
+                <Radio.Group defaultValue={data.status}>
+                  <Space direction="vertical">
+                    {STATUS_INPROGRESS_CHECKBOX.map((item, index) => (
+                      <Radio value={item.value} className="col-lg-12">
+                        {item.name}<br/>
+                        {data.status == "WAIT_START" && index == 0 && (
+                          <Radio.Group defaultValue={data?.isProblem}>
+                            <Space direction="vertical">
+                              <Radio value={false}>ปกติ</Radio>
+                              <Radio value={true}>งานมีปัญหา</Radio>
+                              {data.isProblem == true && (
+                                <TextArea placeholder="กรอกรายละเอียดปัญหา" />
+                              )}
+                            </Space>
+                          </Radio.Group>
+                        )}
+                      </Radio>
+                    ))}
+                  </Space>
+                </Radio.Group>
               </div>
             </Form>
           </div>
@@ -359,7 +406,7 @@ const EditInprogressTask = () => {
 
   return (
     <>
-      <Layouts>
+      <Layouts key={data?.id}>
         <Row>
           <BackIconButton
             onClick={() => (window.location.href = "/IndexInprogressTask")}

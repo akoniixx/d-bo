@@ -47,15 +47,12 @@ export const STATUS_INDEX_FINISHTASK = [
 export const STATUS_INPROGRESS_CHECKBOX = [
   {
     key: "0",
+    value: "WAIT_START",
     name: "รอดำเนินงาน",
-    substatus: [
-      { key: 0, name: "ปกติ" },
-      { key: 1, name: "งานมีปัญหา" },
-    ],
   },
   {
     key: "1",
+    value: "CANCELED",
     name: "ยกเลิกงาน",
-    substatus: [],
   },
 ];
