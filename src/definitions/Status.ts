@@ -41,8 +41,69 @@ export const STATUS_NEWTASK_COLOR_MAPPING: any = {
   รอนักบินโดรนรับงาน: "#EA973E",
 };
 
-
-export const STATUS_INDEX_FINISHTASK = [
+export const TASK_TODAY_STATUS : any = {
+  WAIT_START : "รอเริ่มงาน",
+  IN_PROGRESS : "กำลังดำเนินงาน",
+}
+export const TASK_TODAY_STATUS_MAPPING : any = {
+  ACTIVE : "สะดวก",
+  INACTIVE : "ไม่สะดวก"
+}
+export const TASKTODAY_STATUS: any = [
   { value: "WAIT_START", name: "รอเริ่มงาน" },
-  { value: "IN_PROGRESS", name: "กำลังดำเนินงาน" }
+  { value: "IN_PROGRESS", name: "กำลังดำเนินงาน" },
+  { value: "CANCELED", name: "ยกเลิก" },
 ];
+export const TASKTODAY_STATUS1: any = [
+
+  { value: "IN_PROGRESS", name: "กำลังดำเนินงาน" },
+  { value: "CANCELED", name: "ยกเลิก" },
+];
+export const REDIO_WAIT_START = [
+  { key: 0, name: "ปกติ", isChecked: false },
+  { key: 1, name: "งานมีปัญหา", isChecked: false },
+];
+export const REDIO_IN_PROGRESS = [
+  { key: 0, name: "ปกติ", isChecked: false },
+  { key: 1, name: "รออนุมัติการขยายเวลา", isChecked: false },
+  { key: 2, name: "อนุมัติขยายเวลา", isChecked: false },
+  { key: 3, name: "งานมีปัญหา", isChecked: false },
+];
+
+export const STATUS_COLOR_TASK_TODAY: any = {
+  WAIT_START: color.secondary3,
+  IN_PROGRESS: color.primary1,
+};
+export const STATUS_IS_PROBLEM: any = {
+  true: "งานมีปัญหา",
+  false: "ปกติ",
+};
+export const STATUS_IS_DELAY: any = {
+  true: "ขยายเวลา",
+  false: "ปกติ",
+};
+export const STATUS_DELAY = [
+  { value: "WAIT_APPROVE", name: "รออนุมัติขยายเวลา" },
+  { value: "APPROVE", name: "อนุมัติขยายเวลา" },
+  { value: "EXTENDED", name: "ขยายเวลา" },
+  { value: "REJECT", name: "งานมีปัญหา" },
+]
+export const STATUS_SUMMARY = [
+  { value: "inprogressnormal", name: "ปกติ" },
+  { value: "inprogressproblem", name: "งานมีปัญหา" },
+  { value: "waitstartnormal", name: "ปกติ" },
+  { value: "waitstartproblem", name: "งานมีปัญหา" },
+  { value: "waitapprovedelay", name: "รออนุมัติขยายเวลา" },
+  { value: "extended", name: "อนุมัติขยายเวลา" },
+]
+export const STATUS_INPROGRESS = [
+  { value: "inprogressnormal", name: "ปกติ", isChecked: false },
+  { value: "waitapprovedelay", name: "รออนุมัติขยายเวลา", isChecked: false },
+  { value: "extended", name: "อนุมัติขยายเวลา", isChecked: false },
+  { value: "inprogressproblem", name: "งานมีปัญหา", isChecked: false },
+];
+export const STATUS_WAITSTART = [
+  { value: "waitstartnormal", name: "ปกติ", isChecked: false },
+  { value: "waitstartproblem", name: "งานมีปัญหา", isChecked: false },
+];
+
