@@ -10,6 +10,21 @@ axios.interceptors.request.use(async (config: any) => {
   return config;
 });
 
+axios.interceptors.response.use(
+  async function (response) {
+    return response;
+  },
+  async function (error) {
+    if (401 === error.response.status) {
+      localStorage.clear();
+      sessionStorage.clear();
+      window.location.href = "/";
+    }
+
+    return Promise.reject(error);
+  }
+);
+
 export const httpClient = axios;
 export const intanceAuth = axios.create({
   baseURL: BASE_URL,
