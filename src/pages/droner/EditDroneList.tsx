@@ -291,6 +291,7 @@ function EditDroneList() {
     setImgLicenseDroner(false);
     setBtnSaveDisable(false);
   };
+
   const onChangeLicenseDrone = async (file: any) => {
     let src = file.target.files[0];
     src = await new Promise((resolve) => {
@@ -326,13 +327,14 @@ function EditDroneList() {
     imgWindow?.document.write(image.outerHTML);
   };
   const removeLicenseDrone = () => {
-    const removeImg = data.file?.filter(
-      (x) => x.category != "DRONE_LICENSE"
-    )[0];
-    const d = Map(data).set("file", removeImg == undefined ? [] : [removeImg]);
-    setData(d.toJS());
+    const getImg = data.file.filter((x) => x.category == "DRONE_LICENSE")[0];
+    if (getImg != undefined) {
+      UploadImageDatasouce.deleteImage(getImg.id, getImg.path).then(
+        (res) => {}
+      );
+    }
     setImgLicenseDrone(false);
-    setBtnSaveDisable(true);
+    setBtnSaveDisable(false);
   };
   const UpdateDronerDrone = async () => {
     let textReasonList = [];
@@ -546,9 +548,8 @@ function EditDroneList() {
             </div>
           </div>
           <div className="row">
-            <div className="form-group">
+            <div className="form-group col-lg-6 pb-5">
               <label>ใบอนุญาตโดรนจาก กสทช.</label>
-              <span style={{ color: "red" }}>*</span>
               <span style={{ color: color.Disable }}> (ไฟล์รูป หรือ pdf.)</span>
               <br />
               <div className="pb-2">
@@ -588,8 +589,7 @@ function EditDroneList() {
                 }}
               >
                 <input
-                  key={imgLicenseDrone}
-                  required
+                  key={imgLicenseDroner}
                   type="file"
                   onChange={onChangeLicenseDrone}
                   title="เลือกรูป"
