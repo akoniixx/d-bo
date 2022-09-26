@@ -1,4 +1,10 @@
 ## [Version - 0]
+## Fix [v0.15.1] 2022-09-26
+- fixed entity index task today menu
+- fixed image license drone list menu
+## Feature [v0.15.0] 2022-09-23
+- create Today Task 
+- connect api all page in today task menu
 ## Fix [v0.14.3] 2022-09-22
 - fixed defect plot name in add new task
 - fixed defect duplicate muti droner and single droner in new task
