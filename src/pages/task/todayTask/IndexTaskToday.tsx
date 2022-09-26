@@ -419,16 +419,18 @@ export default function IndexTodayTask() {
   const columns = [
     {
       title: "วัน/เวลา นัดหมาย",
-      dataIndex: "dateAppointment",
-      key: "dateAppointment",
-      sorter: (a: any, b: any) => sorter(a.dateAppointment, b.dateAppointment),
+      dataIndex: "task_date_appointment",
+      key: "task_date_appointment",
+      sorter: (a: any, b: any) =>
+        sorter(a.task_date_appointment, b.task_date_appointment),
       render: (value: any, row: any, index: number) => {
         return {
           children: (
             <>
               <span>
-                {moment(new Date(row.dateAppointment)).format(dateFormat)},{" "}
-                {moment(new Date(row.dateAppointment)).format(timeFormat)}
+                {moment(new Date(row.task_date_appointment)).format(dateFormat)}
+                ,{" "}
+                {moment(new Date(row.task_date_appointment)).format(timeFormat)}
               </span>
               <br />
               <span style={{ color: color.Disable, fontSize: "12px" }}>
@@ -444,13 +446,13 @@ export default function IndexTodayTask() {
       dataIndex: "droner",
       key: "droner",
       sorter: (a: any, b: any) =>
-        sorter(a.droner.firstname, b.droner.firstname),
+        sorter(a.droner_firstname, b.droner_firstname),
       render: (value: any, row: any, index: number) => {
-        const changeDroner = row.taskHistory[0];
+        const changeDroner = row.count_change_droner;
         return {
           children: (
             <>
-              <span>{row.droner.firstname + " " + row.droner.lastname}</span>
+              <span>{row.droner_firstname + " " + row.droner_lastname}</span>
               {changeDroner != undefined ? (
                 <Tooltip
                   style={{ fontSize: "18px" }}
@@ -462,7 +464,7 @@ export default function IndexTodayTask() {
               ) : null}
               <br />
               <span style={{ color: color.Disable, fontSize: "12px" }}>
-                {row.droner.telephoneNo}
+                {row.droner_telephone_no}
               </span>
             </>
           ),
@@ -474,15 +476,15 @@ export default function IndexTodayTask() {
       dataIndex: "farmer",
       key: "farmer",
       sorter: (a: any, b: any) =>
-        sorter(a.farmer.firstname, b.farmer.firstname),
+        sorter(a.farmer_firstname, b.farmer_firstname),
       render: (value: any, row: any, index: number) => {
         return {
           children: (
             <>
-              <span>{row.farmer.firstname + " " + row.farmer.lastname}</span>
+              <span>{row.farmer_firstname + " " + row.farmer_lastname}</span>
               <br />
               <span style={{ color: color.Disable, fontSize: "12px" }}>
-                {row.farmer.telephoneNo}
+                {row.farmer_telephone_no}
               </span>
             </>
           ),
@@ -494,16 +496,16 @@ export default function IndexTodayTask() {
       dataIndex: "plotArea",
       key: "plotArea",
       render: (value: any, row: any, index: number) => {
-        const subdistrict = row.farmerPlot.plotArea;
-        const district = row.farmerPlot.plotArea;
-        const province = row.farmerPlot.plotArea;
+        const subdistrict = row.plotArea_subdistrict_name;
+        const district = row.plotArea_district_name;
+        const province = row.plotArea_province_name;
         return {
           children: (
             <>
               <span className="text-dark-75  d-block font-size-lg">
-                {subdistrict != null ? subdistrict.subdistrictName + "/" : null}
-                {district != null ? district.districtName + "/" : null}
-                {province != null ? province.provinceName + "/" : null}
+                {subdistrict != null ? subdistrict + "/" : null}
+                {district != null ? district + "/" : null}
+                {province != null ? province + "/" : null}
               </span>
               <a
                 onClick={() => handleModalMap(row.farmerPlotId)}
@@ -519,21 +521,22 @@ export default function IndexTodayTask() {
 
     {
       title: "ค่าบริการ",
-      dataIndex: "totalPrice",
-      key: "totalPrice",
-      sorter: (a: any, b: any) => sorter(a.totalPrice, b.totalPrice),
+      dataIndex: "task_total_price",
+      key: "task_total_price",
+      sorter: (a: any, b: any) =>
+        sorter(a.task_total_price, b.task_total_price),
       render: (value: any, row: any, index: number) => {
         return {
           children: (
             <>
               <span>
-                {row.totalPrice != null
-                  ? formatCurrency(row.totalPrice) + " " + "บาท"
+                {row.task_total_price != null
+                  ? formatCurrency(row.task_total_price) + " " + "บาท"
                   : "0.00" + " " + "บาท"}
               </span>
               <br />
               <span style={{ color: color.Disable, fontSize: "12px" }}>
-                {"จำนวน" + " " + row.farmAreaAmount + " " + "ไร่"}
+                {"จำนวน" + " " + row.farmerPlot_rai_amount + " " + "ไร่"}
               </span>
             </>
           ),
@@ -542,17 +545,17 @@ export default function IndexTodayTask() {
     },
     {
       title: "สถานะ ",
-      dataIndex: "status",
-      key: "status",
+      dataIndex: "task_status",
+      key: "task_status",
       render: (value: any, row: any, index: number) => {
         return {
           children: (
             <>
-              <span style={{ color: STATUS_COLOR_TASK_TODAY[row.status] }}>
-                <Badge color={STATUS_COLOR_TASK_TODAY[row.status]} />
-                {TASK_TODAY_STATUS[row.status]}
+              <span style={{ color: STATUS_COLOR_TASK_TODAY[row.task_status] }}>
+                <Badge color={STATUS_COLOR_TASK_TODAY[row.task_status]} />
+                {TASK_TODAY_STATUS[row.task_status]}
                 <span style={{ color: color.Error }}>
-                  {row.isProblem == true
+                  {row.task_is_problem == true
                     ? " " + "(" + "งานมีปัญหา" + ")"
                     : null}
                 </span>
@@ -561,7 +564,7 @@ export default function IndexTodayTask() {
 
               <span style={{ color: color.Disable, fontSize: "12px" }}>
                 <UserOutlined style={{ padding: "0 4px 0 0" }} />
-                {row.createBy}
+                {row.task_update_by}
               </span>
             </>
           ),
@@ -576,20 +579,20 @@ export default function IndexTodayTask() {
         return {
           children: (
             <div className="d-flex flex-row justify-content-between">
-              {row.status == "IN_PROGRESS" ? (
+              {row.task_status == "IN_PROGRESS" ? (
                 <ActionButton
                   icon={<EditOutlined />}
                   color={color.primary1}
                   onClick={() =>
-                    (window.location.href = "/EditInProgress?=" + row.id)
+                    (window.location.href = "/EditInProgress?=" + row.task_id)
                   }
                 />
-              ) : row.status == "WAIT_START" ? (
+              ) : row.task_status == "WAIT_START" ? (
                 <ActionButton
                   icon={<EditOutlined />}
                   color={color.primary1}
                   onClick={() =>
-                    (window.location.href = "/EditWaitStart?=" + row.id)
+                    (window.location.href = "/EditWaitStart?=" + row.task_id)
                   }
                 />
               ) : null}

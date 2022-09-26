@@ -1,4 +1,7 @@
 ## [Version - 0]
+## Fix [v0.15.1] 2022-09-26
+- fixed entity index task today menu
+- fixed image license drone list menu
 ## Feature [v0.15.0] 2022-09-23
 - create Today Task 
 - connect api all page in today task menu
