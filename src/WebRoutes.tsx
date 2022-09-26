@@ -30,6 +30,8 @@ import IndexRankDroner from "./pages/droner/IndexRankDroner";
 import IndexNewTask from "./pages/task/newTask/IndexNewTask";
 import AddNewTask from "./pages/task/newTask/AddNewTask";
 import EditNewTask from "./pages/task/newTask/EditNewTask";
+import IndexInprogressTask from "./pages/task/improgressTask/IndexInprogressTask";
+import EditInprogressTask from "./pages/task/improgressTask/EditInprogressTask";
 import EditCancel from "./pages/task/todayTask/DetailEdit/EditCancel";
 import EditWaitStart from "./pages/task/todayTask/DetailEdit/EditWaitStart";
 import EditInProgress from "./pages/task/todayTask/DetailEdit/EditInProgress";
@@ -58,8 +60,8 @@ const WebRoutes: React.FC<any> = () => {
           <Route path="/AddDroner" element={<AddDroner />} />
           <Route path="/DroneList" element={<DroneList />} />
           <Route path="/IndexRankDroner" element={<IndexRankDroner />} />
-          <Route path="/DetailRankDroner" element={<DetailRankDroner/>} />
-          <Route path="/DetailWorkDroner" element={<DetailWorkDroner/>} />
+          <Route path="/DetailRankDroner" element={<DetailRankDroner />} />
+          <Route path="/DetailWorkDroner" element={<DetailWorkDroner />} />
           <Route path="/EditDroneList" element={<EditDroneList />} />
           <Route path="/EditFarmer/:id" element={<EditFarmer />} />
           <Route path="/EditDroner" element={<EditDroner />} />
@@ -69,6 +71,14 @@ const WebRoutes: React.FC<any> = () => {
           <Route path="/IndexNewTask" element={<IndexNewTask />} />
           <Route path="/AddNewTask:type" element={<AddNewTask />} />
           <Route path="/EditNewTask/:id" element={<EditNewTask />} />
+          <Route
+            path="/IndexInprogressTask"
+            element={<IndexInprogressTask />}
+          />
+          <Route
+            path="/EditInprogressTask/:id"
+            element={<EditInprogressTask />}
+          />
           <Route path="/IndexTodayTask" element={<IndexTodayTask />} />
           <Route path="/EditWaitStart" element={<EditWaitStart/>} />
           <Route path="/EditInProgress" element={<EditInProgress/>} />

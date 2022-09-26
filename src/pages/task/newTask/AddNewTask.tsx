@@ -154,7 +154,6 @@ const AddNewTask = () => {
     let plotSelected = farmerSelected?.farmerPlot.filter(
       (x) => x.id == value
     )[0];
-    console.log(plotSelected);
     const f = Map(createNewTask).set("farmerPlotId", plotSelected?.id);
     const g = Map(f.toJS()).set("farmAreaAmount", plotSelected?.raiAmount);
     setCropSelected(plotSelected?.plantName);
@@ -221,7 +220,7 @@ const AddNewTask = () => {
   const handlePreparation = (e: any) => {
     const d = Map(createNewTask).set("preparationBy", e.target.value);
     setCreateNewTask(d.toJS());
-    checkValidateStep(d.toJS());
+    checkValidateStep(d.toJS(), current);
   };
   const handleCalServiceCharge = (e: any) => {
     if (e.target.id == "unitPrice") {
@@ -358,11 +357,16 @@ const AddNewTask = () => {
                   <Form.Item>
                     <Input
                       value={
-                        farmerPlotSeleced?.plotArea.subdistrictName +
-                        "/" +
-                        farmerPlotSeleced?.plotArea.districtName +
-                        "/" +
-                        farmerPlotSeleced?.plotArea.provinceName
+                        (farmerPlotSeleced?.plotArea.subdistrictName !=
+                        undefined
+                          ? farmerPlotSeleced?.plotArea.subdistrictName + "/"
+                          : "") +
+                        (farmerPlotSeleced?.plotArea.districtName != undefined
+                          ? farmerPlotSeleced?.plotArea.districtName + "/"
+                          : "") +
+                        (farmerPlotSeleced?.plotArea.provinceName != undefined
+                          ? farmerPlotSeleced?.plotArea.provinceName
+                          : "")
                       }
                       disabled
                     />
@@ -756,7 +760,6 @@ const AddNewTask = () => {
     setRating({ ratingMin: min, ratingMax: max });
   };
   const handleSelectDroner = async (e: any, data: any) => {
-    console.log(data);
     let inputType = e.target.type;
     let checked = e.target.checked;
     let d: TaskSearchDroner[] = [];
@@ -1310,7 +1313,6 @@ const AddNewTask = () => {
         setDisableBtn(true);
       }
     } else {
-      console.log(dataDroner);
       let checkDroner = dataDroner?.length != 0;
       checkDroner ? setDisableBtn(false) : setDisableBtn(true);
     }
@@ -1333,6 +1335,8 @@ const AddNewTask = () => {
 
   const nextStep = () => {
     if (current == 0) {
+      let changeTimeFormat = moment(timeAppointment).format(timeCreateFormat);
+      let changeDateFormat = moment(dateAppointment).format(dateCreateFormat);
       let otherSprayList = [];
       if (otherSpray != undefined) {
         let m = otherSpray.split(",");
@@ -1346,7 +1350,7 @@ const AddNewTask = () => {
       );
       const d = Map(createNewTask).set(
         "dateAppointment",
-        moment(dateAppointment + " " + timeAppointment).toISOString()
+        moment(changeDateFormat + " " + changeTimeFormat).toISOString()
       );
       const p = Map(d.toJS()).set(
         "createBy",

@@ -112,16 +112,23 @@ const Layouts: React.FC<any> = ({ children }) => {
                 </Link>
               </Menu.Item>
               <Menu.Item>
+                <Link
+                  to="/IndexInprogressTask"
+                  style={{ textDecoration: "none" }}
+                >
+                  <span>งานรอดำเนินงาน</span>
+                </Link>
+              </Menu.Item>
+              <Menu.Item>
                 <Link to="/IndexTodayTask" style={{ textDecoration: "none" }}>
                   <span>งานในวันนี้</span>
-                  </Link>
-                  </Menu.Item>
+                </Link>
+              </Menu.Item>
               <Menu.Item>
                 <Link to="/IndexFinishTask" style={{ textDecoration: "none" }}>
                   <span>งานที่เสร็จแล้ว</span>
-                  </Link>
-                  </Menu.Item>
-
+                </Link>
+              </Menu.Item>
             </Menu.SubMenu>
             <Menu.Item icon={<DollarCircleFilled />}>
               <Link to="/TotalIncomePage" style={{ textDecoration: "none" }}>

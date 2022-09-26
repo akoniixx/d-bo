@@ -1,4 +1,7 @@
 ## [Version - 0]
+## Feature [v0.16.0] 2022-09-26
+- added index inprogress task menu
+- fixed defect date appointment in new task
 ## Fix [v0.15.1] 2022-09-26
 - fixed entity index task today menu
 - fixed image license drone list menu
