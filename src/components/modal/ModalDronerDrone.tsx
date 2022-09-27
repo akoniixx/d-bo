@@ -84,7 +84,6 @@ const ModalDrone: React.FC<ModalDroneProps> = ({
       } else {
         await UploadImageDatasouce.getImage(checkDronerLicense[0].path).then(
           (resImg) => {
-            console.log(resImg);
             setImgLicenseDroner(resImg.url);
           }
         );

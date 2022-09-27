@@ -108,7 +108,6 @@ const EditFarmer = () => {
 
   const fecthFarmer = async () => {
     await FarmerDatasource.getFarmerById(farmerId).then((res) => {
-      console.log(res);
       setData(res);
       setAddress(res.address);
       setFarmerPlotList(res.farmerPlot);
