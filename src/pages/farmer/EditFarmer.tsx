@@ -355,7 +355,6 @@ const EditFarmer = () => {
       data.firstname,
       data.lastname,
       data.telephoneNo,
-      data.idNo,
       address.address1,
     ].includes("");
     let checkEmptyNumber = ![
@@ -376,7 +375,6 @@ const EditFarmer = () => {
       data.firstname,
       data.lastname,
       data.telephoneNo,
-      data.idNo,
       address.address1,
     ].includes("");
     let checkEmptyNumber = ![
@@ -567,17 +565,15 @@ const EditFarmer = () => {
           </div>
           <div className="row">
             <div className="form-group col-lg-6">
-              <label>
-                รหัสบัตรประชาชน <span style={{ color: "red" }}>*</span>
-              </label>
+              <label>รหัสบัตรประชาชน</label>
               <Form.Item
                 name="idNo"
-                rules={[
-                  {
-                    required: true,
-                    message: "กรุณากรอกรหัสบัตรประชาชน!",
-                  },
-                ]}
+                // rules={[
+                //   {
+                //     required: true,
+                //     message: "กรุณากรอกรหัสบัตรประชาชน!",
+                //   },
+                // ]}
               >
                 <Input
                   placeholder="กรอกรหัสบัตรประชาชน"
