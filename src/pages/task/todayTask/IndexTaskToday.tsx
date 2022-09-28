@@ -77,6 +77,7 @@ export default function IndexTodayTask() {
     fetchAllTaskToday();
     fetchProvince();
   }, [current, row]);
+  
   const fetchAllTaskToday = async (
     text?: string,
     proId?: number,
@@ -151,6 +152,7 @@ export default function IndexTodayTask() {
       }
     }
     setSearchStatus(arr);
+    setCurrent(1)
   };
   const handleIsProblem = (e: any) => {
     let value = e.target.value;
