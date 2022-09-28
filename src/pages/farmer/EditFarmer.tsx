@@ -408,8 +408,11 @@ const EditFarmer = () => {
         var i = 0;
         for (i; 2 > i; i++) {
           i == 0 &&
+            createImgProfile.path != "" &&
             UploadImageDatasouce.uploadImage(createImgProfile).then(res);
-          i == 1 && UploadImageDatasouce.uploadImage(createImgIdCard).then(res);
+          i == 1 &&
+            createImgIdCard.path != "" &&
+            UploadImageDatasouce.uploadImage(createImgIdCard).then(res);
         }
         Swal.fire({
           title: "บันทึกสำเร็จ",

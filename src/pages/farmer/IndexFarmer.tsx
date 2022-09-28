@@ -373,6 +373,7 @@ function IndexFarmer() {
           total={data?.count}
           onChange={onChangePage}
           pageSize={row}
+          showSizeChanger={false}
         />
       </div>
     </Layouts>
