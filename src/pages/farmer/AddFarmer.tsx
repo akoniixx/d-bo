@@ -291,7 +291,6 @@ const AddFarmer = () => {
       data.firstname,
       data.lastname,
       data.telephoneNo,
-      data.idNo,
       address.address1,
     ].includes("");
     let checkEmptyNumber = ![
@@ -312,7 +311,6 @@ const AddFarmer = () => {
       data.firstname,
       data.lastname,
       data.telephoneNo,
-      data.idNo,
       data.birthDate,
       addr.address1,
     ].includes("");
@@ -496,16 +494,16 @@ const AddFarmer = () => {
           <div className="row">
             <div className="form-group col-lg-6">
               <label>
-                รหัสบัตรประชาชน <span style={{ color: "red" }}>*</span>
+                รหัสบัตรประชาชน 
               </label>
               <Form.Item
                 name="idNo"
-                rules={[
-                  {
-                    required: true,
-                    message: "กรุณากรอกรหัสบัตรประชาชน!",
-                  },
-                ]}
+                // rules={[
+                //   {
+                //     required: true,
+                //     message: "กรุณากรอกรหัสบัตรประชาชน!",
+                //   },
+                // ]}
               >
                 <Input
                   placeholder="กรอกรหัสบัตรประชาชน"

@@ -1,7 +1,7 @@
 import { color } from "./../resource/index";
 export const DRONER_STATUS_MAPPING: any = {
   OPEN: "ข้อมูลไม่ครบถ้วน",
-  PENDING: "รอตรวจสอบ",
+  PENDING: "รอยืนยันตัวตน",
   REJECTED: "ไม่อนุมัติ",
   ACTIVE: "ใช้งาน",
   INACTIVE: "ปิดการใช้งาน",
@@ -42,5 +42,3 @@ export const STATUS_COLOR: any = {
   OPEN: color.Disable,
   REJECTED: color.Error,
 };
-
-

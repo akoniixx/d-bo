@@ -333,7 +333,7 @@ function AddDroner() {
     const e = Map(d.toJS()).set("resource", "DRONER");
     const f = Map(e.toJS()).set("category", "PROFILE_IMAGE");
     setCreateImgProfile(f.toJS());
-    checkValidate(f.toJS());
+    setBtnSaveDisable(false);
   };
   const onPreviewProfile = async () => {
     let src = imgProfile;
@@ -399,7 +399,6 @@ function AddDroner() {
       data?.firstname,
       data?.lastname,
       data?.telephoneNo,
-      data?.idNo,
       addr?.address1,
       area?.lat,
       area?.long,
@@ -419,7 +418,8 @@ function AddDroner() {
     let checkEmptyOtherPlant = otherPlant != undefined && otherPlant != "";
     let checkEmptyDate =
       ![data?.birthDate].includes("1970-01-01") &&
-      (data?.birthDate && data?.birthDate?.trim().length > 0)
+      data?.birthDate &&
+      data?.birthDate?.trim().length > 0
         ? true
         : false;
     if (
@@ -660,16 +660,17 @@ function AddDroner() {
           <div className="row">
             <div className="form-group col-lg-6">
               <label>
-                รหัสบัตรประชาชน <span style={{ color: "red" }}>*</span>
+                รหัสบัตรประชาชน
+                {/* <span style={{ color: "red" }}>*</span> */}
               </label>
               <Form.Item
                 name="idNo"
-                rules={[
-                  {
-                    required: true,
-                    message: "กรุณากรอกรหัสบัตรประชาชน!",
-                  },
-                ]}
+                // rules={[
+                //   {
+                //     required: true,
+                //     message: "กรุณากรอกรหัสบัตรประชาชน!",
+                //   },
+                // ]}
               >
                 <Input
                   placeholder="กรอกบัตรประชาชน"
