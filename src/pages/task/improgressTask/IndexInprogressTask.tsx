@@ -352,7 +352,7 @@ const IndexInprogressTask = () => {
                   row.plotArea_province_name}
               </span>
               <a
-                onClick={() => handleModalMap(row.farmerPlot_farmer_id)}
+                onClick={() => handleModalMap(row.task_farmer_plot_id)}
                 style={{ color: color.primary1 }}
               >
                 ดูแผนที่แปลง
