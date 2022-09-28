@@ -471,6 +471,7 @@ export default function IndexTodayTask() {
         };
       },
     },
+
     {
       title: "ชื่อเกษตรกร",
       dataIndex: "farmer",
@@ -499,6 +500,7 @@ export default function IndexTodayTask() {
         const subdistrict = row.plotArea_subdistrict_name;
         const district = row.plotArea_district_name;
         const province = row.plotArea_province_name;
+
         return {
           children: (
             <>
@@ -508,7 +510,7 @@ export default function IndexTodayTask() {
                 {province != null ? province + "/" : null}
               </span>
               <a
-                onClick={() => handleModalMap(row.farmerPlotId)}
+                onClick={() => handleModalMap(row.task_farmer_plot_id)}
                 style={{ color: color.primary1 }}
               >
                 ดูแผนที่แปลง
