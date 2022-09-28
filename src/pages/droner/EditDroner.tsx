@@ -509,7 +509,6 @@ function EditDroner() {
       data.firstname,
       data.lastname,
       data.telephoneNo,
-      data.idNo,
       address.address1,
       dronerArea.lat,
       dronerArea.long,
@@ -538,7 +537,6 @@ function EditDroner() {
     let checkEmptySting = ![
       data.firstname,
       data.telephoneNo,
-      data.idNo,
       address.address1,
       dronerArea.lat,
       dronerArea.long,
@@ -780,16 +778,16 @@ function EditDroner() {
           <div className="row">
             <div className="form-group col-lg-6">
               <label>
-                รหัสบัตรประชาชน <span style={{ color: "red" }}>*</span>
+                รหัสบัตรประชาชน 
               </label>
               <Form.Item
                 name="idNo"
-                rules={[
-                  {
-                    required: true,
-                    message: "กรุณากรอกรหัสบัตรประชาชน!",
-                  },
-                ]}
+                // rules={[
+                //   {
+                //     required: true,
+                //     message: "กรุณากรอกรหัสบัตรประชาชน!",
+                //   },
+                // ]}
               >
                 <Input
                   placeholder=""

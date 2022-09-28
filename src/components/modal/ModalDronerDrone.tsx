@@ -322,8 +322,7 @@ const ModalDrone: React.FC<ModalDroneProps> = ({
       main.status,
       serise?.name,
     ].includes("");
-    let checkImg = img != undefined && img != false;
-    setBtnSaveDisable(checkEmptyMain && checkImg ? false : true);
+    setBtnSaveDisable(checkEmptyMain  ? false : true);
   };
   const checkValidateReason = (
     data: DronerDroneEntity,
@@ -513,7 +512,6 @@ const ModalDrone: React.FC<ModalDroneProps> = ({
           <div className="row">
             <div className="form-group">
               <label>ใบอนุญาตโดรนจาก กสทช.</label>
-              <span style={{ color: "red" }}>*</span>
               <span style={{ color: color.Disable }}> (ไฟล์รูป หรือ pdf.)</span>
               <br />
               <div className="pb-2">
