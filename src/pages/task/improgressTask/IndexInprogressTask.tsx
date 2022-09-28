@@ -146,7 +146,7 @@ const IndexInprogressTask = () => {
             className="card-label font-weight-bolder text-dark"
             style={{ fontSize: 22, fontWeight: "bold", padding: "8px" }}
           >
-            <strong>งานรอดำเนินการ</strong>
+            <strong>งานรอดำเนินงาน</strong>
           </span>
         </div>
         <div style={{ color: color.Error }}>

@@ -1,4 +1,8 @@
 ## [Version - 0]
+## Fix [v0.16.2] 2022-09-28
+- fixed defect calculation after changed farmer in edit new task
+- fixed wording Longitude
+- fixed design remove search button in add & edit new task
 ## Fix [v0.16.1] 2022-09-27
 - fixed not require image license droner
 - fixed validation idNo droner and farmer
