@@ -2,6 +2,7 @@ import {
   CheckCircleFilled,
   DownOutlined,
   EditFilled,
+  SearchOutlined,
   StarFilled,
   TeamOutlined,
 } from "@ant-design/icons";
@@ -158,6 +159,7 @@ const EditNewTask = () => {
       setFarmerSelected(res.farmer);
       setFarmerPlotSelected(res.farmerPlot);
       fetchPurposeSpray(res.farmerPlot.plantName);
+      console.log(res);
       setData(res);
     });
   };
@@ -644,7 +646,7 @@ const EditNewTask = () => {
                       status={validateComma.status}
                       key={data.targetSpray[0]}
                       className="col-lg-5"
-                      disabled={current == 2 || checkSelectPlot == "error"}
+                      disabled={current == 2 || checkCrop}
                       placeholder="โปรดระบุ เช่น เพลี้ย,หอย"
                       defaultValue={Array.from(
                         new Set(
@@ -686,7 +688,6 @@ const EditNewTask = () => {
               placeholder="ระบุหมายเหตุเพื่อแจ้งนักบินโดรน เช่น เกษตรกรจะเตรียมยาให้, ฝากนักบินเลือกยาราคาไม่แพงมาให้หน่อย เป็นต้น"
               disabled={current == 2 || checkSelectPlot == "error"}
               defaultValue={data?.comment}
-              key={data.comment}
               onChange={handleComment}
             />
           </div>
@@ -974,14 +975,15 @@ const EditNewTask = () => {
 
   const searchSection = (
     <div className="d-flex justify-content-between" style={{ padding: "10px" }}>
-      <div className="col-lg-3">
-        <Search
+      <div className="col-lg-3 p-1">
+        <Input
+          prefix={<SearchOutlined style={{ color: color.Disable }} />}
           placeholder="ค้นหาชื่อเกษตรกร หรือเบอร์โทร"
           className="col-lg-12 p-1"
           onChange={(e: any) => setSearchTextDroner(e.target.value)}
         />
       </div>
-      <div className="col-lg-2 pt-1">
+      <div className="col-lg-2 p-1">
         <Popover
           content={
             <>
@@ -1367,10 +1369,7 @@ const EditNewTask = () => {
           <Form style={{ padding: "20px" }}>
             <label>ยอดรวมค่าบริการ (หลังรวมค่าธรรมเนียม)</label>
             <h5 style={{ color: color.primary1 }} className="p-2">
-              {parseFloat(
-                numberWithCommas(parseFloat(data?.price)).toString()
-              ).toFixed(2)}{" "}
-              บาท
+              {numberWithCommas(parseFloat(data?.price)).toString()} บาท
             </h5>
             <div className="row">
               <div className="form-group col-lg-4">
@@ -1444,8 +1443,17 @@ const EditNewTask = () => {
         "updateBy",
         profile.firstname + " " + profile.lastname
       );
+      console.log(q.toJS());
       setData(q.toJS());
     } else {
+      const s = Map(data).set("status", "WAIT_RECEIVE");
+      const d = Map(s.toJS()).set("dronerId", data.dronerId);
+      const f = Map(d.toJS()).set("fee", parseFloat(data.price) * 0.05);
+      const df = Map(f.toJS()).set(
+        "discountFee",
+        parseFloat(data.price) * 0.05
+      );
+      setData(df.toJS());
     }
     fetchDronerList(data.farmerId, data.farmerPlotId, dateAppointment);
     setCurrent(current + 1);

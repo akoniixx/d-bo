@@ -35,7 +35,6 @@ const ModalDronerList: React.FC<ModalDronerListProps> = ({
       width: "20%",
       render: (value: any, row: any, index: number) => {
         let data = JSON.parse(row.dronerDetail[0]);
-        console.log(data);
         return {
           children: (
             <>
