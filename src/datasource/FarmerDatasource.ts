@@ -67,7 +67,6 @@ export class FarmerDatasource {
     return httpClient
       .patch(BASE_URL + "/farmer/" + data.id, data)
       .then((response) => {
-        console.log("respo", response);
         return response.data;
       })
       .catch((err) => {

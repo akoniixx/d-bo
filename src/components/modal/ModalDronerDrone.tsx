@@ -334,7 +334,7 @@ const ModalDrone: React.FC<ModalDroneProps> = ({
 
   return (
     <>
-      <Modal
+      <Modal key={dataDrone.id}
         title={
           <div
             style={{

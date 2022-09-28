@@ -123,7 +123,6 @@ function EditDroner() {
       if (res.birthDate == null) {
         res.birthDate = "1970-01-01";
       }
-      console.log(res);
       setOtherPlant(
         res.expPlant.filter((a) => !EXP_PLANT.some((x) => x === a)).join(",")
       );
@@ -366,56 +365,76 @@ function EditDroner() {
   const updateDrone = async (drone: DronerDroneEntity) => {
     console.log(drone);
     const d = Map(drone).set("dronerId", dronerId);
-    // if (d.toJS().id != "") {
-    //   await DronerDroneDatasource.updateDronerDrone(d.toJS()).then(
-    //     async (res) => {
-    //       if (res.id != null) {
-    //         for (let i: number = 0; drone.file.length > i; i++) {
-    //           let getImg = drone.file[i];
-    //           imgDroneList?.push({
-    //             resourceId: res.id,
-    //             category: getImg.category,
-    //             file: getImg.file,
-    //             resource: getImg.resource,
-    //             path: "",
-    //           });
-    //         }
-    //         const checkImg = imgDroneList.filter((x) => x.resourceId != "");
-    //         for (let k = 0; checkImg.length > k; k++) {
-    //           let getDataImg: any = checkImg[k];
-    //           await UploadImageDatasouce.uploadImage(getDataImg).then(res);
-    //         }
-    //       }
-    //     }
-    //   );
-    // } else {
-    //   await DronerDroneDatasource.createDronerDrone(d.toJS()).then(
-    //     async (res) => {
-    //       if (res.id != null) {
-    //         for (let i: number = 0; drone.file.length > i; i++) {
-    //           let getImg = drone.file[i];
-    //           imgDroneList?.push({
-    //             resourceId: res.id,
-    //             category: getImg.category,
-    //             file: getImg.file,
-    //             resource: getImg.resource,
-    //             path: "",
-    //           });
-    //         }
-    //         const checkImg = imgDroneList.filter((x) => x.resourceId != "");
-    //         for (let k = 0; checkImg.length > k; k++) {
-    //           let getDataImg: any = checkImg[k];
-    //           await UploadImageDatasouce.uploadImage(getDataImg).then(res);
-    //         }
-    //       }
-    //     }
-    //   );
-    // }
-    // fetchDronerById();
-    // setShowAddModal(false);
-    // setShowEditModal(false);
-    // setEditIndex(0);
-    // setBtnSaveDisable(false);
+    if (d.toJS().id != "") {
+      await DronerDroneDatasource.updateDronerDrone(d.toJS()).then(
+        async (res) => {
+          if (res.id != null) {
+            let checkFileImg: any = [];
+            let findDrone = data.dronerDrone?.filter(
+              (x) => x.id == drone.id
+            )[0];
+            checkFileImg = findDrone?.file
+              .map((x) => x)
+              .filter(
+                (y) => !drone.file.map((z) => z.category).includes(y.category)
+              );
+            if (checkFileImg.length > 0) {
+              UploadImageDatasouce.deleteImage(
+                checkFileImg[0].id,
+                checkFileImg[0].path
+              ).then(res);
+              fetchDronerById();
+            } else {
+              for (let i: number = 0; drone.file.length > i; i++) {
+                let getImg = drone.file[i];
+                imgDroneList?.push({
+                  resourceId: res.id,
+                  category: getImg.category,
+                  file: getImg.file,
+                  resource: getImg.resource,
+                  path: "",
+                });
+              }
+              const checkImg = imgDroneList.filter((x) => x.resourceId != "");
+              for (let k = 0; checkImg.length > k; k++) {
+                let getDataImg: any = checkImg[k];
+                if (getDataImg.file != undefined) {
+                  await UploadImageDatasouce.uploadImage(getDataImg).then(res);
+                }
+              }
+            }
+          }
+        }
+      );
+    } else {
+      await DronerDroneDatasource.createDronerDrone(d.toJS()).then(
+        async (res) => {
+          if (res.id != null) {
+            for (let i: number = 0; drone.file.length > i; i++) {
+              let getImg = drone.file[i];
+              imgDroneList?.push({
+                resourceId: res.id,
+                category: getImg.category,
+                file: getImg.file,
+                resource: getImg.resource,
+                path: "",
+              });
+            }
+            const checkImg = imgDroneList.filter((x) => x.resourceId != "");
+            for (let k = 0; checkImg.length > k; k++) {
+              let getDataImg: any = checkImg[k];
+              await UploadImageDatasouce.uploadImage(getDataImg).then(res);
+            }
+          }
+        }
+      );
+    }
+    fetchDronerById();
+    setShowAddModal(false);
+    setShowEditModal(false);
+    setEditIndex(0);
+    setBtnSaveDisable(false);
+    setDronerDroneList(dronerDroneList);
   };
   const removeDrone = (index: number) => {
     const newData = dronerDroneList.filter((x) => x.modalDroneIndex != index);
@@ -612,24 +631,25 @@ function EditDroner() {
       "dronerDrone",
       dronerDroneList
     );
-
-    console.log("final", pushDroneList.toJS());
     await DronerDatasource.updateDroner(pushDroneList.toJS()).then((res) => {
       if (res != undefined) {
-        // var i = 0;
-        // for (i; 2 > i; i++) {
-        //   i == 0 &&
-        //     UploadImageDatasouce.uploadImage(createImgProfile).then(res);
-        //   i == 1 && UploadImageDatasouce.uploadImage(createImgIdCard).then(res);
-        // }
-        // Swal.fire({
-        //   title: "บันทึกสำเร็จ",
-        //   icon: "success",
-        //   timer: 1500,
-        //   showConfirmButton: false,
-        // }).then((time) => {
-        //   window.location.href = "/IndexDroner";
-        // });
+        var i = 0;
+        for (i; 2 > i; i++) {
+          i == 0 &&
+            createImgProfile.path != "" &&
+            UploadImageDatasouce.uploadImage(createImgProfile).then(res);
+          i == 1 &&
+            createImgIdCard.path != "" &&
+            UploadImageDatasouce.uploadImage(createImgIdCard).then(res);
+        }
+        Swal.fire({
+          title: "บันทึกสำเร็จ",
+          icon: "success",
+          timer: 1500,
+          showConfirmButton: false,
+        }).then((time) => {
+          window.location.href = "/IndexDroner";
+        });
       } else {
         Swal.fire({
           title: "เบอร์โทร หรือ รหัสบัตรประชาชน <br/> ซ้ำในระบบ",
@@ -781,9 +801,7 @@ function EditDroner() {
           </div>
           <div className="row">
             <div className="form-group col-lg-6">
-              <label>
-                รหัสบัตรประชาชน 
-              </label>
+              <label>รหัสบัตรประชาชน</label>
               <Form.Item
                 name="idNo"
                 // rules={[
