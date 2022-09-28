@@ -120,7 +120,7 @@ const ModalDrone: React.FC<ModalDroneProps> = ({
     const m = Map(pushDrone).set("droneBrandId", brand);
     setPushDrone(m.toJS());
     setSearchSeriesDrone(filterSeries);
-    checkValidate(dataDrone, m.toJS(), pushSeries);
+    checkValidate(dataDrone, m.toJS(), pushSeries, imgLicenseDrone);
   };
   const handleSeries = (id: string) => {
     let getSeries = seriesDrone?.filter((x) => x.id == id)[0];
@@ -135,22 +135,22 @@ const ModalDrone: React.FC<ModalDroneProps> = ({
     setPushDrone(pushDroneSeries.toJS());
     setPushSeries(p.toJS());
     setDataDrone(m.toJS());
-    checkValidate(m.toJS(), pushDroneSeries.toJS(), p.toJS());
+    checkValidate(m.toJS(), pushDroneSeries.toJS(), p.toJS(), imgLicenseDrone);
   };
   const handleSerialNo = (e: any) => {
     const m = Map(dataDrone).set("serialNo", e.target.value);
     setDataDrone(m.toJS());
-    checkValidate(m.toJS(), pushDrone, pushSeries);
+    checkValidate(m.toJS(), pushDrone, pushSeries, imgLicenseDrone);
   };
   const handleYear = (e: any) => {
     const m = Map(dataDrone).set("purchaseYear", e.target.value);
     setDataDrone(m.toJS());
-    checkValidate(m.toJS(), pushDrone, pushSeries);
+    checkValidate(m.toJS(), pushDrone, pushSeries, imgLicenseDrone);
   };
   const handleMonth = (e: any) => {
     const m = Map(dataDrone).set("purchaseMonth", e);
     setDataDrone(m.toJS());
-    checkValidate(m.toJS(), pushDrone, pushSeries);
+    checkValidate(m.toJS(), pushDrone, pushSeries, imgLicenseDrone);
   };
   const handleChangeStatus = (e: any) => {
     let status = e.target.value;
@@ -158,7 +158,7 @@ const ModalDrone: React.FC<ModalDroneProps> = ({
     if (status == "REJECTED" || status == "INACTIVE") {
       setBtnSaveDisable(true);
     } else {
-      checkValidate(m.toJS(), pushDrone, pushSeries);
+      checkValidate(m.toJS(), pushDrone, pushSeries, imgLicenseDrone);
     }
     const n = Map(m.toJS()).set("reason", []);
     REASON_IS_CHECK.map((reason) => _.set(reason, "isChecked", false));
@@ -213,7 +213,7 @@ const ModalDrone: React.FC<ModalDroneProps> = ({
       g.toJS(),
     ]);
     setDataDrone(pushImg.toJS());
-    checkValidate(pushImg.toJS(), pushDrone, pushSeries);
+    checkValidate(pushImg.toJS(), pushDrone, pushSeries, createLicenseDrone);
   };
   const previewLicenseDroner = async () => {
     let src = imgLicenseDroner;
@@ -230,14 +230,17 @@ const ModalDrone: React.FC<ModalDroneProps> = ({
     imgWindow?.document.write(image.outerHTML);
   };
   const removeLicenseDroner = () => {
-    const getImg = data.file.filter((x) => x.category == "DRONER_LICENSE")[0];
-    if (getImg != undefined) {
-      UploadImageDatasouce.deleteImage(getImg.id, getImg.path).then(
-        (res) => {}
-      );
-    }
+    const removeImg = dataDrone.file?.filter(
+      (x) => x.category != "DRONER_LICENSE"
+    )[0];
+    const d = Map(dataDrone).set(
+      "file",
+      removeImg == undefined ? [] : [removeImg]
+    );
+    console.log(d.toJS());
+    setDataDrone(d.toJS());
     setImgLicenseDroner(false);
-    setBtnSaveDisable(false);
+    checkValidate(dataDrone, pushDrone, pushSeries, createLicenseDrone);
   };
   const onChangeLicenseDrone = async (file: any) => {
     let src = file.target.files[0];
@@ -258,7 +261,7 @@ const ModalDrone: React.FC<ModalDroneProps> = ({
       g.toJS(),
     ]);
     setDataDrone(pushImg.toJS());
-    checkValidate(pushImg.toJS(), pushDrone, pushSeries);
+    checkValidate(pushImg.toJS(), pushDrone, pushSeries, g.toJS());
   };
   const previewLicenseDrone = async () => {
     let src = imgLicenseDrone;
@@ -275,14 +278,17 @@ const ModalDrone: React.FC<ModalDroneProps> = ({
     imgWindow?.document.write(image.outerHTML);
   };
   const removeLicenseDrone = () => {
-    const getImg = data.file.filter((x) => x.category == "DRONE_LICENSE")[0];
-    if (getImg != undefined) {
-      UploadImageDatasouce.deleteImage(getImg.id, getImg.path).then(
-        (res) => {}
-      );
-    }
+    const removeImg = dataDrone.file?.filter(
+      (x) => x.category != "DRONE_LICENSE"
+    )[0];
+    const d = Map(dataDrone).set(
+      "file",
+      removeImg == undefined ? [] : [removeImg]
+    );
+    setDataDrone(d.toJS());
     setImgLicenseDrone(false);
-    setBtnSaveDisable(false);
+    setCreateLicenseDrone(undefined);
+    checkValidate(dataDrone, pushDrone, pushSeries, false);
   };
   //#endregion
 
@@ -308,7 +314,8 @@ const ModalDrone: React.FC<ModalDroneProps> = ({
   const checkValidate = (
     main: DronerDroneEntity,
     drone?: DroneEntity,
-    serise?: DroneBrandEntity
+    serise?: DroneBrandEntity,
+    img?: any
   ) => {
     let checkEmptyMain = ![
       main.droneId,
@@ -316,7 +323,7 @@ const ModalDrone: React.FC<ModalDroneProps> = ({
       main.status,
       serise?.name,
     ].includes("");
-    setBtnSaveDisable(checkEmptyMain ? false : true);
+    setBtnSaveDisable(checkEmptyMain  ? false : true);
   };
   const checkValidateReason = (
     data: DronerDroneEntity,

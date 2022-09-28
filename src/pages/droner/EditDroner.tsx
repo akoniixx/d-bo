@@ -123,6 +123,7 @@ function EditDroner() {
       if (res.birthDate == null) {
         res.birthDate = "1970-01-01";
       }
+      console.log(res);
       setOtherPlant(
         res.expPlant.filter((a) => !EXP_PLANT.some((x) => x === a)).join(",")
       );
@@ -364,56 +365,57 @@ function EditDroner() {
   };
   const updateDrone = async (drone: DronerDroneEntity) => {
     const d = Map(drone).set("dronerId", dronerId);
-    if (d.toJS().id != "") {
-      await DronerDroneDatasource.updateDronerDrone(d.toJS()).then(
-        async (res) => {
-          if (res.id != null) {
-            for (let i: number = 0; drone.file.length > i; i++) {
-              let getImg = drone.file[i];
-              imgDroneList?.push({
-                resourceId: res.id,
-                category: getImg.category,
-                file: getImg.file,
-                resource: getImg.resource,
-                path: "",
-              });
-            }
-            const checkImg = imgDroneList.filter((x) => x.resourceId != "");
-            for (let k = 0; checkImg.length > k; k++) {
-              let getDataImg: any = checkImg[k];
-              await UploadImageDatasouce.uploadImage(getDataImg).then(res);
-            }
-          }
-        }
-      );
-    } else {
-      await DronerDroneDatasource.createDronerDrone(d.toJS()).then(
-        async (res) => {
-          if (res.id != null) {
-            for (let i: number = 0; drone.file.length > i; i++) {
-              let getImg = drone.file[i];
-              imgDroneList?.push({
-                resourceId: res.id,
-                category: getImg.category,
-                file: getImg.file,
-                resource: getImg.resource,
-                path: "",
-              });
-            }
-            const checkImg = imgDroneList.filter((x) => x.resourceId != "");
-            for (let k = 0; checkImg.length > k; k++) {
-              let getDataImg: any = checkImg[k];
-              await UploadImageDatasouce.uploadImage(getDataImg).then(res);
-            }
-          }
-        }
-      );
-    }
-    fetchDronerById();
-    setShowAddModal(false);
-    setShowEditModal(false);
-    setEditIndex(0);
-    setBtnSaveDisable(false);
+    console.log(drone);
+    // if (d.toJS().id != "") {
+    //   await DronerDroneDatasource.updateDronerDrone(d.toJS()).then(
+    //     async (res) => {
+    //       if (res.id != null) {
+    //         for (let i: number = 0; drone.file.length > i; i++) {
+    //           let getImg = drone.file[i];
+    //           imgDroneList?.push({
+    //             resourceId: res.id,
+    //             category: getImg.category,
+    //             file: getImg.file,
+    //             resource: getImg.resource,
+    //             path: "",
+    //           });
+    //         }
+    //         const checkImg = imgDroneList.filter((x) => x.resourceId != "");
+    //         for (let k = 0; checkImg.length > k; k++) {
+    //           let getDataImg: any = checkImg[k];
+    //           await UploadImageDatasouce.uploadImage(getDataImg).then(res);
+    //         }
+    //       }
+    //     }
+    //   );
+    // } else {
+    //   await DronerDroneDatasource.createDronerDrone(d.toJS()).then(
+    //     async (res) => {
+    //       if (res.id != null) {
+    //         for (let i: number = 0; drone.file.length > i; i++) {
+    //           let getImg = drone.file[i];
+    //           imgDroneList?.push({
+    //             resourceId: res.id,
+    //             category: getImg.category,
+    //             file: getImg.file,
+    //             resource: getImg.resource,
+    //             path: "",
+    //           });
+    //         }
+    //         const checkImg = imgDroneList.filter((x) => x.resourceId != "");
+    //         for (let k = 0; checkImg.length > k; k++) {
+    //           let getDataImg: any = checkImg[k];
+    //           await UploadImageDatasouce.uploadImage(getDataImg).then(res);
+    //         }
+    //       }
+    //     }
+    //   );
+    // }
+    // fetchDronerById();
+    // setShowAddModal(false);
+    // setShowEditModal(false);
+    // setEditIndex(0);
+    // setBtnSaveDisable(false);
   };
   const removeDrone = (index: number) => {
     const newData = dronerDroneList.filter((x) => x.modalDroneIndex != index);
