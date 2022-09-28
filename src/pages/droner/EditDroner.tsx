@@ -363,6 +363,7 @@ function EditDroner() {
     setEditDroneList(data);
   };
   const updateDrone = async (drone: DronerDroneEntity) => {
+    console.log(drone);
     const d = Map(drone).set("dronerId", dronerId);
     if (d.toJS().id != "") {
       await DronerDroneDatasource.updateDronerDrone(d.toJS()).then(
@@ -641,14 +642,14 @@ function EditDroner() {
             createImgIdCard.path != "" &&
             UploadImageDatasouce.uploadImage(createImgIdCard).then(res);
         }
-        // Swal.fire({
-        //   title: "บันทึกสำเร็จ",
-        //   icon: "success",
-        //   timer: 1500,
-        //   showConfirmButton: false,
-        // }).then((time) => {
-        //   window.location.href = "/IndexDroner";
-        // });
+        Swal.fire({
+          title: "บันทึกสำเร็จ",
+          icon: "success",
+          timer: 1500,
+          showConfirmButton: false,
+        }).then((time) => {
+          window.location.href = "/IndexDroner";
+        });
       } else {
         Swal.fire({
           title: "เบอร์โทร หรือ รหัสบัตรประชาชน <br/> ซ้ำในระบบ",

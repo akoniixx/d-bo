@@ -64,7 +64,7 @@ const IndexNewTask = () => {
 
   useEffect(() => {
     fetchNewTaskList();
-  }, [searchStatus, searchText, searchStartDate, searchEndDate]);
+  }, [searchStatus, searchText, searchStartDate, searchEndDate, current]);
 
   const handleSearchStatus = (status: any) => {
     setSearchStatus(status);
