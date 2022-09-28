@@ -1,4 +1,7 @@
 ## [Version - 0]
+## Fix [v0.16.1] 2022-09-27
+- fixed not require image license droner
+- fixed validation idNo droner and farmer
 ## Feature [v0.16.0] 2022-09-26
 - added index inprogress task menu
 - fixed defect date appointment in new task
