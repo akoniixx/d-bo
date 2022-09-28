@@ -237,7 +237,6 @@ const ModalDrone: React.FC<ModalDroneProps> = ({
       "file",
       removeImg == undefined ? [] : [removeImg]
     );
-    console.log(d.toJS());
     setDataDrone(d.toJS());
     setImgLicenseDroner(false);
     checkValidate(dataDrone, pushDrone, pushSeries, createLicenseDrone);
