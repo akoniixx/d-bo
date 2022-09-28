@@ -26,6 +26,8 @@ export class DronerDatasource {
       status: status,
       search: search,
     };
+    console.log("param",params);
+    
     return httpClient
       .get(BASE_URL + "/droner", { params })
       .then((response) => {
@@ -48,11 +50,6 @@ export class DronerDatasource {
   }
 
   static updateDroner(data: DronerEntity): Promise<any> {
-    // for (let i = 0; data.dronerDrone.length > i; i++) {
-    //   let checkIdDronerDrone = data.dronerDrone[i].id;
-    //   checkIdDronerDrone == "" && delete data.dronerDrone[i].dronerId;
-    //   delete data.dronerDrone[i].id;
-    // }
     delete data["dronerDrone"];
 
     if (data.dronerArea.provinceId == 0) {
@@ -62,6 +59,7 @@ export class DronerDatasource {
       delete data.dronerArea["subdistrictId"];
       delete data.dronerArea["distance"];
     }
+    console.log("data", JSON.stringify(data));
     return httpClient
       .patch(BASE_URL + "/droner/" + data.id, data)
       .then((response) => {
