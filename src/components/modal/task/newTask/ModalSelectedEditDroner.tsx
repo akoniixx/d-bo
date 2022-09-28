@@ -20,7 +20,6 @@ const ModalSelectedEditDroner: React.FC<ModalSelectedEditDronerProps> = ({
   title,
   callBack,
 }) => {
-  console.log(dataDroner);
    let checkDup = Array.from(new Set(dataDroner)).filter(
     (x) => x.dronerId != ""
   );

@@ -1,4 +1,9 @@
-import { DownOutlined, StarFilled, TeamOutlined } from "@ant-design/icons";
+import {
+  DownOutlined,
+  SearchOutlined,
+  StarFilled,
+  TeamOutlined,
+} from "@ant-design/icons";
 import {
   AutoComplete,
   Avatar,
@@ -852,6 +857,7 @@ const AddNewTask = () => {
     <div className="d-flex justify-content-between" style={{ padding: "10px" }}>
       <div className="col-lg-3 p-1">
         <Input
+          prefix={<SearchOutlined style={{ color: color.Disable }} />}
           placeholder="ค้นหาชื่อเกษตรกร หรือเบอร์โทร"
           className="col-lg-12"
           onChange={(e: any) => setSearchTextDroner(e.target.value)}
