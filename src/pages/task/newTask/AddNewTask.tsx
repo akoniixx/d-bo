@@ -805,7 +805,9 @@ const AddNewTask = () => {
           ])
         : [...checkSingleDroner.filter((x) => x.droner_id != "")];
     setDronerSelected(
-      Array.from(new Set(checkDup)).filter((x) => x.droner_id != "")
+      Array.from(new Set(checkDup.filter((y) => y.isChecked))).filter(
+        (x) => x.droner_id != ""
+      )
     );
     checkValidateStep(
       createNewTask,

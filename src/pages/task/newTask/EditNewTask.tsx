@@ -68,6 +68,8 @@ import {
 import {
   GetNewTaskEntity,
   GetNewTaskEntity_INIT,
+  UpdateNewTask,
+  UpdateNewTask_INIT,
 } from "../../../entities/NewTaskEntities";
 import {
   TaskSearchDroner,
@@ -1459,6 +1461,7 @@ const EditNewTask = () => {
     setCurrent(current + 1);
   };
   const updateNewTask = async () => {
+    let updateTask: UpdateNewTask = UpdateNewTask_INIT;
     Swal.fire({
       title: "ยืนยันการแก้ไข",
       text: "โปรดตรวจสอบรายละเอียดที่คุณต้องการแก้ไขข้อมูลก่อนเสมอ เพราะอาจส่งผลต่อการจ้างงานในระบบ",
@@ -1469,10 +1472,12 @@ const EditNewTask = () => {
       showCloseButton: true,
     }).then(async (result) => {
       if (result.isConfirmed) {
+        console.log(data);
         await TaskDatasource.updateNewTask(data).then((res) => {
-          if (res.userMessage == "success") {
-            window.location.href = "/IndexNewTask";
-          }
+          console.log("res", res);
+          // if (res.userMessage == "success") {
+          //   window.location.href = "/IndexNewTask";
+          // }
         });
       }
     });
