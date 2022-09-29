@@ -121,7 +121,7 @@ export interface GetNewTaskEntity {
   farmer: FarmerEntity;
   droner: string;
   farmerPlot: FarmerPlotEntity;
-  updatedAt?:string;
+  updatedAt?: string;
 }
 export const GetNewTaskEntity_INIT: GetNewTaskEntity = {
   id: "",
@@ -162,5 +162,45 @@ export const GetNewTaskEntity_INIT: GetNewTaskEntity = {
   farmer: FarmerEntity_INIT,
   droner: "",
   farmerPlot: FarmerPlotEntity_INIT,
-  updatedAt:"",
+  updatedAt: "",
+};
+export interface UpdateNewTask {
+  id: string;
+  farmerId: string;
+  farmerPlotId: string;
+  farmAreaAmount: string;
+  dateAppointment: string;
+  targetSpray: string[];
+  preparationBy: string;
+  purposeSprayId: string;
+  status: string;
+  statusRemark: string;
+  updateBy: string;
+  unitPriceStandard: number;
+  priceStandard: number;
+  unitPrice: number;
+  price: number;
+  comment: string;
+  fee: number;
+  discountFee: number;
+}
+export const UpdateNewTask_INIT: UpdateNewTask = {
+  id: "",
+  farmerId: "",
+  farmerPlotId: "",
+  farmAreaAmount: "",
+  dateAppointment: "",
+  targetSpray: [""],
+  preparationBy: "",
+  purposeSprayId: "",
+  status: "",
+  statusRemark: "",
+  updateBy: "",
+  unitPriceStandard: 0,
+  priceStandard: 0,
+  unitPrice: 0,
+  price: 0,
+  comment: "",
+  fee: 0,
+  discountFee: 0,
 };

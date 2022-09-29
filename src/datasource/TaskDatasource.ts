@@ -4,6 +4,7 @@ import {
   CreateNewTaskEntity,
   GetNewTaskEntity,
   NewTaskPageEntity,
+  UpdateNewTask,
 } from "../entities/NewTaskEntities";
 import {
   GetTaskInprogressEntity,
@@ -67,8 +68,7 @@ export class TaskDatasource {
         console.log(err, "err getnewtaskbyid");
       });
   }
-  static updateNewTask(data: GetNewTaskEntity): Promise<any> {
-    delete data["taskDronerTemp"];
+  static updateNewTask(data: UpdateNewTask): Promise<any> {
     return httpClient
       .patch(BASE_URL + "/tasks/task/" + data.id, data)
       .then((response) => {
