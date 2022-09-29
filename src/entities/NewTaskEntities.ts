@@ -168,8 +168,7 @@ export interface UpdateNewTask {
   id: string;
   farmerId: string;
   farmerPlotId: string;
-  farmerAreaAmount: string;
-  dronerId: string;
+  farmAreaAmount: string;
   dateAppointment: string;
   targetSpray: string[];
   preparationBy: string;
@@ -182,18 +181,14 @@ export interface UpdateNewTask {
   unitPrice: number;
   price: number;
   comment: string;
-  isProblem: boolean;
-  problemRemark: string;
-  isDelay: boolean;
-  delayRemark: string;
-  dateDelay: string;
+  fee: number;
+  discountFee: number;
 }
 export const UpdateNewTask_INIT: UpdateNewTask = {
   id: "",
   farmerId: "",
   farmerPlotId: "",
-  farmerAreaAmount: "",
-  dronerId: "",
+  farmAreaAmount: "",
   dateAppointment: "",
   targetSpray: [""],
   preparationBy: "",
@@ -206,9 +201,6 @@ export const UpdateNewTask_INIT: UpdateNewTask = {
   unitPrice: 0,
   price: 0,
   comment: "",
-  isProblem: false,
-  problemRemark: "",
-  isDelay: false,
-  delayRemark: "",
-  dateDelay: "",
+  fee: 0,
+  discountFee: 0,
 };
