@@ -157,7 +157,6 @@ export interface TaskInprogressPageEntity {
   count: number;
   data: TaskInprogressEntity[];
 }
-
 export const GetTaskInprogressEntity_INIT: GetTaskInprogressEntity = {
   id: "",
   taskNo: "",
@@ -203,3 +202,25 @@ export const GetTaskInprogressEntity_INIT: GetTaskInprogressEntity = {
   taskDronerTemp: [TaskDronerTempEntity_INIT],
   taskHistory: [],
 };
+export interface UpdateInprogressTaskEntity {
+  id: string;
+  dateAppointment: string;
+  purposeSprayId: string;
+  tragetSpray: string[];
+  preparationBy: string;
+  comment: string;
+  status: string;
+  isProblem: boolean;
+  updateBy: string;
+}
+export const UpdateInprogressTaskEntity_INIT : UpdateInprogressTaskEntity = {
+  id: "",
+  dateAppointment: "",
+  purposeSprayId: "",
+  tragetSpray: [""],
+  preparationBy: "",
+  comment: "",
+  status: "",
+  isProblem: false,
+  updateBy: "",
+}

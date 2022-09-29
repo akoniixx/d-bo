@@ -1,4 +1,5 @@
 import {
+  Avatar,
   DatePicker,
   Form,
   Input,
@@ -29,6 +30,8 @@ import { CropPurposeSprayEntity } from "../../../entities/CropEntities";
 import {
   GetTaskInprogressEntity,
   GetTaskInprogressEntity_INIT,
+  UpdateInprogressTaskEntity,
+  UpdateInprogressTaskEntity_INIT,
 } from "../../../entities/TaskInprogress";
 import { color } from "../../../resource";
 import { numberWithCommas } from "../../../utilities/TextFormatter";
@@ -44,6 +47,7 @@ const { Map } = require("immutable");
 let queryString = _.split(window.location.pathname, "=");
 
 const EditInprogressTask = () => {
+  const profile = JSON.parse(localStorage.getItem("profile") || "{  }");
   const [data, setData] = useState<GetTaskInprogressEntity>(
     GetTaskInprogressEntity_INIT
   );
@@ -53,8 +57,17 @@ const EditInprogressTask = () => {
   const [timeAppointment, setTimeAppointment] = useState<any>(
     moment(undefined)
   );
-  const [saveBtnDisable, setBtnSaveDisable] = useState<boolean>(true);
+  const [saveBtnDisable, setBtnSaveDisable] = useState<boolean>(false);
   const [periodSpray, setPeriodSpray] = useState<CropPurposeSprayEntity>();
+  const [checkCrop, setCheckCrop] = useState<boolean>(true);
+  let [otherSpray, setOtherSpray] = useState<any>();
+  const [validateComma, setValidateComma] = useState<{
+    status: any;
+    message: string;
+  }>({
+    status: "",
+    message: "",
+  });
 
   const fetchInprogressTask = async () => {
     await TaskDatasource.getInprogressTaskById(queryString[1]).then((res) => {
@@ -75,6 +88,98 @@ const EditInprogressTask = () => {
   useEffect(() => {
     fetchInprogressTask();
   }, []);
+
+  const handleChangeStatus = (e: any) => {
+    let status = e.target.value;
+    const m = Map(data).set("status", status);
+    const n = Map(m.toJS()).set("isProblem", false);
+    const o = Map(n.toJS()).set("problemRemark", "");
+    setData(o.toJS());
+  };
+  const handleChangeStatusProblem = (e: any) => {
+    let status = e.target.value;
+    const m = Map(data).set("isProblem", status);
+    const n = Map(m.toJS()).set("problemRemark", "");
+    const o = Map(n.toJS()).set("statusRemark", "");
+    setData(o.toJS());
+  };
+  const handleChangeRemarkProblem = (
+    e: React.ChangeEvent<HTMLTextAreaElement>
+  ) => {
+    const m = Map(data).set("problemRemark", e.target.value);
+    setData(m.toJS());
+  };
+  const handleChangeRemarkCancel = (
+    e: React.ChangeEvent<HTMLTextAreaElement>
+  ) => {
+    const m = Map(data).set("statusRemark", e.target.value);
+    setData(m.toJS());
+  };
+  const handlePeriodSpray = (e: any) => {
+    const d = Map(data).set("purposeSprayId", e);
+    setData(d.toJS());
+  };
+  const handlePurposeSpray = (e: any) => {
+    let checked = e.target.checked;
+    let value = e.target.value;
+    setCheckCrop(
+      value == "อื่นๆ" ? !checked : otherSpray != null ? false : true
+    );
+    PURPOSE_SPRAY_CHECKBOX.map((item) =>
+      _.set(item, "isChecked", item.crop == value ? checked : item.isChecked)
+    );
+    let p: any = "";
+
+    if (checked) {
+      p = Map(data).set(
+        "targetSpray",
+        [...data?.targetSpray, value].filter((x) => x != "")
+      );
+    } else {
+      let removePlant = data?.targetSpray.filter((x) => x != value);
+      p = Map(data).set("targetSpray", removePlant);
+    }
+    setData(p.toJS());
+  };
+  const handlePreparation = (e: any) => {
+    const d = Map(data).set("preparationBy", e.target.value);
+    setData(d.toJS());
+  };
+  const handleOtherSpray = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.value.trim().length != 0) {
+      setOtherSpray(e.target.value);
+      let checkComma = checkValidateComma(e.target.value);
+      if (!checkComma) {
+        setValidateComma({ status: "", message: "" });
+        setBtnSaveDisable(false);
+      } else {
+        setValidateComma({
+          status: "error",
+          message: "กรุณาใช้ (,) ให้กับการเพิ่มมากกว่า 1 อย่าง",
+        });
+        setBtnSaveDisable(true);
+      }
+    } else {
+      setValidateComma({
+        status: "error",
+        message: "โปรดระบุ",
+      });
+      setBtnSaveDisable(true);
+    }
+  };
+  const handleComment = (e: any) => {
+    const d = Map(data).set("comment", e.target.value);
+    setData(d.toJS());
+  };
+  const checkValidateComma = (data: string) => {
+    const checkSyntax =
+      data.includes("*") ||
+      data.includes("/") ||
+      data.includes(" ") ||
+      data.includes("-") ||
+      data.includes("+");
+    return data.trim().length != 0 ? (checkSyntax ? true : false) : true;
+  };
 
   const renderFormAppointment = (
     <CardContainer>
@@ -100,6 +205,11 @@ const EditInprogressTask = () => {
                       format={dateFormat}
                       className="col-lg-12"
                       defaultValue={moment(dateAppointment)}
+                      onChange={(e: any) =>
+                        setDateAppointment(
+                          moment(new Date(e)).format(dateCreateFormat)
+                        )
+                      }
                     />
                   </Form.Item>
                 </div>
@@ -118,6 +228,11 @@ const EditInprogressTask = () => {
                     <TimePicker
                       format={timeFormat}
                       className="col-lg-12"
+                      onChange={(e: any) =>
+                        setTimeAppointment(
+                          moment(new Date(e)).format(timeCreateFormat)
+                        )
+                      }
                       defaultValue={moment(timeAppointment)}
                     />
                   </Form.Item>
@@ -128,7 +243,11 @@ const EditInprogressTask = () => {
                   ช่วงเวลาการพ่น <span style={{ color: "red" }}>*</span>
                 </label>
                 <Form.Item name="searchAddress">
-                  <Select placeholder="-" defaultValue={data?.purposeSprayId}>
+                  <Select
+                    placeholder="-"
+                    defaultValue={data?.purposeSprayId}
+                    onChange={handlePeriodSpray}
+                  >
                     {periodSpray?.purposeSpray?.length ? (
                       periodSpray?.purposeSpray?.map((item) => (
                         <Option value={item.id}>{item.purposeSprayName}</Option>
@@ -156,17 +275,20 @@ const EditInprogressTask = () => {
                 ).map((x, index) => (
                   <div className="form-group">
                     <input
-                      key={data?.targetSpray[0]}
                       type="checkbox"
                       value={x.crop}
                       checked={x.isChecked}
+                      onChange={handlePurposeSpray}
                     />{" "}
                     <label style={{ padding: "0 8px 0 0" }}>{x.crop}</label>
                     {index == 4 && (
                       <>
                         <Input
+                          status={validateComma.status}
                           className="col-lg-9"
                           placeholder="โปรดระบุ เช่น เพลี้ย,หอย"
+                          onChange={handleOtherSpray}
+                          disabled={checkCrop}
                           defaultValue={Array.from(
                             new Set(
                               data?.targetSpray.filter(
@@ -175,6 +297,16 @@ const EditInprogressTask = () => {
                             )
                           )}
                         />
+                        {validateComma.status == "error" && (
+                          <p
+                            style={{
+                              color: color.Error,
+                              padding: "0 0 0 55px",
+                            }}
+                          >
+                            {validateComma.message}
+                          </p>
+                        )}
                       </>
                     )}
                   </div>
@@ -188,7 +320,7 @@ const EditInprogressTask = () => {
                   defaultValue={data?.preparationBy}
                   key={data?.preparationBy}
                 >
-                  <Space direction="vertical">
+                  <Space direction="vertical" onChange={handlePreparation}>
                     <Radio value="เกษตรกรเตรียมยาเอง">เกษตรกรเตรียมยาเอง</Radio>
                     <Radio value="นักบินโดรนเตรียมให้">
                       นักบินโดรนเตรียมให้
@@ -201,6 +333,7 @@ const EditInprogressTask = () => {
                 <TextArea
                   placeholder="ระบุหมายเหตุเพื่อแจ้งนักบินโดรน เช่น เกษตรกรจะเตรียมยาให้, ฝากนักบินเลือกยาราคาไม่แพงมาให้หน่อย เป็นต้น"
                   value={data?.comment}
+                  onChange={handleComment}
                 />
               </div>
             </Form>
@@ -218,18 +351,34 @@ const EditInprogressTask = () => {
               <div className="form-group col-lg-12">
                 <label>สถานะ</label>
                 <br />
-                <Radio.Group defaultValue={data.status}>
+                <Radio.Group
+                  defaultValue={data.status}
+                  onChange={handleChangeStatus}
+                >
                   <Space direction="vertical">
                     {STATUS_INPROGRESS_CHECKBOX.map((item, index) => (
                       <Radio value={item.value} className="col-lg-12">
-                        {item.name}<br/>
+                        {item.name}
+                        {data.status == "CANCELED" && index == 1 && (
+                          <TextArea
+                            placeholder="กรอกรายละเอียดปัญหา"
+                            onChange={handleChangeRemarkCancel}
+                          />
+                        )}
+                        <br />
                         {data.status == "WAIT_START" && index == 0 && (
-                          <Radio.Group defaultValue={data?.isProblem}>
+                          <Radio.Group
+                            defaultValue={data?.isProblem}
+                            onChange={handleChangeStatusProblem}
+                          >
                             <Space direction="vertical">
                               <Radio value={false}>ปกติ</Radio>
                               <Radio value={true}>งานมีปัญหา</Radio>
                               {data.isProblem == true && (
-                                <TextArea placeholder="กรอกรายละเอียดปัญหา" />
+                                <TextArea
+                                  placeholder="กรอกรายละเอียดปัญหา"
+                                  onChange={handleChangeRemarkProblem}
+                                />
                               )}
                             </Space>
                           </Radio.Group>
@@ -353,7 +502,44 @@ const EditInprogressTask = () => {
       </div>
     </CardContainer>
   );
-
+  const renderDronerSelectedList = (
+    <CardContainer>
+      <CardHeader textHeader="รายชื่อนักบินโดรน" />
+      <Form>
+        <div className="container">
+          <div className="row pt-3">
+            <div className="col-lg-3">
+              {data.droner.firstname} {data.droner.lastname}
+              <br />
+              <p style={{ fontSize: "12px", color: color.Grey }}>
+                {data.droner.dronerCode}
+              </p>
+            </div>
+            <div className="col-lg-2">{data.droner.telephoneNo}</div>
+            <div className="col-lg-4">
+              {data.droner.address.subdistrict.subdistrictName +
+                "/" +
+                data.droner.address.subdistrict.districtName +
+                "/" +
+                data.droner.address.subdistrict.provinceName}
+            </div>
+            <div className="col-lg-2">
+              <Avatar
+                size={25}
+                //src={data.dronerDrone[0].drone?.droneBrand.logoImagePath}
+                style={{ marginRight: "5px" }}
+              />
+              {/* {data.dronerDrone[0].drone.droneBrand.name} */}
+              <br />
+              {/* <p style={{ fontSize: "12px", color: color.Grey }}>
+                {data.dronerDrone.length > 1 && "(มากกว่า 1 ยี่หัอ)"}
+              </p> */}
+            </div>
+          </div>
+        </div>
+      </Form>
+    </CardContainer>
+  );
   const renderServiceCharge = (
     <CardContainer>
       <CardHeader textHeader="ยอดรวมค่าบริการ" />
@@ -381,7 +567,12 @@ const EditInprogressTask = () => {
               <div className="form-group col-lg-4">
                 <label>ค่าธรรมเนียม (คิด 5% ของราคารวม)</label>
                 <Form.Item>
-                  <Input suffix="บาท" value={data?.fee} step="0.01" disabled />
+                  <Input
+                    suffix="บาท"
+                    value={parseFloat(data?.fee).toFixed(2)}
+                    step="0.01"
+                    disabled
+                  />
                 </Form.Item>
               </div>
               <div className="form-group col-lg-4">
@@ -389,7 +580,7 @@ const EditInprogressTask = () => {
                 <Form.Item>
                   <Input
                     suffix="บาท"
-                    value={data?.discountFee}
+                    value={parseFloat(data?.discountFee).toFixed(2)}
                     step="0.01"
                     disabled
                   />
@@ -402,7 +593,37 @@ const EditInprogressTask = () => {
     </CardContainer>
   );
 
-  const updateInprogressTask = () => {};
+  const updateInprogressTask = () => {
+    console.log(data);
+    let changeTimeFormat = moment(timeAppointment).format(timeCreateFormat);
+    let changeDateFormat = moment(dateAppointment).format(dateCreateFormat);
+    let otherSprayList = [];
+    if (otherSpray != undefined) {
+      let m = otherSpray.split(",");
+      for (let i = 0; m.length > i; i++) {
+        otherSprayList.push(m[i]);
+      }
+    }
+    data.targetSpray.push.apply(
+      data.targetSpray,
+      otherSprayList.filter((x) => x != "")
+    );
+
+    let updateTask: UpdateInprogressTaskEntity =
+      UpdateInprogressTaskEntity_INIT;
+    updateTask.id = data.id;
+    updateTask.dateAppointment = moment(
+      changeDateFormat + " " + changeTimeFormat
+    ).toISOString();
+    updateTask.purposeSprayId = data.purposeSprayId;
+    updateTask.tragetSpray = data.targetSpray;
+    updateTask.preparationBy = data.preparationBy;
+    updateTask.comment = data.comment;
+    updateTask.status = data.status;
+    updateTask.isProblem = data.isProblem;
+    updateTask.updateBy = profile.firstname + " " + profile.lastname;
+    console.log("task", updateTask);
+  };
 
   return (
     <>
@@ -420,6 +641,8 @@ const EditInprogressTask = () => {
         <CardContainer>{renderFormAppointment}</CardContainer>
         <br />
         <CardContainer>{renderFormSearchFarmer}</CardContainer>
+        <br />
+        <CardContainer>{renderDronerSelectedList}</CardContainer>
         <br />
         <CardContainer>{renderServiceCharge}</CardContainer>
         <FooterPage

@@ -25,7 +25,6 @@ const ModalMapPlot: React.FC<ModalMapPlotProps> = ({
 
   const fetchFarmerPlot = async () => {
     await FarmerPlotDatasource.getFarmerPlotById(plotId).then((res) => {
-      console.log("res", res);
       setMapPosition({ lat: parseFloat(res.lat), lng: parseFloat(res.long) });
       setData(res);
     });
