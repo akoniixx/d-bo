@@ -68,6 +68,8 @@ import {
 import {
   GetNewTaskEntity,
   GetNewTaskEntity_INIT,
+  UpdateNewTask,
+  UpdateNewTask_INIT,
 } from "../../../entities/NewTaskEntities";
 import {
   TaskSearchDroner,
@@ -159,7 +161,6 @@ const EditNewTask = () => {
       setFarmerSelected(res.farmer);
       setFarmerPlotSelected(res.farmerPlot);
       fetchPurposeSpray(res.farmerPlot.plantName);
-      console.log(res);
       setData(res);
     });
   };
@@ -1459,6 +1460,26 @@ const EditNewTask = () => {
     setCurrent(current + 1);
   };
   const updateNewTask = async () => {
+    let updateTask: UpdateNewTask = UpdateNewTask_INIT;
+    updateTask.id = data.id;
+    updateTask.farmerId = data.farmerId;
+    updateTask.farmerPlotId = data.farmerPlotId;
+    updateTask.farmAreaAmount = data.farmAreaAmount;
+    updateTask.dateAppointment = data.dateAppointment;
+    updateTask.targetSpray = data.targetSpray;
+    updateTask.preparationBy = data.preparationBy;
+    updateTask.purposeSprayId = data.purposeSprayId;
+    updateTask.status = data.status;
+    updateTask.statusRemark = data.statusRemark;
+    updateTask.updateBy = profile.firstname + " " + profile.lastname;
+    // updateTask.unitPriceStandard = parseFloat(data.unitPriceStandard);
+    // updateTask.priceStandard = parseFloat(data.priceStandard);
+    updateTask.unitPrice = parseFloat(data.unitPrice);
+    updateTask.price = parseFloat(data.price);
+    updateTask.comment = data.comment;
+    updateTask.fee = parseFloat(data.fee);
+    updateTask.discountFee = parseFloat(data.discountFee);
+    console.log(updateTask);
     Swal.fire({
       title: "ยืนยันการแก้ไข",
       text: "โปรดตรวจสอบรายละเอียดที่คุณต้องการแก้ไขข้อมูลก่อนเสมอ เพราะอาจส่งผลต่อการจ้างงานในระบบ",
@@ -1469,7 +1490,7 @@ const EditNewTask = () => {
       showCloseButton: true,
     }).then(async (result) => {
       if (result.isConfirmed) {
-        await TaskDatasource.updateNewTask(data).then((res) => {
+        await TaskDatasource.updateNewTask(updateTask).then((res) => {
           if (res.userMessage == "success") {
             window.location.href = "/IndexNewTask";
           }

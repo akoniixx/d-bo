@@ -53,23 +53,17 @@ const IndexInprogressTask = () => {
     { value: "true", name: "งานมีปัญหา" },
   ];
 
-  const fetchInprogressTask = async (
-    proId?: number,
-    disId?: number,
-    subDisId?: number,
-    text?: string,
-    problem?: boolean
-  ) => {
+  const fetchInprogressTask = async () => {
     await TaskDatasource.getInprogressTaskList(
       row,
       current,
-      proId,
-      disId,
-      subDisId,
-      text,
+      searchProvince,
+      searchDistrict,
+      searchSubdistrict,
+      searchText,
       startDate,
       endDate,
-      problem
+      searchStatus
     ).then((res) => {
       setData(res);
     });
@@ -258,15 +252,7 @@ const IndexInprogressTask = () => {
               color: color.secondary2,
               backgroundColor: color.Success,
             }}
-            onClick={() =>
-              fetchInprogressTask(
-                searchProvince,
-                searchDistrict,
-                searchSubdistrict,
-                searchText,
-                searchStatus
-              )
-            }
+            onClick={fetchInprogressTask}
           >
             ค้นหาข้อมูล
           </Button>

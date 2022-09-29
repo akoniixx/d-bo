@@ -1,4 +1,9 @@
 ## [Version - 0]
+## Fix [v0.16.5] 2022-09-29
+- fixed select droner for render in modal
+- changed entity update new task in edit new task
+- fixed search with page in inprogress task in inprogress task menu
+- fixed render plot in plot modal in inprogress task menu
 ## Fix [v0.16.4] 2022-09-28
 - fixed save img in farmer & droner menus
 ## Fix [v0.16.3] 2022-09-28
