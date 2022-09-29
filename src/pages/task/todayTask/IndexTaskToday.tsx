@@ -70,6 +70,7 @@ export default function IndexTodayTask() {
   const [showModalMap, setShowModalMap] = useState<boolean>(false);
   const [plotId, setPlotId] = useState<string>("");
   const [statusArr, setStatusArr] = useState<string[]>([]);
+  const [statusIsProblem, setStatusIsProblem] = useState<string[]>([]);
   const dateFormat = "DD/MM/YYYY";
   const timeFormat = "HH:mm";
 
@@ -96,6 +97,7 @@ export default function IndexTodayTask() {
       isProblem,
       isDelay
     ).then((res: TaskTodayListEntity) => {
+      console.log(res)
       setData(res);
     });
   };
@@ -156,25 +158,18 @@ export default function IndexTodayTask() {
   };
   const handleIsProblem = (e: any) => {
     let value = e.target.value;
+    console.log(value)
     let checked = e.target.checked;
-    if (checked) {
-      if (searchStatus == "WAIT_START" && value == "waitstartnormal") {
-        setIsProblem(false);
-      } else if (searchStatus == "WAIT_START" && value == "waitstartproblem") {
-        setIsProblem(true);
-      } else if (searchStatus == "IN_PROGRESS" && value == "inprogressnormal") {
-        setIsProblem(false);
-      } else if (
-        searchStatus == "IN_PROGRESS" &&
-        value == "inprogressproblem"
-      ) {
-        setIsProblem(true);
-      } else {
-        setIsProblem(undefined);
-      }
-    } else {
-      setSearchStatus(searchStatus);
-      setIsProblem(undefined);
+    let statusProblem = ['waitstartproblem', 'inprogressproblem'];
+    let statusNormal= ['waitstartnormal', 'inprogressnormal'];
+    if(checked){
+        if(statusProblem.includes(value)){
+          setIsProblem(true)
+        }else if(statusNormal.includes(value)){
+          setIsProblem(false)
+        }
+    }else{
+      setIsProblem(undefined)
     }
   };
 

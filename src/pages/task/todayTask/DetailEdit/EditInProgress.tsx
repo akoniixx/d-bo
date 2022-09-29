@@ -71,6 +71,7 @@ function EditInProgress() {
   const fetchTaskDetail = async () => {
     await TaskInprogressDatasource.getTaskDetailById(taskId).then((res) => {
       setData(res);
+      console.log(res)
       setMapPosition({
         lat: parseFloat(res.farmerPlot.lat),
         lng: parseFloat(res.farmerPlot.long),
@@ -109,7 +110,8 @@ function EditInProgress() {
   };
   const handleChangeIsProblem = (e: any) => {
     const m = Map(data).set("isProblem", e.target.value);
-    setData(m.toJS());
+    const n = Map(m.toJS()).set("problemRemark", "");
+    setData(n.toJS());
     if (e.target.value == true) {
       if (data.problemRemark != null) {
         setBtnSaveDisable(true);
@@ -521,7 +523,7 @@ function EditInProgress() {
           }
         );
       }
-      fetchTaskDetail();
+      EditInProgress();
     });
   };
 

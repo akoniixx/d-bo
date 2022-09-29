@@ -63,7 +63,6 @@ function EditWaitStart() {
   const [periodSpray, setPeriodSpray] = useState<CropPurposeSprayEntity>();
   const [checkCrop, setCheckCrop] = useState<boolean>(true);
   const [saveBtnDisable, setBtnSaveDisable] = useState<boolean>(true);
-
   const [validateComma, setValidateComma] = useState<{
     status: any;
     message: string;
@@ -74,12 +73,8 @@ function EditWaitStart() {
   let [otherSpray, setOtherSpray] = useState<any>();
   const fetchTaskDetail = async () => {
     await TaskInprogressDatasource.getTaskDetailById(taskId).then((res) => {
+      console.log(res)
       setData(res);
-      setOtherSpray(
-        res.targetSpray
-          .filter((a) => !PURPOSE_SPRAY.some((x) => x === a))
-          .join(",")
-      );
       fetchPurposeSpray(res.farmerPlot.plantName);
       setMapPosition({
         lat: parseFloat(res.farmerPlot.lat),
@@ -131,7 +126,7 @@ function EditWaitStart() {
     let checked = e.target.checked;
     let value = e.target.value;
     setCheckCrop(
-      value == "อื่นๆ" ? !checked : otherSpray != null ? false : true
+      value == "อื่นๆ" ? !checked : otherSpray != null ? false : true 
     );
     PURPOSE_SPRAY_CHECKBOX.map((item) =>
       _.set(item, "isChecked", item.crop == value ? checked : item.isChecked)
@@ -168,12 +163,16 @@ function EditWaitStart() {
   };
   const handleChangeStatus = (e: any) => {
     const d = Map(data).set("status", e.target.value);
-    setData(d.toJS());
+    const n = Map(d.toJS()).set("problemRemark", "");
+    const m = Map(n.toJS()).set("isProblem", false);
+    setData(m.toJS());
     setBtnSaveDisable(false);
   };
   const handleChangeIsProblem = (e: any) => {
+    console.log(e.target.value);
     const m = Map(data).set("isProblem", e.target.value);
-    setData(m.toJS());
+    const n = Map(m.toJS()).set("problemRemark", "");
+    setData(n.toJS());
     if (e.target.value == true) {
       if (data.problemRemark != null) {
         setBtnSaveDisable(true);
@@ -185,13 +184,21 @@ function EditWaitStart() {
       setBtnSaveDisable(false);
     }
   };
-  const onChangeProblemText = (e: any) => {
+  const onChangeProblemWaitStart = (  e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const m = Map(data).set("problemRemark", e.target.value);
     setData(m.toJS());
     {
       !e.target.value ? setBtnSaveDisable(true) : setBtnSaveDisable(false);
     }
   };
+  const onChangeProblemInProgress = (e: any) => {
+    const m = Map(data).set("problemRemark", e.target.value);
+    setData(m.toJS());
+    {
+      !e.target.value ? setBtnSaveDisable(true) : setBtnSaveDisable(false);
+    }
+  };
+  
   const onChangeCanCelText = (e: any) => {
     const m = Map(data).set("statusRemark", e.target.value);
     setData(m.toJS());
@@ -307,7 +314,7 @@ function EditWaitStart() {
                 ).map((x, index) => (
                   <div className="form-group">
                     <Checkbox
-                      key={x.key}
+                      key={data.targetSpray[0]}
                       value={x.crop}
                       onClick={handlerTargetSpray}
                       checked={x.isChecked}
@@ -317,14 +324,18 @@ function EditWaitStart() {
                     {index == 4 && (
                       <>
                         <Input
-                          disabled={checkCrop}
-                          key={data.targetSpray[0]}
+                        disabled={checkCrop}
+                          status={validateComma.status}
+                          key={data?.targetSpray[0]}
                           onChange={handleOtherSpray}
                           placeholder="โปรดระบุ เช่น เพลี้ย,หอย"
-                          autoComplete="off"
-                          defaultValue={data.targetSpray
-                            .filter((a) => !PURPOSE_SPRAY.some((x) => x === a))
-                            .join(",")}
+                          defaultValue={Array.from(
+                            new Set(
+                              data?.targetSpray.filter(
+                                (a) => !PURPOSE_SPRAY.some((x) => x === a)
+                              )
+                            )
+                          ).join(",")}
                         />
                         {validateComma.status == "error" && (
                           <p style={{ color: color.Error }}>
@@ -343,8 +354,8 @@ function EditWaitStart() {
             </label>
             <Form.Item>
               <Radio.Group
-                key={data.preparationBy}
-                value={data.preparationBy}
+                key={data?.preparationBy}
+                value={data?.preparationBy}
                 onChange={handlePreparation}
               >
                 <Space direction="vertical">
@@ -356,7 +367,7 @@ function EditWaitStart() {
           </div>
           <div className="form-group col-lg-10">
             <label>หมายเหตุ</label>
-            <TextArea rows={3} onChange={handleComment} value={data.comment} />
+            <TextArea rows={3} onChange={handleComment} value={data?.comment} />
           </div>
         </div>
 
@@ -368,7 +379,7 @@ function EditWaitStart() {
             <div className="row">
               <div className="form-group col-lg-4">
                 <Radio.Group
-                  value={data.status}
+                  value={data?.status}
                   onChange={handleChangeStatus}
                   className="col-lg-4"
                 >
@@ -383,7 +394,7 @@ function EditWaitStart() {
                           >
                             <Form.Item style={{ width: "530px" }}>
                               <Radio.Group
-                                value={data.isProblem}
+                                value={data?.isProblem}
                                 onChange={handleChangeIsProblem}
                               >
                                 <Space direction="vertical">
@@ -392,27 +403,25 @@ function EditWaitStart() {
                                 </Space>
                               </Radio.Group>
                             </Form.Item>
-                            {data.isProblem == true ? (
+                            {data.isProblem == true && (
                               <Form.Item>
                                 <TextArea
                                   rows={3}
-                                  onChange={onChangeProblemText}
+                                  onChange={onChangeProblemWaitStart}
                                   placeholder="รายละเอียดปัญหา"
                                   autoComplete="off"
                                   defaultValue={
-                                    data.problemRemark != null
-                                      ? data.problemRemark
-                                      : undefined
+                                    data?.problemRemark 
                                   }
                                 />
                               </Form.Item>
-                            ) : null}
+                           )} 
                           </div>
-                        ) : data.status == "IN_PROGRESS" && index == 1 ? (
+                        ) : data.status == "IN_PROGRESS" && index == 1  ? (
                           <div style={{ marginLeft: "20px" }}>
                             <Form.Item style={{ width: "500px" }}>
                               <Radio.Group
-                                value={data.isProblem}
+                                value={data?.isProblem}
                                 onChange={handleChangeIsProblem}
                               >
                                 <Space direction="vertical">
@@ -428,21 +437,19 @@ function EditWaitStart() {
                                 </Space>
                               </Radio.Group>
                             </Form.Item>
-                            {data.isProblem == true ? (
+                            {data.isProblem == true && (
                               <Form.Item>
                                 <TextArea
                                   rows={3}
-                                  onChange={onChangeProblemText}
+                                  onChange={onChangeProblemInProgress}
                                   placeholder="รายละเอียดปัญหา"
                                   autoComplete="off"
                                   defaultValue={
-                                    data.problemRemark != null
-                                      ? data.problemRemark
-                                      : undefined
+                                    data?.problemRemark
                                   }
                                 />
                               </Form.Item>
-                            ) : null}
+                            )}
                           </div>
                         ) : data.status == "CANCELED" && index == 2 ? (
                           <div style={{ marginLeft: "20px" }}>
@@ -727,7 +734,7 @@ function EditWaitStart() {
           }
         );
       }
-      fetchTaskDetail();
+      EditWaitStart();
     });
   };
 
