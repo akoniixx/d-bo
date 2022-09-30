@@ -1,4 +1,6 @@
 ## [Version - 0]
+## Feature [v0.17.0] 2022-09-30
+- enhanced edit inprogress task
 ## Fix [v0.16.6] 2022-09-30
 - fixed pagination index task today
 - fixed modal farmer plot
