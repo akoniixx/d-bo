@@ -8,8 +8,8 @@ import {
 } from "../entities/NewTaskEntities";
 import {
   GetTaskInprogressEntity,
-  TaskInprogressEntity,
   TaskInprogressPageEntity,
+  UpdateInprogressTaskEntity,
 } from "../entities/TaskInprogress";
 
 export class TaskDatasource {
@@ -129,6 +129,17 @@ export class TaskDatasource {
       })
       .catch((err) => {
         console.log(err, "err getinprogresstaskbyid");
+      });
+  }
+  static updateInprogressTask(data: UpdateInprogressTaskEntity): Promise<any> {
+    console.log(JSON.stringify(data));
+    return httpClient
+      .patch(BASE_URL + "/tasks/task/" + data.id, data)
+      .then((response) => {
+        return response.data;
+      })
+      .catch((error) => {
+        console.log(error);
       });
   }
 }
