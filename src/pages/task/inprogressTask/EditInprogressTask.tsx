@@ -89,7 +89,6 @@ const EditInprogressTask = () => {
       setTimeAppointment(new Date(res.dateAppointment).getTime());
       fetchPurposeSpray(res.farmerPlot.plantName);
       setDronerSelected(res.droner);
-      console.log(res);
       setData(res);
     });
   };
