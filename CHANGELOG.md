@@ -1,4 +1,10 @@
 ## [Version - 0]
+## Fix [v0.16.6] 2022-09-30
+- fixed pagination index task today
+- fixed modal farmer plot
+- fixed set value change status in detail edit task today
+- fixed checkbox targetSpray enable button
+- fixed table row index not hover
 ## Fix [v0.16.5] 2022-09-29
 - fixed select droner for render in modal
 - changed entity update new task in edit new task

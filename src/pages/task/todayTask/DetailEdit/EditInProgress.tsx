@@ -71,7 +71,6 @@ function EditInProgress() {
   const fetchTaskDetail = async () => {
     await TaskInprogressDatasource.getTaskDetailById(taskId).then((res) => {
       setData(res);
-      console.log(res)
       setMapPosition({
         lat: parseFloat(res.farmerPlot.lat),
         lng: parseFloat(res.farmerPlot.long),
@@ -105,8 +104,10 @@ function EditInProgress() {
   };
   const handleChangeStatus = (e: any) => {
     const d = Map(data).set("status", e.target.value);
-    setData(d.toJS());
-    setBtnSaveDisable(true);
+    const n = Map(d.toJS()).set("problemRemark", "");
+    const m = Map(n.toJS()).set("isProblem", false);
+    setData(m.toJS());
+    setBtnSaveDisable(false);
   };
   const handleChangeIsProblem = (e: any) => {
     const m = Map(data).set("isProblem", e.target.value);
@@ -132,7 +133,8 @@ function EditInProgress() {
   };
   const onChangeCanCelText = (e: any) => {
     const m = Map(data).set("statusRemark", e.target.value);
-    setData(m.toJS());
+    const n = Map(m.toJS()).set("statusRemark", "");
+    setData(n.toJS());
     {
       !e.target.value ? setBtnSaveDisable(true) : setBtnSaveDisable(false);
     }
@@ -402,7 +404,7 @@ function EditInProgress() {
             data.droner.address.district.districtName +
             "," +
             " " +
-            data.droner.address.province.region}
+            data.droner.address.district.provinceName }
         </div>
         <div className="col-lg">
           <span>

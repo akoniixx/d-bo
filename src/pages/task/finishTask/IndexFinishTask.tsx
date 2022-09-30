@@ -70,21 +70,17 @@ export default function IndexFinishTask() {
     fetchProvince();
   }, [current, row, startDate, endDate]);
   const fetchTaskFinish = async (
-    proId?: number,
-    disId?: number,
-    subDisId?: number,
-    text?: string
   ) => {
     await TaskFinishedDatasource.getTaskFinishList(
       current,
       row,
-      proId,
-      disId,
-      subDisId,
+      searchSubdistrict,
+      searchDistrict,
+      searchProvince,
       startDate,
       endDate,
       searchStatus,
-      text
+      searchText
     ).then((res: TaskFinishListEntity) => {
       setData(res);
     });
@@ -282,13 +278,8 @@ export default function IndexFinishTask() {
               color: color.secondary2,
               backgroundColor: color.Success,
             }}
-            onClick={() =>
-              fetchTaskFinish(
-                searchSubdistrict,
-                searchDistrict,
-                searchProvince,
-                searchText
-              )
+            onClick={
+              fetchTaskFinish
             }
           >
             ค้นหาข้อมูล

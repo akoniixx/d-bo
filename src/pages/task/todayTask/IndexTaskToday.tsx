@@ -1,4 +1,5 @@
 import {
+  ClockCircleFilled,
   DownOutlined,
   EditOutlined,
   SearchOutlined,
@@ -70,34 +71,27 @@ export default function IndexTodayTask() {
   const [showModalMap, setShowModalMap] = useState<boolean>(false);
   const [plotId, setPlotId] = useState<string>("");
   const [statusArr, setStatusArr] = useState<string[]>([]);
-  const [statusIsProblem, setStatusIsProblem] = useState<string[]>([]);
   const dateFormat = "DD/MM/YYYY";
   const timeFormat = "HH:mm";
-
+  const [problems, setProblems] = useState<any>([]);
   useEffect(() => {
     fetchAllTaskToday();
     fetchProvince();
-  }, [current, row]);
-  
-  const fetchAllTaskToday = async (
-    text?: string,
-    proId?: number,
-    disId?: number,
-    subDisId?: number
-  ) => {
+  }, [current]);
+
+  const fetchAllTaskToday = async () => {
     await TaskInprogressDatasource.getAllTaskToday(
       searchStatus,
       current,
       row,
-      text,
+      searchText,
       statusDelay,
-      proId,
-      disId,
-      subDisId,
+      searchProvince,
+      searchDistrict,
+      searchSubdistrict,
       isProblem,
       isDelay
     ).then((res: TaskTodayListEntity) => {
-      console.log(res)
       setData(res);
     });
   };
@@ -154,22 +148,34 @@ export default function IndexTodayTask() {
       }
     }
     setSearchStatus(arr);
-    setCurrent(1)
+    setCurrent(1);
   };
-  const handleIsProblem = (e: any) => {
+
+  const searching = () => {
+    let statusProblem = ["waitstartproblem", "inprogressproblem"];
+    let statusNormal = ["waitstartnormal", "inprogressnormal"];
+    if (problems.length == 2 || problems.length == 0) {
+      setIsProblem(undefined);
+    } else {
+      if (statusProblem.includes(problems[0])) {
+        setIsProblem(true);
+      } else if (statusNormal.includes(problems[0])) {
+        setIsProblem(false);
+      }
+    }
+    fetchAllTaskToday();
+  };
+
+  const handleIsProblem = async (e: any) => {
     let value = e.target.value;
-    console.log(value)
     let checked = e.target.checked;
-    let statusProblem = ['waitstartproblem', 'inprogressproblem'];
-    let statusNormal= ['waitstartnormal', 'inprogressnormal'];
-    if(checked){
-        if(statusProblem.includes(value)){
-          setIsProblem(true)
-        }else if(statusNormal.includes(value)){
-          setIsProblem(false)
-        }
-    }else{
-      setIsProblem(undefined)
+    let m: any = [];
+    if (checked) {
+      m = [...problems, value];
+      setProblems(m);
+    } else {
+      m = problems.filter((x: any) => x != value);
+      setProblems(m);
     }
   };
 
@@ -398,14 +404,7 @@ export default function IndexTodayTask() {
               color: color.secondary2,
               backgroundColor: color.Success,
             }}
-            onClick={() =>
-              fetchAllTaskToday(
-                searchText,
-                searchSubdistrict,
-                searchDistrict,
-                searchProvince
-              )
-            }
+            onClick={searching}
           >
             ค้นหาข้อมูล
           </Button>
@@ -421,6 +420,7 @@ export default function IndexTodayTask() {
       sorter: (a: any, b: any) =>
         sorter(a.task_date_appointment, b.task_date_appointment),
       render: (value: any, row: any, index: number) => {
+        const changeTime = row.count_change_appointment;
         return {
           children: (
             <>
@@ -429,6 +429,14 @@ export default function IndexTodayTask() {
                 ,{" "}
                 {moment(new Date(row.task_date_appointment)).format(timeFormat)}
               </span>
+              {changeTime != null ? (
+                <Tooltip
+                  title="มีการเปลี่ยนแปลงวันและเวลานัดหมาย"
+                  className="p-2"
+                >
+                  <img src={icon.iconChangeTime} />
+                </Tooltip>
+              ) : null}
               <br />
               <span style={{ color: color.Disable, fontSize: "12px" }}>
                 {row.taskNo}
@@ -450,7 +458,7 @@ export default function IndexTodayTask() {
           children: (
             <>
               <span>{row.droner_firstname + " " + row.droner_lastname}</span>
-              {changeDroner != undefined ? (
+              {changeDroner != null ? (
                 <Tooltip
                   style={{ fontSize: "18px" }}
                   title="มีการเปลี่ยนแปลงนักบินโดรนคนใหม่"
