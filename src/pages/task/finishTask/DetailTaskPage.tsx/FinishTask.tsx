@@ -421,7 +421,7 @@ function FinishTasks() {
                 data.data.droner.address.district.districtName +
                 "," +
                 " " +
-                data.data.droner.address.province.region
+                data.data.droner.address.province.provinceName
               : "-"}
           </span>
         </div>

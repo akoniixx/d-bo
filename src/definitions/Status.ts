@@ -66,9 +66,9 @@ export const TASK_TODAY_STATUS_MAPPING : any = {
   INACTIVE : "ไม่สะดวก"
 }
 export const TASKTODAY_STATUS: any = [
-  { value: "WAIT_START", name: "รอเริ่มงาน" },
-  { value: "IN_PROGRESS", name: "กำลังดำเนินงาน" },
-  { value: "CANCELED", name: "ยกเลิก" },
+  {key: "0", value: "WAIT_START", name: "รอเริ่มงาน" },
+  {key: "1", value: "IN_PROGRESS", name: "กำลังดำเนินงาน" },
+  {key: "2", value: "CANCELED", name: "ยกเลิก" },
 ];
 export const TASKTODAY_STATUS1: any = [
 

@@ -289,7 +289,7 @@ function CancelTask() {
                 data.data.droner.address.district.districtName +
                 "," +
                 " " +
-                data.data.droner.address.province.region
+                data.data.droner.address.province.provinceName
               : null}
           </span>
         </div>

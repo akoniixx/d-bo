@@ -265,7 +265,7 @@ export interface TaskDetailEntity {
   updateBy: string;
   distance: string;
   status: string;
-  statusRemark: null;
+  statusRemark: string;
   reviewDronerAvg: null;
   reviewDronerDetail: null;
   unitPriceStandard: string;
@@ -280,7 +280,7 @@ export interface TaskDetailEntity {
   imagePathFinishTask: null;
   comment: string;
   isProblem: boolean;
-  problemRemark: null;
+  problemRemark: string;
   isDelay: boolean;
   delayRemark: null;
   dateDelay: null;
@@ -309,7 +309,7 @@ export const TaskDetailEntity_INIT: TaskDetailEntity = {
   updateBy: "",
   distance: "",
   status: "",
-  statusRemark: null,
+  statusRemark: "",
   reviewDronerAvg: null,
   reviewDronerDetail: null,
   unitPriceStandard: "",
@@ -324,7 +324,7 @@ export const TaskDetailEntity_INIT: TaskDetailEntity = {
   imagePathFinishTask: null,
   comment: "",
   isProblem: false,
-  problemRemark: null,
+  problemRemark: "",
   isDelay: false,
   delayRemark: null,
   dateDelay: null,

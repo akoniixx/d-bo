@@ -426,7 +426,7 @@ function DetailWorkDroner() {
             data.droner.address.district.districtName +
             "," +
             " " +
-            data.droner.address.province.region}
+            data.droner.address.province.provinceName}
         </div>
         <div className="col-lg">
           <span>
