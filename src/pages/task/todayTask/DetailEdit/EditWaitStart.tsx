@@ -168,12 +168,15 @@ function EditWaitStart() {
   };
   const handleChangeStatus = (e: any) => {
     const d = Map(data).set("status", e.target.value);
-    setData(d.toJS());
+    const n = Map(d.toJS()).set("problemRemark", "");
+    const m = Map(n.toJS()).set("isProblem", false);
+    setData(m.toJS());
     setBtnSaveDisable(false);
   };
   const handleChangeIsProblem = (e: any) => {
     const m = Map(data).set("isProblem", e.target.value);
-    setData(m.toJS());
+    const n = Map(m.toJS()).set("problemRemark", "");
+    setData(n.toJS());
     if (e.target.value == true) {
       if (data.problemRemark != null) {
         setBtnSaveDisable(true);
@@ -194,7 +197,8 @@ function EditWaitStart() {
   };
   const onChangeCanCelText = (e: any) => {
     const m = Map(data).set("statusRemark", e.target.value);
-    setData(m.toJS());
+    const n = Map(m.toJS()).set("statusRemark", "");
+    setData(n.toJS());
     {
       !e.target.value ? setBtnSaveDisable(true) : setBtnSaveDisable(false);
     }
@@ -317,7 +321,6 @@ function EditWaitStart() {
                     {index == 4 && (
                       <>
                         <Input
-                          disabled={checkCrop}
                           key={data.targetSpray[0]}
                           onChange={handleOtherSpray}
                           placeholder="โปรดระบุ เช่น เพลี้ย,หอย"
@@ -591,7 +594,7 @@ function EditWaitStart() {
             data.droner.address.district.districtName +
             "," +
             " " +
-            data.droner.address.province.region}
+            data.droner.address.province.provinceName}
         </div>
         <div className="col-lg">
           <span>
@@ -714,7 +717,7 @@ function EditWaitStart() {
           otherSprayList.filter((x) => x != "")
         );
         const setOtherSpray = Array.from(new Set(data.targetSpray)).filter(
-          (x) => x != ""
+          (x) => x != "" && x != "อื่นๆ"
         );
         const pushTextTarget = Map(data).set("targetSpray", setOtherSpray);
         const pushUpdateBy = Map(pushTextTarget.toJS()).set(
@@ -727,7 +730,7 @@ function EditWaitStart() {
           }
         );
       }
-      fetchTaskDetail();
+      EditWaitStart();
     });
   };
 

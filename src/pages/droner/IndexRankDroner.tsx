@@ -49,24 +49,20 @@ export default function IndexRankDroner() {
   useEffect(() => {
     fetchDronerRank();
     fetchProvince();
-  }, [current, row, startDate, endDate]);
+  }, [current, startDate, endDate]);
   const fetchDronerRank = async (
-    proId?: number,
-    disId?: number,
-    subDisId?: number,
-    text?: string
   ) => {
     await DronerRankDatasource.getDronerRank(
       current,
       row,
-      proId,
-      disId,
-      subDisId,
+      searchSubdistrict,
+      searchDistrict,
+      searchProvince,
       rating?.ratingMin,
       rating?.ratingMax,
       startDate,
       endDate,
-      text
+      searchText
     ).then((res: DronerRankListEntity) => {
       setData(res);
     });
@@ -380,13 +376,8 @@ export default function IndexRankDroner() {
               color: color.secondary2,
               backgroundColor: color.Success,
             }}
-            onClick={() =>
-              fetchDronerRank(
-                searchSubdistrict,
-                searchDistrict,
-                searchProvince,
-                searchText
-              )
+            onClick={
+              fetchDronerRank
             }
           >
             ค้นหาข้อมูล
@@ -524,12 +515,12 @@ export default function IndexRankDroner() {
     },
     {
       title: "จังหวัด",
-      dataIndex: "province_region",
-      key: "province_region",
+      dataIndex: "province_province_name",
+      key: "province_province_name",
       width: "10%",
-      sorter: (a: any, b: any) => sorter(a.province_region, b.province_region),
+      sorter: (a: any, b: any) => sorter(a.province_province_name, b.province_province_name),
       render: (value: any, row: any, index: number) => {
-        const province = row.province_region;
+        const province = row.province_province_name;
         return {
           children: (
             <div className="container">

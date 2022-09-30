@@ -74,7 +74,6 @@ function EditDroneList() {
   const fetchDronerDrone = async () => {
     await DronerDroneDatasource.getDronerDroneById(DronerDroneId).then(
       (res) => {
-        console.log(res)
         setData(res);
         setDronerId(res.dronerId);
         let getPathPro = res.droner.file.filter(

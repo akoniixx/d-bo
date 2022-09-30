@@ -231,7 +231,7 @@ function DetailRankDroner() {
                   <Input
                     disabled
                     defaultValue={
-                      data.address != null ? data.address.province.region : "-"
+                      data.address != null ? data.address.province.provinceName : "-"
                     }
                   />
                 </Form.Item>
@@ -303,7 +303,7 @@ function DetailRankDroner() {
         return {
           children: (
             <>
-              <span>{row.farmer.address.province.region}</span>
+              <span>{row.farmer.address.province.provinceName}</span>
             </>
           ),
         };
