@@ -1,3 +1,4 @@
+import { EditOutlined } from "@ant-design/icons";
 import {
   Avatar,
   DatePicker,
@@ -12,12 +13,15 @@ import {
 import TextArea from "antd/lib/input/TextArea";
 import moment from "moment";
 import React, { useEffect, useState } from "react";
+import Swal from "sweetalert2";
+import ActionButton from "../../../components/button/ActionButton";
 import { BackIconButton } from "../../../components/button/BackButton";
 import { CardContainer } from "../../../components/card/CardContainer";
 import FooterPage from "../../../components/footer/FooterPage";
 import { CardHeader } from "../../../components/header/CardHearder";
 import Layouts from "../../../components/layout/Layout";
 import GooleMap from "../../../components/map/GoogleMap";
+import ModalSelectedDroner from "../../../components/modal/task/inprogressTask/ModalSelectedDroner";
 import { CropDatasource } from "../../../datasource/CropDatasource";
 import { TaskDatasource } from "../../../datasource/TaskDatasource";
 import { LAT_LNG_BANGKOK } from "../../../definitions/Location";
@@ -28,11 +32,17 @@ import {
 import { STATUS_INPROGRESS_CHECKBOX } from "../../../definitions/Status";
 import { CropPurposeSprayEntity } from "../../../entities/CropEntities";
 import {
+  DronerDroneEntity_INIT,
+  DronerEntity,
+  DronerEntity_INIT,
+} from "../../../entities/DronerDroneEntities";
+import {
   GetTaskInprogressEntity,
   GetTaskInprogressEntity_INIT,
   UpdateInprogressTaskEntity,
   UpdateInprogressTaskEntity_INIT,
 } from "../../../entities/TaskInprogress";
+import { TaskSearchDroner } from "../../../entities/TaskSearchDroner";
 import { color } from "../../../resource";
 import { numberWithCommas } from "../../../utilities/TextFormatter";
 const { Option } = Select;
@@ -57,7 +67,7 @@ const EditInprogressTask = () => {
   const [timeAppointment, setTimeAppointment] = useState<any>(
     moment(undefined)
   );
-  const [saveBtnDisable, setBtnSaveDisable] = useState<boolean>(false);
+  const [saveBtnDisable, setBtnSaveDisable] = useState<boolean>(true);
   const [periodSpray, setPeriodSpray] = useState<CropPurposeSprayEntity>();
   const [checkCrop, setCheckCrop] = useState<boolean>(true);
   let [otherSpray, setOtherSpray] = useState<any>();
@@ -68,13 +78,18 @@ const EditInprogressTask = () => {
     status: "",
     message: "",
   });
+  const [showModel, setShowModal] = useState<boolean>(false);
+  const [dronerSelected, setDronerSelected] =
+    useState<DronerEntity>(DronerEntity_INIT);
 
   const fetchInprogressTask = async () => {
     await TaskDatasource.getInprogressTaskById(queryString[1]).then((res) => {
-      console.log(res);
+      res.droner.totalDroneCount = res.droner.dronerDrone.length;
       setDateAppointment(new Date(res.dateAppointment).toUTCString());
       setTimeAppointment(new Date(res.dateAppointment).getTime());
       fetchPurposeSpray(res.farmerPlot.plantName);
+      setDronerSelected(res.droner);
+      console.log(res);
       setData(res);
     });
   };
@@ -95,6 +110,7 @@ const EditInprogressTask = () => {
     const n = Map(m.toJS()).set("isProblem", false);
     const o = Map(n.toJS()).set("problemRemark", "");
     setData(o.toJS());
+    checkValidate(o.toJS());
   };
   const handleChangeStatusProblem = (e: any) => {
     let status = e.target.value;
@@ -102,22 +118,26 @@ const EditInprogressTask = () => {
     const n = Map(m.toJS()).set("problemRemark", "");
     const o = Map(n.toJS()).set("statusRemark", "");
     setData(o.toJS());
+    checkValidate(o.toJS());
   };
   const handleChangeRemarkProblem = (
     e: React.ChangeEvent<HTMLTextAreaElement>
   ) => {
     const m = Map(data).set("problemRemark", e.target.value);
     setData(m.toJS());
+    checkValidate(m.toJS());
   };
   const handleChangeRemarkCancel = (
     e: React.ChangeEvent<HTMLTextAreaElement>
   ) => {
     const m = Map(data).set("statusRemark", e.target.value);
     setData(m.toJS());
+    checkValidate(m.toJS());
   };
   const handlePeriodSpray = (e: any) => {
     const d = Map(data).set("purposeSprayId", e);
     setData(d.toJS());
+    checkValidate(d.toJS());
   };
   const handlePurposeSpray = (e: any) => {
     let checked = e.target.checked;
@@ -140,10 +160,12 @@ const EditInprogressTask = () => {
       p = Map(data).set("targetSpray", removePlant);
     }
     setData(p.toJS());
+    checkValidate(p.toJS());
   };
   const handlePreparation = (e: any) => {
     const d = Map(data).set("preparationBy", e.target.value);
     setData(d.toJS());
+    checkValidate(d.toJS());
   };
   const handleOtherSpray = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.value.trim().length != 0) {
@@ -179,6 +201,36 @@ const EditInprogressTask = () => {
       data.includes("-") ||
       data.includes("+");
     return data.trim().length != 0 ? (checkSyntax ? true : false) : true;
+  };
+  const checkValidate = (data: GetTaskInprogressEntity) => {
+    let checkEmptySting = ![data?.purposeSprayId, data?.preparationBy].includes(
+      ""
+    );
+    let checkEmptyArray = false;
+    if (data?.targetSpray !== undefined) {
+      checkEmptyArray =
+        ![data?.targetSpray][0]?.includes("") &&
+        data?.targetSpray.length !== 0 &&
+        data?.targetSpray !== undefined;
+    }
+    let checkDateTime = ![dateAppointment, timeAppointment].includes("");
+    let checkEmptyRemark = true;
+    if (data.status == "WAIT_START" && data.isProblem) {
+      checkEmptyRemark = ![data.problemRemark].includes("");
+    } else {
+      checkEmptyRemark = ![data.statusRemark].includes("");
+    }
+    console.log(checkEmptyRemark);
+    if (
+      checkEmptySting &&
+      checkEmptyArray &&
+      checkDateTime &&
+      checkEmptyRemark
+    ) {
+      setBtnSaveDisable(false);
+    } else {
+      setBtnSaveDisable(true);
+    }
   };
 
   const renderFormAppointment = (
@@ -363,6 +415,7 @@ const EditInprogressTask = () => {
                           <TextArea
                             placeholder="กรอกรายละเอียดปัญหา"
                             onChange={handleChangeRemarkCancel}
+                            value={data?.statusRemark}
                           />
                         )}
                         <br />
@@ -378,6 +431,7 @@ const EditInprogressTask = () => {
                                 <TextArea
                                   placeholder="กรอกรายละเอียดปัญหา"
                                   onChange={handleChangeRemarkProblem}
+                                  value={data?.problemRemark}
                                 />
                               )}
                             </Space>
@@ -509,31 +563,44 @@ const EditInprogressTask = () => {
         <div className="container">
           <div className="row pt-3">
             <div className="col-lg-3">
-              {data.droner.firstname} {data.droner.lastname}
+              {dronerSelected.firstname} {dronerSelected.lastname}
               <br />
               <p style={{ fontSize: "12px", color: color.Grey }}>
-                {data.droner.dronerCode}
+                {dronerSelected.dronerCode}
               </p>
             </div>
-            <div className="col-lg-2">{data.droner.telephoneNo}</div>
+            <div className="col-lg-2">{dronerSelected.telephoneNo}</div>
             <div className="col-lg-4">
-              {data.droner.address.subdistrict.subdistrictName +
-                "/" +
-                data.droner.address.subdistrict.districtName +
-                "/" +
-                data.droner.address.subdistrict.provinceName}
+              {(dronerSelected.address.subdistrict.subdistrictName
+                ? dronerSelected.address.subdistrict.subdistrictName + "/"
+                : "") +
+                (dronerSelected.address.district.districtName != null
+                  ? dronerSelected.address.district.districtName + "/"
+                  : "'") +
+                (dronerSelected.address.province.provinceName != null
+                  ? dronerSelected.address.province.provinceName
+                  : "")}
             </div>
             <div className="col-lg-2">
               <Avatar
                 size={25}
-                //src={data.dronerDrone[0].drone?.droneBrand.logoImagePath}
+                src={
+                  dronerSelected.dronerDrone[0].drone.droneBrand.logoImagePath
+                }
                 style={{ marginRight: "5px" }}
               />
-              {/* {data.dronerDrone[0].drone.droneBrand.name} */}
+              {dronerSelected.dronerDrone[0].drone.droneBrand.name}
               <br />
-              {/* <p style={{ fontSize: "12px", color: color.Grey }}>
-                {data.dronerDrone.length > 1 && "(มากกว่า 1 ยี่หัอ)"}
-              </p> */}
+              <p style={{ fontSize: "12px", color: color.Grey }}>
+                {dronerSelected.totalDroneCount > 1 && "(มากกว่า 1 ยี่หัอ)"}
+              </p>
+            </div>
+            <div className="col-lg-1">
+              <ActionButton
+                icon={<EditOutlined />}
+                color={color.primary1}
+                onClick={() => setShowModal((prev) => !prev)}
+              />
             </div>
           </div>
         </div>
@@ -593,8 +660,26 @@ const EditInprogressTask = () => {
     </CardContainer>
   );
 
+  const updateDroner = (newDroner: TaskSearchDroner) => {
+    let drone = DronerDroneEntity_INIT;
+    let droner = DronerEntity_INIT;
+    drone.drone.droneBrand.name = newDroner.drone_brand;
+    drone.drone.droneBrand.logoImagePath = newDroner.logo_drone_brand;
+    droner.id = newDroner.droner_id;
+    droner.dronerCode = newDroner.droner_code;
+    droner.firstname = newDroner.firstname;
+    droner.lastname = newDroner.lastname;
+    droner.telephoneNo = newDroner.telephone_no;
+    droner.status = newDroner.droner_status;
+    droner.address.subdistrict.subdistrictName = newDroner.subdistrict_name;
+    droner.address.district.districtName = newDroner.district_name;
+    droner.address.province.provinceName = newDroner.province_name;
+    droner.totalDroneCount = parseInt(newDroner.count_drone);
+    droner.dronerDrone = [drone];
+    setDronerSelected(droner);
+    setShowModal((prev) => !prev);
+  };
   const updateInprogressTask = () => {
-    console.log(data);
     let changeTimeFormat = moment(timeAppointment).format(timeCreateFormat);
     let changeDateFormat = moment(dateAppointment).format(dateCreateFormat);
     let otherSprayList = [];
@@ -616,13 +701,35 @@ const EditInprogressTask = () => {
       changeDateFormat + " " + changeTimeFormat
     ).toISOString();
     updateTask.purposeSprayId = data.purposeSprayId;
-    updateTask.tragetSpray = data.targetSpray;
+    updateTask.targetSpray = data.targetSpray;
     updateTask.preparationBy = data.preparationBy;
     updateTask.comment = data.comment;
     updateTask.status = data.status;
     updateTask.isProblem = data.isProblem;
     updateTask.updateBy = profile.firstname + " " + profile.lastname;
+    updateTask.dronerId = dronerSelected.id;
+    updateTask.problemRemark = data.problemRemark;
+    updateTask.statusRemark = data.statusRemark;
+    updateTask.farmerPlotId = data.farmerPlotId;
     console.log("task", updateTask);
+    Swal.fire({
+      title: "ยืนยันการแก้ไข",
+      text: "โปรดตรวจสอบรายละเอียดที่คุณต้องการแก้ไขข้อมูลก่อนเสมอ เพราะอาจส่งผลต่อการจ้างงานในระบบ",
+      cancelButtonText: "ยกเลิก",
+      confirmButtonText: "ยืนยัน",
+      confirmButtonColor: color.Success,
+      showCancelButton: true,
+      showCloseButton: true,
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        await TaskDatasource.updateInprogressTask(updateTask).then((res) => {
+          console.log(res);
+          if (res.userMessage == "success") {
+            window.location.href = "/IndexInprogressTask";
+          }
+        });
+      }
+    });
   };
 
   return (
@@ -651,6 +758,16 @@ const EditInprogressTask = () => {
           disableSaveBtn={saveBtnDisable}
         />
       </Layouts>
+      {showModel && (
+        <ModalSelectedDroner
+          show={showModel}
+          backButton={() => setShowModal((prev) => !prev)}
+          title="เปลี่ยนแปลงนักบินโดรน"
+          dataTask={data}
+          dataDroner={dronerSelected}
+          callBack={updateDroner}
+        />
+      )}
     </>
   );
 };

@@ -1479,7 +1479,6 @@ const EditNewTask = () => {
     updateTask.comment = data.comment;
     updateTask.fee = parseFloat(data.fee);
     updateTask.discountFee = parseFloat(data.discountFee);
-    console.log(updateTask);
     Swal.fire({
       title: "ยืนยันการแก้ไข",
       text: "โปรดตรวจสอบรายละเอียดที่คุณต้องการแก้ไขข้อมูลก่อนเสมอ เพราะอาจส่งผลต่อการจ้างงานในระบบ",

@@ -275,7 +275,7 @@ const IndexInprogressTask = () => {
                 {moment(new Date(row.task_date_appointment)).format(timeFormat)}
               </span>
               <span style={{ color: color.Disable, fontSize: "12px" }}>
-                {row.taskNo}
+                {row.task_task_no}
               </span>
             </>
           ),

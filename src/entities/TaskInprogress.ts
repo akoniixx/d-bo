@@ -204,23 +204,31 @@ export const GetTaskInprogressEntity_INIT: GetTaskInprogressEntity = {
 };
 export interface UpdateInprogressTaskEntity {
   id: string;
+  dronerId: string;
   dateAppointment: string;
   purposeSprayId: string;
-  tragetSpray: string[];
+  targetSpray: string[];
   preparationBy: string;
   comment: string;
   status: string;
   isProblem: boolean;
   updateBy: string;
+  problemRemark: string;
+  statusRemark: string;
+  farmerPlotId: string;
 }
-export const UpdateInprogressTaskEntity_INIT : UpdateInprogressTaskEntity = {
+export const UpdateInprogressTaskEntity_INIT: UpdateInprogressTaskEntity = {
   id: "",
+  dronerId: "",
   dateAppointment: "",
   purposeSprayId: "",
-  tragetSpray: [""],
+  targetSpray: [""],
   preparationBy: "",
   comment: "",
   status: "",
   isProblem: false,
   updateBy: "",
-}
+  problemRemark: "",
+  statusRemark: "",
+  farmerPlotId: "",
+};

@@ -1,7 +1,7 @@
 export interface TaskSearchDroner {
   droner_id: string;
-  firstName: string;
-  lastName: string;
+  firstname: string;
+  lastname: string;
   telephone_no: string;
   subdistrict_name: string;
   district_name: string;
@@ -17,11 +17,12 @@ export interface TaskSearchDroner {
   distance: number;
   droner_status: string;
   isChecked: boolean;
+  droner_code: string;
 }
 export const TaskSearchDroner_INIT: TaskSearchDroner = {
   droner_id: "",
-  firstName: "",
-  lastName: "",
+  firstname: "",
+  lastname: "",
   telephone_no: "",
   subdistrict_name: "",
   district_name: "",
@@ -37,4 +38,5 @@ export const TaskSearchDroner_INIT: TaskSearchDroner = {
   distance: 0,
   droner_status: "",
   isChecked: false,
+  droner_code: "",
 };
