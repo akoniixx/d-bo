@@ -249,6 +249,12 @@ const AddNewTask = () => {
     const d = Map(createNewTask).set("comment", e.target.value);
     setCreateNewTask(d.toJS());
   };
+  const handleDateAppointment = (e: any) => {
+    setDateAppointment(moment(new Date(e)).format(dateCreateFormat));
+  };
+  const handleTimeAppiontment = (e: any) => {
+    setTimeAppointment(moment(new Date(e)).format(timeCreateFormat));
+  };
   const checkValidateComma = (data: string) => {
     const checkSyntax =
       data.includes("*") ||
@@ -489,11 +495,7 @@ const AddNewTask = () => {
                   format={dateFormat}
                   className="col-lg-12"
                   disabled={current == 2 || checkSelectPlot == "error"}
-                  onChange={(e: any) =>
-                    setDateAppointment(
-                      moment(new Date(e)).format(dateCreateFormat)
-                    )
-                  }
+                  onChange={handleDateAppointment}
                   defaultValue={moment(dateAppointment)}
                 />
               </Form.Item>
@@ -514,11 +516,7 @@ const AddNewTask = () => {
                 <TimePicker
                   format={timeFormat}
                   disabled={current == 2 || checkSelectPlot == "error"}
-                  onChange={(e: any) =>
-                    setTimeAppointment(
-                      moment(new Date(e)).format(timeCreateFormat)
-                    )
-                  }
+                  onChange={handleTimeAppiontment}
                   defaultValue={moment(timeAppointment, timeFormat)}
                 />
               </Form.Item>
@@ -1358,7 +1356,7 @@ const AddNewTask = () => {
 
   const nextStep = () => {
     if (current == 0) {
-      let changeTimeFormat = moment(timeAppointment).format(timeCreateFormat);
+      let changeTimeFormat = timeAppointment;
       let changeDateFormat = moment(dateAppointment).format(dateCreateFormat);
       let otherSprayList = [];
       if (otherSpray != undefined) {
@@ -1433,9 +1431,6 @@ const AddNewTask = () => {
   };
 
   const insertNewTask = async () => {
-    let checkDupSpray = Array.from(new Set(createNewTask.targetSpray));
-    const d = Map(createNewTask).set("targetSpray", checkDupSpray);
-    setCreateNewTask(d.toJS());
     Swal.fire({
       title: "ยืนยันการสร้างงาน",
       text: "โปรดตรวจสอบรายละเอียดที่คุณต้องการแก้ไขข้อมูลก่อนเสมอ เพราะอาจส่งผลต่อการจ้างงานในระบบ",
@@ -1447,10 +1442,13 @@ const AddNewTask = () => {
     }).then(async (result) => {
       if (result.isConfirmed) {
         if (selectionType == "checkbox") {
-          delete d.toJS()["dronerId"];
+          delete createNewTask["dronerId"];
         } else {
-          delete d.toJS()["taskDronerTemp"];
+          delete createNewTask["taskDronerTemp"];
         }
+        let checkDupSpray = Array.from(new Set(createNewTask.targetSpray));
+        const d = Map(createNewTask).set("targetSpray", checkDupSpray);
+        setCreateNewTask(d.toJS());
         await TaskDatasource.insertNewTask(d.toJS()).then((res) => {
           if (res.userMessage == "success") {
             window.location.href = "/IndexNewTask";
