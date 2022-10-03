@@ -89,6 +89,7 @@ const EditInprogressTask = () => {
       setTimeAppointment(new Date(res.dateAppointment).getTime());
       fetchPurposeSpray(res.farmerPlot.plantName);
       setDronerSelected(res.droner);
+      setCheckCrop(!res.targetSpray.includes("อื่นๆ"));
       setData(res);
     });
   };
@@ -192,6 +193,15 @@ const EditInprogressTask = () => {
     const d = Map(data).set("comment", e.target.value);
     setData(d.toJS());
   };
+  const handleDateAppointment = (e: any) => {
+    setDateAppointment(moment(new Date(e)).format(dateCreateFormat));
+    checkValidate(data);
+  };
+  const handleTimeAppiontment = (e: any) => {
+    setTimeAppointment(moment(new Date(e)).format(timeCreateFormat));
+    checkValidate(data);
+  };
+
   const checkValidateComma = (data: string) => {
     const checkSyntax =
       data.includes("*") ||
@@ -255,11 +265,7 @@ const EditInprogressTask = () => {
                       format={dateFormat}
                       className="col-lg-12"
                       defaultValue={moment(dateAppointment)}
-                      onChange={(e: any) =>
-                        setDateAppointment(
-                          moment(new Date(e)).format(dateCreateFormat)
-                        )
-                      }
+                      onChange={handleDateAppointment}
                     />
                   </Form.Item>
                 </div>
@@ -278,11 +284,7 @@ const EditInprogressTask = () => {
                     <TimePicker
                       format={timeFormat}
                       className="col-lg-12"
-                      onChange={(e: any) =>
-                        setTimeAppointment(
-                          moment(new Date(e)).format(timeCreateFormat)
-                        )
-                      }
+                      onChange={handleTimeAppiontment}
                       defaultValue={moment(timeAppointment)}
                     />
                   </Form.Item>
@@ -679,8 +681,8 @@ const EditInprogressTask = () => {
     setBtnSaveDisable(false);
   };
   const updateInprogressTask = () => {
-    let changeTimeFormat = moment(timeAppointment).format(timeCreateFormat);
     let changeDateFormat = moment(dateAppointment).format(dateCreateFormat);
+    let changeTimeFormat = timeAppointment;
     let otherSprayList = [];
     if (otherSpray != undefined) {
       let m = otherSpray.split(",");
