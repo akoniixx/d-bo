@@ -656,7 +656,6 @@ const AddNewTask = () => {
             : false
         )
       );
-      console.log(res);
       setDataDronerList(res);
     });
   };

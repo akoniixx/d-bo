@@ -721,7 +721,6 @@ const EditInprogressTask = () => {
     }).then(async (result) => {
       if (result.isConfirmed) {
         await TaskDatasource.updateInprogressTask(updateTask).then((res) => {
-          console.log(res);
           if (res.userMessage == "success") {
             window.location.href = "/IndexInprogressTask";
           }

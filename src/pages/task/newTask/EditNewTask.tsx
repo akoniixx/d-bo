@@ -1454,7 +1454,6 @@ const EditNewTask = () => {
         "updateBy",
         profile.firstname + " " + profile.lastname
       );
-      console.log(q.toJS());
       setData(q.toJS());
     } else {
       const s = Map(data).set("status", "WAIT_RECEIVE");
