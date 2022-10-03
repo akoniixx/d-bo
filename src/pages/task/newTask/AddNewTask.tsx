@@ -822,7 +822,7 @@ const AddNewTask = () => {
       _.set(
         item,
         "isChecked",
-        item.droner_status == "ไม่สะดวก" || item.is_open_receive_task
+        item.droner_status == "ไม่สะดวก" || item.is_open_receive_task == false
           ? false
           : checked
       )
@@ -983,7 +983,7 @@ const AddNewTask = () => {
           checked={dataDronerList
             .filter(
               (x) =>
-                x.droner_status != "ไม่สะดวก" && x.is_open_receive_task != true
+                x.droner_status != "ไม่สะดวก" && x.is_open_receive_task != false
             )
             .every((x) => x.isChecked)}
           style={{ width: "18px", height: "18px" }}
@@ -1000,7 +1000,7 @@ const AddNewTask = () => {
                 disabled={
                   selectionType == "checkbox"
                     ? row.droner_status != "ไม่สะดวก" &&
-                      row.is_open_receive_task != true
+                      row.is_open_receive_task != false
                       ? false
                       : true
                     : false
@@ -1143,23 +1143,26 @@ const AddNewTask = () => {
             <>
               <span
                 style={{
-                  color: row.is_open_receive_task
-                    ? color.Disable
-                    : row.droner_status == "สะดวก"
-                    ? color.Success
-                    : color.Error,
+                  color:
+                    row.is_open_receive_task == false
+                      ? color.Disable
+                      : row.droner_status == "สะดวก"
+                      ? color.Success
+                      : color.Error,
                 }}
               >
                 <Badge
                   color={
-                    row.is_open_receive_task
+                    row.is_open_receive_task == false
                       ? color.Disable
                       : row.droner_status == "สะดวก"
                       ? color.Success
                       : color.Error
                   }
                 />
-                {row.is_open_receive_task ? "ปิดการใช้งาน" : row.droner_status}
+                {row.is_open_receive_task == false
+                  ? "ปิดการใช้งาน"
+                  : row.droner_status}
                 <br />
               </span>
             </>
@@ -1430,11 +1433,6 @@ const AddNewTask = () => {
   };
 
   const insertNewTask = async () => {
-    if (selectionType == "checkbox") {
-      delete createNewTask["dronerId"];
-    } else {
-      delete createNewTask["taskDronerTemp"];
-    }
     let checkDupSpray = Array.from(new Set(createNewTask.targetSpray));
     const d = Map(createNewTask).set("targetSpray", checkDupSpray);
     setCreateNewTask(d.toJS());
@@ -1448,6 +1446,11 @@ const AddNewTask = () => {
       showCloseButton: true,
     }).then(async (result) => {
       if (result.isConfirmed) {
+        if (selectionType == "checkbox") {
+          delete d.toJS()["dronerId"];
+        } else {
+          delete d.toJS()["taskDronerTemp"];
+        }
         await TaskDatasource.insertNewTask(d.toJS()).then((res) => {
           if (res.userMessage == "success") {
             window.location.href = "/IndexNewTask";
