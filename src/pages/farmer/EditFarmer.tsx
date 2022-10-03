@@ -408,10 +408,10 @@ const EditFarmer = () => {
         var i = 0;
         for (i; 2 > i; i++) {
           i == 0 &&
-            createImgProfile.path != "" &&
+            createImgProfile.file != "" &&
             UploadImageDatasouce.uploadImage(createImgProfile).then(res);
           i == 1 &&
-            createImgIdCard.path != "" &&
+            createImgIdCard.file != "" &&
             UploadImageDatasouce.uploadImage(createImgIdCard).then(res);
         }
         Swal.fire({

@@ -65,6 +65,7 @@ import { CreateDronerTempEntity } from "../../../entities/TaskDronerTemp";
 import TextArea from "antd/lib/input/TextArea";
 import Swal from "sweetalert2";
 import { numberWithCommas } from "../../../utilities/TextFormatter";
+import icon from "../../../resource/icon";
 const { Step } = Steps;
 const { Option } = Select;
 const dateFormat = "DD/MM/YYYY";
@@ -821,7 +822,9 @@ const AddNewTask = () => {
       _.set(
         item,
         "isChecked",
-        item.droner_status == "ไม่สะดวก" ? false : checked
+        item.droner_status == "ไม่สะดวก" || item.is_open_receive_task
+          ? false
+          : checked
       )
     );
     setDataDronerList(d);
@@ -978,7 +981,10 @@ const AddNewTask = () => {
           type={selectionType}
           onChange={handleAllSelectDroner}
           checked={dataDronerList
-            .filter((x) => x.droner_status != "ไม่สะดวก")
+            .filter(
+              (x) =>
+                x.droner_status != "ไม่สะดวก" && x.is_open_receive_task != true
+            )
             .every((x) => x.isChecked)}
           style={{ width: "18px", height: "18px" }}
         />
@@ -993,7 +999,8 @@ const AddNewTask = () => {
                 checked={row.isChecked}
                 disabled={
                   selectionType == "checkbox"
-                    ? row.droner_status != "ไม่สะดวก"
+                    ? row.droner_status != "ไม่สะดวก" &&
+                      row.is_open_receive_task != true
                       ? false
                       : true
                     : false
@@ -1025,9 +1032,7 @@ const AddNewTask = () => {
               <span>{row.firstname + " " + row.lastname}</span>
               {row.rating_avg != null && (
                 <Tooltip title={tooltipTitle} className="p-2">
-                  <TeamOutlined
-                    style={{ color: color.Success, fontSize: "18px" }}
-                  />
+                  <img src={icon.iconReviewDroner} />
                 </Tooltip>
               )}
               <br />
@@ -1138,16 +1143,23 @@ const AddNewTask = () => {
             <>
               <span
                 style={{
-                  color:
-                    row.droner_status == "สะดวก" ? color.Success : color.Error,
+                  color: row.is_open_receive_task
+                    ? color.Disable
+                    : row.droner_status == "สะดวก"
+                    ? color.Success
+                    : color.Error,
                 }}
               >
                 <Badge
                   color={
-                    row.droner_status == "สะดวก" ? color.Success : color.Error
+                    row.is_open_receive_task
+                      ? color.Disable
+                      : row.droner_status == "สะดวก"
+                      ? color.Success
+                      : color.Error
                   }
                 />
-                {row.droner_status}
+                {row.is_open_receive_task ? "ปิดการใช้งาน" : row.droner_status}
                 <br />
               </span>
             </>

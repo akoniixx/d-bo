@@ -1,4 +1,10 @@
 ## [Version - 0]
+## Fix [v0.17.1] 2022-10-03
+- fixed save imgs in droner and farmer
+- added tooltip in inprogress task
+- changed tooltip in add new task (step 2)
+- fixed validate in droner menu
+- fixed validate in inprogress task menu
 ## Feature [v0.17.0] 2022-09-30
 - enhanced edit inprogress task
 ## Fix [v0.16.6] 2022-09-30

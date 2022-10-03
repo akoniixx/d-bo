@@ -205,7 +205,6 @@ const ModalSelectedDroner: React.FC<ModalSelectedDronerProps> = ({
     setVisibleRating(newVisible);
   };
   const handleCallBack = () => {
-    console.log(newDronerSelected);
     callBack(newDronerSelected);
   };
 

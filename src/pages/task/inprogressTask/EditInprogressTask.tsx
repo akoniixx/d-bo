@@ -216,10 +216,9 @@ const EditInprogressTask = () => {
     let checkEmptyRemark = true;
     if (data.status == "WAIT_START" && data.isProblem) {
       checkEmptyRemark = ![data.problemRemark].includes("");
-    } else {
+    } else if (data.status == "CANCELED") {
       checkEmptyRemark = ![data.statusRemark].includes("");
     }
-    console.log(checkEmptyRemark);
     if (
       checkEmptySting &&
       checkEmptyArray &&
@@ -677,6 +676,7 @@ const EditInprogressTask = () => {
     droner.dronerDrone = [drone];
     setDronerSelected(droner);
     setShowModal((prev) => !prev);
+    setBtnSaveDisable(false);
   };
   const updateInprogressTask = () => {
     let changeTimeFormat = moment(timeAppointment).format(timeCreateFormat);
@@ -710,7 +710,6 @@ const EditInprogressTask = () => {
     updateTask.problemRemark = data.problemRemark;
     updateTask.statusRemark = data.statusRemark;
     updateTask.farmerPlotId = data.farmerPlotId;
-    console.log("task", updateTask);
     Swal.fire({
       title: "ยืนยันการแก้ไข",
       text: "โปรดตรวจสอบรายละเอียดที่คุณต้องการแก้ไขข้อมูลก่อนเสมอ เพราะอาจส่งผลต่อการจ้างงานในระบบ",
@@ -722,7 +721,6 @@ const EditInprogressTask = () => {
     }).then(async (result) => {
       if (result.isConfirmed) {
         await TaskDatasource.updateInprogressTask(updateTask).then((res) => {
-          console.log(res);
           if (res.userMessage == "success") {
             window.location.href = "/IndexInprogressTask";
           }
