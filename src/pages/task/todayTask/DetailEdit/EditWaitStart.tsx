@@ -151,7 +151,6 @@ function EditWaitStart() {
       let removeTarget = data?.targetSpray.filter((x) => x != value);
       p = Map(data).set("targetSpray", removeTarget);
     }
-    console.log(p.toJS().targetSpray);
     setData(p.toJS());
     checkValidate(p.toJS());
   };
