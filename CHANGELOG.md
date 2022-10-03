@@ -1,4 +1,8 @@
 ## [Version - 0]
+## Fix [v0.17.5] 2022-10-03
+- fixed search status and province index task today menu
+- fixed enable checkbox detail edit task today menu
+- fixed save value statusRemark
 ## Fix [v0.17.4] 2022-10-03
 - fixed handle change date and time appointment
 ## Fix [v0.17.3] 2022-10-03
