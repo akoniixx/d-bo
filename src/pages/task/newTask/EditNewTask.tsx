@@ -1099,7 +1099,7 @@ const EditNewTask = () => {
           checked={dataDronerList
             .filter(
               (x) =>
-                x.droner_status != "ไม่สะดวก" && x.is_open_receive_task != true
+                x.droner_status != "ไม่สะดวก" && x.is_open_receive_task != false
             )
             .every((x) => x.isChecked)}
           style={{ width: "18px", height: "18px" }}
@@ -1116,7 +1116,7 @@ const EditNewTask = () => {
                 disabled={
                   selectionType == "checkbox"
                     ? row.droner_status != "ไม่สะดวก" &&
-                      row.is_open_receive_task != true
+                      row.is_open_receive_task != false
                       ? false
                       : true
                     : false
@@ -1261,23 +1261,26 @@ const EditNewTask = () => {
             <>
               <span
                 style={{
-                  color: row.is_open_receive_task
-                    ? color.Disable
-                    : row.droner_status == "สะดวก"
-                    ? color.Success
-                    : color.Error,
+                  color:
+                    row.is_open_receive_task == false
+                      ? color.Disable
+                      : row.droner_status == "สะดวก"
+                      ? color.Success
+                      : color.Error,
                 }}
               >
                 <Badge
                   color={
-                    row.is_open_receive_task
+                    row.is_open_receive_task == false
                       ? color.Disable
                       : row.droner_status == "สะดวก"
                       ? color.Success
                       : color.Error
                   }
                 />
-                {row.is_open_receive_task ? "ปิดการใช้งาน" : row.droner_status}
+                {row.is_open_receive_task != false
+                  ? "ปิดการใช้งาน"
+                  : row.droner_status}
                 <br />
               </span>
             </>

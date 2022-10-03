@@ -107,10 +107,10 @@ const AddNewTask = () => {
   });
 
   const [dateAppointment, setDateAppointment] = useState<any>(
-    moment(undefined)
+    moment(new Date()).format(dateFormat)
   );
   const [timeAppointment, setTimeAppointment] = useState<any>(
-    moment(undefined)
+    moment(new Date().getTime())
   );
   const [disableBtn, setDisableBtn] = useState<boolean>(true);
   const [searchTextDroner, setSearchTextDroner] = useState<string>("");
@@ -248,6 +248,12 @@ const AddNewTask = () => {
   const handleComment = (e: any) => {
     const d = Map(createNewTask).set("comment", e.target.value);
     setCreateNewTask(d.toJS());
+  };
+  const handleDateAppointment = (e: any) => {
+    setDateAppointment(moment(new Date(e)).format(dateCreateFormat));
+  };
+  const handleTimeAppiontment = (e: any) => {
+    setTimeAppointment(moment(new Date(e).getTime()));
   };
   const checkValidateComma = (data: string) => {
     const checkSyntax =
@@ -489,11 +495,7 @@ const AddNewTask = () => {
                   format={dateFormat}
                   className="col-lg-12"
                   disabled={current == 2 || checkSelectPlot == "error"}
-                  onChange={(e: any) =>
-                    setDateAppointment(
-                      moment(new Date(e)).format(dateCreateFormat)
-                    )
-                  }
+                  onChange={handleDateAppointment}
                   defaultValue={moment(dateAppointment)}
                 />
               </Form.Item>
@@ -514,12 +516,8 @@ const AddNewTask = () => {
                 <TimePicker
                   format={timeFormat}
                   disabled={current == 2 || checkSelectPlot == "error"}
-                  onChange={(e: any) =>
-                    setTimeAppointment(
-                      moment(new Date(e)).format(timeCreateFormat)
-                    )
-                  }
-                  defaultValue={moment(timeAppointment, timeFormat)}
+                  onChange={handleTimeAppiontment}
+                  defaultValue={moment(timeAppointment)}
                 />
               </Form.Item>
             </div>
@@ -822,7 +820,7 @@ const AddNewTask = () => {
       _.set(
         item,
         "isChecked",
-        item.droner_status == "ไม่สะดวก" || item.is_open_receive_task
+        item.droner_status == "ไม่สะดวก" || item.is_open_receive_task == false
           ? false
           : checked
       )
@@ -983,7 +981,7 @@ const AddNewTask = () => {
           checked={dataDronerList
             .filter(
               (x) =>
-                x.droner_status != "ไม่สะดวก" && x.is_open_receive_task != true
+                x.droner_status != "ไม่สะดวก" && x.is_open_receive_task != false
             )
             .every((x) => x.isChecked)}
           style={{ width: "18px", height: "18px" }}
@@ -1000,7 +998,7 @@ const AddNewTask = () => {
                 disabled={
                   selectionType == "checkbox"
                     ? row.droner_status != "ไม่สะดวก" &&
-                      row.is_open_receive_task != true
+                      row.is_open_receive_task != false
                       ? false
                       : true
                     : false
@@ -1143,23 +1141,26 @@ const AddNewTask = () => {
             <>
               <span
                 style={{
-                  color: row.is_open_receive_task
-                    ? color.Disable
-                    : row.droner_status == "สะดวก"
-                    ? color.Success
-                    : color.Error,
+                  color:
+                    row.is_open_receive_task == false
+                      ? color.Disable
+                      : row.droner_status == "สะดวก"
+                      ? color.Success
+                      : color.Error,
                 }}
               >
                 <Badge
                   color={
-                    row.is_open_receive_task
+                    row.is_open_receive_task == false
                       ? color.Disable
                       : row.droner_status == "สะดวก"
                       ? color.Success
                       : color.Error
                   }
                 />
-                {row.is_open_receive_task ? "ปิดการใช้งาน" : row.droner_status}
+                {row.is_open_receive_task == false
+                  ? "ปิดการใช้งาน"
+                  : row.droner_status}
                 <br />
               </span>
             </>
@@ -1355,8 +1356,8 @@ const AddNewTask = () => {
 
   const nextStep = () => {
     if (current == 0) {
-      let changeTimeFormat = moment(timeAppointment).format(timeCreateFormat);
       let changeDateFormat = moment(dateAppointment).format(dateCreateFormat);
+      let changeTimeFormat = moment(timeAppointment).format(timeCreateFormat);
       let otherSprayList = [];
       if (otherSpray != undefined) {
         let m = otherSpray.split(",");
@@ -1430,14 +1431,6 @@ const AddNewTask = () => {
   };
 
   const insertNewTask = async () => {
-    if (selectionType == "checkbox") {
-      delete createNewTask["dronerId"];
-    } else {
-      delete createNewTask["taskDronerTemp"];
-    }
-    let checkDupSpray = Array.from(new Set(createNewTask.targetSpray));
-    const d = Map(createNewTask).set("targetSpray", checkDupSpray);
-    setCreateNewTask(d.toJS());
     Swal.fire({
       title: "ยืนยันการสร้างงาน",
       text: "โปรดตรวจสอบรายละเอียดที่คุณต้องการแก้ไขข้อมูลก่อนเสมอ เพราะอาจส่งผลต่อการจ้างงานในระบบ",
@@ -1448,6 +1441,14 @@ const AddNewTask = () => {
       showCloseButton: true,
     }).then(async (result) => {
       if (result.isConfirmed) {
+        if (selectionType == "checkbox") {
+          delete createNewTask["dronerId"];
+        } else {
+          delete createNewTask["taskDronerTemp"];
+        }
+        let checkDupSpray = Array.from(new Set(createNewTask.targetSpray));
+        const d = Map(createNewTask).set("targetSpray", checkDupSpray);
+        setCreateNewTask(d.toJS());
         await TaskDatasource.insertNewTask(d.toJS()).then((res) => {
           if (res.userMessage == "success") {
             window.location.href = "/IndexNewTask";

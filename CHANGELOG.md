@@ -1,4 +1,13 @@
 ## [Version - 0]
+## Fix [v0.17.4] 2022-10-03
+- fixed handle change date and time appointment
+## Fix [v0.17.3] 2022-10-03
+- fixed field and date time appointment in new task menu
+## Fix [v0.17.2] 2022-10-03
+- fixed logic status 'ปิดการใช้งาน' of droner in new task menu
+- fixed render droner in step 3 in new task menu
+- fixed validate date appointment in edit inprogress task menu
+- fixed check disable other plant "พืชอื่นๆ" edit inprogress task menu
 ## Fix [v0.17.1] 2022-10-03
 - fixed save imgs in droner and farmer
 - added tooltip in inprogress task
