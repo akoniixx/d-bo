@@ -63,7 +63,6 @@ function EditWaitStart() {
   const [periodSpray, setPeriodSpray] = useState<CropPurposeSprayEntity>();
   const [checkCrop, setCheckCrop] = useState<boolean>(true);
   const [saveBtnDisable, setBtnSaveDisable] = useState<boolean>(true);
-
   const [validateComma, setValidateComma] = useState<{
     status: any;
     message: string;
@@ -74,6 +73,7 @@ function EditWaitStart() {
   let [otherSpray, setOtherSpray] = useState<any>();
   const fetchTaskDetail = async () => {
     await TaskInprogressDatasource.getTaskDetailById(taskId).then((res) => {
+      setCheckCrop(!res.targetSpray.includes("อื่นๆ"));
       setData(res);
       setOtherSpray(
         res.targetSpray
@@ -136,6 +136,11 @@ function EditWaitStart() {
     PURPOSE_SPRAY_CHECKBOX.map((item) =>
       _.set(item, "isChecked", item.crop == value ? checked : item.isChecked)
     );
+    if (PURPOSE_SPRAY_CHECKBOX[4].isChecked == true) {
+      setCheckCrop(false);
+    } else {
+      setCheckCrop(true);
+    }
     let p: any = "";
     if (checked) {
       p = Map(data).set(
@@ -169,7 +174,8 @@ function EditWaitStart() {
   const handleChangeStatus = (e: any) => {
     const d = Map(data).set("status", e.target.value);
     const n = Map(d.toJS()).set("problemRemark", "");
-    const m = Map(n.toJS()).set("isProblem", false);
+    const o = Map(n.toJS()).set("statusRemark", "");
+    const m = Map(o.toJS()).set("isProblem", false);
     setData(m.toJS());
     setBtnSaveDisable(false);
   };
@@ -197,8 +203,7 @@ function EditWaitStart() {
   };
   const onChangeCanCelText = (e: any) => {
     const m = Map(data).set("statusRemark", e.target.value);
-    const n = Map(m.toJS()).set("statusRemark", "");
-    setData(n.toJS());
+    setData(m.toJS());
     {
       !e.target.value ? setBtnSaveDisable(true) : setBtnSaveDisable(false);
     }
@@ -318,16 +323,21 @@ function EditWaitStart() {
                     />{" "}
                     <label>{x.crop}</label>
                     <br />
-                    {index == 4 && (
+                    {PURPOSE_SPRAY_CHECKBOX[4] && index == 4 && (
                       <>
                         <Input
-                          key={data.targetSpray[0]}
+                          key={data?.targetSpray[0]}
+                          disabled={checkCrop}
                           onChange={handleOtherSpray}
                           placeholder="โปรดระบุ เช่น เพลี้ย,หอย"
                           autoComplete="off"
-                          defaultValue={data.targetSpray
-                            .filter((a) => !PURPOSE_SPRAY.some((x) => x === a))
-                            .join(",")}
+                          defaultValue={Array.from(
+                            new Set(
+                              data?.targetSpray.filter(
+                                (a) => !PURPOSE_SPRAY.some((x) => x === a)
+                              )
+                            )
+                          )}
                         />
                         {validateComma.status == "error" && (
                           <p style={{ color: color.Error }}>
@@ -714,11 +724,12 @@ function EditWaitStart() {
         }
         data.targetSpray.push.apply(
           data.targetSpray,
-          otherSprayList.filter((x) => x != "")
+          otherSprayList.filter((x) => x != "" && x != data.targetSpray)
         );
         const setOtherSpray = Array.from(new Set(data.targetSpray)).filter(
-          (x) => x != "" && x != "อื่นๆ"
+          (x) => x != ""
         );
+
         const pushTextTarget = Map(data).set("targetSpray", setOtherSpray);
         const pushUpdateBy = Map(pushTextTarget.toJS()).set(
           "updateBy",

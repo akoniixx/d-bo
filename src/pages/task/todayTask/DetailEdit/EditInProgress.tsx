@@ -105,7 +105,8 @@ function EditInProgress() {
   const handleChangeStatus = (e: any) => {
     const d = Map(data).set("status", e.target.value);
     const n = Map(d.toJS()).set("problemRemark", "");
-    const m = Map(n.toJS()).set("isProblem", false);
+    const o = Map(n.toJS()).set("statusRemark", "");
+    const m = Map(o.toJS()).set("isProblem", false);
     setData(m.toJS());
     setBtnSaveDisable(false);
   };
@@ -133,8 +134,7 @@ function EditInProgress() {
   };
   const onChangeCanCelText = (e: any) => {
     const m = Map(data).set("statusRemark", e.target.value);
-    const n = Map(m.toJS()).set("statusRemark", "");
-    setData(n.toJS());
+    setData(m.toJS());
     {
       !e.target.value ? setBtnSaveDisable(true) : setBtnSaveDisable(false);
     }
@@ -404,7 +404,7 @@ function EditInProgress() {
             data.droner.address.district.districtName +
             "," +
             " " +
-            data.droner.address.district.provinceName }
+            data.droner.address.district.provinceName}
         </div>
         <div className="col-lg">
           <span>
