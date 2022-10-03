@@ -1,4 +1,6 @@
 ## [Version - 0]
+## Fix [v0.17.4] 2022-10-03
+- fixed handle change date and time appointment
 ## Fix [v0.17.3] 2022-10-03
 - fixed field and date time appointment in new task menu
 ## Fix [v0.17.2] 2022-10-03

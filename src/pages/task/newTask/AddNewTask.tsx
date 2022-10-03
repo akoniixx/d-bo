@@ -107,10 +107,10 @@ const AddNewTask = () => {
   });
 
   const [dateAppointment, setDateAppointment] = useState<any>(
-    moment(undefined)
+    moment(new Date()).format(dateFormat)
   );
   const [timeAppointment, setTimeAppointment] = useState<any>(
-    moment(undefined)
+    moment(new Date().getTime())
   );
   const [disableBtn, setDisableBtn] = useState<boolean>(true);
   const [searchTextDroner, setSearchTextDroner] = useState<string>("");
@@ -253,7 +253,7 @@ const AddNewTask = () => {
     setDateAppointment(moment(new Date(e)).format(dateCreateFormat));
   };
   const handleTimeAppiontment = (e: any) => {
-    setTimeAppointment(moment(new Date(e)).format(timeCreateFormat));
+    setTimeAppointment(moment(new Date(e).getTime()));
   };
   const checkValidateComma = (data: string) => {
     const checkSyntax =
@@ -517,7 +517,7 @@ const AddNewTask = () => {
                   format={timeFormat}
                   disabled={current == 2 || checkSelectPlot == "error"}
                   onChange={handleTimeAppiontment}
-                  defaultValue={moment(timeAppointment, timeFormat)}
+                  defaultValue={moment(timeAppointment)}
                 />
               </Form.Item>
             </div>
@@ -1356,8 +1356,8 @@ const AddNewTask = () => {
 
   const nextStep = () => {
     if (current == 0) {
-      let changeTimeFormat = timeAppointment;
       let changeDateFormat = moment(dateAppointment).format(dateCreateFormat);
+      let changeTimeFormat = moment(timeAppointment).format(timeCreateFormat);
       let otherSprayList = [];
       if (otherSpray != undefined) {
         let m = otherSpray.split(",");
@@ -1449,11 +1449,13 @@ const AddNewTask = () => {
         let checkDupSpray = Array.from(new Set(createNewTask.targetSpray));
         const d = Map(createNewTask).set("targetSpray", checkDupSpray);
         setCreateNewTask(d.toJS());
-        await TaskDatasource.insertNewTask(d.toJS()).then((res) => {
-          if (res.userMessage == "success") {
-            window.location.href = "/IndexNewTask";
-          }
-        });
+        console.log(d.toJS());
+
+        // await TaskDatasource.insertNewTask(d.toJS()).then((res) => {
+        //   if (res.userMessage == "success") {
+        //     window.location.href = "/IndexNewTask";
+        //   }
+        // });
       }
     });
   };

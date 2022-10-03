@@ -198,7 +198,7 @@ const EditInprogressTask = () => {
     checkValidate(data);
   };
   const handleTimeAppiontment = (e: any) => {
-    setTimeAppointment(moment(new Date(e)).format(timeCreateFormat));
+    setTimeAppointment(moment(new Date(e).getTime()));
     checkValidate(data);
   };
 
@@ -682,7 +682,7 @@ const EditInprogressTask = () => {
   };
   const updateInprogressTask = () => {
     let changeDateFormat = moment(dateAppointment).format(dateCreateFormat);
-    let changeTimeFormat = timeAppointment;
+    let changeTimeFormat = moment(timeAppointment).format(timeCreateFormat);
     let otherSprayList = [];
     if (otherSpray != undefined) {
       let m = otherSpray.split(",");

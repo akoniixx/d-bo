@@ -1278,7 +1278,9 @@ const EditNewTask = () => {
                       : color.Error
                   }
                 />
-                {row.is_open_receive_task ? "ปิดการใช้งาน" : row.droner_status}
+                {row.is_open_receive_task != false
+                  ? "ปิดการใช้งาน"
+                  : row.droner_status}
                 <br />
               </span>
             </>
