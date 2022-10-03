@@ -88,6 +88,7 @@ import ModalSelectedEditDroner from "../../../components/modal/task/newTask/Moda
 import { numberWithCommas } from "../../../utilities/TextFormatter";
 import { TaskDronerTempDataSource } from "../../../datasource/TaskDronerTempDatasource";
 import Swal from "sweetalert2";
+import icon from "../../../resource/icon";
 const dateFormat = "DD/MM/YYYY";
 const dateCreateFormat = "YYYY-MM-DD";
 const timeFormat = "HH:mm";
@@ -1096,7 +1097,10 @@ const EditNewTask = () => {
           type={selectionType}
           onChange={handleAllSelectDroner}
           checked={dataDronerList
-            .filter((x) => x.droner_status != "ไม่สะดวก")
+            .filter(
+              (x) =>
+                x.droner_status != "ไม่สะดวก" && x.is_open_receive_task != true
+            )
             .every((x) => x.isChecked)}
           style={{ width: "18px", height: "18px" }}
         />
@@ -1111,7 +1115,8 @@ const EditNewTask = () => {
                 checked={row.isChecked}
                 disabled={
                   selectionType == "checkbox"
-                    ? row.droner_status != "ไม่สะดวก"
+                    ? row.droner_status != "ไม่สะดวก" &&
+                      row.is_open_receive_task != true
                       ? false
                       : true
                     : false
@@ -1144,9 +1149,7 @@ const EditNewTask = () => {
               <span>{row.firstname + " " + row.lastname}</span>
               {row.rating_avg != null && (
                 <Tooltip title={tooltipTitle} className="p-2">
-                  <TeamOutlined
-                    style={{ color: color.Success, fontSize: "18px" }}
-                  />
+                  <img src={icon.iconReviewDroner} />
                 </Tooltip>
               )}
 
@@ -1258,16 +1261,23 @@ const EditNewTask = () => {
             <>
               <span
                 style={{
-                  color:
-                    row.droner_status == "สะดวก" ? color.Success : color.Error,
+                  color: row.is_open_receive_task
+                    ? color.Disable
+                    : row.droner_status == "สะดวก"
+                    ? color.Success
+                    : color.Error,
                 }}
               >
                 <Badge
                   color={
-                    row.droner_status == "สะดวก" ? color.Success : color.Error
+                    row.is_open_receive_task
+                      ? color.Disable
+                      : row.droner_status == "สะดวก"
+                      ? color.Success
+                      : color.Error
                   }
                 />
-                {row.droner_status}
+                {row.is_open_receive_task ? "ปิดการใช้งาน" : row.droner_status}
                 <br />
               </span>
             </>

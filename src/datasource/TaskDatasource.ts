@@ -132,7 +132,6 @@ export class TaskDatasource {
       });
   }
   static updateInprogressTask(data: UpdateInprogressTaskEntity): Promise<any> {
-    console.log(JSON.stringify(data));
     return httpClient
       .patch(BASE_URL + "/tasks/task/" + data.id, data)
       .then((response) => {

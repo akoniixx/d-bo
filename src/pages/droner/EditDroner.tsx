@@ -271,7 +271,6 @@ function EditDroner() {
     );
     setMoreReason(value);
   };
-
   //#endregion
 
   //#region address
@@ -363,7 +362,6 @@ function EditDroner() {
     setEditDroneList(data);
   };
   const updateDrone = async (drone: DronerDroneEntity) => {
-    console.log(drone);
     const d = Map(drone).set("dronerId", dronerId);
     if (d.toJS().id != "") {
       await DronerDroneDatasource.updateDronerDrone(d.toJS()).then(
@@ -591,8 +589,10 @@ function EditDroner() {
     return data.trim().length != 0 ? (checkSyntax ? true : false) : true;
   };
   const checkValidateReason = (data: DronerEntity) => {
-    let checkEmptyReason = data.reason.filter((x) => x != "").length > 0;
-    setBtnSaveDisable(!checkEmptyReason);
+    if (data.status == "INACTIVE" || data.status == "REJECTED") {
+      let checkEmptyReason = data.reason.filter((x) => x != "").length > 0;
+      setBtnSaveDisable(!checkEmptyReason);
+    }
   };
 
   const updateDroner = async () => {
@@ -636,10 +636,10 @@ function EditDroner() {
         var i = 0;
         for (i; 2 > i; i++) {
           i == 0 &&
-            createImgProfile.path != "" &&
+            createImgProfile.file != "" &&
             UploadImageDatasouce.uploadImage(createImgProfile).then(res);
           i == 1 &&
-            createImgIdCard.path != "" &&
+            createImgIdCard.file != "" &&
             UploadImageDatasouce.uploadImage(createImgIdCard).then(res);
         }
         Swal.fire({

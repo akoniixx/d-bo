@@ -7,6 +7,7 @@ import {
   Pagination,
   Select,
   Table,
+  Tooltip,
 } from "antd";
 import moment from "moment";
 import React, { useEffect, useState } from "react";
@@ -23,6 +24,7 @@ import {
 } from "../../../entities/LocationEntities";
 import { TaskInprogressPageEntity } from "../../../entities/TaskInprogress";
 import { color } from "../../../resource";
+import icon from "../../../resource/icon";
 import { numberWithCommas } from "../../../utilities/TextFormatter";
 
 const { RangePicker } = DatePicker;
@@ -65,6 +67,7 @@ const IndexInprogressTask = () => {
       endDate,
       searchStatus
     ).then((res) => {
+      console.log(res);
       setData(res);
     });
   };
@@ -273,7 +276,16 @@ const IndexInprogressTask = () => {
                 {moment(new Date(row.task_date_appointment)).format(dateFormat)}
                 ,{" "}
                 {moment(new Date(row.task_date_appointment)).format(timeFormat)}
+                {row.count_change_appointment != null && (
+                  <Tooltip
+                    title="มีการเปลี่ยนแปลงวันและเวลานัดหมาย"
+                    className="p-2"
+                  >
+                    <img src={icon.iconChangeTime} />
+                  </Tooltip>
+                )}
               </span>
+
               <span style={{ color: color.Disable, fontSize: "12px" }}>
                 {row.task_task_no}
               </span>
@@ -294,6 +306,14 @@ const IndexInprogressTask = () => {
                 {row.droner !== null
                   ? row.droner_firstname + " " + row.droner_lastname
                   : null}
+                {row.count_change_droner != null && (
+                  <Tooltip
+                    title="มีการเปลี่ยนแปลงนักบินโดรนคนใหม่"
+                    className="p-2"
+                  >
+                    <img src={icon.iconChangeDroner} />
+                  </Tooltip>
+                )}
               </span>
               <span style={{ color: color.Disable, fontSize: "12px" }}>
                 {row.droner !== null ? row.droner_telephone_no : null}

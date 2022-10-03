@@ -18,6 +18,7 @@ export interface TaskSearchDroner {
   droner_status: string;
   isChecked: boolean;
   droner_code: string;
+  is_open_receive_task: boolean;
 }
 export const TaskSearchDroner_INIT: TaskSearchDroner = {
   droner_id: "",
@@ -39,4 +40,5 @@ export const TaskSearchDroner_INIT: TaskSearchDroner = {
   droner_status: "",
   isChecked: false,
   droner_code: "",
+  is_open_receive_task: false,
 };
