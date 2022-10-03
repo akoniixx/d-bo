@@ -78,7 +78,6 @@ export default function IndexTodayTask() {
     fetchAllTaskToday();
     fetchProvince();
   }, [current]);
-
   const fetchAllTaskToday = async () => {
     await TaskInprogressDatasource.getAllTaskToday(
       searchStatus,
@@ -86,9 +85,9 @@ export default function IndexTodayTask() {
       row,
       searchText,
       statusDelay,
-      searchProvince,
-      searchDistrict,
       searchSubdistrict,
+      searchDistrict,
+      searchProvince,
       isProblem,
       isDelay
     ).then((res: TaskTodayListEntity) => {
@@ -150,32 +149,36 @@ export default function IndexTodayTask() {
     setSearchStatus(arr);
     setCurrent(1);
   };
-
-  const searching = () => {
-    let statusProblem = ["waitstartproblem", "inprogressproblem"];
-    let statusNormal = ["waitstartnormal", "inprogressnormal"];
-    if (problems.length == 2 || problems.length == 0) {
-      setIsProblem(undefined);
-    } else {
-      if (statusProblem.includes(problems[0])) {
-        setIsProblem(true);
-      } else if (statusNormal.includes(problems[0])) {
-        setIsProblem(false);
-      }
-    }
-    fetchAllTaskToday();
-  };
-
-  const handleIsProblem = async (e: any) => {
+  const handleIsProblem = (e: any) => {
     let value = e.target.value;
     let checked = e.target.checked;
+    let statusProblem = ["waitstartproblem", "inprogressproblem"];
+    let statusNormal = ["waitstartnormal", "inprogressnormal"];
     let m: any = [];
     if (checked) {
       m = [...problems, value];
       setProblems(m);
+      if (m.length == 2) {
+        setIsProblem(undefined);
+      } else {
+        if (statusProblem.includes(m[0])) {
+          setIsProblem(true);
+        } else if (statusNormal.includes(m[0])) {
+          setIsProblem(false);
+        }
+      }
     } else {
       m = problems.filter((x: any) => x != value);
       setProblems(m);
+      if (m.length == 0) {
+        setIsProblem(undefined);
+      } else {
+        if (m == "waitstartproblem" || m == "inprogressproblem") {
+          setIsProblem(true);
+        } else {
+          setIsProblem(false);
+        }
+      }
     }
   };
 
@@ -313,7 +316,6 @@ export default function IndexTodayTask() {
             allowClear
             className="col-lg-12 p-1"
             placeholder="เลือกจังหวัด"
-            onChange={handleProvince}
             showSearch
             optionFilterProp="children"
             filterOption={(input: any, option: any) =>
@@ -324,11 +326,10 @@ export default function IndexTodayTask() {
                 .toLowerCase()
                 .localeCompare(optionB.children.toLowerCase())
             }
+            onChange={handleProvince}
           >
             {province?.map((item) => (
-              <option value={item.provinceId.toString()}>
-                {item.provinceName}
-              </option>
+              <option value={item.provinceId}>{item.provinceName}</option>
             ))}
           </Select>
         </div>
@@ -404,7 +405,7 @@ export default function IndexTodayTask() {
               color: color.secondary2,
               backgroundColor: color.Success,
             }}
-            onClick={searching}
+            onClick={fetchAllTaskToday}
           >
             ค้นหาข้อมูล
           </Button>

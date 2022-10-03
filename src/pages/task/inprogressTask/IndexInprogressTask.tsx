@@ -67,6 +67,7 @@ const IndexInprogressTask = () => {
       endDate,
       searchStatus
     ).then((res) => {
+      console.log(res)
       setData(res);
     });
   };
