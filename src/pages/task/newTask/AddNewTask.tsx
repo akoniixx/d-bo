@@ -1449,13 +1449,11 @@ const AddNewTask = () => {
         let checkDupSpray = Array.from(new Set(createNewTask.targetSpray));
         const d = Map(createNewTask).set("targetSpray", checkDupSpray);
         setCreateNewTask(d.toJS());
-        console.log(d.toJS());
-
-        // await TaskDatasource.insertNewTask(d.toJS()).then((res) => {
-        //   if (res.userMessage == "success") {
-        //     window.location.href = "/IndexNewTask";
-        //   }
-        // });
+        await TaskDatasource.insertNewTask(d.toJS()).then((res) => {
+          if (res.userMessage == "success") {
+            window.location.href = "/IndexNewTask";
+          }
+        });
       }
     });
   };
