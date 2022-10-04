@@ -1,4 +1,8 @@
-import { DownOutlined, SearchOutlined, StarFilled } from "@ant-design/icons";
+import {
+  DownOutlined,
+  SearchOutlined,
+  StarFilled,
+} from "@ant-design/icons";
 import {
   Avatar,
   Badge,
@@ -47,13 +51,13 @@ const ModalSelectedDroner: React.FC<ModalSelectedDronerProps> = ({
   dataDroner,
   callBack,
 }) => {
-  const [newDronerSelected, setNewDronerSelected] = useState<TaskSearchDroner>(
-    TaskSearchDroner_INIT
-  );
-  const [dataDronerList, setDataDronerList] = useState<TaskSearchDroner[]>([
-    TaskSearchDroner_INIT,
-  ]);
-  const [searchTextDroner, setSearchTextDroner] = useState<string>("");
+  const [newDronerSelected, setNewDronerSelected] =
+    useState<TaskSearchDroner>(TaskSearchDroner_INIT);
+  const [dataDronerList, setDataDronerList] = useState<
+    TaskSearchDroner[]
+  >([TaskSearchDroner_INIT]);
+  const [searchTextDroner, setSearchTextDroner] =
+    useState<string>("");
   const ratingStar = (
     <Menu
       items={[
@@ -68,7 +72,9 @@ const ModalSelectedDroner: React.FC<ModalSelectedDronerProps> = ({
             </div>
           ),
           key: "1",
-          icon: <Checkbox value={5} onClick={(e) => onChangeRating(e)} />,
+          icon: (
+            <Checkbox value={5} onClick={(e) => onChangeRating(e)} />
+          ),
         },
         {
           label: (
@@ -80,7 +86,9 @@ const ModalSelectedDroner: React.FC<ModalSelectedDronerProps> = ({
             </div>
           ),
           key: "2",
-          icon: <Checkbox value={4} onClick={(e) => onChangeRating(e)} />,
+          icon: (
+            <Checkbox value={4} onClick={(e) => onChangeRating(e)} />
+          ),
         },
         {
           label: (
@@ -91,7 +99,9 @@ const ModalSelectedDroner: React.FC<ModalSelectedDronerProps> = ({
             </div>
           ),
           key: "3",
-          icon: <Checkbox value={3} onClick={(e) => onChangeRating(e)} />,
+          icon: (
+            <Checkbox value={3} onClick={(e) => onChangeRating(e)} />
+          ),
         },
         {
           label: (
@@ -101,7 +111,9 @@ const ModalSelectedDroner: React.FC<ModalSelectedDronerProps> = ({
             </div>
           ),
           key: "4",
-          icon: <Checkbox value={2} onClick={(e) => onChangeRating(e)} />,
+          icon: (
+            <Checkbox value={2} onClick={(e) => onChangeRating(e)} />
+          ),
         },
         {
           label: (
@@ -110,14 +122,19 @@ const ModalSelectedDroner: React.FC<ModalSelectedDronerProps> = ({
             </div>
           ),
           key: "5",
-          icon: <Checkbox value={1} onClick={(e) => onChangeRating(e)} />,
+          icon: (
+            <Checkbox value={1} onClick={(e) => onChangeRating(e)} />
+          ),
         },
       ]}
     />
   );
   const [visibleSlider, setVisibleSlider] = useState(false);
   const [visibleRating, setVisibleRating] = useState(false);
-  const [distrance, setDistrance] = useState<{ min: number; max: number }>({
+  const [distrance, setDistrance] = useState<{
+    min: number;
+    max: number;
+  }>({
     min: 0,
     max: 0,
   });
@@ -146,7 +163,11 @@ const ModalSelectedDroner: React.FC<ModalSelectedDronerProps> = ({
       ratingMax
     ).then((res) => {
       res.map((item) =>
-        _.set(item, "isChecked", item.droner_id == dataDroner.id ? true : false)
+        _.set(
+          item,
+          "isChecked",
+          item.droner_id == dataDroner.id ? true : false
+        )
       );
       setDataDronerList(res);
     });
@@ -209,7 +230,9 @@ const ModalSelectedDroner: React.FC<ModalSelectedDronerProps> = ({
   };
 
   const searchSection = (
-    <div className="d-flex justify-content-start" style={{ padding: "10px" }}>
+    <div
+      className="d-flex justify-content-start"
+      style={{ padding: "10px" }}>
       <div className="col-lg-3 p-1">
         <Input
           prefix={<SearchOutlined style={{ color: color.Disable }} />}
@@ -255,8 +278,7 @@ const ModalSelectedDroner: React.FC<ModalSelectedDronerProps> = ({
           trigger="click"
           visible={visibleSlider}
           onVisibleChange={handleVisibleSlider}
-          placement="bottom"
-        >
+          placement="bottom">
           <Button className="col-lg-12">เลือกระยะทาง</Button>
         </Popover>
       </div>
@@ -266,8 +288,7 @@ const ModalSelectedDroner: React.FC<ModalSelectedDronerProps> = ({
           trigger={["click"]}
           className="col-lg-12"
           onVisibleChange={handleVisibleRating}
-          visible={visibleRating}
-        >
+          visible={visibleRating}>
           <Button>
             เลือก Rating
             <DownOutlined />
@@ -279,8 +300,7 @@ const ModalSelectedDroner: React.FC<ModalSelectedDronerProps> = ({
           allowClear
           className="col-lg-12 p-1"
           placeholder="เลือกสถานะ"
-          onChange={onChangeStatusDroner}
-        >
+          onChange={onChangeStatusDroner}>
           <option value="สะดวก">สะดวก</option>
           <option value="ไม่สะดวก">ไม่สะดวก</option>
         </Select>
@@ -300,8 +320,7 @@ const ModalSelectedDroner: React.FC<ModalSelectedDronerProps> = ({
               rating?.ratingMin,
               rating?.ratingMax
             )
-          }
-        >
+          }>
           ค้นหาข้อมูล
         </Button>
       </div>
@@ -338,7 +357,9 @@ const ModalSelectedDroner: React.FC<ModalSelectedDronerProps> = ({
             {"เคยให้บริการเกษตรกรท่านนี้,"}
             <br />
             {"คะแนนรีวิวล่าสุด "}
-            <StarFilled style={{ color: "#FFCA37", fontSize: "16px" }} />{" "}
+            <StarFilled
+              style={{ color: "#FFCA37", fontSize: "16px" }}
+            />{" "}
             {parseFloat(row.rating_avg).toFixed(1)}
           </>
         );
@@ -347,7 +368,9 @@ const ModalSelectedDroner: React.FC<ModalSelectedDronerProps> = ({
             <>
               <span>{row.firstname + " " + row.lastname}</span>
               <br />
-              <span style={{ color: color.Grey }}>{row.droner_code}</span>
+              <span style={{ color: color.Grey }}>
+                {row.droner_code}
+              </span>
             </>
           ),
         };
@@ -366,7 +389,9 @@ const ModalSelectedDroner: React.FC<ModalSelectedDronerProps> = ({
         return {
           children: (
             <>
-              <span>{row.total_task == null ? 0 : row.total_task} งาน</span>
+              <span>
+                {row.total_task == null ? 0 : row.total_task} งาน
+              </span>
               <br />
               <span style={{ color: color.Grey }}>
                 รวม {row.total_area == null ? 0 : row.total_area} ไร่
@@ -393,7 +418,8 @@ const ModalSelectedDroner: React.FC<ModalSelectedDronerProps> = ({
                     <StarFilled />
                   </div>
                   <span className="pt-2 ps-1">
-                    {parseFloat(row.rating_avg).toFixed(1)} ({row.count_rating})
+                    {parseFloat(row.rating_avg).toFixed(1)} (
+                    {row.count_rating})
                   </span>
                 </Row>
               ) : (
@@ -455,12 +481,15 @@ const ModalSelectedDroner: React.FC<ModalSelectedDronerProps> = ({
               <span
                 style={{
                   color:
-                    row.droner_status == "สะดวก" ? color.Success : color.Error,
-                }}
-              >
+                    row.droner_status == "สะดวก"
+                      ? color.Success
+                      : color.Error,
+                }}>
                 <Badge
                   color={
-                    row.droner_status == "สะดวก" ? color.Success : color.Error
+                    row.droner_status == "สะดวก"
+                      ? color.Success
+                      : color.Error
                   }
                 />
                 {row.droner_status}
@@ -480,8 +509,7 @@ const ModalSelectedDroner: React.FC<ModalSelectedDronerProps> = ({
             style={{
               width: "100%",
               cursor: "move",
-            }}
-          >
+            }}>
             {title}
           </div>
         }
@@ -496,8 +524,7 @@ const ModalSelectedDroner: React.FC<ModalSelectedDronerProps> = ({
             }}
             disableSaveBtn={false}
           />,
-        ]}
-      >
+        ]}>
         <Form>
           {searchSection}
           <CardContainer>
