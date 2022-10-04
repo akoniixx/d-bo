@@ -360,13 +360,14 @@ function EditDroneList() {
     const pushTextReasons = Map(data).set("reason", setTextReason);
     await DronerDroneDatasource.updateDroneList(pushTextReasons.toJS()).then(
       (res) => {
-
-        if (res) {
+        if (res != undefined) {
           var i = 0;
           for (i; 2 > i; i++) {
-            i == 0 && createLicenseDroner.path !== "" &&
+            i == 0 && 
+            createLicenseDroner.file !== "" &&
               UploadImageDatasouce.uploadImage(createLicenseDroner).then(res);
-            i == 1 && createLicenseDrone.path !== "" &&
+            i == 1 && 
+            createLicenseDrone.file !== "" &&
               UploadImageDatasouce.uploadImage(createLicenseDrone).then(res);
           }
           Swal.fire({

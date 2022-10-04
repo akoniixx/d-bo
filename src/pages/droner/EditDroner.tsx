@@ -298,10 +298,15 @@ function EditDroner() {
     setAddress(m.toJS());
     checkValidateAddr(m.toJS());
   };
-  const handleAddress = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+  const handleAddress1 = (e: React.ChangeEvent<HTMLInputElement>) => {
     const d = Map(address).set("address1", e.target.value);
     setAddress(d.toJS());
-    checkValidateAddr(d.toJS());
+   {!e.target.value ? setBtnSaveDisable(true) : setBtnSaveDisable(false)}
+  };
+  const handleAddress2 = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const d = Map(address).set("address2", e.target.value);
+    setAddress(d.toJS());
+    {!e.target.value ? setBtnSaveDisable(true) : setBtnSaveDisable(false)}
   };
   //#endregion
 
@@ -529,6 +534,7 @@ function EditDroner() {
       data.lastname,
       data.telephoneNo,
       address.address1,
+      address.address2,
       dronerArea.lat,
       dronerArea.long,
     ].includes("");
@@ -557,6 +563,7 @@ function EditDroner() {
       data.firstname,
       data.telephoneNo,
       address.address1,
+      address.address2,
       dronerArea.lat,
       dronerArea.long,
     ].includes("");
@@ -804,12 +811,6 @@ function EditDroner() {
               <label>รหัสบัตรประชาชน</label>
               <Form.Item
                 name="idNo"
-                // rules={[
-                //   {
-                //     required: true,
-                //     message: "กรุณากรอกรหัสบัตรประชาชน!",
-                //   },
-                // ]}
               >
                 <Input
                   placeholder=""
@@ -1008,23 +1009,45 @@ function EditDroner() {
           <div className="row">
             <div className="form-group">
               <label>
-                ที่อยู่บ้าน <span style={{ color: "red" }}>*</span>
+                บ้านเลขที่ <span style={{ color: "red" }}>*</span>
               </label>
               <Form.Item
-                name="address"
+                name="address1"
                 rules={[
                   {
                     required: true,
-                    message: "กรุณากรอกที่อยู่บ้าน!",
+                    message: "กรุณากรอกบ้านเลขที่!",
                   },
                 ]}
               >
-                <TextArea
-                  onChange={handleAddress}
+                <Input
+                  onChange={handleAddress1}
                   className="col-lg-12"
-                  rows={5}
                   placeholder=""
                   defaultValue={data.address.address1}
+                />
+              </Form.Item>
+            </div>
+          </div>
+          <div className="row">
+            <div className="form-group">
+              <label>
+                รายละเอียดที่อยู่ (หมู่, ถนน) <span style={{ color: "red" }}>*</span>
+              </label>
+              <Form.Item
+                name="address2"
+                rules={[
+                  {
+                    required: true,
+                    message: "กรุณากรอกรายละเอียดที่อยู่บ้าน!",
+                  },
+                ]}
+              >
+                <Input
+                  onChange={handleAddress2}
+                  className="col-lg-12"
+                  placeholder=""
+                  defaultValue={data.address.address2}
                 />
               </Form.Item>
             </div>
