@@ -43,6 +43,9 @@ function DetailRankDroner() {
   const row = 10;
   const [current, setCurrent] = useState(1);
 
+  const getData = () => {
+    return data.task.slice((current - 1) * row, current * row);
+  };
   const sorter = (a: any, b: any) => {
     if (a === b) return 0;
     else if (a === null) return 1;
@@ -51,8 +54,7 @@ function DetailRankDroner() {
   };
   useEffect(() => {
     fetchDronerById();
-  }, []);
-
+  }, [current]);
   const previewImg = async () => {
     let src = imgProfile;
     if (!src) {
@@ -231,7 +233,9 @@ function DetailRankDroner() {
                   <Input
                     disabled
                     defaultValue={
-                      data.address != null ? data.address.province.provinceName : "-"
+                      data.address != null
+                        ? data.address.province.provinceName
+                        : "-"
                     }
                   />
                 </Form.Item>
@@ -375,7 +379,7 @@ function DetailRankDroner() {
         {renderDroner}
         <CardContainer>
           <CardHeader textHeader="รายละเอียดการบริการ" />
-          <Table columns={columns} dataSource={data.task} pagination={false} />
+          <Table columns={columns} dataSource={getData()} pagination={false} />
         </CardContainer>
       </Row>
       <Row justify="end">
@@ -386,7 +390,7 @@ function DetailRankDroner() {
           <p>รายการทั้งหมด {data.task.length} รายการ</p>
           <Pagination
             current={current}
-            total={data.task.length}
+            total={data?.task.length}
             onChange={onChangePage}
             pageSize={row}
             showSizeChanger={false}
