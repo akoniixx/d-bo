@@ -2,9 +2,17 @@ import moment from "moment";
 
 export function numberWithCommas(x: number) {
   if (!x) return 0;
+
   return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 }
+export const numberWithCommasToFixed = (x: number) => {
+  if (!x) return 0;
 
+  return x
+    .toFixed(2)
+    .toString()
+    .replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+};
 export function formatDate(d: string) {
   return moment(d).format("DD/MM/yyyy, HH:mm");
 }

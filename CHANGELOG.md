@@ -1,4 +1,10 @@
 ## [Version - 0]
+## Fix [v0.17.7] 2022-10-04
+- fixed address render string 
+- fixed menu improgress task status render
+- fixed change number service charge fixed 2 number
+- fixed default date format
+- fixed selected edit task farmer set field comment  to empty 
 ## Fix [v0.17.6] 2022-10-04
 - fixed row table in detail ranking droner
 - fixed save img drone list

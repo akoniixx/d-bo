@@ -102,10 +102,17 @@ const { Map } = require("immutable");
 let queryString = _.split(window.location.pathname, "=");
 
 const EditNewTask = () => {
-  const profile = JSON.parse(localStorage.getItem("profile") || "{  }");
+  const [form] = Form.useForm();
+
+  const profile = JSON.parse(
+    localStorage.getItem("profile") || "{  }"
+  );
   const [current, setCurrent] = useState(0);
-  const [data, setData] = useState<GetNewTaskEntity>(GetNewTaskEntity_INIT);
-  const [dataFarmer, setDataFarmer] = useState<FarmerEntity>(FarmerEntity_INIT);
+  const [data, setData] = useState<GetNewTaskEntity>(
+    GetNewTaskEntity_INIT
+  );
+  const [dataFarmer, setDataFarmer] =
+    useState<FarmerEntity>(FarmerEntity_INIT);
   const [farmerList, setFarmerList] = useState<FarmerEntity[]>([
     FarmerEntity_INIT,
   ]);
@@ -115,9 +122,9 @@ const EditNewTask = () => {
     useState<FarmerPlotEntity>();
   const [searchFarmer, setSearchFarmer] = useState<string>();
   const [checkSelectPlot, setCheckSelectPlot] = useState<any>("");
-  const [dronerSelected, setDronerSelected] = useState<TaskSearchDroner[]>([
-    TaskSearchDroner_INIT,
-  ]);
+  const [dronerSelected, setDronerSelected] = useState<
+    TaskSearchDroner[]
+  >([TaskSearchDroner_INIT]);
   const [checkCrop, setCheckCrop] = useState<boolean>(true);
   let [otherSpray, setOtherSpray] = useState<any>();
   const [validateComma, setValidateComma] = useState<{
@@ -134,14 +141,16 @@ const EditNewTask = () => {
   const [timeAppointment, setTimeAppointment] = useState<any>(
     moment(undefined)
   );
-  const [searchTextDroner, setSearchTextDroner] = useState<string>("");
+  const [searchTextDroner, setSearchTextDroner] =
+    useState<string>("");
 
-  const [periodSpray, setPeriodSpray] = useState<CropPurposeSprayEntity>();
+  const [periodSpray, setPeriodSpray] =
+    useState<CropPurposeSprayEntity>();
   const [selectionType] = useState<RowSelectionType>("checkbox");
 
-  const [dataDronerList, setDataDronerList] = useState<TaskSearchDroner[]>([
-    TaskSearchDroner_INIT,
-  ]);
+  const [dataDronerList, setDataDronerList] = useState<
+    TaskSearchDroner[]
+  >([TaskSearchDroner_INIT]);
   const [dronerSelectedList, setDronerSelectedList] = useState<
     TaskDronerTempEntity[]
   >([TaskDronerTempEntity_INIT]);
@@ -151,19 +160,26 @@ const EditNewTask = () => {
   const [disableBtn, setDisableBtn] = useState<boolean>(false);
 
   const fetchNewTask = async () => {
-    await TaskDatasource.getNewTaskById(queryString[1]).then((res) => {
-      delete res["updatedAt"];
-      res.farmer.farmerPlot = [res.farmerPlot];
-      res?.taskDronerTemp?.map((item) => _.set(item, "isChecked", true));
-      res.taskDronerTemp && setDronerSelectedList(res?.taskDronerTemp);
-      setDateAppointment(new Date(res.dateAppointment).toUTCString());
-      setTimeAppointment(new Date(res.dateAppointment).getTime());
-      setDataFarmer(res.farmer);
-      setFarmerSelected(res.farmer);
-      setFarmerPlotSelected(res.farmerPlot);
-      fetchPurposeSpray(res.farmerPlot.plantName);
-      setData(res);
-    });
+    await TaskDatasource.getNewTaskById(queryString[1]).then(
+      (res) => {
+        delete res["updatedAt"];
+        res.farmer.farmerPlot = [res.farmerPlot];
+        res?.taskDronerTemp?.map((item) =>
+          _.set(item, "isChecked", true)
+        );
+        res.taskDronerTemp &&
+          setDronerSelectedList(res?.taskDronerTemp);
+        setDateAppointment(
+          new Date(res.dateAppointment).toUTCString()
+        );
+        setTimeAppointment(new Date(res.dateAppointment).getTime());
+        setDataFarmer(res.farmer);
+        setFarmerSelected(res.farmer);
+        setFarmerPlotSelected(res.farmerPlot);
+        fetchPurposeSpray(res.farmerPlot.plantName);
+        setData(res);
+      }
+    );
   };
   const fetchFarmerList = async (text?: string) => {
     await TaskDatasource.getFarmerList(text).then((res) => {
@@ -241,12 +257,17 @@ const EditNewTask = () => {
     setTimeAppointment(moment(undefined));
   };
   const handleSelectFarmerPlot = (value: any) => {
-    PURPOSE_SPRAY_CHECKBOX.map((item) => _.set(item, "isChecked", false));
+    PURPOSE_SPRAY_CHECKBOX.map((item) =>
+      _.set(item, "isChecked", false)
+    );
     let plotSelected = farmerSelected?.farmerPlot.filter(
       (x) => x.id == value
     )[0];
     const f = Map(data).set("farmerPlotId", plotSelected?.id);
-    const g = Map(f.toJS()).set("farmAreaAmount", plotSelected?.raiAmount);
+    const g = Map(f.toJS()).set(
+      "farmAreaAmount",
+      plotSelected?.raiAmount
+    );
     setCheckSelectPlot("");
     setData(g.toJS());
     setFarmerPlotSelected(plotSelected);
@@ -258,12 +279,17 @@ const EditNewTask = () => {
   };
   const handleCalServiceCharge = (e: any) => {
     if (e.target.id == "unitPrice") {
-      let calUnitPrice = parseFloat(data.farmAreaAmount) * e.target.value;
+      let calUnitPrice =
+        parseFloat(data.farmAreaAmount) * e.target.value;
       const d = Map(data).set("unitPrice", e.target.value);
-      const pushCal = Map(d.toJS()).set("price", calUnitPrice.toFixed(2));
+      const pushCal = Map(d.toJS()).set(
+        "price",
+        calUnitPrice.toFixed(2)
+      );
       setData(pushCal.toJS());
     } else {
-      let calUnitPrice = e.target.value / parseFloat(data.farmAreaAmount);
+      let calUnitPrice =
+        e.target.value / parseFloat(data.farmAreaAmount);
       const d = Map(data).set("price", e.target.value);
       const pushCal = Map(d.toJS()).set("unitPrice", calUnitPrice);
       setData(pushCal.toJS());
@@ -276,7 +302,11 @@ const EditNewTask = () => {
       value == "อื่นๆ" ? !checked : otherSpray != null ? false : true
     );
     PURPOSE_SPRAY_CHECKBOX.map((item) =>
-      _.set(item, "isChecked", item.crop == value ? checked : item.isChecked)
+      _.set(
+        item,
+        "isChecked",
+        item.crop == value ? checked : item.isChecked
+      )
     );
     let p: any = "";
 
@@ -291,7 +321,9 @@ const EditNewTask = () => {
     }
     setData(p.toJS());
   };
-  const handleOtherSpray = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleOtherSpray = (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
     if (e.target.value.trim().length != 0) {
       setOtherSpray(e.target.value);
       let checkComma = checkValidateComma(e.target.value);
@@ -328,7 +360,11 @@ const EditNewTask = () => {
       data.includes(" ") ||
       data.includes("-") ||
       data.includes("+");
-    return data.trim().length != 0 ? (checkSyntax ? true : false) : true;
+    return data.trim().length != 0
+      ? checkSyntax
+        ? true
+        : false
+      : true;
   };
   const handleDate = (e: any) => {
     let dateSelect = new Date(e);
@@ -348,7 +384,7 @@ const EditNewTask = () => {
     <CardContainer>
       <CardHeader textHeader="ข้อมูลเกษตรกรและแปลง" />
       <div className="flex-column">
-        <Form style={{ padding: "20px" }}>
+        <Form style={{ padding: "20px" }} form={form}>
           {current == 0 && (
             <div className="row">
               <div className="form-group col-lg-6">
@@ -362,13 +398,11 @@ const EditNewTask = () => {
                       placeholder="ค้นหาชื่อเกษตรกร/เบอร์โทร/เลขบัตรปชช."
                       onSearch={(e: any) => setSearchFarmer(e)}
                       onSelect={onSelectFarmer}
-                      onChange={handleSearchFarmer}
-                    >
+                      onChange={handleSearchFarmer}>
                       {farmerList?.map((item) => (
                         <Option
                           value={item.firstname + " " + item.lastname}
-                          id={item.id}
-                        >
+                          id={item.id}>
                           {item.firstname + " " + item.lastname}
                         </Option>
                       ))}
@@ -384,8 +418,7 @@ const EditNewTask = () => {
                     backgroundColor: "rgba(33, 150, 83, 0.1)",
                     color: color.Success,
                   }}
-                  onClick={handleSelectFarmer}
-                >
+                  onClick={handleSelectFarmer}>
                   เลือกเกษตรกร
                 </Button>
               </div>
@@ -398,7 +431,11 @@ const EditNewTask = () => {
                   <Form.Item>
                     <label>ชื่อ-นามสกุล</label>
                     <Input
-                      value={dataFarmer.firstname + " " + dataFarmer.lastname}
+                      value={
+                        dataFarmer.firstname +
+                        " " +
+                        dataFarmer.lastname
+                      }
                       disabled
                     />
                   </Form.Item>
@@ -419,27 +456,36 @@ const EditNewTask = () => {
                       placeholder="เลือกแปลง"
                       disabled={current == 2}
                       onChange={handleSelectFarmerPlot}
-                      defaultValue={data?.farmerPlotId}
-                    >
+                      defaultValue={data?.farmerPlotId}>
                       {dataFarmer?.farmerPlot.map((item) => (
-                        <option value={item.id}>{item.plotName}</option>
+                        <option value={item.id}>
+                          {item.plotName}
+                        </option>
                       ))}
                     </Select>
                     {checkSelectPlot == "error" && (
-                      <span style={{ color: color.Error }}>กรุณาเลือกแปลง</span>
+                      <span style={{ color: color.Error }}>
+                        กรุณาเลือกแปลง
+                      </span>
                     )}
                   </Form.Item>
                 </div>
                 <div className="form-group col-lg-4">
                   <label>พืชที่ปลูก</label>
                   <Form.Item>
-                    <Input value={farmerPlotSeleced?.plantName} disabled />
+                    <Input
+                      value={farmerPlotSeleced?.plantName}
+                      disabled
+                    />
                   </Form.Item>
                 </div>
                 <div className="form-group col-lg-4">
                   <label>จำนวนไร่</label>
                   <Form.Item>
-                    <Input value={farmerPlotSeleced?.raiAmount} disabled />
+                    <Input
+                      value={farmerPlotSeleced?.raiAmount}
+                      disabled
+                    />
                   </Form.Item>
                 </div>
               </div>
@@ -495,7 +541,10 @@ const EditNewTask = () => {
                     <div className="form-group">
                       <label>จุดสังเกต</label>
                       <Form.Item>
-                        <Input value={farmerPlotSeleced?.landmark} disabled />
+                        <Input
+                          value={farmerPlotSeleced?.landmark}
+                          disabled
+                        />
                       </Form.Item>
                     </div>
                   </div>
@@ -505,8 +554,7 @@ const EditNewTask = () => {
           )}
           {dataFarmer && (
             <CardContainer
-              style={{ backgroundColor: "rgba(33, 150, 83, 0.1)" }}
-            >
+              style={{ backgroundColor: "rgba(33, 150, 83, 0.1)" }}>
               <Form style={{ padding: "20px" }}>
                 <label>ยอดรวมค่าบริการ</label>
                 <div className="row">
@@ -521,7 +569,9 @@ const EditNewTask = () => {
                         step="0.01"
                         value={data?.unitPrice}
                         onChange={handleCalServiceCharge}
-                        disabled={current == 2 || checkSelectPlot == "error"}
+                        disabled={
+                          current == 2 || checkSelectPlot == "error"
+                        }
                       />
                     </Form.Item>
                   </div>
@@ -535,7 +585,9 @@ const EditNewTask = () => {
                         step="0.01"
                         value={data?.price}
                         onChange={handleCalServiceCharge}
-                        disabled={current == 2 || checkSelectPlot == "error"}
+                        disabled={
+                          current == 2 || checkSelectPlot == "error"
+                        }
                       />
                     </Form.Item>
                   </div>
@@ -564,12 +616,13 @@ const EditNewTask = () => {
                     message: "กรุณากรอกวันที่นัดหมาย!",
                   },
                 ]}
-                key={dateAppointment}
-              >
+                key={dateAppointment}>
                 <DatePicker
                   format={dateFormat}
                   className="col-lg-12"
-                  disabled={current == 2 || checkSelectPlot == "error"}
+                  disabled={
+                    current == 2 || checkSelectPlot == "error"
+                  }
                   onChange={(e: any) => handleDate(e)}
                   defaultValue={moment(dateAppointment)}
                 />
@@ -586,11 +639,12 @@ const EditNewTask = () => {
                     message: "กรุณากรอกเวลานัดหมาย!",
                   },
                 ]}
-                key={timeAppointment}
-              >
+                key={timeAppointment}>
                 <TimePicker
                   format={timeFormat}
-                  disabled={current == 2 || checkSelectPlot == "error"}
+                  disabled={
+                    current == 2 || checkSelectPlot == "error"
+                  }
                   onChange={(e: any) => handleTime(e)}
                   defaultValue={moment(timeAppointment)}
                 />
@@ -607,11 +661,12 @@ const EditNewTask = () => {
                 placeholder="-"
                 disabled={current == 2 || checkSelectPlot == "error"}
                 defaultValue={data?.purposeSprayId}
-                onChange={handlePeriodSpray}
-              >
+                onChange={handlePeriodSpray}>
                 {periodSpray?.purposeSpray?.length ? (
                   periodSpray?.purposeSpray?.map((item) => (
-                    <Option value={item.id}>{item.purposeSprayName}</Option>
+                    <Option value={item.id}>
+                      {item.purposeSprayName}
+                    </Option>
                   ))
                 ) : (
                   <Option>-</Option>
@@ -621,13 +676,16 @@ const EditNewTask = () => {
           </div>
           <div className="row form-group col-lg-6 p-2">
             <label>
-              เป้าหมายการฉีดพ่น <span style={{ color: "red" }}>*</span>
+              เป้าหมายการฉีดพ่น{" "}
+              <span style={{ color: "red" }}>*</span>
             </label>
             {PURPOSE_SPRAY_CHECKBOX.map((item) =>
               _.set(
                 item,
                 "isChecked",
-                data?.targetSpray.map((x) => x).find((y) => y === item.crop)
+                data?.targetSpray
+                  .map((x) => x)
+                  .find((y) => y === item.crop)
                   ? true
                   : item.isChecked
               )
@@ -637,11 +695,15 @@ const EditNewTask = () => {
                   key={data.targetSpray[0]}
                   type="checkbox"
                   value={x.crop}
-                  disabled={current == 2 || checkSelectPlot == "error"}
+                  disabled={
+                    current == 2 || checkSelectPlot == "error"
+                  }
                   checked={x.isChecked}
                   onChange={handlePurposeSpray}
                 />{" "}
-                <label style={{ padding: "0 8px 0 0" }}>{x.crop}</label>
+                <label style={{ padding: "0 8px 0 0" }}>
+                  {x.crop}
+                </label>
                 {index == 4 && (
                   <>
                     <Input
@@ -660,7 +722,11 @@ const EditNewTask = () => {
                       onChange={handleOtherSpray}
                     />
                     {validateComma.status == "error" && (
-                      <p style={{ color: color.Error, padding: "0 0 0 55px" }}>
+                      <p
+                        style={{
+                          color: color.Error,
+                          padding: "0 0 0 55px",
+                        }}>
                         {validateComma.message}
                       </p>
                     )}
@@ -676,22 +742,29 @@ const EditNewTask = () => {
             <Radio.Group
               disabled={current == 2 || checkSelectPlot == "error"}
               defaultValue={data?.preparationBy}
-              key={data.preparationBy}
-            >
-              <Space direction="vertical" onChange={handlePreparation}>
-                <Radio value="เกษตรกรเตรียมยาเอง">เกษตรกรเตรียมยาเอง</Radio>
-                <Radio value="นักบินโดรนเตรียมให้">นักบินโดรนเตรียมให้</Radio>
+              key={data.preparationBy}>
+              <Space
+                direction="vertical"
+                onChange={handlePreparation}>
+                <Radio value="เกษตรกรเตรียมยาเอง">
+                  เกษตรกรเตรียมยาเอง
+                </Radio>
+                <Radio value="นักบินโดรนเตรียมให้">
+                  นักบินโดรนเตรียมให้
+                </Radio>
               </Space>
             </Radio.Group>
           </div>
           <div className="form-group">
             <label>หมายเหตุ</label>
-            <TextArea
-              placeholder="ระบุหมายเหตุเพื่อแจ้งนักบินโดรน เช่น เกษตรกรจะเตรียมยาให้, ฝากนักบินเลือกยาราคาไม่แพงมาให้หน่อย เป็นต้น"
-              disabled={current == 2 || checkSelectPlot == "error"}
-              defaultValue={data?.comment}
-              onChange={handleComment}
-            />
+            <Form.Item>
+              <TextArea
+                value={data.comment}
+                placeholder="ระบุหมายเหตุเพื่อแจ้งนักบินโดรน เช่น เกษตรกรจะเตรียมยาให้, ฝากนักบินเลือกยาราคาไม่แพงมาให้หน่อย เป็นต้น"
+                disabled={current == 2 || checkSelectPlot == "error"}
+                onChange={handleComment}
+              />
+            </Form.Item>
           </div>
         </Form>
       </div>
@@ -748,7 +821,9 @@ const EditNewTask = () => {
             </div>
           ),
           key: "1",
-          icon: <Checkbox value={5} onClick={(e) => onChangeRating(e)} />,
+          icon: (
+            <Checkbox value={5} onClick={(e) => onChangeRating(e)} />
+          ),
         },
         {
           label: (
@@ -760,7 +835,9 @@ const EditNewTask = () => {
             </div>
           ),
           key: "2",
-          icon: <Checkbox value={4} onClick={(e) => onChangeRating(e)} />,
+          icon: (
+            <Checkbox value={4} onClick={(e) => onChangeRating(e)} />
+          ),
         },
         {
           label: (
@@ -771,7 +848,9 @@ const EditNewTask = () => {
             </div>
           ),
           key: "3",
-          icon: <Checkbox value={3} onClick={(e) => onChangeRating(e)} />,
+          icon: (
+            <Checkbox value={3} onClick={(e) => onChangeRating(e)} />
+          ),
         },
         {
           label: (
@@ -781,7 +860,9 @@ const EditNewTask = () => {
             </div>
           ),
           key: "4",
-          icon: <Checkbox value={2} onClick={(e) => onChangeRating(e)} />,
+          icon: (
+            <Checkbox value={2} onClick={(e) => onChangeRating(e)} />
+          ),
         },
         {
           label: (
@@ -790,14 +871,19 @@ const EditNewTask = () => {
             </div>
           ),
           key: "5",
-          icon: <Checkbox value={1} onClick={(e) => onChangeRating(e)} />,
+          icon: (
+            <Checkbox value={1} onClick={(e) => onChangeRating(e)} />
+          ),
         },
       ]}
     />
   );
   const [visibleSlider, setVisibleSlider] = useState(false);
   const [visibleRating, setVisibleRating] = useState(false);
-  const [distrance, setDistrance] = useState<{ min: number; max: number }>({
+  const [distrance, setDistrance] = useState<{
+    min: number;
+    max: number;
+  }>({
     min: 0,
     max: 0,
   });
@@ -841,109 +927,118 @@ const EditNewTask = () => {
     setRating({ ratingMin: min, ratingMax: max });
   };
   const handleSelectDroner = async (e: any, droner: any) => {
-    let dronerSelected: CreateDronerTempEntity = CreateDronerTempEntity_INIT;
+    let dronerSelected: CreateDronerTempEntity =
+      CreateDronerTempEntity_INIT;
     let checked = e.target.checked;
     if (checked) {
       dronerSelected.taskId = queryString[1];
       dronerSelected.dronerId = droner.droner_id;
       dronerSelected.status = "WAIT_RECEIVE";
       dronerSelected.dronerDetail = [JSON.stringify(droner)];
-      await TaskDronerTempDataSource.createDronerTemp(dronerSelected).then(
-        (res) => {
-          let droner = dataDronerList.map((item) =>
-            _.set(
-              item,
-              "isChecked",
-              res.responseData
-                .map((x: any) => x)
-                .find((y: any) => y.dronerId === item.droner_id)
-                ? true
-                : false
-            )
-          );
-          setDataDronerList(droner);
-          setDronerSelectedList(res.responseData);
-        }
-      );
+      await TaskDronerTempDataSource.createDronerTemp(
+        dronerSelected
+      ).then((res) => {
+        let droner = dataDronerList.map((item) =>
+          _.set(
+            item,
+            "isChecked",
+            res.responseData
+              .map((x: any) => x)
+              .find((y: any) => y.dronerId === item.droner_id)
+              ? true
+              : false
+          )
+        );
+        setDataDronerList(droner);
+        setDronerSelectedList(res.responseData);
+      });
     } else {
       let deleteDroner: DeletedDronerTemp = DeletedDronerTemp_INIT;
       deleteDroner.taskId = queryString[1];
       deleteDroner.dronerId = droner.droner_id;
-      await TaskDronerTempDataSource.deleteDronerTemp(deleteDroner).then(
-        (res) => {
-          let droner = dataDronerList.map((item) =>
-            _.set(
-              item,
-              "isChecked",
-              res.responseData
-                .map((x: any) => x)
-                .find((y: any) => y.dronerId === item.droner_id)
-                ? true
-                : false
-            )
-          );
-          setDataDronerList(droner);
-          setDronerSelectedList(res.responseData);
-        }
-      );
+      await TaskDronerTempDataSource.deleteDronerTemp(
+        deleteDroner
+      ).then((res) => {
+        let droner = dataDronerList.map((item) =>
+          _.set(
+            item,
+            "isChecked",
+            res.responseData
+              .map((x: any) => x)
+              .find((y: any) => y.dronerId === item.droner_id)
+              ? true
+              : false
+          )
+        );
+        setDataDronerList(droner);
+        setDronerSelectedList(res.responseData);
+      });
     }
   };
   const handleAllSelectDroner = async (e: any) => {
-    let dronerSelected: CreateDronerTempEntity = CreateDronerTempEntity_INIT;
+    let dronerSelected: CreateDronerTempEntity =
+      CreateDronerTempEntity_INIT;
     let deleteDroner: DeletedDronerTemp = DeletedDronerTemp_INIT;
     let checked = e.target.checked;
     if (checked) {
       let compareData = dataDronerList.filter(
-        (x) => !dronerSelectedList.map((y) => y.dronerId).includes(x.droner_id)
+        (x) =>
+          !dronerSelectedList
+            .map((y) => y.dronerId)
+            .includes(x.droner_id)
       );
       for (let i: number = 0; compareData.length > i; i++) {
         dronerSelected.taskId = queryString[1];
         dronerSelected.dronerId = compareData[i].droner_id;
         dronerSelected.status = "WAIT_RECEIVE";
-        dronerSelected.dronerDetail = [JSON.stringify(compareData[i])];
-        await TaskDronerTempDataSource.createDronerTemp(dronerSelected).then(
-          (res) => {
-            let droner = dataDronerList.map((item) =>
-              _.set(
-                item,
-                "isChecked",
-                res.responseData
-                  .map((x: any) => x)
-                  .find((y: any) => y.dronerId === item.droner_id)
-                  ? true
-                  : false
-              )
-            );
-            setDataDronerList(droner);
-            setDronerSelectedList(res.responseData);
-          }
-        );
+        dronerSelected.dronerDetail = [
+          JSON.stringify(compareData[i]),
+        ];
+        await TaskDronerTempDataSource.createDronerTemp(
+          dronerSelected
+        ).then((res) => {
+          let droner = dataDronerList.map((item) =>
+            _.set(
+              item,
+              "isChecked",
+              res.responseData
+                .map((x: any) => x)
+                .find((y: any) => y.dronerId === item.droner_id)
+                ? true
+                : false
+            )
+          );
+          setDataDronerList(droner);
+          setDronerSelectedList(res.responseData);
+        });
       }
     } else {
       for (let i: number = 0; dataDronerList.length > i; i++) {
         deleteDroner.taskId = queryString[1];
         deleteDroner.dronerId = dataDronerList[i].droner_id;
-        await TaskDronerTempDataSource.deleteDronerTemp(deleteDroner).then(
-          (res) => {
-            let droner = dataDronerList.map((item) =>
-              _.set(
-                item,
-                "isChecked",
-                res.responseData
-                  .map((x: any) => x)
-                  .find((y: any) => y.dronerId === item.droner_id)
-                  ? true
-                  : false
-              )
-            );
-            setDataDronerList(droner);
-            setDronerSelectedList(res.responseData);
-          }
-        );
+        await TaskDronerTempDataSource.deleteDronerTemp(
+          deleteDroner
+        ).then((res) => {
+          let droner = dataDronerList.map((item) =>
+            _.set(
+              item,
+              "isChecked",
+              res.responseData
+                .map((x: any) => x)
+                .find((y: any) => y.dronerId === item.droner_id)
+                ? true
+                : false
+            )
+          );
+          setDataDronerList(droner);
+          setDronerSelectedList(res.responseData);
+        });
       }
     }
   };
-  const callBackDronerSelected = async (data: TaskDronerTempEntity[]) => {
+  const callBackDronerSelected = async (
+    data: TaskDronerTempEntity[]
+  ) => {
     let compareData = dronerSelectedList.filter(
       (x) => !data.map((y) => y.id).includes(x.id)
     );
@@ -951,23 +1046,23 @@ const EditNewTask = () => {
       let deleteDroner: DeletedDronerTemp = DeletedDronerTemp_INIT;
       deleteDroner.taskId = queryString[1];
       deleteDroner.dronerId = compareData[i].dronerId;
-      await TaskDronerTempDataSource.deleteDronerTemp(deleteDroner).then(
-        (res) => {
-          let droner = dataDronerList.map((item) =>
-            _.set(
-              item,
-              "isChecked",
-              res.responseData
-                .map((x: any) => x)
-                .find((y: any) => y.dronerId === item.droner_id)
-                ? true
-                : false
-            )
-          );
-          setDataDronerList(droner);
-          setDronerSelectedList(res.responseData);
-        }
-      );
+      await TaskDronerTempDataSource.deleteDronerTemp(
+        deleteDroner
+      ).then((res) => {
+        let droner = dataDronerList.map((item) =>
+          _.set(
+            item,
+            "isChecked",
+            res.responseData
+              .map((x: any) => x)
+              .find((y: any) => y.dronerId === item.droner_id)
+              ? true
+              : false
+          )
+        );
+        setDataDronerList(droner);
+        setDronerSelectedList(res.responseData);
+      });
     }
     setShowModalSelectedDroner((prev) => !prev);
   };
@@ -976,7 +1071,9 @@ const EditNewTask = () => {
   };
 
   const searchSection = (
-    <div className="d-flex justify-content-between" style={{ padding: "10px" }}>
+    <div
+      className="d-flex justify-content-between"
+      style={{ padding: "10px" }}>
       <div className="col-lg-3 p-1">
         <Input
           prefix={<SearchOutlined style={{ color: color.Disable }} />}
@@ -1022,8 +1119,7 @@ const EditNewTask = () => {
           trigger="click"
           visible={visibleSlider}
           onVisibleChange={handleVisibleSlider}
-          placement="bottom"
-        >
+          placement="bottom">
           <Button className="col-lg-12">เลือกระยะทาง</Button>
         </Popover>
       </div>
@@ -1033,8 +1129,7 @@ const EditNewTask = () => {
           trigger={["click"]}
           className="col-lg-12"
           onVisibleChange={handleVisibleRating}
-          visible={visibleRating}
-        >
+          visible={visibleRating}>
           <Button>
             เลือก Rating
             <DownOutlined />
@@ -1046,8 +1141,7 @@ const EditNewTask = () => {
           allowClear
           className="col-lg-12 p-1"
           placeholder="เลือกสถานะ"
-          onChange={onChangeStatusDroner}
-        >
+          onChange={onChangeStatusDroner}>
           <option value="สะดวก">สะดวก</option>
           <option value="ไม่สะดวก">ไม่สะดวก</option>
         </Select>
@@ -1070,8 +1164,7 @@ const EditNewTask = () => {
               rating?.ratingMin,
               rating?.ratingMax
             )
-          }
-        >
+          }>
           ค้นหาข้อมูล
         </Button>
       </div>
@@ -1082,10 +1175,13 @@ const EditNewTask = () => {
             borderRadius: "5px",
             color: color.Success,
           }}
-          onClick={() => setShowModalSelectedDroner((prev) => !prev)}
-        >
+          onClick={() => setShowModalSelectedDroner((prev) => !prev)}>
           ดูรายชื่อนักบินโดรนที่เลือก (
-          {dronerSelectedList.filter((x) => x.isChecked != false).length})
+          {
+            dronerSelectedList.filter((x) => x.isChecked != false)
+              .length
+          }
+          )
         </Button>
       </div>
     </div>
@@ -1099,7 +1195,8 @@ const EditNewTask = () => {
           checked={dataDronerList
             .filter(
               (x) =>
-                x.droner_status != "ไม่สะดวก" && x.is_open_receive_task != false
+                x.droner_status != "ไม่สะดวก" &&
+                x.is_open_receive_task != false
             )
             .every((x) => x.isChecked)}
           style={{ width: "18px", height: "18px" }}
@@ -1139,7 +1236,9 @@ const EditNewTask = () => {
             {"เคยให้บริการเกษตรกรท่านนี้,"}
             <br />
             {"คะแนนรีวิวล่าสุด "}
-            <StarFilled style={{ color: "#FFCA37", fontSize: "16px" }} />{" "}
+            <StarFilled
+              style={{ color: "#FFCA37", fontSize: "16px" }}
+            />{" "}
             {parseFloat(row.rating_avg).toFixed(1)}
           </>
         );
@@ -1154,7 +1253,9 @@ const EditNewTask = () => {
               )}
 
               <br />
-              <span style={{ color: color.Grey }}>{row.droner_code}</span>
+              <span style={{ color: color.Grey }}>
+                {row.droner_code}
+              </span>
             </>
           ),
         };
@@ -1173,7 +1274,9 @@ const EditNewTask = () => {
         return {
           children: (
             <>
-              <span>{row.total_task == null ? 0 : row.total_task} งาน</span>
+              <span>
+                {row.total_task == null ? 0 : row.total_task} งาน
+              </span>
               <br />
               <span style={{ color: color.Grey }}>
                 รวม {row.total_area == null ? 0 : row.total_area} ไร่
@@ -1200,7 +1303,8 @@ const EditNewTask = () => {
                     <StarFilled />
                   </div>
                   <span className="pt-2 ps-1">
-                    {parseFloat(row.rating_avg).toFixed(1)} ({row.count_rating})
+                    {parseFloat(row.rating_avg).toFixed(1)} (
+                    {row.count_rating})
                   </span>
                 </Row>
               ) : (
@@ -1256,29 +1360,31 @@ const EditNewTask = () => {
       dataIndex: "droner_status",
       key: "droner_status",
       render: (value: any, row: any, index: number) => {
+        console.log(row);
         return {
           children: (
             <>
               <span
                 style={{
                   color:
-                    row.is_open_receive_task == false
-                      ? color.Disable
-                      : row.droner_status == "สะดวก"
+                    row.droner_status === "สะดวก" &&
+                    row.is_open_receive_task
                       ? color.Success
+                      : row.is_open_receive_task === false
+                      ? color.Disable
                       : color.Error,
-                }}
-              >
+                }}>
                 <Badge
                   color={
-                    row.is_open_receive_task == false
-                      ? color.Disable
-                      : row.droner_status == "สะดวก"
+                    row.droner_status === "สะดวก" &&
+                    row.is_open_receive_task
                       ? color.Success
+                      : row.is_open_receive_task === false
+                      ? color.Disable
                       : color.Error
                   }
                 />
-                {row.is_open_receive_task != false
+                {!row.is_open_receive_task
                   ? "ปิดการใช้งาน"
                   : row.droner_status}
                 <br />
@@ -1319,7 +1425,11 @@ const EditNewTask = () => {
                         {JSON.parse(item?.dronerDetail).firstname}{" "}
                         {JSON.parse(item?.dronerDetail).lastname}
                         <br />
-                        <p style={{ fontSize: "12px", color: color.Grey }}>
+                        <p
+                          style={{
+                            fontSize: "12px",
+                            color: color.Grey,
+                          }}>
                           {JSON.parse(item?.dronerDetail).droner_code}
                         </p>
                       </div>
@@ -1327,42 +1437,56 @@ const EditNewTask = () => {
                         {JSON.parse(item?.dronerDetail).telephone_no}
                       </div>
                       <div className="col-lg-4">
-                        {JSON.parse(item?.dronerDetail).subdistrict_name}/
-                        {JSON.parse(item?.dronerDetail).district_name}/
+                        {
+                          JSON.parse(item?.dronerDetail)
+                            .subdistrict_name
+                        }
+                        /
+                        {JSON.parse(item?.dronerDetail).district_name}
+                        /
                         {JSON.parse(item?.dronerDetail).province_name}
                       </div>
                       <div className="col-lg-2">
                         <Avatar
                           size={25}
-                          src={JSON.parse(item.dronerDetail).logo_drone_brand}
+                          src={
+                            JSON.parse(item.dronerDetail)
+                              .logo_drone_brand
+                          }
                           style={{ marginRight: "5px" }}
                         />
                         {JSON.parse(item?.dronerDetail).drone_brand}
                         <br />
-                        <p style={{ fontSize: "12px", color: color.Grey }}>
-                          {JSON.parse(item.dronerDetail).count_drone > 1 &&
-                            "(มากกว่า 1 ยี่หัอ)"}
+                        <p
+                          style={{
+                            fontSize: "12px",
+                            color: color.Grey,
+                          }}>
+                          {JSON.parse(item.dronerDetail).count_drone >
+                            1 && "(มากกว่า 1 ยี่หัอ)"}
                         </p>
                       </div>
                       <div className="col-lg-1">
                         <span
                           style={{
                             color:
-                              JSON.parse(item?.dronerDetail).droner_status ==
-                              "สะดวก"
+                              JSON.parse(item?.dronerDetail)
+                                .droner_status == "สะดวก"
                                 ? color.Success
                                 : color.Error,
-                          }}
-                        >
+                          }}>
                           <Badge
                             color={
-                              JSON.parse(item?.dronerDetail).droner_status ==
-                              "สะดวก"
+                              JSON.parse(item?.dronerDetail)
+                                .droner_status == "สะดวก"
                                 ? color.Success
                                 : color.Error
                             }
                           />
-                          {JSON.parse(item?.dronerDetail).droner_status}
+                          {
+                            JSON.parse(item?.dronerDetail)
+                              .droner_status
+                          }
                           <br />
                         </span>
                       </div>
@@ -1379,11 +1503,13 @@ const EditNewTask = () => {
     <CardContainer>
       <CardHeader textHeader="ยอดรวมค่าบริการ" />
       <Form style={{ padding: "20px" }}>
-        <CardContainer style={{ backgroundColor: "rgba(33, 150, 83, 0.1)" }}>
+        <CardContainer
+          style={{ backgroundColor: "rgba(33, 150, 83, 0.1)" }}>
           <Form style={{ padding: "20px" }}>
             <label>ยอดรวมค่าบริการ (หลังรวมค่าธรรมเนียม)</label>
             <h5 style={{ color: color.primary1 }} className="p-2">
-              {numberWithCommas(parseFloat(data?.price)).toString()} บาท
+              {numberWithCommas(parseFloat(data?.price)).toString()}{" "}
+              บาท
             </h5>
             <div className="row">
               <div className="form-group col-lg-4">
@@ -1432,8 +1558,10 @@ const EditNewTask = () => {
 
   const nextStep = () => {
     if (current == 0) {
-      let changeTimeFormat = moment(timeAppointment).format(timeCreateFormat);
-      let changeDateFormat = moment(dateAppointment).format(dateCreateFormat);
+      let changeTimeFormat =
+        moment(timeAppointment).format(timeCreateFormat);
+      let changeDateFormat =
+        moment(dateAppointment).format(dateCreateFormat);
       let otherSprayList = [];
       if (otherSpray != undefined) {
         let m = otherSpray.split(",");
@@ -1447,7 +1575,9 @@ const EditNewTask = () => {
       );
       const d = Map(data).set(
         "dateAppointment",
-        moment(changeDateFormat + " " + changeTimeFormat).toISOString()
+        moment(
+          changeDateFormat + " " + changeTimeFormat
+        ).toISOString()
       );
       const p = Map(d.toJS()).set(
         "createBy",
@@ -1461,14 +1591,21 @@ const EditNewTask = () => {
     } else {
       const s = Map(data).set("status", "WAIT_RECEIVE");
       const d = Map(s.toJS()).set("dronerId", data.dronerId);
-      const f = Map(d.toJS()).set("fee", parseFloat(data.price) * 0.05);
+      const f = Map(d.toJS()).set(
+        "fee",
+        parseFloat(data.price) * 0.05
+      );
       const df = Map(f.toJS()).set(
         "discountFee",
         parseFloat(data.price) * 0.05
       );
       setData(df.toJS());
     }
-    fetchDronerList(data.farmerId, data.farmerPlotId, dateAppointment);
+    fetchDronerList(
+      data.farmerId,
+      data.farmerPlotId,
+      dateAppointment
+    );
     setCurrent(current + 1);
   };
   const updateNewTask = async () => {
@@ -1545,7 +1682,9 @@ const EditNewTask = () => {
           ))}
         </Steps>
       </div>
-      <div className="steps-content">{titleStep[current].content}</div>
+      <div className="steps-content">
+        {titleStep[current].content}
+      </div>
       <Row className="d-flex justify-content-between pt-2">
         {current == 0 && (
           <BackButton
@@ -1553,18 +1692,21 @@ const EditNewTask = () => {
           />
         )}
         {current > 0 && (
-          <BackButton onClick={() => setCurrent((prev) => prev - 1)} />
+          <BackButton
+            onClick={() => setCurrent((prev) => prev - 1)}
+          />
         )}
         {current < titleStep.length - 1 && (
           <Button
             style={{
-              backgroundColor: disableBtn == false ? color.Success : color.Grey,
-              borderColor: disableBtn == false ? color.Success : color.Grey,
+              backgroundColor:
+                disableBtn == false ? color.Success : color.Grey,
+              borderColor:
+                disableBtn == false ? color.Success : color.Grey,
               borderRadius: "5px",
               color: color.BG,
             }}
-            onClick={nextStep}
-          >
+            onClick={nextStep}>
             ถัดไป
           </Button>
         )}
@@ -1595,7 +1737,9 @@ const EditNewTask = () => {
           show={showModalSelectedDroner}
           dataDroner={dronerSelectedList}
           title="รายชื่อนักบินโดรน"
-          backButton={() => setShowModalSelectedDroner((prev) => !prev)}
+          backButton={() =>
+            setShowModalSelectedDroner((prev) => !prev)
+          }
           callBack={callBackDronerSelected}
         />
       )}

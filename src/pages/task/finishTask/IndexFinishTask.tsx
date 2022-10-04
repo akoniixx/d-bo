@@ -1,17 +1,12 @@
 import {
   Badge,
   Button,
-  Checkbox,
   DatePicker,
-  Dropdown,
   Input,
-  Menu,
   Pagination,
-  Rate,
   Select,
   Table,
 } from "antd";
-import Search from "antd/lib/input/Search";
 import moment from "moment";
 import React, { useEffect, useState } from "react";
 import ActionButton from "../../../components/button/ActionButton";
@@ -24,7 +19,6 @@ import {
 } from "../../../entities/LocationEntities";
 import color from "../../../resource/color";
 import {
-  DownOutlined,
   EditOutlined,
   FileTextOutlined,
   SearchOutlined,
@@ -32,12 +26,8 @@ import {
   UserOutlined,
 } from "@ant-design/icons";
 import { TaskFinishedDatasource } from "../../../datasource/TaskFinishDatasource";
-import {
-  TaskFinishListEntity,
-  TaskFinish_INIT,
-} from "../../../entities/TaskFinishEntities";
-import { FarmerPlotEntity } from "../../../entities/FarmerPlotEntities";
-import { Option } from "antd/lib/mentions";
+import { TaskFinishListEntity } from "../../../entities/TaskFinishEntities";
+
 import {
   FINISH_TASK,
   FINISH_TASK_SEARCH,
@@ -58,7 +48,8 @@ export default function IndexFinishTask() {
   const [searchSubdistrict, setSearchSubdistrict] = useState<any>();
   const [province, setProvince] = useState<ProviceEntity[]>();
   const [district, setDistrict] = useState<DistrictEntity[]>();
-  const [subdistrict, setSubdistrict] = useState<SubdistrictEntity[]>();
+  const [subdistrict, setSubdistrict] =
+    useState<SubdistrictEntity[]>();
   const [showModalMap, setShowModalMap] = useState<boolean>(false);
   const [plotId, setPlotId] = useState<string>("");
   const { RangePicker } = DatePicker;
@@ -69,8 +60,7 @@ export default function IndexFinishTask() {
     fetchTaskFinish();
     fetchProvince();
   }, [current, row, startDate, endDate]);
-  const fetchTaskFinish = async (
-  ) => {
+  const fetchTaskFinish = async () => {
     await TaskFinishedDatasource.getTaskFinishList(
       current,
       row,
@@ -106,9 +96,11 @@ export default function IndexFinishTask() {
     });
   };
   const fetchSubdistrict = async (districtId: number) => {
-    await LocationDatasource.getSubdistrict(districtId).then((res) => {
-      setSubdistrict(res);
-    });
+    await LocationDatasource.getSubdistrict(districtId).then(
+      (res) => {
+        setSubdistrict(res);
+      }
+    );
   };
   const changeTextSearch = (searchText: any) => {
     setSearchText(searchText.target.value);
@@ -154,13 +146,15 @@ export default function IndexFinishTask() {
     <>
       <div
         className="container d-flex justify-content-between"
-        style={{ padding: "10px" }}
-      >
+        style={{ padding: "10px" }}>
         <div>
           <span
             className="card-label font-weight-bolder text-dark"
-            style={{ fontSize: 22, fontWeight: "bold", padding: "8px" }}
-          >
+            style={{
+              fontSize: 22,
+              fontWeight: "bold",
+              padding: "8px",
+            }}>
             <strong>งานที่เสร็จแล้ว</strong>
           </span>
         </div>
@@ -174,11 +168,12 @@ export default function IndexFinishTask() {
       </div>
       <div
         className="container d-flex justify-content-between"
-        style={{ padding: "8px" }}
-      >
+        style={{ padding: "8px" }}>
         <div className="col-lg-4 p-1">
           <Input
-            prefix={<SearchOutlined style={{ color: color.Disable }} />}
+            prefix={
+              <SearchOutlined style={{ color: color.Disable }} />
+            }
             placeholder="ค้นหาชื่อเกษตรกร, คนบินโดรน หรือเบอร์โทร"
             className="col-lg-12 p-1"
             onChange={changeTextSearch}
@@ -199,8 +194,7 @@ export default function IndexFinishTask() {
               optionA.children
                 .toLowerCase()
                 .localeCompare(optionB.children.toLowerCase())
-            }
-          >
+            }>
             {province?.map((item) => (
               <option value={item.provinceId.toString()}>
                 {item.provinceName}
@@ -224,8 +218,7 @@ export default function IndexFinishTask() {
                 .toLowerCase()
                 .localeCompare(optionB.children.toLowerCase())
             }
-            disabled={searchProvince == undefined}
-          >
+            disabled={searchProvince === undefined}>
             {district?.map((item) => (
               <option value={item.districtId.toString()}>
                 {item.districtName}
@@ -249,8 +242,7 @@ export default function IndexFinishTask() {
                 .toLowerCase()
                 .localeCompare(optionB.children.toLowerCase())
             }
-            disabled={searchDistrict == undefined}
-          >
+            disabled={searchDistrict == undefined}>
             {subdistrict?.map((item) => (
               <option value={item.subdistrictId.toString()}>
                 {item.subdistrictName}
@@ -263,8 +255,7 @@ export default function IndexFinishTask() {
             className="col-lg-12 p-1"
             placeholder="เลือกสถานะ"
             onChange={handleStatus}
-            allowClear
-          >
+            allowClear>
             {FINISH_TASK_SEARCH.map((item) => (
               <option value={item.value}>{item.name}</option>
             ))}
@@ -278,10 +269,7 @@ export default function IndexFinishTask() {
               color: color.secondary2,
               backgroundColor: color.Success,
             }}
-            onClick={
-              fetchTaskFinish
-            }
-          >
+            onClick={fetchTaskFinish}>
             ค้นหาข้อมูล
           </Button>
         </div>
@@ -298,10 +286,16 @@ export default function IndexFinishTask() {
           children: (
             <>
               <span className="text-dark-75  d-block font-size-lg">
-                {moment(new Date(row.dateAppointment)).format(dateFormat)},{" "}
-                {moment(new Date(row.dateAppointment)).format(timeFormat)}
+                {moment(new Date(row.dateAppointment)).format(
+                  dateFormat
+                )}
+                ,{" "}
+                {moment(new Date(row.dateAppointment)).format(
+                  timeFormat
+                )}
               </span>
-              <span style={{ color: color.Disable, fontSize: "12px" }}>
+              <span
+                style={{ color: color.Disable, fontSize: "12px" }}>
                 {row.taskNo}
               </span>
             </>
@@ -322,7 +316,8 @@ export default function IndexFinishTask() {
                   ? row.droner.firstname + " " + row.droner.lastname
                   : null}
               </span>
-              <span style={{ color: color.Disable, fontSize: "12px" }}>
+              <span
+                style={{ color: color.Disable, fontSize: "12px" }}>
                 {row.droner !== null ? row.droner.telephoneNo : null}
               </span>
             </>
@@ -341,7 +336,8 @@ export default function IndexFinishTask() {
               <span className="text-dark-75  d-block font-size-lg">
                 {row.farmer.firstname + " " + row.farmer.lastname}
               </span>
-              <span style={{ color: color.Disable, fontSize: "12px" }}>
+              <span
+                style={{ color: color.Disable, fontSize: "12px" }}>
                 {row.farmer.telephoneNo}
               </span>
             </>
@@ -361,16 +357,19 @@ export default function IndexFinishTask() {
           children: (
             <>
               <span className="text-dark-75  d-block font-size-lg">
-                {subdistrict != undefined
+                {subdistrict !== undefined
                   ? subdistrict.subdistrictName + "/"
                   : null}
-                {district != undefined ? district.districtName + "/" : null}
-                {province != undefined ? province.provinceName + "/" : null}
+                {district !== undefined
+                  ? district.districtName + "/"
+                  : null}
+                {province !== undefined
+                  ? province.provinceName + ""
+                  : null}
               </span>
               <a
                 onClick={() => handleModalMap(row.farmerPlotId)}
-                style={{ color: color.primary1 }}
-              >
+                style={{ color: color.primary1 }}>
                 ดูแผนที่แปลง
               </a>
             </>
@@ -420,7 +419,8 @@ export default function IndexFinishTask() {
                   ? formatNumber(row.totalPrice) + " " + "บาท"
                   : 0 + " " + "บาท"}
               </span>
-              <span style={{ color: color.Disable, fontSize: "12px" }}>
+              <span
+                style={{ color: color.Disable, fontSize: "12px" }}>
                 {"จำนวน" + " " + row.farmAreaAmount + " " + "ไร่"}
               </span>
             </>
@@ -442,12 +442,16 @@ export default function IndexFinishTask() {
                 {FINISH_TASK[row.status]}
                 {beforeValue != undefined
                   ? row.status == "CANCELED"
-                    ? " " + "(" + TASK_HISTORY[beforeValue.beforeValue] + ")" 
+                    ? " " +
+                      "(" +
+                      TASK_HISTORY[beforeValue.beforeValue] +
+                      ")"
                     : null
                   : null}
                 <br />
               </span>
-              <span style={{ color: color.Disable, fontSize: "12px" }}>
+              <span
+                style={{ color: color.Disable, fontSize: "12px" }}>
                 <UserOutlined style={{ padding: "0 4px 0 0" }} />
                 {row.createBy}
               </span>
