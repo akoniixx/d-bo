@@ -2,6 +2,7 @@
 ## Fix [v0.17.6] 2022-10-04
 - fixed row table in detail ranking droner
 - fixed save img drone list
+- fixed field address in add droner and edit droner menu
 ## Fix [v0.17.5] 2022-10-03
 - fixed search status and province index task today menu
 - fixed enable checkbox detail edit task today menu
