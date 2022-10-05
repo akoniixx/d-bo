@@ -352,7 +352,7 @@ function EditDroneList() {
     }
     data.reason.push.apply(
       data.reason,
-      textReasonList.filter((x) => x != "")
+      textReasonList.filter((x) => x != "" && x != null)
     );
     const setTextReason = Array.from(new Set(data.reason)).filter(
       (x) => x != ""

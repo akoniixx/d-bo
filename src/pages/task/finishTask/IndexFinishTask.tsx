@@ -357,13 +357,13 @@ export default function IndexFinishTask() {
           children: (
             <>
               <span className="text-dark-75  d-block font-size-lg">
-                {subdistrict !== undefined
+                {subdistrict !== null
                   ? subdistrict.subdistrictName + "/"
                   : null}
-                {district !== undefined
+                {district !== null
                   ? district.districtName + "/"
                   : null}
-                {province !== undefined
+                {province !== null
                   ? province.provinceName + ""
                   : null}
               </span>
