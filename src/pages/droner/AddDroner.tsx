@@ -855,7 +855,7 @@ function AddDroner() {
           <div className="row">
             <div className="form-group">
               <label>
-                ที่อยู่บ้าน <span style={{ color: "red" }}>*</span>
+              รายละเอียดที่อยู่ (หมู่, ถนน) <span style={{ color: "red" }}>*</span>
               </label>
               <Form.Item
                 name="address2"
