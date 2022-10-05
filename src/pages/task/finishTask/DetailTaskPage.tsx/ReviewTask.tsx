@@ -85,12 +85,12 @@ function ReviewTask() {
     const m = Map(detailDroner).set("canReview", e.target.value);
     const n = Map(m.toJS()).set("taskId", taskId);
     setDetailDroner(n.toJS());
-    if(e.target.value == "Yes"){
+    if (e.target.value == "Yes") {
       setBtnSaveDisable(true);
       setSaveRate(false);
-    }else{
+    } else {
       setBtnSaveDisable(false);
-      setSaveRate(false);
+      setSaveRate(true);
     }
   };
 
@@ -98,20 +98,21 @@ function ReviewTask() {
     const m = Map(detailDroner).set("pilotEtiquette", parseInt(e));
     const n = Map(m.toJS()).set("taskId", taskId);
     setDetailDroner(n.toJS());
-     setBtnSaveDisable(false);
+    setBtnSaveDisable(false);
   };
   const punctuality = (e: any) => {
     const m = Map(detailDroner).set("punctuality", parseInt(e));
     const n = Map(m.toJS()).set("taskId", taskId);
     setDetailDroner(n.toJS());
-     setBtnSaveDisable(false);
+    setBtnSaveDisable(false);
   };
   const expertise = (e: any) => {
     const m = Map(detailDroner).set("sprayExpertise", parseInt(e));
     const n = Map(m.toJS()).set("taskId", taskId);
     setDetailDroner(n.toJS());
-    {e == 0 ?  setBtnSaveDisable(true) :  setBtnSaveDisable(false); }
-    
+    {
+      e == 0 ? setBtnSaveDisable(true) : setBtnSaveDisable(false);
+    }
   };
   const commentReview = (e: any) => {
     const m = Map(detailDroner).set("comment", e.target.value);
