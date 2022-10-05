@@ -1,4 +1,6 @@
 ## [Version - 0]
+## Fix [v0.17.8] 2022-10-05
+- check null plotArea in index task finish
 ## Fix [v0.17.7] 2022-10-04
 - fixed address render string 
 - fixed menu improgress task status render
