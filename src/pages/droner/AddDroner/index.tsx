@@ -15,7 +15,6 @@ import {
 } from "antd";
 import { CardContainer } from "../../../components/card/CardContainer";
 import { BackIconButton } from "../../../components/button/BackButton";
-import TextArea from "antd/lib/input/TextArea";
 import emptyData from "../../../resource/media/empties/tabler_drone.png";
 import { EditOutlined } from "@ant-design/icons";
 import color from "../../../resource/color";
@@ -68,13 +67,12 @@ import moment from "moment";
 const dateFormat = "DD/MM/YYYY";
 const dateCreateFormat = "YYYY-MM-DD";
 
-const _ = require("lodash");
 const { Map } = require("immutable");
 
 function AddDroner() {
   const [form] = Form.useForm();
 
-  const [data, setData] = useState<CreateDronerEntity>(
+  const [data] = useState<CreateDronerEntity>(
     CreateDronerEntity_INIT
   );
   const [address, setAddress] = useState<CreateAddressEntity>(
@@ -119,8 +117,6 @@ function AddDroner() {
   }>(LAT_LNG_BANGKOK);
   const [location, setLocation] = useState<SubdistrictEntity[]>([]);
   const [searchLocation] = useState("");
-  const [validateComma, setValidateComma] = useState<any>("");
-  let [otherPlant, setOtherPlant] = useState<any>();
 
   useEffect(() => {
     fetchProvince();
@@ -175,7 +171,7 @@ function AddDroner() {
   };
   const handleOnChangePostcode = (addr: CreateAddressEntity) => {
     let getPostcode = subdistrict.filter(
-      (x) => x.subdistrictId == addr.subdistrictId
+      (x) => x.subdistrictId === addr.subdistrictId
     )[0].postcode;
     const c = Map(addr).set("postcode", getPostcode);
     setAddress(c.toJS());
@@ -189,7 +185,7 @@ function AddDroner() {
   //#region map
   const handleSearchLocation = async (value: any) => {
     if (!!value) {
-      const a = location.filter((x) => x.subdistrictId == value)[0];
+      const a = location.filter((x) => x.subdistrictId === value)[0];
       const pushProvince = Map(dronerArea).set(
         "provinceId",
         a.provinceId
@@ -282,7 +278,7 @@ function AddDroner() {
     setEditIndex(index);
   };
   const insertDroneList = (data: DronerDroneEntity) => {
-    if (data.modalDroneIndex == 0) {
+    if (data.modalDroneIndex === 0) {
       const pushId = Map(data).set(
         "modalDroneIndex",
         dronerDroneList.length + 1
@@ -290,7 +286,7 @@ function AddDroner() {
       setDronerDroneList([...dronerDroneList, pushId.toJS()]);
     } else {
       const m = dronerDroneList.filter(
-        (x) => x.modalDroneIndex != data.modalDroneIndex
+        (x) => x.modalDroneIndex !== data.modalDroneIndex
       );
       setDronerDroneList([...m, data]);
     }
@@ -396,7 +392,7 @@ function AddDroner() {
         data?.expPlant !== undefined;
     }
     let checkEmptyOtherPlant =
-      otherPlant != undefined && otherPlant != "";
+      otherPlant !== undefined && otherPlant !== "";
     let checkEmptyDate =
       ![data?.birthDate].includes("1970-01-01") &&
       data?.birthDate &&
@@ -421,7 +417,7 @@ function AddDroner() {
       data.includes(" ") ||
       data.includes("-") ||
       data.includes("+");
-    return data.trim().length != 0
+    return data.trim().length !== 0
       ? checkSyntax
         ? true
         : false
@@ -429,19 +425,14 @@ function AddDroner() {
   };
 
   const insertDroner = async (values: any) => {
-    let otherPlantList = [];
-    if (otherPlant !== undefined) {
-      let m = otherPlant.split(",");
-      for (let i = 0; m.length > i; i++) {
-        otherPlantList?.push(m[i]);
-      }
-    } else {
-      otherPlantList?.push(otherPlant);
-    }
-    data.expPlant?.push.apply(
-      data.expPlant,
-      otherPlantList.filter((x) => x !== "")
-    );
+    const splitPlant = values?.plantsOther
+      ? values?.plantsOther?.split(",")
+      : [];
+    const expPlant =
+      splitPlant.length > 0
+        ? [...values.checkPlantsOther, ...splitPlant]
+        : values.checkPlantsOther;
+
     const pushAdd = Map(data).set("address", address);
     const pushDronerArea = Map(pushAdd.toJS()).set(
       "dronerArea",
@@ -459,74 +450,88 @@ function AddDroner() {
       "expPlant",
       setOtherPlant
     );
-    await DronerDatasource.createDronerList({
+    console.log("pushOtherPlant", pushOtherPlant.toJS());
+    const newData = {
       ...pushOtherPlant.toJS(),
       ...values,
-      birthDate: moment(values.birthDate).toISOString(),
-    }).then(async (res) => {
-      if (res !== undefined) {
-        const pushImgProId = Map(createImgProfile).set(
-          "resourceId",
-          res.id
-        );
-        const pushImgCardId = Map(createImgIdCard).set(
-          "resourceId",
-          res.id
-        );
-        let i = 0;
-        for (i; 2 > i; i++) {
-          i === 0 &&
-            UploadImageDatasouce.uploadImage(
-              pushImgProId.toJS()
-            ).then(res);
-          i === 1 &&
-            UploadImageDatasouce.uploadImage(
-              pushImgCardId.toJS()
-            ).then(res);
-        }
-
-        for (i = 0; res.dronerDrone.length > i; i++) {
-          let findId = res.dronerDrone[i];
-          let getData = dronerDroneList.filter(
-            (x) => x.serialNo === findId.serialNo
-          )[0];
-
-          for (let j = 0; getData.file.length > j; j++) {
-            let getImg = getData.file[j];
-            imgDroneList?.push({
-              resourceId: findId.id,
-              category: getImg.category,
-              file: getImg.file,
-              resource: getImg.resource,
-              path: "",
-            });
-          }
-        }
-        const checkImg = imgDroneList.filter(
-          (x) => x.resourceId !== ""
-        );
-        for (let k = 0; checkImg.length > k; k++) {
-          let getDataImg: any = checkImg[k];
-          await UploadImageDatasouce.uploadImage(getDataImg).then(
-            res
+      expPlant: expPlant,
+      birthDate: moment(values.birthDate).format("YYYY-MM-DD"),
+      address: {
+        ...pushOtherPlant.toJS().address,
+        address1: values.address1,
+        address2: values.address2,
+      },
+      dronerArea: {
+        ...pushOtherPlant.toJS().dronerArea,
+        mapUrl: values.mapUrl,
+      },
+    };
+    await DronerDatasource.createDronerList(newData).then(
+      async (res) => {
+        if (res !== undefined) {
+          const pushImgProId = Map(createImgProfile).set(
+            "resourceId",
+            res.id
           );
+          const pushImgCardId = Map(createImgIdCard).set(
+            "resourceId",
+            res.id
+          );
+          let i = 0;
+          for (i; 2 > i; i++) {
+            i === 0 &&
+              UploadImageDatasouce.uploadImage(
+                pushImgProId.toJS()
+              ).then(res);
+            i === 1 &&
+              UploadImageDatasouce.uploadImage(
+                pushImgCardId.toJS()
+              ).then(res);
+          }
+
+          for (i = 0; res.dronerDrone.length > i; i++) {
+            let findId = res.dronerDrone[i];
+            let getData = dronerDroneList.filter(
+              (x) => x.serialNo === findId.serialNo
+            )[0];
+
+            for (let j = 0; getData.file.length > j; j++) {
+              let getImg = getData.file[j];
+              imgDroneList?.push({
+                resourceId: findId.id,
+                category: getImg.category,
+                file: getImg.file,
+                resource: getImg.resource,
+                path: "",
+              });
+            }
+          }
+          const checkImg = imgDroneList.filter(
+            (x) => x.resourceId !== ""
+          );
+          for (let k = 0; checkImg.length > k; k++) {
+            let getDataImg: any = checkImg[k];
+            await UploadImageDatasouce.uploadImage(getDataImg).then(
+              res
+            );
+          }
+          Swal.fire({
+            title: "บันทึกสำเร็จ",
+            icon: "success",
+            timer: 1500,
+            showConfirmButton: false,
+          }).then((time) => {
+            window.location.href = "/IndexDroner";
+          });
+        } else {
+          Swal.fire({
+            title: "เบอร์โทร หรือ รหัสบัตรประชาชน <br/> ซ้ำในระบบ",
+            icon: "error",
+            showConfirmButton: true,
+          });
         }
-        Swal.fire({
-          title: "บันทึกสำเร็จ",
-          icon: "success",
-          timer: 1500,
-          showConfirmButton: false,
-        }).then((time) => {
-          window.location.href = "/IndexDroner";
-        });
-      } else {
-        Swal.fire({
-          title: "เบอร์โทร หรือ รหัสบัตรประชาชน <br/> ซ้ำในระบบ",
-          icon: "error",
-          showConfirmButton: true,
-        });
       }
-    });
+    );
   };
 
   const renderFromData = (
@@ -904,18 +909,8 @@ function AddDroner() {
             </div>
           </div>
           <div className="form-group">
-            <label>
-              พื้นที่ให้บริการหลัก{" "}
-              <span style={{ color: "red" }}>*</span>
-            </label>
-            <Form.Item
-              name="dronerArea"
-              rules={[
-                {
-                  required: true,
-                  message: "กรุณากรอกพื้นที่ให้บริการ!",
-                },
-              ]}>
+            <label>พื้นที่ให้บริการหลัก </label>
+            <Form.Item name="dronerArea">
               <Select
                 allowClear
                 showSearch
@@ -944,7 +939,7 @@ function AddDroner() {
           </div>
           <div className="form-group">
             <label>หรือ</label>
-            <Form.Item name="url">
+            <Form.Item name="mapUrl">
               <Input
                 placeholder="กรอกข้อมูล Url Google Map"
                 onBlur={handleOnChangeUrl}
@@ -1012,12 +1007,13 @@ function AddDroner() {
             </label>
             <Form.Item
               name="checkPlantsOther"
+              dependencies={["plantsOther"]}
               rules={[
                 {
                   validator: (_, value, callback) => {
                     const plantsOther =
                       form.getFieldValue("plantsOther");
-                    console.log(plantsOther, value);
+
                     if (value?.length < 1 && !plantsOther) {
                       callback(
                         "กรุณาเลือกพืชที่เคยฉีดพ่นอย่างน้อย 1 อย่าง"
@@ -1045,12 +1041,27 @@ function AddDroner() {
             <label></label>
             <Form.Item
               name="plantsOther"
+              dependencies={["checkPlantsOther"]}
               rules={[
                 {
                   validator(rule, value, callback) {
+                    const splitValue = value && value.split(",");
+                    const valueCheckbox = form.getFieldValue(
+                      "checkPlantsOther"
+                    );
+                    const isDuplicate =
+                      splitValue &&
+                      splitValue.some((el: string) =>
+                        valueCheckbox.includes(el)
+                      );
+
                     if (!!value && checkValidateComma(value)) {
                       callback(
                         "กรุณาใช้ (,) ให้กับการเพิ่มพืชมากกว่า 1 อย่าง"
+                      );
+                    } else if (isDuplicate) {
+                      callback(
+                        "กรุณากรอกพืชที่เคยฉีดพ่นให้ถูกต้อง ไม่ควรมีพืชที่ซ้ำกัน"
                       );
                     } else {
                       callback();
@@ -1172,7 +1183,7 @@ function AddDroner() {
       <FooterPage
         onClickBack={() => (window.location.href = "/IndexDroner")}
         onClickSave={() => form.submit()}
-        // disableSaveBtn={saveBtnDisable}
+        disableSaveBtn={dronerDroneList.length < 1}
       />
       {showAddModal && (
         <ModalDrone

@@ -70,6 +70,7 @@ export class DronerDatasource {
   }
 
   static createDronerList(data: CreateDronerEntity): Promise<any> {
+    console.log(data);
     for (let i = 0; data.dronerDrone.length > i; i++) {
       delete data.dronerDrone[i].droneName;
       delete data.dronerDrone[i].id;
@@ -79,7 +80,7 @@ export class DronerDatasource {
         delete data.dronerDrone[i].file[j];
       }
     }
-    if (data.dronerArea.provinceId == 0) {
+    if (data.dronerArea.provinceId === 0) {
       delete data.dronerArea["provinceId"];
       delete data.dronerArea["dronerId"];
       delete data.dronerArea["districtId"];
