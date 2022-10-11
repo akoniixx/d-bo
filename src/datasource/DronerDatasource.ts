@@ -26,8 +26,8 @@ export class DronerDatasource {
       status: status,
       search: search,
     };
-    console.log("param",params);
-    
+    console.log("param", params);
+
     return httpClient
       .get(BASE_URL + "/droner", { params })
       .then((response) => {
@@ -86,6 +86,7 @@ export class DronerDatasource {
       delete data.dronerArea["subdistrictId"];
       delete data.dronerArea["distance"];
     }
+
     return httpClient
       .post(BASE_URL + "/droner", data)
       .then((response) => {
