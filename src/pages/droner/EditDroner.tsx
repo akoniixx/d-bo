@@ -30,10 +30,7 @@ import {
 import { DronerDatasource } from "../../datasource/DronerDatasource";
 import Swal from "sweetalert2";
 import { LocationDatasource } from "../../datasource/LocationDatasource";
-import {
-  EXP_PLANT,
-  EXP_PLANT_CHECKBOX,
-} from "../../definitions/ExpPlant";
+import { EXP_PLANT } from "../../definitions/ExpPlant";
 import ActionButton from "../../components/button/ActionButton";
 import {
   AddressEntity,
@@ -71,8 +68,10 @@ import {
   DronerAreaEntity_INIT,
 } from "../../entities/DronerAreaEntities";
 import { LAT_LNG_BANGKOK } from "../../definitions/Location";
-import { REASON_DRONER_STATUS } from "../../definitions/Reason";
+
 import moment from "moment";
+import locale from "antd/es/date-picker/locale/th_TH";
+
 const dateFormat = "DD/MM/YYYY";
 const dateCreateFormat = "YYYY-MM-DD";
 
@@ -93,7 +92,8 @@ function EditDroner() {
   const [dronerDroneList, setDronerDroneList] = useState<
     DronerDroneEntity[]
   >([DronerDroneEntity_INIT]);
-  const [saveBtnDisable, setBtnSaveDisable] = useState<boolean>(true);
+  const [disableSaveBtn, setDisableSaveBtn] =
+    useState<boolean>(false);
   const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [editIndex, setEditIndex] = useState(0);
@@ -123,7 +123,6 @@ function EditDroner() {
   const [imgDroneList] = useState<UploadImageEntity[]>([
     UploadImageEntity_INTI,
   ]);
-  let [moreReason, setMoreReason] = useState<any>("");
   const [status, setStatus] = useState<string | undefined>(undefined);
   const fetchDronerById = useCallback(async () => {
     await DronerDatasource.getDronerByID(dronerId).then(
@@ -132,12 +131,9 @@ function EditDroner() {
           res.birthDate = moment().format(dateCreateFormat);
         }
 
-        // setOtherPlant(
-        //   res.expPlant
-        //     .filter((a) => !EXP_PLANT.some((x) => x === a))
-        //     .join(",")
-        // );
-        console.log("res", res);
+        const checkBoxReason = (res.reason || []).filter((el) => {
+          return el === "บัตรประชาชนไม่ชัดเจน/ไม่ถูกต้อง";
+        });
         const checkPlantsOther = res.expPlant.filter((el) => {
           return EXP_PLANT.some((x) => x === el);
         });
@@ -146,8 +142,14 @@ function EditDroner() {
         });
 
         setData(res);
+
         form.setFieldsValue({
-          birthDate: moment(res.birthDate, dateFormat),
+          ...res,
+          postcode: res.address.postcode,
+          province: res.address.provinceId,
+          district: res.address.districtId,
+          subdistrict: res.address.subdistrictId,
+          birthDate: moment(res.birthDate),
           latitude: res.dronerArea?.lat || undefined,
           longitude: res.dronerArea?.long || undefined,
           address1: res.address?.address1 || undefined,
@@ -156,11 +158,20 @@ function EditDroner() {
           dronerArea: res.dronerArea.subdistrictId,
           mapUrl: res.dronerArea?.mapUrl || undefined,
           status: res.status,
-          reason: res.reason,
+          reason:
+            (res?.reason || [])?.filter((el) => {
+              return el !== "บัตรประชาชนไม่ชัดเจน/ไม่ถูกต้อง";
+            }).length > 0
+              ? (res?.reason || [])?.filter((el) => {
+                  return el !== "บัตรประชาชนไม่ชัดเจน/ไม่ถูกต้อง";
+                })
+              : null,
+
           plantsOther:
             plantsOther.length > 0
               ? plantsOther.join(",")
               : undefined,
+          checkReason: checkBoxReason,
         });
         setMapPosition({
           lat: parseFloat(res.dronerArea?.lat),
@@ -240,24 +251,11 @@ function EditDroner() {
   const handleChangeStatus = (e: any) => {
     let status = e.target.value;
 
-    setMoreReason("");
     setStatus(status);
-  };
-
-  const handleCheckBoxReason = (e: any) => {
-    let checked = e.target.checked;
-    let value = e.target.value;
-    let p;
-    if (checked) {
-      p = Map(data).set("reason", [...data.reason, value]);
-    } else {
-      let removeReason = data.reason.filter(
-        (x) => x !== "บัตรประชาชนไม่ชัดเจน/ไม่ถูกต้อง"
-      );
-      p = Map(data).set("reason", removeReason);
-    }
-    setData(p.toJS());
-    checkValidateReason(p.toJS());
+    form.setFieldsValue({
+      reason: "",
+      checkReason: [],
+    });
   };
 
   //#endregion
@@ -310,25 +308,22 @@ function EditDroner() {
         lat: a.lat !== null ? parseFloat(a.lat) : 0,
         lng: a.long !== null ? parseFloat(a.long) : 0,
       });
-      checkValidate(pushLong.toJS());
     } else {
       setMapPosition(LAT_LNG_BANGKOK);
     }
   };
-
   const handleOnChangeLat = (value: any) => {
     const m = Map(dronerArea).set("lat", value.target.value);
     setDronerArea(m.toJS());
-    checkValidate(m.toJS());
     setMapPosition((prev) => ({
       lat: parseFloat(value.target.value),
       lng: prev.lng,
     }));
   };
+
   const handleOnChangeLng = (value: any) => {
     const m = Map(dronerArea).set("long", value.target.value);
     setDronerArea(m.toJS());
-    checkValidate(m.toJS());
     setMapPosition((prev) => ({
       lat: prev.lat,
       lng: parseFloat(value.target.value),
@@ -423,7 +418,6 @@ function EditDroner() {
     setShowAddModal(false);
     setShowEditModal(false);
     setEditIndex(0);
-    setBtnSaveDisable(false);
     setDronerDroneList(dronerDroneList);
   };
   const removeDrone = (index: number) => {
@@ -448,7 +442,6 @@ function EditDroner() {
     const f = Map(e.toJS()).set("category", "PROFILE_IMAGE");
     const g = Map(f.toJS()).set("resourceId", dronerId);
     setCreateImgProfile(g.toJS());
-    checkValidate(g.toJS());
   };
   const onPreviewProfile = async () => {
     let src = imgProfile;
@@ -475,8 +468,8 @@ function EditDroner() {
     }
     setCreateImgProfile(ImageEntity_INTI);
     setImgProfile(undefined);
-    checkValidate(data);
   };
+
   const onChangeIdCard = async (file: any) => {
     let src = file.target.files[0];
     src = await new Promise((resolve) => {
@@ -490,7 +483,6 @@ function EditDroner() {
     const f = Map(e.toJS()).set("category", "ID_CARD_IMAGE");
     const g = Map(f.toJS()).set("resourceId", dronerId);
     setCreateImgIdCrad(g.toJS());
-    checkValidate(data);
   };
   const onPreviewIdCard = async () => {
     let src = imgIdCard;
@@ -517,41 +509,8 @@ function EditDroner() {
     }
     setCreateImgIdCrad(ImageEntity_INTI);
     setImgIdCard(undefined);
-    checkValidate(data);
   };
   //#endregion
-
-  const checkValidate = (data: DronerEntity, otherPlant?: any) => {
-    let checkEmptySting = ![
-      data.firstname,
-      data.lastname,
-      data.telephoneNo,
-      address.address1,
-      address.address2,
-      dronerArea.lat,
-      dronerArea.long,
-    ].includes("");
-    let checkEmptyNumber = ![
-      address.provinceId,
-      address.districtId,
-      address.subdistrictId,
-    ].includes(0);
-    let checkEmptyArray = ![data.expPlant].includes([""]);
-    let checkEmptyDate = ![data?.birthDate].includes("1970-01-01");
-    let checkEmptyOtherPlant =
-      otherPlant !== undefined && otherPlant !== "";
-    if (
-      checkEmptySting &&
-      checkEmptyNumber &&
-      checkEmptyArray &&
-      (checkEmptyArray || checkEmptyOtherPlant) &&
-      checkEmptyDate
-    ) {
-      setBtnSaveDisable(false);
-    } else {
-      setBtnSaveDisable(true);
-    }
-  };
 
   const checkValidateComma = (data: string) => {
     const checkSyntax =
@@ -566,16 +525,28 @@ function EditDroner() {
         : false
       : true;
   };
-  const checkValidateReason = (data: DronerEntity) => {
-    if (data.status === "INACTIVE" || data.status === "REJECTED") {
-      let checkEmptyReason =
-        data.reason.filter((x) => x !== "").length > 0;
-      setBtnSaveDisable(!checkEmptyReason);
-    }
-  };
 
   const updateDroner = async (values: any) => {
-    await DronerDatasource.updateDroner({ ...values }).then((res) => {
+    const reason = [];
+    if (values.checkReason.length > 0) {
+      reason.push(...values.checkReason);
+    }
+    if (!!values.reason) {
+      reason.push(values.reason);
+    }
+    const payload = {
+      ...data,
+      ...values,
+      birthDate: moment(values.birthDate).toISOString(),
+      address,
+      reason,
+
+      dronerArea: {
+        ...dronerArea,
+        mapUrl: values.mapUrl ? values.mapUrl : undefined,
+      },
+    };
+    await DronerDatasource.updateDroner(payload).then((res) => {
       if (res !== undefined) {
         var i = 0;
         for (i; 2 > i; i++) {
@@ -606,6 +577,48 @@ function EditDroner() {
         });
       }
     });
+  };
+
+  const onFieldsChange = () => {
+    const isHasError = form.getFieldsError().some(({ errors }) => {
+      return errors.length > 0;
+    });
+
+    const {
+      mapUrl,
+      plantsOther,
+      dronerArea,
+      checkReason = [],
+      checkPlantsOther,
+      reason,
+      ...rest
+    } = form.getFieldsValue();
+    const reasonList = [];
+    const expPlant = [];
+    if (checkReason.length > 0) {
+      reasonList.push(...checkReason);
+    }
+    if (!!reason) {
+      reasonList.push(reason);
+    }
+    if (checkPlantsOther) {
+      expPlant.push(...checkPlantsOther);
+    }
+    if (plantsOther) {
+      expPlant.push(...plantsOther);
+    }
+    const isHasValues = Object.values({
+      ...rest,
+      expPlant: expPlant.length > 0,
+      reasonList:
+        reasonList.length > 0 &&
+        (status === "REJECTED" || status === "INACTIVE"),
+    }).every((el) => el);
+    if (!isHasError && isHasValues) {
+      setDisableSaveBtn(false);
+    } else {
+      setDisableSaveBtn(true);
+    }
   };
 
   const renderFromData = (
@@ -661,6 +674,7 @@ function EditDroner() {
         <Form
           style={{ padding: "32px" }}
           form={form}
+          onFieldsChange={onFieldsChange}
           onFinish={updateDroner}>
           <div className="row">
             <div className="form-group col-lg-6">
@@ -743,6 +757,7 @@ function EditDroner() {
                   ]}>
                   <DatePicker
                     placeholder="กรอกวันเดือนปีเกิด"
+                    locale={locale}
                     format={dateFormat}
                     disabledDate={(current) =>
                       current && current > moment().endOf("day")
@@ -854,6 +869,7 @@ function EditDroner() {
                       .localeCompare(optionB.children.toLowerCase())
                   }
                   placeholder="เลือกจังหวัด"
+                  allowClear
                   onChange={handleProvince}
                   defaultValue={address.provinceId}>
                   {province.map((item: any, index: any) => (
@@ -879,6 +895,7 @@ function EditDroner() {
                 ]}>
                 <Select
                   showSearch
+                  allowClear
                   optionFilterProp="children"
                   filterOption={(input: any, option: any) =>
                     option.children.includes(input)
@@ -915,6 +932,7 @@ function EditDroner() {
                   },
                 ]}>
                 <Select
+                  allowClear
                   showSearch
                   optionFilterProp="children"
                   filterOption={(input: any, option: any) =>
@@ -1030,7 +1048,7 @@ function EditDroner() {
           </div>
           <div className="form-group">
             <label>หรือ</label>
-            <Form.Item name="url">
+            <Form.Item name="mapUrl">
               <Input
                 placeholder="กรอกข้อมูล Url Google Map"
                 autoComplete="off"
@@ -1095,6 +1113,9 @@ function EditDroner() {
             <Form.Item
               name="checkPlantsOther"
               dependencies={["plantsOther"]}
+              style={{
+                marginBottom: "0px",
+              }}
               rules={[
                 {
                   validator: (_, value, callback) => {
@@ -1186,12 +1207,76 @@ function EditDroner() {
                           {item.name}
                           {status === "REJECTED" && index === 3 ? (
                             <div className="form-group ps-3">
-                              <Checkbox style={{ marginRight: 6 }} />
-                              <label>
-                                บัตรประชาชนไม่ชัดเจน/ไม่ถูกต้อง
-                              </label>
-                              <br />
-                              <Form.Item name="reason">
+                              <Form.Item
+                                style={{
+                                  marginBottom: "0px",
+                                }}
+                                dependencies={["reason"]}
+                                name="checkReason"
+                                rules={[
+                                  {
+                                    validator: (
+                                      _,
+                                      value,
+                                      callback
+                                    ) => {
+                                      const reasonField =
+                                        form.getFieldValue("reason");
+
+                                      if (
+                                        value?.length < 1 &&
+                                        !reasonField
+                                      ) {
+                                        callback(
+                                          "กรุณากรอกเหตุผลที่ไม่อนุมัติ/เลือกเหตุผลที่ไม่อนุมัติ"
+                                        );
+                                      } else {
+                                        callback();
+                                      }
+                                    },
+                                  },
+                                ]}>
+                                <Checkbox.Group>
+                                  <Checkbox
+                                    value="บัตรประชาชนไม่ชัดเจน/ไม่ถูกต้อง"
+                                    style={{ marginRight: 6 }}
+                                  />
+                                  <label>
+                                    บัตรประชาชนไม่ชัดเจน/ไม่ถูกต้อง
+                                  </label>
+                                </Checkbox.Group>
+                              </Form.Item>
+                              <Form.Item
+                                name="reason"
+                                style={{
+                                  marginBottom: "0px",
+                                }}
+                                rules={[
+                                  {
+                                    validator: (
+                                      _,
+                                      value,
+                                      callback
+                                    ) => {
+                                      const checkReason =
+                                        form.getFieldValue(
+                                          "checkReason"
+                                        );
+
+                                      if (
+                                        !value &&
+                                        checkReason.length < 1
+                                      ) {
+                                        callback(
+                                          "กรุณากรอกเหตุผลที่ไม่อนุมัติ"
+                                        );
+                                      } else {
+                                        callback();
+                                      }
+                                    },
+                                  },
+                                ]}
+                                dependencies={["checkReason"]}>
                                 <TextArea
                                   className="col-lg-12"
                                   rows={3}
@@ -1203,7 +1288,25 @@ function EditDroner() {
                           ) : status === "INACTIVE" && index === 4 ? (
                             <div>
                               <div className="form-group ps-3">
-                                <Form.Item name="reason">
+                                <Form.Item
+                                  name="reason"
+                                  rules={[
+                                    {
+                                      validator: (
+                                        _,
+                                        value,
+                                        callback
+                                      ) => {
+                                        if (!value) {
+                                          callback(
+                                            "กรุณากรอกเหตุผลที่ปิดการใช้งาน"
+                                          );
+                                        } else {
+                                          callback();
+                                        }
+                                      },
+                                    },
+                                  ]}>
                                   <TextArea
                                     className="col-lg-12"
                                     rows={3}
@@ -1336,8 +1439,9 @@ function EditDroner() {
       <FooterPage
         onClickBack={() => (window.location.href = "/IndexDroner")}
         onClickSave={() => form.submit()}
-        disableSaveBtn={dronerDroneList.length === 0}
+        disableSaveBtn={disableSaveBtn}
       />
+
       {showAddModal && (
         <ModalDrone
           show={showAddModal}

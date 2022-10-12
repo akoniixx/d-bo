@@ -64,11 +64,12 @@ import {
 import { LAT_LNG_BANGKOK } from "../../../definitions/Location";
 import GoogleMap from "../../../components/map/GoogleMap";
 import moment from "moment";
+import locale from "antd/es/date-picker/locale/th_TH";
 const dateFormat = "DD/MM/YYYY";
 const dateCreateFormat = "YYYY-MM-DD";
 
 const { Map } = require("immutable");
-
+const { Option } = Select;
 function AddDroner() {
   const [form] = Form.useForm();
 
@@ -148,7 +149,6 @@ function AddDroner() {
   ) => {
     const d = Map(addr).set("provinceId", provinceId);
     setAddress(d.toJS());
-    checkValidate(data, d.toJS(), dronerArea);
     await LocationDatasource.getDistrict(provinceId).then((res) => {
       setDistrict(res);
     });
@@ -156,7 +156,6 @@ function AddDroner() {
   const handleOnChangeDistrict = async (districtId: number) => {
     const d = Map(address).set("districtId", districtId);
     setAddress(d.toJS());
-    checkValidate(data, d.toJS(), dronerArea);
     await LocationDatasource.getSubdistrict(districtId).then(
       (res) => {
         setSubdistrict(res);
@@ -166,7 +165,6 @@ function AddDroner() {
   const handleOnChangeSubdistrict = async (subdistrictId: number) => {
     const d = Map(address).set("subdistrictId", subdistrictId);
     setAddress(d.toJS());
-    checkValidate(data, d.toJS(), dronerArea);
     await handleOnChangePostcode(d.toJS());
   };
   const handleOnChangePostcode = (addr: CreateAddressEntity) => {
@@ -178,7 +176,6 @@ function AddDroner() {
     form.setFieldsValue({
       postcode: c.toJS().postcode,
     });
-    checkValidate(data, c.toJS(), dronerArea);
   };
   //#endregion
 
@@ -235,20 +232,14 @@ function AddDroner() {
           longitude: a.long,
         });
       }
-      checkValidate(pushLong.toJS());
     } else {
       setMapPosition(LAT_LNG_BANGKOK);
     }
   };
-  const handleOnChangeUrl = (value: any) => {
-    const m = Map(dronerArea).set("mapUrl", value.target.value);
-    setDronerArea(m.toJS());
-    checkValidate(m.toJS());
-  };
+
   const handleOnChangeLat = (value: any) => {
     const m = Map(dronerArea).set("lat", value.target.value);
     setDronerArea(m.toJS());
-    checkValidate(m.toJS());
     setMapPosition((prev) => ({
       lat: parseFloat(value.target.value),
       lng: prev.lng,
@@ -260,7 +251,6 @@ function AddDroner() {
   const handleOnChangeLng = (value: any) => {
     const m = Map(dronerArea).set("long", value.target.value);
     setDronerArea(m.toJS());
-    checkValidate(m.toJS());
     setMapPosition((prev) => ({
       lat: prev.lat,
       lng: parseFloat(value.target.value),
@@ -270,7 +260,6 @@ function AddDroner() {
     });
   };
   //#endregion
-
   //#region modal
   const editDroneList = (data: DronerDroneEntity, index: number) => {
     setShowEditModal((prev) => !prev);
@@ -328,7 +317,6 @@ function AddDroner() {
   const removeImgProfile = () => {
     setImgProfile(undefined);
     setCreateImgProfile(UploadImageEntity_INTI);
-    checkValidate(data);
   };
   const onChangeIdCard = async (file: any) => {
     let src = file.target.files[0];
@@ -338,7 +326,6 @@ function AddDroner() {
       reader.onload = () => resolve(reader.result);
     });
     setImgIdCard(src);
-    checkValidate(data);
     const d = Map(createImgIdCard).set("file", file.target.files[0]);
     const e = Map(d.toJS()).set("resource", "DRONER");
     const f = Map(e.toJS()).set("category", "ID_CARD_IMAGE");
@@ -361,55 +348,9 @@ function AddDroner() {
   const removeImgIdCard = () => {
     setImgIdCard(undefined);
     setCreateImgIdCard(UploadImageEntity_INTI);
-    checkValidate(data);
   };
   //#endregion
 
-  const checkValidate = (
-    data?: CreateDronerEntity,
-    addr?: CreateAddressEntity,
-    area?: DronerAreaEntity,
-    otherPlant?: any
-  ) => {
-    let checkEmptySting = ![
-      data?.firstname,
-      data?.lastname,
-      data?.telephoneNo,
-      addr?.address1,
-      area?.lat,
-      area?.long,
-    ].includes("");
-    let checkEmptyNumber = ![
-      addr?.provinceId,
-      addr?.districtId,
-      addr?.subdistrictId,
-    ].includes(0);
-    let checkEmptyArray = false;
-    if (data?.expPlant !== undefined) {
-      checkEmptyArray =
-        ![data?.expPlant][0]?.includes("") &&
-        data?.expPlant.length !== 0 &&
-        data?.expPlant !== undefined;
-    }
-    let checkEmptyOtherPlant =
-      otherPlant !== undefined && otherPlant !== "";
-    let checkEmptyDate =
-      ![data?.birthDate].includes("1970-01-01") &&
-      data?.birthDate &&
-      data?.birthDate?.trim().length > 0
-        ? true
-        : false;
-    if (
-      checkEmptySting &&
-      checkEmptyNumber &&
-      checkEmptyDate &&
-      (checkEmptyArray || checkEmptyOtherPlant)
-    ) {
-      setBtnSaveDisable(false);
-    } else {
-      setBtnSaveDisable(true);
-    }
-  };
   const checkValidateComma = (data: string) => {
     const checkSyntax =
       data.includes("*") ||
@@ -424,6 +365,36 @@ function AddDroner() {
       : true;
   };
 
+  const onFieldsChange = () => {
+    const isHasError = form.getFieldsError().some(({ errors }) => {
+      return errors.length > 0;
+    });
+
+    const {
+      mapUrl,
+      plantsOther,
+      dronerArea,
+      checkPlantsOther,
+      ...rest
+    } = form.getFieldsValue();
+    const expPlant = [];
+    if (checkPlantsOther) {
+      expPlant.push(...checkPlantsOther);
+    }
+    if (plantsOther) {
+      expPlant.push(...plantsOther);
+    }
+    const isHasValues = Object.values({
+      ...rest,
+      expPlant: expPlant.length > 0,
+    }).every((el) => el);
+
+    if (!isHasError && isHasValues) {
+      setBtnSaveDisable(false);
+    } else {
+      setBtnSaveDisable(true);
+    }
+  };
   const insertDroner = async (values: any) => {
     const splitPlant = values?.plantsOther
       ? values?.plantsOther?.split(",")
@@ -450,8 +421,8 @@ function AddDroner() {
       "expPlant",
       setOtherPlant
     );
-    console.log("pushOtherPlant", pushOtherPlant.toJS());
-    const newData = {
+
+    const payload = {
       ...pushOtherPlant.toJS(),
       ...values,
       expPlant: expPlant,
@@ -466,7 +437,7 @@ function AddDroner() {
         mapUrl: values.mapUrl,
       },
     };
-    await DronerDatasource.createDronerList(newData).then(
+    await DronerDatasource.createDronerList(payload).then(
       async (res) => {
         if (res !== undefined) {
           const pushImgProId = Map(createImgProfile).set(
@@ -541,6 +512,7 @@ function AddDroner() {
         <Form
           style={{ padding: "32px" }}
           onFinish={insertDroner}
+          onFieldsChange={onFieldsChange}
           form={form}>
           <div className="row">
             <div className="form-group text-center pb-5">
@@ -650,6 +622,7 @@ function AddDroner() {
                 <DatePicker
                   placeholder="กรอกวันเดือนปีเกิด"
                   format={dateFormat}
+                  locale={locale}
                   disabledDate={(current) =>
                     current && current > moment().endOf("day")
                   }
@@ -762,9 +735,9 @@ function AddDroner() {
                   onChange={handleOnChangeProvince}
                   key={address.provinceId}>
                   {province?.map((item) => (
-                    <option value={item.provinceId}>
+                    <Option value={item.provinceId}>
                       {item.provinceName}
-                    </option>
+                    </Option>
                   ))}
                 </Select>
               </Form.Item>
@@ -805,9 +778,9 @@ function AddDroner() {
                   allowClear
                   onChange={handleOnChangeDistrict}>
                   {district?.map((item) => (
-                    <option value={item.districtId}>
+                    <Option value={item.districtId}>
                       {item.districtName}
-                    </option>
+                    </Option>
                   ))}
                 </Select>
               </Form.Item>
@@ -846,9 +819,9 @@ function AddDroner() {
                   }
                   onChange={handleOnChangeSubdistrict}>
                   {subdistrict?.map((item) => (
-                    <option value={item.subdistrictId}>
+                    <Option value={item.subdistrictId}>
                       {item.subdistrictName}
-                    </option>
+                    </Option>
                   ))}
                 </Select>
               </Form.Item>
@@ -926,13 +899,13 @@ function AddDroner() {
                   option.children.includes(input)
                 }>
                 {location?.map((item) => (
-                  <option value={item.subdistrictId}>
+                  <Option value={item.subdistrictId}>
                     {item.subdistrictName +
                       "/" +
                       item.districtName +
                       "/" +
                       item.provinceName}
-                  </option>
+                  </Option>
                 ))}
               </Select>
             </Form.Item>
@@ -942,7 +915,6 @@ function AddDroner() {
             <Form.Item name="mapUrl">
               <Input
                 placeholder="กรอกข้อมูล Url Google Map"
-                onBlur={handleOnChangeUrl}
                 autoComplete="off"
               />
             </Form.Item>
@@ -1007,6 +979,9 @@ function AddDroner() {
             </label>
             <Form.Item
               name="checkPlantsOther"
+              style={{
+                marginBottom: "0px",
+              }}
               dependencies={["plantsOther"]}
               rules={[
                 {
@@ -1014,7 +989,10 @@ function AddDroner() {
                     const plantsOther =
                       form.getFieldValue("plantsOther");
 
-                    if (value?.length < 1 && !plantsOther) {
+                    if (
+                      (!value || value.length === 0) &&
+                      !plantsOther
+                    ) {
                       callback(
                         "กรุณาเลือกพืชที่เคยฉีดพ่นอย่างน้อย 1 อย่าง"
                       );
@@ -1052,7 +1030,7 @@ function AddDroner() {
                     const isDuplicate =
                       splitValue &&
                       splitValue.some((el: string) =>
-                        valueCheckbox.includes(el)
+                        valueCheckbox?.includes(el)
                       );
 
                     if (!!value && checkValidateComma(value)) {
@@ -1063,8 +1041,13 @@ function AddDroner() {
                       callback(
                         "กรุณากรอกพืชที่เคยฉีดพ่นให้ถูกต้อง ไม่ควรมีพืชที่ซ้ำกัน"
                       );
-                    } else {
-                      callback();
+                    } else if (
+                      !value &&
+                      valueCheckbox?.length === 0
+                    ) {
+                      callback(
+                        "กรุณาเลือกพืชที่เคยฉีดพ่น/กรอกพืชที่เคยฉีดพ่นอย่างน้อย 1 อย่าง"
+                      );
                     }
                   },
                 },
@@ -1072,9 +1055,6 @@ function AddDroner() {
               <Input
                 placeholder="กรอกข้อมูลพืชอื่นๆ เช่น ส้ม,มะขาม (กรุณาใช้ (,) ให้กับการเพิ่มพืชมากกว่า 1 อย่าง)"
                 autoComplete="off"
-                defaultValue={data.expPlant
-                  .filter((a) => !EXP_PLANT.some((x) => x === a))
-                  .join(",")}
               />
             </Form.Item>
           </div>
@@ -1145,14 +1125,12 @@ function AddDroner() {
               ))}
           </Form>
         ) : (
-          <Form>
-            <div
-              className="container text-center"
-              style={{ padding: "80px" }}>
-              <img src={emptyData} alt="" />
-              <p>ยังไม่มีข้อมูลโดรน</p>
-            </div>
-          </Form>
+          <div
+            className="container text-center"
+            style={{ padding: "80px" }}>
+            <img src={emptyData} alt="" />
+            <p>ยังไม่มีข้อมูลโดรน</p>
+          </div>
         )}
       </CardContainer>
       <div className="d-flex justify-content-between pt-3">
@@ -1180,10 +1158,11 @@ function AddDroner() {
         {renderFromData}
         {renderDrone}
       </Row>
+
       <FooterPage
         onClickBack={() => (window.location.href = "/IndexDroner")}
         onClickSave={() => form.submit()}
-        disableSaveBtn={dronerDroneList.length < 1}
+        disableSaveBtn={saveBtnDisable}
       />
       {showAddModal && (
         <ModalDrone
