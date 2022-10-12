@@ -26,7 +26,6 @@ export class DronerDatasource {
       status: status,
       search: search,
     };
-    console.log("param", params);
 
     return httpClient
       .get(BASE_URL + "/droner", { params })
@@ -70,7 +69,6 @@ export class DronerDatasource {
   }
 
   static createDronerList(data: CreateDronerEntity): Promise<any> {
-    console.log(data);
     for (let i = 0; data.dronerDrone.length > i; i++) {
       delete data.dronerDrone[i].droneName;
       delete data.dronerDrone[i].id;
