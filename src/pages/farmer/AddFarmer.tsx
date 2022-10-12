@@ -15,7 +15,7 @@ import {
 import { CardContainer } from "../../components/card/CardContainer";
 import { BackIconButton } from "../../components/button/BackButton";
 import TextArea from "antd/lib/input/TextArea";
-import { DeleteOutlined, EditOutlined, PictureFilled } from "@ant-design/icons";
+import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
 import emptyData from "../../resource/media/empties/iconoir_farm.png";
 import color from "../../resource/color";
 import FooterPage from "../../components/footer/FooterPage";
@@ -67,7 +67,9 @@ const _ = require("lodash");
 const { Map } = require("immutable");
 
 const AddFarmer = () => {
-  const [data, setData] = useState<CreateFarmerEntity>(CreateFarmerEntity_INIT);
+  const [data, setData] = useState<CreateFarmerEntity>(
+    CreateFarmerEntity_INIT
+  );
   const [address, setAddress] = useState<CreateAddressEntity>(
     CreateAddressEntity_INIT
   );
@@ -81,23 +83,22 @@ const AddFarmer = () => {
   const [district, setDistrict] = useState<DistrictEntity[]>([
     DistrictEntity_INIT,
   ]);
-  const [subdistrict, setSubdistrict] = useState<SubdistrictEntity[]>([
-    SubdistrictEntity_INIT,
-  ]);
-  const [editFarmerPlot, setEditFarmerPlot] = useState<FarmerPlotEntity>(
-    FarmerPlotEntity_INIT
+  const [subdistrict, setSubdistrict] = useState<SubdistrictEntity[]>(
+    [SubdistrictEntity_INIT]
   );
-  const [farmerPlotList, setFarmerPlotList] = useState<FarmerPlotEntity[]>([]);
+  const [editFarmerPlot, setEditFarmerPlot] =
+    useState<FarmerPlotEntity>(FarmerPlotEntity_INIT);
+  const [farmerPlotList, setFarmerPlotList] = useState<
+    FarmerPlotEntity[]
+  >([]);
 
   const [imgProfile, setImgProfile] = useState<any>();
   const [imgIdCard, setImgIdCard] = useState<any>();
 
-  const [createImgProfile, setCreateImgProfile] = useState<UploadImageEntity>(
-    UploadImageEntity_INTI
-  );
-  const [createImgIdCard, setCreateImgIdCrad] = useState<UploadImageEntity>(
-    UploadImageEntity_INTI
-  );
+  const [createImgProfile, setCreateImgProfile] =
+    useState<UploadImageEntity>(UploadImageEntity_INTI);
+  const [createImgIdCard, setCreateImgIdCrad] =
+    useState<UploadImageEntity>(UploadImageEntity_INTI);
 
   const fetchProvince = async () => {
     await LocationDatasource.getProvince().then((res) => {
@@ -128,7 +129,10 @@ const AddFarmer = () => {
     await getProvince(provinceId, CreateAddressEntity_INIT);
   };
 
-  const getProvince = async (provinceId: number, addr: CreateAddressEntity) => {
+  const getProvince = async (
+    provinceId: number,
+    addr: CreateAddressEntity
+  ) => {
     const d = Map(addr).set(
       "provinceId",
       provinceId == undefined ? 0 : provinceId
@@ -147,9 +151,11 @@ const AddFarmer = () => {
     );
     setAddress(d.toJS());
     checkValidateAddr(d.toJS());
-    await LocationDatasource.getSubdistrict(districtId).then((res) => {
-      setSubdistrict(res);
-    });
+    await LocationDatasource.getSubdistrict(districtId).then(
+      (res) => {
+        setSubdistrict(res);
+      }
+    );
   };
 
   const handleOnChangeSubdistrict = async (subdistrictId: number) => {
@@ -170,7 +176,9 @@ const AddFarmer = () => {
     setAddress(c.toJS());
   };
 
-  const handleOnChangeAddress = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+  const handleOnChangeAddress = (
+    e: React.ChangeEvent<HTMLTextAreaElement>
+  ) => {
     const d = Map(address).set("address1", e.target.value);
     setAddress(d.toJS());
     checkValidateAddr(d.toJS());
@@ -204,10 +212,15 @@ const AddFarmer = () => {
 
   const insertFarmerPlot = (data: FarmerPlotEntity) => {
     if (data.plotId == 0) {
-      const pushId = Map(data).set("plotId", farmerPlotList.length + 1);
+      const pushId = Map(data).set(
+        "plotId",
+        farmerPlotList.length + 1
+      );
       setFarmerPlotList([...farmerPlotList, pushId.toJS()]);
     } else {
-      const newData = farmerPlotList.filter((x) => x.plotId != data.plotId);
+      const newData = farmerPlotList.filter(
+        (x) => x.plotId != data.plotId
+      );
       setFarmerPlotList([...newData, data]);
     }
     setShowAddModal(false);
@@ -330,36 +343,51 @@ const AddFarmer = () => {
   const insertFarmer = async () => {
     const pushAddr = Map(data).set("address", address);
     setData(pushAddr.toJS());
-    const pushPlot = Map(pushAddr.toJS()).set("farmerPlot", farmerPlotList);
+    const pushPlot = Map(pushAddr.toJS()).set(
+      "farmerPlot",
+      farmerPlotList
+    );
     setData(pushPlot.toJS());
 
-    await FarmerDatasource.insertFarmer(pushPlot.toJS()).then((res) => {
-      if (res != undefined) {
-        const pushImgProId = Map(createImgProfile).set("resourceId", res.id);
-        const pushImgCardId = Map(createImgIdCard).set("resourceId", res.id);
-        var i = 0;
-        for (i; 2 > i; i++) {
-          i == 0 &&
-            UploadImageDatasouce.uploadImage(pushImgProId.toJS()).then(res);
-          i == 1 &&
-            UploadImageDatasouce.uploadImage(pushImgCardId.toJS()).then(res);
+    await FarmerDatasource.insertFarmer(pushPlot.toJS()).then(
+      (res) => {
+        if (res != undefined) {
+          const pushImgProId = Map(createImgProfile).set(
+            "resourceId",
+            res.id
+          );
+          const pushImgCardId = Map(createImgIdCard).set(
+            "resourceId",
+            res.id
+          );
+          var i = 0;
+          for (i; 2 > i; i++) {
+            i == 0 &&
+              UploadImageDatasouce.uploadImage(
+                pushImgProId.toJS()
+              ).then(res);
+            i == 1 &&
+              UploadImageDatasouce.uploadImage(
+                pushImgCardId.toJS()
+              ).then(res);
+          }
+          Swal.fire({
+            title: "บันทึกสำเร็จ",
+            icon: "success",
+            timer: 1500,
+            showConfirmButton: false,
+          }).then((time) => {
+            window.location.href = "/IndexFarmer";
+          });
+        } else {
+          Swal.fire({
+            title: "เบอร์โทร หรือ รหัสบัตรประชาชน <br/> ซ้ำในระบบ",
+            icon: "error",
+            showConfirmButton: true,
+          });
         }
-        Swal.fire({
-          title: "บันทึกสำเร็จ",
-          icon: "success",
-          timer: 1500,
-          showConfirmButton: false,
-        }).then((time) => {
-          window.location.href = "/IndexFarmer";
-        });
-      } else {
-        Swal.fire({
-          title: "เบอร์โทร หรือ รหัสบัตรประชาชน <br/> ซ้ำในระบบ",
-          icon: "error",
-          showConfirmButton: true,
-        });
       }
-    });
+    );
   };
 
   const renderFromData = (
@@ -375,8 +403,7 @@ const AddFarmer = () => {
                   backgroundImage: `url(${
                     imgProfile == undefined ? img_empty : imgProfile
                   })`,
-                }}
-              >
+                }}>
                 <input
                   key={imgProfile}
                   type="file"
@@ -390,15 +417,19 @@ const AddFarmer = () => {
                     <Tag
                       color={color.Success}
                       onClick={onPreviewProfile}
-                      style={{ cursor: "pointer", borderRadius: "5px" }}
-                    >
+                      style={{
+                        cursor: "pointer",
+                        borderRadius: "5px",
+                      }}>
                       View
                     </Tag>
                     <Tag
                       color={color.Error}
                       onClick={removeImgProfile}
-                      style={{ cursor: "pointer", borderRadius: "5px" }}
-                    >
+                      style={{
+                        cursor: "pointer",
+                        borderRadius: "5px",
+                      }}>
                       Remove
                     </Tag>
                   </>
@@ -418,8 +449,7 @@ const AddFarmer = () => {
                     required: true,
                     message: "กรุณากรอกชื่อ!",
                   },
-                ]}
-              >
+                ]}>
                 <Input
                   placeholder="กรอกชื่อ"
                   onChange={handleOnChange}
@@ -438,8 +468,7 @@ const AddFarmer = () => {
                     required: true,
                     message: "กรุณากรอกนามสกุล!",
                   },
-                ]}
-              >
+                ]}>
                 <Input
                   placeholder="กรอกนามสกุล"
                   onChange={handleOnChange}
@@ -460,8 +489,7 @@ const AddFarmer = () => {
                     required: true,
                     message: "กรุณากรอกเบอร์โทร!",
                   },
-                ]}
-              >
+                ]}>
                 <Input
                   placeholder="กรอกเบอร์โทร"
                   onChange={handleOnChange}
@@ -480,8 +508,7 @@ const AddFarmer = () => {
                     required: true,
                     message: "กรุณากรอกวันเดือนปีเกิด",
                   },
-                ]}
-              >
+                ]}>
                 <DatePicker
                   placeholder="กรอกวันเดือนปีเกิด"
                   format={dateFormat}
@@ -493,9 +520,7 @@ const AddFarmer = () => {
           </div>
           <div className="row">
             <div className="form-group col-lg-6">
-              <label>
-                รหัสบัตรประชาชน 
-              </label>
+              <label>รหัสบัตรประชาชน</label>
               <Form.Item
                 name="idNo"
                 // rules={[
@@ -506,6 +531,7 @@ const AddFarmer = () => {
                 // ]}
               >
                 <Input
+                  maxLength={13}
                   placeholder="กรอกรหัสบัตรประชาชน"
                   onChange={handleOnChange}
                   autoComplete="off"
@@ -522,9 +548,9 @@ const AddFarmer = () => {
                   className="hiddenFileInput"
                   style={{
                     backgroundImage: `url(${imgIdCard})`,
-                    display: imgIdCard != undefined ? "block" : "none",
-                  }}
-                ></div>
+                    display:
+                      imgIdCard != undefined ? "block" : "none",
+                  }}></div>
               </div>
               <div className="text-left ps-4">
                 {imgIdCard != undefined && (
@@ -532,15 +558,19 @@ const AddFarmer = () => {
                     <Tag
                       color={color.Success}
                       onClick={onPreviewIdCard}
-                      style={{ cursor: "pointer", borderRadius: "5px" }}
-                    >
+                      style={{
+                        cursor: "pointer",
+                        borderRadius: "5px",
+                      }}>
                       View
                     </Tag>
                     <Tag
                       color={color.Error}
                       onClick={removeImgIdCard}
-                      style={{ cursor: "pointer", borderRadius: "5px" }}
-                    >
+                      style={{
+                        cursor: "pointer",
+                        borderRadius: "5px",
+                      }}>
                       Remove
                     </Tag>
                   </>
@@ -551,8 +581,7 @@ const AddFarmer = () => {
                 style={{
                   backgroundImage: `url(${bth_img_empty})`,
                   display: imgIdCard == undefined ? "block" : "none",
-                }}
-              >
+                }}>
                 <input
                   key={imgIdCard}
                   type="file"
@@ -582,10 +611,11 @@ const AddFarmer = () => {
                       .localeCompare(optionB.children.toLowerCase())
                   }
                   onChange={handleOnChangeProvince}
-                  key={address.provinceId}
-                >
+                  key={address.provinceId}>
                   {province?.map((item) => (
-                    <Option value={item.provinceId}>{item.provinceName}</Option>
+                    <Option value={item.provinceId}>
+                      {item.provinceName}
+                    </Option>
                   ))}
                 </Select>
               </Form.Item>
@@ -608,10 +638,11 @@ const AddFarmer = () => {
                       .toLowerCase()
                       .localeCompare(optionB.children.toLowerCase())
                   }
-                  onChange={handleOnChangeDistrict}
-                >
+                  onChange={handleOnChangeDistrict}>
                   {district?.map((item) => (
-                    <Option value={item.districtId}>{item.districtName}</Option>
+                    <Option value={item.districtId}>
+                      {item.districtName}
+                    </Option>
                   ))}
                 </Select>
               </Form.Item>
@@ -636,8 +667,7 @@ const AddFarmer = () => {
                       .toLowerCase()
                       .localeCompare(optionB.children.toLowerCase())
                   }
-                  onChange={handleOnChangeSubdistrict}
-                >
+                  onChange={handleOnChangeSubdistrict}>
                   {subdistrict?.map((item) => (
                     <Option value={item.subdistrictId}>
                       {item.subdistrictName}
@@ -671,8 +701,7 @@ const AddFarmer = () => {
                     required: true,
                     message: "กรุณากรอกที่อยู่บ้าน!",
                   },
-                ]}
-              >
+                ]}>
                 <TextArea
                   className="col-lg-12"
                   rows={5}
@@ -692,8 +721,7 @@ const AddFarmer = () => {
               <br />
               <Radio.Group
                 defaultValue={data.status}
-                onChange={handleChangeStatus}
-              >
+                onChange={handleChangeStatus}>
                 <Space direction="vertical">
                   {FARMER_STATUS_SEARCH.filter(
                     (x) => x.value != "INACTIVE"
@@ -718,8 +746,7 @@ const AddFarmer = () => {
             borderRadius: "12px 12px 0px 0px",
             padding: "10px 10px 10px 10px",
           }}
-          className="d-flex justify-content-between"
-        >
+          className="d-flex justify-content-between">
           <h4 className="pt-2 ps-3" style={{ color: "white" }}>
             แปลงเกษตร
           </h4>
@@ -731,8 +758,7 @@ const AddFarmer = () => {
               border: "none",
               borderRadius: "5px",
             }}
-            onClick={() => setShowAddModal((prev) => !prev)}
-          >
+            onClick={() => setShowAddModal((prev) => !prev)}>
             เพิ่มแปลง
           </Button>
         </div>
@@ -746,17 +772,34 @@ const AddFarmer = () => {
                     <div className="col-lg-4">
                       {item.plotName}
                       <br />
-                      <p style={{ fontSize: "12px", color: color.Grey }}>
+                      <p
+                        style={{
+                          fontSize: "12px",
+                          color: color.Grey,
+                        }}>
                         {item.plantName}
                       </p>
                     </div>
-                    <div className="col-lg-2">{item.raiAmount} ไร่</div>
+                    <div className="col-lg-2">
+                      {item.raiAmount} ไร่
+                    </div>
                     <div className="col-lg-3">
                       <span
-                        style={{ color: colorStatus(item.isActive.toString()) }}
-                      >
-                        <Badge color={colorStatus(item.isActive.toString())} />
-                        {STATUS_NORMAL_MAPPING[item.isActive.toString()]}
+                        style={{
+                          color: colorStatus(
+                            item.isActive.toString()
+                          ),
+                        }}>
+                        <Badge
+                          color={colorStatus(
+                            item.isActive.toString()
+                          )}
+                        />
+                        {
+                          STATUS_NORMAL_MAPPING[
+                            item.isActive.toString()
+                          ]
+                        }
                       </span>
                     </div>
                     <div className="col-lg-3 d-flex justify-content-between">
@@ -781,7 +824,9 @@ const AddFarmer = () => {
           </Form>
         ) : (
           <Form>
-            <div className="container text-center" style={{ padding: "80px" }}>
+            <div
+              className="container text-center"
+              style={{ padding: "80px" }}>
               <img src={emptyData}></img>
               <p>ยังไม่มีแปลงเกษตร</p>
             </div>

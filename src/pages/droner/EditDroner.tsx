@@ -591,6 +591,7 @@ function EditDroner() {
       checkReason = [],
       checkPlantsOther,
       reason,
+      idNo,
       ...rest
     } = form.getFieldsValue();
     const reasonList = [];

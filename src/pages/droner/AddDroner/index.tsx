@@ -375,6 +375,7 @@ function AddDroner() {
       plantsOther,
       dronerArea,
       checkPlantsOther,
+      idNo,
       ...rest
     } = form.getFieldsValue();
     const expPlant = [];
@@ -637,10 +638,6 @@ function AddDroner() {
               <Form.Item
                 name="idNo"
                 rules={[
-                  {
-                    required: true,
-                    message: "กรุณากรอกรหัสบัตรประชาชน",
-                  },
                   {
                     min: 13,
                     message: "กรุณากรอกรหัสบัตรประชาชน 13 หลัก",
