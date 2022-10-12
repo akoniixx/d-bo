@@ -1,3 +1,4 @@
+import { Moment } from "moment";
 import {
   FullAddressEntity,
   FullAddressEntiry_INIT,
@@ -6,7 +7,10 @@ import {
   AddressEntity,
   AddressEntity_INIT,
 } from "./AddressEntities";
-import { FarmerPlotEntity, FarmerPlotEntity_INIT } from "./FarmerPlotEntities";
+import {
+  FarmerPlotEntity,
+  FarmerPlotEntity_INIT,
+} from "./FarmerPlotEntities";
 import { ImageEntity, ImageEntity_INTI } from "./UploadImageEntities";
 
 export interface FarmerEntity {
@@ -45,7 +49,7 @@ export interface GetFarmerEntity {
   telephoneNo: string;
   status: string;
   reason: string;
-  birthDate: string;
+  birthDate: string | Moment;
   address: AddressEntity;
   farmerPlot: FarmerPlotEntity[];
   file: ImageEntity[];

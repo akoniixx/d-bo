@@ -770,7 +770,15 @@ const AddFarmer = () => {
                 <div className="container">
                   <div className="row pt-3 pb-3">
                     <div className="col-lg-4">
-                      {item.plotName}
+                      <p
+                        style={{
+                          textOverflow: "ellipsis",
+                          overflow: "hidden",
+                          whiteSpace: "nowrap",
+                          marginBottom: 0,
+                        }}>
+                        {item.plotName}
+                      </p>
                       <br />
                       <p
                         style={{
@@ -827,7 +835,7 @@ const AddFarmer = () => {
             <div
               className="container text-center"
               style={{ padding: "80px" }}>
-              <img src={emptyData}></img>
+              <img src={emptyData} alt="" />
               <p>ยังไม่มีแปลงเกษตร</p>
             </div>
           </Form>
