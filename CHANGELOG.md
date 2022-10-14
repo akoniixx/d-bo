@@ -1,4 +1,8 @@
 ## [Version - 0]
+## Fix [v0.17.12] 2022-10-14
+- increase validate Tel number  Droner & Farmer (Add & Edit)
+- fixed Lat long not changing when change address
+- fixed when edit droner  field expPlant not changing
 ## Fix [v0.17.11] 2022-10-14
 - fixed defect button cant submit Droner (Add & Edit)
 - fixed DatePicker cant select date future

@@ -503,10 +503,19 @@ const AddFarmer = () => {
                     required: true,
                     message: "กรุณากรอกเบอร์โทร!",
                   },
+                  {
+                    pattern: new RegExp(/^[0-9\b]+$/),
+                    message: "กรุณากรอกเบอร์โทรให้ถูกต้อง!",
+                  },
+                  {
+                    min: 10,
+                    message: "กรุณากรอกเบอร์โทรให้ครบ 10 หลัก!",
+                  },
                 ]}>
                 <Input
                   placeholder="กรอกเบอร์โทร"
                   onChange={handleOnChange}
+                  maxLength={10}
                   autoComplete="off"
                 />
               </Form.Item>
@@ -544,6 +553,10 @@ const AddFarmer = () => {
                   {
                     min: 13,
                     message: "กรุณากรอกรหัสบัตรประชาชน 13 หลัก",
+                  },
+                  {
+                    pattern: new RegExp(/^[0-9\b]+$/),
+                    message: "กรุณากรอกรหัสบัตรประชาชนให้ถูกต้อง!",
                   },
                 ]}>
                 <Input
