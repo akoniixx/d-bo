@@ -601,10 +601,19 @@ function AddDroner() {
                     required: true,
                     message: "กรุณากรอกเบอร์โทร!",
                   },
+                  {
+                    pattern: new RegExp(/^[0-9\b]+$/),
+                    message: "กรุณากรอกเบอร์โทรให้ถูกต้อง!",
+                  },
+                  {
+                    min: 10,
+                    message: "กรุณากรอกเบอร์โทรให้ครบ 10 หลัก!",
+                  },
                 ]}>
                 <Input
                   placeholder="กรอกเบอร์โทร"
                   autoComplete="off"
+                  maxLength={10}
                 />
               </Form.Item>
             </div>
@@ -641,6 +650,10 @@ function AddDroner() {
                   {
                     min: 13,
                     message: "กรุณากรอกรหัสบัตรประชาชน 13 หลัก",
+                  },
+                  {
+                    pattern: new RegExp(/^[0-9\b]+$/),
+                    message: "กรุณากรอกรหัสบัตรประชาชนให้ถูกต้อง!",
                   },
                 ]}>
                 <Input
@@ -1030,12 +1043,13 @@ function AddDroner() {
                       splitValue.some((el: string) =>
                         valueCheckbox?.includes(el)
                       );
-
+                    const isDupTyping =
+                      new Set(splitValue).size !== splitValue.length;
                     if (!!value && checkValidateComma(value)) {
                       return Promise.reject(
                         "กรุณาใช้ (,) ให้กับการเพิ่มพืชมากกว่า 1 อย่าง"
                       );
-                    } else if (isDuplicate) {
+                    } else if (isDuplicate || isDupTyping) {
                       return Promise.reject(
                         "กรุณากรอกพืชที่เคยฉีดพ่นให้ถูกต้อง ไม่ควรมีพืชที่ซ้ำกัน"
                       );

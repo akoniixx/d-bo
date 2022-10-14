@@ -306,6 +306,10 @@ function EditDroner() {
       const pushLat = Map(pushSubDis.toJS()).set("lat", a.lat);
       const pushLong = Map(pushLat.toJS()).set("long", a.long);
       setDronerArea(pushLong.toJS());
+      form.setFieldsValue({
+        latitude: a.lat,
+        longitude: a.long,
+      });
       setMapPosition({
         lat: a.lat !== null ? parseFloat(a.lat) : 0,
         lng: a.long !== null ? parseFloat(a.long) : 0,
@@ -530,6 +534,15 @@ function EditDroner() {
 
   const updateDroner = async (values: any) => {
     const reason = [];
+
+    const splitPlant = values?.plantsOther
+      ? values?.plantsOther?.split(",")
+      : [];
+    const expPlant =
+      splitPlant.length > 0
+        ? [...values.checkPlantsOther, ...splitPlant]
+        : values.checkPlantsOther;
+
     if (values?.checkReason?.length > 0) {
       reason.push(...values.checkReason);
     }
@@ -542,7 +555,7 @@ function EditDroner() {
       birthDate: moment(values.birthDate).toISOString(),
       address,
       reason,
-
+      expPlant,
       dronerArea: {
         ...dronerArea,
         mapUrl: values.mapUrl ? values.mapUrl : undefined,
@@ -736,6 +749,14 @@ function EditDroner() {
                     required: true,
                     message: "กรุณากรอกเบอร์โทร!",
                   },
+                  {
+                    pattern: new RegExp(/^[0-9\b]+$/),
+                    message: "กรุณากรอกเบอร์โทรให้ถูกต้อง!",
+                  },
+                  {
+                    min: 10,
+                    message: "กรุณากรอกเบอร์โทรให้ครบ 10 หลัก!",
+                  },
                 ]}>
                 <Input
                   placeholder=""
@@ -783,12 +804,12 @@ function EditDroner() {
                 name="idNo"
                 rules={[
                   {
-                    required: true,
-                    message: "กรุณากรอกรหัสบัตรประชาชน",
-                  },
-                  {
                     min: 13,
                     message: "กรุณากรอกรหัสบัตรประชาชน 13 หลัก",
+                  },
+                  {
+                    pattern: new RegExp(/^[0-9\b]+$/),
+                    message: "กรุณากรอกรหัสบัตรประชาชนให้ถูกต้อง!",
                   },
                 ]}>
                 <Input
@@ -1171,11 +1192,14 @@ function EditDroner() {
                         valueCheckbox.includes(el)
                       );
 
+                    const isDupTyping =
+                      new Set(splitValue).size !== splitValue.length;
+
                     if (!!value && checkValidateComma(value)) {
                       return Promise.reject(
                         "กรุณาใช้ (,) ให้กับการเพิ่มพืชมากกว่า 1 อย่าง"
                       );
-                    } else if (isDuplicate) {
+                    } else if (isDuplicate || isDupTyping) {
                       return Promise.reject(
                         "กรุณากรอกพืชที่เคยฉีดพ่นให้ถูกต้อง ไม่ควรมีพืชที่ซ้ำกัน"
                       );

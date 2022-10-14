@@ -564,11 +564,20 @@ const EditFarmer = () => {
                     required: true,
                     message: "กรุณากรอกเบอร์โทร!",
                   },
+                  {
+                    pattern: new RegExp(/^[0-9\b]+$/),
+                    message: "กรุณากรอกเบอร์โทรให้ถูกต้อง!",
+                  },
+                  {
+                    min: 10,
+                    message: "กรุณากรอกเบอร์โทรให้ครบ 10 หลัก!",
+                  },
                 ]}>
                 <Input
                   placeholder="กรอกเบอร์โทร"
                   defaultValue={data.telephoneNo}
                   autoComplete="off"
+                  maxLength={10}
                   onChange={handleOnChange}
                 />
               </Form.Item>
@@ -603,18 +612,22 @@ const EditFarmer = () => {
               <label>รหัสบัตรประชาชน</label>
               <Form.Item
                 name="idNo"
-                // rules={[
-                //   {
-                //     required: true,
-                //     message: "กรุณากรอกรหัสบัตรประชาชน!",
-                //   },
-                // ]}
-              >
+                rules={[
+                  {
+                    min: 13,
+                    message:
+                      "กรุณากรอกรหัสบัตรประชาชนให้ครบ 13 หลัก!",
+                  },
+                  {
+                    pattern: new RegExp(/^[0-9\b]+$/),
+                    message: "กรุณากรอกรหัสบัตรประชาชนให้ถูกต้อง!",
+                  },
+                ]}>
                 <Input
                   placeholder="กรอกรหัสบัตรประชาชน"
                   defaultValue={data.idNo}
                   autoComplete="off"
-                  minLength={13}
+                  maxLength={13}
                   onChange={handleOnChange}
                 />
               </Form.Item>
