@@ -1,4 +1,7 @@
-import { PlotAreaEntity, PlotAreaEntity_INIT } from './PlotAreaEntities';
+import {
+  PlotAreaEntity,
+  PlotAreaEntity_INIT,
+} from "./PlotAreaEntities";
 import { LAT_LNG_BANGKOK } from "../definitions/Location";
 
 export interface FarmerPlotEntity {

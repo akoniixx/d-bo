@@ -1,4 +1,6 @@
 ## [Version - 0]
+## Fix [v0.17.10] 2022-10-12
+- change form to AntdForm  'Droner' & 'Farmer' Menu
 ## Fix [v0.17.9] 2022-10-05
 - fixed wording in add droner menu
 ## Fix [v0.17.8] 2022-10-05
