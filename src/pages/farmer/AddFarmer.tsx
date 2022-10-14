@@ -57,6 +57,7 @@ import { UploadImageDatasouce } from "../../datasource/UploadImageDatasource";
 import img_empty from "../../resource/media/empties/uploadImg.png";
 import bth_img_empty from "../../resource/media/empties/upload_Img_btn.png";
 import moment from "moment";
+import { resizeFileImg } from "../../utilities/ResizeImage";
 
 const dateFormat = "DD/MM/YYYY";
 const dateCreateFormat = "YYYY-MM-DD";
@@ -232,6 +233,19 @@ const AddFarmer = () => {
   //#region image
   const onChangeProfile = async (file: any) => {
     let src = file.target.files[0];
+    // let src: any;
+    // src = await resizeFileImg({
+    //   file: source,
+    //   maxWidth: 300,
+    //   maxHeight: 300,
+    //   compressFormat: source?.type.split("/")[1],
+    //   quality: 0.9,
+    //   rotation: 0,
+    //   responseUriFunc: (res: any) => {
+    //     console.log(res);
+    //   },
+    // });
+
     src = await new Promise((resolve) => {
       const reader = new FileReader();
       reader.readAsDataURL(src);
@@ -513,6 +527,9 @@ const AddFarmer = () => {
                   placeholder="กรอกวันเดือนปีเกิด"
                   format={dateFormat}
                   className="col-lg-12"
+                  disabledDate={(current) =>
+                    current && current > moment().endOf("day")
+                  }
                   onChange={(e: any) => handleOnChangeBirthday(e)}
                 />
               </Form.Item>
@@ -523,13 +540,12 @@ const AddFarmer = () => {
               <label>รหัสบัตรประชาชน</label>
               <Form.Item
                 name="idNo"
-                // rules={[
-                //   {
-                //     required: true,
-                //     message: "กรุณากรอกรหัสบัตรประชาชน!",
-                //   },
-                // ]}
-              >
+                rules={[
+                  {
+                    min: 13,
+                    message: "กรุณากรอกรหัสบัตรประชาชน 13 หลัก",
+                  },
+                ]}>
                 <Input
                   maxLength={13}
                   placeholder="กรอกรหัสบัตรประชาชน"
@@ -881,6 +897,7 @@ const AddFarmer = () => {
       )}
       {showEditModal && (
         <ModalFarmerPlot
+          isEditModal
           show={showEditModal}
           backButton={() => setShowEditModal((prev) => !prev)}
           callBack={insertFarmerPlot}

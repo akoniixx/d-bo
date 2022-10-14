@@ -379,11 +379,11 @@ function AddDroner() {
       ...rest
     } = form.getFieldsValue();
     const expPlant = [];
-    if (checkPlantsOther) {
+    if (checkPlantsOther?.length > 0) {
       expPlant.push(...checkPlantsOther);
     }
-    if (plantsOther) {
-      expPlant.push(...plantsOther);
+    if (!!plantsOther) {
+      expPlant.push(plantsOther);
     }
     const isHasValues = Object.values({
       ...rest,
@@ -982,7 +982,7 @@ function AddDroner() {
               dependencies={["plantsOther"]}
               rules={[
                 {
-                  validator: (_, value, callback) => {
+                  validator: (_, value) => {
                     const plantsOther =
                       form.getFieldValue("plantsOther");
 
@@ -990,11 +990,11 @@ function AddDroner() {
                       (!value || value.length === 0) &&
                       !plantsOther
                     ) {
-                      callback(
+                      return Promise.reject(
                         "กรุณาเลือกพืชที่เคยฉีดพ่นอย่างน้อย 1 อย่าง"
                       );
                     } else {
-                      callback();
+                      return Promise.resolve();
                     }
                   },
                 },
@@ -1019,8 +1019,9 @@ function AddDroner() {
               dependencies={["checkPlantsOther"]}
               rules={[
                 {
-                  validator(rule, value, callback) {
-                    const splitValue = value && value.split(",");
+                  validator(rule, value) {
+                    const splitValue =
+                      (value && value.split(",")) || [];
                     const valueCheckbox = form.getFieldValue(
                       "checkPlantsOther"
                     );
@@ -1031,20 +1032,22 @@ function AddDroner() {
                       );
 
                     if (!!value && checkValidateComma(value)) {
-                      callback(
+                      return Promise.reject(
                         "กรุณาใช้ (,) ให้กับการเพิ่มพืชมากกว่า 1 อย่าง"
                       );
                     } else if (isDuplicate) {
-                      callback(
+                      return Promise.reject(
                         "กรุณากรอกพืชที่เคยฉีดพ่นให้ถูกต้อง ไม่ควรมีพืชที่ซ้ำกัน"
                       );
                     } else if (
                       !value &&
                       valueCheckbox?.length === 0
                     ) {
-                      callback(
+                      return Promise.reject(
                         "กรุณาเลือกพืชที่เคยฉีดพ่น/กรอกพืชที่เคยฉีดพ่นอย่างน้อย 1 อย่าง"
                       );
+                    } else {
+                      return Promise.resolve();
                     }
                   },
                 },

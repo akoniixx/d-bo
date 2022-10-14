@@ -14,7 +14,7 @@ export const resizeFileImg = (params: {
   minWidth?: number;
   minHeight?: number;
 }): Promise<string | Blob | File | ProgressEvent<FileReader>> => {
-  const outPutType = params.outputType ? params.outputType : "File";
+  const outPutType = params.outputType ? params.outputType : "blob";
   return new Promise((resolve) => {
     Resizer.imageFileResizer(
       params.file,
