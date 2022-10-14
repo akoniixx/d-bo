@@ -978,6 +978,7 @@ const EditFarmer = () => {
       )}
       {showEditModal && (
         <ModalFarmerPlot
+          isEditModal
           show={showEditModal}
           backButton={() => setShowEditModal((prev) => !prev)}
           callBack={updateFarmerPlot}

@@ -20,6 +20,7 @@ interface ModalFarmerPlotProps {
   data: FarmerPlotEntity;
   editIndex: number;
   title: string;
+  isEditModal?: boolean;
 }
 const ModalFarmerPlot: React.FC<ModalFarmerPlotProps> = ({
   show,
@@ -28,11 +29,14 @@ const ModalFarmerPlot: React.FC<ModalFarmerPlotProps> = ({
   data,
   editIndex,
   title,
+  isEditModal = false,
 }) => {
   const [form] = Form.useForm();
   const [farmerPlot, setFarmerPlot] =
     useState<FarmerPlotEntity>(data);
-  const [saveBtnDisable, setBtnSaveDisable] = useState<boolean>(true);
+  const [saveBtnDisable, setBtnSaveDisable] = useState<boolean>(
+    isEditModal ? false : true
+  );
   const [mapPosition, setMapPosition] = useState<{
     lat: number;
     lng: number;
