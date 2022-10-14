@@ -1,4 +1,8 @@
 ## [Version - 0]
+## Fix [v0.17.11] 2022-10-14
+- fixed defect button cant submit Droner (Add & Edit)
+- fixed DatePicker cant select date future
+- fixed Disable button in Modal edit AreaFarmer 
 ## Fix [v0.17.10] 2022-10-12
 - change form to AntdForm  'Droner' & 'Farmer' Menu
 ## Fix [v0.17.9] 2022-10-05
