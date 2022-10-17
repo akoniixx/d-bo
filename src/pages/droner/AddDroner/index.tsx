@@ -369,7 +369,6 @@ function AddDroner() {
     const isHasError = form.getFieldsError().some(({ errors }) => {
       return errors.length > 0;
     });
-    console.log(isHasError);
 
     const {
       mapUrl,
