@@ -73,11 +73,15 @@ let queryString = _.split(window.location.pathname, "=");
 
 const EditFarmer = () => {
   const farmerId = queryString[1];
-  const [data, setData] = useState<GetFarmerEntity>(GetFarmerEntity_INIT);
-  const [address, setAddress] = useState<AddressEntity>(AddressEntity_INIT);
-  const [farmerPlotList, setFarmerPlotList] = useState<FarmerPlotEntity[]>([
-    FarmerPlotEntity_INIT,
-  ]);
+  const [data, setData] = useState<GetFarmerEntity>(
+    GetFarmerEntity_INIT
+  );
+  const [address, setAddress] = useState<AddressEntity>(
+    AddressEntity_INIT
+  );
+  const [farmerPlotList, setFarmerPlotList] = useState<
+    FarmerPlotEntity[]
+  >([FarmerPlotEntity_INIT]);
   const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [editIndex, setEditIndex] = useState(0);
@@ -88,13 +92,13 @@ const EditFarmer = () => {
   const [district, setDistrict] = useState<DistrictEntity[]>([
     DistrictEntity_INIT,
   ]);
-  const [subdistrict, setSubdistrict] = useState<SubdistrictEntity[]>([
-    SubdistrictEntity_INIT,
-  ]);
-  const [saveBtnDisable, setBtnSaveDisable] = useState<boolean>(true);
-  const [editFarmerPlot, setEditFarmerPlot] = useState<FarmerPlotEntity>(
-    FarmerPlotEntity_INIT
+  const [subdistrict, setSubdistrict] = useState<SubdistrictEntity[]>(
+    [SubdistrictEntity_INIT]
   );
+  const [saveBtnDisable, setBtnSaveDisable] =
+    useState<boolean>(false);
+  const [editFarmerPlot, setEditFarmerPlot] =
+    useState<FarmerPlotEntity>(FarmerPlotEntity_INIT);
 
   const [imgProfile, setImgProfile] = useState<any>();
   const [imgIdCard, setImgIdCard] = useState<any>();
@@ -104,31 +108,41 @@ const EditFarmer = () => {
   const [createImgIdCard, setCreateImgIdCrad] =
     useState<ImageEntity>(ImageEntity_INTI);
 
-  let imgList: (string | boolean)[] = [];
-
   const fecthFarmer = async () => {
     await FarmerDatasource.getFarmerById(farmerId).then((res) => {
-      setData(res);
+      setData({
+        ...res,
+        birthDate: res.birthDate ? moment(res.birthDate) : moment(),
+      });
+
       setAddress(res.address);
       setFarmerPlotList(res.farmerPlot);
-      let getPathPro = res.file.filter((x) => x.category == "PROFILE_IMAGE");
-      let getPathCard = res.file.filter((x) => x.category == "ID_CARD_IMAGE");
-      imgList.push(
-        getPathPro.length >= 1 ? getPathPro[0].path : "",
-        getPathCard.length >= 1 ? getPathCard[0].path : ""
+      let getPathPro = res.file.filter(
+        (x) => x.category == "PROFILE_IMAGE"
       );
-      var i = 0;
+      let getPathCard = res.file.filter(
+        (x) => x.category == "ID_CARD_IMAGE"
+      );
+      let imgList: (string | boolean)[] = [];
+      if (getPathPro.length > 0) {
+        imgList.push(getPathPro[0].path);
+      }
+      if (getPathCard.length > 0) {
+        imgList.push(getPathCard[0].path);
+      }
+
+      let i = 0;
       for (i; imgList.length > i; i++) {
-        i == 0 &&
+        i === 0 &&
           UploadImageDatasouce.getImage(imgList[i].toString()).then(
             (resImg) => {
-              setImgProfile(resImg.url);
+              resImg?.url && setImgProfile(resImg.url);
             }
           );
-        i == 1 &&
+        i === 1 &&
           UploadImageDatasouce.getImage(imgList[i].toString()).then(
             (resImg) => {
-              setImgIdCard(resImg.url);
+              resImg?.url && setImgIdCard(resImg.url);
             }
           );
       }
@@ -137,6 +151,7 @@ const EditFarmer = () => {
 
   useEffect(() => {
     fecthFarmer();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -146,9 +161,11 @@ const EditFarmer = () => {
     LocationDatasource.getDistrict(address.provinceId).then((res) => {
       setDistrict(res);
     });
-    LocationDatasource.getSubdistrict(address.districtId).then((res) => {
-      setSubdistrict(res);
-    });
+    LocationDatasource.getSubdistrict(address.districtId).then(
+      (res) => {
+        setSubdistrict(res);
+      }
+    );
   }, [address.provinceId, address.districtId]);
 
   //#region function farmer
@@ -201,7 +218,9 @@ const EditFarmer = () => {
     checkValidateAddr(c.toJS());
   };
 
-  const handleOnChangeAddress = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+  const handleOnChangeAddress = (
+    e: React.ChangeEvent<HTMLTextAreaElement>
+  ) => {
     const d = Map(address).set("address1", e.target.value);
     setAddress(d.toJS());
     checkValidateAddr(d.toJS());
@@ -217,7 +236,9 @@ const EditFarmer = () => {
     checkValidateReason(m.toJS());
   };
 
-  const handleOnChangeReason = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+  const handleOnChangeReason = (
+    e: React.ChangeEvent<HTMLTextAreaElement>
+  ) => {
     const d = Map(data).set("reason", e.target.value);
     setData(d.toJS());
     checkValidateAddr(d.toJS());
@@ -296,7 +317,9 @@ const EditFarmer = () => {
   };
 
   const removeImg = () => {
-    const getImg = data.file.filter((x) => x.category == "PROFILE_IMAGE")[0];
+    const getImg = data.file.filter(
+      (x) => x.category == "PROFILE_IMAGE"
+    )[0];
     if (getImg != undefined) {
       UploadImageDatasouce.deleteImage(getImg.id, getImg.path).then(
         (res) => {}
@@ -337,7 +360,9 @@ const EditFarmer = () => {
     imgWindow?.document.write(image.outerHTML);
   };
   const removeImgIdCard = () => {
-    const getImg = data.file.filter((x) => x.category == "ID_CARD_IMAGE")[0];
+    const getImg = data.file.filter(
+      (x) => x.category == "ID_CARD_IMAGE"
+    )[0];
     if (getImg != undefined) {
       UploadImageDatasouce.deleteImage(getImg.id, getImg.path).then(
         (res) => {}
@@ -403,33 +428,39 @@ const EditFarmer = () => {
   const updateFarmer = async () => {
     const pushAddr = Map(data).set("address", address);
     const pushPin = Map(pushAddr.toJS()).set("pin", "");
-    await FarmerDatasource.updateFarmer(pushPin.toJS()).then((res) => {
-      if (res != undefined) {
-        var i = 0;
-        for (i; 2 > i; i++) {
-          i == 0 &&
-            createImgProfile.file != "" &&
-            UploadImageDatasouce.uploadImage(createImgProfile).then(res);
-          i == 1 &&
-            createImgIdCard.file != "" &&
-            UploadImageDatasouce.uploadImage(createImgIdCard).then(res);
+    await FarmerDatasource.updateFarmer(pushPin.toJS()).then(
+      (res) => {
+        if (res != undefined) {
+          var i = 0;
+          for (i; 2 > i; i++) {
+            i == 0 &&
+              createImgProfile.file != "" &&
+              UploadImageDatasouce.uploadImage(createImgProfile).then(
+                res
+              );
+            i == 1 &&
+              createImgIdCard.file != "" &&
+              UploadImageDatasouce.uploadImage(createImgIdCard).then(
+                res
+              );
+          }
+          Swal.fire({
+            title: "บันทึกสำเร็จ",
+            icon: "success",
+            timer: 1500,
+            showConfirmButton: false,
+          }).then((time) => {
+            window.location.href = "/IndexFarmer";
+          });
+        } else {
+          Swal.fire({
+            title: "เบอร์โทร หรือ รหัสบัตรประชาชน <br/> ซ้ำในระบบ",
+            icon: "error",
+            showConfirmButton: true,
+          });
         }
-        Swal.fire({
-          title: "บันทึกสำเร็จ",
-          icon: "success",
-          timer: 1500,
-          showConfirmButton: false,
-        }).then((time) => {
-          window.location.href = "/IndexFarmer";
-        });
-      } else {
-        Swal.fire({
-          title: "เบอร์โทร หรือ รหัสบัตรประชาชน <br/> ซ้ำในระบบ",
-          icon: "error",
-          showConfirmButton: true,
-        });
       }
-    });
+    );
   };
 
   const renderFromData = (
@@ -443,10 +474,9 @@ const EditFarmer = () => {
                 className="hiddenFileInput zoom"
                 style={{
                   backgroundImage: `url(${
-                    imgProfile == undefined ? img_empty : imgProfile
+                    imgProfile === undefined ? img_empty : imgProfile
                   })`,
-                }}
-              >
+                }}>
                 <input
                   key={imgProfile}
                   type="file"
@@ -455,20 +485,24 @@ const EditFarmer = () => {
                 />
               </div>
               <div>
-                {imgProfile != undefined && (
+                {imgProfile !== undefined && (
                   <>
                     <Tag
                       color={color.Success}
                       onClick={onPreviewProfile}
-                      style={{ cursor: "pointer", borderRadius: "5px" }}
-                    >
+                      style={{
+                        cursor: "pointer",
+                        borderRadius: "5px",
+                      }}>
                       View
                     </Tag>
                     <Tag
                       color={color.Error}
                       onClick={removeImg}
-                      style={{ cursor: "pointer", borderRadius: "5px" }}
-                    >
+                      style={{
+                        cursor: "pointer",
+                        borderRadius: "5px",
+                      }}>
                       Remove
                     </Tag>
                   </>
@@ -488,8 +522,7 @@ const EditFarmer = () => {
                     required: true,
                     message: "กรุณากรอกชื่อ!",
                   },
-                ]}
-              >
+                ]}>
                 <Input
                   placeholder="กรอกชื่อ"
                   defaultValue={data.firstname}
@@ -509,8 +542,7 @@ const EditFarmer = () => {
                     required: true,
                     message: "กรุณากรอกนามสกุล!",
                   },
-                ]}
-              >
+                ]}>
                 <Input
                   placeholder="กรอกนามสกุล"
                   defaultValue={data.lastname}
@@ -532,12 +564,20 @@ const EditFarmer = () => {
                     required: true,
                     message: "กรุณากรอกเบอร์โทร!",
                   },
-                ]}
-              >
+                  {
+                    pattern: new RegExp(/^[0-9\b]+$/),
+                    message: "กรุณากรอกเบอร์โทรให้ถูกต้อง!",
+                  },
+                  {
+                    min: 10,
+                    message: "กรุณากรอกเบอร์โทรให้ครบ 10 หลัก!",
+                  },
+                ]}>
                 <Input
                   placeholder="กรอกเบอร์โทร"
                   defaultValue={data.telephoneNo}
                   autoComplete="off"
+                  maxLength={10}
                   onChange={handleOnChange}
                 />
               </Form.Item>
@@ -553,12 +593,14 @@ const EditFarmer = () => {
                     required: true,
                     message: "กรุณากรอกวันเดือนปีเกิด",
                   },
-                ]}
-              >
+                ]}>
                 <DatePicker
                   placeholder="กรอกวันเดือนปีเกิด"
                   format={dateFormat}
                   className="col-lg-12"
+                  disabledDate={(current) => {
+                    return current && current > moment().endOf("day");
+                  }}
                   onChange={(e: any) => handleOnChangeBirthday(e)}
                   defaultValue={moment(data.birthDate)}
                 />
@@ -570,17 +612,22 @@ const EditFarmer = () => {
               <label>รหัสบัตรประชาชน</label>
               <Form.Item
                 name="idNo"
-                // rules={[
-                //   {
-                //     required: true,
-                //     message: "กรุณากรอกรหัสบัตรประชาชน!",
-                //   },
-                // ]}
-              >
+                rules={[
+                  {
+                    min: 13,
+                    message:
+                      "กรุณากรอกรหัสบัตรประชาชนให้ครบ 13 หลัก!",
+                  },
+                  {
+                    pattern: new RegExp(/^[0-9\b]+$/),
+                    message: "กรุณากรอกรหัสบัตรประชาชนให้ถูกต้อง!",
+                  },
+                ]}>
                 <Input
                   placeholder="กรอกรหัสบัตรประชาชน"
                   defaultValue={data.idNo}
                   autoComplete="off"
+                  maxLength={13}
                   onChange={handleOnChange}
                 />
               </Form.Item>
@@ -595,9 +642,9 @@ const EditFarmer = () => {
                   className="hiddenFileInput"
                   style={{
                     backgroundImage: `url(${imgIdCard})`,
-                    display: imgIdCard != undefined ? "block" : "none",
-                  }}
-                ></div>
+                    display:
+                      imgIdCard != undefined ? "block" : "none",
+                  }}></div>
               </div>
               <div className="text-left ps-4">
                 {imgIdCard != undefined && (
@@ -605,15 +652,19 @@ const EditFarmer = () => {
                     <Tag
                       color={color.Success}
                       onClick={onPreviewIdCard}
-                      style={{ cursor: "pointer", borderRadius: "5px" }}
-                    >
+                      style={{
+                        cursor: "pointer",
+                        borderRadius: "5px",
+                      }}>
                       View
                     </Tag>
                     <Tag
                       color={color.Error}
                       onClick={removeImgIdCard}
-                      style={{ cursor: "pointer", borderRadius: "5px" }}
-                    >
+                      style={{
+                        cursor: "pointer",
+                        borderRadius: "5px",
+                      }}>
                       Remove
                     </Tag>
                   </>
@@ -624,8 +675,7 @@ const EditFarmer = () => {
                 style={{
                   backgroundImage: `url(${bth_img_empty})`,
                   display: imgIdCard == undefined ? "block" : "none",
-                }}
-              >
+                }}>
                 <input
                   key={imgIdCard}
                   type="file"
@@ -655,10 +705,11 @@ const EditFarmer = () => {
                       .toLowerCase()
                       .localeCompare(optionB.children.toLowerCase())
                   }
-                  onChange={handleOnChangeProvince}
-                >
+                  onChange={handleOnChangeProvince}>
                   {province?.map((item) => (
-                    <Option value={item.provinceId}>{item.provinceName}</Option>
+                    <Option value={item.provinceId}>
+                      {item.provinceName}
+                    </Option>
                   ))}
                 </Select>
               </Form.Item>
@@ -682,10 +733,11 @@ const EditFarmer = () => {
                       .toLowerCase()
                       .localeCompare(optionB.children.toLowerCase())
                   }
-                  onChange={handleOnChangeDistrict}
-                >
+                  onChange={handleOnChangeDistrict}>
                   {district?.map((item) => (
-                    <Option value={item.districtId}>{item.districtName}</Option>
+                    <Option value={item.districtId}>
+                      {item.districtName}
+                    </Option>
                   ))}
                 </Select>
               </Form.Item>
@@ -711,8 +763,7 @@ const EditFarmer = () => {
                       .toLowerCase()
                       .localeCompare(optionB.children.toLowerCase())
                   }
-                  onChange={handleOnChangeSubdistrict}
-                >
+                  onChange={handleOnChangeSubdistrict}>
                   {subdistrict?.map((item) => (
                     <Option value={item.subdistrictId}>
                       {item.subdistrictName}
@@ -747,8 +798,7 @@ const EditFarmer = () => {
                     required: true,
                     message: "กรุณากรอกที่อยู่บ้าน!",
                   },
-                ]}
-              >
+                ]}>
                 <TextArea
                   className="col-lg-12"
                   rows={5}
@@ -768,8 +818,7 @@ const EditFarmer = () => {
               <br />
               <Radio.Group
                 defaultValue={data.status}
-                onChange={handleChangeFarmerstatus}
-              >
+                onChange={handleChangeFarmerstatus}>
                 <Space direction="vertical">
                   {FARMER_STATUS_SEARCH.map((item) => (
                     <Radio value={item.value}>{item.name}</Radio>
@@ -810,8 +859,7 @@ const EditFarmer = () => {
             borderRadius: "12px 12px 0px 0px",
             padding: "10px 10px 10px 10px",
           }}
-          className="d-flex justify-content-between"
-        >
+          className="d-flex justify-content-between">
           <h4 className="pt-2 ps-3" style={{ color: "white" }}>
             แปลงเกษตร
           </h4>
@@ -823,8 +871,7 @@ const EditFarmer = () => {
               border: "none",
               borderRadius: "5px",
             }}
-            onClick={() => setShowAddModal((prev) => !prev)}
-          >
+            onClick={() => setShowAddModal((prev) => !prev)}>
             เพิ่มแปลง
           </Button>
         </div>
@@ -834,9 +881,17 @@ const EditFarmer = () => {
               {farmerPlotList.map((item, index) => (
                 <div className="row pt-3 pb-3">
                   <div className="col-lg-4">
-                    <span>{item.plotName}</span>
-                    <br />
-                    <p style={{ fontSize: "12px", color: color.Grey }}>
+                    <p
+                      style={{
+                        textOverflow: "ellipsis",
+                        overflow: "hidden",
+                        whiteSpace: "nowrap",
+                        marginBottom: 0,
+                      }}>
+                      {item.plotName}
+                    </p>
+                    <p
+                      style={{ fontSize: "12px", color: color.Grey }}>
                       {item.plantName}
                     </p>
                   </div>
@@ -850,8 +905,7 @@ const EditFarmer = () => {
                           STATUS_FARMERPLOT_COLOR_MAPPING[
                             item.isActive.toString()
                           ],
-                      }}
-                    >
+                      }}>
                       <Badge
                         color={
                           STATUS_FARMERPLOT_COLOR_MAPPING[
@@ -859,7 +913,11 @@ const EditFarmer = () => {
                           ]
                         }
                       />
-                      {STATUS_NORMAL_MAPPING[item.isActive.toString()]}
+                      {
+                        STATUS_NORMAL_MAPPING[
+                          item.isActive.toString()
+                        ]
+                      }
                     </span>
                   </div>
                   <div className="col-lg-3 d-flex justify-content-between">
@@ -882,8 +940,10 @@ const EditFarmer = () => {
               ))}
             </div>
           ) : (
-            <div className="container text-center" style={{ padding: "80px" }}>
-              <img src={emptyData}></img>
+            <div
+              className="container text-center"
+              style={{ padding: "80px" }}>
+              <img src={emptyData} alt="" />
               <h5>ยังไม่มีแปลงเกษตร</h5>
             </div>
           )}
@@ -931,6 +991,7 @@ const EditFarmer = () => {
       )}
       {showEditModal && (
         <ModalFarmerPlot
+          isEditModal
           show={showEditModal}
           backButton={() => setShowEditModal((prev) => !prev)}
           callBack={updateFarmerPlot}

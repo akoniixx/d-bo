@@ -26,8 +26,7 @@ export class DronerDatasource {
       status: status,
       search: search,
     };
-    console.log("param",params);
-    
+
     return httpClient
       .get(BASE_URL + "/droner", { params })
       .then((response) => {
@@ -79,13 +78,14 @@ export class DronerDatasource {
         delete data.dronerDrone[i].file[j];
       }
     }
-    if (data.dronerArea.provinceId == 0) {
+    if (data.dronerArea.provinceId === 0) {
       delete data.dronerArea["provinceId"];
       delete data.dronerArea["dronerId"];
       delete data.dronerArea["districtId"];
       delete data.dronerArea["subdistrictId"];
       delete data.dronerArea["distance"];
     }
+
     return httpClient
       .post(BASE_URL + "/droner", data)
       .then((response) => {

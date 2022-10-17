@@ -20,6 +20,7 @@ interface ModalFarmerPlotProps {
   data: FarmerPlotEntity;
   editIndex: number;
   title: string;
+  isEditModal?: boolean;
 }
 const ModalFarmerPlot: React.FC<ModalFarmerPlotProps> = ({
   show,
@@ -28,10 +29,18 @@ const ModalFarmerPlot: React.FC<ModalFarmerPlotProps> = ({
   data,
   editIndex,
   title,
+  isEditModal = false,
 }) => {
-  const [farmerPlot, setFarmerPlot] = useState<FarmerPlotEntity>(data);
-  const [saveBtnDisable, setBtnSaveDisable] = useState<boolean>(true);
-  const [mapPosition, setMapPosition] = useState<{ lat: number; lng: number }>({
+  const [form] = Form.useForm();
+  const [farmerPlot, setFarmerPlot] =
+    useState<FarmerPlotEntity>(data);
+  const [saveBtnDisable, setBtnSaveDisable] = useState<boolean>(
+    isEditModal ? false : true
+  );
+  const [mapPosition, setMapPosition] = useState<{
+    lat: number;
+    lng: number;
+  }>({
     lat: parseFloat(data.lat),
     lng: parseFloat(data.long),
   });
@@ -46,75 +55,62 @@ const ModalFarmerPlot: React.FC<ModalFarmerPlotProps> = ({
 
   useEffect(() => {
     fetchLocation(searchLocation);
-  }, [searchLocation]);
+    if (data) {
+      form.setFieldsValue({
+        ...data,
+        plotAreaId:
+          data.plotAreaId === 0 ? undefined : data.plotAreaId,
+      });
+    }
+  }, [searchLocation, data, form]);
 
-  const handleOnChangePlot = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const m = Map(farmerPlot).set(e.target.id, e.target.value);
-    setFarmerPlot(m.toJS());
-    checkValidate(m.toJS());
-  };
-  const handleChangePlotstatus = (e: any) => {
-    const m = Map(farmerPlot).set("isActive", e.target.value);
-    setFarmerPlot(m.toJS());
-    checkValidate(m.toJS());
-  };
-  const handleOnChangePlantSelect = (value: any) => {
-    const m = Map(farmerPlot).set("plantName", value == undefined ? "" : value);
-    setFarmerPlot(m.toJS());
-    checkValidate(m.toJS());
-  };
   const handleSearchLocation = async (value: any) => {
-    if (value != undefined) {
-      const a = location.filter((x) => x.subdistrictId == value)[0];
-      const pushAreaId = Map(farmerPlot).set("plotAreaId", a.subdistrictId);
-      const pushLat = Map(pushAreaId.toJS()).set(
-        "lat",
-        a.lat != null ? parseFloat(a.lat) : 0
-      );
-      const pushLong = Map(pushLat.toJS()).set(
-        "long",
-        a.long != null ? parseFloat(a.long) : 0
-      );
-      setFarmerPlot(pushLong.toJS());
+    if (value !== undefined) {
+      const a = location.filter((x) => x.subdistrictId === value)[0];
+
+      form.setFieldsValue({
+        lat: a.lat,
+        long: a.long,
+        plotAreaId: a.subdistrictId,
+      });
+
       setMapPosition({
         lat: a.lat != null ? parseFloat(a.lat) : 0,
         lng: a.long != null ? parseFloat(a.long) : 0,
       });
-      checkValidate(pushLong.toJS());
     } else {
       setMapPosition(LAT_LNG_BANGKOK);
     }
   };
-  const handleOnChangeUrl = (value: any) => {
-    const m = Map(farmerPlot).set("mapUrl", value.target.value);
-    setFarmerPlot(m.toJS());
-    checkValidate(m.toJS());
-  };
+
   const handleOnChangeLat = (value: any) => {
-    const m = Map(farmerPlot).set("lat", value.target.value);
-    setFarmerPlot(m.toJS());
-    checkValidate(m.toJS());
+    setFarmerPlot((prev) => ({
+      ...prev,
+      lat: value.target.value,
+    }));
+
     setMapPosition((prev) => ({
       lat: parseFloat(value.target.value),
       lng: prev.lng,
     }));
   };
   const handleOnChangeLng = (value: any) => {
-    const m = Map(farmerPlot).set("long", value.target.value);
-    setFarmerPlot(m.toJS());
-    checkValidate(m.toJS());
+    setFarmerPlot((prev) => ({
+      ...prev,
+      long: value.target.value,
+    }));
+
     setMapPosition((prev) => ({
       lat: prev.lat,
       lng: parseFloat(value.target.value),
     }));
   };
-  const handelCallBack = async () => {
-    const m = Map(farmerPlot).set("plotId", editIndex);
+  const handelCallBack = async (values: FarmerPlotEntity) => {
     let locationName = "";
     let geocoder = new google.maps.Geocoder();
     const latlng = {
-      lat: parseFloat(m.toJS().lat),
-      lng: parseFloat(m.toJS().long),
+      lat: parseFloat(values.lat),
+      lng: parseFloat(values.long),
     };
     await geocoder
       .geocode({
@@ -130,8 +126,14 @@ const ModalFarmerPlot: React.FC<ModalFarmerPlotProps> = ({
           " " +
           location[3].long_name;
       });
-    const l = Map(m.toJS()).set("locationName", locationName);
-    callBack(l.toJS());
+
+    const payload = {
+      ...farmerPlot,
+      ...values,
+      locationName,
+      plotId: editIndex,
+    };
+    callBack(payload);
   };
   const checkValidate = (data: FarmerPlotEntity) => {
     let checkEmpty = ![
@@ -140,12 +142,20 @@ const ModalFarmerPlot: React.FC<ModalFarmerPlotProps> = ({
       data.landmark,
       data.raiAmount,
     ].includes("");
-    let checkEmptyNumber = ![data.plotAreaId, data.lat, data.long].includes(0);
+    let checkEmptyNumber = ![
+      data.plotAreaId,
+      data.lat,
+      data.long,
+    ].includes(0);
     if (checkEmpty && checkEmptyNumber) {
       setBtnSaveDisable(false);
     } else {
       setBtnSaveDisable(true);
     }
+  };
+  const onFieldsChange = () => {
+    const valuesForm = form.getFieldsValue();
+    checkValidate(valuesForm);
   };
 
   return (
@@ -156,8 +166,7 @@ const ModalFarmerPlot: React.FC<ModalFarmerPlotProps> = ({
             style={{
               width: "100%",
               cursor: "move",
-            }}
-          >
+            }}>
             {title}
           </div>
         }
@@ -166,12 +175,15 @@ const ModalFarmerPlot: React.FC<ModalFarmerPlotProps> = ({
         footer={[
           <FooterPage
             onClickBack={backButton}
-            onClickSave={() => handelCallBack()}
+            onClickSave={() => form.submit()}
             disableSaveBtn={saveBtnDisable}
           />,
-        ]}
-      >
-        <Form key={data.plotId}>
+        ]}>
+        <Form
+          key={data.plotId}
+          form={form}
+          onFinish={handelCallBack}
+          onFieldsChange={onFieldsChange}>
           <div className="form-group">
             <label>
               ชื่อแปลง <span style={{ color: "red" }}>*</span>
@@ -183,14 +195,8 @@ const ModalFarmerPlot: React.FC<ModalFarmerPlotProps> = ({
                   required: true,
                   message: "กรุณากรอกชื่อแปลง!",
                 },
-              ]}
-            >
-              <Input
-                placeholder="กรอกชื่อแปลง"
-                onChange={handleOnChangePlot}
-                defaultValue={farmerPlot.plotName}
-                autoComplete="off"
-              />
+              ]}>
+              <Input placeholder="กรอกชื่อแปลง" autoComplete="off" />
             </Form.Item>
           </div>
           <div className="form-group">
@@ -198,14 +204,9 @@ const ModalFarmerPlot: React.FC<ModalFarmerPlotProps> = ({
               พืชที่ปลูก <span style={{ color: "red" }}>*</span>
             </label>
             <Form.Item name="plantName">
-              <Select
-                allowClear
-                placeholder="เลือกพืชที่ปลูก"
-                defaultValue={farmerPlot.plantName}
-                onChange={handleOnChangePlantSelect}
-              >
+              <Select allowClear placeholder="เลือกพืชที่ปลูก">
                 {EXP_PLANT.map((x) => (
-                  <option value={x}>{x}</option>
+                  <Select.Option value={x}>{x}</Select.Option>
                 ))}
               </Select>
             </Form.Item>
@@ -221,12 +222,9 @@ const ModalFarmerPlot: React.FC<ModalFarmerPlotProps> = ({
                   required: true,
                   message: "กรุณากรอกจำนวนไร่!",
                 },
-              ]}
-            >
+              ]}>
               <Input
                 placeholder="ไร่"
-                onChange={handleOnChangePlot}
-                defaultValue={farmerPlot.raiAmount}
                 autoComplete="off"
                 suffix="ไร่"
               />
@@ -235,7 +233,7 @@ const ModalFarmerPlot: React.FC<ModalFarmerPlotProps> = ({
           <div className="form-group">
             <label>พื้นที่แปลงเกษตร</label>
             <span style={{ color: "red" }}>*</span>
-            <Form.Item name="searchAddress">
+            <Form.Item name="plotAreaId">
               <Select
                 allowClear
                 showSearch
@@ -250,8 +248,9 @@ const ModalFarmerPlot: React.FC<ModalFarmerPlotProps> = ({
                 filterOption={(input: any, option: any) =>
                   option.children.includes(input)
                 }
-                defaultValue={data.plotAreaId == 0 ? null : data.plotAreaId}
-              >
+                defaultValue={
+                  data.plotAreaId === 0 ? null : data.plotAreaId
+                }>
                 {location.map((item) => (
                   <Option value={item.subdistrictId}>
                     {item.districtName +
@@ -266,11 +265,9 @@ const ModalFarmerPlot: React.FC<ModalFarmerPlotProps> = ({
           </div>
           <div className="form-group">
             <label>Link Google Map</label>
-            <Form.Item name="url">
+            <Form.Item name="mapUrl">
               <Input
-                defaultValue={farmerPlot.mapUrl}
                 placeholder="กรอกข้อมูล Url Google Map"
-                onBlur={handleOnChangeUrl}
                 autoComplete="off"
               />
             </Form.Item>
@@ -280,14 +277,14 @@ const ModalFarmerPlot: React.FC<ModalFarmerPlotProps> = ({
               <label>Latitude (ละติจูด) </label>
               <span style={{ color: "red" }}>*</span>
               <Form.Item
+                name="lat"
                 rules={[
                   {
                     required: true,
                     message: "กรุณากรอกละติจูด!",
                   },
                 ]}
-                key={mapPosition.lat}
-              >
+                key={mapPosition.lat}>
                 <Input
                   placeholder="กรอกข้อมูล Latitude"
                   defaultValue={mapPosition.lat}
@@ -299,14 +296,14 @@ const ModalFarmerPlot: React.FC<ModalFarmerPlotProps> = ({
               <label>Longitude (ลองติจูด) </label>
               <span style={{ color: "red" }}>*</span>
               <Form.Item
+                name="long"
                 rules={[
                   {
                     required: true,
                     message: "กรุณากรอกลองติจูด!",
                   },
                 ]}
-                key={mapPosition.lng}
-              >
+                key={mapPosition.lng}>
                 <Input
                   placeholder="กรอกข้อมูล Longitude"
                   defaultValue={mapPosition.lng}
@@ -330,7 +327,6 @@ const ModalFarmerPlot: React.FC<ModalFarmerPlotProps> = ({
             <Form.Item name="landmark">
               <Input
                 placeholder="กรอกจุดสังเกต"
-                onChange={handleOnChangePlot}
                 defaultValue={farmerPlot.landmark}
                 autoComplete="off"
               />
@@ -341,15 +337,21 @@ const ModalFarmerPlot: React.FC<ModalFarmerPlotProps> = ({
               สถานะ <span style={{ color: "red" }}>*</span>
             </label>
             <br />
-            <Radio.Group
-              defaultValue={farmerPlot.isActive}
-              onChange={handleChangePlotstatus}
-            >
-              <Space direction="vertical">
-                <Radio value={true}>ใช้งาน</Radio>
-                <Radio value={false}>ไม่ใช้งาน</Radio>
-              </Space>
-            </Radio.Group>
+            <Form.Item
+              name="isActive"
+              rules={[
+                {
+                  required: true,
+                  message: "กรุณาเลือกสถานะ!",
+                },
+              ]}>
+              <Radio.Group defaultValue={farmerPlot.isActive}>
+                <Space direction="vertical">
+                  <Radio value={true}>ใช้งาน</Radio>
+                  <Radio value={false}>ไม่ใช้งาน</Radio>
+                </Space>
+              </Radio.Group>
+            </Form.Item>
           </div>
         </Form>
       </Modal>
