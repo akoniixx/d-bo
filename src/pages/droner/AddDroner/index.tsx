@@ -369,6 +369,7 @@ function AddDroner() {
     const isHasError = form.getFieldsError().some(({ errors }) => {
       return errors.length > 0;
     });
+    console.log(isHasError);
 
     const {
       mapUrl,
@@ -400,10 +401,11 @@ function AddDroner() {
     const splitPlant = values?.plantsOther
       ? values?.plantsOther?.split(",")
       : [];
+    const valuePlant = values?.checkPlantsOther || [];
     const expPlant =
       splitPlant.length > 0
-        ? [...values.checkPlantsOther, ...splitPlant]
-        : values.checkPlantsOther;
+        ? [...valuePlant, ...splitPlant]
+        : valuePlant;
 
     const pushAdd = Map(data).set("address", address);
     const pushDronerArea = Map(pushAdd.toJS()).set(

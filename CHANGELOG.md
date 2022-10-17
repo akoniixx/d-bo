@@ -1,4 +1,6 @@
 ## [Version - 0]
+## Fix [v0.17.13] 2022-10-14
+- fixed cant submit form issue AddDroner  & EditDroner
 ## Fix [v0.17.12] 2022-10-14
 - increase validate Tel number  Droner & Farmer (Add & Edit)
 - fixed Lat long not changing when change address

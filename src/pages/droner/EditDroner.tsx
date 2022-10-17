@@ -595,8 +595,6 @@ function EditDroner() {
   };
 
   const onFieldsChange = (field: any) => {
-    const currentStatus =
-      (field[0].name[0] === "status" && field[0].value) || status;
     const isHasError = form.getFieldsError().some(({ errors }) => {
       return errors.length > 0;
     });
@@ -609,6 +607,7 @@ function EditDroner() {
       checkPlantsOther,
       reason,
       idNo,
+      status: currentStatus,
       ...rest
     } = form.getFieldsValue();
     const reasonList = [];
@@ -1147,16 +1146,16 @@ function EditDroner() {
               }}
               rules={[
                 {
-                  validator: (_, value, callback) => {
+                  validator: (_, value) => {
                     const plantsOther =
                       form.getFieldValue("plantsOther");
 
                     if (value?.length < 1 && !plantsOther) {
-                      callback(
+                      return Promise.reject(
                         "กรุณาเลือกพืชที่เคยฉีดพ่นอย่างน้อย 1 อย่าง"
                       );
                     } else {
-                      callback();
+                      return Promise.resolve();
                     }
                   },
                 },
@@ -1193,6 +1192,7 @@ function EditDroner() {
                       );
 
                     const isDupTyping =
+                      splitValue &&
                       new Set(splitValue).size !== splitValue.length;
 
                     if (!!value && checkValidateComma(value)) {
@@ -1247,11 +1247,7 @@ function EditDroner() {
                                 name="checkReason"
                                 rules={[
                                   {
-                                    validator: (
-                                      _,
-                                      value,
-                                      callback
-                                    ) => {
+                                    validator: (_, value) => {
                                       const reasonField =
                                         form.getFieldValue("reason");
 
