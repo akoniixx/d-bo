@@ -65,8 +65,7 @@ export default function IndexTodayTask() {
   const [statusDelay, setStatusDelay] = useState<any>();
   const [province, setProvince] = useState<ProviceEntity[]>();
   const [district, setDistrict] = useState<DistrictEntity[]>();
-  const [subdistrict, setSubdistrict] =
-    useState<SubdistrictEntity[]>();
+  const [subdistrict, setSubdistrict] = useState<SubdistrictEntity[]>();
   const [visibleRating, setVisibleRating] = useState(false);
   const [showModalMap, setShowModalMap] = useState<boolean>(false);
   const [plotId, setPlotId] = useState<string>("");
@@ -74,6 +73,7 @@ export default function IndexTodayTask() {
   const dateFormat = "DD/MM/YYYY";
   const timeFormat = "HH:mm";
   const [problems, setProblems] = useState<any>([]);
+  const [delays, setDelays] = useState<any>([]);
   useEffect(() => {
     fetchAllTaskToday();
     fetchProvince();
@@ -91,6 +91,7 @@ export default function IndexTodayTask() {
       isProblem,
       isDelay
     ).then((res: TaskTodayListEntity) => {
+      console.log(res);
       setData(res);
     });
   };
@@ -106,11 +107,9 @@ export default function IndexTodayTask() {
     });
   };
   const fetchSubdistrict = async (districtId: number) => {
-    await LocationDatasource.getSubdistrict(districtId).then(
-      (res) => {
-        setSubdistrict(res);
-      }
-    );
+    await LocationDatasource.getSubdistrict(districtId).then((res) => {
+      setSubdistrict(res);
+    });
   };
   const changeTextSearch = (searchText: any) => {
     setSearchText(searchText.target.value);
@@ -156,10 +155,13 @@ export default function IndexTodayTask() {
     let checked = e.target.checked;
     let statusProblem = ["waitstartproblem", "inprogressproblem"];
     let statusNormal = ["waitstartnormal", "inprogressnormal"];
+    // let isDelay = ["waitapprovedelay", "extended"];
     let m: any = [];
     if (checked) {
       m = [...problems, value];
+      // setDelays(m);
       setProblems(m);
+      console.log(m.length)
       if (m.length == 2) {
         setIsProblem(undefined);
       } else {
@@ -167,7 +169,7 @@ export default function IndexTodayTask() {
           setIsProblem(true);
         } else if (statusNormal.includes(m[0])) {
           setIsProblem(false);
-        }
+        } 
       }
     } else {
       m = problems.filter((x: any) => x != value);
@@ -192,13 +194,9 @@ export default function IndexTodayTask() {
   };
   const formatCurrency = (e: any) => {
     e = parseFloat(e);
-    return e
-      .toFixed(2)
-      .replace(/./g, function (c: any, i: any, a: any) {
-        return i > 0 && c !== "." && (a.length - i) % 3 === 0
-          ? "," + c
-          : c;
-      });
+    return e.toFixed(2).replace(/./g, function (c: any, i: any, a: any) {
+      return i > 0 && c !== "." && (a.length - i) % 3 === 0 ? "," + c : c;
+    });
   };
   const handleModalMap = (plotId: string) => {
     setShowModalMap((prev) => !prev);
@@ -217,7 +215,8 @@ export default function IndexTodayTask() {
           icon: (
             <Checkbox
               value="WAIT_START"
-              onClick={(e) => handleStatus(e)}></Checkbox>
+              onClick={(e) => handleStatus(e)}
+            ></Checkbox>
           ),
         },
         {
@@ -227,7 +226,8 @@ export default function IndexTodayTask() {
             <Checkbox
               style={{ marginLeft: "20px" }}
               value="waitstartnormal"
-              onClick={(e) => handleIsProblem(e)}></Checkbox>
+              onClick={(e) => handleIsProblem(e)}
+            ></Checkbox>
           ),
         },
         {
@@ -237,7 +237,8 @@ export default function IndexTodayTask() {
             <Checkbox
               style={{ marginLeft: "20px" }}
               value="waitstartproblem"
-              onClick={(e) => handleIsProblem(e)}></Checkbox>
+              onClick={(e) => handleIsProblem(e)}
+            ></Checkbox>
           ),
         },
         {
@@ -246,7 +247,8 @@ export default function IndexTodayTask() {
           icon: (
             <Checkbox
               value="IN_PROGRESS"
-              onClick={(e) => handleStatus(e)}></Checkbox>
+              onClick={(e) => handleStatus(e)}
+            ></Checkbox>
           ),
         },
         {
@@ -256,7 +258,8 @@ export default function IndexTodayTask() {
             <Checkbox
               style={{ marginLeft: "20px" }}
               value="inprogressnormal"
-              onClick={(e) => handleIsProblem(e)}></Checkbox>
+              onClick={(e) => handleIsProblem(e)}
+            ></Checkbox>
           ),
         },
         {
@@ -264,10 +267,10 @@ export default function IndexTodayTask() {
           key: "6",
           icon: (
             <Checkbox
-              disabled
               style={{ marginLeft: "20px" }}
               value="waitapprovedelay"
-              onClick={(e) => handleIsProblem(e)}></Checkbox>
+              onClick={(e) => handleIsProblem(e)}
+            ></Checkbox>
           ),
         },
         {
@@ -275,10 +278,10 @@ export default function IndexTodayTask() {
           key: "7",
           icon: (
             <Checkbox
-              disabled
               style={{ marginLeft: "20px" }}
               value="extended"
-              onClick={(e) => handleIsProblem(e)}></Checkbox>
+              onClick={(e) => handleIsProblem(e)}
+            ></Checkbox>
           ),
         },
         {
@@ -288,7 +291,8 @@ export default function IndexTodayTask() {
             <Checkbox
               style={{ marginLeft: "20px" }}
               value="inprogressproblem"
-              onClick={(e) => handleIsProblem(e)}></Checkbox>
+              onClick={(e) => handleIsProblem(e)}
+            ></Checkbox>
           ),
         },
       ]}
@@ -298,13 +302,12 @@ export default function IndexTodayTask() {
     <>
       <div
         className="container d-flex justify-content-between"
-        style={{ padding: "8px" }}>
+        style={{ padding: "8px" }}
+      >
         <div className="col-lg-4 p-1" style={{ maxWidth: "1200px" }}>
           <Input
             allowClear
-            prefix={
-              <SearchOutlined style={{ color: color.Disable }} />
-            }
+            prefix={<SearchOutlined style={{ color: color.Disable }} />}
             placeholder="ค้นหาชื่อเกษตรกร, คนบินโดรน หรือเบอร์โทร"
             className="col-lg-12 p-1"
             onChange={changeTextSearch}
@@ -325,11 +328,10 @@ export default function IndexTodayTask() {
                 .toLowerCase()
                 .localeCompare(optionB.children.toLowerCase())
             }
-            onChange={handleProvince}>
+            onChange={handleProvince}
+          >
             {province?.map((item) => (
-              <option value={item.provinceId}>
-                {item.provinceName}
-              </option>
+              <option value={item.provinceId}>{item.provinceName}</option>
             ))}
           </Select>
         </div>
@@ -349,7 +351,8 @@ export default function IndexTodayTask() {
                 .toLowerCase()
                 .localeCompare(optionB.children.toLowerCase())
             }
-            disabled={searchProvince == undefined}>
+            disabled={searchProvince == undefined}
+          >
             {district?.map((item) => (
               <option value={item.districtId.toString()}>
                 {item.districtName}
@@ -373,7 +376,8 @@ export default function IndexTodayTask() {
                 .toLowerCase()
                 .localeCompare(optionB.children.toLowerCase())
             }
-            disabled={searchDistrict === undefined}>
+            disabled={searchDistrict === undefined}
+          >
             {subdistrict?.map((item) => (
               <option value={item.subdistrictId.toString()}>
                 {item.subdistrictName}
@@ -387,7 +391,8 @@ export default function IndexTodayTask() {
             trigger={["click"]}
             className="col-lg-12"
             onVisibleChange={handleVisibleRating}
-            visible={visibleRating}>
+            visible={visibleRating}
+          >
             <Button style={{ color: color.Disable }}>
               เลือกสถานะ
               <DownOutlined />
@@ -402,7 +407,8 @@ export default function IndexTodayTask() {
               color: color.secondary2,
               backgroundColor: color.Success,
             }}
-            onClick={fetchAllTaskToday}>
+            onClick={fetchAllTaskToday}
+          >
             ค้นหาข้อมูล
           </Button>
         </div>
@@ -422,27 +428,20 @@ export default function IndexTodayTask() {
           children: (
             <>
               <span>
-                {moment(new Date(row.task_date_appointment)).format(
-                  dateFormat
-                )}
+                {moment(new Date(row.task_date_appointment)).format(dateFormat)}
                 ,{" "}
-                {moment(new Date(row.task_date_appointment)).format(
-                  timeFormat
-                )}
+                {moment(new Date(row.task_date_appointment)).format(timeFormat)}
               </span>
               {changeTime != null ? (
                 <Tooltip
                   title="มีการเปลี่ยนแปลงวันและเวลานัดหมาย"
-                  className="p-2">
-                  <img
-                    src={icon.iconChangeTime}
-                    alt="ic_change_time"
-                  />
+                  className="p-2"
+                >
+                  <img src={icon.iconChangeTime} alt="ic_change_time" />
                 </Tooltip>
               ) : null}
               <br />
-              <span
-                style={{ color: color.Disable, fontSize: "12px" }}>
+              <span style={{ color: color.Disable, fontSize: "12px" }}>
                 {row.taskNo}
               </span>
             </>
@@ -461,23 +460,18 @@ export default function IndexTodayTask() {
         return {
           children: (
             <>
-              <span>
-                {row.droner_firstname + " " + row.droner_lastname}
-              </span>
+              <span>{row.droner_firstname + " " + row.droner_lastname}</span>
               {changeDroner != null ? (
                 <Tooltip
                   style={{ fontSize: "18px" }}
                   title="มีการเปลี่ยนแปลงนักบินโดรนคนใหม่"
-                  className="p-2">
-                  <img
-                    src={icon.iconChangeDroner}
-                    alt="ic_change_droner"
-                  />
+                  className="p-2"
+                >
+                  <img src={icon.iconChangeDroner} alt="ic_change_droner" />
                 </Tooltip>
               ) : null}
               <br />
-              <span
-                style={{ color: color.Disable, fontSize: "12px" }}>
+              <span style={{ color: color.Disable, fontSize: "12px" }}>
                 {row.droner_telephone_no}
               </span>
             </>
@@ -496,12 +490,9 @@ export default function IndexTodayTask() {
         return {
           children: (
             <>
-              <span>
-                {row.farmer_firstname + " " + row.farmer_lastname}
-              </span>
+              <span>{row.farmer_firstname + " " + row.farmer_lastname}</span>
               <br />
-              <span
-                style={{ color: color.Disable, fontSize: "12px" }}>
+              <span style={{ color: color.Disable, fontSize: "12px" }}>
                 {row.farmer_telephone_no}
               </span>
             </>
@@ -527,10 +518,9 @@ export default function IndexTodayTask() {
                 {province !== null ? province + "" : null}
               </span>
               <div
-                onClick={() =>
-                  handleModalMap(row.task_farmer_plot_id)
-                }
-                style={{ color: color.primary1, cursor: "pointer" }}>
+                onClick={() => handleModalMap(row.task_farmer_plot_id)}
+                style={{ color: color.primary1, cursor: "pointer" }}
+              >
                 ดูแผนที่แปลง
               </div>
             </>
@@ -555,13 +545,8 @@ export default function IndexTodayTask() {
                   : "0.00" + " " + "บาท"}
               </span>
               <br />
-              <span
-                style={{ color: color.Disable, fontSize: "12px" }}>
-                {"จำนวน" +
-                  " " +
-                  row.farmerPlot_rai_amount +
-                  " " +
-                  "ไร่"}
+              <span style={{ color: color.Disable, fontSize: "12px" }}>
+                {"จำนวน" + " " + row.farmerPlot_rai_amount + " " + "ไร่"}
               </span>
             </>
           ),
@@ -579,21 +564,28 @@ export default function IndexTodayTask() {
               <span
                 style={{
                   color: STATUS_COLOR_TASK_TODAY[row.task_status],
-                }}>
-                <Badge
-                  color={STATUS_COLOR_TASK_TODAY[row.task_status]}
-                />
+                }}
+              >
+                <Badge color={STATUS_COLOR_TASK_TODAY[row.task_status]} />
                 {TASK_TODAY_STATUS[row.task_status]}
                 <span style={{ color: color.Error }}>
                   {row.task_is_problem == true
                     ? " " + "(" + "งานมีปัญหา" + ")"
                     : null}
                 </span>
+                <span style={{ color: "#2F80ED" }}>
+                  {row.task_status_delay == "WAIT_APPROVE"
+                    ? " " + "(" + "รออนุมัติขยายเวลา" + ")"
+                    : null}
+                </span>
+                <span style={{ color: "#56CCF2" }}>
+                  {row.task_status_delay == "EXTENDED"
+                    ? " " + "(" + "อนุมัติขยายเวลา" + ")"
+                    : null}
+                </span>
                 <br />
               </span>
-
-              <span
-                style={{ color: color.Disable, fontSize: "12px" }}>
+              <span style={{ color: color.Disable, fontSize: "12px" }}>
                 <UserOutlined style={{ padding: "0 4px 0 0" }} />
                 {row.task_update_by}
               </span>
@@ -615,8 +607,7 @@ export default function IndexTodayTask() {
                   icon={<EditOutlined />}
                   color={color.primary1}
                   onClick={() =>
-                    (window.location.href =
-                      "/EditInProgress?=" + row.task_id)
+                    (window.location.href = "/EditInProgress?=" + row.task_id)
                   }
                 />
               ) : row.task_status == "WAIT_START" ? (
@@ -624,8 +615,7 @@ export default function IndexTodayTask() {
                   icon={<EditOutlined />}
                   color={color.primary1}
                   onClick={() =>
-                    (window.location.href =
-                      "/EditWaitStart?=" + row.task_id)
+                    (window.location.href = "/EditWaitStart?=" + row.task_id)
                   }
                 />
               ) : null}
@@ -640,20 +630,23 @@ export default function IndexTodayTask() {
     <Layouts>
       <span
         className="container"
-        style={{ fontSize: 22, fontWeight: "bold", padding: "8px" }}>
+        style={{ fontSize: 22, fontWeight: "bold", padding: "8px" }}
+      >
         <strong>งานในวันนี้</strong>{" "}
         {"(" + moment(new Date()).format(dateFormat) + ")"}
       </span>
       <div
         className="d-flex justify-content-between"
-        style={{ marginTop: "20px" }}>
+        style={{ marginTop: "20px" }}
+      >
         <CardContainer
           style={{
             width: "35%",
             padding: "20px",
             marginRight: "20px",
             borderRadius: "5px",
-          }}>
+          }}
+        >
           <p>รอเริ่มงาน</p>
           <div className="d-flex justify-content-between">
             <CardContainer
@@ -662,10 +655,12 @@ export default function IndexTodayTask() {
                 borderRadius: "5px",
                 padding: "20px",
                 width: "47%",
-              }}>
+              }}
+            >
               <div
                 className="d-flex justify-content-between"
-                style={{ color: color.White }}>
+                style={{ color: color.White }}
+              >
                 <strong>ปกติ</strong>
                 <strong>
                   {data?.summary != undefined
@@ -680,10 +675,12 @@ export default function IndexTodayTask() {
                 borderRadius: "5px",
                 padding: "20px",
                 width: "47%",
-              }}>
+              }}
+            >
               <div
                 className="d-flex justify-content-between"
-                style={{ color: color.White }}>
+                style={{ color: color.White }}
+              >
                 <strong>งานมีปัญหา</strong>
                 <strong>
                   {data?.summary != undefined
@@ -699,7 +696,8 @@ export default function IndexTodayTask() {
             width: "80%",
             padding: "20px",
             borderRadius: "5px",
-          }}>
+          }}
+        >
           <p>กำลังดำเนินงาน</p>
           <div className="d-flex justify-content-between">
             <CardContainer
@@ -708,10 +706,12 @@ export default function IndexTodayTask() {
                 borderRadius: "5px",
                 padding: "20px",
                 width: "23%",
-              }}>
+              }}
+            >
               <div
                 className="d-flex justify-content-between"
-                style={{ color: color.White }}>
+                style={{ color: color.White }}
+              >
                 <strong>ปกติ</strong>
                 <strong>
                   {data?.summary != undefined
@@ -726,10 +726,12 @@ export default function IndexTodayTask() {
                 borderRadius: "5px",
                 padding: "20px",
                 width: "23%",
-              }}>
+              }}
+            >
               <div
                 className="d-flex justify-content-between"
-                style={{ color: color.White }}>
+                style={{ color: color.White }}
+              >
                 <strong>รออนุมัติขยายเวลา</strong>
                 <strong>
                   {data?.summary != undefined
@@ -744,15 +746,15 @@ export default function IndexTodayTask() {
                 borderRadius: "5px",
                 padding: "20px",
                 width: "23%",
-              }}>
+              }}
+            >
               <div
                 className="d-flex justify-content-between"
-                style={{ color: color.White }}>
+                style={{ color: color.White }}
+              >
                 <strong>อนุมัติขยายเวลา</strong>
                 <strong>
-                  {data?.summary != undefined
-                    ? data?.summary.extended
-                    : null}
+                  {data?.summary != undefined ? data?.summary.extended : null}
                 </strong>
               </div>
             </CardContainer>
@@ -762,10 +764,12 @@ export default function IndexTodayTask() {
                 borderRadius: "5px",
                 padding: "20px",
                 width: "23%",
-              }}>
+              }}
+            >
               <div
                 className="d-flex justify-content-between"
-                style={{ color: color.White }}>
+                style={{ color: color.White }}
+              >
                 <strong>งานมีปัญหา</strong>
                 <strong>
                   {data?.summary != undefined
@@ -780,11 +784,11 @@ export default function IndexTodayTask() {
       <br />
       {PageTitle}
       <br />
-      <Table
-        columns={columns}
-        dataSource={data?.data}
-        pagination={false}
-      />
+      <Table 
+      columns={columns} 
+      dataSource={data?.data} 
+      pagination={false}
+    />
       <div className="d-flex justify-content-between pt-5">
         <p>รายการทั้งหมด {data?.count} รายการ</p>
         <Pagination

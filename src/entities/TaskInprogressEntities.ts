@@ -10,16 +10,16 @@ import {
   CropPurposeSprayEntity_INT,
 } from "./CropEntities";
 export interface TaskInprogressEntity {
-  count: number;
-  summary: {
-    inprogressnormal: string;
-    inprogressproblem: string;
-    waitstartnormal: string;
-    waitstartproblem: string;
-    waitapprovedelay: string;
-    extended: string;
-  };
-  data: [
+  // count: number;
+  // summary: {
+  //   inprogressnormal: string;
+  //   inprogressproblem: string;
+  //   waitstartnormal: string;
+  //   waitstartproblem: string;
+  //   waitapprovedelay: string;
+  //   extended: string;
+  // };
+  data: 
     {
       task_id: string;
       task_task_no: string;
@@ -116,19 +116,18 @@ export interface TaskInprogressEntity {
       droner_updated_at: string;
       count_change_droner: string;
     }
-  ];
 }
 export const TaskInprogressEntity_INIT: TaskInprogressEntity = {
-  count: 0,
-  summary: {
-    inprogressnormal: "",
-    inprogressproblem: "",
-    waitstartnormal: "",
-    waitstartproblem: "",
-    waitapprovedelay: "",
-    extended: "",
-  },
-  data: [
+  // count: 0,
+  // summary: {
+  //   inprogressnormal: "",
+  //   inprogressproblem: "",
+  //   waitstartnormal: "",
+  //   waitstartproblem: "",
+  //   waitapprovedelay: "",
+  //   extended: "",
+  // },
+  data: 
     {
       task_id: "",
       task_task_no: "",
@@ -225,7 +224,6 @@ export const TaskInprogressEntity_INIT: TaskInprogressEntity = {
       droner_updated_at: "",
       count_change_droner: "",
     }
-  ],
 };
 export interface summaryEntity {
   inprogressnormal: string;
