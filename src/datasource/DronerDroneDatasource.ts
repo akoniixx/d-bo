@@ -31,7 +31,9 @@ export class DronerDroneDatasource {
         console.log(error);
       });
   }
-  static getDronerDroneById(id: string): Promise<GetDronerDroneEntity> {
+  static getDronerDroneById(
+    id: string
+  ): Promise<GetDronerDroneEntity> {
     return httpClient
       .get(BASE_URL + "/droner-drone/" + id)
       .then((res) => {
@@ -65,6 +67,16 @@ export class DronerDroneDatasource {
   static updateDroneList(data: GetDronerDroneEntity): Promise<any> {
     return httpClient
       .patch(BASE_URL + "/droner-drone/" + data.id, data)
+      .then((response) => {
+        return response.data;
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  }
+  static async removeDronerDrone(id?: string): Promise<any> {
+    return httpClient
+      .delete(BASE_URL + "/droner-drone/" + id)
       .then((response) => {
         return response.data;
       })

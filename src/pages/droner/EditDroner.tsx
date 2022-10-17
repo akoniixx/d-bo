@@ -426,11 +426,13 @@ function EditDroner() {
     setEditIndex(0);
     setDronerDroneList(dronerDroneList);
   };
-  const removeDrone = (index: number) => {
-    const newData = dronerDroneList.filter(
-      (x) => x.modalDroneIndex !== index
-    );
-    setDronerDroneList(newData);
+  const removeDrone = async (id?: string) => {
+    try {
+      await DronerDroneDatasource.removeDronerDrone(id);
+      fetchDronerById();
+    } catch (e) {
+      console.log(e);
+    }
   };
   //#endregion
 
@@ -901,9 +903,11 @@ function EditDroner() {
                   onChange={handleProvince}
                   defaultValue={address.provinceId}>
                   {province.map((item: any, index: any) => (
-                    <option key={index} value={item.provinceId}>
+                    <Select.Option
+                      key={index}
+                      value={item.provinceId}>
                       {item.provinceName}
-                    </option>
+                    </Select.Option>
                   ))}
                 </Select>
               </Form.Item>
@@ -937,9 +941,11 @@ function EditDroner() {
                   onChange={handleDistrict}
                   defaultValue={address.districtId}>
                   {district.map((item: any, index: any) => (
-                    <option key={index} value={item.districtId}>
+                    <Select.Option
+                      key={index}
+                      value={item.districtId}>
                       {item.districtName}
-                    </option>
+                    </Select.Option>
                   ))}
                 </Select>
               </Form.Item>
@@ -975,9 +981,11 @@ function EditDroner() {
                   onChange={handleSubDistrict}
                   defaultValue={address.subdistrictId}>
                   {subdistrict?.map((item: any, index: any) => (
-                    <option key={index} value={item.subdistrictId}>
+                    <Select.Option
+                      key={index}
+                      value={item.subdistrictId}>
                       {item.subdistrictName}
-                    </option>
+                    </Select.Option>
                   ))}
                 </Select>
               </Form.Item>
@@ -1060,7 +1068,7 @@ function EditDroner() {
                     option.children.includes(input)
                   }>
                   {location.map((item: any) => (
-                    <option
+                    <Select.Option
                       key={item.subdistrictId}
                       value={item.subdistrictId}>
                       {item.subdistrictName +
@@ -1068,7 +1076,7 @@ function EditDroner() {
                         item.districtName +
                         "/" +
                         item.provinceName}
-                    </option>
+                    </Select.Option>
                   ))}
                 </Select>
               </Form.Item>
@@ -1412,7 +1420,7 @@ function EditDroner() {
                       <ActionButton
                         icon={<DeleteOutlined />}
                         color={color.Error}
-                        onClick={() => removeDrone(index + 1)}
+                        onClick={() => removeDrone(item.id)}
                       />
                     </div>
                   </div>

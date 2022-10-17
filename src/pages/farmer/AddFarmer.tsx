@@ -364,27 +364,19 @@ const AddFarmer = () => {
     setData(pushPlot.toJS());
 
     await FarmerDatasource.insertFarmer(pushPlot.toJS()).then(
-      (res) => {
+      async (res) => {
         if (res != undefined) {
-          const pushImgProId = Map(createImgProfile).set(
-            "resourceId",
-            res.id
-          );
-          const pushImgCardId = Map(createImgIdCard).set(
-            "resourceId",
-            res.id
-          );
-          var i = 0;
-          for (i; 2 > i; i++) {
-            i == 0 &&
-              UploadImageDatasouce.uploadImage(
-                pushImgProId.toJS()
-              ).then(res);
-            i == 1 &&
-              UploadImageDatasouce.uploadImage(
-                pushImgCardId.toJS()
-              ).then(res);
-          }
+          const fileList = [createImgProfile, createImgIdCard]
+            .filter((el) => {
+              return el.file !== "" && el.file !== undefined;
+            })
+            .map((el) => {
+              return UploadImageDatasouce.uploadImage(
+                Map(el).set("resourceId", res.id).toJS()
+              );
+            });
+
+          await Promise.all(fileList);
           Swal.fire({
             title: "บันทึกสำเร็จ",
             icon: "success",
