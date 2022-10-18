@@ -400,10 +400,11 @@ function AddDroner() {
     const splitPlant = values?.plantsOther
       ? values?.plantsOther?.split(",")
       : [];
+    const valuePlant = values?.checkPlantsOther || [];
     const expPlant =
       splitPlant.length > 0
-        ? [...values.checkPlantsOther, ...splitPlant]
-        : values.checkPlantsOther;
+        ? [...valuePlant, ...splitPlant]
+        : valuePlant;
 
     const pushAdd = Map(data).set("address", address);
     const pushDronerArea = Map(pushAdd.toJS()).set(
@@ -441,27 +442,19 @@ function AddDroner() {
     await DronerDatasource.createDronerList(payload).then(
       async (res) => {
         if (res !== undefined) {
-          const pushImgProId = Map(createImgProfile).set(
-            "resourceId",
-            res.id
-          );
-          const pushImgCardId = Map(createImgIdCard).set(
-            "resourceId",
-            res.id
-          );
-          let i = 0;
-          for (i; 2 > i; i++) {
-            i === 0 &&
-              UploadImageDatasouce.uploadImage(
-                pushImgProId.toJS()
-              ).then(res);
-            i === 1 &&
-              UploadImageDatasouce.uploadImage(
-                pushImgCardId.toJS()
-              ).then(res);
-          }
+          const fileList = [createImgProfile, createImgIdCard]
+            .filter((el) => {
+              return el.file !== "" && el.file !== undefined;
+            })
+            .map((el) => {
+              return UploadImageDatasouce.uploadImage(
+                Map(el).set("resourceId", res.id).toJS()
+              );
+            });
 
-          for (i = 0; res.dronerDrone.length > i; i++) {
+          await Promise.all(fileList);
+
+          for (let i = 0; res.dronerDrone.length > i; i++) {
             let findId = res.dronerDrone[i];
             let getData = dronerDroneList.filter(
               (x) => x.serialNo === findId.serialNo

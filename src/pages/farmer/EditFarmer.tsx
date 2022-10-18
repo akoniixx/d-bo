@@ -320,7 +320,7 @@ const EditFarmer = () => {
     const getImg = data.file.filter(
       (x) => x.category == "PROFILE_IMAGE"
     )[0];
-    if (getImg != undefined) {
+    if (getImg !== undefined) {
       UploadImageDatasouce.deleteImage(getImg.id, getImg.path).then(
         (res) => {}
       );
