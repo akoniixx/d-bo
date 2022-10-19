@@ -34,7 +34,8 @@ function IndexFarmer() {
   const [searchSubdistrict, setSearchSubdstrict] = useState<any>();
   const [province, setProvince] = useState<ProviceEntity[]>();
   const [district, setDistrict] = useState<DistrictEntity[]>();
-  const [subdistrict, setSubdistrict] = useState<SubdistrictEntity[]>();
+  const [subdistrict, setSubdistrict] =
+    useState<SubdistrictEntity[]>();
 
   const fecthAdmin = async () => {
     await FarmerDatasource.getFarmerList(
@@ -44,7 +45,7 @@ function IndexFarmer() {
       searchText,
       searchProvince,
       searchDistrict,
-      searchSubdistrict,
+      searchSubdistrict
     ).then((res: FarmerPageEntity) => {
       setData(res);
     });
@@ -55,21 +56,30 @@ function IndexFarmer() {
     });
   };
   const fetchDistrict = async () => {
-    await LocationDatasource.getDistrict(searchProvince).then((res) => {
-      setDistrict(res);
-    });
+    await LocationDatasource.getDistrict(searchProvince).then(
+      (res) => {
+        setDistrict(res);
+      }
+    );
   };
   const fetchSubdistrict = async () => {
-    await LocationDatasource.getSubdistrict(searchDistrict).then((res) => {
-      setSubdistrict(res);
-    });
+    await LocationDatasource.getSubdistrict(searchDistrict).then(
+      (res) => {
+        setSubdistrict(res);
+      }
+    );
   };
 
   useEffect(() => {
     fecthAdmin();
     fecthProvince();
-    fetchDistrict();
-    fetchSubdistrict();
+    if (searchProvince) {
+      fetchDistrict();
+    }
+    if (searchDistrict) {
+      fetchSubdistrict();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     current,
     searchStatus,
@@ -108,13 +118,15 @@ function IndexFarmer() {
     <>
       <div
         className="container d-flex justify-content-between"
-        style={{ padding: "10px" }}
-      >
+        style={{ padding: "10px" }}>
         <div>
           <span
             className="card-label font-weight-bolder text-dark"
-            style={{ fontSize: 22, fontWeight: "bold", padding: "8px" }}
-          >
+            style={{
+              fontSize: 22,
+              fontWeight: "bold",
+              padding: "8px",
+            }}>
             <strong>ข้อมูลเกษตรกร (Farmer)</strong>
           </span>
         </div>
@@ -127,8 +139,7 @@ function IndexFarmer() {
       </div>
       <div
         className="container d-flex justify-content-between"
-        style={{ padding: "8px" }}
-      >
+        style={{ padding: "8px" }}>
         <div className="col-lg-3">
           <Search
             placeholder="ค้นหาชื่อเกษตรกร หรือเบอร์โทร"
@@ -151,10 +162,11 @@ function IndexFarmer() {
               optionA.children
                 .toLowerCase()
                 .localeCompare(optionB.children.toLowerCase())
-            }
-          >
+            }>
             {province?.map((item) => (
-              <Option value={item.provinceId.toString()}>{item.provinceName}</Option>
+              <Option value={item.provinceId.toString()}>
+                {item.provinceName}
+              </Option>
             ))}
           </Select>
         </div>
@@ -174,8 +186,7 @@ function IndexFarmer() {
                 .toLowerCase()
                 .localeCompare(optionB.children.toLowerCase())
             }
-            disabled={searchProvince == undefined}
-          >
+            disabled={searchProvince == undefined}>
             {district?.map((item) => (
               <Option value={item.districtId.toString()}>
                 {item.districtName}
@@ -199,8 +210,7 @@ function IndexFarmer() {
                 .toLowerCase()
                 .localeCompare(optionB.children.toLowerCase())
             }
-            disabled={searchDistrict == undefined}
-          >
+            disabled={searchDistrict == undefined}>
             {subdistrict?.map((item) => (
               <Option value={item.subdistrictId.toString()}>
                 {item.subdistrictName}
@@ -213,8 +223,7 @@ function IndexFarmer() {
             allowClear
             className="col-lg-12 p-1"
             placeholder="เลือกสถานะ"
-            onChange={handleSearchStatus}
-          >
+            onChange={handleSearchStatus}>
             {FARMER_STATUS_SEARCH.map((item) => (
               <option value={item.value}>{item.name}</option>
             ))}
@@ -266,7 +275,9 @@ function IndexFarmer() {
       key: "date",
       render: (value: any, row: any, index: number) => {
         return {
-          children: <span>{row.address.subdistrict.subdistrictName}</span>,
+          children: (
+            <span>{row.address.subdistrict.subdistrictName}</span>
+          ),
         };
       },
     },
@@ -287,7 +298,9 @@ function IndexFarmer() {
       render: (value: any, row: any, index: number) => {
         return {
           children: (
-            <span>{row.totalRaiCount ? row.totalRaiCount : 0} ไร่</span>
+            <span>
+              {row.totalRaiCount ? row.totalRaiCount : 0} ไร่
+            </span>
           ),
         };
       },
@@ -308,7 +321,8 @@ function IndexFarmer() {
         return {
           children: (
             <>
-              <span style={{ color: STATUS_COLOR_MAPPING[row.status] }}>
+              <span
+                style={{ color: STATUS_COLOR_MAPPING[row.status] }}>
                 <Badge color={STATUS_COLOR_MAPPING[row.status]} />
                 {STATUS_FARMER_MAPPING[row.status]}
                 <br />
@@ -356,10 +370,15 @@ function IndexFarmer() {
           }}
           rowClassName={(a) =>
             a.status == "PENDING" &&
-            moment(Date.now()).diff(moment(new Date(a.createdAt)), "day") >= 3
+            moment(Date.now()).diff(
+              moment(new Date(a.createdAt)),
+              "day"
+            ) >= 3
               ? "PENDING" &&
-                moment(Date.now()).diff(moment(new Date(a.createdAt)), "day") >=
-                  7
+                moment(Date.now()).diff(
+                  moment(new Date(a.createdAt)),
+                  "day"
+                ) >= 7
                 ? "table-row-older"
                 : "table-row-old"
               : "table-row-lasted"

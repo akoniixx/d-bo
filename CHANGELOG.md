@@ -1,4 +1,8 @@
 ## [Version - 0]
+## Fix [v0.17.15] 2022-10-19
+- fixed edit farmer dont send field famerPlot
+- fixed api get farmer & droner error 500
+- fixed edit address field droner  data dont change 
 ## Fix [v0.17.14] 2022-10-17
 - fixed code upload image Edit Add Farmer & Droner
 - fixed delete droner-drone
