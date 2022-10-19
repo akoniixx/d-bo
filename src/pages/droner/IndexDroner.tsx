@@ -35,7 +35,11 @@ function IndexDroner() {
   const [searchDroneBrand, setSearchDroneBrand] = useState<any>();
   const [province, setProvince] = useState<ProviceEntity[]>([]);
   const [district, setDistrict] = useState<DistrictEntity[]>([]);
-  const [subdistrict, setSubdistrict] = useState<SubdistrictEntity[]>([]);
+  const [subdistrict, setSubdistrict] = useState<SubdistrictEntity[]>(
+    []
+  );
+  console.log(data);
+
   const [droneBrandId, setDroneBrandId] = useState<any>();
 
   useEffect(() => {
@@ -73,14 +77,18 @@ function IndexDroner() {
     });
   };
   const fetchDistrict = async () => {
-    await LocationDatasource.getDistrict(searchProvince).then((res) => {
-      setDistrict(res);
-    });
+    await LocationDatasource.getDistrict(searchProvince).then(
+      (res) => {
+        setDistrict(res);
+      }
+    );
   };
   const fetchSubdistrict = async () => {
-    await LocationDatasource.getSubdistrict(searchDistrict).then((res) => {
-      setSubdistrict(res);
-    });
+    await LocationDatasource.getSubdistrict(searchDistrict).then(
+      (res) => {
+        setSubdistrict(res);
+      }
+    );
   };
   const fetchDroneBrand = async () => {
     await DroneDatasource.getDroneBrandList().then((res) => {
@@ -114,18 +122,19 @@ function IndexDroner() {
     setSearchStatus(status);
     setCurrent(1);
   };
-
   const PageTitle = (
     <>
       <div
         className="container d-flex justify-content-between"
-        style={{ padding: "10px" }}
-      >
+        style={{ padding: "10px" }}>
         <div>
           <span
             className="card-label font-weight-bolder text-dark"
-            style={{ fontSize: 22, fontWeight: "bold", padding: "8px" }}
-          >
+            style={{
+              fontSize: 22,
+              fontWeight: "bold",
+              padding: "8px",
+            }}>
             <strong>รายชื่อนักบินโดรน (Droner)</strong>
           </span>
         </div>
@@ -138,8 +147,7 @@ function IndexDroner() {
       </div>
       <div
         className="container d-flex justify-content-between"
-        style={{ padding: "8px" }}
-      >
+        style={{ padding: "8px" }}>
         <div className="col-lg-3">
           <Search
             placeholder="ค้นหาชื่อนักบินโดรน หรือเบอร์โทร"
@@ -162,8 +170,7 @@ function IndexDroner() {
               optionA.children
                 .toLowerCase()
                 .localeCompare(optionB.children.toLowerCase())
-            }
-          >
+            }>
             {province?.map((item) => (
               <Option value={item.provinceId.toString()}>
                 {item.provinceName}
@@ -187,8 +194,7 @@ function IndexDroner() {
                 .toLowerCase()
                 .localeCompare(optionB.children.toLowerCase())
             }
-            disabled={searchProvince == undefined}
-          >
+            disabled={searchProvince == undefined}>
             {district?.map((item) => (
               <Option value={item.districtId.toString()}>
                 {item.districtName}
@@ -212,8 +218,7 @@ function IndexDroner() {
                 .toLowerCase()
                 .localeCompare(optionB.children.toLowerCase())
             }
-            disabled={searchDistrict == undefined}
-          >
+            disabled={searchDistrict == undefined}>
             {subdistrict?.map((item) => (
               <Option value={item.subdistrictId.toString()}>
                 {item.subdistrictName}
@@ -236,8 +241,7 @@ function IndexDroner() {
             className="col-lg-12 p-1"
             placeholder="เลือกยี่ห้อ"
             allowClear
-            onChange={handleDroneBrand}
-          >
+            onChange={handleDroneBrand}>
             {droneBrandId?.map((item: any) => (
               <Option value={item.id.toString()}>{item.name}</Option>
             ))}
@@ -247,8 +251,7 @@ function IndexDroner() {
           <Select
             className="col-lg-12 p-1"
             placeholder="เลือกสถานะ"
-            onChange={handleStatus}
-          >
+            onChange={handleStatus}>
             {DRONER_STATUS.map((item) => (
               <option value={item.value}>{item.name}</option>
             ))}
@@ -286,7 +289,9 @@ function IndexDroner() {
         return {
           children: (
             <span className="text-dark-75  d-block font-size-lg">
-              {subdistrict !== undefined ? subdistrict.subdistrictName : null}
+              {subdistrict !== undefined
+                ? subdistrict.subdistrictName
+                : null}
             </span>
           ),
         };
@@ -303,7 +308,9 @@ function IndexDroner() {
           children: (
             <div className="container">
               <span className="text-dark-75  d-block font-size-lg">
-                {district !== undefined ? district.districtName : null}
+                {district !== undefined
+                  ? district.districtName
+                  : null}
               </span>
             </div>
           ),
@@ -321,7 +328,9 @@ function IndexDroner() {
           children: (
             <div className="container">
               <span className="text-dark-75  d-block font-size-lg">
-                {province !== undefined ? province.provinceName : null}
+                {province !== undefined
+                  ? province.provinceName
+                  : null}
               </span>
             </div>
           ),
@@ -371,8 +380,10 @@ function IndexDroner() {
                 ) : (
                   <Avatar
                     size={25}
-                    style={{ color: "#0068F4", backgroundColor: "#EFF2F9" }}
-                  >
+                    style={{
+                      color: "#0068F4",
+                      backgroundColor: "#EFF2F9",
+                    }}>
                     {/* {droneLatest.charAt(0)} */}
                   </Avatar>
                 )}
@@ -381,7 +392,9 @@ function IndexDroner() {
                   : null}
               </span>
               <span style={{ color: color.Grey, fontSize: "12px" }}>
-                {row.dronerDrone.length > 1 ? "(มากกว่า 1 ยี่ห้อ)" : null}
+                {row.dronerDrone.length > 1
+                  ? "(มากกว่า 1 ยี่ห้อ)"
+                  : null}
               </span>
             </div>
           ),
@@ -452,9 +465,15 @@ function IndexDroner() {
         scroll={{ x: 1300 }}
         rowClassName={(a) =>
           a.status == "PENDING" &&
-          moment(Date.now()).diff(moment(new Date(a.createdAt)), "day") >= 3
+          moment(Date.now()).diff(
+            moment(new Date(a.createdAt)),
+            "day"
+          ) >= 3
             ? "PENDING" &&
-              moment(Date.now()).diff(moment(new Date(a.createdAt)), "day") >= 7
+              moment(Date.now()).diff(
+                moment(new Date(a.createdAt)),
+                "day"
+              ) >= 7
               ? "table-row-older"
               : "table-row-old"
             : "table-row-lasted"
