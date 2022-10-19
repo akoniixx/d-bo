@@ -45,9 +45,14 @@ function IndexDroner() {
   useEffect(() => {
     fetchDronerList();
     fetchProvince();
-    fetchDistrict();
-    fetchSubdistrict();
+    if (searchProvince) {
+      fetchDistrict();
+    }
+    if (searchDistrict) {
+      fetchSubdistrict();
+    }
     fetchDroneBrand();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     current,
     searchText,

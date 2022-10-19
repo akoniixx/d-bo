@@ -240,14 +240,20 @@ function EditDroner() {
     LocationDatasource.getProvince().then((res) => {
       setProvince(res);
     });
-    LocationDatasource.getDistrict(address.provinceId).then((res) => {
-      setDistrict(res);
-    });
-    LocationDatasource.getSubdistrict(address.districtId).then(
-      (res) => {
-        setSubdistrict(res);
-      }
-    );
+    if (address?.provinceId) {
+      LocationDatasource.getDistrict(address.provinceId).then(
+        (res) => {
+          setDistrict(res);
+        }
+      );
+    }
+    if (address?.districtId) {
+      LocationDatasource.getSubdistrict(address.districtId).then(
+        (res) => {
+          setSubdistrict(res);
+        }
+      );
+    }
   }, [address.provinceId, address.districtId]);
 
   //#region data droner
@@ -555,7 +561,11 @@ function EditDroner() {
       ...data,
       ...values,
       birthDate: moment(values.birthDate).toISOString(),
-      address,
+      address: {
+        ...address,
+        address1: values.address1,
+        address2: values.address2,
+      },
       reason,
       expPlant,
       dronerArea: {
