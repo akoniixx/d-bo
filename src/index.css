@@ -1,16 +1,16 @@
 @import url("https://fonts.googleapis.com/css2?family=Prompt:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&display=swap");
 
 html {
-  font-size: 10px;
+  font-size: 14px;
   height: 100%;
   line-height: 1.8;
   -webkit-text-size-adjust: 100%;
   -ms-text-size-adjust: 100%;
 }
 body {
+  font-family: "Prompt" !important;
+  font-weight: 400 !important;
   color: #000;
-  font-family: "sans-serif", "Helvetica Neue", Arial !important;
-  font-weight: normal !important;
   margin: 0;
   padding: 0;
   -webkit-font-smoothing: antialiased;
@@ -18,28 +18,20 @@ body {
   height: 100%;
 }
 
-table tr td {
+table tr td :hover {
   font-weight: normal !important;
 }
-Form,
-Input,
-p,
-Table,
-Form,
-h1,
-h2,
-h3,
-h4,
-h5,
-label,
-span,
-.font-size-h1,
-.font-size-h2,
-.font-size-h3,
-.font-size-h4,
-.font-size-h5 {
-  font-family: "Prompt" !important;
-  font-weight: 400 !important;
+.table-row-old td {
+  background-color: rgba(244, 132, 26, 0.2) !important;
+}
+.table-row-older td {
+  background-color: rgba(235, 87, 87, 0.3) !important;
+}
+.table-row-lasted td {
+  background-color: rgb(255, 255, 255) !important;
+}
+.table-row-wait-review td {
+  background-color: #2f80ed1a !important;
 }
 
 .ant-layout-sider-light {
@@ -51,4 +43,34 @@ span,
   font-weight: 500 !important;
   color: rgb(255, 255, 255) !important;
   font-weight: bold !important;
+}
+
+.custom-steps
+  .ant-steps-item-process
+  > .ant-steps-item-container
+  > .ant-steps-item-icon {
+  background-color: #219653;
+  border-color: #219653;
+}
+.custom-steps .ant-steps-item-finish .ant-steps-item-icon {
+  background-color: #fff;
+  border-color: #219653;
+}
+.custom-steps .ant-steps-item-finish .ant-steps-item-icon > .ant-steps-icon {
+  color: #219653;
+  top: -4.5px;
+}
+.custom-steps
+  .ant-steps-item-process
+  > .ant-steps-item-container
+  > .ant-steps-item-content
+  > .ant-steps-item-title:after {
+  background-color: #c6c6c6;
+}
+.custom-steps
+  .ant-steps-item-finish
+  > .ant-steps-item-container
+  > .ant-steps-item-content
+  > .ant-steps-item-title:after {
+  background-color: #219653;
 }

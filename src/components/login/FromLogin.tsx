@@ -1,15 +1,13 @@
 import { Button, Divider, Form, Input, message, Space } from "antd";
 import React, { SyntheticEvent, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import swal from "sweetalert";
 import { AuthDatasource } from "../../datasource/AuthDatasource";
 import { useLocalStorage } from "../../hook/useLocalStorage";
 import color from "../../resource/color";
 
 const FromLogin: React.FC = () => {
   const style: React.CSSProperties = {
-    width: "400px",
-    height: "40px",
+    height: "35px",
     borderRadius: "5px",
   };
   const [formLogin] = Form.useForm();
@@ -17,21 +15,27 @@ const FromLogin: React.FC = () => {
     "profile",
     []
   );
-
   const navigate = useNavigate();
   const [token, setToken] = useLocalStorage("token", []);
   const handlerSubmitFrom = (data: any) => {
-    AuthDatasource.login(data.username, data.password).then((res: any) => {
-      if (res.accessToken) {
-        console.log(res.accessToken);
-        message.success("Login Successful");
-        setPersistedProfile(res.data);
-        setToken(res.accessToken);
-        return navigate("HomePage");
-      } else {
-        return message.error("กรุณากรอกชื่อผู้ใช้หรือรหัสผ่านที่ถูกต้อง");
-      }
-    });
+    AuthDatasource.login(data.username, data.password)
+      .then((res: any) => {
+        if (res.accessToken) {
+          message.success("Login Successful");
+          setPersistedProfile(res.data);
+          setToken(res.accessToken);
+          return navigate("HomePage");
+        } else if (res.responseCode == "F101-Permission") {
+          message.error("user นี้ไม่มีสิทธิ์เข้าใช้งาน กรุณาติดต่อเจ้าหน้าที่");
+        } else if (
+          res.responseCode == "F102-This user does not exist in the system."
+        ) {
+          message.error("user นี้ไม่มีในระบบ");
+        }
+      })
+      .catch((error) => {
+        message.error("username หรือ password ไม่ถูกต้อง");
+      });
   };
 
   return (
@@ -55,7 +59,7 @@ const FromLogin: React.FC = () => {
               },
             ]}
           >
-            <Input placeholder="กรอกชื่อผู้ใช้" />
+            <Input placeholder="กรอกชื่อผู้ใช้" style={style} />
           </Form.Item>
         </div>
         <div className="text-start">
@@ -71,7 +75,7 @@ const FromLogin: React.FC = () => {
               },
             ]}
           >
-            <Input.Password placeholder="กรอกรหัสผ่าน" />
+            <Input.Password placeholder="กรอกรหัสผ่าน" style={style} />
           </Form.Item>
           <div className="text-start">
             <Form.Item>
@@ -79,9 +83,11 @@ const FromLogin: React.FC = () => {
                 className="col-lg-12"
                 style={{
                   borderRadius: "5px",
+                  height: "35px",
                   backgroundColor: color.primary1,
+                  color: color.White,
                 }}
-                type="primary"
+                type="ghost"
                 htmlType="submit"
               >
                 Login

@@ -5,9 +5,13 @@ import { LeftOutlined } from "@ant-design/icons";
 
 interface BackBackProps {
   onClick?: () => void;
+  disableBtn?: boolean;
 }
 
-export const BackButton: React.FC<BackBackProps> = ({ onClick }) => (
+export const BackButton: React.FC<BackBackProps> = ({
+  onClick,
+  disableBtn,
+}) => (
   <Button
     style={{
       borderColor: color.Success,
@@ -15,6 +19,7 @@ export const BackButton: React.FC<BackBackProps> = ({ onClick }) => (
       color: color.Success,
     }}
     onClick={onClick}
+    disabled={disableBtn}
   >
     ย้อนกลับ
   </Button>

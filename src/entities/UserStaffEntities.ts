@@ -1,4 +1,4 @@
-export interface UserStaffCreate {
+export interface UserStaffEntity {
   id: string;
   email: string;
   username: string;
@@ -10,3 +10,25 @@ export interface UserStaffCreate {
   updateAt: string;
   isActive: boolean;
 }
+export const UserStaffEntity_INIT: UserStaffEntity = {
+  id: "",
+  email: "",
+  username: "",
+  password: "",
+  role: "",
+  firstname: "",
+  lastname: "",
+  createdAt: "",
+  updateAt: "",
+  isActive: true,
+};
+export interface UserStaffPageEntity {
+  results: UserStaffEntity[];
+  total_page: number;
+  total: number;
+}
+export const UserStaffPageEntity_INIT: UserStaffPageEntity = {
+  results: [UserStaffEntity_INIT],
+  total_page: 0,
+  total: 0
+};

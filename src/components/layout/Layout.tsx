@@ -97,7 +97,7 @@ const Layouts: React.FC<any> = ({ children }) => {
         >
           <Menu mode="inline" defaultOpenKeys={["order"]} style={style}>
             <Menu.Item icon={<SignalFilled />}>
-              <Link to="/OverviewPage">
+              <Link to="/OverviewPage" style={{ textDecoration: "none" }}>
                 <span>ภาพรวม</span>
               </Link>
             </Menu.Item>
@@ -105,14 +105,38 @@ const Layouts: React.FC<any> = ({ children }) => {
               icon={<ProfileFilled />}
               title={<span>ติดตามงาน</span>}
               key={"sub1"}
-            ></Menu.SubMenu>
+            >
+              <Menu.Item>
+                <Link to="/IndexNewTask" style={{ textDecoration: "none" }}>
+                  <span>งานใหม่ (รอนักบิน)</span>
+                </Link>
+              </Menu.Item>
+              <Menu.Item>
+                <Link
+                  to="/IndexInprogressTask"
+                  style={{ textDecoration: "none" }}
+                >
+                  <span>งานรอดำเนินงาน</span>
+                </Link>
+              </Menu.Item>
+              <Menu.Item>
+                <Link to="/IndexTodayTask" style={{ textDecoration: "none" }}>
+                  <span>งานในวันนี้</span>
+                </Link>
+              </Menu.Item>
+              <Menu.Item>
+                <Link to="/IndexFinishTask" style={{ textDecoration: "none" }}>
+                  <span>งานที่เสร็จแล้ว</span>
+                </Link>
+              </Menu.Item>
+            </Menu.SubMenu>
             <Menu.Item icon={<DollarCircleFilled />}>
-              <Link to="/TotalIncomePage">
+              <Link to="/TotalIncomePage" style={{ textDecoration: "none" }}>
                 <span>ยอดรวมรายได้</span>
               </Link>
             </Menu.Item>
             <Menu.Item icon={<ContactsFilled />}>
-              <Link to="/IndexFarmer">
+              <Link to="/IndexFarmer" style={{ textDecoration: "none" }}>
                 <span>ข้อมูลเกษตรกร</span>
               </Link>
             </Menu.Item>
@@ -122,23 +146,23 @@ const Layouts: React.FC<any> = ({ children }) => {
               key={"sub2"}
             >
               <Menu.Item>
-                <Link to="/IndexDroner">
+                <Link to="/IndexDroner" style={{ textDecoration: "none" }}>
                   <span>รายชื่อนักบินโดรน</span>
                 </Link>
               </Menu.Item>
               <Menu.Item>
-                <Link to="/DronerList">
+                <Link to="/DroneList" style={{ textDecoration: "none" }}>
                   <span>รายการโดรนเกษตร</span>
                 </Link>
               </Menu.Item>
               <Menu.Item>
-                <Link to="/RateDroner">
+                <Link to="/IndexRankDroner" style={{ textDecoration: "none" }}>
                   <span>อันดับนักบินโดรน</span>
                 </Link>
               </Menu.Item>
             </Menu.SubMenu>
             <Menu.Item icon={<GiftFilled />}>
-              <Link to="/PromotionPage">
+              <Link to="/PromotionPage" style={{ textDecoration: "none" }}>
                 <span>โปรโมชั่น</span>
               </Link>
             </Menu.Item>
@@ -146,7 +170,13 @@ const Layouts: React.FC<any> = ({ children }) => {
               icon={<SettingFilled />}
               title={<span>ผู้ดูแลระบบ</span>}
               key={"sub3"}
-            ></Menu.SubMenu>
+            >
+              <Menu.Item>
+                <Link to="/IndexAdmin" style={{ textDecoration: "none" }}>
+                  <span>รายชื่อผู้ดูแลระบบ</span>
+                </Link>
+              </Menu.Item>
+            </Menu.SubMenu>
           </Menu>
         </Sider>
         <Layout
