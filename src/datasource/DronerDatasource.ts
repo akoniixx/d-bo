@@ -6,7 +6,7 @@ import {
 import { BASE_URL, httpClient } from "../config/develop-config";
 
 export class DronerDatasource {
-  static getDronerList(
+  static async getDronerList(
     page: number,
     row: number,
     subdistrictId?: number,

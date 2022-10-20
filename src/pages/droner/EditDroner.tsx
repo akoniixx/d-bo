@@ -240,14 +240,20 @@ function EditDroner() {
     LocationDatasource.getProvince().then((res) => {
       setProvince(res);
     });
-    LocationDatasource.getDistrict(address.provinceId).then((res) => {
-      setDistrict(res);
-    });
-    LocationDatasource.getSubdistrict(address.districtId).then(
-      (res) => {
-        setSubdistrict(res);
-      }
-    );
+    if (address?.provinceId) {
+      LocationDatasource.getDistrict(address.provinceId).then(
+        (res) => {
+          setDistrict(res);
+        }
+      );
+    }
+    if (address?.districtId) {
+      LocationDatasource.getSubdistrict(address.districtId).then(
+        (res) => {
+          setSubdistrict(res);
+        }
+      );
+    }
   }, [address.provinceId, address.districtId]);
 
   //#region data droner
@@ -426,11 +432,13 @@ function EditDroner() {
     setEditIndex(0);
     setDronerDroneList(dronerDroneList);
   };
-  const removeDrone = (index: number) => {
-    const newData = dronerDroneList.filter(
-      (x) => x.modalDroneIndex !== index
-    );
-    setDronerDroneList(newData);
+  const removeDrone = async (id?: string) => {
+    try {
+      await DronerDroneDatasource.removeDronerDrone(id);
+      fetchDronerById();
+    } catch (e) {
+      console.log(e);
+    }
   };
   //#endregion
 
@@ -553,7 +561,11 @@ function EditDroner() {
       ...data,
       ...values,
       birthDate: moment(values.birthDate).toISOString(),
-      address,
+      address: {
+        ...address,
+        address1: values.address1,
+        address2: values.address2,
+      },
       reason,
       expPlant,
       dronerArea: {
@@ -595,8 +607,6 @@ function EditDroner() {
   };
 
   const onFieldsChange = (field: any) => {
-    const currentStatus =
-      (field[0].name[0] === "status" && field[0].value) || status;
     const isHasError = form.getFieldsError().some(({ errors }) => {
       return errors.length > 0;
     });
@@ -609,6 +619,7 @@ function EditDroner() {
       checkPlantsOther,
       reason,
       idNo,
+      status: currentStatus,
       ...rest
     } = form.getFieldsValue();
     const reasonList = [];
@@ -902,9 +913,11 @@ function EditDroner() {
                   onChange={handleProvince}
                   defaultValue={address.provinceId}>
                   {province.map((item: any, index: any) => (
-                    <option key={index} value={item.provinceId}>
+                    <Select.Option
+                      key={index}
+                      value={item.provinceId}>
                       {item.provinceName}
-                    </option>
+                    </Select.Option>
                   ))}
                 </Select>
               </Form.Item>
@@ -938,9 +951,11 @@ function EditDroner() {
                   onChange={handleDistrict}
                   defaultValue={address.districtId}>
                   {district.map((item: any, index: any) => (
-                    <option key={index} value={item.districtId}>
+                    <Select.Option
+                      key={index}
+                      value={item.districtId}>
                       {item.districtName}
-                    </option>
+                    </Select.Option>
                   ))}
                 </Select>
               </Form.Item>
@@ -976,9 +991,11 @@ function EditDroner() {
                   onChange={handleSubDistrict}
                   defaultValue={address.subdistrictId}>
                   {subdistrict?.map((item: any, index: any) => (
-                    <option key={index} value={item.subdistrictId}>
+                    <Select.Option
+                      key={index}
+                      value={item.subdistrictId}>
                       {item.subdistrictName}
-                    </option>
+                    </Select.Option>
                   ))}
                 </Select>
               </Form.Item>
@@ -1061,7 +1078,7 @@ function EditDroner() {
                     option.children.includes(input)
                   }>
                   {location.map((item: any) => (
-                    <option
+                    <Select.Option
                       key={item.subdistrictId}
                       value={item.subdistrictId}>
                       {item.subdistrictName +
@@ -1069,7 +1086,7 @@ function EditDroner() {
                         item.districtName +
                         "/" +
                         item.provinceName}
-                    </option>
+                    </Select.Option>
                   ))}
                 </Select>
               </Form.Item>
@@ -1147,16 +1164,16 @@ function EditDroner() {
               }}
               rules={[
                 {
-                  validator: (_, value, callback) => {
+                  validator: (_, value) => {
                     const plantsOther =
                       form.getFieldValue("plantsOther");
 
                     if (value?.length < 1 && !plantsOther) {
-                      callback(
+                      return Promise.reject(
                         "กรุณาเลือกพืชที่เคยฉีดพ่นอย่างน้อย 1 อย่าง"
                       );
                     } else {
-                      callback();
+                      return Promise.resolve();
                     }
                   },
                 },
@@ -1193,6 +1210,7 @@ function EditDroner() {
                       );
 
                     const isDupTyping =
+                      splitValue &&
                       new Set(splitValue).size !== splitValue.length;
 
                     if (!!value && checkValidateComma(value)) {
@@ -1247,11 +1265,7 @@ function EditDroner() {
                                 name="checkReason"
                                 rules={[
                                   {
-                                    validator: (
-                                      _,
-                                      value,
-                                      callback
-                                    ) => {
+                                    validator: (_, value) => {
                                       const reasonField =
                                         form.getFieldValue("reason");
 
@@ -1416,7 +1430,7 @@ function EditDroner() {
                       <ActionButton
                         icon={<DeleteOutlined />}
                         color={color.Error}
-                        onClick={() => removeDrone(index + 1)}
+                        onClick={() => removeDrone(item.id)}
                       />
                     </div>
                   </div>

@@ -264,19 +264,22 @@ const EditFarmer = () => {
       showCloseButton: true,
     }).then(async (result) => {
       if (result.isConfirmed) {
-        await FarmerPlotDatasource.deleteFarmerPlot(data.id).then();
+        await FarmerPlotDatasource.deleteFarmerPlot(data.id);
       }
       fecthFarmer();
     });
   };
 
   const updateFarmerPlot = async (plot: FarmerPlotEntity) => {
-    const p = Map(plot).set("farmerId", farmerId);
-    if (p.toJS().id != "") {
-      await FarmerPlotDatasource.updateFarmerPlot(p.toJS()).then();
+    const payload = {
+      ...plot,
+      farmerId,
+    };
+    if (payload.id !== "") {
+      await FarmerPlotDatasource.updateFarmerPlot(payload);
       setShowEditModal((prev) => !prev);
     } else {
-      await FarmerPlotDatasource.insertFarmerPlot(p.toJS()).then();
+      await FarmerPlotDatasource.insertFarmerPlot(payload);
       setShowAddModal((prev) => !prev);
     }
     fecthFarmer();
@@ -320,7 +323,7 @@ const EditFarmer = () => {
     const getImg = data.file.filter(
       (x) => x.category == "PROFILE_IMAGE"
     )[0];
-    if (getImg != undefined) {
+    if (getImg !== undefined) {
       UploadImageDatasouce.deleteImage(getImg.id, getImg.path).then(
         (res) => {}
       );
@@ -428,39 +431,41 @@ const EditFarmer = () => {
   const updateFarmer = async () => {
     const pushAddr = Map(data).set("address", address);
     const pushPin = Map(pushAddr.toJS()).set("pin", "");
-    await FarmerDatasource.updateFarmer(pushPin.toJS()).then(
-      (res) => {
-        if (res != undefined) {
-          var i = 0;
-          for (i; 2 > i; i++) {
-            i == 0 &&
-              createImgProfile.file != "" &&
-              UploadImageDatasouce.uploadImage(createImgProfile).then(
-                res
-              );
-            i == 1 &&
-              createImgIdCard.file != "" &&
-              UploadImageDatasouce.uploadImage(createImgIdCard).then(
-                res
-              );
-          }
-          Swal.fire({
-            title: "บันทึกสำเร็จ",
-            icon: "success",
-            timer: 1500,
-            showConfirmButton: false,
-          }).then((time) => {
-            window.location.href = "/IndexFarmer";
-          });
-        } else {
-          Swal.fire({
-            title: "เบอร์โทร หรือ รหัสบัตรประชาชน <br/> ซ้ำในระบบ",
-            icon: "error",
-            showConfirmButton: true,
-          });
+    const payload = {
+      ...pushPin.toJS(),
+    };
+    delete payload.farmerPlot;
+    await FarmerDatasource.updateFarmer(payload).then((res) => {
+      if (res !== undefined) {
+        let i = 0;
+        for (i; 2 > i; i++) {
+          i === 0 &&
+            createImgProfile.file !== "" &&
+            UploadImageDatasouce.uploadImage(createImgProfile).then(
+              res
+            );
+          i === 1 &&
+            createImgIdCard.file !== "" &&
+            UploadImageDatasouce.uploadImage(createImgIdCard).then(
+              res
+            );
         }
+        Swal.fire({
+          title: "บันทึกสำเร็จ",
+          icon: "success",
+          timer: 1500,
+          showConfirmButton: false,
+        }).then((time) => {
+          window.location.href = "/IndexFarmer";
+        });
+      } else {
+        Swal.fire({
+          title: "เบอร์โทร หรือ รหัสบัตรประชาชน <br/> ซ้ำในระบบ",
+          icon: "error",
+          showConfirmButton: true,
+        });
       }
-    );
+    });
   };
 
   const renderFromData = (
