@@ -1,6 +1,8 @@
 ## [Version - 0]
 ## Fix [v0.17.16] 2022-10-19
-- fixed 
+- increase field comment droner farmer dronerDrone
+- increase field table updateAt & updateBy  editDroner editFarmer 
+- increase ui createBy  Droner Farmer
 
 ## Fix [v0.17.15] 2022-10-19
 - fixed edit farmer dont send field famerPlot
