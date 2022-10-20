@@ -753,6 +753,14 @@ const AddFarmer = () => {
               </Radio.Group>
             </div>
           </div>
+          <div
+            className="form-group col-lg-12"
+            style={{ marginTop: 16 }}>
+            <label>หมายเหตุ</label>
+            <Form.Item name="note">
+              <TextArea />
+            </Form.Item>
+          </div>
         </Form>
       </CardContainer>
     </div>

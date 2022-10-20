@@ -306,6 +306,22 @@ function IndexFarmer() {
       },
     },
     {
+      title: "อัพเดทล่าสุด",
+      dataIndex: "updatedAt",
+      key: "updatedAt",
+      render: (value: any) => {
+        return {
+          children: (
+            <div className="container">
+              <span className="text-dark-75  d-block font-size-lg">
+                {moment(value).format("DD/MM/YYYY")}
+              </span>
+            </div>
+          ),
+        };
+      },
+    },
+    {
       title: "สถานะ",
       dataIndex: "status",
       key: "status",

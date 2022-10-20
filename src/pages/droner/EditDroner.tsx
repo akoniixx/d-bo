@@ -147,6 +147,7 @@ function EditDroner() {
         if (res) {
           form.setFieldsValue({
             ...res,
+            note: res.note || "",
             postcode: res.address.postcode || undefined,
             province: res.address.provinceId || undefined,
             district: res.address.districtId || undefined,
@@ -715,6 +716,19 @@ function EditDroner() {
                 <Input disabled defaultValue={data.dronerCode} />
               </Form.Item>
             </div>
+            <div className="form-group col-lg-6">
+              <label>สร้างเมื่อ</label>
+
+              <div style={{ marginBottom: 24 }}>
+                <Input
+                  style={{
+                    padding: "4px 12px",
+                  }}
+                  disabled
+                  value={moment(data.createdAt).format("DD/MM/YYYY")}
+                />
+              </div>
+            </div>
           </div>
           <div className="row">
             <div className="form-group col-lg-6">
@@ -1236,6 +1250,7 @@ function EditDroner() {
               />
             </Form.Item>
           </div>
+
           <div className="row">
             <div className="form-group col-lg-12">
               <label
@@ -1363,6 +1378,12 @@ function EditDroner() {
                 </Radio.Group>
               </Form.Item>
             </div>
+          </div>
+          <div className="form-group col-lg-12">
+            <label>หมายเหตุ</label>
+            <Form.Item name="note">
+              <TextArea />
+            </Form.Item>
           </div>
         </Form>
       </CardContainer>
@@ -1493,6 +1514,7 @@ function EditDroner() {
       )}
       {showEditModal && (
         <ModalDrone
+          isEdit
           show={showEditModal}
           backButton={() => setShowEditModal((prev) => !prev)}
           callBack={updateDrone}

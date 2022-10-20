@@ -53,6 +53,7 @@ export interface GetFarmerEntity {
   address: AddressEntity;
   farmerPlot: FarmerPlotEntity[];
   file: ImageEntity[];
+  createdAt?: string;
 }
 export const GetFarmerEntity_INIT: GetFarmerEntity = {
   id: "",

@@ -158,14 +158,20 @@ const EditFarmer = () => {
     LocationDatasource.getProvince().then((res) => {
       setProvince(res);
     });
-    LocationDatasource.getDistrict(address.provinceId).then((res) => {
-      setDistrict(res);
-    });
-    LocationDatasource.getSubdistrict(address.districtId).then(
-      (res) => {
-        setSubdistrict(res);
-      }
-    );
+    if (address.provinceId) {
+      LocationDatasource.getDistrict(address.provinceId).then(
+        (res) => {
+          setDistrict(res);
+        }
+      );
+    }
+    if (address.districtId) {
+      LocationDatasource.getSubdistrict(address.districtId).then(
+        (res) => {
+          setSubdistrict(res);
+        }
+      );
+    }
   }, [address.provinceId, address.districtId]);
 
   //#region function farmer
@@ -427,7 +433,6 @@ const EditFarmer = () => {
       setBtnSaveDisable(false);
     }
   };
-
   const updateFarmer = async () => {
     const pushAddr = Map(data).set("address", address);
     const pushPin = Map(pushAddr.toJS()).set("pin", "");
@@ -512,6 +517,21 @@ const EditFarmer = () => {
                     </Tag>
                   </>
                 )}
+              </div>
+            </div>
+          </div>
+          <div className="row">
+            <div className="form-group col-lg-6">
+              <label>สร้างเมื่อ</label>
+
+              <div style={{ marginBottom: 24 }}>
+                <Input
+                  style={{
+                    padding: "4px 12px",
+                  }}
+                  disabled
+                  value={moment(data.createdAt).format("DD/MM/YYYY")}
+                />
               </div>
             </div>
           </div>

@@ -65,6 +65,7 @@ import { LAT_LNG_BANGKOK } from "../../../definitions/Location";
 import GoogleMap from "../../../components/map/GoogleMap";
 import moment from "moment";
 import locale from "antd/es/date-picker/locale/th_TH";
+import TextArea from "antd/lib/input/TextArea";
 const dateFormat = "DD/MM/YYYY";
 const dateCreateFormat = "YYYY-MM-DD";
 
@@ -1065,6 +1066,12 @@ function AddDroner() {
               />
             </Form.Item>
           </div>
+          <div className="form-group col-lg-12">
+            <label>หมายเหตุ</label>
+            <Form.Item name="note">
+              <TextArea />
+            </Form.Item>
+          </div>
         </Form>
       </CardContainer>
     </div>
@@ -1183,6 +1190,7 @@ function AddDroner() {
       )}
       {showEditModal && (
         <ModalDrone
+          isEdit
           show={showEditModal}
           backButton={() => setShowEditModal((prev) => !prev)}
           callBack={insertDroneList}

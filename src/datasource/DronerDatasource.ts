@@ -37,7 +37,7 @@ export class DronerDatasource {
       });
   }
 
-  static getDronerByID(id: string): Promise<DronerEntity> {
+  static async getDronerByID(id: string): Promise<DronerEntity> {
     return httpClient
       .get(BASE_URL + "/droner/" + id)
       .then((res) => {

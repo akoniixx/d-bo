@@ -5,7 +5,10 @@ import {
   UploadImageEntity_INTI,
 } from "./UploadImageEntities";
 import { DroneEntity, DroneEntity_INIT } from "./DroneEntities";
-import { FullAddressEntiry_INIT, FullAddressEntity } from './AddressEntities';
+import {
+  FullAddressEntiry_INIT,
+  FullAddressEntity,
+} from "./AddressEntities";
 
 export interface DronerDroneEntity {
   id?: string;
@@ -23,6 +26,7 @@ export interface DronerDroneEntity {
   updatedAt?: string;
   file: ImageEntity[];
   reason: string[];
+  note?: string;
 }
 export const DronerDroneEntity_INIT: DronerDroneEntity = {
   id: "",
@@ -40,6 +44,7 @@ export const DronerDroneEntity_INIT: DronerDroneEntity = {
   updatedAt: "",
   file: [ImageEntity_INTI],
   reason: [""],
+  note: "",
 };
 
 export interface DronerEntity {
