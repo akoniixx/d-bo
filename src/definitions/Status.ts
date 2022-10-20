@@ -71,9 +71,12 @@ export const TASKTODAY_STATUS: any = [
   {key: "2", value: "CANCELED", name: "ยกเลิก" },
 ];
 export const TASKTODAY_STATUS1: any = [
-
   { value: "IN_PROGRESS", name: "กำลังดำเนินงาน" },
   { value: "CANCELED", name: "ยกเลิก" },
+];
+export const APPROVED: any = [
+  { value: "APPROVED", name: "อนุมัติ" },
+  { value: "REJECTED", name: "ไม่อนุมัติ" },
 ];
 export const REDIO_WAIT_START = [
   { key: 0, name: "ปกติ", isChecked: false },

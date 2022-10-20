@@ -264,8 +264,8 @@ export interface TaskDetailEntity {
   distance: string;
   status: string;
   statusRemark: string;
-  reviewDronerAvg: null;
-  reviewDronerDetail: null;
+  reviewDronerAvg: string;
+  reviewDronerDetail: string;
   unitPriceStandard: string;
   priceStandard: string;
   unitPrice: string;
@@ -273,16 +273,16 @@ export interface TaskDetailEntity {
   totalPrice: string;
   fee: string;
   discountFee: string;
-  reviewFarmerScore: null;
-  reviewFarmerComment: null;
-  imagePathFinishTask: null;
+  reviewFarmerScore: string;
+  reviewFarmerComment: string;
+  imagePathFinishTask: string;
   comment: string;
   isProblem: boolean;
   problemRemark: string;
   isDelay: boolean;
-  delayRemark: null;
-  dateDelay: null;
-  statusDelay: null;
+  delayRemark: string;
+  dateDelay: string;
+  statusDelay: string;
   delayRejectRemark: string;
   purposeSpray: CropPurposeSprayEntity;
   farmer: FarmerEntity;
@@ -308,8 +308,8 @@ export const TaskDetailEntity_INIT: TaskDetailEntity = {
   distance: "",
   status: "",
   statusRemark: "",
-  reviewDronerAvg: null,
-  reviewDronerDetail: null,
+  reviewDronerAvg: "",
+  reviewDronerDetail: "",
   unitPriceStandard: "",
   priceStandard: "",
   unitPrice: "",
@@ -317,16 +317,16 @@ export const TaskDetailEntity_INIT: TaskDetailEntity = {
   totalPrice: "",
   fee: "",
   discountFee: "",
-  reviewFarmerScore: null,
-  reviewFarmerComment: null,
-  imagePathFinishTask: null,
+  reviewFarmerScore: "",
+  reviewFarmerComment: "",
+  imagePathFinishTask: "",
   comment: "",
   isProblem: false,
   problemRemark: "",
   isDelay: false,
-  delayRemark: null,
-  dateDelay: null,
-  statusDelay: null,
+  delayRemark: "",
+  dateDelay: "",
+  statusDelay: "",
   delayRejectRemark: "",
   purposeSpray: CropPurposeSprayEntity_INT,
   farmer: FarmerEntity_INIT,

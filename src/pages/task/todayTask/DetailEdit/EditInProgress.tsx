@@ -38,6 +38,7 @@ import TextArea from "antd/lib/input/TextArea";
 import { Option } from "antd/lib/mentions";
 import Swal from "sweetalert2";
 import {
+  APPROVED,
   REDIO_IN_PROGRESS,
   STATUS_COLOR_MAPPING,
   STATUS_INPROGRESS,
@@ -69,7 +70,6 @@ function EditInProgress() {
     status: "",
     message: "",
   });
-  let [otherSpray, setOtherSpray] = useState<any>();
   const fetchTaskDetail = async () => {
     await TaskInprogressDatasource.getTaskDetailById(taskId).then((res) => {
       setData(res);
@@ -114,22 +114,21 @@ function EditInProgress() {
     setBtnSaveDisable(false);
   };
   const handleChangeIsProblem = (e: any) => {
-    console.log(e.target.value);
     const m = Map(data).set("isProblem", e.target.value);
-    setData(m.toJS());
-    // const n = Map(m.toJS()).set("problemRemark", "");
-    // setData(n.toJS());
-    // if (e.target.value == true) {
-    //   if (data.problemRemark != null) {
-    //     setBtnSaveDisable(true);
-    //   } else {
-    //     setBtnSaveDisable(true);
-    //   }
-    //   setBtnSaveDisable(true);
-    // } else {
-    setBtnSaveDisable(false);
-    // }
+    const n = Map(m.toJS()).set("problemRemark", "");
+    setData(n.toJS());
+    if (e.target.value == true) {
+      if (data.problemRemark != null) {
+        setBtnSaveDisable(true);
+      } else {
+        setBtnSaveDisable(true);
+      }
+      setBtnSaveDisable(true);
+    } else {
+      setBtnSaveDisable(false);
+    }
   };
+
   const onChangeProblemText = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const m = Map(data).set("problemRemark", e.target.value);
     setData(m.toJS());
@@ -137,6 +136,14 @@ function EditInProgress() {
       !e.target.value ? setBtnSaveDisable(true) : setBtnSaveDisable(false);
     }
   };
+  const onChangeDelayText = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const m = Map(data).set("delayRemark", e.target.value);
+    setData(m.toJS());
+    {
+      !e.target.value ? setBtnSaveDisable(true) : setBtnSaveDisable(false);
+    }
+  };
+
   const onChangeCanCelText = (e: any) => {
     const m = Map(data).set("statusRemark", e.target.value);
     setData(m.toJS());
@@ -144,8 +151,12 @@ function EditInProgress() {
       !e.target.value ? setBtnSaveDisable(true) : setBtnSaveDisable(false);
     }
   };
+
   const handlerApprove = (e: any) => {
-    console.log(e);
+    const m = Map(data).set("statusDelay", e);
+    console.log(m.toJS())
+    // setData(m.toJS());
+    setBtnSaveDisable(false);
   };
   const renderAppointment = (
     <Form style={{ padding: "32px" }}>
@@ -229,12 +240,49 @@ function EditInProgress() {
                           <div style={{ marginLeft: "20px" }}>
                             <div className="col-lg-12">
                               <Radio.Group
-                                value={data.statusDelay}
+                                value={data.isProblem}
                                 onChange={handleChangeIsProblem}
                               >
                                 <Space direction="vertical">
                                   <Radio value={false}>งานปกติ</Radio>
-                                  <Radio value={"WAIT_APPROVE"} disabled={data.statusDelay == "EXTENDED" }>
+                                  <Radio value={true}>งานมีปัญหา</Radio>
+                                </Space>
+                              </Radio.Group>
+                            </div>
+                            {data.isProblem == true ? (
+                              <div className="col-lg">
+                                <TextArea
+                                  rows={3}
+                                  onChange={onChangeProblemText}
+                                  placeholder="รายละเอียดปัญหา"
+                                  autoComplete="off"
+                                  defaultValue={
+                                    data.problemRemark != null
+                                      ? data.problemRemark
+                                      : undefined
+                                  }
+                                />
+                              </div>
+                            ) : null}
+                            <div className="col-lg-12">
+                              <Radio.Group
+                                value={data.statusDelay}
+                                disabled={
+                                  data.isProblem == false ||
+                                  data.isProblem == true
+                                }
+                              >
+                                <label style={{ marginTop: "20px" }}>
+                                  ขยายเวลา
+                                </label>
+                                <Space direction="vertical">
+                                  <Radio
+                                    value={"WAIT_APPROVE"}
+                                    disabled={
+                                      data.statusDelay == "APPROVED" ||
+                                      data.statusDelay == "EXTENDED"
+                                    }
+                                  >
                                     รออนุมัติขยายเวลา{" "}
                                     <span style={{ color: color.Error }}>
                                       *ต้องโทรหาเกษตกรเพื่อคอนเฟิร์มการอนุมัติ/ปฏิเสธ*
@@ -281,11 +329,8 @@ function EditInProgress() {
                                       <div className="col-lg">
                                         <TextArea
                                           rows={3}
-                                          //  onChange={onChangeProblemText}
-
-                                          // defaultValue={
-
-                                          // }
+                                          onChange={onChangeDelayText}
+                                          defaultValue={data.delayRemark}
                                         />
                                       </div>
                                       <Form.Item
@@ -293,33 +338,27 @@ function EditInProgress() {
                                         style={{ marginTop: "10px" }}
                                       >
                                         <span>อนุมัติ/ไม่อนุมัติ</span>
-                                        <Select
-                                          key={data.statusDelay}
-                                          className="col-lg"
-                                          onChange={handlerApprove}
-                                          // disabled={
-                                          //   searchDistrict === undefined
-                                          // }
-                                        >
-                                          <Option value={"APPROVE"}>
-                                            อนุมัติ
-                                          </Option>
-                                          <Option value={"REJECTED"}>
-                                            ไม่อนุมัติ
-                                          </Option>
+                                        <Select 
+                                        onChange={handlerApprove}>
+                                          {APPROVED.map((x: any) => (
+                                            <option value={x.value}>
+                                              {x.name}
+                                            </option>
+                                          ))}
                                         </Select>
                                       </Form.Item>
                                     </>
                                   ) : null}
                                   <Radio
-                                    value={"EXTENDED"}
+                                    value={"APPROVED"}
                                     disabled={
                                       data.statusDelay == "WAIT_APPROVE"
                                     }
                                   >
                                     อนุมัติขยายเวลา
                                   </Radio>
-                                  {data.statusDelay == "EXTENDED" ? (
+                                  {data.statusDelay == "EXTENDED" ||
+                                  data.statusDelay == "APPROVED" ? (
                                     <>
                                       <div className="row">
                                         <div className="col-lg-5">
@@ -361,33 +400,14 @@ function EditInProgress() {
                                         <TextArea
                                           rows={3}
                                           disabled
-                                          //  onChange={onChangeProblemText}
-                                          // defaultValue={
-
-                                          // }
+                                          defaultValue={data.delayRemark}
                                         />
                                       </div>
                                     </>
                                   ) : null}
-                                  <Radio value={true}>งานมีปัญหา</Radio>
                                 </Space>
                               </Radio.Group>
                             </div>
-                            {data.isProblem == true ? (
-                              <Form.Item>
-                                <TextArea
-                                  rows={3}
-                                  onChange={onChangeProblemText}
-                                  placeholder="รายละเอียดปัญหา"
-                                  autoComplete="off"
-                                  defaultValue={
-                                    data.problemRemark != null
-                                      ? data.problemRemark
-                                      : undefined
-                                  }
-                                />
-                              </Form.Item>
-                            ) : null}
                           </div>
                         ) : data.status == "CANCELED" && index == 1 ? (
                           <div style={{ marginLeft: "20px" }}>

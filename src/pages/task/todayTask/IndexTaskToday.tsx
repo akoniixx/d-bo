@@ -150,32 +150,37 @@ export default function IndexTodayTask() {
     setSearchStatus(arr);
     setCurrent(1);
   };
-  const handleIsProblem = (e: any) => {
+  const handleSubStatus = (e: any) => {
     let value = e.target.value;
+    console.log(value)
     let checked = e.target.checked;
     let statusProblem = ["waitstartproblem", "inprogressproblem"];
     let statusNormal = ["waitstartnormal", "inprogressnormal"];
-    // let isDelay = ["waitapprovedelay", "extended"];
+    let statusDelay = ["extended", "waitapprovedelay"];
     let m: any = [];
     if (checked) {
       m = [...problems, value];
-      // setDelays(m);
+      console.log(m)
       setProblems(m);
-      console.log(m.length)
-      if (m.length == 2) {
+      if (m.length == 4) {
         setIsProblem(undefined);
       } else {
         if (statusProblem.includes(m[0])) {
           setIsProblem(true);
+          setIsDelay(false);
         } else if (statusNormal.includes(m[0])) {
           setIsProblem(false);
-        } 
+          setIsDelay(false);
+        } else if(statusDelay.includes(m[0])){
+          setIsDelay(true);
+        }
       }
     } else {
       m = problems.filter((x: any) => x != value);
       setProblems(m);
       if (m.length == 0) {
         setIsProblem(undefined);
+        setIsDelay(undefined);
       } else {
         if (m == "waitstartproblem" || m == "inprogressproblem") {
           setIsProblem(true);
@@ -226,7 +231,7 @@ export default function IndexTodayTask() {
             <Checkbox
               style={{ marginLeft: "20px" }}
               value="waitstartnormal"
-              onClick={(e) => handleIsProblem(e)}
+              onClick={(e) => handleSubStatus(e)}
             ></Checkbox>
           ),
         },
@@ -237,7 +242,7 @@ export default function IndexTodayTask() {
             <Checkbox
               style={{ marginLeft: "20px" }}
               value="waitstartproblem"
-              onClick={(e) => handleIsProblem(e)}
+              onClick={(e) => handleSubStatus(e)}
             ></Checkbox>
           ),
         },
@@ -258,7 +263,7 @@ export default function IndexTodayTask() {
             <Checkbox
               style={{ marginLeft: "20px" }}
               value="inprogressnormal"
-              onClick={(e) => handleIsProblem(e)}
+              onClick={(e) => handleSubStatus(e)}
             ></Checkbox>
           ),
         },
@@ -269,7 +274,7 @@ export default function IndexTodayTask() {
             <Checkbox
               style={{ marginLeft: "20px" }}
               value="waitapprovedelay"
-              onClick={(e) => handleIsProblem(e)}
+              onClick={(e) => handleSubStatus(e)}
             ></Checkbox>
           ),
         },
@@ -280,7 +285,7 @@ export default function IndexTodayTask() {
             <Checkbox
               style={{ marginLeft: "20px" }}
               value="extended"
-              onClick={(e) => handleIsProblem(e)}
+              onClick={(e) => handleSubStatus(e)}
             ></Checkbox>
           ),
         },
@@ -291,7 +296,7 @@ export default function IndexTodayTask() {
             <Checkbox
               style={{ marginLeft: "20px" }}
               value="inprogressproblem"
-              onClick={(e) => handleIsProblem(e)}
+              onClick={(e) => handleSubStatus(e)}
             ></Checkbox>
           ),
         },
@@ -579,7 +584,8 @@ export default function IndexTodayTask() {
                     : null}
                 </span>
                 <span style={{ color: "#56CCF2" }}>
-                  {row.task_status_delay == "EXTENDED"
+                  {row.task_status_delay == "EXTENDED" ||
+                  row.task_status_delay == "APPROVED"
                     ? " " + "(" + "อนุมัติขยายเวลา" + ")"
                     : null}
                 </span>
@@ -784,11 +790,7 @@ export default function IndexTodayTask() {
       <br />
       {PageTitle}
       <br />
-      <Table 
-      columns={columns} 
-      dataSource={data?.data} 
-      pagination={false}
-    />
+      <Table columns={columns} dataSource={data?.data} pagination={false} />
       <div className="d-flex justify-content-between pt-5">
         <p>รายการทั้งหมด {data?.count} รายการ</p>
         <Pagination
