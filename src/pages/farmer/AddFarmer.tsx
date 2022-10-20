@@ -57,6 +57,7 @@ import { UploadImageDatasouce } from "../../datasource/UploadImageDatasource";
 import img_empty from "../../resource/media/empties/uploadImg.png";
 import bth_img_empty from "../../resource/media/empties/upload_Img_btn.png";
 import moment from "moment";
+import { useLocalStorage } from "../../hook/useLocalStorage";
 
 const dateFormat = "DD/MM/YYYY";
 const dateCreateFormat = "YYYY-MM-DD";
@@ -67,6 +68,8 @@ const _ = require("lodash");
 const { Map } = require("immutable");
 
 const AddFarmer = () => {
+  const [profile] = useLocalStorage("profile", []);
+
   const [data, setData] = useState<CreateFarmerEntity>(
     CreateFarmerEntity_INIT
   );
@@ -360,6 +363,7 @@ const AddFarmer = () => {
       ...pushAddr.toJS(),
       farmerPlotList: farmerPlotList,
       comment: data.comment,
+      createBy: `${profile?.firstname} ${profile?.lastname}`,
     };
     setData((prev) => ({
       ...prev,

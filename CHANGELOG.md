@@ -1,4 +1,7 @@
 ## [Version - 0]
+## Fix [v0.17.16] 2022-10-19
+- fixed 
+
 ## Fix [v0.17.15] 2022-10-19
 - fixed edit farmer dont send field famerPlot
 - fixed api get farmer & droner error 500

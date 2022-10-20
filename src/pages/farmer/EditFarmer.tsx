@@ -61,6 +61,7 @@ import "../farmer/Style.css";
 import img_empty from "../../resource/media/empties/uploadImg.png";
 import bth_img_empty from "../../resource/media/empties/upload_Img_btn.png";
 import moment from "moment";
+import { useLocalStorage } from "../../hook/useLocalStorage";
 const { Option } = Select;
 
 const dateFormat = "DD/MM/YYYY";
@@ -72,6 +73,8 @@ const { Map } = require("immutable");
 let queryString = _.split(window.location.pathname, "=");
 
 const EditFarmer = () => {
+  const [profile] = useLocalStorage("profile", []);
+
   const farmerId = queryString[1];
   const [data, setData] = useState<GetFarmerEntity>(
     GetFarmerEntity_INIT
@@ -438,6 +441,7 @@ const EditFarmer = () => {
     const pushPin = Map(pushAddr.toJS()).set("pin", "");
     const payload = {
       ...pushPin.toJS(),
+      updateBy: `${profile.firstname} ${profile.lastname}`,
     };
     delete payload.farmerPlot;
     await FarmerDatasource.updateFarmer(payload).then((res) => {

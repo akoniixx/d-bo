@@ -71,6 +71,7 @@ import { LAT_LNG_BANGKOK } from "../../definitions/Location";
 
 import moment from "moment";
 import locale from "antd/es/date-picker/locale/th_TH";
+import { useLocalStorage } from "../../hook/useLocalStorage";
 
 const dateFormat = "DD/MM/YYYY";
 const dateCreateFormat = "YYYY-MM-DD";
@@ -83,7 +84,7 @@ function EditDroner() {
   const [form] = Form.useForm();
   const dronerId = queryString[1];
   const status = Form.useWatch("status", form);
-
+  const [profile] = useLocalStorage("profile", []);
   const [data, setData] = useState<DronerEntity>(DronerEntity_INIT);
   const [address, setAddress] = useState<AddressEntity>(
     AddressEntity_INIT
@@ -144,6 +145,7 @@ function EditDroner() {
         });
 
         setData(res);
+        console.log(res);
         if (res) {
           form.setFieldsValue({
             ...res,
@@ -568,6 +570,7 @@ function EditDroner() {
         address2: values.address2,
       },
       reason,
+      updateBy: `${profile?.firstname} ${profile?.lastname}`,
       expPlant,
       dronerArea: {
         ...dronerArea,
@@ -625,6 +628,7 @@ function EditDroner() {
       checkPlantsOther,
       reason,
       idNo,
+      comment,
       status: currentStatus,
       ...rest
     } = form.getFieldsValue();
@@ -645,6 +649,7 @@ function EditDroner() {
 
     const isHasValues = Object.values({
       ...rest,
+
       expPlant: expPlant.length > 0,
       reasonList:
         reasonList.length > 0 ||

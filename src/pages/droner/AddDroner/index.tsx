@@ -66,6 +66,7 @@ import GoogleMap from "../../../components/map/GoogleMap";
 import moment from "moment";
 import locale from "antd/es/date-picker/locale/th_TH";
 import TextArea from "antd/lib/input/TextArea";
+import { useLocalStorage } from "../../../hook/useLocalStorage";
 const dateFormat = "DD/MM/YYYY";
 const dateCreateFormat = "YYYY-MM-DD";
 
@@ -73,7 +74,7 @@ const { Map } = require("immutable");
 const { Option } = Select;
 function AddDroner() {
   const [form] = Form.useForm();
-
+  const [profile] = useLocalStorage("profile", []);
   const [data] = useState<CreateDronerEntity>(
     CreateDronerEntity_INIT
   );
@@ -377,6 +378,7 @@ function AddDroner() {
       dronerArea,
       checkPlantsOther,
       idNo,
+      comment,
       ...rest
     } = form.getFieldsValue();
     const expPlant = [];
@@ -439,6 +441,7 @@ function AddDroner() {
         ...pushOtherPlant.toJS().dronerArea,
         mapUrl: values.mapUrl,
       },
+      createBy: `${profile?.firstName} ${profile?.lastName}`,
     };
     await DronerDatasource.createDronerList(payload).then(
       async (res) => {
