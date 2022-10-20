@@ -2,7 +2,6 @@ import {
   DownOutlined,
   SearchOutlined,
   StarFilled,
-  TeamOutlined,
 } from "@ant-design/icons";
 import {
   AutoComplete,
@@ -40,11 +39,13 @@ import Layouts from "../../../components/layout/Layout";
 import color from "../../../resource/color";
 import { TaskDatasource } from "../../../datasource/TaskDatasource";
 import { FarmerEntity } from "../../../entities/FarmerEntities";
-import { FarmerPlotEntity } from "../../../entities/FarmerPlotEntities";
+import {
+  FarmerPlotEntity,
+  FarmerPlotEntity_INIT,
+} from "../../../entities/FarmerPlotEntities";
 import GooleMap from "../../../components/map/GoogleMap";
 import { LAT_LNG_BANGKOK } from "../../../definitions/Location";
 import { RowSelectionType } from "antd/lib/table/interface";
-import Search from "antd/lib/input/Search";
 import {
   CreateNewTaskEntity,
   CreateNewTaskEntity_INIT,
@@ -66,6 +67,7 @@ import TextArea from "antd/lib/input/TextArea";
 import Swal from "sweetalert2";
 import { numberWithCommas } from "../../../utilities/TextFormatter";
 import icon from "../../../resource/icon";
+import { LocationPriceDatasource } from "../../../datasource/LocationPriceDatasource";
 const { Step } = Steps;
 const { Option } = Select;
 const dateFormat = "DD/MM/YYYY";
@@ -88,8 +90,9 @@ const AddNewTask = () => {
   const [dataFarmer, setDataFarmer] = useState<FarmerEntity>();
   const [farmerList, setFarmerList] = useState<FarmerEntity[]>();
   const [farmerSelected, setFarmerSelected] = useState<FarmerEntity>();
-  const [farmerPlotSeleced, setFarmerPlotSelected] =
-    useState<FarmerPlotEntity>();
+  const [farmerPlotSeleced, setFarmerPlotSelected] = useState<FarmerPlotEntity>(
+    FarmerPlotEntity_INIT
+  );
   const [selectionType] = useState<RowSelectionType>(queryString[1]);
   const [searchFarmer, setSearchFarmer] = useState<string>();
   const [checkSelectPlot, setCheckSelectPlot] = useState<any>("error");
@@ -114,6 +117,7 @@ const AddNewTask = () => {
   );
   const [disableBtn, setDisableBtn] = useState<boolean>(true);
   const [searchTextDroner, setSearchTextDroner] = useState<string>("");
+  const [priceMethod, setPriceMethod] = useState<string>("อัตโนมัติ");
 
   const fetchFarmerList = async (text?: string) => {
     await TaskDatasource.getFarmerList(text).then((res) => {
@@ -148,6 +152,27 @@ const AddNewTask = () => {
       setFarmerSelected(undefined);
     }
   };
+  const fetchLocationPrice = async (
+    proId?: number,
+    plant?: string,
+    rai?: number,
+    plot?: string
+  ) => {
+    await LocationPriceDatasource.getLocationPrice(proId, plant).then((res) => {
+      let calUnitPrice = rai && parseFloat(res.price) * rai;
+      const d = Map(createNewTask).set("priceStandard", calUnitPrice);
+      const e = Map(d.toJS()).set("farmAreaAmount", rai);
+      const pushCal = Map(e.toJS()).set(
+        "unitPriceStandard",
+        parseFloat(res.price)
+      );
+      const f = Map(pushCal.toJS()).set("price", calUnitPrice);
+      const pushCale = Map(f.toJS()).set("unitPrice", parseFloat(res.price));
+      const g = Map(pushCale.toJS()).set("farmerPlotId", plot);
+      setCreateNewTask(g.toJS());
+      checkValidateStep(g.toJS(), current);
+    });
+  };
   const handleSelectFarmer = () => {
     const f = Map(createNewTask).set("farmerId", farmerSelected?.id);
     setCheckSelectPlot("error");
@@ -160,18 +185,38 @@ const AddNewTask = () => {
     let plotSelected = farmerSelected?.farmerPlot.filter(
       (x) => x.id == value
     )[0];
-    const f = Map(createNewTask).set("farmerPlotId", plotSelected?.id);
-    const g = Map(f.toJS()).set("farmAreaAmount", plotSelected?.raiAmount);
+    setPriceMethod("อัตโนมัติ");
     setCropSelected(plotSelected?.plantName);
     setCheckSelectPlot("");
-    setCreateNewTask(g.toJS());
-    setFarmerPlotSelected(plotSelected);
-    checkValidateStep(g.toJS(), current);
+    plotSelected && setFarmerPlotSelected(plotSelected);
+    fetchLocationPrice(
+      plotSelected?.plotArea.provinceId,
+      plotSelected?.plantName,
+      plotSelected?.raiAmount,
+      plotSelected?.id
+    );
   };
   const onSelectFarmer = (e: any, id: any) => {
     setFarmerSelected(undefined);
     const findFarmer = farmerList?.filter((x) => x.id == id.id)[0];
     setFarmerSelected(findFarmer);
+  };
+  const handleAmountRai = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const selected = { ...farmerPlotSeleced };
+    e.target.value
+      ? (selected.raiAmount = parseFloat(e.target.value))
+      : (selected.raiAmount = 0);
+    setFarmerPlotSelected(selected);
+    const payload = {
+      ...createNewTask,
+    };
+    payload.priceStandard =
+      createNewTask.unitPriceStandard * parseFloat(e.target.value);
+    payload.price =
+      createNewTask.unitPriceStandard * parseFloat(e.target.value);
+    payload.unitPriceStandard = createNewTask.unitPrice;
+    payload.farmAreaAmount = e.target.value;
+    setCreateNewTask(payload);
   };
   const handlePeriodSpray = (e: any) => {
     const d = Map(createNewTask).set("purposeSprayId", e);
@@ -264,6 +309,23 @@ const AddNewTask = () => {
       data.includes("+");
     return data.trim().length != 0 ? (checkSyntax ? true : false) : true;
   };
+  const selectPrice = (e: any) => {
+    setPriceMethod(e.target.outerText);
+    if (e.target.outerText == "กรอกข้อมูลเอง") {
+      const d = Map(createNewTask).set("price", 0);
+      const pushCal = Map(d.toJS()).set("unitPrice", 0);
+      setCreateNewTask(pushCal.toJS());
+      setDisableBtn(true);
+    } else {
+      fetchLocationPrice(
+        farmerPlotSeleced?.plotArea.provinceId,
+        farmerPlotSeleced?.plantName,
+        farmerPlotSeleced?.raiAmount,
+        farmerPlotSeleced?.id
+      );
+    }
+  };
+
   const renderFormSearchFarmer = (
     <CardContainer>
       <CardHeader textHeader="ข้อมูลเกษตรกรและแปลง" />
@@ -359,7 +421,11 @@ const AddNewTask = () => {
                 <div className="form-group col-lg-4">
                   <label>จำนวนไร่</label>
                   <Form.Item>
-                    <Input value={farmerPlotSeleced?.raiAmount} disabled />
+                    <Input
+                      value={farmerPlotSeleced?.raiAmount}
+                      onChange={handleAmountRai}
+                      disabled={current == 2 || checkSelectPlot == "error"}
+                    />
                   </Form.Item>
                 </div>
               </div>
@@ -435,60 +501,113 @@ const AddNewTask = () => {
               <Form style={{ padding: "20px" }}>
                 <label>ยอดรวมค่าบริการ</label>
                 <br />
-                <Button
-                  size="middle"
-                  style={{
-                    backgroundColor: color.Success,
-                    color: color.White,
-                    borderColor: color.Success,
-                  }}
-                  disabled={current == 2 || checkSelectPlot == "error"}
-                >
-                  อัตโนมัติ
-                </Button>
-                <Button
-                  size="middle"
-                  style={{
-                    backgroundColor: color.White,
-                    color: color.Grey,
-                    borderColor: color.White,
-                  }}
-                  disabled={current == 2 || checkSelectPlot == "error"}
-                >
-                  กรอกข้อมูลเอง
-                </Button>
-                <br />
-                <div className="row">
-                  <div className="form-group col-lg-4">
-                    <Form.Item>
-                      <label>ค่าบริการ/ไร่</label>{" "}
+                {current !== 2 && (
+                  <>
+                    <Button
+                      size="middle"
+                      style={{
+                        backgroundColor:
+                          priceMethod == "กรอกข้อมูลเอง"
+                            ? color.White
+                            : color.Success,
+                        color:
+                          priceMethod == "กรอกข้อมูลเอง"
+                            ? color.Grey
+                            : color.White,
+                        borderColor:
+                          priceMethod == "กรอกข้อมูลเอง"
+                            ? color.White
+                            : color.Success,
+                      }}
+                      disabled={current == 2 || checkSelectPlot == "error"}
+                      onClick={(e) => selectPrice(e)}
+                    >
+                      อัตโนมัติ
+                    </Button>
+                    <Button
+                      size="middle"
+                      style={{
+                        backgroundColor:
+                          priceMethod == "อัตโนมัติ"
+                            ? color.White
+                            : color.Success,
+                        color:
+                          priceMethod == "อัตโนมัติ" ? color.Grey : color.White,
+                        borderColor:
+                          priceMethod == "อัตโนมัติ"
+                            ? color.White
+                            : color.Success,
+                      }}
+                      disabled={current == 2 || checkSelectPlot == "error"}
+                      onClick={(e) => selectPrice(e)}
+                    >
+                      กรอกข้อมูลเอง
+                    </Button>
+                  </>
+                )}
+                {priceMethod === "อัตโนมัติ" && (
+                  <div className="row pt-3">
+                    <div className="form-group col-lg-4">
+                      <Form.Item>
+                        <label>ค่าบริการ/ไร่</label>{" "}
+                        <span style={{ color: "red" }}>*</span>
+                        <Input
+                          suffix="บาท/ไร่"
+                          value={createNewTask.unitPriceStandard}
+                          disabled
+                          autoComplete="off"
+                          step="0.01"
+                        />
+                      </Form.Item>
+                    </div>
+                    <div className="form-group col-lg-4">
+                      <label>คำนวณยอดรวม</label>{" "}
                       <span style={{ color: "red" }}>*</span>
-                      <Input
-                        suffix="บาท/ไร่"
-                        id="unitPrice"
-                        value={createNewTask.unitPrice}
-                        onChange={handleCalServiceCharge}
-                        disabled={current == 2 || checkSelectPlot == "error"}
-                        autoComplete="off"
-                        step="0.01"
-                      />
-                    </Form.Item>
+                      <Form.Item>
+                        <Input
+                          suffix="บาท"
+                          value={createNewTask.priceStandard}
+                          disabled
+                          autoComplete="off"
+                          step="0.01"
+                        />
+                      </Form.Item>
+                    </div>
                   </div>
-                  <div className="form-group col-lg-4">
-                    <label>คำนวณยอดรวม</label>{" "}
-                    <span style={{ color: "red" }}>*</span>
-                    <Form.Item>
-                      <Input
-                        suffix="บาท"
-                        value={createNewTask.price}
-                        onChange={handleCalServiceCharge}
-                        disabled={current == 2 || checkSelectPlot == "error"}
-                        autoComplete="off"
-                        step="0.01"
-                      />
-                    </Form.Item>
+                )}
+                {priceMethod === "กรอกข้อมูลเอง" && (
+                  <div className="row pt-3">
+                    <div className="form-group col-lg-4">
+                      <Form.Item>
+                        <label>ค่าบริการ/ไร่</label>{" "}
+                        <span style={{ color: "red" }}>*</span>
+                        <Input
+                          suffix="บาท/ไร่"
+                          id="unitPrice"
+                          value={createNewTask.unitPrice}
+                          onChange={handleCalServiceCharge}
+                          disabled={current == 2 || checkSelectPlot == "error"}
+                          autoComplete="off"
+                          step="0.01"
+                        />
+                      </Form.Item>
+                    </div>
+                    <div className="form-group col-lg-4">
+                      <label>คำนวณยอดรวม</label>{" "}
+                      <span style={{ color: "red" }}>*</span>
+                      <Form.Item>
+                        <Input
+                          suffix="บาท"
+                          value={createNewTask.price}
+                          onChange={handleCalServiceCharge}
+                          disabled={current == 2 || checkSelectPlot == "error"}
+                          autoComplete="off"
+                          step="0.01"
+                        />
+                      </Form.Item>
+                    </div>
                   </div>
-                </div>
+                )}
               </Form>
             </CardContainer>
           )}
@@ -1380,7 +1499,6 @@ const AddNewTask = () => {
       checkDroner ? setDisableBtn(false) : setDisableBtn(true);
     }
   };
-
   const previousStep = async () => {
     let checkCurrent = current - 1;
     if (checkCurrent == 0) {
@@ -1395,7 +1513,6 @@ const AddNewTask = () => {
     }
     setCurrent(checkCurrent);
   };
-
   const nextStep = () => {
     if (current == 0) {
       let changeDateFormat = moment(dateAppointment).format(dateCreateFormat);
@@ -1411,15 +1528,18 @@ const AddNewTask = () => {
         createNewTask.targetSpray,
         otherSprayList.filter((x) => x != "")
       );
-      const d = Map(createNewTask).set(
-        "dateAppointment",
-        moment(changeDateFormat + " " + changeTimeFormat).toISOString()
-      );
-      const p = Map(d.toJS()).set(
-        "createBy",
-        profile.firstname + " " + profile.lastname
-      );
-      setCreateNewTask(p.toJS());
+      const payload = {
+        ...createNewTask,
+      };
+      payload.dateAppointment = moment(
+        changeDateFormat + " " + changeTimeFormat
+      ).toISOString();
+      payload.createBy = profile.firstname + " " + profile.lastname;
+      if (priceMethod == "กรอกข้อมูลเอง") {
+        payload.priceStandard = 0;
+        payload.unitPriceStandard = 0;
+      }
+      setCreateNewTask(payload);
       checkValidateStep(
         createNewTask,
         current,
@@ -1434,26 +1554,21 @@ const AddNewTask = () => {
           dronerDetail: [JSON.stringify(dronerSelected[i])],
         });
       }
-      const a = Map(createNewTask).set("taskDronerTemp", pushDronerList);
+      const payload = { ...createNewTask };
+      payload.taskDronerTemp = pushDronerList;
       if (selectionType == "checkbox") {
-        const s = Map(a.toJS()).set("status", "WAIT_RECEIVE");
-        const f = Map(s.toJS()).set("fee", parseFloat(a.toJS().price) * 0.05);
-        const df = Map(f.toJS()).set(
-          "discountFee",
-          parseFloat(a.toJS().price) * 0.05
-        );
-        setCreateNewTask(df.toJS());
+        payload.status = "WAIT_RECEIVE";
+        payload.fee = payload.price * 0.05;
+        payload.discountFee = payload.price * 0.05;
+        setCreateNewTask(payload);
       } else {
-        const s = Map(a.toJS()).set("status", "WAIT_START");
-        const d = Map(s.toJS()).set("dronerId", dronerSelected[0].droner_id);
-        const f = Map(d.toJS()).set("fee", parseFloat(a.toJS().price) * 0.05);
-        const df = Map(f.toJS()).set(
-          "discountFee",
-          parseFloat(a.toJS().price) * 0.05
-        );
-        setCreateNewTask(df.toJS());
+        payload.status = "WAIT_START";
+        payload.dronerId = dronerSelected[0].droner_id;
+        payload.fee = payload.price * 0.05;
+        payload.discountFee = payload.price * 0.05;
+        setCreateNewTask(payload);
         checkValidateStep(
-          createNewTask,
+          payload,
           current,
           dronerSelected.filter((x) => x.droner_id != "")
         );
