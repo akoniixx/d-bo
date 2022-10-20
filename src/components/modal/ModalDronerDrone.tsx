@@ -623,6 +623,19 @@ const ModalDrone: React.FC<ModalDroneProps> = ({
           </div>
 
           <br />
+          <div className="form-group col-lg-12">
+            <label>หมายเหตุ</label>
+            <TextArea
+              value={dataDrone.comment}
+              onChange={(e) => {
+                setDataDrone((prev) => ({
+                  ...prev,
+                  comment: e.target.value,
+                }));
+              }}
+            />
+          </div>
+          <br />
 
           <div className="row">
             <div className="form-group">
@@ -712,18 +725,6 @@ const ModalDrone: React.FC<ModalDroneProps> = ({
                 </Radio.Group>
               </Form.Item>
             </div>
-          </div>
-          <div className="form-group col-lg-12">
-            <label>หมายเหตุ</label>
-            <TextArea
-              value={dataDrone.note}
-              onChange={(e) => {
-                setDataDrone((prev) => ({
-                  ...prev,
-                  note: e.target.value,
-                }));
-              }}
-            />
           </div>
         </Form>
       </Modal>

@@ -7,6 +7,7 @@ import GoogleMap from "../map/GoogleMap";
 import { SubdistrictEntity } from "../../entities/LocationEntities";
 import { LocationDatasource } from "../../datasource/LocationDatasource";
 import { LAT_LNG_BANGKOK } from "../../definitions/Location";
+import TextArea from "antd/lib/input/TextArea";
 
 const { Option } = Select;
 
@@ -330,6 +331,14 @@ const ModalFarmerPlot: React.FC<ModalFarmerPlotProps> = ({
                 defaultValue={farmerPlot.landmark}
                 autoComplete="off"
               />
+            </Form.Item>
+          </div>
+          <div
+            className="form-group col-lg-12"
+            style={{ marginTop: 16 }}>
+            <label>หมายเหตุ</label>
+            <Form.Item name="comment">
+              <TextArea value={farmerPlot.comment} />
             </Form.Item>
           </div>
           <div className="form-group">

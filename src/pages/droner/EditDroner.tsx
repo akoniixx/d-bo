@@ -147,7 +147,7 @@ function EditDroner() {
         if (res) {
           form.setFieldsValue({
             ...res,
-            note: res.note || "",
+            comment: res.comment || "",
             postcode: res.address.postcode || undefined,
             province: res.address.provinceId || undefined,
             district: res.address.districtId || undefined,
@@ -574,6 +574,11 @@ function EditDroner() {
         mapUrl: values.mapUrl ? values.mapUrl : undefined,
       },
     };
+
+    if (values.status === "ACTIVE") {
+      payload.isDelete = false;
+      payload.isOpenReceiveTask = true;
+    }
     await DronerDatasource.updateDroner(payload).then((res) => {
       if (res !== undefined) {
         var i = 0;
@@ -717,7 +722,7 @@ function EditDroner() {
               </Form.Item>
             </div>
             <div className="form-group col-lg-6">
-              <label>สร้างเมื่อ</label>
+              <label>วันที่ลงทะเบียน</label>
 
               <div style={{ marginBottom: 24 }}>
                 <Input
@@ -1381,7 +1386,7 @@ function EditDroner() {
           </div>
           <div className="form-group col-lg-12">
             <label>หมายเหตุ</label>
-            <Form.Item name="note">
+            <Form.Item name="comment">
               <TextArea />
             </Form.Item>
           </div>

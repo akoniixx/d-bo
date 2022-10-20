@@ -522,7 +522,7 @@ const EditFarmer = () => {
           </div>
           <div className="row">
             <div className="form-group col-lg-6">
-              <label>สร้างเมื่อ</label>
+              <label>วันที่ลงทะเบียน</label>
 
               <div style={{ marginBottom: 24 }}>
                 <Input
@@ -870,6 +870,22 @@ const EditFarmer = () => {
               </div>
             </div>
           )}
+          <div
+            className="form-group col-lg-12"
+            style={{ marginTop: 16 }}>
+            <label>หมายเหตุ</label>
+            <Form.Item>
+              <TextArea
+                value={data.comment}
+                onChange={(e) => {
+                  setData((prev) => ({
+                    ...prev,
+                    comment: e.target.value,
+                  }));
+                }}
+              />
+            </Form.Item>
+          </div>
         </Form>
       </CardContainer>
     </div>

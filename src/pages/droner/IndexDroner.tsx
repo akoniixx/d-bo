@@ -3,8 +3,8 @@ import React, { useEffect, useState } from "react";
 import Search from "antd/lib/input/Search";
 import { Option } from "antd/lib/mentions";
 import color from "../../resource/color";
+import { EditOutlined, UserOutlined } from "@ant-design/icons";
 import ActionButton from "../../components/button/ActionButton";
-import { EditOutlined } from "@ant-design/icons";
 import { DronerListEntity } from "../../entities/DronerEntities";
 import { DronerDatasource } from "../../datasource/DronerDatasource";
 import {
@@ -266,6 +266,32 @@ function IndexDroner() {
   );
   const columns = [
     {
+      title: "อัพเดทล่าสุด",
+      key: "updatedAt",
+      render: (value: { updatedAt: string; updateBy?: string }) => {
+        return {
+          children: (
+            <div className="container">
+              <span className="text-dark-75  d-block font-size-lg">
+                {moment(value.updatedAt).format("DD/MM/YYYY HH:mm")}
+              </span>
+              {value.updateBy && (
+                <div>
+                  <span
+                    className=" d-block font-size-lg"
+                    style={{ color: color.Grey }}>
+                    <UserOutlined style={{ padding: "0 4px 0 0" }} />
+
+                    {value?.updateBy}
+                  </span>
+                </div>
+              )}
+            </div>
+          ),
+        };
+      },
+    },
+    {
       title: "ชื่อนักบินโดรน",
       dataIndex: "firstname",
       key: "firstname",
@@ -398,22 +424,7 @@ function IndexDroner() {
         };
       },
     },
-    {
-      title: "อัพเดทล่าสุด",
-      dataIndex: "updatedAt",
-      key: "updatedAt",
-      render: (value: any) => {
-        return {
-          children: (
-            <div className="container">
-              <span className="text-dark-75  d-block font-size-lg">
-                {moment(value).format("DD/MM/YYYY")}
-              </span>
-            </div>
-          ),
-        };
-      },
-    },
+
     {
       title: "สถานะ",
       dataIndex: "status",

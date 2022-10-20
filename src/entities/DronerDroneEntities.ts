@@ -26,7 +26,7 @@ export interface DronerDroneEntity {
   updatedAt?: string;
   file: ImageEntity[];
   reason: string[];
-  note?: string;
+  comment?: string;
 }
 export const DronerDroneEntity_INIT: DronerDroneEntity = {
   id: "",
@@ -44,7 +44,7 @@ export const DronerDroneEntity_INIT: DronerDroneEntity = {
   updatedAt: "",
   file: [ImageEntity_INTI],
   reason: [""],
-  note: "",
+  comment: "",
 };
 
 export interface DronerEntity {
@@ -101,6 +101,7 @@ export interface GetDronerDroneEntity {
   file: ImageEntity[];
   createdAt: string;
   updatedAt: string;
+  comment?: string;
 }
 export const GetDronerDroneEntity_INIT: GetDronerDroneEntity = {
   id: "",

@@ -38,7 +38,7 @@ export interface DronerEntity {
   updatedAt: string;
   totalDroneCount: number;
   birthDate: string;
-  note?: string;
+  comment?: string;
 }
 export const DronerEntity_INIT: DronerEntity = {
   id: "",

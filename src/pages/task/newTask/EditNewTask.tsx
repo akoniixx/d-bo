@@ -177,9 +177,6 @@ const EditNewTask = () => {
         setFarmerSelected(res.farmer);
         setFarmerPlotSelected(res.farmerPlot);
         fetchPurposeSpray(res.farmerPlot.plantName);
-        form.setFieldsValue({
-          farmAreaAmount: res.farmAreaAmount,
-        });
         setData(res);
       }
     );
@@ -255,7 +252,6 @@ const EditNewTask = () => {
     setData(newData);
     setCheckSelectPlot("error");
     setDronerSelected([]);
-
     setDataFarmer(farmerSelected);
     setDateAppointment(moment(undefined));
     setTimeAppointment(moment(undefined));
@@ -384,22 +380,11 @@ const EditNewTask = () => {
     setTimeAppointment(new Date(e).getTime());
   };
 
-  const onFieldsChange = () => {
-    const isHasError = form.getFieldError("farmAreaAmount");
-    if (isHasError.length > 0) {
-      setDisableBtn(true);
-    } else {
-      setDisableBtn(false);
-    }
-  };
   const renderFormSearchFarmer = (
     <CardContainer>
       <CardHeader textHeader="ข้อมูลเกษตรกรและแปลง" />
       <div className="flex-column">
-        <Form
-          style={{ padding: "20px" }}
-          form={form}
-          onFieldsChange={onFieldsChange}>
+        <Form style={{ padding: "20px" }} form={form}>
           {current == 0 && (
             <div className="row">
               <div className="form-group col-lg-6">
@@ -496,44 +481,10 @@ const EditNewTask = () => {
                 </div>
                 <div className="form-group col-lg-4">
                   <label>จำนวนไร่</label>
-                  <Form.Item
-                    name="farmAreaAmount"
-                    rules={[
-                      {
-                        required: true,
-                        message: "กรุณากรอกจำนวนไร่",
-                      },
-                      {
-                        pattern: /^\d+\.?\d*$/,
-                        message: "กรุณากรอกตัวเลข",
-                      },
-                      {
-                        validator: (_, value) => {
-                          const area =
-                            farmerPlotSeleced &&
-                            farmerPlotSeleced?.raiAmount;
-
-                          if (area && +value > +area) {
-                            return Promise.reject(
-                              `จำนวนไร่ต้องไม่เกิน ${area} ไร่`
-                            );
-                          } else {
-                            return Promise.resolve();
-                          }
-                        },
-                      },
-                    ]}>
+                  <Form.Item>
                     <Input
-                      value={data?.farmAreaAmount}
-                      onChange={(e) => {
-                        setData((prev) => ({
-                          ...prev,
-                          farmAreaAmount: e.target.value,
-                        }));
-                      }}
-                      disabled={
-                        !data?.farmAreaAmount && !farmerPlotSeleced
-                      }
+                      value={farmerPlotSeleced?.raiAmount}
+                      disabled
                     />
                   </Form.Item>
                 </div>

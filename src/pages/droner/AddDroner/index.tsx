@@ -1068,7 +1068,7 @@ function AddDroner() {
           </div>
           <div className="form-group col-lg-12">
             <label>หมายเหตุ</label>
-            <Form.Item name="note">
+            <Form.Item name="comment">
               <TextArea />
             </Form.Item>
           </div>

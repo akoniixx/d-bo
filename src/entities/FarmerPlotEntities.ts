@@ -20,6 +20,7 @@ export interface FarmerPlotEntity {
   plotId: number;
   farmerId?: string;
   plotAreaId: number;
+  comment?: string;
 }
 export const FarmerPlotEntity_INIT: FarmerPlotEntity = {
   id: "",
