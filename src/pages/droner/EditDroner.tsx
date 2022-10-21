@@ -145,7 +145,6 @@ function EditDroner() {
         });
 
         setData(res);
-        console.log(res);
         if (res) {
           form.setFieldsValue({
             ...res,
