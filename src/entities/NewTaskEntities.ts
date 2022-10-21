@@ -100,13 +100,13 @@ export interface GetNewTaskEntity {
   statusRemark: string;
   reviewDronerAvg: string;
   reviewDronerDetail: string;
-  unitPriceStandard: string;
-  priceStandard: string;
-  unitPrice: string;
-  price: string;
+  unitPriceStandard: number;
+  priceStandard: number;
+  unitPrice: number;
+  price: number;
   totalPrice: string;
-  fee: string;
-  discountFee: string;
+  fee: number;
+  discountFee: number;
   reviewFarmerScore: string;
   reviewFarmerComment: string;
   imagePathFinishTask: string;
@@ -141,13 +141,13 @@ export const GetNewTaskEntity_INIT: GetNewTaskEntity = {
   statusRemark: "",
   reviewDronerAvg: "",
   reviewDronerDetail: "",
-  unitPriceStandard: "",
-  priceStandard: "",
-  unitPrice: "",
-  price: "",
+  unitPriceStandard: 0,
+  priceStandard: 0,
+  unitPrice: 0,
+  price: 0,
   totalPrice: "",
-  fee: "",
-  discountFee: "",
+  fee: 0,
+  discountFee: 0,
   reviewFarmerScore: "",
   reviewFarmerComment: "",
   imagePathFinishTask: "",

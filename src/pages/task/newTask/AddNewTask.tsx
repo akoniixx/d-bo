@@ -155,11 +155,11 @@ const AddNewTask = () => {
   const fetchLocationPrice = async (
     proId?: number,
     plant?: string,
-    rai?: number,
+    rai?: string,
     plot?: string
   ) => {
     await LocationPriceDatasource.getLocationPrice(proId, plant).then((res) => {
-      let calUnitPrice = rai && parseFloat(res.price) * rai;
+      let calUnitPrice = rai && parseFloat(res.price) * parseFloat(rai);
       const d = Map(createNewTask).set("priceStandard", calUnitPrice);
       const e = Map(d.toJS()).set("farmAreaAmount", rai);
       const pushCal = Map(e.toJS()).set(
@@ -204,8 +204,8 @@ const AddNewTask = () => {
   const handleAmountRai = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selected = { ...farmerPlotSeleced };
     e.target.value
-      ? (selected.raiAmount = parseFloat(e.target.value))
-      : (selected.raiAmount = 0);
+      ? (selected.raiAmount = e.target.value)
+      : (selected.raiAmount = "");
     setFarmerPlotSelected(selected);
     const payload = {
       ...createNewTask,

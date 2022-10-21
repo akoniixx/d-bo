@@ -7,7 +7,7 @@ import { LAT_LNG_BANGKOK } from "../definitions/Location";
 export interface FarmerPlotEntity {
   id?: string;
   plotName: string;
-  raiAmount: number;
+  raiAmount: string;
   landmark: string;
   plantName: string;
   plantNature: string;
@@ -24,7 +24,7 @@ export interface FarmerPlotEntity {
 export const FarmerPlotEntity_INIT: FarmerPlotEntity = {
   id: "",
   plotName: "",
-  raiAmount: 0,
+  raiAmount: "",
   landmark: "",
   plantName: "",
   plantNature: "",
