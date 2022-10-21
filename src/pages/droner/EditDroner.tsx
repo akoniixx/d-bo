@@ -428,16 +428,27 @@ function EditDroner() {
         }
       );
     }
-    fetchDronerById();
+    // fetchDronerById();
     setShowAddModal(false);
     setShowEditModal(false);
+    setDronerDroneList((prev) => {
+      const isEdit = prev.findIndex((x) => x.id === drone.id);
+      if (isEdit !== -1) {
+        return [
+          ...prev.slice(0, isEdit),
+          drone,
+          ...prev.slice(isEdit + 1),
+        ];
+      } else {
+        return [...prev, drone];
+      }
+    });
     setEditIndex(0);
-    setDronerDroneList(dronerDroneList);
   };
   const removeDrone = async (id?: string) => {
     try {
       await DronerDroneDatasource.removeDronerDrone(id);
-      fetchDronerById();
+      setDronerDroneList((prev) => prev.filter((x) => x.id !== id));
     } catch (e) {
       console.log(e);
     }
@@ -734,7 +745,14 @@ function EditDroner() {
                     padding: "4px 12px",
                   }}
                   disabled
-                  value={moment(data.createdAt).format("DD/MM/YYYY")}
+                  value={`${moment(data.createdAt).format(
+                    "DD/MM/YYYY"
+                  )} ${
+                    data.createBy === null ||
+                    data.createBy === undefined
+                      ? "(ลงทะเบียนโดยนักบิน)"
+                      : `(${data.createBy})`
+                  }`}
                 />
               </div>
             </div>

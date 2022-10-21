@@ -441,7 +441,7 @@ function AddDroner() {
         ...pushOtherPlant.toJS().dronerArea,
         mapUrl: values.mapUrl,
       },
-      createBy: `${profile?.firstName} ${profile?.lastName}`,
+      createBy: `${profile?.firstname} ${profile?.lastname}`,
     };
     await DronerDatasource.createDronerList(payload).then(
       async (res) => {

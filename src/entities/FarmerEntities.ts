@@ -54,6 +54,7 @@ export interface GetFarmerEntity {
   farmerPlot: FarmerPlotEntity[];
   file: ImageEntity[];
   createdAt?: string;
+  createBy?: string;
   comment?: string;
 }
 export const GetFarmerEntity_INIT: GetFarmerEntity = {

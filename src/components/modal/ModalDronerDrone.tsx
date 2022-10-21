@@ -36,6 +36,7 @@ const ModalDrone: React.FC<ModalDroneProps> = ({
   isEdit = false,
   title,
 }) => {
+  const [form] = Form.useForm();
   const [dataDrone, setDataDrone] = useState<DronerDroneEntity>(data);
   const [droneList, setDroneList] = useState<DroneBrandEntity[]>();
   const [droneBrandId, setDroneBrandId] = useState<string>();
@@ -128,8 +129,18 @@ const ModalDrone: React.FC<ModalDroneProps> = ({
       (x) => x.droneBrandId == brand
     );
     const m = Map(pushDrone).set("droneBrandId", brand);
-    setPushDrone(m.toJS());
+    setPushDrone({
+      ...m.toJS(),
+    });
     setSearchSeriesDrone(filterSeries);
+    setDataDrone((prev) => ({
+      ...prev,
+      droneId: "",
+    }));
+    form.setFieldsValue({
+      series: "",
+    });
+    setBtnSaveDisable(true);
     checkValidate(dataDrone, m.toJS(), pushSeries, imgLicenseDrone);
   };
   const handleSeries = (id: string) => {
@@ -409,7 +420,7 @@ const ModalDrone: React.FC<ModalDroneProps> = ({
             disableSaveBtn={saveBtnDisable}
           />,
         ]}>
-        <Form key={data.droneId}>
+        <Form key={data.droneId} form={form}>
           <div className="form-group">
             <label>
               ยี่ห้อโดรนที่ฉีดพ่น{" "}
@@ -449,8 +460,8 @@ const ModalDrone: React.FC<ModalDroneProps> = ({
               <Select
                 placeholder="เลือกรุ่น"
                 allowClear
-                onChange={handleSeries}
-                defaultValue={dataDrone.droneId}>
+                defaultValue={dataDrone.droneId}
+                onChange={handleSeries}>
                 {searchSeriesDrone?.map((item: any, index: any) => (
                   <option key={index} value={item.id}>
                     {item.series}

@@ -534,7 +534,14 @@ const EditFarmer = () => {
                     padding: "4px 12px",
                   }}
                   disabled
-                  value={moment(data.createdAt).format("DD/MM/YYYY")}
+                  value={`${moment(data.createdAt).format(
+                    "DD/MM/YYYY"
+                  )} ${
+                    data.createBy === null ||
+                    data.createBy === undefined
+                      ? "ลงทะเบียนโดยเกษตรกร"
+                      : `(${data.createBy})`
+                  }`}
                 />
               </div>
             </div>
