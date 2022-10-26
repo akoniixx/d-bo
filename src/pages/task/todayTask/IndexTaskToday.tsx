@@ -600,14 +600,10 @@ export default function IndexTodayTask() {
                     title={
                       "ขยายเวลา:" +
                       " " +
-                      moment(new Date(row.task_date_appointment)).format(
-                        dateFormat
-                      ) +
+                      moment(new Date(row.task_date_delay)).format(dateFormat) +
                       "," +
                       " " +
-                      moment(new Date(row.task_date_appointment)).format(
-                        timeFormat
-                      )
+                      moment(new Date(row.task_date_delay)).format(timeFormat)
                     }
                     className="p-2"
                   >

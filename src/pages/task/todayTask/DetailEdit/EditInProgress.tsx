@@ -138,17 +138,18 @@ function EditInProgress() {
   };
   const handlerApprove = (e: RadioChangeEvent) => {
     const m = Map(data).set("statusDelay", e.target.value);
-    if (m.toJS().statusDelay === "REJECTED") {
+    const o = Map(m.toJS()).set("dateDelay", data.updatedAt)
+    if (o.toJS().statusDelay === "REJECTED") {
       {
         !data.delayRejectRemark
           ? setBtnSaveDisable(true)
           : setBtnSaveDisable(false);
       }
-      const n = Map(m.toJS()).set("isDelay", false);
+      const n = Map(o.toJS()).set("isDelay", false);
       setUpdateExtend(n.toJS());
       setValue(e.target.value);
     } else {
-      const n = Map(m.toJS()).set("isDelay", true);
+      const n = Map(o.toJS()).set("isDelay", true);
       setUpdateExtend(n.toJS());
       setValue(e.target.value);
       setBtnSaveDisable(false);
