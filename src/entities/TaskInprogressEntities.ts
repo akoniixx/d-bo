@@ -311,52 +311,30 @@ export const TaskDetailEntity_INIT: TaskDetailEntity = {
   taskDronerTemp: TaskDronerTempEntity_INIT,
 };
 export interface UpdateTask {
-  id: string;
-  farmerId: string;
-  farmerPlotId: string;
-  farmAreaAmount: string;
-  dronerId: string;
-  dateAppointment: string;
-  targetSpray: [string];
-  preparationBy: string;
-  purposeSprayId: string;
+  taskId: string;
   status: string;
   statusRemark: string;
   updateBy: string;
-  unitPriceStandard: string;
-  priceStandard: string;
-  unitPrice: string;
-  price: string;
   comment: string;
   isProblem: boolean;
   problemRemark: string;
   isDelay: boolean;
   delayRemark: string;
   dateDelay: string;
+  delayRejectRemark: string;
 }
 export const UpdateTask_INIT: UpdateTask = {
-  id: "",
-  farmerId: "",
-  farmerPlotId: "",
-  farmAreaAmount: "",
-  dronerId: "",
-  dateAppointment: "",
-  targetSpray: [""],
-  preparationBy: "",
-  purposeSprayId: "",
+  taskId: "",
   status: "",
   statusRemark: "",
   updateBy: "",
-  unitPriceStandard: "",
-  priceStandard: "",
-  unitPrice: "",
-  price: "",
   comment: "",
   isProblem: false,
   problemRemark: "",
   isDelay: false,
   delayRemark: "",
   dateDelay: "",
+  delayRejectRemark: "",
 };
 
 

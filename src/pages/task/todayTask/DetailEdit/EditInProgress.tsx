@@ -24,7 +24,7 @@ import color from "../../../../resource/color";
 import Layouts from "../../../../components/layout/Layout";
 import {
   TaskDetailEntity,
-  TaskDetailEntity_INIT
+  TaskDetailEntity_INIT,
 } from "../../../../entities/TaskInprogressEntities";
 import { TaskInprogressDatasource } from "../../../../datasource/TaskInprogressDatasource";
 import FooterPage from "../../../../components/footer/FooterPage";
@@ -65,11 +65,9 @@ function EditInProgress() {
   const [periodSpray, setPeriodSpray] = useState<CropPurposeSprayEntity>();
   const [saveBtnDisable, setBtnSaveDisable] = useState<boolean>(true);
   const [updateExtend, setUpdateExtend] = useState<any>();
-  const [textRejected, setTextRejected] = useState<any>();
   const fetchTaskDetail = async () => {
     await TaskInprogressDatasource.getTaskDetailById(taskId).then((res) => {
       setData(res);
-      console.log(res);
       setMapPosition({
         lat: parseFloat(res.farmerPlot.lat),
         lng: parseFloat(res.farmerPlot.long),
@@ -139,7 +137,6 @@ function EditInProgress() {
     }
   };
   const handlerApprove = (e: RadioChangeEvent) => {
-    console.log(e.target.value)
     const m = Map(data).set("statusDelay", e.target.value);
     if (m.toJS().statusDelay === "REJECTED") {
       {
@@ -154,14 +151,13 @@ function EditInProgress() {
       const n = Map(m.toJS()).set("isDelay", true);
       setUpdateExtend(n.toJS());
       setValue(e.target.value);
-      setBtnSaveDisable(false)
+      setBtnSaveDisable(false);
     }
   };
   const onChangeRejectDelay = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const m = Map(data).set("delayRejectRemark", e.target.value);
-    setTextRejected(m.toJS());
-    // console.log(m.toJS());
-    // setUpdateExtend(m.toJS());
+    const n = Map(m.toJS()).set("statusDelay", updateExtend.statusDelay);
+    setUpdateExtend(n.toJS());
     {
       !e.target.value ? setBtnSaveDisable(true) : setBtnSaveDisable(false);
     }
@@ -779,7 +775,6 @@ function EditInProgress() {
     }).then(async (result) => {
       if (result.isConfirmed) {
         const pushApproved = Map(data).set("statusDelay", updateExtend);
-        // const pushTextRejected = Map(pushApproved.toJS()).set("delayRejectRemark", textRejected);
         const pushUpdateBy = Map(
           pushApproved.toJS().statusDelay || pushApproved.toJS()
         ).set("updateBy", profile.firstname + " " + profile.lastname);

@@ -1,4 +1,8 @@
 ## [Version - 0]
+## Feature [v0.20.0] 2022-10-27
+- added info totalPrice & farmAreaAmount in detail task today
+- added status extend time in index today task menu
+- added extend time in edit today task menu
 ## Feature [v0.19.0] 2022-10-26
 - added handle auto cost in new task
 ## Fix [v0.18.1] 2022-10-21

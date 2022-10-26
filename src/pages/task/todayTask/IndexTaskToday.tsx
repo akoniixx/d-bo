@@ -73,7 +73,6 @@ export default function IndexTodayTask() {
   const dateFormat = "DD/MM/YYYY";
   const timeFormat = "HH:mm";
   const [problems, setProblems] = useState<any>([]);
-  const [delays, setDelays] = useState<any>([]);
   useEffect(() => {
     fetchAllTaskToday();
     fetchProvince();
@@ -91,7 +90,6 @@ export default function IndexTodayTask() {
       isProblem,
       isDelay
     ).then((res: TaskTodayListEntity) => {
-      console.log(res);
       setData(res);
     });
   };
@@ -152,17 +150,13 @@ export default function IndexTodayTask() {
   };
   const handleSubStatus = (e: any) => {
     let value = e.target.value;
-    console.log(value);
     let checked = e.target.checked;
     let statusProblem = ["waitstartproblem", "inprogressproblem"];
     let statusNormal = ["waitstartnormal", "inprogressnormal"];
     let m: any = [];
     if (checked) {
       m = [...problems, value];
-      m = [...delays, value];
-      console.log(m);
       setProblems(m);
-      setDelays(m);
       if (m.length == 2) {
         setIsProblem(undefined);
         setIsDelay(undefined);
@@ -171,28 +165,31 @@ export default function IndexTodayTask() {
           setIsProblem(true);
         } else if (statusNormal.includes(m[0])) {
           setIsProblem(false);
-         
+          setStatusDelay(null);
         } else if (value == "extended") {
-          setStatusDelay(value)
+          setStatusDelay(value);
           setIsDelay(true);
         } else if (value == "waitapprovedelay") {
-          setStatusDelay(value)
+          setStatusDelay(value);
           setIsDelay(false);
         }
       }
     } else {
       m = problems.filter((x: any) => x != value);
-      m = delays.filter((x: any) => x != value);
       setProblems(m);
-      setDelays(m);
       if (m.length == 0) {
         setIsProblem(undefined);
         setIsDelay(undefined);
+        setStatusDelay(undefined);
       } else {
         if (m == "waitstartproblem" || m == "inprogressproblem") {
           setIsProblem(true);
-        } else {
+        } else if (m == "waitstartnormal" || m == "inprogressnormal") {
           setIsProblem(false);
+        } else if (m == "extended") {
+          setIsDelay(true);
+        } else if (m == "waitapprovedelay") {
+          setIsDelay(false);
         }
       }
     }
