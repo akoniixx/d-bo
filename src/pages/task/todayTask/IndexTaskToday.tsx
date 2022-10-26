@@ -152,32 +152,39 @@ export default function IndexTodayTask() {
   };
   const handleSubStatus = (e: any) => {
     let value = e.target.value;
-    console.log(value)
+    console.log(value);
     let checked = e.target.checked;
     let statusProblem = ["waitstartproblem", "inprogressproblem"];
     let statusNormal = ["waitstartnormal", "inprogressnormal"];
-    let statusDelay = ["extended", "waitapprovedelay"];
     let m: any = [];
     if (checked) {
       m = [...problems, value];
-      console.log(m)
+      m = [...delays, value];
+      console.log(m);
       setProblems(m);
-      if (m.length == 4) {
+      setDelays(m);
+      if (m.length == 2) {
         setIsProblem(undefined);
+        setIsDelay(undefined);
       } else {
         if (statusProblem.includes(m[0])) {
           setIsProblem(true);
-          setIsDelay(false);
         } else if (statusNormal.includes(m[0])) {
           setIsProblem(false);
-          setIsDelay(false);
-        } else if(statusDelay.includes(m[0])){
+         
+        } else if (value == "extended") {
+          setStatusDelay(value)
           setIsDelay(true);
+        } else if (value == "waitapprovedelay") {
+          setStatusDelay(value)
+          setIsDelay(false);
         }
       }
     } else {
       m = problems.filter((x: any) => x != value);
+      m = delays.filter((x: any) => x != value);
       setProblems(m);
+      setDelays(m);
       if (m.length == 0) {
         setIsProblem(undefined);
         setIsDelay(undefined);
@@ -563,6 +570,7 @@ export default function IndexTodayTask() {
       dataIndex: "task_status",
       key: "task_status",
       render: (value: any, row: any, index: number) => {
+        const extend = row.task_status_delay;
         return {
           children: (
             <>
@@ -589,6 +597,26 @@ export default function IndexTodayTask() {
                     ? " " + "(" + "อนุมัติขยายเวลา" + ")"
                     : null}
                 </span>
+                {extend == "APPROVED" ? (
+                  <Tooltip
+                    style={{ fontSize: "18px" }}
+                    title={
+                      "ขยายเวลา:" +
+                      " " +
+                      moment(new Date(row.task_date_appointment)).format(
+                        dateFormat
+                      ) +
+                      "," +
+                      " " +
+                      moment(new Date(row.task_date_appointment)).format(
+                        timeFormat
+                      )
+                    }
+                    className="p-2"
+                  >
+                    <img src={icon.iconExtend} alt="ic_change_droner" />
+                  </Tooltip>
+                ) : null}
                 <br />
               </span>
               <span style={{ color: color.Disable, fontSize: "12px" }}>
@@ -790,7 +818,20 @@ export default function IndexTodayTask() {
       <br />
       {PageTitle}
       <br />
-      <Table columns={columns} dataSource={data?.data} pagination={false} />
+      <Table
+        columns={columns}
+        dataSource={data?.data}
+        pagination={false}
+        rowClassName={(a) =>
+          a.task_is_problem == true
+            ? "table-row-older"
+            : a.task_status_delay == "WAIT_APPROVE"
+            ? "table-row-wait-approve"
+            : a.task_status_delay == "APPROVED"
+            ? "table-row-approve"
+            : "table-row-lasted"
+        }
+      />
       <div className="d-flex justify-content-between pt-5">
         <p>รายการทั้งหมด {data?.count} รายการ</p>
         <Pagination
