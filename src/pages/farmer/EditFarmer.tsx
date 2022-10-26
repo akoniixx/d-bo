@@ -61,6 +61,7 @@ import "../farmer/Style.css";
 import img_empty from "../../resource/media/empties/uploadImg.png";
 import bth_img_empty from "../../resource/media/empties/upload_Img_btn.png";
 import moment from "moment";
+import { useLocalStorage } from "../../hook/useLocalStorage";
 const { Option } = Select;
 
 const dateFormat = "DD/MM/YYYY";
@@ -72,6 +73,8 @@ const { Map } = require("immutable");
 let queryString = _.split(window.location.pathname, "=");
 
 const EditFarmer = () => {
+  const [profile] = useLocalStorage("profile", []);
+
   const farmerId = queryString[1];
   const [data, setData] = useState<GetFarmerEntity>(
     GetFarmerEntity_INIT
@@ -158,14 +161,20 @@ const EditFarmer = () => {
     LocationDatasource.getProvince().then((res) => {
       setProvince(res);
     });
-    LocationDatasource.getDistrict(address.provinceId).then((res) => {
-      setDistrict(res);
-    });
-    LocationDatasource.getSubdistrict(address.districtId).then(
-      (res) => {
-        setSubdistrict(res);
-      }
-    );
+    if (address.provinceId) {
+      LocationDatasource.getDistrict(address.provinceId).then(
+        (res) => {
+          setDistrict(res);
+        }
+      );
+    }
+    if (address.districtId) {
+      LocationDatasource.getSubdistrict(address.districtId).then(
+        (res) => {
+          setSubdistrict(res);
+        }
+      );
+    }
   }, [address.provinceId, address.districtId]);
 
   //#region function farmer
@@ -264,19 +273,22 @@ const EditFarmer = () => {
       showCloseButton: true,
     }).then(async (result) => {
       if (result.isConfirmed) {
-        await FarmerPlotDatasource.deleteFarmerPlot(data.id).then();
+        await FarmerPlotDatasource.deleteFarmerPlot(data.id);
       }
       fecthFarmer();
     });
   };
 
   const updateFarmerPlot = async (plot: FarmerPlotEntity) => {
-    const p = Map(plot).set("farmerId", farmerId);
-    if (p.toJS().id != "") {
-      await FarmerPlotDatasource.updateFarmerPlot(p.toJS()).then();
+    const payload = {
+      ...plot,
+      farmerId,
+    };
+    if (payload.id !== "") {
+      await FarmerPlotDatasource.updateFarmerPlot(payload);
       setShowEditModal((prev) => !prev);
     } else {
-      await FarmerPlotDatasource.insertFarmerPlot(p.toJS()).then();
+      await FarmerPlotDatasource.insertFarmerPlot(payload);
       setShowAddModal((prev) => !prev);
     }
     fecthFarmer();
@@ -424,43 +436,45 @@ const EditFarmer = () => {
       setBtnSaveDisable(false);
     }
   };
-
   const updateFarmer = async () => {
     const pushAddr = Map(data).set("address", address);
     const pushPin = Map(pushAddr.toJS()).set("pin", "");
-    await FarmerDatasource.updateFarmer(pushPin.toJS()).then(
-      (res) => {
-        if (res != undefined) {
-          var i = 0;
-          for (i; 2 > i; i++) {
-            i == 0 &&
-              createImgProfile.file != "" &&
-              UploadImageDatasouce.uploadImage(createImgProfile).then(
-                res
-              );
-            i == 1 &&
-              createImgIdCard.file != "" &&
-              UploadImageDatasouce.uploadImage(createImgIdCard).then(
-                res
-              );
-          }
-          Swal.fire({
-            title: "บันทึกสำเร็จ",
-            icon: "success",
-            timer: 1500,
-            showConfirmButton: false,
-          }).then((time) => {
-            window.location.href = "/IndexFarmer";
-          });
-        } else {
-          Swal.fire({
-            title: "เบอร์โทร หรือ รหัสบัตรประชาชน <br/> ซ้ำในระบบ",
-            icon: "error",
-            showConfirmButton: true,
-          });
+    const payload = {
+      ...pushPin.toJS(),
+      updateBy: `${profile.firstname} ${profile.lastname}`,
+    };
+    delete payload.farmerPlot;
+    await FarmerDatasource.updateFarmer(payload).then((res) => {
+      if (res !== undefined) {
+        let i = 0;
+        for (i; 2 > i; i++) {
+          i === 0 &&
+            createImgProfile.file !== "" &&
+            UploadImageDatasouce.uploadImage(createImgProfile).then(
+              res
+            );
+          i === 1 &&
+            createImgIdCard.file !== "" &&
+            UploadImageDatasouce.uploadImage(createImgIdCard).then(
+              res
+            );
         }
+        Swal.fire({
+          title: "บันทึกสำเร็จ",
+          icon: "success",
+          timer: 1500,
+          showConfirmButton: false,
+        }).then((time) => {
+          window.location.href = "/IndexFarmer";
+        });
+      } else {
+        Swal.fire({
+          title: "เบอร์โทร หรือ รหัสบัตรประชาชน <br/> ซ้ำในระบบ",
+          icon: "error",
+          showConfirmButton: true,
+        });
       }
-    );
+    });
   };
 
   const renderFromData = (
@@ -507,6 +521,28 @@ const EditFarmer = () => {
                     </Tag>
                   </>
                 )}
+              </div>
+            </div>
+          </div>
+          <div className="row">
+            <div className="form-group col-lg-6">
+              <label>วันที่ลงทะเบียน</label>
+
+              <div style={{ marginBottom: 24 }}>
+                <Input
+                  style={{
+                    padding: "4px 12px",
+                  }}
+                  disabled
+                  value={`${moment(data.createdAt).format(
+                    "DD/MM/YYYY"
+                  )} ${
+                    data.createBy === null ||
+                    data.createBy === undefined
+                      ? "ลงทะเบียนโดยเกษตรกร"
+                      : `(${data.createBy})`
+                  }`}
+                />
               </div>
             </div>
           </div>
@@ -845,6 +881,22 @@ const EditFarmer = () => {
               </div>
             </div>
           )}
+          <div
+            className="form-group col-lg-12"
+            style={{ marginTop: 16 }}>
+            <label>หมายเหตุ</label>
+            <Form.Item>
+              <TextArea
+                value={data.comment}
+                onChange={(e) => {
+                  setData((prev) => ({
+                    ...prev,
+                    comment: e.target.value,
+                  }));
+                }}
+              />
+            </Form.Item>
+          </div>
         </Form>
       </CardContainer>
     </div>

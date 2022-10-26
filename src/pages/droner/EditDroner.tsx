@@ -71,6 +71,7 @@ import { LAT_LNG_BANGKOK } from "../../definitions/Location";
 
 import moment from "moment";
 import locale from "antd/es/date-picker/locale/th_TH";
+import { useLocalStorage } from "../../hook/useLocalStorage";
 
 const dateFormat = "DD/MM/YYYY";
 const dateCreateFormat = "YYYY-MM-DD";
@@ -83,7 +84,7 @@ function EditDroner() {
   const [form] = Form.useForm();
   const dronerId = queryString[1];
   const status = Form.useWatch("status", form);
-
+  const [profile] = useLocalStorage("profile", []);
   const [data, setData] = useState<DronerEntity>(DronerEntity_INIT);
   const [address, setAddress] = useState<AddressEntity>(
     AddressEntity_INIT
@@ -147,6 +148,7 @@ function EditDroner() {
         if (res) {
           form.setFieldsValue({
             ...res,
+            comment: res.comment || "",
             postcode: res.address.postcode || undefined,
             province: res.address.provinceId || undefined,
             district: res.address.districtId || undefined,
@@ -240,14 +242,20 @@ function EditDroner() {
     LocationDatasource.getProvince().then((res) => {
       setProvince(res);
     });
-    LocationDatasource.getDistrict(address.provinceId).then((res) => {
-      setDistrict(res);
-    });
-    LocationDatasource.getSubdistrict(address.districtId).then(
-      (res) => {
-        setSubdistrict(res);
-      }
-    );
+    if (address?.provinceId) {
+      LocationDatasource.getDistrict(address.provinceId).then(
+        (res) => {
+          setDistrict(res);
+        }
+      );
+    }
+    if (address?.districtId) {
+      LocationDatasource.getSubdistrict(address.districtId).then(
+        (res) => {
+          setSubdistrict(res);
+        }
+      );
+    }
   }, [address.provinceId, address.districtId]);
 
   //#region data droner
@@ -420,16 +428,27 @@ function EditDroner() {
         }
       );
     }
-    fetchDronerById();
+    // fetchDronerById();
     setShowAddModal(false);
     setShowEditModal(false);
+    setDronerDroneList((prev) => {
+      const isEdit = prev.findIndex((x) => x.id === drone.id);
+      if (isEdit !== -1) {
+        return [
+          ...prev.slice(0, isEdit),
+          drone,
+          ...prev.slice(isEdit + 1),
+        ];
+      } else {
+        return [...prev, drone];
+      }
+    });
     setEditIndex(0);
-    setDronerDroneList(dronerDroneList);
   };
   const removeDrone = async (id?: string) => {
     try {
       await DronerDroneDatasource.removeDronerDrone(id);
-      fetchDronerById();
+      setDronerDroneList((prev) => prev.filter((x) => x.id !== id));
     } catch (e) {
       console.log(e);
     }
@@ -555,14 +574,24 @@ function EditDroner() {
       ...data,
       ...values,
       birthDate: moment(values.birthDate).toISOString(),
-      address,
+      address: {
+        ...address,
+        address1: values.address1,
+        address2: values.address2,
+      },
       reason,
+      updateBy: `${profile?.firstname} ${profile?.lastname}`,
       expPlant,
       dronerArea: {
         ...dronerArea,
         mapUrl: values.mapUrl ? values.mapUrl : undefined,
       },
     };
+
+    if (values.status === "ACTIVE") {
+      payload.isDelete = false;
+      payload.isOpenReceiveTask = true;
+    }
     await DronerDatasource.updateDroner(payload).then((res) => {
       if (res !== undefined) {
         var i = 0;
@@ -609,6 +638,7 @@ function EditDroner() {
       checkPlantsOther,
       reason,
       idNo,
+      comment,
       status: currentStatus,
       ...rest
     } = form.getFieldsValue();
@@ -629,6 +659,7 @@ function EditDroner() {
 
     const isHasValues = Object.values({
       ...rest,
+
       expPlant: expPlant.length > 0,
       reasonList:
         reasonList.length > 0 ||
@@ -704,6 +735,26 @@ function EditDroner() {
               <Form.Item name="dronerCode">
                 <Input disabled defaultValue={data.dronerCode} />
               </Form.Item>
+            </div>
+            <div className="form-group col-lg-6">
+              <label>วันที่ลงทะเบียน</label>
+
+              <div style={{ marginBottom: 24 }}>
+                <Input
+                  style={{
+                    padding: "4px 12px",
+                  }}
+                  disabled
+                  value={`${moment(data.createdAt).format(
+                    "DD/MM/YYYY"
+                  )} ${
+                    data.createBy === null ||
+                    data.createBy === undefined
+                      ? "(ลงทะเบียนโดยนักบิน)"
+                      : `(${data.createBy})`
+                  }`}
+                />
+              </div>
             </div>
           </div>
           <div className="row">
@@ -1226,6 +1277,7 @@ function EditDroner() {
               />
             </Form.Item>
           </div>
+
           <div className="row">
             <div className="form-group col-lg-12">
               <label
@@ -1353,6 +1405,12 @@ function EditDroner() {
                 </Radio.Group>
               </Form.Item>
             </div>
+          </div>
+          <div className="form-group col-lg-12">
+            <label>หมายเหตุ</label>
+            <Form.Item name="comment">
+              <TextArea />
+            </Form.Item>
           </div>
         </Form>
       </CardContainer>
@@ -1483,6 +1541,7 @@ function EditDroner() {
       )}
       {showEditModal && (
         <ModalDrone
+          isEdit
           show={showEditModal}
           backButton={() => setShowEditModal((prev) => !prev)}
           callBack={updateDrone}

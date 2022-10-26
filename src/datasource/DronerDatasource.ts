@@ -6,7 +6,7 @@ import {
 import { BASE_URL, httpClient } from "../config/develop-config";
 
 export class DronerDatasource {
-  static getDronerList(
+  static async getDronerList(
     page: number,
     row: number,
     subdistrictId?: number,
@@ -37,7 +37,7 @@ export class DronerDatasource {
       });
   }
 
-  static getDronerByID(id: string): Promise<DronerEntity> {
+  static async getDronerByID(id: string): Promise<DronerEntity> {
     return httpClient
       .get(BASE_URL + "/droner/" + id)
       .then((res) => {

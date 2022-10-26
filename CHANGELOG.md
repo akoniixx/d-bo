@@ -1,4 +1,16 @@
 ## [Version - 0]
+## Fix [v0.18.1] 2022-10-21
+- increase createBy 
+- fix edit dronerDrone is refresh value before submit
+## Fix [v0.18.0] 2022-10-19
+- increase field comment droner farmer dronerDrone
+- increase field table updateAt & updateBy  editDroner editFarmer 
+- increase ui createBy  Droner Farmer
+
+## Fix [v0.17.15] 2022-10-19
+- fixed edit farmer dont send field famerPlot
+- fixed api get farmer & droner error 500
+- fixed edit address field droner  data dont change 
 ## Fix [v0.17.14] 2022-10-17
 - fixed code upload image Edit Add Farmer & Droner
 - fixed delete droner-drone
