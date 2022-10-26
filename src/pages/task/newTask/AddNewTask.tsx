@@ -1,8 +1,4 @@
-import {
-  DownOutlined,
-  SearchOutlined,
-  StarFilled,
-} from "@ant-design/icons";
+import { DownOutlined, SearchOutlined, StarFilled } from "@ant-design/icons";
 import {
   AutoComplete,
   Avatar,
@@ -202,11 +198,6 @@ const AddNewTask = () => {
     setFarmerSelected(findFarmer);
   };
   const handleAmountRai = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const selected = { ...farmerPlotSeleced };
-    e.target.value
-      ? (selected.raiAmount = e.target.value)
-      : (selected.raiAmount = "");
-    setFarmerPlotSelected(selected);
     const payload = {
       ...createNewTask,
     };
@@ -217,6 +208,7 @@ const AddNewTask = () => {
     payload.unitPriceStandard = createNewTask.unitPrice;
     payload.farmAreaAmount = e.target.value;
     setCreateNewTask(payload);
+    checkValidateStep(payload, current);
   };
   const handlePeriodSpray = (e: any) => {
     const d = Map(createNewTask).set("purposeSprayId", e);
@@ -278,7 +270,7 @@ const AddNewTask = () => {
       let calUnitPrice =
         parseFloat(createNewTask.farmAreaAmount) * e.target.value;
       const d = Map(createNewTask).set("unitPrice", e.target.value);
-      const pushCal = Map(d.toJS()).set("price", calUnitPrice.toFixed(2));
+      const pushCal = Map(d.toJS()).set("price", calUnitPrice);
       setCreateNewTask(pushCal.toJS());
       checkValidateStep(pushCal.toJS(), current);
     } else {
@@ -422,10 +414,30 @@ const AddNewTask = () => {
                   <label>จำนวนไร่</label>
                   <Form.Item>
                     <Input
-                      value={farmerPlotSeleced?.raiAmount}
+                      status={
+                        parseFloat(createNewTask?.farmAreaAmount) >
+                        (farmerPlotSeleced.raiAmount == undefined
+                          ? 0
+                          : parseFloat(farmerPlotSeleced.raiAmount))
+                          ? "error"
+                          : ""
+                      }
+                      value={createNewTask?.farmAreaAmount}
                       onChange={handleAmountRai}
                       disabled={current == 2 || checkSelectPlot == "error"}
                     />
+                    {parseFloat(createNewTask?.farmAreaAmount) >
+                      (farmerPlotSeleced.raiAmount == undefined
+                        ? 0
+                        : parseFloat(farmerPlotSeleced.raiAmount)) && (
+                      <p
+                        style={{
+                          color: color.Error,
+                        }}
+                      >
+                        ไม่สามารถกรอกเกินจำนวน {farmerPlotSeleced.raiAmount} ไร่
+                      </p>
+                    )}
                   </Form.Item>
                 </div>
               </div>
@@ -553,7 +565,7 @@ const AddNewTask = () => {
                         <span style={{ color: "red" }}>*</span>
                         <Input
                           suffix="บาท/ไร่"
-                          value={createNewTask.unitPriceStandard}
+                          value={createNewTask.unitPriceStandard.toFixed(2)}
                           disabled
                           autoComplete="off"
                           step="0.01"
@@ -566,7 +578,7 @@ const AddNewTask = () => {
                       <Form.Item>
                         <Input
                           suffix="บาท"
-                          value={createNewTask.priceStandard}
+                          value={createNewTask.priceStandard.toFixed(2)}
                           disabled
                           autoComplete="off"
                           step="0.01"
@@ -584,7 +596,7 @@ const AddNewTask = () => {
                         <Input
                           suffix="บาท/ไร่"
                           id="unitPrice"
-                          value={createNewTask.unitPrice}
+                          value={createNewTask.unitPrice.toFixed(2)}
                           onChange={handleCalServiceCharge}
                           disabled={current == 2 || checkSelectPlot == "error"}
                           autoComplete="off"
@@ -598,7 +610,7 @@ const AddNewTask = () => {
                       <Form.Item>
                         <Input
                           suffix="บาท"
-                          value={createNewTask.price}
+                          value={createNewTask.price.toFixed(2)}
                           onChange={handleCalServiceCharge}
                           disabled={current == 2 || checkSelectPlot == "error"}
                           autoComplete="off"
@@ -1474,8 +1486,13 @@ const AddNewTask = () => {
         data?.farmerPlotId,
         data?.purposeSprayId,
         data?.preparationBy,
+        data.farmAreaAmount,
       ].includes("");
-      let checkEmptyNumber = ![data.price, data.unitPrice].includes(0);
+      let checkEmptyNumber = ![
+        data.price,
+        data.unitPrice,
+        data.farmAreaAmount,
+      ].includes(0);
       let checkEmptyArray = false;
       if (data?.targetSpray !== undefined) {
         checkEmptyArray =

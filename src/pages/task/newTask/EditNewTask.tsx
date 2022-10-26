@@ -161,7 +161,6 @@ const EditNewTask = () => {
       res.farmer.farmerPlot = [res.farmerPlot];
       res?.taskDronerTemp?.map((item) => _.set(item, "isChecked", true));
       res.taskDronerTemp && setDronerSelectedList(res?.taskDronerTemp);
-      res.farmerPlot.raiAmount = res.farmAreaAmount;
       setDateAppointment(new Date(res.dateAppointment).toUTCString());
       setPriceMethod(res.priceStandard != 0 ? "อัตโนมัติ" : "กรอกข้อมูลเอง");
       setTimeAppointment(new Date(res.dateAppointment).getTime());
@@ -287,13 +286,6 @@ const EditNewTask = () => {
     );
   };
   const handleAmountRai = (e: React.ChangeEvent<HTMLInputElement>) => {
-    console.log(e.target.value);
-    const selected = { ...farmerPlotSeleced };
-    console.log(selected);
-    e.target.value
-      ? (selected.raiAmount = e.target.value)
-      : (selected.raiAmount = "");
-    setFarmerPlotSelected(selected);
     const payload = {
       ...data,
     };
@@ -509,10 +501,31 @@ const EditNewTask = () => {
                     <label>จำนวนไร่</label>
                     <Form.Item>
                       <Input
-                        value={farmerPlotSeleced?.raiAmount}
+                        status={
+                          parseFloat(data?.farmAreaAmount) >
+                          (farmerPlotSeleced.raiAmount == undefined
+                            ? 0
+                            : parseFloat(farmerPlotSeleced.raiAmount))
+                            ? "error"
+                            : ""
+                        }
+                        value={data?.farmAreaAmount}
                         onChange={handleAmountRai}
                         disabled={current == 2 || checkSelectPlot == "error"}
                       />
+                      {parseFloat(data?.farmAreaAmount) >
+                        (farmerPlotSeleced.raiAmount == undefined
+                          ? 0
+                          : parseFloat(farmerPlotSeleced.raiAmount)) && (
+                        <p
+                          style={{
+                            color: color.Error,
+                          }}
+                        >
+                          ไม่สามารถกรอกเกินจำนวน {farmerPlotSeleced.raiAmount}{" "}
+                          ไร่
+                        </p>
+                      )}
                     </Form.Item>
                   </div>
                 </div>
