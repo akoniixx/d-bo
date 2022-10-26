@@ -3,8 +3,8 @@ import React, { useEffect, useState } from "react";
 import Search from "antd/lib/input/Search";
 import { Option } from "antd/lib/mentions";
 import color from "../../resource/color";
+import { EditOutlined, UserOutlined } from "@ant-design/icons";
 import ActionButton from "../../components/button/ActionButton";
-import { EditOutlined } from "@ant-design/icons";
 import { DronerListEntity } from "../../entities/DronerEntities";
 import { DronerDatasource } from "../../datasource/DronerDatasource";
 import {
@@ -38,6 +38,7 @@ function IndexDroner() {
   const [subdistrict, setSubdistrict] = useState<SubdistrictEntity[]>(
     []
   );
+
   const [droneBrandId, setDroneBrandId] = useState<any>();
 
   useEffect(() => {
@@ -125,7 +126,6 @@ function IndexDroner() {
     setSearchStatus(status);
     setCurrent(1);
   };
-
   const PageTitle = (
     <>
       <div
@@ -266,10 +266,35 @@ function IndexDroner() {
   );
   const columns = [
     {
+      title: "อัพเดทล่าสุด",
+      key: "updatedAt",
+      render: (value: { updatedAt: string; updateBy?: string }) => {
+        return {
+          children: (
+            <div className="container">
+              <span className="text-dark-75  d-block font-size-lg">
+                {moment(value.updatedAt).format("DD/MM/YYYY HH:mm")}
+              </span>
+              {value.updateBy && (
+                <div>
+                  <span
+                    className=" d-block font-size-lg"
+                    style={{ color: color.Grey }}>
+                    <UserOutlined style={{ padding: "0 4px 0 0" }} />
+
+                    {value?.updateBy}
+                  </span>
+                </div>
+              )}
+            </div>
+          ),
+        };
+      },
+    },
+    {
       title: "ชื่อนักบินโดรน",
       dataIndex: "firstname",
       key: "firstname",
-      width: "12%",
       render: (value: any, row: any, index: number) => {
         return {
           children: (
@@ -287,7 +312,6 @@ function IndexDroner() {
       title: "ตำบล",
       dataIndex: "subdistrict",
       key: "subdistrict",
-      width: "10%",
       render: (value: any, row: any, index: number) => {
         const subdistrict = row.address.subdistrict;
         return {
@@ -305,7 +329,6 @@ function IndexDroner() {
       title: "อำเภอ",
       dataIndex: "district",
       key: "district",
-      width: "10%",
       render: (value: any, row: any, index: number) => {
         const district = row.address.district;
         return {
@@ -325,7 +348,6 @@ function IndexDroner() {
       title: "จังหวัด",
       dataIndex: "province",
       key: "province",
-      width: "10%",
       render: (value: any, row: any, index: number) => {
         const province = row.address.province;
         return {
@@ -345,13 +367,11 @@ function IndexDroner() {
       title: "เบอร์โทร",
       dataIndex: "telephoneNo",
       key: "telephoneNo",
-      width: "10%",
     },
     {
       title: "จำนวนโดรน",
       dataIndex: "totalDroneCount",
       key: "totalDroneCount",
-      width: "8%",
       render: (value: any, row: any, index: number) => {
         return {
           children: (
@@ -368,7 +388,6 @@ function IndexDroner() {
       title: "ยี่ห้อ",
       dataIndex: "brand",
       key: "brand",
-      width: "10%",
       render: (value: any, row: any, index: number) => {
         const droneLatest = row.dronerDrone[0];
         return {
@@ -405,11 +424,11 @@ function IndexDroner() {
         };
       },
     },
+
     {
       title: "สถานะ",
       dataIndex: "status",
       key: "status",
-      width: "10%",
       render: (value: any, row: any, index: number) => {
         const countDay = () => {
           let dateToday: any = moment(Date.now());
@@ -439,7 +458,6 @@ function IndexDroner() {
       title: "",
       dataIndex: "Action",
       key: "Action",
-      width: "7%",
       render: (value: any, row: any, index: number) => {
         return {
           children: (
@@ -466,7 +484,7 @@ function IndexDroner() {
         columns={columns}
         dataSource={data?.data}
         pagination={false}
-        scroll={{ x: 1300 }}
+        scroll={{ x: "max-content" }}
         rowClassName={(a) =>
           a.status == "PENDING" &&
           moment(Date.now()).diff(
