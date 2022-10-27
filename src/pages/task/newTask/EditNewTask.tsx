@@ -1,10 +1,7 @@
 import {
-  CheckCircleFilled,
   DownOutlined,
-  EditFilled,
   SearchOutlined,
   StarFilled,
-  TeamOutlined,
 } from "@ant-design/icons";
 import {
   AutoComplete,
@@ -33,7 +30,6 @@ import TextArea from "antd/lib/input/TextArea";
 import { RowSelectionType } from "antd/lib/table/interface";
 import moment, { utc } from "moment";
 import React, { useEffect, useState } from "react";
-import Search from "antd/lib/input/Search";
 import {
   BackButton,
   BackIconButton,
@@ -58,8 +54,6 @@ import {
 import {
   FarmerEntity,
   FarmerEntity_INIT,
-  GetFarmerEntity,
-  GetFarmerEntity_INIT,
 } from "../../../entities/FarmerEntities";
 import {
   FarmerPlotEntity,
@@ -396,7 +390,7 @@ const EditNewTask = () => {
       fetchLocationPrice(
         farmerPlotSeleced?.plotArea.provinceId,
         farmerPlotSeleced?.plantName,
-        farmerPlotSeleced?.raiAmount,
+        data?.farmAreaAmount,
         farmerPlotSeleced?.id
       );
     }

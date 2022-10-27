@@ -33,6 +33,12 @@ table tr td :hover {
 .table-row-wait-review td {
   background-color: #2f80ed1a !important;
 }
+.table-row-wait-approve td {
+  background-color: #2F80ED33 !important;
+}
+.table-row-approve td {
+  background-color: #56CCF21A !important;
+}
 
 .ant-layout-sider-light {
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12),

@@ -4,4 +4,5 @@ export default {
   iconChangeDroner: require("./media/images/iconChangDrone.png"),
   iconChangeTime: require("./media/images/changeTime.png"),
   iconReviewDroner: require("./media/images/reviewDroner.png"),
+  iconExtend: require("./media/images/extend.png"),
 };

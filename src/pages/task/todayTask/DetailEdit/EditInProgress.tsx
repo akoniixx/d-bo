@@ -12,6 +12,7 @@ import {
   Space,
   TimePicker,
 } from "antd";
+import type { RadioChangeEvent } from "antd";
 import moment from "moment";
 import React, { useEffect, useState } from "react";
 import GoogleMap from "../../../../components/map/GoogleMap";
@@ -38,7 +39,10 @@ import TextArea from "antd/lib/input/TextArea";
 import { Option } from "antd/lib/mentions";
 import Swal from "sweetalert2";
 import {
+  APPROVED,
+  REDIO_IN_PROGRESS,
   STATUS_COLOR_MAPPING,
+  STATUS_INPROGRESS,
   TASKTODAY_STATUS,
   TASKTODAY_STATUS1,
   TASK_TODAY_STATUS_MAPPING,
@@ -56,18 +60,11 @@ function EditInProgress() {
     lat: LAT_LNG_BANGKOK.lat,
     lng: LAT_LNG_BANGKOK.lng,
   });
+  const [value, setValue] = useState("");
   const [data, setData] = useState<TaskDetailEntity>(TaskDetailEntity_INIT);
   const [periodSpray, setPeriodSpray] = useState<CropPurposeSprayEntity>();
-  const [checkCrop, setCheckCrop] = useState<boolean>(true);
   const [saveBtnDisable, setBtnSaveDisable] = useState<boolean>(true);
-  const [validateComma, setValidateComma] = useState<{
-    status: any;
-    message: string;
-  }>({
-    status: "",
-    message: "",
-  });
-  let [otherSpray, setOtherSpray] = useState<any>();
+  const [updateExtend, setUpdateExtend] = useState<any>();
   const fetchTaskDetail = async () => {
     await TaskInprogressDatasource.getTaskDetailById(taskId).then((res) => {
       setData(res);
@@ -132,6 +129,40 @@ function EditInProgress() {
       !e.target.value ? setBtnSaveDisable(true) : setBtnSaveDisable(false);
     }
   };
+  const onChangeDelayText = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const m = Map(data).set("delayRemark", e.target.value);
+    setData(m.toJS());
+    {
+      !e.target.value ? setBtnSaveDisable(true) : setBtnSaveDisable(false);
+    }
+  };
+  const handlerApprove = (e: RadioChangeEvent) => {
+    const m = Map(data).set("statusDelay", e.target.value);
+    const o = Map(m.toJS()).set("dateDelay", data.updatedAt)
+    if (o.toJS().statusDelay === "REJECTED") {
+      {
+        !data.delayRejectRemark
+          ? setBtnSaveDisable(true)
+          : setBtnSaveDisable(false);
+      }
+      const n = Map(o.toJS()).set("isDelay", false);
+      setUpdateExtend(n.toJS());
+      setValue(e.target.value);
+    } else {
+      const n = Map(o.toJS()).set("isDelay", true);
+      setUpdateExtend(n.toJS());
+      setValue(e.target.value);
+      setBtnSaveDisable(false);
+    }
+  };
+  const onChangeRejectDelay = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const m = Map(data).set("delayRejectRemark", e.target.value);
+    const n = Map(m.toJS()).set("statusDelay", updateExtend.statusDelay);
+    setUpdateExtend(n.toJS());
+    {
+      !e.target.value ? setBtnSaveDisable(true) : setBtnSaveDisable(false);
+    }
+  };
   const onChangeCanCelText = (e: any) => {
     const m = Map(data).set("statusRemark", e.target.value);
     setData(m.toJS());
@@ -140,7 +171,7 @@ function EditInProgress() {
     }
   };
   const renderAppointment = (
-    <Form style={{ padding: "32px" }}>
+    <Form style={{ padding: "2%" }}>
       <div className="row">
         <div className="col-lg-6">
           <div className="row">
@@ -201,86 +232,315 @@ function EditInProgress() {
           </div>
           <div className="form-group col-lg-10">
             <label>หมายเหตุ</label>
-            <TextArea onChange={handleComment} value={data.comment} />
+            <TextArea rows={3} onChange={handleComment} value={data.comment} />
           </div>
         </div>
         <div className="col-lg-6">
+          <div className="form-group col-lg-6">
+            <label>ค่าบริการ</label>
+            <p>
+              {data.totalPrice !== null
+                ? formatCurrency(data.totalPrice) + " " + "บาท"
+                : "0.00" + " " + "บาท"}{" "}
+              (จำนวน {data?.farmAreaAmount} ไร่)
+            </p>
+          </div>
           <label style={{ marginBottom: "10px" }}>
             สถานะ <span style={{ color: "red" }}>*</span>
           </label>
-          <Form.Item name="status">
-            <div className="row">
-              <div className="form-group col-lg-4">
-                <Radio.Group
-                  value={data.status}
-                  onChange={handleChangeStatus}
-                  className="col-lg-4"
-                >
-                  <Space direction="vertical">
-                    <Radio disabled>รอเริ่มงาน</Radio>
-                    {TASKTODAY_STATUS1.map((item: any, index: any) => (
-                      <Radio value={item.value}>
-                        {item.name}
-                        {data.status == "IN_PROGRESS" && index == 0 ? (
-                          <div style={{ marginLeft: "20px" }}>
-                            <Form.Item style={{ width: "500px" }}>
-                              <Radio.Group
-                                value={data.isProblem}
-                                onChange={handleChangeIsProblem}
-                              >
-                                <Space direction="vertical">
-                                  <Radio value={false}>งานปกติ</Radio>
-                                  <Radio disabled>รออนุมัติขยายเวลา</Radio>
-                                  <Radio disabled>
-                                    อนุมัติขยายเวลา{" "}
-                                    <span style={{ color: color.Error }}>
-                                      *ต้องโทรหาเกษตกรเพื่อคอนเฟิร์มการอนุมัติ/ปฏิเสธ*
-                                    </span>
-                                  </Radio>
-                                  <Radio value={true}>งานมีปัญหา</Radio>
-                                </Space>
-                              </Radio.Group>
-                            </Form.Item>
-                            {data.isProblem == true ? (
-                              <Form.Item>
-                                <TextArea
-                                  rows={3}
-                                  onChange={onChangeProblemText}
-                                  placeholder="รายละเอียดปัญหา"
-                                  autoComplete="off"
-                                  defaultValue={
-                                    data.problemRemark != null
-                                      ? data.problemRemark
-                                      : undefined
-                                  }
-                                />
-                              </Form.Item>
-                            ) : null}
-                          </div>
-                        ) : data.status == "CANCELED" && index == 1 ? (
-                          <div style={{ marginLeft: "20px" }}>
-                            <Form.Item style={{ width: "500px" }}>
-                              <TextArea
-                                rows={3}
-                                onChange={onChangeCanCelText}
-                                placeholder="รายละเอียดการยกเลิก"
-                                autoComplete="off"
-                                defaultValue={
-                                  data.statusRemark != null
-                                    ? data.statusRemark
-                                    : undefined
-                                }
-                              />
-                            </Form.Item>
+          <div className="row">
+            <Radio.Group value={data.status} onChange={handleChangeStatus}>
+              <Space direction="vertical" style={{ width: "530px" }}>
+                <Radio disabled>รอเริ่มงาน</Radio>
+                {TASKTODAY_STATUS1.map((item: any, index: any) => (
+                  <Radio value={item.value}>
+                    <b> {item.name}</b>
+                    {data.status == "IN_PROGRESS" && index == 0 ? (
+                      <>
+                        <div>
+                          <Radio.Group
+                            value={data.isProblem}
+                            onChange={handleChangeIsProblem}
+                          >
+                            <Space direction="vertical">
+                              <Radio value={false}>งานปกติ</Radio>
+                              <Radio value={true}>งานมีปัญหา</Radio>
+                            </Space>
+                          </Radio.Group>
+                        </div>
+                        {data.isProblem == true ? (
+                          <div>
+                            <TextArea
+                              rows={3}
+                              onChange={onChangeProblemText}
+                              placeholder="รายละเอียดปัญหา"
+                              autoComplete="off"
+                              defaultValue={
+                                data.problemRemark != null
+                                  ? data.problemRemark
+                                  : undefined
+                              }
+                            />
                           </div>
                         ) : null}
-                      </Radio>
-                    ))}
-                  </Space>
-                </Radio.Group>
-              </div>
-            </div>
-          </Form.Item>
+                        <br />
+                        {data.statusDelay == "WAIT_APPROVE" ? (
+                          <>
+                            <Form.Item
+                              style={{
+                                backgroundColor: "#2F80ED33",
+                                padding: "3%",
+                                width: "120%",
+                              }}
+                            >
+                              <b>ขยายเวลา</b>
+                              <br />
+                              <span style={{ paddingLeft: "3%" }}>
+                                รออนุมัติการขยายเวลา
+                              </span>
+                              <span style={{ color: color.Error }}>
+                                *ต้องโทรหาเกษตกรเพื่อคอนเฟิร์มการอนุมัติ/ปฏิเสธ*
+                              </span>
+                              <div
+                                className="row"
+                                style={{ paddingLeft: "3%" }}
+                              >
+                                <div className="col-lg">
+                                  <label>วันที่ขยายเวลา</label>
+                                  <Form.Item>
+                                    <DatePicker
+                                      disabled
+                                      format={dateFormat}
+                                      style={{ width: "100%" }}
+                                      value={moment(
+                                        new Date(
+                                          data.dateDelay !== null
+                                            ? data.dateDelay
+                                            : new Date()
+                                        )
+                                      )}
+                                    />
+                                  </Form.Item>
+                                </div>
+                                <div className="col-lg">
+                                  <label>เวลา</label>
+                                  <Form.Item>
+                                    <TimePicker
+                                      disabled
+                                      format={timeFormat}
+                                      style={{ width: "100%" }}
+                                      value={moment(
+                                        new Date(
+                                          data.dateDelay !== null
+                                            ? data.dateDelay
+                                            : new Date()
+                                        )
+                                      )}
+                                    />
+                                  </Form.Item>
+                                </div>
+                              </div>
+                              <div
+                                className="col-lg"
+                                style={{ paddingLeft: "3%" }}
+                              >
+                                <TextArea
+                                  rows={3}
+                                  onChange={onChangeDelayText}
+                                  defaultValue={data.delayRemark}
+                                />
+                              </div>
+                              <br />
+                              <label style={{ paddingLeft: "3%" }}>
+                                ยืนยันการขยายเวลา
+                              </label>
+                              <br />
+                              <Radio.Group
+                                style={{ paddingLeft: "3%" }}
+                                onChange={handlerApprove}
+                                defaultValue={data.statusDelay}
+                              >
+                                <Space>
+                                  <Radio value="APPROVED">อนุมัติ</Radio>
+                                  <Radio value="REJECTED">ไม่อนุมัติ</Radio>
+                                </Space>
+                                {value === "REJECTED" ? (
+                                  <div style={{ width: "227%" }}>
+                                    <TextArea
+                                      rows={3}
+                                      onChange={onChangeRejectDelay}
+                                      defaultValue={data?.delayRejectRemark}
+                                      placeholder="กรอกเหตุผลที่ไม่อนุมัติ"
+                                    />
+                                  </div>
+                                ) : null}
+                              </Radio.Group>
+                            </Form.Item>
+                          </>
+                        ) : data.statusDelay == "APPROVED" ? (
+                          <>
+                            <Form.Item
+                              style={{
+                                backgroundColor: "#56CCF21A",
+                                padding: "3%",
+                                width: "170%",
+                              }}
+                            >
+                              <b>ขยายเวลา</b>
+                              <br />
+                              <span style={{ paddingLeft: "3%" }}>
+                                อนุมัติขยายเวลา
+                              </span>
+                              <div
+                                className="row"
+                                style={{ paddingLeft: "3%" }}
+                              >
+                                <div className="col-lg">
+                                  <label>วันที่ขยายเวลา</label>
+                                  <Form.Item>
+                                    <DatePicker
+                                      disabled
+                                      format={dateFormat}
+                                      style={{ width: "100%" }}
+                                      value={moment(
+                                        new Date(
+                                          data.dateDelay !== null
+                                            ? data.dateDelay
+                                            : new Date()
+                                        )
+                                      )}
+                                    />
+                                  </Form.Item>
+                                </div>
+                                <div className="col-lg">
+                                  <label>เวลา</label>
+                                  <Form.Item>
+                                    <TimePicker
+                                      disabled
+                                      format={timeFormat}
+                                      style={{ width: "100%" }}
+                                      value={moment(
+                                        new Date(
+                                          data.dateDelay !== null
+                                            ? data.dateDelay
+                                            : new Date()
+                                        )
+                                      )}
+                                    />
+                                  </Form.Item>
+                                </div>
+                              </div>
+                              <div style={{ paddingLeft: "3%" }}>
+                                <TextArea
+                                  rows={3}
+                                  disabled
+                                  onChange={onChangeDelayText}
+                                  defaultValue={data.delayRemark}
+                                />
+                              </div>
+                            </Form.Item>
+                          </>
+                        ) : data.statusDelay == "REJECTED" ? (
+                          <>
+                            <Form.Item
+                              style={{
+                                backgroundColor: "rgba(235, 87, 87, 0.3)",
+                                padding: "3%",
+                                width: "170%",
+                              }}
+                            >
+                              <b>ขยายเวลา</b>
+                              <br />
+                              <span style={{ paddingLeft: "3%" }}>
+                                ไม่อนุมัติขยายเวลา
+                              </span>
+                              <div
+                                className="row"
+                                style={{ paddingLeft: "3%" }}
+                              >
+                                <div className="col-lg">
+                                  <label>วันที่ขยายเวลา</label>
+                                  <Form.Item>
+                                    <DatePicker
+                                      disabled
+                                      format={dateFormat}
+                                      style={{ width: "100%" }}
+                                      value={moment(
+                                        new Date(
+                                          data.dateDelay !== null
+                                            ? data.dateDelay
+                                            : new Date()
+                                        )
+                                      )}
+                                    />
+                                  </Form.Item>
+                                </div>
+                                <div className="col-lg">
+                                  <label>เวลา</label>
+                                  <Form.Item>
+                                    <TimePicker
+                                      disabled
+                                      format={timeFormat}
+                                      style={{ width: "100%" }}
+                                      value={moment(
+                                        new Date(
+                                          data.dateDelay !== null
+                                            ? data.dateDelay
+                                            : new Date()
+                                        )
+                                      )}
+                                    />
+                                  </Form.Item>
+                                </div>
+                              </div>
+                              <div
+                                className="col-lg"
+                                style={{ paddingLeft: "3%" }}
+                              >
+                                <TextArea
+                                  rows={3}
+                                  disabled
+                                  defaultValue={data?.delayRemark}
+                                />
+                              </div>
+                              <br />
+                              <div
+                                className="col-lg"
+                                style={{ paddingLeft: "3%" }}
+                              >
+                                <span>เหตุผลที่ไม่อนุมัติ</span>
+                                <TextArea
+                                  rows={3}
+                                  disabled
+                                  defaultValue={data?.delayRejectRemark}
+                                />
+                              </div>
+                            </Form.Item>
+                          </>
+                        ) : null}
+                      </>
+                    ) : data.status == "CANCELED" && index == 1 ? (
+                      <div style={{ marginLeft: "20px" }}>
+                        <Form.Item style={{ width: "500px" }}>
+                          <TextArea
+                            rows={3}
+                            onChange={onChangeCanCelText}
+                            placeholder="รายละเอียดการยกเลิก"
+                            autoComplete="off"
+                            defaultValue={
+                              data.statusRemark != null
+                                ? data.statusRemark
+                                : undefined
+                            }
+                          />
+                        </Form.Item>
+                      </div>
+                    ) : null}
+                  </Radio>
+                ))}
+              </Space>
+            </Radio.Group>
+          </div>
         </div>
       </div>
     </Form>
@@ -515,10 +775,10 @@ function EditInProgress() {
       showCloseButton: true,
     }).then(async (result) => {
       if (result.isConfirmed) {
-        const pushUpdateBy = Map(data).set(
-          "updateBy",
-          profile.firstname + " " + profile.lastname
-        );
+        const pushApproved = Map(data).set("statusDelay", updateExtend);
+        const pushUpdateBy = Map(
+          pushApproved.toJS().statusDelay || pushApproved.toJS()
+        ).set("updateBy", profile.firstname + " " + profile.lastname);
         await TaskInprogressDatasource.UpdateTask(pushUpdateBy.toJS()).then(
           (time) => {
             window.location.href = "/IndexTodayTask";

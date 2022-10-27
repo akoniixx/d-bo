@@ -312,7 +312,7 @@ const AddNewTask = () => {
       fetchLocationPrice(
         farmerPlotSeleced?.plotArea.provinceId,
         farmerPlotSeleced?.plantName,
-        farmerPlotSeleced?.raiAmount,
+        createNewTask.farmAreaAmount,
         farmerPlotSeleced?.id
       );
     }
@@ -596,7 +596,7 @@ const AddNewTask = () => {
                         <Input
                           suffix="บาท/ไร่"
                           id="unitPrice"
-                          value={createNewTask.unitPrice.toFixed(2)}
+                          value={createNewTask.unitPrice}
                           onChange={handleCalServiceCharge}
                           disabled={current == 2 || checkSelectPlot == "error"}
                           autoComplete="off"
@@ -610,7 +610,7 @@ const AddNewTask = () => {
                       <Form.Item>
                         <Input
                           suffix="บาท"
-                          value={createNewTask.price.toFixed(2)}
+                          value={createNewTask.price}
                           onChange={handleCalServiceCharge}
                           disabled={current == 2 || checkSelectPlot == "error"}
                           autoComplete="off"
