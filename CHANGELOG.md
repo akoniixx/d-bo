@@ -1,7 +1,9 @@
 ## [Version - 0]
-## Fix [v0.20.1] 2022-10-27
-- fixed defect 
-- fixed defect change amoung rai in method auto price in new task
+## Fix [v0.20.2] 2022-10-27
+- fixed defect Fetch Image 
+- fixed defect Edit dronerDrone
+- increase sorter for droner & farmer  (Updated Field)
+- fixed Farmer  cant submit 
 ## Fix [v0.20.1] 2022-10-27
 - fixed defect change method price in new task
 - fixed defect change amoung rai in method auto price in new task
