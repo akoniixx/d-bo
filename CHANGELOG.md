@@ -1,4 +1,7 @@
 ## [Version - 0]
+## Fix [v0.20.3] 2022-10-27
+- fixed defect add farmPlot not save
+- fixed defect Edit DronerDrone bug api add & delete
 ## Fix [v0.20.2] 2022-10-27
 - fixed defect Fetch Image 
 - fixed defect Edit dronerDrone

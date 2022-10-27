@@ -84,6 +84,7 @@ function EditDroner() {
   const [form] = Form.useForm();
   const dronerId = queryString[1];
   const status = Form.useWatch("status", form);
+  const [showWarning, setShowWarning] = useState(false);
   const [profile] = useLocalStorage("profile", []);
   const [data, setData] = useState<DronerEntity>(DronerEntity_INIT);
   const [address, setAddress] = useState<AddressEntity>(
@@ -232,6 +233,19 @@ function EditDroner() {
       setLocation(res);
     });
   }, []);
+  const fetchDronerOnlyDrone = useCallback(async () => {
+    await DronerDatasource.getDronerByID(dronerId).then(
+      async (res) => {
+        if (res.dronerDrone !== undefined) {
+          let k = 0;
+          for (k; res.dronerDrone.length > k; k++) {
+            res.dronerDrone[k].modalDroneIndex = k + 1;
+          }
+          setDronerDroneList(res.dronerDrone);
+        }
+      }
+    );
+  }, [dronerId]);
   useEffect(() => {
     fetchDronerById();
     fetchLocation(searchLocation);
@@ -429,26 +443,33 @@ function EditDroner() {
       );
     }
     // fetchDronerById();
+    fetchDronerOnlyDrone();
+
     setShowAddModal(false);
     setShowEditModal(false);
-    setDronerDroneList((prev) => {
-      const isEdit = prev.findIndex((x) => x.id === drone.id);
-      if (isEdit !== -1) {
-        return [
-          ...prev.slice(0, isEdit),
-          drone,
-          ...prev.slice(isEdit + 1),
-        ];
-      } else {
-        return [...prev, drone];
-      }
-    });
     setEditIndex(0);
   };
   const removeDrone = async (id?: string) => {
     try {
-      await DronerDroneDatasource.removeDronerDrone(id);
-      setDronerDroneList((prev) => prev.filter((x) => x.id !== id));
+      Swal.fire({
+        title: "ยืนยันการลบ",
+        text: "โปรดตรวจสอบรายการโดรนที่คุณต้องการลบ เพราะอาจจะส่งผลต่อการจ้างงานในแอปพลิเคชัน",
+        cancelButtonText: "ย้อนกลับ",
+        confirmButtonText: "ลบ",
+        confirmButtonColor: "#d33",
+        showCancelButton: true,
+        showCloseButton: true,
+      }).then(async (result) => {
+        if (result.isConfirmed) {
+          await DronerDroneDatasource.removeDronerDrone(id).then(
+            () => {
+              setDronerDroneList((prev) =>
+                prev.filter((x) => x.id !== id)
+              );
+            }
+          );
+        }
+      });
     } catch (e) {
       console.log(e);
     }
@@ -1445,45 +1466,47 @@ function EditDroner() {
         <Form>
           {dronerDroneList.length !== 0 ? (
             <div className="container">
-              {dronerDroneList.map((item, index) => (
-                <div className="row pt-3 pb-3">
-                  <div className="col-lg-1">
-                    <Avatar
-                      size={25}
-                      src={item.drone?.droneBrand.logoImagePath}
-                      style={{ marginRight: "5px" }}
-                    />
-                  </div>
-                  <div className="col-lg-5">
-                    <h6>{item.drone?.droneBrand.name}</h6>
-                    <p style={{ color: "#ccc" }}>{item.serialNo}</p>
-                  </div>
-                  <div className="col-lg-4">
-                    <span
-                      style={{ color: STATUS_COLOR[item.status] }}>
-                      <Badge color={STATUS_COLOR[item.status]} />
-                      {DRONER_DRONE_MAPPING[item.status]}
-                      <br />
-                    </span>
-                  </div>
-                  <div className="col-lg-2 d-flex justify-content-between">
-                    <div className="col-lg-6">
-                      <ActionButton
-                        icon={<EditOutlined />}
-                        color={color.primary1}
-                        onClick={() => editDroner(item, index + 1)}
+              {dronerDroneList.map((item, index) => {
+                return (
+                  <div className="row pt-3 pb-3">
+                    <div className="col-lg-1">
+                      <Avatar
+                        size={25}
+                        src={item.drone?.droneBrand.logoImagePath}
+                        style={{ marginRight: "5px" }}
                       />
                     </div>
-                    <div className="col-lg-6">
-                      <ActionButton
-                        icon={<DeleteOutlined />}
-                        color={color.Error}
-                        onClick={() => removeDrone(item.id)}
-                      />
+                    <div className="col-lg-5">
+                      <h6>{item.drone?.droneBrand.name}</h6>
+                      <p style={{ color: "#ccc" }}>{item.serialNo}</p>
+                    </div>
+                    <div className="col-lg-4">
+                      <span
+                        style={{ color: STATUS_COLOR[item.status] }}>
+                        <Badge color={STATUS_COLOR[item.status]} />
+                        {DRONER_DRONE_MAPPING[item.status]}
+                        <br />
+                      </span>
+                    </div>
+                    <div className="col-lg-2 d-flex justify-content-between">
+                      <div className="col-lg-6">
+                        <ActionButton
+                          icon={<EditOutlined />}
+                          color={color.primary1}
+                          onClick={() => editDroner(item, index + 1)}
+                        />
+                      </div>
+                      <div className="col-lg-6">
+                        <ActionButton
+                          icon={<DeleteOutlined />}
+                          color={color.Error}
+                          onClick={() => removeDrone(item.id)}
+                        />
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           ) : (
             <div
