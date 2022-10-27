@@ -374,6 +374,12 @@ function EditWaitStart() {
         </div>
 
         <div className="col-lg-6">
+          <div className="form-group col-lg-6">
+            <label>ค่าบริการ</label>
+            <p>
+              {data?.totalPrice} บาท (จำนวน {data?.farmAreaAmount} ไร่)
+            </p>
+          </div>
           <label style={{ marginBottom: "10px" }}>
             สถานะ <span style={{ color: "red" }}>*</span>
           </label>
@@ -388,7 +394,8 @@ function EditWaitStart() {
                   <Space direction="vertical">
                     {TASKTODAY_STATUS.map((item: any, index: any) => (
                       <Radio value={item.value}>
-                        {item.name}
+                        <b> {item.name}</b>
+
                         {data.status == "WAIT_START" && index == 0 ? (
                           <div
                             style={{ marginLeft: "20px" }}

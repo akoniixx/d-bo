@@ -71,19 +71,22 @@ export const TASKTODAY_STATUS: any = [
   {key: "2", value: "CANCELED", name: "ยกเลิก" },
 ];
 export const TASKTODAY_STATUS1: any = [
-
   { value: "IN_PROGRESS", name: "กำลังดำเนินงาน" },
   { value: "CANCELED", name: "ยกเลิก" },
+];
+export const APPROVED: any = [
+  { value: "APPROVED", name: "อนุมัติ" },
+  { value: "REJECTED", name: "ไม่อนุมัติ" },
 ];
 export const REDIO_WAIT_START = [
   { key: 0, name: "ปกติ", isChecked: false },
   { key: 1, name: "งานมีปัญหา", isChecked: false },
 ];
 export const REDIO_IN_PROGRESS = [
-  { key: 0, name: "ปกติ", isChecked: false },
-  { key: 1, name: "รออนุมัติการขยายเวลา", isChecked: false },
-  { key: 2, name: "อนุมัติขยายเวลา", isChecked: false },
-  { key: 3, name: "งานมีปัญหา", isChecked: false },
+  { value: "EXTENDED", name: "ปกติ" },
+  { value: "WAIT_APPROVE", name: "รออนุมัติขยายเวลา" },
+  { value: "APPROVED", name: "อนุมัติขยายเวลา",  },
+  { value: "REJECTED", name: "งานมีปัญหา" },
 ];
 
 export const STATUS_COLOR_TASK_TODAY: any = {
