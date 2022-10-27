@@ -587,7 +587,7 @@ function EditDroner() {
         mapUrl: values.mapUrl ? values.mapUrl : undefined,
       },
     };
-
+    delete payload.dronerDrone;
     if (values.status === "ACTIVE") {
       payload.isDelete = false;
       payload.isOpenReceiveTask = true;

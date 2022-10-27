@@ -5,7 +5,12 @@ import { Option } from "antd/lib/mentions";
 import color from "../../resource/color";
 import Layouts from "../../components/layout/Layout";
 import ActionButton from "../../components/button/ActionButton";
-import { EditOutlined, UserOutlined } from "@ant-design/icons";
+import {
+  CaretDownOutlined,
+  CaretUpOutlined,
+  EditOutlined,
+  UserOutlined,
+} from "@ant-design/icons";
 import AddButtton from "../../components/button/AddButton";
 import { CardContainer } from "../../components/card/CardContainer";
 import { FarmerPageEntity } from "../../entities/FarmerEntities";
@@ -36,7 +41,9 @@ function IndexFarmer() {
   const [district, setDistrict] = useState<DistrictEntity[]>();
   const [subdistrict, setSubdistrict] =
     useState<SubdistrictEntity[]>();
-
+  const [sortStatus, setSortStatus] = useState<string | undefined>(
+    undefined
+  );
   const fecthAdmin = async () => {
     await FarmerDatasource.getFarmerList(
       current,
@@ -50,6 +57,34 @@ function IndexFarmer() {
       setData(res);
     });
   };
+  useEffect(() => {
+    const fetchWithSort = async ({
+      sortDirection,
+      sortField,
+    }: {
+      sortDirection?: string;
+      sortField?: string;
+    }) => {
+      await FarmerDatasource.getFarmerList(
+        current,
+        row,
+        searchStatus,
+        searchText,
+        searchProvince,
+        searchDistrict,
+        searchSubdistrict,
+        sortDirection,
+        sortField
+      ).then((res: FarmerPageEntity) => {
+        setData(res);
+      });
+    };
+    fetchWithSort({
+      sortDirection: sortStatus,
+      sortField: "updatedAt",
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sortStatus]);
   const fecthProvince = async () => {
     await LocationDatasource.getProvince().then((res) => {
       setProvince(res);
@@ -113,7 +148,6 @@ function IndexFarmer() {
     setSearchSubdstrict(subdistrictId);
     setCurrent(1);
   };
-
   const pageTitle = (
     <>
       <div
@@ -235,7 +269,47 @@ function IndexFarmer() {
 
   const columns = [
     {
-      title: "อัพเดทล่าสุด",
+      title: () => {
+        return (
+          <div
+            style={{ display: "flex", gap: 8, alignItems: "center" }}>
+            อัพเดทล่าสุด
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                cursor: "pointer",
+              }}
+              onClick={() => {
+                setSortStatus((prev) => {
+                  if (prev === "ASC") {
+                    return "DESC";
+                  } else if (prev === undefined) {
+                    return "ASC";
+                  } else {
+                    return undefined;
+                  }
+                });
+              }}>
+              <CaretUpOutlined
+                style={{
+                  position: "relative",
+                  top: 2,
+                  color: sortStatus === "ASC" ? "#ffca37" : "white",
+                }}
+              />
+              <CaretDownOutlined
+                style={{
+                  position: "relative",
+                  bottom: 2,
+                  color: sortStatus === "DESC" ? "#ffca37" : "white",
+                }}
+              />
+            </div>
+          </div>
+        );
+      },
+
       key: "updatedAt",
       render: (value: { updatedAt: string; updateBy?: string }) => {
         return {
