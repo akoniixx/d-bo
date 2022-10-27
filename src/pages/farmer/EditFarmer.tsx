@@ -121,33 +121,40 @@ const EditFarmer = () => {
       setAddress(res.address);
       setFarmerPlotList(res.farmerPlot);
       let getPathPro = res.file.filter(
-        (x) => x.category == "PROFILE_IMAGE"
+        (x) => x.category === "PROFILE_IMAGE"
       );
       let getPathCard = res.file.filter(
-        (x) => x.category == "ID_CARD_IMAGE"
+        (x) => x.category === "ID_CARD_IMAGE"
       );
-      let imgList: (string | boolean)[] = [];
+      let imgList: {
+        path: string;
+        category: string;
+      }[] = [];
       if (getPathPro.length > 0) {
-        imgList.push(getPathPro[0].path);
+        imgList.push(getPathPro[0]);
       }
       if (getPathCard.length > 0) {
-        imgList.push(getPathCard[0].path);
+        imgList.push(getPathCard[0]);
       }
 
       let i = 0;
       for (i; imgList.length > i; i++) {
         i === 0 &&
-          UploadImageDatasouce.getImage(imgList[i].toString()).then(
-            (resImg) => {
-              resImg?.url && setImgProfile(resImg.url);
+          UploadImageDatasouce.getImage(
+            imgList[i].path.toString()
+          ).then((resImg) => {
+            if (resImg.url) {
+              imgList[0].category === "PROFILE_IMAGE"
+                ? setImgProfile(resImg.url)
+                : setImgIdCard(resImg.url);
             }
-          );
+          });
         i === 1 &&
-          UploadImageDatasouce.getImage(imgList[i].toString()).then(
-            (resImg) => {
-              resImg?.url && setImgIdCard(resImg.url);
-            }
-          );
+          UploadImageDatasouce.getImage(
+            imgList[i].path.toString()
+          ).then((resImg) => {
+            resImg?.url && setImgIdCard(resImg.url);
+          });
       }
     });
   };

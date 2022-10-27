@@ -14,7 +14,9 @@ export class DronerDatasource {
     provinceId?: number,
     droneBrandId?: string,
     status?: string,
-    search?: string
+    search?: string,
+    sortField?: string,
+    sortDirection?: string
   ): Promise<DronerListEntity> {
     const params = {
       page: page,
@@ -25,6 +27,8 @@ export class DronerDatasource {
       droneBrandId: droneBrandId,
       status: status,
       search: search,
+      sortField,
+      sortDirection,
     };
 
     return httpClient

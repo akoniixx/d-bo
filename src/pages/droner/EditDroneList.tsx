@@ -61,7 +61,8 @@ function EditDroneList() {
   const [seriesDrone, setSeriesDrone] = useState<DroneEntity[]>();
   const [searchSeriesDrone, setSearchSeriesDrone] =
     useState<DroneEntity[]>();
-  const [saveBtnDisable, setBtnSaveDisable] = useState<boolean>(true);
+  const [saveBtnDisable, setBtnSaveDisable] =
+    useState<boolean>(false);
   const [imgProfile, setImgProfile] = useState<any>();
   const [createLicenseDroner, setCreateLicenseDroner] =
     useState<ImageEntity>(ImageEntity_INTI);
