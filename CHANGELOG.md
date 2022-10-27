@@ -1,4 +1,7 @@
 ## [Version - 0]
+## Fix [v0.20.1] 2022-10-27
+- fixed defect change method price in new task
+- fixed defect change amoung rai in method auto price in new task
 ## Feature [v0.20.0] 2022-10-27
 - added info totalPrice & farmAreaAmount in detail task today
 - added status extend time in index today task menu
