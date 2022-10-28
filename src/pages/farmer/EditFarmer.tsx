@@ -61,6 +61,7 @@ import "../farmer/Style.css";
 import img_empty from "../../resource/media/empties/uploadImg.png";
 import bth_img_empty from "../../resource/media/empties/upload_Img_btn.png";
 import moment from "moment";
+import { useLocalStorage } from "../../hook/useLocalStorage";
 const { Option } = Select;
 
 const dateFormat = "DD/MM/YYYY";
@@ -72,6 +73,8 @@ const { Map } = require("immutable");
 let queryString = _.split(window.location.pathname, "=");
 
 const EditFarmer = () => {
+  const [profile] = useLocalStorage("profile", []);
+
   const farmerId = queryString[1];
   const [data, setData] = useState<GetFarmerEntity>(
     GetFarmerEntity_INIT
@@ -118,33 +121,40 @@ const EditFarmer = () => {
       setAddress(res.address);
       setFarmerPlotList(res.farmerPlot);
       let getPathPro = res.file.filter(
-        (x) => x.category == "PROFILE_IMAGE"
+        (x) => x.category === "PROFILE_IMAGE"
       );
       let getPathCard = res.file.filter(
-        (x) => x.category == "ID_CARD_IMAGE"
+        (x) => x.category === "ID_CARD_IMAGE"
       );
-      let imgList: (string | boolean)[] = [];
+      let imgList: {
+        path: string;
+        category: string;
+      }[] = [];
       if (getPathPro.length > 0) {
-        imgList.push(getPathPro[0].path);
+        imgList.push(getPathPro[0]);
       }
       if (getPathCard.length > 0) {
-        imgList.push(getPathCard[0].path);
+        imgList.push(getPathCard[0]);
       }
 
       let i = 0;
       for (i; imgList.length > i; i++) {
         i === 0 &&
-          UploadImageDatasouce.getImage(imgList[i].toString()).then(
-            (resImg) => {
-              resImg?.url && setImgProfile(resImg.url);
+          UploadImageDatasouce.getImage(
+            imgList[i].path.toString()
+          ).then((resImg) => {
+            if (resImg.url) {
+              imgList[0].category === "PROFILE_IMAGE"
+                ? setImgProfile(resImg.url)
+                : setImgIdCard(resImg.url);
             }
-          );
+          });
         i === 1 &&
-          UploadImageDatasouce.getImage(imgList[i].toString()).then(
-            (resImg) => {
-              resImg?.url && setImgIdCard(resImg.url);
-            }
-          );
+          UploadImageDatasouce.getImage(
+            imgList[i].path.toString()
+          ).then((resImg) => {
+            resImg?.url && setImgIdCard(resImg.url);
+          });
       }
     });
   };
@@ -158,14 +168,20 @@ const EditFarmer = () => {
     LocationDatasource.getProvince().then((res) => {
       setProvince(res);
     });
-    LocationDatasource.getDistrict(address.provinceId).then((res) => {
-      setDistrict(res);
-    });
-    LocationDatasource.getSubdistrict(address.districtId).then(
-      (res) => {
-        setSubdistrict(res);
-      }
-    );
+    if (address.provinceId) {
+      LocationDatasource.getDistrict(address.provinceId).then(
+        (res) => {
+          setDistrict(res);
+        }
+      );
+    }
+    if (address.districtId) {
+      LocationDatasource.getSubdistrict(address.districtId).then(
+        (res) => {
+          setSubdistrict(res);
+        }
+      );
+    }
   }, [address.provinceId, address.districtId]);
 
   //#region function farmer
@@ -427,12 +443,12 @@ const EditFarmer = () => {
       setBtnSaveDisable(false);
     }
   };
-
   const updateFarmer = async () => {
     const pushAddr = Map(data).set("address", address);
     const pushPin = Map(pushAddr.toJS()).set("pin", "");
     const payload = {
       ...pushPin.toJS(),
+      updateBy: `${profile.firstname} ${profile.lastname}`,
     };
     delete payload.farmerPlot;
     await FarmerDatasource.updateFarmer(payload).then((res) => {
@@ -512,6 +528,28 @@ const EditFarmer = () => {
                     </Tag>
                   </>
                 )}
+              </div>
+            </div>
+          </div>
+          <div className="row">
+            <div className="form-group col-lg-6">
+              <label>วันที่ลงทะเบียน</label>
+
+              <div style={{ marginBottom: 24 }}>
+                <Input
+                  style={{
+                    padding: "4px 12px",
+                  }}
+                  disabled
+                  value={`${moment(data.createdAt).format(
+                    "DD/MM/YYYY"
+                  )} ${
+                    data.createBy === null ||
+                    data.createBy === undefined
+                      ? "ลงทะเบียนโดยเกษตรกร"
+                      : `(${data.createBy})`
+                  }`}
+                />
               </div>
             </div>
           </div>
@@ -850,6 +888,22 @@ const EditFarmer = () => {
               </div>
             </div>
           )}
+          <div
+            className="form-group col-lg-12"
+            style={{ marginTop: 16 }}>
+            <label>หมายเหตุ</label>
+            <Form.Item>
+              <TextArea
+                value={data.comment}
+                onChange={(e) => {
+                  setData((prev) => ({
+                    ...prev,
+                    comment: e.target.value,
+                  }));
+                }}
+              />
+            </Form.Item>
+          </div>
         </Form>
       </CardContainer>
     </div>

@@ -1,4 +1,28 @@
 ## [Version - 0]
+## Fix [v0.20.3] 2022-10-27
+- fixed defect add farmPlot not save
+- fixed defect Edit DronerDrone bug api add & delete
+## Fix [v0.20.2] 2022-10-27
+- fixed defect Fetch Image 
+- fixed defect Edit dronerDrone
+- increase sorter for droner & farmer  (Updated Field)
+- fixed Farmer  cant submit 
+## Fix [v0.20.1] 2022-10-27
+- fixed defect change method price in new task
+- fixed defect change amoung rai in method auto price in new task
+## Feature [v0.20.0] 2022-10-27
+- added info totalPrice & farmAreaAmount in detail task today
+- added status extend time in index today task menu
+- added extend time in edit today task menu
+## Feature [v0.19.0] 2022-10-26
+- added handle auto cost in new task
+## Fix [v0.18.1] 2022-10-21
+- increase createBy 
+- fix edit dronerDrone is refresh value before submit
+## Feature [v0.18.0] 2022-10-19
+- increase field comment droner farmer dronerDrone
+- increase field table updateAt & updateBy  editDroner editFarmer 
+- increase ui createBy  Droner Farmer
 ## Fix [v0.17.15] 2022-10-19
 - fixed edit farmer dont send field famerPlot
 - fixed api get farmer & droner error 500

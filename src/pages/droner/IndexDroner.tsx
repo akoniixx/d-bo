@@ -3,8 +3,13 @@ import React, { useEffect, useState } from "react";
 import Search from "antd/lib/input/Search";
 import { Option } from "antd/lib/mentions";
 import color from "../../resource/color";
+import {
+  CaretDownOutlined,
+  CaretUpOutlined,
+  EditOutlined,
+  UserOutlined,
+} from "@ant-design/icons";
 import ActionButton from "../../components/button/ActionButton";
-import { EditOutlined } from "@ant-design/icons";
 import { DronerListEntity } from "../../entities/DronerEntities";
 import { DronerDatasource } from "../../datasource/DronerDatasource";
 import {
@@ -37,6 +42,9 @@ function IndexDroner() {
   const [district, setDistrict] = useState<DistrictEntity[]>([]);
   const [subdistrict, setSubdistrict] = useState<SubdistrictEntity[]>(
     []
+  );
+  const [sortStatus, setSortStatus] = useState<string | undefined>(
+    undefined
   );
   const [droneBrandId, setDroneBrandId] = useState<any>();
 
@@ -74,6 +82,35 @@ function IndexDroner() {
       setData(res);
     });
   };
+  useEffect(() => {
+    const fetchWithSort = async ({
+      sortDirection,
+      sortField,
+    }: {
+      sortField?: string;
+      sortDirection?: string;
+    }) => {
+      await DronerDatasource.getDronerList(
+        current,
+        row,
+        searchSubdistrict,
+        searchDistrict,
+        searchProvince,
+        searchDroneBrand,
+        searchStatus,
+        searchText,
+        sortField,
+        sortDirection
+      ).then((res: DronerListEntity) => {
+        setData(res);
+      });
+    };
+    fetchWithSort({
+      sortField: "updatedAt",
+      sortDirection: sortStatus,
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sortStatus]);
   const fetchProvince = async () => {
     await LocationDatasource.getProvince().then((res) => {
       setProvince(res);
@@ -125,7 +162,6 @@ function IndexDroner() {
     setSearchStatus(status);
     setCurrent(1);
   };
-
   const PageTitle = (
     <>
       <div
@@ -264,12 +300,78 @@ function IndexDroner() {
       </div>
     </>
   );
+
   const columns = [
+    {
+      title: () => {
+        return (
+          <div
+            style={{ display: "flex", gap: 8, alignItems: "center" }}>
+            อัพเดทล่าสุด
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                cursor: "pointer",
+              }}
+              onClick={() => {
+                setSortStatus((prev) => {
+                  if (prev === "ASC") {
+                    return "DESC";
+                  } else if (prev === undefined) {
+                    return "ASC";
+                  } else {
+                    return undefined;
+                  }
+                });
+              }}>
+              <CaretUpOutlined
+                style={{
+                  position: "relative",
+                  top: 2,
+                  color: sortStatus === "ASC" ? "#ffca37" : "white",
+                }}
+              />
+              <CaretDownOutlined
+                style={{
+                  position: "relative",
+                  bottom: 2,
+                  color: sortStatus === "DESC" ? "#ffca37" : "white",
+                }}
+              />
+            </div>
+          </div>
+        );
+      },
+      key: "updatedAt",
+
+      render: (value: { updatedAt: string; updateBy?: string }) => {
+        return {
+          children: (
+            <div className="container">
+              <span className="text-dark-75  d-block font-size-lg">
+                {moment(value.updatedAt).format("DD/MM/YYYY HH:mm")}
+              </span>
+              {value.updateBy && (
+                <div>
+                  <span
+                    className=" d-block font-size-lg"
+                    style={{ color: color.Grey }}>
+                    <UserOutlined style={{ padding: "0 4px 0 0" }} />
+
+                    {value?.updateBy}
+                  </span>
+                </div>
+              )}
+            </div>
+          ),
+        };
+      },
+    },
     {
       title: "ชื่อนักบินโดรน",
       dataIndex: "firstname",
       key: "firstname",
-      width: "12%",
       render: (value: any, row: any, index: number) => {
         return {
           children: (
@@ -287,7 +389,6 @@ function IndexDroner() {
       title: "ตำบล",
       dataIndex: "subdistrict",
       key: "subdistrict",
-      width: "10%",
       render: (value: any, row: any, index: number) => {
         const subdistrict = row.address.subdistrict;
         return {
@@ -305,7 +406,6 @@ function IndexDroner() {
       title: "อำเภอ",
       dataIndex: "district",
       key: "district",
-      width: "10%",
       render: (value: any, row: any, index: number) => {
         const district = row.address.district;
         return {
@@ -325,7 +425,6 @@ function IndexDroner() {
       title: "จังหวัด",
       dataIndex: "province",
       key: "province",
-      width: "10%",
       render: (value: any, row: any, index: number) => {
         const province = row.address.province;
         return {
@@ -345,13 +444,11 @@ function IndexDroner() {
       title: "เบอร์โทร",
       dataIndex: "telephoneNo",
       key: "telephoneNo",
-      width: "10%",
     },
     {
       title: "จำนวนโดรน",
       dataIndex: "totalDroneCount",
       key: "totalDroneCount",
-      width: "8%",
       render: (value: any, row: any, index: number) => {
         return {
           children: (
@@ -368,7 +465,6 @@ function IndexDroner() {
       title: "ยี่ห้อ",
       dataIndex: "brand",
       key: "brand",
-      width: "10%",
       render: (value: any, row: any, index: number) => {
         const droneLatest = row.dronerDrone[0];
         return {
@@ -405,11 +501,11 @@ function IndexDroner() {
         };
       },
     },
+
     {
       title: "สถานะ",
       dataIndex: "status",
       key: "status",
-      width: "10%",
       render: (value: any, row: any, index: number) => {
         const countDay = () => {
           let dateToday: any = moment(Date.now());
@@ -439,7 +535,6 @@ function IndexDroner() {
       title: "",
       dataIndex: "Action",
       key: "Action",
-      width: "7%",
       render: (value: any, row: any, index: number) => {
         return {
           children: (
@@ -466,7 +561,7 @@ function IndexDroner() {
         columns={columns}
         dataSource={data?.data}
         pagination={false}
-        scroll={{ x: 1300 }}
+        scroll={{ x: "max-content" }}
         rowClassName={(a) =>
           a.status == "PENDING" &&
           moment(Date.now()).diff(

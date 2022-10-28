@@ -71,6 +71,7 @@ import { LAT_LNG_BANGKOK } from "../../definitions/Location";
 
 import moment from "moment";
 import locale from "antd/es/date-picker/locale/th_TH";
+import { useLocalStorage } from "../../hook/useLocalStorage";
 
 const dateFormat = "DD/MM/YYYY";
 const dateCreateFormat = "YYYY-MM-DD";
@@ -83,7 +84,8 @@ function EditDroner() {
   const [form] = Form.useForm();
   const dronerId = queryString[1];
   const status = Form.useWatch("status", form);
-
+  const [showWarning, setShowWarning] = useState(false);
+  const [profile] = useLocalStorage("profile", []);
   const [data, setData] = useState<DronerEntity>(DronerEntity_INIT);
   const [address, setAddress] = useState<AddressEntity>(
     AddressEntity_INIT
@@ -147,6 +149,7 @@ function EditDroner() {
         if (res) {
           form.setFieldsValue({
             ...res,
+            comment: res.comment || "",
             postcode: res.address.postcode || undefined,
             province: res.address.provinceId || undefined,
             district: res.address.districtId || undefined,
@@ -230,6 +233,19 @@ function EditDroner() {
       setLocation(res);
     });
   }, []);
+  const fetchDronerOnlyDrone = useCallback(async () => {
+    await DronerDatasource.getDronerByID(dronerId).then(
+      async (res) => {
+        if (res.dronerDrone !== undefined) {
+          let k = 0;
+          for (k; res.dronerDrone.length > k; k++) {
+            res.dronerDrone[k].modalDroneIndex = k + 1;
+          }
+          setDronerDroneList(res.dronerDrone);
+        }
+      }
+    );
+  }, [dronerId]);
   useEffect(() => {
     fetchDronerById();
     fetchLocation(searchLocation);
@@ -426,16 +442,34 @@ function EditDroner() {
         }
       );
     }
-    fetchDronerById();
+    // fetchDronerById();
+    fetchDronerOnlyDrone();
+
     setShowAddModal(false);
     setShowEditModal(false);
     setEditIndex(0);
-    setDronerDroneList(dronerDroneList);
   };
   const removeDrone = async (id?: string) => {
     try {
-      await DronerDroneDatasource.removeDronerDrone(id);
-      fetchDronerById();
+      Swal.fire({
+        title: "ยืนยันการลบ",
+        text: "โปรดตรวจสอบรายการโดรนที่คุณต้องการลบ เพราะอาจจะส่งผลต่อการจ้างงานในแอปพลิเคชัน",
+        cancelButtonText: "ย้อนกลับ",
+        confirmButtonText: "ลบ",
+        confirmButtonColor: "#d33",
+        showCancelButton: true,
+        showCloseButton: true,
+      }).then(async (result) => {
+        if (result.isConfirmed) {
+          await DronerDroneDatasource.removeDronerDrone(id).then(
+            () => {
+              setDronerDroneList((prev) =>
+                prev.filter((x) => x.id !== id)
+              );
+            }
+          );
+        }
+      });
     } catch (e) {
       console.log(e);
     }
@@ -567,12 +601,18 @@ function EditDroner() {
         address2: values.address2,
       },
       reason,
+      updateBy: `${profile?.firstname} ${profile?.lastname}`,
       expPlant,
       dronerArea: {
         ...dronerArea,
         mapUrl: values.mapUrl ? values.mapUrl : undefined,
       },
     };
+    delete payload.dronerDrone;
+    if (values.status === "ACTIVE") {
+      payload.isDelete = false;
+      payload.isOpenReceiveTask = true;
+    }
     await DronerDatasource.updateDroner(payload).then((res) => {
       if (res !== undefined) {
         var i = 0;
@@ -619,6 +659,7 @@ function EditDroner() {
       checkPlantsOther,
       reason,
       idNo,
+      comment,
       status: currentStatus,
       ...rest
     } = form.getFieldsValue();
@@ -639,6 +680,7 @@ function EditDroner() {
 
     const isHasValues = Object.values({
       ...rest,
+
       expPlant: expPlant.length > 0,
       reasonList:
         reasonList.length > 0 ||
@@ -714,6 +756,26 @@ function EditDroner() {
               <Form.Item name="dronerCode">
                 <Input disabled defaultValue={data.dronerCode} />
               </Form.Item>
+            </div>
+            <div className="form-group col-lg-6">
+              <label>วันที่ลงทะเบียน</label>
+
+              <div style={{ marginBottom: 24 }}>
+                <Input
+                  style={{
+                    padding: "4px 12px",
+                  }}
+                  disabled
+                  value={`${moment(data.createdAt).format(
+                    "DD/MM/YYYY"
+                  )} ${
+                    data.createBy === null ||
+                    data.createBy === undefined
+                      ? "(ลงทะเบียนโดยนักบิน)"
+                      : `(${data.createBy})`
+                  }`}
+                />
+              </div>
             </div>
           </div>
           <div className="row">
@@ -1236,6 +1298,7 @@ function EditDroner() {
               />
             </Form.Item>
           </div>
+
           <div className="row">
             <div className="form-group col-lg-12">
               <label
@@ -1364,6 +1427,12 @@ function EditDroner() {
               </Form.Item>
             </div>
           </div>
+          <div className="form-group col-lg-12">
+            <label>หมายเหตุ</label>
+            <Form.Item name="comment">
+              <TextArea />
+            </Form.Item>
+          </div>
         </Form>
       </CardContainer>
     </div>
@@ -1397,45 +1466,47 @@ function EditDroner() {
         <Form>
           {dronerDroneList.length !== 0 ? (
             <div className="container">
-              {dronerDroneList.map((item, index) => (
-                <div className="row pt-3 pb-3">
-                  <div className="col-lg-1">
-                    <Avatar
-                      size={25}
-                      src={item.drone?.droneBrand.logoImagePath}
-                      style={{ marginRight: "5px" }}
-                    />
-                  </div>
-                  <div className="col-lg-5">
-                    <h6>{item.drone?.droneBrand.name}</h6>
-                    <p style={{ color: "#ccc" }}>{item.serialNo}</p>
-                  </div>
-                  <div className="col-lg-4">
-                    <span
-                      style={{ color: STATUS_COLOR[item.status] }}>
-                      <Badge color={STATUS_COLOR[item.status]} />
-                      {DRONER_DRONE_MAPPING[item.status]}
-                      <br />
-                    </span>
-                  </div>
-                  <div className="col-lg-2 d-flex justify-content-between">
-                    <div className="col-lg-6">
-                      <ActionButton
-                        icon={<EditOutlined />}
-                        color={color.primary1}
-                        onClick={() => editDroner(item, index + 1)}
+              {dronerDroneList.map((item, index) => {
+                return (
+                  <div className="row pt-3 pb-3">
+                    <div className="col-lg-1">
+                      <Avatar
+                        size={25}
+                        src={item.drone?.droneBrand.logoImagePath}
+                        style={{ marginRight: "5px" }}
                       />
                     </div>
-                    <div className="col-lg-6">
-                      <ActionButton
-                        icon={<DeleteOutlined />}
-                        color={color.Error}
-                        onClick={() => removeDrone(item.id)}
-                      />
+                    <div className="col-lg-5">
+                      <h6>{item.drone?.droneBrand.name}</h6>
+                      <p style={{ color: "#ccc" }}>{item.serialNo}</p>
+                    </div>
+                    <div className="col-lg-4">
+                      <span
+                        style={{ color: STATUS_COLOR[item.status] }}>
+                        <Badge color={STATUS_COLOR[item.status]} />
+                        {DRONER_DRONE_MAPPING[item.status]}
+                        <br />
+                      </span>
+                    </div>
+                    <div className="col-lg-2 d-flex justify-content-between">
+                      <div className="col-lg-6">
+                        <ActionButton
+                          icon={<EditOutlined />}
+                          color={color.primary1}
+                          onClick={() => editDroner(item, index + 1)}
+                        />
+                      </div>
+                      <div className="col-lg-6">
+                        <ActionButton
+                          icon={<DeleteOutlined />}
+                          color={color.Error}
+                          onClick={() => removeDrone(item.id)}
+                        />
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           ) : (
             <div
@@ -1493,6 +1564,7 @@ function EditDroner() {
       )}
       {showEditModal && (
         <ModalDrone
+          isEdit
           show={showEditModal}
           backButton={() => setShowEditModal((prev) => !prev)}
           callBack={updateDrone}

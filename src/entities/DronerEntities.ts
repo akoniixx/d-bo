@@ -1,4 +1,7 @@
-import { DronerAreaEntity, DronerAreaEntity_INIT } from "./DronerAreaEntities";
+import {
+  DronerAreaEntity,
+  DronerAreaEntity_INIT,
+} from "./DronerAreaEntities";
 import { ImageEntity, ImageEntity_INTI } from "./UploadImageEntities";
 import {
   DronerDroneEntity,
@@ -35,6 +38,8 @@ export interface DronerEntity {
   updatedAt: string;
   totalDroneCount: number;
   birthDate: string;
+  comment?: string;
+  createBy?: string;
 }
 export const DronerEntity_INIT: DronerEntity = {
   id: "",

@@ -5,7 +5,6 @@ import {
   GetFarmerEntity,
 } from "../entities/FarmerEntities";
 
-
 export class FarmerDatasource {
   static getFarmerList(
     page: number,
@@ -15,7 +14,8 @@ export class FarmerDatasource {
     provinceId?: number,
     districtId?: number,
     subdistrictId?: number,
-    sortDirection?: string
+    sortDirection?: string,
+    sortField?: string
   ): Promise<FarmerPageEntity> {
     const params = {
       status: status,
@@ -26,6 +26,7 @@ export class FarmerDatasource {
       districtId: districtId,
       subdistrictId: subdistrictId,
       sortDirection: sortDirection,
+      sortField: sortField,
     };
     return httpClient
       .get(BASE_URL + "/farmer", { params })

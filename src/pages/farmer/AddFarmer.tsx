@@ -57,7 +57,7 @@ import { UploadImageDatasouce } from "../../datasource/UploadImageDatasource";
 import img_empty from "../../resource/media/empties/uploadImg.png";
 import bth_img_empty from "../../resource/media/empties/upload_Img_btn.png";
 import moment from "moment";
-import { resizeFileImg } from "../../utilities/ResizeImage";
+import { useLocalStorage } from "../../hook/useLocalStorage";
 
 const dateFormat = "DD/MM/YYYY";
 const dateCreateFormat = "YYYY-MM-DD";
@@ -68,6 +68,8 @@ const _ = require("lodash");
 const { Map } = require("immutable");
 
 const AddFarmer = () => {
+  const [profile] = useLocalStorage("profile", []);
+
   const [data, setData] = useState<CreateFarmerEntity>(
     CreateFarmerEntity_INIT
   );
@@ -356,44 +358,47 @@ const AddFarmer = () => {
 
   const insertFarmer = async () => {
     const pushAddr = Map(data).set("address", address);
-    setData(pushAddr.toJS());
-    const pushPlot = Map(pushAddr.toJS()).set(
-      "farmerPlot",
-      farmerPlotList
-    );
-    setData(pushPlot.toJS());
 
-    await FarmerDatasource.insertFarmer(pushPlot.toJS()).then(
-      async (res) => {
-        if (res != undefined) {
-          const fileList = [createImgProfile, createImgIdCard]
-            .filter((el) => {
-              return el.file !== "" && el.file !== undefined;
-            })
-            .map((el) => {
-              return UploadImageDatasouce.uploadImage(
-                Map(el).set("resourceId", res.id).toJS()
-              );
-            });
+    const payload = {
+      ...pushAddr.toJS(),
+      farmerPlot: farmerPlotList,
+      comment: data.comment,
+      createBy: `${profile?.firstname} ${profile?.lastname}`,
+    };
+    setData((prev) => ({
+      ...prev,
+      farmerPlot: farmerPlotList,
+    }));
 
-          await Promise.all(fileList);
-          Swal.fire({
-            title: "บันทึกสำเร็จ",
-            icon: "success",
-            timer: 1500,
-            showConfirmButton: false,
-          }).then((time) => {
-            window.location.href = "/IndexFarmer";
+    await FarmerDatasource.insertFarmer(payload).then(async (res) => {
+      if (res != undefined) {
+        const fileList = [createImgProfile, createImgIdCard]
+          .filter((el) => {
+            return el.file !== "" && el.file !== undefined;
+          })
+          .map((el) => {
+            return UploadImageDatasouce.uploadImage(
+              Map(el).set("resourceId", res.id).toJS()
+            );
           });
-        } else {
-          Swal.fire({
-            title: "เบอร์โทร หรือ รหัสบัตรประชาชน <br/> ซ้ำในระบบ",
-            icon: "error",
-            showConfirmButton: true,
-          });
-        }
+
+        await Promise.all(fileList);
+        Swal.fire({
+          title: "บันทึกสำเร็จ",
+          icon: "success",
+          timer: 1500,
+          showConfirmButton: false,
+        }).then((time) => {
+          window.location.href = "/IndexFarmer";
+        });
+      } else {
+        Swal.fire({
+          title: "เบอร์โทร หรือ รหัสบัตรประชาชน <br/> ซ้ำในระบบ",
+          icon: "error",
+          showConfirmButton: true,
+        });
       }
-    );
+    });
   };
 
   const renderFromData = (
@@ -752,6 +757,22 @@ const AddFarmer = () => {
                 </Space>
               </Radio.Group>
             </div>
+          </div>
+          <div
+            className="form-group col-lg-12"
+            style={{ marginTop: 16 }}>
+            <label>หมายเหตุ</label>
+            <Form.Item>
+              <TextArea
+                value={data.comment}
+                onChange={(e) => {
+                  setData((prev) => ({
+                    ...prev,
+                    comment: e.target.value,
+                  }));
+                }}
+              />
+            </Form.Item>
           </div>
         </Form>
       </CardContainer>

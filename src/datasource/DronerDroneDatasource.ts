@@ -31,7 +31,7 @@ export class DronerDroneDatasource {
         console.log(error);
       });
   }
-  static getDronerDroneById(
+  static async getDronerDroneById(
     id: string
   ): Promise<GetDronerDroneEntity> {
     return httpClient
