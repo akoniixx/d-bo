@@ -361,9 +361,7 @@ const AddFarmer = () => {
 
     const payload = {
       ...pushAddr.toJS(),
-      farmerPlot: farmerPlotList.filter(
-        (el) => el.id !== "" && el.plantName !== ""
-      ),
+      farmerPlot: farmerPlotList,
       comment: data.comment,
       createBy: `${profile?.firstname} ${profile?.lastname}`,
     };
