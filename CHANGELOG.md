@@ -1,4 +1,7 @@
 ## [Version - 0]
+## Fix [v0.20.4] 2022-11-01
+- hide initial map values 
+- enable button edit even without ID (auto generate)
 ## Fix [v0.20.3] 2022-10-27
 - fixed defect add farmPlot not save
 - fixed defect Edit DronerDrone bug api add & delete

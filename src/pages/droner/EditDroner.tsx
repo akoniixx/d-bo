@@ -84,7 +84,6 @@ function EditDroner() {
   const [form] = Form.useForm();
   const dronerId = queryString[1];
   const status = Form.useWatch("status", form);
-  const [showWarning, setShowWarning] = useState(false);
   const [profile] = useLocalStorage("profile", []);
   const [data, setData] = useState<DronerEntity>(DronerEntity_INIT);
   const [address, setAddress] = useState<AddressEntity>(
@@ -660,6 +659,7 @@ function EditDroner() {
       reason,
       idNo,
       comment,
+      dronerCode,
       status: currentStatus,
       ...rest
     } = form.getFieldsValue();

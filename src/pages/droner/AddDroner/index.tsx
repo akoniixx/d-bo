@@ -115,9 +115,9 @@ function AddDroner() {
   const [createImgIdCard, setCreateImgIdCard] =
     useState<UploadImageEntity>(UploadImageEntity_INTI);
   const [mapPosition, setMapPosition] = useState<{
-    lat: number;
-    lng: number;
-  }>(LAT_LNG_BANGKOK);
+    lat?: number;
+    lng?: number;
+  }>();
   const [location, setLocation] = useState<SubdistrictEntity[]>([]);
   const [searchLocation] = useState("");
 
@@ -244,7 +244,7 @@ function AddDroner() {
     setDronerArea(m.toJS());
     setMapPosition((prev) => ({
       lat: parseFloat(value.target.value),
-      lng: prev.lng,
+      lng: prev?.lng,
     }));
     form.setFieldsValue({
       latitude: value.target.value,
@@ -254,7 +254,7 @@ function AddDroner() {
     const m = Map(dronerArea).set("long", value.target.value);
     setDronerArea(m.toJS());
     setMapPosition((prev) => ({
-      lat: prev.lat,
+      lat: prev?.lat,
       lng: parseFloat(value.target.value),
     }));
     form.setFieldsValue({
@@ -938,10 +938,10 @@ function AddDroner() {
                     message: "กรุณากรอกละติจูด!",
                   },
                 ]}
-                key={mapPosition.lat}>
+                key={mapPosition?.lat}>
                 <Input
                   placeholder="กรอกข้อมูล Latitude"
-                  value={mapPosition.lat}
+                  value={mapPosition?.lat}
                   onBlur={handleOnChangeLat}
                   autoComplete="off"
                 />
@@ -958,10 +958,10 @@ function AddDroner() {
                     message: "กรุณากรอกลองติจูด!",
                   },
                 ]}
-                key={mapPosition.lng}>
+                key={mapPosition?.lng}>
                 <Input
                   placeholder="กรอกข้อมูล Longitude"
-                  value={mapPosition.lng}
+                  value={mapPosition?.lng}
                   onBlur={handleOnChangeLng}
                   autoComplete="off"
                 />
@@ -972,8 +972,8 @@ function AddDroner() {
             width="100%"
             height="300px"
             zoom={17}
-            lat={mapPosition.lat}
-            lng={mapPosition.lng}
+            lat={mapPosition?.lat}
+            lng={mapPosition?.lng}
           />
 
           <div className="form-group col-lg-6">
