@@ -152,14 +152,14 @@ function EditDroner() {
             postcode: res.address.postcode || undefined,
             province: res.address.provinceId || undefined,
             district: res.address.districtId || undefined,
-            subdistrict: res.address.subdistrictId || undefined,
+            subdistrict: res.address?.subdistrictId || undefined,
             birthDate: moment(res.birthDate) || undefined,
             latitude: res.dronerArea?.lat || undefined,
             longitude: res.dronerArea?.long || undefined,
             address1: res.address?.address1 || undefined,
             address2: res.address?.address2 || undefined,
             checkPlantsOther: checkPlantsOther || [],
-            dronerArea: res.dronerArea.subdistrictId,
+            dronerArea: res.dronerArea?.subdistrictId,
             mapUrl: res.dronerArea?.mapUrl || undefined,
             status: res.status,
             reason:
@@ -1129,7 +1129,7 @@ function EditDroner() {
                   showSearch
                   placeholder="ค้นหาตำบล/อำเภอ/จังหวัด"
                   onChange={handleSearchLocation}
-                  value={dronerArea.subdistrictId}
+                  value={dronerArea?.subdistrictId}
                   optionFilterProp="children"
                   filterSort={(optionA, optionB) =>
                     optionA.children

@@ -38,13 +38,20 @@ const ModalFarmerPlot: React.FC<ModalFarmerPlotProps> = ({
   const [saveBtnDisable, setBtnSaveDisable] = useState<boolean>(
     isEditModal ? false : true
   );
-  const [mapPosition, setMapPosition] = useState<{
-    lat: number;
-    lng: number;
-  }>({
-    lat: parseFloat(data.lat),
-    lng: parseFloat(data.long),
-  });
+  const [mapPosition, setMapPosition] = useState<
+    | {
+        lat?: number;
+        lng?: number;
+      }
+    | undefined
+  >(
+    isEditModal
+      ? {
+          lat: parseFloat(data.lat),
+          lng: parseFloat(data.long),
+        }
+      : undefined
+  );
   const [location, setLocation] = useState<SubdistrictEntity[]>([]);
   const [searchLocation] = useState("");
 
@@ -61,9 +68,11 @@ const ModalFarmerPlot: React.FC<ModalFarmerPlotProps> = ({
         ...data,
         plotAreaId:
           data.plotAreaId === 0 ? undefined : data.plotAreaId,
+        lat: isEditModal ? parseFloat(data.lat) : undefined,
+        long: isEditModal ? parseFloat(data.long) : undefined,
       });
     }
-  }, [searchLocation, data, form]);
+  }, [searchLocation, data, form, isEditModal]);
 
   const handleSearchLocation = async (value: any) => {
     if (value !== undefined) {
@@ -92,7 +101,7 @@ const ModalFarmerPlot: React.FC<ModalFarmerPlotProps> = ({
 
     setMapPosition((prev) => ({
       lat: parseFloat(value.target.value),
-      lng: prev.lng,
+      lng: prev?.lng,
     }));
   };
   const handleOnChangeLng = (value: any) => {
@@ -102,10 +111,11 @@ const ModalFarmerPlot: React.FC<ModalFarmerPlotProps> = ({
     }));
 
     setMapPosition((prev) => ({
-      lat: prev.lat,
+      lat: prev?.lat,
       lng: parseFloat(value.target.value),
     }));
   };
+
   const handelCallBack = async (values: FarmerPlotEntity) => {
     let locationName = "";
     let geocoder = new google.maps.Geocoder();
@@ -285,10 +295,10 @@ const ModalFarmerPlot: React.FC<ModalFarmerPlotProps> = ({
                     message: "กรุณากรอกละติจูด!",
                   },
                 ]}
-                key={mapPosition.lat}>
+                key={mapPosition?.lat}>
                 <Input
                   placeholder="กรอกข้อมูล Latitude"
-                  defaultValue={mapPosition.lat}
+                  defaultValue={mapPosition?.lat}
                   onBlur={handleOnChangeLat}
                 />
               </Form.Item>
@@ -304,10 +314,10 @@ const ModalFarmerPlot: React.FC<ModalFarmerPlotProps> = ({
                     message: "กรุณากรอกลองติจูด!",
                   },
                 ]}
-                key={mapPosition.lng}>
+                key={mapPosition?.lng}>
                 <Input
                   placeholder="กรอกข้อมูล Longitude"
-                  defaultValue={mapPosition.lng}
+                  defaultValue={mapPosition?.lng}
                   onBlur={handleOnChangeLng}
                 />
               </Form.Item>
@@ -317,8 +327,8 @@ const ModalFarmerPlot: React.FC<ModalFarmerPlotProps> = ({
             width="470px"
             height="300px"
             zoom={17}
-            lat={mapPosition.lat}
-            lng={mapPosition.lng}
+            lat={mapPosition?.lat}
+            lng={mapPosition?.lng}
           />
           <div className="form-group">
             <label>
