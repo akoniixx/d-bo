@@ -84,7 +84,6 @@ function EditDroner() {
   const [form] = Form.useForm();
   const dronerId = queryString[1];
   const status = Form.useWatch("status", form);
-  const [showWarning, setShowWarning] = useState(false);
   const [profile] = useLocalStorage("profile", []);
   const [data, setData] = useState<DronerEntity>(DronerEntity_INIT);
   const [address, setAddress] = useState<AddressEntity>(
@@ -153,14 +152,14 @@ function EditDroner() {
             postcode: res.address.postcode || undefined,
             province: res.address.provinceId || undefined,
             district: res.address.districtId || undefined,
-            subdistrict: res.address.subdistrictId || undefined,
+            subdistrict: res.address?.subdistrictId || undefined,
             birthDate: moment(res.birthDate) || undefined,
             latitude: res.dronerArea?.lat || undefined,
             longitude: res.dronerArea?.long || undefined,
             address1: res.address?.address1 || undefined,
             address2: res.address?.address2 || undefined,
             checkPlantsOther: checkPlantsOther || [],
-            dronerArea: res.dronerArea.subdistrictId,
+            dronerArea: res.dronerArea?.subdistrictId,
             mapUrl: res.dronerArea?.mapUrl || undefined,
             status: res.status,
             reason:
@@ -660,6 +659,7 @@ function EditDroner() {
       reason,
       idNo,
       comment,
+      dronerCode,
       status: currentStatus,
       ...rest
     } = form.getFieldsValue();
@@ -1129,7 +1129,7 @@ function EditDroner() {
                   showSearch
                   placeholder="ค้นหาตำบล/อำเภอ/จังหวัด"
                   onChange={handleSearchLocation}
-                  value={dronerArea.subdistrictId}
+                  value={dronerArea?.subdistrictId}
                   optionFilterProp="children"
                   filterSort={(optionA, optionB) =>
                     optionA.children
