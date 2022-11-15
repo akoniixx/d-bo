@@ -106,7 +106,7 @@ function IndexDroner() {
       });
     };
     fetchWithSort({
-      sortField: "updatedAt",
+      sortField: sortStatus ? "updatedAt" : undefined,
       sortDirection: sortStatus,
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps

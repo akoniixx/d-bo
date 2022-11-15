@@ -1,7 +1,10 @@
 ## [Version - 0]
+## Fix [v0.20.5] 2022-11-15
+- resolve inital parameters sorting droner & farmer 
 ## Fix [v0.20.4] 2022-11-01
 - hide initial map values 
 - enable button edit even without ID (auto generate)
+- issue user not filled  DronerArea
 ## Fix [v0.20.3] 2022-10-27
 - fixed defect add farmPlot not save
 - fixed defect Edit DronerDrone bug api add & delete

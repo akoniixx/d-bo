@@ -79,10 +79,12 @@ function IndexFarmer() {
         setData(res);
       });
     };
+
     fetchWithSort({
       sortDirection: sortStatus,
-      sortField: "updatedAt",
+      sortField: sortStatus ? "updatedAt" : undefined,
     });
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sortStatus]);
   const fecthProvince = async () => {
