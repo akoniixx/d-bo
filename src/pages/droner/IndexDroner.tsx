@@ -46,7 +46,6 @@ function IndexDroner() {
   const [sortStatus, setSortStatus] = useState<string | undefined>(
     undefined
   );
-  console.log("sortStatus", sortStatus);
   const [droneBrandId, setDroneBrandId] = useState<any>();
 
   useEffect(() => {
