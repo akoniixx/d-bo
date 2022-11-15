@@ -46,6 +46,7 @@ function IndexDroner() {
   const [sortStatus, setSortStatus] = useState<string | undefined>(
     undefined
   );
+  console.log("sortStatus", sortStatus);
   const [droneBrandId, setDroneBrandId] = useState<any>();
 
   useEffect(() => {
@@ -106,7 +107,7 @@ function IndexDroner() {
       });
     };
     fetchWithSort({
-      sortField: "updatedAt",
+      sortField: sortStatus ? "updatedAt" : undefined,
       sortDirection: sortStatus,
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
