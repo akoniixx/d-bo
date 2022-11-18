@@ -1,4 +1,6 @@
 ## [Version - 0]
+## Fix [v0.20.6] 2022-11-18
+- fixed date delay when approve
 ## Fix [v0.20.5] 2022-11-15
 - resolve inital parameters sorting droner & farmer 
 ## Fix [v0.20.4] 2022-11-01
