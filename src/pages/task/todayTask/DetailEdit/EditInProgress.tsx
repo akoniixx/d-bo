@@ -138,7 +138,7 @@ function EditInProgress() {
   };
   const handlerApprove = (e: RadioChangeEvent) => {
     const m = Map(data).set("statusDelay", e.target.value);
-    const o = Map(m.toJS()).set("dateDelay", data.updatedAt)
+    const o = Map(m.toJS()).set("dateDelay", data.dateDelay)
     if (o.toJS().statusDelay === "REJECTED") {
       {
         !data.delayRejectRemark
