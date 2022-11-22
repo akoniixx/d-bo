@@ -1,4 +1,6 @@
 ## [Version - 0]
+## Fix [v0.20.7] 2022-11-22
+-  compress file profile & idCard (droner & farmer)
 ## Fix [v0.20.6] 2022-11-18
 - fixed date delay when approve
 ## Fix [v0.20.5] 2022-11-15
