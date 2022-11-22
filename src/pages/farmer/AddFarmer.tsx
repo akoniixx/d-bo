@@ -58,6 +58,7 @@ import img_empty from "../../resource/media/empties/uploadImg.png";
 import bth_img_empty from "../../resource/media/empties/upload_Img_btn.png";
 import moment from "moment";
 import { useLocalStorage } from "../../hook/useLocalStorage";
+import { resizeFileImg } from "../../utilities/ResizeImage";
 
 const dateFormat = "DD/MM/YYYY";
 const dateCreateFormat = "YYYY-MM-DD";
@@ -234,28 +235,31 @@ const AddFarmer = () => {
 
   //#region image
   const onChangeProfile = async (file: any) => {
-    let src = file.target.files[0];
-    // let src: any;
-    // src = await resizeFileImg({
-    //   file: source,
-    //   maxWidth: 300,
-    //   maxHeight: 300,
-    //   compressFormat: source?.type.split("/")[1],
-    //   quality: 0.9,
-    //   rotation: 0,
-    //   responseUriFunc: (res: any) => {
-    //     console.log(res);
-    //   },
-    // });
+    const source = file.target.files[0];
+    let newSource: any;
 
-    src = await new Promise((resolve) => {
+    const isFileMoreThan2MB = source.size > 2 * 1024 * 1024;
+    if (isFileMoreThan2MB) {
+      newSource = await resizeFileImg({
+        file: source,
+        compressFormat: source?.type.split("/")[1],
+        quality: 70,
+        rotation: 0,
+        responseUriFunc: (res: any) => {},
+      });
+    }
+    const img_base64 = await new Promise((resolve) => {
       const reader = new FileReader();
-      reader.readAsDataURL(src);
+      reader.readAsDataURL(isFileMoreThan2MB ? newSource : source);
       reader.onload = () => resolve(reader.result);
     });
-    setImgProfile(src);
+
+    setImgProfile(img_base64);
     checkValidate(data);
-    const d = Map(createImgProfile).set("file", file.target.files[0]);
+    const d = Map(createImgProfile).set(
+      "file",
+      isFileMoreThan2MB ? newSource : source
+    );
     const e = Map(d.toJS()).set("resource", "FARMER");
     const f = Map(e.toJS()).set("category", "PROFILE_IMAGE");
     setCreateImgProfile(f.toJS());
@@ -281,15 +285,31 @@ const AddFarmer = () => {
   };
 
   const onChangeIdCard = async (file: any) => {
-    let src = file.target.files[0];
-    src = await new Promise((resolve) => {
+    const source = file.target.files[0];
+    let newSource: any;
+
+    const isFileMoreThan2MB = source.size > 2 * 1024 * 1024;
+    if (isFileMoreThan2MB) {
+      newSource = await resizeFileImg({
+        file: source,
+        compressFormat: source?.type.split("/")[1],
+        quality: 70,
+        rotation: 0,
+        responseUriFunc: (res: any) => {},
+      });
+    }
+    const img_base64 = await new Promise((resolve) => {
       const reader = new FileReader();
-      reader.readAsDataURL(src);
+      reader.readAsDataURL(isFileMoreThan2MB ? newSource : source);
       reader.onload = () => resolve(reader.result);
     });
-    setImgIdCard(src);
+
+    setImgIdCard(img_base64);
     checkValidate(data);
-    const d = Map(createImgIdCard).set("file", file.target.files[0]);
+    const d = Map(createImgProfile).set(
+      "file",
+      isFileMoreThan2MB ? newSource : source
+    );
     const e = Map(d.toJS()).set("resource", "FARMER");
     const f = Map(e.toJS()).set("category", "ID_CARD_IMAGE");
     setCreateImgIdCrad(f.toJS());

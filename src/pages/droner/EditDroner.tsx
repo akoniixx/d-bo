@@ -72,6 +72,7 @@ import { LAT_LNG_BANGKOK } from "../../definitions/Location";
 import moment from "moment";
 import locale from "antd/es/date-picker/locale/th_TH";
 import { useLocalStorage } from "../../hook/useLocalStorage";
+import { resizeFileImg } from "../../utilities/ResizeImage";
 
 const dateFormat = "DD/MM/YYYY";
 const dateCreateFormat = "YYYY-MM-DD";
@@ -477,14 +478,29 @@ function EditDroner() {
 
   //#region img
   const onChangeProfile = async (file: any) => {
-    let src = file.target.files[0];
-    src = await new Promise((resolve) => {
+    const source = file.target.files[0];
+    let newSource: any;
+
+    const isFileMoreThan2MB = source.size > 2 * 1024 * 1024;
+    if (isFileMoreThan2MB) {
+      newSource = await resizeFileImg({
+        file: source,
+        compressFormat: source?.type.split("/")[1],
+        quality: 70,
+        rotation: 0,
+        responseUriFunc: (res: any) => {},
+      });
+    }
+    const img_base64 = await new Promise((resolve) => {
       const reader = new FileReader();
-      reader.readAsDataURL(src);
+      reader.readAsDataURL(isFileMoreThan2MB ? newSource : source);
       reader.onload = () => resolve(reader.result);
     });
-    setImgProfile(src);
-    const d = Map(createImgProfile).set("file", file.target.files[0]);
+    setImgProfile(img_base64);
+    const d = Map(createImgProfile).set(
+      "file",
+      isFileMoreThan2MB ? newSource : source
+    );
     const e = Map(d.toJS()).set("resource", "DRONER");
     const f = Map(e.toJS()).set("category", "PROFILE_IMAGE");
     const g = Map(f.toJS()).set("resourceId", dronerId);
@@ -518,14 +534,29 @@ function EditDroner() {
   };
 
   const onChangeIdCard = async (file: any) => {
-    let src = file.target.files[0];
-    src = await new Promise((resolve) => {
+    const source = file.target.files[0];
+    let newSource: any;
+
+    const isFileMoreThan2MB = source.size > 2 * 1024 * 1024;
+    if (isFileMoreThan2MB) {
+      newSource = await resizeFileImg({
+        file: source,
+        compressFormat: source?.type.split("/")[1],
+        quality: 70,
+        rotation: 0,
+        responseUriFunc: (res: any) => {},
+      });
+    }
+    const img_base64 = await new Promise((resolve) => {
       const reader = new FileReader();
-      reader.readAsDataURL(src);
+      reader.readAsDataURL(isFileMoreThan2MB ? newSource : source);
       reader.onload = () => resolve(reader.result);
     });
-    setImgIdCard(src);
-    const d = Map(createImgIdCard).set("file", file.target.files[0]);
+    setImgIdCard(img_base64);
+    const d = Map(createImgIdCard).set(
+      "file",
+      isFileMoreThan2MB ? newSource : source
+    );
     const e = Map(d.toJS()).set("resource", "DRONER");
     const f = Map(e.toJS()).set("category", "ID_CARD_IMAGE");
     const g = Map(f.toJS()).set("resourceId", dronerId);

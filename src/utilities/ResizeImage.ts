@@ -2,8 +2,8 @@ import Resizer from "react-image-file-resizer";
 
 export const resizeFileImg = (params: {
   file: Blob;
-  maxWidth: number;
-  maxHeight: number;
+  maxWidth?: number;
+  maxHeight?: number;
   compressFormat: string;
   quality: number;
   rotation: number;
@@ -14,12 +14,12 @@ export const resizeFileImg = (params: {
   minWidth?: number;
   minHeight?: number;
 }): Promise<string | Blob | File | ProgressEvent<FileReader>> => {
-  const outPutType = params.outputType ? params.outputType : "blob";
+  const outPutType = params.outputType ? params.outputType : "file";
   return new Promise((resolve) => {
     Resizer.imageFileResizer(
       params.file,
-      params.maxWidth,
-      params.maxHeight,
+      params?.maxWidth || 1000,
+      params?.maxHeight || 1000,
       params.compressFormat,
       params.quality,
       params.rotation,
