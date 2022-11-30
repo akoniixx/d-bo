@@ -49,7 +49,10 @@ function IndexDroner() {
   const [droneBrandId, setDroneBrandId] = useState<any>();
 
   useEffect(() => {
-    fetchDronerList();
+    fetchDronerList({
+      sortField: sortStatus ? "updatedAt" : undefined,
+      sortDirection: sortStatus,
+    });
     fetchProvince();
     if (searchProvince) {
       fetchDistrict();
@@ -61,6 +64,8 @@ function IndexDroner() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     current,
+    sortStatus,
+
     searchText,
     searchStatus,
     searchProvince,
@@ -68,7 +73,13 @@ function IndexDroner() {
     searchDroneBrand,
     searchSubdistrict,
   ]);
-  const fetchDronerList = async () => {
+  const fetchDronerList = async ({
+    sortField,
+    sortDirection,
+  }: {
+    sortField?: string;
+    sortDirection?: string;
+  }) => {
     await DronerDatasource.getDronerList(
       current,
       row,
@@ -77,40 +88,14 @@ function IndexDroner() {
       searchProvince,
       searchDroneBrand,
       searchStatus,
-      searchText
+      searchText,
+      sortField,
+      sortDirection
     ).then((res: DronerListEntity) => {
       setData(res);
     });
   };
-  useEffect(() => {
-    const fetchWithSort = async ({
-      sortDirection,
-      sortField,
-    }: {
-      sortField?: string;
-      sortDirection?: string;
-    }) => {
-      await DronerDatasource.getDronerList(
-        current,
-        row,
-        searchSubdistrict,
-        searchDistrict,
-        searchProvince,
-        searchDroneBrand,
-        searchStatus,
-        searchText,
-        sortField,
-        sortDirection
-      ).then((res: DronerListEntity) => {
-        setData(res);
-      });
-    };
-    fetchWithSort({
-      sortField: sortStatus ? "updatedAt" : undefined,
-      sortDirection: sortStatus,
-    });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [sortStatus]);
+
   const fetchProvince = async () => {
     await LocationDatasource.getProvince().then((res) => {
       setProvince(res);
