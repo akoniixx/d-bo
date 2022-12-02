@@ -44,7 +44,13 @@ function IndexFarmer() {
   const [sortStatus, setSortStatus] = useState<string | undefined>(
     undefined
   );
-  const fecthAdmin = async () => {
+  const fecthAdmin = async ({
+    sortDirection,
+    sortField,
+  }: {
+    sortDirection?: string;
+    sortField?: string;
+  }) => {
     await FarmerDatasource.getFarmerList(
       current,
       row,
@@ -52,41 +58,14 @@ function IndexFarmer() {
       searchText,
       searchProvince,
       searchDistrict,
-      searchSubdistrict
+      searchSubdistrict,
+      sortDirection,
+      sortField
     ).then((res: FarmerPageEntity) => {
       setData(res);
     });
   };
-  useEffect(() => {
-    const fetchWithSort = async ({
-      sortDirection,
-      sortField,
-    }: {
-      sortDirection?: string;
-      sortField?: string;
-    }) => {
-      await FarmerDatasource.getFarmerList(
-        current,
-        row,
-        searchStatus,
-        searchText,
-        searchProvince,
-        searchDistrict,
-        searchSubdistrict,
-        sortDirection,
-        sortField
-      ).then((res: FarmerPageEntity) => {
-        setData(res);
-      });
-    };
 
-    fetchWithSort({
-      sortDirection: sortStatus,
-      sortField: sortStatus ? "updatedAt" : undefined,
-    });
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [sortStatus]);
   const fecthProvince = async () => {
     await LocationDatasource.getProvince().then((res) => {
       setProvince(res);
@@ -108,7 +87,10 @@ function IndexFarmer() {
   };
 
   useEffect(() => {
-    fecthAdmin();
+    fecthAdmin({
+      sortField: sortStatus ? "updatedAt" : undefined,
+      sortDirection: sortStatus,
+    });
     fecthProvince();
     if (searchProvince) {
       fetchDistrict();
@@ -119,6 +101,7 @@ function IndexFarmer() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     current,
+    sortStatus,
     searchStatus,
     searchText,
     searchProvince,

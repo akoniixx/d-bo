@@ -1,4 +1,6 @@
 ## [Version - 0]
+## Fix [v0.20.8] 2022-11-30
+-  resolved sort issue droner & farmer
 ## Fix [v0.20.7] 2022-11-22
 -  compress file profile & idCard (droner & farmer)
 ## Fix [v0.20.6] 2022-11-18
