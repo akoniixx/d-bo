@@ -632,20 +632,10 @@ const AddNewTask = () => {
       <CardHeader textHeader="นัดหมายบริการ" />
       <div className="flex-column">
         <Form style={{ padding: "20px" }}>
-          <div className="row col-lg-6">
-            <div className="form-group col-lg-6">
-              <label>
-                วันที่นัดหมาย <span style={{ color: "red" }}>*</span>
-              </label>
-              <Form.Item
-                name="dateAppointment"
-                rules={[
-                  {
-                    required: true,
-                    message: "กรุณากรอกวันที่นัดหมาย!",
-                  },
-                ]}
-              >
+          <div className="row form-group col-lg-12">
+            <div className="col-lg">
+              วันนัดหมาย <span style={{ color: "red" }}>*</span>
+              <div>
                 <DatePicker
                   format={dateFormat}
                   className="col-lg-12"
@@ -653,28 +643,21 @@ const AddNewTask = () => {
                   onChange={handleDateAppointment}
                   defaultValue={moment(dateAppointment)}
                 />
-              </Form.Item>
+              </div>
             </div>
-            <div className="form-group col-lg-6">
-              <label>
-                เวลานัดหมาย <span style={{ color: "red" }}>*</span>
-              </label>
-              <Form.Item
-                name="lastname"
-                rules={[
-                  {
-                    required: true,
-                    message: "กรุณากรอกเวลานัดหมาย!",
-                  },
-                ]}
-              >
+            <div className="col-lg">
+              เวลานัดหมาย <span style={{ color: "red" }}>*</span>
+              <div>
                 <TimePicker
-                  format={timeFormat}
+                  className="col-lg-6"
                   disabled={current == 2 || checkSelectPlot == "error"}
-                  onChange={handleTimeAppiontment}
-                  defaultValue={moment(timeAppointment)}
+                  format={timeFormat}
+                  onSelect={(v) => {
+                    setTimeAppointment(v);
+                  }}
+                  value={moment(timeAppointment)}
                 />
-              </Form.Item>
+              </div>
             </div>
           </div>
           <div className="row form-group col-lg-6">

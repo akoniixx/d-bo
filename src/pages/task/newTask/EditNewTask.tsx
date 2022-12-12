@@ -1,8 +1,4 @@
-import {
-  DownOutlined,
-  SearchOutlined,
-  StarFilled,
-} from "@ant-design/icons";
+import { DownOutlined, SearchOutlined, StarFilled } from "@ant-design/icons";
 import {
   AutoComplete,
   Avatar,
@@ -716,20 +712,10 @@ const EditNewTask = () => {
       <CardHeader textHeader="นัดหมายบริการ" />
       <div className="flex-column">
         <Form style={{ padding: "20px" }}>
-          <div className="row col-lg-6">
-            <div className="form-group col-lg-6">
-              <label>
-                วันที่นัดหมาย <span style={{ color: "red" }}>*</span>
-              </label>
-              <Form.Item
-                rules={[
-                  {
-                    required: true,
-                    message: "กรุณากรอกวันที่นัดหมาย!",
-                  },
-                ]}
-                key={dateAppointment}
-              >
+          <div className="row form-group col-lg-12">
+            <div className="col-lg">
+              วันนัดหมาย
+              <div>
                 <DatePicker
                   format={dateFormat}
                   className="col-lg-12"
@@ -737,28 +723,21 @@ const EditNewTask = () => {
                   onChange={(e: any) => handleDate(e)}
                   defaultValue={moment(dateAppointment)}
                 />
-              </Form.Item>
+              </div>
             </div>
-            <div className="form-group col-lg-6">
-              <label>
-                เวลานัดหมาย <span style={{ color: "red" }}>*</span>
-              </label>
-              <Form.Item
-                rules={[
-                  {
-                    required: true,
-                    message: "กรุณากรอกเวลานัดหมาย!",
-                  },
-                ]}
-                key={timeAppointment}
-              >
+            <div className="col-lg">
+              เวลานัดหมาย
+              <div>
                 <TimePicker
-                  format={timeFormat}
+                  className="col-lg-6"
                   disabled={current == 2 || checkSelectPlot == "error"}
-                  onChange={(e: any) => handleTime(e)}
-                  defaultValue={moment(timeAppointment)}
+                  format={timeFormat}
+                  onSelect={(v) => {
+                    setTimeAppointment(v);
+                  }}
+                  value={moment(timeAppointment)}
                 />
-              </Form.Item>
+              </div>
             </div>
           </div>
           <div className="row form-group col-lg-6">
