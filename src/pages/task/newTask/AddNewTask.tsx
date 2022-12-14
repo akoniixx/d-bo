@@ -632,7 +632,7 @@ const AddNewTask = () => {
       <CardHeader textHeader="นัดหมายบริการ" />
       <div className="flex-column">
         <Form style={{ padding: "20px" }}>
-          <div className="row form-group col-lg-12">
+          <div className="row form-group col-lg-6">
             <div className="col-lg">
               วันนัดหมาย <span style={{ color: "red" }}>*</span>
               <div>
@@ -649,7 +649,7 @@ const AddNewTask = () => {
               เวลานัดหมาย <span style={{ color: "red" }}>*</span>
               <div>
                 <TimePicker
-                  className="col-lg-6"
+                  className="col-lg-12"
                   disabled={current == 2 || checkSelectPlot == "error"}
                   format={timeFormat}
                   onSelect={(v) => {
