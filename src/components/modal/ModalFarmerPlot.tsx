@@ -324,6 +324,13 @@ const ModalFarmerPlot: React.FC<ModalFarmerPlotProps> = ({
             </div>
           </div>
           <GoogleMap
+            changeLatLng={(lat,lng)=>{
+              form.setFieldsValue({
+                lat : lat,
+                long : lng
+              })
+            }}
+            isEdit={true}
             width="470px"
             height="300px"
             zoom={17}

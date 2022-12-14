@@ -553,6 +553,14 @@ const EditNewTask = () => {
                 <div className="row">
                   <div className="form-group col-lg-12">
                     <GooleMap
+                      changeLatLng={(lat,lng)=> {
+                        const oldfarmerPlotSeleced = farmerPlotSeleced
+                        setFarmerPlotSelected({
+                          ...oldfarmerPlotSeleced,
+                          lat : lat,
+                          long : lng
+                        })
+                      }}
                       width="100%"
                       height="350px"
                       zoom={17}
@@ -1767,4 +1775,5 @@ const EditNewTask = () => {
     </>
   );
 };
+
 export default EditNewTask;
