@@ -144,8 +144,6 @@ function EditDroner() {
         const plantsOther = res.expPlant.filter((el) => {
           return !EXP_PLANT.some((x) => x === el);
         });
-
-        setData(res);
         if (res) {
           form.setFieldsValue({
             ...res,
@@ -305,6 +303,9 @@ function EditDroner() {
     )[0].postcode;
     const m = Map(add).set("postcode", filterSubDistrict);
     setAddress(m.toJS());
+    form.setFieldsValue({
+      postcode : m.toJS().postcode
+    })
   };
 
   //#endregion
@@ -629,6 +630,7 @@ function EditDroner() {
         ...address,
         address1: values.address1,
         address2: values.address2,
+        postcode: values.postcode
       },
       reason,
       updateBy: `${profile?.firstname} ${profile?.lastname}`,
@@ -1110,7 +1112,7 @@ function EditDroner() {
                   name="postcode"
                   placeholder="กรอกรหัสไปรษณีย์"
                   defaultValue={address.postcode}
-                  key={address.subdistrictId}
+                  key={address.postcode}
                   disabled
                 />
               </Form.Item>
@@ -1235,6 +1237,18 @@ function EditDroner() {
             </div>
           </div>
           <GoogleMap
+            isEdit={true}
+            changeLatLng={(lat,lng)=>{
+              setDronerArea({
+                ...dronerArea,
+                lat : lat,
+                long : lng
+              })
+              form.setFieldsValue({
+                latitude : lat,
+                longitude : lng
+              })
+            }}
             width="100%"
             height="300px"
             zoom={17}

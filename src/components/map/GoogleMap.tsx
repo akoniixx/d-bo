@@ -5,6 +5,7 @@ import {
   useLoadScript,
 } from "@react-google-maps/api";
 import { LAT_LNG_BANGKOK } from "../../definitions/Location";
+import { useState } from "react";
 
 interface GoogleMapProps {
   width: string;
@@ -12,6 +13,8 @@ interface GoogleMapProps {
   zoom: number;
   lat?: number;
   lng?: number;
+  isEdit? : boolean;
+  changeLatLng? :(lat : string, lng : string) => void;
 }
 
 const GooleMap: React.FC<GoogleMapProps> = ({
@@ -20,21 +23,35 @@ const GooleMap: React.FC<GoogleMapProps> = ({
   zoom,
   lat = LAT_LNG_BANGKOK.lat,
   lng = LAT_LNG_BANGKOK.lng,
+  isEdit,
+  changeLatLng
 }) => {
+  const [position,setPosition] = useState({
+    lat: lat,
+    lng: lng,
+  });
+  const [center,setCenter] = useState({
+    lat: lat,
+    lng: lng,
+  })
   const containerStyle = {
     width: width,
     height: height,
   };
 
-  const center = {
-    lat: lat,
-    lng: lng,
-  };
-
-  const position = {
-    lat: lat,
-    lng: lng,
-  };
+  const changePosition = (position : any) =>{
+    if(isEdit){
+      setPosition({
+        lat: position.latLng?.lat(),
+        lng: position.latLng?.lng(),
+      })
+      setCenter({
+        lat: position.latLng?.lat(),
+        lng: position.latLng?.lng(),
+      })
+      changeLatLng!(position.latLng?.lat(),position.latLng?.lng())
+    }
+  }
 
   const { isLoaded } = useLoadScript({
     googleMapsApiKey: "AIzaSyDg4BI3Opn-Bo2Pnr40Z7PKlC6MOv8T598",
@@ -45,11 +62,12 @@ const GooleMap: React.FC<GoogleMapProps> = ({
   const renderMap = () => (
     <>
       <GoogleMap
+        onClick={changePosition}
         mapContainerStyle={containerStyle}
         zoom={zoom}
         center={center}
         mapTypeId="roadmap">
-        <MarkerF position={position} />
+        <MarkerF position={position}/>
       </GoogleMap>
       <br />
     </>
