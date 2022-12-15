@@ -248,34 +248,33 @@ const EditInprogressTask = () => {
         <div className="col-lg-6">
           <div className="flex-column">
             <Form style={{ padding: "20px" }}>
-              <div className="row">
-                <div className="row form-group col-lg-12">
-                  <div className="col-lg">
-                    วันนัดหมาย
-                    <div>
-                      <DatePicker
-                        format={dateFormat}
-                        className="col-lg-12"
-                        defaultValue={moment(dateAppointment)}
-                        onChange={handleDateAppointment}
-                      />
-                    </div>
+              <div className="row form-group">
+                <div className="col-lg">
+                  วันนัดหมาย
+                  <div>
+                    <DatePicker
+                      format={dateFormat}
+                      className="col-lg-12"
+                      defaultValue={moment(dateAppointment)}
+                      onChange={handleDateAppointment}
+                    />
                   </div>
-                  <div className="col-lg">
-                    เวลานัดหมาย
-                    <div>
-                      <TimePicker
-                        className="col-lg-6"
-                        format={timeFormat}
-                        onSelect={(v) => {
-                          setTimeAppointment(v);
-                        }}
-                        value={moment(timeAppointment)}
-                      />
-                    </div>
+                </div>
+                <div className="col-lg">
+                  เวลานัดหมาย
+                  <div>
+                    <TimePicker
+                      className="col-lg-12"
+                      format={timeFormat}
+                      onSelect={(v) => {
+                        setTimeAppointment(v);
+                      }}
+                      value={moment(timeAppointment)}
+                    />
                   </div>
                 </div>
               </div>
+
               <div className="row form-group">
                 <label>
                   ช่วงเวลาการพ่น <span style={{ color: "red" }}>*</span>

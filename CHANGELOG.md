@@ -1,4 +1,6 @@
 ## [Version - 0]
+## Fix [v0.20.10] 2022-12-14
+- fixed text box size timeAppointment
 ## Fix [v0.20.9] 2022-12-9
 - enhance timeAppointment in task page
 ## Fix [v0.20.8] 2022-11-30
