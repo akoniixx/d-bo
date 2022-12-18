@@ -73,6 +73,7 @@ import moment from "moment";
 import locale from "antd/es/date-picker/locale/th_TH";
 import { useLocalStorage } from "../../hook/useLocalStorage";
 import { resizeFileImg } from "../../utilities/ResizeImage";
+import { useNavigate } from "react-router-dom";
 
 const dateFormat = "DD/MM/YYYY";
 const dateCreateFormat = "YYYY-MM-DD";
@@ -85,6 +86,7 @@ function EditDroner() {
   const [form] = Form.useForm();
   const dronerId = queryString[1];
   const status = Form.useWatch("status", form);
+  const navigate = useNavigate();
   const [profile] = useLocalStorage("profile", []);
   const [data, setData] = useState<DronerEntity>(DronerEntity_INIT);
   const [address, setAddress] = useState<AddressEntity>(
@@ -304,8 +306,8 @@ function EditDroner() {
     const m = Map(add).set("postcode", filterSubDistrict);
     setAddress(m.toJS());
     form.setFieldsValue({
-      postcode : m.toJS().postcode
-    })
+      postcode: m.toJS().postcode,
+    });
   };
 
   //#endregion
@@ -630,7 +632,7 @@ function EditDroner() {
         ...address,
         address1: values.address1,
         address2: values.address2,
-        postcode: values.postcode
+        postcode: values.postcode,
       },
       reason,
       updateBy: `${profile?.firstname} ${profile?.lastname}`,
@@ -1238,16 +1240,16 @@ function EditDroner() {
           </div>
           <GoogleMap
             isEdit={true}
-            changeLatLng={(lat,lng)=>{
+            changeLatLng={(lat, lng) => {
               setDronerArea({
                 ...dronerArea,
-                lat : lat,
-                long : lng
-              })
+                lat: lat,
+                long: lng,
+              });
               form.setFieldsValue({
-                latitude : lat,
-                longitude : lng
-              })
+                latitude: lat,
+                longitude: lng,
+              });
             }}
             width="100%"
             height="300px"
@@ -1578,9 +1580,7 @@ function EditDroner() {
   return (
     <Layout>
       <Row>
-        <BackIconButton
-          onClick={() => (window.location.href = "/IndexDroner")}
-        />
+        <BackIconButton onClick={() => navigate(-1)} />
         <span className="pt-4">
           <strong style={{ fontSize: "20px" }}>
             แก้ไขข้อมูลคนบินโดรน
