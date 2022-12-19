@@ -27,22 +27,85 @@ import moment from "moment";
 import AddButtton from "../../components/button/AddButton";
 import { DroneDatasource } from "../../datasource/DroneDatasource";
 import Layouts from "../../components/layout/Layout";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import { useEffectOnce } from "../../hook/useEffectOnce";
 
+interface SearchSelectType {
+  label: any;
+  value: any;
+}
 function IndexDroner() {
   const row = 10;
   const [current, setCurrent] = useState(1);
   const [data, setData] = useState<DronerListEntity>();
-  const [searchStatus, setSearchStatus] = useState<string>();
   const [searchText, setSearchText] = useState<string>();
-  const [searchProvince, setSearchProvince] = useState<any>();
-  const [searchDistrict, setSearchDistrict] = useState<any>();
-  const [searchSubdistrict, setSearchSubdistrict] = useState<any>();
-  const [searchDroneBrand, setSearchDroneBrand] = useState<any>();
+  const [searchStatus, setSearchStatus] = useState<SearchSelectType>({
+    label: "ทั้งหมด",
+    value: "ALL",
+  });
+  const [searchProvince, setSearchProvince] = useState<
+    SearchSelectType | undefined
+  >(undefined);
+  const [searchDistrict, setSearchDistrict] = useState<
+    SearchSelectType | undefined
+  >(undefined);
+  const [searchSubdistrict, setSearchSubdistrict] = useState<
+    SearchSelectType | undefined
+  >(undefined);
+  const [searchDroneBrand, setSearchDroneBrand] = useState<
+    SearchSelectType | undefined
+  >(undefined);
   const [province, setProvince] = useState<ProviceEntity[]>([]);
   const [district, setDistrict] = useState<DistrictEntity[]>([]);
   const [subdistrict, setSubdistrict] = useState<SubdistrictEntity[]>(
     []
   );
+  const genQuery = ({
+    searchDistrict,
+    searchDroneBrand,
+    searchProvince,
+    searchStatus,
+    searchSubdistrict,
+    searchText,
+  }: {
+    searchStatus?: string;
+    searchText?: string;
+    searchProvince?: string;
+    searchDistrict?: string;
+    searchSubdistrict?: string;
+    searchDroneBrand?: string;
+  }) => {
+    const query: any = {};
+    if (searchStatus) {
+      query.status = searchStatus;
+    }
+    if (searchText) {
+      query.searchText = searchText;
+    }
+    if (searchProvince) {
+      query.province = searchProvince;
+    }
+    if (searchDistrict) {
+      query.district = searchDistrict;
+    }
+    if (searchSubdistrict) {
+      query.subdistrict = searchSubdistrict;
+    }
+    if (searchDroneBrand) {
+      query.droneBrand = searchDroneBrand;
+    }
+    const queryString = Object.keys(query);
+    if (queryString.length > 0) {
+      return (
+        "?" +
+        queryString.map((key) => key + "=" + query[key]).join("&")
+      );
+    }
+    return "";
+  };
+  const navigate = useNavigate();
+  const [searchQuery] = useSearchParams();
+
   const [sortStatus, setSortStatus] = useState<string | undefined>(
     undefined
   );
@@ -53,14 +116,12 @@ function IndexDroner() {
       sortField: sortStatus ? "updatedAt" : undefined,
       sortDirection: sortStatus,
     });
-    fetchProvince();
     if (searchProvince) {
       fetchDistrict();
     }
     if (searchDistrict) {
       fetchSubdistrict();
     }
-    fetchDroneBrand();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     current,
@@ -83,11 +144,11 @@ function IndexDroner() {
     await DronerDatasource.getDronerList(
       current,
       row,
-      searchSubdistrict,
-      searchDistrict,
-      searchProvince,
-      searchDroneBrand,
-      searchStatus,
+      searchSubdistrict?.value,
+      searchDistrict?.value,
+      searchProvince?.value,
+      searchDroneBrand?.value,
+      searchStatus?.value === "ALL" ? undefined : searchStatus?.value,
       searchText,
       sortField,
       sortDirection
@@ -95,56 +156,199 @@ function IndexDroner() {
       setData(res);
     });
   };
+  useEffectOnce(() => {
+    const getInitialSearch = async () => {
+      const provinceData = await fetchProvince();
+      const droneBrandData = await fetchDroneBrand();
+      let findProvince: any;
+      let findDistrict: any;
+      if (searchQuery) {
+        const status = searchQuery.get("status");
+        const searchText = searchQuery.get("searchText");
+        const provinceQuery = searchQuery.get("province");
+        const districtQuery = searchQuery.get("district");
+        const subdistrictQuery = searchQuery.get("subdistrict");
+        const droneBrand = searchQuery.get("droneBrand");
+
+        if (droneBrand) {
+          const find = droneBrandData.find(
+            (item: any) => item.name === droneBrand
+          );
+          setSearchDroneBrand({
+            label: find?.name,
+            value: find?.id,
+          });
+        }
+        if (status) {
+          const find = DRONER_STATUS.find(
+            (item) => item.name === status
+          );
+          setSearchStatus({
+            label: find?.name || "ทั้งหมด",
+            value: find?.value || "ALL",
+          });
+        }
+        if (searchText) {
+          setSearchText(searchText);
+        }
+        if (provinceQuery && provinceData) {
+          findProvince = provinceData.find((el: any) => {
+            return el.provinceName === provinceQuery;
+          });
+          setSearchProvince({
+            label: findProvince?.provinceName || "",
+            value: findProvince?.provinceId || "",
+          });
+        }
+
+        if (districtQuery && findProvince) {
+          const districtData = await LocationDatasource.getDistrict(
+            findProvince?.provinceId
+          );
+          findDistrict = districtData.find((el: any) => {
+            return el.districtName === districtQuery;
+          });
+          setSearchDistrict({
+            label: findDistrict?.districtName || "",
+            value: findDistrict?.districtId || "",
+          });
+        }
+        if (subdistrictQuery && findDistrict) {
+          const subdistrictData =
+            await LocationDatasource.getSubdistrict(
+              findDistrict?.districtId
+            );
+          const findSubdistrict = subdistrictData.find((el: any) => {
+            return el.subdistrictName === subdistrictQuery;
+          });
+          setSearchSubdistrict({
+            label: findSubdistrict?.subdistrictName || "",
+            value: findSubdistrict?.subdistrictId || "",
+          });
+        }
+      }
+    };
+    getInitialSearch();
+  });
 
   const fetchProvince = async () => {
-    await LocationDatasource.getProvince().then((res) => {
+    return await LocationDatasource.getProvince().then((res) => {
       setProvince(res);
+      return res;
     });
   };
   const fetchDistrict = async () => {
-    await LocationDatasource.getDistrict(searchProvince).then(
+    await LocationDatasource.getDistrict(searchProvince?.value).then(
       (res) => {
         setDistrict(res);
       }
     );
   };
   const fetchSubdistrict = async () => {
-    await LocationDatasource.getSubdistrict(searchDistrict).then(
-      (res) => {
-        setSubdistrict(res);
-      }
-    );
+    await LocationDatasource.getSubdistrict(
+      searchDistrict?.value
+    ).then((res) => {
+      setSubdistrict(res);
+    });
   };
   const fetchDroneBrand = async () => {
-    await DroneDatasource.getDroneBrandList().then((res) => {
+    return await DroneDatasource.getDroneBrandList().then((res) => {
       setDroneBrandId(res.data);
+      return res.data;
     });
   };
   const onChangePage = (page: number) => {
     setCurrent(page);
   };
-  const handleProvince = (provinceId: number) => {
-    setSearchProvince(provinceId);
+  const handleProvince = (provinceId: number, data: any) => {
+    setSearchProvince({ value: provinceId, label: data.children });
+    navigate(
+      `/IndexDroner${genQuery({
+        searchProvince: data.children,
+        searchDistrict: searchDistrict?.label,
+        searchSubdistrict: searchSubdistrict?.label,
+        searchDroneBrand: searchDroneBrand?.label,
+        searchStatus: searchStatus?.label,
+        searchText,
+      })}`
+    );
+
     setCurrent(1);
   };
-  const handleDistrict = (districtId: number) => {
-    setSearchDistrict(districtId);
+  const handleDistrict = (districtId: number, data: any) => {
+    setSearchDistrict({ value: districtId, label: data.children });
+    navigate(
+      `/IndexDroner${genQuery({
+        searchProvince: searchProvince?.label,
+        searchDistrict: data.children,
+        searchSubdistrict: searchSubdistrict?.label,
+        searchDroneBrand: searchDroneBrand?.label,
+        searchStatus: searchStatus?.label,
+        searchText,
+      })}`
+    );
     setCurrent(1);
   };
-  const handleSubDistrict = (subdistrictId: any) => {
+  const handleSubDistrict = (subdistrictId: any, data: any) => {
     setSearchSubdistrict(subdistrictId);
+    navigate(
+      `/IndexDroner${genQuery({
+        searchProvince: searchProvince?.label,
+        searchDistrict: searchDistrict?.label,
+        searchSubdistrict: data.children,
+        searchDroneBrand: searchDroneBrand?.label,
+        searchStatus: searchStatus?.label,
+        searchText,
+      })}`
+    );
     setCurrent(1);
   };
-  const handleDroneBrand = (droneBrandId: string) => {
-    setSearchDroneBrand(droneBrandId);
+  const handleDroneBrand = (droneBrandId: string, data: any) => {
+    setSearchDroneBrand({
+      value: droneBrandId,
+      label: data.children,
+    });
+    navigate(
+      `/IndexDroner${genQuery({
+        searchProvince: searchProvince?.label,
+        searchDistrict: searchDistrict?.label,
+        searchSubdistrict: searchSubdistrict?.label,
+        searchDroneBrand: data.children,
+        searchStatus: searchStatus?.label,
+        searchText,
+      })}`
+    );
     setCurrent(1);
   };
   const changeTextSearch = (value: string) => {
     setSearchText(value);
+    navigate(
+      `/IndexDroner${genQuery({
+        searchProvince: searchProvince?.label,
+        searchDistrict: searchDistrict?.label,
+        searchSubdistrict: searchSubdistrict?.label,
+        searchDroneBrand: searchDroneBrand?.label,
+        searchStatus: searchStatus?.label,
+        searchText: value,
+      })}`
+    );
     setCurrent(1);
   };
-  const handleStatus = (status: any) => {
-    setSearchStatus(status);
+  const handleStatus = (status: any, data: any) => {
+    setSearchStatus({
+      value: status,
+      label: data.children,
+    });
+    navigate(
+      `/IndexDroner${genQuery({
+        searchProvince: searchProvince?.label,
+        searchDistrict: searchDistrict?.label,
+        searchSubdistrict: searchSubdistrict?.label,
+        searchDroneBrand: searchDroneBrand?.label,
+        searchStatus: data.children,
+        searchText,
+      })}`
+    );
     setCurrent(1);
   };
   const PageTitle = (
@@ -166,7 +370,7 @@ function IndexDroner() {
         <div>
           <AddButtton
             text="เพิ่มนักบินโดรน"
-            onClick={() => (window.location.href = "/AddDroner")}
+            onClick={() => navigate("/AddDroner")}
           />
         </div>
       </div>
@@ -177,6 +381,7 @@ function IndexDroner() {
           <Search
             placeholder="ค้นหาชื่อนักบินโดรน หรือเบอร์โทร"
             className="col-lg-12 p-1"
+            value={searchText}
             onSearch={changeTextSearch}
           />
         </div>
@@ -186,7 +391,21 @@ function IndexDroner() {
             placeholder="เลือกจังหวัด"
             onChange={handleProvince}
             showSearch
+            value={searchProvince?.label}
             allowClear
+            onClear={() => {
+              setSearchProvince(undefined);
+              navigate(
+                `/IndexDroner${genQuery({
+                  searchProvince: undefined,
+                  searchDistrict: searchDistrict?.label,
+                  searchSubdistrict: searchSubdistrict?.label,
+                  searchDroneBrand: searchDroneBrand?.label,
+                  searchStatus: searchStatus?.label,
+                  searchText,
+                })}`
+              );
+            }}
             optionFilterProp="children"
             filterOption={(input: any, option: any) =>
               option.children.includes(input)
@@ -206,9 +425,23 @@ function IndexDroner() {
         <div className="col">
           <Select
             className="col-lg-12 p-1"
+            onClear={() => {
+              setSearchDistrict(undefined);
+              navigate(
+                `/IndexDroner${genQuery({
+                  searchProvince: searchProvince?.label,
+                  searchDistrict: undefined,
+                  searchSubdistrict: searchSubdistrict?.label,
+                  searchDroneBrand: searchDroneBrand?.label,
+                  searchStatus: searchStatus?.label,
+                  searchText,
+                })}`
+              );
+            }}
             placeholder="เลือกอำเภอ"
             onChange={handleDistrict}
             showSearch
+            value={searchDistrict?.label}
             allowClear
             optionFilterProp="children"
             filterOption={(input: any, option: any) =>
@@ -219,7 +452,7 @@ function IndexDroner() {
                 .toLowerCase()
                 .localeCompare(optionB.children.toLowerCase())
             }
-            disabled={searchProvince == undefined}>
+            disabled={searchProvince === undefined}>
             {district?.map((item) => (
               <Option value={item.districtId.toString()}>
                 {item.districtName}
@@ -232,8 +465,22 @@ function IndexDroner() {
             className="col-lg-12 p-1"
             placeholder="เลือกตำบล"
             onChange={handleSubDistrict}
+            onClear={() => {
+              setSearchSubdistrict(undefined);
+              navigate(
+                `/IndexDroner${genQuery({
+                  searchProvince: searchProvince?.label,
+                  searchDistrict: searchDistrict?.label,
+                  searchSubdistrict: undefined,
+                  searchDroneBrand: searchDroneBrand?.label,
+                  searchStatus: searchStatus?.label,
+                  searchText,
+                })}`
+              );
+            }}
             showSearch
             allowClear
+            value={searchSubdistrict?.label}
             optionFilterProp="children"
             filterOption={(input: any, option: any) =>
               option.children.includes(input)
@@ -254,6 +501,20 @@ function IndexDroner() {
         <div className="col">
           <Select
             showSearch
+            value={searchDroneBrand?.label}
+            onClear={() => {
+              setSearchDroneBrand(undefined);
+              navigate(
+                `/IndexDroner${genQuery({
+                  searchProvince: searchProvince?.label,
+                  searchDistrict: searchDistrict?.label,
+                  searchSubdistrict: searchSubdistrict?.label,
+                  searchDroneBrand: undefined,
+                  searchStatus: searchStatus?.label,
+                  searchText,
+                })}`
+              );
+            }}
             optionFilterProp="children"
             filterOption={(input: any, option: any) =>
               option.children.includes(input)
@@ -272,13 +533,15 @@ function IndexDroner() {
             ))}
           </Select>
         </div>
+
         <div className="col">
           <Select
             className="col-lg-12 p-1"
             placeholder="เลือกสถานะ"
+            value={searchStatus?.label}
             onChange={handleStatus}>
             {DRONER_STATUS.map((item) => (
-              <option value={item.value}>{item.name}</option>
+              <Option value={item.value}>{item.name}</Option>
             ))}
           </Select>
         </div>

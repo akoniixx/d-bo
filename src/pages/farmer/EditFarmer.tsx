@@ -63,6 +63,7 @@ import bth_img_empty from "../../resource/media/empties/upload_Img_btn.png";
 import moment from "moment";
 import { useLocalStorage } from "../../hook/useLocalStorage";
 import { resizeFileImg } from "../../utilities/ResizeImage";
+import { Navigate, useNavigate } from "react-router-dom";
 const { Option } = Select;
 
 const dateFormat = "DD/MM/YYYY";
@@ -75,6 +76,7 @@ let queryString = _.split(window.location.pathname, "=");
 
 const EditFarmer = () => {
   const [profile] = useLocalStorage("profile", []);
+  const navigate = useNavigate();
 
   const farmerId = queryString[1];
   const [data, setData] = useState<GetFarmerEntity>(
@@ -1054,7 +1056,9 @@ const EditFarmer = () => {
     <Layout>
       <Row>
         <BackIconButton
-          onClick={() => (window.location.href = "/IndexFarmer")}
+          onClick={() => {
+            navigate(-1);
+          }}
         />
         <span className="pt-4">
           <strong style={{ fontSize: "20px" }}>

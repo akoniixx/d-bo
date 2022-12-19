@@ -7,7 +7,7 @@ export const DRONER_STATUS_MAPPING: any = {
   INACTIVE: "ปิดการใช้งาน",
 };
 export const DRONER_STATUS = [
-  { value: "", name: "ทั้งหมด" },
+  { value: "ALL", name: "ทั้งหมด" },
   { value: "OPEN", name: "ยังไม่เปิดใช้งาน" },
   { value: "PENDING", name: "รอยืนยันตัวตน" },
   { value: "ACTIVE", name: "ใช้งาน" },

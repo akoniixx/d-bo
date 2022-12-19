@@ -68,6 +68,7 @@ import locale from "antd/es/date-picker/locale/th_TH";
 import TextArea from "antd/lib/input/TextArea";
 import { useLocalStorage } from "../../../hook/useLocalStorage";
 import { resizeFileImg } from "../../../utilities/ResizeImage";
+import { useNavigate } from "react-router-dom";
 const dateFormat = "DD/MM/YYYY";
 const dateCreateFormat = "YYYY-MM-DD";
 
@@ -75,6 +76,7 @@ const { Map } = require("immutable");
 const { Option } = Select;
 function AddDroner() {
   const [form] = Form.useForm();
+  const navigate = useNavigate();
   const [profile] = useLocalStorage("profile", []);
   const [data] = useState<CreateDronerEntity>(
     CreateDronerEntity_INIT
@@ -1193,9 +1195,7 @@ function AddDroner() {
   return (
     <Layout>
       <Row>
-        <BackIconButton
-          onClick={() => (window.location.href = "/IndexDroner")}
-        />
+        <BackIconButton onClick={() => navigate(-1)} />
         <span className="pt-4">
           <strong style={{ fontSize: "20px" }}>
             เพิ่มข้อมูลนักบินโดรน (Droner)
