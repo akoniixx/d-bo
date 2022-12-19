@@ -27,16 +27,31 @@ import {
   ProviceEntity,
   SubdistrictEntity,
 } from "../../entities/LocationEntities";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import { useEffectOnce } from "../../hook/useEffectOnce";
 
+interface SearchSelectType {
+  label: any;
+  value: any;
+}
 function IndexFarmer() {
   const row = 10;
   const [current, setCurrent] = useState(1);
+  const navigate = useNavigate();
   const [data, setData] = useState<FarmerPageEntity>();
-  const [searchStatus, setSearchStatus] = useState<string>();
+  const [searchStatus, setSearchStatus] = useState<
+    SearchSelectType | undefined
+  >();
   const [searchText, setSearchText] = useState<string>();
-  const [searchProvince, setSearchProvince] = useState<any>();
-  const [searchDistrict, setSearchDistrict] = useState<any>();
-  const [searchSubdistrict, setSearchSubdstrict] = useState<any>();
+  const [searchProvince, setSearchProvince] = useState<
+    SearchSelectType | undefined
+  >();
+  const [searchDistrict, setSearchDistrict] = useState<
+    SearchSelectType | undefined
+  >();
+  const [searchSubdistrict, setSearchSubdistrict] = useState<
+    SearchSelectType | undefined
+  >();
   const [province, setProvince] = useState<ProviceEntity[]>();
   const [district, setDistrict] = useState<DistrictEntity[]>();
   const [subdistrict, setSubdistrict] =
@@ -44,6 +59,52 @@ function IndexFarmer() {
   const [sortStatus, setSortStatus] = useState<string | undefined>(
     undefined
   );
+  const [searchQuery] = useSearchParams();
+
+  const genQuery = ({
+    searchDistrict,
+    searchDroneBrand,
+    searchProvince,
+    searchStatus,
+    searchSubdistrict,
+    searchText,
+  }: {
+    searchStatus?: string;
+    searchText?: string;
+    searchProvince?: string;
+    searchDistrict?: string;
+    searchSubdistrict?: string;
+    searchDroneBrand?: string;
+  }) => {
+    const query: any = {};
+    if (searchStatus) {
+      query.status = searchStatus;
+    }
+    if (searchText) {
+      query.searchText = searchText;
+    }
+    if (searchProvince) {
+      query.province = searchProvince;
+    }
+    if (searchDistrict) {
+      query.district = searchDistrict;
+    }
+    if (searchSubdistrict) {
+      query.subdistrict = searchSubdistrict;
+    }
+    if (searchDroneBrand) {
+      query.droneBrand = searchDroneBrand;
+    }
+    const queryString = Object.keys(query);
+    if (queryString.length > 0) {
+      return (
+        "?" +
+        queryString.map((key) => key + "=" + query[key]).join("&")
+      );
+    }
+    return "";
+  };
+
   const fecthAdmin = async ({
     sortDirection,
     sortField,
@@ -54,11 +115,11 @@ function IndexFarmer() {
     await FarmerDatasource.getFarmerList(
       current,
       row,
-      searchStatus,
+      searchStatus?.value,
       searchText,
-      searchProvince,
-      searchDistrict,
-      searchSubdistrict,
+      searchProvince?.value,
+      searchDistrict?.value,
+      searchSubdistrict?.value,
       sortDirection,
       sortField
     ).then((res: FarmerPageEntity) => {
@@ -66,24 +127,27 @@ function IndexFarmer() {
     });
   };
 
-  const fecthProvince = async () => {
-    await LocationDatasource.getProvince().then((res) => {
+  const fetchProvince = async () => {
+    return await LocationDatasource.getProvince().then((res) => {
       setProvince(res);
+      return res;
     });
   };
   const fetchDistrict = async () => {
-    await LocationDatasource.getDistrict(searchProvince).then(
-      (res) => {
-        setDistrict(res);
-      }
-    );
+    return await LocationDatasource.getDistrict(
+      searchProvince?.value
+    ).then((res) => {
+      setDistrict(res);
+      return res;
+    });
   };
   const fetchSubdistrict = async () => {
-    await LocationDatasource.getSubdistrict(searchDistrict).then(
-      (res) => {
-        setSubdistrict(res);
-      }
-    );
+    return await LocationDatasource.getSubdistrict(
+      searchDistrict?.value
+    ).then((res) => {
+      setSubdistrict(res);
+      return res;
+    });
   };
 
   useEffect(() => {
@@ -91,7 +155,6 @@ function IndexFarmer() {
       sortField: sortStatus ? "updatedAt" : undefined,
       sortDirection: sortStatus,
     });
-    fecthProvince();
     if (searchProvince) {
       fetchDistrict();
     }
@@ -113,26 +176,150 @@ function IndexFarmer() {
     setCurrent(page);
   };
 
-  const handleSearchStatus = (status: any) => {
-    setSearchStatus(status);
+  const handleSearchStatus = (status: any, data: any) => {
+    setSearchStatus({
+      value: status,
+      label: data.children,
+    });
+    navigate(
+      `/IndexFarmer${genQuery({
+        searchProvince: searchProvince?.label,
+        searchDistrict: searchDistrict?.label,
+        searchSubdistrict: searchSubdistrict?.label,
+        searchStatus: data.children,
+        searchText,
+      })}`
+    );
     setCurrent(1);
   };
   const handleSearchText = (e: string) => {
     setSearchText(e);
+    navigate(
+      `/IndexFarmer${genQuery({
+        searchProvince: searchProvince?.label,
+        searchDistrict: searchDistrict?.label,
+        searchSubdistrict: searchSubdistrict?.label,
+        searchStatus: searchStatus?.label,
+        searchText: e,
+      })}`
+    );
     setCurrent(1);
   };
-  const handleSearchProvince = (provinceId: number) => {
-    setSearchProvince(provinceId);
+  const handleSearchProvince = (provinceId: number, data: any) => {
+    setSearchProvince({
+      value: provinceId,
+      label: data.children,
+    });
+    navigate(
+      `/IndexFarmer${genQuery({
+        searchProvince: data.children,
+        searchDistrict: searchDistrict?.label,
+        searchSubdistrict: searchSubdistrict?.label,
+        searchStatus: searchStatus?.label,
+        searchText,
+      })}`
+    );
     setCurrent(1);
   };
-  const handleSearchDistrict = (districtId: number) => {
-    setSearchDistrict(districtId);
+  const handleSearchDistrict = (districtId: number, data: any) => {
+    setSearchDistrict({
+      value: districtId,
+      label: data.children,
+    });
+    navigate(
+      `/IndexFarmer${genQuery({
+        searchProvince: searchProvince?.label,
+        searchDistrict: data.children,
+        searchSubdistrict: searchSubdistrict?.label,
+        searchStatus: searchStatus?.label,
+        searchText,
+      })}`
+    );
     setCurrent(1);
   };
-  const handleSearchSubdistrict = (subdistrictId: number) => {
-    setSearchSubdstrict(subdistrictId);
+  const handleSearchSubdistrict = (
+    subdistrictId: number,
+    data: any
+  ) => {
+    setSearchSubdistrict({
+      value: subdistrictId,
+      label: data.children,
+    });
+    navigate(
+      `/IndexFarmer${genQuery({
+        searchProvince: searchProvince?.label,
+        searchDistrict: searchDistrict?.label,
+        searchSubdistrict: data.children,
+        searchStatus: searchStatus?.label,
+        searchText,
+      })}`
+    );
     setCurrent(1);
   };
+
+  useEffectOnce(() => {
+    const getInitialSearch = async () => {
+      const provinceData = await fetchProvince();
+      let findProvince: any;
+      let findDistrict: any;
+      if (searchQuery) {
+        const status = searchQuery.get("status");
+        const searchText = searchQuery.get("searchText");
+        const provinceQuery = searchQuery.get("province");
+        const districtQuery = searchQuery.get("district");
+        const subdistrictQuery = searchQuery.get("subdistrict");
+        if (status) {
+          const statusData = FARMER_STATUS_SEARCH.find((el: any) => {
+            return el.name === status;
+          });
+          setSearchStatus({
+            label: statusData?.name || "",
+            value: statusData?.value || "",
+          });
+        }
+
+        if (searchText) {
+          setSearchText(searchText);
+        }
+        if (provinceQuery && provinceData) {
+          findProvince = provinceData.find((el: any) => {
+            return el.provinceName === provinceQuery;
+          });
+          setSearchProvince({
+            label: findProvince?.provinceName || "",
+            value: findProvince?.provinceId || "",
+          });
+        }
+
+        if (districtQuery && findProvince) {
+          const districtData = await LocationDatasource.getDistrict(
+            findProvince?.provinceId
+          );
+          findDistrict = districtData.find((el: any) => {
+            return el.districtName === districtQuery;
+          });
+          setSearchDistrict({
+            label: findDistrict?.districtName || "",
+            value: findDistrict?.districtId || "",
+          });
+        }
+        if (subdistrictQuery && findDistrict) {
+          const subdistrictData =
+            await LocationDatasource.getSubdistrict(
+              findDistrict?.districtId
+            );
+          const findSubdistrict = subdistrictData.find((el: any) => {
+            return el.subdistrictName === subdistrictQuery;
+          });
+          setSearchSubdistrict({
+            label: findSubdistrict?.subdistrictName || "",
+            value: findSubdistrict?.subdistrictId || "",
+          });
+        }
+      }
+    };
+    getInitialSearch();
+  });
   const pageTitle = (
     <>
       <div
@@ -161,6 +348,7 @@ function IndexFarmer() {
         style={{ padding: "8px" }}>
         <div className="col-lg-3">
           <Search
+            value={searchText}
             placeholder="ค้นหาชื่อเกษตรกร หรือเบอร์โทร"
             className="col-lg-12 p-1"
             onSearch={handleSearchText}
@@ -173,6 +361,19 @@ function IndexFarmer() {
             placeholder="เลือกจังหวัด"
             onChange={handleSearchProvince}
             showSearch
+            onClear={() => {
+              setSearchProvince(undefined);
+              navigate(
+                `/IndexFarmer${genQuery({
+                  searchProvince: undefined,
+                  searchDistrict: searchDistrict?.label,
+                  searchSubdistrict: searchSubdistrict?.label,
+                  searchStatus: searchStatus?.label,
+                  searchText,
+                })}`
+              );
+            }}
+            value={searchProvince?.label}
             optionFilterProp="children"
             filterOption={(input: any, option: any) =>
               option.children.includes(input)
@@ -194,8 +395,21 @@ function IndexFarmer() {
             allowClear
             className="col-lg-12 p-1"
             placeholder="เลือกอำเภอ"
+            value={searchDistrict?.label}
             onChange={handleSearchDistrict}
             showSearch
+            onClear={() => {
+              setSearchDistrict(undefined);
+              navigate(
+                `/IndexFarmer${genQuery({
+                  searchProvince: searchProvince?.label,
+                  searchDistrict: undefined,
+                  searchSubdistrict: searchSubdistrict?.label,
+                  searchStatus: searchStatus?.label,
+                  searchText,
+                })}`
+              );
+            }}
             optionFilterProp="children"
             filterOption={(input: any, option: any) =>
               option.children.includes(input)
@@ -217,7 +431,20 @@ function IndexFarmer() {
           <Select
             allowClear
             className="col-lg-12 p-1"
+            value={searchSubdistrict?.label}
             placeholder="เลือกตำบล"
+            onClear={() => {
+              setSearchSubdistrict(undefined);
+              navigate(
+                `/IndexFarmer${genQuery({
+                  searchProvince: searchProvince?.label,
+                  searchDistrict: searchDistrict?.label,
+                  searchSubdistrict: undefined,
+                  searchStatus: searchStatus?.label,
+                  searchText,
+                })}`
+              );
+            }}
             onChange={handleSearchSubdistrict}
             showSearch
             optionFilterProp="children"
@@ -239,9 +466,22 @@ function IndexFarmer() {
         </div>
         <div className="col-lg-2">
           <Select
+            onClear={() => {
+              setSearchStatus(undefined);
+              navigate(
+                `/IndexFarmer${genQuery({
+                  searchProvince: searchProvince?.label,
+                  searchDistrict: searchDistrict?.label,
+                  searchSubdistrict: searchSubdistrict?.label,
+                  searchStatus: undefined,
+                  searchText,
+                })}`
+              );
+            }}
             allowClear
             className="col-lg-12 p-1"
             placeholder="เลือกสถานะ"
+            value={searchStatus?.label}
             onChange={handleSearchStatus}>
             {FARMER_STATUS_SEARCH.map((item) => (
               <option value={item.value}>{item.name}</option>

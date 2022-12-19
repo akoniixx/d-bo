@@ -1,4 +1,7 @@
 ## [Version - 0]
+
+## improve [v0.20.11] 2022-12-19
+- improve searchQuery droner & farmer
 ## Fix [v0.20.10] 2022-12-14
 - fixed text box size timeAppointment
 ## Fix [v0.20.9] 2022-12-9

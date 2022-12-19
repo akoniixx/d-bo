@@ -59,6 +59,7 @@ import bth_img_empty from "../../resource/media/empties/upload_Img_btn.png";
 import moment from "moment";
 import { useLocalStorage } from "../../hook/useLocalStorage";
 import { resizeFileImg } from "../../utilities/ResizeImage";
+import { useNavigate } from "react-router-dom";
 
 const dateFormat = "DD/MM/YYYY";
 const dateCreateFormat = "YYYY-MM-DD";
@@ -70,6 +71,7 @@ const { Map } = require("immutable");
 
 const AddFarmer = () => {
   const [profile] = useLocalStorage("profile", []);
+  const navigate = useNavigate();
 
   const [data, setData] = useState<CreateFarmerEntity>(
     CreateFarmerEntity_INIT
@@ -913,9 +915,7 @@ const AddFarmer = () => {
   return (
     <Layout>
       <Row>
-        <BackIconButton
-          onClick={() => (window.location.href = "/IndexFarmer")}
-        />
+        <BackIconButton onClick={() => navigate(-1)} />
         <span className="pt-4">
           <strong style={{ fontSize: "20px" }}>
             เพิ่มข้อมูลเกษตรกร (Farmer)

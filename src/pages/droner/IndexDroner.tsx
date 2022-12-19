@@ -191,7 +191,7 @@ function IndexDroner() {
         if (searchText) {
           setSearchText(searchText);
         }
-        if (provinceQuery && province) {
+        if (provinceQuery && provinceData) {
           findProvince = provinceData.find((el: any) => {
             return el.provinceName === provinceQuery;
           });
