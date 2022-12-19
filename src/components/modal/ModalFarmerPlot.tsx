@@ -77,13 +77,11 @@ const ModalFarmerPlot: React.FC<ModalFarmerPlotProps> = ({
   const handleSearchLocation = async (value: any) => {
     if (value !== undefined) {
       const a = location.filter((x) => x.subdistrictId === value)[0];
-
       form.setFieldsValue({
         lat: a.lat,
         long: a.long,
         plotAreaId: a.subdistrictId,
       });
-
       setMapPosition({
         lat: a.lat != null ? parseFloat(a.lat) : 0,
         lng: a.long != null ? parseFloat(a.long) : 0,
