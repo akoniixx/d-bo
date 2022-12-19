@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import {
   GoogleMap,
   MarkerF,
@@ -58,6 +58,17 @@ const GooleMap: React.FC<GoogleMapProps> = ({
     googleMapsClientId:
       "427194649680-frihsda5p9jjp6no28ijvoa66vrmq64f.apps.googleusercontent.com",
   });
+
+  useEffect(()=>{
+    setCenter({
+      lat : lat,
+      lng : lng
+    })
+    setPosition({
+      lat : lat,
+      lng : lng
+    })
+  },[lat,lng])
 
   const renderMap = () => (
     <>
