@@ -30,7 +30,6 @@ export class DronerDatasource {
       sortField,
       sortDirection,
     };
-
     return httpClient
       .get(BASE_URL + "/droner", { params })
       .then((response) => {

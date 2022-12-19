@@ -1592,7 +1592,7 @@ function EditDroner() {
         {renderDrone}
       </Row>
       <FooterPage
-        onClickBack={() => (window.location.href = "/IndexDroner")}
+        onClickBack={() => navigate(-1)}
         onClickSave={() => form.submit()}
         disableSaveBtn={disableSaveBtn}
       />
