@@ -154,6 +154,14 @@ function EditDroner() {
             province: res.address.provinceId || undefined,
             district: res.address.districtId || undefined,
             subdistrict: res.address?.subdistrictId || undefined,
+            dronerCreatedAt : `${moment(res.createdAt).format(
+              "DD/MM/YYYY"
+            )} ${
+              data.createBy === null ||
+              data.createBy === undefined
+                ? "(ลงทะเบียนโดยนักบิน)"
+                : `(${res.createBy})`
+            }`,
             birthDate: moment(res.birthDate) || undefined,
             latitude: res.dronerArea?.lat || undefined,
             longitude: res.dronerArea?.long || undefined,
@@ -641,6 +649,7 @@ function EditDroner() {
         ...dronerArea,
         mapUrl: values.mapUrl ? values.mapUrl : undefined,
       },
+      id : dronerId
     };
     delete payload.dronerDrone;
     if (values.status === "ACTIVE") {
@@ -794,23 +803,9 @@ function EditDroner() {
             </div>
             <div className="form-group col-lg-6">
               <label>วันที่ลงทะเบียน</label>
-
-              <div style={{ marginBottom: 24 }}>
-                <Input
-                  style={{
-                    padding: "4px 12px",
-                  }}
-                  disabled
-                  value={`${moment(data.createdAt).format(
-                    "DD/MM/YYYY"
-                  )} ${
-                    data.createBy === null ||
-                    data.createBy === undefined
-                      ? "(ลงทะเบียนโดยนักบิน)"
-                      : `(${data.createBy})`
-                  }`}
-                />
-              </div>
+              <Form.Item name="dronerCreatedAt">
+                <Input disabled defaultValue={data.createdAt} />
+              </Form.Item>
             </div>
           </div>
           <div className="row">
