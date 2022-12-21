@@ -1002,6 +1002,18 @@ function AddDroner() {
             </div>
           </div>
           <GoogleMap
+            changeLatLng={(lat, lng) => {
+              setDronerArea({
+                ...dronerArea,
+                lat: lat,
+                long: lng,
+              });
+              form.setFieldsValue({
+                latitude: lat,
+                longitude: lng,
+              });
+            }}
+            isEdit={true}
             width="100%"
             height="300px"
             zoom={17}
