@@ -1,9 +1,7 @@
 ## [Version - 0]
 
-## improve [v0.20.13] 2022-12-21
-- fixed add droner and googlemap in adddroner page
 ## improve [v0.20.12] 2022-12-21
-- fixed edit droner information
+- fixed edit droner infromation
 ## improve [v0.20.11] 2022-12-19
 - improve searchQuery droner & farmer
 ## Fix [v0.20.10] 2022-12-14
