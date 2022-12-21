@@ -1,7 +1,5 @@
 ## [Version - 0]
 
-## improve [v0.20.12] 2022-12-19
-- fixed edit information for droner
 ## improve [v0.20.11] 2022-12-19
 - improve searchQuery droner & farmer
 ## Fix [v0.20.10] 2022-12-14

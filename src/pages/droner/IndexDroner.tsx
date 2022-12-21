@@ -110,7 +110,6 @@ function IndexDroner() {
     undefined
   );
   const [droneBrandId, setDroneBrandId] = useState<any>();
-
   useEffect(() => {
     fetchDronerList({
       sortField: sortStatus ? "updatedAt" : undefined,
@@ -290,7 +289,10 @@ function IndexDroner() {
     setCurrent(1);
   };
   const handleSubDistrict = (subdistrictId: any, data: any) => {
-    setSearchSubdistrict(subdistrictId);
+    setSearchSubdistrict({
+      value: subdistrictId,
+      label: data.children,
+    });
     navigate(
       `/IndexDroner${genQuery({
         searchProvince: searchProvince?.label,

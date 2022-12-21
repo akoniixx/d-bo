@@ -927,7 +927,7 @@ const AddFarmer = () => {
         {renderLand}
       </Row>
       <FooterPage
-        onClickBack={() => (window.location.href = "/IndexFarmer")}
+        onClickBack={() => navigate(-1)}
         onClickSave={insertFarmer}
         disableSaveBtn={saveBtnDisable}
       />
