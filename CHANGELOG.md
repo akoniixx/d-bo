@@ -1,5 +1,7 @@
 ## [Version - 0]
-
+## improve [v0.20.12] 2022-12-19
+- bug searchQuery result not expected  
+- back bottom change to navigate back
 ## improve [v0.20.11] 2022-12-19
 - improve searchQuery droner & farmer
 ## Fix [v0.20.10] 2022-12-14
