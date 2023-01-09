@@ -1,6 +1,5 @@
 import { Avatar, Badge, Pagination, Select, Table } from "antd";
 import React, { useEffect, useState } from "react";
-import Search from "antd/lib/input/Search";
 import { Option } from "antd/lib/mentions";
 import color from "../../resource/color";
 import {
@@ -29,6 +28,7 @@ import { DroneDatasource } from "../../datasource/DroneDatasource";
 import Layouts from "../../components/layout/Layout";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useEffectOnce } from "../../hook/useEffectOnce";
+import SearchDebounce from "../../components/searchDebounce/SearchDebounce";
 
 interface SearchSelectType {
   label: any;
@@ -103,6 +103,7 @@ function IndexDroner() {
     }
     return "";
   };
+
   const navigate = useNavigate();
   const [searchQuery] = useSearchParams();
 
@@ -133,6 +134,7 @@ function IndexDroner() {
     searchDroneBrand,
     searchSubdistrict,
   ]);
+
   const fetchDronerList = async ({
     sortField,
     sortDirection,
@@ -229,7 +231,6 @@ function IndexDroner() {
     };
     getInitialSearch();
   });
-
   const fetchProvince = async () => {
     return await LocationDatasource.getProvince().then((res) => {
       setProvince(res);
@@ -380,11 +381,11 @@ function IndexDroner() {
         className="container d-flex justify-content-between"
         style={{ padding: "8px" }}>
         <div className="col-lg-3">
-          <Search
+          <SearchDebounce
+            onSearch={changeTextSearch}
             placeholder="ค้นหาชื่อนักบินโดรน หรือเบอร์โทร"
             className="col-lg-12 p-1"
-            value={searchText}
-            onSearch={changeTextSearch}
+            searchDefault={searchText}
           />
         </div>
         <div className="col">

@@ -1,5 +1,7 @@
 ## [Version - 0]
-
+## Fix [v0.20.14] 2022-12-22
+- fixed edit drone image bug
+- change search to onChange fired api
 ## improve [v0.20.13] 2022-12-21
 - fixed add droner and googlemap in adddroner page
 ## improve [v0.20.12] 2022-12-21

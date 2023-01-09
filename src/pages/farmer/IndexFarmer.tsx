@@ -29,6 +29,7 @@ import {
 } from "../../entities/LocationEntities";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useEffectOnce } from "../../hook/useEffectOnce";
+import SearchDebounce from "../../components/searchDebounce/SearchDebounce";
 
 interface SearchSelectType {
   label: any;
@@ -347,8 +348,8 @@ function IndexFarmer() {
         className="container d-flex justify-content-between"
         style={{ padding: "8px" }}>
         <div className="col-lg-3">
-          <Search
-            value={searchText}
+          <SearchDebounce
+            searchDefault={searchText}
             placeholder="ค้นหาชื่อเกษตรกร หรือเบอร์โทร"
             className="col-lg-12 p-1"
             onSearch={handleSearchText}
