@@ -1,7 +1,8 @@
+import { Form } from "antd";
 import Search from "antd/lib/input/Search";
 
 import React, { useEffect } from "react";
-import { useDebounce } from "../../hook/useDeboune";
+import { useSearchParams } from "react-router-dom";
 import { useEffectOnce } from "../../hook/useEffectOnce";
 
 interface Props {
@@ -15,26 +16,35 @@ function SearchDebounce({
   onSearch,
   ...props
 }: Props) {
-  const [search, setSearch] = React.useState("");
-  const debounceValue = useDebounce(search, 1000);
+  const [form] = Form.useForm();
+  const [searchQuery] = useSearchParams();
 
-  useEffectOnce(() => {
-    if (searchDefault) {
-      setSearch(searchDefault);
-    }
-  });
   useEffect(() => {
-    if (debounceValue) {
-      onSearch(debounceValue);
+    const searchText = searchQuery.get("searchText");
+    if (searchText) {
+      form.setFieldsValue({
+        search: searchText,
+      });
+      onSearch(searchText);
     }
-  }, [debounceValue, onSearch]);
-  const onChangeDebounce = (
-    e: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    setSearch(e.target.value);
-  };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [form, searchQuery]);
+
   return (
-    <Search {...props} value={search} onChange={onChangeDebounce} />
+    <Form
+      form={form}
+      initialValues={{
+        search: searchDefault,
+      }}>
+      <Form.Item name="search">
+        <Search
+          {...props}
+          onSearch={(value) => {
+            onSearch(value);
+          }}
+        />
+      </Form.Item>
+    </Form>
   );
 }
 

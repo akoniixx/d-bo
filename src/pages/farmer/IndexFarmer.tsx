@@ -265,7 +265,6 @@ function IndexFarmer() {
       let findDistrict: any;
       if (searchQuery) {
         const status = searchQuery.get("status");
-        const searchText = searchQuery.get("searchText");
         const provinceQuery = searchQuery.get("province");
         const districtQuery = searchQuery.get("district");
         const subdistrictQuery = searchQuery.get("subdistrict");
@@ -279,9 +278,6 @@ function IndexFarmer() {
           });
         }
 
-        if (searchText) {
-          setSearchText(searchText);
-        }
         if (provinceQuery && provinceData) {
           findProvince = provinceData.find((el: any) => {
             return el.provinceName === provinceQuery;

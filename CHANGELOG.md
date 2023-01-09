@@ -1,4 +1,7 @@
 ## [Version - 0]
+## Fix [v0.20.15] 2022-12-22
+- change to enter search fired api
+
 ## Fix [v0.20.14] 2022-12-22
 - fixed edit drone image bug
 - change search to onChange fired api
