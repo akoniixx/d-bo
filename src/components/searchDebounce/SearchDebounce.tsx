@@ -3,7 +3,6 @@ import Search from "antd/lib/input/Search";
 
 import React, { useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
-import { useEffectOnce } from "../../hook/useEffectOnce";
 
 interface Props {
   searchDefault?: string;
@@ -25,7 +24,6 @@ function SearchDebounce({
       form.setFieldsValue({
         search: searchText,
       });
-      onSearch(searchText);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [form, searchQuery]);
