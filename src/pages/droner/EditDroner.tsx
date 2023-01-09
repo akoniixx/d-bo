@@ -154,11 +154,10 @@ function EditDroner() {
             province: res.address.provinceId || undefined,
             district: res.address.districtId || undefined,
             subdistrict: res.address?.subdistrictId || undefined,
-            dronerCreatedAt : `${moment(res.createdAt).format(
+            dronerCreatedAt: `${moment(res.createdAt).format(
               "DD/MM/YYYY"
             )} ${
-              data.createBy === null ||
-              data.createBy === undefined
+              data.createBy === null || data.createBy === undefined
                 ? "(ลงทะเบียนโดยนักบิน)"
                 : `(${res.createBy})`
             }`,
@@ -394,29 +393,31 @@ function EditDroner() {
                     .map((z) => z.category)
                     .includes(y.category)
               );
-            if (checkFileImg.length > 0) {
+            if (checkFileImg?.length > 0) {
               UploadImageDatasouce.deleteImage(
                 checkFileImg[0].id,
                 checkFileImg[0].path
               ).then(res);
               fetchDronerById();
             } else {
-              for (let i: number = 0; drone.file.length > i; i++) {
-                let getImg = drone.file[i];
-                imgDroneList?.push({
-                  resourceId: res.id,
-                  category: getImg.category,
-                  file: getImg.file,
-                  resource: getImg.resource,
-                  path: "",
-                });
+              if (drone?.file?.length > 0) {
+                for (let i: number = 0; drone.file.length > i; i++) {
+                  let getImg = drone.file[i];
+                  imgDroneList?.push({
+                    resourceId: res.id,
+                    category: getImg.category,
+                    file: getImg.file,
+                    resource: getImg.resource,
+                    path: "",
+                  });
+                }
               }
-              const checkImg = imgDroneList.filter(
+              const checkImg = (imgDroneList || []).filter(
                 (x) => x.resourceId !== ""
               );
               for (let k = 0; checkImg.length > k; k++) {
                 let getDataImg: any = checkImg[k];
-                if (getDataImg.file !== undefined) {
+                if (!!getDataImg.file) {
                   await UploadImageDatasouce.uploadImage(
                     getDataImg
                   ).then(res);
@@ -649,7 +650,7 @@ function EditDroner() {
         ...dronerArea,
         mapUrl: values.mapUrl ? values.mapUrl : undefined,
       },
-      id : dronerId
+      id: dronerId,
     };
     delete payload.dronerDrone;
     if (values.status === "ACTIVE") {
@@ -725,9 +726,9 @@ function EditDroner() {
     const isHasValues = Object.values({
       ...rest,
 
-      expPlant: expPlant.length > 0,
+      expPlant: expPlant?.length > 0,
       reasonList:
-        reasonList.length > 0 ||
+        reasonList?.length > 0 ||
         (currentStatus !== "REJECTED" &&
           currentStatus !== "INACTIVE"),
     }).every((el) => el);
