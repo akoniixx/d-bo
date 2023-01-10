@@ -80,6 +80,7 @@ const ModalDrone: React.FC<ModalDroneProps> = ({
       }
     );
   };
+  // console.log(dataDrone);
   const fetchImg = async () => {
     if (checkDronerLicense?.length > 0) {
       if (checkDronerLicense[0].path == "") {
@@ -279,10 +280,19 @@ const ModalDrone: React.FC<ModalDroneProps> = ({
     const imgWindow = window.open(src);
     imgWindow?.document.write(image.outerHTML);
   };
-  const removeLicenseDroner = () => {
+  const removeLicenseDroner = async () => {
     const removeImg = dataDrone.file?.filter(
       (x) => x.category != "DRONER_LICENSE"
     )[0];
+    const findDroner = dataDrone.file?.find((el) => {
+      return el.category == "DRONER_LICENSE";
+    });
+    if (findDroner) {
+      await UploadImageDatasouce.deleteImage(
+        findDroner?.id,
+        findDroner?.path
+      );
+    }
     const d = Map(dataDrone).set(
       "file",
       removeImg == undefined ? [] : [removeImg]
@@ -334,14 +344,24 @@ const ModalDrone: React.FC<ModalDroneProps> = ({
     const imgWindow = window.open(src);
     imgWindow?.document.write(image.outerHTML);
   };
-  const removeLicenseDrone = () => {
+  const removeLicenseDrone = async () => {
     const removeImg = dataDrone.file?.filter(
       (x) => x.category != "DRONE_LICENSE"
     )[0];
+    const findDrone = dataDrone.file?.find((el) => {
+      return el.category == "DRONE_LICENSE";
+    });
+    if (findDrone) {
+      await UploadImageDatasouce.deleteImage(
+        findDrone?.id,
+        findDrone?.path
+      );
+    }
     const d = Map(dataDrone).set(
       "file",
       removeImg == undefined ? [] : [removeImg]
     );
+
     setDataDrone(d.toJS());
     setImgLicenseDrone(false);
     setCreateLicenseDrone(undefined);
@@ -371,6 +391,7 @@ const ModalDrone: React.FC<ModalDroneProps> = ({
       editIndex
     );
     const n = Map(m.toJS()).set("drone", pushDrone);
+    // console.log(n.toJS());
     callBack(n.toJS());
   };
 
@@ -605,7 +626,9 @@ const ModalDrone: React.FC<ModalDroneProps> = ({
                     </Tag>
                     <Tag
                       color={color.Error}
-                      onClick={removeLicenseDrone}
+                      onClick={() => {
+                        removeLicenseDrone();
+                      }}
                       style={{
                         cursor: "pointer",
                         borderRadius: "5px",
