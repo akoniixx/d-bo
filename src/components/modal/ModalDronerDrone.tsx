@@ -80,7 +80,6 @@ const ModalDrone: React.FC<ModalDroneProps> = ({
       }
     );
   };
-  // console.log(dataDrone);
   const fetchImg = async () => {
     if (checkDronerLicense?.length > 0) {
       if (checkDronerLicense[0].path == "") {
