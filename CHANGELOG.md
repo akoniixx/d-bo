@@ -1,4 +1,6 @@
 ## [Version - 0]
+## Fix [v0.20.16] 2022-12-22
+- image cant remove in EditDroner
 ## Fix [v0.20.15] 2022-12-22
 - change to enter search fired api
 

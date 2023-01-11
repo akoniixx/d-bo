@@ -126,10 +126,11 @@ function EditDroner() {
   const [location, setLocation] = useState<SubdistrictEntity[]>([]);
   const [searchLocation] = useState("");
 
-  const [imgDroneList] = useState<UploadImageEntity[]>([
-    UploadImageEntity_INTI,
-  ]);
-
+  let imgDroneList = [
+    {
+      ...UploadImageEntity_INTI,
+    },
+  ];
   const fetchDronerById = useCallback(async () => {
     await DronerDatasource.getDronerByID(dronerId).then(
       async (res) => {
@@ -377,6 +378,7 @@ function EditDroner() {
   };
   const updateDrone = async (drone: DronerDroneEntity) => {
     const d = Map(drone).set("dronerId", dronerId);
+
     if (d.toJS().id !== "") {
       await DronerDroneDatasource.updateDronerDrone(d.toJS()).then(
         async (res) => {
@@ -393,28 +395,28 @@ function EditDroner() {
                     .map((z) => z.category)
                     .includes(y.category)
               );
-            if (checkFileImg?.length > 0) {
+            if (!!checkFileImg) {
+              console.log(checkFileImg);
               UploadImageDatasouce.deleteImage(
                 checkFileImg[0].id,
                 checkFileImg[0].path
               ).then(res);
               fetchDronerById();
             } else {
-              if (drone?.file?.length > 0) {
-                for (let i: number = 0; drone.file.length > i; i++) {
-                  let getImg = drone.file[i];
-                  imgDroneList?.push({
-                    resourceId: res.id,
-                    category: getImg.category,
-                    file: getImg.file,
-                    resource: getImg.resource,
-                    path: "",
-                  });
-                }
+              for (let i: number = 0; drone.file.length > i; i++) {
+                let getImg = drone.file[i];
+                imgDroneList?.push({
+                  resourceId: res.id,
+                  category: getImg.category,
+                  file: getImg.file,
+                  resource: getImg.resource,
+                  path: "",
+                });
               }
               const checkImg = (imgDroneList || []).filter(
                 (x) => x.resourceId !== ""
               );
+
               for (let k = 0; checkImg.length > k; k++) {
                 let getDataImg: any = checkImg[k];
                 if (!!getDataImg.file) {
