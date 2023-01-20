@@ -12,4 +12,15 @@ export class CropDatasource {
         console.log(err, "err getCropByName");
       });
   }
+
+  static getAllCropPlantName() : Promise<CropPurposeSprayEntity[]> {
+    return httpClient
+      .get(BASE_URL + "/tasks/crop")
+      .then((response) => {
+        return response.data;
+      })
+      .catch((err) => {
+        console.log(err, "err getCropPlantName");
+    });
+  }
 }
