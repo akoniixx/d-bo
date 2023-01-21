@@ -1,13 +1,15 @@
 import { color } from "../resource";
 
 export const STATUS_NORMAL_MAPPING: any = {
-  true: "ใช้งาน",
-  false: "ไม่ใช้งาน",
+  PENDING: "รอยืนยันตัวแปลง",
+  ACTIVE: "ใช้งาน",
+  INACTIVE: "ปิดการใช้งาน",
 };
 
 export const STATUS_FARMERPLOT_COLOR_MAPPING: any = {
-  true: color.Success,
-  false: color.Error,
+  PENDING: "#EA973E",
+  ACTIVE: color.Success,
+  INACTIVE: color.Error,
 };
 
 export const STATUS_FARMER_MAPPING: any = {

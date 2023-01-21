@@ -1,5 +1,14 @@
 ## [Version - 0]
+## Fix [v0.20.17] 2023-01-21
+- add farmer plot status fix address to null safety and drafting coupon
+## Fix [v0.20.16] 2022-12-22
+- image cant remove in EditDroner
+## Fix [v0.20.15] 2022-12-22
+- change to enter search fired api
 
+## Fix [v0.20.14] 2022-12-22
+- fixed edit drone image bug
+- change search to onChange fired api
 ## improve [v0.20.13] 2022-12-21
 - fixed add droner and googlemap in adddroner page
 ## improve [v0.20.12] 2022-12-21

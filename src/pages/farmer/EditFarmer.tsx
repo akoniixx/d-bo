@@ -997,19 +997,19 @@ const EditFarmer = () => {
                       style={{
                         color:
                           STATUS_FARMERPLOT_COLOR_MAPPING[
-                            item.isActive.toString()
+                            item.status
                           ],
                       }}>
                       <Badge
                         color={
                           STATUS_FARMERPLOT_COLOR_MAPPING[
-                            item.isActive.toString()
+                            item.status
                           ]
                         }
                       />
                       {
                         STATUS_NORMAL_MAPPING[
-                          item.isActive.toString()
+                          item.status
                         ]
                       }
                     </span>

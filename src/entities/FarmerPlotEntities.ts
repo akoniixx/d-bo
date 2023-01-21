@@ -15,12 +15,13 @@ export interface FarmerPlotEntity {
   mapUrl: string;
   lat: string;
   long: string;
-  isActive: boolean;
+  isActive?: boolean;
   locationName: string;
   plotId: number;
   farmerId?: string;
   plotAreaId: number;
   comment?: string;
+  status : string;
 }
 export const FarmerPlotEntity_INIT: FarmerPlotEntity = {
   id: "",
@@ -38,4 +39,5 @@ export const FarmerPlotEntity_INIT: FarmerPlotEntity = {
   plotId: 0,
   farmerId: "",
   plotAreaId: 0,
+  status : "PENDING"
 };

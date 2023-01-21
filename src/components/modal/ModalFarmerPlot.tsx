@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Form, Input, Modal, Radio, Select, Space } from "antd";
+import { Form, Input, Modal, Radio, RadioChangeEvent, Select, Space } from "antd";
 import FooterPage from "../footer/FooterPage";
 import { FarmerPlotEntity } from "../../entities/FarmerPlotEntities";
 import { EXP_PLANT } from "../../definitions/ExpPlant";
@@ -54,6 +54,7 @@ const ModalFarmerPlot: React.FC<ModalFarmerPlotProps> = ({
   );
   const [location, setLocation] = useState<SubdistrictEntity[]>([]);
   const [searchLocation] = useState("");
+  const [commentDisable,setCommentDisable] = useState<boolean>((data.status !== "INACTIVE"))
 
   const fetchLocation = async (text?: string) => {
     await LocationDatasource.getSubdistrict(0, text).then((res) => {
@@ -90,6 +91,15 @@ const ModalFarmerPlot: React.FC<ModalFarmerPlotProps> = ({
       setMapPosition(LAT_LNG_BANGKOK);
     }
   };
+
+  const handleShowComment = (e : RadioChangeEvent) =>{
+    if(e.target.value === "INACTIVE"){
+      setCommentDisable(false)
+    }
+    else{
+      setCommentDisable(true)
+    }
+  }
 
   const handleOnChangeLat = (value: any) => {
     setFarmerPlot((prev) => ({
@@ -348,34 +358,47 @@ const ModalFarmerPlot: React.FC<ModalFarmerPlotProps> = ({
               />
             </Form.Item>
           </div>
-          <div
-            className="form-group col-lg-12"
-            style={{ marginTop: 16 }}>
-            <label>หมายเหตุ</label>
-            <Form.Item name="comment">
-              <TextArea value={farmerPlot.comment} />
-            </Form.Item>
-          </div>
           <div className="form-group">
             <label>
               สถานะ <span style={{ color: "red" }}>*</span>
             </label>
             <br />
             <Form.Item
-              name="isActive"
+              name="status"
               rules={[
                 {
                   required: true,
                   message: "กรุณาเลือกสถานะ!",
                 },
               ]}>
-              <Radio.Group defaultValue={farmerPlot.isActive}>
-                <Space direction="vertical">
-                  <Radio value={true}>ใช้งาน</Radio>
-                  <Radio value={false}>ไม่ใช้งาน</Radio>
-                </Space>
-              </Radio.Group>
+              {
+                isEditModal?
+                <Radio.Group defaultValue={farmerPlot.status} onChange={handleShowComment}>
+                  <Space direction="vertical">
+                    <Radio value={"ACTIVE"}>ใช้งาน</Radio>
+                    <Radio value={"PENDING"}>รอการตรวจสอบ</Radio>
+                    <Radio value={"INACTIVE"}>ไม่อนุมัติ</Radio>
+                  </Space>
+                </Radio.Group>:
+                <Radio.Group defaultValue={farmerPlot.status}>
+                  <Space direction="vertical">
+                    <Radio value={"ACTIVE"}>ใช้งาน</Radio>
+                    <Radio value={"PENDING"}>รอการตรวจสอบ</Radio>
+                  </Space>
+                </Radio.Group>
+              }
             </Form.Item>
+            {
+                (commentDisable)?
+                <></>:
+                <div
+                  className="form-group col-lg-12"
+                  style={{ marginTop: 16 }}>
+                  <Form.Item name="comment">
+                    <TextArea value={farmerPlot.comment} placeholder="กรอกเหตุผล/หมายเหตุเพิ่มเติม"/>
+                  </Form.Item>
+                </div>
+              }
           </div>
         </Form>
       </Modal>

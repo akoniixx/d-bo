@@ -29,7 +29,7 @@ export class UploadImageDatasouce {
       });
   }
 
-  static deleteImage(id: string, path: string): Promise<any> {
+  static async deleteImage(id: string, path: string): Promise<any> {
     const params = {
       id: id,
       path: path,

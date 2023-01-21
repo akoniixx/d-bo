@@ -29,6 +29,7 @@ import {
 } from "../../entities/LocationEntities";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useEffectOnce } from "../../hook/useEffectOnce";
+import SearchDebounce from "../../components/searchDebounce/SearchDebounce";
 
 interface SearchSelectType {
   label: any;
@@ -347,8 +348,8 @@ function IndexFarmer() {
         className="container d-flex justify-content-between"
         style={{ padding: "8px" }}>
         <div className="col-lg-3">
-          <Search
-            value={searchText}
+          <SearchDebounce
+            searchDefault={searchText}
             placeholder="ค้นหาชื่อเกษตรกร หรือเบอร์โทร"
             className="col-lg-12 p-1"
             onSearch={handleSearchText}
@@ -579,9 +580,10 @@ function IndexFarmer() {
       dataIndex: "province",
       key: "province",
       render: (value: any, row: any, index: number) => {
+        console.log(row)
         return {
           children: 
-          <span>{(row.address.province !== null)?row.address.province.provinceName:"-"}</span>,
+          <span>{(row.address.province !== null)?(row.address.province.provinceName !== null?row.address.province.provinceName:"-"):"-"}</span>,
         };
       },
     },
@@ -601,7 +603,6 @@ function IndexFarmer() {
       dataIndex: "date",
       key: "date",
       render: (value: any, row: any, index: number) => {
-        console.log(row.address)
         return {
           children: (
             <span>{(row.address.subdistrict !== null)?row.address.subdistrict.subdistrictName:"-"}</span>

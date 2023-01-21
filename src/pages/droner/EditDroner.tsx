@@ -126,10 +126,11 @@ function EditDroner() {
   const [location, setLocation] = useState<SubdistrictEntity[]>([]);
   const [searchLocation] = useState("");
 
-  const [imgDroneList] = useState<UploadImageEntity[]>([
-    UploadImageEntity_INTI,
-  ]);
-
+  let imgDroneList = [
+    {
+      ...UploadImageEntity_INTI,
+    },
+  ];
   const fetchDronerById = useCallback(async () => {
     await DronerDatasource.getDronerByID(dronerId).then(
       async (res) => {
@@ -154,11 +155,10 @@ function EditDroner() {
             province: res.address.provinceId || undefined,
             district: res.address.districtId || undefined,
             subdistrict: res.address?.subdistrictId || undefined,
-            dronerCreatedAt : `${moment(res.createdAt).format(
+            dronerCreatedAt: `${moment(res.createdAt).format(
               "DD/MM/YYYY"
             )} ${
-              data.createBy === null ||
-              data.createBy === undefined
+              data.createBy === null || data.createBy === undefined
                 ? "(ลงทะเบียนโดยนักบิน)"
                 : `(${res.createBy})`
             }`,
@@ -378,6 +378,7 @@ function EditDroner() {
   };
   const updateDrone = async (drone: DronerDroneEntity) => {
     const d = Map(drone).set("dronerId", dronerId);
+
     if (d.toJS().id !== "") {
       await DronerDroneDatasource.updateDronerDrone(d.toJS()).then(
         async (res) => {
@@ -394,7 +395,8 @@ function EditDroner() {
                     .map((z) => z.category)
                     .includes(y.category)
               );
-            if (checkFileImg.length > 0) {
+            if (!!checkFileImg) {
+              console.log(checkFileImg);
               UploadImageDatasouce.deleteImage(
                 checkFileImg[0].id,
                 checkFileImg[0].path
@@ -411,12 +413,13 @@ function EditDroner() {
                   path: "",
                 });
               }
-              const checkImg = imgDroneList.filter(
+              const checkImg = (imgDroneList || []).filter(
                 (x) => x.resourceId !== ""
               );
+
               for (let k = 0; checkImg.length > k; k++) {
                 let getDataImg: any = checkImg[k];
-                if (getDataImg.file !== undefined) {
+                if (!!getDataImg.file) {
                   await UploadImageDatasouce.uploadImage(
                     getDataImg
                   ).then(res);
@@ -649,7 +652,7 @@ function EditDroner() {
         ...dronerArea,
         mapUrl: values.mapUrl ? values.mapUrl : undefined,
       },
-      id : dronerId
+      id: dronerId,
     };
     delete payload.dronerDrone;
     if (values.status === "ACTIVE") {
@@ -725,9 +728,9 @@ function EditDroner() {
     const isHasValues = Object.values({
       ...rest,
 
-      expPlant: expPlant.length > 0,
+      expPlant: expPlant?.length > 0,
       reasonList:
-        reasonList.length > 0 ||
+        reasonList?.length > 0 ||
         (currentStatus !== "REJECTED" &&
           currentStatus !== "INACTIVE"),
     }).every((el) => el);
