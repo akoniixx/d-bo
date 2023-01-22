@@ -43,6 +43,7 @@ import {
 } from "../../entities/FarmerPlotEntities";
 import {
   FARMER_STATUS_SEARCH,
+  STATUS_FARMERPLOT_COLOR_MAPPING,
   STATUS_NORMAL_MAPPING,
 } from "../../definitions/Status";
 import ActionButton from "../../components/button/ActionButton";
@@ -199,9 +200,7 @@ const AddFarmer = () => {
 
   //#region data farmer plot
   const colorStatus = (status: string) => {
-    var mapStatus = STATUS_NORMAL_MAPPING[status];
-    var colorText = color.Success;
-    colorText = mapStatus == "ใช้งาน" ? colorText : color.Error;
+    let colorText = STATUS_FARMERPLOT_COLOR_MAPPING[status];
     return colorText;
   };
 
@@ -859,17 +858,17 @@ const AddFarmer = () => {
                       <span
                         style={{
                           color: colorStatus(
-                            item.isActive.toString()
+                            item.status
                           ),
                         }}>
                         <Badge
                           color={colorStatus(
-                            item.isActive.toString()
+                            item.status
                           )}
                         />
                         {
                           STATUS_NORMAL_MAPPING[
-                            item.isActive.toString()
+                            item.status
                           ]
                         }
                       </span>

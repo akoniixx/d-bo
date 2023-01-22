@@ -40,6 +40,7 @@ import EditInprogressTask from "./pages/task/inprogressTask/EditInprogressTask";
 import EditWaitStart from "./pages/task/todayTask/DetailEdit/EditWaitStart";
 import EditInProgress from "./pages/task/todayTask/DetailEdit/EditInProgress";
 import IndexTodayTask from "./pages/task/todayTask/IndexTaskToday";
+import AddPromotion from "./pages/promotion/AddPromotionPage";
 
 const WebRoutes: React.FC<any> = () => {
   return (
@@ -109,6 +110,7 @@ const WebRoutes: React.FC<any> = () => {
             element={<EditInProgress />}
           />
           <Route path="*" element={<PageNotFound />} />
+          <Route path="/AddPromotion" element={<AddPromotion />}/>
         </Route>
         <Route element={<PublicRoute />}>
           <Route index element={<AuthPage />} />

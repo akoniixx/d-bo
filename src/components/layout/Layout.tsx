@@ -187,17 +187,29 @@ const Layouts: React.FC<any> = ({ children }) => {
                 </Link>
               </Menu.Item>
             </Menu.SubMenu>
-            <Menu.Item key="promotion" icon={<GiftFilled />}>
-              <Link
-                to="/PromotionPage"
-                style={{ textDecoration: "none" }}>
-                <span>โปรโมชั่น</span>
-              </Link>
-            </Menu.Item>
+            <Menu.SubMenu
+              icon={<GiftFilled />}
+              title={<span>ข่าวสารและโปรโมชั่น</span>}
+              key={"sub4"}>
+              {/* <Menu.Item key="droner">
+                <Link
+                  to="/IndexDroner"
+                  style={{ textDecoration: "none" }}>
+                  <span>ข่าวสาร</span>
+                </Link>
+              </Menu.Item> */}
+              <Menu.Item key="dronerList">
+                <Link
+                  to="/PromotionPage"
+                  style={{ textDecoration: "none" }}>
+                  <span>คูปอง</span>
+                </Link>
+              </Menu.Item>
+            </Menu.SubMenu>
             <Menu.SubMenu
               icon={<SettingFilled />}
               title={<span>ผู้ดูแลระบบ</span>}
-              key={"sub4"}>
+              key={"sub5"}>
               <Menu.Item key="admin">
                 <Link
                   to="/IndexAdmin"

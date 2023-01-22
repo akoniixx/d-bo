@@ -386,7 +386,7 @@ function IndexFarmer() {
             }>
             {province?.map((item) => (
               <Option value={item.provinceId.toString()}>
-                {item.provinceName}
+                {item.provinceName??[]}
               </Option>
             ))}
           </Select>
@@ -420,7 +420,7 @@ function IndexFarmer() {
                 .toLowerCase()
                 .localeCompare(optionB.children.toLowerCase())
             }
-            disabled={searchProvince == undefined}>
+            disabled={searchProvince === undefined}>
             {district?.map((item) => (
               <Option value={item.districtId.toString()}>
                 {item.districtName}
@@ -457,7 +457,7 @@ function IndexFarmer() {
                 .toLowerCase()
                 .localeCompare(optionB.children.toLowerCase())
             }
-            disabled={searchDistrict == undefined}>
+            disabled={searchDistrict === undefined}>
             {subdistrict?.map((item) => (
               <Option value={item.subdistrictId.toString()}>
                 {item.subdistrictName}
@@ -580,8 +580,10 @@ function IndexFarmer() {
       dataIndex: "province",
       key: "province",
       render: (value: any, row: any, index: number) => {
+        console.log(row)
         return {
-          children: <span>{row.address.province.provinceName}</span>,
+          children: 
+          <span>{(row.address.province !== null)?(row.address.province.provinceName !== null?row.address.province.provinceName:"-"):"-"}</span>,
         };
       },
     },
@@ -591,7 +593,8 @@ function IndexFarmer() {
       key: "district",
       render: (value: any, row: any, index: number) => {
         return {
-          children: <span>{row.address.district.districtName}</span>,
+          children: 
+          <span>{(row.address.district !== null)?row.address.district.districtName:"-"}</span>,
         };
       },
     },
@@ -602,7 +605,7 @@ function IndexFarmer() {
       render: (value: any, row: any, index: number) => {
         return {
           children: (
-            <span>{row.address.subdistrict.subdistrictName}</span>
+            <span>{(row.address.subdistrict !== null)?row.address.subdistrict.subdistrictName:"-"}</span>
           ),
         };
       },
@@ -642,7 +645,7 @@ function IndexFarmer() {
           let createDate: any = moment(new Date(row.createdAt));
           let dateDiff = dateToday.diff(createDate, "day");
           let textDateDiff =
-            dateDiff == 0 ? null : "(รอไปแล้ว " + dateDiff + " วัน)";
+            dateDiff === 0 ? null : "(รอไปแล้ว " + dateDiff + " วัน)";
           return textDateDiff;
         };
         return {
@@ -655,7 +658,7 @@ function IndexFarmer() {
                 <br />
               </span>
               <span style={{ color: color.Grey }}>
-                {row.status == "PENDING" ? countDay() : null}
+                {row.status === "PENDING" ? countDay() : null}
               </span>
             </>
           ),
@@ -696,7 +699,7 @@ function IndexFarmer() {
             x: 300,
           }}
           rowClassName={(a) =>
-            a.status == "PENDING" &&
+            a.status === "PENDING" &&
             moment(Date.now()).diff(
               moment(new Date(a.createdAt)),
               "day"
