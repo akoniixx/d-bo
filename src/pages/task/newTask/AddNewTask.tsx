@@ -205,7 +205,7 @@ const AddNewTask = () => {
     setCheckSelectPlot("");
     plotSelected && setFarmerPlotSelected(plotSelected);
     fetchLocationPrice(
-      plotSelected?.plotArea.provinceId,
+      (!farmerPlotSeleced?.plotArea)?0:farmerPlotSeleced?.plotArea.provinceId,
       plotSelected?.plantName,
       plotSelected?.raiAmount,
       plotSelected?.id
@@ -343,7 +343,7 @@ const AddNewTask = () => {
       setDisableBtn(true);
     } else {
       fetchLocationPrice(
-        farmerPlotSeleced?.plotArea.provinceId,
+        (!farmerPlotSeleced?.plotArea)?0:farmerPlotSeleced?.plotArea.provinceId,
         farmerPlotSeleced?.plantName,
         createNewTask.farmAreaAmount,
         farmerPlotSeleced?.id
@@ -491,20 +491,23 @@ const AddNewTask = () => {
                   <Form.Item>
                     <Input
                       value={
-                        (farmerPlotSeleced?.plotArea
-                          .subdistrictName != undefined
-                          ? farmerPlotSeleced?.plotArea
+                        (!(farmerPlotSeleced?.plotArea
+                          )
+                          ? ""
+                          : farmerPlotSeleced?.plotArea
                               .subdistrictName + "/"
-                          : "") +
-                        (farmerPlotSeleced?.plotArea.districtName !=
-                        undefined
-                          ? farmerPlotSeleced?.plotArea.districtName +
+                          ) +
+                        (!(farmerPlotSeleced?.plotArea)
+                          ? 
+                          "":
+                          farmerPlotSeleced?.plotArea.districtName +
                             "/"
-                          : "") +
-                        (farmerPlotSeleced?.plotArea.provinceName !=
-                        undefined
-                          ? farmerPlotSeleced?.plotArea.provinceName
-                          : "")
+                            ) +
+                        (!(farmerPlotSeleced?.plotArea)
+                          ? 
+                          "":
+                          farmerPlotSeleced?.plotArea.provinceName + "/"
+                          )
                       }
                       disabled
                     />
@@ -1710,6 +1713,7 @@ const AddNewTask = () => {
       showCancelButton: true,
       showCloseButton: true,
     }).then(async (result) => {
+      console.log(result)
       if (result.isConfirmed) {
         if (selectionType == "checkbox") {
           delete createNewTask["dronerId"];
@@ -1725,6 +1729,7 @@ const AddNewTask = () => {
         );
         setCreateNewTask(d.toJS());
         await TaskDatasource.insertNewTask(d.toJS()).then((res) => {
+          console.log(d.toJS())
           if (res.userMessage == "success") {
             window.location.href = "/IndexNewTask";
           }
