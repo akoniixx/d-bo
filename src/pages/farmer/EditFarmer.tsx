@@ -487,6 +487,8 @@ const EditFarmer = () => {
     };
     delete payload.farmerPlot;
     await FarmerDatasource.updateFarmer(payload).then((res) => {
+      console.log(payload)
+      console.log(res)
       if (res !== undefined) {
         let i = 0;
         for (i; 2 > i; i++) {

@@ -153,7 +153,7 @@ const AddNewTask = () => {
   //#region Step1 & Step3
   const handleSearchFarmer = (value: any, id: any) => {
     if (value != undefined) {
-      setFarmerSelected(farmerList?.filter((x) => x.id == id.id)[0]);
+      setFarmerSelected(farmerList?.filter((x) => x.id === id.id)[0]);
     } else {
       setFarmerSelected(undefined);
     }
@@ -198,7 +198,7 @@ const AddNewTask = () => {
   };
   const handleSelectFarmerPlot = (value: any) => {
     let plotSelected = farmerSelected?.farmerPlot.filter(
-      (x) => x.id == value
+      (x) => x.id === value
     )[0];
     setPriceMethod("อัตโนมัติ");
     setCropSelected(plotSelected?.plantName);
@@ -213,7 +213,7 @@ const AddNewTask = () => {
   };
   const onSelectFarmer = (e: any, id: any) => {
     setFarmerSelected(undefined);
-    const findFarmer = farmerList?.filter((x) => x.id == id.id)[0];
+    const findFarmer = farmerList?.filter((x) => x.id === id.id)[0];
     setFarmerSelected(findFarmer);
   };
   const handleAmountRai = (
@@ -240,13 +240,13 @@ const AddNewTask = () => {
     let checked = e.target.checked;
     let value = e.target.value;
     setCheckCrop(
-      value == "อื่นๆ" ? !checked : otherSpray != null ? false : true
+      value === "อื่นๆ" ? !checked : otherSpray != null ? false : true
     );
     PURPOSE_SPRAY_CHECKBOX.map((item) =>
       _.set(
         item,
         "isChecked",
-        item.crop == value ? checked : item.isChecked
+        item.crop === value ? checked : item.isChecked
       )
     );
     let p: any = "";
@@ -295,7 +295,7 @@ const AddNewTask = () => {
     checkValidateStep(d.toJS(), current);
   };
   const handleCalServiceCharge = (e: any) => {
-    if (e.target.id == "unitPrice") {
+    if (e.target.id === "unitPrice") {
       let calUnitPrice =
         parseFloat(createNewTask.farmAreaAmount) * e.target.value;
       const d = Map(createNewTask).set("unitPrice", e.target.value);
@@ -336,7 +336,7 @@ const AddNewTask = () => {
   };
   const selectPrice = (e: any) => {
     setPriceMethod(e.target.outerText);
-    if (e.target.outerText == "กรอกข้อมูลเอง") {
+    if (e.target.outerText === "กรอกข้อมูลเอง") {
       const d = Map(createNewTask).set("price", 0);
       const pushCal = Map(d.toJS()).set("unitPrice", 0);
       setCreateNewTask(pushCal.toJS());
@@ -356,7 +356,7 @@ const AddNewTask = () => {
       <CardHeader textHeader="ข้อมูลเกษตรกรและแปลง" />
       <div className="flex-column">
         <Form style={{ padding: "20px" }}>
-          {current == 0 && (
+          {current === 0 && (
             <div className="row">
               <div className="form-group col-lg-6">
                 <Form.Item name="searchAddress">
@@ -426,7 +426,7 @@ const AddNewTask = () => {
                       status={checkSelectPlot}
                       placeholder="เลือกแปลง"
                       onChange={handleSelectFarmerPlot}
-                      disabled={current == 2}
+                      disabled={current === 2}
                       defaultValue={createNewTask.farmerPlotId}>
                       {dataFarmer.farmerPlot.map((item) => (
                         <option value={item.id}>
@@ -434,7 +434,7 @@ const AddNewTask = () => {
                         </option>
                       ))}
                     </Select>
-                    {checkSelectPlot == "error" && (
+                    {checkSelectPlot === "error" && (
                       <span style={{ color: color.Error }}>
                         กรุณาเลือกแปลง
                       </span>
@@ -456,7 +456,7 @@ const AddNewTask = () => {
                     <Input
                       status={
                         parseFloat(createNewTask?.farmAreaAmount) >
-                        (farmerPlotSeleced.raiAmount == undefined
+                        (farmerPlotSeleced.raiAmount === undefined
                           ? 0
                           : parseFloat(farmerPlotSeleced.raiAmount))
                           ? "error"
@@ -465,11 +465,11 @@ const AddNewTask = () => {
                       value={createNewTask?.farmAreaAmount}
                       onChange={handleAmountRai}
                       disabled={
-                        current == 2 || checkSelectPlot == "error"
+                        current === 2 || checkSelectPlot === "error"
                       }
                     />
                     {parseFloat(createNewTask?.farmAreaAmount) >
-                      (farmerPlotSeleced.raiAmount == undefined
+                      (farmerPlotSeleced.raiAmount === undefined
                         ? 0
                         : parseFloat(
                             farmerPlotSeleced.raiAmount
@@ -566,26 +566,26 @@ const AddNewTask = () => {
               <Form style={{ padding: "20px" }}>
                 <label>ยอดรวมค่าบริการ</label>
                 <br />
-                {current !== 2 && (
+                {current != 2 && (
                   <>
                     <Button
                       size="middle"
                       style={{
                         backgroundColor:
-                          priceMethod == "กรอกข้อมูลเอง"
+                          priceMethod === "กรอกข้อมูลเอง"
                             ? color.White
                             : color.Success,
                         color:
-                          priceMethod == "กรอกข้อมูลเอง"
+                          priceMethod === "กรอกข้อมูลเอง"
                             ? color.Grey
                             : color.White,
                         borderColor:
-                          priceMethod == "กรอกข้อมูลเอง"
+                          priceMethod === "กรอกข้อมูลเอง"
                             ? color.White
                             : color.Success,
                       }}
                       disabled={
-                        current == 2 || checkSelectPlot == "error"
+                        current === 2 || checkSelectPlot === "error"
                       }
                       onClick={(e) => selectPrice(e)}>
                       อัตโนมัติ
@@ -594,20 +594,20 @@ const AddNewTask = () => {
                       size="middle"
                       style={{
                         backgroundColor:
-                          priceMethod == "อัตโนมัติ"
+                          priceMethod === "อัตโนมัติ"
                             ? color.White
                             : color.Success,
                         color:
-                          priceMethod == "อัตโนมัติ"
+                          priceMethod === "อัตโนมัติ"
                             ? color.Grey
                             : color.White,
                         borderColor:
-                          priceMethod == "อัตโนมัติ"
+                          priceMethod === "อัตโนมัติ"
                             ? color.White
                             : color.Success,
                       }}
                       disabled={
-                        current == 2 || checkSelectPlot == "error"
+                        current === 2 || checkSelectPlot === "error"
                       }
                       onClick={(e) => selectPrice(e)}>
                       กรอกข้อมูลเอง
@@ -660,7 +660,7 @@ const AddNewTask = () => {
                           value={createNewTask.unitPrice}
                           onChange={handleCalServiceCharge}
                           disabled={
-                            current == 2 || checkSelectPlot == "error"
+                            current === 2 || checkSelectPlot === "error"
                           }
                           autoComplete="off"
                           step="0.01"
@@ -676,7 +676,7 @@ const AddNewTask = () => {
                           value={createNewTask.price}
                           onChange={handleCalServiceCharge}
                           disabled={
-                            current == 2 || checkSelectPlot == "error"
+                            current === 2 || checkSelectPlot === "error"
                           }
                           autoComplete="off"
                           step="0.01"
@@ -705,7 +705,7 @@ const AddNewTask = () => {
                   format={dateFormat}
                   className="col-lg-12"
                   disabled={
-                    current == 2 || checkSelectPlot == "error"
+                    current === 2 || checkSelectPlot === "error"
                   }
                   onChange={handleDateAppointment}
                   defaultValue={moment(dateAppointment)}
@@ -718,7 +718,7 @@ const AddNewTask = () => {
                 <TimePicker
                   className="col-lg-12"
                   disabled={
-                    current == 2 || checkSelectPlot == "error"
+                    current === 2 || checkSelectPlot === "error"
                   }
                   format={timeFormat}
                   onSelect={(v) => {
@@ -736,7 +736,7 @@ const AddNewTask = () => {
             <Form.Item name="searchAddress">
               <Select
                 placeholder="-"
-                disabled={current == 2 || checkSelectPlot == "error"}
+                disabled={current === 2 || checkSelectPlot === "error"}
                 onChange={handlePeriodSpray}
                 defaultValue={createNewTask.purposeSprayId}>
                 {periodSpray?.purposeSpray?.length ? (
@@ -772,7 +772,7 @@ const AddNewTask = () => {
                   type="checkbox"
                   value={x.crop}
                   disabled={
-                    current == 2 || checkSelectPlot == "error"
+                    current === 2 || checkSelectPlot === "error"
                   }
                   onChange={handlePurposeSpray}
                   checked={x.isChecked}
@@ -780,12 +780,12 @@ const AddNewTask = () => {
                 <label style={{ padding: "0 8px 0 0" }}>
                   {x.crop}
                 </label>
-                {index == 4 && (
+                {index === 4 && (
                   <>
                     <Input
                       status={validateComma.status}
                       className="col-lg-5"
-                      disabled={current == 2 || checkCrop}
+                      disabled={current === 2 || checkCrop}
                       placeholder="โปรดระบุ เช่น เพลี้ย,หอย"
                       onChange={handleOtherSpray}
                       defaultValue={Array.from(
@@ -796,7 +796,7 @@ const AddNewTask = () => {
                         )
                       )}
                     />
-                    {validateComma.status == "error" && (
+                    {validateComma.status === "error" && (
                       <p
                         style={{
                           color: color.Error,
@@ -815,7 +815,7 @@ const AddNewTask = () => {
               การเตรียมยา <span style={{ color: "red" }}>*</span>
             </label>
             <Radio.Group
-              disabled={current == 2 || checkSelectPlot == "error"}
+              disabled={current === 2 || checkSelectPlot === "error"}
               defaultValue={createNewTask.preparationBy}>
               <Space
                 direction="vertical"
@@ -833,7 +833,7 @@ const AddNewTask = () => {
             <label>หมายเหตุ</label>
             <TextArea
               placeholder="ระบุหมายเหตุเพื่อแจ้งนักบินโดรน เช่น เกษตรกรจะเตรียมยาให้, ฝากนักบินเลือกยาราคาไม่แพงมาให้หน่อย เป็นต้น"
-              disabled={current == 2 || checkSelectPlot == "error"}
+              disabled={current === 2 || checkSelectPlot === "error"}
               onChange={handleComment}
               defaultValue={createNewTask.comment}
             />
@@ -1003,12 +1003,12 @@ const AddNewTask = () => {
     let checked = e.target.checked;
     let d: TaskSearchDroner[] = [];
     let checkDup = [];
-    if (inputType == "checkbox") {
+    if (inputType === "checkbox") {
       d = dataDronerList.map((item) =>
         _.set(
           item,
           "isChecked",
-          item.droner_id == data.droner_id ? checked : item.isChecked
+          item.droner_id === data.droner_id ? checked : item.isChecked
         )
       );
     } else {
@@ -1016,7 +1016,7 @@ const AddNewTask = () => {
         _.set(
           item,
           "isChecked",
-          item.droner_id == data.droner_id ? checked : false
+          item.droner_id === data.droner_id ? checked : false
         )
       );
     }
@@ -1024,7 +1024,7 @@ const AddNewTask = () => {
     let checkSingleDroner = Array.from(
       new Set(
         d
-          .filter((x) => x.isChecked == true)
+          .filter((x) => x.isChecked === true)
           .map((y) => y)
           .filter(
             (z) =>
@@ -1035,7 +1035,7 @@ const AddNewTask = () => {
       )
     );
     checkDup =
-      inputType == "checkbox"
+      inputType === "checkbox"
         ? (checkDup = [
             ...dronerSelected.filter((x) => x.droner_id != ""),
             ...checkSingleDroner.filter((x) => x.droner_id != ""),
@@ -1049,7 +1049,7 @@ const AddNewTask = () => {
     checkValidateStep(
       createNewTask,
       current,
-      d.filter((x) => x.isChecked == true)
+      d.filter((x) => x.isChecked === true)
     );
   };
   const handleAllSelectDroner = (e: any) => {
@@ -1058,18 +1058,18 @@ const AddNewTask = () => {
       _.set(
         item,
         "isChecked",
-        item.droner_status == "ไม่สะดวก" ||
-          item.is_open_receive_task == false
+        item.droner_status === "ไม่สะดวก" ||
+          item.is_open_receive_task === false
           ? false
           : checked
       )
     );
     setDataDronerList(d);
-    setDronerSelected(d.filter((x) => x.isChecked == true));
+    setDronerSelected(d.filter((x) => x.isChecked === true));
     checkValidateStep(
       createNewTask,
       current,
-      d.filter((x) => x.isChecked == true)
+      d.filter((x) => x.isChecked === true)
     );
   };
   const callBackDronerSelected = (data: TaskSearchDroner[]) => {
@@ -1085,12 +1085,12 @@ const AddNewTask = () => {
       )
     );
     setDataDronerList(d);
-    setDronerSelected(d.filter((x) => x.isChecked == true));
+    setDronerSelected(d.filter((x) => x.isChecked === true));
     setShowModalSelectedDroner((prev) => !prev);
     checkValidateStep(
       createNewTask,
       current,
-      d.filter((x) => x.isChecked == true)
+      d.filter((x) => x.isChecked === true)
     );
   };
   const handleVisibleRating = (newVisible: any) => {
@@ -1212,15 +1212,15 @@ const AddNewTask = () => {
 
   const columns = [
     {
-      title: selectionType == "checkbox" && (
+      title: selectionType === "checkbox" && (
         <input
           type={selectionType}
           onChange={handleAllSelectDroner}
           checked={dataDronerList
             .filter(
               (x) =>
-                x.droner_status != "ไม่สะดวก" &&
-                x.is_open_receive_task != false
+                x.droner_status !== "ไม่สะดวก" &&
+                x.is_open_receive_task !== false
             )
             .every((x) => x.isChecked)}
           style={{ width: "18px", height: "18px" }}
@@ -1235,9 +1235,9 @@ const AddNewTask = () => {
                 onChange={(e) => handleSelectDroner(e, row)}
                 checked={row.isChecked}
                 disabled={
-                  selectionType == "checkbox"
-                    ? row.droner_status != "ไม่สะดวก" &&
-                      row.is_open_receive_task != false
+                  selectionType === "checkbox"
+                    ? row.droner_status !== "ไม่สะดวก" &&
+                      row.is_open_receive_task !== false
                       ? false
                       : true
                     : false
@@ -1297,11 +1297,11 @@ const AddNewTask = () => {
           children: (
             <>
               <span>
-                {row.total_task == null ? 0 : row.total_task} งาน
+                {row.total_task === null ? 0 : row.total_task} งาน
               </span>
               <br />
               <span style={{ color: color.Grey }}>
-                รวม {row.total_area == null ? 0 : row.total_area} ไร่
+                รวม {row.total_area === null ? 0 : row.total_area} ไร่
               </span>
             </>
           ),
@@ -1388,22 +1388,22 @@ const AddNewTask = () => {
               <span
                 style={{
                   color:
-                    row.is_open_receive_task == false
+                    row.is_open_receive_task === false
                       ? color.Disable
-                      : row.droner_status == "สะดวก"
+                      : row.droner_status === "สะดวก"
                       ? color.Success
                       : color.Error,
                 }}>
                 <Badge
                   color={
-                    row.is_open_receive_task == false
+                    row.is_open_receive_task === false
                       ? color.Disable
-                      : row.droner_status == "สะดวก"
+                      : row.droner_status === "สะดวก"
                       ? color.Success
                       : color.Error
                   }
                 />
-                {row.is_open_receive_task == false
+                {row.is_open_receive_task === false
                   ? "ปิดการใช้งาน"
                   : row.droner_status}
                 <br />
@@ -1480,13 +1480,13 @@ const AddNewTask = () => {
                       <span
                         style={{
                           color:
-                            JSON.parse(x).droner_status == "สะดวก"
+                            JSON.parse(x).droner_status === "สะดวก"
                               ? color.Success
                               : color.Error,
                         }}>
                         <Badge
                           color={
-                            JSON.parse(x).droner_status == "สะดวก"
+                            JSON.parse(x).droner_status === "สะดวก"
                               ? color.Success
                               : color.Error
                           }
@@ -1522,7 +1522,7 @@ const AddNewTask = () => {
                     suffix="บาท"
                     value={createNewTask.price}
                     disabled={
-                      current == 2 || checkSelectPlot == "error"
+                      current === 2 || checkSelectPlot === "error"
                     }
                     autoComplete="off"
                     step="0.01"
@@ -1536,7 +1536,7 @@ const AddNewTask = () => {
                     suffix="บาท"
                     value={createNewTask.fee}
                     disabled={
-                      current == 2 || checkSelectPlot == "error"
+                      current === 2 || checkSelectPlot === "error"
                     }
                     autoComplete="off"
                     step="0.01"
@@ -1550,7 +1550,7 @@ const AddNewTask = () => {
                     suffix="บาท"
                     value={createNewTask.discountFee}
                     disabled={
-                      current == 2 || checkSelectPlot == "error"
+                      current === 2 || checkSelectPlot === "error"
                     }
                     autoComplete="off"
                     step="0.01"
@@ -1570,7 +1570,7 @@ const AddNewTask = () => {
     currentStep?: number,
     dataDroner?: TaskSearchDroner[]
   ) => {
-    if (currentStep == 0) {
+    if (currentStep === 0) {
       let checkEmptySting = ![
         data?.farmerId,
         data?.farmerPlotId,
@@ -1611,7 +1611,7 @@ const AddNewTask = () => {
   };
   const previousStep = async () => {
     let checkCurrent = current - 1;
-    if (checkCurrent == 0) {
+    if (checkCurrent === 0) {
       await checkValidateStep(createNewTask, checkCurrent);
     } else {
       fetchDronerList(
@@ -1628,7 +1628,7 @@ const AddNewTask = () => {
     setCurrent(checkCurrent);
   };
   const nextStep = () => {
-    if (current == 0) {
+    if (current === 0) {
       let changeDateFormat =
         moment(dateAppointment).format(dateCreateFormat);
       let changeTimeFormat =
@@ -1651,7 +1651,7 @@ const AddNewTask = () => {
         changeDateFormat + " " + changeTimeFormat
       ).toISOString();
       payload.createBy = profile.firstname + " " + profile.lastname;
-      if (priceMethod == "กรอกข้อมูลเอง") {
+      if (priceMethod === "กรอกข้อมูลเอง") {
         payload.priceStandard = 0;
         payload.unitPriceStandard = 0;
       }
@@ -1672,7 +1672,7 @@ const AddNewTask = () => {
       }
       const payload = { ...createNewTask };
       payload.taskDronerTemp = pushDronerList;
-      if (selectionType == "checkbox") {
+      if (selectionType === "checkbox") {
         payload.status = "WAIT_RECEIVE";
         payload.fee = payload.price * 0.05;
         payload.discountFee = payload.price * 0.05;
@@ -1713,9 +1713,8 @@ const AddNewTask = () => {
       showCancelButton: true,
       showCloseButton: true,
     }).then(async (result) => {
-      console.log(result)
       if (result.isConfirmed) {
-        if (selectionType == "checkbox") {
+        if (selectionType === "checkbox") {
           delete createNewTask["dronerId"];
         } else {
           delete createNewTask["taskDronerTemp"];
@@ -1727,13 +1726,14 @@ const AddNewTask = () => {
           "targetSpray",
           checkDupSpray
         );
-        setCreateNewTask(d.toJS());
-        await TaskDatasource.insertNewTask(d.toJS()).then((res) => {
-          console.log(d.toJS())
-          if (res.userMessage == "success") {
+        const payload = d.toJS();
+        payload.cropName = farmerPlotSeleced?.plantName
+        setCreateNewTask(payload);
+        await TaskDatasource.insertNewTask(payload).then((res) => {
+          if (res.userMessage === "success") {
             window.location.href = "/IndexNewTask";
           }
-        });
+        }).catch(err => console.log(err));
       }
     });
   };
@@ -1777,7 +1777,7 @@ const AddNewTask = () => {
         {titleStep[current].content}
       </div>
       <Row className="d-flex justify-content-between pt-2">
-        {current == 0 && (
+        {current === 0 && (
           <BackButton
             onClick={() => (window.location.href = "/IndexNewTask")}
           />

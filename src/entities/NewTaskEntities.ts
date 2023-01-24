@@ -41,6 +41,7 @@ export interface NewTaskPageEntity {
   count: number;
 }
 export interface CreateNewTaskEntity {
+  cropName: string;
   farmerId: string;
   farmerPlotId: string;
   farmAreaAmount: string;
@@ -62,6 +63,7 @@ export interface CreateNewTaskEntity {
   comment: string;
 }
 export const CreateNewTaskEntity_INIT: CreateNewTaskEntity = {
+  cropName: "",
   farmerId: "",
   farmerPlotId: "",
   farmAreaAmount: "",
