@@ -377,7 +377,7 @@ const ModalFarmerPlot: React.FC<ModalFarmerPlotProps> = ({
                   <Space direction="vertical">
                     <Radio value={"ACTIVE"}>ใช้งาน</Radio>
                     <Radio value={"PENDING"}>รอการตรวจสอบ</Radio>
-                    <Radio value={"INACTIVE"}>ไม่อนุมัติ</Radio>
+                    <Radio value={"REJECTED"}>ไม่อนุมัติ</Radio>
                   </Space>
                 </Radio.Group>:
                 <Radio.Group defaultValue={farmerPlot.status}>
