@@ -652,7 +652,7 @@ function IndexFarmer() {
             <>
               <span
                 style={{ color: STATUS_COLOR_MAPPING[row.status] }}>
-                <Badge color={STATUS_COLOR_MAPPING[row.status]} />
+                <Badge color={STATUS_COLOR_MAPPING[row.status]} />{" "}
                 {STATUS_FARMER_MAPPING[row.status]}
                 <br />
               </span>
