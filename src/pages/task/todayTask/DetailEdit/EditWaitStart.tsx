@@ -46,6 +46,7 @@ import {
 } from "../../../../definitions/Status";
 import { Option } from "antd/lib/mentions";
 import Swal from "sweetalert2";
+import { CouponDataSource } from "../../../../datasource/CouponDatasource";
 const { Map } = require("immutable");
 const _ = require("lodash");
 let queryString = _.split(window.location.search, "=");
@@ -60,6 +61,15 @@ function EditWaitStart() {
     lng: LAT_LNG_BANGKOK.lng,
   });
   const [data, setData] = useState<TaskDetailEntity>(TaskDetailEntity_INIT);
+  const [couponData,setCouponData] = useState<{
+    couponCode : string,
+    couponName : string,
+    couponDiscount : number | null
+  }>({
+    couponCode : "",
+    couponName : "",
+    couponDiscount : null
+  })
   const [periodSpray, setPeriodSpray] = useState<CropPurposeSprayEntity>();
   const [checkCrop, setCheckCrop] = useState<boolean>(true);
   const [saveBtnDisable, setBtnSaveDisable] = useState<boolean>(true);
@@ -73,6 +83,13 @@ function EditWaitStart() {
   let [otherSpray, setOtherSpray] = useState<any>();
   const fetchTaskDetail = async () => {
     await TaskInprogressDatasource.getTaskDetailById(taskId).then((res) => {
+      if(res.couponId !== null){
+        CouponDataSource.getPromotionCode(res.couponId).then(result => setCouponData({
+          couponCode : result.couponCode??"",
+          couponDiscount : (!res.discount)?null:parseInt(res.discount),
+          couponName : result.couponName??""
+        }))
+      }
       setCheckCrop(!res.targetSpray.includes("อื่นๆ"));
       setData(res);
       setOtherSpray(
@@ -706,6 +723,30 @@ function EditWaitStart() {
                 suffix="บาท"
               />
             </Form.Item>
+          </div>
+          <div className="form-group col-lg-4">
+            <label>รหัสคูปอง</label>
+            <Input
+                value={couponData.couponCode}
+                disabled
+                autoComplete="off"
+             />
+          </div>
+          <div className="form-group col-lg-4">
+            <label>ชื่อคูปอง</label>
+            <Input
+                value={couponData.couponName}
+                disabled
+                autoComplete="off"
+             />
+          </div>
+          <div className="form-group col-lg-4">
+            <label>ส่วนลดคูปอง</label>
+            <Input
+                value={couponData.couponDiscount!}
+                disabled
+                autoComplete="off"
+             />
           </div>
         </div>
       </Form>

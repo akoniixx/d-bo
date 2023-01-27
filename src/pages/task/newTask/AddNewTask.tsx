@@ -68,6 +68,7 @@ import Swal from "sweetalert2";
 import { numberWithCommas } from "../../../utilities/TextFormatter";
 import icon from "../../../resource/icon";
 import { LocationPriceDatasource } from "../../../datasource/LocationPriceDatasource";
+import { CouponDataSource } from "../../../datasource/CouponDatasource";
 const { Search } = Input;
 const { Step } = Steps;
 const { Option } = Select;
@@ -85,9 +86,18 @@ const AddNewTask = () => {
   const profile = JSON.parse(
     localStorage.getItem("profile") || "{  }"
   );
-  const [current, setCurrent] = useState(2);
+  const [current, setCurrent] = useState(0);
   const [createNewTask, setCreateNewTask] =
     useState<CreateNewTaskEntity>(CreateNewTaskEntity_INIT);
+  const [couponData,setCouponData] = useState<{
+    couponCode : string,
+    couponName : string,
+    couponDiscount : number | null
+  }>({
+    couponCode : "",
+    couponName : "",
+    couponDiscount : null
+  })
 
   const [dataFarmer, setDataFarmer] = useState<FarmerEntity>();
   const [farmerList, setFarmerList] = useState<FarmerEntity[]>();
@@ -123,6 +133,14 @@ const AddNewTask = () => {
   const [searchTextDroner, setSearchTextDroner] =
     useState<string>("");
   const [priceMethod, setPriceMethod] = useState<string>("อัตโนมัติ");
+
+  const [couponCode, setCouponCode] = useState<string>("")
+  const [couponId, setCouponId] = useState<string>("")
+  const [couponUsedBtn,setCouponUsedBtn] = useState<boolean>(true)
+  const [colorCouponBtn,setColorCouponBtn] = useState<boolean>(true)
+  const [couponMessage,setCouponMessage] = useState<string>("")
+  const [farmerPlotId,setFarmerPlotId] = useState<string>("")
+  const [discountResult,setDiscountResult] = useState<number | null>()
 
   const fetchFarmerList = async (text?: string) => {
     await TaskDatasource.getFarmerList(text).then((res) => {
@@ -211,6 +229,7 @@ const AddNewTask = () => {
       plotSelected?.raiAmount,
       plotSelected?.id
     );
+    setFarmerPlotId(value)
   };
   const onSelectFarmer = (e: any, id: any) => {
     setFarmerSelected(undefined);
@@ -351,6 +370,46 @@ const AddNewTask = () => {
       );
     }
   };
+
+  const checkCoupon = () =>{
+    if(couponUsedBtn){
+      CouponDataSource.getCoupon(couponCode).then(
+        result => {
+          if(!result.userMessage){
+            if(result.canUsed){
+              setCouponId(result.id)
+              setColorCouponBtn(true)
+              setCouponUsedBtn(false)
+              setCouponMessage("รหัสคูปองสามารถใช้ได้")
+              CouponDataSource.calculateCoupon(
+                farmerPlotId,
+                farmerPlotSeleced?.plantName,
+                parseInt(farmerPlotSeleced?.raiAmount!),
+                couponCode
+              ).then(
+                res=> setDiscountResult(res.responseData.priceCouponDiscount)
+              )
+            }
+            else{
+              setColorCouponBtn(false)
+              setCouponUsedBtn(true)
+              setCouponMessage("รหัสคูปองสามารถนี้ถูกใช้ไปแล้ว")
+            }
+          }
+          else{
+            setColorCouponBtn(false)
+            setCouponMessage(result.userMessage)
+          }
+        }
+      )
+    }
+    else{
+      setColorCouponBtn(false)
+      setCouponUsedBtn(true)
+      setCouponMessage("")
+      setDiscountResult(null)
+    }
+  }
 
   const renderFormSearchFarmer = (
     <CardContainer>
@@ -1513,7 +1572,7 @@ const AddNewTask = () => {
           <Form style={{ padding: "20px" }}>
             <label>ยอดรวมค่าบริการ (หลังรวมค่าธรรมเนียม)</label>
             <h5 style={{ color: color.primary1 }} className="p-2">
-              {numberWithCommas(createNewTask.price)} บาท
+              {numberWithCommas(createNewTask.price-(discountResult??0))} บาท
             </h5>
             <div className="row">
               <div className="form-group col-lg-4">
@@ -1560,10 +1619,14 @@ const AddNewTask = () => {
               </div>
               <div className="form-group col-lg-4">
                 <label>รหัสคูปอง</label>
-                <Form.Item style={{
+                <Form.Item name="couponCode" style={{
                   marginBottom : '2px'
                 }}>
                   <Input
+                    disabled={!couponUsedBtn}
+                    onChange={(e)=> {
+                      setCouponCode(e.target.value)
+                    }}
                     style={{
                       paddingRight : 0,
                       paddingTop : 0,
@@ -1571,20 +1634,25 @@ const AddNewTask = () => {
                     }}
                     placeholder="กรอกรหัสคูปอง" 
                     suffix={<Button style={{
-                      borderColor : "#219653",
-                      backgroundColor : "#E6F2EC",
-                      color : "#219653"
-                    }}>ใช้รหัส</Button>}
+                      borderColor : couponUsedBtn?color.Success:color.Error,
+                      backgroundColor : couponUsedBtn?"#E6F2EC":'#FAEEEE',
+                      color : couponUsedBtn?color.Success:color.Error
+                    }} onClick={checkCoupon}>{
+                      (couponUsedBtn)?
+                      "ใช้รหัส":
+                      "ยกเลิก"
+                    }</Button>}
                   />
                 </Form.Item>
                 <p style={{
                   padding : 0,
-                  margin : 0
-                }}>สวัสดี</p>
+                  margin : 0,
+                  color : colorCouponBtn?color.Success:color.Error
+                }}>{couponMessage}</p>
               </div>
               <div className="form-group col-lg-4">
                 <label>หรือเลือกคูปอง (คูปองที่เกษตรกรเก็บในระบบ)</label>
-                <Select placeholder="เลือกคูปอง" style={{
+                <Select disabled placeholder="เลือกคูปอง" style={{
                   width : '100%'
                 }}>
 
@@ -1597,6 +1665,7 @@ const AddNewTask = () => {
                     suffix="บาท"
                     disabled
                     placeholder="ส่วนลดคูปอง" 
+                    value={discountResult!}
                   />
                 </Form.Item>
               </div>
@@ -1771,10 +1840,19 @@ const AddNewTask = () => {
         );
         const payload = d.toJS();
         payload.cropName = farmerPlotSeleced?.plantName
-        setCreateNewTask(payload);
-        await TaskDatasource.insertNewTask(payload).then((res) => {
+        payload.couponCode = couponCode
+        payload.couponId = couponId
+        payload.discount = discountResult??0
+        await TaskDatasource.insertNewTask(payload).then(async(res) => {
           if (res.userMessage === "success") {
-            window.location.href = "/IndexNewTask";
+            if(!couponCode){
+              window.location.href = "/IndexNewTask"
+            }
+            else{
+              await CouponDataSource.usedCoupon(couponCode).then(
+                (res) => window.location.href = "/IndexNewTask"
+              )
+            }
           }
         }).catch(err => console.log(err));
       }

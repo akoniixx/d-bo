@@ -59,6 +59,7 @@ const IndexNewTask = () => {
       searchStartDate,
       searchEndDate
     ).then((res) => {
+      console.log(res)
       setData(res);
     });
   };

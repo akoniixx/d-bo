@@ -99,7 +99,7 @@ const ModalFarmerPlot: React.FC<ModalFarmerPlotProps> = ({
     })
     if(e.target.value != "REJECTED"){
       form.setFieldsValue({
-        comment : ""
+        reason : ""
       });
     }
   }
@@ -395,7 +395,7 @@ const ModalFarmerPlot: React.FC<ModalFarmerPlotProps> = ({
             {farmerPlot.status == "REJECTED" && (
               <div className="form-group">
                 <br />
-                <Form.Item name="comment"
+                <Form.Item name="reason"
                   rules={[
                     {
                       required: farmerPlot.status === "REJECTED",
@@ -411,6 +411,15 @@ const ModalFarmerPlot: React.FC<ModalFarmerPlotProps> = ({
                 </Form.Item>
               </div>
           )}
+          <div className="form-group " style={{ marginTop: 16 }}>
+            <label>หมายเหตุ</label>
+            <Form.Item name="comment">
+              <TextArea
+              className="col-lg-12"
+                autoComplete="off"    
+              />
+            </Form.Item>
+          </div>
           </div>
         </Form>
       </Modal>

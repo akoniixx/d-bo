@@ -50,7 +50,7 @@ export class TaskDatasource {
   }
   static insertNewTask(data: CreateNewTaskEntity): Promise<any> {
     return httpClient
-      .post(BASE_URL + "/tasks/task", data)
+      .post(BASE_URL + "/tasks/task/create-task-bo", data)
       .then((response) => {
         return response.data;
       })

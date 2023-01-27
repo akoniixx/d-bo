@@ -233,6 +233,8 @@ export interface DronerRankListEntity {
 }
 export interface taskDetailEntity {
   id: string;
+  couponId : string;
+  discount : string;
   taskNo: string;
   farmerId: string;
   farmerPlotId: string;
@@ -277,6 +279,8 @@ export interface taskDetailEntity {
 }
 export const taskDetailEntity_INIT: taskDetailEntity = {
   id: "",
+  couponId : "",
+  discount : "",
   taskNo: "",
   farmerId: "",
   farmerPlotId: "",

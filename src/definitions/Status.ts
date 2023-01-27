@@ -18,7 +18,7 @@ export const STATUS_FARMER_MAPPING: any = {
   PENDING: "รอยืนยันตัวตน",
   ACTIVE: "ใช้งาน",
   INACTIVE: "ปิดการใช้งาน",
-  REJECTED : "ไม่อนุมัติ"
+  REJECTED: "ไม่อนุมัติ",
 };
 
 export const STATUS_COLOR_MAPPING: any = {
@@ -31,7 +31,7 @@ export const STATUS_COLOR_MAPPING: any = {
 export const FARMER_STATUS_SEARCH = [
   { value: "PENDING", name: "รอยืนยันตัวตน" },
   { value: "ACTIVE", name: "ใช้งาน" },
-  { value: "REJECTED",name: "ไม่อนุมัติ"}, 
+  { value: "REJECTED", name: "ไม่อนุมัติ" },
   { value: "INACTIVE", name: "ปิดการใช้งาน" },
 ];
 
@@ -62,20 +62,20 @@ export const STATUS_INPROGRESS_CHECKBOX = [
     value: "CANCELED",
     name: "ยกเลิกงาน",
   },
-]
+];
 
-export const TASK_TODAY_STATUS : any = {
-  WAIT_START : "รอเริ่มงาน",
-  IN_PROGRESS : "กำลังดำเนินงาน",
-}
-export const TASK_TODAY_STATUS_MAPPING : any = {
-  ACTIVE : "สะดวก",
-  INACTIVE : "ไม่สะดวก"
-}
+export const TASK_TODAY_STATUS: any = {
+  WAIT_START: "รอเริ่มงาน",
+  IN_PROGRESS: "กำลังดำเนินงาน",
+};
+export const TASK_TODAY_STATUS_MAPPING: any = {
+  ACTIVE: "สะดวก",
+  INACTIVE: "ไม่สะดวก",
+};
 export const TASKTODAY_STATUS: any = [
-  {key: "0", value: "WAIT_START", name: "รอเริ่มงาน" },
-  {key: "1", value: "IN_PROGRESS", name: "กำลังดำเนินงาน" },
-  {key: "2", value: "CANCELED", name: "ยกเลิก" },
+  { key: "0", value: "WAIT_START", name: "รอเริ่มงาน" },
+  { key: "1", value: "IN_PROGRESS", name: "กำลังดำเนินงาน" },
+  { key: "2", value: "CANCELED", name: "ยกเลิก" },
 ];
 export const TASKTODAY_STATUS1: any = [
   { value: "IN_PROGRESS", name: "กำลังดำเนินงาน" },
@@ -92,7 +92,7 @@ export const REDIO_WAIT_START = [
 export const REDIO_IN_PROGRESS = [
   { value: "EXTENDED", name: "ปกติ" },
   { value: "WAIT_APPROVE", name: "รออนุมัติขยายเวลา" },
-  { value: "APPROVED", name: "อนุมัติขยายเวลา",  },
+  { value: "APPROVED", name: "อนุมัติขยายเวลา" },
   { value: "REJECTED", name: "งานมีปัญหา" },
 ];
 
@@ -113,7 +113,7 @@ export const STATUS_DELAY = [
   { value: "APPROVE", name: "อนุมัติขยายเวลา" },
   { value: "EXTENDED", name: "ขยายเวลา" },
   { value: "REJECT", name: "งานมีปัญหา" },
-]
+];
 export const STATUS_SUMMARY = [
   { value: "inprogressnormal", name: "ปกติ" },
   { value: "inprogressproblem", name: "งานมีปัญหา" },
@@ -121,7 +121,7 @@ export const STATUS_SUMMARY = [
   { value: "waitstartproblem", name: "งานมีปัญหา" },
   { value: "waitapprovedelay", name: "รออนุมัติขยายเวลา" },
   { value: "extended", name: "อนุมัติขยายเวลา" },
-]
+];
 export const STATUS_INPROGRESS = [
   { value: "inprogressnormal", name: "ปกติ", isChecked: false },
   { value: "waitapprovedelay", name: "รออนุมัติขยายเวลา", isChecked: false },
@@ -132,4 +132,3 @@ export const STATUS_WAITSTART = [
   { value: "waitstartnormal", name: "ปกติ", isChecked: false },
   { value: "waitstartproblem", name: "งานมีปัญหา", isChecked: false },
 ];
-
