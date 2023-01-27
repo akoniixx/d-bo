@@ -80,6 +80,7 @@ import { TaskDronerTempDataSource } from "../../../datasource/TaskDronerTempData
 import Swal from "sweetalert2";
 import icon from "../../../resource/icon";
 import { LocationPriceDatasource } from "../../../datasource/LocationPriceDatasource";
+import { CouponDataSource } from "../../../datasource/CouponDatasource";
 const dateFormat = "DD/MM/YYYY";
 const dateCreateFormat = "YYYY-MM-DD";
 const timeFormat = "HH:mm";
@@ -122,6 +123,16 @@ const EditNewTask = () => {
     message: "",
   });
 
+  const [couponData,setCouponData] = useState<{
+    couponCode : string,
+    couponName : string,
+    couponDiscount : number | null
+  }>({
+    couponCode : "",
+    couponName : "",
+    couponDiscount : null
+  })
+
   const [dateAppointment, setDateAppointment] = useState<any>(
     moment(undefined)
   );
@@ -159,6 +170,13 @@ const EditNewTask = () => {
       setFarmerPlotSelected(res.farmerPlot);
       fetchPurposeSpray(res.farmerPlot.plantName);
       setData(res);
+      if(res.couponId){
+        CouponDataSource.getPromotionCode(res.couponId).then(result => setCouponData({
+          couponCode : result.couponCode,
+          couponDiscount : parseInt(res.discount),
+          couponName : result.couponName
+        }))
+      }
     });
   };
   const fetchFarmerList = async (text?: string) => {
@@ -171,6 +189,7 @@ const EditNewTask = () => {
       setPeriodSpray(res);
     });
   };
+
   useEffect(() => {
     fetchNewTask();
     fetchFarmerList(searchFarmer);
@@ -1590,6 +1609,30 @@ const EditNewTask = () => {
                     step="0.01"
                   />
                 </Form.Item>
+              </div>
+              <div className="form-group col-lg-4">
+                <label>รหัสคูปอง</label>
+                <Input
+                    value={couponData.couponCode}
+                    disabled
+                    autoComplete="off"
+                 />
+              </div>
+              <div className="form-group col-lg-4">
+                <label>ชื่อคูปอง</label>
+                <Input
+                    value={couponData.couponName}
+                    disabled
+                    autoComplete="off"
+                 />
+              </div>
+              <div className="form-group col-lg-4">
+                <label>ส่วนลดคูปอง</label>
+                <Input
+                    value={couponData.couponDiscount!}
+                    disabled
+                    autoComplete="off"
+                 />
               </div>
             </div>
           </Form>

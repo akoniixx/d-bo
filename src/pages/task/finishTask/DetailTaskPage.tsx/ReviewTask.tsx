@@ -58,6 +58,15 @@ const timeFormat = "HH:mm";
 function ReviewTask() {
   const profile = JSON.parse(localStorage.getItem("profile") || "{  }");
   const taskId = queryString[1];
+  const [couponData,setCouponData] = useState<{
+    couponCode : string,
+    couponName : string,
+    couponDiscount : number | null
+  }>({
+    couponCode : "",
+    couponName : "",
+    couponDiscount : null
+  })
   const [data, setData] = useState<DetailReviewTask>(DetailReviewTask_INIT);
   const [detailDroner, setDetailDroner] =
     useState<CreateReview>(CreateReview_INIT);
@@ -562,6 +571,30 @@ function ReviewTask() {
                 suffix="บาท"
               />
             </Form.Item>
+          </div>
+          <div className="form-group col-lg-4">
+            <label>รหัสคูปอง</label>
+            <Input
+                // value={couponData.couponCode}
+                disabled
+                autoComplete="off"
+             />
+          </div>
+          <div className="form-group col-lg-4">
+            <label>ชื่อคูปอง</label>
+            <Input
+                // value={couponData.couponName}
+                disabled
+                autoComplete="off"
+             />
+          </div>
+          <div className="form-group col-lg-4">
+            <label>ส่วนลดคูปอง</label>
+            <Input
+                // value={couponData.couponDiscount!}
+                disabled
+                autoComplete="off"
+             />
           </div>
         </div>
       </Form>

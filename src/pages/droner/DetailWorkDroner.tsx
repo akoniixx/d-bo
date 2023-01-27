@@ -37,6 +37,7 @@ import {
 import { LocationDatasource } from "../../datasource/LocationDatasource";
 import { CropPurposeSprayEntity } from "../../entities/CropEntities";
 import { PURPOSE_SPRAY } from "../../definitions/PurposeSpray";
+import { CouponDataSource } from "../../datasource/CouponDatasource";
 const _ = require("lodash");
 let queryString = _.split(window.location.search, "=");
 const dateFormat = "DD/MM/YYYY";
@@ -51,9 +52,25 @@ function DetailWorkDroner() {
     lng: LAT_LNG_BANGKOK.lng,
   });
   const [imgFinish, setImgFinish] = useState<any>();
+  const [couponData,setCouponData] = useState<{
+    couponCode : string,
+    couponName : string,
+    couponDiscount : number | null
+  }>({
+    couponCode : "",
+    couponName : "",
+    couponDiscount : null
+  })
 
   const fetchTask = async () => {
     await DronerRankDatasource.getTaskDetail(taskId).then((res) => {
+      if(res.couponId !== null){
+        CouponDataSource.getPromotionCode(res.couponId).then(result => setCouponData({
+          couponCode : result.couponCode??"",
+          couponDiscount : (!res.discount)?null:parseInt(res.discount),
+          couponName : result.couponName??""
+        }))
+      }
       setData(res);
       setMapPosition({
         lat: parseFloat(res.farmerPlot.lat),
@@ -508,6 +525,30 @@ function DetailWorkDroner() {
                 suffix="บาท"
               />
             </Form.Item>
+          </div>
+          <div className="form-group col-lg-4">
+            <label>รหัสคูปอง</label>
+            <Input
+                // value={couponData.couponCode}
+                disabled
+                autoComplete="off"
+             />
+          </div>
+          <div className="form-group col-lg-4">
+            <label>ชื่อคูปอง</label>
+            <Input
+                // value={couponData.couponName}
+                disabled
+                autoComplete="off"
+             />
+          </div>
+          <div className="form-group col-lg-4">
+            <label>ส่วนลดคูปอง</label>
+            <Input
+                // value={couponData.couponDiscount!}
+                disabled
+                autoComplete="off"
+             />
           </div>
         </div>
       </Form>

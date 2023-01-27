@@ -38,6 +38,7 @@ const ModalFarmerPlot: React.FC<ModalFarmerPlotProps> = ({
   const [saveBtnDisable, setBtnSaveDisable] = useState<boolean>(
     isEditModal ? false : true
   );
+  const [comment,setComment] = useState(data.comment)
   const [mapPosition, setMapPosition] = useState<
     | {
         lat?: number;
@@ -54,7 +55,6 @@ const ModalFarmerPlot: React.FC<ModalFarmerPlotProps> = ({
   );
   const [location, setLocation] = useState<SubdistrictEntity[]>([]);
   const [searchLocation] = useState("");
-  const [commentDisable,setCommentDisable] = useState<boolean>((data.status !== "INACTIVE"))
 
   const fetchLocation = async (text?: string) => {
     await LocationDatasource.getSubdistrict(0, text).then((res) => {
@@ -93,11 +93,14 @@ const ModalFarmerPlot: React.FC<ModalFarmerPlotProps> = ({
   };
 
   const handleShowComment = (e : RadioChangeEvent) =>{
-    if(e.target.value === "INACTIVE"){
-      setCommentDisable(false)
-    }
-    else{
-      setCommentDisable(true)
+    setFarmerPlot({
+      ...farmerPlot,
+      status : e.target.value
+    })
+    if(e.target.value != "REJECTED"){
+      form.setFieldsValue({
+        reason : ""
+      });
     }
   }
 
@@ -378,6 +381,7 @@ const ModalFarmerPlot: React.FC<ModalFarmerPlotProps> = ({
                     <Radio value={"ACTIVE"}>ใช้งาน</Radio>
                     <Radio value={"PENDING"}>รอการตรวจสอบ</Radio>
                     <Radio value={"REJECTED"}>ไม่อนุมัติ</Radio>
+                    <Radio value={"INACTIVE"}>ปิดการใช้งาน</Radio>
                   </Space>
                 </Radio.Group>:
                 <Radio.Group defaultValue={farmerPlot.status}>
@@ -388,17 +392,34 @@ const ModalFarmerPlot: React.FC<ModalFarmerPlotProps> = ({
                 </Radio.Group>
               }
             </Form.Item>
-            {
-                (commentDisable)?
-                <></>:
-                <div
-                  className="form-group col-lg-12"
-                  style={{ marginTop: 16 }}>
-                  <Form.Item name="comment">
-                    <TextArea value={farmerPlot.comment} placeholder="กรอกเหตุผล/หมายเหตุเพิ่มเติม"/>
-                  </Form.Item>
-                </div>
-              }
+            {farmerPlot.status == "REJECTED" && (
+              <div className="form-group">
+                <br />
+                <Form.Item name="reason"
+                  rules={[
+                    {
+                      required: farmerPlot.status === "REJECTED",
+                      message: "กรุณากรอกเหตุผลที่ไม่อนุมัติ!",
+                    },
+                  ]}>
+                  <TextArea
+                    className="col-lg-12"
+                    rows={3}
+                    placeholder="กรอกเหตุผล/เหตุหมายเพิ่มเติม"
+                    autoComplete="off"                    
+                  />
+                </Form.Item>
+              </div>
+          )}
+          <div className="form-group " style={{ marginTop: 16 }}>
+            <label>หมายเหตุ</label>
+            <Form.Item name="comment">
+              <TextArea
+              className="col-lg-12"
+                autoComplete="off"    
+              />
+            </Form.Item>
+          </div>
           </div>
         </Form>
       </Modal>

@@ -86,6 +86,8 @@ export const CreateNewTaskEntity_INIT: CreateNewTaskEntity = {
 };
 export interface GetNewTaskEntity {
   id: string;
+  couponId : string;
+  discount : string;
   taskNo: string;
   farmerId: string;
   farmerPlotId: string;
@@ -129,7 +131,9 @@ export const GetNewTaskEntity_INIT: GetNewTaskEntity = {
   id: "",
   taskNo: "",
   farmerId: "",
+  discount : "",
   farmerPlotId: "",
+  couponId: "",
   farmAreaAmount: "",
   dronerId: "",
   purposeSprayId: "",

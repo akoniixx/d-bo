@@ -224,6 +224,8 @@ export interface TaskTodayListEntity {
 }
 export interface TaskDetailEntity {
   id: string;
+  couponId : string;
+  discount : string;
   taskNo: string;
   farmerId: string;
   farmerPlotId: string;
@@ -268,6 +270,8 @@ export interface TaskDetailEntity {
 }
 export const TaskDetailEntity_INIT: TaskDetailEntity = {
   id: "",
+  couponId : "",
+  discount : "",
   taskNo: "",
   farmerId: "",
   farmerPlotId: "",

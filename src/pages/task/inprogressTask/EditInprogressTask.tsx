@@ -22,6 +22,7 @@ import { CardHeader } from "../../../components/header/CardHearder";
 import Layouts from "../../../components/layout/Layout";
 import GooleMap from "../../../components/map/GoogleMap";
 import ModalSelectedDroner from "../../../components/modal/task/inprogressTask/ModalSelectedDroner";
+import { CouponDataSource } from "../../../datasource/CouponDatasource";
 import { CropDatasource } from "../../../datasource/CropDatasource";
 import { TaskDatasource } from "../../../datasource/TaskDatasource";
 import { LAT_LNG_BANGKOK } from "../../../definitions/Location";
@@ -67,6 +68,15 @@ const EditInprogressTask = () => {
   const [timeAppointment, setTimeAppointment] = useState<any>(
     moment(undefined)
   );
+  const [couponData,setCouponData] = useState<{
+    couponCode : string,
+    couponName : string,
+    couponDiscount : number | null
+  }>({
+    couponCode : "",
+    couponName : "",
+    couponDiscount : null
+  })
   const [saveBtnDisable, setBtnSaveDisable] = useState<boolean>(true);
   const [periodSpray, setPeriodSpray] = useState<CropPurposeSprayEntity>();
   const [checkCrop, setCheckCrop] = useState<boolean>(true);
@@ -91,6 +101,11 @@ const EditInprogressTask = () => {
       setDronerSelected(res.droner);
       setCheckCrop(!res.targetSpray.includes("อื่นๆ"));
       setData(res);
+      CouponDataSource.getPromotionCode(res.couponId).then(result => setCouponData({
+        couponCode : result.couponCode??"",
+        couponDiscount : (!res.discount)?null:parseInt(res.discount),
+        couponName : result.couponName??""
+      }))
     });
   };
 
@@ -637,6 +652,30 @@ const EditInprogressTask = () => {
                     disabled
                   />
                 </Form.Item>
+              </div>
+              <div className="form-group col-lg-4">
+                <label>รหัสคูปอง</label>
+                <Input
+                    value={couponData.couponCode}
+                    disabled
+                    autoComplete="off"
+                 />
+              </div>
+              <div className="form-group col-lg-4">
+                <label>ชื่อคูปอง</label>
+                <Input
+                    value={couponData.couponName}
+                    disabled
+                    autoComplete="off"
+                 />
+              </div>
+              <div className="form-group col-lg-4">
+                <label>ส่วนลดคูปอง</label>
+                <Input
+                    value={couponData.couponDiscount!}
+                    disabled
+                    autoComplete="off"
+                 />
               </div>
             </div>
           </Form>

@@ -1,4 +1,6 @@
 ## [Version - 0]
+## improve [v0.20.19] 2023-01-27
+- added coupon for all task
 ## improve [v0.20.18] 2023-01-26
 - added "REJECTED" status in farmer menu
 ## Fix [v0.20.17] 2023-01-21

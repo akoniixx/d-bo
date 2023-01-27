@@ -34,6 +34,7 @@ import {
 import { TaskFinishedDatasource } from "../../../../datasource/TaskFinishDatasource";
 import moment from "moment";
 import { UploadImageDatasouce } from "../../../../datasource/UploadImageDatasource";
+import { CouponDataSource } from "../../../../datasource/CouponDatasource";
 const _ = require("lodash");
 let queryString = _.split(window.location.search, "=");
 const dateFormat = "DD/MM/YYYY";
@@ -41,6 +42,15 @@ const timeFormat = "HH:mm";
 
 function FinishTasks() {
   const taskId = queryString[1];
+  const [couponData,setCouponData] = useState<{
+    couponCode : string,
+    couponName : string,
+    couponDiscount : number | null
+  }>({
+    couponCode : "",
+    couponName : "",
+    couponDiscount : null
+  })
   const [data, setData] = useState<DetailFinishTask>(DetailFinishTask_INIT);
   const [mapPosition, setMapPosition] = useState<{ lat: number; lng: number }>({
     lat: LAT_LNG_BANGKOK.lat,
@@ -48,6 +58,13 @@ function FinishTasks() {
   });
   const fetchDetailTask = async () => {
     await TaskFinishedDatasource.getDetailFinishTaskById(taskId).then((res) => {
+      if(res.couponId !== null){
+        CouponDataSource.getPromotionCode(res.couponId).then(result => setCouponData({
+          couponCode : result.couponCode??"",
+          couponDiscount : (!res.discount)?null:parseInt(res.discount),
+          couponName : result.couponName??""
+        }))
+      }
       setData(res);
       setMapPosition({
         lat: parseFloat(res.data.farmerPlot.lat),
@@ -512,6 +529,30 @@ function FinishTasks() {
                 suffix="บาท"
               />
             </Form.Item>
+          </div>
+          <div className="form-group col-lg-4">
+            <label>รหัสคูปอง</label>
+            <Input
+                value={couponData.couponCode}
+                disabled
+                autoComplete="off"
+             />
+          </div>
+          <div className="form-group col-lg-4">
+            <label>ชื่อคูปอง</label>
+            <Input
+                value={couponData.couponName}
+                disabled
+                autoComplete="off"
+             />
+          </div>
+          <div className="form-group col-lg-4">
+            <label>ส่วนลดคูปอง</label>
+            <Input
+                value={couponData.couponDiscount!}
+                disabled
+                autoComplete="off"
+             />
           </div>
         </div>
       </Form>

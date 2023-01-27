@@ -14,6 +14,8 @@ import {
 
 export interface GetTaskInprogressEntity {
   id: string;
+  couponId: string;
+  discount : string;
   taskNo: string;
   farmerId: string;
   farmerPlotId: string;
@@ -159,7 +161,9 @@ export interface TaskInprogressPageEntity {
 }
 export const GetTaskInprogressEntity_INIT: GetTaskInprogressEntity = {
   id: "",
+  couponId: "",
   taskNo: "",
+  discount : "",
   farmerId: "",
   farmerPlotId: "",
   farmAreaAmount: "",
