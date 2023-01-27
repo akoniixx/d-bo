@@ -246,7 +246,7 @@ const EditFarmer = () => {
   };
 
   const handleChangeFarmerstatus = (e: any) => {
-    if (e.target.value != "INATIVE") {
+    if (e.target.value != "REJECTED") {
       data.reason = "";
     }
     const m = Map(data).set("status", e.target.value);
@@ -487,8 +487,6 @@ const EditFarmer = () => {
     };
     delete payload.farmerPlot;
     await FarmerDatasource.updateFarmer(payload).then((res) => {
-      console.log(payload)
-      console.log(res)
       if (res !== undefined) {
         let i = 0;
         for (i; 2 > i; i++) {
@@ -907,12 +905,18 @@ const EditFarmer = () => {
               </Radio.Group>
             </div>
           </div>
-          {data.status == "INACTIVE" && (
+          {data.status == "REJECTED" && (
             <div>
               <div className="form-group">
                 <label></label>
                 <br />
-                <Form.Item>
+                <Form.Item name="reason"
+                  rules={[
+                    {
+                      required: data.status === "REJECTED",
+                      message: "กรุณากรอกเหตุผลที่ไม่อนุมัติ!",
+                    },
+                  ]}>
                   <TextArea
                     className="col-lg-12"
                     rows={3}
@@ -925,22 +929,6 @@ const EditFarmer = () => {
               </div>
             </div>
           )}
-          <div
-            className="form-group col-lg-12"
-            style={{ marginTop: 16 }}>
-            <label>หมายเหตุ</label>
-            <Form.Item>
-              <TextArea
-                value={data.comment}
-                onChange={(e) => {
-                  setData((prev) => ({
-                    ...prev,
-                    comment: e.target.value,
-                  }));
-                }}
-              />
-            </Form.Item>
-          </div>
         </Form>
       </CardContainer>
     </div>

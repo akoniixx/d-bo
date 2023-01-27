@@ -4,29 +4,34 @@ export const STATUS_NORMAL_MAPPING: any = {
   PENDING: "รอยืนยันตัวแปลง",
   ACTIVE: "ใช้งาน",
   INACTIVE: "ปิดการใช้งาน",
+  REJECTED : "ไม่อนุมัติ"
 };
 
 export const STATUS_FARMERPLOT_COLOR_MAPPING: any = {
   PENDING: "#EA973E",
   ACTIVE: color.Success,
   INACTIVE: color.Error,
+  REJECTED: color.Error
 };
 
 export const STATUS_FARMER_MAPPING: any = {
   PENDING: "รอยืนยันตัวตน",
   ACTIVE: "ใช้งาน",
   INACTIVE: "ปิดการใช้งาน",
+  REJECTED : "ไม่อนุมัติ"
 };
 
 export const STATUS_COLOR_MAPPING: any = {
   PENDING: "#EA973E",
   ACTIVE: color.Success,
+  REJECTED: color.Error,
   INACTIVE: color.Error,
 };
 
 export const FARMER_STATUS_SEARCH = [
   { value: "PENDING", name: "รอยืนยันตัวตน" },
   { value: "ACTIVE", name: "ใช้งาน" },
+  { value: "REJECTED",name: "ไม่อนุมัติ"}, 
   { value: "INACTIVE", name: "ปิดการใช้งาน" },
 ];
 

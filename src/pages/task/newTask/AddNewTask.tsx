@@ -68,6 +68,7 @@ import Swal from "sweetalert2";
 import { numberWithCommas } from "../../../utilities/TextFormatter";
 import icon from "../../../resource/icon";
 import { LocationPriceDatasource } from "../../../datasource/LocationPriceDatasource";
+const { Search } = Input;
 const { Step } = Steps;
 const { Option } = Select;
 const dateFormat = "DD/MM/YYYY";
@@ -84,7 +85,7 @@ const AddNewTask = () => {
   const profile = JSON.parse(
     localStorage.getItem("profile") || "{  }"
   );
-  const [current, setCurrent] = useState(0);
+  const [current, setCurrent] = useState(2);
   const [createNewTask, setCreateNewTask] =
     useState<CreateNewTaskEntity>(CreateNewTaskEntity_INIT);
 
@@ -1554,6 +1555,48 @@ const AddNewTask = () => {
                     }
                     autoComplete="off"
                     step="0.01"
+                  />
+                </Form.Item>
+              </div>
+              <div className="form-group col-lg-4">
+                <label>รหัสคูปอง</label>
+                <Form.Item style={{
+                  marginBottom : '2px'
+                }}>
+                  <Input
+                    style={{
+                      paddingRight : 0,
+                      paddingTop : 0,
+                      paddingBottom : 0
+                    }}
+                    placeholder="กรอกรหัสคูปอง" 
+                    suffix={<Button style={{
+                      borderColor : "#219653",
+                      backgroundColor : "#E6F2EC",
+                      color : "#219653"
+                    }}>ใช้รหัส</Button>}
+                  />
+                </Form.Item>
+                <p style={{
+                  padding : 0,
+                  margin : 0
+                }}>สวัสดี</p>
+              </div>
+              <div className="form-group col-lg-4">
+                <label>หรือเลือกคูปอง (คูปองที่เกษตรกรเก็บในระบบ)</label>
+                <Select placeholder="เลือกคูปอง" style={{
+                  width : '100%'
+                }}>
+
+                </Select>
+              </div>
+              <div className="form-group col-lg-4">
+                <label>ส่วนลดจากคูปอง</label>
+                <Form.Item>
+                  <Input
+                    suffix="บาท"
+                    disabled
+                    placeholder="ส่วนลดคูปอง" 
                   />
                 </Form.Item>
               </div>
