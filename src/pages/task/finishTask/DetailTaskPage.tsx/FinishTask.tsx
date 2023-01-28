@@ -35,6 +35,7 @@ import { TaskFinishedDatasource } from "../../../../datasource/TaskFinishDatasou
 import moment from "moment";
 import { UploadImageDatasouce } from "../../../../datasource/UploadImageDatasource";
 import { CouponDataSource } from "../../../../datasource/CouponDatasource";
+import { numberWithCommas } from "../../../../utilities/TextFormatter";
 const _ = require("lodash");
 let queryString = _.split(window.location.search, "=");
 const dateFormat = "DD/MM/YYYY";
@@ -42,15 +43,15 @@ const timeFormat = "HH:mm";
 
 function FinishTasks() {
   const taskId = queryString[1];
-  const [couponData,setCouponData] = useState<{
-    couponCode : string,
-    couponName : string,
-    couponDiscount : number | null
+  const [couponData, setCouponData] = useState<{
+    couponCode: string;
+    couponName: string;
+    couponDiscount: number | null;
   }>({
-    couponCode : "",
-    couponName : "",
-    couponDiscount : null
-  })
+    couponCode: "",
+    couponName: "",
+    couponDiscount: null,
+  });
   const [data, setData] = useState<DetailFinishTask>(DetailFinishTask_INIT);
   const [mapPosition, setMapPosition] = useState<{ lat: number; lng: number }>({
     lat: LAT_LNG_BANGKOK.lat,
@@ -58,12 +59,14 @@ function FinishTasks() {
   });
   const fetchDetailTask = async () => {
     await TaskFinishedDatasource.getDetailFinishTaskById(taskId).then((res) => {
-      if(res.couponId !== null){
-        CouponDataSource.getPromotionCode(res.couponId).then(result => setCouponData({
-          couponCode : result.couponCode??"",
-          couponDiscount : (!res.discount)?null:parseInt(res.discount),
-          couponName : result.couponName??""
-        }))
+      if (res.couponId !== null) {
+        CouponDataSource.getPromotionCode(res.couponId).then((result) =>
+          setCouponData({
+            couponCode: result.couponCode ?? "",
+            couponDiscount: !res.discount ? null : parseInt(res.discount),
+            couponName: result.couponName ?? "",
+          })
+        );
       }
       setData(res);
       setMapPosition({
@@ -196,7 +199,7 @@ function FinishTasks() {
           <label>หมายเหตุ</label>
           <Form.Item>
             <span style={{ color: color.Grey }}>
-              {data.data.comment !== null ? data.data.comment : "-"}
+              <TextArea rows={3} value={data.data.comment! || "-"} disabled />
             </span>
           </Form.Item>
         </div>
@@ -206,11 +209,12 @@ function FinishTasks() {
           <Form.Item style={{ color: color.Grey }}>
             <span>
               {data.data.price !== null
-                ? formatCurrency(data.data.price) + " " + "บาท"
-                : "0.00" + " " + "บาท"}
+                ? numberWithCommas(parseFloat(data.data.price)) + " บาท"
+                : "0 บาท"}
             </span>{" "}
             <span>
-              {"(จำนวน" + " " + data.data.farmAreaAmount + " " + "ไร่)"}
+              {"(จำนวน" + " " + data.data.farmAreaAmount + " " + "ไร่)"}{" "}
+              ราคาไร่ละ {data.data.unitPrice} บาท
             </span>
           </Form.Item>
           <br />
@@ -249,9 +253,7 @@ function FinishTasks() {
                       ).toFixed(1)}
                     </span>
                   </Row>
-                ) : (
-                  "-"
-                )}
+                ) : null}
               </div>
             </div>
             <div className="row">
@@ -307,7 +309,7 @@ function FinishTasks() {
           <label>สถานะ</label>
           <Form.Item>
             <span style={{ color: color.Success }}>
-              <Badge color={color.Success} />
+              <Badge color={color.Success} />{" "}
               {data.data.status == "DONE" ? "เสร็จสิ้น" : null}
               <br />
             </span>
@@ -428,19 +430,19 @@ function FinishTasks() {
         <div className="col-lg-3">
           <span>{data.data.droner.telephoneNo}</span>
         </div>
-        <div className="col-lg-4">
+        <div className="col-lg-3">
           <span>
-            {" "}
             {data.data.droner.address !== null
               ? data.data.droner.address.subdistrict.subdistrictName +
-                "," +
-                " " +
+                "/" +
                 data.data.droner.address.district.districtName +
-                "," +
-                " " +
+                "/" +
                 data.data.droner.address.province.provinceName
-              : "-"}
+              : null}
           </span>
+        </div>
+        <div className="col-lg-1">
+          {data.data.droner?.dronerArea.distance || 0} km
         </div>
         <div className="col-lg">
           <span>
@@ -456,7 +458,7 @@ function FinishTasks() {
             />
             {data.data.droner.dronerDrone[0] != null
               ? data.data.droner.dronerDrone[0].drone.droneBrand.name
-              : "-"}
+              : null}
           </span>
           <br />
           <p style={{ fontSize: "12px", color: color.Grey }}>
@@ -475,12 +477,13 @@ function FinishTasks() {
           <div className="col-lg">
             <Form.Item>
               <span>
-                ยอดรวมค่าบริการ (หลังรวมค่าธรรมเนียม)
+                ยอดรวมค่าบริการ
                 <br />
                 <b style={{ fontSize: "20px", color: color.Success }}>
                   {data.data.totalPrice !== null
-                    ? formatCurrency(data.data.totalPrice) + " " + "บาท"
-                    : "0.00" + " " + "บาท"}
+                    ? numberWithCommas(parseFloat(data.data.totalPrice)) +
+                      " บาท"
+                    : "0 บาท"}
                 </b>
               </span>
             </Form.Item>
@@ -494,8 +497,8 @@ function FinishTasks() {
                 disabled
                 value={
                   data.data.price !== null
-                    ? formatCurrency(data.data.price) + " " + "บาท"
-                    : "0.00" + " " + "บาท"
+                    ? numberWithCommas(parseFloat(data.data.price))
+                    : 0
                 }
                 suffix="บาท"
               />
@@ -509,8 +512,8 @@ function FinishTasks() {
                 placeholder="0.0"
                 value={
                   data.data.fee !== null
-                    ? parseFloat(data.data.fee).toFixed(2) + " " + "บาท"
-                    : "0.00" + " " + "บาท"
+                    ? numberWithCommas(parseFloat(data.data.fee))
+                    : 0
                 }
                 suffix="บาท"
               />
@@ -523,8 +526,8 @@ function FinishTasks() {
                 disabled
                 value={
                   data.data.discountFee !== null
-                    ? formatCurrency(data.data.discountFee) + " " + "บาท"
-                    : "0.00" + " " + "บาท"
+                    ? numberWithCommas(parseFloat(data.data.discountFee))
+                    : 0
                 }
                 suffix="บาท"
               />
@@ -532,27 +535,19 @@ function FinishTasks() {
           </div>
           <div className="form-group col-lg-4">
             <label>รหัสคูปอง</label>
-            <Input
-                value={couponData.couponCode}
-                disabled
-                autoComplete="off"
-             />
+            <Input value={couponData.couponCode} disabled autoComplete="off" />
           </div>
           <div className="form-group col-lg-4">
             <label>ชื่อคูปอง</label>
-            <Input
-                value={couponData.couponName}
-                disabled
-                autoComplete="off"
-             />
+            <Input value={couponData.couponName} disabled autoComplete="off" />
           </div>
           <div className="form-group col-lg-4">
             <label>ส่วนลดคูปอง</label>
             <Input
-                value={couponData.couponDiscount!}
-                disabled
-                autoComplete="off"
-             />
+              value={numberWithCommas(couponData.couponDiscount!)}
+              disabled
+              autoComplete="off"
+            />
           </div>
         </div>
       </Form>

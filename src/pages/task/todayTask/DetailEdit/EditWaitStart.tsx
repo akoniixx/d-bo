@@ -47,6 +47,7 @@ import {
 import { Option } from "antd/lib/mentions";
 import Swal from "sweetalert2";
 import { CouponDataSource } from "../../../../datasource/CouponDatasource";
+import { numberWithCommas } from "../../../../utilities/TextFormatter";
 const { Map } = require("immutable");
 const _ = require("lodash");
 let queryString = _.split(window.location.search, "=");
@@ -61,15 +62,15 @@ function EditWaitStart() {
     lng: LAT_LNG_BANGKOK.lng,
   });
   const [data, setData] = useState<TaskDetailEntity>(TaskDetailEntity_INIT);
-  const [couponData,setCouponData] = useState<{
-    couponCode : string,
-    couponName : string,
-    couponDiscount : number | null
+  const [couponData, setCouponData] = useState<{
+    couponCode: string;
+    couponName: string;
+    couponDiscount: number | null;
   }>({
-    couponCode : "",
-    couponName : "",
-    couponDiscount : null
-  })
+    couponCode: "",
+    couponName: "",
+    couponDiscount: null,
+  });
   const [periodSpray, setPeriodSpray] = useState<CropPurposeSprayEntity>();
   const [checkCrop, setCheckCrop] = useState<boolean>(true);
   const [saveBtnDisable, setBtnSaveDisable] = useState<boolean>(true);
@@ -83,12 +84,14 @@ function EditWaitStart() {
   let [otherSpray, setOtherSpray] = useState<any>();
   const fetchTaskDetail = async () => {
     await TaskInprogressDatasource.getTaskDetailById(taskId).then((res) => {
-      if(res.couponId !== null){
-        CouponDataSource.getPromotionCode(res.couponId).then(result => setCouponData({
-          couponCode : result.couponCode??"",
-          couponDiscount : (!res.discount)?null:parseInt(res.discount),
-          couponName : result.couponName??""
-        }))
+      if (res.couponId !== null) {
+        CouponDataSource.getPromotionCode(res.couponId).then((result) =>
+          setCouponData({
+            couponCode: result.couponCode ?? "",
+            couponDiscount: !res.discount ? null : parseInt(res.discount),
+            couponName: result.couponName ?? "",
+          })
+        );
       }
       setCheckCrop(!res.targetSpray.includes("อื่นๆ"));
       setData(res);
@@ -389,12 +392,12 @@ function EditWaitStart() {
             <TextArea rows={3} onChange={handleComment} value={data.comment} />
           </div>
         </div>
-
         <div className="col-lg-6">
-          <div className="form-group col-lg-6">
+          <div className="form-group col-lg-12">
             <label>ค่าบริการ</label>
             <p>
-              {data?.totalPrice} บาท (จำนวน {data?.farmAreaAmount} ไร่)
+              {numberWithCommas(parseFloat(data?.totalPrice))} บาท (จำนวน{" "}
+              {data?.farmAreaAmount} ไร่) ราคาไร่ละ {data.unitPrice} บาท
             </p>
           </div>
           <label style={{ marginBottom: "10px" }}>
@@ -621,14 +624,19 @@ function EditWaitStart() {
         <div className="col-lg-2">
           <span>{data.droner.telephoneNo}</span>
         </div>
-        <div className="col-lg-4">
-          {data.droner.address.subdistrict.subdistrictName +
-            "," +
-            " " +
-            data.droner.address.district.districtName +
-            "," +
-            " " +
-            data.droner.address.province.provinceName}
+        <div className="col-lg-3">
+          {(data.droner.address.subdistrict.subdistrictName
+            ? data.droner.address.subdistrict.subdistrictName + "/"
+            : "") +
+            (data.droner.address.district.districtName != null
+              ? data.droner.address.district.districtName + "/"
+              : "'") +
+            (data.droner.address.province.provinceName != null
+              ? data.droner.address.province.provinceName
+              : "")}
+        </div>
+        <div className="col-lg-1">
+          {data.droner.dronerArea.distance || 0} km
         </div>
         <div className="col-lg">
           <span>
@@ -655,12 +663,12 @@ function EditWaitStart() {
         <div className="col-lg">
           {data.droner.status == "ACTIVE" ? (
             <span style={{ color: STATUS_COLOR_MAPPING[data.droner.status] }}>
-              <Badge color={STATUS_COLOR_MAPPING[data.droner.status]} />
+              <Badge color={STATUS_COLOR_MAPPING[data.droner.status]} />{" "}
               {TASK_TODAY_STATUS_MAPPING[data.droner.status]}
             </span>
           ) : (
             <span style={{ color: STATUS_COLOR_MAPPING[data.droner.status] }}>
-              <Badge color={STATUS_COLOR_MAPPING[data.droner.status]} />
+              <Badge color={STATUS_COLOR_MAPPING[data.droner.status]} />{" "}
               {TASK_TODAY_STATUS_MAPPING[data.droner.status]}
             </span>
           )}
@@ -675,12 +683,12 @@ function EditWaitStart() {
           <div className="col-lg">
             <Form.Item>
               <span>
-                ยอดรวมค่าบริการ (หลังรวมค่าธรรมเนียม)
+                ยอดรวมค่าบริการ
                 <br />
                 <b style={{ fontSize: "20px", color: color.Success }}>
                   {data.totalPrice !== null
-                    ? formatCurrency(data.totalPrice) + " " + "บาท"
-                    : "0.00" + " " + "บาท"}
+                    ? numberWithCommas(parseFloat(data.totalPrice)) + " บาท"
+                    : "0 บาท"}
                 </b>
               </span>
             </Form.Item>
@@ -693,7 +701,9 @@ function EditWaitStart() {
               <Input
                 disabled
                 value={
-                  data.price !== null ? formatCurrency(data.price) : "0.00"
+                  data.price !== null
+                    ? numberWithCommas(parseFloat(data.price))
+                    : "0"
                 }
                 suffix="บาท"
               />
@@ -705,7 +715,11 @@ function EditWaitStart() {
               <Input
                 disabled
                 placeholder="0.0"
-                value={data.fee !== null ? formatCurrency(data.fee) : "0.00"}
+                value={
+                  data.fee !== null
+                    ? numberWithCommas(parseFloat(data.fee))
+                    : "0"
+                }
                 suffix="บาท"
               />
             </Form.Item>
@@ -717,8 +731,8 @@ function EditWaitStart() {
                 disabled
                 value={
                   data.discountFee !== null
-                    ? formatCurrency(data.discountFee)
-                    : "0.00"
+                    ? numberWithCommas(parseFloat(data.discountFee))
+                    : "0"
                 }
                 suffix="บาท"
               />
@@ -726,27 +740,19 @@ function EditWaitStart() {
           </div>
           <div className="form-group col-lg-4">
             <label>รหัสคูปอง</label>
-            <Input
-                value={couponData.couponCode}
-                disabled
-                autoComplete="off"
-             />
+            <Input value={couponData.couponCode} disabled autoComplete="off" />
           </div>
           <div className="form-group col-lg-4">
             <label>ชื่อคูปอง</label>
-            <Input
-                value={couponData.couponName}
-                disabled
-                autoComplete="off"
-             />
+            <Input value={couponData.couponName} disabled autoComplete="off" />
           </div>
           <div className="form-group col-lg-4">
             <label>ส่วนลดคูปอง</label>
             <Input
-                value={couponData.couponDiscount!}
-                disabled
-                autoComplete="off"
-             />
+              value={numberWithCommas(couponData.couponDiscount!)}
+              disabled
+              autoComplete="off"
+            />
           </div>
         </div>
       </Form>
