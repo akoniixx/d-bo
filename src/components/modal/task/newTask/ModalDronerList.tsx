@@ -87,39 +87,35 @@ const ModalDronerList: React.FC<ModalDronerListProps> = ({
       },
     },
     {
-      title: "ตำบล",
+      title: "ตำบล/อำเภอ/จังหวัด",
       render: (value: any, row: any, index: number) => {
         let data = JSON.parse(row.dronerDetail[0]);
         return {
           children: (
             <>
-              <span>{data.subdistrict_name}</span>
+             {data.subdistrict_name && (
+                <span key={index}>{data.subdistrict_name}/</span>
+              )}
+              {data.district_name && (
+                <span key={index}>{data.district_name}/</span>
+              )}
+               {data.province_name && (
+                <span key={index}>{data.province_name}</span>
+              )}
             </>
           ),
         };
       },
     },
     {
-      title: "อำเภอ",
+      title: "ระยะทาง",
+      dataIndex: "distance",
+      key: "distance",
       render: (value: any, row: any, index: number) => {
-        let data = JSON.parse(row.dronerDetail[0]);
         return {
           children: (
             <>
-              <span>{data.district_name}</span>
-            </>
-          ),
-        };
-      },
-    },
-    {
-      title: "จังหวัด",
-      render: (value: any, row: any, index: number) => {
-        let data = JSON.parse(row.dronerDetail[0]);
-        return {
-          children: (
-            <>
-              <span>{data.province_name}</span>
+              <span>{parseFloat(row.distance).toFixed(0)} km</span>
             </>
           ),
         };
@@ -167,7 +163,7 @@ const ModalDronerList: React.FC<ModalDronerListProps> = ({
                   color={
                     row.status == "WAIT_RECEIVE" ? color.Warning : color.Error
                   }
-                />
+                />{" "}
                 {STATUS_MAPPING[row.status]}
                 <br />
               </span>

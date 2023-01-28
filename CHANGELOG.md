@@ -1,4 +1,7 @@
 ## [Version - 0]
+## improve [v0.20.20] 2023-01-28
+- added distrance in all task menu
+- enhanced UI in all task menu
 ## improve [v0.20.19] 2023-01-27
 - added coupon for all task
 ## improve [v0.20.18] 2023-01-26
