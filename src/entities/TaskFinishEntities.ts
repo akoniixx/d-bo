@@ -8,6 +8,7 @@ import {
 import { FarmerEntity, FarmerEntity_INIT } from "./FarmerEntities";
 import { DronerEntity, DronerEntity_INIT } from "./DronerDroneEntities";
 import { HistoryEntity, HistoryEntity_INIT } from "./HistoryEntities";
+import { TaskDronerTempEntity, TaskDronerTempEntity_INIT } from "./TaskDronerTemp";
 export interface TaskFinish {
   id: string;
   taskNo: string;
@@ -48,6 +49,7 @@ export interface TaskFinish {
   farmer: FarmerEntity;
   farmerPlot: FarmerPlotEntity;
   droner: DronerEntity;
+  taskDronerTemp: TaskDronerTempEntity[];
 }
 export const TaskFinish_INIT: TaskFinish = {
   id: "",
@@ -89,6 +91,7 @@ export const TaskFinish_INIT: TaskFinish = {
   farmerPlot: FarmerPlotEntity_INIT,
   farmer: FarmerEntity_INIT,
   droner: DronerEntity_INIT,
+  taskDronerTemp: [TaskDronerTempEntity_INIT],
 };
 export interface TaskFinishListEntity {
   data: TaskFinish[];

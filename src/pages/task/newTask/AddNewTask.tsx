@@ -65,7 +65,6 @@ import { numberWithCommas } from "../../../utilities/TextFormatter";
 import icon from "../../../resource/icon";
 import { LocationPriceDatasource } from "../../../datasource/LocationPriceDatasource";
 import { CouponDataSource } from "../../../datasource/CouponDatasource";
-const { Search } = Input;
 const { Step } = Steps;
 const { Option } = Select;
 const dateFormat = "DD/MM/YYYY";
@@ -133,6 +132,7 @@ const AddNewTask = () => {
   const [couponMessage, setCouponMessage] = useState<string>("");
   const [farmerPlotId, setFarmerPlotId] = useState<string>("");
   const [discountResult, setDiscountResult] = useState<number | null>();
+  const [loading, setLoading] = useState<boolean>(true);
 
   const fetchFarmerList = async (text?: string) => {
     await TaskDatasource.getFarmerList(text).then((res) => {
@@ -205,7 +205,7 @@ const AddNewTask = () => {
     setCheckSelectPlot("");
     plotSelected && setFarmerPlotSelected(plotSelected);
     fetchLocationPrice(
-      !farmerPlotSeleced?.plotArea ? 0 : farmerPlotSeleced?.plotArea.provinceId,
+      plotSelected?.plotArea.provinceId,
       plotSelected?.plantName,
       plotSelected?.raiAmount,
       plotSelected?.id
@@ -839,6 +839,7 @@ const AddNewTask = () => {
     ratingMin?: number,
     ratingMax?: number
   ) => {
+    setLoading(true);
     await TaskSearchDronerDatasource.getTaskDronerList(
       farmerId,
       plotId,
@@ -862,6 +863,7 @@ const AddNewTask = () => {
         )
       );
       setDataDronerList(res);
+      setLoading(false);
     });
   };
   const ratingStar = (
@@ -1189,11 +1191,7 @@ const AddNewTask = () => {
           type={selectionType}
           onChange={handleAllSelectDroner}
           checked={dataDronerList
-            .filter(
-              (x) =>
-                x.droner_status !== "ไม่สะดวก" &&
-                x.is_open_receive_task !== false
-            )
+            .filter((x) => x.is_open_receive_task !== false)
             .every((x) => x.isChecked)}
           style={{ width: "18px", height: "18px" }}
         />
@@ -1208,8 +1206,7 @@ const AddNewTask = () => {
                 checked={row.isChecked}
                 disabled={
                   selectionType === "checkbox"
-                    ? row.droner_status !== "ไม่สะดวก" &&
-                      row.is_open_receive_task !== false
+                    ? row.is_open_receive_task !== false
                       ? false
                       : true
                     : false
@@ -1318,7 +1315,7 @@ const AddNewTask = () => {
       },
     },
     {
-      title: "ระยะกระจัด",
+      title: "ระยะทาง",
       dataIndex: "distance",
       key: "distance",
       render: (value: any, row: any, index: number) => {
@@ -1402,6 +1399,7 @@ const AddNewTask = () => {
           columns={columns}
           dataSource={dataDronerList}
           pagination={false}
+          loading={loading}
         />
       </CardContainer>
     </>

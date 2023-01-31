@@ -1,4 +1,8 @@
 ## [Version - 0]
+## improve [v0.20.21] 2023-01-31
+- added input address 1 & 2
+- fixed render plant price in new task
+- added loading table search task
 ## improve [v0.20.20] 2023-01-28
 - added distance in all task menu
 - enhanced UI in all task menu

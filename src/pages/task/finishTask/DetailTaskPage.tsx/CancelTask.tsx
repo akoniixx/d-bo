@@ -1,6 +1,6 @@
 import Layout from "../../../../components/layout/Layout";
 import React, { useEffect, useState } from "react";
-import { Avatar, Badge, Form, Input, Row, Select, Tag, Upload } from "antd";
+import { Avatar, Badge, Form, Input, Row, Select } from "antd";
 import { BackIconButton } from "../../../../components/button/BackButton";
 import { CardContainer } from "../../../../components/card/CardContainer";
 import { CardHeader } from "../../../../components/header/CardHearder";
@@ -9,7 +9,6 @@ import GoogleMap from "../../../../components/map/GoogleMap";
 import { LAT_LNG_BANGKOK } from "../../../../definitions/Location";
 import TextArea from "antd/lib/input/TextArea";
 import {
-  StarFilled,
   CalendarOutlined,
   ClockCircleOutlined,
 } from "@ant-design/icons";
@@ -19,7 +18,6 @@ import {
 } from "../../../../entities/TaskFinishEntities";
 import { TaskFinishedDatasource } from "../../../../datasource/TaskFinishDatasource";
 import moment from "moment";
-import { UploadImageDatasouce } from "../../../../datasource/UploadImageDatasource";
 import { FINISH_TASK, TASK_HISTORY } from "../../../../definitions/FinishTask";
 import {
   HistoryEntity,
@@ -27,6 +25,10 @@ import {
 } from "../../../../entities/HistoryEntities";
 import { CouponDataSource } from "../../../../datasource/CouponDatasource";
 import { numberWithCommas } from "../../../../utilities/TextFormatter";
+import {
+  STATUS_EN_NEWTASK_COLOR_MAPPING,
+  STATUS_NEWTASK_MAPPING,
+} from "../../../../definitions/Status";
 const _ = require("lodash");
 let queryString = _.split(window.location.search, "=");
 const dateFormat = "DD/MM/YYYY";
@@ -62,6 +64,7 @@ function CancelTask() {
       }
       setHistory(res.data.taskHistory[0]);
       setData(res);
+      console.log("res", res);
       setMapPosition({
         lat: parseFloat(res.data.farmerPlot.lat),
         lng: parseFloat(res.data.farmerPlot.long),
@@ -284,61 +287,145 @@ function CancelTask() {
     </Form>
   );
   const renderDroner = (
-    <Form style={{ padding: "32px" }}>
-      <div className="row">
-        <div className="col-lg-3">
-          <span>
-            {data.data.droner?.firstname ??
-              "" + " " + data.data.droner?.lastname ??
-              ""}
-            <br />
-            <p style={{ fontSize: "12px", color: color.Grey }}>
-              {data.data.droner?.dronerCode ?? ""}
-            </p>
-          </span>
-        </div>
-        <div className="col-lg-3">
-          <span>{data.data.droner?.telephoneNo ?? ""}</span>
-        </div>
-        <div className="col-lg-3">
-          <span>
-            {data.data.droner?.address !== undefined
-              ? data.data.droner.address.subdistrict.subdistrictName +
-                "/" +
-                data.data.droner.address.district.districtName +
-                "/" +
-                data.data.droner.address.province.provinceName
-              : null}
-          </span>
-        </div>
-        <div className="col-lg-1">
-          {data.data.droner?.dronerArea.distance || 0} km
-        </div>
-        <div className="col-lg">
-          <span>
-            <Avatar
-              size={25}
-              src={
-                data.data.droner?.dronerDrone[0] != undefined
-                  ? data.data.droner.dronerDrone[0].drone.droneBrand
-                      .logoImagePath
-                  : null
-              }
-              style={{ marginRight: "5px" }}
-            />
-            {data.data.droner?.dronerDrone[0] != undefined
-              ? data.data.droner.dronerDrone[0].drone.droneBrand.name
-              : "-"}
-          </span>
-          <br />
-          <p style={{ fontSize: "12px", color: color.Grey }}>
-            {data.data.droner?.dronerDrone?.length > 1
-              ? "(มากกว่า 1 ยี่ห้อ)"
-              : null}
-          </p>
-        </div>
-      </div>
-    </Form>
+    <>
+      {data.data.droner ? (
+        <Form style={{ padding: "32px" }}>
+          <div className="row">
+            <div className="col-lg-3">
+              <span>
+                {data.data.droner?.firstname ??
+                  "" + " " + data.data.droner?.lastname ??
+                  ""}
+                <br />
+                <p style={{ fontSize: "12px", color: color.Grey }}>
+                  {data.data.droner?.dronerCode ?? ""}
+                </p>
+              </span>
+            </div>
+            <div className="col-lg-3">
+              <span>{data.data.droner?.telephoneNo ?? ""}</span>
+            </div>
+            <div className="col-lg-3">
+              <span>
+                {data.data.droner?.address !== undefined
+                  ? data.data.droner.address.subdistrict.subdistrictName +
+                    "/" +
+                    data.data.droner.address.district.districtName +
+                    "/" +
+                    data.data.droner.address.province.provinceName
+                  : null}
+              </span>
+            </div>
+            <div className="col-lg-1">
+              {data.data.droner?.dronerArea.distance || 0} km
+            </div>
+            <div className="col-lg">
+              <span>
+                <Avatar
+                  size={25}
+                  src={
+                    data.data.droner?.dronerDrone[0] != undefined
+                      ? data.data.droner.dronerDrone[0].drone.droneBrand
+                          .logoImagePath
+                      : null
+                  }
+                  style={{ marginRight: "5px" }}
+                />
+                {data.data.droner?.dronerDrone[0] != undefined
+                  ? data.data.droner.dronerDrone[0].drone.droneBrand.name
+                  : "-"}
+              </span>
+              <br />
+              <p style={{ fontSize: "12px", color: color.Grey }}>
+                {data.data.droner?.dronerDrone?.length > 1
+                  ? "(มากกว่า 1 ยี่ห้อ)"
+                  : null}
+              </p>
+            </div>
+          </div>
+        </Form>
+      ) : (
+        <Form style={{ padding: "32px" }}>
+          {data.data.taskDronerTemp.map((item) => (
+            <div className="row">
+              {JSON.parse(item.dronerDetail[0]) !== null && (
+                <>
+                  <div className="col-lg-2">
+                    <span>
+                      {JSON.parse(item.dronerDetail[0]).firstname +
+                        " " +
+                        JSON.parse(item.dronerDetail[0]).lastname}
+                      <br />
+                      <p style={{ fontSize: "12px", color: color.Grey }}>
+                        {JSON.parse(item.dronerDetail[0]).droner_code ?? ""}
+                      </p>
+                    </span>
+                  </div>
+                  <div className="col-lg-2">
+                    <span>
+                      {JSON.parse(item.dronerDetail[0]).telephone_no ?? ""}
+                    </span>
+                  </div>
+                  <div className="col-lg-3">
+                    <span>
+                      {(JSON.parse(item.dronerDetail[0]).subdistrict_name &&
+                        JSON.parse(item.dronerDetail[0]).subdistrict_name +
+                          "/") ||
+                        ""}
+                      {(JSON.parse(item.dronerDetail[0]).district_name &&
+                        JSON.parse(item.dronerDetail[0]).district_name + "/") ||
+                        ""}
+                      {(JSON.parse(item.dronerDetail[0]).province_name &&
+                        JSON.parse(item.dronerDetail[0]).province_name) ||
+                        ""}
+                    </span>
+                  </div>
+                  <div className="col-lg-1">
+                    {JSON.parse(item.dronerDetail[0]).distance.toFixed(0) || 0}{" "}
+                    km
+                  </div>
+                  <div className="col-lg-2">
+                    <span>
+                      <Avatar
+                        size={25}
+                        src={
+                          JSON.parse(item.dronerDetail[0]).logo_drone_brand !=
+                          undefined
+                            ? JSON.parse(item.dronerDetail[0]).logo_drone_brand
+                            : null
+                        }
+                        style={{ marginRight: "5px" }}
+                      />
+                      {JSON.parse(item.dronerDetail[0]).drone_brand != undefined
+                        ? JSON.parse(item.dronerDetail[0]).drone_brand
+                        : "-"}
+                    </span>
+                    <br />
+                    <p style={{ fontSize: "12px", color: color.Grey }}>
+                      {JSON.parse(item.dronerDetail[0]).count_drone > 1
+                        ? "(มากกว่า 1 ยี่ห้อ)"
+                        : null}
+                    </p>
+                  </div>
+                  <div className="col-lg-2">
+                    <span
+                      style={{
+                        color: STATUS_EN_NEWTASK_COLOR_MAPPING[item.status],
+                      }}
+                    >
+                      <Badge
+                        color={STATUS_EN_NEWTASK_COLOR_MAPPING[item.status]}
+                      />{" "}
+                      {STATUS_NEWTASK_MAPPING[item.status]}
+                    </span>
+                  </div>
+                </>
+              )}
+            </div>
+          ))}
+        </Form>
+      )}
+    </>
   );
   const renderPrice = (
     <Form style={{ padding: "20px" }}>
