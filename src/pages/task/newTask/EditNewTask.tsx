@@ -155,6 +155,7 @@ const EditNewTask = () => {
     useState<boolean>(false);
   const [disableBtn, setDisableBtn] = useState<boolean>(false);
   const [priceMethod, setPriceMethod] = useState<string>("อัตโนมัติ");
+  const [loading, setLoading] = useState<boolean>(true);
 
   const fetchNewTask = async () => {
     await TaskDatasource.getNewTaskById(queryString[1]).then((res) => {
@@ -888,6 +889,7 @@ const EditNewTask = () => {
     ratingMin?: number,
     ratingMax?: number
   ) => {
+    setLoading(true);
     await TaskSearchDronerDatasource.getTaskDronerList(
       farmerId,
       plotId,
@@ -911,6 +913,7 @@ const EditNewTask = () => {
         )
       );
       setDataDronerList(res);
+      setLoading(false);
     });
   };
   const ratingStar = (
@@ -1409,7 +1412,7 @@ const EditNewTask = () => {
       },
     },
     {
-      title: "ระยะกระจัด",
+      title: "ระยะทาง",
       dataIndex: "distance",
       key: "distance",
       render: (value: any, row: any, index: number) => {
@@ -1491,6 +1494,7 @@ const EditNewTask = () => {
           columns={columns}
           dataSource={dataDronerList}
           pagination={false}
+          loading={loading}
         />
       </CardContainer>
     </>

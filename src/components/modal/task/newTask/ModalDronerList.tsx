@@ -21,6 +21,9 @@ const ModalDronerList: React.FC<ModalDronerListProps> = ({
   const [data, setData] = useState<TaskDronerTempEntity[]>();
   const fetchDronerList = async () => {
     await TaskDronerTempDataSource.getDronerList(taskId).then((res) => {
+      res.sort((a, b) =>
+        parseFloat(a.distance) > parseFloat(b.distance) ? 1 : -1
+      );
       setData(res);
     });
   };
@@ -38,7 +41,7 @@ const ModalDronerList: React.FC<ModalDronerListProps> = ({
         return {
           children: (
             <>
-              <span>{data.firstname + " " + data.lastname}</span>
+              <span>{data?.firstname + " " + data?.lastname}</span>
               <br />
               <span style={{ color: color.Grey }}>{data.droner_code}</span>
             </>
@@ -53,7 +56,7 @@ const ModalDronerList: React.FC<ModalDronerListProps> = ({
         return {
           children: (
             <>
-              <span>{data.telephone_no}</span>
+              <span>{data?.telephone_no}</span>
             </>
           ),
         };
@@ -90,17 +93,18 @@ const ModalDronerList: React.FC<ModalDronerListProps> = ({
       title: "ตำบล/อำเภอ/จังหวัด",
       render: (value: any, row: any, index: number) => {
         let data = JSON.parse(row.dronerDetail[0]);
+        console.log(data);
         return {
           children: (
             <>
-             {data.subdistrict_name && (
-                <span key={index}>{data.subdistrict_name}/</span>
+              {data?.subdistrict_name && (
+                <span key={index}>{data?.subdistrict_name}/</span>
               )}
-              {data.district_name && (
-                <span key={index}>{data.district_name}/</span>
+              {data?.district_name && (
+                <span key={index}>{data?.district_name}/</span>
               )}
-               {data.province_name && (
-                <span key={index}>{data.province_name}</span>
+              {data?.province_name && (
+                <span key={index}>{data?.province_name}</span>
               )}
             </>
           ),

@@ -4,14 +4,14 @@ export const STATUS_NORMAL_MAPPING: any = {
   PENDING: "รอยืนยันตัวแปลง",
   ACTIVE: "ใช้งาน",
   INACTIVE: "ปิดการใช้งาน",
-  REJECTED : "ไม่อนุมัติ"
+  REJECTED: "ไม่อนุมัติ",
 };
 
 export const STATUS_FARMERPLOT_COLOR_MAPPING: any = {
   PENDING: "#EA973E",
   ACTIVE: color.Success,
   INACTIVE: color.Error,
-  REJECTED: color.Error
+  REJECTED: color.Error,
 };
 
 export const STATUS_FARMER_MAPPING: any = {
@@ -36,8 +36,10 @@ export const FARMER_STATUS_SEARCH = [
 ];
 
 export const STATUS_NEWTASK_MAPPING: any = {
-  WAIT_RECEIVE: "ไม่มีนักบินรับงาน",
-  WAIT_START: "รอนักบินโดรนรับงาน",
+  WAIT_RECEIVE: "ไม่มีนักบินโดรนรับงาน",
+  REJECTED: "นักบินโดรนไม่รับงาน",
+  CANCELED: "ไม่มีนักบินโดรนรับงาน",
+  RECEIVED: "นักบินโดรนรับงานแล้ว",
 };
 export const NEWTASK_STATUS_SEARCH = [
   { value: "WAIT_RECEIVE", name: "ไม่มีนักบินรับงาน" },
@@ -46,6 +48,12 @@ export const NEWTASK_STATUS_SEARCH = [
 export const STATUS_NEWTASK_COLOR_MAPPING: any = {
   ไม่มีนักบินรับงาน: color.Error,
   รอนักบินโดรนรับงาน: "#EA973E",
+};
+export const STATUS_EN_NEWTASK_COLOR_MAPPING: any = {
+  WAIT_RECEIVE: color.Error,
+  REJECTED: color.Error,
+  CANCELED: color.Error,
+  RECEIVED: color.Success,
 };
 export const STATUS_INDEX_FINISHTASK = [
   { value: "WAIT_START", name: "รอเริ่มงาน" },
