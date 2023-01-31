@@ -771,7 +771,7 @@ const AddFarmer = () => {
                 onChange={handleChangeStatus}>
                 <Space direction="vertical">
                   {FARMER_STATUS_SEARCH.filter(
-                    (x) => x.value != "INACTIVE"
+                    (x) => x.value != "INACTIVE" && x.value != "REJECTED"
                   ).map((item) => (
                     <Radio value={item.value}>{item.name}</Radio>
                   ))}

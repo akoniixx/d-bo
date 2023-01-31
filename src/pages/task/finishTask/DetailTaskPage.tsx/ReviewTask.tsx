@@ -48,6 +48,7 @@ import {
   CreateReview,
   CreateReview_INIT,
 } from "../../../../entities/ReviewDronerEntities";
+import { CouponDataSource } from "../../../../datasource/CouponDatasource";
 
 const { Map } = require("immutable");
 const _ = require("lodash");
@@ -78,6 +79,13 @@ function ReviewTask() {
   const [saveRate, setSaveRate] = useState<boolean>(true);
   const fetchDetailTask = async () => {
     await TaskFinishedDatasource.getDetailFinishTaskById(taskId).then((res) => {
+      if(res.couponId !== null){
+        CouponDataSource.getPromotionCode(res.couponId).then(result => setCouponData({
+          couponCode : result.couponCode??"",
+          couponDiscount : (!res.discount)?null:parseInt(res.discount),
+          couponName : result.couponName??""
+        }))
+      }
       setData(res);
       setMapPosition({
         lat: parseFloat(res.data.farmerPlot.lat),
