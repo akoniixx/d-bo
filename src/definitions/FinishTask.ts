@@ -26,4 +26,5 @@ export const STATUS_COLOR_TASK: any = {
   export const TASK_HISTORY: any = {
     WAIT_START: "รอเริ่มงาน",
     IN_PROGRESS: "กำลังดำเนินงาน",
+    WAIT_RECEIVE : "ไม่มีนักบินรับงาน"
   };

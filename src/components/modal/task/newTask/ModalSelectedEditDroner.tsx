@@ -1,6 +1,7 @@
 import { DeleteOutlined, StarFilled } from "@ant-design/icons";
 import { Avatar, Badge, Form, Modal, Row, Table } from "antd";
 import React, { useState } from "react";
+import { displayName } from "react-quill";
 import { TaskDronerTempEntity } from "../../../../entities/TaskDronerTemp";
 import { color } from "../../../../resource";
 import ActionButton from "../../../button/ActionButton";
@@ -20,7 +21,7 @@ const ModalSelectedEditDroner: React.FC<ModalSelectedEditDronerProps> = ({
   title,
   callBack,
 }) => {
-   let checkDup = Array.from(new Set(dataDroner)).filter(
+  let checkDup = Array.from(new Set(dataDroner)).filter(
     (x) => x.dronerId != ""
   );
   const [data, setData] = useState<TaskDronerTempEntity[]>(checkDup);
@@ -96,45 +97,38 @@ const ModalSelectedEditDroner: React.FC<ModalSelectedEditDronerProps> = ({
       },
     },
     {
-      title: "ตำบล",
+      title: "ตำบล/อำเภอ/จังหวัด",
       dataIndex: "subdistrict_name",
       key: "subdistrict_name",
       render: (value: any, row: any, index: number) => {
         let data = JSON.parse(row.dronerDetail[0]);
+        console.log(data);
         return {
           children: (
             <>
-              <span key={index}>{data.subdistrict_name}</span>
+              {data.subdistrict_name && (
+                <span key={index}>{data.subdistrict_name}/</span>
+              )}
+              {data.district_name && (
+                <span key={index}>{data.district_name}/</span>
+              )}
+               {data.province_name && (
+                <span key={index}>{data.province_name}</span>
+              )}
             </>
           ),
         };
       },
     },
     {
-      title: "อำเภอ",
-      dataIndex: "district_name",
-      key: "district_name",
+      title: "ระยะทาง",
+      dataIndex: "distance",
+      key: "distance",
       render: (value: any, row: any, index: number) => {
-        let data = JSON.parse(row.dronerDetail[0]);
         return {
           children: (
             <>
-              <span key={index}>{data.district_name}</span>
-            </>
-          ),
-        };
-      },
-    },
-    {
-      title: "จังหวัด",
-      dataIndex: "province_name",
-      key: "province_name",
-      render: (value: any, row: any, index: number) => {
-        let data = JSON.parse(row.dronerDetail[0]);
-        return {
-          children: (
-            <>
-              <span key={index}>{data.province_name}</span>
+              <span>{parseFloat(row.distance).toFixed(0)} km</span>
             </>
           ),
         };
@@ -185,7 +179,7 @@ const ModalSelectedEditDroner: React.FC<ModalSelectedEditDronerProps> = ({
                   color={
                     data.droner_status == "สะดวก" ? color.Success : color.Error
                   }
-                />
+                />{" "}
                 {data.droner_status}
                 <br />
               </span>
@@ -217,7 +211,7 @@ const ModalSelectedEditDroner: React.FC<ModalSelectedEditDronerProps> = ({
                   color={
                     row.status == "WAIT_RECEIVE" ? color.Warning : color.Error
                   }
-                />
+                />{" "}
                 {STATUS_MAPPING[row.status]}
                 <br />
               </span>
@@ -283,7 +277,7 @@ const ModalSelectedEditDroner: React.FC<ModalSelectedEditDronerProps> = ({
               pagination={false}
               size="large"
               tableLayout="fixed"
-              rowKey={data => data.id}
+              rowKey={(data) => data.id}
             />
           </CardContainer>
         </Form>

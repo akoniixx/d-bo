@@ -1,6 +1,6 @@
 import Layout from "../../../../components/layout/Layout";
 import React, { useEffect, useState } from "react";
-import { Avatar, Badge, Form, Input, Row, Select, Tag, Upload } from "antd";
+import { Avatar, Badge, Form, Input, Row, Select } from "antd";
 import { BackIconButton } from "../../../../components/button/BackButton";
 import { CardContainer } from "../../../../components/card/CardContainer";
 import { CardHeader } from "../../../../components/header/CardHearder";
@@ -9,7 +9,6 @@ import GoogleMap from "../../../../components/map/GoogleMap";
 import { LAT_LNG_BANGKOK } from "../../../../definitions/Location";
 import TextArea from "antd/lib/input/TextArea";
 import {
-  StarFilled,
   CalendarOutlined,
   ClockCircleOutlined,
 } from "@ant-design/icons";
@@ -19,13 +18,17 @@ import {
 } from "../../../../entities/TaskFinishEntities";
 import { TaskFinishedDatasource } from "../../../../datasource/TaskFinishDatasource";
 import moment from "moment";
-import { UploadImageDatasouce } from "../../../../datasource/UploadImageDatasource";
 import { FINISH_TASK, TASK_HISTORY } from "../../../../definitions/FinishTask";
 import {
   HistoryEntity,
   HistoryEntity_INIT,
 } from "../../../../entities/HistoryEntities";
 import { CouponDataSource } from "../../../../datasource/CouponDatasource";
+import { numberWithCommas } from "../../../../utilities/TextFormatter";
+import {
+  STATUS_EN_NEWTASK_COLOR_MAPPING,
+  STATUS_NEWTASK_MAPPING,
+} from "../../../../definitions/Status";
 const _ = require("lodash");
 let queryString = _.split(window.location.search, "=");
 const dateFormat = "DD/MM/YYYY";
@@ -39,26 +42,29 @@ function CancelTask() {
     lat: LAT_LNG_BANGKOK.lat,
     lng: LAT_LNG_BANGKOK.lng,
   });
-  const [couponData,setCouponData] = useState<{
-    couponCode : string,
-    couponName : string,
-    couponDiscount : number | null
+  const [couponData, setCouponData] = useState<{
+    couponCode: string;
+    couponName: string;
+    couponDiscount: number | null;
   }>({
-    couponCode : "",
-    couponName : "",
-    couponDiscount : null
-  })
+    couponCode: "",
+    couponName: "",
+    couponDiscount: null,
+  });
   const fetchDetailTask = async () => {
     await TaskFinishedDatasource.getDetailFinishTaskById(taskId).then((res) => {
-      if(res.couponId !== null){
-        CouponDataSource.getPromotionCode(res.couponId).then(result => setCouponData({
-          couponCode : result.couponCode??"",
-          couponDiscount : (!res.discount)?null:parseInt(res.discount),
-          couponName : result.couponName??""
-        }))
+      if (res.data.couponId !== null) {
+        CouponDataSource.getPromotionCode(res.data.couponId).then((result) =>
+          setCouponData({
+            couponCode: res.data.couponCode ?? "",
+            couponDiscount: !res.data.discount ? null : parseInt(res.data.discount),
+            couponName: result.couponName ?? "",
+          })
+        );
       }
       setHistory(res.data.taskHistory[0]);
       setData(res);
+      console.log("res", res);
       setMapPosition({
         lat: parseFloat(res.data.farmerPlot.lat),
         lng: parseFloat(res.data.farmerPlot.long),
@@ -136,12 +142,10 @@ function CancelTask() {
               {data.data.preparationBy !== null ? data.data.preparationBy : "-"}
             </span>
           </Form.Item>
-
-          <br />
           <label>หมายเหตุ</label>
           <Form.Item>
             <span style={{ color: color.Grey }}>
-              {data.data.comment !== null ? data.data.comment : "-"}
+              <TextArea rows={3} value={data.data.comment! || "-"} disabled />
             </span>
           </Form.Item>
         </div>
@@ -151,19 +155,19 @@ function CancelTask() {
           <Form.Item style={{ color: color.Grey }}>
             <span>
               {data.data.price !== null
-                ? formatCurrency(data.data.price) + " " + "บาท"
-                : "0.00" + " " + "บาท"}
+                ? numberWithCommas(parseFloat(data.data.price)) + " บาท"
+                : "0 บาท"}
             </span>{" "}
             <span>
-              {"(จำนวน" + " " + data.data.farmAreaAmount + " " + "ไร่)"}
+              {"(จำนวน " + data.data.farmAreaAmount + " ไร่)"} ราคาไร่ละ{" "}
+              {data.data.unitPrice} บาท
             </span>
           </Form.Item>
           <br />
           <label>สถานะ</label>
           <Form.Item>
             <span style={{ color: color.Error }}>
-              <Badge color={color.Error} />
-              {FINISH_TASK[data.data.status]}
+              <Badge color={color.Error} /> {FINISH_TASK[data.data.status]}
               {history != null
                 ? " " + "(" + TASK_HISTORY[history.beforeValue] + ")"
                 : null}
@@ -283,58 +287,145 @@ function CancelTask() {
     </Form>
   );
   const renderDroner = (
-    <Form style={{ padding: "32px" }}>
-      <div className="row">
-        <div className="col-lg-3">
-          <span>
-            {data.data.droner.firstname + " " + data.data.droner.lastname}
-            <br />
-            <p style={{ fontSize: "12px", color: color.Grey }}>
-              {data.data.droner.dronerCode}
-            </p>
-          </span>
-        </div>
-        <div className="col-lg-3">
-          <span>{data.data.droner.telephoneNo}</span>
-        </div>
-        <div className="col-lg-4">
-          <span>
-            {data.data.droner.address !== null
-              ? data.data.droner.address.subdistrict.subdistrictName +
-                "," +
-                " " +
-                data.data.droner.address.district.districtName +
-                "," +
-                " " +
-                data.data.droner.address.province.provinceName
-              : null}
-          </span>
-        </div>
-        <div className="col-lg">
-          <span>
-            <Avatar
-              size={25}
-              src={
-                data.data.droner.dronerDrone[0] != null
-                  ? data.data.droner.dronerDrone[0].drone.droneBrand
-                      .logoImagePath
-                  : null
-              }
-              style={{ marginRight: "5px" }}
-            />
-            {data.data.droner.dronerDrone[0] != null
-              ? data.data.droner.dronerDrone[0].drone.droneBrand.name
-              : "-"}
-          </span>
-          <br />
-          <p style={{ fontSize: "12px", color: color.Grey }}>
-            {data.data.droner.dronerDrone.length > 1
-              ? "(มากกว่า 1 ยี่ห้อ)"
-              : null}
-          </p>
-        </div>
-      </div>
-    </Form>
+    <>
+      {data.data.droner ? (
+        <Form style={{ padding: "32px" }}>
+          <div className="row">
+            <div className="col-lg-3">
+              <span>
+                {data.data.droner?.firstname ??
+                  "" + " " + data.data.droner?.lastname ??
+                  ""}
+                <br />
+                <p style={{ fontSize: "12px", color: color.Grey }}>
+                  {data.data.droner?.dronerCode ?? ""}
+                </p>
+              </span>
+            </div>
+            <div className="col-lg-3">
+              <span>{data.data.droner?.telephoneNo ?? ""}</span>
+            </div>
+            <div className="col-lg-3">
+              <span>
+                {data.data.droner?.address !== undefined
+                  ? data.data.droner.address.subdistrict.subdistrictName +
+                    "/" +
+                    data.data.droner.address.district.districtName +
+                    "/" +
+                    data.data.droner.address.province.provinceName
+                  : null}
+              </span>
+            </div>
+            <div className="col-lg-1">
+              {data.data.droner?.dronerArea.distance || 0} km
+            </div>
+            <div className="col-lg">
+              <span>
+                <Avatar
+                  size={25}
+                  src={
+                    data.data.droner?.dronerDrone[0] != undefined
+                      ? data.data.droner.dronerDrone[0].drone.droneBrand
+                          .logoImagePath
+                      : null
+                  }
+                  style={{ marginRight: "5px" }}
+                />
+                {data.data.droner?.dronerDrone[0] != undefined
+                  ? data.data.droner.dronerDrone[0].drone.droneBrand.name
+                  : "-"}
+              </span>
+              <br />
+              <p style={{ fontSize: "12px", color: color.Grey }}>
+                {data.data.droner?.dronerDrone?.length > 1
+                  ? "(มากกว่า 1 ยี่ห้อ)"
+                  : null}
+              </p>
+            </div>
+          </div>
+        </Form>
+      ) : (
+        <Form style={{ padding: "32px" }}>
+          {data.data.taskDronerTemp.map((item) => (
+            <div className="row">
+              {JSON.parse(item.dronerDetail[0]) !== null && (
+                <>
+                  <div className="col-lg-2">
+                    <span>
+                      {JSON.parse(item.dronerDetail[0]).firstname +
+                        " " +
+                        JSON.parse(item.dronerDetail[0]).lastname}
+                      <br />
+                      <p style={{ fontSize: "12px", color: color.Grey }}>
+                        {JSON.parse(item.dronerDetail[0]).droner_code ?? ""}
+                      </p>
+                    </span>
+                  </div>
+                  <div className="col-lg-2">
+                    <span>
+                      {JSON.parse(item.dronerDetail[0]).telephone_no ?? ""}
+                    </span>
+                  </div>
+                  <div className="col-lg-3">
+                    <span>
+                      {(JSON.parse(item.dronerDetail[0]).subdistrict_name &&
+                        JSON.parse(item.dronerDetail[0]).subdistrict_name +
+                          "/") ||
+                        ""}
+                      {(JSON.parse(item.dronerDetail[0]).district_name &&
+                        JSON.parse(item.dronerDetail[0]).district_name + "/") ||
+                        ""}
+                      {(JSON.parse(item.dronerDetail[0]).province_name &&
+                        JSON.parse(item.dronerDetail[0]).province_name) ||
+                        ""}
+                    </span>
+                  </div>
+                  <div className="col-lg-1">
+                    {JSON.parse(item.dronerDetail[0]).distance.toFixed(0) || 0}{" "}
+                    km
+                  </div>
+                  <div className="col-lg-2">
+                    <span>
+                      <Avatar
+                        size={25}
+                        src={
+                          JSON.parse(item.dronerDetail[0]).logo_drone_brand !=
+                          undefined
+                            ? JSON.parse(item.dronerDetail[0]).logo_drone_brand
+                            : null
+                        }
+                        style={{ marginRight: "5px" }}
+                      />
+                      {JSON.parse(item.dronerDetail[0]).drone_brand != undefined
+                        ? JSON.parse(item.dronerDetail[0]).drone_brand
+                        : "-"}
+                    </span>
+                    <br />
+                    <p style={{ fontSize: "12px", color: color.Grey }}>
+                      {JSON.parse(item.dronerDetail[0]).count_drone > 1
+                        ? "(มากกว่า 1 ยี่ห้อ)"
+                        : null}
+                    </p>
+                  </div>
+                  <div className="col-lg-2">
+                    <span
+                      style={{
+                        color: STATUS_EN_NEWTASK_COLOR_MAPPING[item.status],
+                      }}
+                    >
+                      <Badge
+                        color={STATUS_EN_NEWTASK_COLOR_MAPPING[item.status]}
+                      />{" "}
+                      {STATUS_NEWTASK_MAPPING[item.status]}
+                    </span>
+                  </div>
+                </>
+              )}
+            </div>
+          ))}
+        </Form>
+      )}
+    </>
   );
   const renderPrice = (
     <Form style={{ padding: "20px" }}>
@@ -343,12 +434,13 @@ function CancelTask() {
           <div className="col-lg">
             <Form.Item>
               <span>
-                ยอดรวมค่าบริการ (หลังรวมค่าธรรมเนียม)
+                ยอดรวมค่าบริการ
                 <br />
                 <b style={{ fontSize: "20px", color: color.Success }}>
                   {data.data.totalPrice !== null
-                    ? formatCurrency(data.data.totalPrice) + " " + "บาท"
-                    : "0.00" + " " + "บาท"}
+                    ? numberWithCommas(parseFloat(data.data.totalPrice)) +
+                      " บาท"
+                    : "0 บาท"}
                 </b>
               </span>
             </Form.Item>
@@ -362,8 +454,8 @@ function CancelTask() {
                 disabled
                 value={
                   data.data.price !== null
-                    ? formatCurrency(data.data.price) + " " + "บาท"
-                    : "0.00" + " " + "บาท"
+                    ? numberWithCommas(parseFloat(data.data.price))
+                    : 0
                 }
                 suffix="บาท"
               />
@@ -376,8 +468,8 @@ function CancelTask() {
                 disabled
                 value={
                   data.data.fee !== null
-                    ? parseFloat(data.data.fee).toFixed(2) + " " + "บาท"
-                    : "0.00" + " " + "บาท"
+                    ? numberWithCommas(parseFloat(data.data.fee))
+                    : 0
                 }
                 suffix="บาท"
               />
@@ -390,8 +482,8 @@ function CancelTask() {
                 disabled
                 value={
                   data.data.discountFee !== null
-                    ? formatCurrency(data.data.discountFee) + " " + "บาท"
-                    : "0.00" + " " + "บาท"
+                    ? numberWithCommas(parseFloat(data.data.discountFee))
+                    : 0
                 }
                 suffix="บาท"
               />
@@ -399,27 +491,19 @@ function CancelTask() {
           </div>
           <div className="form-group col-lg-4">
             <label>รหัสคูปอง</label>
-            <Input
-                value={couponData.couponCode}
-                disabled
-                autoComplete="off"
-             />
+            <Input value={couponData.couponCode} disabled autoComplete="off" />
           </div>
           <div className="form-group col-lg-4">
             <label>ชื่อคูปอง</label>
-            <Input
-                value={couponData.couponName}
-                disabled
-                autoComplete="off"
-             />
+            <Input value={couponData.couponName} disabled autoComplete="off" />
           </div>
           <div className="form-group col-lg-4">
             <label>ส่วนลดคูปอง</label>
             <Input
-                value={couponData.couponDiscount!}
-                disabled
-                autoComplete="off"
-             />
+              value={numberWithCommas(couponData.couponDiscount!)}
+              disabled
+              autoComplete="off"
+            />
           </div>
         </div>
       </Form>

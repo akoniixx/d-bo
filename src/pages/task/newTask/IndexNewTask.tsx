@@ -31,6 +31,7 @@ import {
 import { NewTaskPageEntity } from "../../../entities/NewTaskEntities";
 import { color } from "../../../resource";
 import { DateTimeUtil } from "../../../utilities/DateTimeUtil";
+import { numberWithCommas } from "../../../utilities/TextFormatter";
 const { RangePicker } = DatePicker;
 const dateFormat = "DD-MM-YYYY";
 const dateSearchFormat = "YYYY-MM-DD";
@@ -44,8 +45,7 @@ const IndexNewTask = () => {
   const [searchStartDate, setSearchStartDate] = useState<any>(null);
   const [searchEndDate, setSearchEndDate] = useState<any>(null);
   const [showModalMap, setShowModalMap] = useState<boolean>(false);
-  const [showModalDroner, setShowModalDroner] =
-    useState<boolean>(false);
+  const [showModalDroner, setShowModalDroner] = useState<boolean>(false);
 
   const [plotId, setPlotId] = useState<string>("");
   const [taskId, setTaskId] = useState<string>("");
@@ -59,20 +59,13 @@ const IndexNewTask = () => {
       searchStartDate,
       searchEndDate
     ).then((res) => {
-      console.log(res)
       setData(res);
     });
   };
 
   useEffect(() => {
     fetchNewTaskList();
-  }, [
-    searchStatus,
-    searchText,
-    searchStartDate,
-    searchEndDate,
-    current,
-  ]);
+  }, [searchStatus, searchText, searchStartDate, searchEndDate, current]);
 
   const handleSearchStatus = (status: any) => {
     setSearchStatus(status);
@@ -84,12 +77,8 @@ const IndexNewTask = () => {
   };
   const handleSearchDate = (e: any) => {
     if (e != null) {
-      setSearchStartDate(
-        moment(new Date(e[0])).format(dateSearchFormat)
-      );
-      setSearchEndDate(
-        moment(new Date(e[1])).format(dateSearchFormat)
-      );
+      setSearchStartDate(moment(new Date(e[0])).format(dateSearchFormat));
+      setSearchEndDate(moment(new Date(e[1])).format(dateSearchFormat));
     } else {
       setSearchStartDate(e);
       setSearchEndDate(e);
@@ -130,8 +119,7 @@ const IndexNewTask = () => {
         {
           label: "เลือกนักบินหลายคน (แบบปกติ)",
           key: "1",
-          onClick: () =>
-            (window.location.href = "/AddNewTask=checkbox"),
+          onClick: () => (window.location.href = "/AddNewTask=checkbox"),
         },
         {
           label: "บังคับเลือกนักบิน (ติดต่อแล้ว)",
@@ -144,7 +132,8 @@ const IndexNewTask = () => {
   const pageTitle = (
     <div
       className="container d-flex justify-content-between"
-      style={{ padding: "10px" }}>
+      style={{ padding: "10px" }}
+    >
       <div className="col-lg-2">
         <span
           className="card-label font-weight-bolder text-dark"
@@ -152,7 +141,8 @@ const IndexNewTask = () => {
             fontSize: 22,
             fontWeight: "bold",
             padding: "8px",
-          }}>
+          }}
+        >
           <strong>งานใหม่ (รอนักบิน)</strong>
         </span>
       </div>
@@ -168,7 +158,8 @@ const IndexNewTask = () => {
           className="col-lg-12 p-1"
           placeholder="สถานะทั้งหมด"
           onChange={handleSearchStatus}
-          allowClear>
+          allowClear
+        >
           {NEWTASK_STATUS_SEARCH.map((item) => (
             <option value={item.name}>{item.name}</option>
           ))}
@@ -190,7 +181,8 @@ const IndexNewTask = () => {
               color: color.secondary2,
               borderColor: color.Success,
               borderRadius: "5px",
-            }}>
+            }}
+          >
             เพิ่มงานบินโดรนใหม่
             <DownOutlined />
           </Button>
@@ -226,9 +218,7 @@ const IndexNewTask = () => {
             <>
               <span>{row.firstname + " " + row.lastname}</span>
               <br />
-              <span style={{ color: color.Grey }}>
-                {row.telephone_no}
-              </span>
+              <span style={{ color: color.Grey }}>{row.telephone_no}</span>
             </>
           ),
         };
@@ -242,9 +232,7 @@ const IndexNewTask = () => {
           let district =
             row.district_name == null ? "" : row.district_name + "/";
           let subdistrict =
-            row.subdistrict_name == null
-              ? ""
-              : row.subdistrict_name + "/";
+            row.subdistrict_name == null ? "" : row.subdistrict_name + "/";
           return subdistrict + district + province;
         };
         return {
@@ -254,7 +242,8 @@ const IndexNewTask = () => {
               <br />
               <div
                 onClick={() => handleModalMap(row.farmer_plot_id)}
-                style={{ color: color.primary1, cursor: "pointer" }}>
+                style={{ color: color.primary1, cursor: "pointer" }}
+              >
                 ดูแผนที่แปลง
               </div>
             </>
@@ -273,7 +262,7 @@ const IndexNewTask = () => {
               <span>
                 {row.total_price == null
                   ? 0.0 + " บาท"
-                  : parseFloat(row.total_price).toFixed(2) + " บาท"}
+                  : numberWithCommas(parseFloat(row.total_price)) + " บาท"}
               </span>
               <br />
               <span style={{ color: color.Grey }}>
@@ -296,7 +285,8 @@ const IndexNewTask = () => {
               <br />
               <a
                 onClick={() => handleModalDronerList(row.id)}
-                style={{ color: color.primary1 }}>
+                style={{ color: color.primary1 }}
+              >
                 ดูรายชื่อนักบินโดรน
               </a>
             </>
@@ -314,14 +304,10 @@ const IndexNewTask = () => {
             <>
               <span
                 style={{
-                  color:
-                    STATUS_NEWTASK_COLOR_MAPPING[row.task_status],
-                }}>
-                <Badge
-                  color={
-                    STATUS_NEWTASK_COLOR_MAPPING[row.task_status]
-                  }
-                />
+                  color: STATUS_NEWTASK_COLOR_MAPPING[row.task_status],
+                }}
+              >
+                <Badge color={STATUS_NEWTASK_COLOR_MAPPING[row.task_status]} />{" "}
                 {row.task_status}
               </span>
               <br />
@@ -348,8 +334,7 @@ const IndexNewTask = () => {
                   icon={<EditOutlined />}
                   color={color.primary1}
                   onClick={() =>
-                    (window.location.href =
-                      "/EditNewTask/id=" + row.id)
+                    (window.location.href = "/EditNewTask/id=" + row.id)
                   }
                 />
               </div>

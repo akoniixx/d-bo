@@ -1,5 +1,4 @@
 import {
-  ClockCircleFilled,
   DownOutlined,
   EditOutlined,
   SearchOutlined,
@@ -22,9 +21,8 @@ import {
   Table,
   Tooltip,
 } from "antd";
-import Search from "antd/lib/input/Search";
 import moment from "moment";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import ActionButton from "../../../components/button/ActionButton";
 import { CardContainer } from "../../../components/card/CardContainer";
 import { CardHeader } from "../../../components/header/CardHearder";
@@ -32,11 +30,8 @@ import Layouts from "../../../components/layout/Layout";
 import ModalMapPlot from "../../../components/modal/task/finishTask/ModalMapPlot";
 import { LocationDatasource } from "../../../datasource/LocationDatasource";
 import { TaskInprogressDatasource } from "../../../datasource/TaskInprogressDatasource";
-import { STATUS_COLOR } from "../../../definitions/DronerStatus";
 import {
   STATUS_COLOR_TASK_TODAY,
-  STATUS_IS_PROBLEM,
-  TASKTODAY_STATUS,
   TASK_TODAY_STATUS,
 } from "../../../definitions/Status";
 import {
@@ -45,11 +40,11 @@ import {
   SubdistrictEntity,
 } from "../../../entities/LocationEntities";
 import {
-  summaryEntity,
   TaskTodayListEntity,
 } from "../../../entities/TaskInprogressEntities";
 import color from "../../../resource/color";
 import icon from "../../../resource/icon";
+import { numberWithCommas } from "../../../utilities/TextFormatter";
 
 export default function IndexTodayTask() {
   const row = 10;
@@ -450,7 +445,7 @@ export default function IndexTodayTask() {
                 </Tooltip>
               ) : null}
               <br />
-              <span style={{ color: color.Disable, fontSize: "12px" }}>
+              <span style={{ color: color.Grey, fontSize: "12px" }}>
                 {row.taskNo}
               </span>
             </>
@@ -480,7 +475,7 @@ export default function IndexTodayTask() {
                 </Tooltip>
               ) : null}
               <br />
-              <span style={{ color: color.Disable, fontSize: "12px" }}>
+              <span style={{ color: color.Grey, fontSize: "12px" }}>
                 {row.droner_telephone_no}
               </span>
             </>
@@ -501,7 +496,7 @@ export default function IndexTodayTask() {
             <>
               <span>{row.farmer_firstname + " " + row.farmer_lastname}</span>
               <br />
-              <span style={{ color: color.Disable, fontSize: "12px" }}>
+              <span style={{ color: color.Grey, fontSize: "12px" }}>
                 {row.farmer_telephone_no}
               </span>
             </>
@@ -550,12 +545,12 @@ export default function IndexTodayTask() {
             <>
               <span>
                 {row.task_total_price != null
-                  ? formatCurrency(row.task_total_price) + " " + "บาท"
-                  : "0.00" + " " + "บาท"}
+                  ? numberWithCommas(row.task_total_price) + " บาท"
+                  : "0 บาท"}
               </span>
               <br />
-              <span style={{ color: color.Disable, fontSize: "12px" }}>
-                {"จำนวน" + " " + row.farmerPlot_rai_amount + " " + "ไร่"}
+              <span style={{ color: color.Grey, fontSize: "12px" }}>
+                {"จำนวน " + row.farmerPlot_rai_amount + " ไร่"}
               </span>
             </>
           ),
@@ -576,7 +571,7 @@ export default function IndexTodayTask() {
                   color: STATUS_COLOR_TASK_TODAY[row.task_status],
                 }}
               >
-                <Badge color={STATUS_COLOR_TASK_TODAY[row.task_status]} />
+                <Badge color={STATUS_COLOR_TASK_TODAY[row.task_status]} /> {" "}
                 {TASK_TODAY_STATUS[row.task_status]}
                 <span style={{ color: color.Error }}>
                   {row.task_is_problem == true
@@ -587,7 +582,7 @@ export default function IndexTodayTask() {
                   {row.task_status_delay == "WAIT_APPROVE"
                     ? " " + "(" + "รออนุมัติขยายเวลา" + ")"
                     : null}
-                </span>
+                </span><br/>
                 <span style={{ color: "#56CCF2" }}>
                   {row.task_status_delay == "EXTENDED" ||
                   row.task_status_delay == "APPROVED"
@@ -612,7 +607,7 @@ export default function IndexTodayTask() {
                 ) : null}
                 <br />
               </span>
-              <span style={{ color: color.Disable, fontSize: "12px" }}>
+              <span style={{ color: color.Grey, fontSize: "12px" }}>
                 <UserOutlined style={{ padding: "0 4px 0 0" }} />
                 {row.task_update_by}
               </span>

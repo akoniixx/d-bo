@@ -123,15 +123,15 @@ const EditNewTask = () => {
     message: "",
   });
 
-  const [couponData,setCouponData] = useState<{
-    couponCode : string,
-    couponName : string,
-    couponDiscount : number | null
+  const [couponData, setCouponData] = useState<{
+    couponCode: string;
+    couponName: string;
+    couponDiscount: number | null;
   }>({
-    couponCode : "",
-    couponName : "",
-    couponDiscount : null
-  })
+    couponCode: "",
+    couponName: "",
+    couponDiscount: null,
+  });
 
   const [dateAppointment, setDateAppointment] = useState<any>(
     moment(undefined)
@@ -155,6 +155,7 @@ const EditNewTask = () => {
     useState<boolean>(false);
   const [disableBtn, setDisableBtn] = useState<boolean>(false);
   const [priceMethod, setPriceMethod] = useState<string>("อัตโนมัติ");
+  const [loading, setLoading] = useState<boolean>(true);
 
   const fetchNewTask = async () => {
     await TaskDatasource.getNewTaskById(queryString[1]).then((res) => {
@@ -170,12 +171,14 @@ const EditNewTask = () => {
       setFarmerPlotSelected(res.farmerPlot);
       fetchPurposeSpray(res.farmerPlot.plantName);
       setData(res);
-      if(res.couponId){
-        CouponDataSource.getPromotionCode(res.couponId).then(result => setCouponData({
-          couponCode : result.couponCode,
-          couponDiscount : parseInt(res.discount),
-          couponName : result.couponName
-        }))
+      if (res.couponId) {
+        CouponDataSource.getPromotionCode(res.couponId).then((result) =>
+          setCouponData({
+            couponCode: result.couponCode,
+            couponDiscount: parseInt(res.discount),
+            couponName: result.couponName,
+          })
+        );
       }
     });
   };
@@ -572,13 +575,13 @@ const EditNewTask = () => {
                 <div className="row">
                   <div className="form-group col-lg-12">
                     <GooleMap
-                      changeLatLng={(lat,lng)=> {
-                        const oldfarmerPlotSeleced = farmerPlotSeleced
+                      changeLatLng={(lat, lng) => {
+                        const oldfarmerPlotSeleced = farmerPlotSeleced;
                         setFarmerPlotSelected({
                           ...oldfarmerPlotSeleced,
-                          lat : lat,
-                          long : lng
-                        })
+                          lat: lat,
+                          long: lng,
+                        });
                       }}
                       width="100%"
                       height="350px"
@@ -680,7 +683,7 @@ const EditNewTask = () => {
                         <Form.Item>
                           <Input
                             suffix="บาท"
-                            value={data.priceStandard}
+                            value={numberWithCommas(data.priceStandard)}
                             disabled
                             autoComplete="off"
                             step="0.01"
@@ -714,7 +717,7 @@ const EditNewTask = () => {
                         <Form.Item>
                           <Input
                             suffix="บาท"
-                            value={data.price}
+                            value={numberWithCommas(data.price)}
                             onChange={handleCalServiceCharge}
                             disabled={
                               current == 2 || checkSelectPlot == "error"
@@ -886,6 +889,7 @@ const EditNewTask = () => {
     ratingMin?: number,
     ratingMax?: number
   ) => {
+    setLoading(true);
     await TaskSearchDronerDatasource.getTaskDronerList(
       farmerId,
       plotId,
@@ -909,6 +913,7 @@ const EditNewTask = () => {
         )
       );
       setDataDronerList(res);
+      setLoading(false);
     });
   };
   const ratingStar = (
@@ -1392,19 +1397,33 @@ const EditNewTask = () => {
       },
     },
     {
-      title: "ตำบล",
+      title: "ตำบล/อำเภอ/จังหวัด",
       dataIndex: "subdistrict_name",
-      key: "subdistrict_name",
+      render: (value: any, row: any, index: number) => {
+        return {
+          children: (
+            <>
+              {row.subdistrict_name && <span>{row.subdistrict_name}/</span>}
+              {row.district_name && <span>{row.district_name}/</span>}
+              {row.province_name && <span>{row.province_name}</span>}
+            </>
+          ),
+        };
+      },
     },
     {
-      title: "อำเภอ",
-      dataIndex: "district_name",
-      key: "district_name",
-    },
-    {
-      title: "จังหวัด",
-      dataIndex: "province_name",
-      key: "province_name",
+      title: "ระยะทาง",
+      dataIndex: "distance",
+      key: "distance",
+      render: (value: any, row: any, index: number) => {
+        return {
+          children: (
+            <>
+              <span>{row.distance.toFixed(0)} km</span>
+            </>
+          ),
+        };
+      },
     },
     {
       title: "ยี่หัอ",
@@ -1457,7 +1476,7 @@ const EditNewTask = () => {
                       ? color.Disable
                       : color.Error
                   }
-                />
+                />{" "}
                 {!row.is_open_receive_task ? "ปิดการใช้งาน" : row.droner_status}
                 <br />
               </span>
@@ -1475,6 +1494,7 @@ const EditNewTask = () => {
           columns={columns}
           dataSource={dataDronerList}
           pagination={false}
+          loading={loading}
         />
       </CardContainer>
     </>
@@ -1492,69 +1512,76 @@ const EditNewTask = () => {
               <div className="row pt-3">
                 {item?.dronerDetail[0] != "" && (
                   <>
-                    <>
-                      <div className="col-lg-3">
-                        {JSON.parse(item?.dronerDetail).firstname}{" "}
-                        {JSON.parse(item?.dronerDetail).lastname}
+                    <div className="col-lg-3">
+                      {JSON.parse(item?.dronerDetail).firstname}{" "}
+                      {JSON.parse(item?.dronerDetail).lastname}
+                      <br />
+                      <p
+                        style={{
+                          fontSize: "12px",
+                          color: color.Grey,
+                        }}
+                      >
+                        {JSON.parse(item?.dronerDetail).droner_code}
+                      </p>
+                    </div>
+                    <div className="col-lg-2">
+                      {JSON.parse(item?.dronerDetail).telephone_no}
+                    </div>
+                    <div className="col-lg-3">
+                      {JSON.parse(item?.dronerDetail).subdistrict_name && (
+                        <>{JSON.parse(item?.dronerDetail).subdistrict_name}/</>
+                      )}
+                      {JSON.parse(item?.dronerDetail).district_name && (
+                        <>{JSON.parse(item?.dronerDetail).district_name}/</>
+                      )}
+                      {JSON.parse(item?.dronerDetail).province_name && (
+                        <>{JSON.parse(item?.dronerDetail).province_name}</>
+                      )}
+                    </div>
+                    <div className="col-lg-1">
+                      {JSON.parse(item.distance).toFixed(0)} km
+                    </div>
+                    <div className="col-lg-2">
+                      <Avatar
+                        size={25}
+                        src={JSON.parse(item.dronerDetail).logo_drone_brand}
+                        style={{ marginRight: "5px" }}
+                      />
+                      {JSON.parse(item?.dronerDetail).drone_brand}
+                      <br />
+                      <p
+                        style={{
+                          fontSize: "12px",
+                          color: color.Grey,
+                        }}
+                      >
+                        {JSON.parse(item.dronerDetail).count_drone > 1 &&
+                          "(มากกว่า 1 ยี่หัอ)"}
+                      </p>
+                    </div>
+                    <div className="col-lg-1">
+                      <span
+                        style={{
+                          color:
+                            JSON.parse(item?.dronerDetail).droner_status ==
+                            "สะดวก"
+                              ? color.Success
+                              : color.Error,
+                        }}
+                      >
+                        <Badge
+                          color={
+                            JSON.parse(item?.dronerDetail).droner_status ==
+                            "สะดวก"
+                              ? color.Success
+                              : color.Error
+                          }
+                        />{" "}
+                        {JSON.parse(item?.dronerDetail).droner_status}
                         <br />
-                        <p
-                          style={{
-                            fontSize: "12px",
-                            color: color.Grey,
-                          }}
-                        >
-                          {JSON.parse(item?.dronerDetail).droner_code}
-                        </p>
-                      </div>
-                      <div className="col-lg-2">
-                        {JSON.parse(item?.dronerDetail).telephone_no}
-                      </div>
-                      <div className="col-lg-4">
-                        {JSON.parse(item?.dronerDetail).subdistrict_name}/
-                        {JSON.parse(item?.dronerDetail).district_name}/
-                        {JSON.parse(item?.dronerDetail).province_name}
-                      </div>
-                      <div className="col-lg-2">
-                        <Avatar
-                          size={25}
-                          src={JSON.parse(item.dronerDetail).logo_drone_brand}
-                          style={{ marginRight: "5px" }}
-                        />
-                        {JSON.parse(item?.dronerDetail).drone_brand}
-                        <br />
-                        <p
-                          style={{
-                            fontSize: "12px",
-                            color: color.Grey,
-                          }}
-                        >
-                          {JSON.parse(item.dronerDetail).count_drone > 1 &&
-                            "(มากกว่า 1 ยี่หัอ)"}
-                        </p>
-                      </div>
-                      <div className="col-lg-1">
-                        <span
-                          style={{
-                            color:
-                              JSON.parse(item?.dronerDetail).droner_status ==
-                              "สะดวก"
-                                ? color.Success
-                                : color.Error,
-                          }}
-                        >
-                          <Badge
-                            color={
-                              JSON.parse(item?.dronerDetail).droner_status ==
-                              "สะดวก"
-                                ? color.Success
-                                : color.Error
-                            }
-                          />
-                          {JSON.parse(item?.dronerDetail).droner_status}
-                          <br />
-                        </span>
-                      </div>
-                    </>
+                      </span>
+                    </div>
                   </>
                 )}
               </div>
@@ -1569,9 +1596,9 @@ const EditNewTask = () => {
       <Form style={{ padding: "20px" }}>
         <CardContainer style={{ backgroundColor: "rgba(33, 150, 83, 0.1)" }}>
           <Form style={{ padding: "20px" }}>
-            <label>ยอดรวมค่าบริการ (หลังรวมค่าธรรมเนียม)</label>
+            <label>ยอดรวมค่าบริการ</label>
             <h5 style={{ color: color.primary1 }} className="p-2">
-              {numberWithCommas(data?.price).toString()} บาท
+              {numberWithCommas(parseInt(data?.totalPrice)).toString()} บาท
             </h5>
             <div className="row">
               <div className="form-group col-lg-4">
@@ -1579,7 +1606,7 @@ const EditNewTask = () => {
                 <Form.Item>
                   <Input
                     suffix="บาท"
-                    value={data?.price}
+                    value={numberWithCommas(data?.price)}
                     disabled={current == 2}
                     autoComplete="off"
                     step="0.01"
@@ -1591,7 +1618,7 @@ const EditNewTask = () => {
                 <Form.Item>
                   <Input
                     suffix="บาท"
-                    value={data?.fee}
+                    value={numberWithCommas(data?.fee)}
                     disabled={current == 2}
                     autoComplete="off"
                     step="0.01"
@@ -1603,7 +1630,7 @@ const EditNewTask = () => {
                 <Form.Item>
                   <Input
                     suffix="บาท"
-                    value={data?.discountFee}
+                    value={numberWithCommas(data?.discountFee)}
                     disabled={current == 2}
                     autoComplete="off"
                     step="0.01"
@@ -1613,26 +1640,26 @@ const EditNewTask = () => {
               <div className="form-group col-lg-4">
                 <label>รหัสคูปอง</label>
                 <Input
-                    value={couponData.couponCode}
-                    disabled
-                    autoComplete="off"
-                 />
+                  value={couponData.couponCode}
+                  disabled
+                  autoComplete="off"
+                />
               </div>
               <div className="form-group col-lg-4">
                 <label>ชื่อคูปอง</label>
                 <Input
-                    value={couponData.couponName}
-                    disabled
-                    autoComplete="off"
-                 />
+                  value={couponData.couponName}
+                  disabled
+                  autoComplete="off"
+                />
               </div>
               <div className="form-group col-lg-4">
                 <label>ส่วนลดคูปอง</label>
                 <Input
-                    value={couponData.couponDiscount!}
-                    disabled
-                    autoComplete="off"
-                 />
+                  value={numberWithCommas(couponData.couponDiscount!)}
+                  disabled
+                  autoComplete="off"
+                />
               </div>
             </div>
           </Form>

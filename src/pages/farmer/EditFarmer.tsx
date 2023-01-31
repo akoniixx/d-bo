@@ -225,8 +225,14 @@ const EditFarmer = () => {
     checkValidateAddr(c.toJS());
   };
 
-  const handleOnChangeAddress = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+  const handleOnChangeAddress1 = (e: React.ChangeEvent<HTMLInputElement>) => {
     const d = Map(address).set("address1", e.target.value);
+    setAddress(d.toJS());
+    checkValidateAddr(d.toJS());
+  };
+
+  const handleOnChangeAddress2 = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const d = Map(address).set("address2", e.target.value);
     setAddress(d.toJS());
     checkValidateAddr(d.toJS());
   };
@@ -434,6 +440,7 @@ const EditFarmer = () => {
       data.lastname,
       data.telephoneNo,
       address.address1,
+      address.address2,
     ].includes("");
     let checkEmptyNumber = ![
       addr.provinceId,
@@ -849,6 +856,29 @@ const EditFarmer = () => {
             </div>
           </div>
           <div className="row">
+            <div className="form-group col-lg-12">
+              <label>
+                บ้านเลขที่ <span style={{ color: "red" }}>*</span>
+              </label>
+              <Form.Item
+                name="address1"
+                rules={[
+                  {
+                    required: true,
+                    message: "กรุณากรอกบ้านเลขที่",
+                  },
+                ]}
+              >
+                <Input
+                  placeholder="กรอกบ้านเลขที่"
+                  onChange={handleOnChangeAddress1}
+                  defaultValue={address.address1}
+                  autoComplete="off"
+                />
+              </Form.Item>
+            </div>
+          </div>
+          <div className="row">
             <div className="form-group">
               <label>
                 ที่อยู่บ้าน <span style={{ color: "red" }}>*</span>
@@ -866,9 +896,9 @@ const EditFarmer = () => {
                   className="col-lg-12"
                   rows={5}
                   placeholder="กรอกที่อยู่บ้าน (เลขที่บ้าน, หมู่บ้าน, ชื่ออาคาร/ตึก, ซอย)"
-                  defaultValue={address.address1}
+                  defaultValue={address.address2}
                   autoComplete="off"
-                  onChange={handleOnChangeAddress}
+                  onChange={handleOnChangeAddress2}
                 />
               </Form.Item>
             </div>

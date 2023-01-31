@@ -34,7 +34,7 @@ export interface DeletedDronerTemp {
   taskId: string;
   dronerId: string;
 }
-export const DeletedDronerTemp_INIT : DeletedDronerTemp = {
+export const DeletedDronerTemp_INIT: DeletedDronerTemp = {
   taskId: "",
   dronerId: "",
-}
+};

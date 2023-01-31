@@ -74,9 +74,7 @@ const AddFarmer = () => {
   const [profile] = useLocalStorage("profile", []);
   const navigate = useNavigate();
 
-  const [data, setData] = useState<CreateFarmerEntity>(
-    CreateFarmerEntity_INIT
-  );
+  const [data, setData] = useState<CreateFarmerEntity>(CreateFarmerEntity_INIT);
   const [address, setAddress] = useState<CreateAddressEntity>(
     CreateAddressEntity_INIT
   );
@@ -90,22 +88,23 @@ const AddFarmer = () => {
   const [district, setDistrict] = useState<DistrictEntity[]>([
     DistrictEntity_INIT,
   ]);
-  const [subdistrict, setSubdistrict] = useState<SubdistrictEntity[]>(
-    [SubdistrictEntity_INIT]
+  const [subdistrict, setSubdistrict] = useState<SubdistrictEntity[]>([
+    SubdistrictEntity_INIT,
+  ]);
+  const [editFarmerPlot, setEditFarmerPlot] = useState<FarmerPlotEntity>(
+    FarmerPlotEntity_INIT
   );
-  const [editFarmerPlot, setEditFarmerPlot] =
-    useState<FarmerPlotEntity>(FarmerPlotEntity_INIT);
-  const [farmerPlotList, setFarmerPlotList] = useState<
-    FarmerPlotEntity[]
-  >([]);
+  const [farmerPlotList, setFarmerPlotList] = useState<FarmerPlotEntity[]>([]);
 
   const [imgProfile, setImgProfile] = useState<any>();
   const [imgIdCard, setImgIdCard] = useState<any>();
 
-  const [createImgProfile, setCreateImgProfile] =
-    useState<UploadImageEntity>(UploadImageEntity_INTI);
-  const [createImgIdCard, setCreateImgIdCrad] =
-    useState<UploadImageEntity>(UploadImageEntity_INTI);
+  const [createImgProfile, setCreateImgProfile] = useState<UploadImageEntity>(
+    UploadImageEntity_INTI
+  );
+  const [createImgIdCard, setCreateImgIdCrad] = useState<UploadImageEntity>(
+    UploadImageEntity_INTI
+  );
 
   const fetchProvince = async () => {
     await LocationDatasource.getProvince().then((res) => {
@@ -136,10 +135,7 @@ const AddFarmer = () => {
     await getProvince(provinceId, CreateAddressEntity_INIT);
   };
 
-  const getProvince = async (
-    provinceId: number,
-    addr: CreateAddressEntity
-  ) => {
+  const getProvince = async (provinceId: number, addr: CreateAddressEntity) => {
     const d = Map(addr).set(
       "provinceId",
       provinceId == undefined ? 0 : provinceId
@@ -158,11 +154,9 @@ const AddFarmer = () => {
     );
     setAddress(d.toJS());
     checkValidateAddr(d.toJS());
-    await LocationDatasource.getSubdistrict(districtId).then(
-      (res) => {
-        setSubdistrict(res);
-      }
-    );
+    await LocationDatasource.getSubdistrict(districtId).then((res) => {
+      setSubdistrict(res);
+    });
   };
 
   const handleOnChangeSubdistrict = async (subdistrictId: number) => {
@@ -183,10 +177,14 @@ const AddFarmer = () => {
     setAddress(c.toJS());
   };
 
-  const handleOnChangeAddress = (
-    e: React.ChangeEvent<HTMLTextAreaElement>
-  ) => {
+  const handleOnChangeAddress1 = (e: React.ChangeEvent<HTMLInputElement>) => {
     const d = Map(address).set("address1", e.target.value);
+    setAddress(d.toJS());
+    checkValidateAddr(d.toJS());
+  };
+
+  const handleOnChangeAddress2 = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const d = Map(address).set("address2", e.target.value);
     setAddress(d.toJS());
     checkValidateAddr(d.toJS());
   };
@@ -217,15 +215,10 @@ const AddFarmer = () => {
 
   const insertFarmerPlot = (data: FarmerPlotEntity) => {
     if (data.plotId == 0) {
-      const pushId = Map(data).set(
-        "plotId",
-        farmerPlotList.length + 1
-      );
+      const pushId = Map(data).set("plotId", farmerPlotList.length + 1);
       setFarmerPlotList([...farmerPlotList, pushId.toJS()]);
     } else {
-      const newData = farmerPlotList.filter(
-        (x) => x.plotId != data.plotId
-      );
+      const newData = farmerPlotList.filter((x) => x.plotId != data.plotId);
       setFarmerPlotList([...newData, data]);
     }
     setShowAddModal(false);
@@ -363,6 +356,7 @@ const AddFarmer = () => {
       data.telephoneNo,
       data.birthDate,
       addr.address1,
+      addr.address2,
     ].includes("");
     let checkEmptyNumber = ![
       addr.provinceId,
@@ -435,7 +429,8 @@ const AddFarmer = () => {
                   backgroundImage: `url(${
                     imgProfile == undefined ? img_empty : imgProfile
                   })`,
-                }}>
+                }}
+              >
                 <input
                   key={imgProfile}
                   type="file"
@@ -452,7 +447,8 @@ const AddFarmer = () => {
                       style={{
                         cursor: "pointer",
                         borderRadius: "5px",
-                      }}>
+                      }}
+                    >
                       View
                     </Tag>
                     <Tag
@@ -461,7 +457,8 @@ const AddFarmer = () => {
                       style={{
                         cursor: "pointer",
                         borderRadius: "5px",
-                      }}>
+                      }}
+                    >
                       Remove
                     </Tag>
                   </>
@@ -481,7 +478,8 @@ const AddFarmer = () => {
                     required: true,
                     message: "กรุณากรอกชื่อ!",
                   },
-                ]}>
+                ]}
+              >
                 <Input
                   placeholder="กรอกชื่อ"
                   onChange={handleOnChange}
@@ -500,7 +498,8 @@ const AddFarmer = () => {
                     required: true,
                     message: "กรุณากรอกนามสกุล!",
                   },
-                ]}>
+                ]}
+              >
                 <Input
                   placeholder="กรอกนามสกุล"
                   onChange={handleOnChange}
@@ -529,7 +528,8 @@ const AddFarmer = () => {
                     min: 10,
                     message: "กรุณากรอกเบอร์โทรให้ครบ 10 หลัก!",
                   },
-                ]}>
+                ]}
+              >
                 <Input
                   placeholder="กรอกเบอร์โทร"
                   onChange={handleOnChange}
@@ -549,7 +549,8 @@ const AddFarmer = () => {
                     required: true,
                     message: "กรุณากรอกวันเดือนปีเกิด",
                   },
-                ]}>
+                ]}
+              >
                 <DatePicker
                   placeholder="กรอกวันเดือนปีเกิด"
                   format={dateFormat}
@@ -576,7 +577,8 @@ const AddFarmer = () => {
                     pattern: new RegExp(/^[0-9\b]+$/),
                     message: "กรุณากรอกรหัสบัตรประชาชนให้ถูกต้อง!",
                   },
-                ]}>
+                ]}
+              >
                 <Input
                   maxLength={13}
                   placeholder="กรอกรหัสบัตรประชาชน"
@@ -595,9 +597,9 @@ const AddFarmer = () => {
                   className="hiddenFileInput"
                   style={{
                     backgroundImage: `url(${imgIdCard})`,
-                    display:
-                      imgIdCard != undefined ? "block" : "none",
-                  }}></div>
+                    display: imgIdCard != undefined ? "block" : "none",
+                  }}
+                ></div>
               </div>
               <div className="text-left ps-4">
                 {imgIdCard != undefined && (
@@ -608,7 +610,8 @@ const AddFarmer = () => {
                       style={{
                         cursor: "pointer",
                         borderRadius: "5px",
-                      }}>
+                      }}
+                    >
                       View
                     </Tag>
                     <Tag
@@ -617,7 +620,8 @@ const AddFarmer = () => {
                       style={{
                         cursor: "pointer",
                         borderRadius: "5px",
-                      }}>
+                      }}
+                    >
                       Remove
                     </Tag>
                   </>
@@ -628,7 +632,8 @@ const AddFarmer = () => {
                 style={{
                   backgroundImage: `url(${bth_img_empty})`,
                   display: imgIdCard == undefined ? "block" : "none",
-                }}>
+                }}
+              >
                 <input
                   key={imgIdCard}
                   type="file"
@@ -658,11 +663,10 @@ const AddFarmer = () => {
                       .localeCompare(optionB.children.toLowerCase())
                   }
                   onChange={handleOnChangeProvince}
-                  key={address.provinceId}>
+                  key={address.provinceId}
+                >
                   {province?.map((item) => (
-                    <Option value={item.provinceId}>
-                      {item.provinceName}
-                    </Option>
+                    <Option value={item.provinceId}>{item.provinceName}</Option>
                   ))}
                 </Select>
               </Form.Item>
@@ -685,11 +689,10 @@ const AddFarmer = () => {
                       .toLowerCase()
                       .localeCompare(optionB.children.toLowerCase())
                   }
-                  onChange={handleOnChangeDistrict}>
+                  onChange={handleOnChangeDistrict}
+                >
                   {district?.map((item) => (
-                    <Option value={item.districtId}>
-                      {item.districtName}
-                    </Option>
+                    <Option value={item.districtId}>{item.districtName}</Option>
                   ))}
                 </Select>
               </Form.Item>
@@ -714,7 +717,8 @@ const AddFarmer = () => {
                       .toLowerCase()
                       .localeCompare(optionB.children.toLowerCase())
                   }
-                  onChange={handleOnChangeSubdistrict}>
+                  onChange={handleOnChangeSubdistrict}
+                >
                   {subdistrict?.map((item) => (
                     <Option value={item.subdistrictId}>
                       {item.subdistrictName}
@@ -738,24 +742,46 @@ const AddFarmer = () => {
             </div>
           </div>
           <div className="row">
-            <div className="form-group">
+            <div className="form-group col-lg-12">
               <label>
-                ที่อยู่บ้าน <span style={{ color: "red" }}>*</span>
+                บ้านเลขที่ <span style={{ color: "red" }}>*</span>
               </label>
               <Form.Item
+                name="address1"
                 rules={[
                   {
                     required: true,
-                    message: "กรุณากรอกที่อยู่บ้าน!",
+                    message: "กรุณากรอกบ้านเลขที่",
                   },
-                ]}>
+                ]}
+              >
+                <Input
+                  placeholder="กรอกบ้านเลขที่"
+                  onChange={handleOnChangeAddress1}
+                />
+              </Form.Item>
+            </div>
+          </div>
+          <div className="row">
+            <div className="form-group">
+              <label>
+                รายละเอียดที่อยู่ <span style={{ color: "red" }}>*</span>
+              </label>
+              <Form.Item
+                name="address2"
+                rules={[
+                  {
+                    required: true,
+                    message: "กรุณากรอกรายละเอียด",
+                  },
+                ]}
+              >
                 <TextArea
                   className="col-lg-12"
                   rows={5}
-                  placeholder="กรอกที่อยู่บ้าน (เลขที่บ้าน, หมู่บ้าน, ชื่ออาคาร/ตึก, ซอย)"
-                  onChange={handleOnChangeAddress}
+                  placeholder="กรอกรายละเอียดที่อยู่บ้าน (หมู่, ถนน)"
+                  onChange={handleOnChangeAddress2}
                   autoComplete="off"
-                  key={address.provinceId}
                 />
               </Form.Item>
             </div>
@@ -768,7 +794,8 @@ const AddFarmer = () => {
               <br />
               <Radio.Group
                 defaultValue={data.status}
-                onChange={handleChangeStatus}>
+                onChange={handleChangeStatus}
+              >
                 <Space direction="vertical">
                   {FARMER_STATUS_SEARCH.filter(
                     (x) => x.value != "INACTIVE" && x.value != "REJECTED"
@@ -779,9 +806,7 @@ const AddFarmer = () => {
               </Radio.Group>
             </div>
           </div>
-          <div
-            className="form-group col-lg-12"
-            style={{ marginTop: 16 }}>
+          <div className="form-group col-lg-12" style={{ marginTop: 16 }}>
             <label>หมายเหตุ</label>
             <Form.Item>
               <TextArea
@@ -809,7 +834,8 @@ const AddFarmer = () => {
             borderRadius: "12px 12px 0px 0px",
             padding: "10px 10px 10px 10px",
           }}
-          className="d-flex justify-content-between">
+          className="d-flex justify-content-between"
+        >
           <h4 className="pt-2 ps-3" style={{ color: "white" }}>
             แปลงเกษตร
           </h4>
@@ -821,7 +847,8 @@ const AddFarmer = () => {
               border: "none",
               borderRadius: "5px",
             }}
-            onClick={() => setShowAddModal((prev) => !prev)}>
+            onClick={() => setShowAddModal((prev) => !prev)}
+          >
             เพิ่มแปลง
           </Button>
         </div>
@@ -839,7 +866,8 @@ const AddFarmer = () => {
                           overflow: "hidden",
                           whiteSpace: "nowrap",
                           marginBottom: 0,
-                        }}>
+                        }}
+                      >
                         {item.plotName}
                       </p>
                       <br />
@@ -847,30 +875,20 @@ const AddFarmer = () => {
                         style={{
                           fontSize: "12px",
                           color: color.Grey,
-                        }}>
+                        }}
+                      >
                         {item.plantName}
                       </p>
                     </div>
-                    <div className="col-lg-2">
-                      {item.raiAmount} ไร่
-                    </div>
+                    <div className="col-lg-2">{item.raiAmount} ไร่</div>
                     <div className="col-lg-3">
                       <span
                         style={{
-                          color: colorStatus(
-                            item.status
-                          ),
-                        }}>
-                        <Badge
-                          color={colorStatus(
-                            item.status
-                          )}
-                        />
-                        {
-                          STATUS_NORMAL_MAPPING[
-                            item.status
-                          ]
-                        }
+                          color: colorStatus(item.status),
+                        }}
+                      >
+                        <Badge color={colorStatus(item.status)} />
+                        {STATUS_NORMAL_MAPPING[item.status]}
                       </span>
                     </div>
                     <div className="col-lg-3 d-flex justify-content-between">
@@ -895,9 +913,7 @@ const AddFarmer = () => {
           </Form>
         ) : (
           <Form>
-            <div
-              className="container text-center"
-              style={{ padding: "80px" }}>
+            <div className="container text-center" style={{ padding: "80px" }}>
               <img src={emptyData} alt="" />
               <p>ยังไม่มีแปลงเกษตร</p>
             </div>

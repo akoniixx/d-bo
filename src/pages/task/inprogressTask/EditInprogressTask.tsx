@@ -68,15 +68,15 @@ const EditInprogressTask = () => {
   const [timeAppointment, setTimeAppointment] = useState<any>(
     moment(undefined)
   );
-  const [couponData,setCouponData] = useState<{
-    couponCode : string,
-    couponName : string,
-    couponDiscount : number | null
+  const [couponData, setCouponData] = useState<{
+    couponCode: string;
+    couponName: string;
+    couponDiscount: number | null;
   }>({
-    couponCode : "",
-    couponName : "",
-    couponDiscount : null
-  })
+    couponCode: "",
+    couponName: "",
+    couponDiscount: null,
+  });
   const [saveBtnDisable, setBtnSaveDisable] = useState<boolean>(true);
   const [periodSpray, setPeriodSpray] = useState<CropPurposeSprayEntity>();
   const [checkCrop, setCheckCrop] = useState<boolean>(true);
@@ -101,11 +101,13 @@ const EditInprogressTask = () => {
       setDronerSelected(res.droner);
       setCheckCrop(!res.targetSpray.includes("อื่นๆ"));
       setData(res);
-      CouponDataSource.getPromotionCode(res.couponId).then(result => setCouponData({
-        couponCode : result.couponCode??"",
-        couponDiscount : (!res.discount)?null:parseInt(res.discount),
-        couponName : result.couponName??""
-      }))
+      CouponDataSource.getPromotionCode(res.couponId).then((result) =>
+        setCouponData({
+          couponCode: result.couponCode ?? "",
+          couponDiscount: !res.discount ? null : parseInt(res.discount),
+          couponName: result.couponName ?? "",
+        })
+      );
     });
   };
 
@@ -394,10 +396,11 @@ const EditInprogressTask = () => {
         <div className="col-lg-6">
           <div className="flex-column">
             <Form style={{ padding: "20px" }}>
-              <div className="form-group col-lg-6">
+              <div className="form-group col-lg-12">
                 <label>ค่าบริการ</label>
                 <p>
-                  {data?.totalPrice} บาท (จำนวน {data?.farmAreaAmount} ไร่)
+                  {numberWithCommas(parseFloat(data?.totalPrice))} บาท (จำนวน{" "}
+                  {data?.farmAreaAmount} ไร่) ราคาไร่ละ {data.unitPrice} บาท
                 </p>
               </div>
               <div className="form-group col-lg-12">
@@ -570,16 +573,19 @@ const EditInprogressTask = () => {
               </p>
             </div>
             <div className="col-lg-2">{dronerSelected.telephoneNo}</div>
-            <div className="col-lg-4">
+            <div className="col-lg-3">
               {(dronerSelected.address.subdistrict.subdistrictName
                 ? dronerSelected.address.subdistrict.subdistrictName + "/"
                 : "") +
                 (dronerSelected.address.district.districtName != null
                   ? dronerSelected.address.district.districtName + "/"
-                  : "'") +
+                  : "") +
                 (dronerSelected.address.province.provinceName != null
                   ? dronerSelected.address.province.provinceName
                   : "")}
+            </div>
+            <div className="col-lg-1">
+              {dronerSelected.dronerArea.distance || 0} km
             </div>
             <div className="col-lg-2">
               <Avatar
@@ -613,11 +619,10 @@ const EditInprogressTask = () => {
       <Form style={{ padding: "20px" }}>
         <CardContainer style={{ backgroundColor: "rgba(33, 150, 83, 0.1)" }}>
           <Form style={{ padding: "20px" }}>
-            <label>ยอดรวมค่าบริการ (หลังรวมค่าธรรมเนียม)</label>
+            <label>ยอดรวมค่าบริการ</label>
             <h5 style={{ color: color.primary1 }} className="p-2">
               {data?.totalPrice &&
-                numberWithCommas(parseFloat(data?.totalPrice))}{" "}
-              บาท
+                numberWithCommas(parseFloat(data?.totalPrice))}
             </h5>
             <div className="row">
               <div className="form-group col-lg-4">
@@ -625,7 +630,7 @@ const EditInprogressTask = () => {
                 <Form.Item>
                   <Input
                     suffix="บาท"
-                    value={data?.price}
+                    value={numberWithCommas(parseFloat(data?.price))}
                     step="0.01"
                     disabled
                   />
@@ -636,7 +641,7 @@ const EditInprogressTask = () => {
                 <Form.Item>
                   <Input
                     suffix="บาท"
-                    value={parseFloat(data?.fee).toFixed(2)}
+                    value={numberWithCommas(parseFloat(data?.fee))}
                     step="0.01"
                     disabled
                   />
@@ -647,7 +652,7 @@ const EditInprogressTask = () => {
                 <Form.Item>
                   <Input
                     suffix="บาท"
-                    value={parseFloat(data?.discountFee).toFixed(2)}
+                    value={numberWithCommas(parseFloat(data?.discountFee))}
                     step="0.01"
                     disabled
                   />
@@ -656,26 +661,26 @@ const EditInprogressTask = () => {
               <div className="form-group col-lg-4">
                 <label>รหัสคูปอง</label>
                 <Input
-                    value={couponData.couponCode}
-                    disabled
-                    autoComplete="off"
-                 />
+                  value={couponData.couponCode}
+                  disabled
+                  autoComplete="off"
+                />
               </div>
               <div className="form-group col-lg-4">
                 <label>ชื่อคูปอง</label>
                 <Input
-                    value={couponData.couponName}
-                    disabled
-                    autoComplete="off"
-                 />
+                  value={couponData.couponName}
+                  disabled
+                  autoComplete="off"
+                />
               </div>
               <div className="form-group col-lg-4">
                 <label>ส่วนลดคูปอง</label>
                 <Input
-                    value={couponData.couponDiscount!}
-                    disabled
-                    autoComplete="off"
-                 />
+                  value={numberWithCommas(couponData.couponDiscount!)}
+                  disabled
+                  autoComplete="off"
+                />
               </div>
             </div>
           </Form>

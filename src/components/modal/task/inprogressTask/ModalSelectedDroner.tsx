@@ -431,19 +431,33 @@ const ModalSelectedDroner: React.FC<ModalSelectedDronerProps> = ({
       },
     },
     {
-      title: "ตำบล",
+      title: "ตำบล/อำเภอ/จังหวัด",
       dataIndex: "subdistrict_name",
-      key: "subdistrict_name",
+      render: (value: any, row: any, index: number) => {
+        return {
+          children: (
+            <>
+              {row.subdistrict_name && <span>{row.subdistrict_name}/</span>}
+              {row.district_name && <span>{row.district_name}/</span>}
+              {row.province_name && <span>{row.province_name}</span>}
+            </>
+          ),
+        };
+      },
     },
     {
-      title: "อำเภอ",
-      dataIndex: "district_name",
-      key: "district_name",
-    },
-    {
-      title: "จังหวัด",
-      dataIndex: "province_name",
-      key: "province_name",
+      title: "ระยะทาง",
+      dataIndex: "distance",
+      key: "distance",
+      render: (value: any, row: any, index: number) => {
+        return {
+          children: (
+            <>
+              <span>{row.distance.toFixed(0)} km</span>
+            </>
+          ),
+        };
+      },
     },
     {
       title: "ยี่หัอ",
@@ -491,7 +505,7 @@ const ModalSelectedDroner: React.FC<ModalSelectedDronerProps> = ({
                       ? color.Success
                       : color.Error
                   }
-                />
+                /> {" "}
                 {row.droner_status}
                 <br />
               </span>

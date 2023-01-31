@@ -49,6 +49,7 @@ import {
   CreateReview_INIT,
 } from "../../../../entities/ReviewDronerEntities";
 import { CouponDataSource } from "../../../../datasource/CouponDatasource";
+import { numberWithCommas } from "../../../../utilities/TextFormatter";
 
 const { Map } = require("immutable");
 const _ = require("lodash");
@@ -59,15 +60,15 @@ const timeFormat = "HH:mm";
 function ReviewTask() {
   const profile = JSON.parse(localStorage.getItem("profile") || "{  }");
   const taskId = queryString[1];
-  const [couponData,setCouponData] = useState<{
-    couponCode : string,
-    couponName : string,
-    couponDiscount : number | null
+  const [couponData, setCouponData] = useState<{
+    couponCode: string;
+    couponName: string;
+    couponDiscount: number | null;
   }>({
-    couponCode : "",
-    couponName : "",
-    couponDiscount : null
-  })
+    couponCode: "",
+    couponName: "",
+    couponDiscount: null,
+  });
   const [data, setData] = useState<DetailReviewTask>(DetailReviewTask_INIT);
   const [detailDroner, setDetailDroner] =
     useState<CreateReview>(CreateReview_INIT);
@@ -79,12 +80,14 @@ function ReviewTask() {
   const [saveRate, setSaveRate] = useState<boolean>(true);
   const fetchDetailTask = async () => {
     await TaskFinishedDatasource.getDetailFinishTaskById(taskId).then((res) => {
-      if(res.couponId !== null){
-        CouponDataSource.getPromotionCode(res.couponId).then(result => setCouponData({
-          couponCode : result.couponCode??"",
-          couponDiscount : (!res.discount)?null:parseInt(res.discount),
-          couponName : result.couponName??""
-        }))
+      if(res.data.couponId !== null){
+        CouponDataSource.getPromotionCode(res.data.couponId).then(result => {
+          setCouponData({
+            couponCode : res.data.couponCode??"",
+            couponDiscount : (!res.data.discount)?null:parseInt(res.data.discount),
+            couponName : result.couponName??""
+          })
+        })
       }
       setData(res);
       setMapPosition({
@@ -274,7 +277,7 @@ function ReviewTask() {
           <label>หมายเหตุ</label>
           <Form.Item>
             <span style={{ color: color.Grey }}>
-              {data.data.comment !== null ? data.data.comment : "-"}
+              <TextArea rows={3} value={data.data.comment! || "-"} disabled />
             </span>
           </Form.Item>
         </div>
@@ -284,11 +287,12 @@ function ReviewTask() {
           <Form.Item style={{ color: color.Grey }}>
             <span>
               {data.data.price !== null
-                ? formatCurrency(data.data.price) + " " + "บาท"
-                : "0.00" + " " + "บาท"}
+                ? numberWithCommas(parseFloat(data.data.price)) + " บาท"
+                : "0 บาท"}
             </span>{" "}
             <span>
-              {"(จำนวน" + " " + data.data.farmAreaAmount + " " + "ไร่)"}
+              {"(จำนวน" + " " + data.data.farmAreaAmount + " ไร่)"} ราคาไร่ละ{" "}
+              {data.data.unitPrice} บาท
             </span>
           </Form.Item>
           <br />
@@ -354,7 +358,7 @@ function ReviewTask() {
           <label>สถานะ</label>
           <Form.Item>
             <span style={{ color: "#2F80ED" }}>
-              <Badge color={"#2F80ED"} />
+              <Badge color={"#2F80ED"} />{" "}
               {data.data.status == "WAIT_REVIEW" ? "รอรีวิว" : null}
               <br />
             </span>
@@ -479,18 +483,19 @@ function ReviewTask() {
             {data.data.droner !== null ? data.data.droner.telephoneNo : null}
           </span>
         </div>
-        <div className="col-lg-4">
+        <div className="col-lg-3">
           <span>
             {data.data.droner.address !== null
               ? data.data.droner.address.subdistrict.subdistrictName +
-                "," +
-                " " +
+                "/" +
                 data.data.droner.address.district.districtName +
-                "," +
-                " " +
+                "/" +
                 data.data.droner.address.province.provinceName
               : null}
           </span>
+        </div>
+        <div className="col-lg-1">
+          {data.data.droner.dronerArea.distance || 0} km
         </div>
         <div className="col-lg">
           <span>
@@ -525,12 +530,13 @@ function ReviewTask() {
           <div className="col-lg">
             <Form.Item>
               <span>
-                ยอดรวมค่าบริการ (หลังรวมค่าธรรมเนียม)
+                ยอดรวมค่าบริการ
                 <br />
                 <b style={{ fontSize: "20px", color: color.Success }}>
                   {data.data.totalPrice !== null
-                    ? formatCurrency(data.data.totalPrice) + " " + "บาท"
-                    : "0.00" + " " + "บาท"}
+                    ? numberWithCommas(parseFloat(data.data.totalPrice)) +
+                      " บาท"
+                    : "0 บาท"}
                 </b>
               </span>
             </Form.Item>
@@ -544,8 +550,8 @@ function ReviewTask() {
                 disabled
                 value={
                   data.data.price !== null
-                    ? formatCurrency(data.data.price) + " " + "บาท"
-                    : "0.00" + " " + "บาท"
+                    ? numberWithCommas(parseFloat(data.data.price))
+                    : 0
                 }
                 suffix="บาท"
               />
@@ -559,8 +565,8 @@ function ReviewTask() {
                 placeholder="0.0"
                 value={
                   data.data.fee !== null
-                    ? formatCurrency(data.data.fee) + " " + "บาท"
-                    : "0.00" + " " + "บาท"
+                    ? numberWithCommas(parseFloat(data.data.fee))
+                    : 0
                 }
                 suffix="บาท"
               />
@@ -573,8 +579,8 @@ function ReviewTask() {
                 disabled
                 value={
                   data.data.discountFee !== null
-                    ? formatCurrency(data.data.discountFee) + " " + "บาท"
-                    : "0.00" + " " + "บาท"
+                    ? numberWithCommas(parseFloat(data.data.discountFee))
+                    : 0
                 }
                 suffix="บาท"
               />
@@ -582,27 +588,19 @@ function ReviewTask() {
           </div>
           <div className="form-group col-lg-4">
             <label>รหัสคูปอง</label>
-            <Input
-                // value={couponData.couponCode}
-                disabled
-                autoComplete="off"
-             />
+            <Input value={couponData.couponCode} disabled autoComplete="off" />
           </div>
           <div className="form-group col-lg-4">
             <label>ชื่อคูปอง</label>
-            <Input
-                // value={couponData.couponName}
-                disabled
-                autoComplete="off"
-             />
+            <Input value={couponData.couponName} disabled autoComplete="off" />
           </div>
           <div className="form-group col-lg-4">
             <label>ส่วนลดคูปอง</label>
             <Input
-                // value={couponData.couponDiscount!}
-                disabled
-                autoComplete="off"
-             />
+              value={numberWithCommas(couponData.couponDiscount!)}
+              disabled
+              autoComplete="off"
+            />
           </div>
         </div>
       </Form>

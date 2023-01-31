@@ -21,6 +21,9 @@ const ModalDronerList: React.FC<ModalDronerListProps> = ({
   const [data, setData] = useState<TaskDronerTempEntity[]>();
   const fetchDronerList = async () => {
     await TaskDronerTempDataSource.getDronerList(taskId).then((res) => {
+      res.sort((a, b) =>
+        parseFloat(a.distance) > parseFloat(b.distance) ? 1 : -1
+      );
       setData(res);
     });
   };
@@ -38,7 +41,7 @@ const ModalDronerList: React.FC<ModalDronerListProps> = ({
         return {
           children: (
             <>
-              <span>{data.firstname + " " + data.lastname}</span>
+              <span>{data?.firstname + " " + data?.lastname}</span>
               <br />
               <span style={{ color: color.Grey }}>{data.droner_code}</span>
             </>
@@ -53,7 +56,7 @@ const ModalDronerList: React.FC<ModalDronerListProps> = ({
         return {
           children: (
             <>
-              <span>{data.telephone_no}</span>
+              <span>{data?.telephone_no}</span>
             </>
           ),
         };
@@ -87,39 +90,36 @@ const ModalDronerList: React.FC<ModalDronerListProps> = ({
       },
     },
     {
-      title: "ตำบล",
+      title: "ตำบล/อำเภอ/จังหวัด",
       render: (value: any, row: any, index: number) => {
         let data = JSON.parse(row.dronerDetail[0]);
+        console.log(data);
         return {
           children: (
             <>
-              <span>{data.subdistrict_name}</span>
+              {data?.subdistrict_name && (
+                <span key={index}>{data?.subdistrict_name}/</span>
+              )}
+              {data?.district_name && (
+                <span key={index}>{data?.district_name}/</span>
+              )}
+              {data?.province_name && (
+                <span key={index}>{data?.province_name}</span>
+              )}
             </>
           ),
         };
       },
     },
     {
-      title: "อำเภอ",
+      title: "ระยะทาง",
+      dataIndex: "distance",
+      key: "distance",
       render: (value: any, row: any, index: number) => {
-        let data = JSON.parse(row.dronerDetail[0]);
         return {
           children: (
             <>
-              <span>{data.district_name}</span>
-            </>
-          ),
-        };
-      },
-    },
-    {
-      title: "จังหวัด",
-      render: (value: any, row: any, index: number) => {
-        let data = JSON.parse(row.dronerDetail[0]);
-        return {
-          children: (
-            <>
-              <span>{data.province_name}</span>
+              <span>{parseFloat(row.distance).toFixed(0)} km</span>
             </>
           ),
         };
@@ -167,7 +167,7 @@ const ModalDronerList: React.FC<ModalDronerListProps> = ({
                   color={
                     row.status == "WAIT_RECEIVE" ? color.Warning : color.Error
                   }
-                />
+                />{" "}
                 {STATUS_MAPPING[row.status]}
                 <br />
               </span>
