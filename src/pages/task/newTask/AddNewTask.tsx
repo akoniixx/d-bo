@@ -354,9 +354,13 @@ const AddNewTask = () => {
               farmerPlotSeleced?.plantName,
               parseInt(farmerPlotSeleced?.raiAmount!),
               couponCode
-            ).then((res) =>
-              setDiscountResult(res.responseData.priceCouponDiscount)
-            );
+            ).then((res) => {
+              let calCoupon =
+                res.responseData.priceCouponDiscount > createNewTask.price
+                  ? createNewTask.price
+                  : res.responseData.priceCouponDiscount;
+              setDiscountResult(calCoupon);
+            });
           } else {
             setColorCouponBtn(false);
             setCouponUsedBtn(true);
@@ -638,7 +642,7 @@ const AddNewTask = () => {
                       <Form.Item>
                         <Input
                           suffix="บาท"
-                          value={numberWithCommas(createNewTask.priceStandard)}
+                          value={createNewTask.priceStandard}
                           disabled
                           autoComplete="off"
                           step="0.01"
@@ -1555,6 +1559,8 @@ const AddNewTask = () => {
                       paddingTop: 0,
                       paddingBottom: 0,
                     }}
+                    key={couponCode}
+                    defaultValue={couponCode}
                     placeholder="กรอกรหัสคูปอง"
                     suffix={
                       <Button
@@ -1659,6 +1665,7 @@ const AddNewTask = () => {
     if (checkCurrent === 0) {
       await checkValidateStep(createNewTask, checkCurrent);
     } else {
+      
       fetchDronerList(
         createNewTask.farmerId,
         createNewTask.farmerPlotId,
@@ -1711,6 +1718,7 @@ const AddNewTask = () => {
       }
       const payload = { ...createNewTask };
       payload.taskDronerTemp = pushDronerList;
+
       if (selectionType === "checkbox") {
         payload.status = "WAIT_RECEIVE";
         payload.fee = payload.price * 0.05;

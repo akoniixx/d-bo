@@ -86,8 +86,8 @@ export const CreateNewTaskEntity_INIT: CreateNewTaskEntity = {
 };
 export interface GetNewTaskEntity {
   id: string;
-  couponId : string;
-  discount : string;
+  couponId: string;
+  discount: string;
   taskNo: string;
   farmerId: string;
   farmerPlotId: string;
@@ -131,7 +131,7 @@ export const GetNewTaskEntity_INIT: GetNewTaskEntity = {
   id: "",
   taskNo: "",
   farmerId: "",
-  discount : "",
+  discount: "",
   farmerPlotId: "",
   couponId: "",
   farmAreaAmount: "",
@@ -209,4 +209,18 @@ export const UpdateNewTask_INIT: UpdateNewTask = {
   comment: "",
   fee: 0,
   discountFee: 0,
+};
+
+export interface UpdateTaskStatus {
+  id: string;
+  status: string;
+  statusRemark: string;
+  updateBy: string;
+}
+
+export const UpdateTaskStatus_INIT: UpdateTaskStatus = {
+  id: "",
+  status: "",
+  statusRemark: "",
+  updateBy: "",
 };

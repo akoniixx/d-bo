@@ -1,8 +1,8 @@
 import {
-  DeleteOutlined,
   DownOutlined,
   EditOutlined,
   UserOutlined,
+  ExceptionOutlined,
 } from "@ant-design/icons";
 import {
   Badge,
@@ -16,7 +16,7 @@ import {
 } from "antd";
 import Search from "antd/lib/input/Search";
 import moment from "moment";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import Swal from "sweetalert2";
 import ActionButton from "../../../components/button/ActionButton";
 import { CardContainer } from "../../../components/card/CardContainer";
@@ -28,7 +28,11 @@ import {
   NEWTASK_STATUS_SEARCH,
   STATUS_NEWTASK_COLOR_MAPPING,
 } from "../../../definitions/Status";
-import { NewTaskPageEntity } from "../../../entities/NewTaskEntities";
+import {
+  NewTaskPageEntity,
+  UpdateTaskStatus,
+  UpdateTaskStatus_INIT,
+} from "../../../entities/NewTaskEntities";
 import { color } from "../../../resource";
 import { DateTimeUtil } from "../../../utilities/DateTimeUtil";
 import { numberWithCommas } from "../../../utilities/TextFormatter";
@@ -37,6 +41,8 @@ const dateFormat = "DD-MM-YYYY";
 const dateSearchFormat = "YYYY-MM-DD";
 
 const IndexNewTask = () => {
+  const profile = JSON.parse(localStorage.getItem("profile") || "{  }");
+
   const row = 10;
   const [current, setCurrent] = useState(1);
   const [data, setData] = useState<NewTaskPageEntity>();
@@ -93,18 +99,30 @@ const IndexNewTask = () => {
     setShowModalDroner((prev) => !prev);
     setTaskId(taskId);
   };
-  const removeNewTask = async (e: string) => {
+  const removeNewTask = async (id: string) => {
     Swal.fire({
-      title: "ยืนยันการลบ",
-      text: "โปรดตรวจสอบงานใหม่ที่คุณต้องการลบ ก่อนที่จะกดยืนยันการลบ เพราะอาจส่งผลต่อการจ้างงานในระบบ",
+      title: "ยืนยันการยกเลิก",
       cancelButtonText: "ยกเลิก",
-      confirmButtonText: "ลบ",
+      confirmButtonText: "ยืนยัน",
       confirmButtonColor: "#d33",
       showCancelButton: true,
       showCloseButton: true,
+      input: "textarea",
+      inputPlaceholder: "กรอกเหตุผลการยกเลิก",
+      inputAttributes: { input: "text", required: "true" },
+      html:
+        "<p class='text-left'>โปรดตรวจสอบงานใหม่ที่คุณต้องการลบ ก่อนที่จะกดยืนยันการลบ เพราะอาจส่งผลต่อการจ้างงานในระบบ</p>" +
+        "<p class='text-left'>เหตุผล</p>",
     }).then(async (result) => {
       if (result.isConfirmed) {
-        await TaskDatasource.deleteTask(e).then();
+        const data: UpdateTaskStatus = UpdateTaskStatus_INIT;
+        data.id = id;
+        data.status = "CANCELED";
+        data.statusRemark = result.value;
+        data.updateBy = profile.firstname + " " + profile.lastname;
+        await TaskDatasource.cancelNewTask(data).then((res) => {
+          //window.location.href = "/IndexNewTask";
+        });
       }
       fetchNewTaskList();
     });
@@ -340,7 +358,7 @@ const IndexNewTask = () => {
               </div>
               <div className="col-lg-6">
                 <ActionButton
-                  icon={<DeleteOutlined />}
+                  icon={<ExceptionOutlined />}
                   color={color.Error}
                   onClick={() => removeNewTask(row.id)}
                 />

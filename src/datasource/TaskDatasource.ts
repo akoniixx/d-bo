@@ -5,6 +5,7 @@ import {
   GetNewTaskEntity,
   NewTaskPageEntity,
   UpdateNewTask,
+  UpdateTaskStatus,
 } from "../entities/NewTaskEntities";
 import {
   GetTaskInprogressEntity,
@@ -134,6 +135,16 @@ export class TaskDatasource {
   static updateInprogressTask(data: UpdateInprogressTaskEntity): Promise<any> {
     return httpClient
       .patch(BASE_URL + "/tasks/task/" + data.id, data)
+      .then((response) => {
+        return response.data;
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  }
+  static cancelNewTask(data: UpdateTaskStatus): Promise<any> {
+    return httpClient
+      .post(BASE_URL + "/tasks/task/update-task-status", data)
       .then((response) => {
         return response.data;
       })
