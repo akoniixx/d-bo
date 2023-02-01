@@ -1598,7 +1598,7 @@ const EditNewTask = () => {
           <Form style={{ padding: "20px" }}>
             <label>ยอดรวมค่าบริการ</label>
             <h5 style={{ color: color.primary1 }} className="p-2">
-              {numberWithCommas(data?.price).toString()} บาท
+              {numberWithCommas(parseInt(data?.totalPrice)).toString()} บาท
             </h5>
             <div className="row">
               <div className="form-group col-lg-4">
