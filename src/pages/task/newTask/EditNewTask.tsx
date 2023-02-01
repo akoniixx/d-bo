@@ -315,7 +315,7 @@ const EditNewTask = () => {
     if (e.target.id == "unitPrice") {
       let calUnitPrice = parseFloat(data.farmAreaAmount) * e.target.value;
       const d = Map(data).set("unitPrice", e.target.value);
-      const pushCal = Map(d.toJS()).set("price", calUnitPrice.toFixed(2));
+      const pushCal = Map(d.toJS()).set("price", calUnitPrice);
       setData(pushCal.toJS());
     } else {
       let calUnitPrice = e.target.value / parseFloat(data.farmAreaAmount);
@@ -683,7 +683,7 @@ const EditNewTask = () => {
                         <Form.Item>
                           <Input
                             suffix="บาท"
-                            value={numberWithCommas(data.priceStandard)}
+                            value={data.priceStandard}
                             disabled
                             autoComplete="off"
                             step="0.01"
@@ -717,7 +717,7 @@ const EditNewTask = () => {
                         <Form.Item>
                           <Input
                             suffix="บาท"
-                            value={numberWithCommas(data.price)}
+                            value={data.price}
                             onChange={handleCalServiceCharge}
                             disabled={
                               current == 2 || checkSelectPlot == "error"
@@ -1282,10 +1282,7 @@ const EditNewTask = () => {
           type={selectionType}
           onChange={handleAllSelectDroner}
           checked={dataDronerList
-            .filter(
-              (x) =>
-                x.droner_status != "ไม่สะดวก" && x.is_open_receive_task != false
-            )
+            .filter((x) => x.is_open_receive_task != false)
             .every((x) => x.isChecked)}
           style={{ width: "18px", height: "18px" }}
         />
@@ -1300,8 +1297,7 @@ const EditNewTask = () => {
                 checked={row.isChecked}
                 disabled={
                   selectionType == "checkbox"
-                    ? row.droner_status != "ไม่สะดวก" &&
-                      row.is_open_receive_task != false
+                    ? row.is_open_receive_task != false
                       ? false
                       : true
                     : false
@@ -1697,16 +1693,22 @@ const EditNewTask = () => {
       setData(payload);
     } else {
       const payload = { ...data };
+      const calCoupon =
+      payload.price > (couponData.couponDiscount ?? 0)
+          ? payload.price - (couponData.couponDiscount ?? 0)
+          : 0;
       if (selectionType == "checkbox") {
         payload.status = "WAIT_RECEIVE";
         payload.fee = payload.price * 0.05;
         payload.discountFee = payload.price * 0.05;
+        payload.totalPrice = calCoupon.toString();
         setData(payload);
       } else {
         payload.status = "WAIT_START";
         payload.dronerId = dronerSelected[0].droner_id;
         payload.fee = payload.price * 0.05;
         payload.discountFee = payload.price * 0.05;
+        payload.totalPrice = calCoupon.toString();
         setData(payload);
       }
     }

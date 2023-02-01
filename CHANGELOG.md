@@ -1,4 +1,8 @@
 ## [Version - 0]
+## improve [v0.20.23] 2023-02-02
+- fixed display coupon in new task
+- fixed calculate price with coupon in edit new task
+- added funtion cancel task with reason in new task
 ## improve [v0.20.22] 2023-01-31
 - fixed coupon
 ## improve [v0.20.21] 2023-01-31

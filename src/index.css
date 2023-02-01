@@ -84,3 +84,7 @@ table tr td :hover {
   > .ant-steps-item-title:after {
   background-color: #219653;
 }
+.text-left{
+  text-align: left;
+  margin: 0;
+}
