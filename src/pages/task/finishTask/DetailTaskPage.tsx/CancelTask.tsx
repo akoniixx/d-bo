@@ -53,11 +53,11 @@ function CancelTask() {
   });
   const fetchDetailTask = async () => {
     await TaskFinishedDatasource.getDetailFinishTaskById(taskId).then((res) => {
-      if (res.couponId !== null) {
-        CouponDataSource.getPromotionCode(res.couponId).then((result) =>
+      if (res.data.couponId !== null) {
+        CouponDataSource.getPromotionCode(res.data.couponId).then((result) =>
           setCouponData({
-            couponCode: result.couponCode ?? "",
-            couponDiscount: !res.discount ? null : parseInt(res.discount),
+            couponCode: res.data.couponCode ?? "",
+            couponDiscount: !res.data.discount ? null : parseInt(res.data.discount),
             couponName: result.couponName ?? "",
           })
         );

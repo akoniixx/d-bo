@@ -380,8 +380,50 @@ const ModalFarmerPlot: React.FC<ModalFarmerPlotProps> = ({
                   <Space direction="vertical">
                     <Radio value={"ACTIVE"}>ใช้งาน</Radio>
                     <Radio value={"PENDING"}>รอการตรวจสอบ</Radio>
-                    <Radio value={"REJECTED"}>ไม่อนุมัติ</Radio>
-                    <Radio value={"INACTIVE"}>ปิดการใช้งาน</Radio>
+                    <Radio value={"REJECTED"}>
+                      ไม่อนุมัติ 
+                      {farmerPlot.status == "REJECTED" && (
+                        <div className="form-group">
+                          <br />
+                          <Form.Item name="reason"
+                            rules={[
+                              {
+                                required: farmerPlot.status === "REJECTED",
+                                message: "กรุณากรอกเหตุผลที่ไม่อนุมัติ!",
+                              },
+                            ]}>
+                            <TextArea
+                              className="col-lg-12"
+                              rows={3}
+                              placeholder="กรอกเหตุผล/เหตุหมายเพิ่มเติม"
+                              autoComplete="off"                    
+                            />
+                          </Form.Item>
+                        </div>
+                      )}
+                    </Radio>
+                    <Radio value={"INACTIVE"}>
+                      ปิดการใช้งาน
+                      {farmerPlot.status === "INACTIVE" && (
+                        <div className="form-group">
+                          <br />
+                          <Form.Item name="reason"
+                            rules={[
+                              {
+                                required: farmerPlot.status === "INACTIVE",
+                                message: "กรุณากรอกเหตุผลที่ไม่อนุมัติ!",
+                              },
+                            ]}>
+                            <TextArea
+                              className="col-lg-12"
+                              rows={3}
+                              placeholder="กรอกเหตุผล/เหตุหมายเพิ่มเติม"
+                              autoComplete="off"                    
+                            />
+                          </Form.Item>
+                        </div>
+                      )}
+                    </Radio>
                   </Space>
                 </Radio.Group>:
                 <Radio.Group defaultValue={farmerPlot.status}>
@@ -392,25 +434,6 @@ const ModalFarmerPlot: React.FC<ModalFarmerPlotProps> = ({
                 </Radio.Group>
               }
             </Form.Item>
-            {farmerPlot.status == "REJECTED" && (
-              <div className="form-group">
-                <br />
-                <Form.Item name="reason"
-                  rules={[
-                    {
-                      required: farmerPlot.status === "REJECTED",
-                      message: "กรุณากรอกเหตุผลที่ไม่อนุมัติ!",
-                    },
-                  ]}>
-                  <TextArea
-                    className="col-lg-12"
-                    rows={3}
-                    placeholder="กรอกเหตุผล/เหตุหมายเพิ่มเติม"
-                    autoComplete="off"                    
-                  />
-                </Form.Item>
-              </div>
-          )}
           <div className="form-group " style={{ marginTop: 16 }}>
             <label>หมายเหตุ</label>
             <Form.Item name="comment">

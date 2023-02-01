@@ -581,8 +581,7 @@ function IndexFarmer() {
       key: "province",
       render: (value: any, row: any, index: number) => {
         return {
-          children: 
-          <span>{(row.address.province !== null)?(row.address.province.provinceName !== null?row.address.province.provinceName:"-"):"-"}</span>,
+          children: <span>{(row?.address?.province !== null)?(row.address.province.provinceName !== null?row.address.province.provinceName:"-"):"-"}</span>,
         };
       },
     },
@@ -592,8 +591,7 @@ function IndexFarmer() {
       key: "district",
       render: (value: any, row: any, index: number) => {
         return {
-          children: 
-          <span>{(row.address.district !== null)?(row.address.district.districtName !== null?row.address.district.districtName:"-"):"-"}</span>
+          children: <span>{(row?.address?.district !== null)?(row.address.district.districtName !== null?row.address.district.districtName:"-"):"-"}</span>
         };
       },
     },
@@ -604,7 +602,7 @@ function IndexFarmer() {
       render: (value: any, row: any, index: number) => {
         return {
           children: (
-            <span>{(row.address.subdistrict !== null)?(row.address.subdistrict.subdistrictName !== null?row.address.subdistrict.subdistrictName:"-"):"-"}</span>
+            <span>{(row?.address?.subdistrict !== null)?(row.address.subdistrict.subdistrictName !== null?row.address.subdistrict.subdistrictName:"-"):"-"}</span>
           ),
         };
       },
