@@ -1,8 +1,8 @@
 import {
-  DeleteOutlined,
   DownOutlined,
   EditOutlined,
   UserOutlined,
+  ExceptionOutlined
 } from "@ant-design/icons";
 import {
   Badge,
@@ -16,7 +16,7 @@ import {
 } from "antd";
 import Search from "antd/lib/input/Search";
 import moment from "moment";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import Swal from "sweetalert2";
 import ActionButton from "../../../components/button/ActionButton";
 import { CardContainer } from "../../../components/card/CardContainer";
@@ -102,9 +102,13 @@ const IndexNewTask = () => {
       confirmButtonColor: "#d33",
       showCancelButton: true,
       showCloseButton: true,
+      input: 'text',
+      inputAttributes: {
+        autocapitalize: 'off'
+      },
     }).then(async (result) => {
       if (result.isConfirmed) {
-        await TaskDatasource.deleteTask(e).then();
+        //await TaskDatasource.deleteTask(e).then();
       }
       fetchNewTaskList();
     });
@@ -340,7 +344,7 @@ const IndexNewTask = () => {
               </div>
               <div className="col-lg-6">
                 <ActionButton
-                  icon={<DeleteOutlined />}
+                  icon={<ExceptionOutlined />}
                   color={color.Error}
                   onClick={() => removeNewTask(row.id)}
                 />
