@@ -81,6 +81,12 @@ import Swal from "sweetalert2";
 import icon from "../../../resource/icon";
 import { LocationPriceDatasource } from "../../../datasource/LocationPriceDatasource";
 import { CouponDataSource } from "../../../datasource/CouponDatasource";
+import {
+  GetTaskCoupon,
+  GetTaskCoupon_INIT,
+  TaskCoupon,
+  TaskCoupon_INIT,
+} from "../../../entities/CalculateTask";
 const dateFormat = "DD/MM/YYYY";
 const dateCreateFormat = "YYYY-MM-DD";
 const timeFormat = "HH:mm";
@@ -123,15 +129,8 @@ const EditNewTask = () => {
     message: "",
   });
 
-  const [couponData, setCouponData] = useState<{
-    couponCode: string;
-    couponName: string;
-    couponDiscount: number | null;
-  }>({
-    couponCode: "",
-    couponName: "",
-    couponDiscount: null,
-  });
+  const [couponData, setCouponData] = useState<TaskCoupon>(TaskCoupon_INIT);
+  const [getCoupon, setGetCoupon] = useState<GetTaskCoupon>(GetTaskCoupon_INIT);
 
   const [dateAppointment, setDateAppointment] = useState<any>(
     moment(undefined)
@@ -158,7 +157,7 @@ const EditNewTask = () => {
   const [loading, setLoading] = useState<boolean>(true);
 
   const fetchNewTask = async () => {
-    await TaskDatasource.getNewTaskById(queryString[1]).then((res) => {
+    await TaskDatasource.getNewTaskById(queryString[1]).then(async (res) => {
       delete res["updatedAt"];
       res.farmer.farmerPlot = [res.farmerPlot];
       res?.taskDronerTemp?.map((item) => _.set(item, "isChecked", true));
@@ -171,15 +170,28 @@ const EditNewTask = () => {
       setFarmerPlotSelected(res.farmerPlot);
       fetchPurposeSpray(res.farmerPlot.plantName);
       setData(res);
-      if (res.couponId) {
-        CouponDataSource.getPromotionCode(res.couponId).then((result) =>
-          setCouponData({
-            couponCode: result.couponCode,
-            couponDiscount: parseInt(res.discount),
-            couponName: result.couponName,
-          })
-        );
-      }
+      const couponInfo = { ...getCoupon };
+      couponInfo.farmerPlotId = res.farmerPlotId;
+      couponInfo.cropName = res.farmerPlot?.plantName;
+      couponInfo.couponCode = res.couponCode;
+      couponInfo.raiAmount = parseInt(res?.farmAreaAmount!);
+      couponInfo.priceCustom =
+        res.unitPriceStandard === 0 ? res.unitPrice.toString() : "0";
+      await CouponDataSource.calculateEditCoupon(couponInfo).then((cou) => {
+        setCouponData(cou.responseData);
+      });
+    });
+  };
+  const calculatePrice = () => {
+    const couponInfo = { ...getCoupon };
+    couponInfo.farmerPlotId = data.farmerPlotId;
+    couponInfo.cropName = farmerPlotSeleced?.plantName;
+    couponInfo.couponCode = data.couponCode;
+    couponInfo.raiAmount = parseInt(data?.farmAreaAmount!);
+    couponInfo.priceCustom =
+      data.unitPriceStandard === 0 ? data.unitPrice.toString() : "0";
+    CouponDataSource.calculateEditCoupon(couponInfo).then((res) => {
+      setCouponData(res.responseData);
     });
   };
   const fetchFarmerList = async (text?: string) => {
@@ -1594,7 +1606,7 @@ const EditNewTask = () => {
           <Form style={{ padding: "20px" }}>
             <label>ยอดรวมค่าบริการ</label>
             <h5 style={{ color: color.primary1 }} className="p-2">
-              {numberWithCommas(parseInt(data?.totalPrice)).toString()} บาท
+              {numberWithCommas(couponData?.netPrice)} บาท
             </h5>
             <div className="row">
               <div className="form-group col-lg-4">
@@ -1602,7 +1614,7 @@ const EditNewTask = () => {
                 <Form.Item>
                   <Input
                     suffix="บาท"
-                    value={numberWithCommas(data?.price)}
+                    value={numberWithCommas(couponData?.priceBefore)}
                     disabled={current == 2}
                     autoComplete="off"
                     step="0.01"
@@ -1614,7 +1626,7 @@ const EditNewTask = () => {
                 <Form.Item>
                   <Input
                     suffix="บาท"
-                    value={numberWithCommas(data?.fee)}
+                    value={numberWithCommas(couponData?.fee)}
                     disabled={current == 2}
                     autoComplete="off"
                     step="0.01"
@@ -1626,7 +1638,7 @@ const EditNewTask = () => {
                 <Form.Item>
                   <Input
                     suffix="บาท"
-                    value={numberWithCommas(data?.discountFee)}
+                    value={numberWithCommas(couponData?.discountFee)}
                     disabled={current == 2}
                     autoComplete="off"
                     step="0.01"
@@ -1635,11 +1647,7 @@ const EditNewTask = () => {
               </div>
               <div className="form-group col-lg-4">
                 <label>รหัสคูปอง</label>
-                <Input
-                  value={couponData.couponCode}
-                  disabled
-                  autoComplete="off"
-                />
+                <Input value={data.couponCode} disabled autoComplete="off" />
               </div>
               <div className="form-group col-lg-4">
                 <label>ชื่อคูปอง</label>
@@ -1652,7 +1660,7 @@ const EditNewTask = () => {
               <div className="form-group col-lg-4">
                 <label>ส่วนลดคูปอง</label>
                 <Input
-                  value={numberWithCommas(couponData.couponDiscount!)}
+                  value={numberWithCommas(couponData.priceCouponDiscount!)}
                   disabled
                   autoComplete="off"
                 />
@@ -1693,27 +1701,22 @@ const EditNewTask = () => {
       setData(payload);
     } else {
       const payload = { ...data };
-      const calCoupon =
-      payload.price > (couponData.couponDiscount ?? 0)
-          ? payload.price - (couponData.couponDiscount ?? 0)
-          : 0;
       if (selectionType == "checkbox") {
         payload.status = "WAIT_RECEIVE";
         payload.fee = payload.price * 0.05;
         payload.discountFee = payload.price * 0.05;
-        payload.totalPrice = calCoupon.toString();
         setData(payload);
       } else {
         payload.status = "WAIT_START";
         payload.dronerId = dronerSelected[0].droner_id;
         payload.fee = payload.price * 0.05;
         payload.discountFee = payload.price * 0.05;
-        payload.totalPrice = calCoupon.toString();
         setData(payload);
       }
     }
     fetchDronerList(data.farmerId, data.farmerPlotId, dateAppointment);
     setCurrent(current + 1);
+    calculatePrice();
   };
 
   const updateNewTask = async () => {
@@ -1736,6 +1739,9 @@ const EditNewTask = () => {
     updateTask.comment = data.comment;
     updateTask.fee = data.fee;
     updateTask.discountFee = data.discountFee;
+    updateTask.couponCode = data.couponCode;
+    updateTask.couponId = couponData.couponId;
+    updateTask.discount = couponData.priceCouponDiscount!;
     Swal.fire({
       title: "ยืนยันการแก้ไข",
       text: "โปรดตรวจสอบรายละเอียดที่คุณต้องการแก้ไขข้อมูลก่อนเสมอ เพราะอาจส่งผลต่อการจ้างงานในระบบ",

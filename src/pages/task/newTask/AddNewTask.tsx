@@ -65,6 +65,12 @@ import { numberWithCommas } from "../../../utilities/TextFormatter";
 import icon from "../../../resource/icon";
 import { LocationPriceDatasource } from "../../../datasource/LocationPriceDatasource";
 import { CouponDataSource } from "../../../datasource/CouponDatasource";
+import {
+  GetTaskCoupon,
+  GetTaskCoupon_INIT,
+  TaskCoupon,
+  TaskCoupon_INIT,
+} from "../../../entities/CalculateTask";
 const { Step } = Steps;
 const { Option } = Select;
 const dateFormat = "DD/MM/YYYY";
@@ -124,6 +130,9 @@ const AddNewTask = () => {
   const [disableBtn, setDisableBtn] = useState<boolean>(true);
   const [searchTextDroner, setSearchTextDroner] = useState<string>("");
   const [priceMethod, setPriceMethod] = useState<string>("อัตโนมัติ");
+
+  const [dataCoupon, setDataCoupon] = useState<TaskCoupon>(TaskCoupon_INIT);
+  const [getCoupon, setGetCoupon] = useState<GetTaskCoupon>(GetTaskCoupon_INIT);
 
   const [couponCode, setCouponCode] = useState<string>("");
   const [couponId, setCouponId] = useState<string>("");
@@ -349,18 +358,7 @@ const AddNewTask = () => {
             setColorCouponBtn(true);
             setCouponUsedBtn(false);
             setCouponMessage("รหัสคูปองสามารถใช้ได้");
-            CouponDataSource.calculateCoupon(
-              farmerPlotId,
-              farmerPlotSeleced?.plantName,
-              parseInt(farmerPlotSeleced?.raiAmount!),
-              couponCode
-            ).then((res) => {
-              let calCoupon =
-                res.responseData.priceCouponDiscount > createNewTask.price
-                  ? createNewTask.price
-                  : res.responseData.priceCouponDiscount;
-              setDiscountResult(calCoupon);
-            });
+            calculatePrice();
           } else {
             setColorCouponBtn(false);
             setCouponUsedBtn(true);
@@ -377,6 +375,24 @@ const AddNewTask = () => {
       setCouponMessage("");
       setDiscountResult(null);
     }
+  };
+  const calculatePrice = () => {
+    const couponInfo = { ...getCoupon };
+    couponInfo.farmerPlotId = farmerPlotId;
+    couponInfo.cropName = farmerPlotSeleced?.plantName;
+    couponInfo.couponCode = couponCode;
+    couponInfo.raiAmount = parseInt(farmerPlotSeleced?.raiAmount!);
+    couponInfo.priceCustom =
+      createNewTask.unitPriceStandard === 0
+        ? createNewTask.unitPrice.toString()
+        : "0";
+    CouponDataSource.calculateCoupon(couponInfo).then((res) => {
+      let calCoupon =
+        res.responseData.priceCouponDiscount > createNewTask.price
+          ? createNewTask.price
+          : res.responseData.priceCouponDiscount;
+      setDiscountResult(calCoupon);
+    });
   };
 
   const renderFormSearchFarmer = (
@@ -1559,7 +1575,6 @@ const AddNewTask = () => {
                       paddingTop: 0,
                       paddingBottom: 0,
                     }}
-                    key={couponCode}
                     defaultValue={couponCode}
                     placeholder="กรอกรหัสคูปอง"
                     suffix={
@@ -1665,7 +1680,6 @@ const AddNewTask = () => {
     if (checkCurrent === 0) {
       await checkValidateStep(createNewTask, checkCurrent);
     } else {
-      
       fetchDronerList(
         createNewTask.farmerId,
         createNewTask.farmerPlotId,
@@ -1707,6 +1721,7 @@ const AddNewTask = () => {
         current,
         dronerSelected.filter((x) => x.droner_id != "")
       );
+      couponId && calculatePrice();
     } else {
       let pushDronerList: CreateDronerTempEntity[] = [];
       for (let i: number = 0; dronerSelected.length > i; i++) {
