@@ -1721,7 +1721,6 @@ const AddNewTask = () => {
         current,
         dronerSelected.filter((x) => x.droner_id != "")
       );
-      couponId && calculatePrice();
     } else {
       let pushDronerList: CreateDronerTempEntity[] = [];
       for (let i: number = 0; dronerSelected.length > i; i++) {
@@ -1763,6 +1762,7 @@ const AddNewTask = () => {
       dronerSelected.filter((x) => x.droner_id != "")
     );
     setCurrent(current + 1);
+    couponId && calculatePrice();
   };
 
   const insertNewTask = async () => {
