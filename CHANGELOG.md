@@ -1,4 +1,6 @@
 ## [Version - 0]
+## fix [v0.20.24] 2023-02-03
+- changed api calculate price with coupon in edit new task
 ## improve [v0.20.23] 2023-02-02
 - fixed display coupon in new task
 - fixed calculate price with coupon in edit new task
