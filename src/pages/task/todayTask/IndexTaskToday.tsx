@@ -7,16 +7,11 @@ import {
 import {
   Badge,
   Button,
-  Card,
   Checkbox,
   Dropdown,
-  Form,
-  Grid,
   Input,
   Menu,
   Pagination,
-  Radio,
-  Row,
   Select,
   Table,
   Tooltip,
@@ -39,9 +34,7 @@ import {
   ProviceEntity,
   SubdistrictEntity,
 } from "../../../entities/LocationEntities";
-import {
-  TaskTodayListEntity,
-} from "../../../entities/TaskInprogressEntities";
+import { TaskTodayListEntity } from "../../../entities/TaskInprogressEntities";
 import color from "../../../resource/color";
 import icon from "../../../resource/icon";
 import { numberWithCommas } from "../../../utilities/TextFormatter";
@@ -446,7 +439,7 @@ export default function IndexTodayTask() {
               ) : null}
               <br />
               <span style={{ color: color.Grey, fontSize: "12px" }}>
-                {row.taskNo}
+                {row.task_task_no}
               </span>
             </>
           ),
@@ -491,6 +484,7 @@ export default function IndexTodayTask() {
       sorter: (a: any, b: any) =>
         sorter(a.farmer_firstname, b.farmer_firstname),
       render: (value: any, row: any, index: number) => {
+        console.log(row);
         return {
           children: (
             <>
@@ -550,7 +544,7 @@ export default function IndexTodayTask() {
               </span>
               <br />
               <span style={{ color: color.Grey, fontSize: "12px" }}>
-                {"จำนวน " + row.farmerPlot_rai_amount + " ไร่"}
+                {"จำนวน " + row.task_farm_area_amount + " ไร่"}
               </span>
             </>
           ),
@@ -571,7 +565,7 @@ export default function IndexTodayTask() {
                   color: STATUS_COLOR_TASK_TODAY[row.task_status],
                 }}
               >
-                <Badge color={STATUS_COLOR_TASK_TODAY[row.task_status]} /> {" "}
+                <Badge color={STATUS_COLOR_TASK_TODAY[row.task_status]} />{" "}
                 {TASK_TODAY_STATUS[row.task_status]}
                 <span style={{ color: color.Error }}>
                   {row.task_is_problem == true
@@ -582,7 +576,8 @@ export default function IndexTodayTask() {
                   {row.task_status_delay == "WAIT_APPROVE"
                     ? " " + "(" + "รออนุมัติขยายเวลา" + ")"
                     : null}
-                </span><br/>
+                </span>
+                <br />
                 <span style={{ color: "#56CCF2" }}>
                   {row.task_status_delay == "EXTENDED" ||
                   row.task_status_delay == "APPROVED"
