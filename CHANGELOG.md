@@ -1,4 +1,6 @@
 ## [Version - 0]
+## fix [v0.20.26] 2023-02-07
+- fixed fields task today
 ## fix [v0.20.25] 2023-02-03
 - fixed calculate price with coupon in create new task
 ## fix [v0.20.24] 2023-02-03
