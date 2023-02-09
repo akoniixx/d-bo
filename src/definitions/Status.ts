@@ -19,6 +19,7 @@ export const STATUS_FARMER_MAPPING: any = {
   ACTIVE: "ใช้งาน",
   INACTIVE: "ปิดการใช้งาน",
   REJECTED: "ไม่อนุมัติ",
+  OPEN: "ข้อมูลไม่ครบถ้วน",
 };
 
 export const STATUS_COLOR_MAPPING: any = {
@@ -26,9 +27,11 @@ export const STATUS_COLOR_MAPPING: any = {
   ACTIVE: color.Success,
   REJECTED: color.Error,
   INACTIVE: color.Error,
+  OPEN: color.Grey,
 };
 
 export const FARMER_STATUS_SEARCH = [
+  { value: "OPEN", name: "ยังไม่เปิดใช้งาน" },
   { value: "PENDING", name: "รอยืนยันตัวตน" },
   { value: "ACTIVE", name: "ใช้งาน" },
   { value: "REJECTED", name: "ไม่อนุมัติ" },
