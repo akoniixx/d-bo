@@ -917,8 +917,8 @@ const EditFarmer = () => {
                   {FARMER_STATUS_SEARCH.map((item, index) => (
                     <Radio value={item.value}>
                       {item.name}
-                      {(data.status == "REJECTED" && index == 2) ||
-                      (data.status == "INACTIVE" && index == 3) ? (
+                      {(data.status == "REJECTED" && index == 3) ||
+                      (data.status == "INACTIVE" && index == 4) ? (
                         <div>
                           <div className="form-group">
                             <label></label>

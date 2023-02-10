@@ -1,4 +1,7 @@
 ## [Version - 0]
+## Fix [v0.20.27] 2023-02-09
+- fixed display textarea with status in edit droner
+- added status "OPEN" into index & edit farmer
 ## fix [v0.20.26] 2023-02-07
 - fixed fields task today
 ## fix [v0.20.25] 2023-02-03

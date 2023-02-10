@@ -1357,7 +1357,7 @@ function EditDroner() {
                   className="col-lg-12"
                   onChange={handleChangeStatus}>
                   <Space direction="vertical" className="col-lg-12">
-                    {DRONER_STATUS.filter((x) => x.value !== "").map(
+                    {DRONER_STATUS.filter((x) => x.value !== "ALL").map(
                       (item, index) => (
                         <Radio
                           value={item.value}

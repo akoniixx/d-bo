@@ -55,11 +55,8 @@ function IndexFarmer() {
   >();
   const [province, setProvince] = useState<ProviceEntity[]>();
   const [district, setDistrict] = useState<DistrictEntity[]>();
-  const [subdistrict, setSubdistrict] =
-    useState<SubdistrictEntity[]>();
-  const [sortStatus, setSortStatus] = useState<string | undefined>(
-    undefined
-  );
+  const [subdistrict, setSubdistrict] = useState<SubdistrictEntity[]>();
+  const [sortStatus, setSortStatus] = useState<string | undefined>(undefined);
   const [searchQuery] = useSearchParams();
 
   const genQuery = ({
@@ -98,10 +95,7 @@ function IndexFarmer() {
     }
     const queryString = Object.keys(query);
     if (queryString.length > 0) {
-      return (
-        "?" +
-        queryString.map((key) => key + "=" + query[key]).join("&")
-      );
+      return "?" + queryString.map((key) => key + "=" + query[key]).join("&");
     }
     return "";
   };
@@ -135,20 +129,20 @@ function IndexFarmer() {
     });
   };
   const fetchDistrict = async () => {
-    return await LocationDatasource.getDistrict(
-      searchProvince?.value
-    ).then((res) => {
-      setDistrict(res);
-      return res;
-    });
+    return await LocationDatasource.getDistrict(searchProvince?.value).then(
+      (res) => {
+        setDistrict(res);
+        return res;
+      }
+    );
   };
   const fetchSubdistrict = async () => {
-    return await LocationDatasource.getSubdistrict(
-      searchDistrict?.value
-    ).then((res) => {
-      setSubdistrict(res);
-      return res;
-    });
+    return await LocationDatasource.getSubdistrict(searchDistrict?.value).then(
+      (res) => {
+        setSubdistrict(res);
+        return res;
+      }
+    );
   };
 
   useEffect(() => {
@@ -238,10 +232,7 @@ function IndexFarmer() {
     );
     setCurrent(1);
   };
-  const handleSearchSubdistrict = (
-    subdistrictId: number,
-    data: any
-  ) => {
+  const handleSearchSubdistrict = (subdistrictId: number, data: any) => {
     setSearchSubdistrict({
       value: subdistrictId,
       label: data.children,
@@ -305,10 +296,9 @@ function IndexFarmer() {
           });
         }
         if (subdistrictQuery && findDistrict) {
-          const subdistrictData =
-            await LocationDatasource.getSubdistrict(
-              findDistrict?.districtId
-            );
+          const subdistrictData = await LocationDatasource.getSubdistrict(
+            findDistrict?.districtId
+          );
           const findSubdistrict = subdistrictData.find((el: any) => {
             return el.subdistrictName === subdistrictQuery;
           });
@@ -325,7 +315,8 @@ function IndexFarmer() {
     <>
       <div
         className="container d-flex justify-content-between"
-        style={{ padding: "10px" }}>
+        style={{ padding: "10px" }}
+      >
         <div>
           <span
             className="card-label font-weight-bolder text-dark"
@@ -333,7 +324,8 @@ function IndexFarmer() {
               fontSize: 22,
               fontWeight: "bold",
               padding: "8px",
-            }}>
+            }}
+          >
             <strong>ข้อมูลเกษตรกร (Farmer)</strong>
           </span>
         </div>
@@ -346,7 +338,8 @@ function IndexFarmer() {
       </div>
       <div
         className="container d-flex justify-content-between"
-        style={{ padding: "8px" }}>
+        style={{ padding: "8px" }}
+      >
         <div className="col-lg-3">
           <SearchDebounce
             searchDefault={searchText}
@@ -383,10 +376,11 @@ function IndexFarmer() {
               optionA.children
                 .toLowerCase()
                 .localeCompare(optionB.children.toLowerCase())
-            }>
+            }
+          >
             {province?.map((item) => (
               <Option value={item.provinceId.toString()}>
-                {item.provinceName??[]}
+                {item.provinceName ?? []}
               </Option>
             ))}
           </Select>
@@ -420,7 +414,8 @@ function IndexFarmer() {
                 .toLowerCase()
                 .localeCompare(optionB.children.toLowerCase())
             }
-            disabled={searchProvince === undefined}>
+            disabled={searchProvince === undefined}
+          >
             {district?.map((item) => (
               <Option value={item.districtId.toString()}>
                 {item.districtName}
@@ -457,7 +452,8 @@ function IndexFarmer() {
                 .toLowerCase()
                 .localeCompare(optionB.children.toLowerCase())
             }
-            disabled={searchDistrict === undefined}>
+            disabled={searchDistrict === undefined}
+          >
             {subdistrict?.map((item) => (
               <Option value={item.subdistrictId.toString()}>
                 {item.subdistrictName}
@@ -483,7 +479,8 @@ function IndexFarmer() {
             className="col-lg-12 p-1"
             placeholder="เลือกสถานะ"
             value={searchStatus?.label}
-            onChange={handleSearchStatus}>
+            onChange={handleSearchStatus}
+          >
             {FARMER_STATUS_SEARCH.map((item) => (
               <option value={item.value}>{item.name}</option>
             ))}
@@ -497,8 +494,7 @@ function IndexFarmer() {
     {
       title: () => {
         return (
-          <div
-            style={{ display: "flex", gap: 8, alignItems: "center" }}>
+          <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
             อัพเดทล่าสุด
             <div
               style={{
@@ -516,7 +512,8 @@ function IndexFarmer() {
                     return undefined;
                   }
                 });
-              }}>
+              }}
+            >
               <CaretUpOutlined
                 style={{
                   position: "relative",
@@ -548,9 +545,9 @@ function IndexFarmer() {
                 <div>
                   <span
                     className=" d-block font-size-lg"
-                    style={{ color: color.Grey }}>
+                    style={{ color: color.Grey }}
+                  >
                     <UserOutlined style={{ padding: "0 4px 0 0" }} />
-
                     {value?.updateBy}
                   </span>
                 </div>
@@ -581,7 +578,15 @@ function IndexFarmer() {
       key: "province",
       render: (value: any, row: any, index: number) => {
         return {
-          children: <span>{(row?.address?.province !== null)?(row.address.province.provinceName !== null?row.address.province.provinceName:"-"):"-"}</span>,
+          children: (
+            <span>
+              {row?.address?.province !== null
+                ? row.address.province.provinceName !== null
+                  ? row.address.province.provinceName
+                  : "-"
+                : "-"}
+            </span>
+          ),
         };
       },
     },
@@ -591,7 +596,15 @@ function IndexFarmer() {
       key: "district",
       render: (value: any, row: any, index: number) => {
         return {
-          children: <span>{(row?.address?.district !== null)?(row.address.district.districtName !== null?row.address.district.districtName:"-"):"-"}</span>
+          children: (
+            <span>
+              {row?.address?.district !== null
+                ? row.address.district.districtName !== null
+                  ? row.address.district.districtName
+                  : "-"
+                : "-"}
+            </span>
+          ),
         };
       },
     },
@@ -602,7 +615,13 @@ function IndexFarmer() {
       render: (value: any, row: any, index: number) => {
         return {
           children: (
-            <span>{(row?.address?.subdistrict !== null)?(row.address.subdistrict.subdistrictName !== null?row.address.subdistrict.subdistrictName:"-"):"-"}</span>
+            <span>
+              {row?.address?.subdistrict !== null
+                ? row.address.subdistrict.subdistrictName !== null
+                  ? row.address.subdistrict.subdistrictName
+                  : "-"
+                : "-"}
+            </span>
           ),
         };
       },
@@ -624,9 +643,7 @@ function IndexFarmer() {
       render: (value: any, row: any, index: number) => {
         return {
           children: (
-            <span>
-              {row.totalRaiCount ? row.totalRaiCount : 0} ไร่
-            </span>
+            <span>{row.totalRaiCount ? row.totalRaiCount : 0} ไร่</span>
           ),
         };
       },
@@ -648,8 +665,7 @@ function IndexFarmer() {
         return {
           children: (
             <>
-              <span
-                style={{ color: STATUS_COLOR_MAPPING[row.status] }}>
+              <span style={{ color: STATUS_COLOR_MAPPING[row.status] }}>
                 <Badge color={STATUS_COLOR_MAPPING[row.status]} />{" "}
                 {STATUS_FARMER_MAPPING[row.status]}
                 <br />
@@ -697,15 +713,10 @@ function IndexFarmer() {
           }}
           rowClassName={(a) =>
             a.status === "PENDING" &&
-            moment(Date.now()).diff(
-              moment(new Date(a.createdAt)),
-              "day"
-            ) >= 3
+            moment(Date.now()).diff(moment(new Date(a.createdAt)), "day") >= 3
               ? "PENDING" &&
-                moment(Date.now()).diff(
-                  moment(new Date(a.createdAt)),
-                  "day"
-                ) >= 7
+                moment(Date.now()).diff(moment(new Date(a.createdAt)), "day") >=
+                  7
                 ? "table-row-older"
                 : "table-row-old"
               : "table-row-lasted"
