@@ -1045,6 +1045,7 @@ const EditNewTask = () => {
       dronerSelected.dronerId = droner.droner_id;
       dronerSelected.status = "WAIT_RECEIVE";
       dronerSelected.dronerDetail = [JSON.stringify(droner)];
+      dronerSelected.distance = droner.distance;
       await TaskDronerTempDataSource.createDronerTemp(dronerSelected).then(
         (res) => {
           let droner = dataDronerList.map((item) =>
@@ -1098,6 +1099,7 @@ const EditNewTask = () => {
         dronerSelected.dronerId = compareData[i].droner_id;
         dronerSelected.status = "WAIT_RECEIVE";
         dronerSelected.dronerDetail = [JSON.stringify(compareData[i])];
+        dronerSelected.distance = compareData[i].distance;
         await TaskDronerTempDataSource.createDronerTemp(dronerSelected).then(
           (res) => {
             let droner = dataDronerList.map((item) =>

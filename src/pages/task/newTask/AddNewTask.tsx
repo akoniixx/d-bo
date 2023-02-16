@@ -1728,6 +1728,7 @@ const AddNewTask = () => {
           dronerId: dronerSelected[i].droner_id,
           status: "WAIT_RECEIVE",
           dronerDetail: [JSON.stringify(dronerSelected[i])],
+          distance: dronerSelected[i].distance,
         });
       }
       const payload = { ...createNewTask };
@@ -1741,6 +1742,7 @@ const AddNewTask = () => {
       } else {
         payload.status = "WAIT_START";
         payload.dronerId = dronerSelected[0].droner_id;
+        payload.distance = dronerSelected[0].distance;
         payload.fee = payload.price * 0.05;
         payload.discountFee = payload.price * 0.05;
         setCreateNewTask(payload);
@@ -1778,6 +1780,7 @@ const AddNewTask = () => {
       if (result.isConfirmed) {
         if (selectionType === "checkbox") {
           delete createNewTask["dronerId"];
+          delete createNewTask["distance"];
         } else {
           delete createNewTask["taskDronerTemp"];
         }
