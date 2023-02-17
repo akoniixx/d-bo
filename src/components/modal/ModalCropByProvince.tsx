@@ -1,3 +1,4 @@
+import { SearchOutlined } from "@ant-design/icons";
 import {
   Button,
   Form,
@@ -24,6 +25,12 @@ const ModalCropByProvince: React.FC<ModalMapPlotProps> = ({
   const [form] = Form.useForm();
   const [data, setData] = useState<any>();
   const [value, setValue] = useState(1);
+  const [searchText, setSearchText] = useState<string>();
+  const changeTextSearch = (searchText: any) => {
+    console.log(searchText.target.value);
+    setSearchText(searchText.target.value);
+  };
+  const fetchCrop = async () => {};
 
   const dataSource = [
     {
@@ -89,6 +96,31 @@ const ModalCropByProvince: React.FC<ModalMapPlotProps> = ({
         visible={show}
         onCancel={backButton}
       >
+        <div className="row col-lg-12 pb-3 pt-2">
+          <div className="col-lg-10">
+            <Input
+              allowClear
+              prefix={<SearchOutlined style={{ color: color.Disable }} />}
+              placeholder="ค้นหาชื่อพืช"
+              onChange={changeTextSearch}
+            />
+          </div>
+          <div className="col-lg-2">
+            <Button
+              style={{
+                borderColor: color.Success,
+                borderRadius: "5px",
+                color: color.secondary2,
+                backgroundColor: color.Success,
+                padding: 6,
+                paddingTop: 4,
+              }}
+              onClick={fetchCrop}
+            >
+              ค้นหาข้อมูล
+            </Button>
+          </div>
+        </div>
         <Table
           dataSource={dataSource}
           columns={columns}

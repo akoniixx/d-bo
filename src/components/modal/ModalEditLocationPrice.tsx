@@ -1,3 +1,4 @@
+import { SearchOutlined } from "@ant-design/icons";
 import {
   Button,
   Form,
@@ -28,6 +29,7 @@ const ModalEditLocationPrice: React.FC<ModalMapPlotProps> = ({
   const [form] = Form.useForm();
   const [data, setData] = useState<any>();
   const [value, setValue] = useState(1);
+  const [searchText, setSearchText] = useState<string>();
   const [saveBtnDisable, setBtnSaveDisable] = useState<boolean>(
     isEditModal ? false : true
   );
@@ -53,6 +55,11 @@ const ModalEditLocationPrice: React.FC<ModalMapPlotProps> = ({
     checkValidate(valuesForm);
   };
   const handlePriceByCrop = (e: React.ChangeEvent<HTMLInputElement>) => {};
+  const changeTextSearch = (searchText: any) => {
+    setSearchText(searchText.target.value);
+  };
+  const fetchCrop = async () => {};
+
   const dataSource = [
     {
       crop: "นาข้าว1",
@@ -139,7 +146,35 @@ const ModalEditLocationPrice: React.FC<ModalMapPlotProps> = ({
                 <Radio value={1}>ใช้ราคาเท่ากันทั้งหมด</Radio>
                 <Radio value={2}>กำหนดรายพืช</Radio>
                 {value === 2 ? (
-                  <div className="pt-2">
+                  <div className="pt-1">
+                    <div className="row col-lg-12 pb-3 pt-2">
+                      <div className="col-lg-10">
+                        <Input
+                          allowClear
+                          prefix={
+                            <SearchOutlined style={{ color: color.Disable }} />
+                          }
+                          placeholder="ค้นหาชื่อพืช"
+                          onChange={changeTextSearch}
+                        />
+                      </div>
+                      <div className="col-lg-2">
+                        <Button
+                          style={{
+                            borderColor: color.Success,
+                            borderRadius: "5px",
+                            color: color.secondary2,
+                            backgroundColor: color.Success,
+                            padding: 6,
+                            paddingTop: 4,
+                          }}
+                          onClick={fetchCrop}
+                        >
+                          ค้นหาข้อมูล
+                        </Button>
+                      </div>
+                    </div>
+
                     <Table
                       dataSource={dataSource}
                       columns={columns}
