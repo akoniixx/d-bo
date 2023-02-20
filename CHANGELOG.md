@@ -1,4 +1,6 @@
 ## [Version - 0]
+## improve [v0.20.28] 2023-02-16
+- added distance in create & edit task
 ## Fix [v0.20.27] 2023-02-09
 - fixed display textarea with status in edit droner
 - added status "OPEN" into index & edit farmer

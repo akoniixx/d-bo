@@ -100,6 +100,8 @@ const EditInprogressTask = () => {
       fetchPurposeSpray(res.farmerPlot.plantName);
       setDronerSelected(res.droner);
       setCheckCrop(!res.targetSpray.includes("อื่นๆ"));
+      console.log(res);
+      
       setData(res);
       CouponDataSource.getPromotionCode(res.couponId).then((result) =>
         setCouponData({
@@ -585,7 +587,7 @@ const EditInprogressTask = () => {
                   : "")}
             </div>
             <div className="col-lg-1">
-              {dronerSelected.dronerArea.distance || 0} km
+              {parseFloat(data.distance).toFixed(0) || 0} km
             </div>
             <div className="col-lg-2">
               <Avatar
@@ -705,6 +707,7 @@ const EditInprogressTask = () => {
     droner.address.province.provinceName = newDroner.province_name;
     droner.totalDroneCount = parseInt(newDroner.count_drone);
     droner.dronerDrone = [drone];
+    droner.distance =  newDroner.distance;
     setDronerSelected(droner);
     setShowModal((prev) => !prev);
     setBtnSaveDisable(false);
@@ -738,6 +741,7 @@ const EditInprogressTask = () => {
     updateTask.isProblem = data.isProblem;
     updateTask.updateBy = profile.firstname + " " + profile.lastname;
     updateTask.dronerId = dronerSelected.id;
+    updateTask.distance = dronerSelected.distance || 0;
     updateTask.problemRemark = data.problemRemark;
     updateTask.statusRemark = data.statusRemark;
     updateTask.farmerPlotId = data.farmerPlotId;

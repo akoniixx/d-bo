@@ -46,6 +46,7 @@ export interface CreateNewTaskEntity {
   farmerPlotId: string;
   farmAreaAmount: string;
   dronerId?: string;
+  distance?: number;
   dateAppointment: string;
   targetSpray: string[];
   preparationBy: string;
@@ -68,6 +69,7 @@ export const CreateNewTaskEntity_INIT: CreateNewTaskEntity = {
   farmerPlotId: "",
   farmAreaAmount: "",
   dronerId: "",
+  distance: 0,
   dateAppointment: "",
   targetSpray: [""],
   preparationBy: "",
