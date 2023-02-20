@@ -495,7 +495,7 @@ function ReviewTask() {
           </span>
         </div>
         <div className="col-lg-1">
-          {data.data.droner.dronerArea.distance || 0} km
+          {parseFloat(data.data.distance).toFixed(0) || 0} km
         </div>
         <div className="col-lg">
           <span>

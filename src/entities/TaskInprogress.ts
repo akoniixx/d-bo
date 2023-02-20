@@ -29,7 +29,7 @@ export interface GetTaskInprogressEntity {
   updatedAt: string;
   createBy: string;
   updateBy: string;
-  distrance: string;
+  distance: string;
   status: string;
   statusRemark: string;
   reviewDronerAvg: string;
@@ -176,7 +176,7 @@ export const GetTaskInprogressEntity_INIT: GetTaskInprogressEntity = {
   updatedAt: "",
   createBy: "",
   updateBy: "",
-  distrance: "",
+  distance: "",
   status: "",
   statusRemark: "",
   reviewDronerAvg: "",
@@ -209,6 +209,7 @@ export const GetTaskInprogressEntity_INIT: GetTaskInprogressEntity = {
 export interface UpdateInprogressTaskEntity {
   id: string;
   dronerId: string;
+  distance: number;
   dateAppointment: string;
   purposeSprayId: string;
   targetSpray: string[];
@@ -224,6 +225,7 @@ export interface UpdateInprogressTaskEntity {
 export const UpdateInprogressTaskEntity_INIT: UpdateInprogressTaskEntity = {
   id: "",
   dronerId: "",
+  distance: 0,
   dateAppointment: "",
   purposeSprayId: "",
   targetSpray: [""],

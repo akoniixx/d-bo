@@ -23,12 +23,14 @@ export interface CreateDronerTempEntity {
   dronerId: string;
   status: string;
   dronerDetail: string[];
+  distance: number;
 }
 export const CreateDronerTempEntity_INIT: CreateDronerTempEntity = {
   taskId: "",
   dronerId: "",
   status: "",
   dronerDetail: [""],
+  distance: 0,
 };
 export interface DeletedDronerTemp {
   taskId: string;
