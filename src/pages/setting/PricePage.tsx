@@ -7,48 +7,61 @@ import Layouts from "../../components/layout/Layout";
 import ModalCropByProvince from "../../components/modal/ModalCropByProvince";
 import ModalEditLocationPrice from "../../components/modal/ModalEditLocationPrice";
 import color from "../../resource/color";
+import { LocationPriceDatasource } from "../../datasource/LocationPriceDatasource";
+import { LocationPricePageEntity } from "../../entities/LocationPrice";
+import moment from "moment";
 
 function PricePage() {
-  const [current, setCurrent] = useState(1);
+  const row = 10;
+  const [data, setData] = useState<LocationPricePageEntity>();
   const [showModalEdit, setShowModalEdit] = useState<boolean>(false);
   const [showModalCrop, setShowModalCrop] = useState<boolean>(false);
   const [searchText, setSearchText] = useState<string>();
+  const [provinceId, setProvinceId] = useState<string>("");
 
   const changeTextSearch = (searchText: any) => {
     setSearchText(searchText.target.value);
-    setCurrent(1);
+  };
+  useEffect(() => {
+    fetchLocationPrice();
+  }, []);
+  const fetchLocationPrice = async () => {
+    await LocationPriceDatasource.getAllLocationPrice(searchText).then(
+      (res: LocationPricePageEntity) => {
+        setData(res);
+      }
+    );
+  };
+  const previewCrop = (value: any) => {
+    setShowModalCrop((prev) => !prev);
+    setProvinceId(value);
   };
   const columns = [
     {
       title: "จังหวัด",
-      dataIndex: "province",
-      key: "province",
+      dataIndex: "province_name",
+      key: "province_name",
       width: "25%",
     },
     {
       title: "พืช",
-      dataIndex: "crop",
-      key: "crop",
+      dataIndex: "plants",
+      key: "plants",
       width: "15%",
       render: (value: any, row: any, index: number) => {
-        const previewCrop = async () => {
-          setShowModalCrop((prev) => !prev);
-          //getCropList
-        };
         return {
           children: (
-            <div>
-              <span
-                style={{
-                  cursor: "pointer",
-                  color: color.Success,
-                  textDecorationLine: "underline",
-                }}
-                onClick={previewCrop}
-              >
-                ดูรายการพืช
-              </span>
-            </div>
+            <span
+              style={{
+                cursor: "pointer",
+                color: color.Success,
+                textDecorationLine: "underline",
+                fontWeight: "700",
+              }}
+              onClick={() => previewCrop(value)}
+            >
+              ดูรายการพืช
+            </span>
           ),
         };
       },
@@ -57,21 +70,51 @@ function PricePage() {
       title: "ช่วงราคาฉีดพ่น",
       dataIndex: "price",
       key: "price",
+      render: (value: any, row: any, index: number) => {
+        return {
+          children: (
+            <span style={{ color: color.primary1, fontWeight: "700" }}>
+              {`${row.min_price + " - " + row.max_price + " บาท"}`}
+            </span>
+          ),
+        };
+      },
     },
     {
       title: "จำนวนอำเภอ",
-      dataIndex: "district",
-      key: "district",
+      dataIndex: "count_district",
+      key: "count_district",
+      render: (value: any, row: any, index: number) => {
+        return {
+          children: <span>{row.count_district + `  อำเภอ`}</span>,
+        };
+      },
     },
     {
       title: "จำนวนตำบล",
-      dataIndex: "subDistrict",
-      key: "subDistrict",
+      dataIndex: "count_subdistrict",
+      key: "count_subdistrict",
+      render: (value: any, row: any, index: number) => {
+        return {
+          children: <span>{row.count_subdistrict + `  ตำบล`}</span>,
+        };
+      },
     },
     {
       title: "อัพเดตล่าสุด",
-      dataIndex: "updates",
-      key: "updates",
+      dataIndex: "update_at",
+      key: "update_at",
+      render: (value: any, row: any, index: number) => {
+        return {
+          children: (
+            <div className="container">
+              <span className="text-dark-75  d-block font-size-lg">
+                {moment(row.update_at).format("DD/MM/YYYY, HH:mm")}
+              </span>
+            </div>
+          ),
+        };
+      },
     },
     {
       title: "",
@@ -96,20 +139,6 @@ function PricePage() {
       },
     },
   ];
-  const datas = [
-    {
-      province: "สระบุรี",
-      price: "60",
-      crop: "นาข้าว",
-      district: "13 อำเภอ",
-      subDistrict: "28 ตำบล",
-      updates: "15/02/2023, 10:00",
-    },
-  ];
-  useEffect(() => {
-    fetchPrice();
-  }, [current]);
-  const fetchPrice = async () => {};
   const pageTitle = (
     <div className="container d-flex" style={{ padding: "8px" }}>
       <div className="col-lg-6">
@@ -124,7 +153,7 @@ function PricePage() {
         <Input
           allowClear
           prefix={<SearchOutlined style={{ color: color.Disable }} />}
-          placeholder="ค้นหาจังหวัด, อำเภอ, หรือตำบล"
+          placeholder="ค้นหาจังหวัด"
           className="col-lg-12 p-1"
           onChange={changeTextSearch}
         />
@@ -138,7 +167,7 @@ function PricePage() {
             backgroundColor: color.Success,
           }}
           className="col-lg-12"
-          onClick={fetchPrice}
+          onClick={fetchLocationPrice}
         >
           ค้นหาข้อมูล
         </Button>
@@ -157,22 +186,17 @@ function PricePage() {
       </div>
     </div>
   );
-  const updateLocationPrice = async (data: any) => {
-  };
+  const updateLocationPrice = async (data: any) => {};
   return (
     <Layouts>
       {pageTitle}
       <CardContainer>
-        <Table
-          dataSource={datas}
-          columns={columns}
-          pagination={false}
-          size="large"
-          tableLayout="fixed"
-        />
+        <Table columns={columns} dataSource={data?.data} />
       </CardContainer>
       <div className="d-flex justify-content-between pt-5">
-        <p>รายการทั้งหมด 0 รายการ</p>
+        <p>
+          รายการ {data?.data.length} จากทั้งหมด {data?.count} รายการ
+        </p>
       </div>
       {showModalEdit && (
         <ModalEditLocationPrice
@@ -185,8 +209,9 @@ function PricePage() {
       {showModalCrop && (
         <ModalCropByProvince
           show={showModalCrop}
+          index={provinceId}
           backButton={() => setShowModalCrop((prev) => !prev)}
-          title="รายการพืช: จังหวัดสระบุรี"
+          title={''}
         />
       )}
     </Layouts>
