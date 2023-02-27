@@ -20,7 +20,7 @@ export const AuthPage: React.FC = () => {
   );
   const [checkTime, setCheckTime] = useState(false);
   const checkMaintance = () => {
-    MaintenanceDataSource.getMaintenceSystem().then((res) => {
+    MaintenanceDataSource.getMaintenceSystem("BO").then((res) => {
       setCheckTime(
         checkTimeMaintance(moment(res.dateStart), moment(res.dateEnd))
       );

@@ -14,7 +14,6 @@ export const ModalMaintence: React.FC<ModalMaintenceProp> = ({
   onClose,
   data,
 }) => {
-  console.log("data", show);
   const footerClose = () => {
     return (
       <div className="text-center">
@@ -52,7 +51,7 @@ export const ModalMaintence: React.FC<ModalMaintenceProp> = ({
         <div className="col-lg-12">
           <div style={{ width: "100%" }}>
             <div className="text-center p-1">
-              <label style={{ fontSize: "20px" }}>{data?.text}</label>{" "}
+              <label style={{ fontSize: "17px" }}>{data?.text}</label>{" "}
             </div>
             <div className="text-center">
               <h5 style={{ color: color.Error }}>

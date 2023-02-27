@@ -23,7 +23,7 @@ export function HomePage() {
   const [showModalMaintance, setShowModalMaintance] = useState<boolean>(true);
 
   const checkMaintence = () => {
-    MaintenanceDataSource.getMaintenceSystem().then((res) => {
+    MaintenanceDataSource.getMaintenceSystem("BO").then((res) => {
       setShowModalMaintance(res.id ? true : false);
       res.textDate =
         "วันที่ " +
