@@ -1,4 +1,6 @@
 ## [Version - 0]
+## Fix [v0.21.01] 2023-02-28
+- fixed modal maintance
 ## Feature [v0.21.00] 2023-02-27
 - added maintenance feature
 ## improve [v0.20.28] 2023-02-16
