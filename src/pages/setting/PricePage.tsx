@@ -8,20 +8,34 @@ import ModalCropByProvince from "../../components/modal/ModalCropByProvince";
 import ModalEditLocationPrice from "../../components/modal/ModalEditLocationPrice";
 import color from "../../resource/color";
 import { LocationPriceDatasource } from "../../datasource/LocationPriceDatasource";
-import { LocationPricePageEntity } from "../../entities/LocationPrice";
+import {
+  AllLocatePriceEntity,
+  LocationPricePageEntity,
+  UpdateLocationPrice,
+  UpdateLocationPriceList,
+  UpdateLocationPriceList_INIT,
+  UpdateLocationPrice_INIT,
+} from "../../entities/LocationPrice";
 import moment from "moment";
+const _ = require("lodash");
+const { Map } = require("immutable");
+let queryString = _.split(window.location.pathname, "=");
 
 function PricePage() {
-  const row = 10;
-  const [data, setData] = useState<LocationPricePageEntity>();
-  const [showModalEdit, setShowModalEdit] = useState<boolean>(false);
-  const [showModalCrop, setShowModalCrop] = useState<boolean>(false);
-  const [searchText, setSearchText] = useState<string>();
-  const [provinceId, setProvinceId] = useState<string>("");
+  const PlantsId = queryString[1];
 
+  const [data, setData] = useState<LocationPricePageEntity>();
+  const [showModalEdit, setShowModalEdit] = useState(false);
+  const [editIndex, setEditIndex] = useState();
+  const [showModalCrop, setShowModalCrop] = useState(false);
+  const [searchText, setSearchText] = useState<string>();
+  const [provinceId, setProvinceId] = useState();
+  const [editLocationPrice, setEditLocationPrice] =
+    useState<UpdateLocationPrice>(UpdateLocationPrice_INIT);
   const changeTextSearch = (searchText: any) => {
     setSearchText(searchText.target.value);
   };
+
   useEffect(() => {
     fetchLocationPrice();
   }, []);
@@ -32,10 +46,17 @@ function PricePage() {
       }
     );
   };
-  const previewCrop = (value: any) => {
-    setShowModalCrop((prev) => !prev);
-    setProvinceId(value);
+  const handleModalEdit = (plants: UpdateLocationPrice, index: any) => {
+    setShowModalEdit((prev) => !prev);
+    setEditIndex(index);
+    setEditLocationPrice(plants);
   };
+
+  const previewCrop = (province: any) => {
+    setShowModalCrop((prev) => !prev);
+    setProvinceId(province);
+  };
+
   const columns = [
     {
       title: "จังหวัด",
@@ -58,7 +79,7 @@ function PricePage() {
                 textDecorationLine: "underline",
                 fontWeight: "700",
               }}
-              onClick={() => previewCrop(value)}
+              onClick={() => previewCrop(row)}
             >
               ดูรายการพืช
             </span>
@@ -122,16 +143,13 @@ function PricePage() {
       key: "id",
       width: "6%",
       render: (value: any, row: any, index: number) => {
-        const handleModalEdit = () => {
-          setShowModalEdit((prev) => !prev);
-        };
         return {
           children: (
             <div className="d-flex flex-row justify-content-between">
               <ActionButton
                 icon={<EditOutlined />}
                 color={color.primary1}
-                onClick={() => handleModalEdit()}
+                onClick={() => handleModalEdit(row, row.plants)}
               />
             </div>
           ),
@@ -186,7 +204,14 @@ function PricePage() {
       </div>
     </div>
   );
-  const updateLocationPrice = async (data: any) => {};
+
+  const updatePriceCrop = async (dataUpdate: UpdateLocationPrice) => {
+    await LocationPriceDatasource.updateLocationPrice(dataUpdate);
+    setShowModalEdit((prev) => !prev);
+    fetchLocationPrice();
+  
+  };
+
   return (
     <Layouts>
       {pageTitle}
@@ -200,10 +225,12 @@ function PricePage() {
       </div>
       {showModalEdit && (
         <ModalEditLocationPrice
+          isEditModal
           show={showModalEdit}
           backButton={() => setShowModalEdit((prev) => !prev)}
-          title="แก้ไขราคา: สระบุรี"
-          callBack={updateLocationPrice}
+          callBack={updatePriceCrop}
+          data={editLocationPrice}
+          editIndex={editIndex}
         />
       )}
       {showModalCrop && (
@@ -211,7 +238,6 @@ function PricePage() {
           show={showModalCrop}
           index={provinceId}
           backButton={() => setShowModalCrop((prev) => !prev)}
-          title={''}
         />
       )}
     </Layouts>

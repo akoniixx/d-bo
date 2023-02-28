@@ -1,67 +1,61 @@
 import { SearchOutlined } from "@ant-design/icons";
-import {
-  Button,
-  Form,
-  Input,
-  Modal,
-  Radio,
-  RadioChangeEvent,
-  Table,
-} from "antd";
+import { Button, Input, Modal, Table } from "antd";
 import React, { useEffect, useState } from "react";
 import { LocationPriceDatasource } from "../../datasource/LocationPriceDatasource";
 import {
+  AllLocatePriceEntity,
   LocationPricePageEntity,
   PricePlantsEntity,
 } from "../../entities/LocationPrice";
 import { color } from "../../resource";
-import FooterPage from "../footer/FooterPage";
 
-interface ModalMapPlotProps {
+interface ModalCropProps {
   show: boolean;
   backButton: () => void;
-  title: string;
-  index: string;
+  index: any;
 }
-const ModalCropByProvince: React.FC<ModalMapPlotProps> = ({
+const ModalCropByProvince: React.FC<ModalCropProps> = ({
   show,
   backButton,
-  title,
   index,
 }) => {
-  const [data, setData] = useState<any>(index);
+  const [data, setData] = useState<AllLocatePriceEntity>(index);
+  const [plants, setPlants] = useState();
   const [searchText, setSearchText] = useState<string>();
-  const changeTextSearch = (searchText: any) => {
-    setSearchText(searchText.target.value);
+
+  const fetchLocationPrice = async () => {
+    await LocationPriceDatasource.getAllLocationPrice(index.province_name, searchText).then(
+      (res) => {
+          setData(res.data);
+      }
+    );
+  };
+  const changeTextSearch = (search: any) => {
+    setSearchText(search.target.value);
   };
   const columns = [
     {
       title: "ชื่อพืช",
-      dataIndex: "plants",
-      key: "plants",
+      dataIndex: "plant_name",
+      key: "plant_name",
       width: "50%",
-      render: (value: any, row: any, index: number) => {
-        return {
-          children: <span>{row.plant_name}</span>,
-        };
-      },
     },
     {
       title: "ราคา",
-      dataIndex: "province_name",
-      key: "province_name",
+      dataIndex: "price",
+      key: "price",
       width: "50%",
       render: (value: any, row: any, index: number) => {
         return {
-          children: <span>{row.price}</span>,
+          children: <span>{`${row.price.toFixed(2)}  ` + "บาท"}</span>,
         };
       },
     },
   ];
-  const searchPlants = () => {};
   return (
     <>
       <Modal
+        key={index}
         width={575}
         title={
           <div
@@ -69,7 +63,7 @@ const ModalCropByProvince: React.FC<ModalMapPlotProps> = ({
               cursor: "move",
             }}
           >
-            {`รายการพืช : จังหวัด ${title}`}
+            {`รายการพืช : จังหวัด${index.province_name}`}
           </div>
         }
         footer={false}
@@ -95,14 +89,14 @@ const ModalCropByProvince: React.FC<ModalMapPlotProps> = ({
                 padding: 6,
                 paddingTop: 4,
               }}
-              onClick={searchPlants}
+              onClick={fetchLocationPrice}
             >
               ค้นหาข้อมูล
             </Button>
           </div>
         </div>
         <Table
-          dataSource={data}
+          dataSource={data.plants}
           columns={columns}
           pagination={false}
           scroll={{ x: 0, y: 300 }}

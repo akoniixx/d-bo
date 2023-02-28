@@ -1,4 +1,4 @@
-import { SearchOutlined } from "@ant-design/icons";
+import React, { useEffect, useState } from "react";
 import {
   Button,
   Form,
@@ -6,111 +6,140 @@ import {
   Modal,
   Radio,
   RadioChangeEvent,
+  Select,
+  Space,
   Table,
 } from "antd";
-import React, { useEffect, useState } from "react";
-import { color } from "../../resource";
 import FooterPage from "../footer/FooterPage";
+import {
+  AllLocatePriceEntity,
+  LocationPricePageEntity,
+  PricePlantsEntity,
+  UpdateLocationPrice,
+  UpdateLocationPriceList,
+  UpdateLocationPriceList_INIT,
+  UpdateLocationPrice_INIT,
+} from "../../entities/LocationPrice";
+import { LocationPriceDatasource } from "../../datasource/LocationPriceDatasource";
+import { SearchOutlined } from "@ant-design/icons";
+import { color } from "../../resource";
 
-interface ModalMapPlotProps {
+const _ = require("lodash");
+const { Map } = require("immutable");
+
+interface ModalLocationPriceProps {
   show: boolean;
   backButton: () => void;
-  title: string;
+  callBack: (data: UpdateLocationPrice) => void;
+  data: any;
+  editIndex: any;
   isEditModal?: boolean;
-  callBack: (data: any) => void;
 }
-const ModalEditLocationPrice: React.FC<ModalMapPlotProps> = ({
+const ModalEditLocationPrice: React.FC<ModalLocationPriceProps> = ({
   show,
   backButton,
-  title,
-  isEditModal,
   callBack,
+  data,
+  editIndex,
+  isEditModal = false,
 }) => {
   const [form] = Form.useForm();
-  const [data, setData] = useState<any>();
-  const [value, setValue] = useState(1);
-  const [searchText, setSearchText] = useState<string>();
+  const [priceList, setPriceList] = useState<UpdateLocationPrice>();
+  const [locationPrice, setLocationPrice] =
+    useState<UpdateLocationPrice>(editIndex);
+  const [saveData, setSaveData] = useState<any>();
   const [saveBtnDisable, setBtnSaveDisable] = useState<boolean>(
     isEditModal ? false : true
   );
+  const [searchText, setSearchText] = useState<string>("");
+  // useEffect(() => {
+  //   searchPlants();
+  // }, []);
+  // const searchPlants = async () => {
+  //   await LocationPriceDatasource.getAllLocationPrice(searchText).then(
+  //     (res) => {
+  //       setLocationPrice(res);
+  //     }
+  //   );
+  // };
 
-  const onChange = (e: RadioChangeEvent) => {
-    console.log("radio checked", e.target.value);
-    setValue(e.target.value);
+  const changeTextSearch = (search: any) => {
+    setSearchText(search.target.value);
   };
-  const checkValidate = (data: any) => {
-    let checkEmpty = ![data].includes("");
-    let checkEmptyNumber = ![data].includes(0);
-    if (checkEmpty && checkEmptyNumber) {
-      setBtnSaveDisable(false);
-    } else {
-      setBtnSaveDisable(true);
-    }
+
+  const handelCallBack = async () => {
+    callBack(locationPrice);
   };
-  const handelCallBack = async (values: any) => {
-    console.log(values);
+  const checkValidate = (data: UpdateLocationPrice) => {
+    // let checkEmpty = ![
+    //   data.priceData[0].location_price_id,
+    //   data.priceData[0].price,
+    // ].includes("");
+    // let checkEmptyNumber = ![
+    //   data.priceData[0].location_price_id,
+    //   data.priceData[0].price,
+    // ].includes(0);
+    // if (checkEmpty && checkEmptyNumber) {
+    //   setBtnSaveDisable(false);
+    // } else {
+    //   setBtnSaveDisable(true);
+    // }
   };
   const onFieldsChange = () => {
     const valuesForm = form.getFieldsValue();
     checkValidate(valuesForm);
   };
-  const handlePriceByCrop = (e: React.ChangeEvent<HTMLInputElement>) => {};
-  const changeTextSearch = (searchText: any) => {
-    setSearchText(searchText.target.value);
-  };
-  const fetchCrop = async () => {};
-
-  const dataSource = [
-    {
-      crop: "นาข้าว1",
-    },
-    {
-      crop: "นาข้าว2",
-    },
-    {
-      crop: "นาข้าว3",
-    },
-    {
-      crop: "นาข้าว4",
-    },
-  ];
   const columns = [
     {
       title: "ชื่อพืช",
-      dataIndex: "crop",
-      key: "crop",
+      dataIndex: "plant_name",
+      key: "plant_name",
+      width: "50%",
     },
     {
       title: "ราคา",
       dataIndex: "price",
       key: "price",
-      width: "65%",
+      width: "50%",
       render: (value: any, row: any, index: number) => {
+        const indexPlant = index;
+        const handleOnChangePrice = (e: any) => {
+          const filterId = row.id;
+          const price_id = Map(priceList).set("location_price_id", filterId);
+          const price = Map(price_id.toJS()).set("price", e.target.value);
+          const dataHi = {
+            priceData: [price.toJS()],
+          };
+          setLocationPrice(dataHi);
+        };
         return {
           children: (
-            <div className="flex-row justify-content-between">
+            <>
               <Input
-                autoComplete="off"
+                onBlur={handleOnChangePrice}
+                defaultValue={row.price.toFixed(2)}
                 suffix="บาท"
-                onChange={handlePriceByCrop}
+                autoComplete="off"
               />
-            </div>
+            </>
           ),
         };
       },
     },
   ];
+
   return (
     <>
       <Modal
-        width={575}
+        key={data}
         title={
           <div
             style={{
+              width: "100%",
               cursor: "move",
             }}
           >
-            {title}
+            {`แก้ไขราคา : จังหวัด${data.province_name}`}
           </div>
         }
         visible={show}
@@ -124,82 +153,47 @@ const ModalEditLocationPrice: React.FC<ModalMapPlotProps> = ({
         ]}
       >
         <Form
-          key={"/"}
+          key={data.plants}
           form={form}
           onFinish={handelCallBack}
           onFieldsChange={onFieldsChange}
         >
-          <div className="form-group">
-            <label style={{ color: "#636E72" }}>
+          <div className="row col-lg-12 pb-3">
+            <span style={{ color: color.Grey }}>
               โปรดตรวจสอบราคาการฉีดพ่นก่อนที่จะกดบันทึกเสมอ
               เพราะอาจจะทำให้ราคาฉีดพ่น ของอำเภอ และตำบลทั้งหมดเปลี่ยนแปลงตาม
               อาจจะส่งผลต่อการจ้างงานในระบบ
-            </label>
-          </div>
-          <div className="p-1"></div>
-          <div className="form-group col-lg-12">
-            <label>
-              ราคา <span style={{ color: "red" }}>*</span>
-            </label>
-            <div className="row pt-2">
-              <Radio.Group onChange={onChange} value={value}>
-                <Radio value={1}>ใช้ราคาเท่ากันทั้งหมด</Radio>
-                <Radio value={2}>กำหนดรายพืช</Radio>
-                {value === 2 ? (
-                  <div className="pt-1">
-                    <div className="row col-lg-12 pb-3 pt-2">
-                      <div className="col-lg-10">
-                        <Input
-                          allowClear
-                          prefix={
-                            <SearchOutlined style={{ color: color.Disable }} />
-                          }
-                          placeholder="ค้นหาชื่อพืช"
-                          onChange={changeTextSearch}
-                        />
-                      </div>
-                      <div className="col-lg-2">
-                        <Button
-                          style={{
-                            borderColor: color.Success,
-                            borderRadius: "5px",
-                            color: color.secondary2,
-                            backgroundColor: color.Success,
-                            padding: 6,
-                            paddingTop: 4,
-                          }}
-                          onClick={fetchCrop}
-                        >
-                          ค้นหาข้อมูล
-                        </Button>
-                      </div>
-                    </div>
-
-                    <Table
-                      dataSource={dataSource}
-                      columns={columns}
-                      pagination={false}
-                      scroll={{ x: 0, y: 300 }}
-                    />
-                  </div>
-                ) : (
-                  <div className="pt-2">
-                    <Form.Item
-                      name=""
-                      rules={[
-                        {
-                          pattern: new RegExp(/^[0-9\b]+$/),
-                          message: "กรุณากรอกราคาให้ถูกต้อง!",
-                        },
-                      ]}
-                    >
-                      <Input autoComplete="off" suffix="บาท" />
-                    </Form.Item>
-                  </div>
-                )}
-              </Radio.Group>
+            </span>
+            <div className="col-lg-10 pt-3">
+              <Input
+                allowClear
+                prefix={<SearchOutlined style={{ color: color.Disable }} />}
+                placeholder="ค้นหาชื่อพืช"
+                onChange={changeTextSearch}
+              />
+            </div>
+            <div className="col-lg-2 pt-3">
+              <Button
+                style={{
+                  borderColor: color.Success,
+                  borderRadius: "5px",
+                  color: color.secondary2,
+                  backgroundColor: color.Success,
+                  padding: 6,
+                  paddingTop: 4,
+                }}
+                // onClick={searchPlants}
+              >
+                ค้นหาข้อมูล
+              </Button>
             </div>
           </div>
+          <Table
+            dataSource={data.plants}
+            columns={columns}
+            pagination={false}
+            scroll={{ x: 0, y: 300 }}
+          />
         </Form>
       </Modal>
     </>

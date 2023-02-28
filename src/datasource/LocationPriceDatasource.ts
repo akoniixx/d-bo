@@ -1,8 +1,7 @@
 import { BASE_URL, httpClient } from "../config/develop-config";
-import axios from 'axios';
+import axios from "axios";
 import {
-  LocationPriceEntity,
-  LocationPricePageEntity,
+  LocationPriceEntity, UpdateLocationPrice,
 } from "../entities/LocationPrice";
 
 export class LocationPriceDatasource {
@@ -24,23 +23,27 @@ export class LocationPriceDatasource {
       });
   }
   static async getAllLocationPrice(
-    // limit?: number,
-    // offset?: number,
-    // sortField?: string,
-    // sortDirection?: string,
     search?: string,
+    searchPlant?: string,
   ): Promise<any> {
     return axios
       .post(BASE_URL + `/tasks/location-price/get-all-location-price`, {
-        // limit: limit,
-        // offset: offset,
-        // sortField: sortField,
-        // sortDirection: sortDirection,
         search: search,
+        searchPlant:searchPlant
       })
-      .then(res => {
+      .then((res) => {
         return res.data;
       });
   }
-
+  static updateLocationPrice(data: any): Promise<any> {
+    return httpClient
+      .post(BASE_URL + '/tasks/location-price/update-multiple-price' , data)
+      .then((response) => {
+        console.log(response.data)
+        return response.data;
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }
 }
