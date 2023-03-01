@@ -79,7 +79,6 @@ const AddAdmin = () => {
 
   const insertNewAdmin = (data: UserStaffEntity) => {
     AdminDatasource.insertAdmin(data).then((res) => {
-      console.log(res);
       if (res.success) {
         Swal.fire({
           title: "บันทึกสำเร็จ",

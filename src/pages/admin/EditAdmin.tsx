@@ -1,6 +1,6 @@
 import Layout from "../../components/layout/Layout";
 import React, { useEffect, useState } from "react";
-import { Form, Input, Radio, Row, Select, Space } from "antd";
+import { Form, Input, Radio, Row, Select, Space, Tooltip } from "antd";
 import { BackIconButton } from "../../components/button/BackButton";
 import { CardContainer } from "../../components/card/CardContainer";
 import { CardHeader } from "../../components/header/CardHearder";
@@ -12,6 +12,7 @@ import {
 } from "../../entities/UserStaffEntities";
 import { AdminDatasource } from "../../datasource/AdminDatasource";
 import Swal from "sweetalert2";
+import { ExclamationCircleOutlined } from "@ant-design/icons";
 
 const _ = require("lodash");
 const { Map } = require("immutable");
@@ -22,6 +23,13 @@ const EditAdmin = () => {
   const admidId = queryString[1];
   const [showBtn, setShowBtn] = useState<boolean>(true);
   const [data, setData] = useState<UserStaffEntity>(UserStaffEntity_INIT);
+  const textUserName = (
+    <span>
+      ● ตัวอักษรภาษาอังกฤษ
+      <br />● มีความยาวไม่ต่ำกว่า 6 ตัวอักษร
+    </span>
+  );
+  const [tooltipUserOpen, setTooltipUserOpen] = useState<boolean>(false);
 
   const fecthAdmin = async (id: string) => {
     await AdminDatasource.getAdminById(id).then((res) => {
@@ -62,8 +70,7 @@ const EditAdmin = () => {
         }).then((time) => {
           window.location.href = "/IndexAdmin";
         });
-      }
-      else{
+      } else {
         Swal.fire({
           title: "Username หรือ Email ซ้ำในระบบ",
           icon: "error",
@@ -157,7 +164,20 @@ const EditAdmin = () => {
       <div className="row">
         <div className="form-group col-lg-6">
           <label>
-            ชื่อผู้ใช้ <span style={{ color: "red" }}>*</span>
+            ชื่อผู้ใช้{" "}
+            <span style={{ color: "red" }}>
+              *{" "}
+              <Tooltip
+                placement="topLeft"
+                title={textUserName}
+                open={tooltipUserOpen}
+              >
+                <ExclamationCircleOutlined
+                  style={{ position: "relative", bottom: 5 }}
+                  onClick={() => setTooltipUserOpen(!tooltipUserOpen)}
+                />
+              </Tooltip>
+            </span>
           </label>
           <Form.Item
             name="username"
