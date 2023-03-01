@@ -11,13 +11,21 @@ export const FromMaintenance: React.FC<FromMaintenanceProp> = (data) => {
   return (
     <div className="col-lg-12">
       <div style={{ width: "100%" }}>
-        <div className="text-center p-1">
-          <h3 style={{ color: color.Error }}>{data.data.text}</h3>
+        <div className="text-center">
+          <h3>{data.data.header}</h3>
         </div>
         <div className="text-center p-1">
-          <h5 style={{ color: color.Grey }}>
-            {data.data.textDate}
-          </h5>
+          <h5>{data.data.textDate}</h5>
+        </div>
+        <div className="text-center">
+          <label style={{ color: color.Grey, fontSize: "16px" }}>
+            {data.data.text}
+          </label>
+        </div>
+        <div className="text-center">
+          <label style={{ color: color.Grey, fontSize: "16px" }}>
+            {data.data.footer}
+          </label>
         </div>
       </div>
     </div>
