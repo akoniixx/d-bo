@@ -8,13 +8,11 @@ export interface LocationPriceEntity {
   updateAt: string;
 }
 export interface PricePlantsEntity {
-  province_name: string;
   id: string;
   price: number;
   plant_name: string;
 }
 export const PricePlantsEntity_INIT: PricePlantsEntity = {
-  province_name: "",
   id: "",
   price: 0,
   plant_name: "",
@@ -47,7 +45,7 @@ export interface LocationPricePageEntity {
 
 export interface UpdateLocationPriceList {
   location_price_id: string;
-      price: number;
+  price: number;
 }
 export const UpdateLocationPriceList_INIT: UpdateLocationPriceList = {
   location_price_id: "",
@@ -55,19 +53,7 @@ export const UpdateLocationPriceList_INIT: UpdateLocationPriceList = {
 };
 export interface UpdateLocationPrice {
   priceData: UpdateLocationPriceList[];
-  // priceData: [
-  //   {
-  //     location_price_id: string;
-  //     price: number;
-  //   }
-  // ];
 }
 export const UpdateLocationPrice_INIT: UpdateLocationPrice = {
   priceData: [UpdateLocationPriceList_INIT],
-  // priceData: [
-  //   {
-  //     location_price_id: "",
-  //     price: 0,
-  //   },
-  // ],
 };

@@ -22,9 +22,8 @@ const { Map } = require("immutable");
 let queryString = _.split(window.location.pathname, "=");
 
 function PricePage() {
-  const PlantsId = queryString[1];
-
   const [data, setData] = useState<LocationPricePageEntity>();
+  const [plantIndex, setPlantsIndex] = useState<any>();
   const [showModalEdit, setShowModalEdit] = useState(false);
   const [editIndex, setEditIndex] = useState();
   const [showModalCrop, setShowModalCrop] = useState(false);
@@ -56,7 +55,16 @@ function PricePage() {
     setShowModalCrop((prev) => !prev);
     setProvinceId(province);
   };
-
+  const updatePriceCrop = async (dataUpdate: UpdateLocationPriceList[]) => {
+    if (dataUpdate !== undefined) {
+      const dataArrPlants = {
+        priceData: dataUpdate,
+      };
+      await LocationPriceDatasource.updateLocationPrice(dataArrPlants);
+      setShowModalEdit((prev) => !prev);
+      fetchLocationPrice();
+    }
+  };
   const columns = [
     {
       title: "จังหวัด",
@@ -204,13 +212,6 @@ function PricePage() {
       </div>
     </div>
   );
-
-  const updatePriceCrop = async (dataUpdate: UpdateLocationPrice) => {
-    await LocationPriceDatasource.updateLocationPrice(dataUpdate);
-    setShowModalEdit((prev) => !prev);
-    fetchLocationPrice();
-  
-  };
 
   return (
     <Layouts>

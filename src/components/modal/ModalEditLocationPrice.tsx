@@ -26,11 +26,10 @@ import { color } from "../../resource";
 
 const _ = require("lodash");
 const { Map } = require("immutable");
-
 interface ModalLocationPriceProps {
   show: boolean;
   backButton: () => void;
-  callBack: (data: UpdateLocationPrice) => void;
+  callBack: (data: UpdateLocationPriceList[]) => void;
   data: any;
   editIndex: any;
   isEditModal?: boolean;
@@ -44,10 +43,8 @@ const ModalEditLocationPrice: React.FC<ModalLocationPriceProps> = ({
   isEditModal = false,
 }) => {
   const [form] = Form.useForm();
-  const [priceList, setPriceList] = useState<UpdateLocationPrice>();
   const [locationPrice, setLocationPrice] =
-    useState<UpdateLocationPrice>(editIndex);
-  const [saveData, setSaveData] = useState<any>();
+    useState<UpdateLocationPriceList[]>(editIndex);
   const [saveBtnDisable, setBtnSaveDisable] = useState<boolean>(
     isEditModal ? false : true
   );
@@ -66,18 +63,17 @@ const ModalEditLocationPrice: React.FC<ModalLocationPriceProps> = ({
   const changeTextSearch = (search: any) => {
     setSearchText(search.target.value);
   };
-
   const handelCallBack = async () => {
     callBack(locationPrice);
   };
   const checkValidate = (data: UpdateLocationPrice) => {
     // let checkEmpty = ![
-    //   data.priceData[0].location_price_id,
-    //   data.priceData[0].price,
+    //   locationPrice.priceData[0].location_price_id,
+    //   locationPrice.priceData[0].price,
     // ].includes("");
     // let checkEmptyNumber = ![
-    //   data.priceData[0].location_price_id,
-    //   data.priceData[0].price,
+    //   locationPrice.priceData[0].location_price_id,
+    //   locationPrice.priceData[0].price,
     // ].includes(0);
     // if (checkEmpty && checkEmptyNumber) {
     //   setBtnSaveDisable(false);
@@ -102,21 +98,19 @@ const ModalEditLocationPrice: React.FC<ModalLocationPriceProps> = ({
       key: "price",
       width: "50%",
       render: (value: any, row: any, index: number) => {
-        const indexPlant = index;
-        const handleOnChangePrice = (e: any) => {
-          const filterId = row.id;
-          const price_id = Map(priceList).set("location_price_id", filterId);
-          const price = Map(price_id.toJS()).set("price", e.target.value);
-          const dataHi = {
-            priceData: [price.toJS()],
-          };
-          setLocationPrice(dataHi);
+        const handleItemClick = (indexData: number, newItem: any) => {
+          const newItems = [...locationPrice];
+          const dataChange: UpdateLocationPriceList[] = [];
+          const price_id = Map(dataChange).set("location_price_id", row.id);
+          const price = Map(price_id.toJS()).set("price", newItem);
+          newItems[indexData] = price.toJS();
+          setLocationPrice(newItems)
         };
         return {
           children: (
             <>
               <Input
-                onBlur={handleOnChangePrice}
+                onChange={(event) => handleItemClick(index, event.target.value)}
                 defaultValue={row.price.toFixed(2)}
                 suffix="บาท"
                 autoComplete="off"
