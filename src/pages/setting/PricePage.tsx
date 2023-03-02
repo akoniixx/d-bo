@@ -23,9 +23,9 @@ let queryString = _.split(window.location.pathname, "=");
 
 function PricePage() {
   const [data, setData] = useState<LocationPricePageEntity>();
-  const [plantIndex, setPlantsIndex] = useState<any>();
   const [showModalEdit, setShowModalEdit] = useState(false);
   const [editIndex, setEditIndex] = useState();
+  const [indexRow, setIndexRow] = useState();
   const [showModalCrop, setShowModalCrop] = useState(false);
   const [searchText, setSearchText] = useState<string>();
   const [provinceId, setProvinceId] = useState();
@@ -53,7 +53,14 @@ function PricePage() {
 
   const previewCrop = (province: any) => {
     setShowModalCrop((prev) => !prev);
+    // setIndexRow(index);
     setProvinceId(province);
+  };
+  const sorter = (a: any, b: any) => {
+    if (a === b) return 0;
+    else if (a === null) return 1;
+    else if (b === null) return -1;
+    else return a.localeCompare(b);
   };
   const updatePriceCrop = async (dataUpdate: UpdateLocationPriceList[]) => {
     if (dataUpdate !== undefined) {
@@ -71,6 +78,8 @@ function PricePage() {
       dataIndex: "province_name",
       key: "province_name",
       width: "25%",
+      sorter: (a: any, b: any) =>
+      sorter(a.province_name, b.province_name)
     },
     {
       title: "พืช",
@@ -99,6 +108,8 @@ function PricePage() {
       title: "ช่วงราคาฉีดพ่น",
       dataIndex: "price",
       key: "price",
+      sorter: (a: any, b: any) =>
+      sorter(a.min_price, b.max_price),
       render: (value: any, row: any, index: number) => {
         return {
           children: (
@@ -113,6 +124,8 @@ function PricePage() {
       title: "จำนวนอำเภอ",
       dataIndex: "count_district",
       key: "count_district",
+      sorter: (a: any, b: any) =>
+      sorter(a.count_district, b.count_district),
       render: (value: any, row: any, index: number) => {
         return {
           children: <span>{row.count_district + `  อำเภอ`}</span>,
@@ -123,6 +136,8 @@ function PricePage() {
       title: "จำนวนตำบล",
       dataIndex: "count_subdistrict",
       key: "count_subdistrict",
+      sorter: (a: any, b: any) =>
+      sorter(a.count_subdistrict, b.count_subdistrict),
       render: (value: any, row: any, index: number) => {
         return {
           children: <span>{row.count_subdistrict + `  ตำบล`}</span>,
@@ -237,7 +252,8 @@ function PricePage() {
       {showModalCrop && (
         <ModalCropByProvince
           show={showModalCrop}
-          index={provinceId}
+          data={provinceId}
+          // indexPlants={indexRow}
           backButton={() => setShowModalCrop((prev) => !prev)}
         />
       )}

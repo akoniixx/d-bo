@@ -39,7 +39,6 @@ export class LocationPriceDatasource {
     return httpClient
       .post(BASE_URL + '/tasks/location-price/update-multiple-price' , data)
       .then((response) => {
-        console.log(response.data)
         return response.data;
       })
       .catch((err) => {
