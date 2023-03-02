@@ -62,7 +62,7 @@ export function HomePage() {
       >
         <span>version {version}</span>
       </footer>
-      {dataMaintance && (
+      {dataMaintance.id && (
         <ModalMaintence
           show={showModalMaintance}
           onClose={() => setShowModalMaintance(!showModalMaintance)}
