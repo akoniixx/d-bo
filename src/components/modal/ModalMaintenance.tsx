@@ -50,14 +50,16 @@ export const ModalMaintence: React.FC<ModalMaintenceProp> = ({
         </div>
         <div className="col-lg-12">
           <div style={{ width: "100%" }}>
-            <div className="text-center p-1">
-              <label style={{ fontSize: "17px" }}>{data?.text}</label>{" "}
+            <div className="text-center">
+              <label style={{ fontSize: "20px", font: 'bold' }}>{data?.header}</label>{" "}
             </div>
             <div className="text-center">
-              <h5 style={{ color: color.Error }}>
-                {data.textDate}
-              </h5>
+              <label style={{ fontSize: "17px" }}>{data.textDate}</label>
             </div>
+            <div className="text-center">
+              <label style={{ fontSize: "17px" }}>{data?.text}</label>{" "}
+            </div>
+
             <div className="text-center">
               <label style={{ fontSize: "15px", color: color.Grey }}>
                 {data?.footer}

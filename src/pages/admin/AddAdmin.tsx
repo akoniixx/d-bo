@@ -1,6 +1,6 @@
 import Layout from "../../components/layout/Layout";
 import React, { useState } from "react";
-import { Form, Input, Radio, Row, Select, Space } from "antd";
+import { Form, Input, Radio, Row, Select, Space, Tooltip } from "antd";
 import { BackIconButton } from "../../components/button/BackButton";
 import { CardContainer } from "../../components/card/CardContainer";
 import { CardHeader } from "../../components/header/CardHearder";
@@ -12,6 +12,7 @@ import {
 } from "../../entities/UserStaffEntities";
 import { AdminDatasource } from "../../datasource/AdminDatasource";
 import Swal from "sweetalert2";
+import { ExclamationCircleOutlined } from "@ant-design/icons";
 
 const _ = require("lodash");
 const { Map } = require("immutable");
@@ -19,6 +20,25 @@ const { Map } = require("immutable");
 const AddAdmin = () => {
   const [showBtn, setShowBtn] = useState<boolean>(true);
   const [data, setData] = useState<UserStaffEntity>(UserStaffEntity_INIT);
+  const textPassword = (
+    <span>
+      รหัสต้องประกอบด้วย
+      <br /> ● ภาษาอังกฤษพิมพ์ใหญ่
+      <br />
+      ● ภาษาอังกฤษพิมพ์เล็ก
+      <br /> ● อักขระพิเศษ @!_#$
+      <br /> ● ตัวเลข <br />● มีความยาวไม่ต่ำกว่า 8 ตัวอักษร
+    </span>
+  );
+  const [tooltipPassOpen, setTooltipPassOpen] = useState<boolean>(false);
+
+  const textUserName = (
+    <span>
+      ● ตัวอักษรภาษาอังกฤษ
+      <br />● มีความยาวไม่ต่ำกว่า 6 ตัวอักษร
+    </span>
+  );
+  const [tooltipUserOpen, setTooltipUserOpen] = useState<boolean>(false);
 
   const handleChangestatus = (e: any) => {
     const m = Map(data).set("isActive", e.target.value);
@@ -29,6 +49,11 @@ const AddAdmin = () => {
     const m = Map(data).set(e.target.id, e.target.value);
     setData(m.toJS());
     checkValidate(m.toJS());
+    if (e.target.id === "username") {
+      setTooltipUserOpen(true);
+    } else if (e.target.id === "password") {
+      setTooltipPassOpen(true);
+    }
   };
 
   const handleOnChangeSelect = (value: any) => {
@@ -60,15 +85,22 @@ const AddAdmin = () => {
           icon: "success",
           timer: 1500,
           showConfirmButton: false,
-        }).then((time) => {
+        }).then(() => {
           window.location.href = "/IndexAdmin";
         });
-      }
-      else{
+      } else {
+        let messageList = res.response.data.message;
         Swal.fire({
-          title: "Username หรือ Email ซ้ำในระบบ",
+          title: messageList, //"Username หรือ Email ซ้ำในระบบ",
           icon: "error",
           showConfirmButton: true,
+        }).then(() => {
+          let checkUsername = messageList.filter((x: any) =>
+          x.includes("username")
+        );
+        let checkPass = messageList.filter((x: any) => x.includes("password"));
+          checkUsername.length && setTooltipUserOpen(true);
+          checkPass.length && setTooltipPassOpen(true);
         });
       }
     });
@@ -147,7 +179,20 @@ const AddAdmin = () => {
       <div className="row">
         <div className="form-group col-lg-6">
           <label>
-            ชื่อผู้ใช้ <span style={{ color: "red" }}>*</span>
+            ชื่อผู้ใช้{" "}
+            <span style={{ color: "red" }}>
+              *{" "}
+              <Tooltip
+                placement="topLeft"
+                title={textUserName}
+                open={tooltipUserOpen}
+              >
+                <ExclamationCircleOutlined
+                  style={{ position: "relative", bottom: 5 }}
+                  onClick={() => setTooltipUserOpen(!tooltipUserOpen)}
+                />
+              </Tooltip>
+            </span>
           </label>
           <Form.Item
             name="username"
@@ -161,14 +206,29 @@ const AddAdmin = () => {
             <Input
               placeholder="กรอกชื่อในระบบ"
               value={data?.username}
-              onChange={handleOnChange}
+              onFocus={handleOnChange}
               autoComplete="off"
+              onBlur={() => setTooltipUserOpen(!tooltipUserOpen)}
+              onChange={handleOnChange}
             />
           </Form.Item>
         </div>
         <div className="form-group col-lg-6">
           <label>
-            รหัสผ่าน <span style={{ color: "red" }}>*</span>
+            รหัสผ่าน{" "}
+            <span style={{ color: "red" }}>
+              *{" "}
+              <Tooltip
+                placement="topLeft"
+                title={textPassword}
+                open={tooltipPassOpen}
+              >
+                <ExclamationCircleOutlined
+                  style={{ position: "relative", bottom: 5 }}
+                  onClick={() => setTooltipPassOpen(!tooltipPassOpen)}
+                />
+              </Tooltip>
+            </span>
           </label>
           <Form.Item
             name="password"
@@ -182,8 +242,10 @@ const AddAdmin = () => {
             <Input
               placeholder="กรอกรหัสผ่าน"
               value={data?.password}
-              onChange={handleOnChange}
+              onFocus={handleOnChange}
               autoComplete="off"
+              onBlur={() => setTooltipPassOpen(!tooltipPassOpen)}
+              onChange={handleOnChange}
             />
           </Form.Item>
         </div>
@@ -229,7 +291,6 @@ const AddAdmin = () => {
             เพิ่มข้อมูลผู้ดูแลระบบ (User Management)
           </strong>
         </span>
-        
       </Row>
       <CardContainer>
         <CardHeader textHeader="ข้อมูลผู้ดูแลระบบ" />
