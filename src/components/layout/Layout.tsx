@@ -24,12 +24,14 @@ import {
   LogoutOutlined,
   ContactsFilled,
   DollarCircleFilled,
+  UserOutlined,
 } from "@ant-design/icons";
 import { Link, useNavigate } from "react-router-dom";
 import HeaderLogo from "../../resource/media/logos/HeaderLogo.png";
 import color from "../../resource/color";
 import icon from "../../resource/icon";
 import { useLocalStorage } from "../../hook/useLocalStorage";
+import Image from "../../resource/image";
 const logout = () => {
   localStorage.clear();
   sessionStorage.clear();
@@ -207,7 +209,7 @@ const Layouts: React.FC<any> = ({ children }) => {
               </Menu.Item>
             </Menu.SubMenu>
             <Menu.SubMenu
-              icon={<SettingFilled />}
+              icon={<UserOutlined />}
               title={<span>ผู้ดูแลระบบ</span>}
               key={"sub5"}>
               <Menu.Item key="admin">
@@ -215,6 +217,18 @@ const Layouts: React.FC<any> = ({ children }) => {
                   to="/IndexAdmin"
                   style={{ textDecoration: "none" }}>
                   <span>รายชื่อผู้ดูแลระบบ</span>
+                </Link>
+              </Menu.Item>
+            </Menu.SubMenu>
+            <Menu.SubMenu
+              icon={<SettingFilled />}
+              title={<span>ตั้งค่า</span>}
+              key={"sub6"}>
+              <Menu.Item key="">
+                <Link
+                  to="/PricePage"
+                  style={{ textDecoration: "none" }}>
+                  <span>ราคาฉีดพ่น</span>
                 </Link>
               </Menu.Item>
             </Menu.SubMenu>

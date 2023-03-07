@@ -1,4 +1,6 @@
 ## [Version - 0]
+## Feature [v0.22.00] 2023-03-02
+- added location price by province feature
 ## Fix [v0.21.02] 2023-03-01
 - fixed modal maintance
 - added logic save user staff
