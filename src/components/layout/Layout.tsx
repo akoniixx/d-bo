@@ -224,7 +224,14 @@ const Layouts: React.FC<any> = ({ children }) => {
               icon={<SettingFilled />}
               title={<span>ตั้งค่า</span>}
               key={"sub6"}>
-              <Menu.Item key="">
+              <Menu.Item key="IndexDroneBrand">
+                <Link
+                  to="/IndexDroneBrand"
+                  style={{ textDecoration: "none" }}>
+                  <span>ยี่ห้อโดรน</span>
+                </Link>
+              </Menu.Item>
+              <Menu.Item key="pricePage">
                 <Link
                   to="/PricePage"
                   style={{ textDecoration: "none" }}>
