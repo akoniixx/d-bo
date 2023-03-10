@@ -35,8 +35,12 @@ import { MONTH_SALE } from "../../definitions/Month"
 import { CouponDataSource } from "../../datasource/CouponDatasource"
 import { CouponEntities } from "../../entities/CouponEntites"
 import Swal from "sweetalert2"
+import ModalDeleteCoupon from "../../components/modal/ModalDeleteCoupon"
+const _ = require("lodash");
 
-function AddPromotion(){
+let queryString = _.split(window.location.pathname, "=");
+
+function EditPromotion(){
   const profile = JSON.parse(localStorage.getItem("profile") || "{  }");
   const [plantName,setPlantName] = useState<string[]>([])
   const [provinceList,setProvinceList] = useState<string[]>([])
@@ -61,7 +65,7 @@ function AddPromotion(){
   const [couponProvince,setCouponProvince] = useState<boolean>(false);
   const [couponNotiMany,setCouponNotiMany] = useState<boolean>(false);
   const [couponNotiExpired,setCouponNotiExpired] = useState<boolean>(false);
-  const [saveBtnDisable, setBtnSaveDisable] = useState<boolean>(true);
+  const [saveBtnDisable, setBtnSaveDisable] = useState<boolean>(false);
   const [openModalSave,setModalSave] = useState<boolean>(false)
   const [openModalWarning,setModalWarning] = useState<boolean>(false)
   const fetchTwice = useRef<boolean>(true)
@@ -85,12 +89,81 @@ function AddPromotion(){
   const [form] = Form.useForm();
     useEffect(()=>{
       if(fetchTwice.current){
+        getPromotion(queryString[1])
         getCropPlantName()
         getProvince()
         fetchTwice.current = false;
       }
     },[])
 
+    const getPromotion = (id : string)=>{
+      CouponDataSource.queryCoupon(id)
+      .then(async res=>{
+        form.setFieldsValue({
+          couponName : res.couponName,
+          couponType : res.couponType,
+          promotionStatus : res.promotionStatus,
+          promotionType : res.promotionType,
+          discount : res.discount,
+          discountType : res.discountType,
+          count : res.count,
+          description : res.description,
+          condition : res.condition,
+          DateStart : moment(new Date(res.startDate).toUTCString()),
+          TimeStart : moment(new Date(res.startDate).getTime()),
+          DateExpired : moment(new Date(res.expiredDate).toUTCString()),
+          TimeExpired : moment(new Date(res.expiredDate).getTime()),
+          specialCondition : res.specialCondition,
+          raiCheckbox : res.couponConditionRai,
+          serviceCheckbox : res.couponConditionService,
+          plantCheckbox : res.couponConditionPlant,
+          couponConditionRaiMin : res.couponConditionRaiMin,
+          couponConditionRaiMax : res.couponConditionRaiMax,
+          couponConditionServiceMin : res.couponConditionServiceMin,
+          couponConditionServiceMax : res.couponConditionServiceMax,
+          provinceCheckbox : res.couponConditionProvince,
+          couponConditionProvinceList : res.couponConditionProvinceList,
+        })
+        setSpecialCoupon(res.specialCondition??false);
+        setRaiCondition(res.couponConditionRai??false);
+        setServiceCondition(res.couponConditionService??false);
+        setCouponPlant(res.couponConditionPlant??false);
+        setCouponType(res.couponType);
+        setCouponInfo(res.promotionType)
+        setCouponProvince(res.couponConditionProvince)
+        setProvince(res.couponConditionProvinceList)
+        setCoupon(res.discountType)
+        setDescriptionEditor(res.description)
+        setConditionEditor(res.condition)
+        res.couponConditionPlantList.map((item : any,index : number)=> getCropinjectionTimingInit(index,item.plantName,item.injectionTiming))
+        setRenderMobile(
+          {
+          couponName : res.couponName,
+          couponType : res.couponType,
+          promotionStatus : res.promotionStatus,
+          count : res.count,
+          startDate : changeFormat(moment(res.startDate).format("YYYY-MM-DD")),
+          expiredDate : changeFormat(moment(res.expiredDate).format("YYYY-MM-DD")),
+          startTime : moment(res.startDate).format("HH:mm"),
+          expiredTime : moment(res.expiredDate).format("HH:mm"),
+          expiredDateTitle : "",
+          raiConditionMin : res.couponConditionRaiMin,
+          raiConditionMax : res.couponConditionRaiMax,
+          serviceConditionMin : res.couponConditionServiceMin,
+          serviceConditionMax : res.couponConditionServiceMax,
+          plantName : res.couponConditionPlantList.map((item : any)=>{
+            let plantname = ""
+            plantname += item.plantName+ " "
+            return plantname
+          }),
+          province : res.couponConditionProvinceList.map((item : any)=>{
+            let province = ""
+            province += item+ " "
+            return province
+          })
+        })
+      }).catch(err => console.log(err))
+    }
     const getCropPlantName = ()=>{
       CropDatasource.getAllCropPlantName()
       .then((res)=>{
@@ -104,13 +177,30 @@ function AddPromotion(){
       .catch(err => console.log(err))
     }
 
-    const getCropInjectionTime = (index : number,plantName : string)=>{
+    const getCropinjectionTiming = (index : number,plantName : string)=>{
       CropDatasource.getPurposeByCroupName(plantName)
       .then((res)=>{
         const updateCrop = crop.map((item : any,i : number)=>{
           if(index === i){
             const injectionList = res.purposeSpray.map((purposespray) => purposespray.purposeSprayName)
             return {...item ,injectionList : injectionList,plantName : plantName}
+          }
+          else{
+            return item
+          }
+        })
+        setCrop(updateCrop)
+      })
+      .catch(err => console.log(err))
+    }
+
+    const getCropinjectionTimingInit = async(index : number,plantName : string,injectionTiming : string[])=>{
+      CropDatasource.getPurposeByCroupName(plantName)
+      .then((res)=>{
+        const updateCrop = crop.map((item : any,i : number)=>{
+          if(index === i){
+            const injectionList = res.purposeSpray.map((purposespray) => purposespray.purposeSprayName)
+            return {...item,injectionTiming: injectionTiming,injectionList : injectionList,plantName : plantName}
           }
           else{
             return item
@@ -185,7 +275,7 @@ function AddPromotion(){
           let formName = `plantName${index}`
           return {
             children: (
-              <Form.Item name={formName}
+              <Form.Item
               key={index}
               rules={[
                 {
@@ -198,6 +288,7 @@ function AddPromotion(){
                   disabled={!couponPlant}
                   className="col-lg-12 p-1"
                   placeholder="เลือกพืช"
+                  defaultValue={crop[index].plantName}
                   onChange={(plant)=>{
                     handleChangePlantCrop(index,plant)
                   }}
@@ -235,7 +326,7 @@ function AddPromotion(){
           let formName = `injectionTiming${index}`
           return {
             children: (
-              <Form.Item name={formName}
+              <Form.Item
               key={index}
               rules={[
                 {
@@ -251,12 +342,13 @@ function AddPromotion(){
                   onClear={() => {
 
                   }}
+                  defaultValue={crop[index].injectionTiming}
                   placeholder="เลือกช่วงเวลาการพ่น"
                   onChange={(injectionTiming)=>{
-                    handleChangeInjectionTime(index,injectionTiming)
+                    handleChangeinjectionTiming(index,injectionTiming)
                   }}
                   showSearch
-                  // value={crop[index].injectionTime}
+                  value={value}
                   allowClear
                   optionFilterProp="children"
                   filterOption={(input: any, option: any) =>
@@ -308,10 +400,10 @@ function AddPromotion(){
         }
       })
       setCrop(updateCrop)
-      getCropInjectionTime(index,plant)
+      getCropinjectionTiming(index,plant)
     }
 
-    const handleChangeInjectionTime = (index : number,injectionTiming : string[]) => {
+    const handleChangeinjectionTiming = (index : number,injectionTiming : string[]) => {
       const updateCrop = crop.map((item : any,i : number)=>{
         if(i === index){
           return {...item,injectionTiming : injectionTiming};
@@ -542,10 +634,7 @@ function AddPromotion(){
           onSubmit()
         }
       }
-      else{
-        setModalSave(false)
-        onSubmit()
-      }
+      
     }
 
     const onSubmit = (status? : string) => {
@@ -570,7 +659,7 @@ function AddPromotion(){
         plantCheckbox,
         serviceCheckbox,
         raiCheckbox,
-        provinceCheckbox
+        couponConditionProvinceList
       } = form.getFieldsValue()
       const cropForm = crop.map((item : any)=>{
         if(crop.length === 1){
@@ -601,26 +690,24 @@ function AddPromotion(){
         discountType: discountType,
         discount: parseInt(discount),
         count: count,
-        keep: 0,
-        used: 0,
         createBy: profile.username + " " + profile.lastname,
         startDate: new Date(startDate),
         expiredDate: new Date(expiredDate),
         description: description,
         condition: condition,
         specialCondition: specialCoupon,
-        couponConditionRai: raiCheckbox??false,
+        couponConditionRai: raiCheckbox,
         couponConditionRaiMin: couponConditionRaiMin,
         couponConditionRaiMax: couponConditionRaiMax,
-        couponConditionService: serviceCheckbox??false,
+        couponConditionService: serviceCheckbox,
         couponConditionServiceMin: couponConditionServiceMin,
         couponConditionServiceMax: couponConditionServiceMax,
-        couponConditionPlant: plantCheckbox??false,
+        couponConditionPlant: plantCheckbox,
         couponConditionPlantList: cropForm,
-        couponConditionProvince: provinceCheckbox??false,
-        couponConditionProvinceList: province,
+        couponConditionProvince: couponProvince,
+        couponConditionProvinceList: couponConditionProvinceList,
       }
-      CouponDataSource.addCoupon(couponDto).then(
+      CouponDataSource.patchCoupon(queryString[1],couponDto).then(
         res => {
           Swal.fire({
             title: "บันทึกสำเร็จ",
@@ -711,7 +798,7 @@ function AddPromotion(){
         <div className="d-flex align-items-center">
             <BackIconButton onClick={() => navigate(-1)} />
               <strong style={{ fontSize: "20px" }}>
-                เพิ่มคูปอง
+                แก้ไขคูปอง
               </strong>
         </div>
         <br />
@@ -906,7 +993,8 @@ function AddPromotion(){
                                           message: "กรุณากรอกเวลา!",
                                         },
                                     ]}>
-                                    <TimePicker format={"HH:mm"} className="ms-3" placeholder="เลือกเวลา" onChange={(val)=> {
+                                    <TimePicker 
+                                      format={"HH:mm"} className="ms-3" placeholder="เลือกเวลา" onChange={(val)=> {
                                         if(val){
                                           const startTime = moment(val).format("HH:mm")
                                           setRenderMobile({
@@ -1276,6 +1364,9 @@ function AddPromotion(){
 
                             </div>
                             <div>
+                              <>{()=>{
+                                console.log(`renderMobile.couponName = ${renderMobile.couponName}`)
+                              }}</>
                               <p style={{
                                 margin : '0px',
                                 padding : '0px',
@@ -1415,4 +1506,4 @@ function AddPromotion(){
 }
 
 
-export default AddPromotion
+export default EditPromotion
