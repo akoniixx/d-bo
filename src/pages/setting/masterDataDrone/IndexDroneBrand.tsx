@@ -11,30 +11,63 @@ import ActionButton from "../../../components/button/ActionButton";
 import { CardContainer } from "../../../components/card/CardContainer";
 import Layouts from "../../../components/layout/Layout";
 import { DroneDatasource } from "../../../datasource/DroneDatasource";
-import { DroneBrandEntity } from "../../../entities/DroneBrandEntities";
+import {
+  DroneBrandEntity,
+  DroneBrandListEntity,
+} from "../../../entities/DroneBrandEntities";
 import { color } from "../../../resource";
 import { DateTimeUtil } from "../../../utilities/DateTimeUtil";
 
 function IndexDroneBrand() {
-  const row = 10;
+  const row = 100;
   const [current, setCurrent] = useState(1);
-  const [data, setData] = useState<DroneBrandEntity[]>();
+  const [data, setData] = useState<DroneBrandListEntity>();
   const [searchText, setSearchText] = useState<string>();
+
+  const fetchDrone = async () => {
+    await DroneDatasource.getDroneBrandList(row, searchText).then((res) => {
+      console.log(res);
+      setData(res);
+    });
+  };
+
+  useEffect(() => {
+    fetchDrone();
+  }, [current]);
 
   const onChangePage = (page: number) => {
     setCurrent(page);
   };
-  const fetchDrone = async () => {
-    await DroneDatasource.getDroneBrandList(searchText).then((res) => {
-      setData(res.data);
-    });
-  };
-  useEffect(() => {
-    fetchDrone();
-  }, []);
-
   const changeTextSearch = (searchText: any) => {
     setSearchText(searchText.target.value);
+    setCurrent(1);
+  };
+  const isNumber = (n: any) => {
+    return !isNaN(parseFloat(n)) && isFinite(n);
+  };
+  const sorter = (a: any, b: any) => {
+    if (a === null) {
+      return 1;
+    }
+    if (b === null) {
+      return -1;
+    }
+    if (isNumber(a) && isNumber(b)) {
+      if (parseInt(a, 10) === parseInt(b, 10)) {
+        return 0;
+      }
+      return parseInt(a, 10) > parseInt(b, 10) ? 1 : -1;
+    }
+    if (isNumber(a)) {
+      return -1;
+    }
+    if (isNumber(b)) {
+      return 1;
+    }
+    if (a === b) {
+      return 0;
+    }
+    return a > b ? 1 : -1;
   };
 
   const pageTitle = (
@@ -89,7 +122,7 @@ function IndexDroneBrand() {
     </div>
   );
   const removeDroneBrand = (data: DroneBrandEntity) => {
-    console.log(data)
+    console.log(data);
     Swal.fire({
       title: "ยืนยันการลบ",
       text: "โปรดตรวจสอบยี่ห้อโดรนที่คุณต้องการลบ ก่อนที่จะกดยืนยันการลบ เพราะอาจส่งผลต่อข้อมูลยี่ห้อโดรนและรุ่นโดรนในระบบ",
@@ -100,7 +133,7 @@ function IndexDroneBrand() {
       showCloseButton: true,
     }).then(async (result) => {
       if (result.isConfirmed) {
-        await DroneDatasource.deleteDroneBrand(data);
+        await DroneDatasource.deleteDroneBrand(data.id);
       }
       fetchDrone();
     });
@@ -111,12 +144,14 @@ function IndexDroneBrand() {
       dataIndex: "name",
       key: "name",
       width: "30%",
+      sorter: (a: any, b: any) => sorter(a.name, b.name),
     },
     {
       title: "จำนวนรุ่นโดรน",
       dataIndex: "drone",
       key: "drone",
       width: "20%",
+      sorter: (a: any, b: any) => sorter(a.drone, b.drone),
       render: (value: any, row: any, index: number) => {
         return {
           children: (
@@ -134,6 +169,7 @@ function IndexDroneBrand() {
       dataIndex: "isActive",
       key: "isActive",
       width: "20%",
+      sorter: (a: any, b: any) => sorter(a.isActive, b.isActive),
       render: (value: any, row: any, index: number) => {
         return {
           children: (
@@ -149,6 +185,7 @@ function IndexDroneBrand() {
       title: "อัพเดตล่าสุด",
       dataIndex: "updatedAt",
       key: "updatedAt",
+      sorter: (a: any, b: any) => sorter(a.updatedAt, b.updatedAt),
       render: (value: any, row: any, index: number) => {
         return {
           children: (
@@ -169,15 +206,19 @@ function IndexDroneBrand() {
               style={{ justifyContent: "center" }}
             >
               <div className="col-lg-4">
-                <ActionButton icon={<EditOutlined />} color={color.primary1}    onClick={() =>
-                  (window.location.href = "/EditDroneBrand/id=" + row.id)
-                }/>
+                <ActionButton
+                  icon={<EditOutlined />}
+                  color={color.primary1}
+                  onClick={() =>
+                    (window.location.href = "/EditDroneBrand/id=" + row.id)
+                  }
+                />
               </div>
               <div>
                 <ActionButton
                   icon={<DeleteOutlined />}
                   color={color.Error}
-                  onClick={() => removeDroneBrand(row.id)}
+                  onClick={() => removeDroneBrand(row)}
                 />
               </div>
             </div>
@@ -191,7 +232,7 @@ function IndexDroneBrand() {
       {pageTitle}
       <CardContainer>
         <Table
-          dataSource={data}
+          dataSource={data?.data}
           columns={columns}
           pagination={false}
           size="large"
@@ -199,12 +240,13 @@ function IndexDroneBrand() {
         />
       </CardContainer>
       <div className="d-flex justify-content-between pt-5">
-        <p>รายการทั้งหมด {data?.length} รายการ</p>
+        <p>รายการทั้งหมด {data?.count} รายการ</p>
         <Pagination
           current={current}
-          total={data?.length}
+          total={data?.count}
           onChange={onChangePage}
           pageSize={row}
+          showSizeChanger={false}
         />
       </div>
     </Layouts>

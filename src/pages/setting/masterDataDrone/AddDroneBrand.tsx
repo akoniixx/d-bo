@@ -52,6 +52,7 @@ import { UploadImageDatasouce } from "../../../datasource/UploadImageDatasource"
 const _ = require("lodash");
 const { Map } = require("immutable");
 function AddDroneBrand() {
+  const row = 5;
   const navigate = useNavigate();
   const [data, setData] = useState<CreateDroneBrandEntity>(
     CreateDroneBrandEntity_INIT
@@ -100,7 +101,9 @@ function AddDroneBrand() {
     const e = Map(d.toJS()).set("resource", "DRONE_BRAND");
     const f = Map(e.toJS()).set("category", "DRONE_BRAND_LOGO");
     setCreateImgDroneBrand(f.toJS());
+    console.log(f.toJS());
   };
+
   const onPreviewDrone = async () => {
     let src = imgDroneBrand;
     if (!src) {
@@ -152,7 +155,6 @@ function AddDroneBrand() {
       ...prev,
       drone: droneList,
     }));
-    console.log(payload);
     await DroneDatasource.addDroneBrand(payload).then(async (res) => {
       if (res != undefined) {
         const fileList = [createImgDroneBrand]
@@ -163,8 +165,7 @@ function AddDroneBrand() {
             return UploadImageDatasouce.uploadImage(
               Map(el).set("resourceId", res.id).toJS()
             );
-          });
-
+          })
         await Promise.all(fileList);
         Swal.fire({
           title: "บันทึกสำเร็จ",
@@ -334,20 +335,13 @@ function AddDroneBrand() {
           ) : (
             <div className="container text-center" style={{ padding: "80px" }}>
               <img src={emptyData} alt="" />
-              <h5 style={{color: color.Disable}}>ยังไม่มีข้อมูลรุ่นโดรน</h5>
+              <h5 style={{ color: color.Disable }}>ยังไม่มีข้อมูลรุ่นโดรน</h5>
             </div>
           )}
         </Form>
       </CardContainer>
       <div className="d-flex justify-content-between pt-5">
         <p>รายการทั้งหมด {droneList.length} รายการ</p>
-        <Pagination
-          // current={current}
-          total={droneList.length}
-          // onChange={onChangePage}
-          // pageSize={row}
-          showSizeChanger={false}
-        />
       </div>
     </div>
   );

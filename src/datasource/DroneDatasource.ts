@@ -45,7 +45,7 @@ export class DroneDatasource {
   static CreateDroneList(data: CreateDroneEntity): Promise<any> {
     delete data.id;
     return httpClient
-      .post(BASE_URL + "/drone",  data )
+      .post(BASE_URL + "/drone", data)
       .then((response) => {
         return response.data;
       })
@@ -56,7 +56,7 @@ export class DroneDatasource {
 
   static UpdateDroneList(data: CreateDroneEntity): Promise<any> {
     return httpClient
-      .patch(BASE_URL + "/drone/" +  data.id, data)
+      .patch(BASE_URL + "/drone/" + data.id, data)
       .then((response) => {
         return response.data;
       })
@@ -77,12 +77,16 @@ export class DroneDatasource {
   }
 
   //DroneBrand
-  static getDroneBrandList(search?: string): Promise<any> {
+  static getDroneBrandList(
+    take?: number,
+    search?: string
+  ): Promise<DroneBrandListEntity> {
     const params = {
+      take: take,
       search: search,
     };
     return httpClient
-      .get(BASE_URL + "/drone-brand", {params})
+      .get(BASE_URL + "/drone-brand", { params })
       .then((response) => {
         return response.data;
       })
@@ -90,10 +94,11 @@ export class DroneDatasource {
         console.log(error);
       });
   }
+
   static getDrone(
     page: number,
     row: number,
-    droneBrandId: string,
+    droneBrandId: string
   ): Promise<any> {
     const params = {
       page: page,
@@ -115,19 +120,19 @@ export class DroneDatasource {
     delete data.drone[id];
     delete data.drone[droneBrandId];
     return httpClient
-      .post(BASE_URL + "/drone-brand",  data )
+      .post(BASE_URL + "/drone-brand", data)
       .then((response) => {
-        console.log(response.data)
+        console.log(response.data);
         return response.data;
       })
       .catch((error) => {
         console.log(error);
       });
   }
-  static deleteDroneBrand(data: DroneBrandEntity) {
+  static deleteDroneBrand(id?: string) {
     return httpClient
-    .delete(BASE_URL + "/drone-brand/" + data.id)
-    .then((response) => {
+      .delete(BASE_URL + "/drone-brand/" + id)
+      .then((response) => {
         return response.data;
       })
       .catch((error) => {

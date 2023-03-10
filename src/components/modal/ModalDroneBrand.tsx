@@ -36,37 +36,16 @@ const ModalDroneBrand: React.FC<ModalDroneProps> = ({
 }) => {
   const [form] = Form.useForm();
   const [dataDrone, setDataDrone] = useState<CreateDroneEntity>(data);
-  const [droneList, setDroneList] = useState<CreateDroneBrandEntity[]>();
-  const [droneId, setdroneId] = useState<string>();
-  const [seriesDrone, setSeriesDrone] = useState<DroneEntity[]>();
-  const [searchSeriesDrone, setSearchSeriesDrone] = useState<DroneEntity[]>();
   const [saveBtnDisable, setBtnSaveDisable] = useState<boolean>(
     isEditModal ? false : true
   );
-  const [imgLicenseDroner, setImgLicenseDroner] = useState<any>(false);
-  const fetchDrone = async () => {
-    await DroneDatasource.getDroneBrandList().then((res) => {
-      setDroneList(res.data);
-    });
-  };
-  const fetchDroneSeries = async () => {
-    await DroneDatasource.getDroneList(1, 500, droneId).then((res) => {
-      setSeriesDrone(res.data);
-      setSearchSeriesDrone(res.data);
-    });
-  };
-
-  useEffect(() => {
-    fetchDrone();
-    fetchDroneSeries();
-  }, [droneId]);
 
   const handleSeries = (value: any) => {
     !value.target.value ? setBtnSaveDisable(true) : setBtnSaveDisable(false);
-    const m = Map(dataDrone).set("series", value.target.value);
-    const s = Map(m.toJS()).set("isActive", true);
-    console.log(m.toJS());
-    setDataDrone(s.toJS());
+    setDataDrone((prev) => ({
+      ...prev,
+      series: value.target.value,
+    }));
   };
 
   const handleCallBack = async (values: CreateDroneEntity) => {
@@ -101,60 +80,27 @@ const ModalDroneBrand: React.FC<ModalDroneProps> = ({
           />,
         ]}
       >
-        <Form key={data.droneId} form={form} onFinish={handleCallBack}>
+        <Form key={dataDrone.id} form={form} onFinish={handleCallBack}>
           <div className="form-group">
             <label>
               ชื่อรุ่นโดรน <span style={{ color: "red" }}>*</span>
             </label>
-            {isEditModal ? (
-              <Form.Item
-                name="series"
-                rules={[
-                  {
-                    required: true,
-                    message: "กรุณากรอกชื่อรุ่นโดรน",
-                  },
-                ]}
-              >
-                <Input
-                  placeholder="กรอกชื่อรุ่นโดรน"
-                  allowClear
-                  onChange={handleSeries}
-                  defaultValue={dataDrone.series}
-                />
-
-                <Radio.Group
-                  defaultValue={dataDrone.isActive}
-                  style={{ marginTop: 20 }}
-                >
-                  <label>
-                    สถานะ <span style={{ color: "red" }}>*</span>
-                  </label>
-                  <br />
-                  <Space direction="vertical" style={{ marginTop: 10 }}>
-                    <Radio value={true}>ใช้งาน</Radio>
-                    <Radio value={false}>ปิดการใช้งาน</Radio>
-                  </Space>
-                </Radio.Group>
-              </Form.Item>
-            ) : (
-              <Form.Item
-                name="series"
-                rules={[
-                  {
-                    required: true,
-                    message: "กรุณากรอกชื่อรุ่นโดรน",
-                  },
-                ]}
-              >
-                <Input
-                  placeholder="กรอกชื่อรุ่นโดรน"
-                  allowClear
-                  onChange={handleSeries}
-                  defaultValue={dataDrone.series}
-                />
-              </Form.Item>
-            )}
+            <Form.Item
+              name="series"
+              rules={[
+                {
+                  required: true,
+                  message: "กรุณากรอกชื่อรุ่นโดรน",
+                },
+              ]}
+            >
+              <Input
+                placeholder="กรอกชื่อรุ่นโดรน"
+                allowClear
+                onChange={handleSeries}
+                defaultValue={dataDrone.series}
+              />
+            </Form.Item>
           </div>
         </Form>
       </Modal>

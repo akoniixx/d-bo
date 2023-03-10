@@ -1,11 +1,27 @@
 import { DroneEntity, DroneEntity_INIT } from "./DroneEntities";
-
+export interface fileEntity {
+  id: string;
+  fileName: string;
+  fileType: string;
+  resource: string;
+  category: string;
+  path: string;
+}
+export const fileEntity_INIT: fileEntity = {
+  id: "",
+  fileName: "",
+  fileType: "",
+  resource: "",
+  category: "",
+  path: "",
+};
 export interface UpdateDroneEntity {
   droneBrandId: string;
   series: string;
   isActive: boolean;
   id: string;
 }
+
 export const UpdateDroneEntity_INIT: UpdateDroneEntity = {
   droneBrandId: "",
   series: "",
@@ -17,6 +33,7 @@ export interface DroneBrandEntity {
   name: string;
   logoImagePath: string;
   drone: number;
+  file: fileEntity[];
   isActive: boolean;
   createdAt: string;
   updatedAt: string;
@@ -26,6 +43,7 @@ export const DroneBrandEntity_INIT: DroneBrandEntity = {
   name: "",
   logoImagePath: "",
   drone: 0,
+  file: [fileEntity_INIT],
   isActive: true,
   createdAt: "",
   updatedAt: "",

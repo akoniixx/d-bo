@@ -25,7 +25,6 @@ function PricePage() {
   const [data, setData] = useState<LocationPricePageEntity>();
   const [showModalEdit, setShowModalEdit] = useState(false);
   const [editIndex, setEditIndex] = useState();
-  const [indexRow, setIndexRow] = useState();
   const [showModalCrop, setShowModalCrop] = useState(false);
   const [searchText, setSearchText] = useState<string>();
   const [provinceId, setProvinceId] = useState();
@@ -53,7 +52,6 @@ function PricePage() {
 
   const previewCrop = (province: any) => {
     setShowModalCrop((prev) => !prev);
-    // setIndexRow(index);
     setProvinceId(province);
   };
   const sorter = (a: any, b: any) => {
@@ -72,6 +70,7 @@ function PricePage() {
       fetchLocationPrice();
     }
   };
+  console.log(data)
   const columns = [
     {
       title: "จังหวัด",

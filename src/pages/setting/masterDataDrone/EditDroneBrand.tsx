@@ -1,4 +1,14 @@
-import { Badge, Button, Form, Input, Pagination, Row, Tag } from "antd";
+import {
+  Badge,
+  Button,
+  Form,
+  Input,
+  Pagination,
+  Radio,
+  Row,
+  Space,
+  Tag,
+} from "antd";
 import React, { useEffect, useState } from "react";
 import { Navigate, useNavigate } from "react-router-dom";
 import { BackIconButton } from "../../../components/button/BackButton";
@@ -100,7 +110,7 @@ const EditDroneBrand = () => {
     const e = Map(d.toJS()).set("resource", "DRONE");
     const f = Map(e.toJS()).set("category", "DRONE_BRAND_LOGO");
     const g = Map(f.toJS()).set("resourceId", droneBrandId);
-    console.log(g.toJS())
+    console.log(g.toJS());
     setCreateImgDroneBrand(g.toJS());
   };
   const onPreviewDrone = async () => {
@@ -122,9 +132,13 @@ const EditDroneBrand = () => {
     setImgDroneBrand(undefined);
   };
   const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    !e.target.value ? setBtnSaveDisable(true) : setBtnSaveDisable(false);
     const m = Map(data).set("name", e.target.value);
     setData(m.toJS());
-    console.log(m.toJS());
+  };
+  const handleChangestatus = (e: any) => {
+    const m = Map(data).set("isActive", e.target.value);
+    setData(m.toJS());
   };
   const editDroneIndex = (data: CreateDroneEntity, index: number) => {
     setShowEditModal((prev) => !prev);
@@ -224,6 +238,22 @@ const EditDroneBrand = () => {
               />
             </Form.Item>
           </div>
+          <div>
+            <label>
+              สถานะ <span style={{ color: "red" }}>*</span>
+            </label>
+            <br />
+          </div>
+
+          <Radio.Group
+            defaultValue={data.isActive}
+            onChange={handleChangestatus}
+          >
+            <Space direction="vertical">
+              <Radio value={true}>ใช้งาน</Radio>
+              <Radio value={false}>ไม่ใช้งาน</Radio>
+            </Space>
+          </Radio.Group>
         </Form>
       </CardContainer>
     </div>
@@ -307,7 +337,7 @@ const EditDroneBrand = () => {
           ) : (
             <div className="container text-center" style={{ padding: "80px" }}>
               <img src={emptyData} alt="" />
-              <h5 style={{color: color.Disable}}>ยังไม่มีข้อมูลรุ่นโดรน</h5>
+              <h5 style={{ color: color.Disable }}>ยังไม่มีข้อมูลรุ่นโดรน</h5>
             </div>
           )}
         </Form>
@@ -325,24 +355,32 @@ const EditDroneBrand = () => {
     </div>
   );
 
-  const updateSeriesDrone = async(data: CreateDroneEntity) => {
+  const updateSeriesDrone = async (data: CreateDroneEntity) => {
     const payload = {
       ...data,
       droneBrandId,
     };
     if (payload.id !== "") {
-      await DroneDatasource.CreateDroneList(payload);
+      await DroneDatasource.UpdateDroneList(payload);
       setShowEditModal((prev) => !prev);
     } else {
-      await DroneDatasource.UpdateDroneList(payload);
+      await DroneDatasource.CreateDroneList(payload);
       setShowAddModal((prev) => !prev);
     }
-    fetchDroneBrand();
+    fetchDroneList();
   };
-
   const updateDroneBrand = async () => {
     await DroneDatasource.updateDroneBrand(data).then((res) => {
-      console.log(res)
+      if (res !== undefined) {
+        Swal.fire({
+          title: "บันทึกสำเร็จ",
+          icon: "success",
+          timer: 1500,
+          showConfirmButton: false,
+        }).then((time) => {
+          window.location.href = "/IndexDroneBrand";
+        });
+      }
     });
   };
   return (
@@ -366,7 +404,7 @@ const EditDroneBrand = () => {
         onClickSave={updateDroneBrand}
         disableSaveBtn={saveBtnDisable}
       />
-     {showAddModal && (
+      {showAddModal && (
         <ModalDroneBrand
           show={showAddModal}
           backButton={() => setShowAddModal((prev) => !prev)}
