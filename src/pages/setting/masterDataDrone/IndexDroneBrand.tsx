@@ -1,46 +1,37 @@
+import React, { useEffect, useState } from "react";
+import { Badge, Button, Input, Pagination, Table } from "antd";
+import Layouts from "../../../components/layout/Layout";
+import {
+  DroneBrandEntity,
+  DroneBrandListEntity,
+} from "../../../entities/DroneBrandEntities";
+import { DroneDatasource } from "../../../datasource/DroneDatasource";
+import { color } from "../../../resource";
+import moment from "moment";
+import ActionButton from "../../../components/button/ActionButton";
 import {
   DeleteOutlined,
   EditOutlined,
   SearchOutlined,
 } from "@ant-design/icons";
-import { Badge, Button, Input, Pagination, Table } from "antd";
-import moment from "moment";
-import React, { useEffect, useState } from "react";
 import Swal from "sweetalert2";
-import ActionButton from "../../../components/button/ActionButton";
-import { CardContainer } from "../../../components/card/CardContainer";
-import Layouts from "../../../components/layout/Layout";
-import { DroneDatasource } from "../../../datasource/DroneDatasource";
-import {
-  DroneBrandEntity,
-  DroneBrandListEntity,
-} from "../../../entities/DroneBrandEntities";
-import { color } from "../../../resource";
-import { DateTimeUtil } from "../../../utilities/DateTimeUtil";
 
-function IndexDroneBrand() {
-  const row = 100;
-  const [current, setCurrent] = useState(1);
+const IndexDroneBrand: React.FC = () => {
   const [data, setData] = useState<DroneBrandListEntity>();
   const [searchText, setSearchText] = useState<string>();
 
   const fetchDrone = async () => {
-    await DroneDatasource.getDroneBrandList(row, searchText).then((res) => {
-      console.log(res);
+    await DroneDatasource.getDroneBrandList(searchText).then((res) => {
       setData(res);
     });
   };
 
   useEffect(() => {
     fetchDrone();
-  }, [current]);
+  }, []);
 
-  const onChangePage = (page: number) => {
-    setCurrent(page);
-  };
   const changeTextSearch = (searchText: any) => {
     setSearchText(searchText.target.value);
-    setCurrent(1);
   };
   const isNumber = (n: any) => {
     return !isNaN(parseFloat(n)) && isFinite(n);
@@ -69,7 +60,22 @@ function IndexDroneBrand() {
     }
     return a > b ? 1 : -1;
   };
-
+  const removeDroneBrand = (data: DroneBrandEntity) => {
+    Swal.fire({
+      title: "ยืนยันการลบ",
+      text: "โปรดตรวจสอบยี่ห้อโดรนที่คุณต้องการลบ ก่อนที่จะกดยืนยันการลบ เพราะอาจส่งผลต่อข้อมูลยี่ห้อโดรนและรุ่นโดรนในระบบ",
+      cancelButtonText: "ยกเลิก",
+      confirmButtonText: "ลบ",
+      confirmButtonColor: "#d33",
+      showCancelButton: true,
+      showCloseButton: true,
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        await DroneDatasource.deleteDroneBrand(data.id);
+      }
+      fetchDrone();
+    });
+  };
   const pageTitle = (
     <div className="container d-flex pb-3" style={{ padding: "8px" }}>
       <div className="col-lg-6">
@@ -121,29 +127,12 @@ function IndexDroneBrand() {
       </div>
     </div>
   );
-  const removeDroneBrand = (data: DroneBrandEntity) => {
-    console.log(data);
-    Swal.fire({
-      title: "ยืนยันการลบ",
-      text: "โปรดตรวจสอบยี่ห้อโดรนที่คุณต้องการลบ ก่อนที่จะกดยืนยันการลบ เพราะอาจส่งผลต่อข้อมูลยี่ห้อโดรนและรุ่นโดรนในระบบ",
-      cancelButtonText: "ยกเลิก",
-      confirmButtonText: "ลบ",
-      confirmButtonColor: "#d33",
-      showCancelButton: true,
-      showCloseButton: true,
-    }).then(async (result) => {
-      if (result.isConfirmed) {
-        await DroneDatasource.deleteDroneBrand(data.id);
-      }
-      fetchDrone();
-    });
-  };
   const columns = [
     {
       title: "ชื่อยี่ห้อ/แบรนด์",
       dataIndex: "name",
       key: "name",
-      width: "30%",
+      width: "25%",
       sorter: (a: any, b: any) => sorter(a.name, b.name),
     },
     {
@@ -227,30 +216,14 @@ function IndexDroneBrand() {
       },
     },
   ];
+
   return (
     <Layouts>
       {pageTitle}
-      <CardContainer>
-        <Table
-          dataSource={data?.data}
-          columns={columns}
-          pagination={false}
-          size="large"
-          tableLayout="fixed"
-        />
-      </CardContainer>
-      <div className="d-flex justify-content-between pt-5">
-        <p>รายการทั้งหมด {data?.count} รายการ</p>
-        <Pagination
-          current={current}
-          total={data?.count}
-          onChange={onChangePage}
-          pageSize={row}
-          showSizeChanger={false}
-        />
-      </div>
+      <Table columns={columns} dataSource={data?.data} />
+      <p>รายการทั้งหมด {data?.count} รายการ</p>
     </Layouts>
   );
-}
+};
 
 export default IndexDroneBrand;

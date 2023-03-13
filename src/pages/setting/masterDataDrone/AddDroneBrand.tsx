@@ -1,41 +1,20 @@
 import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
-import {
-  Avatar,
-  Badge,
-  Button,
-  Form,
-  Input,
-  Layout,
-  Pagination,
-  Row,
-  Tag,
-} from "antd";
+import { Avatar, Badge, Button, Form, Input, Pagination, Row, Tag } from "antd";
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import ActionButton from "../../../components/button/ActionButton";
-import AddButtton from "../../../components/button/AddButton";
 import { BackIconButton } from "../../../components/button/BackButton";
 import { CardContainer } from "../../../components/card/CardContainer";
 import FooterPage from "../../../components/footer/FooterPage";
 import { CardHeader } from "../../../components/header/CardHearder";
 import Layouts from "../../../components/layout/Layout";
-import {
-  DRONER_DRONE_MAPPING,
-  STATUS_COLOR,
-} from "../../../definitions/DronerStatus";
 import { color } from "../../../resource";
 import uploadImg from "../../../resource/media/empties/uploadImg.png";
 import emptyData from "../../../resource/media/empties/tabler_drone.png";
-import ModalDrone from "../../../components/modal/ModalDronerDrone";
-import {
-  DronerDroneEntity,
-  DronerDroneEntity_INIT,
-} from "../../../entities/DronerDroneEntities";
+import { DronerDroneEntity } from "../../../entities/DronerDroneEntities";
 import ModalDroneBrand from "../../../components/modal/ModalDroneBrand";
 import { resizeFileImg } from "../../../utilities/ResizeImage";
 import {
-  ImageEntity,
-  ImageEntity_INTI,
   UploadImageEntity,
   UploadImageEntity_INTI,
 } from "../../../entities/UploadImageEntities";
@@ -52,16 +31,12 @@ import { UploadImageDatasouce } from "../../../datasource/UploadImageDatasource"
 const _ = require("lodash");
 const { Map } = require("immutable");
 function AddDroneBrand() {
-  const row = 5;
   const navigate = useNavigate();
   const [data, setData] = useState<CreateDroneBrandEntity>(
     CreateDroneBrandEntity_INIT
   );
   const [imgDroneBrand, setImgDroneBrand] = useState<any>();
-  const [dronerDroneList, setDronerDroneList] = useState<DronerDroneEntity[]>(
-    []
-  );
-  const [saveBtnDisable, setBtnSaveDisable] = useState<boolean>(false);
+  const [saveBtnDisable, setBtnSaveDisable] = useState<boolean>(true);
   const [droneList, setDroneList] = useState<CreateDroneEntity[]>([]);
 
   const [showAddModal, setShowAddModal] = useState(false);
@@ -72,7 +47,6 @@ function AddDroneBrand() {
   const [editDrone, setEditDrone] = useState<CreateDroneEntity>(
     CreateDroneEntity_INIT
   );
-
   const onChangeImgDrone = async (file: any) => {
     const source = file.target.files[0];
     let newSource: any;
@@ -101,7 +75,6 @@ function AddDroneBrand() {
     const e = Map(d.toJS()).set("resource", "DRONE_BRAND");
     const f = Map(e.toJS()).set("category", "DRONE_BRAND_LOGO");
     setCreateImgDroneBrand(f.toJS());
-    console.log(f.toJS());
   };
 
   const onPreviewDrone = async () => {
@@ -123,6 +96,9 @@ function AddDroneBrand() {
     setCreateImgDroneBrand(UploadImageEntity_INTI);
   };
   const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    {
+      !e.target.value ? setBtnSaveDisable(true) : setBtnSaveDisable(false);
+    }
     const m = Map(data).set("name", e.target.value);
     setData(m.toJS());
   };
@@ -131,19 +107,21 @@ function AddDroneBrand() {
     setEditIndex(index);
     setEditDrone(data);
   };
+
   const removeDrone = (index: number) => {
     const newData = droneList.filter((x) => x.droneId != index);
     setDroneList(newData);
   };
   const insertSeriesDrone = (data: CreateDroneEntity) => {
     if (data.droneId == 0) {
-      const pushId = Map(data).set("droneBrandId", droneList.length + 1);
+      const pushId = Map(data).set("droneId", droneList.length + 1);
       setDroneList([...droneList, pushId.toJS()]);
     } else {
       const newData = droneList.filter((x) => x.droneId != data.droneId);
       setDroneList([...newData, data]);
     }
     setShowAddModal(false);
+    setShowEditModal(false);
     setEditIndex(0);
   };
   const insertDroneBrand = async () => {
@@ -165,7 +143,7 @@ function AddDroneBrand() {
             return UploadImageDatasouce.uploadImage(
               Map(el).set("resourceId", res.id).toJS()
             );
-          })
+          });
         await Promise.all(fileList);
         Swal.fire({
           title: "บันทึกสำเร็จ",
@@ -249,7 +227,7 @@ function AddDroneBrand() {
               <Input
                 placeholder="กรอกชื่อยี่ห้อ/แบรนด์"
                 autoComplete="off"
-                onBlur={handleOnChange}
+                onChange={handleOnChange}
               />
             </Form.Item>
           </div>

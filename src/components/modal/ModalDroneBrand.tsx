@@ -1,18 +1,7 @@
-import { Form, Input, Modal, Radio, Select, Space, Tag } from "antd";
+import { Form, Input, Modal, Radio, Space } from "antd";
 import React, { useEffect, useState } from "react";
-import { DroneDatasource } from "../../datasource/DroneDatasource";
-import {
-  CreateDroneBrandEntity,
-  CreateDroneEntity,
-  DroneBrandEntity,
-} from "../../entities/DroneBrandEntities";
-import { DroneEntity } from "../../entities/DroneEntities";
-import { DronerDroneEntity } from "../../entities/DronerDroneEntities";
-import { UploadImageEntity } from "../../entities/UploadImageEntities";
+import { CreateDroneEntity } from "../../entities/DroneBrandEntities";
 import FooterPage from "../footer/FooterPage";
-import { UploadImageDatasouce } from "../../datasource/UploadImageDatasource";
-import { REASON_IS_CHECK } from "../../definitions/Reason";
-
 const _ = require("lodash");
 const { Map } = require("immutable");
 
@@ -39,15 +28,20 @@ const ModalDroneBrand: React.FC<ModalDroneProps> = ({
   const [saveBtnDisable, setBtnSaveDisable] = useState<boolean>(
     isEditModal ? false : true
   );
+  useEffect(() => {
+    if (dataDrone) {
+      form.setFieldsValue({
+        ...data,
+        series: isEditModal ? dataDrone.series : undefined,
+        isActive: isEditModal ? dataDrone.isActive : undefined,
+      });
+    }
+  }, [dataDrone, form, isEditModal]);
 
-  const handleSeries = (value: any) => {
-    !value.target.value ? setBtnSaveDisable(true) : setBtnSaveDisable(false);
-    setDataDrone((prev) => ({
-      ...prev,
-      series: value.target.value,
-    }));
+  const handleChangestatus = (e: any) => {
+    const m = Map(dataDrone).set("isActive", e.target.value);
+    setDataDrone(m.toJS());
   };
-
   const handleCallBack = async (values: CreateDroneEntity) => {
     const payload = {
       ...dataDrone,
@@ -55,6 +49,18 @@ const ModalDroneBrand: React.FC<ModalDroneProps> = ({
       droneId: editIndex,
     };
     callBack(payload);
+  };
+  const checkValidate = (dataDrone: CreateDroneEntity) => {
+    let checkEmpty = ![dataDrone.series, dataDrone.isActive].includes("");
+    if (checkEmpty) {
+      setBtnSaveDisable(false);
+    } else {
+      setBtnSaveDisable(true);
+    }
+  };
+  const onFieldsChange = () => {
+    const valuesForm = form.getFieldsValue();
+    checkValidate(valuesForm);
   };
 
   return (
@@ -80,7 +86,12 @@ const ModalDroneBrand: React.FC<ModalDroneProps> = ({
           />,
         ]}
       >
-        <Form key={dataDrone.id} form={form} onFinish={handleCallBack}>
+        <Form
+          key={data.droneId}
+          form={form}
+          onFinish={handleCallBack}
+          onFieldsChange={onFieldsChange}
+        >
           <div className="form-group">
             <label>
               ชื่อรุ่นโดรน <span style={{ color: "red" }}>*</span>
@@ -90,18 +101,40 @@ const ModalDroneBrand: React.FC<ModalDroneProps> = ({
               rules={[
                 {
                   required: true,
-                  message: "กรุณากรอกชื่อรุ่นโดรน",
+                  message: "กรุณากรอกชื่อรุ่นโดรน!",
                 },
               ]}
             >
-              <Input
-                placeholder="กรอกชื่อรุ่นโดรน"
-                allowClear
-                onChange={handleSeries}
-                defaultValue={dataDrone.series}
-              />
+              <Input placeholder="กรอกชื่อรุ่นโดรน" autoComplete="off" />
             </Form.Item>
           </div>
+          {isEditModal && (
+            <div className="form-group">
+              <label>
+                สถานะ <span style={{ color: "red" }}>*</span>
+              </label>
+              <br />
+              <Form.Item
+                name="isActive"
+                rules={[
+                  {
+                    required: true,
+                    message: "กรุณาเลือกสถานะ!",
+                  },
+                ]}
+              >
+                <Radio.Group
+                  defaultValue={dataDrone.isActive}
+                  onChange={handleChangestatus}
+                >
+                  <Space direction="vertical">
+                    <Radio value={true}>ใช้งาน</Radio>
+                    <Radio value={false}>ไม่ใช้งาน</Radio>
+                  </Space>
+                </Radio.Group>
+              </Form.Item>
+            </div>
+          )}
         </Form>
       </Modal>
     </>

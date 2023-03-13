@@ -1,4 +1,6 @@
 ## [Version - 0]
+## Feature [v0.23.00] 2023-03-13
+- added master data drone feature
 ## Feature [v0.22.00] 2023-03-02
 - added location price by province feature
 ## Fix [v0.21.02] 2023-03-01

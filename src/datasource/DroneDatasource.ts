@@ -78,11 +78,9 @@ export class DroneDatasource {
 
   //DroneBrand
   static getDroneBrandList(
-    take?: number,
     search?: string
   ): Promise<DroneBrandListEntity> {
     const params = {
-      take: take,
       search: search,
     };
     return httpClient
@@ -122,7 +120,6 @@ export class DroneDatasource {
     return httpClient
       .post(BASE_URL + "/drone-brand", data)
       .then((response) => {
-        console.log(response.data);
         return response.data;
       })
       .catch((error) => {

@@ -10,7 +10,7 @@ import {
   Tag,
 } from "antd";
 import React, { useEffect, useState } from "react";
-import { Navigate, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { BackIconButton } from "../../../components/button/BackButton";
 import { CardContainer } from "../../../components/card/CardContainer";
 import FooterPage from "../../../components/footer/FooterPage";
@@ -23,6 +23,7 @@ import {
   CreateDroneEntity_INIT,
   DroneBrandEntity,
   DroneBrandEntity_INIT,
+  DroneBrandListEntity,
 } from "../../../entities/DroneBrandEntities";
 import emptyData from "../../../resource/media/empties/tabler_drone.png";
 import ActionButton from "../../../components/button/ActionButton";
@@ -34,8 +35,6 @@ import { resizeFileImg } from "../../../utilities/ResizeImage";
 import {
   ImageEntity,
   ImageEntity_INTI,
-  UploadImageEntity,
-  UploadImageEntity_INTI,
 } from "../../../entities/UploadImageEntities";
 import { UploadImageDatasouce } from "../../../datasource/UploadImageDatasource";
 import ModalDroneBrand from "../../../components/modal/ModalDroneBrand";
@@ -47,7 +46,7 @@ const { Map } = require("immutable");
 let queryString = _.split(window.location.pathname, "=");
 
 const EditDroneBrand = () => {
-  const row = 5;
+  const row = 7;
   const [current, setCurrent] = useState(1);
   const droneBrandId = queryString[1];
   const navigate = useNavigate();
@@ -57,12 +56,34 @@ const EditDroneBrand = () => {
   const [data, setData] = useState<DroneBrandEntity>(DroneBrandEntity_INIT);
   const [dataDrone, setDataDrone] = useState<DroneListEntity>();
   const [imgDroneBrand, setImgDroneBrand] = useState<any>();
+  const [filterImg, setFilterImage] = useState<any>();
+
+  const [getDroneBarnd, setGetDroneBrand] = useState<DroneBrandListEntity>();
+
   const [saveBtnDisable, setBtnSaveDisable] = useState<boolean>(false);
   const [createImgDroneBrand, setCreateImgDroneBrand] =
     useState<ImageEntity>(ImageEntity_INTI);
   const [editDrone, setEditDrone] = useState<CreateDroneEntity>(
     CreateDroneEntity_INIT
   );
+
+  const fetchDrone = async () => {
+    await DroneDatasource.getDroneBrandList().then((res) => {
+      setGetDroneBrand(res);
+      if (res.data !== undefined) {
+        const findId = res.data.find((x) => x.id === droneBrandId);
+        if (findId?.file.length != 0) {
+          const findFile = res.data.find((x) => x.id === droneBrandId)?.file;
+          const findImg = findFile?.map((x) => x.path)[0];
+          UploadImageDatasouce.getImage(findImg).then((res) => {
+            setFilterImage(res.url);
+          });
+        } else {
+          setFilterImage(undefined);
+        }
+      }
+    });
+  };
   const fetchDroneBrand = async () => {
     await DroneDatasource.getDroneBrandById(droneBrandId).then((res) => {
       setData(res);
@@ -77,7 +98,9 @@ const EditDroneBrand = () => {
   useEffect(() => {
     fetchDroneBrand();
     fetchDroneList();
+    fetchDrone();
   }, [current]);
+
   const onChangePage = (page: number) => {
     setCurrent(page);
   };
@@ -101,20 +124,19 @@ const EditDroneBrand = () => {
       reader.readAsDataURL(isFileMoreThan2MB ? newSource : source);
       reader.onload = () => resolve(reader.result);
     });
-
     setImgDroneBrand(img_base64);
+    setFilterImage(img_base64);
     const d = Map(createImgDroneBrand).set(
       "file",
       isFileMoreThan2MB ? newSource : source
     );
-    const e = Map(d.toJS()).set("resource", "DRONE");
+    const e = Map(d.toJS()).set("resource", "DRONE_BRAND");
     const f = Map(e.toJS()).set("category", "DRONE_BRAND_LOGO");
     const g = Map(f.toJS()).set("resourceId", droneBrandId);
-    console.log(g.toJS());
     setCreateImgDroneBrand(g.toJS());
   };
   const onPreviewDrone = async () => {
-    let src = imgDroneBrand;
+    let src = imgDroneBrand || filterImg;
     if (!src) {
       src = await new Promise((resolve) => {
         const reader = new FileReader();
@@ -127,9 +149,29 @@ const EditDroneBrand = () => {
     const imgWindow = window.open(src);
     imgWindow?.document.write(image.outerHTML);
   };
-  const removeImgDrone = () => {
+
+  const removeImgDrone = async () => {
+    if (filterImg) {
+      const findId = getDroneBarnd?.data.find((x) => x.id === droneBrandId)
+        ?.file[0];
+      const filterId = findId?.id;
+      const filterPath = findId?.path;
+      UploadImageDatasouce.deleteImage(filterId, filterPath).then((res) => {});
+      setImgDroneBrand("");
+      setFilterImage(undefined);
+    } else {
+      const getImg = data.logoImagePath;
+      if (getImg !== undefined) {
+        const img = Map(data).set("logoImagePath", "");
+        setData(img.toJS());
+        setCreateImgDroneBrand(ImageEntity_INTI);
+        setImgDroneBrand("");
+        setFilterImage(undefined);
+      }
+    }
     setCreateImgDroneBrand(ImageEntity_INTI);
-    setImgDroneBrand(undefined);
+    setImgDroneBrand("");
+    setFilterImage(undefined);
   };
   const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     !e.target.value ? setBtnSaveDisable(true) : setBtnSaveDisable(false);
@@ -161,6 +203,7 @@ const EditDroneBrand = () => {
       fetchDroneList();
     });
   };
+
   const renderFromData = (
     <div className="col-lg-7">
       <CardContainer>
@@ -175,19 +218,21 @@ const EditDroneBrand = () => {
                 className="hiddenFileInput"
                 style={{
                   backgroundImage: `url(${
-                    imgDroneBrand === null ? uploadImg : imgDroneBrand
+                    imgDroneBrand !== "" || filterImg !== undefined
+                      ? imgDroneBrand || filterImg
+                      : uploadImg
                   })`,
                 }}
               >
                 <input
-                  key={imgDroneBrand}
+                  key={imgDroneBrand || filterImg}
                   type="file"
                   onChange={onChangeImgDrone}
                   title="เลือกรูป"
                 />
               </div>
               <div>
-                {imgDroneBrand != undefined && (
+                {imgDroneBrand !== "" || filterImg !== undefined ? (
                   <>
                     <Tag
                       color={color.Success}
@@ -210,7 +255,7 @@ const EditDroneBrand = () => {
                       Remove
                     </Tag>
                   </>
-                )}
+                ) : undefined}
               </div>
             </div>
           </div>
@@ -370,7 +415,15 @@ const EditDroneBrand = () => {
     fetchDroneList();
   };
   const updateDroneBrand = async () => {
-    await DroneDatasource.updateDroneBrand(data).then((res) => {
+    if (createImgDroneBrand.file !== "") {
+      UploadImageDatasouce.uploadImage(createImgDroneBrand);
+    }
+    const pushDrone = Map(data).set("drone", dataDrone);
+    const payload = {
+      ...pushDrone.toJS(),
+    };
+    delete payload.drone;
+    await DroneDatasource.updateDroneBrand(payload).then((res) => {
       if (res !== undefined) {
         Swal.fire({
           title: "บันทึกสำเร็จ",
