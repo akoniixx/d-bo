@@ -2,30 +2,23 @@ import { EditOutlined, SearchOutlined } from "@ant-design/icons";
 import { Button, Input, Pagination, Select, Table } from "antd";
 import { useEffect, useState } from "react";
 import ActionButton from "../../components/button/ActionButton";
-import { CardContainer } from "../../components/card/CardContainer";
 import Layouts from "../../components/layout/Layout";
 import ModalCropByProvince from "../../components/modal/ModalCropByProvince";
 import ModalEditLocationPrice from "../../components/modal/ModalEditLocationPrice";
 import color from "../../resource/color";
 import { LocationPriceDatasource } from "../../datasource/LocationPriceDatasource";
 import {
-  AllLocatePriceEntity,
   LocationPricePageEntity,
   UpdateLocationPrice,
   UpdateLocationPriceList,
-  UpdateLocationPriceList_INIT,
   UpdateLocationPrice_INIT,
 } from "../../entities/LocationPrice";
 import moment from "moment";
-const _ = require("lodash");
-const { Map } = require("immutable");
-let queryString = _.split(window.location.pathname, "=");
 
 function PricePage() {
   const [data, setData] = useState<LocationPricePageEntity>();
   const [showModalEdit, setShowModalEdit] = useState(false);
   const [editIndex, setEditIndex] = useState();
-  const [indexRow, setIndexRow] = useState();
   const [showModalCrop, setShowModalCrop] = useState(false);
   const [searchText, setSearchText] = useState<string>();
   const [provinceId, setProvinceId] = useState();
@@ -53,7 +46,6 @@ function PricePage() {
 
   const previewCrop = (province: any) => {
     setShowModalCrop((prev) => !prev);
-    // setIndexRow(index);
     setProvinceId(province);
   };
   const sorter = (a: any, b: any) => {
@@ -78,8 +70,7 @@ function PricePage() {
       dataIndex: "province_name",
       key: "province_name",
       width: "25%",
-      sorter: (a: any, b: any) =>
-      sorter(a.province_name, b.province_name)
+      sorter: (a: any, b: any) => sorter(a.province_name, b.province_name),
     },
     {
       title: "พืช",
@@ -108,8 +99,7 @@ function PricePage() {
       title: "ช่วงราคาฉีดพ่น",
       dataIndex: "price",
       key: "price",
-      sorter: (a: any, b: any) =>
-      sorter(a.min_price, b.max_price),
+      sorter: (a: any, b: any) => sorter(a.min_price, b.max_price),
       render: (value: any, row: any, index: number) => {
         return {
           children: (
@@ -124,8 +114,7 @@ function PricePage() {
       title: "จำนวนอำเภอ",
       dataIndex: "count_district",
       key: "count_district",
-      sorter: (a: any, b: any) =>
-      sorter(a.count_district, b.count_district),
+      sorter: (a: any, b: any) => sorter(a.count_district, b.count_district),
       render: (value: any, row: any, index: number) => {
         return {
           children: <span>{row.count_district + `  อำเภอ`}</span>,
@@ -137,7 +126,7 @@ function PricePage() {
       dataIndex: "count_subdistrict",
       key: "count_subdistrict",
       sorter: (a: any, b: any) =>
-      sorter(a.count_subdistrict, b.count_subdistrict),
+        sorter(a.count_subdistrict, b.count_subdistrict),
       render: (value: any, row: any, index: number) => {
         return {
           children: <span>{row.count_subdistrict + `  ตำบล`}</span>,
@@ -231,14 +220,10 @@ function PricePage() {
   return (
     <Layouts>
       {pageTitle}
-      <CardContainer>
-        <Table columns={columns} dataSource={data?.data} />
-      </CardContainer>
-      <div className="d-flex justify-content-between pt-5">
-        <p>
-          รายการ {data?.data.length} จากทั้งหมด {data?.count} รายการ
-        </p>
-      </div>
+      <Table columns={columns} dataSource={data?.data} />
+      <p>
+        รายการ {data?.data.length} จากทั้งหมด {data?.count} รายการ
+      </p>
       {showModalEdit && (
         <ModalEditLocationPrice
           isEditModal
@@ -253,7 +238,6 @@ function PricePage() {
         <ModalCropByProvince
           show={showModalCrop}
           data={provinceId}
-          // indexPlants={indexRow}
           backButton={() => setShowModalCrop((prev) => !prev)}
         />
       )}

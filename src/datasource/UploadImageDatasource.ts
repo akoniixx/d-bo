@@ -18,7 +18,7 @@ export class UploadImageDatasouce {
         console.log(err, "err insertImg");
       });
   }
-  static getImage(path: string): Promise<any> {
+  static getImage(path: any): Promise<any> {
     return httpClient
       .get(BASE_URL + "/file/geturl?path=" + path)
       .then((response) => {
@@ -29,7 +29,7 @@ export class UploadImageDatasouce {
       });
   }
 
-  static async deleteImage(id: string, path: string): Promise<any> {
+  static async deleteImage(id: any, path: any): Promise<any> {
     const params = {
       id: id,
       path: path,

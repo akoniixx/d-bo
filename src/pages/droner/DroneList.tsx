@@ -39,11 +39,12 @@ function DroneList() {
       droneBrandId,
       searchText
     ).then((res) => {
+      console.log(res)
       setDroneList(res);
     });
   };
   const fetchDroneList = async () => {
-    await DroneDatasource.getDroneList(current, 500, droneBrandId).then(
+    await DroneDatasource.getDroneList(current, row, droneBrandId).then(
       (res) => {
         setSeriesDrone(res.data);
       }

@@ -45,8 +45,7 @@ const ModalDrone: React.FC<ModalDroneProps> = ({
   let [pushSeries, setPushSeries] = useState<DroneBrandEntity>(
     data.drone.droneBrand
   );
-  const [searchSeriesDrone, setSearchSeriesDrone] =
-    useState<DroneEntity[]>();
+  const [searchSeriesDrone, setSearchSeriesDrone] = useState<DroneEntity[]>();
   const [saveBtnDisable, setBtnSaveDisable] = useState<boolean>(
     isEdit ? false : true
   );
@@ -57,8 +56,7 @@ const ModalDrone: React.FC<ModalDroneProps> = ({
   let checkDroneLicense = data.file?.filter(
     (x) => x.category == "DRONE_LICENSE"
   );
-  const [imgLicenseDroner, setImgLicenseDroner] =
-    useState<any>(false);
+  const [imgLicenseDroner, setImgLicenseDroner] = useState<any>(false);
   const [imgLicenseDrone, setImgLicenseDrone] = useState<any>(false);
 
   const [createLicenseDroner, setCreateLicenseDroner] =
@@ -73,12 +71,10 @@ const ModalDrone: React.FC<ModalDroneProps> = ({
     });
   };
   const fetchDroneSeries = async () => {
-    await DroneDatasource.getDroneList(1, 500, droneBrandId).then(
-      (res) => {
-        setSeriesDrone(res.data);
-        setSearchSeriesDrone(res.data);
-      }
-    );
+    await DroneDatasource.getDroneList(1, 500, droneBrandId).then((res) => {
+      setSeriesDrone(res.data);
+      setSearchSeriesDrone(res.data);
+    });
   };
   const fetchImg = async () => {
     if (checkDronerLicense?.length > 0) {
@@ -91,11 +87,11 @@ const ModalDrone: React.FC<ModalDroneProps> = ({
         });
         setImgLicenseDroner(src);
       } else {
-        await UploadImageDatasouce.getImage(
-          checkDronerLicense[0].path
-        ).then((resImg) => {
-          setImgLicenseDroner(resImg.url);
-        });
+        await UploadImageDatasouce.getImage(checkDronerLicense[0].path).then(
+          (resImg) => {
+            setImgLicenseDroner(resImg.url);
+          }
+        );
       }
     }
     if (checkDroneLicense?.length > 0) {
@@ -108,11 +104,11 @@ const ModalDrone: React.FC<ModalDroneProps> = ({
         });
         setImgLicenseDrone(src);
       } else {
-        await UploadImageDatasouce.getImage(
-          checkDroneLicense[0].path
-        ).then((resImg) => {
-          setImgLicenseDrone(resImg.url);
-        });
+        await UploadImageDatasouce.getImage(checkDroneLicense[0].path).then(
+          (resImg) => {
+            setImgLicenseDrone(resImg.url);
+          }
+        );
       }
     }
   };
@@ -125,9 +121,7 @@ const ModalDrone: React.FC<ModalDroneProps> = ({
 
   const handleBrand = (brand: string) => {
     setDroneBrandId(brand);
-    let filterSeries = seriesDrone?.filter(
-      (x) => x.droneBrandId == brand
-    );
+    let filterSeries = seriesDrone?.filter((x) => x.droneBrandId == brand);
     const m = Map(pushDrone).set("droneBrandId", brand);
     setPushDrone({
       ...m.toJS(),
@@ -152,19 +146,11 @@ const ModalDrone: React.FC<ModalDroneProps> = ({
       "logoImagePath",
       getSeries?.droneBrand.logoImagePath
     );
-    const pushDroneSeries = Map(pushDrone).set(
-      "droneBrand",
-      p.toJS()
-    );
+    const pushDroneSeries = Map(pushDrone).set("droneBrand", p.toJS());
     setPushDrone(pushDroneSeries.toJS());
     setPushSeries(p.toJS());
     setDataDrone(m.toJS());
-    checkValidate(
-      m.toJS(),
-      pushDroneSeries.toJS(),
-      p.toJS(),
-      imgLicenseDrone
-    );
+    checkValidate(m.toJS(), pushDroneSeries.toJS(), p.toJS(), imgLicenseDrone);
   };
   const handleSerialNo = (e: any) => {
     const m = Map(dataDrone).set("serialNo", e.target.value);
@@ -190,29 +176,22 @@ const ModalDrone: React.FC<ModalDroneProps> = ({
       checkValidate(m.toJS(), pushDrone, pushSeries, imgLicenseDrone);
     }
     const n = Map(m.toJS()).set("reason", []);
-    REASON_IS_CHECK.map((reason) =>
-      _.set(reason, "isChecked", false)
-    );
+    REASON_IS_CHECK.map((reason) => _.set(reason, "isChecked", false));
     setDataDrone(n.toJS());
   };
   const handleCheckBoxReason = (e: any) => {
     let checked = e.target.checked;
     let value = e.target.value;
     REASON_IS_CHECK.map((item) =>
-      _.set(
-        item,
-        "isChecked",
-        value === item.reason ? checked : item.isChecked
-      )
+      _.set(item, "isChecked", value === item.reason ? checked : item.isChecked)
     );
     let p;
     if (checked) {
       p = Map(dataDrone).set(
         "reason",
-        [
-          ...(dataDrone.reason == null ? [""] : dataDrone.reason),
-          value,
-        ].filter((x) => x != "")
+        [...(dataDrone.reason == null ? [""] : dataDrone.reason), value].filter(
+          (x) => x != ""
+        )
       );
     } else {
       let removeReason = dataDrone.reason.filter((x) => x != value);
@@ -221,16 +200,10 @@ const ModalDrone: React.FC<ModalDroneProps> = ({
     setDataDrone(p.toJS());
     checkValidateReason(p.toJS());
   };
-  const handleMoreReason = (
-    e: React.ChangeEvent<HTMLTextAreaElement>
-  ) => {
+  const handleMoreReason = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     let value = e.target.value;
     setBtnSaveDisable(
-      dataDrone.reason != null
-        ? false
-        : value.trim().length != 0
-        ? false
-        : true
+      dataDrone.reason != null ? false : value.trim().length != 0 ? false : true
     );
     checkValidateReason(dataDrone, value);
     setMoreReason(value);
@@ -245,10 +218,7 @@ const ModalDrone: React.FC<ModalDroneProps> = ({
       reader.onload = () => resolve(reader.result);
     });
     setImgLicenseDroner(src);
-    const d = Map(createLicenseDroner).set(
-      "file",
-      file.target.files[0]
-    );
+    const d = Map(createLicenseDroner).set("file", file.target.files[0]);
     const e = Map(d.toJS()).set("resource", "DRONER_DRONE");
     const f = Map(e.toJS()).set("category", "DRONER_LICENSE");
     const g = Map(f.toJS()).set("path", "");
@@ -258,12 +228,7 @@ const ModalDrone: React.FC<ModalDroneProps> = ({
       g.toJS(),
     ]);
     setDataDrone(pushImg.toJS());
-    checkValidate(
-      pushImg.toJS(),
-      pushDrone,
-      pushSeries,
-      createLicenseDrone
-    );
+    checkValidate(pushImg.toJS(), pushDrone, pushSeries, createLicenseDrone);
   };
   const previewLicenseDroner = async () => {
     let src = imgLicenseDroner;
@@ -287,10 +252,7 @@ const ModalDrone: React.FC<ModalDroneProps> = ({
       return el.category == "DRONER_LICENSE";
     });
     if (findDroner) {
-      await UploadImageDatasouce.deleteImage(
-        findDroner?.id,
-        findDroner?.path
-      );
+      await UploadImageDatasouce.deleteImage(findDroner?.id, findDroner?.path);
     }
     const d = Map(dataDrone).set(
       "file",
@@ -298,12 +260,7 @@ const ModalDrone: React.FC<ModalDroneProps> = ({
     );
     setDataDrone(d.toJS());
     setImgLicenseDroner(false);
-    checkValidate(
-      dataDrone,
-      pushDrone,
-      pushSeries,
-      createLicenseDrone
-    );
+    checkValidate(dataDrone, pushDrone, pushSeries, createLicenseDrone);
   };
   const onChangeLicenseDrone = async (file: any) => {
     let src = file.target.files[0];
@@ -314,10 +271,7 @@ const ModalDrone: React.FC<ModalDroneProps> = ({
     });
     setImgLicenseDrone(src);
     checkValidate(data);
-    const d = Map(createLicenseDrone).set(
-      "file",
-      file.target.files[0]
-    );
+    const d = Map(createLicenseDrone).set("file", file.target.files[0]);
     const e = Map(d.toJS()).set("resource", "DRONER_DRONE");
     const f = Map(e.toJS()).set("category", "DRONE_LICENSE");
     const g = Map(f.toJS()).set("path", "");
@@ -351,10 +305,7 @@ const ModalDrone: React.FC<ModalDroneProps> = ({
       return el.category == "DRONE_LICENSE";
     });
     if (findDrone) {
-      await UploadImageDatasouce.deleteImage(
-        findDrone?.id,
-        findDrone?.path
-      );
+      await UploadImageDatasouce.deleteImage(findDrone?.id, findDrone?.path);
     }
     const d = Map(dataDrone).set(
       "file",
@@ -371,9 +322,9 @@ const ModalDrone: React.FC<ModalDroneProps> = ({
   const handleCallBack = async () => {
     let pushReasonChecked = [];
     if (dataDrone.status == "REJECTED") {
-      let reasonChecked = REASON_IS_CHECK.filter(
-        (x) => x.isChecked
-      ).map((y) => y.reason);
+      let reasonChecked = REASON_IS_CHECK.filter((x) => x.isChecked).map(
+        (y) => y.reason
+      );
       for (let i: number = 0; reasonChecked.length > i; i++) {
         await pushReasonChecked.push(reasonChecked[i]);
       }
@@ -381,16 +332,9 @@ const ModalDrone: React.FC<ModalDroneProps> = ({
     } else if (dataDrone.status == "INACTIVE") {
       pushReasonChecked.push(moreReason);
     }
-    const pushReason = Map(dataDrone).set(
-      "reason",
-      pushReasonChecked
-    );
-    const m = Map(pushReason.toJS()).set(
-      "modalDroneIndex",
-      editIndex
-    );
+    const pushReason = Map(dataDrone).set("reason", pushReasonChecked);
+    const m = Map(pushReason.toJS()).set("modalDroneIndex", editIndex);
     const n = Map(m.toJS()).set("drone", pushDrone);
-    // console.log(n.toJS());
     callBack(n.toJS());
   };
 
@@ -425,7 +369,8 @@ const ModalDrone: React.FC<ModalDroneProps> = ({
             style={{
               width: "100%",
               cursor: "move",
-            }}>
+            }}
+          >
             {title}
           </div>
         }
@@ -439,12 +384,12 @@ const ModalDrone: React.FC<ModalDroneProps> = ({
             }}
             disableSaveBtn={saveBtnDisable}
           />,
-        ]}>
+        ]}
+      >
         <Form key={data.droneId} form={form}>
           <div className="form-group">
             <label>
-              ยี่ห้อโดรนที่ฉีดพ่น{" "}
-              <span style={{ color: "red" }}>*</span>
+              ยี่ห้อโดรนที่ฉีดพ่น <span style={{ color: "red" }}>*</span>
             </label>
             <Form.Item
               name="droneBrand"
@@ -453,12 +398,14 @@ const ModalDrone: React.FC<ModalDroneProps> = ({
                   required: true,
                   message: "กรุณาเลือกยี่ห้อโดรนที่ฉีดพ่น",
                 },
-              ]}>
+              ]}
+            >
               <Select
                 placeholder="เลือกยี่ห้อโดรน"
                 allowClear
                 onChange={handleBrand}
-                defaultValue={dataDrone.drone.droneBrandId}>
+                defaultValue={dataDrone.drone.droneBrandId}
+              >
                 {droneList?.map((item: any) => (
                   <Option value={item.id}>{item.name}</Option>
                 ))}
@@ -476,12 +423,14 @@ const ModalDrone: React.FC<ModalDroneProps> = ({
                   required: true,
                   message: "กรุณาเลือกรุ่นโดรน",
                 },
-              ]}>
+              ]}
+            >
               <Select
                 placeholder="เลือกรุ่น"
                 allowClear
                 defaultValue={dataDrone.droneId}
-                onChange={handleSeries}>
+                onChange={handleSeries}
+              >
                 {searchSeriesDrone?.map((item: any, index: any) => (
                   <option key={index} value={item.id}>
                     {item.series}
@@ -501,7 +450,8 @@ const ModalDrone: React.FC<ModalDroneProps> = ({
                   required: true,
                   message: "กรุณากรอกเลขตัวถังโดรน",
                 },
-              ]}>
+              ]}
+            >
               <Input
                 onChange={handleSerialNo}
                 placeholder="กรอกเลขตัวถังโดรน"
@@ -529,7 +479,8 @@ const ModalDrone: React.FC<ModalDroneProps> = ({
                   className="col-lg-6"
                   placeholder="เลือกเดือน"
                   onChange={handleMonth}
-                  defaultValue={dataDrone.purchaseMonth}>
+                  defaultValue={dataDrone.purchaseMonth}
+                >
                   {MONTH_SALE.map((item) => (
                     <Option value={item.name}>{item.name}</Option>
                   ))}
@@ -540,19 +491,16 @@ const ModalDrone: React.FC<ModalDroneProps> = ({
           <div className="row">
             <div className="form-group col-lg-6 pb-5">
               <label>ใบอนุญาตนักบิน</label>
-              <span style={{ color: color.Disable }}>
-                {" "}
-                (ไฟล์รูป หรือ pdf.)
-              </span>
+              <span style={{ color: color.Disable }}> (ไฟล์รูป หรือ pdf.)</span>
               <br />
               <div className="pb-2">
                 <div
                   className="hiddenFileInput"
                   style={{
                     backgroundImage: `url(${imgLicenseDroner})`,
-                    display:
-                      imgLicenseDroner != false ? "block" : "none",
-                  }}></div>
+                    display: imgLicenseDroner != false ? "block" : "none",
+                  }}
+                ></div>
               </div>
               <div className="text-left ps-4">
                 {imgLicenseDroner != false && (
@@ -563,7 +511,8 @@ const ModalDrone: React.FC<ModalDroneProps> = ({
                       style={{
                         cursor: "pointer",
                         borderRadius: "5px",
-                      }}>
+                      }}
+                    >
                       View
                     </Tag>
                     <Tag
@@ -572,7 +521,8 @@ const ModalDrone: React.FC<ModalDroneProps> = ({
                       style={{
                         cursor: "pointer",
                         borderRadius: "5px",
-                      }}>
+                      }}
+                    >
                       Remove
                     </Tag>
                   </>
@@ -582,9 +532,9 @@ const ModalDrone: React.FC<ModalDroneProps> = ({
                 className="hiddenFileBtn"
                 style={{
                   backgroundImage: `url(${bth_img_empty})`,
-                  display:
-                    imgLicenseDroner == false ? "block" : "none",
-                }}>
+                  display: imgLicenseDroner == false ? "block" : "none",
+                }}
+              >
                 <input
                   key={imgLicenseDroner}
                   type="file"
@@ -597,19 +547,16 @@ const ModalDrone: React.FC<ModalDroneProps> = ({
           <div className="row">
             <div className="form-group">
               <label>ใบอนุญาตโดรนจาก กสทช.</label>
-              <span style={{ color: color.Disable }}>
-                {" "}
-                (ไฟล์รูป หรือ pdf.)
-              </span>
+              <span style={{ color: color.Disable }}> (ไฟล์รูป หรือ pdf.)</span>
               <br />
               <div className="pb-2">
                 <div
                   className="hiddenFileInput"
                   style={{
                     backgroundImage: `url(${imgLicenseDrone})`,
-                    display:
-                      imgLicenseDrone != false ? "block" : "none",
-                  }}></div>
+                    display: imgLicenseDrone != false ? "block" : "none",
+                  }}
+                ></div>
               </div>
               <div className="text-left ps-4">
                 {imgLicenseDrone != false && (
@@ -620,7 +567,8 @@ const ModalDrone: React.FC<ModalDroneProps> = ({
                       style={{
                         cursor: "pointer",
                         borderRadius: "5px",
-                      }}>
+                      }}
+                    >
                       View
                     </Tag>
                     <Tag
@@ -631,7 +579,8 @@ const ModalDrone: React.FC<ModalDroneProps> = ({
                       style={{
                         cursor: "pointer",
                         borderRadius: "5px",
-                      }}>
+                      }}
+                    >
                       Remove
                     </Tag>
                   </>
@@ -641,9 +590,9 @@ const ModalDrone: React.FC<ModalDroneProps> = ({
                 className="hiddenFileBtn"
                 style={{
                   backgroundImage: `url(${bth_img_empty})`,
-                  display:
-                    imgLicenseDrone == false ? "block" : "none",
-                }}>
+                  display: imgLicenseDrone == false ? "block" : "none",
+                }}
+              >
                 <input
                   required
                   key={imgLicenseDrone}
@@ -682,17 +631,18 @@ const ModalDrone: React.FC<ModalDroneProps> = ({
                     required: true,
                     message: "กรุณาเลือกสถานะ!",
                   },
-                ]}>
+                ]}
+              >
                 <Radio.Group
                   defaultValue={dataDrone.status}
-                  onChange={handleChangeStatus}>
+                  onChange={handleChangeStatus}
+                >
                   <Space direction="vertical">
                     {DRONE_STATUS.filter((x) => x.value != "").map(
                       (item, index) => (
                         <Radio value={item.value}>
                           {item.name}
-                          {dataDrone.status == "REJECTED" &&
-                          index == 2 ? (
+                          {dataDrone.status == "REJECTED" && index == 2 ? (
                             <div className="form-group ps-3">
                               {REASON_IS_CHECK.map((reason) =>
                                 _.set(
@@ -725,14 +675,11 @@ const ModalDrone: React.FC<ModalDroneProps> = ({
                                 onChange={handleMoreReason}
                                 defaultValue={dataDrone.reason.filter(
                                   (a) =>
-                                    !REASON_IS_CHECK.some(
-                                      (x) => x.reason === a
-                                    )
+                                    !REASON_IS_CHECK.some((x) => x.reason === a)
                                 )}
                               />
                             </div>
-                          ) : dataDrone.status == "INACTIVE" &&
-                            index == 3 ? (
+                          ) : dataDrone.status == "INACTIVE" && index == 3 ? (
                             <div>
                               <div className="form-group ps-3">
                                 <TextArea

@@ -102,7 +102,6 @@ const ModalSelectedEditDroner: React.FC<ModalSelectedEditDronerProps> = ({
       key: "subdistrict_name",
       render: (value: any, row: any, index: number) => {
         let data = JSON.parse(row.dronerDetail[0]);
-        console.log(data);
         return {
           children: (
             <>

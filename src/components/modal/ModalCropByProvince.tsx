@@ -19,11 +19,8 @@ const ModalCropByProvince: React.FC<ModalCropProps> = ({
   backButton,
   data,
 }) => {
-  const [dataPlant, setDataPlant] = useState<AllLocatePriceEntity>(data);
   const [crops, setCrop] = useState<AllLocatePriceEntity[]>();
   const [searchText, setSearchText] = useState<string>("");
-  const [selectedId, setSelectedId] = useState(null);
-  const [counter, setCounter] = useState(0);
 
   const fetchLocationPrice = async () => {
     await LocationPriceDatasource.getAllLocationPrice(
