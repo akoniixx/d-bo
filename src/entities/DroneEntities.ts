@@ -7,6 +7,7 @@ export interface DroneEntity {
   series: string;
   droneBrand: DroneBrandEntity;
   file: ImageEntity[];
+  dronerDrone: number
   isActive: boolean;
   createdAt: string;
   updatedAt: string;
@@ -19,6 +20,7 @@ export const DroneEntity_INIT: DroneEntity = {
   series: "",
   droneBrand: DroneBrandEntity_INIT,
   file: [ImageEntity_INTI],
+  dronerDrone: 0,
   isActive: true,
   createdAt: "",
   updatedAt: "",

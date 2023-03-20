@@ -16,6 +16,8 @@ import {
 import moment from "moment";
 
 function PricePage() {
+  const row = 10;
+  const [current, setCurrent] = useState(1);
   const [data, setData] = useState<LocationPricePageEntity>();
   const [showModalEdit, setShowModalEdit] = useState(false);
   const [editIndex, setEditIndex] = useState();
@@ -27,23 +29,26 @@ function PricePage() {
   const changeTextSearch = (searchText: any) => {
     setSearchText(searchText.target.value);
   };
-
   useEffect(() => {
     fetchLocationPrice();
-  }, []);
+  }, [current]);
   const fetchLocationPrice = async () => {
-    await LocationPriceDatasource.getAllLocationPrice(searchText).then(
-      (res: LocationPricePageEntity) => {
-        setData(res);
-      }
-    );
+    await LocationPriceDatasource.getAllLocationPrice(
+      current,
+      row,
+      searchText
+    ).then((res: LocationPricePageEntity) => {
+      setData(res);
+    });
   };
   const handleModalEdit = (plants: UpdateLocationPrice, index: any) => {
     setShowModalEdit((prev) => !prev);
     setEditIndex(index);
     setEditLocationPrice(plants);
   };
-
+  const onChangePage = (page: number) => {
+    setCurrent(page);
+  };
   const previewCrop = (province: any) => {
     setShowModalCrop((prev) => !prev);
     setProvinceId(province);
@@ -220,10 +225,18 @@ function PricePage() {
   return (
     <Layouts>
       {pageTitle}
-      <Table columns={columns} dataSource={data?.data} />
-      <p>
-        รายการ {data?.data.length} จากทั้งหมด {data?.count} รายการ
-      </p>
+      <Table columns={columns} dataSource={data?.data} pagination={false} />
+      <div className="d-flex justify-content-between pt-5">
+        <p>รายการทั้งหมด {data?.count} รายการ</p>
+        <Pagination
+          current={current}
+          total={data?.count}
+          onChange={onChangePage}
+          pageSize={row}
+          showSizeChanger={false}
+        />
+      </div>
+
       {showModalEdit && (
         <ModalEditLocationPrice
           isEditModal

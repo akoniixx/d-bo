@@ -34,6 +34,7 @@ export interface DroneBrandEntity {
   logoImagePath: string;
   drone: number;
   file: fileEntity[];
+  droneCount: number;
   isActive: boolean;
   createdAt: string;
   updatedAt: string;
@@ -44,6 +45,7 @@ export const DroneBrandEntity_INIT: DroneBrandEntity = {
   logoImagePath: "",
   drone: 0,
   file: [fileEntity_INIT],
+  droneCount: 0,
   isActive: true,
   createdAt: "",
   updatedAt: "",
@@ -77,6 +79,10 @@ export const CreateDroneBrandEntity_INIT: CreateDroneBrandEntity = {
 export interface DroneBrandListEntity {
   data: DroneBrandEntity[];
   count: number;
+}
+export const DroneBrandListEntity_INIT: DroneBrandListEntity = {
+  data: [DroneBrandEntity_INIT],
+  count: 0,
 }
 export interface UpdateDroneBrand {
   name: string;

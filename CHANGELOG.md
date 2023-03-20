@@ -1,4 +1,9 @@
 ## [Version - 0]
+## Fix [v0.23.01] 2023-03-20
+- fixed search plants
+- fixed current page
+- enhance master data drone , added drone count
+- enhance master data drone , condition delete drone
 ## Feature [v0.23.00] 2023-03-13
 - added master data drone feature
 ## Feature [v0.22.00] 2023-03-02

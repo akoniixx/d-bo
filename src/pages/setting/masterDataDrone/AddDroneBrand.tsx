@@ -76,7 +76,6 @@ function AddDroneBrand() {
     const f = Map(e.toJS()).set("category", "DRONE_BRAND_LOGO");
     setCreateImgDroneBrand(f.toJS());
   };
-
   const onPreviewDrone = async () => {
     let src = imgDroneBrand;
     if (!src) {
@@ -134,10 +133,10 @@ function AddDroneBrand() {
       drone: droneList,
     }));
     await DroneDatasource.addDroneBrand(payload).then(async (res) => {
-      if (res != undefined) {
+      if (res.id) {
         const fileList = [createImgDroneBrand]
-          .filter((el) => {
-            return el.file !== "" && el.file !== undefined;
+          .filter((x) => {
+            return x.file !== "" && x.file !== undefined;
           })
           .map((el) => {
             return UploadImageDatasouce.uploadImage(
@@ -145,6 +144,7 @@ function AddDroneBrand() {
             );
           });
         await Promise.all(fileList);
+
         Swal.fire({
           title: "บันทึกสำเร็จ",
           icon: "success",
