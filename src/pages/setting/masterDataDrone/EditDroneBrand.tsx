@@ -100,11 +100,9 @@ const EditDroneBrand = () => {
     fetchDroneList();
     fetchDrone();
   }, [current]);
-
   const onChangePage = (page: number) => {
     setCurrent(page);
   };
-
   const onChangeImgDrone = async (file: any) => {
     const source = file.target.files[0];
     let newSource: any;
@@ -205,7 +203,7 @@ const EditDroneBrand = () => {
   };
 
   const renderFromData = (
-    <div className="col-lg-7">
+    <div className="col-lg-6">
       <CardContainer>
         <CardHeader textHeader="ข้อมูลยี่ห้อโดรน" />
         <Form>
@@ -305,7 +303,7 @@ const EditDroneBrand = () => {
   );
 
   const renderLand = (
-    <div className="col-lg-4">
+    <div className="col-lg-5">
       <CardContainer>
         <div
           style={{
@@ -336,7 +334,7 @@ const EditDroneBrand = () => {
             <div className="container">
               {dataDrone?.data.map((item, index) => (
                 <div className="row pt-3 pb-3">
-                  <div className="col-lg-6">
+                  <div className="col-lg-5">
                     <p
                       style={{
                         textOverflow: "ellipsis",
@@ -348,7 +346,19 @@ const EditDroneBrand = () => {
                       {item.series}
                     </p>
                   </div>
-                  <div className="col-lg-3">
+                  <div className="col-lg">
+                    <p
+                      style={{
+                        textOverflow: "ellipsis",
+                        overflow: "hidden",
+                        whiteSpace: "nowrap",
+                        marginBottom: 0,
+                      }}
+                    >
+                      {item.dronerDrone + " ลำ"}
+                    </p>
+                  </div>
+                  <div className="col-lg">
                     <span
                       style={{
                         color: item.isActive ? color.Success : color.Error,
@@ -360,15 +370,16 @@ const EditDroneBrand = () => {
                       {item.isActive ? "ใช้งาน" : "ไม่ใช้งาน"}
                     </span>
                   </div>
-                  <div className="col-lg-3 d-flex justify-content-between">
-                    <div className="col-lg-6">
+
+                  <div className="col-lg d-flex justify-content-between">
+                    <div className="col-lg">
                       <ActionButton
                         icon={<EditOutlined />}
                         color={color.primary1}
                         onClick={() => editDroneIndex(item, index)}
                       />
                     </div>
-                    <div className="col-lg-6">
+                    <div className="col-lg">
                       <ActionButton
                         icon={<DeleteOutlined />}
                         color={color.Error}

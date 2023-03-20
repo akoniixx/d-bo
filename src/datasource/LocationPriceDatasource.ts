@@ -1,7 +1,9 @@
 import { BASE_URL, httpClient } from "../config/develop-config";
 import axios from "axios";
 import {
-  LocationPriceEntity, UpdateLocationPrice,
+  LocationPriceEntity,
+  LocationPricePageEntity,
+  UpdateLocationPrice,
 } from "../entities/LocationPrice";
 
 export class LocationPriceDatasource {
@@ -23,13 +25,23 @@ export class LocationPriceDatasource {
       });
   }
   static async getAllLocationPrice(
-    search?: string,
-    searchPlant?: string,
-  ): Promise<any> {
+    page: number,
+    row: number,
+    search?: string
+  ): Promise<LocationPricePageEntity> {
+    return httpClient
+      .post(BASE_URL + `/tasks/location-price/get-all-location-price?page=${page}&take=${row}`, {
+        search,
+      })
+      .then((res) => {
+        return res.data;
+      });
+  }
+  static async getPrice(search?: string, searchPlant?: string): Promise<any> {
     return axios
       .post(BASE_URL + `/tasks/location-price/get-all-location-price`, {
         search: search,
-        searchPlant:searchPlant
+        searchPlant: searchPlant,
       })
       .then((res) => {
         return res.data;
@@ -37,7 +49,7 @@ export class LocationPriceDatasource {
   }
   static updateLocationPrice(data: any): Promise<any> {
     return httpClient
-      .post(BASE_URL + '/tasks/location-price/update-multiple-price' , data)
+      .post(BASE_URL + "/tasks/location-price/update-multiple-price", data)
       .then((response) => {
         return response.data;
       })

@@ -580,9 +580,11 @@ function IndexFarmer() {
         return {
           children: (
             <span>
-              {row?.address?.province !== null
-                ? row.address.province.provinceName !== null
-                  ? row.address.province.provinceName
+              {row?.address !== null
+                ? row?.address?.province !== null
+                  ? row.address.province.provinceName !== null
+                    ? row.address.province.provinceName
+                    : "-"
                   : "-"
                 : "-"}
             </span>
@@ -598,9 +600,11 @@ function IndexFarmer() {
         return {
           children: (
             <span>
-              {row?.address?.district !== null
-                ? row.address.district.districtName !== null
-                  ? row.address.district.districtName
+              {row?.address !== null
+                ? row?.address?.district !== null
+                  ? row.address.district.districtName !== null
+                    ? row.address.district.districtName
+                    : "-"
                   : "-"
                 : "-"}
             </span>
@@ -616,9 +620,11 @@ function IndexFarmer() {
         return {
           children: (
             <span>
-              {row?.address?.subdistrict !== null
-                ? row.address.subdistrict.subdistrictName !== null
-                  ? row.address.subdistrict.subdistrictName
+              {row?.address !== null
+                ? row?.address?.subdistrict !== null
+                  ? row.address.subdistrict.subdistrictName !== null
+                    ? row.address.subdistrict.subdistrictName
+                    : "-"
                   : "-"
                 : "-"}
             </span>
