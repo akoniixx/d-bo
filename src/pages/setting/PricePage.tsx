@@ -28,6 +28,7 @@ function PricePage() {
     useState<UpdateLocationPrice>(UpdateLocationPrice_INIT);
   const changeTextSearch = (searchText: any) => {
     setSearchText(searchText.target.value);
+    setCurrent(1);
   };
   useEffect(() => {
     fetchLocationPrice();
