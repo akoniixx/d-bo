@@ -47,27 +47,25 @@ const ModalEditLocationPrice: React.FC<ModalLocationPriceProps> = ({
   const [locationPrice, setLocationPrice] =
     useState<UpdateLocationPriceList[]>(editIndex);
   const [getSearch, setGetSearch] = useState<AllLocatePriceEntity[]>();
-  const [changeUpSearch, setChangeUpSearch] =
-    useState<UpdateLocationPriceList[]>(editIndex);
   const [saveBtnDisable, setBtnSaveDisable] = useState<boolean>(false);
   const [searchText, setSearchText] = useState<string>("");
+
   const searchPlants = async () => {
-    await LocationPriceDatasource.getAllLocationPrice(
-      data.province_name,
-      searchText
-    ).then((res) => {
-      setGetSearch(res.data);
-    });
+    await LocationPriceDatasource.getPrice(data.province_name, searchText).then(
+      (res) => {
+        if (searchText.length > 0) {
+          setGetSearch(res.data);
+        } else {
+          setGetSearch(undefined);
+        }
+      }
+    );
   };
   const changeTextSearch = (search: any) => {
     setSearchText(search.target.value);
   };
   const handelCallBack = async () => {
-    if (searchText) {
-      callBack(changeUpSearch);
-    } else {
-      callBack(locationPrice);
-    }
+    callBack(locationPrice);
   };
   const columns = [
     {
@@ -76,11 +74,8 @@ const ModalEditLocationPrice: React.FC<ModalLocationPriceProps> = ({
       key: "plant_name",
       width: "50%",
       render: (value: any, row: any, index: any) => {
-        const plantArr: any = getSearch?.map(
-          (x) => x.plants.map((x) => x.plant_name)[index]
-        );
         return {
-          children: <>{searchText ? plantArr : row.plant_name}</>,
+          children: <>{row.plant_name}</>,
         };
       },
     },
@@ -90,53 +85,30 @@ const ModalEditLocationPrice: React.FC<ModalLocationPriceProps> = ({
       key: "price",
       width: "50%",
       render: (value: any, row: any, index: number) => {
-        const plantArr: any = getSearch?.map(
-          (x) => x.plants.map((x) => x.price.toFixed(2))[0]
-        );
-        const plantId = getSearch?.map((x) => x.plants.map((x) => x.id));
         const handleItemClick = (indexData: number, newItem: number) => {
           const newItems = [...locationPrice];
-          const searchItem: any = [plantArr];
           const dataChange: UpdateLocationPriceList[] = [];
-          const dataChangeSearch: UpdateLocationPriceList[] = [];
           const price_id = Map(dataChange).set("location_price_id", row.id);
           const price = Map(price_id.toJS()).set("price", newItem);
           newItems[indexData] = price.toJS();
           setLocationPrice(newItems);
-          const price_id_search = Map(dataChangeSearch).set(
-            "location_price_id",
-            plantId?.join("")
-          );
-          const price_search = Map(price_id_search.toJS()).set(
-            "price",
-            newItem
-          );
-          searchItem[indexData] = price_search.toJS();
-          setChangeUpSearch(searchItem);
-          !newItem ? setBtnSaveDisable(true) : setBtnSaveDisable(false);
+
+          {
+            !newItem ? setBtnSaveDisable(true) : setBtnSaveDisable(false);
+          }
         };
         return {
           children: (
             <>
-              {searchText ? (
-                <InputNumber
-                  style={{ width: 200 }}
-                  defaultValue={plantArr}
-                  step="0.01"
-                  onChange={(event) => handleItemClick(index, event)}
-                  stringMode
-                  addonAfter="บาท"
-                />
-              ) : (
-                <InputNumber
-                  style={{ width: 200 }}
-                  defaultValue={row.price}
-                  step="0.01"
-                  onChange={(event) => handleItemClick(index, event)}
-                  stringMode
-                  addonAfter="บาท"
-                />
-              )}
+              <InputNumber
+                key={row.price}
+                style={{ width: 200 }}
+                defaultValue={row.price}
+                step="0.01"
+                onChange={(event) => handleItemClick(index, event)}
+                stringMode
+                addonAfter="บาท"
+              />
             </>
           ),
         };
@@ -199,9 +171,9 @@ const ModalEditLocationPrice: React.FC<ModalLocationPriceProps> = ({
               </Button>
             </div>
           </div>
-          {searchText ? (
+          {getSearch ? (
             <Table
-              dataSource={getSearch}
+              dataSource={getSearch?.map((x) => x.plants)[0]}
               columns={columns}
               pagination={false}
               scroll={{ x: 0, y: 300 }}

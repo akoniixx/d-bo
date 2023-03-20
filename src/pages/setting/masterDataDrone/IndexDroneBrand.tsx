@@ -4,6 +4,7 @@ import Layouts from "../../../components/layout/Layout";
 import {
   DroneBrandEntity,
   DroneBrandListEntity,
+  DroneBrandListEntity_INIT,
 } from "../../../entities/DroneBrandEntities";
 import { DroneDatasource } from "../../../datasource/DroneDatasource";
 import { color } from "../../../resource";
@@ -17,19 +18,19 @@ import {
 import Swal from "sweetalert2";
 
 const IndexDroneBrand: React.FC = () => {
-  const [data, setData] = useState<DroneBrandListEntity>();
+  const [data, setData] = useState<DroneBrandListEntity[]>([
+    DroneBrandListEntity_INIT,
+  ]);
   const [searchText, setSearchText] = useState<string>();
 
   const fetchDrone = async () => {
-    await DroneDatasource.getDroneBrandList(searchText).then((res) => {
+    await DroneDatasource.getCountDroneBrandList(searchText).then((res) => {
       setData(res);
     });
   };
-
   useEffect(() => {
     fetchDrone();
   }, []);
-
   const changeTextSearch = (searchText: any) => {
     setSearchText(searchText.target.value);
   };
@@ -139,7 +140,6 @@ const IndexDroneBrand: React.FC = () => {
       title: "จำนวนรุ่นโดรน",
       dataIndex: "drone",
       key: "drone",
-      width: "20%",
       sorter: (a: any, b: any) => sorter(a.drone, b.drone),
       render: (value: any, row: any, index: number) => {
         return {
@@ -154,10 +154,27 @@ const IndexDroneBrand: React.FC = () => {
       },
     },
     {
+      title: "จำนวนเครื่องโดรน",
+      dataIndex: "droneCount",
+      key: "droneCount",
+      sorter: (a: any, b: any) => sorter(a.droneCount, b.droneCount),
+      render: (value: any, row: any, index: number) => {
+        return {
+          children: (
+            <span>
+              {row.droneCount !== 0
+                ? `${row.droneCount + " " + "ลำ"}`
+                : 0 + " " + "ลำ"}
+            </span>
+          ),
+        };
+      },
+    },
+    {
       title: "สถานะ",
       dataIndex: "isActive",
       key: "isActive",
-      width: "20%",
+      width: "10%",
       sorter: (a: any, b: any) => sorter(a.isActive, b.isActive),
       render: (value: any, row: any, index: number) => {
         return {
@@ -187,6 +204,7 @@ const IndexDroneBrand: React.FC = () => {
       title: "",
       dataIndex: "action",
       key: "action",
+      width: "13%",
       render: (value: any, row: any, index: number) => {
         return {
           children: (
@@ -203,13 +221,24 @@ const IndexDroneBrand: React.FC = () => {
                   }
                 />
               </div>
-              <div>
-                <ActionButton
-                  icon={<DeleteOutlined />}
-                  color={color.Error}
-                  onClick={() => removeDroneBrand(row)}
-                />
-              </div>
+              {row.drone === 0 ? (
+                <div>
+                  <ActionButton
+                    icon={<DeleteOutlined />}
+                    color={color.Error}
+                    onClick={() => removeDroneBrand(row)}
+                  />
+                </div>
+              ) : (
+                <div>
+                  <Button
+                    disabled
+                    style={{ borderRadius: 5 }}
+                    icon={<DeleteOutlined />}
+                    color={color.Disable}
+                  />
+                </div>
+              )}
             </div>
           ),
         };
@@ -220,8 +249,8 @@ const IndexDroneBrand: React.FC = () => {
   return (
     <Layouts>
       {pageTitle}
-      <Table columns={columns} dataSource={data?.data} />
-      <p>รายการทั้งหมด {data?.count} รายการ</p>
+      <Table columns={columns} dataSource={data[0].data} />
+      <p>รายการทั้งหมด {data[0].count} รายการ</p>
     </Layouts>
   );
 };

@@ -92,7 +92,21 @@ export class DroneDatasource {
         console.log(error);
       });
   }
-
+  static getCountDroneBrandList(
+    search?: string
+  ): Promise<DroneBrandListEntity[]> {
+    const params = {
+      search: search,
+    };
+    return httpClient
+      .get(BASE_URL + "/drone-brand/droner-brand-all", { params })
+      .then((response) => {
+        return response.data;
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  }
   static getDrone(
     page: number,
     row: number,

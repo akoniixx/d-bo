@@ -163,17 +163,22 @@ const EditFarmer = () => {
     LocationDatasource.getProvince().then((res) => {
       setProvince(res);
     });
-    if (address.provinceId) {
-      LocationDatasource.getDistrict(address.provinceId).then((res) => {
-        setDistrict(res);
-      });
+    if (address !== null) {
+      if (address.provinceId) {
+        LocationDatasource.getDistrict(address.provinceId).then((res) => {
+          setDistrict(res);
+        });
+      }
+      if (address.districtId) {
+        LocationDatasource.getSubdistrict(address.districtId).then((res) => {
+          setSubdistrict(res);
+        });
+      }
     }
-    if (address.districtId) {
-      LocationDatasource.getSubdistrict(address.districtId).then((res) => {
-        setSubdistrict(res);
-      });
-    }
-  }, [address.provinceId, address.districtId]);
+  }, [
+    address !== null && address.provinceId,
+    address !== null && address.districtId,
+  ]);
 
   //#region function farmer
   const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -231,7 +236,9 @@ const EditFarmer = () => {
     checkValidateAddr(d.toJS());
   };
 
-  const handleOnChangeAddress2 = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+  const handleOnChangeAddress2 = (
+    e: React.ChangeEvent<HTMLTextAreaElement>
+  ) => {
     const d = Map(address).set("address2", e.target.value);
     setAddress(d.toJS());
     checkValidateAddr(d.toJS());
@@ -764,7 +771,7 @@ const EditFarmer = () => {
                 <Select
                   allowClear
                   placeholder="เลือกจังหวัด"
-                  defaultValue={address.provinceId}
+                  defaultValue={address !== null ? address.provinceId : 0}
                   showSearch
                   optionFilterProp="children"
                   filterOption={(input: any, option: any) =>
@@ -791,7 +798,7 @@ const EditFarmer = () => {
                 <Select
                   allowClear
                   placeholder="เลือกอำเภอ"
-                  defaultValue={address.districtId}
+                  defaultValue={address !== null ? address.districtId : 0}
                   showSearch
                   optionFilterProp="children"
                   filterOption={(input: any, option: any) =>
@@ -820,7 +827,7 @@ const EditFarmer = () => {
                 <Select
                   allowClear
                   placeholder="เลือกตำบล"
-                  defaultValue={address.subdistrictId}
+                  defaultValue={address !== null ? address.subdistrictId : 0}
                   showSearch
                   optionFilterProp="children"
                   filterOption={(input: any, option: any) =>
@@ -848,8 +855,8 @@ const EditFarmer = () => {
               <Form.Item name="postcode">
                 <Input
                   placeholder="เลือกรหัสไปรษณีย์"
-                  defaultValue={address.postcode}
-                  key={address.subdistrictId}
+                  defaultValue={address !== null ? address.postcode : "-"}
+                  key={address !== null ? address.subdistrictId : 0}
                   disabled
                 />
               </Form.Item>
@@ -872,7 +879,7 @@ const EditFarmer = () => {
                 <Input
                   placeholder="กรอกบ้านเลขที่"
                   onChange={handleOnChangeAddress1}
-                  defaultValue={address.address1}
+                  defaultValue={address !== null ? address.address1 : "-"}
                   autoComplete="off"
                 />
               </Form.Item>
@@ -896,7 +903,7 @@ const EditFarmer = () => {
                   className="col-lg-12"
                   rows={5}
                   placeholder="กรอกที่อยู่บ้าน (เลขที่บ้าน, หมู่บ้าน, ชื่ออาคาร/ตึก, ซอย)"
-                  defaultValue={address.address2}
+                  defaultValue={address !== null ? address.address2 : "-"}
                   autoComplete="off"
                   onChange={handleOnChangeAddress2}
                 />

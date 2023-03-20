@@ -3,9 +3,7 @@ import { Button, Input, Modal, Select, Table } from "antd";
 import React, { useEffect, useState } from "react";
 import { LocationPriceDatasource } from "../../datasource/LocationPriceDatasource";
 import {
-  AllLocatePriceEntity,
-  LocationPricePageEntity,
-  PricePlantsEntity,
+  AllLocatePriceEntity
 } from "../../entities/LocationPrice";
 import { color } from "../../resource";
 
@@ -19,22 +17,20 @@ const ModalCropByProvince: React.FC<ModalCropProps> = ({
   backButton,
   data,
 }) => {
-  const [crops, setCrop] = useState<AllLocatePriceEntity[]>();
+  const [searchCops, setSearchCrop] = useState<AllLocatePriceEntity[]>();
   const [searchText, setSearchText] = useState<string>("");
 
-  const fetchLocationPrice = async () => {
-    await LocationPriceDatasource.getAllLocationPrice(
-      data.province_name,
-      searchText
-    ).then((res) => {
-      setCrop(res.data);
-    });
+  const searchPlants = async () => {
+    await LocationPriceDatasource.getPrice(data.province_name, searchText).then(
+      (res) => {
+        setSearchCrop(res.data);
+      }
+    );
   };
 
   const changeTextSearch = (search: any) => {
     setSearchText(search.target.value);
   };
-
   const columns = [
     {
       title: "ชื่อพืช",
@@ -42,11 +38,8 @@ const ModalCropByProvince: React.FC<ModalCropProps> = ({
       key: "plants",
       width: "50%",
       render: (value: any, row: any, index: any) => {
-        const plantArr = crops?.map(
-          (x) => x.plants.map((x) => x.plant_name)[index]
-        );
         return {
-          children: <>{searchText ? plantArr : row.plant_name}</>,
+          children: <>{row.plant_name}</>,
         };
       },
     },
@@ -56,14 +49,8 @@ const ModalCropByProvince: React.FC<ModalCropProps> = ({
       key: "price",
       width: "50%",
       render: (value: any, row: any, index: number) => {
-        const plantArr = crops?.map(
-          (x) => x.plants.map((x) => x.price.toFixed(2))[index]
-        );
-
         return {
-          children: (
-            <>{searchText ? plantArr : `${row.price.toFixed(2)}  ` + "บาท"}</>
-          ),
+          children: <>{`${row.price.toFixed(2)}  ` + "บาท"}</>,
         };
       },
     },
@@ -105,19 +92,21 @@ const ModalCropByProvince: React.FC<ModalCropProps> = ({
                 padding: 6,
                 paddingTop: 4,
               }}
-              onClick={fetchLocationPrice}
+              onClick={searchPlants}
             >
               ค้นหาข้อมูล
             </Button>
           </div>
         </div>
-        {searchText ? (
-          <Table
-            dataSource={crops}
-            columns={columns}
-            pagination={false}
-            scroll={{ x: 0, y: 300 }}
-          />
+        {searchCops ? (
+          <>
+            <Table
+              dataSource={searchCops?.map((x) => x.plants)[0]}
+              columns={columns}
+              pagination={false}
+              scroll={{ x: 0, y: 300 }}
+            />
+          </>
         ) : (
           <Table
             dataSource={data.plants}
