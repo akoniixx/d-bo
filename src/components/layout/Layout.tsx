@@ -41,7 +41,6 @@ const Layouts: React.FC<any> = ({ children }) => {
     height: "100%",
     paddingTop: 30,
   };
-
   return (
     <Layout style={{ height: "100vh" }}>
       <Header
@@ -125,7 +124,7 @@ const Layouts: React.FC<any> = ({ children }) => {
                 </Link>
               </Menu.Item>
               <Menu.Item key="finishTask">
-                {persistedProfile.email === "SaiMhaiInwza@gmail.com" ? (
+                {persistedProfile.username == "saimhai" ? (
                   <Link
                     to="/IndexReport"
                     style={{ textDecoration: "none" }}

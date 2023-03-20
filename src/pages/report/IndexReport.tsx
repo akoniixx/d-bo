@@ -1,7 +1,6 @@
 import {
   DownOutlined,
   EditOutlined,
-  FileTextOutlined,
   InfoCircleFilled,
   SearchOutlined,
   StarFilled,
@@ -13,7 +12,6 @@ import {
   Dropdown,
   Input,
   Menu,
-  Pagination,
   Select,
   Table,
   Tooltip,
@@ -27,21 +25,12 @@ import { CardContainer } from "../../components/card/CardContainer";
 import Layouts from "../../components/layout/Layout";
 import ModalMapPlot from "../../components/modal/task/finishTask/ModalMapPlot";
 import { LocationDatasource } from "../../datasource/LocationDatasource";
-import { TaskFinishedDatasource } from "../../datasource/TaskFinishDatasource";
-import {
-  FINISH_TASK,
-  FINISH_TASK_SEARCH,
-  STATUS_COLOR_TASK,
-  TASK_HISTORY,
-} from "../../definitions/FinishTask";
 import {
   DistrictEntity,
   ProviceEntity,
   SubdistrictEntity,
 } from "../../entities/LocationEntities";
-import { TaskFinishListEntity } from "../../entities/TaskFinishEntities";
 import { color } from "../../resource";
-import { numberWithCommas } from "../../utilities/TextFormatter";
 
 interface DataType {
   key: React.Key;
@@ -491,7 +480,10 @@ function IndexReport() {
                 className="d-flex justify-content-between"
                 style={{ color: color.White, fontWeight: "bold" }}
               >
-                <p>รอรีวิว</p>
+                <div style={{alignSelf: 'center', justifyContent: 'space-between', flexDirection: 'row'}}>
+                  <span>รอรีวิว</span>
+                  <span>2</span>
+                </div>
               </div>
             </CardContainer>
           </div>
