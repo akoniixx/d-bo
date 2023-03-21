@@ -20,6 +20,7 @@ import DatePicker from "antd/lib/date-picker";
 import { ColumnsType } from "antd/lib/table";
 import moment from "moment";
 import { useEffect, useState } from "react";
+import Swal from "sweetalert2";
 import ActionButton from "../../components/button/ActionButton";
 import { CardContainer } from "../../components/card/CardContainer";
 import Layouts from "../../components/layout/Layout";
@@ -159,6 +160,28 @@ function IndexReport() {
       return 0;
     }
     return a > b ? 1 : -1;
+  };
+  const onSelectChange = (newSelectedRowKeys: React.Key[]) => {
+    setSelectedRowKeys(newSelectedRowKeys);
+  };
+  const rowSelection = {
+    selectedRowKeys,
+    onChange: onSelectChange,
+  };
+  const paid = (data: any) => {
+    Swal.fire({
+      title: "ยืนยันการเปลี่ยนสถานะ",
+      text: "โปรดตรวจสอบงานที่คุณต้องการเปลี่ยนสถานะ ก่อนที่จะกดยืนยัน เพราะอาจส่งผลต่อการจ่ายเงินของนักบินโดรนในระบบ",
+      cancelButtonText: "ยกเลิก",
+      confirmButtonText: "ยืนยัน",
+      confirmButtonColor: color.Success,
+      showCancelButton: true,
+      showCloseButton: true,
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        // call api
+      }
+    });
   };
   const menu = (
     <Menu
@@ -414,7 +437,7 @@ function IndexReport() {
                   color: color.secondary2,
                   backgroundColor: color.Success,
                 }}
-                // onClick={}
+                onClick={()=> paid(selectedRowKeys)}
               >
                 จ่ายเงินแล้ว
               </Button>
@@ -474,16 +497,14 @@ function IndexReport() {
                 borderRadius: "5px",
                 padding: "10px",
                 width: "100%",
+                marginRight: "10px",
               }}
             >
               <div
                 className="d-flex justify-content-between"
                 style={{ color: color.White, fontWeight: "bold" }}
               >
-                <div style={{alignSelf: 'center', justifyContent: 'space-between', flexDirection: 'row'}}>
-                  <span>รอรีวิว</span>
-                  <span>2</span>
-                </div>
+                <p>รอรีวิว</p>
               </div>
             </CardContainer>
           </div>
@@ -688,14 +709,6 @@ function IndexReport() {
     </>
   );
 
-  const onSelectChange = (newSelectedRowKeys: React.Key[]) => {
-    console.log(newSelectedRowKeys);
-    setSelectedRowKeys(newSelectedRowKeys);
-  };
-  const rowSelection = {
-    selectedRowKeys,
-    onChange: onSelectChange,
-  };
   return (
     <Layouts>
       {PageTitle}
