@@ -440,7 +440,9 @@ export default function IndexFinishTask() {
                 <br />
               </span>
               <span style={{ color: color.Grey, fontSize: "12px" }}>
-                <UserOutlined style={{ padding: "0 4px 0 0" }} />
+                <UserOutlined
+                  style={{ padding: "0 4px 0 0", verticalAlign: 0.5 }}
+                />
                 {row.createBy}
               </span>
             </>

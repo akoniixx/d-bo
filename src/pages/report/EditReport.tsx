@@ -1,8 +1,8 @@
 import {
   CalendarOutlined,
   ClockCircleOutlined,
+  CloseCircleFilled,
   StarFilled,
-  UploadOutlined,
 } from "@ant-design/icons";
 import {
   Avatar,
@@ -22,6 +22,7 @@ import TextArea from "antd/lib/input/TextArea";
 import Upload from "antd/lib/upload/Upload";
 import moment from "moment";
 import { useEffect, useState } from "react";
+import Swal from "sweetalert2";
 import { BackIconButton } from "../../components/button/BackButton";
 import { CardContainer } from "../../components/card/CardContainer";
 import FooterPage from "../../components/footer/FooterPage";
@@ -34,16 +35,20 @@ import { LAT_LNG_BANGKOK } from "../../definitions/Location";
 import {
   DetailFinishTask,
   DetailFinishTask_INIT,
+  updateStatusPays,
+  updateStatusPays_INIT,
 } from "../../entities/TaskFinishEntities";
 import { color } from "../../resource";
 import { numberWithCommas } from "../../utilities/TextFormatter";
-
+import { UpdateStatusPaymentDatasource } from "../../datasource/UpdateStatusPaymentDatasource";
+const { Map } = require("immutable");
 const _ = require("lodash");
 let queryString = _.split(window.location.search, "=");
 const dateFormat = "DD/MM/YYYY";
 const timeFormat = "HH:mm";
 
 function EditReport() {
+  const profile = JSON.parse(localStorage.getItem("profile") || "{  }");
   const taskId = queryString[1];
   const [couponData, setCouponData] = useState<{
     couponCode: string;
@@ -55,12 +60,14 @@ function EditReport() {
     couponDiscount: null,
   });
   const [data, setData] = useState<DetailFinishTask>(DetailFinishTask_INIT);
+  const [statusPayment, setStatusPayment] = useState<any>();
+  const [updateStatusPayment, setUpdateStatusPayment] =
+    useState<updateStatusPays>(updateStatusPays_INIT);
+
   const [mapPosition, setMapPosition] = useState<{ lat: number; lng: number }>({
     lat: LAT_LNG_BANGKOK.lat,
     lng: LAT_LNG_BANGKOK.lng,
   });
-  const [value, setValue] = useState(1);
-
   const fetchDetailTask = async () => {
     await TaskFinishedDatasource.getDetailFinishTaskById(taskId).then((res) => {
       if (res.data.couponId !== null) {
@@ -81,17 +88,9 @@ function EditReport() {
       });
     });
   };
-
   useEffect(() => {
     fetchDetailTask();
   }, []);
-
-  const formatCurrency = (e: any) => {
-    e = parseFloat(e);
-    return e.toFixed(2).replace(/./g, function (c: any, i: any, a: any) {
-      return i > 0 && c !== "." && (a.length - i) % 3 === 0 ? "," + c : c;
-    });
-  };
   const onPreviewImg = async () => {
     let src = data.imageTaskUrl;
     if (!src) {
@@ -104,17 +103,48 @@ function EditReport() {
     const imgWindow = window.open(src);
     imgWindow?.document.write(image.outerHTML);
   };
-  const onChange = (e: RadioChangeEvent) => {
-    console.log("radio checked", e.target.value);
-    setValue(e.target.value);
+  const handleChangeStatus = (e: any) => {
+    setStatusPayment(e.target.value);
   };
-  const fileList: UploadFile[] = [
+  const UpdateStatusPayment = async () => {
+    Swal.fire({
+      title: "ยืนยันการแก้ไข",
+      text: "โปรดตรวจสอบงานที่คุณต้องการแก้ไข ก่อนที่จะกดยืนยันแก้ไข เพราะอาจส่งผลต่อการจ้างงานในแอปพลิเคชัน",
+      cancelButtonText: "ยกเลิก",
+      confirmButtonText: "บันทึก",
+      confirmButtonColor: color.Success,
+      showCancelButton: true,
+      showCloseButton: true,
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        const updateBy = profile.firstname + " " + profile.lastname;
+        const updateInfo = { ...updateStatusPayment };
+        updateInfo.id = [taskId];
+        updateInfo.statusPayment = statusPayment;
+        updateInfo.updateBy = updateBy;
+        await UpdateStatusPaymentDatasource.UpdateStatusPayment(
+          updateInfo
+        ).then((res) => {
+          window.location.href = "/IndexReport";
+        });
+      }
+      fetchDetailTask();
+    });
+  };
+  const IdCard: UploadFile[] = [
     {
-      uid: data.imageTaskUrl,
-      name: "imagenaja.png",
-      status: "done",
-      url: "https://www.sbito.co.th/kyc/images/SelfieIDcard.png",
-      thumbUrl: "https://www.sbito.co.th/kyc/images/SelfieIDcard.png",
+      uid: "",
+      name: data.imageIdCard.fileName,
+      url: data.imageIdCard.path,
+      thumbUrl: data.imageIdCard.path,
+    },
+  ];
+  const BookBank: UploadFile[] = [
+    {
+      uid: "",
+      name: data.imageBookBank.fileName,
+      url: data.imageBookBank.path,
+      thumbUrl: data.imageBookBank.path,
     },
   ];
   const starIcon = (
@@ -126,7 +156,6 @@ function EditReport() {
       }}
     />
   );
-
   const renderAppointment = (
     <Form style={{ padding: "32px" }}>
       <div className="row">
@@ -137,10 +166,9 @@ function EditReport() {
               <Form.Item>
                 <Input
                   style={{ width: "100%" }}
-                  //   value={moment(new Date(data.data.dateAppointment)).format(
-                  //     dateFormat
-                  //   )}
-                  value={"15/03/2023"}
+                  value={moment(new Date(data.data.dateAppointment)).format(
+                    dateFormat
+                  )}
                   disabled
                   suffix={<CalendarOutlined />}
                 />
@@ -151,10 +179,9 @@ function EditReport() {
               <Form.Item>
                 <Input
                   style={{ width: "100%" }}
-                  //   value={moment(new Date(data.data.dateAppointment)).format(
-                  //     timeFormat
-                  //   )}
-                  value={"10:30"}
+                  value={moment(new Date(data.data.dateAppointment)).format(
+                    timeFormat
+                  )}
                   disabled
                   suffix={<ClockCircleOutlined />}
                 />
@@ -165,28 +192,25 @@ function EditReport() {
           <Form.Item>
             <Select
               disabled
-              //   value={
-              //     data.data.purposeSpray !== null
-              //       ? data.data.purposeSpray.purposeSprayName
-              //       : "-"
-              //   }
-              value={"คุมเลน"}
+              value={
+                data.data.purposeSpray !== null
+                  ? data.data.purposeSpray.purposeSprayName
+                  : "-"
+              }
             />
           </Form.Item>
           <label>เป้าหมายการฉีดพ่น</label>
           <Form.Item>
             <span style={{ color: color.Grey }}>
-              หญ้า, หนอน
-              {/* {data.data.targetSpray !== null
+              {data.data.targetSpray !== null
                 ? data.data.targetSpray.join(",")
-                : "-"} */}
+                : "-"}
             </span>
           </Form.Item>
           <label>การเตรียมยา</label>
           <Form.Item>
             <span style={{ color: color.Grey }}>
-              เกษตรกรเตรียมยาเอง
-              {/* {data.data.preparationBy !== null ? data.data.preparationBy : "-"} */}
+              {data.data.preparationBy !== null ? data.data.preparationBy : "-"}
             </span>
           </Form.Item>
           <label>ภาพงานจากนักบินโดรน</label>
@@ -232,10 +256,8 @@ function EditReport() {
             <div className="row">
               <div className="col-lg-3">คะแนนรีวิว </div>
               <div className="col-lg-6">
-                {" "}
                 <span>
-                  4.0
-                  {/* {data.data.reviewDronerAvg > "0" ? (
+                  {data.data.reviewDronerAvg > "0" ? (
                     <Row>
                       {starIcon}
                       <span>
@@ -244,7 +266,7 @@ function EditReport() {
                     </Row>
                   ) : (
                     "-"
-                  )} */}
+                  )}
                 </span>
               </div>
             </div>
@@ -259,13 +281,14 @@ function EditReport() {
                   <Row>
                     {starIcon}
                     <span>
-                      4.0
-                      {/* {parseFloat(
+                      {parseFloat(
                         data.data.reviewDronerDetail.pilotEtiquette
-                      ).toFixed(1)} */}
+                      ).toFixed(1)}
                     </span>
                   </Row>
-                ) : null}
+                ) : (
+                  "-"
+                )}
               </div>
             </div>
             <div className="row">
@@ -277,10 +300,9 @@ function EditReport() {
                   <Row>
                     {starIcon}
                     <span>
-                      4.0
-                      {/* {parseFloat(
+                      {parseFloat(
                         data.data.reviewDronerDetail.punctuality
-                      ).toFixed(1)} */}
+                      ).toFixed(1)}
                     </span>
                   </Row>
                 ) : (
@@ -297,10 +319,9 @@ function EditReport() {
                   <Row>
                     {starIcon}
                     <span>
-                      4.0
-                      {/* {parseFloat(
+                      {parseFloat(
                         data.data.reviewDronerDetail.sprayExpertise
-                      ).toFixed(1)} */}
+                      ).toFixed(1)}
                     </span>
                   </Row>
                 ) : (
@@ -313,23 +334,32 @@ function EditReport() {
             <TextArea
               rows={3}
               disabled
-              value={"นักบินทำงานดี"}
-              //   value={
-              //     data.data.reviewDronerDetail != null
-              //       ? data.data.reviewDronerDetail.comment
-              //       : undefined
-              //   }
+              value={
+                data.data.reviewDronerDetail != null
+                  ? data.data.reviewDronerDetail.comment
+                  : undefined
+              }
             />
           </Form.Item>
           <label>สถานะ</label>
-          <Form.Item>
-            <Radio.Group onChange={onChange} value={value}>
-              <Space direction="vertical">
-                <Radio value={1}>รอจ่ายเงิน</Radio>
-                <Radio value={2}>จ่ายเงินแล้ว</Radio>
-              </Space>
-            </Radio.Group>
-          </Form.Item>
+          {data.data.couponId != null ? (
+            <Form.Item key={data.data.statusPayment}>
+              <Radio.Group
+                defaultValue={data.data.statusPayment}
+                onChange={handleChangeStatus}
+              >
+                <Space direction="vertical">
+                  <Radio value={"WAIT_PAYMENT"}>รอจ่ายเงิน</Radio>
+                  <Radio value={"DONE_PAYMENT"}>จ่ายเงินแล้ว</Radio>
+                </Space>
+              </Radio.Group>
+            </Form.Item>
+          ) : (
+            <div>
+              <Badge color={"#F2994A"} style={{ width: 20 }} />
+              <span style={{ color: "#F2994A" }}>เสร็จสิ้น</span>
+            </div>
+          )}
         </div>
       </div>
     </Form>
@@ -343,23 +373,22 @@ function EditReport() {
             <Form.Item>
               <Input
                 disabled
-                defaultValue="มานี มีนาเยอะ"
-                // defaultValue={
-                //   data.data.farmer.firstname + " " + data.data.farmer.lastname
-                // }
+                defaultValue={
+                  data.data.farmer.firstname + " " + data.data.farmer.lastname
+                }
               />
             </Form.Item>
           </div>
           <div className="col-lg-4 text-start">
             <label>เบอร์โทร</label>
             <Form.Item>
-              <Input disabled defaultValue="081-234-5679" />
+              <Input disabled defaultValue={data.data.farmer.telephoneNo} />
             </Form.Item>
           </div>
           <div className="col-lg-4 text-start">
             <label>แปลง</label>
             <Form.Item>
-              <Select disabled defaultValue="มานี มีนาเยอะ 1" />
+              <Select disabled defaultValue={data.data.farmerPlot.plotName} />
             </Form.Item>
           </div>
         </div>
@@ -367,19 +396,27 @@ function EditReport() {
           <div className="col-lg-4 text-start">
             <label>พืชที่ปลูก</label>
             <Form.Item>
-              <Input disabled defaultValue="ข้าว" />
+              <Input disabled defaultValue={data.data.farmerPlot.plantName} />
             </Form.Item>
           </div>
           <div className="col-lg-4 text-start">
             <label>ค่าบริการ/ไร่</label>
             <Form.Item>
-              <Input disabled defaultValue={70} suffix={"บาท/ไร่"} />
+              <Input
+                disabled
+                defaultValue={data.data.unitPrice}
+                suffix={"บาท/ไร่"}
+              />
             </Form.Item>
           </div>
           <div className="col-lg-4 text-start">
             <label>จำนวนไร่</label>
             <Form.Item>
-              <Input disabled defaultValue="20" suffix="ไร่" />
+              <Input
+                disabled
+                defaultValue={data.data.farmerPlot.raiAmount}
+                suffix="ไร่"
+              />
             </Form.Item>
           </div>
         </div>
@@ -387,7 +424,18 @@ function EditReport() {
           <div className="col-lg-12 text-start">
             <label>พื้นที่แปลงเกษตร</label>
             <Form.Item>
-              <Input disabled defaultValue="ต.สันผักหวาน/อ.หางดง/จ.เชียงใหม่" />
+              <Input
+                disabled
+                defaultValue={
+                  data.data.farmerPlot.plotArea !== null
+                    ? data.data.farmerPlot.plotArea.subdistrictName +
+                      "/" +
+                      data.data.farmerPlot.plotArea.districtName +
+                      "/" +
+                      data.data.farmerPlot.plotArea.provinceName
+                    : "-"
+                }
+              />
             </Form.Item>
           </div>
         </div>
@@ -395,13 +443,13 @@ function EditReport() {
           <div className="col-lg-6 text-start">
             <label>Latitude (ละติจูด)</label>
             <Form.Item key={mapPosition.lat}>
-              <Input disabled defaultValue="15.00" />
+              <Input disabled defaultValue={mapPosition.lat} />
             </Form.Item>
           </div>
           <div className="col-lg-6 text-start">
             <label>Longitude (ลองติจูด)</label>
             <Form.Item key={mapPosition.lng}>
-              <Input disabled defaultValue="15.00" />
+              <Input disabled defaultValue={mapPosition.lng} />
             </Form.Item>
           </div>
         </div>
@@ -428,15 +476,15 @@ function EditReport() {
       <div className="row">
         <div className="col-lg">
           <p>Droner ID</p>
-          <Input disabled defaultValue="DN00000001" />
+          <Input disabled defaultValue={data.data.droner.dronerCode} />
         </div>
         <div className="col-lg">
           <p>ชื่อ</p>
-          <Input disabled defaultValue="สมศักดิ์" />
+          <Input disabled defaultValue={data.data.droner.firstname} />
         </div>
         <div className="col-lg">
           <p>นามสกุล</p>
-          <Input disabled defaultValue="บินโดรน" />
+          <Input disabled defaultValue={data.data.droner.lastname} />
         </div>
       </div>
       <div className="row pt-4">
@@ -465,42 +513,116 @@ function EditReport() {
         </div>
       </div>
       <div className="row pt-4 d-flex justify-content-between">
-        <div className="col-lg-6">
-          <Form
-            style={{
-              padding: "20px",
-              backgroundColor: "#2196531A",
-              borderRadius: 5,
-            }}
-          >
-            <span style={{ color: color.primary1 }}>บัตรประชาชน</span> <br />
-            <span>รูปภาพผู้สมัครคู่กับบัตรประชาชน </span>
-            <Upload
-              action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
-              listType="picture"
-              defaultFileList={[...fileList]}
-              disabled
-            />
-          </Form>
-        </div>
-        <div className="col-lg-6">
-          <Form
-            style={{
-              padding: "20px",
-              backgroundColor: "#2196531A",
-              borderRadius: 5,
-            }}
-          >
-            <span style={{ color: color.primary1 }}>สมุดธนาคาร</span> <br />
-            <span>รูปภาพหน้าสมุดธนาคาร </span>
-            <Upload
-              action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
-              listType="picture"
-              defaultFileList={[...fileList]}
-              disabled
-            />
-          </Form>
-        </div>
+        {data.imageIdCard.path != "" ? (
+          <div className="col-lg-6">
+            <Form
+              style={{
+                padding: "20px",
+                backgroundColor: "#2196531A",
+                borderRadius: 5,
+              }}
+            >
+              <span style={{ color: color.primary1 }}>บัตรประชาชน</span> <br />
+              <span>รูปถ่ายผู้สมัครคู่กับบัตรประชาชน </span>
+              <Upload
+                listType="picture"
+                defaultFileList={[...IdCard]}
+                disabled
+              />
+            </Form>
+          </div>
+        ) : (
+          <div className="col-lg-6">
+            <Form
+              style={{
+                padding: "20px",
+                backgroundColor: "#FCE3E3",
+                borderRadius: 5,
+              }}
+            >
+              <span style={{ color: color.primary1 }}>บัตรประชาชน</span> <br />
+              <span>รูปถ่ายผู้สมัครคู่กับบัตรประชาชน </span>
+              <div
+                style={{
+                  backgroundColor: color.White,
+                  width: "100%",
+                  height: "70px",
+                  borderRadius: 3,
+                }}
+              >
+                <div>
+                  <CloseCircleFilled
+                    className="col-lg-3"
+                    style={{
+                      color: color.Error,
+                      width: "42px",
+                      fontSize: "42px",
+                      padding: 15,
+                    }}
+                  />
+                  <span style={{ color: color.Error, margin: 50 }}>
+                    ยังไม่มีรูปถ่ายผู้สมัครคู่กับบัตรประชาชน
+                  </span>
+                </div>
+              </div>
+            </Form>
+          </div>
+        )}
+        {data.imageBookBank.path != "" ? (
+          <div className="col-lg-6">
+            <Form
+              style={{
+                padding: "20px",
+                backgroundColor: "#2196531A",
+                borderRadius: 5,
+              }}
+            >
+              <span style={{ color: color.primary1 }}>สมุดธนาคาร</span> <br />
+              <span>รูปภาพหน้าสมุดธนาคาร </span>
+              <Upload
+                listType="picture"
+                defaultFileList={[...BookBank]}
+                disabled
+              />
+            </Form>
+          </div>
+        ) : (
+          <div className="col-lg-6">
+            <Form
+              style={{
+                padding: "20px",
+                backgroundColor: "#FCE3E3",
+                borderRadius: 5,
+              }}
+            >
+              <span style={{ color: color.primary1 }}>สมุดธนาคาร</span> <br />
+              <span>รูปภาพหน้าสมุดธนาคาร </span>
+              <div
+                style={{
+                  backgroundColor: color.White,
+                  width: "100%",
+                  height: "70px",
+                  borderRadius: 3,
+                }}
+              >
+                <div>
+                  <CloseCircleFilled
+                    className="col-lg-3"
+                    style={{
+                      color: color.Error,
+                      width: "42px",
+                      fontSize: "42px",
+                      padding: 15,
+                    }}
+                  />
+                  <span style={{ color: color.Error, margin: 50 }}>
+                    ยังไม่มีเอกสารหน้าสมุดธนาคาร
+                  </span>
+                </div>
+              </div>
+            </Form>
+          </div>
+        )}
       </div>
     </Form>
   );
@@ -514,7 +636,10 @@ function EditReport() {
                 ยอดรวมค่าบริการ
                 <br />
                 <b style={{ fontSize: "20px", color: color.Success }}>
-                  1,000.00 บาท
+                  {data.data.totalPrice !== null
+                    ? numberWithCommas(parseFloat(data.data.totalPrice)) +
+                      " บาท"
+                    : "0 บาท"}
                 </b>
               </span>
             </Form.Item>
@@ -524,38 +649,74 @@ function EditReport() {
           <div className="col-lg-4">
             <Form.Item>
               <label>ค่าบริการ (ก่อนคิดค่าธรรมเนียม)</label>
-              <Input disabled value="1,100.00 บาท" suffix="บาท" />
+              <Input
+                disabled
+                value={
+                  data.data.price !== null
+                    ? numberWithCommas(parseFloat(data.data.price))
+                    : 0
+                }
+                suffix="บาท"
+              />
             </Form.Item>
           </div>
           <div className="col-lg-4">
             <Form.Item>
               <label>ค่าธรรมเนียม (5% ของค่าบริการ)</label>
-              <Input disabled placeholder="0.0" value="250.00" suffix="บาท" />
+              <Input
+                disabled
+                placeholder="0.0"
+                value={
+                  data.data.fee !== null
+                    ? numberWithCommas(parseFloat(data.data.fee))
+                    : 0
+                }
+                suffix="บาท"
+              />
             </Form.Item>
           </div>
           <div className="col-lg-4">
             <Form.Item>
               <label>ส่วนลดค่าธรรมเนียม</label>
-              <Input disabled value="250.00" suffix="บาท" />
+              <Input
+                disabled
+                value={
+                  data.data.discountFee !== null
+                    ? numberWithCommas(parseFloat(data.data.discountFee))
+                    : 0
+                }
+                suffix="บาท"
+              />
             </Form.Item>
           </div>
           <div className="form-group col-lg-4">
             <label>รหัสคูปอง</label>
-            <Input value="ABCD" disabled autoComplete="off" />
+            <Input
+              value={couponData.couponCode != "" ? couponData.couponCode : "-"}
+              disabled
+              autoComplete="off"
+            />
           </div>
           <div className="form-group col-lg-4">
             <label>ชื่อคูปอง</label>
-            <Input value="ส่วนลดฉีดพ่น 100 บาท" disabled autoComplete="off" />
+            <Input
+              value={couponData.couponName != "" ? couponData.couponName : "-"}
+              disabled
+              autoComplete="off"
+            />
           </div>
           <div className="form-group col-lg-4">
             <label>ส่วนลดคูปอง</label>
-            <Input value="100.00" disabled autoComplete="off" />
+            <Input
+              value={numberWithCommas(couponData.couponDiscount!)}
+              disabled
+              autoComplete="off"
+            />
           </div>
         </div>
       </Form>
     </Form>
   );
-
   return (
     <Layout>
       <div className="container d-flex justify-content-between pt-1">
@@ -564,12 +725,12 @@ function EditReport() {
             onClick={() => (window.location.href = "/IndexReport")}
           />
         </div>
-        <div className="col-lg-10 pt-4">
+        <div className="col-lg-9 pt-4">
           <strong style={{ fontSize: "20px" }}>
-            รายละเอียดงาน #TK00000001
+            รายละเอียดงาน {data.data.taskNo}
           </strong>
         </div>
-        <div className="col-lg-2 pt-4">
+        <div className="col-lg pt-4">
           <Button
             className="col-lg-9 p-1"
             style={{
@@ -603,8 +764,7 @@ function EditReport() {
       </CardContainer>
       <FooterPage
         onClickBack={() => (window.location.href = "/IndexReport")}
-        onClickSave={() => (window.location.href = "/IndexReport")}
-        // disableSaveBtn={saveBtnDisable}
+        onClickSave={() => UpdateStatusPayment()}
       />
     </Layout>
   );

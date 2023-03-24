@@ -484,7 +484,6 @@ export default function IndexTodayTask() {
       sorter: (a: any, b: any) =>
         sorter(a.farmer_firstname, b.farmer_firstname),
       render: (value: any, row: any, index: number) => {
-        console.log(row);
         return {
           children: (
             <>
@@ -603,7 +602,9 @@ export default function IndexTodayTask() {
                 <br />
               </span>
               <span style={{ color: color.Grey, fontSize: "12px" }}>
-                <UserOutlined style={{ padding: "0 4px 0 0" }} />
+                <UserOutlined
+                  style={{ padding: "0 4px 0 0", verticalAlign: 0.5 }}
+                />
                 {row.task_update_by}
               </span>
             </>

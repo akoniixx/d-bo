@@ -9,15 +9,22 @@ import {
 import {
   Badge,
   Button,
+  Checkbox,
+  Divider,
   Dropdown,
   Input,
   Menu,
+  Pagination,
+  PaginationProps,
+  Popover,
   Select,
   Table,
   Tooltip,
 } from "antd";
+import { CheckboxChangeEvent } from "antd/lib/checkbox";
 import DatePicker from "antd/lib/date-picker";
 import { ColumnsType } from "antd/lib/table";
+import { RowSelectionType } from "antd/lib/table/interface";
 import moment from "moment";
 import { useEffect, useState } from "react";
 import Swal from "sweetalert2";
@@ -26,30 +33,32 @@ import { CardContainer } from "../../components/card/CardContainer";
 import Layouts from "../../components/layout/Layout";
 import ModalMapPlot from "../../components/modal/task/finishTask/ModalMapPlot";
 import { LocationDatasource } from "../../datasource/LocationDatasource";
+import { TaskFinishedDatasource } from "../../datasource/TaskFinishDatasource";
+import { UpdateStatusPaymentDatasource } from "../../datasource/UpdateStatusPaymentDatasource";
+import { FINISH_TASK, STATUS_COLOR_TASK } from "../../definitions/FinishTask";
 import {
   DistrictEntity,
   ProviceEntity,
   SubdistrictEntity,
 } from "../../entities/LocationEntities";
+import {
+  TaskReportEntity,
+  TaskReportListEntity,
+  updateStatusPays,
+  updateStatusPays_INIT,
+} from "../../entities/TaskFinishEntities";
 import { color } from "../../resource";
+import { numberWithCommas } from "../../utilities/TextFormatter";
 
-interface DataType {
-  key: React.Key;
-  date: string;
-  farmer: string;
-  droner: string;
-  plotArea: string;
-  plotCount: string;
-  rating: string;
-  sumPrice: string;
-  status: string;
-}
 function IndexReport() {
-  const row = 5;
+  const profile = JSON.parse(localStorage.getItem("profile") || "{  }");
+  const [row, setRow] = useState(10);
   const [current, setCurrent] = useState(1);
-  // const [data, setData] = useState<TaskFinishListEntity>();
+  const [data, setData] = useState<TaskReportListEntity>();
   const [searchText, setSearchText] = useState<string>();
-  const [searchStatus, setSearchStatus] = useState<string>();
+  const [searchStatus, setSearchStatus] = useState();
+  const [searchStatusPayment, setSearchStatusPayment] = useState();
+  const [searchStatusCancel, setSearchStatusCancel] = useState();
   const [startDate, setStartDate] = useState<any>(null);
   const [endDate, setEndDate] = useState<any>(null);
   const [searchProvince, setSearchProvince] = useState<any>();
@@ -60,16 +69,46 @@ function IndexReport() {
   const [subdistrict, setSubdistrict] = useState<SubdistrictEntity[]>();
   const [showModalMap, setShowModalMap] = useState<boolean>(false);
   const [plotId, setPlotId] = useState<string>("");
-  const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
+  const [visibleRating, setVisibleRating] = useState(false);
+  const [statusArr, setStatusArr] = useState<string[]>([]);
+  const [statusPays, setStatusPays] = useState<string[]>([]);
+  const [statusCan, setStatusCan] = useState<string[]>([]);
+  const [download, setDownLoad] = useState<string[]>([]);
+  const [clickPays, setClickPays] = useState<string[]>([]);
+  const [paysEnum, setPaysEnum] = useState<string[]>([]);
+  const [arrRowEnum, setArrRowEnum] = useState<string[]>([]);
+  const [arrRow, setArrRow] = useState<string[]>([]);
+  const [selectionType] = useState<RowSelectionType>("checkbox");
+  const [statusPayment, setStatusPayment] = useState<updateStatusPays>(
+    updateStatusPays_INIT
+  );
 
   const { RangePicker } = DatePicker;
   const dateFormat = "DD/MM/YYYY";
   const timeFormat = "HH:mm";
   const dateSearchFormat = "YYYY-MM-DD";
   useEffect(() => {
+    fetchAllReport();
     fetchProvince();
   }, [current, row, startDate, endDate]);
 
+  const fetchAllReport = async () => {
+    await TaskFinishedDatasource.getAllReportDroner(
+      current,
+      row,
+      searchSubdistrict,
+      searchDistrict,
+      searchProvince,
+      startDate,
+      endDate,
+      searchStatus,
+      searchStatusPayment,
+      searchStatusCancel,
+      searchText
+    ).then((res: TaskReportListEntity) => {
+      setData(res);
+    });
+  };
   const SearchDate = (e: any) => {
     if (e != null) {
       setStartDate(moment(new Date(e[0])).format(dateSearchFormat));
@@ -102,19 +141,69 @@ function IndexReport() {
   const onChangePage = (page: number) => {
     setCurrent(page);
   };
-  const handleStatus = (status: any) => {
-    setSearchStatus(status);
+  const onShowSizeChange: PaginationProps["onShowSizeChange"] = (
+    current,
+    pageSize
+  ) => {
+    setCurrent(current);
+    setRow(pageSize);
+  };
+  const handleStatus = (e: any) => {
+    let value = e.target.value;
+    let checked = e.target.checked;
+    let arr: any = 0;
+    if (checked) {
+      arr = [...statusArr, value];
+      setStatusArr([...statusArr, value]);
+    } else {
+      let d: string[] = statusArr.filter((x) => x != value);
+      arr = [...d];
+      setStatusArr(d);
+      if (d.length == 0) {
+        arr = undefined;
+      }
+    }
+    setSearchStatus(arr);
     setCurrent(1);
   };
-  const formatNumber = (e: any) => {
-    let formatNumber = Number(e)
-      .toFixed(1)
-      .replace(/\d(?=(\d{3})+\.)/g, "$&,");
-    let splitArray = formatNumber.split(".");
-    if (splitArray.length > 1) {
-      formatNumber = splitArray[0];
+  const handleStatusPayment = (e: any) => {
+    let value = e.target.value;
+    let checked = e.target.checked;
+    let arr: any = 0;
+    if (checked) {
+      arr = [...statusPays, value];
+      setStatusPays([...statusPays, value]);
+    } else {
+      let d: string[] = statusPays.filter((x) => x != value);
+      arr = [...d];
+      setStatusPays(d);
+      if (d.length == 0) {
+        arr = undefined;
+      }
     }
-    return formatNumber;
+    setSearchStatusPayment(arr);
+    setCurrent(1);
+  };
+  const handleStatusCancel = (e: any) => {
+    let value = e.target.value;
+    let checked = e.target.checked;
+    let arr: any = 0;
+    if (checked) {
+      arr = [...statusCan, value];
+      setStatusCan([...statusCan, value]);
+      setSearchStatus(undefined);
+    } else {
+      let d: string[] = statusCan.filter((x) => x != value);
+      arr = [...d];
+      setStatusCan(d);
+      if (d.length == 0) {
+        arr = undefined;
+      }
+      const a: any = "CANCELED";
+      setSearchStatus(a);
+    }
+    setSearchStatusCancel(arr);
+    setCurrent(1);
   };
   const handleProvince = (provinceId: number) => {
     setSearchProvince(provinceId);
@@ -161,259 +250,497 @@ function IndexReport() {
     }
     return a > b ? 1 : -1;
   };
-  const onSelectChange = (newSelectedRowKeys: React.Key[]) => {
-    setSelectedRowKeys(newSelectedRowKeys);
+  const handleVisibleRating = (newVisible: any) => {
+    setVisibleRating(newVisible);
   };
-  const rowSelection = {
-    selectedRowKeys,
-    onChange: onSelectChange,
+  const status = (
+    <Menu
+      items={[
+        {
+          label: "รอรีวิว",
+          key: "1",
+          icon: (
+            <Checkbox value="WAIT_REVIEW" onClick={(e) => handleStatus(e)} />
+          ),
+        },
+        {
+          label: "เสร็จสิ้น",
+          key: "2",
+          icon: <Checkbox value="DONE" onClick={(e) => handleStatus(e)} />,
+        },
+        {
+          label: "รอจ่ายเงิน",
+          key: "3",
+          icon: (
+            <Checkbox
+              style={{ marginLeft: "20px" }}
+              value="WAIT_PAYMENT"
+              onClick={(e) => handleStatusPayment(e)}
+            />
+          ),
+        },
+        {
+          label: "จ่ายเงินแล้ว",
+          key: "4",
+          icon: (
+            <Checkbox
+              style={{ marginLeft: "20px" }}
+              value="DONE_PAYMENT"
+              onClick={(e) => handleStatusPayment(e)}
+            />
+          ),
+        },
+        {
+          label: "เสร็จสิ้น",
+          key: "5",
+          icon: (
+            <Checkbox
+              style={{ marginLeft: "20px" }}
+              value="SUCCESS"
+              onClick={(e) => handleStatusPayment(e)}
+            />
+          ),
+        },
+        {
+          label: "ยกเลิก",
+          key: "6",
+          icon: <Checkbox value="CANCELED" onClick={(e) => handleStatus(e)} />,
+        },
+        {
+          label: "รอเริ่มงาน",
+          key: "7",
+          icon: (
+            <Checkbox
+              style={{ marginLeft: "20px" }}
+              value="WAIT_START"
+              onClick={(e) => handleStatusCancel(e)}
+            />
+          ),
+        },
+        {
+          label: "กำลังดำเนินงาน",
+          key: "8",
+          icon: (
+            <Checkbox
+              style={{ marginLeft: "20px" }}
+              value="IN_PROGRESS"
+              onClick={(e) => handleStatusCancel(e)}
+            />
+          ),
+        },
+      ]}
+    />
+  );
+  const changeStatusPayment = (e: any) => {
+    let value = e.target.value;
+    let checked = e.target.checked;
+    let arr: any = [];
+    let eNum: any = [];
+    if (checked) {
+      eNum = [...arrRowEnum, value.statusPayment];
+      arr = [...arrRow, value.id];
+      setArrRow([...arrRow, value.id]);
+    } else {
+      let d: string[] = arrRow.filter((x) => x != value.id);
+      arr = [...d];
+      setArrRow(d);
+      if (d.length == 0) {
+        arr = [];
+      }
+    }
+    setPaysEnum(eNum);
+    setClickPays(arr);
+    setDownLoad(arr);
   };
-  const paid = (data: any) => {
+  const updateStatusPayment = async () => {
     Swal.fire({
-      title: "ยืนยันการเปลี่ยนสถานะ",
-      text: "โปรดตรวจสอบงานที่คุณต้องการเปลี่ยนสถานะ ก่อนที่จะกดยืนยัน เพราะอาจส่งผลต่อการจ่ายเงินของนักบินโดรนในระบบ",
+      title: "ยืนยันการแก้ไข",
+      text: "โปรดตรวจสอบงานที่คุณต้องการแก้ไข ก่อนที่จะกดยืนยันแก้ไข เพราะอาจส่งผลต่อการจ้างงานในแอปพลิเคชัน",
       cancelButtonText: "ยกเลิก",
-      confirmButtonText: "ยืนยัน",
+      confirmButtonText: "บันทึก",
       confirmButtonColor: color.Success,
       showCancelButton: true,
       showCloseButton: true,
     }).then(async (result) => {
       if (result.isConfirmed) {
-        // call api
+        if (paysEnum[0] === "WAIT_PAYMENT") {
+          const updateBy = profile.firstname + " " + profile.lastname;
+          const updateInfo = { ...statusPayment };
+          updateInfo.id = clickPays;
+          updateInfo.statusPayment = "DONE_PAYMENT";
+          updateInfo.updateBy = updateBy;
+          await UpdateStatusPaymentDatasource.UpdateStatusPayment(
+            updateInfo
+          ).then((res) => {
+            window.location.href = "/IndexReport";
+          });
+        } else if (paysEnum[0] === "DONE_PAYMENT") {
+          const updateBy = profile.firstname + " " + profile.lastname;
+          const updateInfo = { ...statusPayment };
+          updateInfo.id = clickPays;
+          updateInfo.statusPayment = "WAIT_PAYMENT";
+          updateInfo.updateBy = updateBy;
+          await UpdateStatusPaymentDatasource.UpdateStatusPayment(
+            updateInfo
+          ).then((res) => {
+            window.location.href = "/IndexReport";
+          });
+        }
+        fetchAllReport();
       }
     });
   };
-  const menu = (
-    <Menu
-      items={[
-        {
-          label: "ดาวน์โหลดไฟล์ PDF",
-          key: "1",
-          // onClick: () => (window.location.href = "/"),
-        },
-        {
-          label: "ดาวน์โหลดไฟล์ Excel",
-          key: "2",
-          // onClick: () => (window.location.href = "/"),
-        },
-      ]}
-    />
-  );
-  const data: DataType[] = [
+  const handleAllSelect = (e: any) => {
+    let checked = e.target.checked;
+  };
+
+  const columns: ColumnsType<TaskReportEntity> = [
     {
-      key: "1",
-      date: "12/03/2023",
-      farmer: "สมชาย",
-      droner: "สมศักดิ์",
-      plotArea: "สวนพริกไทย/เมืองปทุมธานี/ปทุมธานี",
-      plotCount: "20 ไร่",
-      rating: "4.0",
-      sumPrice: "1,000 บาท",
-      status: "รอจ่ายเงิน",
+      title: selectionType == "checkbox" && (
+        <input
+          type={selectionType}
+          onChange={handleAllSelect}
+          // checked={dataDronerList
+          //   .filter((x) => x.is_open_receive_task != false)
+          //   .every((x) => x.isChecked)}
+          style={{ width: "18px", height: "18px" }}
+        />
+      ),
+      width: "3%",
+      render: (value: any, row: any, index: number) => {
+        return {
+          children: (
+            <>
+              <Checkbox value={row} onChange={changeStatusPayment} />
+            </>
+          ),
+        };
+      },
     },
-    {
-      key: "2",
-      date: "12/03/2023",
-      farmer: "สมหญิง",
-      droner: "สมหมาย",
-      plotArea: "ปากเพรียว/เมืองสระบุรี/สระบุรี",
-      plotCount: "50 ไร่",
-      rating: "5.0",
-      sumPrice: "2,500 บาท",
-      status: "รอจ่ายเงิน",
-    },
-    {
-      key: "3",
-      date: "12/03/2023",
-      farmer: "สมหญิง",
-      droner: "สมหมาย",
-      plotArea: "ปากเพรียว/เมืองสระบุรี/สระบุรี",
-      plotCount: "50 ไร่",
-      rating: "5.0",
-      sumPrice: "2,500 บาท",
-      status: "จ่ายเงินแล้ว",
-    },
-  ];
-  const columns: ColumnsType<DataType> = [
     {
       title: "วัน/เวลา นัดหมาย",
-      dataIndex: "date",
-      sorter: (a: any, b: any) => sorter(a.date, b.date),
-      render: (text: string) => (
-        <>
-          <span className="text-dark-75  d-block font-size-lg">
-            {moment(new Date()).format(dateFormat)},{" "}
-            {moment(new Date()).format(timeFormat)}
-          </span>
-          <span style={{ color: color.Disable, fontSize: "12px" }}>
-            {"TK00000010"}
-          </span>
-        </>
-      ),
+      dataIndex: "dateAppointment",
+      key: "dateAppointment",
+      sorter: (a: any, b: any) => sorter(a.dateAppointment, b.dateAppointment),
+      render: (value: any, row: any, index: number) => {
+        return {
+          children: (
+            <>
+              <span className="text-dark-75  d-block font-size-lg">
+                {moment(new Date(row.dateAppointment)).format(dateFormat)},{" "}
+                {moment(new Date(row.dateAppointment)).format(timeFormat)}
+              </span>
+              <span style={{ color: color.Disable, fontSize: "12px" }}>
+                {row.taskNo}
+              </span>
+            </>
+          ),
+        };
+      },
     },
     {
-      title: "",
-      dataIndex: "farmer",
-      render: (text: string) => (
-        <a>
-          {text}
-          <br />
-          <span style={{ color: color.Grey, fontSize: "12px" }}>
-            {"0805233635"}
-          </span>
-        </a>
-      ),
-    },
-    {
-      title: "",
+      title: "ชื่อนักบินโดรน",
       dataIndex: "droner",
-      render: (text: string) => (
-        <a>
-          {text}
-          <br />
-          <span style={{ color: color.Grey, fontSize: "12px" }}>
-            {"0989284761"}
-          </span>
-        </a>
-      ),
+      key: "droner",
+      sorter: (a: any, b: any) => sorter(a.droner, b.droner),
+      render: (value: any, row: any, index: number) => {
+        return {
+          children: (
+            <>
+              <span className="text-dark-75  d-block font-size-lg">
+                {row.droner !== null
+                  ? row.droner.firstname + " " + row.droner.lastname
+                  : "-"}
+              </span>
+              <span style={{ color: color.Grey, fontSize: "12px" }}>
+                {row.droner !== null ? row.droner.telephoneNo : null}
+              </span>
+            </>
+          ),
+        };
+      },
+    },
+    {
+      title: "ชื่อเกษตรกร",
+      dataIndex: "farmer",
+      key: "farmer",
+      sorter: (a: any, b: any) => sorter(a.farmer, b.farmer),
+      render: (value: any, row: any, index: number) => {
+        return {
+          children: (
+            <>
+              <span className="text-dark-75  d-block font-size-lg">
+                {row.farmer !== null
+                  ? row.farmer.firstname + " " + row.farmer.lastname
+                  : "-"}
+              </span>
+              <span style={{ color: color.Grey, fontSize: "12px" }}>
+                {row.farmer.telephoneNo}
+              </span>
+            </>
+          ),
+        };
+      },
     },
     {
       title: "พื้นที่แปลงเกษตร",
       dataIndex: "plotArea",
-      render: (text: string) => (
-        <>
-          <span className="text-dark-75  d-block font-size-lg">{text}</span>
-          <a
-            // onClick={() => handleModalMap(row.farmerPlotId)}
-            style={{ color: color.primary1 }}
-          >
-            ดูแผนที่แปลง
-          </a>
-        </>
-      ),
+      key: "plotArea",
+      render: (value: any, row: any, index: number) => {
+        const subdistrict = row.farmerPlot.plotArea;
+        const district = row.farmerPlot.plotArea;
+        const province = row.farmerPlot.plotArea;
+        return {
+          children: (
+            <>
+              <span className="text-dark-75  d-block font-size-lg">
+                {subdistrict !== null
+                  ? subdistrict.subdistrictName + "/"
+                  : null}
+                {district !== null ? district.districtName + "/" : null}
+                {province !== null ? province.provinceName + "" : null}
+              </span>
+              <a
+                onClick={() => handleModalMap(row.farmerPlotId)}
+                style={{ color: color.primary1 }}
+              >
+                ดูแผนที่แปลง
+              </a>
+            </>
+          ),
+        };
+      },
     },
     {
       title: "จำนวนไร่",
-      dataIndex: "plotCount",
-      sorter: (a: any, b: any) => sorter(a.name, b.name),
-      render: (text: string) => <a>{text}</a>,
+      dataIndex: "farmAreaAmount",
+      key: "farmAreaAmount",
+      sorter: (a: any, b: any) => sorter(a.farmAreaAmount, b.farmAreaAmount),
+      render: (value: any, row: any, index: number) => {
+        return {
+          children: (
+            <>
+              <span className="text-dark-75  d-block font-size-lg">
+                {`${row.farmAreaAmount} ไร่`}
+              </span>
+            </>
+          ),
+        };
+      },
     },
+
     {
       title: "Rating",
-      dataIndex: "rating",
-      sorter: (a: any, b: any) => sorter(a.name, b.name),
-      render: (text: string) => (
-        <>
-          <span>
-            <StarFilled
-              style={{
-                color: "#FFCA37",
-                fontSize: "20px",
-                marginRight: "7px",
-              }}
-            />
-            {parseFloat(`${text}`).toFixed(1)}
-          </span>
-        </>
-      ),
+      dataIndex: "reviewDronerAvg",
+      key: "reviewDronerAvg",
+      sorter: (a: any, b: any) => sorter(a.reviewDronerAvg, b.reviewDronerAvg),
+      render: (value: any, row: any, index: number) => {
+        return {
+          children: (
+            <>
+              <span className="text-dark-75  d-block font-size-lg">
+                {row.reviewDronerAvg > "0" ? (
+                  <span>
+                    <StarFilled
+                      style={{
+                        color: "#FFCA37",
+                        fontSize: "20px",
+                        marginRight: "7px",
+                        verticalAlign: 0.5,
+                      }}
+                    />
+                    {parseFloat(row.reviewDronerAvg).toFixed(1)}
+                  </span>
+                ) : (
+                  "-"
+                )}
+              </span>
+            </>
+          ),
+        };
+      },
     },
     {
       title: "ยอดรวมค่าบริการ",
-      dataIndex: "sumPrice",
-      sorter: (a: any, b: any) => sorter(a.name, b.name),
-      render: (text: string) => (
-        <>
-          <span className="text-dark-75  d-block font-size-lg">
-            {text}
-            <Tooltip title={"?"} className="p-2">
-              <InfoCircleFilled
-                style={{
-                  fontSize: "18px",
-                  marginLeft: "3px",
-                  color: color.primary1,
-                }}
-              />
-            </Tooltip>
-          </span>
-        </>
-      ),
+      dataIndex: "totalPrice",
+      key: "totalPrice",
+      sorter: (a: any, b: any) => sorter(a.totalPrice, b.totalPrice),
+      render: (value: any, row: any, index: number) => {
+        return {
+          children: (
+            <div>
+              <span className="text-dark-75 d-block font-size-lg">
+                {row.totalPrice != null
+                  ? numberWithCommas(row.totalPrice) + " บาท"
+                  : "0 บาท"}
+                <Popover
+                  title={
+                    <span
+                      style={{
+                        color: color.White,
+                      }}
+                    >
+                      รายละเอียดค่าบริการ
+                    </span>
+                  }
+                  content={
+                    <table style={{ width: "300px" }}>
+                      <tr>
+                        <td>ค่าบริการ</td>
+                        <td>{numberWithCommas(row.price) + " บาท"}</td>
+                      </tr>
+                      <tr>
+                        <td>ค่าธรรมเนียม (5%)</td>
+                        <td>{numberWithCommas(row.fee) + " บาท"}</td>
+                      </tr>
+                      <tr>
+                        <td>ส่วนลดค่าธรรมเนียม</td>
+                        <td>{numberWithCommas(row.discountFee) + " บาท"}</td>
+                      </tr>
+                      <tr>
+                        <td>ส่วนลดจากคูปอง</td>
+                        <td>{numberWithCommas(row.discount) + " บาท"}</td>
+                      </tr>
+                      <tr>
+                        <td>
+                          <Divider />
+                        </td>
+                        <td>
+                          {" "}
+                          <Divider />
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>ยอดรวมค่าบริการ</td>
+                        <td>{numberWithCommas(row.totalPrice) + " บาท"}</td>
+                      </tr>
+                    </table>
+                  }
+                >
+                  <InfoCircleFilled
+                    style={{
+                      color: color.primary1,
+                      fontSize: "15px",
+                      marginLeft: "7px",
+                      verticalAlign: 0.5,
+                    }}
+                  />
+                </Popover>
+              </span>
+            </div>
+          ),
+        };
+      },
     },
     {
       title: "สถานะ",
       dataIndex: "status",
-      render: (text: string) => (
-        <>
-          {text === "จ่ายเงินแล้ว" ? (
+      key: "status",
+      render: (value: any, row: any, index: number) => {
+        const statusCancel =
+          row.taskHistory[0] != undefined
+            ? row.taskHistory[0].beforeValue
+            : null;
+        return {
+          children: (
             <>
-              <span style={{ color: "#A9CB62" }}>
-                <Badge color={"#A9CB62"} /> {text}
+              <span style={{ color: STATUS_COLOR_TASK[row.status] }}>
+                <Badge color={STATUS_COLOR_TASK[row.status]} />{" "}
+                {FINISH_TASK[row.status]}
+                <span style={{ color: color.Success }}>
+                  {row.statusPayment == "WAIT_PAYMENT"
+                    ? " " + "(" + "รอจ่ายเงิน" + ")"
+                    : null}
+                </span>
+                <span style={{ color: color.secondary3 }}>
+                  {row.statusPayment == "DONE_PAYMENT"
+                    ? " " + "(" + "จ่ายเงินแล้ว" + ")"
+                    : null}
+                </span>
+                <span style={{ color: color.secondary1 }}>
+                  {row.statusPayment == "SUCCESS"
+                    ? " " + "(" + "เสร็จสิ้น" + ")"
+                    : null}
+                </span>
+                <span style={{ color: color.Error }}>
+                  {statusCancel == "WAIT_START"
+                    ? " " + "(" + "รอเริ่มงาน" + ")"
+                    : null}
+                </span>
+                <span style={{ color: color.Error }}>
+                  {statusCancel == "IN_PROGRESS"
+                    ? " " + "(" + "กำลังดำเนินงาน" + ")"
+                    : null}
+                </span>
                 <br />
               </span>
               <span style={{ color: color.Grey, fontSize: "12px" }}>
-                <UserOutlined style={{ padding: "0 4px 0 0" }} />
-                {"SaiMhai"}
+                <UserOutlined
+                  style={{ padding: "0 4px 0 0", verticalAlign: 0.5 }}
+                />
+                {row.updateBy != null ? row.updateBy : "-"}
               </span>
             </>
-          ) : (
-            <>
-              <span style={{ color: color.primary1 }}>
-                <Badge color={color.primary1} /> {text}
-                <br />
-              </span>
-              <span style={{ color: color.Grey, fontSize: "12px" }}>
-                <UserOutlined style={{ padding: "0 4px 0 0" }} />
-                {"SaiMhai"}
-              </span>
-            </>
-          )}
-        </>
-      ),
+          ),
+        };
+      },
     },
     {
       title: "",
-      dataIndex: "action",
-      width: "5%",
+      dataIndex: "Action",
+      key: "Action",
       fixed: "right",
-      render: (text: string) => (
-        <div className="d-flex flex-row justify-content-between">
-          <ActionButton
-            icon={<EditOutlined />}
-            color={color.primary1}
-            onClick={() => (window.location.href = "/EditReport?=")}
-          />
-        </div>
-      ),
+      width: "5%",
+      render: (value: any, row: any, index: number) => {
+        return {
+          children: (
+            <div className="d-flex flex-row justify-content-between">
+              <ActionButton
+                icon={<EditOutlined />}
+                color={color.primary1}
+                onClick={() =>
+                  (window.location.href = "/EditReport?=" + row.id)
+                }
+              />
+            </div>
+          ),
+        };
+      },
     },
   ];
+
   const PageTitle = (
     <>
       <div
         className="container d-flex justify-content-between"
         style={{ padding: "10px" }}
       >
-        {selectedRowKeys.length != 0 ? (
+        <div className="col-lg-6">
+          <span
+            className="card-label font-weight-bolder text-dark"
+            style={{
+              fontSize: 22,
+              fontWeight: "bold",
+            }}
+          >
+            <strong>งานที่เสร็จแล้ว</strong>
+          </span>
+        </div>
+        <div style={{ color: color.Error }}>
+          <RangePicker
+            allowClear
+            onCalendarChange={SearchDate}
+            format={dateFormat}
+          />
+        </div>
+
+        {clickPays.length > 0 && download.length > 0 ? (
           <>
-            <div className="col-lg-6">
-              <span
-                className="card-label font-weight-bolder text-dark"
-                style={{
-                  fontSize: 22,
-                  fontWeight: "bold",
-                }}
-              >
-                <strong>งานที่เสร็จแล้ว</strong>
-              </span>
-            </div>
-            <div style={{ color: color.Error }}>
-              <RangePicker
-                allowClear
-                onCalendarChange={SearchDate}
-                format={dateFormat}
-              />
-            </div>
             <div>
               <div>
-                <Dropdown overlay={menu}>
+                <Dropdown
+                // overlay={menu}
+                >
                   <Button
                     style={{
                       padding: "8 0",
@@ -437,47 +764,37 @@ function IndexReport() {
                   color: color.secondary2,
                   backgroundColor: color.Success,
                 }}
-                onClick={()=> paid(selectedRowKeys)}
+                onClick={() => updateStatusPayment()}
               >
-                จ่ายเงินแล้ว
+                {paysEnum[0] == null || paysEnum[0] === "SUCCESS"
+                  ? null
+                  : paysEnum[0] === "WAIT_PAYMENT"
+                  ? "จ่ายเงินแล้ว"
+                  : "DONE_PAYMENT"
+                  ? "รอจ่ายเงิน"
+                  : null}
               </Button>
             </div>
           </>
         ) : (
-          <>
-            <div className="col-lg-7">
-              <span
-                className="card-label font-weight-bolder text-dark"
+          <div style={{ width: "200px" }}>
+            <Dropdown
+            // overlay={menu}
+            >
+              <Button
                 style={{
-                  fontSize: 22,
-                  fontWeight: "bold",
+                  padding: "8 0",
+                  backgroundColor: color.Disable,
+                  color: color.Grey,
+                  borderColor: color.Disable,
+                  borderRadius: "5px",
                 }}
               >
-                <strong>งานที่เสร็จแล้ว</strong>
-              </span>
-            </div>
-            <div style={{ color: color.Error }}>
-              <RangePicker
-                allowClear
-                onCalendarChange={SearchDate}
-                format={dateFormat}
-              />
-            </div>
-            <div>
-              <div>
-                <Button
-                  disabled
-                  style={{
-                    padding: "8 0",
-                    borderRadius: "5px",
-                  }}
-                >
-                  ดาวน์โหลดเอกสาร
-                  <DownOutlined />
-                </Button>
-              </div>
-            </div>
-          </>
+                ดาวน์โหลดเอกสาร
+                <DownOutlined />
+              </Button>
+            </Dropdown>
+          </div>
         )}
       </div>
       <div className="container d-flex justify-content-between pt-3">
@@ -497,14 +814,18 @@ function IndexReport() {
                 borderRadius: "5px",
                 padding: "10px",
                 width: "100%",
-                marginRight: "10px",
               }}
             >
               <div
                 className="d-flex justify-content-between"
                 style={{ color: color.White, fontWeight: "bold" }}
               >
-                <p>รอรีวิว</p>
+                <span>รอรีวิว</span>
+                <strong>
+                  {data?.summary != undefined
+                    ? data?.summary[0].waitreview
+                    : "0"}
+                </strong>
               </div>
             </CardContainer>
           </div>
@@ -517,7 +838,7 @@ function IndexReport() {
             borderRadius: "5px",
           }}
         >
-          <p>เสร็จสิน</p>
+          <p>เสร็จสิ้น</p>
           <div className="d-flex justify-content-between">
             <CardContainer
               style={{
@@ -532,12 +853,17 @@ function IndexReport() {
                 className="d-flex justify-content-between"
                 style={{ color: color.White, fontWeight: "bold" }}
               >
-                <p>รอจ่ายเงิน</p>
+                <span>รอจ่ายเงิน</span>
+                <strong>
+                  {data?.summary != undefined
+                    ? data?.summary[0].waitpayment
+                    : "0"}
+                </strong>
               </div>
             </CardContainer>
             <CardContainer
               style={{
-                backgroundColor: "#A9CB62",
+                backgroundColor: color.secondary3,
                 borderRadius: "5px",
                 padding: "10px",
                 width: "100%",
@@ -548,7 +874,12 @@ function IndexReport() {
                 className="d-flex justify-content-between"
                 style={{ color: color.White, fontWeight: "bold" }}
               >
-                <p>จ่ายเงินแล้ว (บริษัท)</p>
+                <span>จ่ายเงินแล้ว (บริษัท)</span>
+                <strong>
+                  {data?.summary != undefined
+                    ? data?.summary[0].donepayment
+                    : "0"}
+                </strong>
               </div>
             </CardContainer>
             <CardContainer
@@ -564,7 +895,12 @@ function IndexReport() {
                 className="d-flex justify-content-between"
                 style={{ color: color.White, fontWeight: "bold" }}
               >
-                <p>เสร็จสิ้น</p>
+                <span>เสร็จสิ้น</span>
+                <strong>
+                  {data?.summary != undefined
+                    ? data?.summary[0].successpayment
+                    : "0"}
+                </strong>
               </div>
             </CardContainer>
           </div>
@@ -591,7 +927,12 @@ function IndexReport() {
                 className="d-flex justify-content-between"
                 style={{ color: color.White, fontWeight: "bold" }}
               >
-                <p>ยกเลิก</p>
+                <span>ยกเลิก</span>
+                <strong>
+                  {data?.summary != undefined
+                    ? data?.summary[0].canceledtask
+                    : "0"}
+                </strong>
               </div>
             </CardContainer>
           </div>
@@ -680,17 +1021,19 @@ function IndexReport() {
             ))}
           </Select>
         </div>
-        <div className="col-lg">
-          <Select
-            className="col-lg-12 p-1"
-            placeholder="เลือกสถานะ"
-            onChange={handleStatus}
-            allowClear
-            options={[
-              { value: "รอจ่ายเงิน", label: "รอจ่ายเงิน" },
-              { value: "จ่ายเงินแล้ว", label: "จ่ายเงินแล้ว" },
-            ]}
-          />
+        <div className="col-lg p-1">
+          <Dropdown
+            overlay={status}
+            trigger={["click"]}
+            className="col-lg-12"
+            onVisibleChange={handleVisibleRating}
+            visible={visibleRating}
+          >
+            <Button style={{ color: color.Disable }}>
+              เลือกสถานะ
+              <DownOutlined />
+            </Button>
+          </Dropdown>
         </div>
         <div className="pt-1">
           <Button
@@ -700,7 +1043,7 @@ function IndexReport() {
               color: color.secondary2,
               backgroundColor: color.Success,
             }}
-            // onClick={}
+            onClick={fetchAllReport}
           >
             ค้นหาข้อมูล
           </Button>
@@ -714,11 +1057,22 @@ function IndexReport() {
       {PageTitle}
       <br />
       <Table
-        rowSelection={rowSelection}
+        // rowSelection={rowSelection}
         columns={columns}
-        dataSource={data}
-        scroll={{ x: 1350 }}
+        dataSource={data?.data}
+        scroll={{ x: 1400 }}
+        pagination={false}
       />
+      <div className="d-flex justify-content-between pt-5">
+        <p>รายการทั้งหมด {data?.count} รายการ</p>
+        <Pagination
+          current={current}
+          showSizeChanger
+          onChange={onChangePage}
+          onShowSizeChange={onShowSizeChange}
+          total={data?.count}
+        />
+      </div>
       {showModalMap && (
         <ModalMapPlot
           show={showModalMap}
