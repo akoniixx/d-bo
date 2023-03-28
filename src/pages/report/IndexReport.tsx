@@ -22,6 +22,7 @@ import {
   Tooltip,
 } from "antd";
 import { CheckboxChangeEvent } from "antd/lib/checkbox";
+import { CheckboxValueType } from "antd/lib/checkbox/Group";
 import DatePicker from "antd/lib/date-picker";
 import { ColumnsType } from "antd/lib/table";
 import { RowSelectionType } from "antd/lib/table/interface";
@@ -35,7 +36,11 @@ import ModalMapPlot from "../../components/modal/task/finishTask/ModalMapPlot";
 import { LocationDatasource } from "../../datasource/LocationDatasource";
 import { TaskFinishedDatasource } from "../../datasource/TaskFinishDatasource";
 import { UpdateStatusPaymentDatasource } from "../../datasource/UpdateStatusPaymentDatasource";
-import { FINISH_TASK, STATUS_COLOR_TASK } from "../../definitions/FinishTask";
+import {
+  FINISH_TASK,
+  FINISH_TASK_SEARCH,
+  STATUS_COLOR_TASK,
+} from "../../definitions/FinishTask";
 import {
   DistrictEntity,
   ProviceEntity,
@@ -43,10 +48,12 @@ import {
 } from "../../entities/LocationEntities";
 import {
   TaskReportEntity,
+  TaskReportEntity_INIT,
   TaskReportListEntity,
   updateStatusPays,
   updateStatusPays_INIT,
 } from "../../entities/TaskFinishEntities";
+import { downloadExcel } from "react-export-table-to-excel";
 import { color } from "../../resource";
 import { numberWithCommas } from "../../utilities/TextFormatter";
 
@@ -78,11 +85,10 @@ function IndexReport() {
   const [paysEnum, setPaysEnum] = useState<string[]>([]);
   const [arrRowEnum, setArrRowEnum] = useState<string[]>([]);
   const [arrRow, setArrRow] = useState<string[]>([]);
-  const [selectionType] = useState<RowSelectionType>("checkbox");
+  const [checkAll, setCheckAll] = useState<any>();
   const [statusPayment, setStatusPayment] = useState<updateStatusPays>(
     updateStatusPays_INIT
   );
-
   const { RangePicker } = DatePicker;
   const dateFormat = "DD/MM/YYYY";
   const timeFormat = "HH:mm";
@@ -173,13 +179,17 @@ function IndexReport() {
     if (checked) {
       arr = [...statusPays, value];
       setStatusPays([...statusPays, value]);
+      setSearchStatus(undefined);
     } else {
       let d: string[] = statusPays.filter((x) => x != value);
       arr = [...d];
       setStatusPays(d);
       if (d.length == 0) {
         arr = undefined;
+        const a: any = "DONE";
+        setSearchStatus(a);
       }
+      setSearchStatus(undefined);
     }
     setSearchStatusPayment(arr);
     setCurrent(1);
@@ -198,9 +208,10 @@ function IndexReport() {
       setStatusCan(d);
       if (d.length == 0) {
         arr = undefined;
+        const a: any = "CANCELED";
+        setSearchStatus(a);
       }
-      const a: any = "CANCELED";
-      setSearchStatus(a);
+      setSearchStatus(undefined);
     }
     setSearchStatusCancel(arr);
     setCurrent(1);
@@ -331,6 +342,7 @@ function IndexReport() {
       ]}
     />
   );
+
   const changeStatusPayment = (e: any) => {
     let value = e.target.value;
     let checked = e.target.checked;
@@ -338,13 +350,16 @@ function IndexReport() {
     let eNum: any = [];
     if (checked) {
       eNum = [...arrRowEnum, value.statusPayment];
+      setArrRowEnum([...arrRowEnum, value.statusPayment]);
       arr = [...arrRow, value.id];
       setArrRow([...arrRow, value.id]);
     } else {
       let d: string[] = arrRow.filter((x) => x != value.id);
+      let s: string[] = arrRowEnum.filter((x) => x != value.statusPayment);
       arr = [...d];
       setArrRow(d);
-      if (d.length == 0) {
+      setArrRowEnum(s);
+      if (d.length == 0 || s.length == 0) {
         arr = [];
       }
     }
@@ -352,6 +367,26 @@ function IndexReport() {
     setClickPays(arr);
     setDownLoad(arr);
   };
+  const downloadFile = (
+    <Menu
+      items={[
+        {
+          label: "ดาวน์โหลดไฟล์ PDF",
+          key: "pdf",
+          // icon: (
+          //   <Checkbox value="WAIT_REVIEW" onClick={(e) => handleStatus(e)} />
+          // ),
+        },
+        {
+          label: "ดาวน์โหลดไฟล์ Excel",
+          key: "excel",
+          // icon: (
+          //   <Checkbox value="WAIT_REVIEW" onClick={(e) => handleStatus(e)} />
+          // ),
+        },
+      ]}
+    />
+  );
   const updateStatusPayment = async () => {
     Swal.fire({
       title: "ยืนยันการแก้ไข",
@@ -391,27 +426,44 @@ function IndexReport() {
     });
   };
   const handleAllSelect = (e: any) => {
+    let value = e.target.value;
     let checked = e.target.checked;
+    if (checked) {
+      if (value) {
+        let a = value.filter((x: any) => x != false);
+        setCheckAll(a);
+      }
+    } else {
+      setCheckAll(undefined);
+    }
   };
-
+  console.log(checkAll);
   const columns: ColumnsType<TaskReportEntity> = [
     {
-      title: selectionType == "checkbox" && (
-        <input
-          type={selectionType}
-          onChange={handleAllSelect}
-          // checked={dataDronerList
-          //   .filter((x) => x.is_open_receive_task != false)
-          //   .every((x) => x.isChecked)}
-          style={{ width: "18px", height: "18px" }}
-        />
+      title: (
+        <>
+          <Checkbox
+            value={data?.data.map(
+              (x) => x.statusPayment === "WAIT_PAYMENT" && "DONE_PAYMENT"
+            )}
+            onChange={handleAllSelect}
+          />
+        </>
       ),
       width: "3%",
       render: (value: any, row: any, index: number) => {
         return {
           children: (
             <>
-              <Checkbox value={row} onChange={changeStatusPayment} />
+              <Checkbox
+                value={row}
+                onChange={changeStatusPayment}
+                disabled={
+                  row.statusPayment != "WAIT_PAYMENT" &&
+                  row.statusPayment != "DONE_PAYMENT"
+                }
+                // checked={checkAll}
+              />
             </>
           ),
         };
@@ -564,6 +616,7 @@ function IndexReport() {
       title: "ยอดรวมค่าบริการ",
       dataIndex: "totalPrice",
       key: "totalPrice",
+      fixed: "right",
       sorter: (a: any, b: any) => sorter(a.totalPrice, b.totalPrice),
       render: (value: any, row: any, index: number) => {
         return {
@@ -636,6 +689,7 @@ function IndexReport() {
       title: "สถานะ",
       dataIndex: "status",
       key: "status",
+      fixed: "right",
       render: (value: any, row: any, index: number) => {
         const statusCancel =
           row.taskHistory[0] != undefined
@@ -644,36 +698,24 @@ function IndexReport() {
         return {
           children: (
             <>
-              <span style={{ color: STATUS_COLOR_TASK[row.status] }}>
-                <Badge color={STATUS_COLOR_TASK[row.status]} />{" "}
-                {FINISH_TASK[row.status]}
-                <span style={{ color: color.Success }}>
-                  {row.statusPayment == "WAIT_PAYMENT"
-                    ? " " + "(" + "รอจ่ายเงิน" + ")"
-                    : null}
-                </span>
-                <span style={{ color: color.secondary3 }}>
-                  {row.statusPayment == "DONE_PAYMENT"
-                    ? " " + "(" + "จ่ายเงินแล้ว" + ")"
-                    : null}
-                </span>
-                <span style={{ color: color.secondary1 }}>
-                  {row.statusPayment == "SUCCESS"
-                    ? " " + "(" + "เสร็จสิ้น" + ")"
-                    : null}
-                </span>
-                <span style={{ color: color.Error }}>
-                  {statusCancel == "WAIT_START"
-                    ? " " + "(" + "รอเริ่มงาน" + ")"
-                    : null}
-                </span>
-                <span style={{ color: color.Error }}>
-                  {statusCancel == "IN_PROGRESS"
-                    ? " " + "(" + "กำลังดำเนินงาน" + ")"
-                    : null}
-                </span>
-                <br />
-              </span>
+              {row.statusPayment != null ? (
+                <>
+                  <span style={{ color: STATUS_COLOR_TASK[row.statusPayment] }}>
+                    <Badge color={STATUS_COLOR_TASK[row.statusPayment]} />{" "}
+                    {FINISH_TASK[row.statusPayment]}
+                    <br />
+                  </span>
+                </>
+              ) : (
+                <>
+                  <span style={{ color: STATUS_COLOR_TASK[row.status] }}>
+                    <Badge color={STATUS_COLOR_TASK[row.status]} />{" "}
+                    {FINISH_TASK[row.status]}
+                    <br />
+                  </span>
+                </>
+              )}
+
               <span style={{ color: color.Grey, fontSize: "12px" }}>
                 <UserOutlined
                   style={{ padding: "0 4px 0 0", verticalAlign: 0.5 }}
@@ -734,13 +776,11 @@ function IndexReport() {
           />
         </div>
 
-        {clickPays.length > 0 && download.length > 0 ? (
+        {(clickPays.length > 0 && download.length > 0) || checkAll ? (
           <>
             <div>
               <div>
-                <Dropdown
-                // overlay={menu}
-                >
+                <Dropdown overlay={downloadFile}>
                   <Button
                     style={{
                       padding: "8 0",
@@ -777,10 +817,8 @@ function IndexReport() {
             </div>
           </>
         ) : (
-          <div style={{ width: "200px" }}>
-            <Dropdown
-            // overlay={menu}
-            >
+          <div style={{ width: "240px" }}>
+            <Dropdown disabled>
               <Button
                 style={{
                   padding: "8 0",
@@ -1057,12 +1095,12 @@ function IndexReport() {
       {PageTitle}
       <br />
       <Table
-        // rowSelection={rowSelection}
         columns={columns}
         dataSource={data?.data}
         scroll={{ x: 1400 }}
         pagination={false}
       />
+
       <div className="d-flex justify-content-between pt-5">
         <p>รายการทั้งหมด {data?.count} รายการ</p>
         <Pagination

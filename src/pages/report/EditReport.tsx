@@ -41,6 +41,11 @@ import {
 import { color } from "../../resource";
 import { numberWithCommas } from "../../utilities/TextFormatter";
 import { UpdateStatusPaymentDatasource } from "../../datasource/UpdateStatusPaymentDatasource";
+import { TASK_HISTORY } from "../../definitions/FinishTask";
+import {
+  HistoryEntity,
+  HistoryEntity_INIT,
+} from "../../entities/HistoryEntities";
 const { Map } = require("immutable");
 const _ = require("lodash");
 let queryString = _.split(window.location.search, "=");
@@ -63,6 +68,7 @@ function EditReport() {
   const [statusPayment, setStatusPayment] = useState<any>();
   const [updateStatusPayment, setUpdateStatusPayment] =
     useState<updateStatusPays>(updateStatusPays_INIT);
+  const [history, setHistory] = useState<HistoryEntity>(HistoryEntity_INIT);
 
   const [mapPosition, setMapPosition] = useState<{ lat: number; lng: number }>({
     lat: LAT_LNG_BANGKOK.lat,
@@ -81,6 +87,8 @@ function EditReport() {
           })
         );
       }
+      console.log(res.data);
+      setHistory(res.data.taskHistory[0]);
       setData(res);
       setMapPosition({
         lat: parseFloat(res.data.farmerPlot.lat),
@@ -342,7 +350,9 @@ function EditReport() {
             />
           </Form.Item>
           <label>สถานะ</label>
-          {data.data.couponId != null ? (
+
+          {data.data.statusPayment != null &&
+          data.data.statusPayment != "SUCCESS" ? (
             <Form.Item key={data.data.statusPayment}>
               <Radio.Group
                 defaultValue={data.data.statusPayment}
@@ -355,10 +365,31 @@ function EditReport() {
               </Radio.Group>
             </Form.Item>
           ) : (
-            <div>
-              <Badge color={"#F2994A"} style={{ width: 20 }} />
-              <span style={{ color: "#F2994A" }}>เสร็จสิ้น</span>
-            </div>
+            <>
+              {data.data.status === "WAIT_REVIEW" && (
+                <div>
+                  <Badge color={color.blue} style={{ width: 20 }} />
+                  <span style={{ color: color.blue }}>รอรีวิว</span>
+                </div>
+              )}
+              {data.data.status === "CANCELED" && (
+                <div>
+                  <Badge color={color.Error} style={{ width: 20 }} />
+                  <span style={{ color: color.Error }}>
+                    ยกเลิก
+                    {history != null
+                      ? " " + "(" + TASK_HISTORY[history.beforeValue] + ")"
+                      : null}
+                  </span>
+                </div>
+              )}
+              {data.data.status === "DONE" && (
+                <div>
+                  <Badge color={"#F2994A"} style={{ width: 20 }} />
+                  <span style={{ color: "#F2994A" }}>เสร็จสิ้น</span>
+                </div>
+              )}
+            </>
           )}
         </div>
       </div>
