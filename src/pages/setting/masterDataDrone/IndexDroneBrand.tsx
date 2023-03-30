@@ -18,9 +18,9 @@ import {
 import Swal from "sweetalert2";
 
 const IndexDroneBrand: React.FC = () => {
-  const [data, setData] = useState<DroneBrandListEntity[]>([
+  const [data, setData] = useState<DroneBrandListEntity>(
     DroneBrandListEntity_INIT,
-  ]);
+);
   const [searchText, setSearchText] = useState<string>();
 
   const fetchDrone = async () => {
@@ -245,12 +245,11 @@ const IndexDroneBrand: React.FC = () => {
       },
     },
   ];
-
   return (
     <Layouts>
       {pageTitle}
-      <Table columns={columns} dataSource={data[0].data} />
-      <p>รายการทั้งหมด {data[0].count} รายการ</p>
+      <Table columns={columns} dataSource={data.data} />
+      <p>รายการทั้งหมด {data.count} รายการ</p>
     </Layouts>
   );
 };
