@@ -21,8 +21,6 @@ import {
   Table,
   Tooltip,
 } from "antd";
-import { CheckboxChangeEvent } from "antd/lib/checkbox";
-import { CheckboxValueType } from "antd/lib/checkbox/Group";
 import DatePicker from "antd/lib/date-picker";
 import { ColumnsType } from "antd/lib/table";
 import { RowSelectionType } from "antd/lib/table/interface";
@@ -33,6 +31,7 @@ import ActionButton from "../../components/button/ActionButton";
 import { CardContainer } from "../../components/card/CardContainer";
 import Layouts from "../../components/layout/Layout";
 import ModalMapPlot from "../../components/modal/task/finishTask/ModalMapPlot";
+import { DownloadReportDatasource } from "../../datasource/DownloadReportDatasource";
 import { LocationDatasource } from "../../datasource/LocationDatasource";
 import { TaskFinishedDatasource } from "../../datasource/TaskFinishDatasource";
 import { UpdateStatusPaymentDatasource } from "../../datasource/UpdateStatusPaymentDatasource";
@@ -53,7 +52,6 @@ import {
   updateStatusPays,
   updateStatusPays_INIT,
 } from "../../entities/TaskFinishEntities";
-import { downloadExcel } from "react-export-table-to-excel";
 import { color } from "../../resource";
 import { numberWithCommas } from "../../utilities/TextFormatter";
 
@@ -367,15 +365,19 @@ function IndexReport() {
     setClickPays(arr);
     setDownLoad(arr);
   };
+  const DownloadPDF = async () => {
+    await DownloadReportDatasource.reportPDF(download).then((res) => {
+       const blob = new Blob([res], { type: "application/pdf" });
+       window.open(URL.createObjectURL(blob));
+
+    });
+  };
   const downloadFile = (
     <Menu
       items={[
         {
-          label: "ดาวน์โหลดไฟล์ PDF",
+          label: <span onClick={DownloadPDF}>ดาวน์โหลดไฟล์ PDF</span>,
           key: "pdf",
-          // icon: (
-          //   <Checkbox value="WAIT_REVIEW" onClick={(e) => handleStatus(e)} />
-          // ),
         },
         {
           label: "ดาวน์โหลดไฟล์ Excel",
@@ -437,7 +439,6 @@ function IndexReport() {
       setCheckAll(undefined);
     }
   };
-  console.log(checkAll);
   const columns: ColumnsType<TaskReportEntity> = [
     {
       title: (
