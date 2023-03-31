@@ -25,12 +25,12 @@ export class LocationPriceDatasource {
       });
   }
   static async getAllLocationPrice(
+    take: number,
     page: number,
-    row: number,
     search?: string
   ): Promise<LocationPricePageEntity> {
     return httpClient
-      .post(BASE_URL + `/tasks/location-price/get-all-location-price?page=${page}&take=${row}`, {
+      .post(BASE_URL + `/tasks/location-price/get-all-location-price?page=${page}&take=${take}`, {
         search,
       })
       .then((res) => {

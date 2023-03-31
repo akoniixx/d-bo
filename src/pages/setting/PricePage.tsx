@@ -31,8 +31,16 @@ function PricePage() {
   }, [current]);
   const fetchLocationPrice = async () => {
     await LocationPriceDatasource.getAllLocationPrice(
-      current,
       row,
+      current,
+    ).then((res: LocationPricePageEntity) => {
+      setData(res);
+    });
+  };
+  const searchLocationPrice = async () => {
+    await LocationPriceDatasource.getAllLocationPrice(
+      row,
+      current,
       searchText
     ).then((res: LocationPricePageEntity) => {
       setData(res);
@@ -203,7 +211,7 @@ function PricePage() {
             backgroundColor: color.Success,
           }}
           className="col-lg-12"
-          onClick={fetchLocationPrice}
+          onClick={searchLocationPrice}
         >
           ค้นหาข้อมูล
         </Button>
