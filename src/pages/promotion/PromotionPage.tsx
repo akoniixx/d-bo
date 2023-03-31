@@ -101,6 +101,8 @@ function PromotionPage() {
           discountType : res.discountType,
           discount : res.discount,
           count : res.count,
+          keep : res.count,
+          used : 0,
           description : res.description,
           condition : res.condition,
           specialCondition : res.specialCondition,
@@ -124,6 +126,7 @@ function PromotionPage() {
   }
 
   const deleteCoupon = (id: string) =>{
+    console.log(id)
     CouponDataSource.deleteCoupon(id).then(
       res => {
         setModalDelete(false);

@@ -134,6 +134,7 @@ function EditDroner() {
   const fetchDronerById = useCallback(async () => {
     await DronerDatasource.getDronerByID(dronerId).then(
       async (res) => {
+        console.log(res)
         if (res.birthDate === null) {
           res.birthDate = moment().format(dateCreateFormat);
         }
@@ -1357,7 +1358,7 @@ function EditDroner() {
                   className="col-lg-12"
                   onChange={handleChangeStatus}>
                   <Space direction="vertical" className="col-lg-12">
-                    {DRONER_STATUS.filter((x) => x.value !== "").map(
+                    {DRONER_STATUS.filter((x) => x.value !== "ALL").map(
                       (item, index) => (
                         <Radio
                           value={item.value}

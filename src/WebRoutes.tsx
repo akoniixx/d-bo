@@ -42,6 +42,7 @@ import EditInProgress from "./pages/task/todayTask/DetailEdit/EditInProgress";
 import IndexTodayTask from "./pages/task/todayTask/IndexTaskToday";
 import AddPromotion from "./pages/promotion/AddPromotionPage";
 import EditPromotion from "./pages/promotion/EditPromotionPage";
+import PricePage from "./pages/setting/PricePage";
 
 const WebRoutes: React.FC<any> = () => {
   return (
@@ -72,6 +73,8 @@ const WebRoutes: React.FC<any> = () => {
           <Route path="/AddFarmer" element={<AddFarmer />} />
           <Route path="/AddDroner" element={<AddDroner />} />
           <Route path="/DroneList" element={<DroneList />} />
+          <Route path="/PricePage" element={<PricePage />} />
+
           <Route
             path="/IndexRankDroner"
             element={<IndexRankDroner />}

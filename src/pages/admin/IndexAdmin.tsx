@@ -2,7 +2,6 @@ import { EditOutlined } from "@ant-design/icons";
 import { Badge, Button, Pagination, Select, Table } from "antd";
 import "antd/dist/antd.css";
 import React, { useEffect, useState } from "react";
-import { string } from "yup";
 import ActionButton from "../../components/button/ActionButton";
 import AddButtton from "../../components/button/AddButton";
 import { CardContainer } from "../../components/card/CardContainer";
@@ -42,13 +41,6 @@ const IndexAdmin = () => {
     fecthAdmin();
   }, [current, searchStatus, searchRole]);
 
-  const colorStatus = (status: string) => {
-    var mapStatus = STATUS_NORMAL_MAPPING[status];
-    var colorText = color.Success;
-    colorText = mapStatus == "ใช้งาน" ? colorText : color.Error;
-    return colorText;
-  };
-
   const onChangePage = (page: number) => {
     setCurrent(page);
   };
@@ -72,14 +64,10 @@ const IndexAdmin = () => {
       title: "ชื่อ-นามสกุล",
       dataIndex: "firstname",
       key: "firstname",
-      width:"15%",
+      width: "15%",
       render: (value: any, row: any, index: number) => {
         return {
-          children: (
-            <span>
-              {row.firstname + " " + row.lastname}
-            </span>
-          ),
+          children: <span>{row.firstname + " " + row.lastname}</span>,
         };
       },
     },
@@ -106,9 +94,10 @@ const IndexAdmin = () => {
       render: (value: any, row: any, index: number) => {
         return {
           children: (
-            <span style={{ color: colorStatus(value) }}>
-              <Badge color={colorStatus(value)} />
-              {STATUS_NORMAL_MAPPING[value]}
+            <span style={{ color: value ? color.Success : color.Error }}>
+              <Badge color={value ? color.Success : color.Error} />
+              {" "}
+              {value ? "ใช้งาน" : "ไม่ใช้งาน"}
             </span>
           ),
         };

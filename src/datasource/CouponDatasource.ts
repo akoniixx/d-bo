@@ -113,4 +113,22 @@ export class CouponDataSource {
     })
     .catch((err) => console.log(err));
   }
+
+  static getAllOffline(  
+    id : string,  
+    page : number,
+    take : number,
+  ){
+    const params = {
+      id : id,
+      page : page,
+      take : take
+    }
+    return httpClient.get(
+      BASE_URL + `/promotion/promotions/alloffline`,{params}
+    ).then((res) => {
+      return res.data;
+    })
+    .catch((err) => console.log(err));
+  }
 }

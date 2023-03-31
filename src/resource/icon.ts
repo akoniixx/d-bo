@@ -9,7 +9,10 @@ export default {
   pointActive: require("./media/images/pointactive.png"),
   pointDrafting: require("./media/images/pointdrafting.png"),
   pointDisabled: require("./media/images/pointdisabled.png"),
+  pointWarning: require("./media/images/pointwarning.png"),
   adminlogo: require("./media/images/adminlogo.png"),
   iconcopy: require("./media/images/copy.png"),
   icondelete: require("./media/images/delete.png"),
+  injection : require("./media/images/injectionicon.png"),
+  drug : require("./media/images/drugicon.png")
 };

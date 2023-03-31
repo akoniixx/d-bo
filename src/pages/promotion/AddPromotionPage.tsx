@@ -14,7 +14,8 @@ import {
   RadioChangeEvent,
   TimePicker,
   Modal,
-  Button
+  Button,
+  Image
 } from "antd"
 import parse from 'html-react-parser';
 import { Option } from "antd/lib/mentions";
@@ -26,7 +27,7 @@ import color from "../../resource/color"
 import AddButtton from "../../components/button/AddButton"
 import ActionButton from "../../components/button/ActionButton"
 import { DeleteOutlined } from "@ant-design/icons"
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useLayoutEffect, useRef, useState } from "react"
 import { CropDatasource } from "../../datasource/CropDatasource"
 import { LocationDatasource } from "../../datasource/LocationDatasource"
 import FooterPage from "../../components/footer/FooterPage"
@@ -35,6 +36,9 @@ import { MONTH_SALE } from "../../definitions/Month"
 import { CouponDataSource } from "../../datasource/CouponDatasource"
 import { CouponEntities } from "../../entities/CouponEntites"
 import Swal from "sweetalert2"
+import { image } from "../../resource"
+import icon from "../../resource/icon"
+import RenderMobile from "../../components/mobile/RenderMobile"
 
 function AddPromotion(){
   const profile = JSON.parse(localStorage.getItem("profile") || "{  }");
@@ -82,6 +86,7 @@ function AddPromotion(){
     plantName : "",
     province : ""
   })
+  
   const [form] = Form.useForm();
     useEffect(()=>{
       if(fetchTwice.current){
@@ -130,36 +135,7 @@ function AddPromotion(){
       })
       .catch(err => console.log(err))
     }
-    const generateRaiText = () =>{
-      if(renderMobile.raiConditionMin === "" && renderMobile.raiConditionMax === ""){
-        return "จำนวนไร่ขั้นต่ำที่ฉีดพ่น XX ไร่"
-      }
-      else if(renderMobile.raiConditionMin != "" && renderMobile.raiConditionMax === ""){
-        return `จำนวนไร่ขั้นต่ำที่ฉีดพ่น ${renderMobile.raiConditionMin} ไร่`
-      }
-      else if(renderMobile.raiConditionMin === "" && renderMobile.raiConditionMax != ""){
-        return `จำนวนไร่ที่ฉีดพ่นต้องไม่เกิน ${renderMobile.raiConditionMax} ไร่`
-      }
-      else{
-        return `จำนวนไร่ขั้นต่ำที่ฉีดพ่น ${renderMobile.raiConditionMin} ไร่ และไม่เกิน ${renderMobile.raiConditionMax} ไร่`
-      }
-    }
 
-    const generateServiceText = () =>{
-      if(renderMobile.serviceConditionMin === "" && renderMobile.serviceConditionMax === ""){
-        return "ค่าบริการขั้นต่ำ XX บาท"
-      }
-      else if(renderMobile.serviceConditionMin != "" && renderMobile.serviceConditionMax === ""){
-        return `ค่าบริการขั้นต่ำ ${renderMobile.serviceConditionMin} บาท`
-      }
-      else if(renderMobile.serviceConditionMin === "" && renderMobile.raiConditionMax != ""){
-        return `ค่าบริการต้องไม่เกิน ${renderMobile.serviceConditionMax} บาท`
-      }
-      else{
-        return `ค่าบริการขั้นต่ำ ${renderMobile.serviceConditionMin} บาทและไม่เกิน ${renderMobile.serviceConditionMax} บาท`
-      }
-    }
-    
     const navigate = useNavigate()
     const columns = [
       {
@@ -354,6 +330,23 @@ function AddPromotion(){
         registerFirstTime : !specialCoupon
       })
     }
+
+   function checkRai(min : number | null ,max : number | null) : string{
+      let result;
+      if(!min && !max){
+          result = "ไม่จำกัดไร่";
+      }
+      else if(!min && max){
+          result = `เมื่อจ้างไม่เกิน ${max} ไร่`
+      }
+      else if(min && !max){
+          result = `เมื่อจ้างขั้นต่ำ ${min} ไร่`
+      }
+      else{
+          result = `เมื่อจ้างไม่เกิน ${max} ไร่`
+      }
+      return result;
+  }
 
     const handleRaiCondition = ()=>{
       setRaiCondition(!raiCondition)
@@ -601,7 +594,7 @@ function AddPromotion(){
         discountType: discountType,
         discount: parseInt(discount),
         count: count,
-        keep: 0,
+        keep: count,
         used: 0,
         createBy: profile.username + " " + profile.lastname,
         startDate: new Date(startDate),
@@ -1240,167 +1233,29 @@ function AddPromotion(){
                         <br />
                     </div>
                 </div>
-                <div className="col-4">
-                  <div className="position-fixed pe-5">
-                    <CardHeaderPromotion textHeader="ตัวอย่างในแอพลิเคชั่น" center={true}/>
-                    <div style={{
-                      width : '100%',
-
-                    }} className="bg-white">
-                      <div style={{
-                        width : '100%',
-                        height : '100%'
-                      }}>
-                        <div style={{
-                          width : '100%',
-                          height : '120px',
-                          backgroundColor : '#2EC56E',
-                          padding : '15px'
-                        }}>
-                          <div style={{
-                            width : '100%',
-                            height : '100%',
-                            borderRadius : '10px',
-                            backgroundColor : '#FFF',
-                            display : 'flex',
-                            padding : '0px 20px',
-                            alignItems : 'center'
-                          }}>
-                            <div style={{
-                              width : '30px',
-                              height : '30px',
-                              borderRadius : '15px',
-                              backgroundColor : '#2EC56E',
-                              marginRight : '15px'
-                            }}>
-
-                            </div>
-                            <div>
-                              <p style={{
-                                margin : '0px',
-                                padding : '0px',
-                                fontSize : '16px'
-                              }}>{(renderMobile.couponName === "")?"ชื่อคูปอง":renderMobile.couponName}</p>
-                              <p style={{
-                                margin : '0px',
-                                padding : '0px',
-                                fontSize : '12px'
-                              }}>{raiCondition?`เมื่อจ้างขั้นต่ำ ${renderMobile.raiConditionMin === "" ? "XX":renderMobile.raiConditionMin} ไร่`:"ไม่จำกัดไร่"}</p>
-                              <p style={{
-                                margin : '0px',
-                                padding : '0px',
-                                fontSize : '12px',
-                                color : '#747F8B'
-                              }}>{renderMobile.expiredDate === ""?"หมดเขต XX เดือน XXXX":`หมดเขต ${renderMobile.expiredDate}`}</p>
-                            </div>
-                          </div>
-                        </div>
-                        <div style={{
-                          width : '100%',
-                          height : '15%',
-                          backgroundColor : '#F7FFF0',
-                          display : 'flex',
-                          flexFlow : 'column',
-                          alignItems : 'center',
-                          padding : '12px 20px',
-                        }}>
-                          <div style={{
-                            width : '100%',
-                            display : 'flex',
-                            justifyContent : 'space-between'
-                          }}>
-                            <p style={{
-                              fontSize : '16px'
-                            }}>คูปองเหลือ</p>
-                            <p style={{
-                              fontSize : '16px',
-                              color : '#FB8705'
-                            }}>{renderMobile.count === ""?"XX":renderMobile.count}<span style={{
-                              color : '#000'
-                            }}>/{renderMobile.count === ""?"XX":renderMobile.count} สิทธิ</span></p>
-                          </div>
-                          <div style={{
-                            width : '100%',
-                            height : '10px',
-                            borderRadius : '5px',
-                            backgroundImage : 'linear-gradient(67.07deg, #FB8705 14.86%, #FFCF75 85.14%)'
-                          }}>
-
-                          </div>
-                        </div>
-                        <div style={{
-                          width : '100%',
-                          height : '65%',
-                          padding: '10px 20px',
-                        }}>
-                          <p style={{
-                            fontSize : '16px'
-                          }}>ช่วงเวลาที่ใช้งานได้</p>
-                          <p style={{
-                            fontSize : '16px',
-                            color : '#5F6872'
-                          }}>{`${renderMobile.startDate === "" ? `XX XXXX${renderMobile.startTime === "" ? ", XX:XX น.":`, ${renderMobile.startTime} น.`}`:`${renderMobile.startDate}${renderMobile.startTime === "" ? ", XX:XX น.":`, ${renderMobile.startTime} น.`}`} ถึง ${renderMobile.expiredDate === "" ? `XX XXXX${renderMobile.expiredTime === "" ? ", XX:XX น.":`, ${renderMobile.expiredTime} น.`}`:`${renderMobile.expiredDate}${renderMobile.expiredTime === "" ? ", XX:XX น.":`, ${renderMobile.expiredTime} น.`}`}`}
-                          </p>
-                          <p style={{
-                            fontSize : '16px'
-                          }}>รายละเอียด</p>
-                          {
-                            <p>{
-                              parse(descriptionEditor??`<p style="font-size : 16px">...</p>`)
-                            }</p>
-                          }
-                          <p style={{
-                            fontSize : '16px'
-                          }}>เงื่อนไข</p>
-                          {
-                            <p>{
-                              parse(conditionEditor??`<p style="font-size : 16px">...</p>`)
-                            }</p>
-                          }
-                          <p style={{
-                            fontSize : '16px'
-                          }}>เงื่อนไขการใช้คูปอง</p>
-                          <ul>
-                            {
-                              raiCondition?
-                              <li>{generateRaiText()}</li>:<></>
-                            }
-                            {
-                              serviceCondition?
-                              <li>{generateServiceText()}</li>:<></>
-                            }
-                            {
-                              couponPlant?<li>พืชที่ใช้คูปอง {renderMobile.plantName}</li>:<></>
-                            }
-                            {
-                              couponProvince?<li>จังหวัด  {
-                                province.map((item : any)=>{
-                                  return item + " "
-                                })
-                              }</li>:<></>
-                            }
-                          </ul>
-                          <div style={{
-                            margin : '10px 0px',
-                            width : '100%',
-                            height : '54px',
-                            backgroundColor : '#2EC46D',
-                            borderRadius : '8px',
-                            display : 'flex',
-                            justifyContent : 'center',
-                            alignItems : 'center'
-                          }}>
-                            <p style={{
-                              margin : '0px',
-                              color : '#FFF',
-                              fontSize : '18px'
-                            }}>เก็บส่วนลด</p>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
+                <RenderMobile 
+                  couponName={renderMobile.couponName}
+                  couponType={renderMobile.couponType}
+                  promotionStatus={renderMobile.promotionStatus}
+                  count={renderMobile.count}
+                  startDate={renderMobile.startDate}
+                  expiredDate={renderMobile.expiredDate}
+                  startTime={renderMobile.startTime}
+                  expiredTime={renderMobile.expiredTime}
+                  expiredDateTitle={renderMobile.expiredDateTitle}
+                  raiConditionMin={renderMobile.raiConditionMin}
+                  raiConditionMax={renderMobile.raiConditionMax}
+                  serviceConditionMin={renderMobile.serviceConditionMin}
+                  serviceConditionMax={renderMobile.serviceConditionMax}
+                  plantName={renderMobile.plantName}
+                  province={province}
+                  descriptionEditor={descriptionEditor!}
+                  conditionEditor={conditionEditor!}
+                  raiCondition={raiCondition}
+                  serviceCondition={serviceCondition}
+                  couponPlant={couponPlant}
+                  couponProvince={couponProvince}
+                />
                 <div className="col-8">
                 <FooterPage
                   disableSaveBtn={saveBtnDisable}
