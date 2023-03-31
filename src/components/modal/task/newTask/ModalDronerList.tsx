@@ -93,7 +93,6 @@ const ModalDronerList: React.FC<ModalDronerListProps> = ({
       title: "ตำบล/อำเภอ/จังหวัด",
       render: (value: any, row: any, index: number) => {
         let data = JSON.parse(row.dronerDetail[0]);
-        console.log(data);
         return {
           children: (
             <>

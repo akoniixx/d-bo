@@ -1,10 +1,5 @@
 import React from "react";
-import {
-  Routes,
-  Route,
-  Navigate,
-  BrowserRouter,
-} from "react-router-dom";
+import { Routes, Route, Navigate, BrowserRouter } from "react-router-dom";
 import ErrorLoginPage from "./errorPage/ErrorLoginPage";
 import PageNotFound from "./httpError/PageNotFound";
 import { AuthPage } from "./pages/authPage/AuthPage";
@@ -43,6 +38,9 @@ import IndexTodayTask from "./pages/task/todayTask/IndexTaskToday";
 import AddPromotion from "./pages/promotion/AddPromotionPage";
 import EditPromotion from "./pages/promotion/EditPromotionPage";
 import PricePage from "./pages/setting/PricePage";
+import AddDroneBrand from "./pages/setting/masterDataDrone/AddDroneBrand";
+import IndexDroneBrand from "./pages/setting/masterDataDrone/IndexDroneBrand";
+import EditDroneBrand from "./pages/setting/masterDataDrone/EditDroneBrand";
 
 const WebRoutes: React.FC<any> = () => {
   return (
@@ -52,41 +50,26 @@ const WebRoutes: React.FC<any> = () => {
           <Route path="*" element={<Navigate to="/HomePage" />} />
           <Route path="/HomePage" element={<HomePage />} />
           <Route path="/OverviewPage" element={<OverviewPage />} />
-          <Route
-            path="/IndexFinishTask"
-            element={<IndexFinishTask />}
-          />
+          <Route path="/IndexFinishTask" element={<IndexFinishTask />} />
           <Route path="/FinishTasks" element={<FinishTasks />} />
           <Route path="/ReviewTask" element={<ReviewTask />} />
           <Route path="/CancelTask" element={<CancelTask />} />
           <Route path="/IndexDroner" element={<IndexDroner />} />
           <Route path="/IndexFarmer" element={<IndexFarmer />} />
-          <Route
-            path="/TotalIncomePage"
-            element={<TotalIncomePage />}
-          />
+          <Route path="/TotalIncomePage" element={<TotalIncomePage />} />
           <Route path="/PromotionPage" element={<PromotionPage />} />
-          <Route
-            path="/TotalIncomePage"
-            element={<TotalIncomePage />}
-          />
+          <Route path="/TotalIncomePage" element={<TotalIncomePage />} />
           <Route path="/AddFarmer" element={<AddFarmer />} />
           <Route path="/AddDroner" element={<AddDroner />} />
           <Route path="/DroneList" element={<DroneList />} />
           <Route path="/PricePage" element={<PricePage />} />
+          <Route path="/IndexDroneBrand" element={<IndexDroneBrand />} />
+          <Route path="/AddDroneBrand" element={<AddDroneBrand />} />
+          <Route path="/EditDroneBrand/:id" element={<EditDroneBrand />} />
 
-          <Route
-            path="/IndexRankDroner"
-            element={<IndexRankDroner />}
-          />
-          <Route
-            path="/DetailRankDroner"
-            element={<DetailRankDroner />}
-          />
-          <Route
-            path="/DetailWorkDroner"
-            element={<DetailWorkDroner />}
-          />
+          <Route path="/IndexRankDroner" element={<IndexRankDroner />} />
+          <Route path="/DetailRankDroner" element={<DetailRankDroner />} />
+          <Route path="/DetailWorkDroner" element={<DetailWorkDroner />} />
           <Route path="/EditDroneList" element={<EditDroneList />} />
           <Route path="/EditFarmer/:id" element={<EditFarmer />} />
           <Route path="/EditDroner" element={<EditDroner />} />
@@ -104,25 +87,16 @@ const WebRoutes: React.FC<any> = () => {
             path="/EditInprogressTask/:id"
             element={<EditInprogressTask />}
           />
-          <Route
-            path="/IndexTodayTask"
-            element={<IndexTodayTask />}
-          />
+          <Route path="/IndexTodayTask" element={<IndexTodayTask />} />
           <Route path="/EditWaitStart" element={<EditWaitStart />} />
-          <Route
-            path="/EditInProgress"
-            element={<EditInProgress />}
-          />
+          <Route path="/EditInProgress" element={<EditInProgress />} />
           <Route path="*" element={<PageNotFound />} />
           <Route path="/AddPromotion" element={<AddPromotion />}/>
           <Route path="/EditPromotion/:id" element={<EditPromotion />} />
         </Route>
         <Route element={<PublicRoute />}>
           <Route index element={<AuthPage />} />
-          <Route
-            path="/ErrorLoginPage"
-            element={<ErrorLoginPage />}
-          />
+          <Route path="/ErrorLoginPage" element={<ErrorLoginPage />} />
           <Route path="*" element={<PageNotFound />} />
         </Route>
       </Routes>

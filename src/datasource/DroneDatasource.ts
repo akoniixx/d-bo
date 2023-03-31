@@ -1,6 +1,9 @@
 import {
+  CreateDroneBrandEntity,
+  CreateDroneEntity,
   DroneBrandEntity,
   DroneBrandListEntity,
+  UpdateDroneBrand,
 } from "./../entities/DroneBrandEntities";
 import { DroneEntity, DroneListEntity } from "./../entities/DroneEntities";
 import { BASE_URL, httpClient } from "../config/develop-config";
@@ -39,9 +42,10 @@ export class DroneDatasource {
       });
   }
 
-  static CreateDroneList(data: DroneEntity): Promise<any> {
+  static CreateDroneList(data: CreateDroneEntity): Promise<any> {
+    delete data.id;
     return httpClient
-      .post(BASE_URL + "/drone", { data })
+      .post(BASE_URL + "/drone", data)
       .then((response) => {
         return response.data;
       })
@@ -50,9 +54,9 @@ export class DroneDatasource {
       });
   }
 
-  static UpdateDroneList(data: any): Promise<any> {
+  static UpdateDroneList(data: CreateDroneEntity): Promise<any> {
     return httpClient
-      .patch(BASE_URL + "/drone", { data })
+      .patch(BASE_URL + "/drone/" + data.id, data)
       .then((response) => {
         return response.data;
       })
@@ -61,9 +65,9 @@ export class DroneDatasource {
       });
   }
 
-  static deleteDroneList(id: string) {
+  static deleteDroneList(data: CreateDroneEntity) {
     return httpClient
-      .delete(BASE_URL + "/drone" + id)
+      .delete(BASE_URL + "/drone/" + data.id)
       .then((response) => {
         return response.data;
       })
@@ -72,14 +76,98 @@ export class DroneDatasource {
       });
   }
 
-  static getDroneBrandList(): Promise<any> {
+  //DroneBrand
+  static getDroneBrandList(
+    search?: string
+  ): Promise<DroneBrandListEntity> {
+    const params = {
+      search: search,
+    };
     return httpClient
-      .get(BASE_URL + "/drone-brand")
+      .get(BASE_URL + "/drone-brand", { params })
       .then((response) => {
         return response.data;
       })
       .catch((error) => {
         console.log(error);
+      });
+  }
+  static getCountDroneBrandList(
+    search?: string
+  ): Promise<DroneBrandListEntity[]> {
+    const params = {
+      search: search,
+    };
+    return httpClient
+      .get(BASE_URL + "/drone-brand/droner-brand-all", { params })
+      .then((response) => {
+        return response.data;
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  }
+  static getDrone(
+    page: number,
+    row: number,
+    droneBrandId: string
+  ): Promise<any> {
+    const params = {
+      page: page,
+      take: row,
+      droneBrandId: droneBrandId,
+    };
+    return httpClient
+      .get(BASE_URL + "/drone", { params })
+      .then((response) => {
+        return response.data;
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  }
+  static addDroneBrand(data: CreateDroneBrandEntity): Promise<any> {
+    var id: any = "id";
+    var droneBrandId: any = "droneBrandId";
+    delete data.drone[id];
+    delete data.drone[droneBrandId];
+    return httpClient
+      .post(BASE_URL + "/drone-brand", data)
+      .then((response) => {
+        return response.data;
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  }
+  static deleteDroneBrand(id?: string) {
+    return httpClient
+      .delete(BASE_URL + "/drone-brand/" + id)
+      .then((response) => {
+        return response.data;
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  }
+  static getDroneBrandById(id: string): Promise<DroneBrandEntity> {
+    return httpClient
+      .get(BASE_URL + "/drone-brand/" + id)
+      .then((response) => {
+        return response.data;
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }
+  static updateDroneBrand(data: DroneBrandEntity): Promise<any> {
+    return httpClient
+      .patch(BASE_URL + "/drone-brand/" + data.id, data)
+      .then((response) => {
+        return response.data;
+      })
+      .catch((err) => {
+        console.log(err);
       });
   }
 }
