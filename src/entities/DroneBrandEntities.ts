@@ -65,12 +65,16 @@ export const CreateDroneEntity_INIT: CreateDroneEntity = {
   isActive: true,
 };
 export interface CreateDroneBrandEntity {
+  id?: string;
+  droneBrandId?: number;
   name: string;
   logoImagePath: string;
   isActive: boolean;
   drone: CreateDroneEntity[];
 }
 export const CreateDroneBrandEntity_INIT: CreateDroneBrandEntity = {
+  id: "",
+  droneBrandId: 0,
   name: "",
   logoImagePath: "",
   isActive: true,

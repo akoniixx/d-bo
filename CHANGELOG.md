@@ -1,4 +1,8 @@
 ## [Version - 0]
+## Fix [v0.23.02] 2023-03-30
+- fixed condition delete series drone
+- store path logo in the DB.
+- fixed count data location price
 ## Fix [v0.23.01] 2023-03-20
 - fixed search plants
 - fixed current page
