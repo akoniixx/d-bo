@@ -42,8 +42,7 @@ function AddDroneBrand() {
   const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [editIndex, setEditIndex] = useState(0);
-  const [createImgDroneBrand, setCreateImgDroneBrand] =
-    useState<UploadImageEntity>(UploadImageEntity_INTI);
+  const [createImgDroneBrand, setCreateImgDroneBrand] = useState<any>();
   const [editDrone, setEditDrone] = useState<CreateDroneEntity>(
     CreateDroneEntity_INIT
   );
@@ -68,13 +67,8 @@ function AddDroneBrand() {
     });
 
     setImgDroneBrand(img_base64);
-    const d = Map(createImgDroneBrand).set(
-      "file",
-      isFileMoreThan2MB ? newSource : source
-    );
-    const e = Map(d.toJS()).set("resource", "DRONE_BRAND");
-    const f = Map(e.toJS()).set("category", "DRONE_BRAND_LOGO");
-    setCreateImgDroneBrand(f.toJS());
+    const d = Map(data).set("logoImagePath", img_base64);
+    setData(d.toJS());
   };
   const onPreviewDrone = async () => {
     let src = imgDroneBrand;
@@ -123,7 +117,7 @@ function AddDroneBrand() {
     setShowEditModal(false);
     setEditIndex(0);
   };
-  const insertDroneBrand = async () => {
+  const insertDroneBrand = async (data: CreateDroneBrandEntity) => {
     const payload = {
       ...data,
       drone: droneList,
@@ -132,19 +126,8 @@ function AddDroneBrand() {
       ...prev,
       drone: droneList,
     }));
-    await DroneDatasource.addDroneBrand(payload).then(async (res) => {
-      if (res.id) {
-        const fileList = [createImgDroneBrand]
-          .filter((x) => {
-            return x.file !== "" && x.file !== undefined;
-          })
-          .map((el) => {
-            return UploadImageDatasouce.uploadImage(
-              Map(el).set("resourceId", res.id).toJS()
-            );
-          });
-        await Promise.all(fileList);
-
+    await DroneDatasource.addDroneBrand(payload).then((res) => {
+      if (res) {
         Swal.fire({
           title: "บันทึกสำเร็จ",
           icon: "success",
@@ -338,7 +321,7 @@ function AddDroneBrand() {
       </Row>
       <FooterPage
         onClickBack={() => navigate(-1)}
-        onClickSave={insertDroneBrand}
+        onClickSave={() => insertDroneBrand(data)}
         disableSaveBtn={saveBtnDisable}
       />
       {showAddModal && (
