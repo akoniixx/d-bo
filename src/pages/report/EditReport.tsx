@@ -46,6 +46,7 @@ import {
   HistoryEntity,
   HistoryEntity_INIT,
 } from "../../entities/HistoryEntities";
+import { ReportDocDatasource } from "../../datasource/ReportDocument";
 const { Map } = require("immutable");
 const _ = require("lodash");
 let queryString = _.split(window.location.search, "=");
@@ -748,6 +749,31 @@ function EditReport() {
       </Form>
     </Form>
   );
+  const DownloadPDF = async () => {
+    const filterId = data.data.id;
+    const downloadBy = `${profile.firstname} ${profile.lastname}`
+    await ReportDocDatasource.getFileName(
+      "PDF",
+      downloadBy,
+      filterId
+    ).then((res) => {
+      if (res.responseData) {
+        const idFileName = res.responseData.id;
+        const fileName = res.responseData.fileName;
+        ReportDocDatasource.reportPDF([filterId], downloadBy, idFileName).then(
+          (res) => {
+            const blob = new Blob([res], { type: "application/pdf" });
+            const a = document.createElement("a");
+            a.href = window.URL.createObjectURL(blob);
+            a.download = fileName;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+          }
+        );
+      }
+    });
+  };
   return (
     <Layout>
       <div className="container d-flex justify-content-between pt-1">
@@ -769,6 +795,7 @@ function EditReport() {
               backgroundColor: color.primary1,
               borderRadius: "5px",
             }}
+            onClick={DownloadPDF}
           >
             ดาวน์โหลดไฟล์ PDF
           </Button>

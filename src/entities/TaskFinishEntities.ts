@@ -265,6 +265,7 @@ export interface TaskReportEntity {
   discount: string;
   countResend: string;
   statusPayment: string;
+  isChecked: boolean;
   farmer: FarmerEntity;
   farmerPlot: FarmerPlotEntity;
   droner: DronerEntity;
@@ -315,6 +316,7 @@ export const TaskReportEntity_INIT: TaskReportEntity = {
   discount: "",
   countResend: "",
   statusPayment: "",
+  isChecked: false,
   farmer: FarmerEntity_INIT,
   farmerPlot: FarmerPlotEntity_INIT,
   droner: DronerEntity_INIT,

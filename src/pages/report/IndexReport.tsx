@@ -31,7 +31,6 @@ import ActionButton from "../../components/button/ActionButton";
 import { CardContainer } from "../../components/card/CardContainer";
 import Layouts from "../../components/layout/Layout";
 import ModalMapPlot from "../../components/modal/task/finishTask/ModalMapPlot";
-import { DownloadReportDatasource } from "../../datasource/DownloadReportDatasource";
 import { LocationDatasource } from "../../datasource/LocationDatasource";
 import { TaskFinishedDatasource } from "../../datasource/TaskFinishDatasource";
 import { UpdateStatusPaymentDatasource } from "../../datasource/UpdateStatusPaymentDatasource";
@@ -39,6 +38,7 @@ import {
   FINISH_TASK,
   FINISH_TASK_SEARCH,
   STATUS_COLOR_TASK,
+  TASK_HISTORY,
 } from "../../definitions/FinishTask";
 import {
   DistrictEntity,
@@ -52,10 +52,16 @@ import {
   updateStatusPays,
   updateStatusPays_INIT,
 } from "../../entities/TaskFinishEntities";
+import { useLocalStorage } from "../../hook/useLocalStorage";
 import { color } from "../../resource";
 import { numberWithCommas } from "../../utilities/TextFormatter";
+import { ReportDocDatasource } from "../../datasource/ReportDocument";
 
 function IndexReport() {
+  const [persistedProfile, setPersistedProfile] = useLocalStorage(
+    "profile",
+    []
+  );
   const profile = JSON.parse(localStorage.getItem("profile") || "{  }");
   const [row, setRow] = useState(10);
   const [current, setCurrent] = useState(1);
@@ -82,7 +88,11 @@ function IndexReport() {
   const [clickPays, setClickPays] = useState<string[]>([]);
   const [paysEnum, setPaysEnum] = useState<string[]>([]);
   const [arrRowEnum, setArrRowEnum] = useState<string[]>([]);
+  const [dataRow, setDataRow] = useState<string[]>([]);
   const [arrRow, setArrRow] = useState<string[]>([]);
+  const [arrRowAll, setArrRowAll] = useState<string[]>([]);
+  const [getFileName, setGetFileName] = useState<string>();
+
   const [checkAll, setCheckAll] = useState<any>();
   const [statusPayment, setStatusPayment] = useState<updateStatusPays>(
     updateStatusPays_INIT
@@ -97,7 +107,7 @@ function IndexReport() {
   }, [current, row, startDate, endDate]);
 
   const fetchAllReport = async () => {
-    await TaskFinishedDatasource.getAllReportDroner(
+    await ReportDocDatasource.getAllReportDroner(
       current,
       row,
       searchSubdistrict,
@@ -341,37 +351,109 @@ function IndexReport() {
     />
   );
 
+  const handleAllSelect = (e: any) => {
+    let value = e.target.value;
+    let checked = e.target.checked;
+    if (checked) {
+      console.log(value.statusPayment);
+      console.log(value.id);
+
+      setCheckAll(value.statusPayment);
+      setDownLoad(value.id)
+    } else {
+      setCheckAll(undefined);
+    }
+  };
+
   const changeStatusPayment = (e: any) => {
     let value = e.target.value;
     let checked = e.target.checked;
     let arr: any = [];
     let eNum: any = [];
+    let row: any = [];
     if (checked) {
+      setGetFileName(value.id);
+
       eNum = [...arrRowEnum, value.statusPayment];
       setArrRowEnum([...arrRowEnum, value.statusPayment]);
       arr = [...arrRow, value.id];
       setArrRow([...arrRow, value.id]);
+      row = [...dataRow, value];
+      setDataRow([...dataRow, value]);
     } else {
       let d: string[] = arrRow.filter((x) => x != value.id);
       let s: string[] = arrRowEnum.filter((x) => x != value.statusPayment);
+      let o: string[] = dataRow.filter((x) => x != value);
       arr = [...d];
+      eNum = [...s];
+      row = [...o];
       setArrRow(d);
       setArrRowEnum(s);
-      if (d.length == 0 || s.length == 0) {
+      setDataRow(o);
+      if (d.length == 0) {
         arr = [];
+      } else if (s.length == 0) {
+        eNum = [];
+      } else if (o.length == 0) {
+        row = [];
       }
     }
     setPaysEnum(eNum);
     setClickPays(arr);
-    setDownLoad(arr);
+    setDownLoad(row);
   };
   const DownloadPDF = async () => {
-    await DownloadReportDatasource.reportPDF(download).then((res) => {
-       const blob = new Blob([res], { type: "application/pdf" });
-       window.open(URL.createObjectURL(blob));
-
-    });
+    if (download.length > 1) {
+      const filterId = download.map((x: any) => x.id);
+      const downloadBy = `${persistedProfile.firstname} ${persistedProfile.lastname}`;
+      await ReportDocDatasource.getFileName("ZIP_PDF", downloadBy).then(
+        (res) => {
+          if (res.responseData) {
+            const idFileName = res.responseData.id;
+            const fileName = res.responseData.fileName;
+            ReportDocDatasource.reportPDF(
+              filterId,
+              downloadBy,
+              idFileName
+            ).then((res) => {
+              const blob = new Blob([res], { type: "application/zip" });
+              const a = document.createElement("a");
+              a.href = window.URL.createObjectURL(blob);
+              a.download = fileName;
+              document.body.appendChild(a);
+              a.click();
+              document.body.removeChild(a);
+            });
+          }
+        }
+      );
+    } else {
+      const filterId = download.map((x: any) => x.id);
+      const downloadBy = `${persistedProfile.firstname} ${persistedProfile.lastname}`;
+      await ReportDocDatasource.getFileName(
+        "PDF",
+        downloadBy,
+        getFileName
+      ).then((res) => {
+        if (res.responseData) {
+          const idFileName = res.responseData.id;
+          const fileName = res.responseData.fileName;
+          ReportDocDatasource.reportPDF(filterId, downloadBy, idFileName).then(
+            (res) => {
+              const blob = new Blob([res], { type: "application/pdf" });
+              const a = document.createElement("a");
+              a.href = window.URL.createObjectURL(blob);
+              a.download = fileName;
+              document.body.appendChild(a);
+              a.click();
+              document.body.removeChild(a);
+            }
+          );
+        }
+      });
+    }
   };
+
   const downloadFile = (
     <Menu
       items={[
@@ -427,26 +509,13 @@ function IndexReport() {
       }
     });
   };
-  const handleAllSelect = (e: any) => {
-    let value = e.target.value;
-    let checked = e.target.checked;
-    if (checked) {
-      if (value) {
-        let a = value.filter((x: any) => x != false);
-        setCheckAll(a);
-      }
-    } else {
-      setCheckAll(undefined);
-    }
-  };
+
   const columns: ColumnsType<TaskReportEntity> = [
     {
       title: (
         <>
           <Checkbox
-            value={data?.data.map(
-              (x) => x.statusPayment === "WAIT_PAYMENT" && "DONE_PAYMENT"
-            )}
+            value={data?.data}
             onChange={handleAllSelect}
           />
         </>
@@ -456,15 +525,30 @@ function IndexReport() {
         return {
           children: (
             <>
-              <Checkbox
-                value={row}
-                onChange={changeStatusPayment}
-                disabled={
-                  row.statusPayment != "WAIT_PAYMENT" &&
-                  row.statusPayment != "DONE_PAYMENT"
-                }
-                // checked={checkAll}
-              />
+              {checkAll ? (
+                <Checkbox
+                  value={row}
+                  onChange={changeStatusPayment}
+                  checked={
+                    row.statusPayment === "WAIT_PAYMENT" ||
+                    row.statusPayment === "DONE_PAYMENT"
+                  }
+                  disabled={
+                    row.statusPayment != "WAIT_PAYMENT" &&
+                    row.statusPayment != "DONE_PAYMENT"
+                  }
+                />
+              ) : (
+                <Checkbox
+                  value={row}
+                  onChange={changeStatusPayment}
+                  disabled={
+                    row.statusPayment != "WAIT_PAYMENT" &&
+                    row.statusPayment != "DONE_PAYMENT"
+                  }
+                  // checked={false}
+                />
+              )}
             </>
           ),
         };
@@ -586,6 +670,7 @@ function IndexReport() {
       title: "Rating",
       dataIndex: "reviewDronerAvg",
       key: "reviewDronerAvg",
+      width: "7%",
       sorter: (a: any, b: any) => sorter(a.reviewDronerAvg, b.reviewDronerAvg),
       render: (value: any, row: any, index: number) => {
         return {
@@ -692,10 +777,8 @@ function IndexReport() {
       key: "status",
       fixed: "right",
       render: (value: any, row: any, index: number) => {
-        const statusCancel =
-          row.taskHistory[0] != undefined
-            ? row.taskHistory[0].beforeValue
-            : null;
+        const beforeValue = row.taskHistory[0];
+
         return {
           children: (
             <>
@@ -712,6 +795,14 @@ function IndexReport() {
                   <span style={{ color: STATUS_COLOR_TASK[row.status] }}>
                     <Badge color={STATUS_COLOR_TASK[row.status]} />{" "}
                     {FINISH_TASK[row.status]}
+                    {beforeValue != undefined
+                      ? row.status == "CANCELED"
+                        ? " " +
+                          "(" +
+                          TASK_HISTORY[beforeValue.beforeValue] +
+                          ")"
+                        : null
+                      : null}
                     <br />
                   </span>
                 </>
@@ -777,7 +868,8 @@ function IndexReport() {
           />
         </div>
 
-        {(clickPays.length > 0 && download.length > 0) || checkAll ? (
+        {clickPays.length > 0 ||
+        checkAll ? (
           <>
             <div>
               <div>
@@ -807,9 +899,7 @@ function IndexReport() {
                 }}
                 onClick={() => updateStatusPayment()}
               >
-                {paysEnum[0] == null || paysEnum[0] === "SUCCESS"
-                  ? null
-                  : paysEnum[0] === "WAIT_PAYMENT"
+                {paysEnum.find((x) => x === "WAIT_PAYMENT")
                   ? "จ่ายเงินแล้ว"
                   : "DONE_PAYMENT"
                   ? "รอจ่ายเงิน"
@@ -980,6 +1070,7 @@ function IndexReport() {
       <div className="container d-flex justify-content-between pt-3">
         <div className="col-lg-4 p-1">
           <Input
+            allowClear
             prefix={<SearchOutlined style={{ color: color.Disable }} />}
             placeholder="ค้นหาชื่อเกษตรกร, คนบินโดรน หรือเบอร์โทร"
             className="col-lg-12 p-1"

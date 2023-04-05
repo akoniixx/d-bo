@@ -43,41 +43,4 @@ export class TaskFinishedDatasource {
         console.log(err);
       });
   }
-  static getAllReportDroner(
-    page: number,
-    row: number,
-    subdistrictId?: number,
-    districtId?: number,
-    provinceId?: number,
-    dateAppointmentStart?: string,
-    dateAppointmentEnd?: string,
-    status?: string,
-    statusPayment?: string,
-    statusCancel?:string,
-    searchText?: string
-  ): Promise<TaskReportListEntity> {
-    const params = {
-      page: page,
-      take: row,
-      subdistrictId: subdistrictId,
-      districtId: districtId,
-      provinceId: provinceId,
-      dateAppointmentStart: dateAppointmentStart,
-      dateAppointmentEnd: dateAppointmentEnd,
-      status: status,
-      statusPayment: statusPayment,
-      statusCancel: statusCancel,
-      searchText: searchText,
-    };
-    return httpClient
-      .get(BASE_URL + "/tasks/task-finish/get-all-task-finish-account", {
-        params,
-      })
-      .then((response) => {
-        return response.data;
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-  }
 }

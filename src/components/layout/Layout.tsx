@@ -124,7 +124,7 @@ const Layouts: React.FC<any> = ({ children }) => {
                 </Link>
               </Menu.Item>
               <Menu.Item key="finishTask">
-                {persistedProfile.username == "saimhai" ? (
+                {persistedProfile.username == "ick_accounting" ? (
                   <Link
                     to="/IndexReport"
                     style={{ textDecoration: "none" }}
