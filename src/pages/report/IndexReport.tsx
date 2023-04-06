@@ -11,6 +11,7 @@ import {
   Pagination,
   PaginationProps,
   Popover,
+  Row,
   Select,
   Table,
 } from "antd";
@@ -54,6 +55,8 @@ import {
 } from "../../utilities/TextFormatter";
 import ActionButton from "../../components/button/ActionButton";
 import ModalMapPlot from "../../components/modal/task/finishTask/ModalMapPlot";
+import { CheckboxValueType } from "antd/lib/checkbox/Group";
+import { CheckboxChangeEvent } from "antd/lib/checkbox";
 
 interface DataType {
   key: React.Key;
@@ -99,8 +102,6 @@ function IndexReport() {
   const [plotId, setPlotId] = useState<string>("");
   const [visibleRating, setVisibleRating] = useState(false);
   const [statusArr, setStatusArr] = useState<string[]>([]);
-  const [statusPays, setStatusPays] = useState<string[]>([]);
-  const [statusCan, setStatusCan] = useState<string[]>([]);
   const [CheckEnum, setCheckEnum] = useState<string[]>([]);
   const [clickPays, setClickPays] = useState<any[]>([]);
   const [statusPayment, setStatusPayment] = useState<updateStatusPays>(
@@ -194,48 +195,6 @@ function IndexReport() {
     setSearchStatus(arr);
     setCurrent(1);
   };
-  const handleStatusPayment = (e: any) => {
-    let value = e.target.value;
-    let checked = e.target.checked;
-    let arr: any = 0;
-    if (checked) {
-      arr = [...statusPays, value];
-      setStatusPays([...statusPays, value]);
-      setSearchStatus(undefined);
-    } else {
-      let d: string[] = statusPays.filter((x) => x != value);
-      arr = [...d];
-      setStatusPays(d);
-      if (d.length == 0) {
-        arr = undefined;
-        const a: any = "DONE";
-        setSearchStatus(a);
-      }
-    }
-    setSearchStatusPayment(arr);
-    setCurrent(1);
-  };
-  const handleStatusCancel = (e: any) => {
-    let value = e.target.value;
-    let checked = e.target.checked;
-    let arr: any = 0;
-    if (checked) {
-      arr = [...statusCan, value];
-      setStatusCan([...statusCan, value]);
-      setSearchStatus(undefined);
-    } else {
-      let d: string[] = statusCan.filter((x) => x != value);
-      arr = [...d];
-      setStatusCan(d);
-      if (d.length == 0) {
-        arr = undefined;
-        const a: any = "CANCELED";
-        setSearchStatus(a);
-      }
-    }
-    setSearchStatusCancel(arr);
-    setCurrent(1);
-  };
   const handleProvince = (provinceId: number) => {
     setSearchProvince(provinceId);
     fetchDistrict(provinceId);
@@ -284,6 +243,60 @@ function IndexReport() {
   const handleVisibleRating = (newVisible: any) => {
     setVisibleRating(newVisible);
   };
+
+  const statusOptions = ["WAIT_START", "IN_PROGRESS", "WAIT_RECEIVE"];
+  const statusDoneOptions = ["WAIT_PAYMENT", "DONE_PAYMENT", "SUCCESS"];
+
+  const [checkedList, setCheckedList] = useState<CheckboxValueType[]>();
+  const [checkedListDone, setCheckedListDone] = useState<CheckboxValueType[]>();
+
+  const [indeterminate, setIndeterminate] = useState(false);
+  const [indeterminateDone, setIndeterminateDone] = useState(false);
+
+  const [checkAll, setCheckAll] = useState(false);
+  const [checkAllDone, setCheckAllDone] = useState(false);
+
+  const onChange = (list: CheckboxValueType[]) => {
+    setSearchStatus(undefined);
+    let arr: any = 0;
+    arr = [...list];
+    setSearchStatusCancel(arr);
+    setCheckedList(list);
+    setIndeterminate(!!list.length && list.length < statusOptions.length);
+    setCheckAll(list.length === statusOptions.length);
+  };
+  const onCheckAllChange = (e: CheckboxChangeEvent) => {
+    if(e.target.checked === true){
+      setSearchStatus(e.target.value);
+    }else{
+      setSearchStatus(undefined);
+    }
+    setCheckedList(e.target.checked ? statusOptions : []);
+    setIndeterminate(false);
+    setCheckAll(e.target.checked);
+  };
+  const onChangeDone = (list: CheckboxValueType[]) => {
+    setSearchStatus(undefined);
+    let arr: any = 0;
+    arr = [...list];
+    setSearchStatusPayment(arr);
+    setCheckedListDone(list);
+    setIndeterminateDone(
+      !!list.length && list.length < statusDoneOptions.length
+    );
+    setCheckAllDone(list.length === statusDoneOptions.length);
+  };
+  const onCheckAllDoneChange = (e: CheckboxChangeEvent) => {
+    if(e.target.checked === true){
+      setSearchStatus(e.target.value);
+    }else{
+      setSearchStatus(undefined);
+    }
+    setCheckedListDone(e.target.checked ? statusDoneOptions : []);
+    setIndeterminateDone(false);
+    setCheckAllDone(e.target.checked);
+  };
+
   const SubStatus = (
     <Menu
       items={[
@@ -295,76 +308,79 @@ function IndexReport() {
           ),
         },
         {
-          label: "เสร็จสิ้น",
+          label: (
+            <>
+              <Checkbox
+                indeterminate={indeterminateDone}
+                onChange={onCheckAllDoneChange}
+                checked={checkAllDone}
+                value="DONE"
+              >
+                เสร็จสิ้น
+              </Checkbox>
+              <br />
+              <Checkbox.Group
+                value={checkedListDone}
+                style={{ width: "100%" }}
+                onChange={onChangeDone}
+              >
+                <Row>
+                  <Checkbox style={{ marginLeft: "20px" }} value="WAIT_PAYMENT">
+                    รอจ่ายเงิน
+                  </Checkbox>
+                </Row>
+                <Row>
+                  <Checkbox style={{ marginLeft: "20px" }} value="DONE_PAYMENT">
+                    จ่ายเงินแล้ว
+                  </Checkbox>
+                </Row>
+                <Row>
+                  <Checkbox style={{ marginLeft: "20px" }} value="SUCCESS">
+                    เสร็จสิ้น
+                  </Checkbox>
+                </Row>
+              </Checkbox.Group>
+            </>
+          ),
           key: "2",
-          icon: <Checkbox value="DONE" onClick={(e) => handleStatus(e)} />,
         },
         {
-          label: "รอจ่ายเงิน",
+          label: (
+            <>
+              <Checkbox
+                indeterminate={indeterminate}
+                onChange={onCheckAllChange}
+                checked={checkAll}
+                value="CANCELED"
+              >
+                ยกเลิก
+              </Checkbox>
+              <br />
+              <Checkbox.Group
+                value={checkedList}
+                style={{ width: "100%" }}
+                onChange={onChange}
+              >
+                <Row>
+                  <Checkbox style={{ marginLeft: "20px" }} value="WAIT_START">
+                    รอเริ่มงาน
+                  </Checkbox>
+                </Row>
+                <Row>
+                  <Checkbox style={{ marginLeft: "20px" }} value="IN_PROGRESS">
+                    กำลังดำเนินงาน
+                  </Checkbox>
+                </Row>
+              </Checkbox.Group>
+            </>
+          ),
           key: "3",
-          icon: (
-            <Checkbox
-              style={{ marginLeft: "20px" }}
-              value="WAIT_PAYMENT"
-              onClick={(e) => handleStatusPayment(e)}
-            />
-          ),
-        },
-        {
-          label: "จ่ายเงินแล้ว",
-          key: "4",
-          icon: (
-            <Checkbox
-              style={{ marginLeft: "20px" }}
-              value="DONE_PAYMENT"
-              onClick={(e) => handleStatusPayment(e)}
-            />
-          ),
-        },
-        {
-          label: "เสร็จสิ้น",
-          key: "5",
-          icon: (
-            <Checkbox
-              style={{ marginLeft: "20px" }}
-              value="SUCCESS"
-              onClick={(e) => handleStatusPayment(e)}
-            />
-          ),
-        },
-        {
-          label: "ยกเลิก",
-          key: "6",
-          icon: <Checkbox value="CANCELED" onClick={(e) => handleStatus(e)} />,
-        },
-        {
-          label: "รอเริ่มงาน",
-          key: "7",
-          icon: (
-            <Checkbox
-              style={{ marginLeft: "20px" }}
-              value="WAIT_START"
-              onClick={(e) => handleStatusCancel(e)}
-            />
-          ),
-        },
-        {
-          label: "กำลังดำเนินงาน",
-          key: "8",
-          icon: (
-            <Checkbox
-              style={{ marginLeft: "20px" }}
-              value="IN_PROGRESS"
-              onClick={(e) => handleStatusCancel(e)}
-            />
-          ),
         },
       ]}
     />
   );
   const DownloadPDF = async () => {
     if (clickPays.length > 1) {
-      console.log(1);
       const filterId = clickPays.map((x: any) => x.action);
       const downloadBy = `${persistedProfile.firstname} ${persistedProfile.lastname}`;
       await ReportDocDatasource.getFileName("ZIP_PDF", downloadBy).then(
@@ -389,16 +405,13 @@ function IndexReport() {
         }
       );
     } else if (clickPays.length === 1) {
-      console.log(2);
       const filterId = clickPays.map((x: any) => x.action);
-      console.log(filterId);
       const downloadBy = `${persistedProfile.firstname} ${persistedProfile.lastname}`;
       await ReportDocDatasource.getFileName(
         "PDF",
         downloadBy,
         filterId[0]
       ).then((res) => {
-        console.log(res);
         if (res.responseData) {
           const idFileName = res.responseData.id;
           const fileName = res.responseData.fileName;
@@ -448,7 +461,6 @@ function IndexReport() {
           updateInfo.id = clickPays.map((x) => x.action);
           updateInfo.statusPayment = "WAIT_PAYMENT";
           updateInfo.updateBy = updateBy;
-          console.log(updateInfo);
           await UpdateStatusPaymentDatasource.UpdateStatusPayment(
             updateInfo
           ).then((res) => {
@@ -460,7 +472,6 @@ function IndexReport() {
           updateInfo.id = clickPays.map((x) => x.action);
           updateInfo.statusPayment = "DONE_PAYMENT";
           updateInfo.updateBy = updateBy;
-          console.log(updateInfo);
           await UpdateStatusPaymentDatasource.UpdateStatusPayment(
             updateInfo
           ).then((res) => {
@@ -479,7 +490,6 @@ function IndexReport() {
       );
       setClickPays(selectedRows);
       setCheckEnum(checkData);
-      console.log(checkData);
     },
     getCheckboxProps: (record: DataType) => ({
       disabled:

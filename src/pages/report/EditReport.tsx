@@ -91,7 +91,6 @@ function EditReport() {
           })
         );
       }
-      console.log(res.data);
       setHistory(res.data.taskHistory[0]);
       setData(res);
       setMapPosition({
