@@ -1,15 +1,9 @@
-import {
-  DownOutlined,
-  EditOutlined,
-  InfoCircleFilled,
-  SearchOutlined,
-  StarFilled,
-  UserOutlined,
-} from "@ant-design/icons";
+import React, { useState } from "react";
 import {
   Badge,
   Button,
   Checkbox,
+  DatePicker,
   Divider,
   Dropdown,
   Input,
@@ -19,53 +13,75 @@ import {
   Popover,
   Select,
   Table,
-  Tooltip,
 } from "antd";
-import DatePicker from "antd/lib/date-picker";
-import { ColumnsType } from "antd/lib/table";
-import { RowSelectionType } from "antd/lib/table/interface";
-import moment from "moment";
-import { useEffect, useState } from "react";
-import Swal from "sweetalert2";
-import ActionButton from "../../components/button/ActionButton";
-import { CardContainer } from "../../components/card/CardContainer";
-import Layouts from "../../components/layout/Layout";
-import ModalMapPlot from "../../components/modal/task/finishTask/ModalMapPlot";
-import { LocationDatasource } from "../../datasource/LocationDatasource";
-import { TaskFinishedDatasource } from "../../datasource/TaskFinishDatasource";
-import { UpdateStatusPaymentDatasource } from "../../datasource/UpdateStatusPaymentDatasource";
+import type { ColumnsType } from "antd/es/table";
+import { ReportDocDatasource } from "../../datasource/ReportDocument";
 import {
-  FINISH_TASK,
-  FINISH_TASK_SEARCH,
-  STATUS_COLOR_TASK,
-  TASK_HISTORY,
-} from "../../definitions/FinishTask";
+  TaskReportListEntity,
+  updateStatusPays,
+  updateStatusPays_INIT,
+} from "../../entities/TaskFinishEntities";
 import {
   DistrictEntity,
   ProviceEntity,
   SubdistrictEntity,
 } from "../../entities/LocationEntities";
-import {
-  TaskReportEntity,
-  TaskReportEntity_INIT,
-  TaskReportListEntity,
-  updateStatusPays,
-  updateStatusPays_INIT,
-} from "../../entities/TaskFinishEntities";
+import { useEffect } from "react";
+import Layouts from "../../components/layout/Layout";
+import moment from "moment";
+import color from "../../resource/color";
 import { useLocalStorage } from "../../hook/useLocalStorage";
-import { color } from "../../resource";
-import { numberWithCommas } from "../../utilities/TextFormatter";
-import { ReportDocDatasource } from "../../datasource/ReportDocument";
+import { LocationDatasource } from "../../datasource/LocationDatasource";
+import Swal from "sweetalert2";
+import { UpdateStatusPaymentDatasource } from "../../datasource/UpdateStatusPaymentDatasource";
+import {
+  DownOutlined,
+  EditOutlined,
+  InfoCircleFilled,
+  SearchOutlined,
+  StarFilled,
+  UserOutlined,
+} from "@ant-design/icons";
+import { CardContainer } from "../../components/card/CardContainer";
+import {
+  FINISH_TASK,
+  STATUS_COLOR_TASK,
+  TASK_HISTORY,
+} from "../../definitions/FinishTask";
+import {
+  numberWithCommas,
+  numberWithCommasToFixed,
+} from "../../utilities/TextFormatter";
+import ActionButton from "../../components/button/ActionButton";
+import ModalMapPlot from "../../components/modal/task/finishTask/ModalMapPlot";
 
+interface DataType {
+  key: React.Key;
+  date: string;
+  droner: string;
+  farmer: string;
+  plotArea: any;
+  plotId: string;
+  farmAreaAmount: string;
+  rating: string;
+  totalPrice: string;
+  statusPay: string;
+  status: string;
+  telDroner: string;
+  telFarmer: string;
+  taskNo: string;
+  updateBy: string;
+  action: string;
+  discountFee: string;
+  price: string;
+  fee: string;
+  discount: string;
+  taskHistory: string;
+}
 function IndexReport() {
-  const [persistedProfile, setPersistedProfile] = useLocalStorage(
-    "profile",
-    []
-  );
-  const profile = JSON.parse(localStorage.getItem("profile") || "{  }");
+  const [getData, setGetData] = useState<TaskReportListEntity>();
   const [row, setRow] = useState(10);
   const [current, setCurrent] = useState(1);
-  const [data, setData] = useState<TaskReportListEntity>();
   const [searchText, setSearchText] = useState<string>();
   const [searchStatus, setSearchStatus] = useState();
   const [searchStatusPayment, setSearchStatusPayment] = useState();
@@ -78,34 +94,27 @@ function IndexReport() {
   const [province, setProvince] = useState<ProviceEntity[]>();
   const [district, setDistrict] = useState<DistrictEntity[]>();
   const [subdistrict, setSubdistrict] = useState<SubdistrictEntity[]>();
+  const profile = JSON.parse(localStorage.getItem("profile") || "{  }");
   const [showModalMap, setShowModalMap] = useState<boolean>(false);
   const [plotId, setPlotId] = useState<string>("");
   const [visibleRating, setVisibleRating] = useState(false);
   const [statusArr, setStatusArr] = useState<string[]>([]);
   const [statusPays, setStatusPays] = useState<string[]>([]);
   const [statusCan, setStatusCan] = useState<string[]>([]);
-  const [download, setDownLoad] = useState<string[]>([]);
-  const [clickPays, setClickPays] = useState<string[]>([]);
-  const [paysEnum, setPaysEnum] = useState<string[]>([]);
-  const [arrRowEnum, setArrRowEnum] = useState<string[]>([]);
-  const [dataRow, setDataRow] = useState<string[]>([]);
-  const [arrRow, setArrRow] = useState<string[]>([]);
-  const [arrRowAll, setArrRowAll] = useState<string[]>([]);
-  const [getFileName, setGetFileName] = useState<string>();
-
-  const [checkAll, setCheckAll] = useState<any>();
+  const [CheckEnum, setCheckEnum] = useState<string[]>([]);
+  const [clickPays, setClickPays] = useState<any[]>([]);
   const [statusPayment, setStatusPayment] = useState<updateStatusPays>(
     updateStatusPays_INIT
   );
   const { RangePicker } = DatePicker;
+  const dateSearchFormat = "YYYY-MM-DD";
   const dateFormat = "DD/MM/YYYY";
   const timeFormat = "HH:mm";
-  const dateSearchFormat = "YYYY-MM-DD";
+
   useEffect(() => {
     fetchAllReport();
     fetchProvince();
   }, [current, row, startDate, endDate]);
-
   const fetchAllReport = async () => {
     await ReportDocDatasource.getAllReportDroner(
       current,
@@ -120,9 +129,14 @@ function IndexReport() {
       searchStatusCancel,
       searchText
     ).then((res: TaskReportListEntity) => {
-      setData(res);
+      setGetData(res);
     });
   };
+  const [persistedProfile, setPersistedProfile] = useLocalStorage(
+    "profile",
+    []
+  );
+
   const SearchDate = (e: any) => {
     if (e != null) {
       setStartDate(moment(new Date(e[0])).format(dateSearchFormat));
@@ -197,7 +211,6 @@ function IndexReport() {
         const a: any = "DONE";
         setSearchStatus(a);
       }
-      setSearchStatus(undefined);
     }
     setSearchStatusPayment(arr);
     setCurrent(1);
@@ -219,7 +232,6 @@ function IndexReport() {
         const a: any = "CANCELED";
         setSearchStatus(a);
       }
-      setSearchStatus(undefined);
     }
     setSearchStatusCancel(arr);
     setCurrent(1);
@@ -272,7 +284,7 @@ function IndexReport() {
   const handleVisibleRating = (newVisible: any) => {
     setVisibleRating(newVisible);
   };
-  const status = (
+  const SubStatus = (
     <Menu
       items={[
         {
@@ -350,61 +362,10 @@ function IndexReport() {
       ]}
     />
   );
-
-  const handleAllSelect = (e: any) => {
-    let value = e.target.value;
-    let checked = e.target.checked;
-    if (checked) {
-      console.log(value.statusPayment);
-      console.log(value.id);
-
-      setCheckAll(value.statusPayment);
-      setDownLoad(value.id)
-    } else {
-      setCheckAll(undefined);
-    }
-  };
-
-  const changeStatusPayment = (e: any) => {
-    let value = e.target.value;
-    let checked = e.target.checked;
-    let arr: any = [];
-    let eNum: any = [];
-    let row: any = [];
-    if (checked) {
-      setGetFileName(value.id);
-
-      eNum = [...arrRowEnum, value.statusPayment];
-      setArrRowEnum([...arrRowEnum, value.statusPayment]);
-      arr = [...arrRow, value.id];
-      setArrRow([...arrRow, value.id]);
-      row = [...dataRow, value];
-      setDataRow([...dataRow, value]);
-    } else {
-      let d: string[] = arrRow.filter((x) => x != value.id);
-      let s: string[] = arrRowEnum.filter((x) => x != value.statusPayment);
-      let o: string[] = dataRow.filter((x) => x != value);
-      arr = [...d];
-      eNum = [...s];
-      row = [...o];
-      setArrRow(d);
-      setArrRowEnum(s);
-      setDataRow(o);
-      if (d.length == 0) {
-        arr = [];
-      } else if (s.length == 0) {
-        eNum = [];
-      } else if (o.length == 0) {
-        row = [];
-      }
-    }
-    setPaysEnum(eNum);
-    setClickPays(arr);
-    setDownLoad(row);
-  };
   const DownloadPDF = async () => {
-    if (download.length > 1) {
-      const filterId = download.map((x: any) => x.id);
+    if (clickPays.length > 1) {
+      console.log(1);
+      const filterId = clickPays.map((x: any) => x.action);
       const downloadBy = `${persistedProfile.firstname} ${persistedProfile.lastname}`;
       await ReportDocDatasource.getFileName("ZIP_PDF", downloadBy).then(
         (res) => {
@@ -427,14 +388,17 @@ function IndexReport() {
           }
         }
       );
-    } else {
-      const filterId = download.map((x: any) => x.id);
+    } else if (clickPays.length === 1) {
+      console.log(2);
+      const filterId = clickPays.map((x: any) => x.action);
+      console.log(filterId);
       const downloadBy = `${persistedProfile.firstname} ${persistedProfile.lastname}`;
       await ReportDocDatasource.getFileName(
         "PDF",
         downloadBy,
-        getFileName
+        filterId[0]
       ).then((res) => {
+        console.log(res);
         if (res.responseData) {
           const idFileName = res.responseData.id;
           const fileName = res.responseData.fileName;
@@ -453,7 +417,6 @@ function IndexReport() {
       });
     }
   };
-
   const downloadFile = (
     <Menu
       items={[
@@ -464,9 +427,6 @@ function IndexReport() {
         {
           label: "ดาวน์โหลดไฟล์ Excel",
           key: "excel",
-          // icon: (
-          //   <Checkbox value="WAIT_REVIEW" onClick={(e) => handleStatus(e)} />
-          // ),
         },
       ]}
     />
@@ -482,23 +442,25 @@ function IndexReport() {
       showCloseButton: true,
     }).then(async (result) => {
       if (result.isConfirmed) {
-        if (paysEnum[0] === "WAIT_PAYMENT") {
+        if (clickPays.map((x) => x.statusPay)[0] === "DONE_PAYMENT") {
           const updateBy = profile.firstname + " " + profile.lastname;
           const updateInfo = { ...statusPayment };
-          updateInfo.id = clickPays;
-          updateInfo.statusPayment = "DONE_PAYMENT";
+          updateInfo.id = clickPays.map((x) => x.action);
+          updateInfo.statusPayment = "WAIT_PAYMENT";
           updateInfo.updateBy = updateBy;
+          console.log(updateInfo);
           await UpdateStatusPaymentDatasource.UpdateStatusPayment(
             updateInfo
           ).then((res) => {
             window.location.href = "/IndexReport";
           });
-        } else if (paysEnum[0] === "DONE_PAYMENT") {
+        } else if (clickPays.map((x) => x.statusPay)[0] === "WAIT_PAYMENT") {
           const updateBy = profile.firstname + " " + profile.lastname;
           const updateInfo = { ...statusPayment };
-          updateInfo.id = clickPays;
-          updateInfo.statusPayment = "WAIT_PAYMENT";
+          updateInfo.id = clickPays.map((x) => x.action);
+          updateInfo.statusPayment = "DONE_PAYMENT";
           updateInfo.updateBy = updateBy;
+          console.log(updateInfo);
           await UpdateStatusPaymentDatasource.UpdateStatusPayment(
             updateInfo
           ).then((res) => {
@@ -509,63 +471,35 @@ function IndexReport() {
       }
     });
   };
-
-  const columns: ColumnsType<TaskReportEntity> = [
-    {
-      title: (
-        <>
-          <Checkbox
-            value={data?.data}
-            onChange={handleAllSelect}
-          />
-        </>
-      ),
-      width: "3%",
-      render: (value: any, row: any, index: number) => {
-        return {
-          children: (
-            <>
-              {checkAll ? (
-                <Checkbox
-                  value={row}
-                  onChange={changeStatusPayment}
-                  checked={
-                    row.statusPayment === "WAIT_PAYMENT" ||
-                    row.statusPayment === "DONE_PAYMENT"
-                  }
-                  disabled={
-                    row.statusPayment != "WAIT_PAYMENT" &&
-                    row.statusPayment != "DONE_PAYMENT"
-                  }
-                />
-              ) : (
-                <Checkbox
-                  value={row}
-                  onChange={changeStatusPayment}
-                  disabled={
-                    row.statusPayment != "WAIT_PAYMENT" &&
-                    row.statusPayment != "DONE_PAYMENT"
-                  }
-                  // checked={false}
-                />
-              )}
-            </>
-          ),
-        };
-      },
+  const rowSelection = {
+    onChange: (selectedRowKeys: React.Key[], selectedRows: DataType[]) => {
+      const filterEnum = selectedRows.map((x) => x.statusPay);
+      const checkData = filterEnum.filter(
+        (item, index) => filterEnum.indexOf(item) === index
+      );
+      setClickPays(selectedRows);
+      setCheckEnum(checkData);
+      console.log(checkData);
     },
+    getCheckboxProps: (record: DataType) => ({
+      disabled:
+        record.statusPay != "DONE_PAYMENT" &&
+        record.statusPay != "WAIT_PAYMENT",
+      statusPay: record.statusPay,
+    }),
+  };
+  const columns: ColumnsType<DataType> = [
     {
       title: "วัน/เวลา นัดหมาย",
-      dataIndex: "dateAppointment",
-      key: "dateAppointment",
-      sorter: (a: any, b: any) => sorter(a.dateAppointment, b.dateAppointment),
+      dataIndex: "date",
+      sorter: (a: any, b: any) => sorter(a.date, b.date),
       render: (value: any, row: any, index: number) => {
         return {
           children: (
             <>
               <span className="text-dark-75  d-block font-size-lg">
-                {moment(new Date(row.dateAppointment)).format(dateFormat)},{" "}
-                {moment(new Date(row.dateAppointment)).format(timeFormat)}
+                {moment(new Date(value)).format(dateFormat)},{" "}
+                {moment(new Date(value)).format(timeFormat)}
               </span>
               <span style={{ color: color.Disable, fontSize: "12px" }}>
                 {row.taskNo}
@@ -578,19 +512,15 @@ function IndexReport() {
     {
       title: "ชื่อนักบินโดรน",
       dataIndex: "droner",
-      key: "droner",
-      sorter: (a: any, b: any) => sorter(a.droner, b.droner),
       render: (value: any, row: any, index: number) => {
         return {
           children: (
             <>
               <span className="text-dark-75  d-block font-size-lg">
-                {row.droner !== null
-                  ? row.droner.firstname + " " + row.droner.lastname
-                  : "-"}
+                {value}
               </span>
               <span style={{ color: color.Grey, fontSize: "12px" }}>
-                {row.droner !== null ? row.droner.telephoneNo : null}
+                {row.telDroner}
               </span>
             </>
           ),
@@ -600,19 +530,15 @@ function IndexReport() {
     {
       title: "ชื่อเกษตรกร",
       dataIndex: "farmer",
-      key: "farmer",
-      sorter: (a: any, b: any) => sorter(a.farmer, b.farmer),
       render: (value: any, row: any, index: number) => {
         return {
           children: (
             <>
               <span className="text-dark-75  d-block font-size-lg">
-                {row.farmer !== null
-                  ? row.farmer.firstname + " " + row.farmer.lastname
-                  : "-"}
+                {value}
               </span>
               <span style={{ color: color.Grey, fontSize: "12px" }}>
-                {row.farmer.telephoneNo}
+                {row.telFarmer}
               </span>
             </>
           ),
@@ -622,23 +548,15 @@ function IndexReport() {
     {
       title: "พื้นที่แปลงเกษตร",
       dataIndex: "plotArea",
-      key: "plotArea",
       render: (value: any, row: any, index: number) => {
-        const subdistrict = row.farmerPlot.plotArea;
-        const district = row.farmerPlot.plotArea;
-        const province = row.farmerPlot.plotArea;
         return {
           children: (
             <>
               <span className="text-dark-75  d-block font-size-lg">
-                {subdistrict !== null
-                  ? subdistrict.subdistrictName + "/"
-                  : null}
-                {district !== null ? district.districtName + "/" : null}
-                {province !== null ? province.provinceName + "" : null}
+                {value}
               </span>
               <a
-                onClick={() => handleModalMap(row.farmerPlotId)}
+                onClick={() => handleModalMap(row.plotId)}
                 style={{ color: color.primary1 }}
               >
                 ดูแผนที่แปลง
@@ -651,47 +569,35 @@ function IndexReport() {
     {
       title: "จำนวนไร่",
       dataIndex: "farmAreaAmount",
-      key: "farmAreaAmount",
+      width: "9%",
       sorter: (a: any, b: any) => sorter(a.farmAreaAmount, b.farmAreaAmount),
       render: (value: any, row: any, index: number) => {
         return {
-          children: (
-            <>
-              <span className="text-dark-75  d-block font-size-lg">
-                {`${row.farmAreaAmount} ไร่`}
-              </span>
-            </>
-          ),
+          children: <>{`${value} ไร่`}</>,
         };
       },
     },
-
     {
       title: "Rating",
-      dataIndex: "reviewDronerAvg",
-      key: "reviewDronerAvg",
-      width: "7%",
-      sorter: (a: any, b: any) => sorter(a.reviewDronerAvg, b.reviewDronerAvg),
+      dataIndex: "rating",
+      width: "8%",
+      sorter: (a: any, b: any) => sorter(a.rating, b.rating),
       render: (value: any, row: any, index: number) => {
         return {
           children: (
             <>
               <span className="text-dark-75  d-block font-size-lg">
-                {row.reviewDronerAvg > "0" ? (
-                  <span>
-                    <StarFilled
-                      style={{
-                        color: "#FFCA37",
-                        fontSize: "20px",
-                        marginRight: "7px",
-                        verticalAlign: 0.5,
-                      }}
-                    />
-                    {parseFloat(row.reviewDronerAvg).toFixed(1)}
-                  </span>
-                ) : (
-                  "-"
-                )}
+                <span>
+                  <StarFilled
+                    style={{
+                      color: "#FFCA37",
+                      fontSize: "20px",
+                      marginRight: "7px",
+                      verticalAlign: 0.5,
+                    }}
+                  />
+                  {parseFloat(value).toFixed(1)}
+                </span>
               </span>
             </>
           ),
@@ -701,16 +607,16 @@ function IndexReport() {
     {
       title: "ยอดรวมค่าบริการ",
       dataIndex: "totalPrice",
-      key: "totalPrice",
       fixed: "right",
+      width: "12%",
       sorter: (a: any, b: any) => sorter(a.totalPrice, b.totalPrice),
       render: (value: any, row: any, index: number) => {
         return {
           children: (
             <div>
               <span className="text-dark-75 d-block font-size-lg">
-                {row.totalPrice != null
-                  ? numberWithCommas(row.totalPrice) + " บาท"
+                {value != null
+                  ? numberWithCommasToFixed(parseFloat(value)) + " บาท"
                   : "0 บาท"}
                 <Popover
                   title={
@@ -773,20 +679,18 @@ function IndexReport() {
     },
     {
       title: "สถานะ",
-      dataIndex: "status",
-      key: "status",
+      dataIndex: "statusPay",
       fixed: "right",
+      width: "15%",
       render: (value: any, row: any, index: number) => {
-        const beforeValue = row.taskHistory[0];
-
         return {
           children: (
             <>
-              {row.statusPayment != null ? (
+              {value ? (
                 <>
-                  <span style={{ color: STATUS_COLOR_TASK[row.statusPayment] }}>
-                    <Badge color={STATUS_COLOR_TASK[row.statusPayment]} />{" "}
-                    {FINISH_TASK[row.statusPayment]}
+                  <span style={{ color: STATUS_COLOR_TASK[value] }}>
+                    <Badge color={STATUS_COLOR_TASK[value]} />{" "}
+                    {FINISH_TASK[value]}
                     <br />
                   </span>
                 </>
@@ -795,16 +699,13 @@ function IndexReport() {
                   <span style={{ color: STATUS_COLOR_TASK[row.status] }}>
                     <Badge color={STATUS_COLOR_TASK[row.status]} />{" "}
                     {FINISH_TASK[row.status]}
-                    {beforeValue != undefined
+                    {row.taskHistory != undefined
                       ? row.status == "CANCELED"
-                        ? " " +
-                          "(" +
-                          TASK_HISTORY[beforeValue.beforeValue] +
-                          ")"
+                        ? " " + "(" + TASK_HISTORY[row.taskHistory] + ")"
                         : null
                       : null}
-                    <br />
                   </span>
+                  <br />
                 </>
               )}
 
@@ -812,7 +713,7 @@ function IndexReport() {
                 <UserOutlined
                   style={{ padding: "0 4px 0 0", verticalAlign: 0.5 }}
                 />
-                {row.updateBy != null ? row.updateBy : "-"}
+                {row.updateBy}
               </span>
             </>
           ),
@@ -821,8 +722,7 @@ function IndexReport() {
     },
     {
       title: "",
-      dataIndex: "Action",
-      key: "Action",
+      dataIndex: "action",
       fixed: "right",
       width: "5%",
       render: (value: any, row: any, index: number) => {
@@ -832,9 +732,7 @@ function IndexReport() {
               <ActionButton
                 icon={<EditOutlined />}
                 color={color.primary1}
-                onClick={() =>
-                  (window.location.href = "/EditReport?=" + row.id)
-                }
+                onClick={() => (window.location.href = "/EditReport?=" + value)}
               />
             </div>
           ),
@@ -842,7 +740,6 @@ function IndexReport() {
       },
     },
   ];
-
   const PageTitle = (
     <>
       <div
@@ -867,63 +764,87 @@ function IndexReport() {
             format={dateFormat}
           />
         </div>
-
-        {clickPays.length > 0 ||
-        checkAll ? (
+        {CheckEnum[0] != undefined ? (
           <>
-            <div>
-              <div>
-                <Dropdown overlay={downloadFile}>
+            {CheckEnum.length > 0 && CheckEnum.length != 2 ? (
+              <>
+                <div>
+                  <div>
+                    <Dropdown overlay={downloadFile}>
+                      <Button
+                        style={{
+                          padding: "8 0",
+                          backgroundColor: color.primary1,
+                          color: color.secondary2,
+                          borderColor: color.Success,
+                          borderRadius: "5px",
+                        }}
+                      >
+                        ดาวน์โหลดเอกสาร
+                        <DownOutlined />
+                      </Button>
+                    </Dropdown>
+                  </div>
+                </div>
+                <div>
                   <Button
                     style={{
-                      padding: "8 0",
-                      backgroundColor: color.primary1,
-                      color: color.secondary2,
                       borderColor: color.Success,
                       borderRadius: "5px",
+                      color: color.secondary2,
+                      backgroundColor: color.Success,
                     }}
+                    onClick={() => updateStatusPayment()}
                   >
-                    ดาวน์โหลดเอกสาร
-                    <DownOutlined />
+                    {clickPays.find((x) => x.statusPay === "WAIT_PAYMENT")
+                      ? "จ่ายเงินแล้ว"
+                      : "DONE_PAYMENT"
+                      ? "รอจ่ายเงิน"
+                      : null}
                   </Button>
-                </Dropdown>
-              </div>
-            </div>
-            <div>
-              <Button
-                style={{
-                  borderColor: color.Success,
-                  borderRadius: "5px",
-                  color: color.secondary2,
-                  backgroundColor: color.Success,
-                }}
-                onClick={() => updateStatusPayment()}
-              >
-                {paysEnum.find((x) => x === "WAIT_PAYMENT")
-                  ? "จ่ายเงินแล้ว"
-                  : "DONE_PAYMENT"
-                  ? "รอจ่ายเงิน"
-                  : null}
-              </Button>
-            </div>
+                </div>
+              </>
+            ) : (
+              <>
+                <div>
+                  <div style={{ width: "240px" }}>
+                    <Dropdown overlay={downloadFile}>
+                      <Button
+                        style={{
+                          backgroundColor: color.primary1,
+                          color: color.secondary2,
+                          borderColor: color.Success,
+                          borderRadius: "5px",
+                        }}
+                      >
+                        ดาวน์โหลดเอกสาร
+                        <DownOutlined />
+                      </Button>
+                    </Dropdown>
+                  </div>
+                </div>
+              </>
+            )}
           </>
         ) : (
-          <div style={{ width: "240px" }}>
-            <Dropdown disabled>
-              <Button
-                style={{
-                  padding: "8 0",
-                  backgroundColor: color.Disable,
-                  color: color.Grey,
-                  borderColor: color.Disable,
-                  borderRadius: "5px",
-                }}
-              >
-                ดาวน์โหลดเอกสาร
-                <DownOutlined />
-              </Button>
-            </Dropdown>
-          </div>
+          <>
+            <div style={{ width: "240px" }}>
+              <Dropdown disabled>
+                <Button
+                  style={{
+                    padding: "8 0",
+                    backgroundColor: color.Disable,
+                    color: color.Grey,
+                    borderColor: color.Disable,
+                    borderRadius: "5px",
+                  }}
+                >
+                  ดาวน์โหลดเอกสาร
+                  <DownOutlined />
+                </Button>
+              </Dropdown>
+            </div>
+          </>
         )}
       </div>
       <div className="container d-flex justify-content-between pt-3">
@@ -951,8 +872,8 @@ function IndexReport() {
               >
                 <span>รอรีวิว</span>
                 <strong>
-                  {data?.summary != undefined
-                    ? data?.summary[0].waitreview
+                  {getData?.summary != undefined
+                    ? getData?.summary[0].waitreview
                     : "0"}
                 </strong>
               </div>
@@ -984,8 +905,8 @@ function IndexReport() {
               >
                 <span>รอจ่ายเงิน</span>
                 <strong>
-                  {data?.summary != undefined
-                    ? data?.summary[0].waitpayment
+                  {getData?.summary != undefined
+                    ? getData?.summary[0].waitpayment
                     : "0"}
                 </strong>
               </div>
@@ -1005,8 +926,8 @@ function IndexReport() {
               >
                 <span>จ่ายเงินแล้ว (บริษัท)</span>
                 <strong>
-                  {data?.summary != undefined
-                    ? data?.summary[0].donepayment
+                  {getData?.summary != undefined
+                    ? getData?.summary[0].donepayment
                     : "0"}
                 </strong>
               </div>
@@ -1026,8 +947,8 @@ function IndexReport() {
               >
                 <span>เสร็จสิ้น</span>
                 <strong>
-                  {data?.summary != undefined
-                    ? data?.summary[0].successpayment
+                  {getData?.summary != undefined
+                    ? getData?.summary[0].successpayment
                     : "0"}
                 </strong>
               </div>
@@ -1058,8 +979,8 @@ function IndexReport() {
               >
                 <span>ยกเลิก</span>
                 <strong>
-                  {data?.summary != undefined
-                    ? data?.summary[0].canceledtask
+                  {getData?.summary != undefined
+                    ? getData?.summary[0].canceledtask
                     : "0"}
                 </strong>
               </div>
@@ -1153,7 +1074,7 @@ function IndexReport() {
         </div>
         <div className="col-lg p-1">
           <Dropdown
-            overlay={status}
+            overlay={SubStatus}
             trigger={["click"]}
             className="col-lg-12"
             onVisibleChange={handleVisibleRating}
@@ -1182,25 +1103,97 @@ function IndexReport() {
     </>
   );
 
+  const data: DataType[] = [];
+  if (getData != undefined) {
+    for (let i = 0; i < getData.data.length; i++) {
+      data.push({
+        key: i,
+        date: `${getData?.data.map((x) => x.dateAppointment)[i]}`,
+        droner: `${
+          getData?.data.map((x) =>
+            x.droner != null
+              ? x.droner.firstname + " " + x.droner.lastname
+              : "-"
+          )[i]
+        }`,
+        farmer: `${
+          getData?.data.map(
+            (x) => x.farmer.firstname + " " + x.farmer.lastname
+          )[i]
+        }`,
+        plotArea: `${
+          getData?.data.map((x) =>
+            x.farmerPlot.plotArea != null
+              ? x.farmerPlot.plotArea.subdistrictName +
+                "/" +
+                x.farmerPlot.plotArea.districtName +
+                "/" +
+                x.farmerPlot.plotArea.provinceName
+              : "-"
+          )[i]
+        }`,
+        plotId: `${getData?.data.map((x) => x.farmerPlot.id)[i]}`,
+        farmAreaAmount: `${getData?.data.map((x) => x.farmAreaAmount)[i]}`,
+        rating: `${
+          getData?.data.map((x) =>
+            x.reviewDronerAvg != null ? x.reviewDronerAvg : "0"
+          )[i]
+        }`,
+        totalPrice: `${
+          getData?.data.map((x) => (x.totalPrice != null ? x.totalPrice : "0"))[
+            i
+          ]
+        }`,
+        statusPay: `${
+          getData?.data.map((x) =>
+            x.statusPayment != null ? x.statusPayment : ""
+          )[i]
+        }`,
+        status: `${getData?.data.map((x) => x.status)[i]}`,
+        telDroner: `${
+          getData?.data.map((x) =>
+            x.droner != null ? x.droner.telephoneNo : "-"
+          )[i]
+        }`,
+        telFarmer: `${getData?.data.map((x) => x.farmer.telephoneNo)[i]}`,
+        taskNo: `${getData?.data.map((x) => x.taskNo)[i]}`,
+        updateBy: `${
+          getData?.data.map((x) => (x.updateBy != null ? x.updateBy : "-"))[i]
+        }`,
+        discountFee: `${getData?.data.map((x) => x.discountFee)[i]}`,
+        price: `${getData?.data.map((x) => x.price)[i]}`,
+        fee: `${getData?.data.map((x) => x.fee)[i]}`,
+        discount: `${getData?.data.map((x) => x.discount)[i]}`,
+        action: `${getData?.data.map((x) => x.id)[i]}`,
+        taskHistory: `${
+          getData?.data.map((x) =>
+            x.taskHistory.length > 0 ? x.taskHistory[0].beforeValue : []
+          )[i]
+        }`,
+      });
+    }
+  }
   return (
     <Layouts>
       {PageTitle}
       <br />
       <Table
+        rowSelection={{
+          ...rowSelection,
+        }}
         columns={columns}
-        dataSource={data?.data}
-        scroll={{ x: 1400 }}
+        dataSource={data}
         pagination={false}
+        scroll={{ x: 1400 }}
       />
-
       <div className="d-flex justify-content-between pt-5">
-        <p>รายการทั้งหมด {data?.count} รายการ</p>
+        <p>รายการทั้งหมด {getData?.count} รายการ</p>
         <Pagination
           current={current}
           showSizeChanger
           onChange={onChangePage}
           onShowSizeChange={onShowSizeChange}
-          total={data?.count}
+          total={getData?.count}
         />
       </div>
       {showModalMap && (
@@ -1214,4 +1207,5 @@ function IndexReport() {
     </Layouts>
   );
 }
+
 export default IndexReport;

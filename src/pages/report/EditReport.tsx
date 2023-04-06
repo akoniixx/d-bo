@@ -39,7 +39,10 @@ import {
   updateStatusPays_INIT,
 } from "../../entities/TaskFinishEntities";
 import { color } from "../../resource";
-import { numberWithCommas } from "../../utilities/TextFormatter";
+import {
+  numberWithCommas,
+  numberWithCommasToFixed,
+} from "../../utilities/TextFormatter";
 import { UpdateStatusPaymentDatasource } from "../../datasource/UpdateStatusPaymentDatasource";
 import { TASK_HISTORY } from "../../definitions/FinishTask";
 import {
@@ -669,8 +672,9 @@ function EditReport() {
                 <br />
                 <b style={{ fontSize: "20px", color: color.Success }}>
                   {data.data.totalPrice !== null
-                    ? numberWithCommas(parseFloat(data.data.totalPrice)) +
-                      " บาท"
+                    ? numberWithCommasToFixed(
+                        parseFloat(data.data.totalPrice)
+                      ) + " บาท"
                     : "0 บาท"}
                 </b>
               </span>
@@ -685,7 +689,7 @@ function EditReport() {
                 disabled
                 value={
                   data.data.price !== null
-                    ? numberWithCommas(parseFloat(data.data.price))
+                    ? numberWithCommasToFixed(parseFloat(data.data.price))
                     : 0
                 }
                 suffix="บาท"
@@ -700,7 +704,7 @@ function EditReport() {
                 placeholder="0.0"
                 value={
                   data.data.fee !== null
-                    ? numberWithCommas(parseFloat(data.data.fee))
+                    ? numberWithCommasToFixed(parseFloat(data.data.fee))
                     : 0
                 }
                 suffix="บาท"
@@ -714,7 +718,7 @@ function EditReport() {
                 disabled
                 value={
                   data.data.discountFee !== null
-                    ? numberWithCommas(parseFloat(data.data.discountFee))
+                    ? numberWithCommasToFixed(parseFloat(data.data.discountFee))
                     : 0
                 }
                 suffix="บาท"
@@ -740,7 +744,7 @@ function EditReport() {
           <div className="form-group col-lg-4">
             <label>ส่วนลดคูปอง</label>
             <Input
-              value={numberWithCommas(couponData.couponDiscount!)}
+              value={numberWithCommasToFixed(couponData.couponDiscount!)}
               disabled
               autoComplete="off"
             />
@@ -751,17 +755,17 @@ function EditReport() {
   );
   const DownloadPDF = async () => {
     const filterId = data.data.id;
-    const downloadBy = `${profile.firstname} ${profile.lastname}`
-    await ReportDocDatasource.getFileName(
-      "PDF",
-      downloadBy,
-      filterId
-    ).then((res) => {
-      if (res.responseData) {
-        const idFileName = res.responseData.id;
-        const fileName = res.responseData.fileName;
-        ReportDocDatasource.reportPDF([filterId], downloadBy, idFileName).then(
-          (res) => {
+    const downloadBy = `${profile.firstname} ${profile.lastname}`;
+    await ReportDocDatasource.getFileName("PDF", downloadBy, filterId).then(
+      (res) => {
+        if (res.responseData) {
+          const idFileName = res.responseData.id;
+          const fileName = res.responseData.fileName;
+          ReportDocDatasource.reportPDF(
+            [filterId],
+            downloadBy,
+            idFileName
+          ).then((res) => {
             const blob = new Blob([res], { type: "application/pdf" });
             const a = document.createElement("a");
             a.href = window.URL.createObjectURL(blob);
@@ -769,10 +773,10 @@ function EditReport() {
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
-          }
-        );
+          });
+        }
       }
-    });
+    );
   };
   return (
     <Layout>
