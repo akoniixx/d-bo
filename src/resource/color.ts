@@ -11,5 +11,6 @@ export default {
     White: '#FFFFFF',
     Success: '#219653',
     Warning: '#F2994A',
-    Error : '#EB5757'
+    Error : '#EB5757',
+    blue: '#2F80ED'
 }
