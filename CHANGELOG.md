@@ -1,4 +1,8 @@
 ## [Version - 0]
+## Fix [v0.25.01] 2023-04-07
+- fixed delete coupon
+- fixed search with button
+- fixed wording
 ## Feature [v0.25.00] 2023-04-07
 - add promotions feature
 ## Feature [v0.24.00] 2023-04-06
