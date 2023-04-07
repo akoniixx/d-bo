@@ -266,9 +266,9 @@ function IndexReport() {
     setCheckAll(list.length === statusOptions.length);
   };
   const onCheckAllChange = (e: CheckboxChangeEvent) => {
-    if(e.target.checked === true){
+    if (e.target.checked === true) {
       setSearchStatus(e.target.value);
-    }else{
+    } else {
       setSearchStatus(undefined);
     }
     setCheckedList(e.target.checked ? statusOptions : []);
@@ -287,9 +287,9 @@ function IndexReport() {
     setCheckAllDone(list.length === statusDoneOptions.length);
   };
   const onCheckAllDoneChange = (e: CheckboxChangeEvent) => {
-    if(e.target.checked === true){
+    if (e.target.checked === true) {
       setSearchStatus(e.target.value);
-    }else{
+    } else {
       setSearchStatus(undefined);
     }
     setCheckedListDone(e.target.checked ? statusDoneOptions : []);
@@ -407,16 +407,16 @@ function IndexReport() {
     } else if (clickPays.length === 1) {
       const filterId = clickPays.map((x: any) => x.action);
       const downloadBy = `${persistedProfile.firstname} ${persistedProfile.lastname}`;
-      await ReportDocDatasource.getFileName(
-        "PDF",
-        downloadBy,
-        filterId[0]
-      ).then((res) => {
-        if (res.responseData) {
-          const idFileName = res.responseData.id;
-          const fileName = res.responseData.fileName;
-          ReportDocDatasource.reportPDF(filterId, downloadBy, idFileName).then(
-            (res) => {
+      await ReportDocDatasource.getFileName("PDF", downloadBy, filterId).then(
+        (res) => {
+          if (res.responseData) {
+            const idFileName = res.responseData.id;
+            const fileName = res.responseData.fileName;
+            ReportDocDatasource.reportPDF(
+              filterId,
+              downloadBy,
+              idFileName
+            ).then((res) => {
               const blob = new Blob([res], { type: "application/pdf" });
               const a = document.createElement("a");
               a.href = window.URL.createObjectURL(blob);
@@ -424,11 +424,38 @@ function IndexReport() {
               document.body.appendChild(a);
               a.click();
               document.body.removeChild(a);
-            }
-          );
+            });
+          }
         }
-      });
+      );
     }
+  };
+  const DownloadExcel = async () => {
+    const filterId = clickPays.map((x: any) => x.action);
+    const downloadBy = `${persistedProfile.firstname} ${persistedProfile.lastname}`;
+    await ReportDocDatasource.getFileName("EXCEL", downloadBy, filterId).then(
+      (res) => {
+        if (res.responseData) {
+          const idFileName = res.responseData.id;
+          const fileName = res.responseData.fileName;
+          ReportDocDatasource.reportExcel(
+            filterId,
+            downloadBy,
+            idFileName
+          ).then((res) => {
+            const blob = new Blob([res], {
+              type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            });
+            const a = document.createElement("a");
+            a.href = window.URL.createObjectURL(blob);
+            a.download = fileName;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+          });
+        }
+      }
+    );
   };
   const downloadFile = (
     <Menu
@@ -438,7 +465,7 @@ function IndexReport() {
           key: "pdf",
         },
         {
-          label: "ดาวน์โหลดไฟล์ Excel",
+          label: <span onClick={DownloadExcel}>ดาวน์โหลดไฟล์ Excel</span>,
           key: "excel",
         },
       ]}

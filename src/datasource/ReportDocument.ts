@@ -53,12 +53,25 @@ export class ReportDocDatasource {
         return response.data;
       });
   }
-  static getFileName(type: string, downloadBy: string,taskId?: string,  ) {
+  static reportExcel(taskId: string[], downloadBy: string, idFileName: string) {
+    const params = {
+      taskId: taskId,
+      downloadBy: downloadBy,
+      idFileName: idFileName,
+    };
+    return axios
+      .post(BASE_URL + `/tasks/report-document/report-excel`, params, {
+        responseType: "arraybuffer",
+      })
+      .then((response) => {
+        return response.data;
+      });
+  }
+  static getFileName(type: string, downloadBy: string, taskId?: string[]) {
     const params = {
       type: type,
       downloadBy: downloadBy,
       taskId: taskId,
-
     };
     return axios
       .post(BASE_URL + `/tasks/report-document/generate-file-name`, params)
