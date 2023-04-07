@@ -91,3 +91,31 @@ table tr td :hover {
 .ant-popover-title {
   background-color: #219653;
 }
+.ant-menu {
+  color: #7b7b7b !important;
+  font-size: 14px !important;
+}
+.ant-menu-item a{
+  color: #7b7b7b !important;
+}
+.ant-menu-item-selected {
+  color: #219653 !important ;
+  background-color: #ceeed5 !important;
+}
+.ant-menu-inline .ant-menu-item:after {
+  border-right: 0px !important;
+}
+.ant-menu-submenu-title:hover {
+  color: #7b7b7b !important;
+}
+.ant-menu-submenu-open {
+  color: #ffca37 !important;
+  background-color: #219653 !important;
+}
+.ant-menu-submenu-arrow::after {
+  color: #7b7b7b;
+}
+.ant-menu-submenu-arrow::before {
+  color: #7b7b7b;
+} 
+
