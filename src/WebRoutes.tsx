@@ -41,6 +41,8 @@ import PricePage from "./pages/setting/PricePage";
 import AddDroneBrand from "./pages/setting/masterDataDrone/AddDroneBrand";
 import IndexDroneBrand from "./pages/setting/masterDataDrone/IndexDroneBrand";
 import EditDroneBrand from "./pages/setting/masterDataDrone/EditDroneBrand";
+import IndexReport from './pages/report/IndexReport';
+import EditReport from "./pages/report/EditReport";
 
 const WebRoutes: React.FC<any> = () => {
   return (
@@ -93,6 +95,12 @@ const WebRoutes: React.FC<any> = () => {
           <Route path="*" element={<PageNotFound />} />
           <Route path="/AddPromotion" element={<AddPromotion />}/>
           <Route path="/EditPromotion/:id" element={<EditPromotion />} />
+          <Route path="*" element={<PageNotFound />} />IndexReport
+          <Route path="/AddPromotion" element={<AddPromotion />} />
+          <Route path="/IndexReport" element={<IndexReport />} />
+          <Route path="/EditReport" element={<EditReport />} />
+
+
         </Route>
         <Route element={<PublicRoute />}>
           <Route index element={<AuthPage />} />

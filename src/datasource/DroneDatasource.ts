@@ -94,7 +94,7 @@ export class DroneDatasource {
   }
   static getCountDroneBrandList(
     search?: string
-  ): Promise<DroneBrandListEntity[]> {
+  ): Promise<DroneBrandListEntity> {
     const params = {
       search: search,
     };

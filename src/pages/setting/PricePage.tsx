@@ -26,17 +26,13 @@ function PricePage() {
   const [provinceId, setProvinceId] = useState();
   const [editLocationPrice, setEditLocationPrice] =
     useState<UpdateLocationPrice>(UpdateLocationPrice_INIT);
-  const changeTextSearch = (searchText: any) => {
-    setSearchText(searchText.target.value);
-    setCurrent(1);
-  };
   useEffect(() => {
     fetchLocationPrice();
   }, [current]);
   const fetchLocationPrice = async () => {
     await LocationPriceDatasource.getAllLocationPrice(
-      current,
       row,
+      current,
       searchText
     ).then((res: LocationPricePageEntity) => {
       setData(res);
@@ -49,6 +45,10 @@ function PricePage() {
   };
   const onChangePage = (page: number) => {
     setCurrent(page);
+  };
+  const changeTextSearch = (searchText: any) => {
+    setSearchText(searchText.target.value);
+    setCurrent(1);
   };
   const previewCrop = (province: any) => {
     setShowModalCrop((prev) => !prev);
