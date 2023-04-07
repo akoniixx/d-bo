@@ -1247,8 +1247,8 @@ function EditPromotion(){
                                 </Select>
                               </Form.Item>
                             </div>
-                            <Divider />
-                            <div className="row">
+                            {/* <Divider /> */}
+                            {/* <div className="row">
                               <div className="form-group col-lg-12 d-flex flex-column">
                                 <label>
                                 การแจ้งเตือน<span style={{ color: "red" }}> *</span>
@@ -1294,7 +1294,7 @@ function EditPromotion(){
                                   </Checkbox>
                                 </div>
                               </div>
-                            </div>
+                            </div> */}
                             <Divider />
                             <div className="row">
                               <div className="form-group col-lg-12 d-flex flex-column">

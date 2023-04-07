@@ -94,7 +94,7 @@ function PromotionPage() {
     CouponDataSource.queryCoupon(id).then(
       res=> {
         let couponDto  = {
-          couponName : res.couponName,
+          couponName : `${res.couponName} (คัดลอก)`,
           couponType : res.couponType,
           promotionStatus : "DRAFTING",
           promotionType : res.promotionType,
