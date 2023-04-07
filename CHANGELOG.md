@@ -1,4 +1,6 @@
 ## [Version - 0]
+## Feature [v0.25.00] 2023-04-07
+- add promotions feature
 ## Feature [v0.24.00] 2023-04-06
 - added report droner feature (PDF) 
 ## Fix [v0.23.02] 2023-03-30

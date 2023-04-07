@@ -36,6 +36,7 @@ import EditWaitStart from "./pages/task/todayTask/DetailEdit/EditWaitStart";
 import EditInProgress from "./pages/task/todayTask/DetailEdit/EditInProgress";
 import IndexTodayTask from "./pages/task/todayTask/IndexTaskToday";
 import AddPromotion from "./pages/promotion/AddPromotionPage";
+import EditPromotion from "./pages/promotion/EditPromotionPage";
 import PricePage from "./pages/setting/PricePage";
 import AddDroneBrand from "./pages/setting/masterDataDrone/AddDroneBrand";
 import IndexDroneBrand from "./pages/setting/masterDataDrone/IndexDroneBrand";
@@ -91,6 +92,9 @@ const WebRoutes: React.FC<any> = () => {
           <Route path="/IndexTodayTask" element={<IndexTodayTask />} />
           <Route path="/EditWaitStart" element={<EditWaitStart />} />
           <Route path="/EditInProgress" element={<EditInProgress />} />
+          <Route path="*" element={<PageNotFound />} />
+          <Route path="/AddPromotion" element={<AddPromotion />}/>
+          <Route path="/EditPromotion/:id" element={<EditPromotion />} />
           <Route path="*" element={<PageNotFound />} />IndexReport
           <Route path="/AddPromotion" element={<AddPromotion />} />
           <Route path="/IndexReport" element={<IndexReport />} />
