@@ -24,7 +24,7 @@ import ModalDeleteCoupon from "../../components/modal/ModalDeleteCoupon";
 
 function PromotionPage() {
   const dateSearchFormat = "YYYY-MM-DD";
-  const dateFormat = "DD-MM-YYYY";
+  const dateFormat = "DD/MM/YYYY";
   const navigate = useNavigate();
   const { RangePicker } = DatePicker;
   const row = 10;
