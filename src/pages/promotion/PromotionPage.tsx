@@ -448,7 +448,7 @@ function PromotionPage() {
                 <div className="d-flex">
                   <span className="ps-2 text-secondary">
                     <Image src={icon.pointDrafting} width={10} height={10} />{" "}
-                    แบบร่าง
+                    รอเปิดใช้งาน
                   </span>
                 </div>
               )}
@@ -482,7 +482,7 @@ function PromotionPage() {
               </div>
               <div className="pr-1">
                 <ActionButton
-                  icon={<Image src={icon.iconcopy} width={12} height={14} />}
+                  icon={<img src={icon.iconcopy} width={12} height={14} />}
                   color={color.primary1}
                   onClick={() => {
                     duplicateCoupon(row.id);

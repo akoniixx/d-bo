@@ -3,6 +3,10 @@
 - fixed delete coupon
 - fixed search with button
 - fixed wording
+- fixed select plant with injection time in coupon
+- fixed delete selected plant
+- added logic change img follow type coupon
+- fixed render plant and injection in review mobile
 ## Feature [v0.25.00] 2023-04-07
 - add promotions feature
 ## Feature [v0.24.00] 2023-04-06

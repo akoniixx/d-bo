@@ -17,9 +17,8 @@ import {
   Button,
   Image,
 } from "antd";
-import parse from "html-react-parser";
 import { Option } from "antd/lib/mentions";
-import ReactQuill, { Quill } from "react-quill";
+import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 import "../../components/editor/editor.css";
 import { formats, modules } from "../../components/editor/EditorToolbar";
@@ -37,20 +36,21 @@ import { CouponDataSource } from "../../datasource/CouponDatasource";
 import { CouponEntities } from "../../entities/CouponEntites";
 import Swal from "sweetalert2";
 import { image } from "../../resource";
-import icon from "../../resource/icon";
 import RenderMobile from "../../components/mobile/RenderMobile";
 import dayjs from "dayjs";
+import { CropPurposeSprayEntity } from "../../entities/CropEntities";
 
 export default function AddPromotion() {
   const profile = JSON.parse(localStorage.getItem("profile") || "{  }");
   const dateFormat = "DD/MM/YYYY";
-  const [plantName, setPlantName] = useState<string[]>([]);
+  const [plantName, setPlantName] = useState<CropPurposeSprayEntity[]>();
   const [provinceList, setProvinceList] = useState<string[]>([]);
   const [crop, setCrop] = useState<any>([
     {
-      plantName: null,
+      id: null,
+      cropName: null,
       injectionTiming: [],
-      injectionList: [],
+      purposeSpray: [],
     },
   ]);
   const [descriptionEditor, setDescriptionEditor] = useState<string | null>(
@@ -94,8 +94,8 @@ export default function AddPromotion() {
   const [form] = Form.useForm();
   useEffect(() => {
     getCropPlantName();
+    renderMobilePlant();
     if (fetchTwice.current) {
-      //getCropPlantName();
       getProvince();
       fetchTwice.current = false;
     }
@@ -104,39 +104,17 @@ export default function AddPromotion() {
   const getCropPlantName = () => {
     CropDatasource.getAllCropPlantName()
       .then((res) => {
-        const mapCrop = res;
-        const plant: string[] = [];
-        mapCrop.map((item) => {
-          plant.push(item.cropName);
-        });
-        const mapPlant = plant.filter(
-          (p) => !crop.some((c: any) => p === c.plantName)
+        const mapPlant = res.filter(
+          (p) => !crop.some((c: any) => p.id === c.id)
         );
         setPlantName(mapPlant);
       })
       .catch((err) => console.log(err));
   };
-
-  const getCropInjectionTime = (index: number, plantName: string) => {
-    CropDatasource.getPurposeByCroupName(plantName)
-      .then((res) => {
-        const updateCrop = crop.map((item: any, i: number) => {
-          if (index === i) {
-            const injectionList = res.purposeSpray.map(
-              (purposespray) => purposespray.purposeSprayName
-            );
-            return {
-              ...item,
-              injectionList: injectionList,
-              plantName: plantName,
-            };
-          } else {
-            return item;
-          }
-        });
-        setCrop(updateCrop);
-      })
-      .catch((err) => console.log(err));
+  const handleChangePlantCrop = (plantId: string, index: number) => {
+    const getCrop = plantName?.find((f) => f.id === plantId);
+    let map = { ...getCrop, injectionTiming: [] };
+    setCrop([...crop.filter((x: any) => x.id !== null), map]);
   };
 
   const getProvince = () => {
@@ -153,6 +131,7 @@ export default function AddPromotion() {
       title: <div style={{ display: "flex", alignItems: "center" }}>ลำดับ</div>,
       dataIndex: "index",
       key: "index",
+      width: "8%",
       render: (value: any, row: any, index: number) => {
         return {
           children: <p>{index + 1}</p>,
@@ -163,13 +142,13 @@ export default function AddPromotion() {
       title: "ชื่อพืช",
       dataIndex: "plantName",
       key: "plantName",
+      width: "20%",
       render: (value: any, row: any, index: number) => {
-        let formName = `plantName_${index}`;
+        let formName = row.id;
         return {
           children: (
             <Form.Item
               name={formName}
-              key={index}
               rules={[
                 {
                   required: true,
@@ -178,16 +157,14 @@ export default function AddPromotion() {
               ]}
             >
               <Select
-                key={index}
                 disabled={!couponPlant}
                 className="col-lg-12 p-1"
                 placeholder="เลือกพืช"
-                onChange={(plant) => {
-                  handleChangePlantCrop(index, plant);
+                defaultValue={row.cropName}
+                onChange={(plant, id) => {
+                  handleChangePlantCrop(id.key, index);
                 }}
                 showSearch
-                value={value}
-                allowClear
                 optionFilterProp="children"
                 filterOption={(input: any, option: any) =>
                   option.children.includes(input)
@@ -198,9 +175,9 @@ export default function AddPromotion() {
                     .localeCompare(optionB.children.toLowerCase())
                 }
               >
-                {plantName.map((item) => (
-                  <Option key={item} value={item}>
-                    {item}
+                {plantName?.map((item) => (
+                  <Option value={item.cropName} key={item.id}>
+                    {item.cropName}
                   </Option>
                 ))}
               </Select>
@@ -213,8 +190,9 @@ export default function AddPromotion() {
       title: "ช่วงเวลาการพ่น",
       dataIndex: "injectionTiming",
       key: "injectionTiming",
+      width: "30%",
       render: (value: any, row: any, index: number) => {
-        let formName = `injectionTiming_${index}`;
+        let formName = row.cropName;
         return {
           children: (
             <Form.Item
@@ -229,7 +207,7 @@ export default function AddPromotion() {
             >
               <Select
                 key={index}
-                disabled={!crop[index].plantName || !couponPlant}
+                disabled={!crop[index].cropName || !couponPlant}
                 mode="multiple"
                 className="col-lg-12 p-1"
                 onClear={() => {}}
@@ -239,7 +217,6 @@ export default function AddPromotion() {
                 }}
                 showSearch
                 // value={crop[index].injectionTime}
-                allowClear
                 optionFilterProp="children"
                 filterOption={(input: any, option: any) =>
                   option.children.includes(input)
@@ -250,9 +227,9 @@ export default function AddPromotion() {
                     .localeCompare(optionB.children.toLowerCase())
                 }
               >
-                {crop[index].injectionList.map((item: string) => (
-                  <Option key={item} value={item}>
-                    {item}
+                {crop[index].purposeSpray.map((item: any) => (
+                  <Option key={item.id} value={item.purposeSprayName}>
+                    {item.purposeSprayName}
                   </Option>
                 ))}
               </Select>
@@ -262,35 +239,28 @@ export default function AddPromotion() {
       },
     },
     {
+      width: "10%",
       render: (value: any, row: any, index: number) => {
         return {
           children: (
-            <div className="pb-4">
-              <ActionButton
-                icon={<DeleteOutlined />}
-                color={color.Disable}
-                onClick={() => {
-                  deleteCrop(index, row);
-                }}
-              />
-            </div>
+            <>
+              {crop.length > 1 && (
+                <div className="pb-4">
+                  <ActionButton
+                    icon={<DeleteOutlined />}
+                    color={color.Error}
+                    onClick={() => {
+                      deleteCrop(index, row);
+                    }}
+                  />
+                </div>
+              )}
+            </>
           ),
         };
       },
     },
   ];
-
-  const handleChangePlantCrop = (index: number, plant: string) => {
-    const updateCrop = crop.map((item: any, i: number) => {
-      if (i === index) {
-        return { ...item, plantName: plant };
-      } else {
-        return item;
-      }
-    });
-    setCrop(updateCrop);
-    getCropInjectionTime(index, plant);
-  };
 
   const handleChangeInjectionTime = (
     index: number,
@@ -303,16 +273,25 @@ export default function AddPromotion() {
         return item;
       }
     });
+    setCrop(updateCrop);
+  };
+
+  const renderMobilePlant = () => {
     const plantName = crop.map((item: any) => {
+      let injname = "";
       let plantname = "";
-      plantname += item.plantName + " ";
+      item.injectionTiming.map((inj: any) => {
+        injname += inj + ",";
+        return injname;
+      });
+      plantname +=
+        item.cropName + " (" + injname.substring(injname.length - 1, 0) + ") ";
       return plantname;
     });
     setRenderMobile({
       ...renderMobile,
-      plantName: plantName,
+      plantName: plantName.filter((p: any) => !p.includes(null)),
     });
-    setCrop(updateCrop);
   };
 
   const handleChangeProvince = (provinceName: string[]) => {
@@ -325,6 +304,10 @@ export default function AddPromotion() {
 
   const handleCouponType = (type: string) => {
     setCouponType(type);
+    setRenderMobile({
+      ...renderMobile,
+      couponType: type,
+    });
   };
 
   const handleCouponInfo = (info: string) => {
@@ -384,29 +367,29 @@ export default function AddPromotion() {
   };
 
   const addCrop = () => {
-    setCrop((pre: any) => {
-      return [
-        ...pre,
-        {
-          plantName: null,
-          injectionTiming: [],
-          injectionList: [],
-        },
-      ];
-    });
+    if (crop[0].id) {
+      setCrop((pre: any) => {
+        return [
+          ...pre,
+          {
+            id: null,
+            cropName: null,
+            injectionTiming: [],
+            purposeSpray: [],
+          },
+        ];
+      });
+    }
   };
 
   const deleteCrop = (index: number, cropDelete: any) => {
     crop.forEach((item: any) => {
-      if (item.plantName === cropDelete.plantName) {
-        form.setFieldValue(`plantName_${index}`, undefined);
-        form.setFieldValue(`injectionTiming_${index}`, []);
+      if (item.id === cropDelete.id) {
+        form.setFieldValue(cropDelete.id, undefined);
+        form.setFieldValue(cropDelete.cropName, []);
       }
     });
-    const mapCrop = crop.filter(
-      (c: any) => c.plantName !== cropDelete.plantName
-    );
-    console.log(mapCrop);
+    const mapCrop = crop.filter((c: any) => c.cropName !== cropDelete.cropName);
     setEditTable(!editTable);
     setCrop(mapCrop);
   };
@@ -512,7 +495,7 @@ export default function AddPromotion() {
 
     if (plantCheckbox) {
       const plantErrArray = crop.map((item: any) => {
-        if (item.plantName === "" || item.injectionTiming.length === 0) {
+        if (item.cropName === "" || item.injectionTiming.length === 0) {
           return true;
         } else {
           return false;
@@ -1116,10 +1099,7 @@ export default function AddPromotion() {
               <Divider />
               <div className="row">
                 <div className="form-group col-lg-12 d-flex flex-column">
-                  <label>
-                    เงื่อนไขการได้รับพิเศษ{" "}
-                    <span style={{ color: "red" }}>*</span>
-                  </label>
+                  <label>เงื่อนไขการได้รับพิเศษ</label>
                   <Form.Item name="specialCondition" valuePropName="checked">
                     <Checkbox
                       onChange={handleSpecialCoupon}
@@ -1147,7 +1127,15 @@ export default function AddPromotion() {
                         <div className="d-flex">
                           <div className="d-flex flex-column px-3">
                             <label>จำนวนไร่ขั้นต่ำ</label>
-                            <Form.Item name="couponConditionRaiMin">
+                            <Form.Item
+                              name="couponConditionRaiMin"
+                              rules={[
+                                {
+                                  required: raiCondition,
+                                  message: "กรุณากรอกจำนวนไร่ขั้นต่ำ",
+                                },
+                              ]}
+                            >
                               <Input
                                 disabled={!raiCondition}
                                 placeholder="กรอกจำนวนไร่"
@@ -1162,7 +1150,15 @@ export default function AddPromotion() {
                           </div>
                           <div className="d-flex flex-column px-2">
                             <label>จำนวนไร่สูงสุด</label>
-                            <Form.Item name="couponConditionRaiMax">
+                            <Form.Item
+                              name="couponConditionRaiMax"
+                              rules={[
+                                {
+                                  required: raiCondition,
+                                  message: "กรุณากรอกจำนวนไร่สูงสุด",
+                                },
+                              ]}
+                            >
                               <Input
                                 disabled={!raiCondition}
                                 placeholder="กรอกจำนวนไร่"
@@ -1233,7 +1229,6 @@ export default function AddPromotion() {
                     >
                       พืชที่จะใช้คูปอง
                       <span style={{ color: "red" }}>
-                        {" "}
                         * ถ้าไม่กดปุ่ม checkbox คือเลือกพืชทั้งหมด *
                       </span>
                     </Checkbox>
@@ -1242,7 +1237,7 @@ export default function AddPromotion() {
                 </div>
                 <Table
                   columns={columns}
-                  dataSource={[...crop]}
+                  dataSource={crop}
                   pagination={false}
                   scroll={{ x: "max-content" }}
                 />
@@ -1257,7 +1252,6 @@ export default function AddPromotion() {
                     >
                       จังหวัดที่จะใช้คูปองได้
                       <span style={{ color: "red" }}>
-                        {" "}
                         * ถ้าไม่กดปุ่ม Checkbox คือเลือกทุกจังหวัด *
                       </span>
                     </Checkbox>
@@ -1358,7 +1352,7 @@ export default function AddPromotion() {
                     rules={[
                       {
                         required: true,
-                        message: "กรุณากรอกจำนวนวัน",
+                        message: "กรุณาเลือกสถานะ",
                       },
                     ]}
                   >
