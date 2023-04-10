@@ -970,6 +970,7 @@ export default function AddPromotion() {
                     </Form.Item>
                     <Form.Item
                       name="TimeStart"
+                      initialValue={moment("00:00", "HH:mm")}
                       // rules={[
                       //   {
                       //     required: true,
@@ -1029,6 +1030,7 @@ export default function AddPromotion() {
                     </Form.Item>
                     <Form.Item
                       name="TimeExpired"
+                      initialValue={moment("23:59", "HH:mm")}
                       // rules={[
                       //   {
                       //     required: true,

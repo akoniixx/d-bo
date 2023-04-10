@@ -126,8 +126,41 @@ function PromotionPage() {
           createBy: profile.username + " " + profile.lastname,
         };
         CouponDataSource.addCoupon(couponDto)
-          .then((res) => {
-            window.location.reload();
+          .then((resSave) => {
+            setData({
+              count : data.count+1,
+              promotions : [
+                {
+                  id : resSave.id,
+                  couponCode : resSave.couponCode,
+                  couponName : resSave.couponName,
+                  couponType : resSave.couponType,
+                  promotionStatus : resSave.promotionStatus,
+                  promotionType : resSave.promotionType,
+                  discountType : resSave.discountType,
+                  discount : resSave.discount,
+                  count : resSave.count,
+                  keep : resSave.count,
+                  used : resSave.used,
+                  startDate : resSave.startDate,
+                  expiredDate : resSave.expiredDate,
+                  description : resSave.description,
+                  condition : resSave.condition,
+                  specialCondition : resSave.specialCondition,
+                  couponConditionRai : resSave.specialCondition,
+                  couponConditionRaiMin : resSave.couponConditionRaiMin,
+                  couponConditionRaiMax : resSave.couponConditionRaiMax,
+                  couponConditionService : resSave.couponConditionService,
+                  couponConditionServiceMin : resSave.couponConditionServiceMin,
+                  couponConditionServiceMax : resSave.couponConditionServiceMax,
+                  couponConditionPlant : resSave.couponConditionPlant,
+                  couponConditionPlantList : resSave.couponConditionPlantList,
+                  couponConditionProvince : resSave.couponConditionProvince,
+                  couponConditionProvinceList : resSave.couponConditionProvinceList,
+                  createBy : resSave.createBy
+                },...data.promotions
+              ]
+            })
           })
           .catch((err) => console.log(err));
       })

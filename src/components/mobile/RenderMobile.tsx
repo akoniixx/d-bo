@@ -57,9 +57,8 @@ const RenderMobile: React.FC<RenderMobile> = ({
     const divAnimate = div.current.getBoundingClientRect().top;
     const onScroll = () => {
       if (divAnimate < window.scrollY) {
-        console.log("ok");
-        div.current.style.position = "fixed";
-        div.current.style.bottom = 0;
+        div.current.style.position = "sticky";
+        div.current.style.top = 0;
       } else {
         div.current.style.position = "relative";
       }
@@ -107,7 +106,7 @@ const RenderMobile: React.FC<RenderMobile> = ({
   return (
     <div className="col-4">
       <div ref={div}>
-        <CardHeaderPromotion textHeader="ตัวอย่างในแอพลิเคชั่น" center={true} />
+        <CardHeaderPromotion textHeader="ตัวอย่างในแอปพลิเคชั่น" center={true} />
         <div
           style={{
             width: "100%",
@@ -239,6 +238,7 @@ const RenderMobile: React.FC<RenderMobile> = ({
                 style={{
                   width: "100%",
                   height: "10px",
+                  
                   borderRadius: "5px",
                   backgroundImage:
                     "linear-gradient(67.07deg, #FB8705 14.86%, #FFCF75 85.14%)",
@@ -248,7 +248,8 @@ const RenderMobile: React.FC<RenderMobile> = ({
             <div
               style={{
                 width: "100%",
-                height: "65%",
+                maxHeight : '450px',
+                overflow : 'scroll',
                 padding: "10px 20px",
               }}
             >
@@ -325,7 +326,7 @@ const RenderMobile: React.FC<RenderMobile> = ({
               <ul>
                 {raiCondition ? <li>{generateRaiText()}</li> : <></>}
                 {serviceCondition ? <li>{generateServiceText()}</li> : <></>}
-                {couponPlant ? <li>พืชที่ใช้คูปอง {plantName}</li> : <></>}
+                {couponPlant ? <li>พืชที่ใช้คูปองได้ {plantName}</li> : <></>}
                 {couponProvince ? (
                   <li>
                     จังหวัด{" "}
