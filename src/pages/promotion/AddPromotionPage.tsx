@@ -827,8 +827,8 @@ export default function AddPromotion() {
                           .localeCompare(optionB.children.toLowerCase())
                       }
                     >
-                      <Option value={"INJECTION"}>การฉีดพ่น</Option>
-                      <Option value={"DRUG"}>ปุ๋ยและยา</Option>
+                      <Option value={"INJECTION"}>ส่วนลดการฉีดพ่น</Option>
+                      <Option value={"DRUG"}>ส่วนลดปุ๋ยและยา</Option>
                     </Select>
                   </Form.Item>
                 </div>

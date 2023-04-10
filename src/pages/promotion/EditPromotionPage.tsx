@@ -857,10 +857,10 @@ function EditPromotion(){
                                         }
                                       >
                                           <Option value={"INJECTION"}>
-                                            การฉีดพ่น
+                                            ส่วนลดการฉีดพ่น
                                           </Option>
                                           <Option value={"DRUG"}>
-                                            ปุ๋ยและยา
+                                            ส่วนลดปุ๋ยและยา
                                           </Option>
                                       </Select>
                                     </Form.Item>

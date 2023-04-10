@@ -81,11 +81,11 @@ const RenderMobile: React.FC<RenderMobile> = ({
   }
 
   const generateRaiText = () => {
-    if (raiConditionMin === "" && raiConditionMax === "") {
+    if (!raiConditionMin  && !raiConditionMax) {
       return "จำนวนไร่ขั้นต่ำที่ฉีดพ่น XX ไร่";
-    } else if (raiConditionMin != "" && raiConditionMax === "") {
+    } else if (raiConditionMin  && !raiConditionMax) {
       return `จำนวนไร่ขั้นต่ำที่ฉีดพ่น ${raiConditionMin} ไร่`;
-    } else if (raiConditionMin === "" && raiConditionMax != "") {
+    } else if (!raiConditionMin && raiConditionMax) {
       return `จำนวนไร่ที่ฉีดพ่นต้องไม่เกิน ${raiConditionMax} ไร่`;
     } else {
       return `จำนวนไร่ขั้นต่ำที่ฉีดพ่น ${raiConditionMin} ไร่ และไม่เกิน ${raiConditionMax} ไร่`;
@@ -93,11 +93,11 @@ const RenderMobile: React.FC<RenderMobile> = ({
   };
 
   const generateServiceText = () => {
-    if (serviceConditionMin === "" && serviceConditionMax === "") {
+    if (!serviceConditionMin && !serviceConditionMax) {
       return "ค่าบริการขั้นต่ำ XX บาท";
-    } else if (serviceConditionMin != "" && serviceConditionMax === "") {
+    } else if (serviceConditionMin && !serviceConditionMax) {
       return `ค่าบริการขั้นต่ำ ${serviceConditionMin} บาท`;
-    } else if (serviceConditionMin === "" && raiConditionMax != "") {
+    } else if (!serviceConditionMin && raiConditionMax) {
       return `ค่าบริการต้องไม่เกิน ${serviceConditionMax} บาท`;
     } else {
       return `ค่าบริการขั้นต่ำ ${serviceConditionMin} บาทและไม่เกิน ${serviceConditionMax} บาท`;
