@@ -241,8 +241,8 @@ function PromotionPage() {
                 .localeCompare(optionB.children.toLowerCase())
             }
           >
-            <Option value={"INJECTION"}>การฉีดพ่น</Option>
-            <Option value={"DRUG"}>ปุ๋ยและยา</Option>
+            <Option value={"INJECTION"}>ส่วนลดการฉีดพ่น</Option>
+            <Option value={"DRUG"}>ส่วนลดปุ๋ยและยา</Option>
           </Select>
         </div>
         <div className="col">
@@ -355,7 +355,7 @@ function PromotionPage() {
           children: (
             <div className="container">
               <span className="text-dark-75  d-block font-size-lg">
-                {row.couponType === "INJECTION" ? "การฉีดพ่น" : "ปุ๋ยและยา"}
+                {row.couponType === "INJECTION" ? "ส่วนลดการฉีดพ่น" : "ส่วนลดปุ๋ยและยา"}
               </span>
             </div>
           ),

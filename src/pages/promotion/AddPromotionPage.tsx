@@ -586,17 +586,17 @@ export default function AddPromotion() {
     } = form.getFieldsValue();
     const cropForm = crop.map((item: any) => {
       if (crop.length === 1) {
-        if (!crop[0].plantName) {
+        if (!crop[0].cropName) {
           return [];
         } else {
           return {
-            plantName: item.plantName,
+            plantName: item.cropName,
             injectionTiming: item.injectionTiming,
           };
         }
       } else {
         return {
-          plantName: item.plantName,
+          plantName: item.cropName,
           injectionTiming: item.injectionTiming,
         };
       }
