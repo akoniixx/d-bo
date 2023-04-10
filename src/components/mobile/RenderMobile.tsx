@@ -150,11 +150,15 @@ const RenderMobile: React.FC<RenderMobile> = ({
                     alignItems: "center",
                   }}
                 >
-                  <img
+                  {
+                    !couponType?
+                    <></>:
+                    <img
                     src={
                       couponType === "INJECTION" ? icon.injection : icon.drug
                     }
                   />
+                  }
                 </div>
                 <div>
                   <p

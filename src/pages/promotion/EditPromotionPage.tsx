@@ -1103,7 +1103,7 @@ function EditPromotion(){
                             <div className="row">
                               <div className="form-group col-lg-12 d-flex flex-column">
                                 <label>
-                                  เงื่อนไขการได้รับพิเศษ <span style={{ color: "red" }}>*</span>
+                                  เงื่อนไขการได้รับพิเศษ 
                                 </label>
                                 <Form.Item name="specialCondition" valuePropName="checked">
                                   <Checkbox

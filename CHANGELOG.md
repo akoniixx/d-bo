@@ -1,4 +1,7 @@
 ## [Version - 0]
+## Fix [v0.25.02] 2023-04-10
+- fixed edit coupon
+- fixed layout preview mobile
 ## Fix [v0.25.01] 2023-04-07
 - fixed delete coupon
 - fixed search with button

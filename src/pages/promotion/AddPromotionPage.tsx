@@ -1088,7 +1088,6 @@ export default function AddPromotion() {
                 <div className="form-group col-lg-12">
                   <label>
                     เงื่อนไข (จะแสดงในแอพลิเคชั่น){" "}
-                    <span style={{ color: "red" }}>*</span>
                   </label>
                   <Form.Item
                     name="condition"
