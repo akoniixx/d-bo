@@ -18,7 +18,7 @@ import { DateTimeUtil } from "../../utilities/DateTimeUtil";
 import { Button, Image } from "antd";
 import icon from "../../resource/icon";
 import ActionButton from "../../components/button/ActionButton";
-import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
+import { CopyOutlined, DeleteOutlined, EditOutlined } from "@ant-design/icons";
 import { color } from "../../resource";
 import ModalDeleteCoupon from "../../components/modal/ModalDeleteCoupon";
 
@@ -126,8 +126,41 @@ function PromotionPage() {
           createBy: profile.username + " " + profile.lastname,
         };
         CouponDataSource.addCoupon(couponDto)
-          .then((res) => {
-            window.location.reload();
+          .then((resSave) => {
+            setData({
+              count : data.count+1,
+              promotions : [
+                {
+                  id : resSave.id,
+                  couponCode : resSave.couponCode,
+                  couponName : resSave.couponName,
+                  couponType : resSave.couponType,
+                  promotionStatus : resSave.promotionStatus,
+                  promotionType : resSave.promotionType,
+                  discountType : resSave.discountType,
+                  discount : resSave.discount,
+                  count : resSave.count,
+                  keep : resSave.count,
+                  used : resSave.used,
+                  startDate : resSave.startDate,
+                  expiredDate : resSave.expiredDate,
+                  description : resSave.description,
+                  condition : resSave.condition,
+                  specialCondition : resSave.specialCondition,
+                  couponConditionRai : resSave.specialCondition,
+                  couponConditionRaiMin : resSave.couponConditionRaiMin,
+                  couponConditionRaiMax : resSave.couponConditionRaiMax,
+                  couponConditionService : resSave.couponConditionService,
+                  couponConditionServiceMin : resSave.couponConditionServiceMin,
+                  couponConditionServiceMax : resSave.couponConditionServiceMax,
+                  couponConditionPlant : resSave.couponConditionPlant,
+                  couponConditionPlantList : resSave.couponConditionPlantList,
+                  couponConditionProvince : resSave.couponConditionProvince,
+                  couponConditionProvinceList : resSave.couponConditionProvinceList,
+                  createBy : resSave.createBy
+                },...data.promotions
+              ]
+            })
           })
           .catch((err) => console.log(err));
       })
@@ -473,7 +506,7 @@ function PromotionPage() {
             <div className="d-flex flex-row justify-content-between">
               <div className="pr-1">
                 <ActionButton
-                  icon={<EditOutlined />}
+                  icon={<EditOutlined/>}
                   color={color.primary1}
                   onClick={() => {
                     window.location.href = "/EditPromotion/id=" + row.id;
@@ -482,7 +515,7 @@ function PromotionPage() {
               </div>
               <div className="pr-1">
                 <ActionButton
-                  icon={<Image src={icon.iconcopy} width={12} height={14} />}
+                  icon={<CopyOutlined rotate={180}/>}
                   color={color.primary1}
                   onClick={() => {
                     duplicateCoupon(row.id);
