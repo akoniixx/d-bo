@@ -52,7 +52,6 @@ const RenderMobile: React.FC<RenderMobile> = ({
   couponProvince,
   // ref
 }) => {
-  console.log(couponType);
   const div = useRef<any>();
   useLayoutEffect(() => {
     const divAnimate = div.current.getBoundingClientRect().top;

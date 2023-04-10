@@ -114,7 +114,20 @@ export default function AddPromotion() {
   const handleChangePlantCrop = (plantId: string, index: number) => {
     const getCrop = plantName?.find((f) => f.id === plantId);
     let map = { ...getCrop, injectionTiming: [] };
-    setCrop([...crop.filter((x: any) => x.id !== null), map]);
+    if (crop[index].id) {
+      form.setFieldValue(crop[index].cropName, []);
+      let changeCrop = crop;
+      changeCrop[index] = map;
+      changeCrop.push({
+        id: null,
+        cropName: null,
+        injectionTiming: [],
+        purposeSpray: [],
+      });
+      setCrop(changeCrop.filter((x: any) => x.id));
+    } else {
+      setCrop([...crop.filter((x: any) => x.id !== null), map]);
+    }
   };
 
   const getProvince = () => {
