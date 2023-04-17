@@ -213,7 +213,7 @@ function EditReport() {
           <label>เป้าหมายการฉีดพ่น</label>
           <Form.Item>
             <span style={{ color: color.Grey }}>
-              {data.data.targetSpray !== null
+              {data.data.targetSpray != null
                 ? data.data.targetSpray.join(",")
                 : "-"}
             </span>
@@ -753,26 +753,24 @@ function EditReport() {
     </Form>
   );
   const DownloadPDF = async () => {
-    const filterId = data.data.id;
+    const filterId = [data.data.id];
     const downloadBy = `${profile.firstname} ${profile.lastname}`;
     await ReportDocDatasource.getFileName("PDF", downloadBy, filterId).then(
       (res) => {
         if (res.responseData) {
           const idFileName = res.responseData.id;
           const fileName = res.responseData.fileName;
-          ReportDocDatasource.reportPDF(
-            [filterId],
-            downloadBy,
-            idFileName
-          ).then((res) => {
-            const blob = new Blob([res], { type: "application/pdf" });
-            const a = document.createElement("a");
-            a.href = window.URL.createObjectURL(blob);
-            a.download = fileName;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-          });
+          ReportDocDatasource.reportPDF(filterId, downloadBy, idFileName).then(
+            (res) => {
+              const blob = new Blob([res], { type: "application/pdf" });
+              const a = document.createElement("a");
+              a.href = window.URL.createObjectURL(blob);
+              a.download = fileName;
+              document.body.appendChild(a);
+              a.click();
+              document.body.removeChild(a);
+            }
+          );
         }
       }
     );
