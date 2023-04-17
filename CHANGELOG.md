@@ -1,4 +1,15 @@
 ## [Version - 0]
+## Fix [v0.25.03] 2023-04-10
+- fixed edit coupon
+- fixed layout preview mobile
+## Fix [v0.25.02] 2023-04-07
+- fixed delete coupon
+- fixed search with button
+- fixed wording
+- fixed select plant with injection time in coupon
+- fixed delete selected plant
+- added logic change img follow type coupon
+- fixed render plant and injection in review mobile
 ## improve [v0.25.01] 2023-04-07
 - added download excel in report droner
 ## Feature [v0.25.00] 2023-04-07

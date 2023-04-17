@@ -38,19 +38,22 @@ import Swal from "sweetalert2"
 import ModalDeleteCoupon from "../../components/modal/ModalDeleteCoupon"
 import RenderMobile from "../../components/mobile/RenderMobile"
 import RenderOffline from "../../components/mobile/RenderOffline"
+import { CropPurposeSprayEntity } from "../../entities/CropEntities"
 const _ = require("lodash");
 
 let queryString = _.split(window.location.pathname, "=");
 
 function EditPromotion(){
   const profile = JSON.parse(localStorage.getItem("profile") || "{  }");
-  const [plantName,setPlantName] = useState<string[]>([])
+  const dateFormat = "DD/MM/YYYY";
+  const [plantName, setPlantName] = useState<CropPurposeSprayEntity[]>();
   const [provinceList,setProvinceList] = useState<string[]>([])
   const [crop,setCrop] = useState<any>([
     {
-      plantName : null,
+      id: null,
+      cropName: null,
       injectionTiming : [],
-      injectionList : []
+      purposeSpray : []
     }
   ])
   const [descriptionEditor,setDescriptionEditor] = useState<string|null>(null)
@@ -90,13 +93,17 @@ function EditPromotion(){
   })
   const [form] = Form.useForm();
     useEffect(()=>{
+      getPromotion(queryString[1])
       if(fetchTwice.current){
-        getPromotion(queryString[1])
-        getCropPlantName()
         getProvince()
         fetchTwice.current = false;
       }
     },[])
+
+    useEffect(()=>{
+      getCropPlantName()
+      renderMobilePlant()
+    },[crop])
 
     const getPromotion = (id : string)=>{
       CouponDataSource.queryCoupon(id)
@@ -137,7 +144,7 @@ function EditPromotion(){
         setCoupon(res.discountType)
         setDescriptionEditor(res.description)
         setConditionEditor(res.condition)
-        res.couponConditionPlantList.map((item : any,index : number)=> getCropinjectionTimingInit(index,item.plantName,item.injectionTiming))
+        getCropinjectionTimingInit(res.couponConditionPlantList)
         setRenderMobile(
           {
           couponName : res.couponName,
@@ -166,52 +173,49 @@ function EditPromotion(){
         })
       }).catch(err => console.log(err))
     }
-    const getCropPlantName = ()=>{
+    const getCropPlantName = () => {
       CropDatasource.getAllCropPlantName()
-      .then((res)=>{
-        const crop = res;
-        const plant : string[] = []
-        crop.map((item)=>{
-          plant.push(item.cropName)
+        .then((res) => {
+          const mapPlant = res.filter(
+            (p) => !crop.some((c: any) => p.id === c.id)
+          );
+          setPlantName(mapPlant);
         })
-        setPlantName(plant)
-      })
-      .catch(err => console.log(err))
+        .catch((err) => console.log(err));
+    };
+
+    const getCropinjectionTimingInit = async(data : any[])=>{
+      const result = await Promise.all(data.map(
+        async(item,index)=>{
+          let plantData = await CropDatasource.getPurposeByCroupName(item.plantName)
+          return {
+            id : plantData.id,
+            cropName : plantData.cropName,      
+            injectionTiming : data[index].injectionTiming,
+            purposeSpray : plantData.purposeSpray
+          }
+        }
+      ))
+      setCrop(result)
     }
 
-    const getCropinjectionTiming = (index : number,plantName : string)=>{
-      CropDatasource.getPurposeByCroupName(plantName)
-      .then((res)=>{
-        const updateCrop = crop.map((item : any,i : number)=>{
-          if(index === i){
-            const injectionList = res.purposeSpray.map((purposespray) => purposespray.purposeSprayName)
-            return {...item ,injectionList : injectionList,plantName : plantName}
-          }
-          else{
-            return item
-          }
-        })
-        setCrop(updateCrop)
-      })
-      .catch(err => console.log(err))
-    }
-
-    const getCropinjectionTimingInit = async(index : number,plantName : string,injectionTiming : string[])=>{
-      CropDatasource.getPurposeByCroupName(plantName)
-      .then((res)=>{
-        const updateCrop = crop.map((item : any,i : number)=>{
-          if(index === i){
-            const injectionList = res.purposeSpray.map((purposespray) => purposespray.purposeSprayName)
-            return {...item,injectionTiming: injectionTiming,injectionList : injectionList,plantName : plantName}
-          }
-          else{
-            return item
-          }
-        })
-        setCrop(updateCrop)
-      })
-      .catch(err => console.log(err))
-    }
+    const renderMobilePlant = () => {
+      const plantName = crop.map((item: any) => {
+        let injname = "";
+        let plantname = "";
+        item.injectionTiming.map((inj: any) => {
+          injname += inj + ",";
+          return injname;
+        });
+        plantname +=
+          item.cropName + " (" + injname.substring(injname.length - 1, 0) + ") ";
+        return plantname;
+      });
+      setRenderMobile({
+        ...renderMobile,
+        plantName: plantName.filter((p: any) => !p.includes(null)),
+      });
+    };
 
     const getProvince = ()=>{
       LocationDatasource.getProvince()
@@ -225,48 +229,43 @@ function EditPromotion(){
     const navigate = useNavigate()
     const columns = [
       {
-        title : <div
-        style={{ display: "flex", alignItems: "center" }}>
-          ลำดับ
-        </div>,
+        title: <div style={{ display: "flex", alignItems: "center" }}>ลำดับ</div>,
         dataIndex: "index",
         key: "index",
-        render : (value: any, row: any, index: number) => {
+        width: "8%",
+        render: (value: any, row: any, index: number) => {
           return {
-            children: (
-              <p>{index +1}</p>
-            )
-          }
-        }
+            children: <p>{index + 1}</p>,
+          };
+        },
       },
       {
-        title : "ชื่อพืช",
+        title: "ชื่อพืช",
         dataIndex: "plantName",
         key: "plantName",
-        render : (value: any, row: any, index: number) => {
-          let formName = `plantName${index}`
+        width: "20%",
+        render: (value: any, row: any, index: number) => {
+          let formName = row.id;
           return {
             children: (
               <Form.Item
-              key={index}
-              rules={[
-                {
-                  required: true,
-                  message: "กรุณากรอกชื่อพืช!",
-                },
-              ]}>
+                name={formName}
+                rules={[
+                  {
+                    required: true,
+                    message: "กรุณากรอกชื่อพืช!",
+                  },
+                ]}
+              >
                 <Select
-                  key={index}
                   disabled={!couponPlant}
                   className="col-lg-12 p-1"
                   placeholder="เลือกพืช"
-                  defaultValue={crop[index].plantName}
-                  onChange={(plant)=>{
-                    handleChangePlantCrop(index,plant)
+                  defaultValue={row.cropName}
+                  onChange={(plant, id) => {
+                    handleChangePlantCrop(id.key, index);
                   }}
                   showSearch
-                  value={value}
-                  allowClear
                   optionFilterProp="children"
                   filterOption={(input: any, option: any) =>
                     option.children.includes(input)
@@ -277,51 +276,48 @@ function EditPromotion(){
                       .localeCompare(optionB.children.toLowerCase())
                   }
                 >
-                  {
-                    plantName.map((item)=>(
-                      <Option key={item} value={item}>
-                        {item}
-                      </Option>
-                    ))
-                  }
+                  {plantName?.map((item) => (
+                    <Option value={item.cropName} key={item.id}>
+                      {item.cropName}
+                    </Option>
+                  ))}
                 </Select>
               </Form.Item>
-            )
-          }
-        }
+            ),
+          };
+        },
       },
       {
-        title : "ช่วงเวลาการพ่น",
+        title: "ช่วงเวลาการพ่น",
         dataIndex: "injectionTiming",
         key: "injectionTiming",
-        render : (value: any, row: any, index: number) => {
-          let formName = `injectionTiming${index}`
+        width: "30%",
+        render: (value: any, row: any, index: number) => {
+          let formName = row.cropName;
           return {
             children: (
               <Form.Item
-              key={index}
-              rules={[
-                {
-                  required: true,
-                  message: "กรุณากรอกเลือกเวลาในการฉีดพ่น!",
-                },
-              ]}>
+                name={formName}
+                key={index}
+                rules={[
+                  {
+                    required: true,
+                    message: "กรุณากรอกเลือกเวลาในการฉีดพ่น!",
+                  },
+                ]}
+              >
                 <Select
                   key={index}
-                  disabled={!(crop[index].plantName) || !couponPlant}
+                  disabled={!crop[index].cropName || !couponPlant}
                   mode="multiple"
                   className="col-lg-12 p-1"
-                  onClear={() => {
-
-                  }}
-                  defaultValue={crop[index].injectionTiming}
+                  onClear={() => {}}
                   placeholder="เลือกช่วงเวลาการพ่น"
-                  onChange={(injectionTiming)=>{
-                    handleChangeinjectionTiming(index,injectionTiming)
+                  onChange={(injectionTiming) => {
+                    handleChangeInjectionTime(index, injectionTiming);
                   }}
                   showSearch
-                  value={value}
-                  allowClear
+                  defaultValue={row.injectionTiming}
                   optionFilterProp="children"
                   filterOption={(input: any, option: any) =>
                     option.children.includes(input)
@@ -332,69 +328,73 @@ function EditPromotion(){
                       .localeCompare(optionB.children.toLowerCase())
                   }
                 >
-                  {
-                    crop[index].injectionList.map((item : string)=>(
-                      <Option key={item} value={item}>
-                        {item}
-                      </Option>
-                    ))
-                  }
+                  {crop[index].purposeSpray?.map((item: any) => (
+                    <Option key={item.id} value={item.purposeSprayName}>
+                      {item.purposeSprayName}
+                    </Option>
+                  ))}
                 </Select>
               </Form.Item>
-            )
-          }
-        }
+            ),
+          };
+        },
       },
       {
-        render : (value: any, row: any, index: number)=>{
+        width: "10%",
+        render: (value: any, row: any, index: number) => {
           return {
-            children : (
-              <ActionButton
-              icon={<DeleteOutlined />}
-              color={color.primary1}
-              onClick={() =>{
-                deleteCrop(index)
-              }}
-              />
-            )
-          }
-        }
+            children: (
+              <>
+                {crop.length > 1 && (
+                  <div className="pb-4">
+                    <ActionButton
+                      icon={<DeleteOutlined />}
+                      color={color.Error}
+                      onClick={() => {
+                        deleteCrop(index, row);
+                      }}
+                    />
+                  </div>
+                )}
+              </>
+            ),
+          };
+        },
+      },
+    ];
+
+    const handleChangePlantCrop = (plantId: string, index: number) => {
+      const getCrop = plantName?.find((f) => f.id === plantId);
+      let map = { ...getCrop, injectionTiming: [] };
+      if (crop[index].id) {
+        form.setFieldValue(crop[index].cropName, []);
+        let changeCrop = crop;
+        changeCrop[index] = map;
+        changeCrop.push({
+          id: null,
+          cropName: null,
+          injectionTiming: [],
+          purposeSpray: [],
+        });
+        setCrop(changeCrop.filter((x: any) => x.id));
+      } else {
+        setCrop([...crop.filter((x: any) => x.id !== null), map]);
       }
-    ]
+    };
 
-    const handleChangePlantCrop = (index : number,plant : string) =>{
-      const updateCrop = crop.map((item : any,i : number)=>{
-        if(i === index){
-          return {...item,plantName : plant};
+    const handleChangeInjectionTime = (
+      index: number,
+      injectionTiming: string[]
+    ) => {
+      const updateCrop = crop.map((item: any, i: number) => {
+        if (i === index) {
+          return { ...item, injectionTiming: injectionTiming };
+        } else {
+          return item;
         }
-        else{
-          return item
-        }
-      })
-      setCrop(updateCrop)
-      getCropinjectionTiming(index,plant)
-    }
-
-    const handleChangeinjectionTiming = (index : number,injectionTiming : string[]) => {
-      const updateCrop = crop.map((item : any,i : number)=>{
-        if(i === index){
-          return {...item,injectionTiming : injectionTiming};
-        }
-        else{
-          return item
-        }
-      })
-      const plantName = crop.map((item : any)=>{
-        let plantname = ""
-        plantname += item.plantName+ " "
-        return plantname
-      })
-      setRenderMobile({
-        ...renderMobile,
-        plantName : plantName
-      })
-      setCrop(updateCrop)
-    }
+      });
+      setCrop(updateCrop);
+    };
 
     const handleChangeProvince = (provinceName : string[]) =>{
       setProvince(provinceName)
@@ -450,20 +450,26 @@ function EditPromotion(){
 
     const addCrop = ()=>{
        setCrop((pre: any)=>{
-        return [...pre,{
-          plantName : null,
+        return [...pre,    {
+          id: null,
+          cropName: null,
           injectionTiming : [],
-          injectionList : []
+          purposeSpray : []
         }]
        })
     }
 
-    const deleteCrop = (index : number)=>{
-      const updateCrop  = crop
-      updateCrop.splice(index,1)
-      setEditTable(!editTable)
-      setCrop(updateCrop)
-    }
+    const deleteCrop = (index: number, cropDelete: any) => {
+      crop.forEach((item: any) => {
+        if (item.id === cropDelete.id) {
+          form.setFieldValue(cropDelete.id, undefined);
+          form.setFieldValue(cropDelete.cropName, []);
+        }
+      });
+      const mapCrop = crop.filter((c: any) => c.cropName !== cropDelete.cropName);
+      setEditTable(!editTable);
+      setCrop(mapCrop);
+    };
 
     const handleDescriptionEditor = (content : any, delta: any, source : any, editor : any) => {
       setDescriptionEditor(editor.getHTML())
@@ -655,19 +661,19 @@ function EditPromotion(){
       } = form.getFieldsValue()
       const cropForm = crop.map((item : any)=>{
         if(crop.length === 1){
-          if(!crop[0].plantName){
+          if(!crop[0].cropName){
             return []
           }
           else{
             return {
-              plantName : item.plantName,
+              plantName : item.cropName,
               injectionTiming : item.injectionTiming
             }
           }
         }
         else{
           return {
-            plantName : item.plantName,
+            plantName : item.cropName,
             injectionTiming : item.injectionTiming
           }
         }
@@ -851,10 +857,10 @@ function EditPromotion(){
                                         }
                                       >
                                           <Option value={"INJECTION"}>
-                                            การฉีดพ่น
+                                            ส่วนลดการฉีดพ่น
                                           </Option>
                                           <Option value={"DRUG"}>
-                                            ปุ๋ยและยา
+                                            ส่วนลดปุ๋ยและยา
                                           </Option>
                                       </Select>
                                     </Form.Item>
@@ -976,6 +982,7 @@ function EditPromotion(){
                                           })
                                         }
                                       }}
+                                      format={dateFormat}
                                     />
                                   </Form.Item>
                                   <Form.Item name="TimeStart"
@@ -1020,7 +1027,9 @@ function EditPromotion(){
                                             expiredDate : expiredDate
                                           })
                                         }
-                                      }}/>
+                                      }}
+                                      format={dateFormat}
+                                      />
                                   </Form.Item>
                                   <Form.Item name="TimeExpired"
                                       rules={[
@@ -1094,7 +1103,7 @@ function EditPromotion(){
                             <div className="row">
                               <div className="form-group col-lg-12 d-flex flex-column">
                                 <label>
-                                  เงื่อนไขการได้รับพิเศษ <span style={{ color: "red" }}>*</span>
+                                  เงื่อนไขการได้รับพิเศษ 
                                 </label>
                                 <Form.Item name="specialCondition" valuePropName="checked">
                                   <Checkbox
@@ -1310,7 +1319,7 @@ function EditPromotion(){
                                 ]}>
                                   <Radio.Group className="d-flex flex-column">
                                     <Radio value={"ACTIVE"}>ใช้งาน</Radio>
-                                    <Radio value={"DRAFTING"}>แบบร่าง</Radio>
+                                    <Radio value={"DRAFTING"}>รอเปิดการใช้งาน</Radio>
                                     <Radio value={"INACTIVE"}>ปิดการใช้งาน</Radio>
                                   </Radio.Group>
                                 </Form.Item>
@@ -1322,7 +1331,7 @@ function EditPromotion(){
                 </div>
                 {
                   (couponInfo === "ONLINE")?
-                  <RenderMobile 
+                  <RenderMobile
                     couponName={renderMobile.couponName}
                     couponType={renderMobile.couponType}
                     promotionStatus={renderMobile.promotionStatus}

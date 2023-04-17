@@ -6,12 +6,14 @@ interface ActionButtonProps {
   onClick?: () => void;
   icon: React.ReactNode;
   color: string;
+  actionDisable?: boolean;
 }
 
 const ActionButton: React.FC<ActionButtonProps> = ({
   onClick,
   icon,
   color,
+  actionDisable,
 }) => (
   <Button
     style={{
@@ -21,6 +23,7 @@ const ActionButton: React.FC<ActionButtonProps> = ({
     }}
     icon={icon}
     onClick={onClick}
+    disabled={actionDisable}
   />
 );
 
