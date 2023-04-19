@@ -119,8 +119,8 @@ function EditReport() {
   };
   const UpdateStatusPayment = async () => {
     Swal.fire({
-      title: "ยืนยันการแก้ไข",
-      text: "โปรดตรวจสอบงานที่คุณต้องการแก้ไข ก่อนที่จะกดยืนยันแก้ไข เพราะอาจส่งผลต่อการจ้างงานในแอปพลิเคชัน",
+      title: "ยืนยันการเปลี่ยนสถานะ",
+      text: "โปรดตรวจสอบงานที่คุณต้องการเปลี่ยนสถานะ ก่อนที่จะกดยืนยัน เพราะอาจส่งผลต่อการจ่ายเงินของนักบินโดรนในระบบ",
       cancelButtonText: "ยกเลิก",
       confirmButtonText: "บันทึก",
       confirmButtonColor: color.Success,
@@ -789,17 +789,34 @@ function EditReport() {
           </strong>
         </div>
         <div className="col-lg pt-4">
-          <Button
-            className="col-lg-9 p-1"
-            style={{
-              color: color.secondary2,
-              backgroundColor: color.primary1,
-              borderRadius: "5px",
-            }}
-            onClick={DownloadPDF}
-          >
-            ดาวน์โหลดไฟล์ PDF
-          </Button>
+          {data.data.statusPayment === "WAIT_PAYMENT" ||
+          data.data.statusPayment === "DONE_PAYMENT" ? (
+            <Button
+              className="col-lg-9 p-1"
+              style={{
+                color: color.secondary2,
+                backgroundColor: color.primary1,
+                borderRadius: "5px",
+              }}
+              onClick={DownloadPDF}
+            >
+              ดาวน์โหลดไฟล์ PDF
+            </Button>
+          ) : (
+            <Button
+              disabled
+              className="col-lg-9 p-1"
+              style={{
+                padding: "8 0",
+                backgroundColor: color.Disable,
+                color: color.Grey,
+                borderColor: color.Disable,
+                borderRadius: "5px",
+              }}
+            >
+              ดาวน์โหลดไฟล์ PDF
+            </Button>
+          )}
         </div>
       </div>
       <CardContainer>

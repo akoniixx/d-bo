@@ -443,7 +443,7 @@ export default function IndexFinishTask() {
                 <UserOutlined
                   style={{ padding: "0 4px 0 0", verticalAlign: 0.5 }}
                 />
-                {row.createBy}
+                {row.updateBy}
               </span>
             </>
           ),

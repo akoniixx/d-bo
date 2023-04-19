@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import {
+  Alert,
   Badge,
   Button,
   Checkbox,
@@ -13,6 +14,8 @@ import {
   Popover,
   Row,
   Select,
+  Space,
+  Spin,
   Table,
 } from "antd";
 import type { ColumnsType } from "antd/es/table";
@@ -107,6 +110,8 @@ function IndexReport() {
   const [statusPayment, setStatusPayment] = useState<updateStatusPays>(
     updateStatusPays_INIT
   );
+  const [loading, setLoading] = useState(false);
+
   const { RangePicker } = DatePicker;
   const dateSearchFormat = "YYYY-MM-DD";
   const dateFormat = "DD/MM/YYYY";
@@ -163,9 +168,8 @@ function IndexReport() {
       setSubdistrict(res);
     });
   };
-  const changeTextSearch = (searchText: any) => {
-    setSearchText(searchText.target.value);
-    setCurrent(1);
+  const changeTextSearch = (value: any) => {
+    setSearchText(value.target.value);
   };
   const onChangePage = (page: number) => {
     setCurrent(page);
@@ -256,6 +260,28 @@ function IndexReport() {
   const [checkAll, setCheckAll] = useState(false);
   const [checkAllDone, setCheckAllDone] = useState(false);
 
+  const onCheckAllChange = (e: any) => {
+    let value = e.target.value;
+    let checked = e.target.checked;
+    let arr: any = 0;
+    if (checked === true) {
+      arr = [...statusArr, value];
+      setStatusArr([...statusArr, value]);
+      setSearchStatus(value);
+    } else {
+      let d: string[] = statusArr.filter((x) => x != value);
+      arr = [...d];
+      setStatusArr(d);
+      if (d.length == 0) {
+        arr = undefined;
+      }
+      setSearchStatusCancel(undefined);
+    }
+    setSearchStatus(arr);
+    setCheckedList(e.target.checked ? statusOptions : []);
+    setIndeterminate(false);
+    setCheckAll(e.target.checked);
+  };
   const onChange = (list: CheckboxValueType[]) => {
     setSearchStatus(undefined);
     let arr: any = 0;
@@ -265,15 +291,27 @@ function IndexReport() {
     setIndeterminate(!!list.length && list.length < statusOptions.length);
     setCheckAll(list.length === statusOptions.length);
   };
-  const onCheckAllChange = (e: CheckboxChangeEvent) => {
-    if (e.target.checked === true) {
-      setSearchStatus(e.target.value);
+  const onCheckAllDoneChange = (e: any) => {
+    let value = e.target.value;
+    let checked = e.target.checked;
+    let arr: any = 0;
+    if (checked === true) {
+      arr = [...statusArr, value];
+      setStatusArr([...statusArr, value]);
+      setSearchStatus(value);
     } else {
-      setSearchStatus(undefined);
+      let d: string[] = statusArr.filter((x) => x != value);
+      arr = [...d];
+      setStatusArr(d);
+      if (d.length == 0) {
+        arr = undefined;
+      }
+      setSearchStatusPayment(undefined);
     }
-    setCheckedList(e.target.checked ? statusOptions : []);
-    setIndeterminate(false);
-    setCheckAll(e.target.checked);
+    setSearchStatus(arr);
+    setCheckedListDone(e.target.checked ? statusDoneOptions : []);
+    setIndeterminateDone(false);
+    setCheckAllDone(e.target.checked);
   };
   const onChangeDone = (list: CheckboxValueType[]) => {
     setSearchStatus(undefined);
@@ -285,16 +323,6 @@ function IndexReport() {
       !!list.length && list.length < statusDoneOptions.length
     );
     setCheckAllDone(list.length === statusDoneOptions.length);
-  };
-  const onCheckAllDoneChange = (e: CheckboxChangeEvent) => {
-    if (e.target.checked === true) {
-      setSearchStatus(e.target.value);
-    } else {
-      setSearchStatus(undefined);
-    }
-    setCheckedListDone(e.target.checked ? statusDoneOptions : []);
-    setIndeterminateDone(false);
-    setCheckAllDone(e.target.checked);
   };
 
   const SubStatus = (
@@ -380,6 +408,7 @@ function IndexReport() {
     />
   );
   const DownloadPDF = async () => {
+    setLoading(true);
     if (clickPays.length > 1) {
       const filterId = clickPays.map((x: any) => x.action);
       const downloadBy = `${persistedProfile.firstname} ${persistedProfile.lastname}`;
@@ -388,19 +417,18 @@ function IndexReport() {
           if (res.responseData) {
             const idFileName = res.responseData.id;
             const fileName = res.responseData.fileName;
-            ReportDocDatasource.reportPDF(
-              filterId,
-              downloadBy,
-              idFileName
-            ).then((res) => {
-              const blob = new Blob([res], { type: "application/zip" });
-              const a = document.createElement("a");
-              a.href = window.URL.createObjectURL(blob);
-              a.download = fileName;
-              document.body.appendChild(a);
-              a.click();
-              document.body.removeChild(a);
-            });
+            ReportDocDatasource.reportPDF(filterId, downloadBy, idFileName)
+              .then((res) => {
+                const blob = new Blob([res], { type: "application/zip" });
+                const a = document.createElement("a");
+                a.href = window.URL.createObjectURL(blob);
+                a.download = fileName;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+              })
+              .catch((err) => console.log(err))
+              .finally(() => setLoading(false));
           }
         }
       );
@@ -412,25 +440,25 @@ function IndexReport() {
           if (res.responseData) {
             const idFileName = res.responseData.id;
             const fileName = res.responseData.fileName;
-            ReportDocDatasource.reportPDF(
-              filterId,
-              downloadBy,
-              idFileName
-            ).then((res) => {
-              const blob = new Blob([res], { type: "application/pdf" });
-              const a = document.createElement("a");
-              a.href = window.URL.createObjectURL(blob);
-              a.download = fileName;
-              document.body.appendChild(a);
-              a.click();
-              document.body.removeChild(a);
-            });
+            ReportDocDatasource.reportPDF(filterId, downloadBy, idFileName)
+              .then((res) => {
+                const blob = new Blob([res], { type: "application/pdf" });
+                const a = document.createElement("a");
+                a.href = window.URL.createObjectURL(blob);
+                a.download = fileName;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+              })
+              .catch((err) => console.log(err))
+              .finally(() => setLoading(false));
           }
         }
       );
     }
   };
   const DownloadExcel = async () => {
+    setLoading(true);
     const filterId = clickPays.map((x: any) => x.action);
     const downloadBy = `${persistedProfile.firstname} ${persistedProfile.lastname}`;
     await ReportDocDatasource.getFileName("EXCEL", downloadBy, filterId).then(
@@ -438,21 +466,20 @@ function IndexReport() {
         if (res.responseData) {
           const idFileName = res.responseData.id;
           const fileName = res.responseData.fileName;
-          ReportDocDatasource.reportExcel(
-            filterId,
-            downloadBy,
-            idFileName
-          ).then((res) => {
-            const blob = new Blob([res], {
-              type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-            });
-            const a = document.createElement("a");
-            a.href = window.URL.createObjectURL(blob);
-            a.download = fileName;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-          });
+          ReportDocDatasource.reportExcel(filterId, downloadBy, idFileName)
+            .then((res) => {
+              const blob = new Blob([res], {
+                type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+              });
+              const a = document.createElement("a");
+              a.href = window.URL.createObjectURL(blob);
+              a.download = fileName;
+              document.body.appendChild(a);
+              a.click();
+              document.body.removeChild(a);
+            })
+            .catch((err) => console.log(err))
+            .finally(() => setLoading(false));
         }
       }
     );
@@ -473,8 +500,8 @@ function IndexReport() {
   );
   const updateStatusPayment = async () => {
     Swal.fire({
-      title: "ยืนยันการแก้ไข",
-      text: "โปรดตรวจสอบงานที่คุณต้องการแก้ไข ก่อนที่จะกดยืนยันแก้ไข เพราะอาจส่งผลต่อการจ้างงานในแอปพลิเคชัน",
+      title: "ยืนยันการเปลี่ยนสถานะ",
+      text: "โปรดตรวจสอบงานที่คุณต้องการเปลี่ยนสถานะ ก่อนที่จะกดยืนยัน เพราะอาจส่งผลต่อการจ่ายเงินของนักบินโดรนในระบบ",
       cancelButtonText: "ยกเลิก",
       confirmButtonText: "บันทึก",
       confirmButtonColor: color.Success,
@@ -716,32 +743,40 @@ function IndexReport() {
     },
     {
       title: "สถานะ",
-      dataIndex: "statusPay",
+      dataIndex: "status",
       fixed: "right",
       width: "15%",
       render: (value: any, row: any, index: number) => {
         return {
           children: (
             <>
-              {value ? (
+              {value === "WAIT_REVIEW" || value === "CANCELED" ? (
                 <>
                   <span style={{ color: STATUS_COLOR_TASK[value] }}>
                     <Badge color={STATUS_COLOR_TASK[value]} />{" "}
                     {FINISH_TASK[value]}
-                    <br />
-                  </span>
-                </>
-              ) : (
-                <>
-                  <span style={{ color: STATUS_COLOR_TASK[row.status] }}>
-                    <Badge color={STATUS_COLOR_TASK[row.status]} />{" "}
-                    {FINISH_TASK[row.status]}
                     {row.taskHistory != undefined
                       ? row.status == "CANCELED"
                         ? " " + "(" + TASK_HISTORY[row.taskHistory] + ")"
                         : null
                       : null}
+                    <br />
                   </span>
+                </>
+              ) : (
+                <>
+                  {row.statusPay != "" ? (
+                    <span style={{ color: STATUS_COLOR_TASK[row.statusPay] }}>
+                      <Badge color={STATUS_COLOR_TASK[row.statusPay]} />{" "}
+                      {FINISH_TASK[row.statusPay]}
+                    </span>
+                  ) : (
+                    <span style={{ color: STATUS_COLOR_TASK[value] }}>
+                      <Badge color={STATUS_COLOR_TASK[value]} />{" "}
+                      {FINISH_TASK[value]}
+                    </span>
+                  )}
+
                   <br />
                 </>
               )}
@@ -1131,7 +1166,24 @@ function IndexReport() {
               color: color.secondary2,
               backgroundColor: color.Success,
             }}
-            onClick={fetchAllReport}
+            onClick={async () => {
+              await ReportDocDatasource.getAllReportDroner(
+                current,
+                row,
+                searchSubdistrict,
+                searchDistrict,
+                searchProvince,
+                startDate,
+                endDate,
+                searchStatus,
+                searchStatusPayment,
+                searchStatusCancel,
+                searchText
+              ).then((res: TaskReportListEntity) => {
+                setGetData(res);
+                setCurrent(1);
+              });
+            }}
           >
             ค้นหาข้อมูล
           </Button>
@@ -1139,7 +1191,6 @@ function IndexReport() {
       </div>
     </>
   );
-
   const data: DataType[] = [];
   if (getData != undefined) {
     for (let i = 0; i < getData.data.length; i++) {
@@ -1214,15 +1265,20 @@ function IndexReport() {
     <Layouts>
       {PageTitle}
       <br />
-      <Table
-        rowSelection={{
-          ...rowSelection,
-        }}
-        columns={columns}
-        dataSource={data}
-        pagination={false}
-        scroll={{ x: 1400 }}
-      />
+      <Space direction="vertical" style={{ width: "100%" }}>
+        <Spin tip="Loading..." size="large" spinning={loading}>
+          <Table
+            rowSelection={{
+              ...rowSelection,
+            }}
+            columns={columns}
+            dataSource={data}
+            pagination={false}
+            scroll={{ x: 1400 }}
+          />
+        </Spin>
+      </Space>
+
       <div className="d-flex justify-content-between pt-5">
         <p>รายการทั้งหมด {getData?.count} รายการ</p>
         <Pagination
