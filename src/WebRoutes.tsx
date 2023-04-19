@@ -43,6 +43,9 @@ import IndexDroneBrand from "./pages/setting/masterDataDrone/IndexDroneBrand";
 import EditDroneBrand from "./pages/setting/masterDataDrone/EditDroneBrand";
 import IndexReport from './pages/report/IndexReport';
 import EditReport from "./pages/report/EditReport";
+import NewsPage from "./pages/news/NewsPage";
+import EditNewsPage from "./pages/news/EditNewsPage";
+import AddNewsPage from "./pages/news/AddNewsPage";
 
 const WebRoutes: React.FC<any> = () => {
   return (
@@ -60,6 +63,7 @@ const WebRoutes: React.FC<any> = () => {
           <Route path="/IndexFarmer" element={<IndexFarmer />} />
           <Route path="/TotalIncomePage" element={<TotalIncomePage />} />
           <Route path="/PromotionPage" element={<PromotionPage />} />
+          <Route path="/NewsPage" element={<NewsPage />}/>
           <Route path="/TotalIncomePage" element={<TotalIncomePage />} />
           <Route path="/AddFarmer" element={<AddFarmer />} />
           <Route path="/AddDroner" element={<AddDroner />} />
@@ -74,6 +78,7 @@ const WebRoutes: React.FC<any> = () => {
           <Route path="/DetailWorkDroner" element={<DetailWorkDroner />} />
           <Route path="/EditDroneList" element={<EditDroneList />} />
           <Route path="/EditFarmer/:id" element={<EditFarmer />} />
+          <Route path="/EditNews/:id" element={<EditNewsPage />} />
           <Route path="/EditDroner" element={<EditDroner />} />
           <Route path="/IndexAdmin" element={<IndexAdmin />} />
           <Route path="/AddAdmin" element={<AddAdmin />} />
@@ -93,10 +98,10 @@ const WebRoutes: React.FC<any> = () => {
           <Route path="/EditWaitStart" element={<EditWaitStart />} />
           <Route path="/EditInProgress" element={<EditInProgress />} />
           <Route path="*" element={<PageNotFound />} />
-          <Route path="/AddPromotion" element={<AddPromotion />}/>
           <Route path="/EditPromotion/:id" element={<EditPromotion />} />
           <Route path="*" element={<PageNotFound />} />IndexReport
           <Route path="/AddPromotion" element={<AddPromotion />} />
+          <Route path="/AddNews" element={<AddNewsPage/>} />
           <Route path="/IndexReport" element={<IndexReport />} />
           <Route path="/EditReport" element={<EditReport />} />
 

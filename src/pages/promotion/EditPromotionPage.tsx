@@ -892,7 +892,7 @@ function EditPromotion(){
                                             message: "กรุณากรอกส่วนลดคูปอง!",
                                           },
                                       ]}>
-                                        <Input disabled={(coupon !== "DISCOUNT")} placeholder="กรอกจำนวนเงิน" autoComplete="off"/>
+                                        <Input type="number" disabled={(coupon !== "DISCOUNT")} placeholder="กรอกจำนวนเงิน" autoComplete="off"/>
                                       </Form.Item>
                                     </div>
                                   </div>
@@ -938,17 +938,17 @@ function EditPromotion(){
                                 </div>
                                 <div className="form-group col-lg-6">
                                 <label>
-                                  จำนวนคูปอง <span style={{ color: "red" }}>*</span>
+                                  จำนวนสิทธิ์ <span style={{ color: "red" }}>*</span>
                                 </label>
                                 <div className="mt-1">
                                   <Form.Item name="count"
                                       rules={[
                                         {
                                           required: true,
-                                          message: "กรุณากรอกจำนวนคูปอง!",
+                                          message: "กรุณากรอกจำนวนสิทธิ์!",
                                         },
                                     ]}>
-                                    <Input placeholder="กรอกจำนวนคูปอง" autoComplete="off" onChange={(e)=>{
+                                    <Input type="number" placeholder="กรอกจำนวนสิทธ์" autoComplete="off" onChange={(e)=>{
                                       setRenderMobile({
                                         ...renderMobile,
                                         count : e.target.value
@@ -1131,7 +1131,7 @@ function EditPromotion(){
                                         <div className="d-flex flex-column px-3">
                                            <label>จำนวนไร่ขั้นต่ำ</label>
                                            <Form.Item name="couponConditionRaiMin">
-                                             <Input disabled={!raiCondition} placeholder="กรอกจำนวนไร่" onChange={(e)=>{
+                                             <Input type="number" disabled={!raiCondition} placeholder="กรอกจำนวนไร่" onChange={(e)=>{
                                               setRenderMobile({
                                                 ...renderMobile,
                                                 raiConditionMin : e.target.value
@@ -1142,7 +1142,7 @@ function EditPromotion(){
                                         <div className="d-flex flex-column px-2">
                                            <label>จำนวนไร่สูงสุด</label>
                                            <Form.Item name="couponConditionRaiMax">
-                                             <Input disabled={!raiCondition} placeholder="กรอกจำนวนไร่" onChange={(e)=>{
+                                             <Input type="number" disabled={!raiCondition} placeholder="กรอกจำนวนไร่" onChange={(e)=>{
                                               setRenderMobile({
                                                 ...renderMobile,
                                                 raiConditionMax : e.target.value
@@ -1165,7 +1165,7 @@ function EditPromotion(){
                                         <div className="d-flex flex-column px-3">
                                            <label>จำนวนค่าบริการขั้นต่ำ</label>
                                            <Form.Item name="couponConditionServiceMin">
-                                             <Input disabled={!serviceCondition} placeholder="กรอกค่าบริการ" onChange={(e)=>{
+                                             <Input type="number" disabled={!serviceCondition} placeholder="กรอกค่าบริการ" onChange={(e)=>{
                                                 setRenderMobile({
                                                   ...renderMobile,
                                                   serviceConditionMin : e.target.value
@@ -1176,7 +1176,7 @@ function EditPromotion(){
                                         <div className="d-flex flex-column px-2">
                                            <label>จำนวนค่าบริการสูงสุด</label>
                                            <Form.Item name="couponConditionServiceMax">
-                                             <Input disabled={!serviceCondition} placeholder="กรอกค่าบริการ" onChange={(e)=>{
+                                             <Input type="number" disabled={!serviceCondition} placeholder="กรอกค่าบริการ" onChange={(e)=>{
                                                 setRenderMobile({
                                                   ...renderMobile,
                                                   serviceConditionMax : e.target.value

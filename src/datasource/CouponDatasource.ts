@@ -5,7 +5,7 @@ import { CouponEntities } from "../entities/CouponEntites";
 export class CouponDataSource {
   static getCoupon(code: string) {
     return httpClient
-      .get(BASE_URL + `/promotion/promotions/getoffline/${code}`)
+      .get(BASE_URL + `/promotion/promotions/getbycode/${code}`)
       .then((res) => {
         return res.data;
       })

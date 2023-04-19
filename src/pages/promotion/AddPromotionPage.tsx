@@ -361,6 +361,11 @@ export default function AddPromotion() {
   };
 
   const handleCouponProvince = () => {
+    if(couponProvince){
+      form.setFieldsValue({
+        couponConditionProvinceList : province
+      })
+    }
     setCouponProvince(!couponProvince);
   };
 
@@ -864,6 +869,7 @@ export default function AddPromotion() {
                         ]}
                       >
                         <Input
+                          type="number"
                           disabled={coupon !== "DISCOUNT"}
                           placeholder="กรอกจำนวนเงิน"
                           autoComplete="off"
@@ -924,6 +930,7 @@ export default function AddPromotion() {
                       ]}
                     >
                       <Input
+                        type="number"
                         placeholder="กรอกจำนวนสิทธิ์"
                         autoComplete="off"
                         onChange={(e) => {
@@ -1151,6 +1158,7 @@ export default function AddPromotion() {
                               ]}
                             >
                               <Input
+                                type="number"
                                 disabled={!raiCondition}
                                 placeholder="กรอกจำนวนไร่"
                                 onChange={(e) => {
@@ -1174,6 +1182,7 @@ export default function AddPromotion() {
                               ]}
                             >
                               <Input
+                                type="number"
                                 disabled={!raiCondition}
                                 placeholder="กรอกจำนวนไร่"
                                 onChange={(e) => {
@@ -1201,6 +1210,7 @@ export default function AddPromotion() {
                             <label>จำนวนค่าบริการขั้นต่ำ</label>
                             <Form.Item name="couponConditionServiceMin">
                               <Input
+                                type="number"
                                 disabled={!serviceCondition}
                                 placeholder="กรอกค่าบริการ"
                                 onChange={(e) => {
@@ -1216,6 +1226,7 @@ export default function AddPromotion() {
                             <label>จำนวนค่าบริการสูงสุด</label>
                             <Form.Item name="couponConditionServiceMax">
                               <Input
+                                type="number"
                                 disabled={!serviceCondition}
                                 placeholder="กรอกค่าบริการ"
                                 onChange={(e) => {

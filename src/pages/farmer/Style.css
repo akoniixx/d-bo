@@ -16,6 +16,24 @@
   background: center center no-repeat;
   background-size: 100%;
 }
+.hiddenFileInputNews > input {
+  height: 100%;
+  width: 100%;
+  opacity: 0;
+  cursor: pointer;
+}
+.hiddenFileInputNews {
+  /* border: 1px solid #ccc; */
+  /* border-radius: 8px; */
+  width: 587px;
+  height: 330px;
+  display: inline-block;
+  overflow: hidden;
+
+  /*for the background, optional*/
+  background: center center no-repeat;
+  background-size: 100%;
+}
 .zoom {
   padding: 50px;
   transition: transform .2s;
