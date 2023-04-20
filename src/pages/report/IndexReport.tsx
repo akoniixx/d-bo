@@ -1263,10 +1263,10 @@ function IndexReport() {
   }
   return (
     <Layouts>
-      {PageTitle}
-      <br />
       <Space direction="vertical" style={{ width: "100%" }}>
         <Spin tip="Loading..." size="large" spinning={loading}>
+        {PageTitle}
+      <br />
           <Table
             rowSelection={{
               ...rowSelection,
