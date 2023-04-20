@@ -1,4 +1,11 @@
 ## [Version - 0]
+## Fix [v0.25.04] 2023-04-20
+- fixed filter status 
+- fixed button download in edit report 
+- fixed search in report index page 
+- fixed wording modal update statusPayment
+- set loading when download report
+- fixed update status review in finished page
 ## Fix [v0.25.03] 2023-04-10
 - fixed edit coupon
 - fixed layout preview mobile

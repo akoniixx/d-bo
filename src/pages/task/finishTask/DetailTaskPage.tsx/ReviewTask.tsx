@@ -44,10 +44,6 @@ import {
   DetailReviewTask,
   DetailReviewTask_INIT,
 } from "../../../../entities/TaskFinishEntities";
-import {
-  CreateReview,
-  CreateReview_INIT,
-} from "../../../../entities/ReviewDronerEntities";
 import { CouponDataSource } from "../../../../datasource/CouponDatasource";
 import { numberWithCommas } from "../../../../utilities/TextFormatter";
 
@@ -71,7 +67,7 @@ function ReviewTask() {
   });
   const [data, setData] = useState<DetailReviewTask>(DetailReviewTask_INIT);
   const [detailDroner, setDetailDroner] =
-    useState<CreateReview>(CreateReview_INIT);
+    useState<any>();
   const [mapPosition, setMapPosition] = useState<{ lat: number; lng: number }>({
     lat: LAT_LNG_BANGKOK.lat,
     lng: LAT_LNG_BANGKOK.lng,
@@ -80,14 +76,16 @@ function ReviewTask() {
   const [saveRate, setSaveRate] = useState<boolean>(true);
   const fetchDetailTask = async () => {
     await TaskFinishedDatasource.getDetailFinishTaskById(taskId).then((res) => {
-      if(res.data.couponId !== null){
-        CouponDataSource.getPromotionCode(res.data.couponId).then(result => {
+      if (res.data.couponId !== null) {
+        CouponDataSource.getPromotionCode(res.data.couponId).then((result) => {
           setCouponData({
-            couponCode : res.data.couponCode??"",
-            couponDiscount : (!res.data.discount)?null:parseInt(res.data.discount),
-            couponName : result.couponName??""
-          })
-        })
+            couponCode: res.data.couponCode ?? "",
+            couponDiscount: !res.data.discount
+              ? null
+              : parseInt(res.data.discount),
+            couponName: result.couponName ?? "",
+          });
+        });
       }
       setData(res);
       setMapPosition({
@@ -105,7 +103,7 @@ function ReviewTask() {
     const m = Map(detailDroner).set("canReview", e.target.value);
     const n = Map(m.toJS()).set("taskId", taskId);
     setDetailDroner(n.toJS());
-    if (e.target.value == "Yes") {
+    if (e.target.value === "Yes") {
       setBtnSaveDisable(true);
       setSaveRate(false);
     } else {
@@ -139,13 +137,6 @@ function ReviewTask() {
     const n = Map(m.toJS()).set("taskId", taskId);
     setDetailDroner(n.toJS());
   };
-
-  const formatCurrency = (e: any) => {
-    e = parseFloat(e);
-    return e.toFixed(2).replace(/./g, function (c: any, i: any, a: any) {
-      return i > 0 && c !== "." && (a.length - i) % 3 === 0 ? "," + c : c;
-    });
-  };
   const onPreviewImg = async () => {
     let src = data.imageTaskUrl;
     if (!src) {
@@ -170,24 +161,21 @@ function ReviewTask() {
       showCloseButton: true,
     }).then(async (result) => {
       if (result.isConfirmed) {
-        const pushDetailReview = Map(data.data).set(
-          "reviewDronerDetail",
-          detailDroner
-        );
-        const p = Map(pushDetailReview.toJS().reviewDronerDetail).set(
-          "updateBy",
+        await TaskReviewDronerDatasource.UpdateReviewDroner(
+          data.data.id,
+          detailDroner.canReview,
+          detailDroner.pilotEtiquette,
+          detailDroner.punctuality,
+          detailDroner.sprayExpertise,
+          detailDroner.comment,
           profile.firstname + " " + profile.lastname
-        );
-        await TaskReviewDronerDatasource.UpdateReviewDroner(p.toJS()).then(
-          (time) => {
-            window.location.href = "/IndexFinishTask";
-          }
-        );
+        ).then((time) => {
+          window.location.href = "/IndexFinishTask";
+        });
       }
       fetchDetailTask();
     });
   };
-
   const renderAppointment = (
     <Form style={{ padding: "32px" }}>
       <div className="row">
