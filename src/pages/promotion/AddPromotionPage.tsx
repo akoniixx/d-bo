@@ -39,12 +39,19 @@ import { image } from "../../resource";
 import RenderMobile from "../../components/mobile/RenderMobile";
 import dayjs from "dayjs";
 import { CropPurposeSprayEntity } from "../../entities/CropEntities";
+import { FarmerEntity } from "../../entities/FarmerEntities";
+import { TaskDatasource } from "../../datasource/TaskDatasource";
+import { ProviceEntity } from "../../entities/LocationEntities";
 
 export default function AddPromotion() {
   const profile = JSON.parse(localStorage.getItem("profile") || "{  }");
+
   const dateFormat = "DD/MM/YYYY";
   const [plantName, setPlantName] = useState<CropPurposeSprayEntity[]>();
   const [provinceList, setProvinceList] = useState<string[]>([]);
+  const [farmerList, setFarmerList] = useState<any>();
+  const [provinceListId, setProvinceListId] = useState<ProviceEntity[]>([]);
+  const [searchFarmer, setSearchFarmer] = useState<string>("");
   const [crop, setCrop] = useState<any>([
     {
       id: null,
@@ -63,6 +70,7 @@ export default function AddPromotion() {
   const [couponType, setCouponType] = useState<string | null>(null);
   const [couponInfo, setCouponInfo] = useState<string | null>(null);
   const [specialCoupon, setSpecialCoupon] = useState<boolean>(false);
+  const [specificFarmer, setSpecificFarmer] = useState<boolean>(false);
   const [raiCondition, setRaiCondition] = useState<boolean>(false);
   const [serviceCondition, setServiceCondition] = useState<boolean>(false);
   const [couponPlant, setCouponPlant] = useState<boolean>(false);
@@ -95,11 +103,12 @@ export default function AddPromotion() {
   useEffect(() => {
     getCropPlantName();
     renderMobilePlant();
-    if (fetchTwice.current) {
-      getProvince();
-      fetchTwice.current = false;
-    }
+    getProvince();
   }, [crop]);
+
+  useEffect(() => {
+    fetchFarmerList(searchFarmer, provinceListId);
+  }, [searchFarmer, provinceListId]);
 
   const getCropPlantName = () => {
     CropDatasource.getAllCropPlantName()
@@ -130,12 +139,38 @@ export default function AddPromotion() {
     }
   };
 
-  const getProvince = () => {
-    LocationDatasource.getProvince()
+  const getProvince = async () => {
+    await LocationDatasource.getProvince()
       .then((res) => {
         setProvinceList(res.map((item: any) => item.provinceName));
+        setProvinceListId(res);
       })
       .catch((err) => console.log(err));
+  };
+
+  const fetchFarmerList = async (text?: string, dataProvice?: any) => {
+    const data = await (
+      await TaskDatasource.getFarmerList(text).then((res) => {
+        return res;
+      })
+    ).map((x: any) => {
+      const res = { ...x, provinceName: "" };
+      return res;
+    });
+    const mapData = data.map((x) => {
+      const matching = dataProvice.find(
+        (i: any) => `${i.provinceId}` === `${x.address.provinceId}`
+      );
+      if (matching) {
+        return { ...x, provinceName: matching.provinceName };
+      }
+      return {
+        ...x,
+        provinceName: x.provinceName,
+      };
+    });
+    console.log(mapData);
+    setFarmerList(mapData);
   };
 
   const navigate = useNavigate();
@@ -334,6 +369,13 @@ export default function AddPromotion() {
     });
   };
 
+  const handleSpecificFarmer = () => {
+    setSpecificFarmer(!specificFarmer);
+    form.setFieldsValue({
+      specificFarmer: !specificFarmer,
+    });
+  };
+
   function checkRai(min: number | null, max: number | null): string {
     let result;
     if (!min && !max) {
@@ -361,10 +403,10 @@ export default function AddPromotion() {
   };
 
   const handleCouponProvince = () => {
-    if(couponProvince){
+    if (couponProvince) {
       form.setFieldsValue({
-        couponConditionProvinceList : province
-      })
+        couponConditionProvinceList: province,
+      });
     }
     setCouponProvince(!couponProvince);
   };
@@ -624,7 +666,7 @@ export default function AddPromotion() {
       count: count,
       keep: count,
       used: 0,
-      createBy: profile.username + " " + profile.lastname,
+      createBy: profile.firstname + " " + profile.lastname,
       startDate: new Date(startDate),
       expiredDate: new Date(expiredDate),
       description: description,
@@ -917,7 +959,7 @@ export default function AddPromotion() {
                 </div>
                 <div className="form-group col-lg-6">
                   <label>
-                    จำนวนสิทธิ์ <span style={{ color: "red" }}>*</span>
+                    จำนวนสิทธิ <span style={{ color: "red" }}>*</span>
                   </label>
                   <div className="mt-1">
                     <Form.Item
@@ -925,13 +967,13 @@ export default function AddPromotion() {
                       rules={[
                         {
                           required: true,
-                          message: "กรุณากรอกจำนวนสิทธิ์!",
+                          message: "กรุณากรอกจำนวนสิทธิ!",
                         },
                       ]}
                     >
                       <Input
                         type="number"
-                        placeholder="กรอกจำนวนสิทธิ์"
+                        placeholder="กรอกจำนวนสิทธิ"
                         autoComplete="off"
                         onChange={(e) => {
                           setRenderMobile({
@@ -1093,9 +1135,7 @@ export default function AddPromotion() {
               <br />
               <div className="row py-4">
                 <div className="form-group col-lg-12">
-                  <label>
-                    เงื่อนไข (จะแสดงในแอพลิเคชั่น){" "}
-                  </label>
+                  <label>เงื่อนไข (จะแสดงในแอพลิเคชั่น) </label>
                   <Form.Item
                     name="condition"
                     rules={[
@@ -1129,6 +1169,54 @@ export default function AddPromotion() {
                     >
                       ลงทะเบียนใช้งานครั้งแรก
                     </Checkbox>
+                  </Form.Item>
+                  <Form.Item name="specificFarmer" valuePropName="checked">
+                    <Checkbox
+                      onChange={handleSpecificFarmer}
+                      checked={specificFarmer}
+                      className="pt-3"
+                    >
+                      ให้เฉพาะเกษตรกรบางคน
+                    </Checkbox>
+                  </Form.Item>
+                  <Form.Item
+                    name="couponConditionFarmerList"
+                    rules={[
+                      {
+                        required: couponProvince,
+                        message: "กรุณากรอกเลือกจังหวัด",
+                      },
+                    ]}
+                  >
+                    <Select
+                      //disabled={!couponProvince}
+                      mode="multiple"
+                      className="col-lg-12 ps-5 pe-3"
+                      placeholder="เลือกเกษตรกร"
+                      //onChange={handleChangeProvince}
+                      showSearch
+                      value={province}
+                      allowClear
+                      optionFilterProp="children"
+                      filterOption={(input: any, option: any) =>
+                        option.children.includes(input)
+                      }
+                      filterSort={(optionA, optionB) =>
+                        optionA.children
+                          .toLowerCase()
+                          .localeCompare(optionB.children.toLowerCase())
+                      }
+                    >
+                      {farmerList?.map((item: any) => (
+                        <Option value={item.id}>
+                          {item.firstname +
+                            " " +
+                            item.lastname +
+                            " | จังหวัด" +
+                            item.provinceName}
+                        </Option>
+                      ))}
+                    </Select>
                   </Form.Item>
                 </div>
               </div>

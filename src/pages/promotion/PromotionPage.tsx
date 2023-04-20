@@ -15,12 +15,18 @@ import {
   CouponQueryEntities,
 } from "../../entities/CouponEntites";
 import { DateTimeUtil } from "../../utilities/DateTimeUtil";
-import { Button, Image } from "antd";
+import { Badge, Button, Image } from "antd";
 import icon from "../../resource/icon";
 import ActionButton from "../../components/button/ActionButton";
-import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
+import {
+  ClockCircleOutlined,
+  DeleteOutlined,
+  EditOutlined,
+  UserOutlined,
+} from "@ant-design/icons";
 import { color } from "../../resource";
 import ModalDeleteCoupon from "../../components/modal/ModalDeleteCoupon";
+import { STATUS_COUPON } from "../../definitions/Status";
 
 function PromotionPage() {
   const dateSearchFormat = "YYYY-MM-DD";
@@ -128,39 +134,41 @@ function PromotionPage() {
         CouponDataSource.addCoupon(couponDto)
           .then((resSave) => {
             setData({
-              count : data.count+1,
-              promotions : [
+              count: data.count + 1,
+              promotions: [
                 {
-                  id : resSave.id,
-                  couponCode : resSave.couponCode,
-                  couponName : resSave.couponName,
-                  couponType : resSave.couponType,
-                  promotionStatus : resSave.promotionStatus,
-                  promotionType : resSave.promotionType,
-                  discountType : resSave.discountType,
-                  discount : resSave.discount,
-                  count : resSave.count,
-                  keep : resSave.count,
-                  used : resSave.used,
-                  startDate : resSave.startDate,
-                  expiredDate : resSave.expiredDate,
-                  description : resSave.description,
-                  condition : resSave.condition,
-                  specialCondition : resSave.specialCondition,
-                  couponConditionRai : resSave.specialCondition,
-                  couponConditionRaiMin : resSave.couponConditionRaiMin,
-                  couponConditionRaiMax : resSave.couponConditionRaiMax,
-                  couponConditionService : resSave.couponConditionService,
-                  couponConditionServiceMin : resSave.couponConditionServiceMin,
-                  couponConditionServiceMax : resSave.couponConditionServiceMax,
-                  couponConditionPlant : resSave.couponConditionPlant,
-                  couponConditionPlantList : resSave.couponConditionPlantList,
-                  couponConditionProvince : resSave.couponConditionProvince,
-                  couponConditionProvinceList : resSave.couponConditionProvinceList,
-                  createBy : resSave.createBy
-                },...data.promotions
-              ]
-            })
+                  id: resSave.id,
+                  couponCode: resSave.couponCode,
+                  couponName: resSave.couponName,
+                  couponType: resSave.couponType,
+                  promotionStatus: resSave.promotionStatus,
+                  promotionType: resSave.promotionType,
+                  discountType: resSave.discountType,
+                  discount: resSave.discount,
+                  count: resSave.count,
+                  keep: resSave.count,
+                  used: resSave.used,
+                  startDate: resSave.startDate,
+                  expiredDate: resSave.expiredDate,
+                  description: resSave.description,
+                  condition: resSave.condition,
+                  specialCondition: resSave.specialCondition,
+                  couponConditionRai: resSave.specialCondition,
+                  couponConditionRaiMin: resSave.couponConditionRaiMin,
+                  couponConditionRaiMax: resSave.couponConditionRaiMax,
+                  couponConditionService: resSave.couponConditionService,
+                  couponConditionServiceMin: resSave.couponConditionServiceMin,
+                  couponConditionServiceMax: resSave.couponConditionServiceMax,
+                  couponConditionPlant: resSave.couponConditionPlant,
+                  couponConditionPlantList: resSave.couponConditionPlantList,
+                  couponConditionProvince: resSave.couponConditionProvince,
+                  couponConditionProvinceList:
+                    resSave.couponConditionProvinceList,
+                  createBy: resSave.createBy,
+                },
+                ...data.promotions,
+              ],
+            });
           })
           .catch((err) => console.log(err));
       })
@@ -355,7 +363,9 @@ function PromotionPage() {
           children: (
             <div className="container">
               <span className="text-dark-75  d-block font-size-lg">
-                {row.couponType === "INJECTION" ? "ส่วนลดการฉีดพ่น" : "ส่วนลดปุ๋ยและยา"}
+                {row.couponType === "INJECTION"
+                  ? "ส่วนลดการฉีดพ่น"
+                  : "ส่วนลดปุ๋ยและยา"}
               </span>
             </div>
           ),
@@ -388,7 +398,9 @@ function PromotionPage() {
           children: (
             <div className="container d-flex align-items-center">
               <div className="pe-2">
-                <Image src={icon.iconTime} width={16} height={16} />
+                <ClockCircleOutlined
+                  style={{ color: color.Success, fontSize: "20px" }}
+                />
               </div>
               <div>
                 <span className="text-dark-75  d-block font-size-lg">
@@ -432,7 +444,23 @@ function PromotionPage() {
           children: (
             <div className="container">
               <span className="text-dark-75  d-block font-size-lg">
-                {row.count | 0} สิทธิ์
+                {row.count | 0} สิทธิ
+              </span>
+            </div>
+          ),
+        };
+      },
+    },
+    {
+      title: "เก็บแล้ว",
+      dataIndex: "keep",
+      key: "keep",
+      render: (value: any, row: any, index: number) => {
+        return {
+          children: (
+            <div className="container">
+              <span className="text-dark-75  d-block font-size-lg">
+                {(row.count - row.keep) | 0} สิทธิ
               </span>
             </div>
           ),
@@ -448,7 +476,7 @@ function PromotionPage() {
           children: (
             <div className="container">
               <span className="text-dark-75  d-block font-size-lg">
-                {row.used | 0} สิทธิ์
+                {row.used | 0} สิทธิ
               </span>
             </div>
           ),
@@ -463,31 +491,32 @@ function PromotionPage() {
         return {
           children: (
             <div className="container">
-              {row.promotionStatus === "ACTIVE" ? (
-                <div className="d-flex">
-                  <span className="ps-2 text-success">
-                    <Image src={icon.pointActive} width={10} height={10} />{" "}
-                    ใช้งาน
-                  </span>
-                </div>
-              ) : row.promotionStatus === "INACTIVE" ? (
-                <div className="d-flex">
-                  <span className="ps-2 text-danger">
-                    <Image src={icon.pointDisabled} width={10} height={10} />{" "}
-                    ปิดการใช้งาน
-                  </span>
-                </div>
-              ) : (
-                <div className="d-flex">
-                  <span className="ps-2 text-secondary">
-                    <Image src={icon.pointDrafting} width={10} height={10} />{" "}
-                    รอเปิดใช้งาน
-                  </span>
-                </div>
-              )}
+              <span
+                style={{
+                  color:
+                    row.promotionStatus === "ACTIVE"
+                      ? color.Success
+                      : row.promotionStatus === "INACTIVE"
+                      ? color.Error
+                      : color.Grey,
+                }}
+              >
+                <Badge
+                  color={
+                    row.promotionStatus === "ACTIVE"
+                      ? color.Success
+                      : row.promotionStatus === "INACTIVE"
+                      ? color.Error
+                      : color.Grey
+                  }
+                />{" "}
+                {STATUS_COUPON[row.promotionStatus]}
+              </span>
               <div className="d-flex">
-                <span className="p-2 text-secondary">
-                  <Image src={icon.adminlogo} width={10} height={10} />
+                <span style={{ color: color.Grey }}>
+                  <UserOutlined
+                    style={{ padding: "0 4px 0 0", verticalAlign: 0.5 }}
+                  />
                   {row.createBy ?? " - (Admin)"}
                 </span>
               </div>
