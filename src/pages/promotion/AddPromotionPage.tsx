@@ -15,7 +15,6 @@ import {
   TimePicker,
   Modal,
   Button,
-  Image,
 } from "antd";
 import { Option } from "antd/lib/mentions";
 import ReactQuill from "react-quill";
@@ -66,6 +65,7 @@ export default function AddPromotion() {
   const [conditionEditor, setConditionEditor] = useState<string | null>(null);
   const [editTable, setEditTable] = useState(true);
   const [province, setProvince] = useState<string[]>([]);
+  const [farmer, setFarmer] = useState<string[]>([]);
   const [coupon, setCoupon] = useState<string | null>(null);
   const [couponType, setCouponType] = useState<string | null>(null);
   const [couponInfo, setCouponInfo] = useState<string | null>(null);
@@ -344,6 +344,9 @@ export default function AddPromotion() {
 
   const handleChangeProvince = (provinceName: string[]) => {
     setProvince(provinceName);
+  };
+  const handleChangeFarmer = (farmer: string[]) => {
+    setFarmer(farmer);
   };
 
   const handleCoupon = (e: RadioChangeEvent) => {
@@ -952,8 +955,8 @@ export default function AddPromotion() {
                           .localeCompare(optionB.children.toLowerCase())
                       }
                     >
-                      <Option value={"ONLINE"}>ออนไลน์(Online)</Option>
-                      <Option value={"OFFLINE"}>ออฟไลน์(Offline)</Option>
+                      <Option value={"ONLINE"}>ออนไลน์ (Online)</Option>
+                      <Option value={"OFFLINE"}>ออฟไลน์ (Offline)</Option>
                     </Select>
                   </Form.Item>
                 </div>
@@ -1158,69 +1161,86 @@ export default function AddPromotion() {
               </div>
               <br />
               <Divider />
-              <div className="row">
-                <div className="form-group col-lg-12 d-flex flex-column">
-                  <label>เงื่อนไขการได้รับพิเศษ</label>
-                  <Form.Item name="specialCondition" valuePropName="checked">
-                    <Checkbox
-                      onChange={handleSpecialCoupon}
-                      checked={specialCoupon}
-                      className="pt-3"
-                    >
-                      ลงทะเบียนใช้งานครั้งแรก
-                    </Checkbox>
-                  </Form.Item>
-                  <Form.Item name="specificFarmer" valuePropName="checked">
-                    <Checkbox
-                      onChange={handleSpecificFarmer}
-                      checked={specificFarmer}
-                      className="pt-3"
-                    >
-                      ให้เฉพาะเกษตรกรบางคน
-                    </Checkbox>
-                  </Form.Item>
-                  <Form.Item
-                    name="couponConditionFarmerList"
-                    rules={[
-                      {
-                        required: couponProvince,
-                        message: "กรุณากรอกเลือกจังหวัด",
-                      },
-                    ]}
-                  >
-                    <Select
-                      //disabled={!couponProvince}
-                      mode="multiple"
-                      className="col-lg-12 ps-5 pe-3"
-                      placeholder="เลือกเกษตรกร"
-                      //onChange={handleChangeProvince}
-                      showSearch
-                      value={province}
-                      allowClear
-                      optionFilterProp="children"
-                      filterOption={(input: any, option: any) =>
-                        option.children.includes(input)
-                      }
-                      filterSort={(optionA, optionB) =>
-                        optionA.children
-                          .toLowerCase()
-                          .localeCompare(optionB.children.toLowerCase())
-                      }
-                    >
-                      {farmerList?.map((item: any) => (
-                        <Option value={item.id}>
-                          {item.firstname +
-                            " " +
-                            item.lastname +
-                            " | จังหวัด" +
-                            item.provinceName}
-                        </Option>
-                      ))}
-                    </Select>
-                  </Form.Item>
-                </div>
-              </div>
-              <Divider />
+              {couponInfo === "ONLINE" && (
+                <>
+                  <div className="row">
+                    <div className="form-group col-lg-12 d-flex flex-column">
+                      <label>เงื่อนไขการได้รับพิเศษ</label>
+                      <Form.Item
+                        name="specialCondition"
+                        valuePropName="checked"
+                      >
+                        <Checkbox
+                          onChange={handleSpecialCoupon}
+                          checked={specialCoupon}
+                          className="pt-3"
+                        >
+                          ลงทะเบียนใช้งานครั้งแรก
+                        </Checkbox>
+                      </Form.Item>
+                      <Form.Item name="specificFarmer" valuePropName="checked">
+                        <Checkbox
+                          onChange={handleSpecificFarmer}
+                          checked={specificFarmer}
+                          className="pt-3"
+                        >
+                          ให้เฉพาะเกษตรกรบางคน
+                        </Checkbox>
+                      </Form.Item>
+                      <div
+                        className="col-lg-11"
+                        style={{
+                          float: "right",
+                          alignContent: "right",
+                          alignItems: "right",
+                          display: "flex",
+                          justifyContent: "right",
+                          flexDirection: "column",
+                        }}
+                      >
+                        <Form.Item
+                          name="couponConditionFarmerList"
+                          rules={[
+                            {
+                              required: specificFarmer,
+                              message: "กรุณากรอกรายชื่อเกษตรกร",
+                            },
+                          ]}
+                        >
+                          <Select
+                            disabled={!specificFarmer}
+                            mode="multiple"
+                            placeholder="เลือกเกษตรกร"
+                            onChange={handleChangeFarmer}
+                            showSearch
+                            allowClear
+                            optionFilterProp="children"
+                            filterOption={(input: any, option: any) =>
+                              option.children.includes(input)
+                            }
+                            filterSort={(optionA, optionB) =>
+                              optionA.children
+                                .toLowerCase()
+                                .localeCompare(optionB.children.toLowerCase())
+                            }
+                          >
+                            {farmerList?.map((item: any) => (
+                              <Option value={item.id}>
+                                {item.firstname +
+                                  " " +
+                                  item.lastname +
+                                  " | จังหวัด" +
+                                  item.provinceName}
+                              </Option>
+                            ))}
+                          </Select>
+                        </Form.Item>
+                      </div>
+                    </div>
+                  </div>
+                  <Divider />
+                </>
+              )}
               <div className="row">
                 <div className="form-group col-lg-12 d-flex flex-column">
                   <label>
