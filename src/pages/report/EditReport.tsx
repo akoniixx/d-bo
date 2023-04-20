@@ -15,6 +15,7 @@ import {
   Row,
   Select,
   Space,
+  Spin,
   Tag,
   UploadFile,
 } from "antd";
@@ -73,7 +74,7 @@ function EditReport() {
   const [updateStatusPayment, setUpdateStatusPayment] =
     useState<updateStatusPays>(updateStatusPays_INIT);
   const [history, setHistory] = useState<HistoryEntity>(HistoryEntity_INIT);
-
+  const [loading, setLoading] = useState(false);
   const [mapPosition, setMapPosition] = useState<{ lat: number; lng: number }>({
     lat: LAT_LNG_BANGKOK.lat,
     lng: LAT_LNG_BANGKOK.lng,
@@ -753,6 +754,7 @@ function EditReport() {
     </Form>
   );
   const DownloadPDF = async () => {
+    setLoading(true);
     const filterId = [data.data.id];
     const downloadBy = `${profile.firstname} ${profile.lastname}`;
     await ReportDocDatasource.getFileName("PDF", downloadBy, filterId).then(
@@ -760,8 +762,8 @@ function EditReport() {
         if (res.responseData) {
           const idFileName = res.responseData.id;
           const fileName = res.responseData.fileName;
-          ReportDocDatasource.reportPDF(filterId, downloadBy, idFileName).then(
-            (res) => {
+          ReportDocDatasource.reportPDF(filterId, downloadBy, idFileName)
+            .then((res) => {
               const blob = new Blob([res], { type: "application/pdf" });
               const a = document.createElement("a");
               a.href = window.URL.createObjectURL(blob);
@@ -769,79 +771,82 @@ function EditReport() {
               document.body.appendChild(a);
               a.click();
               document.body.removeChild(a);
-            }
-          );
+            })
+            .catch((err) => console.log(err))
+            .finally(() => setLoading(false));
         }
       }
     );
   };
   return (
     <Layout>
-      <div className="container d-flex justify-content-between pt-1">
-        <div className="pt-1">
-          <BackIconButton
-            onClick={() => (window.location.href = "/IndexReport")}
-          />
+      <Spin tip="Loading..." size="large" spinning={loading}>
+        <div className="container d-flex justify-content-between pt-1">
+          <div className="pt-1">
+            <BackIconButton
+              onClick={() => (window.location.href = "/IndexReport")}
+            />
+          </div>
+          <div className="col-lg-9 pt-4">
+            <strong style={{ fontSize: "20px" }}>
+              รายละเอียดงาน {data.data.taskNo}
+            </strong>
+          </div>
+          <div className="col-lg pt-4">
+            {data.data.statusPayment === "WAIT_PAYMENT" ||
+            data.data.statusPayment === "DONE_PAYMENT" ? (
+              <Button
+                className="col-lg-9 p-1"
+                style={{
+                  color: color.secondary2,
+                  backgroundColor: color.primary1,
+                  borderRadius: "5px",
+                }}
+                onClick={DownloadPDF}
+              >
+                ดาวน์โหลดไฟล์ PDF
+              </Button>
+            ) : (
+              <Button
+                disabled
+                className="col-lg-9 p-1"
+                style={{
+                  padding: "8 0",
+                  backgroundColor: color.Disable,
+                  color: color.Grey,
+                  borderColor: color.Disable,
+                  borderRadius: "5px",
+                }}
+              >
+                ดาวน์โหลดไฟล์ PDF
+              </Button>
+            )}
+          </div>
         </div>
-        <div className="col-lg-9 pt-4">
-          <strong style={{ fontSize: "20px" }}>
-            รายละเอียดงาน {data.data.taskNo}
-          </strong>
-        </div>
-        <div className="col-lg pt-4">
-          {data.data.statusPayment === "WAIT_PAYMENT" ||
-          data.data.statusPayment === "DONE_PAYMENT" ? (
-            <Button
-              className="col-lg-9 p-1"
-              style={{
-                color: color.secondary2,
-                backgroundColor: color.primary1,
-                borderRadius: "5px",
-              }}
-              onClick={DownloadPDF}
-            >
-              ดาวน์โหลดไฟล์ PDF
-            </Button>
-          ) : (
-            <Button
-              disabled
-              className="col-lg-9 p-1"
-              style={{
-                padding: "8 0",
-                backgroundColor: color.Disable,
-                color: color.Grey,
-                borderColor: color.Disable,
-                borderRadius: "5px",
-              }}
-            >
-              ดาวน์โหลดไฟล์ PDF
-            </Button>
-          )}
-        </div>
-      </div>
-      <CardContainer>
-        <CardHeader textHeader="นัดหมายบริการ" />
-        {renderAppointment}
-      </CardContainer>
-      <br />
-      <CardContainer>
-        <CardHeader textHeader="ข้อมูลเกษตรกรและแปลง" />
-        {renderFarmer}
-      </CardContainer>
-      <br />
-      <CardContainer>
-        <CardHeader textHeader="รายชื่อนักบินโดรน" />
-        {renderDroner}
-      </CardContainer>
-      <br />
-      <CardContainer>
-        <CardHeader textHeader="ยอดรวมค่าบริการ" />
-        {renderPrice}
-      </CardContainer>
-      <FooterPage
-        onClickBack={() => (window.location.href = "/IndexReport")}
-        onClickSave={() => UpdateStatusPayment()}
-      />
+        <CardContainer>
+          <CardHeader textHeader="นัดหมายบริการ" />
+          {renderAppointment}
+        </CardContainer>
+        <br />
+        <CardContainer>
+          <CardHeader textHeader="ข้อมูลเกษตรกรและแปลง" />
+          {renderFarmer}
+        </CardContainer>
+        <br />
+        <CardContainer>
+          <CardHeader textHeader="รายชื่อนักบินโดรน" />
+          {renderDroner}
+        </CardContainer>
+        <br />
+        <CardContainer>
+          <CardHeader textHeader="ยอดรวมค่าบริการ" />
+          {renderPrice}
+        </CardContainer>
+        <FooterPage
+          onClickBack={() => (window.location.href = "/IndexReport")}
+          onClickSave={() => UpdateStatusPayment()}
+        />
+      </Spin>
     </Layout>
   );
 }

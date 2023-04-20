@@ -1,4 +1,6 @@
 ## [Version - 0]
+## Fix [v0.25.05] 2023-04-20
+- set loading in edit page
 ## Fix [v0.25.04] 2023-04-20
 - fixed filter status 
 - fixed button download in edit report 
