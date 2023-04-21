@@ -1,4 +1,6 @@
 ## [Version - 0]
+## improve [v0.25.06] 2023-04-21
+- added discount promotion & discount coupon & revenue promotion in task menu
 ## Fix [v0.25.05] 2023-04-20
 - set loading in edit page
 ## Fix [v0.25.04] 2023-04-20

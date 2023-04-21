@@ -45,7 +45,10 @@ import {
   DetailReviewTask_INIT,
 } from "../../../../entities/TaskFinishEntities";
 import { CouponDataSource } from "../../../../datasource/CouponDatasource";
-import { numberWithCommas } from "../../../../utilities/TextFormatter";
+import {
+  numberWithCommas,
+  numberWithCommasToFixed,
+} from "../../../../utilities/TextFormatter";
 
 const { Map } = require("immutable");
 const _ = require("lodash");
@@ -66,8 +69,7 @@ function ReviewTask() {
     couponDiscount: null,
   });
   const [data, setData] = useState<DetailReviewTask>(DetailReviewTask_INIT);
-  const [detailDroner, setDetailDroner] =
-    useState<any>();
+  const [detailDroner, setDetailDroner] = useState<any>();
   const [mapPosition, setMapPosition] = useState<{ lat: number; lng: number }>({
     lat: LAT_LNG_BANGKOK.lat,
     lng: LAT_LNG_BANGKOK.lng,
@@ -80,9 +82,9 @@ function ReviewTask() {
         CouponDataSource.getPromotionCode(res.data.couponId).then((result) => {
           setCouponData({
             couponCode: res.data.couponCode ?? "",
-            couponDiscount: !res.data.discount
+            couponDiscount: !res.data.discountCoupon
               ? null
-              : parseInt(res.data.discount),
+              : parseInt(res.data.discountCoupon),
             couponName: result.couponName ?? "",
           });
         });
@@ -515,19 +517,24 @@ function ReviewTask() {
     <Form style={{ padding: "20px" }}>
       <Form style={{ padding: "20px", backgroundColor: "#2196531A" }}>
         <div className="row">
-          <div className="col-lg">
-            <Form.Item>
-              <span>
-                ยอดรวมค่าบริการ
-                <br />
-                <b style={{ fontSize: "20px", color: color.Success }}>
-                  {data.data.totalPrice !== null
-                    ? numberWithCommas(parseFloat(data.data.totalPrice)) +
-                      " บาท"
-                    : "0 บาท"}
-                </b>
-              </span>
-            </Form.Item>
+          <div className="col-lg-3" style={{ borderRight: "solid" }}>
+            <label>ยอดรวมค่าบริการ (เกษตรกร)</label>
+            <h5 style={{ color: color.primary1 }} className="p-2">
+              {data?.data.totalPrice &&
+                numberWithCommasToFixed(parseFloat(data?.data.totalPrice))}{" "}
+              บาท
+            </h5>
+          </div>
+          <div className="col-lg-3" style={{ paddingLeft: "40px" }}>
+            <label>รายได้ที่นักบินโดรนได้รับ</label>
+            <h5 style={{ color: color.Warning }} className="p-2">
+              {data?.data.price &&
+                numberWithCommasToFixed(
+                  parseFloat(data?.data.price) +
+                    parseFloat(data?.data.revenuePromotion)
+                )}{" "}
+              บาท
+            </h5>
           </div>
         </div>
         <div className="row">
@@ -550,7 +557,6 @@ function ReviewTask() {
               <label>ค่าธรรมเนียม (5% ของค่าบริการ)</label>
               <Input
                 disabled
-                placeholder="0.0"
                 value={
                   data.data.fee !== null
                     ? numberWithCommas(parseFloat(data.data.fee))
@@ -574,6 +580,8 @@ function ReviewTask() {
               />
             </Form.Item>
           </div>
+        </div>
+        <div className="row">
           <div className="form-group col-lg-4">
             <label>รหัสคูปอง</label>
             <Input value={couponData.couponCode} disabled autoComplete="off" />
@@ -585,7 +593,28 @@ function ReviewTask() {
           <div className="form-group col-lg-4">
             <label>ส่วนลดคูปอง</label>
             <Input
+              suffix="บาท"
               value={numberWithCommas(couponData.couponDiscount!)}
+              disabled
+              autoComplete="off"
+            />
+          </div>
+        </div>
+        <div className="row pt-3">
+          <div className="form-group col-lg-6 p-2">
+            <label>โปรโมชั่นนักบินโดรน</label>
+            <Input
+              suffix="บาท"
+              value={data.data.discountPromotion || 0}
+              disabled
+              autoComplete="off"
+            />
+          </div>
+          <div className="form-group col-lg-6 p-2">
+            <label>โปรโมชั่นเกษตรกร</label>
+            <Input
+              suffix="บาท"
+              value={data.data.revenuePromotion || 0}
               disabled
               autoComplete="off"
             />

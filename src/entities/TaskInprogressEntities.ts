@@ -224,8 +224,8 @@ export interface TaskTodayListEntity {
 }
 export interface TaskDetailEntity {
   id: string;
-  couponId : string;
-  discount : string;
+  couponId: string;
+  discountCoupon: string;
   taskNo: string;
   farmerId: string;
   farmerPlotId: string;
@@ -267,11 +267,13 @@ export interface TaskDetailEntity {
   droner: DronerEntity;
   farmerPlot: FarmerPlotEntity;
   taskDronerTemp: TaskDronerTempEntity;
+  discountPromotion: string;
+  revenuePromotion: string;
 }
 export const TaskDetailEntity_INIT: TaskDetailEntity = {
   id: "",
-  couponId : "",
-  discount : "",
+  couponId: "",
+  discountCoupon: "",
   taskNo: "",
   farmerId: "",
   farmerPlotId: "",
@@ -313,6 +315,8 @@ export const TaskDetailEntity_INIT: TaskDetailEntity = {
   droner: DronerEntity_INIT,
   farmerPlot: FarmerPlotEntity_INIT,
   taskDronerTemp: TaskDronerTempEntity_INIT,
+  discountPromotion: "",
+  revenuePromotion: "",
 };
 export interface UpdateTask {
   taskId: string;
@@ -340,5 +344,3 @@ export const UpdateTask_INIT: UpdateTask = {
   dateDelay: "",
   delayRejectRemark: "",
 };
-
-
