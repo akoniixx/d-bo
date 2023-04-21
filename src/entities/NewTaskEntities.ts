@@ -110,7 +110,7 @@ export interface GetNewTaskEntity {
   unitPriceStandard: number;
   priceStandard: number;
   unitPrice: number;
-  price: number;
+  price: string;
   totalPrice: string;
   fee: number;
   discountFee: number;
@@ -129,6 +129,8 @@ export interface GetNewTaskEntity {
   droner: string;
   farmerPlot: FarmerPlotEntity;
   updatedAt?: string;
+  revenuePromotion: string;
+  discountPromotion: string;
 }
 export const GetNewTaskEntity_INIT: GetNewTaskEntity = {
   id: "",
@@ -154,7 +156,7 @@ export const GetNewTaskEntity_INIT: GetNewTaskEntity = {
   unitPriceStandard: 0,
   priceStandard: 0,
   unitPrice: 0,
-  price: 0,
+  price: "",
   totalPrice: "",
   fee: 0,
   discountFee: 0,
@@ -173,6 +175,8 @@ export const GetNewTaskEntity_INIT: GetNewTaskEntity = {
   droner: "",
   farmerPlot: FarmerPlotEntity_INIT,
   updatedAt: "",
+  revenuePromotion: "",
+  discountPromotion: "",
 };
 export interface UpdateNewTask {
   id: string;
@@ -189,7 +193,7 @@ export interface UpdateNewTask {
   unitPriceStandard: number;
   priceStandard: number;
   unitPrice: number;
-  price: number;
+  price: string;
   comment: string;
   fee: number;
   discountFee: number;
@@ -212,7 +216,7 @@ export const UpdateNewTask_INIT: UpdateNewTask = {
   unitPriceStandard: 0,
   priceStandard: 0,
   unitPrice: 0,
-  price: 0,
+  price: "",
   comment: "",
   fee: 0,
   discountFee: 0,
