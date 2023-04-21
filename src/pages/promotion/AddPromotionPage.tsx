@@ -1188,14 +1188,9 @@ export default function AddPromotion() {
                         </Checkbox>
                       </Form.Item>
                       <div
-                        className="col-lg-11"
                         style={{
-                          float: "right",
-                          alignContent: "right",
-                          alignItems: "right",
-                          display: "flex",
-                          justifyContent: "right",
-                          flexDirection: "column",
+                          paddingLeft: "16px",
+                          width: "100%",
                         }}
                       >
                         <Form.Item
@@ -1226,11 +1221,16 @@ export default function AddPromotion() {
                           >
                             {farmerList?.map((item: any) => (
                               <Option value={item.id}>
-                                {item.firstname +
-                                  " " +
-                                  item.lastname +
-                                  " | จังหวัด" +
-                                  item.provinceName}
+                                {item.provinceName
+                                  ? item.firstname +
+                                    " " +
+                                    item.lastname +
+                                    " | จังหวัด" +
+                                    item.provinceName
+                                  : item.firstname +
+                                    " " +
+                                    item.lastname +
+                                    " | -"}
                               </Option>
                             ))}
                           </Select>
@@ -1399,31 +1399,37 @@ export default function AddPromotion() {
                     },
                   ]}
                 >
-                  <Select
-                    disabled={!couponProvince}
-                    mode="multiple"
-                    className="col-lg-12 ps-5 pe-3"
-                    placeholder="เลือกจังหวัด"
-                    onChange={handleChangeProvince}
-                    showSearch
-                    value={province}
-                    allowClear
-                    optionFilterProp="children"
-                    filterOption={(input: any, option: any) =>
-                      option.children.includes(input)
-                    }
-                    filterSort={(optionA, optionB) =>
-                      optionA.children
-                        .toLowerCase()
-                        .localeCompare(optionB.children.toLowerCase())
-                    }
+                  <div
+                    style={{
+                      paddingLeft: "16px",
+                      width: "100%",
+                    }}
                   >
-                    {provinceList.map((item) => (
-                      <Option key={item} value={item}>
-                        {item}
-                      </Option>
-                    ))}
-                  </Select>
+                    <Select
+                      disabled={!couponProvince}
+                      mode="multiple"
+                      placeholder="เลือกจังหวัด"
+                      onChange={handleChangeProvince}
+                      showSearch
+                      value={province}
+                      allowClear
+                      optionFilterProp="children"
+                      filterOption={(input: any, option: any) =>
+                        option.children.includes(input)
+                      }
+                      filterSort={(optionA, optionB) =>
+                        optionA.children
+                          .toLowerCase()
+                          .localeCompare(optionB.children.toLowerCase())
+                      }
+                    >
+                      {provinceList.map((item) => (
+                        <Option key={item} value={item}>
+                          {item}
+                        </Option>
+                      ))}
+                    </Select>
+                  </div>
                 </Form.Item>
               </div>
               {/* <Divider /> */}
