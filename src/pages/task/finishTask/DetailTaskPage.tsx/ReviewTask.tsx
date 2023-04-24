@@ -44,12 +44,11 @@ import {
   DetailReviewTask,
   DetailReviewTask_INIT,
 } from "../../../../entities/TaskFinishEntities";
-import {
-  CreateReview,
-  CreateReview_INIT,
-} from "../../../../entities/ReviewDronerEntities";
 import { CouponDataSource } from "../../../../datasource/CouponDatasource";
-import { numberWithCommas } from "../../../../utilities/TextFormatter";
+import {
+  numberWithCommas,
+  numberWithCommasToFixed,
+} from "../../../../utilities/TextFormatter";
 
 const { Map } = require("immutable");
 const _ = require("lodash");
@@ -70,8 +69,7 @@ function ReviewTask() {
     couponDiscount: null,
   });
   const [data, setData] = useState<DetailReviewTask>(DetailReviewTask_INIT);
-  const [detailDroner, setDetailDroner] =
-    useState<CreateReview>(CreateReview_INIT);
+  const [detailDroner, setDetailDroner] = useState<any>();
   const [mapPosition, setMapPosition] = useState<{ lat: number; lng: number }>({
     lat: LAT_LNG_BANGKOK.lat,
     lng: LAT_LNG_BANGKOK.lng,
@@ -80,14 +78,16 @@ function ReviewTask() {
   const [saveRate, setSaveRate] = useState<boolean>(true);
   const fetchDetailTask = async () => {
     await TaskFinishedDatasource.getDetailFinishTaskById(taskId).then((res) => {
-      if(res.data.couponId !== null){
-        CouponDataSource.getPromotionCode(res.data.couponId).then(result => {
+      if (res.data.couponId !== null) {
+        CouponDataSource.getPromotionCode(res.data.couponId).then((result) => {
           setCouponData({
-            couponCode : res.data.couponCode??"",
-            couponDiscount : (!res.data.discount)?null:parseInt(res.data.discount),
-            couponName : result.couponName??""
-          })
-        })
+            couponCode: res.data.couponCode ?? "",
+            couponDiscount: !res.data.discountCoupon
+              ? null
+              : parseInt(res.data.discountCoupon),
+            couponName: result.couponName ?? "",
+          });
+        });
       }
       setData(res);
       setMapPosition({
@@ -105,7 +105,7 @@ function ReviewTask() {
     const m = Map(detailDroner).set("canReview", e.target.value);
     const n = Map(m.toJS()).set("taskId", taskId);
     setDetailDroner(n.toJS());
-    if (e.target.value == "Yes") {
+    if (e.target.value === "Yes") {
       setBtnSaveDisable(true);
       setSaveRate(false);
     } else {
@@ -139,13 +139,6 @@ function ReviewTask() {
     const n = Map(m.toJS()).set("taskId", taskId);
     setDetailDroner(n.toJS());
   };
-
-  const formatCurrency = (e: any) => {
-    e = parseFloat(e);
-    return e.toFixed(2).replace(/./g, function (c: any, i: any, a: any) {
-      return i > 0 && c !== "." && (a.length - i) % 3 === 0 ? "," + c : c;
-    });
-  };
   const onPreviewImg = async () => {
     let src = data.imageTaskUrl;
     if (!src) {
@@ -170,24 +163,21 @@ function ReviewTask() {
       showCloseButton: true,
     }).then(async (result) => {
       if (result.isConfirmed) {
-        const pushDetailReview = Map(data.data).set(
-          "reviewDronerDetail",
-          detailDroner
-        );
-        const p = Map(pushDetailReview.toJS().reviewDronerDetail).set(
-          "updateBy",
+        await TaskReviewDronerDatasource.UpdateReviewDroner(
+          data.data.id,
+          detailDroner.canReview,
+          detailDroner.pilotEtiquette,
+          detailDroner.punctuality,
+          detailDroner.sprayExpertise,
+          detailDroner.comment,
           profile.firstname + " " + profile.lastname
-        );
-        await TaskReviewDronerDatasource.UpdateReviewDroner(p.toJS()).then(
-          (time) => {
-            window.location.href = "/IndexFinishTask";
-          }
-        );
+        ).then((time) => {
+          window.location.href = "/IndexFinishTask";
+        });
       }
       fetchDetailTask();
     });
   };
-
   const renderAppointment = (
     <Form style={{ padding: "32px" }}>
       <div className="row">
@@ -527,19 +517,24 @@ function ReviewTask() {
     <Form style={{ padding: "20px" }}>
       <Form style={{ padding: "20px", backgroundColor: "#2196531A" }}>
         <div className="row">
-          <div className="col-lg">
-            <Form.Item>
-              <span>
-                ยอดรวมค่าบริการ
-                <br />
-                <b style={{ fontSize: "20px", color: color.Success }}>
-                  {data.data.totalPrice !== null
-                    ? numberWithCommas(parseFloat(data.data.totalPrice)) +
-                      " บาท"
-                    : "0 บาท"}
-                </b>
-              </span>
-            </Form.Item>
+          <div className="col-lg-3" style={{ borderRight: "solid" }}>
+            <label>ยอดรวมค่าบริการ (เกษตรกร)</label>
+            <h5 style={{ color: color.primary1 }} className="p-2">
+              {data?.data.totalPrice &&
+                numberWithCommasToFixed(parseFloat(data?.data.totalPrice))}{" "}
+              บาท
+            </h5>
+          </div>
+          <div className="col-lg-3" style={{ paddingLeft: "40px" }}>
+            <label>รายได้ที่นักบินโดรนได้รับ</label>
+            <h5 style={{ color: color.Warning }} className="p-2">
+              {data?.data.price &&
+                numberWithCommasToFixed(
+                  parseFloat(data?.data.price) +
+                    parseFloat(data?.data.revenuePromotion)
+                )}{" "}
+              บาท
+            </h5>
           </div>
         </div>
         <div className="row">
@@ -562,7 +557,6 @@ function ReviewTask() {
               <label>ค่าธรรมเนียม (5% ของค่าบริการ)</label>
               <Input
                 disabled
-                placeholder="0.0"
                 value={
                   data.data.fee !== null
                     ? numberWithCommas(parseFloat(data.data.fee))
@@ -586,6 +580,8 @@ function ReviewTask() {
               />
             </Form.Item>
           </div>
+        </div>
+        <div className="row">
           <div className="form-group col-lg-4">
             <label>รหัสคูปอง</label>
             <Input value={couponData.couponCode} disabled autoComplete="off" />
@@ -597,7 +593,28 @@ function ReviewTask() {
           <div className="form-group col-lg-4">
             <label>ส่วนลดคูปอง</label>
             <Input
+              suffix="บาท"
               value={numberWithCommas(couponData.couponDiscount!)}
+              disabled
+              autoComplete="off"
+            />
+          </div>
+        </div>
+        <div className="row pt-3">
+          <div className="form-group col-lg-6 p-2">
+            <label>โปรโมชั่นนักบินโดรน</label>
+            <Input
+              suffix="บาท"
+              value={data.data.discountPromotion || 0}
+              disabled
+              autoComplete="off"
+            />
+          </div>
+          <div className="form-group col-lg-6 p-2">
+            <label>โปรโมชั่นเกษตรกร</label>
+            <Input
+              suffix="บาท"
+              value={data.data.revenuePromotion || 0}
               disabled
               autoComplete="off"
             />

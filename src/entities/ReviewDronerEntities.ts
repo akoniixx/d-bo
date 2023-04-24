@@ -24,6 +24,7 @@ export interface CreateReview {
     pilotEtiquette: number;
     sprayExpertise: number;
     comment: string;
+    updateBy: string;
 }
 export const CreateReview_INIT : CreateReview = {
     taskId: "",
@@ -32,4 +33,5 @@ export const CreateReview_INIT : CreateReview = {
     pilotEtiquette: 0,
     sprayExpertise: 0,
     comment: "",
+    updateBy: ""
 }

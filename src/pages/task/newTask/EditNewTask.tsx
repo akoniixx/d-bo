@@ -75,7 +75,10 @@ import {
   TaskDronerTempEntity_INIT,
 } from "../../../entities/TaskDronerTemp";
 import ModalSelectedEditDroner from "../../../components/modal/task/newTask/ModalSelectedEditDroner";
-import { numberWithCommas } from "../../../utilities/TextFormatter";
+import {
+  numberWithCommas,
+  numberWithCommasToFixed,
+} from "../../../utilities/TextFormatter";
 import { TaskDronerTempDataSource } from "../../../datasource/TaskDronerTempDatasource";
 import Swal from "sweetalert2";
 import icon from "../../../resource/icon";
@@ -158,6 +161,7 @@ const EditNewTask = () => {
 
   const fetchNewTask = async () => {
     await TaskDatasource.getNewTaskById(queryString[1]).then(async (res) => {
+      console.log("res", res);
       delete res["updatedAt"];
       res.farmer.farmerPlot = [res.farmerPlot];
       res?.taskDronerTemp?.map((item) => _.set(item, "isChecked", true));
@@ -265,7 +269,7 @@ const EditNewTask = () => {
     newData.unitPriceStandard = 0;
     newData.priceStandard = 0;
     newData.unitPrice = 0;
-    newData.price = 0;
+    newData.price = "";
     newData.totalPrice = "";
     newData.fee = 0;
     newData.discountFee = 0;
@@ -314,7 +318,7 @@ const EditNewTask = () => {
       ...data,
     };
     payload.priceStandard = data.unitPriceStandard * parseFloat(e.target.value);
-    payload.price = data.unitPriceStandard * parseFloat(e.target.value);
+    payload.price = String(data.unitPriceStandard * parseFloat(e.target.value));
     payload.unitPriceStandard = data.unitPrice;
     payload.farmAreaAmount = e.target.value;
     setData(payload);
@@ -1606,10 +1610,28 @@ const EditNewTask = () => {
       <Form style={{ padding: "20px" }}>
         <CardContainer style={{ backgroundColor: "rgba(33, 150, 83, 0.1)" }}>
           <Form style={{ padding: "20px" }}>
-            <label>ยอดรวมค่าบริการ</label>
-            <h5 style={{ color: color.primary1 }} className="p-2">
-              {numberWithCommas(couponData?.netPrice)} บาท
-            </h5>
+            <div className="row">
+              <div className="col-lg-3">
+                <label>ยอดรวมค่าบริการ (เกษตรกร)</label>
+                <h5 style={{ color: color.primary1 }} className="p-2">
+                  {numberWithCommasToFixed(couponData?.netPrice)} บาท
+                </h5>
+              </div>
+              <div
+                className="col-lg-3"
+                style={{ paddingLeft: "40px", borderLeft: "solid" }}
+              >
+                <label>รายได้ที่นักบินโดรนได้รับ</label>
+                <h5 style={{ color: color.Warning }} className="p-2">
+                  {data?.price &&
+                    numberWithCommasToFixed(
+                      parseFloat(data?.price) +
+                        parseFloat(data?.revenuePromotion)
+                    )}{" "}
+                  บาท
+                </h5>
+              </div>
+            </div>
             <div className="row">
               <div className="form-group col-lg-4">
                 <label>ค่าบริการ (ก่อนคิดค่าธรรมเนียม)</label>
@@ -1662,7 +1684,28 @@ const EditNewTask = () => {
               <div className="form-group col-lg-4">
                 <label>ส่วนลดคูปอง</label>
                 <Input
+                  suffix="บาท"
                   value={numberWithCommas(couponData.priceCouponDiscount!)}
+                  disabled
+                  autoComplete="off"
+                />
+              </div>
+            </div>
+            <div className="row pt-3">
+              <div className="form-group col-lg-6 p-2">
+                <label>โปรโมชั่นนักบินโดรน</label>
+                <Input
+                  suffix="บาท"
+                  value={data.discountPromotion}
+                  disabled
+                  autoComplete="off"
+                />
+              </div>
+              <div className="form-group col-lg-6 p-2">
+                <label>โปรโมชั่นเกษตรกร</label>
+                <Input
+                  suffix="บาท"
+                  value={data.revenuePromotion}
                   disabled
                   autoComplete="off"
                 />
@@ -1705,14 +1748,14 @@ const EditNewTask = () => {
       const payload = { ...data };
       if (selectionType == "checkbox") {
         payload.status = "WAIT_RECEIVE";
-        payload.fee = payload.price * 0.05;
-        payload.discountFee = payload.price * 0.05;
+        payload.fee = parseFloat(payload.price) * 0.05;
+        payload.discountFee = parseFloat(payload.price) * 0.05;
         setData(payload);
       } else {
         payload.status = "WAIT_START";
         payload.dronerId = dronerSelected[0].droner_id;
-        payload.fee = payload.price * 0.05;
-        payload.discountFee = payload.price * 0.05;
+        payload.fee = parseFloat(payload.price) * 0.05;
+        payload.discountFee = parseFloat(payload.price) * 0.05;
         setData(payload);
       }
     }

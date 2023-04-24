@@ -1,15 +1,31 @@
-import { CreateReview } from './../entities/ReviewDronerEntities';
 import { BASE_URL, httpClient } from "../config/develop-config";
 
 export class TaskReviewDronerDatasource {
-  static UpdateReviewDroner(data : CreateReview ): Promise<any> {
+  static async UpdateReviewDroner(
+    taskId: string,
+    canReview: string,
+    pilotEtiquette: number,
+    punctuality: number,
+    sprayExpertise: number,
+    comment: string,
+    updateBy: string,
+  ): Promise<any> {
+    const params = {
+      taskId: taskId,
+      canReview: canReview,
+      pilotEtiquette: pilotEtiquette,
+      punctuality: punctuality,
+      sprayExpertise: sprayExpertise,
+      comment: comment,
+      updateBy: updateBy,
+    };
     return httpClient
-      .post(BASE_URL + "/tasks/task/review-droner/" + data)
-      .then((response) => {
+      .post(BASE_URL + '/tasks/task/review-droner', params)
+      .then(response => {
         return response.data;
       })
-      .catch((error) => {
-        console.log(error);
+      .catch(err => {
+        throw err;
       });
   }
 }

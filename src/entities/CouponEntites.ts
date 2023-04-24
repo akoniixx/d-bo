@@ -64,7 +64,7 @@ export interface CouponKeepByFarmer {
     couponName: string,
     couponType: string,
     promotionStatus: string,
-    "promotionType": "ONLINE",
+    promotionType: string,
     "discountType": "DISCOUNT",
     "discount": 200,
     "count": 100,
