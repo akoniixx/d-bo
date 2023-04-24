@@ -142,6 +142,7 @@ const AddNewTask = () => {
   const [farmerPlotId, setFarmerPlotId] = useState<string>("");
   const [discountResult, setDiscountResult] = useState<number | null>();
   const [loading, setLoading] = useState<boolean>(true);
+  const [couponKeepList, setCouponKeepList] = useState("");
 
   const fetchFarmerList = async (text?: string) => {
     await TaskDatasource.getFarmerList(text).then((res) => {
@@ -1608,7 +1609,6 @@ const AddNewTask = () => {
               <div className="form-group col-lg-4">
                 <label>หรือเลือกคูปอง (คูปองที่เกษตรกรเก็บในระบบ)</label>
                 <Select
-                  disabled
                   placeholder="เลือกคูปอง"
                   style={{
                     width: "100%",
