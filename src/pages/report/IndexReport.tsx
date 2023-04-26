@@ -81,7 +81,7 @@ interface DataType {
   discountFee: string;
   price: string;
   fee: string;
-  discount: string;
+  discountCoupon: string;
   taskHistory: string;
 }
 function IndexReport() {
@@ -708,7 +708,7 @@ function IndexReport() {
                       </tr>
                       <tr>
                         <td>ส่วนลดจากคูปอง</td>
-                        <td>{numberWithCommas(row.discount) + " บาท"}</td>
+                        <td>{numberWithCommas(row.discountCoupon) + " บาท"}</td>
                       </tr>
                       <tr>
                         <td>
@@ -1251,7 +1251,7 @@ function IndexReport() {
         discountFee: `${getData?.data.map((x) => x.discountFee)[i]}`,
         price: `${getData?.data.map((x) => x.price)[i]}`,
         fee: `${getData?.data.map((x) => x.fee)[i]}`,
-        discount: `${getData?.data.map((x) => x.discount)[i]}`,
+        discountCoupon: `${getData?.data.map((x) => x.discountCoupon)[i]}`,
         action: `${getData?.data.map((x) => x.id)[i]}`,
         taskHistory: `${
           getData?.data.map((x) =>

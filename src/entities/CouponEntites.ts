@@ -28,6 +28,11 @@ export interface CouponEntities {
   couponConditionProvinceList: string[];
   createBy: string;
 }
+export interface CouponKeepList extends CouponEntities {
+  updateAt?: string;
+  speciticFarmer?: boolean;
+  speciticFarmerList?: string[];
+}
 
 export interface CouponPlantList {
   id?: string;
@@ -58,19 +63,5 @@ export interface CouponKeepByFarmer {
   offlineCode: string;
   createAt: string;
   updateAt: string;
-  promotion: {
-    id:string,
-    couponCode: string,
-    couponName: string,
-    couponType: string,
-    promotionStatus: string,
-    promotionType: string,
-    "discountType": "DISCOUNT",
-    "discount": 200,
-    "count": 100,
-    "keep": 98,
-    "used": 1,
-    "point": null,
-    "startDate": "2023-04-19T10:49:07.000Z",
-    "expiredDate": "2023-04-25T10:49:07.000Z"}
+  promotion: CouponKeepList;
 }

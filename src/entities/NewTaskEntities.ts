@@ -51,6 +51,7 @@ export interface CreateNewTaskEntity {
   targetSpray: string[];
   preparationBy: string;
   purposeSprayId: string;
+  purposeSprayName? : string;
   taskDronerTemp?: CreateDronerTempEntity[];
   status: string;
   statusRemark: string;

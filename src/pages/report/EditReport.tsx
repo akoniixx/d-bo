@@ -665,20 +665,28 @@ function EditReport() {
     <Form style={{ padding: "20px" }}>
       <Form style={{ padding: "20px", backgroundColor: "#2196531A" }}>
         <div className="row">
-          <div className="col-lg">
-            <Form.Item>
-              <span>
-                ยอดรวมค่าบริการ
-                <br />
-                <b style={{ fontSize: "20px", color: color.Success }}>
-                  {data.data.totalPrice !== null
-                    ? numberWithCommasToFixed(
-                        parseFloat(data.data.totalPrice)
-                      ) + " บาท"
-                    : "0 บาท"}
-                </b>
-              </span>
-            </Form.Item>
+          <div className="col-lg-3">
+            <label>ยอดรวมค่าบริการ (เกษตรกร)</label>
+            <h5 style={{ color: color.Success }} className="p-2">
+              {data.data.totalPrice !== null
+                ? numberWithCommasToFixed(parseFloat(data.data.totalPrice)) +
+                  " บาท"
+                : "0 บาท"}
+            </h5>
+          </div>
+          <div
+            className="col-lg-3"
+            style={{ paddingLeft: "40px", borderLeft: "solid" }}
+          >
+            <label>รายได้ที่นักบินโดรนได้รับ</label>
+            <h5 style={{ color: color.Warning }} className="p-2">
+              {data?.data.price &&
+                numberWithCommasToFixed(
+                  parseFloat(data?.data.price) +
+                    parseFloat(data?.data.revenuePromotion)
+                )}{" "}
+              บาท
+            </h5>
           </div>
         </div>
         <div className="row">
@@ -725,6 +733,8 @@ function EditReport() {
               />
             </Form.Item>
           </div>
+        </div>
+        <div className="row">
           <div className="form-group col-lg-4">
             <label>รหัสคูปอง</label>
             <Input
@@ -745,6 +755,26 @@ function EditReport() {
             <label>ส่วนลดคูปอง</label>
             <Input
               value={numberWithCommasToFixed(couponData.couponDiscount!)}
+              disabled
+              autoComplete="off"
+            />
+          </div>
+        </div>
+        <div className="row pt-3">
+          <div className="form-group col-lg-6 p-2">
+            <label>โปรโมชั่นนักบินโดรน</label>
+            <Input
+              suffix="บาท"
+              value={data.data.discountPromotion}
+              disabled
+              autoComplete="off"
+            />
+          </div>
+          <div className="form-group col-lg-6 p-2">
+            <label>โปรโมชั่นเกษตรกร</label>
+            <Input
+              suffix="บาท"
+              value={data.data.revenuePromotion}
               disabled
               autoComplete="off"
             />
