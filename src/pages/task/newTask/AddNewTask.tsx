@@ -158,11 +158,7 @@ const AddNewTask = () => {
     });
   };
   const fetchCouponKeep = async (id?: string) => {
-    console.log("check plant", cropSelected);
-    console.log("check plot province", farmerPlotSeleced.plotArea.provinceName);
-    console.log("check plot purpose", createNewTask.purposeSprayName);
     await CouponDataSource.getCouponKeepByFarmerId(id).then((res) => {
-      console.log(res);
       setCouponKeepList(res);
     });
   };
@@ -367,7 +363,6 @@ const AddNewTask = () => {
 
   const checkCoupon = (section: number, e: any) => {
     if (section === 1) {
-      console.log(1);
       CouponDataSource.getCoupon(couponCode).then((result) => {
         if (!result.userMessage) {
           if (result.canUsed) {
@@ -387,11 +382,9 @@ const AddNewTask = () => {
         }
       });
     } else {
-      console.log(2);
       const mapCoupon = couponKeepList?.find((x) => x.promotion.id === e);
       setCouponId(mapCoupon?.promotion?.id || "");
       setCouponCode(mapCoupon?.promotion.couponCode || "");
-      console.log(mapCoupon);
       calculatePrice();
     }
   };
@@ -411,7 +404,6 @@ const AddNewTask = () => {
           ? createNewTask.price
           : res.responseData.priceCouponDiscount;
       setDiscountResult(calCoupon);
-      console.log(calCoupon);
     });
   };
 
@@ -1791,7 +1783,6 @@ const AddNewTask = () => {
     );
     setCurrent(current + 1);
     couponId && calculatePrice();
-    console.log("id", createNewTask.farmerId);
     fetchCouponKeep(createNewTask.farmerId);
   };
 
