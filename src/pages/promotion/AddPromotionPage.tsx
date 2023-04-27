@@ -69,7 +69,7 @@ export default function AddPromotion() {
   const [coupon, setCoupon] = useState<string | null>(null);
   const [couponType, setCouponType] = useState<string | null>(null);
   const [couponInfo, setCouponInfo] = useState<string | null>(null);
-  const [specialCoupon, setSpecialCoupon] = useState<boolean>(false);
+  const [conditionSpecialFirsttime, setConditionSpecialFirsttime] = useState<boolean>(false);
   const [specificFarmer, setSpecificFarmer] = useState<boolean>(false);
   const [raiCondition, setRaiCondition] = useState<boolean>(false);
   const [serviceCondition, setServiceCondition] = useState<boolean>(false);
@@ -363,9 +363,9 @@ export default function AddPromotion() {
   };
 
   const handleSpecialCoupon = () => {
-    setSpecialCoupon(!specialCoupon);
+    setConditionSpecialFirsttime(!conditionSpecialFirsttime);
     form.setFieldsValue({
-      registerFirstTime: !specialCoupon,
+      registerFirstTime: !conditionSpecialFirsttime,
     });
   };
 
@@ -671,7 +671,7 @@ export default function AddPromotion() {
       expiredDate: new Date(expiredDate),
       description: description,
       condition: condition,
-      specialCondition: specialCoupon,
+      conditionSpecialFirsttime: conditionSpecialFirsttime,
       couponConditionRai: raiCheckbox ?? false,
       couponConditionRaiMin: couponConditionRaiMin,
       couponConditionRaiMax: couponConditionRaiMax,
@@ -679,7 +679,7 @@ export default function AddPromotion() {
       couponConditionServiceMin: couponConditionServiceMin,
       couponConditionServiceMax: couponConditionServiceMax,
       couponConditionPlant: plantCheckbox ?? false,
-      couponConditionPlantList: cropForm,
+      couponConditionPlantList: plantCheckbox ? cropForm : null,
       couponConditionProvince: provinceCheckbox ?? false,
       couponConditionProvinceList: province,
     };
@@ -1161,10 +1161,10 @@ export default function AddPromotion() {
               <div className="row">
                 <div className="form-group col-lg-12 d-flex flex-column">
                   <label>เงื่อนไขการได้รับพิเศษ</label>
-                  <Form.Item name="specialCondition" valuePropName="checked">
+                  <Form.Item name="conditionSpecialFirsttime" valuePropName="checked">
                     <Checkbox
                       onChange={handleSpecialCoupon}
-                      checked={specialCoupon}
+                      checked={conditionSpecialFirsttime}
                       className="pt-3"
                     >
                       ลงทะเบียนใช้งานครั้งแรก

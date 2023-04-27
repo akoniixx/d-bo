@@ -65,7 +65,7 @@ function EditPromotion() {
   const [coupon, setCoupon] = useState<string | null>(null);
   const [couponType, setCouponType] = useState<string | null>(null);
   const [couponInfo, setCouponInfo] = useState<string | null>(null);
-  const [specialCoupon, setSpecialCoupon] = useState<boolean>(false);
+  const [conditionSpecialFirsttime, setConditionSpecialFirsttime] = useState<boolean>(false);
   const [raiCondition, setRaiCondition] = useState<boolean>(false);
   const [serviceCondition, setServiceCondition] = useState<boolean>(false);
   const [couponPlant, setCouponPlant] = useState<boolean>(false);
@@ -110,7 +110,6 @@ function EditPromotion() {
   const getPromotion = (id: string) => {
     CouponDataSource.queryCoupon(id)
       .then(async (res) => {
-        console.log("edit", res);
         form.setFieldsValue({
           couponName: res.couponName,
           couponType: res.couponType,
@@ -133,7 +132,7 @@ function EditPromotion() {
           TimeExpired: !res.expiredDate
             ? moment(new Date().toUTCString())
             : moment(new Date(res.expiredDate).getTime()),
-          specialCondition: res.specialCondition,
+          conditionSpecialFirsttime: res.conditionSpecialFirsttime,
           raiCheckbox: res.couponConditionRai,
           serviceCheckbox: res.couponConditionService,
           plantCheckbox: res.couponConditionPlant,
@@ -144,7 +143,7 @@ function EditPromotion() {
           provinceCheckbox: res.couponConditionProvince,
           couponConditionProvinceList: res.couponConditionProvinceList,
         });
-        setSpecialCoupon(res.specialCondition ?? false);
+        setConditionSpecialFirsttime(res.conditionSpecialFirsttime ?? false);
         setRaiCondition(res.couponConditionRai ?? false);
         setServiceCondition(res.couponConditionService ?? false);
         setCouponPlant(res.couponConditionPlant ?? false);
@@ -431,10 +430,10 @@ function EditPromotion() {
     setCouponInfo(info);
   };
 
-  const handleSpecialCoupon = () => {
-    setSpecialCoupon(!specialCoupon);
+  const handleConditionSpecialFirsttime = () => {
+    setConditionSpecialFirsttime(!conditionSpecialFirsttime);
     form.setFieldsValue({
-      registerFirstTime: !specialCoupon,
+      registerFirstTime: !conditionSpecialFirsttime,
     });
   };
 
@@ -724,7 +723,7 @@ function EditPromotion() {
       expiredDate: new Date(expiredDate),
       description: description,
       condition: condition,
-      specialCondition: specialCoupon,
+      conditionSpecialFirsttime: conditionSpecialFirsttime,
       couponConditionRai: raiCheckbox,
       couponConditionRaiMin: couponConditionRaiMin,
       couponConditionRaiMax: couponConditionRaiMax,
@@ -984,6 +983,7 @@ function EditPromotion() {
                     ]}
                   >
                     <Select
+                      disabled
                       className="col-lg-12 p-1"
                       placeholder="เลือกการรับคูปอง"
                       onChange={handleCouponInfo}
@@ -1205,10 +1205,10 @@ function EditPromotion() {
               <div className="row">
                 <div className="form-group col-lg-12 d-flex flex-column">
                   <label>เงื่อนไขการได้รับพิเศษ</label>
-                  <Form.Item name="specialCondition" valuePropName="checked">
+                  <Form.Item name="conditionSpecialFirsttime" valuePropName="checked">
                     <Checkbox
-                      onChange={handleSpecialCoupon}
-                      checked={specialCoupon}
+                      onChange={handleConditionSpecialFirsttime}
+                      checked={conditionSpecialFirsttime}
                       className="pt-3"
                     >
                       ลงทะเบียนใช้งานครั้งแรก

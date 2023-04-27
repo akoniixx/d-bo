@@ -15,7 +15,7 @@ export interface CouponEntities{
     expiredDate? : Date;
     description : string;
     condition : string;
-    specialCondition : boolean;
+    conditionSpecialFirsttime : boolean;
     couponConditionRai : boolean;
     couponConditionRaiMin : number;
     couponConditionRaiMax : number;
@@ -23,7 +23,7 @@ export interface CouponEntities{
     couponConditionServiceMin : number;
     couponConditionServiceMax : number;
     couponConditionPlant : boolean;
-    couponConditionPlantList : CouponPlantList[];
+    couponConditionPlantList : CouponPlantList[] | null;
     couponConditionProvince : boolean;
     couponConditionProvinceList : string[];
     createBy : string;

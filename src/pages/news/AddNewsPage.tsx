@@ -12,9 +12,12 @@ import { formats, modules } from '../../components/editor/EditorToolbar';
 import ReactQuill from 'react-quill';
 import FooterPage from '../../components/footer/FooterPage';
 import RenderNews from '../../components/mobile/RenderNews';
+import { NewsDatasource } from '../../datasource/NewsDatasource';
+import Swal from 'sweetalert2';
 const { Map } = require("immutable");
 
 function AddNewsPage() {
+  const profile = JSON.parse(localStorage.getItem("profile") || "{  }");
   const [imgProfile, setImgProfile] = useState<any>();
   const [chooseFarmer,setChooseFarmer] = useState<boolean>(false)
   const [chooseDroner,setChooseDroner] = useState<boolean>(false)
@@ -57,7 +60,6 @@ function AddNewsPage() {
     );
     const e = Map(d.toJS()).set("resource", "FARMER");
     const f = Map(e.toJS()).set("category", "PROFILE_IMAGE");
-    console.log(f.toJS().file)
     setCreateImgProfile(f.toJS());
   };
 
@@ -148,8 +150,39 @@ function AddNewsPage() {
     else{
       fieldimg = false
     }
-    console.log(fieldInfo , fieldapp , fieldimg)
     setBtnSaveDisable(fieldInfo || fieldapp || fieldimg)
+  }
+
+  const onSubmit = ()=>{
+    const {
+      newsName,
+      newsDescription,
+      newsStatus
+    } = form.getFieldsValue()
+    NewsDatasource.addNews({
+      title : newsName,
+      details : newsDescription,
+      status : newsStatus,
+      application : application,
+      file : createImgProfile.file,
+      createBy : profile.firstname + " " + profile.lastname,
+    }).then(res => {
+      Swal.fire({
+        title: "บันทึกสำเร็จ",
+        icon: "success",
+        timer: 1500,
+        showConfirmButton: false,
+      }).then((time) => {
+        window.location.href = "/NewsPage";
+      });
+    }).catch((err) => {
+      console.log(err);
+      Swal.fire({
+        title: "เกิดข้อผิดพลาก",
+        icon: "error",
+        showConfirmButton: true,
+      });
+    });
   }
 
   return (
@@ -321,9 +354,7 @@ function AddNewsPage() {
           <FooterPage
             disableSaveBtn={saveBtnDisable}
             onClickBack={() => navigate(-1)}
-            onClickSave={() => {
-              // setModalSave(true);
-            }}
+            onClickSave={onSubmit}
           />
         </div>
       </div>
