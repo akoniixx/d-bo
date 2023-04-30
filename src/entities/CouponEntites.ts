@@ -65,3 +65,10 @@ export interface CouponKeepByFarmer {
   updateAt: string;
   promotion: CouponKeepList;
 }
+
+export interface CouponFarmerUsed {
+  id: string | null | undefined;
+  farmerId: string | null | undefined;
+  promotionId: string | null | undefined;
+  offlineCode?: string | null | undefined;
+}

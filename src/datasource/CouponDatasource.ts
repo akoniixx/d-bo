@@ -1,6 +1,6 @@
 import { BASE_URL, httpClient } from "../config/develop-config";
 import { GetTaskCoupon } from "../entities/CalculateTask";
-import { CouponEntities } from "../entities/CouponEntites";
+import { CouponEntities, CouponFarmerUsed } from "../entities/CouponEntites";
 
 export class CouponDataSource {
   static getCoupon(code: string) {
@@ -131,6 +131,15 @@ export class CouponDataSource {
   static getCouponKeepByFarmerId(id?: string) {
     return httpClient
       .get(BASE_URL + `/promotion/farmer-promotions/queryall/${id}`)
+      .then((res) => {
+        return res.data;
+      })
+      .catch((err) => console.log(err));
+  }
+
+  static updateCouponFarmerUsed(data: CouponFarmerUsed) {
+    return httpClient
+      .post(BASE_URL + `/promotion/farmer-promotions/used`, data)
       .then((res) => {
         return res.data;
       })

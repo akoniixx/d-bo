@@ -161,7 +161,6 @@ const EditNewTask = () => {
 
   const fetchNewTask = async () => {
     await TaskDatasource.getNewTaskById(queryString[1]).then(async (res) => {
-      console.log("res", res);
       delete res["updatedAt"];
       res.farmer.farmerPlot = [res.farmerPlot];
       res?.taskDronerTemp?.map((item) => _.set(item, "isChecked", true));
@@ -450,6 +449,9 @@ const EditNewTask = () => {
                         onSearch={(e: any) => setSearchFarmer(e)}
                         onSelect={onSelectFarmer}
                         onChange={handleSearchFarmer}
+                        disabled={
+                          parseFloat(data.discountCoupon) === 0 ? false : true
+                        }
                       >
                         {farmerList?.map((item) => (
                           <Option
@@ -472,6 +474,9 @@ const EditNewTask = () => {
                       color: color.Success,
                     }}
                     onClick={handleSelectFarmer}
+                    disabled={
+                      parseFloat(data.discountCoupon) === 0 ? false : true
+                    }
                   >
                     เลือกเกษตรกร
                   </Button>
@@ -504,7 +509,11 @@ const EditNewTask = () => {
                       <Select
                         status={checkSelectPlot}
                         placeholder="เลือกแปลง"
-                        disabled={current == 2}
+                        disabled={
+                          current == 2 || parseFloat(data.discountCoupon) === 0
+                            ? false
+                            : true
+                        }
                         onChange={handleSelectFarmerPlot}
                         defaultValue={data?.farmerPlotId}
                       >
@@ -539,7 +548,13 @@ const EditNewTask = () => {
                         }
                         value={data?.farmAreaAmount}
                         onChange={handleAmountRai}
-                        disabled={current == 2 || checkSelectPlot == "error"}
+                        disabled={
+                          current == 2 ||
+                          checkSelectPlot == "error" ||
+                          parseFloat(data.discountCoupon) === 0
+                            ? false
+                            : true
+                        }
                       />
                       {parseFloat(data?.farmAreaAmount) >
                         (farmerPlotSeleced.raiAmount == undefined
@@ -794,7 +809,13 @@ const EditNewTask = () => {
               <Select
                 key={data?.purposeSprayId}
                 placeholder="-"
-                disabled={current == 2 || checkSelectPlot == "error"}
+                disabled={
+                  current == 2 ||
+                  checkSelectPlot == "error" ||
+                  parseFloat(data.discountCoupon) === 0
+                    ? false
+                    : true
+                }
                 defaultValue={data?.purposeSprayId}
                 onChange={handlePeriodSpray}
               >
@@ -826,7 +847,13 @@ const EditNewTask = () => {
                   key={data.targetSpray[0]}
                   type="checkbox"
                   value={x.crop}
-                  disabled={current == 2 || checkSelectPlot == "error"}
+                  disabled={
+                    current == 2 ||
+                    checkSelectPlot == "error" ||
+                    parseFloat(data.discountCoupon) === 0
+                      ? false
+                      : true
+                  }
                   checked={x.isChecked}
                   onChange={handlePurposeSpray}
                 />{" "}
@@ -1786,7 +1813,7 @@ const EditNewTask = () => {
     updateTask.discountFee = data.discountFee;
     updateTask.couponCode = data.couponCode;
     updateTask.couponId = couponData.couponId;
-    updateTask.discount = couponData.priceCouponDiscount!;
+    updateTask.discountCoupon = couponData.priceCouponDiscount!;
     Swal.fire({
       title: "ยืนยันการแก้ไข",
       text: "โปรดตรวจสอบรายละเอียดที่คุณต้องการแก้ไขข้อมูลก่อนเสมอ เพราะอาจส่งผลต่อการจ้างงานในระบบ",
@@ -1798,6 +1825,7 @@ const EditNewTask = () => {
     }).then(async (result) => {
       if (result.isConfirmed) {
         await TaskDatasource.updateNewTask(updateTask).then((res) => {
+          console.log("edit", res);
           if (res.userMessage == "success") {
             window.location.href = "/IndexNewTask";
           }
