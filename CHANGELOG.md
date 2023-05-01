@@ -1,4 +1,15 @@
 ## [Version - 0]
+## improve [v0.25.06] 2023-04-21
+- added discount promotion & discount coupon & revenue promotion in task menu
+## Fix [v0.25.05] 2023-04-20
+- set loading in edit page
+## Fix [v0.25.04] 2023-04-20
+- fixed filter status 
+- fixed button download in edit report 
+- fixed search in report index page 
+- fixed wording modal update statusPayment
+- set loading when download report
+- fixed update status review in finished page
 ## Fix [v0.25.03] 2023-04-10
 - fixed edit coupon
 - fixed layout preview mobile

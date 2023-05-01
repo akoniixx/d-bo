@@ -45,4 +45,27 @@ export class NewsDatasource{
         .then(res => {return res.data})
         .catch(err => console.log(err))
     }
+
+    static editNews(data : NewsEntities){
+        const formData = new FormData();
+        if(!data.file){
+            formData.append("title",data.title)
+            formData.append("details",data.details)
+            formData.append("status",data.status)
+            formData.append("createBy",data.createBy)
+            formData.append("application",data.application)
+        }
+        else{
+            formData.append("file",data.file)
+            formData.append("title",data.title)
+            formData.append("details",data.details)
+            formData.append("status",data.status)
+            formData.append("createBy",data.createBy)
+            formData.append("application",data.application)
+        }
+        return httpClient
+        .post(BASE_URL + `/promotion/news/update/${data.id}`,formData)
+        .then(res => {return res.data})
+        .catch(err => console.log(err))
+    }
 }

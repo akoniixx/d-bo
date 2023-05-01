@@ -88,7 +88,9 @@ function EditWaitStart() {
         CouponDataSource.getPromotionCode(res.couponId).then((result) =>
           setCouponData({
             couponCode: result.couponCode ?? "",
-            couponDiscount: !res.discount ? null : parseInt(res.discount),
+            couponDiscount: !res.discountCoupon
+              ? null
+              : parseInt(res.discountCoupon),
             couponName: result.couponName ?? "",
           })
         );
@@ -680,18 +682,23 @@ function EditWaitStart() {
     <Form style={{ padding: "20px" }}>
       <Form style={{ padding: "20px", backgroundColor: "#2196531A" }}>
         <div className="row">
-          <div className="col-lg">
-            <Form.Item>
-              <span>
-                ยอดรวมค่าบริการ
-                <br />
-                <b style={{ fontSize: "20px", color: color.Success }}>
-                  {data.totalPrice !== null
-                    ? numberWithCommas(parseFloat(data.totalPrice)) + " บาท"
-                    : "0 บาท"}
-                </b>
-              </span>
-            </Form.Item>
+          <div className="col-lg-3" style={{ borderRight: "solid" }}>
+            <label>ยอดรวมค่าบริการ (เกษตรกร)</label>
+            <h5 style={{ color: color.primary1 }} className="p-2">
+              {data?.totalPrice &&
+                numberWithCommas(parseFloat(data?.totalPrice))}{" "}
+              บาท
+            </h5>
+          </div>
+          <div className="col-lg-3" style={{ paddingLeft: "40px" }}>
+            <label>รายได้ที่นักบินโดรนได้รับ</label>
+            <h5 style={{ color: color.Warning }} className="p-2">
+              {data?.price &&
+                numberWithCommas(
+                  parseFloat(data?.price) + parseFloat(data?.revenuePromotion)
+                )}{" "}
+              บาท
+            </h5>
           </div>
         </div>
         <div className="row">
@@ -738,6 +745,8 @@ function EditWaitStart() {
               />
             </Form.Item>
           </div>
+        </div>
+        <div className="row">
           <div className="form-group col-lg-4">
             <label>รหัสคูปอง</label>
             <Input value={couponData.couponCode} disabled autoComplete="off" />
@@ -749,7 +758,28 @@ function EditWaitStart() {
           <div className="form-group col-lg-4">
             <label>ส่วนลดคูปอง</label>
             <Input
+              suffix="บาท"
               value={numberWithCommas(couponData.couponDiscount!)}
+              disabled
+              autoComplete="off"
+            />
+          </div>
+        </div>
+        <div className="row pt-3">
+          <div className="form-group col-lg-6 p-2">
+            <label>โปรโมชั่นนักบินโดรน</label>
+            <Input
+              suffix="บาท"
+              value={data.discountPromotion}
+              disabled
+              autoComplete="off"
+            />
+          </div>
+          <div className="form-group col-lg-6 p-2">
+            <label>โปรโมชั่นเกษตรกร</label>
+            <Input
+              suffix="บาท"
+              value={data.revenuePromotion}
               disabled
               autoComplete="off"
             />

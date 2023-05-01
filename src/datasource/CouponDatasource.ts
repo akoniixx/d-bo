@@ -49,86 +49,91 @@ export class CouponDataSource {
   }
 
   static getCoupons(
-    page : number,
-    take : number,
-    sortStatus? : string,
-    sortCoupon? : string,
-    sortType? : string,
-    startDate? : string,
-    expiredDate? : string,
-    search? : string
-  ){
+    page: number,
+    take: number,
+    sortStatus?: string,
+    sortCoupon?: string,
+    sortType?: string,
+    startDate?: string,
+    expiredDate?: string,
+    search?: string
+  ) {
     const params = {
-      page : page,
-      take : take,
-      sortStatus : sortStatus,
-      sortCoupon : sortCoupon,
-      sortType : sortType,
-      startDate : startDate,
-      expiredDate : expiredDate,
-      search : search
-    }
-    return httpClient.get(
-      BASE_URL + '/promotion/promotions',{params}
-    ).then((response) => {
-      return response.data;
-    })
-    .catch((err) => {
-      console.log(err, "err getCoupon");
-    });
+      page: page,
+      take: take,
+      sortStatus: sortStatus,
+      sortCoupon: sortCoupon,
+      sortType: sortType,
+      startDate: startDate,
+      expiredDate: expiredDate,
+      search: search,
+    };
+    return httpClient
+      .get(BASE_URL + "/promotion/promotions", { params })
+      .then((response) => {
+        return response.data;
+      })
+      .catch((err) => {
+        console.log(err, "err getCoupon");
+      });
   }
 
-  static queryCoupon(id : string){
-    return httpClient.get(
-      BASE_URL + `/promotion/promotions/${id}`
-    ).then((res) => {
-      return res.data;
-    })
-    .catch((err) => console.log(err));
+  static queryCoupon(id: string) {
+    return httpClient
+      .get(BASE_URL + `/promotion/promotions/${id}`)
+      .then((res) => {
+        return res.data;
+      })
+      .catch((err) => console.log(err));
   }
 
-  static addCoupon(couponDto : CouponEntities){
-    return httpClient.post(
-      BASE_URL + '/promotion/promotions',couponDto
-    ).then((res) => {
-      return res.data;
-    })
-    .catch((err) => console.log(err));
+  static addCoupon(couponDto: CouponEntities) {
+    return httpClient
+      .post(BASE_URL + "/promotion/promotions", couponDto)
+      .then((res) => {
+        return res.data;
+      })
+      .catch((err) => console.log(err));
   }
 
-  static patchCoupon(id : string,couponDto : CouponEntities){
-    return httpClient.patch(
-      BASE_URL + `/promotion/promotions/${id}`,couponDto
-    ).then((res) => {
-      return res.data;
-    })
-    .catch((err) => console.log(err));
+  static patchCoupon(id: string, couponDto: CouponEntities) {
+    return httpClient
+      .patch(BASE_URL + `/promotion/promotions/${id}`, couponDto)
+      .then((res) => {
+        return res.data;
+      })
+      .catch((err) => console.log(err));
   }
 
-  static deleteCoupon(id : string){
-    return httpClient.delete(
-      BASE_URL + `/promotion/promotions/${id}`
-    ).then((res) => {
-      return res.data;
-    })
-    .catch((err) => console.log(err));
+  static deleteCoupon(id: string) {
+    return httpClient
+      .delete(BASE_URL + `/promotion/promotions/${id}`)
+      .then((res) => {
+        return res.data;
+      })
+      .catch((err) => console.log(err));
   }
 
-  static getAllOffline(  
-    id : string,  
-    page : number,
-    take : number,
-  ){
+  static getAllOffline(id: string, page: number, take: number) {
     const params = {
-      id : id,
-      page : page,
-      take : take
-    }
-    return httpClient.get(
-      BASE_URL + `/promotion/promotions/alloffline`,{params}
-    ).then((res) => {
-      return res.data;
-    })
-    .catch((err) => console.log(err));
+      id: id,
+      page: page,
+      take: take,
+    };
+    return httpClient
+      .get(BASE_URL + `/promotion/promotions/alloffline`, { params })
+      .then((res) => {
+        return res.data;
+      })
+      .catch((err) => console.log(err));
+  }
+
+  static getCouponKeepByFarmerId(id?: string) {
+    return httpClient
+      .get(BASE_URL + `/promotion/farmer-promotions/queryall/${id}`)
+      .then((res) => {
+        return res.data;
+      })
+      .catch((err) => console.log(err));
   }
 }

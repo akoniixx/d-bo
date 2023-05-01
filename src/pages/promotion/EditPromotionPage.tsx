@@ -39,6 +39,9 @@ import ModalDeleteCoupon from "../../components/modal/ModalDeleteCoupon";
 import RenderMobile from "../../components/mobile/RenderMobile";
 import RenderOffline from "../../components/mobile/RenderOffline";
 import { CropPurposeSprayEntity } from "../../entities/CropEntities";
+import { ProviceEntity } from "../../entities/LocationEntities";
+import { TaskDatasource } from "../../datasource/TaskDatasource";
+import { FarmerDatasource } from "../../datasource/FarmerDatasource";
 const _ = require("lodash");
 
 let queryString = _.split(window.location.pathname, "=");
@@ -75,7 +78,12 @@ function EditPromotion() {
   const [saveBtnDisable, setBtnSaveDisable] = useState<boolean>(false);
   const [openModalSave, setModalSave] = useState<boolean>(false);
   const [openModalWarning, setModalWarning] = useState<boolean>(false);
+  const [specificFarmer, setSpecificFarmer] = useState<boolean>(false);
+  const [farmerList, setFarmerList] = useState<any>();
   const fetchTwice = useRef<boolean>(true);
+  const [provinceListId, setProvinceListId] = useState<ProviceEntity[]>([]);
+  const [searchFarmer, setSearchFarmer] = useState<string>("");
+  const [couponConditionFarmerList,setCouponConditionFarmerList] = useState<any[]>([])
   const [renderMobile, setRenderMobile] = useState({
     couponName: "",
     couponType: "",
@@ -96,16 +104,42 @@ function EditPromotion() {
   const [form] = Form.useForm();
   useEffect(() => {
     getPromotion(queryString[1]);
-    if (fetchTwice.current) {
-      getProvince();
-      fetchTwice.current = false;
-    }
+    getProvince();
   }, []);
 
   useEffect(() => {
     getCropPlantName();
     renderMobilePlant();
+    getProvince();
   }, [crop]);
+
+  useEffect(() => {
+    fetchFarmerList(searchFarmer, provinceListId);
+  }, [searchFarmer, provinceListId]);
+
+  const fetchFarmerList = async (text?: string, dataProvice?: any) => {
+    const data = await (
+      await TaskDatasource.getFarmerList(text).then((res) => {
+        return res;
+      })
+    ).map((x: any) => {
+      const res = { ...x, provinceName: "" };
+      return res;
+    });
+    const mapData = data.map((x) => {
+      const matching = dataProvice.find(
+        (i: any) => `${i.provinceId}` === `${x.address.provinceId}`
+      );
+      if (matching) {
+        return { ...x, provinceName: matching.provinceName };
+      }
+      return {
+        ...x,
+        provinceName: x.provinceName,
+      };
+    });
+    setFarmerList(mapData);
+  };
 
   const getPromotion = (id: string) => {
     CouponDataSource.queryCoupon(id)
@@ -133,6 +167,7 @@ function EditPromotion() {
             ? moment(new Date().toUTCString())
             : moment(new Date(res.expiredDate).getTime()),
           conditionSpecialFirsttime: res.conditionSpecialFirsttime,
+          specificFarmer : res.conditionSpecificFarmer,
           raiCheckbox: res.couponConditionRai,
           serviceCheckbox: res.couponConditionService,
           plantCheckbox: res.couponConditionPlant,
@@ -154,7 +189,9 @@ function EditPromotion() {
         setCoupon(res.discountType);
         setDescriptionEditor(res.description);
         setConditionEditor(res.condition);
+        setSpecificFarmer(res.conditionSpecificFarmer);
         getCropinjectionTimingInit(res.couponConditionPlantList);
+        getInfoFarmerManual(res.specificFarmerList)
         setRenderMobile({
           couponName: res.couponName,
           couponType: res.couponType,
@@ -219,6 +256,39 @@ function EditPromotion() {
     setCrop(result);
   };
 
+  const getInfoFarmerManual = async(data : any)=>{
+    const result = await Promise.all(
+      data.map(async (item : any,index : number)=>{
+        let farmer = await FarmerDatasource.getFarmerById(item.farmerId);
+        let province = await LocationDatasource.getSubdistrict(farmer.address.districtId)
+        return {
+          id : item.id,
+          farmerId : item.farmerId,
+          keep : item.keep,
+          firstname : farmer.firstname,
+          lastname : farmer.lastname,
+          provinceName : province[0].provinceName
+        }
+      })
+    )
+
+    form.setFieldValue("couponConditionFarmerList",result.map((item => {
+      return {
+        value : item.farmerId,
+        label : item.firstname + " " + item.lastname + " | จังหวัด " + item.provinceName,
+        id : item.id,
+        keep : item.keep
+      }
+    })))
+    setCouponConditionFarmerList(result.map(item=>{
+      return {
+        id : item.id,
+        farmerId : item.farmerId,
+        keep : item.keep
+      }
+    }))
+  }
+
   const renderMobilePlant = () => {
     const plantName = crop.map((item: any) => {
       let injname = "";
@@ -241,6 +311,7 @@ function EditPromotion() {
     LocationDatasource.getProvince()
       .then((res) => {
         setProvinceList(res.map((item: any) => item.provinceName));
+        setProvinceListId(res);
       })
       .catch((err) => console.log(err));
   };
@@ -453,6 +524,13 @@ function EditPromotion() {
     setCouponProvince(!couponProvince);
   };
 
+  const handleSpecificFarmer = () => {
+    setSpecificFarmer(!specificFarmer);
+    form.setFieldsValue({
+      specificFarmer: !specificFarmer,
+    });
+  };
+
   const handleNotiCouponMany = () => {
     setCouponNotiMany(!couponNotiMany);
   };
@@ -511,6 +589,17 @@ function EditPromotion() {
   ) => {
     setConditionEditor(editor.getHTML());
   };
+
+  const handleCouponConditionFarmerList = (value : any[]) =>{
+    const oldState = couponConditionFarmerList;
+    const newState = {
+      farmerId : value[value.length-1],
+      keep : false
+    }
+    oldState.push(newState)
+    setCouponConditionFarmerList(oldState)
+}
+
 
   function checkRai(min: number | null, max: number | null): string {
     let result;
@@ -684,6 +773,7 @@ function EditPromotion() {
       serviceCheckbox,
       raiCheckbox,
       couponConditionProvinceList,
+      specificFarmer
     } = form.getFieldsValue();
     const cropForm = crop.map((item: any) => {
       if (crop.length === 1) {
@@ -731,9 +821,11 @@ function EditPromotion() {
       couponConditionServiceMin: couponConditionServiceMin,
       couponConditionServiceMax: couponConditionServiceMax,
       couponConditionPlant: plantCheckbox,
-      couponConditionPlantList: cropForm,
+      couponConditionPlantList: plantCheckbox ? cropForm : null,
       couponConditionProvince: couponProvince,
       couponConditionProvinceList: couponConditionProvinceList,
+      conditionSpecificFarmer : specificFarmer,
+      specificFarmerList : couponConditionFarmerList
     };
     CouponDataSource.patchCoupon(queryString[1], couponDto)
       .then((res) => {
@@ -1213,6 +1305,54 @@ function EditPromotion() {
                     >
                       ลงทะเบียนใช้งานครั้งแรก
                     </Checkbox>
+                  </Form.Item>
+                  <Form.Item name="specificFarmer" valuePropName="checked">
+                    <Checkbox
+                      onChange={handleSpecificFarmer}
+                      checked={specificFarmer}
+                      className="pt-3"
+                    >
+                      ให้เฉพาะเกษตรกรบางคน
+                    </Checkbox>
+                  </Form.Item>
+                  <Form.Item
+                    name="couponConditionFarmerList"
+                    rules={[
+                      {
+                        required: couponProvince,
+                        message: "กรุณากรอกเลือกจังหวัด",
+                      },
+                    ]}
+                  >
+                    <Select
+                      //disabled={!couponProvince}
+                      mode="multiple"
+                      className="col-lg-12 ps-5 pe-3"
+                      placeholder="เลือกเกษตรกร"
+                      onChange={handleCouponConditionFarmerList}
+                      showSearch
+                      value={province}
+                      allowClear
+                      optionFilterProp="children"
+                      filterOption={(input: any, option: any) =>
+                        option.children.includes(input)
+                      }
+                      filterSort={(optionA, optionB) =>
+                        optionA.children
+                          .toLowerCase()
+                          .localeCompare(optionB.children.toLowerCase())
+                      }
+                    >
+                      {farmerList?.map((item: any) => (
+                        <Option value={item.id}>
+                          {item.firstname +
+                            " " +
+                            item.lastname +
+                            " | จังหวัด" +
+                            item.provinceName}
+                        </Option>
+                      ))}
+                    </Select>
                   </Form.Item>
                 </div>
               </div>

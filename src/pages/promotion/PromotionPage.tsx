@@ -130,6 +130,7 @@ function PromotionPage() {
           couponConditionProvince: res.couponConditionProvince,
           couponConditionProvinceList: res.couponConditionProvinceList,
           createBy: profile.username + " " + profile.lastname,
+          conditionSpecificFarmer : res.specificFarmer
         };
         CouponDataSource.addCoupon(couponDto)
           .then((resSave) => {
@@ -165,6 +166,7 @@ function PromotionPage() {
                   couponConditionProvinceList:
                     resSave.couponConditionProvinceList,
                   createBy: resSave.createBy,
+                  conditionSpecificFarmer : false
                 },
                 ...data.promotions,
               ],

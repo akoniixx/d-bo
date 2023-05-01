@@ -5,5 +5,5 @@ export interface NewsEntities{
     status : string;
     createBy : string;
     application : string;
-    file : any;
+    file? : any;
 }

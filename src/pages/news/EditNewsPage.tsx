@@ -33,7 +33,7 @@ function EditNewsPage() {
   const [createImgProfile, setCreateImgProfile] = useState<UploadImageEntity>(
     UploadImageEntity_INTI
   );
-  const [saveBtnDisable, setBtnSaveDisable] = useState<boolean>(true);
+  const [saveBtnDisable, setBtnSaveDisable] = useState<boolean>(false);
   const navigate = useNavigate();
   const [form] = Form.useForm();
   const onChangeProfile = async (file: any) => {
@@ -86,6 +86,7 @@ function EditNewsPage() {
   const removeImgProfile = () => {
     setImgProfile(undefined);
     setCreateImgProfile(UploadImageEntity_INTI);
+    setBtnSaveDisable(true);
     // checkValidate(data);
   };
 
@@ -164,36 +165,68 @@ function EditNewsPage() {
       newsDescription,
       newsStatus
     } = form.getFieldsValue()
-    NewsDatasource.addNews({
-      title : newsName,
-      details : newsDescription,
-      status : newsStatus,
-      application : application,
-      file : createImgProfile.file,
-      createBy : profile.firstname + " " + profile.lastname,
-    }).then(res => {
-      Swal.fire({
-        title: "บันทึกสำเร็จ",
-        icon: "success",
-        timer: 1500,
-        showConfirmButton: false,
-      }).then((time) => {
-        window.location.href = "/NewsPage";
+    if(!createImgProfile.file){
+      NewsDatasource.editNews(
+        {
+          id : queryString[1],
+          title : newsName,
+          details : newsDescription,
+          status : newsStatus,
+          application : application,
+          createBy : profile.firstname + " " + profile.lastname,
+        }
+      ).then(res => {
+        Swal.fire({
+          title: "บันทึกสำเร็จ",
+          icon: "success",
+          timer: 1500,
+          showConfirmButton: false,
+        }).then((time) => {
+          window.location.href = "/NewsPage";
+        });
+      }).catch((err) => {
+        console.log(err);
+        Swal.fire({
+          title: "เกิดข้อผิดพลาก",
+          icon: "error",
+          showConfirmButton: true,
+        });
       });
-    }).catch((err) => {
-      console.log(err);
-      Swal.fire({
-        title: "เกิดข้อผิดพลาก",
-        icon: "error",
-        showConfirmButton: true,
+    }
+    else{
+      NewsDatasource.editNews(
+        {
+          id : queryString[1],
+          title : newsName,
+          details : newsDescription,
+          status : newsStatus,
+          application : application,
+          file : createImgProfile.file,
+          createBy : profile.firstname + " " + profile.lastname,
+        }
+      ).then(res => {
+        Swal.fire({
+          title: "บันทึกสำเร็จ",
+          icon: "success",
+          timer: 1500,
+          showConfirmButton: false,
+        }).then((time) => {
+          window.location.href = "/NewsPage";
+        });
+      }).catch((err) => {
+        console.log(err);
+        Swal.fire({
+          title: "เกิดข้อผิดพลาก",
+          icon: "error",
+          showConfirmButton: true,
+        });
       });
-    });
+    }
   }
 
   useEffect(()=>{
     NewsDatasource.getNewsById(queryString[1]).then(
       res=> {
-        console.log(res)
         form.setFieldsValue({
           img : res.imagePath,
           newsName : res.title,
@@ -205,6 +238,9 @@ function EditNewsPage() {
         setNewsName(res.title)
         setDescriptionEditor(res.details);
         setImgProfile(res.imagePath)
+        setApplication(res.application)
+        setChooseFarmer(res.application === "ALL" ? true : res.application === "FARMER" ? true : false)
+        setChooseDroner(res.application === "ALL" ? true : res.application === "DRONER" ? true : false)
       }
     )
   },[])
