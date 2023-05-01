@@ -51,6 +51,7 @@ export interface CreateNewTaskEntity {
   targetSpray: string[];
   preparationBy: string;
   purposeSprayId: string;
+  purposeSprayName?: string;
   taskDronerTemp?: CreateDronerTempEntity[];
   status: string;
   statusRemark: string;
@@ -90,7 +91,7 @@ export interface GetNewTaskEntity {
   id: string;
   couponCode: string;
   couponId: string;
-  discount: string;
+  discountCoupon: string;
   taskNo: string;
   farmerId: string;
   farmerPlotId: string;
@@ -136,7 +137,7 @@ export const GetNewTaskEntity_INIT: GetNewTaskEntity = {
   id: "",
   taskNo: "",
   farmerId: "",
-  discount: "",
+  discountCoupon: "",
   farmerPlotId: "",
   couponCode: "",
   couponId: "",
@@ -199,7 +200,7 @@ export interface UpdateNewTask {
   discountFee: number;
   couponCode: string;
   couponId: string;
-  discount: number;
+  discountCoupon: number;
 }
 export const UpdateNewTask_INIT: UpdateNewTask = {
   id: "",
@@ -222,7 +223,7 @@ export const UpdateNewTask_INIT: UpdateNewTask = {
   discountFee: 0,
   couponCode: "",
   couponId: "",
-  discount: 0,
+  discountCoupon: 0,
 };
 
 export interface UpdateTaskStatus {

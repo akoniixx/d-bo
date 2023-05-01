@@ -15,7 +15,6 @@ import {
   TimePicker,
   Modal,
   Button,
-  Image,
 } from "antd";
 import { Option } from "antd/lib/mentions";
 import ReactQuill from "react-quill";
@@ -39,12 +38,19 @@ import { image } from "../../resource";
 import RenderMobile from "../../components/mobile/RenderMobile";
 import dayjs from "dayjs";
 import { CropPurposeSprayEntity } from "../../entities/CropEntities";
+import { FarmerEntity } from "../../entities/FarmerEntities";
+import { TaskDatasource } from "../../datasource/TaskDatasource";
+import { ProviceEntity } from "../../entities/LocationEntities";
 
 export default function AddPromotion() {
   const profile = JSON.parse(localStorage.getItem("profile") || "{  }");
+
   const dateFormat = "DD/MM/YYYY";
   const [plantName, setPlantName] = useState<CropPurposeSprayEntity[]>();
   const [provinceList, setProvinceList] = useState<string[]>([]);
+  const [farmerList, setFarmerList] = useState<any>();
+  const [provinceListId, setProvinceListId] = useState<ProviceEntity[]>([]);
+  const [searchFarmer, setSearchFarmer] = useState<string>("");
   const [crop, setCrop] = useState<any>([
     {
       id: null,
@@ -57,12 +63,15 @@ export default function AddPromotion() {
     null
   );
   const [conditionEditor, setConditionEditor] = useState<string | null>(null);
-  const [editTable, setEditTable] = useState(true);
+  const [editTable, setEditTable] = useState(true); 
   const [province, setProvince] = useState<string[]>([]);
+  const [couponConditionFarmerList,setCouponConditionFarmerList] = useState<any[]>([])
+  const [farmer, setFarmer] = useState<string[]>([]);
   const [coupon, setCoupon] = useState<string | null>(null);
   const [couponType, setCouponType] = useState<string | null>(null);
   const [couponInfo, setCouponInfo] = useState<string | null>(null);
-  const [specialCoupon, setSpecialCoupon] = useState<boolean>(false);
+  const [conditionSpecialFirsttime, setConditionSpecialFirsttime] = useState<boolean>(false);
+  const [specificFarmer, setSpecificFarmer] = useState<boolean>(false);
   const [raiCondition, setRaiCondition] = useState<boolean>(false);
   const [serviceCondition, setServiceCondition] = useState<boolean>(false);
   const [couponPlant, setCouponPlant] = useState<boolean>(false);
@@ -95,11 +104,12 @@ export default function AddPromotion() {
   useEffect(() => {
     getCropPlantName();
     renderMobilePlant();
-    if (fetchTwice.current) {
-      getProvince();
-      fetchTwice.current = false;
-    }
+    getProvince();
   }, [crop]);
+
+  useEffect(() => {
+    fetchFarmerList(searchFarmer, provinceListId);
+  }, [searchFarmer, provinceListId]);
 
   const getCropPlantName = () => {
     CropDatasource.getAllCropPlantName()
@@ -130,12 +140,37 @@ export default function AddPromotion() {
     }
   };
 
-  const getProvince = () => {
-    LocationDatasource.getProvince()
+  const getProvince = async () => {
+    await LocationDatasource.getProvince()
       .then((res) => {
         setProvinceList(res.map((item: any) => item.provinceName));
+        setProvinceListId(res);
       })
       .catch((err) => console.log(err));
+  };
+
+  const fetchFarmerList = async (text?: string, dataProvice?: any) => {
+    const data = await (
+      await TaskDatasource.getFarmerList(text).then((res) => {
+        return res;
+      })
+    ).map((x: any) => {
+      const res = { ...x, provinceName: "" };
+      return res;
+    });
+    const mapData = data.map((x) => {
+      const matching = dataProvice.find(
+        (i: any) => `${i.provinceId}` === `${x.address.provinceId}`
+      );
+      if (matching) {
+        return { ...x, provinceName: matching.provinceName };
+      }
+      return {
+        ...x,
+        provinceName: x.provinceName,
+      };
+    });
+    setFarmerList(mapData);
   };
 
   const navigate = useNavigate();
@@ -310,6 +345,9 @@ export default function AddPromotion() {
   const handleChangeProvince = (provinceName: string[]) => {
     setProvince(provinceName);
   };
+  const handleChangeFarmer = (farmer: string[]) => {
+    setFarmer(farmer);
+  };
 
   const handleCoupon = (e: RadioChangeEvent) => {
     setCoupon(e.target.value);
@@ -328,9 +366,16 @@ export default function AddPromotion() {
   };
 
   const handleSpecialCoupon = () => {
-    setSpecialCoupon(!specialCoupon);
+    setConditionSpecialFirsttime(!conditionSpecialFirsttime);
     form.setFieldsValue({
-      registerFirstTime: !specialCoupon,
+      registerFirstTime: !conditionSpecialFirsttime,
+    });
+  };
+
+  const handleSpecificFarmer = () => {
+    setSpecificFarmer(!specificFarmer);
+    form.setFieldsValue({
+      specificFarmer: !specificFarmer,
     });
   };
 
@@ -361,8 +406,23 @@ export default function AddPromotion() {
   };
 
   const handleCouponProvince = () => {
+    if (couponProvince) {
+      form.setFieldsValue({
+        couponConditionProvinceList: province,
+      });
+    }
     setCouponProvince(!couponProvince);
   };
+
+  const handleCouponConditionFarmerList = (value : string[]) =>{
+      let result = value.map(item=> {
+        return {
+          farmerId : item,
+          keep : false
+        }
+       })
+       setCouponConditionFarmerList(result)
+  }
 
   const handleNotiCouponMany = () => {
     setCouponNotiMany(!couponNotiMany);
@@ -448,6 +508,7 @@ export default function AddPromotion() {
       serviceCheckbox,
       plantCheckbox,
       provinceCheckbox,
+      specificFarmer
     } = form.getFieldsValue();
 
     let fieldErr: boolean = true;
@@ -456,6 +517,7 @@ export default function AddPromotion() {
     let serviceError: boolean = true;
     let plantErr: boolean = true;
     let provinceError: boolean = true;
+    let specificError : boolean = true;
 
     if (
       couponName &&
@@ -528,13 +590,26 @@ export default function AddPromotion() {
     } else {
       provinceError = false;
     }
+
+    if(specificFarmer){
+      if(couponConditionFarmerList.length != 0){
+        specificError = false
+      }
+      else{
+        specificError = true
+      }
+    }
+    else{
+      specificError = false
+    }
     setBtnSaveDisable(
       fieldErr ||
         discountErr ||
         raiError ||
         serviceError ||
         plantErr ||
-        provinceError
+        provinceError||
+        specificError
     );
   };
 
@@ -583,6 +658,7 @@ export default function AddPromotion() {
       serviceCheckbox,
       raiCheckbox,
       provinceCheckbox,
+      specificFarmer
     } = form.getFieldsValue();
     const cropForm = crop.map((item: any) => {
       if (crop.length === 1) {
@@ -619,12 +695,12 @@ export default function AddPromotion() {
       count: count,
       keep: count,
       used: 0,
-      createBy: profile.username + " " + profile.lastname,
+      createBy: profile.firstname + " " + profile.lastname,
       startDate: new Date(startDate),
       expiredDate: new Date(expiredDate),
       description: description,
       condition: condition,
-      specialCondition: specialCoupon,
+      conditionSpecialFirsttime: conditionSpecialFirsttime,
       couponConditionRai: raiCheckbox ?? false,
       couponConditionRaiMin: couponConditionRaiMin,
       couponConditionRaiMax: couponConditionRaiMax,
@@ -632,9 +708,11 @@ export default function AddPromotion() {
       couponConditionServiceMin: couponConditionServiceMin,
       couponConditionServiceMax: couponConditionServiceMax,
       couponConditionPlant: plantCheckbox ?? false,
-      couponConditionPlantList: cropForm,
+      couponConditionPlantList: plantCheckbox ? cropForm : null,
       couponConditionProvince: provinceCheckbox ?? false,
       couponConditionProvinceList: province,
+      conditionSpecificFarmer : specificFarmer,
+      specificFarmerList : couponConditionFarmerList
     };
     CouponDataSource.addCoupon(couponDto)
       .then((res) => {
@@ -691,8 +769,8 @@ export default function AddPromotion() {
         <div className="d-flex justify-content-between px-4 pb-4">
           <Button
             style={{
-              borderColor: color.Error,
-              color: color.Error,
+              borderColor: color.Success,
+              color: color.Success,
             }}
             onClick={() => {
               setModalSave(false);
@@ -702,8 +780,8 @@ export default function AddPromotion() {
           </Button>
           <Button
             style={{
-              borderColor: color.Error,
-              backgroundColor: color.Error,
+              borderColor: color.Success,
+              backgroundColor: color.Success,
               color: color.White,
             }}
             onClick={() => warningTime()}
@@ -737,8 +815,8 @@ export default function AddPromotion() {
         <div className="d-flex justify-content-between px-4 pb-4">
           <Button
             style={{
-              borderColor: color.Error,
-              color: color.Error,
+              borderColor: color.Success,
+              color: color.Success,
             }}
             onClick={() => {
               setModalWarning(false);
@@ -748,8 +826,8 @@ export default function AddPromotion() {
           </Button>
           <Button
             style={{
-              borderColor: color.Error,
-              backgroundColor: color.Error,
+              borderColor: color.Success,
+              backgroundColor: color.Success,
               color: color.White,
             }}
             onClick={() => {
@@ -864,6 +942,7 @@ export default function AddPromotion() {
                         ]}
                       >
                         <Input
+                          type="number"
                           disabled={coupon !== "DISCOUNT"}
                           placeholder="กรอกจำนวนเงิน"
                           autoComplete="off"
@@ -904,14 +983,14 @@ export default function AddPromotion() {
                           .localeCompare(optionB.children.toLowerCase())
                       }
                     >
-                      <Option value={"ONLINE"}>ออนไลน์(Online)</Option>
-                      <Option value={"OFFLINE"}>ออฟไลน์(Offline)</Option>
+                      <Option value={"ONLINE"}>ออนไลน์ (Online)</Option>
+                      <Option value={"OFFLINE"}>ออฟไลน์ (Offline)</Option>
                     </Select>
                   </Form.Item>
                 </div>
                 <div className="form-group col-lg-6">
                   <label>
-                    จำนวนสิทธิ์ <span style={{ color: "red" }}>*</span>
+                    จำนวนสิทธิ <span style={{ color: "red" }}>*</span>
                   </label>
                   <div className="mt-1">
                     <Form.Item
@@ -919,12 +998,13 @@ export default function AddPromotion() {
                       rules={[
                         {
                           required: true,
-                          message: "กรุณากรอกจำนวนสิทธิ์!",
+                          message: "กรุณากรอกจำนวนสิทธิ!",
                         },
                       ]}
                     >
                       <Input
-                        placeholder="กรอกจำนวนสิทธิ์"
+                        type="number"
+                        placeholder="กรอกจำนวนสิทธิ"
                         autoComplete="off"
                         onChange={(e) => {
                           setRenderMobile({
@@ -1086,9 +1166,7 @@ export default function AddPromotion() {
               <br />
               <div className="row py-4">
                 <div className="form-group col-lg-12">
-                  <label>
-                    เงื่อนไข (จะแสดงในแอพลิเคชั่น){" "}
-                  </label>
+                  <label>เงื่อนไข (จะแสดงในแอพลิเคชั่น) </label>
                   <Form.Item
                     name="condition"
                     rules={[
@@ -1114,15 +1192,67 @@ export default function AddPromotion() {
               <div className="row">
                 <div className="form-group col-lg-12 d-flex flex-column">
                   <label>เงื่อนไขการได้รับพิเศษ</label>
-                  <Form.Item name="specialCondition" valuePropName="checked">
+                  <Form.Item name="conditionSpecialFirsttime" valuePropName="checked">
                     <Checkbox
                       onChange={handleSpecialCoupon}
-                      checked={specialCoupon}
+                      checked={conditionSpecialFirsttime}
                       className="pt-3"
                     >
                       ลงทะเบียนใช้งานครั้งแรก
                     </Checkbox>
                   </Form.Item>
+                  <Form.Item name="specificFarmer" valuePropName="checked">
+                    <Checkbox
+                      onChange={handleSpecificFarmer}
+                      checked={specificFarmer}
+                      className="pt-3"
+                    >
+                      ให้เฉพาะเกษตรกรบางคน
+                    </Checkbox>
+                  </Form.Item>
+                  <div style={{
+                    width : '100%',
+                    paddingLeft : '16px'
+                  }}>
+                    <Form.Item
+                      name="couponConditionFarmerList"
+                      rules={[
+                        {
+                          required: couponProvince,
+                          message: "กรุณากรอกเลือกจังหวัด",
+                        },
+                      ]}
+                    >
+                      <Select
+                        //disabled={!couponProvince}
+                        mode="multiple"
+                        placeholder="เลือกเกษตรกร"
+                        onChange={handleCouponConditionFarmerList}
+                        showSearch
+                        value={province}
+                        allowClear
+                        optionFilterProp="children"
+                        filterOption={(input: any, option: any) =>
+                          option.children.includes(input)
+                        }
+                        filterSort={(optionA, optionB) =>
+                          optionA.children
+                            .toLowerCase()
+                            .localeCompare(optionB.children.toLowerCase())
+                        }
+                      >
+                        {farmerList?.map((item: any) => (
+                          <Option value={item.id}>
+                            {item.firstname +
+                              " " +
+                              item.lastname +
+                              " | จังหวัด" +
+                              item.provinceName}
+                          </Option>
+                        ))}
+                      </Select>
+                    </Form.Item>
+                  </div>
                 </div>
               </div>
               <Divider />
@@ -1151,6 +1281,7 @@ export default function AddPromotion() {
                               ]}
                             >
                               <Input
+                                type="number"
                                 disabled={!raiCondition}
                                 placeholder="กรอกจำนวนไร่"
                                 onChange={(e) => {
@@ -1174,6 +1305,7 @@ export default function AddPromotion() {
                               ]}
                             >
                               <Input
+                                type="number"
                                 disabled={!raiCondition}
                                 placeholder="กรอกจำนวนไร่"
                                 onChange={(e) => {
@@ -1201,6 +1333,7 @@ export default function AddPromotion() {
                             <label>จำนวนค่าบริการขั้นต่ำ</label>
                             <Form.Item name="couponConditionServiceMin">
                               <Input
+                                type="number"
                                 disabled={!serviceCondition}
                                 placeholder="กรอกค่าบริการ"
                                 onChange={(e) => {
@@ -1216,6 +1349,7 @@ export default function AddPromotion() {
                             <label>จำนวนค่าบริการสูงสุด</label>
                             <Form.Item name="couponConditionServiceMax">
                               <Input
+                                type="number"
                                 disabled={!serviceCondition}
                                 placeholder="กรอกค่าบริการ"
                                 onChange={(e) => {
@@ -1280,31 +1414,37 @@ export default function AddPromotion() {
                     },
                   ]}
                 >
-                  <Select
-                    disabled={!couponProvince}
-                    mode="multiple"
-                    className="col-lg-12 ps-5 pe-3"
-                    placeholder="เลือกจังหวัด"
-                    onChange={handleChangeProvince}
-                    showSearch
-                    value={province}
-                    allowClear
-                    optionFilterProp="children"
-                    filterOption={(input: any, option: any) =>
-                      option.children.includes(input)
-                    }
-                    filterSort={(optionA, optionB) =>
-                      optionA.children
-                        .toLowerCase()
-                        .localeCompare(optionB.children.toLowerCase())
-                    }
+                  <div
+                    style={{
+                      paddingLeft: "16px",
+                      width: "100%",
+                    }}
                   >
-                    {provinceList.map((item) => (
-                      <Option key={item} value={item}>
-                        {item}
-                      </Option>
-                    ))}
-                  </Select>
+                    <Select
+                      disabled={!couponProvince}
+                      mode="multiple"
+                      placeholder="เลือกจังหวัด"
+                      onChange={handleChangeProvince}
+                      showSearch
+                      value={province}
+                      allowClear
+                      optionFilterProp="children"
+                      filterOption={(input: any, option: any) =>
+                        option.children.includes(input)
+                      }
+                      filterSort={(optionA, optionB) =>
+                        optionA.children
+                          .toLowerCase()
+                          .localeCompare(optionB.children.toLowerCase())
+                      }
+                    >
+                      {provinceList.map((item) => (
+                        <Option key={item} value={item}>
+                          {item}
+                        </Option>
+                      ))}
+                    </Select>
+                  </div>
                 </Form.Item>
               </div>
               {/* <Divider /> */}

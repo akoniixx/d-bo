@@ -274,7 +274,7 @@ export interface TaskReportEntity {
   delayRejectRemark: string;
   couponCode: string;
   couponId: string;
-  discount: string;
+  discountCoupon: string;
   countResend: string;
   statusPayment: string;
   isChecked: boolean;
@@ -325,7 +325,7 @@ export const TaskReportEntity_INIT: TaskReportEntity = {
   delayRejectRemark: "",
   couponCode: "",
   couponId: "",
-  discount: "",
+  discountCoupon: "",
   countResend: "",
   statusPayment: "",
   isChecked: false,

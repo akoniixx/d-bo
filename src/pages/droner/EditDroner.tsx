@@ -134,7 +134,6 @@ function EditDroner() {
   const fetchDronerById = useCallback(async () => {
     await DronerDatasource.getDronerByID(dronerId).then(
       async (res) => {
-        console.log(res)
         if (res.birthDate === null) {
           res.birthDate = moment().format(dateCreateFormat);
         }

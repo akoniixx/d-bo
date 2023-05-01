@@ -143,3 +143,8 @@ export const STATUS_WAITSTART = [
   { value: "waitstartnormal", name: "ปกติ", isChecked: false },
   { value: "waitstartproblem", name: "งานมีปัญหา", isChecked: false },
 ];
+export const STATUS_COUPON: any = {
+  ACTIVE: "ใช้งาน",
+  DRAFTING: "รอเปิดการใช้งาน",
+  INACTIVE: "ปิดการใช้งาาน",
+};

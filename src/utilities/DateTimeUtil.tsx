@@ -25,12 +25,12 @@ export class DateTimeUtil {
     return moment(date).format("DD/MM/yyyy HH:mm");
   };
 
-  static calculateDay = (date: string) =>{
-    let now = new Date().getTime()
-    let expired = new Date(date).getTime()
-    let result = (expired-now)/86400000
-    return (result < 0)?0:parseInt(result.toString());
-  }
+  static calculateDay = (date: string) => {
+    let now = new Date().getTime();
+    let expired = new Date(date).getTime();
+    let result = (expired - now) / 86400000;
+    return result < 0 ? 0 : parseInt(result.toString());
+  };
 }
 export const newLocale = {
   ...localeTh,

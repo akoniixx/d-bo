@@ -177,14 +177,14 @@ const Layouts: React.FC<any> = ({ children }) => {
               title={<span>ข่าวสารและโปรโมชั่น</span>}
               key={"sub4"}
             >
-              {/* <Menu.Item key="droner">
+              <Menu.Item key="news">
                 <Link
-                  to="/IndexDroner"
+                  to="/NewsPage"
                   style={{ textDecoration: "none" }}>
                   <span>ข่าวสาร</span>
                 </Link>
-              </Menu.Item> */}
-              <Menu.Item key="dronerList">
+              </Menu.Item>
+              <Menu.Item key="promotion">
                 <Link to="/PromotionPage" style={{ textDecoration: "none" }}>
                   <span>คูปอง</span>
                 </Link>
