@@ -81,6 +81,8 @@ function EditReport() {
   });
   const fetchDetailTask = async () => {
     await TaskFinishedDatasource.getDetailFinishTaskById(taskId).then((res) => {
+      console.log("report edit", res);
+
       if (res.data.couponId !== null) {
         CouponDataSource.getPromotionCode(res.data.couponId).then((result) =>
           setCouponData({

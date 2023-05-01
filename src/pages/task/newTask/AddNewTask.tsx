@@ -5,6 +5,7 @@ import {
   Badge,
   Button,
   Checkbox,
+  Col,
   DatePicker,
   Dropdown,
   Form,
@@ -71,7 +72,12 @@ import {
   TaskCoupon,
   TaskCoupon_INIT,
 } from "../../../entities/CalculateTask";
-import { CouponKeepByFarmer } from "../../../entities/CouponEntites";
+import {
+  CouponFarmerUsed,
+  CouponKeepByFarmer,
+} from "../../../entities/CouponEntites";
+import { DateTimeUtil } from "../../../utilities/DateTimeUtil";
+
 const { Step } = Steps;
 const { Option } = Select;
 const dateFormat = "DD/MM/YYYY";
@@ -90,16 +96,6 @@ const AddNewTask = () => {
   const [createNewTask, setCreateNewTask] = useState<CreateNewTaskEntity>(
     CreateNewTaskEntity_INIT
   );
-  const [couponData, setCouponData] = useState<{
-    couponCode: string;
-    couponName: string;
-    couponDiscount: number | null;
-  }>({
-    couponCode: "",
-    couponName: "",
-    couponDiscount: null,
-  });
-
   const [dataFarmer, setDataFarmer] = useState<FarmerEntity>();
   const [farmerList, setFarmerList] = useState<FarmerEntity[]>();
   const [farmerSelected, setFarmerSelected] = useState<FarmerEntity>();
@@ -131,13 +127,11 @@ const AddNewTask = () => {
   const [disableBtn, setDisableBtn] = useState<boolean>(true);
   const [searchTextDroner, setSearchTextDroner] = useState<string>("");
   const [priceMethod, setPriceMethod] = useState<string>("อัตโนมัติ");
-
-  const [dataCoupon, setDataCoupon] = useState<TaskCoupon>(TaskCoupon_INIT);
   const [getCoupon, setGetCoupon] = useState<GetTaskCoupon>(GetTaskCoupon_INIT);
 
   const [couponCode, setCouponCode] = useState<string>("");
   const [couponId, setCouponId] = useState<string>("");
-  const [couponUsedBtn, setCouponUsedBtn] = useState<boolean>(true);
+  const [couponUsedBtn, setCouponUsedBtn] = useState<boolean[]>([false, false]);
   const [colorCouponBtn, setColorCouponBtn] = useState<boolean>(true);
   const [couponMessage, setCouponMessage] = useState<string>("");
   const [farmerPlotId, setFarmerPlotId] = useState<string>("");
@@ -146,6 +140,7 @@ const AddNewTask = () => {
   const [couponKeepList, setCouponKeepList] = useState<CouponKeepByFarmer[]>();
 
   const [checkKeepCoupon, setCheckKeepCoupon] = useState<boolean>(false);
+  const [dataCouponKeep, setCouponKeep] = useState<CouponKeepByFarmer>();
 
   const fetchFarmerList = async (text?: string) => {
     await TaskDatasource.getFarmerList(text).then((res) => {
@@ -158,9 +153,47 @@ const AddNewTask = () => {
     });
   };
   const fetchCouponKeep = async (id?: string) => {
-    await CouponDataSource.getCouponKeepByFarmerId(id).then((res) => {
-      setCouponKeepList(res);
+    const data = await CouponDataSource.getCouponKeepByFarmerId(id).then(
+      (res) => {
+        return res;
+      }
+    );
+    let result: any = [];
+    data.map((item: any) => {
+      let checkCondition = true;
+      const checkPlant = item.promotion.couponConditionPlant
+        ? item.promotion.couponConditionPlantList.some(
+            (plant: any) =>
+              plant.plantName === cropSelected &&
+              plant.injectionTiming.includes(createNewTask.purposeSprayName)
+          )
+        : checkCondition;
+
+      const checkProvince = item.promotion.couponConditionProvince
+        ? item.promotion.couponConditionProvinceList.some(
+            (prov: any) => prov === farmerPlotSeleced.plotArea.provinceName
+          )
+        : checkCondition;
+
+      const checkRai = item.promotion.couponConditionRai
+        ? item.promotion.couponConditionRaiMin <=
+          createNewTask.farmAreaAmount >=
+          item.promotion.couponConditionRaiMax
+        : checkCondition;
+
+      const checkService = item.promotion.couponConditionService
+        ? item.promotion.couponConditionServiceMin <=
+          createNewTask.price - (discountResult ?? 0) >=
+          item.promotion.couponConditionServiceMax
+        : checkCondition;
+
+      checkPlant &&
+        checkProvince &&
+        checkRai &&
+        checkService &&
+        result.push(item);
     });
+    setCouponKeepList(result);
   };
 
   const [dataDronerList, setDataDronerList] = useState<TaskSearchDroner[]>([
@@ -361,6 +394,17 @@ const AddNewTask = () => {
     }
   };
 
+  const handleChangeCoupon = (e: any) => {
+    if (e.target.value) {
+      setCouponCode(e.target.value);
+      setCouponUsedBtn([false, false]);
+      setCheckKeepCoupon(true);
+    } else {
+      setCouponUsedBtn([false, false]);
+      setCheckKeepCoupon(false);
+    }
+  };
+
   const checkCoupon = (section: number, e: any) => {
     if (section === 1) {
       CouponDataSource.getCoupon(couponCode).then((result) => {
@@ -368,12 +412,12 @@ const AddNewTask = () => {
           if (result.canUsed) {
             setCouponId(result.id);
             setColorCouponBtn(true);
-            setCouponUsedBtn(false);
+            setCouponUsedBtn([false, true]);
             setCouponMessage("รหัสคูปองสามารถใช้ได้");
-            calculatePrice();
+            calculatePrice(couponCode);
           } else {
             setColorCouponBtn(false);
-            setCouponUsedBtn(true);
+            setCouponUsedBtn([true, true]);
             setCouponMessage("รหัสคูปองสามารถนี้ถูกใช้ไปแล้ว");
           }
         } else {
@@ -382,17 +426,28 @@ const AddNewTask = () => {
         }
       });
     } else {
-      const mapCoupon = couponKeepList?.find((x) => x.promotion.id === e);
-      setCouponId(mapCoupon?.promotion?.id || "");
-      setCouponCode(mapCoupon?.promotion.couponCode || "");
-      calculatePrice();
+      if (e) {
+        const mapCoupon = couponKeepList?.find((x) => x.promotion.id === e);
+        setCouponKeep(mapCoupon);
+        setCouponId(mapCoupon?.promotion?.id || "");
+        setCouponCode(mapCoupon?.promotion.couponCode || "");
+        setColorCouponBtn(true);
+        setCouponUsedBtn([true, false]);
+        calculatePrice(mapCoupon?.promotion?.couponCode || "");
+      } else {
+        setCouponId("");
+        setCouponCode("");
+        calculatePrice("");
+        setColorCouponBtn(false);
+        setCouponUsedBtn([false, false]);
+      }
     }
   };
-  const calculatePrice = () => {
+  const calculatePrice = (coupon: string) => {
     const couponInfo = { ...getCoupon };
     couponInfo.farmerPlotId = farmerPlotId;
     couponInfo.cropName = farmerPlotSeleced?.plantName;
-    couponInfo.couponCode = couponCode;
+    couponInfo.couponCode = coupon; //couponCode;
     couponInfo.raiAmount = parseInt(farmerPlotSeleced?.raiAmount!);
     couponInfo.priceCustom =
       createNewTask.unitPriceStandard === 0
@@ -1439,6 +1494,23 @@ const AddNewTask = () => {
   //#endregion
 
   //#region Step3
+  const mapWordingCondition = (item: CouponKeepByFarmer) => {
+    const data = item.promotion;
+    let mapping = "-";
+    if (data.couponConditionRai) {
+      let checkMin = data.couponConditionRaiMin
+        ? "เมื่อจ้างขั้นต่ำ " + data.couponConditionRaiMin + " ไร่"
+        : "";
+
+      let checkMax = data.couponConditionRaiMax
+        ? checkMin
+          ? "เมื่อจ้างสูงสุด" + data.couponConditionRaiMax + " ไร่"
+          : " - " + data.couponConditionRaiMax + " ไร่"
+        : "";
+      mapping = checkMin + checkMax;
+    }
+    return mapping;
+  };
   const renderDronerSelectedList = (
     <CardContainer>
       <CardHeader textHeader="รายชื่อนักบินโดรน" />
@@ -1578,31 +1650,34 @@ const AddNewTask = () => {
                   }}
                 >
                   <Input
-                    disabled={!couponUsedBtn}
-                    onChange={(e) => {
-                      setCouponCode(e.target.value);
-                    }}
+                    disabled={couponUsedBtn[0]}
+                    onChange={handleChangeCoupon}
                     style={{
                       paddingRight: 0,
                       paddingTop: 0,
                       paddingBottom: 0,
                     }}
-                    defaultValue={couponCode}
+                    defaultValue={couponUsedBtn ? couponCode : ""}
                     placeholder="กรอกรหัสคูปอง"
                     suffix={
                       <Button
-                        style={{
-                          borderColor: couponUsedBtn
-                            ? color.Success
-                            : color.Error,
-                          backgroundColor: couponUsedBtn
-                            ? "#E6F2EC"
-                            : "#FAEEEE",
-                          color: couponUsedBtn ? color.Success : color.Error,
-                        }}
+                        disabled={couponUsedBtn[0]}
+                        style={
+                          couponUsedBtn[0] && couponUsedBtn[1]
+                            ? {
+                                borderColor: color.Error,
+                                backgroundColor: "#FAEEEE",
+                                color: color.Error, //ยกเลิก
+                              }
+                            : {
+                                borderColor: color.Success,
+                                backgroundColor: "#E6F2EC",
+                                color: color.Success, //ใช้รหัส
+                              }
+                        }
                         onClick={(e) => checkCoupon(1, e)}
                       >
-                        {couponUsedBtn ? "ใช้รหัส" : "ยกเลิก"}
+                        {!couponUsedBtn[1] ? "ใช้รหัส" : "ยกเลิก"}
                       </Button>
                     }
                   />
@@ -1620,15 +1695,34 @@ const AddNewTask = () => {
               <div className="form-group col-lg-4">
                 <label>หรือเลือกคูปอง (คูปองที่เกษตรกรเก็บในระบบ)</label>
                 <Select
+                  disabled={checkKeepCoupon}
                   placeholder="เลือกคูปอง"
                   style={{
                     width: "100%",
                   }}
                   onChange={(e) => checkCoupon(2, e)}
+                  allowClear
+                  defaultValue={checkKeepCoupon ? couponId : null}
                 >
                   {couponKeepList?.map((item) => (
                     <Option value={item.promotion.id}>
-                      {item.promotion.couponName}
+                      <div>
+                        {item.promotion.couponName}
+                        <br />
+                        <Row>
+                          <Col style={{ fontSize: "12px" }} span={13}>
+                            {item.promotion.couponConditionRai
+                              ? mapWordingCondition(item)
+                              : "-"}
+                          </Col>
+                          <Col style={{ fontSize: "12px", alignItems: "end" }}>
+                            หมดเขต{" "}
+                            {DateTimeUtil.formatDateTh(
+                              item?.promotion?.expiredDate?.toString() || ""
+                            )}
+                          </Col>
+                        </Row>
+                      </div>
                     </Option>
                   ))}
                 </Select>
@@ -1782,7 +1876,7 @@ const AddNewTask = () => {
       dronerSelected.filter((x) => x.droner_id != "")
     );
     setCurrent(current + 1);
-    couponId && calculatePrice();
+    couponId && calculatePrice(couponCode);
     fetchCouponKeep(createNewTask.farmerId);
   };
 
@@ -1803,6 +1897,24 @@ const AddNewTask = () => {
         } else {
           delete createNewTask["taskDronerTemp"];
         }
+        if (couponId) {
+          let used: CouponFarmerUsed = {
+            id: "",
+            farmerId: "",
+            promotionId: "",
+            offlineCode: "",
+          };
+          used.id = dataCouponKeep?.id;
+          used.farmerId = dataCouponKeep?.farmerId;
+          used.promotionId = dataCouponKeep?.promotionId;
+          used.offlineCode = !checkKeepCoupon
+            ? !dataCouponKeep?.offlineCode
+              ? null
+              : dataCouponKeep?.offlineCode
+            : couponCode;
+          CouponDataSource.updateCouponFarmerUsed(used).then((res) => {});
+        }
+
         let checkDupSpray = Array.from(new Set(createNewTask.targetSpray));
         const d = Map(createNewTask).set("targetSpray", checkDupSpray);
         const payload = d.toJS();
@@ -1918,6 +2030,3 @@ const AddNewTask = () => {
 };
 
 export default AddNewTask;
-function getCouponKeepByFarmerId() {
-  throw new Error("Function not implemented.");
-}
