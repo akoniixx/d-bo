@@ -877,8 +877,8 @@ function EditPromotion() {
         <div className="d-flex justify-content-between px-4 pb-4">
           <Button
             style={{
-              borderColor: color.Error,
-              color: color.Error,
+              borderColor: color.Success,
+              color: color.Success,
             }}
             onClick={() => {
               setModalSave(false);
@@ -888,8 +888,8 @@ function EditPromotion() {
           </Button>
           <Button
             style={{
-              borderColor: color.Error,
-              backgroundColor: color.Error,
+              borderColor: color.Success,
+              backgroundColor: color.Success,
               color: color.White,
             }}
             onClick={() => warningTime()}
@@ -1315,6 +1315,10 @@ function EditPromotion() {
                       ให้เฉพาะเกษตรกรบางคน
                     </Checkbox>
                   </Form.Item>
+                  <div style={{
+                    width : '100%',
+                    paddingLeft : '16px'
+                  }}>
                   <Form.Item
                     name="couponConditionFarmerList"
                     rules={[
@@ -1327,7 +1331,6 @@ function EditPromotion() {
                     <Select
                       //disabled={!couponProvince}
                       mode="multiple"
-                      className="col-lg-12 ps-5 pe-3"
                       placeholder="เลือกเกษตรกร"
                       onChange={handleCouponConditionFarmerList}
                       showSearch
@@ -1354,6 +1357,7 @@ function EditPromotion() {
                       ))}
                     </Select>
                   </Form.Item>
+                  </div>
                 </div>
               </div>
               <Divider />
@@ -1492,41 +1496,45 @@ function EditPromotion() {
                     </Checkbox>
                   </Form.Item>
                 </div>
-                <Form.Item
-                  name="couponConditionProvinceList"
-                  rules={[
-                    {
-                      required: couponProvince,
-                      message: "กรุณากรอกเลือกจังหวัด",
-                    },
-                  ]}
-                >
-                  <Select
-                    disabled={!couponProvince}
-                    mode="multiple"
-                    className="col-lg-12 ps-5 pe-3"
-                    placeholder="เลือกจังหวัด"
-                    onChange={handleChangeProvince}
-                    showSearch
-                    value={province}
-                    allowClear
-                    optionFilterProp="children"
-                    filterOption={(input: any, option: any) =>
-                      option.children.includes(input)
-                    }
-                    filterSort={(optionA, optionB) =>
-                      optionA.children
-                        .toLowerCase()
-                        .localeCompare(optionB.children.toLowerCase())
-                    }
+                <div style={{
+                  width : '100%',
+                  paddingLeft : '16px'
+                }}>
+                  <Form.Item
+                    name="couponConditionProvinceList"
+                    rules={[
+                      {
+                        required: couponProvince,
+                        message: "กรุณากรอกเลือกจังหวัด",
+                      },
+                    ]}
                   >
-                    {provinceList.map((item) => (
-                      <Option key={item} value={item}>
-                        {item}
-                      </Option>
-                    ))}
-                  </Select>
-                </Form.Item>
+                    <Select
+                      disabled={!couponProvince}
+                      mode="multiple"
+                      placeholder="เลือกจังหวัด"
+                      onChange={handleChangeProvince}
+                      showSearch
+                      value={province}
+                      allowClear
+                      optionFilterProp="children"
+                      filterOption={(input: any, option: any) =>
+                        option.children.includes(input)
+                      }
+                      filterSort={(optionA, optionB) =>
+                        optionA.children
+                          .toLowerCase()
+                          .localeCompare(optionB.children.toLowerCase())
+                      }
+                    >
+                      {provinceList.map((item) => (
+                        <Option key={item} value={item}>
+                          {item}
+                        </Option>
+                      ))}
+                    </Select>
+                  </Form.Item>
+                </div>
               </div>
               {/* <Divider /> */}
               {/* <div className="row">

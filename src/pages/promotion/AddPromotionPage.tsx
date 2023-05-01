@@ -769,8 +769,8 @@ export default function AddPromotion() {
         <div className="d-flex justify-content-between px-4 pb-4">
           <Button
             style={{
-              borderColor: color.Error,
-              color: color.Error,
+              borderColor: color.Success,
+              color: color.Success,
             }}
             onClick={() => {
               setModalSave(false);
@@ -780,8 +780,8 @@ export default function AddPromotion() {
           </Button>
           <Button
             style={{
-              borderColor: color.Error,
-              backgroundColor: color.Error,
+              borderColor: color.Success,
+              backgroundColor: color.Success,
               color: color.White,
             }}
             onClick={() => warningTime()}
@@ -815,8 +815,8 @@ export default function AddPromotion() {
         <div className="d-flex justify-content-between px-4 pb-4">
           <Button
             style={{
-              borderColor: color.Error,
-              color: color.Error,
+              borderColor: color.Success,
+              color: color.Success,
             }}
             onClick={() => {
               setModalWarning(false);
@@ -826,8 +826,8 @@ export default function AddPromotion() {
           </Button>
           <Button
             style={{
-              borderColor: color.Error,
-              backgroundColor: color.Error,
+              borderColor: color.Success,
+              backgroundColor: color.Success,
               color: color.White,
             }}
             onClick={() => {
@@ -1210,45 +1210,49 @@ export default function AddPromotion() {
                       ให้เฉพาะเกษตรกรบางคน
                     </Checkbox>
                   </Form.Item>
-                  <Form.Item
-                    name="couponConditionFarmerList"
-                    rules={[
-                      {
-                        required: couponProvince,
-                        message: "กรุณากรอกเลือกจังหวัด",
-                      },
-                    ]}
-                  >
-                    <Select
-                      //disabled={!couponProvince}
-                      mode="multiple"
-                      className="col-lg-12 ps-5 pe-3"
-                      placeholder="เลือกเกษตรกร"
-                      onChange={handleCouponConditionFarmerList}
-                      showSearch
-                      value={province}
-                      allowClear
-                      optionFilterProp="children"
-                      filterOption={(input: any, option: any) =>
-                        option.children.includes(input)
-                      }
-                      filterSort={(optionA, optionB) =>
-                        optionA.children
-                          .toLowerCase()
-                          .localeCompare(optionB.children.toLowerCase())
-                      }
+                  <div style={{
+                    width : '100%',
+                    paddingLeft : '16px'
+                  }}>
+                    <Form.Item
+                      name="couponConditionFarmerList"
+                      rules={[
+                        {
+                          required: couponProvince,
+                          message: "กรุณากรอกเลือกจังหวัด",
+                        },
+                      ]}
                     >
-                      {farmerList?.map((item: any) => (
-                        <Option value={item.id}>
-                          {item.firstname +
-                            " " +
-                            item.lastname +
-                            " | จังหวัด" +
-                            item.provinceName}
-                        </Option>
-                      ))}
-                    </Select>
-                  </Form.Item>
+                      <Select
+                        //disabled={!couponProvince}
+                        mode="multiple"
+                        placeholder="เลือกเกษตรกร"
+                        onChange={handleCouponConditionFarmerList}
+                        showSearch
+                        value={province}
+                        allowClear
+                        optionFilterProp="children"
+                        filterOption={(input: any, option: any) =>
+                          option.children.includes(input)
+                        }
+                        filterSort={(optionA, optionB) =>
+                          optionA.children
+                            .toLowerCase()
+                            .localeCompare(optionB.children.toLowerCase())
+                        }
+                      >
+                        {farmerList?.map((item: any) => (
+                          <Option value={item.id}>
+                            {item.firstname +
+                              " " +
+                              item.lastname +
+                              " | จังหวัด" +
+                              item.provinceName}
+                          </Option>
+                        ))}
+                      </Select>
+                    </Form.Item>
+                  </div>
                 </div>
               </div>
               <Divider />
