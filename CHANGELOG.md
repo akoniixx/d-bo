@@ -1,4 +1,6 @@
 ## [Version - 0]
+## improve [v0.25.07] 2023-05-01
+- add guru farmer feature
 ## improve [v0.25.06] 2023-04-21
 - added discount promotion & discount coupon & revenue promotion in task menu
 ## Fix [v0.25.05] 2023-04-20
