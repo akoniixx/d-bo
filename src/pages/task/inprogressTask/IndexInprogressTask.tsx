@@ -434,28 +434,34 @@ const IndexInprogressTask = () => {
                     <tr>
                       <td>ส่วนลดค่าธรรมเนียม</td>
                       <td style={{ color: color.Error, textAlign: "right" }}>
-                        {"- " +
-                          numberWithCommasToFixed(
-                            parseFloat(row.task_discount_fee)
-                          )}
+                        {parseFloat(row.task_discount_fee)
+                          ? "- " +
+                            numberWithCommasToFixed(
+                              parseFloat(row.task_discount_fee)
+                            )
+                          : 0}
                       </td>
                     </tr>
                     <tr>
                       <td>ส่วนลดจากคูปอง</td>
                       <td style={{ color: color.Error, textAlign: "right" }}>
-                        {"- " +
-                          numberWithCommasToFixed(
-                            parseFloat(row.task_discount_coupon)
-                          )}
+                        {parseFloat(row.task_discount_coupon)
+                          ? "- " +
+                            numberWithCommasToFixed(
+                              parseFloat(row.task_discount_coupon)
+                            )
+                          : 0}
                       </td>
                     </tr>
                     <tr>
                       <td>ส่วนลดจากโปรโมชั่น</td>
                       <td style={{ color: color.Error, textAlign: "right" }}>
-                        {"- " +
-                          numberWithCommasToFixed(
-                            parseFloat(row.task_discount_promotion)
-                          )}
+                        {parseFloat(row.task_discount_promotion)
+                          ? "- " +
+                            numberWithCommasToFixed(
+                              parseFloat(row.task_discount_promotion)
+                            )
+                          : 0}
                       </td>
                     </tr>
                     <tr>

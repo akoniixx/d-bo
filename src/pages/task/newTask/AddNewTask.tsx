@@ -69,14 +69,13 @@ import { CouponDataSource } from "../../../datasource/CouponDatasource";
 import {
   GetTaskCoupon,
   GetTaskCoupon_INIT,
-  TaskCoupon,
-  TaskCoupon_INIT,
 } from "../../../entities/CalculateTask";
 import {
   CouponFarmerUsed,
   CouponKeepByFarmer,
 } from "../../../entities/CouponEntites";
 import { DateTimeUtil } from "../../../utilities/DateTimeUtil";
+import form from "antd/lib/form";
 
 const { Step } = Steps;
 const { Option } = Select;
@@ -91,6 +90,7 @@ const { Map } = require("immutable");
 let queryString = _.split(window.location.pathname, "=");
 
 const AddNewTask = () => {
+  const [form] = Form.useForm();
   const profile = JSON.parse(localStorage.getItem("profile") || "{  }");
   const [current, setCurrent] = useState(0);
   const [createNewTask, setCreateNewTask] = useState<CreateNewTaskEntity>(
@@ -131,7 +131,7 @@ const AddNewTask = () => {
 
   const [couponCode, setCouponCode] = useState<string>("");
   const [couponId, setCouponId] = useState<string>("");
-  const [couponUsedBtn, setCouponUsedBtn] = useState<boolean[]>([false, false]);
+  const [couponUsedBtn, setCouponUsedBtn] = useState<boolean[]>([false, true]);
   const [colorCouponBtn, setColorCouponBtn] = useState<boolean>(true);
   const [couponMessage, setCouponMessage] = useState<string>("");
   const [farmerPlotId, setFarmerPlotId] = useState<string>("");
@@ -158,6 +158,7 @@ const AddNewTask = () => {
         return res;
       }
     );
+
     let result: any = [];
     data.map((item: any) => {
       let checkCondition = true;
@@ -176,15 +177,16 @@ const AddNewTask = () => {
         : checkCondition;
 
       const checkRai = item.promotion.couponConditionRai
-        ? item.promotion.couponConditionRaiMin <=
-          createNewTask.farmAreaAmount >=
-          item.promotion.couponConditionRaiMax
+        ? createNewTask.farmAreaAmount >=
+            item.promotion.couponConditionRaiMin &&
+          createNewTask.farmAreaAmount <= item.promotion.couponConditionRaiMax
         : checkCondition;
 
       const checkService = item.promotion.couponConditionService
-        ? item.promotion.couponConditionServiceMin <=
-          createNewTask.price - (discountResult ?? 0) >=
-          item.promotion.couponConditionServiceMax
+        ? createNewTask.price - (discountResult ?? 0) >=
+            item.promotion.couponConditionServiceMin &&
+          createNewTask.price - (discountResult ?? 0) <=
+            item.promotion.couponConditionServiceMax
         : checkCondition;
 
       checkPlant &&
@@ -397,7 +399,7 @@ const AddNewTask = () => {
   const handleChangeCoupon = (e: any) => {
     if (e.target.value) {
       setCouponCode(e.target.value);
-      setCouponUsedBtn([false, false]);
+      setCouponUsedBtn([false, true]);
       setCheckKeepCoupon(true);
     } else {
       setCouponUsedBtn([false, false]);
@@ -405,26 +407,35 @@ const AddNewTask = () => {
     }
   };
 
-  const checkCoupon = (section: number, e: any) => {
+  const checkCoupon = (section: number, e: any, order?: string) => {
     if (section === 1) {
-      CouponDataSource.getCoupon(couponCode).then((result) => {
-        if (!result.userMessage) {
-          if (result.canUsed) {
-            setCouponId(result.id);
-            setColorCouponBtn(true);
-            setCouponUsedBtn([false, true]);
-            setCouponMessage("รหัสคูปองสามารถใช้ได้");
-            calculatePrice(couponCode);
+      if (order === "ยกเลิก") {
+        setCouponCode("");
+        setCouponUsedBtn([false, true]);
+        form.setFieldsValue({couponCode : ""});
+        setCouponMessage("");
+        setCheckKeepCoupon(false);
+      } else {
+        CouponDataSource.getCoupon(couponCode).then((result) => {
+          if (!result.userMessage) {
+            if (result.canUsed) {
+              setCouponId(result.id);
+              setColorCouponBtn(true);
+              setCouponUsedBtn([false, false]);
+              setCouponMessage("รหัสคูปองสามารถใช้ได้");
+              calculatePrice(couponCode);
+            } else {
+              setColorCouponBtn(false);
+              setCouponUsedBtn([false, false]);
+              setCouponMessage("รหัสคูปองสามารถนี้ถูกใช้ไปแล้ว");
+            }
           } else {
             setColorCouponBtn(false);
-            setCouponUsedBtn([true, true]);
-            setCouponMessage("รหัสคูปองสามารถนี้ถูกใช้ไปแล้ว");
+            setCouponUsedBtn([false, false]);
+            setCouponMessage(result.userMessage);
           }
-        } else {
-          setColorCouponBtn(false);
-          setCouponMessage(result.userMessage);
-        }
-      });
+        });
+      }
     } else {
       if (e) {
         const mapCoupon = couponKeepList?.find((x) => x.promotion.id === e);
@@ -432,14 +443,14 @@ const AddNewTask = () => {
         setCouponId(mapCoupon?.promotion?.id || "");
         setCouponCode(mapCoupon?.promotion.couponCode || "");
         setColorCouponBtn(true);
-        setCouponUsedBtn([true, false]);
+        setCouponUsedBtn([true, true]);
         calculatePrice(mapCoupon?.promotion?.couponCode || "");
       } else {
         setCouponId("");
         setCouponCode("");
         calculatePrice("");
         setColorCouponBtn(false);
-        setCouponUsedBtn([false, false]);
+        setCouponUsedBtn([false, true]);
       }
     }
   };
@@ -1503,7 +1514,7 @@ const AddNewTask = () => {
         : "";
 
       let checkMax = data.couponConditionRaiMax
-        ? checkMin
+        ? !data.couponConditionRaiMin
           ? "เมื่อจ้างสูงสุด" + data.couponConditionRaiMax + " ไร่"
           : " - " + data.couponConditionRaiMax + " ไร่"
         : "";
@@ -1598,7 +1609,7 @@ const AddNewTask = () => {
       <CardHeader textHeader="ยอดรวมค่าบริการ" />
       <Form style={{ padding: "20px" }}>
         <CardContainer style={{ backgroundColor: "rgba(33, 150, 83, 0.1)" }}>
-          <Form style={{ padding: "20px" }}>
+          <Form style={{ padding: "20px" }} form={form}>
             <label>ยอดรวมค่าบริการ</label>
             <h5 style={{ color: color.primary1 }} className="p-2">
               {numberWithCommas(createNewTask.price - (discountResult ?? 0))}{" "}
@@ -1663,7 +1674,7 @@ const AddNewTask = () => {
                       <Button
                         disabled={couponUsedBtn[0]}
                         style={
-                          couponUsedBtn[0] && couponUsedBtn[1]
+                          !couponUsedBtn[0] && !couponUsedBtn[1]
                             ? {
                                 borderColor: color.Error,
                                 backgroundColor: "#FAEEEE",
@@ -1675,9 +1686,15 @@ const AddNewTask = () => {
                                 color: color.Success, //ใช้รหัส
                               }
                         }
-                        onClick={(e) => checkCoupon(1, e)}
+                        onClick={(e) =>
+                          checkCoupon(
+                            1,
+                            e,
+                            couponUsedBtn[1] ? "ใช้รหัส" : "ยกเลิก"
+                          )
+                        }
                       >
-                        {!couponUsedBtn[1] ? "ใช้รหัส" : "ยกเลิก"}
+                        {couponUsedBtn[1] ? "ใช้รหัส" : "ยกเลิก"}
                       </Button>
                     }
                   />
