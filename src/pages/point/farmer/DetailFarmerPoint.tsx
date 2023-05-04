@@ -1,0 +1,306 @@
+import { InfoCircleFilled } from "@ant-design/icons";
+import {
+  Button,
+  Col,
+  Divider,
+  Form,
+  Input,
+  Popover,
+  Radio,
+  Row,
+  Space,
+} from "antd";
+import React, { useState } from "react";
+import { Container } from "react-bootstrap";
+import { useNavigate } from "react-router-dom";
+import { BackIconButton } from "../../../components/button/BackButton";
+import { CardContainer } from "../../../components/card/CardContainer";
+import { CardHeader } from "../../../components/header/CardHearder";
+import Layouts from "../../../components/layout/Layout";
+import color from "../../../resource/color";
+import { DateTimeUtil } from "../../../utilities/DateTimeUtil";
+import { numberWithCommasToFixed } from "../../../utilities/TextFormatter";
+
+const DetailFarmerPoint = () => {
+  const navigate = useNavigate();
+
+  const dataMock = {
+    dateTime: Date(),
+    farmerName: "รชยา ช่างภักดี",
+    campaignName: "แจกคะแนนขึ้นต่ำ 2 ไร่",
+    pointType: "ได้รับคะแนน",
+    totalPoint: 100,
+    status: "รอดำเนินการ",
+  };
+  const dataTaskMock = {
+    dateTime: Date(),
+    farmerName: "รชยา ช่างภักดี",
+    plot: "สำโรงเหนือ/เมืองสมุทรปราการ/สมุทรปราการ",
+    raiAmount: 20,
+    unitPrice: 60,
+    totalPrice: 1200,
+  };
+  const dataFarmerMock = {
+    dateTime: Date(),
+    farmerId: "123456",
+    farmerFirstName: "รชยา",
+    farmerLastName: "ช่างภักดี",
+    telephone: "0938355808",
+    plot: "สำโรงเหนือ/เมืองสมุทรปราการ/สมุทรปราการ",
+    raiAmount: 20,
+    unitPrice: 60,
+    totalPrice: 1200,
+    oldPoint: 200,
+    newPoint: 300,
+  };
+
+  const renderPointDetail = (
+    <CardContainer>
+      <CardHeader textHeader="ข้อมูลคะแนน" />
+      <Form style={{ padding: "32px" }}>
+        <Row gutter={16}>
+          <Col span={12} style={{ borderRight: "ridge" }}>
+            <div className="pb-3">
+              <div>วันที่ดำเนินงาน</div>
+              <div>{DateTimeUtil.formatDateTime(dataMock.dateTime)}</div>
+            </div>
+            <div className="pb-3">
+              <div>แคมเปญ</div>
+              <div>{dataMock.campaignName}</div>
+            </div>
+            <div className="pb-3">
+              <div>ได้รับ/แลกคะแนน</div>
+              <div>
+                <Input
+                  size="middle"
+                  value={dataMock.pointType}
+                  className="col-lg-3"
+                  style={{
+                    backgroundColor: "#A9CB62",
+                    color: "white",
+                    textAlign: "center",
+                  }}
+                  bordered={false}
+                  disabled
+                />
+                <Input
+                  size="middle"
+                  className="col-lg-3"
+                  value={"+" + dataMock.totalPoint}
+                  style={{
+                    textAlign: "center",
+                    color: color.BK,
+                    backgroundColor: color.Disable,
+                  }}
+                  bordered={false}
+                  disabled
+                />
+              </div>
+            </div>
+          </Col>
+          <Col span={12}>
+            <div className="pb-3 ps-3">
+              <div>สถานะ</div>
+              <Radio.Group defaultValue={dataMock.status}>
+                <Space direction="vertical">
+                  <Radio className="col-lg-12" value={"รอดำเนินการ"}>
+                    รอดำเนินการ
+                  </Radio>
+                  <Radio className="col-lg-12" value={"สิ้นเสร็จ"}>
+                    สิ้นเสร็จ
+                  </Radio>
+                  <Radio className="col-lg-12" value={"ยกเลิก"}>
+                    ยกเลิก
+                  </Radio>
+                </Space>
+              </Radio.Group>
+            </div>
+          </Col>
+        </Row>
+        <br />
+        <Container
+          style={{ backgroundColor: "rgba(86, 167, 104, 0.1)" }}
+          className="p-3"
+        >
+          <div>
+            <b style={{ color: "#219653" }}>งานจ้างที่เกี่ยวข้อง</b>
+          </div>
+          <Row>
+            <Col span={4}>
+              <div>วัน/เวลานัดหมาย</div>
+              <div>{DateTimeUtil.formatDateTime(dataTaskMock.dateTime)}</div>
+            </Col>
+            <Col span={4}>
+              <div>ชื่อเกษตรกร</div>
+              <div>{dataTaskMock.farmerName}</div>
+            </Col>
+            <Col span={8}>
+              <div>พื้นที่แปลงเกษตร</div>
+              <div>{dataTaskMock.plot}</div>
+            </Col>
+            <Col span={2}>
+              <div>จำนวนไร่</div>
+              <div>{dataTaskMock.raiAmount} ไร่</div>
+            </Col>
+            <Col span={3}>
+              <div>ค่าบริการ/ไร่</div>
+              <div>{dataTaskMock.unitPrice} บาท</div>
+            </Col>
+            <Col span={3}>
+              <div>ยอดรวมค่าบริการ</div>
+              <Row>
+                <div>{dataTaskMock.totalPrice} บาท</div>
+                <span>
+                  <Popover
+                    title={
+                      <span
+                        style={{
+                          color: color.White,
+                        }}
+                      >
+                        รายละเอียดค่าบริการ
+                      </span>
+                    }
+                    content={
+                      <table style={{ width: "300px" }}>
+                        <tr>
+                          <td>
+                            ค่าบริการ
+                            <br />
+                            <div style={{ fontSize: "12px" }}>
+                              จำนวนไร่{" "}
+                              <span style={{ color: color.Success }}>
+                                {dataTaskMock.raiAmount} ไร่
+                              </span>{" "}
+                              x ค่าบริการ{" "}
+                              <span style={{ color: color.Success }}>
+                                {dataTaskMock.unitPrice} ไร่
+                              </span>
+                            </div>
+                          </td>
+                          <td style={{ textAlign: "right" }}>
+                            {numberWithCommasToFixed(parseFloat("50"))}
+                          </td>
+                        </tr>
+                        <tr>
+                          <td>ค่าธรรมเนียม (5%)</td>
+                          <td style={{ textAlign: "right" }}>
+                            {numberWithCommasToFixed(parseFloat("50"))}
+                          </td>
+                        </tr>
+                        <tr>
+                          <td>ส่วนลดค่าธรรมเนียม</td>
+                          <td
+                            style={{ color: color.Error, textAlign: "right" }}
+                          >
+                            {"- " + numberWithCommasToFixed(parseFloat("0"))}
+                          </td>
+                        </tr>
+                        <tr>
+                          <td>ส่วนลดจากคูปอง</td>
+                          <td
+                            style={{ color: color.Error, textAlign: "right" }}
+                          >
+                            {"- " + numberWithCommasToFixed(parseFloat("0"))}
+                          </td>
+                        </tr>
+                        <tr>
+                          <td>ส่วนลดจากโปรโมชั่น</td>
+                          <td
+                            style={{ color: color.Error, textAlign: "right" }}
+                          >
+                            {"- " + numberWithCommasToFixed(parseFloat("0"))}
+                          </td>
+                        </tr>
+                        <tr>
+                          <td colSpan={2}>
+                            <Divider />
+                          </td>
+                        </tr>
+                        <tr>
+                          <td>ยอดรวมค่าบริการ</td>
+                          <td
+                            style={{
+                              textAlign: "right",
+                              color: color.Success,
+                              fontWeight: "bold",
+                            }}
+                          >
+                            {numberWithCommasToFixed(
+                              parseFloat(dataTaskMock.totalPrice.toString())
+                            )}
+                          </td>
+                        </tr>
+                      </table>
+                    }
+                  >
+                    <InfoCircleFilled
+                      style={{
+                        color: color.primary1,
+                        fontSize: "15px",
+                        marginLeft: "7px",
+                        verticalAlign: 0.5,
+                      }}
+                    />
+                  </Popover>
+                </span>
+              </Row>
+            </Col>
+          </Row>
+        </Container>
+      </Form>
+    </CardContainer>
+  );
+  const renderDetailFarmer = (
+    <CardContainer>
+      <CardHeader textHeader="ข้อมูลเกษตรกร" />
+      <Form style={{ padding: "32px" }}>
+        <Row gutter={8} justify={"space-between"} className="pb-3">
+          <Col span={8}>
+            <label>Farmer ID</label>
+            <Input value={dataFarmerMock.farmerId} disabled />
+          </Col>
+          <Col span={8}>
+            <label>ชื่อ</label>
+            <Input value={dataFarmerMock.farmerFirstName} disabled />
+          </Col>
+          <Col span={8}>
+            <label>นามสกุล</label>
+            <Input value={dataFarmerMock.farmerLastName} disabled />
+          </Col>
+        </Row>
+        <Row gutter={8} justify={"space-between"}>
+          <Col span={8}>
+            <label>เบอร์โทร</label>
+            <Input value={dataFarmerMock.telephone} disabled />
+          </Col>
+          <Col span={8}>
+            <label>คะแนนเดิม</label>
+            <Input value={dataFarmerMock.oldPoint} disabled  suffix="คะแนน"/>
+          </Col>
+          <Col span={8}>
+            <label>คะแนนล่าสุด</label>
+            <Input value={dataFarmerMock.newPoint} disabled suffix="คะแนน"/>
+          </Col>
+        </Row>
+      </Form>
+    </CardContainer>
+  );
+
+  return (
+    <>
+      <Layouts>
+        <Row>
+          <BackIconButton onClick={() => navigate(-1)} />
+          <span className="pt-3">
+            <strong style={{ fontSize: "20px" }}>รายละเอียดคะแนน</strong>
+          </span>
+        </Row>
+        {renderPointDetail}
+        <br />
+        {renderDetailFarmer}
+      </Layouts>
+    </>
+  );
+};
+export default DetailFarmerPoint;

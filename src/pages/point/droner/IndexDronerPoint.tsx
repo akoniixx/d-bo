@@ -1,0 +1,260 @@
+import {
+  EditOutlined,
+  FileTextOutlined,
+  SearchOutlined,
+} from "@ant-design/icons";
+import {
+  Badge,
+  Button,
+  DatePicker,
+  Dropdown,
+  Input,
+  Pagination,
+  Select,
+  Table,
+} from "antd";
+import Search from "antd/lib/input/Search";
+import React, { useState } from "react";
+import ActionButton from "../../../components/button/ActionButton";
+import { CardContainer } from "../../../components/card/CardContainer";
+import Layouts from "../../../components/layout/Layout";
+import { color } from "../../../resource";
+import { DateTimeUtil } from "../../../utilities/DateTimeUtil";
+
+const { RangePicker } = DatePicker;
+
+const IndexDronerPoint = () => {
+  const dateFormat = "DD/MM/YYYY";
+  const dateSearchFormat = "YYYY-MM-DD";
+
+  const profile = JSON.parse(localStorage.getItem("profile") || "{  }");
+  const row = 10;
+  const [current, setCurrent] = useState(1);
+
+  const onChangePage = (page: number) => {
+    setCurrent(page);
+  };
+  const dataMock = [
+    {
+      dateTime: Date(),
+      dronerName: "สวัสดี นะจ๊ะ",
+      campaignName: "แจกคะแนนขึ้นต่ำ 2 ไร่",
+      pointType: "ได้รับคะแนน",
+      totalPoint: 100,
+      status: "รอดำเนินการ",
+    },
+  ];
+
+  const pageTitle = (
+    <>
+      <div
+        className="container d-flex justify-content-between"
+        style={{ padding: "10px" }}
+      >
+        <div>
+          <span
+            className="card-label font-weight-bolder text-dark"
+            style={{
+              fontSize: 22,
+              fontWeight: "bold",
+              padding: "8px",
+            }}
+          >
+            <strong>รายการคะแนนนักบินโดรน</strong>
+          </span>
+        </div>
+        <div style={{ color: color.Error }}>
+          <RangePicker
+            allowClear
+            format={dateFormat}
+            placeholder={["เลือกวันที่เริ่ม", "เลือกวันที่สิ้นสุด"]}
+          />
+        </div>
+      </div>
+      <div
+        className="container d-flex justify-content-between"
+        style={{ padding: "8px" }}
+      >
+        <div className="col-lg-3 p-1">
+          <Input
+            allowClear
+            prefix={<SearchOutlined style={{ color: color.Disable }} />}
+            placeholder="ค้นหาชื่อเกษตรกร/เบอร์โทร"
+            className="col-lg-12 p-1"
+          />
+        </div>
+        <div className="col-lg p-1">
+          <Input
+            allowClear
+            prefix={<SearchOutlined style={{ color: color.Disable }} />}
+            placeholder="ค้นหาชื่อแคมเปญ/ของรางวัล"
+            className="col-lg-12 p-1"
+          />
+        </div>
+        <div className="col-lg">
+          <Select
+            allowClear
+            className="col-lg-12 p-1"
+            placeholder="ได้รับ/แลกคะแนน"
+            showSearch
+            optionFilterProp="children"
+            filterOption={(input: any, option: any) =>
+              option.children.includes(input)
+            }
+            filterSort={(optionA, optionB) =>
+              optionA.children
+                .toLowerCase()
+                .localeCompare(optionB.children.toLowerCase())
+            }
+          ></Select>
+        </div>
+        <div className="col-lg">
+          <Select
+            className="col-lg-12 p-1"
+            placeholder="เลือกสถานะ"
+            allowClear
+          ></Select>
+        </div>
+        <div className="pt-1">
+          <Button
+            style={{
+              borderColor: color.Success,
+              borderRadius: "5px",
+              color: color.secondary2,
+              backgroundColor: color.Success,
+            }}
+          >
+            ค้นหาข้อมูล
+          </Button>
+        </div>
+      </div>
+    </>
+  );
+
+  const columns = [
+    {
+      title: "วันที่อัพเดท",
+      dataIndex: "date_appointment",
+      key: "date_appointment",
+      width: "15%",
+      render: (value: any, row: any, index: number) => {
+        return {
+          children: (
+            <>
+              <span>{DateTimeUtil.formatDateTime(value)}</span>
+              <br />
+              <span style={{ color: color.Grey }}>{row.task_no}</span>
+            </>
+          ),
+        };
+      },
+    },
+    {
+      title: "ชื่อนักบินโดรน",
+      dataIndex: "dronerName",
+      key: "dronerName",
+      width: "15%",
+      render: (value: any, row: any, index: number) => {
+        return {
+          children: <span>{row.dronerName}</span>,
+        };
+      },
+    },
+    {
+      title: "แคมแปญ/ของขวัญ",
+      dataIndex: "campaignName",
+      width: "20%",
+      render: (value: any, row: any, index: number) => {
+        return {
+          children: <span>{row.campaignName}</span>,
+        };
+      },
+    },
+    {
+      title: "การได้รับ/แลกของขวัญ",
+      dataIndex: "pointType",
+      key: "pointType",
+      width: "15%",
+      render: (value: any, row: any, index: number) => {
+        return {
+          children: <span style={{ color: "#A9CB62" }}>{row.pointType}</span>,
+        };
+      },
+    },
+    {
+      title: "จำนวนคะแนน",
+      dataIndex: "totalPoint",
+      key: "totalPoint",
+      render: (value: any, row: any, index: number) => {
+        return {
+          children: <span>{"+" + row.totalPoint}</span>,
+        };
+      },
+    },
+    {
+      title: "สถานะ",
+      dataIndex: "task_status",
+      key: "task_status",
+      render: (value: any, row: any, index: number) => {
+        return {
+          children: (
+            <span style={{ color: color.Warning }}>
+              <Badge color={color.Warning} /> {row.status}
+            </span>
+          ),
+        };
+      },
+    },
+    {
+      title: "",
+      dataIndex: "Action",
+      key: "Action",
+      render: (value: any, row: any, index: number) => {
+        return {
+          children: (
+            <div className="d-flex flex-row justify-content-center">
+              <div className="col-lg-6">
+                <ActionButton
+                  icon={<FileTextOutlined />}
+                  color={color.primary1}
+                  onClick={() =>
+                    (window.location.href = "/DetailDronerPoint/id=" + 1)
+                  }
+                />
+              </div>
+            </div>
+          ),
+        };
+      },
+    },
+  ];
+
+  return (
+    <>
+      <Layouts>
+        {pageTitle}
+        <CardContainer>
+          <Table
+            dataSource={dataMock}
+            columns={columns}
+            pagination={false}
+            size="large"
+            tableLayout="fixed"
+          />
+        </CardContainer>
+        <div className="d-flex justify-content-between pt-4">
+          <p>รายการทั้งหมด {dataMock?.length} รายการ</p>
+          <Pagination
+            current={current}
+            total={dataMock.length}
+            onChange={onChangePage}
+            pageSize={row}
+            showSizeChanger={false}
+          />
+        </div>
+      </Layouts>
+    </>
+  );
+};
+
+export default IndexDronerPoint;
