@@ -104,7 +104,6 @@ const EditInprogressTask = () => {
       setDronerSelected(res.droner);
       setCheckCrop(!res.targetSpray.includes("อื่นๆ"));
       console.log("check", res);
-
       setData(res);
       CouponDataSource.getPromotionCode(res.couponId).then((result) =>
         setCouponData({
@@ -499,7 +498,7 @@ const EditInprogressTask = () => {
               <div className="form-group col-lg-4">
                 <label>จำนวนไร่</label>
                 <Form.Item>
-                  <Input value={data?.farmerPlot?.raiAmount} disabled />
+                  <Input value={data?.farmAreaAmount} />
                 </Form.Item>
               </div>
             </div>
