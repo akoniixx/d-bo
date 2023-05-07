@@ -1,19 +1,15 @@
 import {
-  EditOutlined,
   FileTextOutlined,
   SearchOutlined,
 } from "@ant-design/icons";
 import {
-  Badge,
   Button,
   DatePicker,
-  Dropdown,
   Input,
   Pagination,
   Select,
   Table,
 } from "antd";
-import Search from "antd/lib/input/Search";
 import React, { useState } from "react";
 import ActionButton from "../../../components/button/ActionButton";
 import { CardContainer } from "../../../components/card/CardContainer";
@@ -41,6 +37,14 @@ const IndexDronerPoint = () => {
       campaignName: "แจกคะแนนขึ้นต่ำ 2 ไร่",
       pointType: "ได้รับคะแนน",
       totalPoint: 100,
+      status: "รอดำเนินการ",
+    },
+    {
+      dateTime: Date(),
+      dronerName: "สวัสดี นะจ๊ะ",
+      campaignName: "แจกคะแนนขึ้นต่ำ 5 ไร่",
+      pointType: "แลกคะแนน",
+      totalPoint: 200,
       status: "รอดำเนินการ",
     },
   ];
@@ -75,7 +79,7 @@ const IndexDronerPoint = () => {
         className="container d-flex justify-content-between"
         style={{ padding: "8px" }}
       >
-        <div className="col-lg-3 p-1">
+        <div className="col-lg-4 p-1">
           <Input
             allowClear
             prefix={<SearchOutlined style={{ color: color.Disable }} />}
@@ -96,24 +100,10 @@ const IndexDronerPoint = () => {
             allowClear
             className="col-lg-12 p-1"
             placeholder="ได้รับ/แลกคะแนน"
-            showSearch
-            optionFilterProp="children"
-            filterOption={(input: any, option: any) =>
-              option.children.includes(input)
-            }
-            filterSort={(optionA, optionB) =>
-              optionA.children
-                .toLowerCase()
-                .localeCompare(optionB.children.toLowerCase())
-            }
-          ></Select>
-        </div>
-        <div className="col-lg">
-          <Select
-            className="col-lg-12 p-1"
-            placeholder="เลือกสถานะ"
-            allowClear
-          ></Select>
+          >
+            <option value="ได้รับคะแนน">ได้รับคะแนน</option>
+            <option value="แลกคะแนน">แลกคะแนน</option>
+          </Select>
         </div>
         <div className="pt-1">
           <Button
@@ -174,10 +164,19 @@ const IndexDronerPoint = () => {
       title: "การได้รับ/แลกของขวัญ",
       dataIndex: "pointType",
       key: "pointType",
-      width: "15%",
+      width: "20%",
       render: (value: any, row: any, index: number) => {
         return {
-          children: <span style={{ color: "#A9CB62" }}>{row.pointType}</span>,
+          children: (
+            <span
+              style={{
+                color:
+                  row.pointType === "ได้รับคะแนน" ? "#A9CB62" : color.Error,
+              }}
+            >
+              {row.pointType}
+            </span>
+          ),
         };
       },
     },
@@ -187,19 +186,13 @@ const IndexDronerPoint = () => {
       key: "totalPoint",
       render: (value: any, row: any, index: number) => {
         return {
-          children: <span>{"+" + row.totalPoint}</span>,
-        };
-      },
-    },
-    {
-      title: "สถานะ",
-      dataIndex: "task_status",
-      key: "task_status",
-      render: (value: any, row: any, index: number) => {
-        return {
           children: (
-            <span style={{ color: color.Warning }}>
-              <Badge color={color.Warning} /> {row.status}
+            <span
+              style={{
+                color: row.pointType === "ได้รับคะแนน" ? color.BK : color.Error,
+              }}
+            >
+              {(row.pointType === "ได้รับคะแนน" ? "+" : "-") + row.totalPoint}
             </span>
           ),
         };
@@ -218,7 +211,8 @@ const IndexDronerPoint = () => {
                   icon={<FileTextOutlined />}
                   color={color.primary1}
                   onClick={() =>
-                    (window.location.href = "/DetailDronerPoint/id=" + 1)
+                    (window.location.href =
+                      "/DetailDronerPoint/id=" + (index + 1))
                   }
                 />
               </div>
@@ -240,6 +234,9 @@ const IndexDronerPoint = () => {
             pagination={false}
             size="large"
             tableLayout="fixed"
+            rowClassName={(a) =>
+              a.pointType == "แลกคะแนน" ? "table-row-older" : "table-row-lasted"
+            }
           />
         </CardContainer>
         <div className="d-flex justify-content-between pt-4">

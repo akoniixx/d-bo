@@ -21,6 +21,9 @@ import color from "../../../resource/color";
 import { DateTimeUtil } from "../../../utilities/DateTimeUtil";
 import { numberWithCommasToFixed } from "../../../utilities/TextFormatter";
 
+const _ = require("lodash");
+let queryString = _.split(window.location.pathname, "=");
+
 const DetailDronerPoint = () => {
   const navigate = useNavigate();
 
@@ -28,11 +31,12 @@ const DetailDronerPoint = () => {
     dateTime: Date(),
     farmerName: "รชยา ช่างภักดี",
     campaignName: "แจกคะแนนขั้นต่ำ 2 ไร่",
-    pointType: "ได้รับคะแนน",
-    totalPoint: 100,
+    pointType: queryString[1] === "1" ? "ได้รับคะแนน" : "แลกคะแนน",
+    totalPoint: queryString[1] === "1" ? 100 : 200,
     status: "รอดำเนินการ",
   };
   const dataTaskMock = {
+    taskId: "TK20230501TH-0000002",
     dateTime: Date(),
     farmerName: "รชยา ช่างภักดี",
     plot: "สำโรงเหนือ/เมืองสมุทรปราการ/สมุทรปราการ",
@@ -59,13 +63,13 @@ const DetailDronerPoint = () => {
       <CardHeader textHeader="ข้อมูลคะแนน" />
       <Form style={{ padding: "32px" }}>
         <Row gutter={16}>
-          <Col span={12} style={{ borderRight: "ridge" }}>
+          <Col span={24}>
             <div className="pb-3">
               <div>วันที่ดำเนินงาน</div>
               <div>{DateTimeUtil.formatDateTime(dataMock.dateTime)}</div>
             </div>
             <div className="pb-3">
-              <div>แคมเปญ</div>
+              <div>ที่มาของคะแนน</div>
               <div>{dataMock.campaignName}</div>
             </div>
             <div className="pb-3">
@@ -74,9 +78,12 @@ const DetailDronerPoint = () => {
                 <Input
                   size="middle"
                   value={dataMock.pointType}
-                  className="col-lg-3"
+                  className="col-lg-2"
                   style={{
-                    backgroundColor: "#A9CB62",
+                    backgroundColor:
+                      dataMock.pointType === "ได้รับคะแนน"
+                        ? "#A9CB62"
+                        : color.Error,
                     color: "white",
                     textAlign: "center",
                   }}
@@ -85,7 +92,7 @@ const DetailDronerPoint = () => {
                 />
                 <Input
                   size="middle"
-                  className="col-lg-3"
+                  className="col-lg-2"
                   value={"+" + dataMock.totalPoint}
                   style={{
                     textAlign: "center",
@@ -98,34 +105,36 @@ const DetailDronerPoint = () => {
               </div>
             </div>
           </Col>
-          <Col span={12}>
-            <div className="pb-3 ps-3">
-              <div>สถานะ</div>
-              <Radio.Group defaultValue={dataMock.status}>
-                <Space direction="vertical">
-                  <Radio className="col-lg-12" value={"รอดำเนินการ"}>
-                    รอดำเนินการ
-                  </Radio>
-                  <Radio className="col-lg-12" value={"สิ้นเสร็จ"}>
-                    สิ้นเสร็จ
-                  </Radio>
-                  <Radio className="col-lg-12" value={"ยกเลิก"}>
-                    ยกเลิก
-                  </Radio>
-                </Space>
-              </Radio.Group>
-            </div>
-          </Col>
         </Row>
         <br />
         <Container
-          style={{ backgroundColor: "rgba(86, 167, 104, 0.1)" }}
+          style={{
+            backgroundColor:
+              dataMock.pointType === "ได้รับคะแนน"
+                ? "rgba(86, 167, 104, 0.1)"
+                : "rgba(235, 87, 87, 0.1)",
+          }}
           className="p-3"
         >
           <div>
-            <b style={{ color: "#219653" }}>งานจ้างที่เกี่ยวข้อง</b>
+            <b
+              style={{
+                color:
+                  dataMock.pointType === "ได้รับคะแนน"
+                    ? "#219653"
+                    : color.Error,
+              }}
+            >
+              งานจ้างที่เกี่ยวข้อง
+            </b>
           </div>
           <Row>
+            <Col span={3}>
+              <div>รหัสงาน</div>
+              <div style={{ color: "#219653" }}>
+                <u>{dataTaskMock.taskId}</u>
+              </div>
+            </Col>
             <Col span={4}>
               <div>วัน/เวลานัดหมาย</div>
               <div>{DateTimeUtil.formatDateTime(dataTaskMock.dateTime)}</div>
@@ -134,7 +143,7 @@ const DetailDronerPoint = () => {
               <div>ชื่อเกษตรกร</div>
               <div>{dataTaskMock.farmerName}</div>
             </Col>
-            <Col span={8}>
+            <Col span={5}>
               <div>พื้นที่แปลงเกษตร</div>
               <div>{dataTaskMock.plot}</div>
             </Col>
@@ -253,7 +262,11 @@ const DetailDronerPoint = () => {
   );
   const renderDetailFarmer = (
     <CardContainer>
-      <CardHeader textHeader="ข้อมูลเกษตรกร" />
+      <CardHeader
+        textHeader="ข้อมูลนักบินโดรน"
+        showButton={true}
+        buttonName="เช็คประวัติคะแนน"
+      />
       <Form style={{ padding: "32px" }}>
         <Row gutter={8} justify={"space-between"} className="pb-3">
           <Col span={8}>
@@ -275,11 +288,11 @@ const DetailDronerPoint = () => {
             <Input value={dataDronerMock.telephone} disabled />
           </Col>
           <Col span={8}>
-            <label>คะแนนเดิม</label>
+            <label>คะแนนก่อนเปลี่ยนแปลง</label>
             <Input value={dataDronerMock.oldPoint} disabled suffix="คะแนน" />
           </Col>
           <Col span={8}>
-            <label>คะแนนล่าสุด</label>
+            <label>คะแนนหลังเปลี่ยนแปลง</label>
             <Input value={dataDronerMock.newPoint} disabled suffix="คะแนน" />
           </Col>
         </Row>
