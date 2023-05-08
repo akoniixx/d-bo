@@ -268,6 +268,9 @@ const DetailFarmerPoint = () => {
         textHeader="ข้อมูลเกษตรกร"
         showButton={true}
         buttonName="เช็คประวัติคะแนน"
+        onClickButoon={() =>
+          (window.location.href = "/IndexDetailFarmerPoint/id=" + 1)
+        }
       />
       <Form style={{ padding: "32px" }}>
         <Row gutter={8} justify={"space-between"} className="pb-3">

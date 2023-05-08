@@ -211,6 +211,14 @@ const Layouts: React.FC<any> = ({ children }) => {
                   </Link>
                 </Menu.Item>
               </Menu.SubMenu>
+              <Menu.Item key="campaignpoint">
+                  <Link
+                    to="/IndexCampaignPoint"
+                    style={{ textDecoration: "none" }}
+                  >
+                    <span>แคมเปญคะแนน</span>
+                  </Link>
+                </Menu.Item>
             </Menu.SubMenu>
             <Menu.SubMenu
               icon={<UserOutlined />}

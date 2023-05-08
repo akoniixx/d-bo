@@ -50,6 +50,10 @@ import IndexFarmerPoint from "./pages/point/farmer/IndexFarmerPoint";
 import IndexDronerPoint from "./pages/point/droner/IndexDronerPoint";
 import DetailFarmerPoint from "./pages/point/farmer/DetailFarmerPoint";
 import DetailDronerPoint from "./pages/point/droner/DetailDronerPoint";
+import IndexCampaignPoint from "./pages/campaign/point/IndexCampaignPoint";
+import AddCampaignPoint from "./pages/campaign/point/AddCampaignPoint";
+import IndexDetailFarmerPoint from "./pages/farmer/IndexDetailFarmerPoint";
+import IndexDetailDronerPoint from "./pages/droner/IndexDetailDronerPoint";
 
 const WebRoutes: React.FC<any> = () => {
   return (
@@ -117,6 +121,16 @@ const WebRoutes: React.FC<any> = () => {
           <Route
             path="/DetailDronerPoint/:id"
             element={<DetailDronerPoint />}
+          />
+          <Route path="/IndexCampaignPoint" element={<IndexCampaignPoint />} />
+          <Route path="/AddCampaignPoint" element={<AddCampaignPoint />} />
+          <Route
+            path="/IndexDetailFarmerPoint/:id"
+            element={<IndexDetailFarmerPoint />}
+          />
+          <Route
+            path="/IndexDetailDronerPoint/:id"
+            element={<IndexDetailDronerPoint />}
           />
         </Route>
         <Route element={<PublicRoute />}>

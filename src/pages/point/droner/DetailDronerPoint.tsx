@@ -266,6 +266,9 @@ const DetailDronerPoint = () => {
         textHeader="ข้อมูลนักบินโดรน"
         showButton={true}
         buttonName="เช็คประวัติคะแนน"
+        onClickButoon={() =>
+          (window.location.href = "/IndexDetailDronerPoint/id=" + 1)
+        }
       />
       <Form style={{ padding: "32px" }}>
         <Row gutter={8} justify={"space-between"} className="pb-3">
