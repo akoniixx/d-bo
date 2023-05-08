@@ -11,14 +11,23 @@ import { useNavigate } from 'react-router-dom';
 import { NewsDatasource } from '../../datasource/NewsDatasource';
 import { DateTimeUtil } from '../../utilities/DateTimeUtil';
 import { STATUS_COUPON } from '../../definitions/Status';
+import ModalDeleteNews from '../../components/modal/ModalDeleteNews';
 
 function NewsPage() {
   const navigate = useNavigate();
   const row = 10;
+  const [newsDelete,setNewsDelete] = useState<any>({
+    newsId : "",
+    newsPath : ""
+  })
   const [status,setStatus] = useState<string | undefined>(undefined)
   const [application,setApplication] = useState<string | undefined>(undefined)
   const [sortDirection,setSortDirection] = useState<string | undefined>(undefined)
+  const [sortDirection1,setSortDirection1] = useState<string | undefined>(undefined)
+  const [sortDirection2,setSortDirection2] = useState<string | undefined>(undefined)
+  const [sortDirection3,setSortDirection3] = useState<string | undefined>(undefined)
   const [sortField,setSortField] = useState<string | undefined>(undefined)
+  const [modalDelete, setModalDelete] = useState<boolean>(false);
   const [search,setSearch] = useState<string>("")
   const [current, setCurrent] = useState(1);
   const [data, setData] = useState<any>({
@@ -44,21 +53,36 @@ function NewsPage() {
 
   const onChangeSearch =(e : any)=>{
     setSearch(e.target.value)
-    setCurrent(1)
   }
 
   const onChangeStatus = (status : string)=>{
     setStatus(status)
-    setCurrent(1)
   }
 
   const onChangeApplication = (application : string)=>{
     setApplication(application)
-    setCurrent(1)
   }
 
   const onChangePage = (page: number) => {
     setCurrent(page);
+  };
+
+  const deleteNews = (id: string,path: string) => {
+    console.log(id,path)
+    NewsDatasource.deleteNews(id,path)      
+    .then((res) => {
+      setModalDelete(!modalDelete);
+      window.location.reload();
+    })
+    .catch((err) => console.log(err));
+  };
+
+  const showDelete = (id: string,path : string) => {
+    setNewsDelete({
+      newsId : id,
+      newsPath : path
+    })
+    setModalDelete(!modalDelete);
   };
 
   useEffect(()=>{
@@ -145,7 +169,12 @@ function NewsPage() {
               color: color.secondary2,
               backgroundColor: color.Success,
             }}
-            onClick={fetchNews}
+            onClick={()=>{
+              setCurrent(1)
+              if(current === 1){
+                fetchNews()
+              }
+            }}
           >
             ค้นหาข้อมูล
           </Button>
@@ -194,19 +223,28 @@ function NewsPage() {
                     return undefined;
                   }
                 });
+                setSortDirection1((prev) => {
+                  if (prev === "ASC") {
+                    return "DESC";
+                  } else if (prev === undefined) {
+                    return "ASC";
+                  } else {
+                    return undefined;
+                  }
+                });
               }}>
               <CaretUpOutlined
                 style={{
                   position: "relative",
                   top: 2,
-                  color: sortDirection === "ASC" ? "#ffca37" : "white",
+                  color: sortDirection1 === "ASC" ? "#ffca37" : "white",
                 }}
               />
               <CaretDownOutlined
                 style={{
                   position: "relative",
                   bottom: 2,
-                  color: sortDirection === "DESC" ? "#ffca37" : "white",
+                  color: sortDirection1 === "DESC" ? "#ffca37" : "white",
                 }}
               />
             </div>
@@ -250,19 +288,28 @@ function NewsPage() {
                     return undefined;
                   }
                 });
+                setSortDirection2((prev) => {
+                  if (prev === "ASC") {
+                    return "DESC";
+                  } else if (prev === undefined) {
+                    return "ASC";
+                  } else {
+                    return undefined;
+                  }
+                });
               }}>
               <CaretUpOutlined
                 style={{
                   position: "relative",
                   top: 2,
-                  color: sortDirection === "ASC" ? "#ffca37" : "white",
+                  color: sortDirection2 === "ASC" ? "#ffca37" : "white",
                 }}
               />
               <CaretDownOutlined
                 style={{
                   position: "relative",
                   bottom: 2,
-                  color: sortDirection === "DESC" ? "#ffca37" : "white",
+                  color: sortDirection2 === "DESC" ? "#ffca37" : "white",
                 }}
               />
             </div>
@@ -306,19 +353,28 @@ function NewsPage() {
                     return undefined;
                   }
                 });
+                setSortDirection3((prev) => {
+                  if (prev === "ASC") {
+                    return "DESC";
+                  } else if (prev === undefined) {
+                    return "ASC";
+                  } else {
+                    return undefined;
+                  }
+                });
               }}>
               <CaretUpOutlined
                 style={{
                   position: "relative",
                   top: 2,
-                  color: sortDirection === "ASC" ? "#ffca37" : "white",
+                  color: sortDirection3 === "ASC" ? "#ffca37" : "white",
                 }}
               />
               <CaretDownOutlined
                 style={{
                   position: "relative",
                   bottom: 2,
-                  color: sortDirection === "DESC" ? "#ffca37" : "white",
+                  color: sortDirection3 === "DESC" ? "#ffca37" : "white",
                 }}
               />
             </div>
@@ -461,7 +517,7 @@ function NewsPage() {
                 <ActionButton
                   icon={<DeleteOutlined />}
                   color={row.used > 0 ? color.Grey : color.Error}
-                  onClick={() => {}}
+                  onClick={() => showDelete(row.id,row.image_path.split("https://storage.googleapis.com/dnds/news-image/")[1].split("?")[0])}
                   actionDisable={row.used > 0 ? true : false}
                 />
               </div>
@@ -474,6 +530,11 @@ function NewsPage() {
 
   return (
     <Layouts>
+      <ModalDeleteNews
+        show={modalDelete}
+        backButton={() => setModalDelete(!modalDelete)}
+        callBack={()=>deleteNews(newsDelete.newsId,newsDelete.newsPath)}
+      />
       {PageTitle}
       <br />
       <Table

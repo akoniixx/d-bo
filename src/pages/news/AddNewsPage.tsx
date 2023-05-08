@@ -81,6 +81,10 @@ function AddNewsPage() {
   const removeImgProfile = () => {
     setImgProfile(undefined);
     setCreateImgProfile(UploadImageEntity_INTI);
+    form.setFieldValue(
+      "img",null
+    )
+    onFieldsChange()
     // checkValidate(data);
   };
 

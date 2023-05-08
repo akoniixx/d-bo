@@ -14,6 +14,7 @@ import FooterPage from '../../components/footer/FooterPage';
 import RenderNews from '../../components/mobile/RenderNews';
 import { NewsDatasource } from '../../datasource/NewsDatasource';
 import Swal from 'sweetalert2';
+import parse from "html-react-parser";
 import { UploadImageDatasouce } from '../../datasource/UploadImageDatasource';
 const { Map } = require("immutable");
 const _ = require("lodash");
@@ -87,6 +88,10 @@ function EditNewsPage() {
     setImgProfile(undefined);
     setCreateImgProfile(UploadImageEntity_INTI);
     setBtnSaveDisable(true);
+    form.setFieldValue(
+      "img",null
+    )
+    onFieldsChange()
     // checkValidate(data);
   };
 
@@ -136,8 +141,7 @@ function EditNewsPage() {
     let fieldInfo = false;
     let fieldapp = false;
     let fieldimg = false;
-
-    if(newsName && newsDescription && newsStatus){
+    if(newsName && (newsDescription != "<p><br></p>") && newsStatus){
       fieldInfo = false
     }
     else{
