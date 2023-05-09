@@ -1,4 +1,3 @@
-import { render } from "@testing-library/react";
 import {
   Button,
   Col,
@@ -21,11 +20,10 @@ import { CardHeader } from "../../../components/header/CardHearder";
 import Layouts from "../../../components/layout/Layout";
 import { color } from "../../../resource";
 
-const AddCampaignPoint = () => {
+const EditCampaignPoint = () => {
   const navigate = useNavigate();
   const dateFormat = "DD/MM/YYYY";
   const [form] = Form.useForm();
-
   const [showModal, setShowModal] = useState(false);
 
   return (
@@ -34,7 +32,7 @@ const AddCampaignPoint = () => {
         <Row>
           <BackIconButton onClick={() => navigate(-1)} />
           <span className="pt-3">
-            <strong style={{ fontSize: "20px" }}>เพิ่มแคมเปญคะแนน</strong>
+            <strong style={{ fontSize: "20px" }}>แก้ไขแคมเปญคะแนน</strong>
           </span>
         </Row>
         <CardContainer>
@@ -229,7 +227,7 @@ const AddCampaignPoint = () => {
       </Layouts>
       {showModal && (
         <Modal
-          title="ยืนยันการเพิ่ม"
+          title="ยืนยันการแก้ไข"
           onCancel={() => {
             setShowModal(!showModal);
           }}
@@ -241,7 +239,7 @@ const AddCampaignPoint = () => {
         >
           <div className="px-4 pt-4">
             <span className="text-secondary">
-              โปรดตรวจสอบแคมเปญที่คุณต้องการเพิ่ม ก่อนที่จะกดยืนยันการเพิ่ม
+              โปรดตรวจสอบแคมเปญที่คุณต้องการแก้ไข ก่อนที่จะกดยืนยันแก้ไข
             </span>
             <p className="text-secondary">
               เพราะอาจส่งผลต่อการคะแนนในแอปพลิเคชัน
@@ -280,4 +278,4 @@ const AddCampaignPoint = () => {
   );
 };
 
-export default AddCampaignPoint;
+export default EditCampaignPoint;

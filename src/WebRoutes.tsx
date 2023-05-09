@@ -54,6 +54,7 @@ import IndexCampaignPoint from "./pages/campaign/point/IndexCampaignPoint";
 import AddCampaignPoint from "./pages/campaign/point/AddCampaignPoint";
 import IndexDetailFarmerPoint from "./pages/farmer/IndexDetailFarmerPoint";
 import IndexDetailDronerPoint from "./pages/droner/IndexDetailDronerPoint";
+import EditCampaignPoint from "./pages/campaign/point/EditCampaignPoint";
 
 const WebRoutes: React.FC<any> = () => {
   return (
@@ -131,6 +132,10 @@ const WebRoutes: React.FC<any> = () => {
           <Route
             path="/IndexDetailDronerPoint/:id"
             element={<IndexDetailDronerPoint />}
+          />
+          <Route
+            path="/EditCampaignPoint/:id"
+            element={<EditCampaignPoint />}
           />
         </Route>
         <Route element={<PublicRoute />}>

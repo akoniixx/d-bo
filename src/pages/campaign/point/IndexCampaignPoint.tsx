@@ -9,7 +9,9 @@ import {
   Button,
   Col,
   DatePicker,
+  Divider,
   Input,
+  Modal,
   Pagination,
   Row,
   Select,
@@ -33,6 +35,7 @@ const IndexCampaignPoint = () => {
   const profile = JSON.parse(localStorage.getItem("profile") || "{  }");
   const row = 10;
   const [current, setCurrent] = useState(1);
+  const [showModal, setShowModal] = useState(false);
 
   const onChangePage = (page: number) => {
     setCurrent(page);
@@ -220,20 +223,17 @@ const IndexCampaignPoint = () => {
                 <ActionButton
                   icon={<EditOutlined />}
                   color={color.primary1}
-                  //   onClick={() =>
-                  //     (window.location.href =
-                  //       "/DetailDronerPoint/id=" + (index + 1))
-                  //   }
+                  onClick={() =>
+                    (window.location.href =
+                      "/EditCampaignPoint/id=" + (index + 1))
+                  }
                 />
               </div>
               <div className="col-lg-6">
                 <ActionButton
                   icon={<DeleteOutlined />}
                   color={color.Error}
-                  //   onClick={() =>
-                  //     (window.location.href =
-                  //       "/DetailDronerPoint/id=" + (index + 1))
-                  //   }
+                  onClick={() => setShowModal(!showModal)}
                 />
               </div>
             </div>
@@ -244,28 +244,79 @@ const IndexCampaignPoint = () => {
   ];
 
   return (
-    <Layouts>
-      {pageTitle}
-      <CardContainer>
-        <Table
-          dataSource={dataMock}
-          columns={columns}
-          pagination={false}
-          size="large"
-          tableLayout="fixed"
-        />
-      </CardContainer>
-      <div className="d-flex justify-content-between pt-4">
-        <p>รายการทั้งหมด {dataMock.length} รายการ</p>
-        <Pagination
-          current={current}
-          total={dataMock.length}
-          onChange={onChangePage}
-          pageSize={row}
-          showSizeChanger={false}
-        />
-      </div>
-    </Layouts>
+    <>
+      <Layouts>
+        {pageTitle}
+        <CardContainer>
+          <Table
+            dataSource={dataMock}
+            columns={columns}
+            pagination={false}
+            size="large"
+            tableLayout="fixed"
+          />
+        </CardContainer>
+        <div className="d-flex justify-content-between pt-4">
+          <p>รายการทั้งหมด {dataMock.length} รายการ</p>
+          <Pagination
+            current={current}
+            total={dataMock.length}
+            onChange={onChangePage}
+            pageSize={row}
+            showSizeChanger={false}
+          />
+        </div>
+      </Layouts>
+      {showModal && (
+        <Modal
+          title="ยืนยันการลบ"
+          onCancel={() => {
+            setShowModal(!showModal);
+          }}
+          open={showModal}
+          footer={null}
+          bodyStyle={{
+            padding: 0,
+          }}
+        >
+          <div className="px-4 pt-4">
+            <span className="text-secondary">
+              โปรดตรวจสอบของแคมเปญที่คุณต้องการลบ ก่อนที่จะกดยืนยัน
+            </span>
+            <p className="text-secondary">
+              เพราะอาจส่งผลต่อการคะแนนในแอปพลิเคชัน
+            </p>
+          </div>
+          <Divider
+            style={{
+              marginBottom: "20px",
+            }}
+          />
+          <div className="d-flex justify-content-between px-4 pb-4">
+            <Button
+              style={{
+                borderColor: color.Error,
+                color: color.Error,
+              }}
+              onClick={() => {
+                setShowModal(!showModal);
+              }}
+            >
+              ยกเลิก
+            </Button>
+            <Button
+              style={{
+                borderColor: color.Error,
+                backgroundColor: color.Error,
+                color: color.White,
+              }}
+            >
+              ยืนยัน
+            </Button>
+          </div>
+        </Modal>
+      )}
+    </>
   );
 };
 
