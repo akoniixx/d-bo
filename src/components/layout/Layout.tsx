@@ -88,7 +88,7 @@ const Layouts: React.FC<any> = ({ children }) => {
       </Header>
       <Layout>
         <Sider
-          width={200}
+          width={205}
           style={{
             position: "fixed",
             height: "100%",
@@ -246,6 +246,21 @@ const Layouts: React.FC<any> = ({ children }) => {
                   <span>ราคาฉีดพ่น</span>
                 </Link>
               </Menu.Item>
+              <Menu.SubMenu
+              title={<span>คะแนน</span>}
+              key={"sub8"}
+            >
+              <Menu.Item key="conditionFarmer">
+                <Link to="/ConditionFarmer" style={{ textDecoration: "none" }}>
+                  <span>เงื่อนไขเกษตรกร</span>
+                </Link>
+              </Menu.Item>
+              <Menu.Item key="conditionDroner">
+                <Link to="/ConditionDroner" style={{ textDecoration: "none" }}>
+                  <span>เงื่อนไขนักบินโดรน</span>
+                </Link>
+              </Menu.Item>
+            </Menu.SubMenu>
             </Menu.SubMenu>
           </Menu>
         </Sider>
