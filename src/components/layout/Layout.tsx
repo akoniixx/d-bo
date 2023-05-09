@@ -12,6 +12,7 @@ import {
   ContactsFilled,
   DollarCircleFilled,
   UserOutlined,
+  StarFilled,
 } from "@ant-design/icons";
 import { Link, useNavigate } from "react-router-dom";
 import color from "../../resource/color";
@@ -36,7 +37,7 @@ const Layouts: React.FC<any> = ({ children }) => {
     "profile",
     []
   );
- 
+
   const style: React.CSSProperties = {
     height: "100%",
     paddingTop: 30,
@@ -125,10 +126,7 @@ const Layouts: React.FC<any> = ({ children }) => {
               </Menu.Item>
               <Menu.Item key="finishTask">
                 {persistedProfile.username == "ick_accounting" ? (
-                  <Link
-                    to="/IndexReport"
-                    style={{ textDecoration: "none" }}
-                  >
+                  <Link to="/IndexReport" style={{ textDecoration: "none" }}>
                     <span>งานที่เสร็จแล้ว</span>
                   </Link>
                 ) : (
@@ -178,9 +176,7 @@ const Layouts: React.FC<any> = ({ children }) => {
               key={"sub4"}
             >
               <Menu.Item key="news">
-                <Link
-                  to="/NewsPage"
-                  style={{ textDecoration: "none" }}>
+                <Link to="/NewsPage" style={{ textDecoration: "none" }}>
                   <span>ข่าวสาร</span>
                 </Link>
               </Menu.Item>
@@ -189,6 +185,40 @@ const Layouts: React.FC<any> = ({ children }) => {
                   <span>คูปอง</span>
                 </Link>
               </Menu.Item>
+            </Menu.SubMenu>
+            <Menu.SubMenu
+              icon={<StarFilled />}
+              title={<span>คะแนน</span>}
+              key={"sub7"}
+            >
+              <Menu.SubMenu title={<span>นักบินโดรน</span>} key={"sub9"}>
+                <Menu.Item key="dronerpoint">
+                  <Link
+                    to="/IndexDronerPoint"
+                    style={{ textDecoration: "none" }}
+                  >
+                    <span>รายการคะแนน</span>
+                  </Link>
+                </Menu.Item>
+              </Menu.SubMenu>
+              <Menu.SubMenu title={<span>เกษตรกร</span>} key={"sub8"}>
+                <Menu.Item key="farmerpoint">
+                  <Link
+                    to="/IndexFarmerPoint"
+                    style={{ textDecoration: "none" }}
+                  >
+                    <span>รายการคะแนน</span>
+                  </Link>
+                </Menu.Item>
+              </Menu.SubMenu>
+              <Menu.Item key="campaignpoint">
+                  <Link
+                    to="/IndexCampaignPoint"
+                    style={{ textDecoration: "none" }}
+                  >
+                    <span>แคมเปญคะแนน</span>
+                  </Link>
+                </Menu.Item>
             </Menu.SubMenu>
             <Menu.SubMenu
               icon={<UserOutlined />}

@@ -41,11 +41,20 @@ import PricePage from "./pages/setting/PricePage";
 import AddDroneBrand from "./pages/setting/masterDataDrone/AddDroneBrand";
 import IndexDroneBrand from "./pages/setting/masterDataDrone/IndexDroneBrand";
 import EditDroneBrand from "./pages/setting/masterDataDrone/EditDroneBrand";
-import IndexReport from './pages/report/IndexReport';
+import IndexReport from "./pages/report/IndexReport";
 import EditReport from "./pages/report/EditReport";
 import NewsPage from "./pages/news/NewsPage";
 import EditNewsPage from "./pages/news/EditNewsPage";
 import AddNewsPage from "./pages/news/AddNewsPage";
+import IndexFarmerPoint from "./pages/point/farmer/IndexFarmerPoint";
+import IndexDronerPoint from "./pages/point/droner/IndexDronerPoint";
+import DetailFarmerPoint from "./pages/point/farmer/DetailFarmerPoint";
+import DetailDronerPoint from "./pages/point/droner/DetailDronerPoint";
+import IndexCampaignPoint from "./pages/campaign/point/IndexCampaignPoint";
+import AddCampaignPoint from "./pages/campaign/point/AddCampaignPoint";
+import IndexDetailFarmerPoint from "./pages/farmer/IndexDetailFarmerPoint";
+import IndexDetailDronerPoint from "./pages/droner/IndexDetailDronerPoint";
+import EditCampaignPoint from "./pages/campaign/point/EditCampaignPoint";
 
 const WebRoutes: React.FC<any> = () => {
   return (
@@ -63,7 +72,7 @@ const WebRoutes: React.FC<any> = () => {
           <Route path="/IndexFarmer" element={<IndexFarmer />} />
           <Route path="/TotalIncomePage" element={<TotalIncomePage />} />
           <Route path="/PromotionPage" element={<PromotionPage />} />
-          <Route path="/NewsPage" element={<NewsPage />}/>
+          <Route path="/NewsPage" element={<NewsPage />} />
           <Route path="/TotalIncomePage" element={<TotalIncomePage />} />
           <Route path="/AddFarmer" element={<AddFarmer />} />
           <Route path="/AddDroner" element={<AddDroner />} />
@@ -72,7 +81,6 @@ const WebRoutes: React.FC<any> = () => {
           <Route path="/IndexDroneBrand" element={<IndexDroneBrand />} />
           <Route path="/AddDroneBrand" element={<AddDroneBrand />} />
           <Route path="/EditDroneBrand/:id" element={<EditDroneBrand />} />
-
           <Route path="/IndexRankDroner" element={<IndexRankDroner />} />
           <Route path="/DetailRankDroner" element={<DetailRankDroner />} />
           <Route path="/DetailWorkDroner" element={<DetailWorkDroner />} />
@@ -99,13 +107,36 @@ const WebRoutes: React.FC<any> = () => {
           <Route path="/EditInProgress" element={<EditInProgress />} />
           <Route path="*" element={<PageNotFound />} />
           <Route path="/EditPromotion/:id" element={<EditPromotion />} />
-          <Route path="*" element={<PageNotFound />} />IndexReport
+          <Route path="*" element={<PageNotFound />} />
+          IndexReport
           <Route path="/AddPromotion" element={<AddPromotion />} />
-          <Route path="/AddNews" element={<AddNewsPage/>} />
+          <Route path="/AddNews" element={<AddNewsPage />} />
           <Route path="/IndexReport" element={<IndexReport />} />
           <Route path="/EditReport" element={<EditReport />} />
-
-
+          <Route path="/IndexFarmerPoint" element={<IndexFarmerPoint />} />
+          <Route path="/IndexDronerPoint" element={<IndexDronerPoint />} />
+          <Route
+            path="/DetailFarmerPoint/:id"
+            element={<DetailFarmerPoint />}
+          />
+          <Route
+            path="/DetailDronerPoint/:id"
+            element={<DetailDronerPoint />}
+          />
+          <Route path="/IndexCampaignPoint" element={<IndexCampaignPoint />} />
+          <Route path="/AddCampaignPoint" element={<AddCampaignPoint />} />
+          <Route
+            path="/IndexDetailFarmerPoint/:id"
+            element={<IndexDetailFarmerPoint />}
+          />
+          <Route
+            path="/IndexDetailDronerPoint/:id"
+            element={<IndexDetailDronerPoint />}
+          />
+          <Route
+            path="/EditCampaignPoint/:id"
+            element={<EditCampaignPoint />}
+          />
         </Route>
         <Route element={<PublicRoute />}>
           <Route index element={<AuthPage />} />
