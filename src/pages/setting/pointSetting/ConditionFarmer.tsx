@@ -1,43 +1,136 @@
 import React, { useState } from "react";
 import Layouts from "../../../components/layout/Layout";
-import { Button, Checkbox, Col, Divider, Form, Input, Row } from "antd";
+import { Button, Checkbox, Col, Divider, Form, Input, Row, Space } from "antd";
 import { CardContainer } from "../../../components/card/CardContainer";
 import { CardHeader } from "../../../components/header/CardHearder";
-import FooterPage from "../../../components/footer/FooterPage";
 import { useNavigate } from "react-router-dom";
-import SaveButton from "../../../components/button/SaveButton";
 import { color } from "../../../resource";
+import {
+  PointSettingEntities,
+  PointSettingEntities_INIT,
+} from "../../../entities/PointSettingEntities";
+import { PointSettingDatasource } from "../../../datasource/PointSettingDatasource";
+import Swal from "sweetalert2";
+import FooterPage from "../../../components/footer/FooterPage";
+
+const _ = require("lodash");
+const { Map } = require("immutable");
 
 function ConditionFarmer() {
-  const navigate = useNavigate();
+  const [dataPoint, setDataPoint] = useState<PointSettingEntities>(
+    PointSettingEntities_INIT
+  );
   const [chooseMission, setChooseMission] = useState<boolean>(false);
-  const [chooseJob, setChooseJob] = useState<boolean>(false);
-  const [disableBtn, setDisableBtn] = useState<boolean>(false);
-  const [discountJob, setDiscountJob] = useState<string>("");
-  const [getPoint, setGetPoint] = useState<string>("");
+  const [chooseTask, setChooseTask] = useState<boolean>(false);
+  const [chooseDisFer, setChooseDisFer] = useState<boolean>(false);
+  const [chooseDisTask, setChooseDisTask] = useState<boolean>(false);
+  const [saveBtnDisable, setBtnSaveDisable] = useState<boolean>(true);
+  const [discountTaskCheck, setDiscountTaskCheckCheck] = useState<any>();
+  const [discountTask, setDiscountTask] = useState<any>();
+  const [status, setStatus] = useState<any>();
 
-  const handlePoint = (mission: boolean, job: boolean) => {
-    if (mission === false && job === false) {
-      setGetPoint("");
-    } else if (mission === true && job === false) {
-      setGetPoint("mission");
-    } else if (mission === false && job === true) {
-      setGetPoint("job");
-    } else {
-      setGetPoint("ALL");
-    }
+  const handleOnPoint = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const m = Map(dataPoint).set("point", e.target.value);
+    setDataPoint(m.toJS());
+    checkValidate(m.toJS());
+  };
+  const handleOnAmounts = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const m = Map(dataPoint).set("amounts", e.target.value);
+    setDataPoint(m.toJS());
+    checkValidate(m.toJS());
+  };
+  const handleOnMinPoint = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const m = Map(dataPoint).set("minPoint", e.target.value);
+    setDataPoint(m.toJS());
+    checkValidate(m.toJS());
+  };
+  const handleChooseTask = (e: any) => {
+    setChooseTask(e.target.checked);
+    handleChooseGetPoint(e.target.checked, chooseMission);
   };
   const handleChooseMission = (e: any) => {
     setChooseMission(e.target.checked);
-    handlePoint(chooseMission, e.target.checked);
+    handleChooseGetPoint(chooseTask, e.target.checked);
   };
-  const handleChooseJob = (e: any) => {
-    setChooseJob(e.target.checked);
-    handlePoint(chooseJob, e.target.checked);
+  const handleChooseGetPoint = (task: boolean, mission: boolean) => {
+    if (task === false && mission === false) {
+      const m = Map(dataPoint).set("receiveType", "");
+      setDataPoint(m.toJS());
+      checkValidate(m.toJS());
+    } else if (task === true && mission === false) {
+      const m = Map(dataPoint).set("receiveType", "TASK");
+      setDataPoint(m.toJS());
+      checkValidate(m.toJS());
+    } else if (task === false && mission === true) {
+      const m = Map(dataPoint).set("receiveType", "MISSION");
+      setDataPoint(m.toJS());
+      checkValidate(m.toJS());
+    } else {
+      const m = Map(dataPoint).set("receiveType", "ALL");
+      setDataPoint(m.toJS());
+      checkValidate(m.toJS());
+    }
   };
-  const onClickSave = () => {};
-  const handleDiscountJob = (e: any) => {
-    setDiscountJob(e.target.checked);
+  const handleDisTask = (e: any) => {
+    setChooseDisTask(e.target.checked);
+    handleChooseRedeem(e.target.checked, chooseDisFer);
+  };
+  const handleDisFertilizer = (e: any) => {
+    setChooseDisFer(e.target.checked);
+    handleChooseRedeem(chooseDisTask, e.target.checked);
+  };
+  const handleChooseRedeem = (task: boolean, Fer: boolean) => {
+    if (task === false && Fer === false) {
+      const m = Map(dataPoint).set("pointType", "");
+      setDataPoint(m.toJS());
+      checkValidate(m.toJS());
+      setStatus("INACTIVE");
+    } else if (task === true && Fer === false) {
+      const m = Map(dataPoint).set("pointType", "DISCOUNT_TASK");
+      setDataPoint(m.toJS());
+      setStatus("ACTIVE");
+      checkValidate(m.toJS());
+    } else if (task === false && Fer === true) {
+      const m = Map(dataPoint).set("pointType", "DISCOUNT_PRODUCT");
+      setDataPoint(m.toJS());
+      setStatus("ACTIVE");
+      checkValidate(m.toJS());
+    } else {
+      const m = Map(dataPoint).set("pointType", "ALL");
+      setDataPoint(m.toJS());
+      setStatus("ACTIVE");
+      checkValidate(m.toJS());
+    }
+  };
+  console.log(dataPoint);
+
+  const checkValidate = (data: PointSettingEntities) => {
+    if (
+      data.status != "INACTIVE" &&
+      data.amounts != 0 &&
+      data.minPoint != 0 &&
+      data.point != 0 &&
+      data.receiveType != "" &&
+      data.pointType != ""
+    ) {
+      setBtnSaveDisable(false);
+    } else {
+      setBtnSaveDisable(true);
+    }
+  };
+  const onClickSave = async () => {
+    const pushApp = Map(dataPoint).set("application", "FARMER");
+    const pushStatus = Map(pushApp.toJS()).set("status", status);
+    await PointSettingDatasource.createPointSetting(pushStatus.toJS()).then(
+      (res) => {
+        Swal.fire({
+          title: "บันทึกสำเร็จ",
+          icon: "success",
+          timer: 1500,
+          showConfirmButton: false,
+        }).then((time) => {});
+      }
+    );
   };
 
   const renderConditionFarmer = (
@@ -48,30 +141,49 @@ function ConditionFarmer() {
           การแลกคะแนนสะสม
         </label>
         <br />
-        <Checkbox onChange={handleDiscountJob} value={"discount"}>
+        <Checkbox onChange={handleDisTask} checked={chooseDisTask}>
           ส่วนลดการจ้างงาน
         </Checkbox>
         <div className="row m-2">
           <div className="col-lg-6">
             <span>การเปรียบเทียบคะแนน/เงิน</span>
-            <Input
-              disabled={!discountJob}
-              placeholder="กรอกคะแนน"
-              suffix="คะแนน / 1 บาท"
-            />
+            <Space.Compact>
+              <Input
+                className="col-lg-9"
+                type="number"
+                disabled={!chooseDisTask}
+                placeholder="กรอกคะแนน"
+                suffix="คะแนน /"
+                onChange={handleOnPoint}
+              />
+              <Input
+                type="number"
+                disabled={!chooseDisTask}
+                suffix="บาท"
+                onChange={handleOnAmounts}
+              />
+            </Space.Compact>
           </div>
           <div className="col-lg-6">
             <span>การใช้คะแนนขั้นต่ำ</span>
             <Input
-              disabled={!discountJob}
+              type="number"
+              disabled={!chooseDisTask}
               placeholder="กรอกคะแนน"
               suffix="คะแนน"
+              onChange={handleOnMinPoint}
             />
           </div>
         </div>
         <br />
         <>
-          <Checkbox disabled>ส่วนลดปุ๋ยและยา</Checkbox>
+          <Checkbox
+            onChange={handleDisFertilizer}
+            checked={chooseDisFer}
+            disabled
+          >
+            ส่วนลดปุ๋ยและยา
+          </Checkbox>
           <div className="row m-2">
             <div className="col-lg-6">
               <span>การเปรียบเทียบคะแนน/เงิน</span>
@@ -89,13 +201,13 @@ function ConditionFarmer() {
           <label>การได้รับคะแนน</label>
           <Form.Item
             initialValue={false}
-            name="jobs"
+            name="task"
             valuePropName="checked"
             className="my-0"
           >
             <Checkbox
-              onChange={handleChooseJob}
-              checked={chooseJob}
+              onChange={handleChooseTask}
+              checked={chooseTask}
               className="pt-2"
             >
               การจ้างงาน
@@ -136,14 +248,15 @@ function ConditionFarmer() {
               borderRadius: "5px",
               color: color.Success,
             }}
-            onClick={() => onClickSave()}
+            // onClick={() => onClickSave()}
           >
             คืนค่าเดิม
           </Button>
           <Button
+            disabled={saveBtnDisable}
             style={{
-              backgroundColor: disableBtn ? color.Grey : color.Success,
-              borderColor: disableBtn ? color.Grey : color.Success,
+              backgroundColor: saveBtnDisable ? color.Grey : color.Success,
+              borderColor: saveBtnDisable ? color.Grey : color.Success,
               borderRadius: "5px",
               color: color.BG,
             }}
