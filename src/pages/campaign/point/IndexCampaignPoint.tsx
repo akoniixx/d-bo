@@ -156,8 +156,8 @@ const IndexCampaignPoint = () => {
             placeholder="แอปพลิเคชัน"
             onChange={(e) => setSearchApp(e)}
           >
-            <option value="FARMER">เกษตรกร</option>
-            <option value="DRONER">นักบินโดรน</option>
+            <option value="FARMER">Farmer</option>
+            <option value="DRONER">Droner</option>
           </Select>
         </div>
         <div className="col-lg">
@@ -201,13 +201,13 @@ const IndexCampaignPoint = () => {
       },
     },
     {
-      title: "แอปพลิเคชัน",
+      title: "ผู้ใช้งาน",
       dataIndex: "application",
       width: "15%",
       render: (value: any, row: any, index: number) => {
         const map: any = {
-          FARMER: "Farmer App",
-          DRONER: "Droner App",
+          FARMER: "Farmer",
+          DRONER: "Droner",
         };
         return {
           children: <span>{map[row.application]}</span>,
@@ -253,7 +253,7 @@ const IndexCampaignPoint = () => {
       title: "สถานะ",
       dataIndex: "status",
       key: "status",
-      width: "12%",
+      width: "15%",
       render: (value: any, row: any, index: number) => {
         return {
           children: (

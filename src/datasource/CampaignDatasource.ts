@@ -17,7 +17,7 @@ export class CampaignDatasource {
       take: take,
       page: page,
       startDate: startDate,
-      endStart: endStart,
+      endDate: endStart,
       status: status,
       search: search,
       application: app,
@@ -56,6 +56,25 @@ export class CampaignDatasource {
   static deleteCampaign(id: string) {
     return httpClient
       .delete(BASE_URL + `/promotion/campaign/${id}`)
+      .then((res) => {
+        return res.data;
+      })
+      .catch((err) => console.log(err));
+  }
+  static checkDupCampaign(
+    campaignType: string,
+    startDate?: string,
+    endStart?: string,
+    app?: string
+  ) {
+    const params = {
+      campaignType: campaignType,
+      startDate: startDate,
+      endDate: endStart,
+      application: app,
+    };
+    return httpClient
+      .post(BASE_URL + `/promotion/campaign/check-dupplicate-date`, params)
       .then((res) => {
         return res.data;
       })

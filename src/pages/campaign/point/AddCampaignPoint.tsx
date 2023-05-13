@@ -12,7 +12,7 @@ import {
   TimePicker,
 } from "antd";
 import moment from "moment";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { BackIconButton } from "../../../components/button/BackButton";
 import { CardContainer } from "../../../components/card/CardContainer";
@@ -24,7 +24,6 @@ import { CreateCampaignEntiry } from "../../../entities/CampaignPointEntites";
 import { color } from "../../../resource";
 
 const _ = require("lodash");
-let queryString = _.split(window.location.pathname, "=");
 
 const AddCampaignPoint = () => {
   const profile = JSON.parse(localStorage.getItem("profile") || "{  }");
@@ -34,7 +33,32 @@ const AddCampaignPoint = () => {
 
   const [showModal, setShowModal] = useState(false);
   const [create, setCreate] = useState<CreateCampaignEntiry>();
+  const [checkDup, setCheckDup] = useState(false);
 
+  useEffect(() => {}, [checkDup]);
+
+  const checkDupCampiagn = () => {
+    const getForm = form.getFieldsValue();
+    let startDate = new Date(
+      moment(getForm.startDate).format("YYYY-MM-DD")
+    ).toISOString();
+    let endDate = new Date(
+      moment(getForm.endDate).format("YYYY-MM-DD")
+    ).toISOString();
+    let application = getForm.application;
+    CampaignDatasource.checkDupCampaign(
+      "POINT",
+      startDate,
+      endDate,
+      application
+    ).then((res) => {
+      if (!res.success) {
+        setCheckDup(true);
+      } else {
+        setCheckDup(false);
+      }
+    });
+  };
   const createCampaign = () => {
     const getForm = form.getFieldsValue();
     const data: any = { ...create };
@@ -63,8 +87,13 @@ const AddCampaignPoint = () => {
     ).toISOString();
     setCreate(data);
     CampaignDatasource.createCampaign(data).then((res) => {
-      if (res.id) {
+      console.log("create", res);
+      if (res.success) {
         window.location.href = "/IndexCampaignPoint";
+      } else {
+        if (res.userMessage === "dupplicate") {
+        } else {
+        }
       }
     });
   };
@@ -111,12 +140,18 @@ const AddCampaignPoint = () => {
                         message: "กรุณากรอกวันที่!",
                       },
                     ]}
+                    validateStatus={checkDup ? "error" : ""}
                   >
-                    <DatePicker placeholder="เลือกวันที่" format={dateFormat} />
+                    <DatePicker
+                      placeholder="เลือกวันที่"
+                      format={dateFormat}
+                      onChange={checkDupCampiagn}
+                    />
                   </Form.Item>
                   <Form.Item
                     name="startTime"
                     initialValue={moment("00:00", "HH:mm")}
+                    validateStatus={checkDup ? "error" : ""}
                   >
                     <TimePicker
                       format={"HH:mm"}
@@ -141,12 +176,18 @@ const AddCampaignPoint = () => {
                         message: "กรุณากรอกวันที่!",
                       },
                     ]}
+                    validateStatus={checkDup ? "error" : ""}
                   >
-                    <DatePicker placeholder="เลือกวันที่" format={dateFormat} />
+                    <DatePicker
+                      placeholder="เลือกวันที่"
+                      format={dateFormat}
+                      onChange={checkDupCampiagn}
+                    />
                   </Form.Item>
                   <Form.Item
                     name="endTime"
                     initialValue={moment("23:59", "HH:mm")}
+                    validateStatus={checkDup ? "error" : ""}
                   >
                     <TimePicker
                       format={"HH:mm"}
@@ -159,6 +200,12 @@ const AddCampaignPoint = () => {
                 </Col>
               </Col>
             </Row>
+            {checkDup && (
+              <p style={{ color: color.Error }}>
+                กรุณาเปลี่ยนแปลงช่วงเวลา “วันเริ่มต้น” หรือ “วันสิ้นสุด”
+                เนื่องจากซ้ำกับช่วงเวลาของแคมเปญอื่นที่สร้างไว้ก่อนหน้า
+              </p>
+            )}
             <Row gutter={8} justify={"start"}>
               <Col span={7}>
                 <label>
@@ -217,9 +264,12 @@ const AddCampaignPoint = () => {
                   },
                 ]}
               >
-                <Radio.Group className="d-flex flex-column">
-                  <Radio value={"FARMER"}>Farmer Application</Radio>
-                  <Radio value={"DRONER"}>Droner Application</Radio>
+                <Radio.Group
+                  className="d-flex flex-column"
+                  onChange={checkDupCampiagn}
+                >
+                  <Radio value={"FARMER"}>Farmer</Radio>
+                  <Radio value={"DRONER"}>Droner</Radio>
                 </Radio.Group>
               </Form.Item>
             </Col>
