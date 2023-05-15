@@ -224,7 +224,6 @@ function ConditionFarmer() {
       );
       await PointSettingDatasource.editPointSetting(pushAmountFer.toJS()).then(
         (res) => {
-          console.log(res);
           Swal.fire({
             title: "บันทึกสำเร็จ",
             icon: "success",
@@ -238,7 +237,6 @@ function ConditionFarmer() {
     if(chooseDisTask === true && chooseDisFer === false){
         await PointSettingDatasource.createPointSetting(dataPoint).then(
           (res) => {
-            console.log(res);
             Swal.fire({
               title: "บันทึกสำเร็จ",
               icon: "success",
@@ -250,7 +248,6 @@ function ConditionFarmer() {
     }else if(chooseDisTask === false && chooseDisFer === true){
       await PointSettingDatasource.createPointSetting(dataPointFer).then(
         (res) => {
-          console.log(res);
           Swal.fire({
             title: "บันทึกสำเร็จ",
             icon: "success",
@@ -263,7 +260,6 @@ function ConditionFarmer() {
       await PointSettingDatasource.createPointSetting(dataPoint)
       await PointSettingDatasource.createPointSetting(dataPointFer).then(
         (res) => {
-          console.log(res);
           Swal.fire({
             title: "บันทึกสำเร็จ",
             icon: "success",
