@@ -1,16 +1,18 @@
 export interface PointSettingEntities {
-  point: number;
-  amounts: number;
-  minPoint: number;
+  id?: string;
+  point: string;
+  amounts: string;
+  minPoint: string;
   pointType: string;
   application: string;
   receiveType: string;
   status: string;
 }
 export const PointSettingEntities_INIT: PointSettingEntities = {
-  point: 0,
-  amounts: 0,
-  minPoint: 0,
+  id: '',
+  point: '',
+  amounts: '',
+  minPoint: '',
   pointType: "",
   application: "" ,
   receiveType: "",
