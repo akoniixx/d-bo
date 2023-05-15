@@ -17,11 +17,19 @@ import {
   Select,
   Table,
 } from "antd";
-import React, { useState } from "react";
+import moment from "moment";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import ActionButton from "../../../components/button/ActionButton";
 import { CardContainer } from "../../../components/card/CardContainer";
 import Layouts from "../../../components/layout/Layout";
+import { CampaignDatasource } from "../../../datasource/CampaignDatasource";
+import { STATUS_COLOR } from "../../../definitions/DronerStatus";
+import { STATUS_COUPON } from "../../../definitions/Status";
+import {
+  CampaignListEntity,
+  CampaignListEntity_INIT,
+} from "../../../entities/CampaignPointEntites";
 import { color } from "../../../resource";
 import { DateTimeUtil } from "../../../utilities/DateTimeUtil";
 
@@ -32,25 +40,60 @@ const IndexCampaignPoint = () => {
   const dateFormat = "DD/MM/YYYY";
   const dateSearchFormat = "YYYY-MM-DD";
 
-  const profile = JSON.parse(localStorage.getItem("profile") || "{  }");
   const row = 10;
   const [current, setCurrent] = useState(1);
   const [showModal, setShowModal] = useState(false);
+  const [data, setData] = useState<CampaignListEntity>(CampaignListEntity_INIT);
+  const [searchStartDate, setSearchStartDate] = useState<any>(null);
+  const [searchEndDate, setSearchEndDate] = useState<any>(null);
+  const [keyword, setKeyword] = useState<string>("");
+  const [searchApp, setSearchApp] = useState<string>("");
+  const [searchStatus, setSearchStatus] = useState<string>("");
+  const [deleteId, setDeleteId] = useState<string>("");
+
+  const fetchCampaignList = () => {
+    CampaignDatasource.getCampaignList(
+      "POINT",
+      row,
+      current,
+      searchStartDate,
+      searchEndDate,
+      searchStatus,
+      keyword,
+      searchApp
+    ).then((res) => {
+      setData(res);
+    });
+  };
+
+  useEffect(() => {
+    fetchCampaignList();
+  }, [searchStartDate, searchEndDate]);
 
   const onChangePage = (page: number) => {
     setCurrent(page);
   };
-
-  const dataMock = [
-    {
-      startDate: Date(),
-      endDate: Date(),
-      campaignName: "แจกคะแนนขึ้นต่ำ 2 ไร่",
-      totalPoint: 100,
-      status: "ใช้งาน",
-      appType: "Droner App",
-    },
-  ];
+  const handleSearchDate = (e: any) => {
+    if (!e) {
+      setSearchStartDate(e);
+      setSearchEndDate(e);
+    } else {
+      setSearchStartDate(moment(new Date(e[0])).format(dateSearchFormat));
+      setSearchEndDate(moment(new Date(e[1])).format(dateSearchFormat));
+    }
+    setCurrent(1);
+  };
+  const setDeleteCampaign = (id: string) => {
+    setShowModal(!showModal);
+    setDeleteId(id);
+  };
+  const deleteCampaign = () => {
+    CampaignDatasource.deleteCampaign(deleteId).then((res) => {
+      setShowModal(!showModal)
+      setDeleteId("");
+      fetchCampaignList();
+    });
+  };
 
   const pageTitle = (
     <>
@@ -75,6 +118,7 @@ const IndexCampaignPoint = () => {
             allowClear
             format={dateFormat}
             placeholder={["เลือกวันที่เริ่ม", "เลือกวันที่สิ้นสุด"]}
+            onCalendarChange={(val) => handleSearchDate(val)}
           />
         </Col>
         <Col span={3} style={{ textAlign: "right" }}>
@@ -101,6 +145,8 @@ const IndexCampaignPoint = () => {
             prefix={<SearchOutlined style={{ color: color.Disable }} />}
             placeholder="ค้นหาชื่อแคมเปญคะแนน"
             className="col-lg-12 p-1"
+            defaultValue={keyword}
+            onChange={(e) => setKeyword(e.target.value)}
           />
         </div>
         <div className="col-lg">
@@ -108,16 +154,22 @@ const IndexCampaignPoint = () => {
             allowClear
             className="col-lg-12 p-1"
             placeholder="แอปพลิเคชัน"
+            onChange={(e) => setSearchApp(e)}
           >
-            <option value="เกษตรกร">เกษตรกร</option>
-            <option value="นักบินโดรน">นักบินโดรน</option>
+            <option value="FARMER">Farmer</option>
+            <option value="DRONER">Droner</option>
           </Select>
         </div>
         <div className="col-lg">
-          <Select allowClear className="col-lg-12 p-1" placeholder="สถานะ">
-            <option value="ใช้งาน">ใช้งาน</option>
-            <option value="รอเปิดใช้งาน">รอเปิดใช้งาน</option>
-            <option value="ปิดใช้งาน">ปิดใช้งาน</option>
+          <Select
+            allowClear
+            className="col-lg-12 p-1"
+            placeholder="สถานะ"
+            onChange={(e) => setSearchStatus(e)}
+          >
+            <option value="ACTIVE">ใช้งาน</option>
+            <option value="DRAFTING">รอเปิดใช้งาน</option>
+            <option value="INACTIVE">ปิดใช้งาน</option>
           </Select>
         </div>
         <div className="pt-1">
@@ -128,6 +180,7 @@ const IndexCampaignPoint = () => {
               color: color.secondary2,
               backgroundColor: color.Success,
             }}
+            onClick={() => fetchCampaignList()}
           >
             ค้นหาข้อมูล
           </Button>
@@ -148,23 +201,27 @@ const IndexCampaignPoint = () => {
       },
     },
     {
-      title: "แอปพลิเคชัน",
-      dataIndex: "appType",
-      width: "20%",
+      title: "ผู้ใช้งาน",
+      dataIndex: "application",
+      width: "15%",
       render: (value: any, row: any, index: number) => {
+        const map: any = {
+          FARMER: "Farmer",
+          DRONER: "Droner",
+        };
         return {
-          children: <span>{row.campaignName}</span>,
+          children: <span>{map[row.application]}</span>,
         };
       },
     },
     {
       title: "การได้รับคะแนน",
-      dataIndex: "totalPoint",
-      key: "totalPoint",
       width: "15%",
       render: (value: any, row: any, index: number) => {
         return {
-          children: <span>{"+" + row.totalPoint + " คะแนน / ไร่"}</span>,
+          children: (
+            <span>{"+" + row.condition[0].point + " คะแนน / ไร่"}</span>
+          ),
         };
       },
     },
@@ -196,16 +253,17 @@ const IndexCampaignPoint = () => {
       title: "สถานะ",
       dataIndex: "status",
       key: "status",
-      width: "10%",
+      width: "15%",
       render: (value: any, row: any, index: number) => {
         return {
           children: (
             <span
               style={{
-                color: color.Success,
+                color: STATUS_COLOR[row.status],
               }}
             >
-              <Badge color={color.Success} /> {row.status}
+              <Badge color={STATUS_COLOR[row.status]} />{" "}
+              {STATUS_COUPON[row.status]}
             </span>
           ),
         };
@@ -224,16 +282,16 @@ const IndexCampaignPoint = () => {
                   icon={<EditOutlined />}
                   color={color.primary1}
                   onClick={() =>
-                    (window.location.href =
-                      "/EditCampaignPoint/id=" + (index + 1))
+                    (window.location.href = "/EditCampaignPoint/id=" + row.id)
                   }
                 />
               </div>
               <div className="col-lg-6">
                 <ActionButton
                   icon={<DeleteOutlined />}
-                  color={color.Error}
-                  onClick={() => setShowModal(!showModal)}
+                  color={row.status === "ACTIVE" ? color.Grey : color.Error}
+                  onClick={() => setDeleteCampaign(row.id)}
+                  actionDisable={row.status === "ACTIVE" ? true : false}
                 />
               </div>
             </div>
@@ -249,7 +307,7 @@ const IndexCampaignPoint = () => {
         {pageTitle}
         <CardContainer>
           <Table
-            dataSource={dataMock}
+            dataSource={data?.data}
             columns={columns}
             pagination={false}
             size="large"
@@ -257,10 +315,10 @@ const IndexCampaignPoint = () => {
           />
         </CardContainer>
         <div className="d-flex justify-content-between pt-4">
-          <p>รายการทั้งหมด {dataMock.length} รายการ</p>
+          <p>รายการทั้งหมด {data?.count} รายการ</p>
           <Pagination
             current={current}
-            total={dataMock.length}
+            total={data?.count}
             onChange={onChangePage}
             pageSize={row}
             showSizeChanger={false}
@@ -310,6 +368,7 @@ const IndexCampaignPoint = () => {
                 backgroundColor: color.Error,
                 color: color.White,
               }}
+              onClick={() => deleteCampaign()}
             >
               ยืนยัน
             </Button>

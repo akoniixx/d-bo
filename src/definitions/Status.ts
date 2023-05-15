@@ -146,5 +146,5 @@ export const STATUS_WAITSTART = [
 export const STATUS_COUPON: any = {
   ACTIVE: "ใช้งาน",
   DRAFTING: "รอเปิดการใช้งาน",
-  INACTIVE: "ปิดการใช้งาาน",
+  INACTIVE: "ปิดการใช้งาน",
 };
