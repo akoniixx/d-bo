@@ -65,13 +65,15 @@ export class CampaignDatasource {
     campaignType: string,
     startDate?: string,
     endStart?: string,
-    app?: string
+    app?: string,
+    campaignId?: string
   ) {
     const params = {
       campaignType: campaignType,
       startDate: startDate,
       endDate: endStart,
       application: app,
+      campaignId: campaignId,
     };
     return httpClient
       .post(BASE_URL + `/promotion/campaign/check-dupplicate-date`, params)

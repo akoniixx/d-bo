@@ -39,6 +39,7 @@ const EditCampaignPoint = () => {
   const [data, setData] = useState<CampaignEntiry>(CampaignEntiry_INIT);
   const [update, setUpdate] = useState<CreateCampaignEntiry>();
   const [isEdit, setIsEdit] = useState(false);
+  const [checkDup, setCheckDup] = useState(false);
 
   const fetchCampaignById = () => {
     CampaignDatasource.getCampaignById(queryString[1]).then((res) => {
@@ -48,7 +49,6 @@ const EditCampaignPoint = () => {
             ? true
             : false
           : false;
-      console.log(checkIsEdit);
       setIsEdit(checkIsEdit);
       setData(res);
       form.setFieldsValue({
@@ -72,6 +72,31 @@ const EditCampaignPoint = () => {
           : moment(new Date(res.endDate).getTime()),
       });
     });
+  };
+  const checkDupCampiagn = async () => {
+    const getForm = form.getFieldsValue();
+    let startDate = new Date(
+      moment(getForm.startDate).format("YYYY-MM-DD")
+    ).toISOString();
+    let endDate = new Date(
+      moment(getForm.endDate).format("YYYY-MM-DD")
+    ).toISOString();
+    let application = getForm.application;
+    let check = await CampaignDatasource.checkDupCampaign(
+      "POINT",
+      startDate,
+      endDate,
+      application,
+      queryString
+    ).then((res) => {
+      if (!res.success) {
+        setCheckDup(true);
+      } else {
+        setCheckDup(false);
+      }
+      return !res.success;
+    });
+    return check;
   };
 
   useEffect(() => {
@@ -111,6 +136,10 @@ const EditCampaignPoint = () => {
       }
     });
   };
+  const submit = async () => {
+    await form.validateFields();
+    setShowModal(!showModal);
+  };
 
   return (
     <>
@@ -147,11 +176,28 @@ const EditCampaignPoint = () => {
                 </label>
                 <div className="d-flex">
                   <Form.Item
+                    dependencies={[
+                      "endDate",
+                      "application",
+                      "startTime",
+                      "endTime",
+                    ]}
                     name="startDate"
                     rules={[
                       {
                         required: true,
                         message: "กรุณากรอกวันที่!",
+                      },
+                      {
+                        validator: (rules, value) => {
+                          return new Promise(async (resolve, reject) => {
+                            if (await checkDupCampiagn()) {
+                              reject("");
+                            } else {
+                              resolve(true);
+                            }
+                          });
+                        },
                       },
                     ]}
                   >
@@ -182,11 +228,28 @@ const EditCampaignPoint = () => {
                 </label>
                 <Col className="d-flex">
                   <Form.Item
+                    dependencies={[
+                      "endDate",
+                      "application",
+                      "startTime",
+                      "endTime",
+                    ]}
                     name="endDate"
                     rules={[
                       {
                         required: true,
                         message: "กรุณากรอกวันที่!",
+                      },
+                      {
+                        validator: (rules, value) => {
+                          return new Promise(async (resolve, reject) => {
+                            if (await checkDupCampiagn()) {
+                              reject("");
+                            } else {
+                              resolve(true);
+                            }
+                          });
+                        },
                       },
                     ]}
                   >
@@ -207,6 +270,12 @@ const EditCampaignPoint = () => {
                 </Col>
               </Col>
             </Row>
+            {checkDup && (
+              <p style={{ color: color.Error }}>
+                กรุณาเปลี่ยนแปลงช่วงเวลา “วันเริ่มต้น” หรือ “วันสิ้นสุด”
+                เนื่องจากซ้ำกับช่วงเวลาของแคมเปญอื่นที่สร้างไว้ก่อนหน้า
+              </p>
+            )}
             <Row gutter={8} justify={"start"}>
               <Col span={7}>
                 <label>
@@ -298,7 +367,7 @@ const EditCampaignPoint = () => {
         <FooterPage
           onClickBack={() => navigate(-1)}
           styleFooter={{ padding: "6px" }}
-          onClickSave={() => setShowModal(!showModal)}
+          onClickSave={() => submit()}
         />
       </Layouts>
       {showModal && (

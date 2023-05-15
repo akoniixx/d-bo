@@ -1,4 +1,3 @@
-import { render } from "@testing-library/react";
 import {
   Button,
   Col,
@@ -37,7 +36,7 @@ const AddCampaignPoint = () => {
 
   useEffect(() => {}, [checkDup]);
 
-  const checkDupCampiagn = () => {
+  const checkDupCampiagn = async () => {
     const getForm = form.getFieldsValue();
     let startDate = new Date(
       moment(getForm.startDate).format("YYYY-MM-DD")
@@ -46,20 +45,22 @@ const AddCampaignPoint = () => {
       moment(getForm.endDate).format("YYYY-MM-DD")
     ).toISOString();
     let application = getForm.application;
-    CampaignDatasource.checkDupCampaign(
+    let check = await CampaignDatasource.checkDupCampaign(
       "POINT",
       startDate,
       endDate,
-      application
+      application,
     ).then((res) => {
       if (!res.success) {
         setCheckDup(true);
       } else {
         setCheckDup(false);
       }
+      return !res.success;
     });
+    return check;
   };
-  const createCampaign = () => {
+  const createCampaign = (e: any) => {
     const getForm = form.getFieldsValue();
     const data: any = { ...create };
     const condition: any = { ...create?.condition };
@@ -87,7 +88,6 @@ const AddCampaignPoint = () => {
     ).toISOString();
     setCreate(data);
     CampaignDatasource.createCampaign(data).then((res) => {
-      console.log("create", res);
       if (res.success) {
         window.location.href = "/IndexCampaignPoint";
       } else {
@@ -96,6 +96,10 @@ const AddCampaignPoint = () => {
         }
       }
     });
+  };
+  const submit = async () => {
+    await form.validateFields();
+    setShowModal(!showModal);
   };
 
   return (
@@ -133,14 +137,30 @@ const AddCampaignPoint = () => {
                 </label>
                 <div className="d-flex">
                   <Form.Item
+                    dependencies={[
+                      "endDate",
+                      "application",
+                      "startTime",
+                      "endTime",
+                    ]}
                     name="startDate"
                     rules={[
                       {
                         required: true,
                         message: "กรุณากรอกวันที่!",
                       },
+                      {
+                        validator: (rules, value) => {
+                          return new Promise(async (resolve, reject) => {
+                            if (await checkDupCampiagn()) {
+                              reject("");
+                            } else {
+                              resolve(true);
+                            }
+                          });
+                        },
+                      },
                     ]}
-                    validateStatus={checkDup ? "error" : ""}
                   >
                     <DatePicker
                       placeholder="เลือกวันที่"
@@ -151,7 +171,6 @@ const AddCampaignPoint = () => {
                   <Form.Item
                     name="startTime"
                     initialValue={moment("00:00", "HH:mm")}
-                    validateStatus={checkDup ? "error" : ""}
                   >
                     <TimePicker
                       format={"HH:mm"}
@@ -169,14 +188,30 @@ const AddCampaignPoint = () => {
                 </label>
                 <Col className="d-flex">
                   <Form.Item
+                    dependencies={[
+                      "endDate",
+                      "application",
+                      "startTime",
+                      "endTime",
+                    ]}
                     name="endDate"
                     rules={[
                       {
                         required: true,
                         message: "กรุณากรอกวันที่!",
                       },
+                      {
+                        validator: (rules, value) => {
+                          return new Promise(async (resolve, reject) => {
+                            if (await checkDupCampiagn()) {
+                              reject("");
+                            } else {
+                              resolve(true);
+                            }
+                          });
+                        },
+                      },
                     ]}
-                    validateStatus={checkDup ? "error" : ""}
                   >
                     <DatePicker
                       placeholder="เลือกวันที่"
@@ -187,7 +222,6 @@ const AddCampaignPoint = () => {
                   <Form.Item
                     name="endTime"
                     initialValue={moment("23:59", "HH:mm")}
-                    validateStatus={checkDup ? "error" : ""}
                   >
                     <TimePicker
                       format={"HH:mm"}
@@ -297,7 +331,7 @@ const AddCampaignPoint = () => {
         <FooterPage
           onClickBack={() => navigate(-1)}
           styleFooter={{ padding: "6px" }}
-          onClickSave={() => setShowModal(!showModal)}
+          onClickSave={() => submit()}
         />
       </Layouts>
       {showModal && (
