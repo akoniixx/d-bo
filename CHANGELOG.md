@@ -1,4 +1,6 @@
 ## [Version - 0]
+## Fix [v0.25.09] 2023-04-20
+- fix add guru farmer
 ## Fix [v0.25.08] 2023-04-20
 - fix defect guru farmer feature
 ## improve [v0.25.07] 2023-05-01
