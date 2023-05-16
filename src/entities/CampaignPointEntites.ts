@@ -24,6 +24,7 @@ export interface CampaignEntiry {
   application: string;
   createAt: string;
   updateAt: string;
+  isDelete: boolean;
 }
 
 export const CampaignEntiry_INIT: CampaignEntiry = {
@@ -39,6 +40,7 @@ export const CampaignEntiry_INIT: CampaignEntiry = {
   application: "",
   createAt: "",
   updateAt: "",
+  isDelete: false,
 };
 
 export interface CampaignListEntity {

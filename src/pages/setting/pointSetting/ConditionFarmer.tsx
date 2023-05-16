@@ -3,50 +3,46 @@ import Layouts from "../../../components/layout/Layout";
 import { Button, Checkbox, Col, Divider, Form, Input, Row, Space } from "antd";
 import { CardContainer } from "../../../components/card/CardContainer";
 import { CardHeader } from "../../../components/header/CardHearder";
-import { useNavigate } from "react-router-dom";
 import { color } from "../../../resource";
 import {
   PointSettingEntities,
-  PointSettingEntities_INIT
+  PointSettingEntities_INIT,
 } from "../../../entities/PointSettingEntities";
 import { PointSettingDatasource } from "../../../datasource/PointSettingDatasource";
 import Swal from "sweetalert2";
-import FooterPage from "../../../components/footer/FooterPage";
-import { CheckboxValueType } from "antd/lib/checkbox/Group";
+import { validateOnlyNumber } from "../../../utilities/TextFormatter";
+import { useForm } from "antd/es/form/Form";
 
 const _ = require("lodash");
 const { Map } = require("immutable");
 let queryString = _.split(window.location.search, "=");
 
 function ConditionFarmer() {
+  const [form] = Form.useForm();
   const [taskId, setTaskId] = useState<PointSettingEntities>(
     PointSettingEntities_INIT
   );
   const [productId, setProductId] = useState<PointSettingEntities>(
     PointSettingEntities_INIT
   );
-  const [dataPoint, setDataPoint] = useState<PointSettingEntities>(
-    {
-      point: '',
-      amounts: '1',
-      minPoint: '',
-      pointType: '',
-      application: 'FARMER',
-      receiveType: 'TASK',
-      status: '',
-    }
-  );
-  const [dataPointFer, setDataPointFer] = useState<PointSettingEntities>(
-    {
-      point: '',
-      amounts: '1',
-      minPoint: '',
-      pointType: '',
-      application: 'FARMER',
-      receiveType: 'TASK',
-      status: '',
-    }
-  );
+  const [dataPoint, setDataPoint] = useState<PointSettingEntities>({
+    point: "",
+    amounts: "1",
+    minPoint: "",
+    pointType: "",
+    application: "FARMER",
+    receiveType: "TASK",
+    status: "",
+  });
+  const [dataPointFer, setDataPointFer] = useState<PointSettingEntities>({
+    point: "",
+    amounts: "1",
+    minPoint: "",
+    pointType: "",
+    application: "FARMER",
+    receiveType: "TASK",
+    status: "",
+  });
   const [chooseDisFer, setChooseDisFer] = useState<boolean>(false);
   const [chooseDisTask, setChooseDisTask] = useState<boolean>(false);
   const [saveBtnDisable, setBtnSaveDisable] = useState<boolean>(true);
@@ -61,12 +57,16 @@ function ConditionFarmer() {
           (x: any) => x.pointType === "DISCOUNT_PRODUCT"
         );
         PointSettingDatasource.getPointSetting(filterTask.id).then((res) => {
-          if(res){
+          form.setFieldsValue({
+            point: res.point,
+            minPoint: res.minPoint,
+          });
+          if (res) {
             setTaskId(res);
           }
         });
         PointSettingDatasource.getPointSetting(filterProduct.id).then((res) => {
-          if(res){
+          if (res) {
             setProductId(res);
           }
         });
@@ -78,25 +78,35 @@ function ConditionFarmer() {
   }, []);
 
   const handleOnPoint = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const values = validateOnlyNumber(e.target.value);
     if (taskId.id) {
-      const m = Map(taskId).set("point", e.target.value);
-      setTaskId(m.toJS());
-      checkValidate(m.toJS());
+      const m = { ...taskId };
+      m.point = values;
+      form.setFieldsValue({ point: m.point });
+      setTaskId(m);
+      checkValidate(m);
     } else {
-      const m = Map(dataPoint).set("point", e.target.value);
-      setDataPoint(m.toJS());
-      checkValidateCreate(m.toJS());
+      const m = { ...dataPoint };
+      m.point = values;
+      form.setFieldsValue({ point: m.point });
+      setDataPoint(m);
+      checkValidateCreate(m);
     }
   };
   const handleOnMinPoint = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const values = validateOnlyNumber(e.target.value);
     if (taskId.id) {
-      const m = Map(taskId).set("minPoint", e.target.value);
-      setTaskId(m.toJS());
-      checkValidate(m.toJS());
+      const m = { ...taskId };
+      m.minPoint = values;
+      form.setFieldsValue({ minPoint: m.minPoint });
+      setTaskId(m);
+      checkValidate(m);
     } else {
-      const m = Map(dataPoint).set("minPoint", e.target.value);
-      setDataPoint(m.toJS());
-      checkValidateCreate(m.toJS());
+      const m = { ...dataPoint };
+      m.minPoint = values;
+      form.setFieldsValue({ minPoint: m.minPoint });
+      setDataPoint(m);
+      checkValidateCreate(m);
     }
   };
   const handlePointFer = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -184,10 +194,10 @@ function ConditionFarmer() {
   };
   const checkValidate = (data: PointSettingEntities) => {
     if (
-      data.status != '' &&
-      data.application != '' &&
-      data.minPoint != '' &&
-      data.point != '' &&
+      data.status != "" &&
+      data.application != "" &&
+      data.minPoint != "" &&
+      data.point != "" &&
       data.receiveType != "" &&
       data.pointType != ""
     ) {
@@ -197,55 +207,52 @@ function ConditionFarmer() {
     }
   };
   const checkValidateCreate = (data: PointSettingEntities) => {
-    if (
-      data.application != '' &&
-      data.minPoint != '' &&
-      data.point != ''
-    ) {
+    if (data.application != "" && data.minPoint != "" && data.point != "") {
       setBtnSaveDisable(false);
     } else {
       setBtnSaveDisable(true);
     }
   };
 
-  const onClickSave = async() => {   
-      const pushApp = Map(taskId).set("application", "FARMER");
-      const pushReceiveType = Map(pushApp.toJS()).set("receiveType", "TASK");
-      const pushAmount = Map(pushReceiveType.toJS()).set(
-        "amounts",
-        taskId.amounts
-      );
-      await PointSettingDatasource.editPointSetting(pushAmount.toJS());
-      const pushAppFer = Map(productId).set("application", "FARMER");
-      const pushReceiveTypeFer = Map(pushAppFer.toJS()).set("receiveType", "TASK");
-      const pushAmountFer = Map(pushReceiveTypeFer.toJS()).set(
-        "amounts",
-        productId.amounts
-      );
-      await PointSettingDatasource.editPointSetting(pushAmountFer.toJS()).then(
-        (res) => {
-          Swal.fire({
-            title: "บันทึกสำเร็จ",
-            icon: "success",
-            timer: 1500,
-            showConfirmButton: false,
-          }).then((time) => {});
-        }
-      );
-  }
+  const onClickSave = async () => {
+    const pushApp = Map(taskId).set("application", "FARMER");
+    const pushReceiveType = Map(pushApp.toJS()).set("receiveType", "TASK");
+    const pushAmount = Map(pushReceiveType.toJS()).set(
+      "amounts",
+      taskId.amounts
+    );
+    await PointSettingDatasource.editPointSetting(pushAmount.toJS());
+    const pushAppFer = Map(productId).set("application", "FARMER");
+    const pushReceiveTypeFer = Map(pushAppFer.toJS()).set(
+      "receiveType",
+      "TASK"
+    );
+    const pushAmountFer = Map(pushReceiveTypeFer.toJS()).set(
+      "amounts",
+      productId.amounts
+    );
+    await PointSettingDatasource.editPointSetting(pushAmountFer.toJS()).then(
+      (res) => {
+        Swal.fire({
+          title: "บันทึกสำเร็จ",
+          icon: "success",
+          timer: 1500,
+          showConfirmButton: false,
+        }).then((time) => {});
+      }
+    );
+  };
   const onClickCreate = async () => {
-    if(chooseDisTask === true && chooseDisFer === false){
-        await PointSettingDatasource.createPointSetting(dataPoint).then(
-          (res) => {
-            Swal.fire({
-              title: "บันทึกสำเร็จ",
-              icon: "success",
-              timer: 1500,
-              showConfirmButton: false,
-            }).then((time) => {});
-          }
-        );
-    }else if(chooseDisTask === false && chooseDisFer === true){
+    if (chooseDisTask === true && chooseDisFer === false) {
+      await PointSettingDatasource.createPointSetting(dataPoint).then((res) => {
+        Swal.fire({
+          title: "บันทึกสำเร็จ",
+          icon: "success",
+          timer: 1500,
+          showConfirmButton: false,
+        }).then((time) => {});
+      });
+    } else if (chooseDisTask === false && chooseDisFer === true) {
       await PointSettingDatasource.createPointSetting(dataPointFer).then(
         (res) => {
           Swal.fire({
@@ -256,8 +263,8 @@ function ConditionFarmer() {
           }).then((time) => {});
         }
       );
-    }else if(chooseDisTask === true && chooseDisFer === true){
-      await PointSettingDatasource.createPointSetting(dataPoint)
+    } else if (chooseDisTask === true && chooseDisFer === true) {
+      await PointSettingDatasource.createPointSetting(dataPoint);
       await PointSettingDatasource.createPointSetting(dataPointFer).then(
         (res) => {
           Swal.fire({
@@ -268,64 +275,70 @@ function ConditionFarmer() {
           }).then((time) => {});
         }
       );
-    }else{
+    } else {
       return;
     }
-   
-  
   };
 
   const renderConditionFarmer = (
     <CardContainer>
       <CardHeader textHeader="ข้อมูลเงื่อนไขเกษตรกร" />
-      <Form style={{ padding: "32px" }}>
+      <Form style={{ padding: "32px" }} form={form}>
         <label style={{ fontSize: "16px", paddingBottom: 10 }}>
-        การแลก ICK Point
+          การแลก ICK Point
         </label>
         <br />
         <Checkbox
-        onChange={handleDisTask}
-        checked={taskId.status === "ACTIVE" || dataPoint.status === "ACTIVE"}
-        name="DISCOUNT_TASK"
-        value={"DISCOUNT_TASK"}
-      >
-        ส่วนลดการจ้างงาน
-      </Checkbox>
+          onChange={handleDisTask}
+          checked={taskId.status === "ACTIVE" || dataPoint.status === "ACTIVE"}
+          name="DISCOUNT_TASK"
+          value={"DISCOUNT_TASK"}
+        >
+          ส่วนลดการจ้างงาน
+        </Checkbox>
         <div className="row m-2">
           <div className="col-lg-6">
             <span>การเปรียบเทียบคะแนน/เงิน</span>
             <br />
-            <Input
-              key={taskId.id}
-              name="point"
-              type="number"
-              disabled={taskId.status != "ACTIVE" && dataPoint.status != "ACTIVE"}
-              placeholder="กรอกคะแนน"
-              suffix="คะแนน / 1 บาท"
-              defaultValue={taskId.point != '' ? taskId.point : undefined}
-              onChange={handleOnPoint}
-            />
+            <Form.Item name="point">
+              <Input
+                key={taskId.id}
+                disabled={
+                  taskId.status != "ACTIVE" && dataPoint.status != "ACTIVE"
+                }
+                placeholder="กรอกคะแนน"
+                suffix="คะแนน / 1 บาท"
+                value={taskId.point != "" ? taskId.point : undefined}
+                onChange={(e) => handleOnPoint(e)}
+                autoComplete="off"
+              />
+            </Form.Item>
           </div>
           <div className="col-lg-6">
             <span>การใช้คะแนนขั้นต่ำ</span>
-            <Input
-              key={taskId.id}
-              name="minPoint"
-              type="number"
-              disabled={taskId.status != "ACTIVE" && dataPoint.status != "ACTIVE"}
-              placeholder="กรอกคะแนน"
-              suffix="คะแนน"
-              defaultValue={taskId.minPoint != '' ? taskId.minPoint : undefined}
-              onChange={handleOnMinPoint}
-            />
+            <Form.Item name="minPoint">
+              <Input
+                key={taskId.id}
+                disabled={
+                  taskId.status != "ACTIVE" && dataPoint.status != "ACTIVE"
+                }
+                placeholder="กรอกคะแนน"
+                suffix="คะแนน"
+                value={taskId.minPoint != "" ? taskId.minPoint : undefined}
+                onChange={(e) => handleOnMinPoint(e)}
+                autoComplete="off"
+              />
+            </Form.Item>
           </div>
         </div>
         <br />
         <>
           <Checkbox
-          disabled
+            disabled
             onChange={handleDisFertilizer}
-            checked={productId.status === "ACTIVE" || dataPointFer.status === "ACTIVE"}
+            checked={
+              productId.status === "ACTIVE" || dataPointFer.status === "ACTIVE"
+            }
             name="DISCOUNT_PRODUCT"
             value={"DISCOUNT_PRODUCT"}
           >
@@ -340,8 +353,13 @@ function ConditionFarmer() {
                 type="number"
                 placeholder="กรอกคะแนน"
                 onChange={handlePointFer}
-                disabled={productId.status != "ACTIVE" && dataPointFer.status != "ACTIVE"}
-                defaultValue={productId.point != '' ? productId.point : undefined}
+                disabled={
+                  productId.status != "ACTIVE" &&
+                  dataPointFer.status != "ACTIVE"
+                }
+                defaultValue={
+                  productId.point != "" ? productId.point : undefined
+                }
                 suffix="คะแนน / 1 บาท"
               />
             </div>
@@ -351,10 +369,14 @@ function ConditionFarmer() {
                 key={productId.id}
                 name="minPoint"
                 type="number"
-                disabled={productId.status != "ACTIVE" && dataPointFer.status != "ACTIVE"}
+                disabled={
+                  productId.status != "ACTIVE" &&
+                  dataPointFer.status != "ACTIVE"
+                }
                 placeholder="กรอกคะแนน"
-                defaultValue={productId.minPoint != '' ? productId.minPoint : undefined}
-
+                defaultValue={
+                  productId.minPoint != "" ? productId.minPoint : undefined
+                }
                 suffix="คะแนน"
                 onChange={handleMinPointFer}
               />
@@ -398,6 +420,7 @@ function ConditionFarmer() {
   );
   return (
     <Layouts>
+      {console.log(taskId.point)}
       <Row>
         <span className="p-3">
           <strong style={{ fontSize: "20px" }}>เงื่อนไขเกษตรกร</strong>
@@ -426,7 +449,7 @@ function ConditionFarmer() {
               color: color.BG,
             }}
             onClick={() => {
-              taskId.id || productId.id ? onClickSave() : onClickCreate()
+              taskId.id || productId.id ? onClickSave() : onClickCreate();
             }}
           >
             บันทึก
@@ -438,5 +461,3 @@ function ConditionFarmer() {
 }
 
 export default ConditionFarmer;
-
-
