@@ -1,4 +1,8 @@
 ## [Version - 0]
+## Fix [v0.27.1] 2023-05-16
+- fixed function check dup campaign point menu
+- added data amount service in new task
+- hide menus
 ## Feature [v0.27.0] 2023-05-15
 - added campaign point menu
 ## Fix [v0.26.1] 2023-05-15
