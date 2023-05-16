@@ -50,6 +50,7 @@ const AddCampaignPoint = () => {
       startDate,
       endDate,
       application,
+      ""
     ).then((res) => {
       if (!res.success) {
         setCheckDup(true);
