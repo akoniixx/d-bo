@@ -87,7 +87,7 @@ const EditCampaignPoint = () => {
       startDate,
       endDate,
       application,
-      queryString
+      queryString[1]
     ).then((res) => {
       if (!res.success) {
         setCheckDup(true);
