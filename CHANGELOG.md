@@ -1,4 +1,7 @@
 ## [Version - 0]
+## Fix [v0.27.2] 2023-05-16
+- fixed input can not fill 0 and letters
+- fixed logic delete in campaint point
 ## Fix [v0.27.1] 2023-05-16
 - fixed function check dup campaign point menu
 - added data amount service in new task

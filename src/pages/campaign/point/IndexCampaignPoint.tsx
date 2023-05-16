@@ -89,7 +89,7 @@ const IndexCampaignPoint = () => {
   };
   const deleteCampaign = () => {
     CampaignDatasource.deleteCampaign(deleteId).then((res) => {
-      setShowModal(!showModal)
+      setShowModal(!showModal);
       setDeleteId("");
       fetchCampaignList();
     });
@@ -289,9 +289,21 @@ const IndexCampaignPoint = () => {
               <div className="col-lg-6">
                 <ActionButton
                   icon={<DeleteOutlined />}
-                  color={row.status === "ACTIVE" ? color.Grey : color.Error}
+                  color={
+                    row.status === "ACTIVE"
+                      ? row.isDelete
+                        ? color.Grey
+                        : color.Grey
+                      : color.Error
+                  }
                   onClick={() => setDeleteCampaign(row.id)}
-                  actionDisable={row.status === "ACTIVE" ? true : false}
+                  actionDisable={
+                    row.status === "ACTIVE"
+                      ? row.isDelete
+                        ? row.isDelete
+                        : !row.isDelete
+                      : false
+                  }
                 />
               </div>
             </div>
