@@ -1,4 +1,12 @@
 ## [Version - 0]
+## Feature [v0.27.0] 2023-05-15
+- added campaign point menu
+## Fix [v0.26.1] 2023-05-15
+- fix defect add guru farmer
+## Feature [v0.26.0] 2023-05-15
+- add point setting feature
+## Fix [v0.25.08] 2023-04-20
+- fix defect guru farmer feature
 ## improve [v0.25.07] 2023-05-01
 - add guru farmer feature
 ## improve [v0.25.06] 2023-04-21

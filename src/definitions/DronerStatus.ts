@@ -41,4 +41,5 @@ export const STATUS_COLOR: any = {
   INACTIVE: color.Error,
   OPEN: color.Disable,
   REJECTED: color.Error,
+  DRAFTING: color.Grey
 };

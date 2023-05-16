@@ -68,4 +68,11 @@ export class NewsDatasource{
         .then(res => {return res.data})
         .catch(err => console.log(err))
     }
+
+    static deleteNews(id : string,path : string){
+        return httpClient
+        .delete(BASE_URL + `/promotion/news/delete?id=${id}&path=${path}`)
+        .then(res => {return res.data})
+        .catch(err => console.log(err))
+    }
 }

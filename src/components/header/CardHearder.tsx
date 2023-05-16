@@ -4,9 +4,15 @@ import { color } from "../../resource";
 
 interface CardHeaderProps {
   textHeader: string;
+  showButton?: boolean;
+  onClickButoon?: () => void;
+  buttonName?: string;
 }
 export const CardHeader: React.FC<CardHeaderProps> = ({
-  textHeader
+  textHeader,
+  showButton,
+  onClickButoon,
+  buttonName,
 }) => (
   <div
     style={{
@@ -19,5 +25,18 @@ export const CardHeader: React.FC<CardHeaderProps> = ({
     <h4 className="pt-2 ps-3" style={{ color: "white" }}>
       {textHeader}
     </h4>
+    {showButton && (
+      <Button
+        style={{
+          color: color.primary1,
+          fontWeight: "bold",
+          borderRadius: "5px",
+          backgroundColor: "#EEF6F0",
+        }}
+        onClick={onClickButoon}
+      >
+        {buttonName}
+      </Button>
+    )}
   </div>
 );

@@ -81,6 +81,10 @@ function AddNewsPage() {
   const removeImgProfile = () => {
     setImgProfile(undefined);
     setCreateImgProfile(UploadImageEntity_INTI);
+    form.setFieldValue(
+      "img",null
+    )
+    onFieldsChange()
     // checkValidate(data);
   };
 
@@ -131,7 +135,7 @@ function AddNewsPage() {
     let fieldapp = false;
     let fieldimg = false;
 
-    if(newsName && newsDescription && newsStatus){
+    if(newsName && (newsDescription != "<p><br></p>") && newsStatus){
       fieldInfo = false
     }
     else{
