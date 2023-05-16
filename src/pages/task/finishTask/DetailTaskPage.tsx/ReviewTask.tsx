@@ -383,7 +383,7 @@ function ReviewTask() {
           <div className="col-lg-4 text-start">
             <label>แปลง</label>
             <Form.Item>
-              <Select disabled defaultValue={data.data.farmerPlot.plotName} />
+              <Select disabled defaultValue={data.data.farmAreaAmount} />
             </Form.Item>
           </div>
           <div className="col-lg-4 text-start">

@@ -230,7 +230,7 @@ function CancelTask() {
             <Form.Item>
               <Input
                 disabled
-                defaultValue={data.data.farmerPlot.raiAmount}
+                defaultValue={data.data.farmAreaAmount}
                 suffix="ไร่"
               />
             </Form.Item>

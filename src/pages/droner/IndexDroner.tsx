@@ -781,14 +781,14 @@ function IndexDroner() {
         return {
           children: (
             <div className="d-flex flex-row justify-content-between">
-              <ActionButton
+              {/* <ActionButton
                 icon={<FolderViewOutlined />}
                 color={color.primary1}
                 onClick={() =>
                   (window.location.href =
                     "/IndexDetailDronerPoint/id=" + row.id)
                 }
-              />
+              /> */}
               <ActionButton
                 icon={<EditOutlined />}
                 color={color.primary1}

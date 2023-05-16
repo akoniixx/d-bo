@@ -96,11 +96,11 @@ const Layouts: React.FC<any> = ({ children }) => {
           }}
         >
           <Menu mode="inline" defaultOpenKeys={["order"]} style={style}>
-            <Menu.Item icon={<SignalFilled />} key="overview">
+            {/* <Menu.Item icon={<SignalFilled />} key="overview">
               <Link to="/OverviewPage" style={{ textDecoration: "none" }}>
                 <span>ภาพรวม</span>
               </Link>
-            </Menu.Item>
+            </Menu.Item> */}
             <Menu.SubMenu
               icon={<ProfileFilled />}
               title={<span>ติดตามงาน</span>}
@@ -139,11 +139,11 @@ const Layouts: React.FC<any> = ({ children }) => {
                 )}
               </Menu.Item>
             </Menu.SubMenu>
-            <Menu.Item key="totalIncome" icon={<DollarCircleFilled />}>
+            {/* <Menu.Item key="totalIncome" icon={<DollarCircleFilled />}>
               <Link to="/TotalIncomePage" style={{ textDecoration: "none" }}>
                 <span>ยอดรวมรายได้</span>
               </Link>
-            </Menu.Item>
+            </Menu.Item> */}
             <Menu.Item key="farmer" icon={<ContactsFilled />}>
               <Link to="/IndexFarmer" style={{ textDecoration: "none" }}>
                 <span>ข้อมูลเกษตรกร</span>
@@ -188,10 +188,10 @@ const Layouts: React.FC<any> = ({ children }) => {
             </Menu.SubMenu>
             <Menu.SubMenu
               icon={<StarFilled />}
-              title={<span>คะแนน</span>}
+              title={<span>คะแนนสะสม</span>}
               key={"sub7"}
             >
-              <Menu.SubMenu title={<span>นักบินโดรน</span>} key={"sub9"}>
+              {/* <Menu.SubMenu title={<span>นักบินโดรน</span>} key={"sub9"}>
                 <Menu.Item key="dronerpoint">
                   <Link
                     to="/IndexDronerPoint"
@@ -210,7 +210,7 @@ const Layouts: React.FC<any> = ({ children }) => {
                     <span>รายการคะแนน</span>
                   </Link>
                 </Menu.Item>
-              </Menu.SubMenu>
+              </Menu.SubMenu> */}
               <Menu.Item key="campaignpoint">
                   <Link
                     to="/IndexCampaignPoint"
@@ -255,11 +255,11 @@ const Layouts: React.FC<any> = ({ children }) => {
                   <span>เงื่อนไขเกษตรกร</span>
                 </Link>
               </Menu.Item>
-              <Menu.Item key="conditionDroner">
+              {/* <Menu.Item key="conditionDroner">
                 <Link to="/ConditionDroner" style={{ textDecoration: "none" }}>
                   <span>เงื่อนไขนักบินโดรน</span>
                 </Link>
-              </Menu.Item>
+              </Menu.Item> */}
             </Menu.SubMenu>
             </Menu.SubMenu>
           </Menu>
