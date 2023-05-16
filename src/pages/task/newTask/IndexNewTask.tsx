@@ -284,7 +284,7 @@ const IndexNewTask = () => {
           children: (
             <>
               <span>
-                {row.total_price == null
+                {row.total_price
                   ? 0.0 + " บาท"
                   : numberWithCommas(parseFloat(row.total_price)) + " บาท"}
               </span>
@@ -307,49 +307,55 @@ const IndexNewTask = () => {
                         <div style={{ fontSize: "12px" }}>
                           จำนวนไร่{" "}
                           <span style={{ color: color.Success }}>
-                            {row.farmerPlot_rai_amount} ไร่
+                            {row.farm_area_amount} ไร่
                           </span>{" "}
                           x ค่าบริการ{" "}
                           <span style={{ color: color.Success }}>
-                            {row.task_unit_price} ไร่
+                            {row.unit_price} ไร่
                           </span>
                         </div>
                       </td>
                       <td style={{ textAlign: "right" }}>
-                        {numberWithCommasToFixed(parseFloat(row.task_price))}
+                        {numberWithCommasToFixed(parseFloat(row.price))}
                       </td>
                     </tr>
                     <tr>
                       <td>ค่าธรรมเนียม (5%)</td>
                       <td style={{ textAlign: "right" }}>
-                        {numberWithCommasToFixed(parseFloat(row.task_fee))}
+                        {numberWithCommasToFixed(parseFloat(row.fee))}
                       </td>
                     </tr>
                     <tr>
                       <td>ส่วนลดค่าธรรมเนียม</td>
                       <td style={{ color: color.Error, textAlign: "right" }}>
-                        {"- " +
-                          numberWithCommasToFixed(
-                            parseFloat(row.task_discount_fee)
-                          )}
+                        {parseFloat(row.discount_fee)
+                          ? "- " +
+                            numberWithCommasToFixed(
+                              parseFloat(row.discount_fee)
+                            )
+                          : 0}
                       </td>
                     </tr>
                     <tr>
                       <td>ส่วนลดจากคูปอง</td>
                       <td style={{ color: color.Error, textAlign: "right" }}>
-                        {"- " +
-                          numberWithCommasToFixed(
-                            parseFloat(row.task_discount_coupon)
-                          )}
+                        {parseFloat(row.discount_coupon)
+                          ? "- " +
+                            numberWithCommasToFixed(
+                              parseFloat(row.discount_coupon)
+                            )
+                          : 0}
                       </td>
                     </tr>
                     <tr>
                       <td>ส่วนลดจากโปรโมชั่น</td>
                       <td style={{ color: color.Error, textAlign: "right" }}>
-                        {"- " +
-                          numberWithCommasToFixed(
-                            parseFloat(row.task_discount_promotion)
-                          )}
+                        {parseFloat(row.discount_promotion)
+                          ? "- " +
+                            numberWithCommasToFixed(
+                              parseFloat(row.discount_promotion)
+                            )
+                          : 0}
                       </td>
                     </tr>
                     <tr>
@@ -366,9 +372,7 @@ const IndexNewTask = () => {
                           fontWeight: "bold",
                         }}
                       >
-                        {numberWithCommasToFixed(
-                          parseFloat(row.task_total_price)
-                        )}
+                        {numberWithCommasToFixed(parseFloat(row.total_price))}
                       </td>
                     </tr>
                   </table>

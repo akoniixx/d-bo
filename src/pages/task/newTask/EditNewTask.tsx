@@ -449,9 +449,7 @@ const EditNewTask = () => {
                         onSearch={(e: any) => setSearchFarmer(e)}
                         onSelect={onSelectFarmer}
                         onChange={handleSearchFarmer}
-                        disabled={
-                          parseFloat(data.discountCoupon) === 0 ? false : true
-                        }
+                        disabled={data.couponId ? true : false}
                       >
                         {farmerList?.map((item) => (
                           <Option
@@ -474,9 +472,7 @@ const EditNewTask = () => {
                       color: color.Success,
                     }}
                     onClick={handleSelectFarmer}
-                    disabled={
-                      parseFloat(data.discountCoupon) === 0 ? false : true
-                    }
+                    disabled={data.couponId ? true : false}
                   >
                     เลือกเกษตรกร
                   </Button>
@@ -509,11 +505,7 @@ const EditNewTask = () => {
                       <Select
                         status={checkSelectPlot}
                         placeholder="เลือกแปลง"
-                        disabled={
-                          current == 2 || parseFloat(data.discountCoupon) === 0
-                            ? false
-                            : true
-                        }
+                        disabled={current == 2 || data.couponId ? true : false}
                         onChange={handleSelectFarmerPlot}
                         defaultValue={data?.farmerPlotId}
                       >
@@ -551,9 +543,9 @@ const EditNewTask = () => {
                         disabled={
                           current == 2 ||
                           checkSelectPlot == "error" ||
-                          parseFloat(data.discountCoupon) === 0
-                            ? false
-                            : true
+                          data.couponId
+                            ? true
+                            : false
                         }
                       />
                       {parseFloat(data?.farmAreaAmount) >
@@ -686,7 +678,11 @@ const EditNewTask = () => {
                               ? color.White
                               : color.Success,
                         }}
-                        disabled={current == 2 || checkSelectPlot == "error"}
+                        disabled={
+                          current == 2 ||
+                          checkSelectPlot == "error"
+                         
+                        }
                         onClick={(e) => selectPrice(e)}
                       >
                         กรอกข้อมูลเอง
@@ -735,7 +731,11 @@ const EditNewTask = () => {
                             value={data.unitPrice}
                             onChange={handleCalServiceCharge}
                             disabled={
-                              current == 2 || checkSelectPlot == "error"
+                              current == 2 ||
+                              checkSelectPlot == "error" ||
+                              data.couponId
+                                ? true
+                                : false
                             }
                             autoComplete="off"
                             step="0.01"
@@ -751,7 +751,11 @@ const EditNewTask = () => {
                             value={data.price}
                             onChange={handleCalServiceCharge}
                             disabled={
-                              current == 2 || checkSelectPlot == "error"
+                              current == 2 ||
+                              checkSelectPlot == "error" ||
+                              data.couponId
+                                ? true
+                                : false
                             }
                             autoComplete="off"
                             step="0.01"
@@ -810,11 +814,9 @@ const EditNewTask = () => {
                 key={data?.purposeSprayId}
                 placeholder="-"
                 disabled={
-                  current == 2 ||
-                  checkSelectPlot == "error" ||
-                  parseFloat(data.discountCoupon) === 0
-                    ? false
-                    : true
+                  current == 2 || checkSelectPlot == "error" || data.couponId
+                    ? true
+                    : false
                 }
                 defaultValue={data?.purposeSprayId}
                 onChange={handlePeriodSpray}
@@ -848,11 +850,9 @@ const EditNewTask = () => {
                   type="checkbox"
                   value={x.crop}
                   disabled={
-                    current == 2 ||
-                    checkSelectPlot == "error" ||
-                    parseFloat(data.discountCoupon) === 0
-                      ? false
-                      : true
+                    current == 2 || checkSelectPlot == "error" || data.couponId
+                      ? true
+                      : false
                   }
                   checked={x.isChecked}
                   onChange={handlePurposeSpray}
@@ -1825,7 +1825,6 @@ const EditNewTask = () => {
     }).then(async (result) => {
       if (result.isConfirmed) {
         await TaskDatasource.updateNewTask(updateTask).then((res) => {
-          console.log("edit", res);
           if (res.userMessage == "success") {
             window.location.href = "/IndexNewTask";
           }

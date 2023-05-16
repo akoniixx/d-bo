@@ -604,8 +604,7 @@ function EditInProgress() {
             <label>จำนวนไร่</label>
             <Form.Item>
               <Input
-                disabled
-                defaultValue={data.farmerPlot.raiAmount}
+                defaultValue={data.farmAreaAmount}
                 suffix="ไร่"
               />
             </Form.Item>

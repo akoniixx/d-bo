@@ -410,6 +410,7 @@ export default function IndexFinishTask() {
       title: "ค่าบริการ",
       dataIndex: "subdistrict_subdistrict_name",
       key: "subdistrict_subdistrict_name",
+      width: '12%',
       render: (value: any, row: any, index: number) => {
         return {
           children: (
@@ -459,28 +460,32 @@ export default function IndexFinishTask() {
                     <tr>
                       <td>ส่วนลดค่าธรรมเนียม</td>
                       <td style={{ color: color.Error, textAlign: "right" }}>
-                        {"- " +
-                          numberWithCommasToFixed(
-                            parseFloat(row.discountFee)
-                          )}
+                        {parseFloat(row.discountFee)
+                          ? "- " +
+                            numberWithCommasToFixed(parseFloat(row.discountFee))
+                          : 0}
                       </td>
                     </tr>
                     <tr>
                       <td>ส่วนลดจากคูปอง</td>
                       <td style={{ color: color.Error, textAlign: "right" }}>
-                        {"- " +
-                          numberWithCommasToFixed(
-                            parseFloat(row.discountCoupon)
-                          )}
+                        {parseFloat(row.discountCoupon)
+                          ? "- " +
+                            numberWithCommasToFixed(
+                              parseFloat(row.discountCoupon)
+                            )
+                          : 0}
                       </td>
                     </tr>
                     <tr>
                       <td>ส่วนลดจากโปรโมชั่น</td>
                       <td style={{ color: color.Error, textAlign: "right" }}>
-                        {"- " +
-                          numberWithCommasToFixed(
-                            parseFloat(row.discountPromotion)
-                          )}
+                        {parseFloat(row.discountPromotion)
+                          ? "- " +
+                            numberWithCommasToFixed(
+                              parseFloat(row.discountPromotion)
+                            )
+                          : 0}
                       </td>
                     </tr>
                     <tr>
@@ -497,9 +502,7 @@ export default function IndexFinishTask() {
                           fontWeight: "bold",
                         }}
                       >
-                        {numberWithCommasToFixed(
-                          parseFloat(row.totalPrice)
-                        )}
+                        {numberWithCommasToFixed(parseFloat(row.totalPrice))}
                       </td>
                     </tr>
                   </table>

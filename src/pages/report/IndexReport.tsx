@@ -695,33 +695,79 @@ function IndexReport() {
                   content={
                     <table style={{ width: "300px" }}>
                       <tr>
-                        <td>ค่าบริการ</td>
-                        <td>{numberWithCommas(row.price) + " บาท"}</td>
+                        <td>
+                          ค่าบริการ
+                          <br />
+                          <div style={{ fontSize: "12px" }}>
+                            จำนวนไร่{" "}
+                            <span style={{ color: color.Success }}>
+                              {row.farmAreaAmount} ไร่
+                            </span>{" "}
+                            x ค่าบริการ{" "}
+                            <span style={{ color: color.Success }}>
+                              {row.unitPrice} ไร่
+                            </span>
+                          </div>
+                        </td>
+                        <td style={{ textAlign: "right" }}>
+                          {numberWithCommasToFixed(parseFloat(row.price))}
+                        </td>
                       </tr>
                       <tr>
                         <td>ค่าธรรมเนียม (5%)</td>
-                        <td>{numberWithCommas(row.fee) + " บาท"}</td>
+                        <td style={{ textAlign: "right" }}>
+                          {numberWithCommasToFixed(parseFloat(row.fee))}
+                        </td>
                       </tr>
                       <tr>
                         <td>ส่วนลดค่าธรรมเนียม</td>
-                        <td>{numberWithCommas(row.discountFee) + " บาท"}</td>
+                        <td style={{ color: color.Error, textAlign: "right" }}>
+                          {parseFloat(row.discountFee)
+                            ? "- " +
+                              numberWithCommasToFixed(
+                                parseFloat(row.discountFee)
+                              )
+                            : 0}
+                        </td>
                       </tr>
                       <tr>
                         <td>ส่วนลดจากคูปอง</td>
-                        <td>{numberWithCommas(row.discountCoupon) + " บาท"}</td>
+                        <td style={{ color: color.Error, textAlign: "right" }}>
+                          {parseFloat(row.discountCoupon)
+                            ? "- " +
+                              numberWithCommasToFixed(
+                                parseFloat(row.discountCoupon)
+                              )
+                            : 0}
+                        </td>
                       </tr>
                       <tr>
-                        <td>
-                          <Divider />
+                        <td>ส่วนลดจากโปรโมชั่น</td>
+                        <td style={{ color: color.Error, textAlign: "right" }}>
+                          {parseFloat(row.discountPromotion)
+                            ? "- " +
+                              numberWithCommasToFixed(
+                                parseFloat(row.discountPromotion)
+                              )
+                            : 0}
                         </td>
-                        <td>
-                          {" "}
+                      </tr>
+                      <tr>
+                        <td colSpan={2}>
                           <Divider />
                         </td>
                       </tr>
                       <tr>
                         <td>ยอดรวมค่าบริการ</td>
-                        <td>{numberWithCommas(row.totalPrice) + " บาท"}</td>
+                        <td
+                          style={{
+                            textAlign: "right",
+                            color: color.Success,
+                            fontWeight: "bold",
+                          }}
+                        >
+                          {numberWithCommasToFixed(parseFloat(row.totalPrice))}
+                        </td>
                       </tr>
                     </table>
                   }
@@ -1265,8 +1311,8 @@ function IndexReport() {
     <Layouts>
       <Space direction="vertical" style={{ width: "100%" }}>
         <Spin tip="Loading..." size="large" spinning={loading}>
-        {PageTitle}
-      <br />
+          {PageTitle}
+          <br />
           <Table
             rowSelection={{
               ...rowSelection,
