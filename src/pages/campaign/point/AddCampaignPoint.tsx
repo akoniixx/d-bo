@@ -21,6 +21,7 @@ import Layouts from "../../../components/layout/Layout";
 import { CampaignDatasource } from "../../../datasource/CampaignDatasource";
 import { CreateCampaignEntiry } from "../../../entities/CampaignPointEntites";
 import { color } from "../../../resource";
+import { validateOnlyNumber } from "../../../utilities/TextFormatter";
 
 const _ = require("lodash");
 
@@ -101,6 +102,14 @@ const AddCampaignPoint = () => {
   const submit = async () => {
     await form.validateFields();
     setShowModal(!showModal);
+  };
+  const checkNumber = (
+    e: React.ChangeEvent<HTMLInputElement>,
+    name: string
+  ) => {
+    const { value: inputValue } = e.target;
+    const convertedNumber = validateOnlyNumber(inputValue);
+    form.setFieldsValue({ [name]: convertedNumber });
   };
 
   return (
@@ -259,6 +268,7 @@ const AddCampaignPoint = () => {
                     placeholder="กรอกคะแนนที่ได้รับ"
                     suffix="คะแนน"
                     autoComplete="off"
+                    onChange={(e) => checkNumber(e, "point")}
                   />
                 </Form.Item>
               </Col>
@@ -282,6 +292,7 @@ const AddCampaignPoint = () => {
                     placeholder="กรอกจำนวนไร่ "
                     suffix="ไร่"
                     autoComplete="off"
+                    onChange={(e) => checkNumber(e, "rai")}
                   />
                 </Form.Item>
               </Col>

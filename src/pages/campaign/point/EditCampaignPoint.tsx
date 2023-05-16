@@ -25,6 +25,7 @@ import {
   CreateCampaignEntiry,
 } from "../../../entities/CampaignPointEntites";
 import { color } from "../../../resource";
+import { validateOnlyNumber } from "../../../utilities/TextFormatter";
 
 const _ = require("lodash");
 let queryString = _.split(window.location.pathname, "=");
@@ -102,6 +103,15 @@ const EditCampaignPoint = () => {
   useEffect(() => {
     fetchCampaignById();
   }, []);
+
+  const checkNumber = (
+    e: React.ChangeEvent<HTMLInputElement>,
+    name: string
+  ) => {
+    const { value: inputValue } = e.target;
+    const convertedNumber = validateOnlyNumber(inputValue);
+    form.setFieldsValue({ [name]: convertedNumber });
+  };
 
   const updateCampaign = () => {
     const getForm = form.getFieldsValue();
@@ -295,6 +305,7 @@ const EditCampaignPoint = () => {
                     suffix="คะแนน"
                     autoComplete="off"
                     disabled={isEdit}
+                    onChange={(e) => checkNumber(e, "point")}
                   />
                 </Form.Item>
               </Col>
@@ -319,6 +330,7 @@ const EditCampaignPoint = () => {
                     suffix="ไร่"
                     autoComplete="off"
                     disabled={isEdit}
+                    onChange={(e) => checkNumber(e, "rai")}
                   />
                 </Form.Item>
               </Col>
