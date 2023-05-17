@@ -45,7 +45,10 @@ import {
 } from "../../../entities/TaskInprogress";
 import { TaskSearchDroner } from "../../../entities/TaskSearchDroner";
 import { color } from "../../../resource";
-import { numberWithCommas } from "../../../utilities/TextFormatter";
+import {
+  numberWithCommas,
+  numberWithCommasToFixed,
+} from "../../../utilities/TextFormatter";
 const { Option } = Select;
 
 const dateFormat = "DD/MM/YYYY";
@@ -100,13 +103,14 @@ const EditInprogressTask = () => {
       fetchPurposeSpray(res.farmerPlot.plantName);
       setDronerSelected(res.droner);
       setCheckCrop(!res.targetSpray.includes("อื่นๆ"));
-      console.log(res);
-      
+      console.log("check", res);
       setData(res);
       CouponDataSource.getPromotionCode(res.couponId).then((result) =>
         setCouponData({
           couponCode: result.couponCode ?? "",
-          couponDiscount: !res.discount ? null : parseInt(res.discount),
+          couponDiscount: !res.discountCoupon
+            ? null
+            : parseInt(res.discountCoupon),
           couponName: result.couponName ?? "",
         })
       );
@@ -494,7 +498,7 @@ const EditInprogressTask = () => {
               <div className="form-group col-lg-4">
                 <label>จำนวนไร่</label>
                 <Form.Item>
-                  <Input value={data?.farmerPlot?.raiAmount} disabled />
+                  <Input value={data?.farmAreaAmount} />
                 </Form.Item>
               </div>
             </div>
@@ -621,11 +625,27 @@ const EditInprogressTask = () => {
       <Form style={{ padding: "20px" }}>
         <CardContainer style={{ backgroundColor: "rgba(33, 150, 83, 0.1)" }}>
           <Form style={{ padding: "20px" }}>
-            <label>ยอดรวมค่าบริการ</label>
-            <h5 style={{ color: color.primary1 }} className="p-2">
-              {data?.totalPrice &&
-                numberWithCommas(parseFloat(data?.totalPrice))}
-            </h5>
+            <div className="row">
+              <div className="col-lg-3" style={{ borderRight: "solid" }}>
+                <label>ยอดรวมค่าบริการ (เกษตรกร)</label>
+                <h5 style={{ color: color.primary1 }} className="p-2">
+                  {data?.totalPrice &&
+                    numberWithCommasToFixed(parseFloat(data?.totalPrice))}{" "}
+                  บาท
+                </h5>
+              </div>
+              <div className="col-lg-3" style={{ paddingLeft: "40px" }}>
+                <label>รายได้ที่นักบินโดรนได้รับ</label>
+                <h5 style={{ color: color.Warning }} className="p-2">
+                  {data?.price &&
+                    numberWithCommasToFixed(
+                      parseFloat(data?.price) +
+                        parseFloat(data?.revenuePromotion)
+                    )}{" "}
+                  บาท
+                </h5>
+              </div>
+            </div>
             <div className="row">
               <div className="form-group col-lg-4">
                 <label>ค่าบริการ (ก่อนคิดค่าธรรมเนียม)</label>
@@ -660,6 +680,8 @@ const EditInprogressTask = () => {
                   />
                 </Form.Item>
               </div>
+            </div>
+            <div className="row">
               <div className="form-group col-lg-4">
                 <label>รหัสคูปอง</label>
                 <Input
@@ -679,7 +701,28 @@ const EditInprogressTask = () => {
               <div className="form-group col-lg-4">
                 <label>ส่วนลดคูปอง</label>
                 <Input
+                  suffix="บาท"
                   value={numberWithCommas(couponData.couponDiscount!)}
+                  disabled
+                  autoComplete="off"
+                />
+              </div>
+            </div>
+            <div className="row pt-3">
+              <div className="form-group col-lg-6 p-2">
+                <label>โปรโมชั่นนักบินโดรน</label>
+                <Input
+                  suffix="บาท"
+                  value={data.discountPromotion}
+                  disabled
+                  autoComplete="off"
+                />
+              </div>
+              <div className="form-group col-lg-6 p-2">
+                <label>โปรโมชั่นเกษตรกร</label>
+                <Input
+                  suffix="บาท"
+                  value={data.revenuePromotion}
                   disabled
                   autoComplete="off"
                 />
@@ -707,7 +750,7 @@ const EditInprogressTask = () => {
     droner.address.province.provinceName = newDroner.province_name;
     droner.totalDroneCount = parseInt(newDroner.count_drone);
     droner.dronerDrone = [drone];
-    droner.distance =  newDroner.distance;
+    droner.distance = newDroner.distance;
     setDronerSelected(droner);
     setShowModal((prev) => !prev);
     setBtnSaveDisable(false);

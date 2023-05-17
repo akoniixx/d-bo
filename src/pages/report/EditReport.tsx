@@ -15,6 +15,7 @@ import {
   Row,
   Select,
   Space,
+  Spin,
   Tag,
   UploadFile,
 } from "antd";
@@ -73,13 +74,15 @@ function EditReport() {
   const [updateStatusPayment, setUpdateStatusPayment] =
     useState<updateStatusPays>(updateStatusPays_INIT);
   const [history, setHistory] = useState<HistoryEntity>(HistoryEntity_INIT);
-
+  const [loading, setLoading] = useState(false);
   const [mapPosition, setMapPosition] = useState<{ lat: number; lng: number }>({
     lat: LAT_LNG_BANGKOK.lat,
     lng: LAT_LNG_BANGKOK.lng,
   });
   const fetchDetailTask = async () => {
     await TaskFinishedDatasource.getDetailFinishTaskById(taskId).then((res) => {
+      console.log("report edit", res);
+
       if (res.data.couponId !== null) {
         CouponDataSource.getPromotionCode(res.data.couponId).then((result) =>
           setCouponData({
@@ -119,8 +122,8 @@ function EditReport() {
   };
   const UpdateStatusPayment = async () => {
     Swal.fire({
-      title: "ยืนยันการแก้ไข",
-      text: "โปรดตรวจสอบงานที่คุณต้องการแก้ไข ก่อนที่จะกดยืนยันแก้ไข เพราะอาจส่งผลต่อการจ้างงานในแอปพลิเคชัน",
+      title: "ยืนยันการเปลี่ยนสถานะ",
+      text: "โปรดตรวจสอบงานที่คุณต้องการเปลี่ยนสถานะ ก่อนที่จะกดยืนยัน เพราะอาจส่งผลต่อการจ่ายเงินของนักบินโดรนในระบบ",
       cancelButtonText: "ยกเลิก",
       confirmButtonText: "บันทึก",
       confirmButtonColor: color.Success,
@@ -213,7 +216,7 @@ function EditReport() {
           <label>เป้าหมายการฉีดพ่น</label>
           <Form.Item>
             <span style={{ color: color.Grey }}>
-              {data.data.targetSpray !== null
+              {data.data.targetSpray != null
                 ? data.data.targetSpray.join(",")
                 : "-"}
             </span>
@@ -664,20 +667,28 @@ function EditReport() {
     <Form style={{ padding: "20px" }}>
       <Form style={{ padding: "20px", backgroundColor: "#2196531A" }}>
         <div className="row">
-          <div className="col-lg">
-            <Form.Item>
-              <span>
-                ยอดรวมค่าบริการ
-                <br />
-                <b style={{ fontSize: "20px", color: color.Success }}>
-                  {data.data.totalPrice !== null
-                    ? numberWithCommasToFixed(
-                        parseFloat(data.data.totalPrice)
-                      ) + " บาท"
-                    : "0 บาท"}
-                </b>
-              </span>
-            </Form.Item>
+          <div className="col-lg-3">
+            <label>ยอดรวมค่าบริการ (เกษตรกร)</label>
+            <h5 style={{ color: color.Success }} className="p-2">
+              {data.data.totalPrice !== null
+                ? numberWithCommasToFixed(parseFloat(data.data.totalPrice)) +
+                  " บาท"
+                : "0 บาท"}
+            </h5>
+          </div>
+          <div
+            className="col-lg-3"
+            style={{ paddingLeft: "40px", borderLeft: "solid" }}
+          >
+            <label>รายได้ที่นักบินโดรนได้รับ</label>
+            <h5 style={{ color: color.Warning }} className="p-2">
+              {data?.data.price &&
+                numberWithCommasToFixed(
+                  parseFloat(data?.data.price) +
+                    parseFloat(data?.data.revenuePromotion)
+                )}{" "}
+              บาท
+            </h5>
           </div>
         </div>
         <div className="row">
@@ -724,6 +735,8 @@ function EditReport() {
               />
             </Form.Item>
           </div>
+        </div>
+        <div className="row">
           <div className="form-group col-lg-4">
             <label>รหัสคูปอง</label>
             <Input
@@ -749,84 +762,123 @@ function EditReport() {
             />
           </div>
         </div>
+        <div className="row pt-3">
+          <div className="form-group col-lg-6 p-2">
+            <label>โปรโมชั่นนักบินโดรน</label>
+            <Input
+              suffix="บาท"
+              value={data.data.discountPromotion}
+              disabled
+              autoComplete="off"
+            />
+          </div>
+          <div className="form-group col-lg-6 p-2">
+            <label>โปรโมชั่นเกษตรกร</label>
+            <Input
+              suffix="บาท"
+              value={data.data.revenuePromotion}
+              disabled
+              autoComplete="off"
+            />
+          </div>
+        </div>
       </Form>
     </Form>
   );
   const DownloadPDF = async () => {
-    const filterId = data.data.id;
+    setLoading(true);
+    const filterId = [data.data.id];
     const downloadBy = `${profile.firstname} ${profile.lastname}`;
     await ReportDocDatasource.getFileName("PDF", downloadBy, filterId).then(
       (res) => {
         if (res.responseData) {
           const idFileName = res.responseData.id;
           const fileName = res.responseData.fileName;
-          ReportDocDatasource.reportPDF(
-            [filterId],
-            downloadBy,
-            idFileName
-          ).then((res) => {
-            const blob = new Blob([res], { type: "application/pdf" });
-            const a = document.createElement("a");
-            a.href = window.URL.createObjectURL(blob);
-            a.download = fileName;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-          });
+          ReportDocDatasource.reportPDF(filterId, downloadBy, idFileName)
+            .then((res) => {
+              const blob = new Blob([res], { type: "application/pdf" });
+              const a = document.createElement("a");
+              a.href = window.URL.createObjectURL(blob);
+              a.download = fileName;
+              document.body.appendChild(a);
+              a.click();
+              document.body.removeChild(a);
+            })
+            .catch((err) => console.log(err))
+            .finally(() => setLoading(false));
         }
       }
     );
   };
   return (
     <Layout>
-      <div className="container d-flex justify-content-between pt-1">
-        <div className="pt-1">
-          <BackIconButton
-            onClick={() => (window.location.href = "/IndexReport")}
-          />
+      <Spin tip="Loading..." size="large" spinning={loading}>
+        <div className="container d-flex justify-content-between pt-1">
+          <div className="pt-1">
+            <BackIconButton
+              onClick={() => (window.location.href = "/IndexReport")}
+            />
+          </div>
+          <div className="col-lg-9 pt-4">
+            <strong style={{ fontSize: "20px" }}>
+              รายละเอียดงาน {data.data.taskNo}
+            </strong>
+          </div>
+          <div className="col-lg pt-4">
+            {data.data.statusPayment === "WAIT_PAYMENT" ||
+            data.data.statusPayment === "DONE_PAYMENT" ? (
+              <Button
+                className="col-lg-9 p-1"
+                style={{
+                  color: color.secondary2,
+                  backgroundColor: color.primary1,
+                  borderRadius: "5px",
+                }}
+                onClick={DownloadPDF}
+              >
+                ดาวน์โหลดไฟล์ PDF
+              </Button>
+            ) : (
+              <Button
+                disabled
+                className="col-lg-9 p-1"
+                style={{
+                  padding: "8 0",
+                  backgroundColor: color.Disable,
+                  color: color.Grey,
+                  borderColor: color.Disable,
+                  borderRadius: "5px",
+                }}
+              >
+                ดาวน์โหลดไฟล์ PDF
+              </Button>
+            )}
+          </div>
         </div>
-        <div className="col-lg-9 pt-4">
-          <strong style={{ fontSize: "20px" }}>
-            รายละเอียดงาน {data.data.taskNo}
-          </strong>
-        </div>
-        <div className="col-lg pt-4">
-          <Button
-            className="col-lg-9 p-1"
-            style={{
-              color: color.secondary2,
-              backgroundColor: color.primary1,
-              borderRadius: "5px",
-            }}
-            onClick={DownloadPDF}
-          >
-            ดาวน์โหลดไฟล์ PDF
-          </Button>
-        </div>
-      </div>
-      <CardContainer>
-        <CardHeader textHeader="นัดหมายบริการ" />
-        {renderAppointment}
-      </CardContainer>
-      <br />
-      <CardContainer>
-        <CardHeader textHeader="ข้อมูลเกษตรกรและแปลง" />
-        {renderFarmer}
-      </CardContainer>
-      <br />
-      <CardContainer>
-        <CardHeader textHeader="รายชื่อนักบินโดรน" />
-        {renderDroner}
-      </CardContainer>
-      <br />
-      <CardContainer>
-        <CardHeader textHeader="ยอดรวมค่าบริการ" />
-        {renderPrice}
-      </CardContainer>
-      <FooterPage
-        onClickBack={() => (window.location.href = "/IndexReport")}
-        onClickSave={() => UpdateStatusPayment()}
-      />
+        <CardContainer>
+          <CardHeader textHeader="นัดหมายบริการ" />
+          {renderAppointment}
+        </CardContainer>
+        <br />
+        <CardContainer>
+          <CardHeader textHeader="ข้อมูลเกษตรกรและแปลง" />
+          {renderFarmer}
+        </CardContainer>
+        <br />
+        <CardContainer>
+          <CardHeader textHeader="รายชื่อนักบินโดรน" />
+          {renderDroner}
+        </CardContainer>
+        <br />
+        <CardContainer>
+          <CardHeader textHeader="ยอดรวมค่าบริการ" />
+          {renderPrice}
+        </CardContainer>
+        <FooterPage
+          onClickBack={() => (window.location.href = "/IndexReport")}
+          onClickSave={() => UpdateStatusPayment()}
+        />
+      </Spin>
     </Layout>
   );
 }

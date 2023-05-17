@@ -6,6 +6,7 @@ import {
   CaretDownOutlined,
   CaretUpOutlined,
   EditOutlined,
+  FolderViewOutlined,
   UserOutlined,
 } from "@ant-design/icons";
 import ActionButton from "../../components/button/ActionButton";
@@ -57,9 +58,7 @@ function IndexDroner() {
   >(undefined);
   const [province, setProvince] = useState<ProviceEntity[]>([]);
   const [district, setDistrict] = useState<DistrictEntity[]>([]);
-  const [subdistrict, setSubdistrict] = useState<SubdistrictEntity[]>(
-    []
-  );
+  const [subdistrict, setSubdistrict] = useState<SubdistrictEntity[]>([]);
   const genQuery = ({
     searchDistrict,
     searchDroneBrand,
@@ -96,10 +95,7 @@ function IndexDroner() {
     }
     const queryString = Object.keys(query);
     if (queryString.length > 0) {
-      return (
-        "?" +
-        queryString.map((key) => key + "=" + query[key]).join("&")
-      );
+      return "?" + queryString.map((key) => key + "=" + query[key]).join("&");
     }
     return "";
   };
@@ -107,9 +103,7 @@ function IndexDroner() {
   const navigate = useNavigate();
   const [searchQuery] = useSearchParams();
 
-  const [sortStatus, setSortStatus] = useState<string | undefined>(
-    undefined
-  );
+  const [sortStatus, setSortStatus] = useState<string | undefined>(undefined);
   const [droneBrandId, setDroneBrandId] = useState<any>();
   useEffect(() => {
     fetchDronerList({
@@ -181,9 +175,7 @@ function IndexDroner() {
           });
         }
         if (status) {
-          const find = DRONER_STATUS.find(
-            (item) => item.name === status
-          );
+          const find = DRONER_STATUS.find((item) => item.name === status);
           setSearchStatus({
             label: find?.name || "ทั้งหมด",
             value: find?.value || "ALL",
@@ -215,10 +207,9 @@ function IndexDroner() {
           });
         }
         if (subdistrictQuery && findDistrict) {
-          const subdistrictData =
-            await LocationDatasource.getSubdistrict(
-              findDistrict?.districtId
-            );
+          const subdistrictData = await LocationDatasource.getSubdistrict(
+            findDistrict?.districtId
+          );
           const findSubdistrict = subdistrictData.find((el: any) => {
             return el.subdistrictName === subdistrictQuery;
           });
@@ -238,18 +229,16 @@ function IndexDroner() {
     });
   };
   const fetchDistrict = async () => {
-    await LocationDatasource.getDistrict(searchProvince?.value).then(
-      (res) => {
-        setDistrict(res);
-      }
-    );
+    await LocationDatasource.getDistrict(searchProvince?.value).then((res) => {
+      setDistrict(res);
+    });
   };
   const fetchSubdistrict = async () => {
-    await LocationDatasource.getSubdistrict(
-      searchDistrict?.value
-    ).then((res) => {
-      setSubdistrict(res);
-    });
+    await LocationDatasource.getSubdistrict(searchDistrict?.value).then(
+      (res) => {
+        setSubdistrict(res);
+      }
+    );
   };
   const fetchDroneBrand = async () => {
     return await DroneDatasource.getDroneBrandList().then((res) => {
@@ -358,7 +347,8 @@ function IndexDroner() {
     <>
       <div
         className="container d-flex justify-content-between"
-        style={{ padding: "10px" }}>
+        style={{ padding: "10px" }}
+      >
         <div>
           <span
             className="card-label font-weight-bolder text-dark"
@@ -366,7 +356,8 @@ function IndexDroner() {
               fontSize: 22,
               fontWeight: "bold",
               padding: "8px",
-            }}>
+            }}
+          >
             <strong>รายชื่อนักบินโดรน (Droner)</strong>
           </span>
         </div>
@@ -379,7 +370,8 @@ function IndexDroner() {
       </div>
       <div
         className="container d-flex justify-content-between"
-        style={{ padding: "8px" }}>
+        style={{ padding: "8px" }}
+      >
         <div className="col-lg-3">
           <SearchDebounce
             onSearch={changeTextSearch}
@@ -417,7 +409,8 @@ function IndexDroner() {
               optionA.children
                 .toLowerCase()
                 .localeCompare(optionB.children.toLowerCase())
-            }>
+            }
+          >
             {province?.map((item) => (
               <Option value={item.provinceId.toString()}>
                 {item.provinceName}
@@ -455,7 +448,8 @@ function IndexDroner() {
                 .toLowerCase()
                 .localeCompare(optionB.children.toLowerCase())
             }
-            disabled={searchProvince === undefined}>
+            disabled={searchProvince === undefined}
+          >
             {district?.map((item) => (
               <Option value={item.districtId.toString()}>
                 {item.districtName}
@@ -493,7 +487,8 @@ function IndexDroner() {
                 .toLowerCase()
                 .localeCompare(optionB.children.toLowerCase())
             }
-            disabled={searchDistrict == undefined}>
+            disabled={searchDistrict == undefined}
+          >
             {subdistrict?.map((item) => (
               <Option value={item.subdistrictId.toString()}>
                 {item.subdistrictName}
@@ -530,7 +525,8 @@ function IndexDroner() {
             className="col-lg-12 p-1"
             placeholder="เลือกยี่ห้อ"
             allowClear
-            onChange={handleDroneBrand}>
+            onChange={handleDroneBrand}
+          >
             {droneBrandId?.map((item: any) => (
               <Option value={item.id.toString()}>{item.name}</Option>
             ))}
@@ -542,7 +538,8 @@ function IndexDroner() {
             className="col-lg-12 p-1"
             placeholder="เลือกสถานะ"
             value={searchStatus?.label}
-            onChange={handleStatus}>
+            onChange={handleStatus}
+          >
             {DRONER_STATUS.map((item) => (
               <Option value={item.value}>{item.name}</Option>
             ))}
@@ -556,8 +553,7 @@ function IndexDroner() {
     {
       title: () => {
         return (
-          <div
-            style={{ display: "flex", gap: 8, alignItems: "center" }}>
+          <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
             อัพเดทล่าสุด
             <div
               style={{
@@ -575,7 +571,8 @@ function IndexDroner() {
                     return undefined;
                   }
                 });
-              }}>
+              }}
+            >
               <CaretUpOutlined
                 style={{
                   position: "relative",
@@ -607,7 +604,8 @@ function IndexDroner() {
                 <div>
                   <span
                     className=" d-block font-size-lg"
-                    style={{ color: color.Grey }}>
+                    style={{ color: color.Grey }}
+                  >
                     <UserOutlined style={{ padding: "0 4px 0 0" }} />
 
                     {value?.updateBy}
@@ -645,9 +643,7 @@ function IndexDroner() {
         return {
           children: (
             <span className="text-dark-75  d-block font-size-lg">
-              {subdistrict !== undefined
-                ? subdistrict.subdistrictName
-                : null}
+              {subdistrict !== undefined ? subdistrict.subdistrictName : null}
             </span>
           ),
         };
@@ -663,9 +659,7 @@ function IndexDroner() {
           children: (
             <div className="container">
               <span className="text-dark-75  d-block font-size-lg">
-                {district !== undefined
-                  ? district.districtName
-                  : null}
+                {district !== undefined ? district.districtName : null}
               </span>
             </div>
           ),
@@ -682,9 +676,7 @@ function IndexDroner() {
           children: (
             <div className="container">
               <span className="text-dark-75  d-block font-size-lg">
-                {province !== undefined
-                  ? province.provinceName
-                  : null}
+                {province !== undefined ? province.provinceName : null}
               </span>
             </div>
           ),
@@ -734,7 +726,8 @@ function IndexDroner() {
                     style={{
                       color: "#0068F4",
                       backgroundColor: "#EFF2F9",
-                    }}>
+                    }}
+                  >
                     {/* {droneLatest.charAt(0)} */}
                   </Avatar>
                 )}
@@ -743,9 +736,7 @@ function IndexDroner() {
                   : null}
               </span>
               <span style={{ color: color.Grey, fontSize: "12px" }}>
-                {row.dronerDrone.length > 1
-                  ? "(มากกว่า 1 ยี่ห้อ)"
-                  : null}
+                {row.dronerDrone.length > 1 ? "(มากกว่า 1 ยี่ห้อ)" : null}
               </span>
             </div>
           ),
@@ -790,6 +781,14 @@ function IndexDroner() {
         return {
           children: (
             <div className="d-flex flex-row justify-content-between">
+              {/* <ActionButton
+                icon={<FolderViewOutlined />}
+                color={color.primary1}
+                onClick={() =>
+                  (window.location.href =
+                    "/IndexDetailDronerPoint/id=" + row.id)
+                }
+              /> */}
               <ActionButton
                 icon={<EditOutlined />}
                 color={color.primary1}
@@ -815,15 +814,9 @@ function IndexDroner() {
         scroll={{ x: "max-content" }}
         rowClassName={(a) =>
           a.status == "PENDING" &&
-          moment(Date.now()).diff(
-            moment(new Date(a.createdAt)),
-            "day"
-          ) >= 3
+          moment(Date.now()).diff(moment(new Date(a.createdAt)), "day") >= 3
             ? "PENDING" &&
-              moment(Date.now()).diff(
-                moment(new Date(a.createdAt)),
-                "day"
-              ) >= 7
+              moment(Date.now()).diff(moment(new Date(a.createdAt)), "day") >= 7
               ? "table-row-older"
               : "table-row-old"
             : "table-row-lasted"

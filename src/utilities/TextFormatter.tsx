@@ -32,3 +32,9 @@ export function maximumLetters(l: string, max: number) {
 export function capitalize(t: string): string {
   return t.charAt(0).toUpperCase() + t.slice(1);
 }
+
+export function validateOnlyNumber(t: string): string {
+  const inputValue = t;
+  const convertedNumber = inputValue.replace(/^0+|[^\d]/g, "");
+  return convertedNumber;
+}

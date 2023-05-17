@@ -1,4 +1,50 @@
 ## [Version - 0]
+## Fix [v0.27.3] 2023-05-17
+- fixed input can fill 0 in min rai at setting point
+- fixed amount service in new task
+## Fix [v0.27.2] 2023-05-16
+- fixed input can not fill 0 and letters
+- fixed logic delete in campaint point
+## Fix [v0.27.1] 2023-05-16
+- fixed function check dup campaign point menu
+- added data amount service in new task
+- hide menus
+## Feature [v0.27.0] 2023-05-15
+- added campaign point menu
+## Fix [v0.26.1] 2023-05-15
+- fix defect add guru farmer
+## Feature [v0.26.0] 2023-05-15
+- add point setting feature
+## Fix [v0.25.08] 2023-04-20
+- fix defect guru farmer feature
+## improve [v0.25.07] 2023-05-01
+- add guru farmer feature
+## improve [v0.25.06] 2023-04-21
+- added discount promotion & discount coupon & revenue promotion in task menu
+## Fix [v0.25.05] 2023-04-20
+- set loading in edit page
+## Fix [v0.25.04] 2023-04-20
+- fixed filter status 
+- fixed button download in edit report 
+- fixed search in report index page 
+- fixed wording modal update statusPayment
+- set loading when download report
+- fixed update status review in finished page
+## Fix [v0.25.03] 2023-04-10
+- fixed edit coupon
+- fixed layout preview mobile
+## Fix [v0.25.02] 2023-04-07
+- fixed delete coupon
+- fixed search with button
+- fixed wording
+- fixed select plant with injection time in coupon
+- fixed delete selected plant
+- added logic change img follow type coupon
+- fixed render plant and injection in review mobile
+## improve [v0.25.01] 2023-04-07
+- added download excel in report droner
+## Feature [v0.25.00] 2023-04-07
+- add promotions feature
 ## Feature [v0.24.00] 2023-04-06
 - added report droner feature (PDF) 
 ## Fix [v0.23.02] 2023-03-30

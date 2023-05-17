@@ -12,6 +12,7 @@ import {
   ContactsFilled,
   DollarCircleFilled,
   UserOutlined,
+  StarFilled,
 } from "@ant-design/icons";
 import { Link, useNavigate } from "react-router-dom";
 import color from "../../resource/color";
@@ -36,7 +37,7 @@ const Layouts: React.FC<any> = ({ children }) => {
     "profile",
     []
   );
- 
+
   const style: React.CSSProperties = {
     height: "100%",
     paddingTop: 30,
@@ -87,7 +88,7 @@ const Layouts: React.FC<any> = ({ children }) => {
       </Header>
       <Layout>
         <Sider
-          width={200}
+          width={205}
           style={{
             position: "fixed",
             height: "100%",
@@ -95,11 +96,11 @@ const Layouts: React.FC<any> = ({ children }) => {
           }}
         >
           <Menu mode="inline" defaultOpenKeys={["order"]} style={style}>
-            <Menu.Item icon={<SignalFilled />} key="overview">
+            {/* <Menu.Item icon={<SignalFilled />} key="overview">
               <Link to="/OverviewPage" style={{ textDecoration: "none" }}>
                 <span>ภาพรวม</span>
               </Link>
-            </Menu.Item>
+            </Menu.Item> */}
             <Menu.SubMenu
               icon={<ProfileFilled />}
               title={<span>ติดตามงาน</span>}
@@ -125,10 +126,7 @@ const Layouts: React.FC<any> = ({ children }) => {
               </Menu.Item>
               <Menu.Item key="finishTask">
                 {persistedProfile.username == "ick_accounting" ? (
-                  <Link
-                    to="/IndexReport"
-                    style={{ textDecoration: "none" }}
-                  >
+                  <Link to="/IndexReport" style={{ textDecoration: "none" }}>
                     <span>งานที่เสร็จแล้ว</span>
                   </Link>
                 ) : (
@@ -141,11 +139,11 @@ const Layouts: React.FC<any> = ({ children }) => {
                 )}
               </Menu.Item>
             </Menu.SubMenu>
-            <Menu.Item key="totalIncome" icon={<DollarCircleFilled />}>
+            {/* <Menu.Item key="totalIncome" icon={<DollarCircleFilled />}>
               <Link to="/TotalIncomePage" style={{ textDecoration: "none" }}>
                 <span>ยอดรวมรายได้</span>
               </Link>
-            </Menu.Item>
+            </Menu.Item> */}
             <Menu.Item key="farmer" icon={<ContactsFilled />}>
               <Link to="/IndexFarmer" style={{ textDecoration: "none" }}>
                 <span>ข้อมูลเกษตรกร</span>
@@ -177,18 +175,50 @@ const Layouts: React.FC<any> = ({ children }) => {
               title={<span>ข่าวสารและโปรโมชั่น</span>}
               key={"sub4"}
             >
-              {/* <Menu.Item key="droner">
-                <Link
-                  to="/IndexDroner"
-                  style={{ textDecoration: "none" }}>
+              <Menu.Item key="news">
+                <Link to="/NewsPage" style={{ textDecoration: "none" }}>
                   <span>ข่าวสาร</span>
                 </Link>
-              </Menu.Item> */}
-              <Menu.Item key="dronerList">
+              </Menu.Item>
+              <Menu.Item key="promotion">
                 <Link to="/PromotionPage" style={{ textDecoration: "none" }}>
                   <span>คูปอง</span>
                 </Link>
               </Menu.Item>
+            </Menu.SubMenu>
+            <Menu.SubMenu
+              icon={<StarFilled />}
+              title={<span>คะแนนสะสม</span>}
+              key={"sub7"}
+            >
+              {/* <Menu.SubMenu title={<span>นักบินโดรน</span>} key={"sub9"}>
+                <Menu.Item key="dronerpoint">
+                  <Link
+                    to="/IndexDronerPoint"
+                    style={{ textDecoration: "none" }}
+                  >
+                    <span>รายการคะแนน</span>
+                  </Link>
+                </Menu.Item>
+              </Menu.SubMenu>
+              <Menu.SubMenu title={<span>เกษตรกร</span>} key={"sub8"}>
+                <Menu.Item key="farmerpoint">
+                  <Link
+                    to="/IndexFarmerPoint"
+                    style={{ textDecoration: "none" }}
+                  >
+                    <span>รายการคะแนน</span>
+                  </Link>
+                </Menu.Item>
+              </Menu.SubMenu> */}
+              <Menu.Item key="campaignpoint">
+                  <Link
+                    to="/IndexCampaignPoint"
+                    style={{ textDecoration: "none" }}
+                  >
+                    <span>แคมเปญคะแนน</span>
+                  </Link>
+                </Menu.Item>
             </Menu.SubMenu>
             <Menu.SubMenu
               icon={<UserOutlined />}
@@ -216,6 +246,21 @@ const Layouts: React.FC<any> = ({ children }) => {
                   <span>ราคาฉีดพ่น</span>
                 </Link>
               </Menu.Item>
+              <Menu.SubMenu
+              title={<span>คะแนน</span>}
+              key={"sub8"}
+            >
+              <Menu.Item key="conditionFarmer">
+                <Link to="/ConditionFarmer" style={{ textDecoration: "none" }}>
+                  <span>เงื่อนไขเกษตรกร</span>
+                </Link>
+              </Menu.Item>
+              {/* <Menu.Item key="conditionDroner">
+                <Link to="/ConditionDroner" style={{ textDecoration: "none" }}>
+                  <span>เงื่อนไขนักบินโดรน</span>
+                </Link>
+              </Menu.Item> */}
+            </Menu.SubMenu>
             </Menu.SubMenu>
           </Menu>
         </Sider>

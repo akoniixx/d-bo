@@ -66,6 +66,9 @@ export interface TaskFinish {
   farmerPlot: FarmerPlotEntity;
   droner: DronerEntity;
   taskDronerTemp: TaskDronerTempEntity[];
+  discountPromotion: string;
+  dissountCoupon: string;
+  revenuePromotion: string;
 }
 export const TaskFinish_INIT: TaskFinish = {
   id: "",
@@ -112,6 +115,9 @@ export const TaskFinish_INIT: TaskFinish = {
   farmer: FarmerEntity_INIT,
   droner: DronerEntity_INIT,
   taskDronerTemp: [TaskDronerTempEntity_INIT],
+  discountPromotion: "",
+  dissountCoupon: "",
+  revenuePromotion: "",
 };
 export interface TaskFinishListEntity {
   data: TaskFinish[];
@@ -170,6 +176,9 @@ export interface CreateReviewDroner {
   farmer: FarmerEntity;
   farmerPlot: FarmerPlotEntity;
   droner: DronerEntity;
+  discountPromotion: string;
+  dissountCoupon: string;
+  revenuePromotion: string;
 }
 export const CreateReviewDroner_INIT: CreateReviewDroner = {
   id: "",
@@ -210,6 +219,9 @@ export const CreateReviewDroner_INIT: CreateReviewDroner = {
   farmerPlot: FarmerPlotEntity_INIT,
   farmer: FarmerEntity_INIT,
   droner: DronerEntity_INIT,
+  discountPromotion: "",
+  dissountCoupon: "",
+  revenuePromotion: "",
 };
 export interface DetailReviewTask {
   data: CreateReviewDroner;
@@ -262,7 +274,7 @@ export interface TaskReportEntity {
   delayRejectRemark: string;
   couponCode: string;
   couponId: string;
-  discount: string;
+  discountCoupon: string;
   countResend: string;
   statusPayment: string;
   isChecked: boolean;
@@ -313,7 +325,7 @@ export const TaskReportEntity_INIT: TaskReportEntity = {
   delayRejectRemark: "",
   couponCode: "",
   couponId: "",
-  discount: "",
+  discountCoupon: "",
   countResend: "",
   statusPayment: "",
   isChecked: false,
@@ -351,4 +363,3 @@ export const updateStatusPays_INIT: updateStatusPays = {
   statusPayment: "",
   updateBy: "",
 };
-

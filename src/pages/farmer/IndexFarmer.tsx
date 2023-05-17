@@ -9,6 +9,7 @@ import {
   CaretDownOutlined,
   CaretUpOutlined,
   EditOutlined,
+  FolderViewOutlined,
   UserOutlined,
 } from "@ant-design/icons";
 import AddButtton from "../../components/button/AddButton";
@@ -659,6 +660,7 @@ function IndexFarmer() {
       title: "สถานะ",
       dataIndex: "status",
       key: "status",
+      width: "12%",
       render: (value: any, row: any, index: number) => {
         const countDay = () => {
           let dateToday: any = moment(Date.now());
@@ -688,10 +690,18 @@ function IndexFarmer() {
       title: "",
       dataIndex: "Action",
       key: "Action",
+      width: "9%",
       render: (value: any, row: any, index: number) => {
         return {
           children: (
             <div className="d-flex flex-row justify-content-between">
+              {/* <ActionButton
+                icon={<FolderViewOutlined />}
+                color={color.primary1}
+                onClick={() =>
+                  (window.location.href = "/IndexDetailFarmerPoint/id=" + row.id)
+                }
+              /> */}
               <ActionButton
                 icon={<EditOutlined />}
                 color={color.primary1}

@@ -2,8 +2,10 @@ import {
   Badge,
   Button,
   DatePicker,
+  Divider,
   Input,
   Pagination,
+  Popover,
   Select,
   Table,
 } from "antd";
@@ -21,6 +23,7 @@ import color from "../../../resource/color";
 import {
   EditOutlined,
   FileTextOutlined,
+  InfoCircleFilled,
   SearchOutlined,
   StarFilled,
   UserOutlined,
@@ -35,7 +38,10 @@ import {
   TASK_HISTORY,
 } from "../../../definitions/FinishTask";
 import ModalMapPlot from "../../../components/modal/task/finishTask/ModalMapPlot";
-import { numberWithCommas } from "../../../utilities/TextFormatter";
+import {
+  numberWithCommas,
+  numberWithCommasToFixed,
+} from "../../../utilities/TextFormatter";
 export default function IndexFinishTask() {
   const row = 10;
   const [current, setCurrent] = useState(1);
@@ -72,6 +78,7 @@ export default function IndexFinishTask() {
       searchStatus,
       searchText
     ).then((res: TaskFinishListEntity) => {
+      console.log(res);
       setData(res);
     });
   };
@@ -403,18 +410,113 @@ export default function IndexFinishTask() {
       title: "ค่าบริการ",
       dataIndex: "subdistrict_subdistrict_name",
       key: "subdistrict_subdistrict_name",
+      width: '12%',
       render: (value: any, row: any, index: number) => {
         return {
           children: (
             <>
-              <span className="text-dark-75  d-block font-size-lg">
+              <span>
                 {row.totalPrice != null
                   ? numberWithCommas(row.totalPrice) + " บาท"
                   : "0 บาท"}
               </span>
-              <span style={{ color: color.Grey, fontSize: "12px" }}>
-                {"จำนวน " + row.farmAreaAmount + " ไร่"}
-              </span>
+              <Popover
+                title={
+                  <span
+                    style={{
+                      color: color.White,
+                    }}
+                  >
+                    รายละเอียดค่าบริการ
+                  </span>
+                }
+                content={
+                  <table style={{ width: "300px" }}>
+                    <tr>
+                      <td>
+                        ค่าบริการ
+                        <br />
+                        <div style={{ fontSize: "12px" }}>
+                          จำนวนไร่{" "}
+                          <span style={{ color: color.Success }}>
+                            {row.farmAreaAmount} ไร่
+                          </span>{" "}
+                          x ค่าบริการ{" "}
+                          <span style={{ color: color.Success }}>
+                            {row.unitPrice} ไร่
+                          </span>
+                        </div>
+                      </td>
+                      <td style={{ textAlign: "right" }}>
+                        {numberWithCommasToFixed(parseFloat(row.price))}
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>ค่าธรรมเนียม (5%)</td>
+                      <td style={{ textAlign: "right" }}>
+                        {numberWithCommasToFixed(parseFloat(row.fee))}
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>ส่วนลดค่าธรรมเนียม</td>
+                      <td style={{ color: color.Error, textAlign: "right" }}>
+                        {parseFloat(row.discountFee)
+                          ? "- " +
+                            numberWithCommasToFixed(parseFloat(row.discountFee))
+                          : 0}
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>ส่วนลดจากคูปอง</td>
+                      <td style={{ color: color.Error, textAlign: "right" }}>
+                        {parseFloat(row.discountCoupon)
+                          ? "- " +
+                            numberWithCommasToFixed(
+                              parseFloat(row.discountCoupon)
+                            )
+                          : 0}
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>ส่วนลดจากโปรโมชั่น</td>
+                      <td style={{ color: color.Error, textAlign: "right" }}>
+                        {parseFloat(row.discountPromotion)
+                          ? "- " +
+                            numberWithCommasToFixed(
+                              parseFloat(row.discountPromotion)
+                            )
+                          : 0}
+                      </td>
+                    </tr>
+                    <tr>
+                      <td colSpan={2}>
+                        <Divider />
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>ยอดรวมค่าบริการ</td>
+                      <td
+                        style={{
+                          textAlign: "right",
+                          color: color.Success,
+                          fontWeight: "bold",
+                        }}
+                      >
+                        {numberWithCommasToFixed(parseFloat(row.totalPrice))}
+                      </td>
+                    </tr>
+                  </table>
+                }
+              >
+                <InfoCircleFilled
+                  style={{
+                    color: color.primary1,
+                    fontSize: "15px",
+                    marginLeft: "7px",
+                    verticalAlign: 0.5,
+                  }}
+                />
+              </Popover>
             </>
           ),
         };
@@ -443,7 +545,7 @@ export default function IndexFinishTask() {
                 <UserOutlined
                   style={{ padding: "0 4px 0 0", verticalAlign: 0.5 }}
                 />
-                {row.createBy}
+                {row.updateBy}
               </span>
             </>
           ),

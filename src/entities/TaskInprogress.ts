@@ -1,3 +1,4 @@
+import { string } from "yup/lib/locale";
 import { DronerAreaEntity, DronerAreaEntity_INIT } from "./DronerAreaEntities";
 import {
   DronerDroneEntity,
@@ -15,7 +16,7 @@ import {
 export interface GetTaskInprogressEntity {
   id: string;
   couponId: string;
-  discount : string;
+  discountCoupon: string;
   taskNo: string;
   farmerId: string;
   farmerPlotId: string;
@@ -58,6 +59,8 @@ export interface GetTaskInprogressEntity {
   farmerPlot: FarmerPlotEntity;
   taskDronerTemp: TaskDronerTempEntity[];
   taskHistory: [];
+  discountPromotion: string;
+  revenuePromotion: string;
 }
 export interface TaskInprogressEntity {
   task_id: string;
@@ -163,7 +166,7 @@ export const GetTaskInprogressEntity_INIT: GetTaskInprogressEntity = {
   id: "",
   couponId: "",
   taskNo: "",
-  discount : "",
+  discountCoupon: "",
   farmerId: "",
   farmerPlotId: "",
   farmAreaAmount: "",
@@ -205,6 +208,8 @@ export const GetTaskInprogressEntity_INIT: GetTaskInprogressEntity = {
   farmerPlot: FarmerPlotEntity_INIT,
   taskDronerTemp: [TaskDronerTempEntity_INIT],
   taskHistory: [],
+  discountPromotion: "",
+  revenuePromotion: "",
 };
 export interface UpdateInprogressTaskEntity {
   id: string;

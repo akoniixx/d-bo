@@ -51,6 +51,7 @@ export interface CreateNewTaskEntity {
   targetSpray: string[];
   preparationBy: string;
   purposeSprayId: string;
+  purposeSprayName?: string;
   taskDronerTemp?: CreateDronerTempEntity[];
   status: string;
   statusRemark: string;
@@ -62,6 +63,12 @@ export interface CreateNewTaskEntity {
   fee: number;
   discountFee: number;
   comment: string;
+  total_price: string;
+  discount_coupon: string;
+  discount_promotion: string;
+  farm_area_amount: string;
+  unit_price: string;
+  discount_fee: string;
 }
 export const CreateNewTaskEntity_INIT: CreateNewTaskEntity = {
   cropName: "",
@@ -85,12 +92,18 @@ export const CreateNewTaskEntity_INIT: CreateNewTaskEntity = {
   fee: 0,
   discountFee: 0,
   comment: "",
+  total_price: "",
+  discount_coupon: "",
+  discount_promotion: "",
+  farm_area_amount: "",
+  unit_price: "",
+  discount_fee: "",
 };
 export interface GetNewTaskEntity {
   id: string;
   couponCode: string;
   couponId: string;
-  discount: string;
+  discountCoupon: string;
   taskNo: string;
   farmerId: string;
   farmerPlotId: string;
@@ -110,7 +123,7 @@ export interface GetNewTaskEntity {
   unitPriceStandard: number;
   priceStandard: number;
   unitPrice: number;
-  price: number;
+  price: string;
   totalPrice: string;
   fee: number;
   discountFee: number;
@@ -129,12 +142,14 @@ export interface GetNewTaskEntity {
   droner: string;
   farmerPlot: FarmerPlotEntity;
   updatedAt?: string;
+  revenuePromotion: string;
+  discountPromotion: string;
 }
 export const GetNewTaskEntity_INIT: GetNewTaskEntity = {
   id: "",
   taskNo: "",
   farmerId: "",
-  discount: "",
+  discountCoupon: "",
   farmerPlotId: "",
   couponCode: "",
   couponId: "",
@@ -154,7 +169,7 @@ export const GetNewTaskEntity_INIT: GetNewTaskEntity = {
   unitPriceStandard: 0,
   priceStandard: 0,
   unitPrice: 0,
-  price: 0,
+  price: "",
   totalPrice: "",
   fee: 0,
   discountFee: 0,
@@ -173,6 +188,8 @@ export const GetNewTaskEntity_INIT: GetNewTaskEntity = {
   droner: "",
   farmerPlot: FarmerPlotEntity_INIT,
   updatedAt: "",
+  revenuePromotion: "",
+  discountPromotion: "",
 };
 export interface UpdateNewTask {
   id: string;
@@ -189,13 +206,13 @@ export interface UpdateNewTask {
   unitPriceStandard: number;
   priceStandard: number;
   unitPrice: number;
-  price: number;
+  price: string;
   comment: string;
   fee: number;
   discountFee: number;
   couponCode: string;
   couponId: string;
-  discount: number;
+  discountCoupon: number;
 }
 export const UpdateNewTask_INIT: UpdateNewTask = {
   id: "",
@@ -212,13 +229,13 @@ export const UpdateNewTask_INIT: UpdateNewTask = {
   unitPriceStandard: 0,
   priceStandard: 0,
   unitPrice: 0,
-  price: 0,
+  price: "",
   comment: "",
   fee: 0,
   discountFee: 0,
   couponCode: "",
   couponId: "",
-  discount: 0,
+  discountCoupon: 0,
 };
 
 export interface UpdateTaskStatus {
