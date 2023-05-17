@@ -1,5 +1,15 @@
-import { FileTextOutlined } from "@ant-design/icons";
-import { Col, Form, Input, Row, Table } from "antd";
+import { FileTextOutlined, SearchOutlined } from "@ant-design/icons";
+import {
+  Badge,
+  Button,
+  Col,
+  DatePicker,
+  Input,
+  Pagination,
+  Row,
+  Select,
+  Table,
+} from "antd";
 import React, { useState } from "react";
 import { Container } from "react-bootstrap";
 import ActionButton from "../../components/button/ActionButton";
@@ -7,8 +17,17 @@ import { CardContainer } from "../../components/card/CardContainer";
 import Layouts from "../../components/layout/Layout";
 import { color } from "../../resource";
 import { DateTimeUtil } from "../../utilities/DateTimeUtil";
+const { RangePicker } = DatePicker;
 
 const IndexReceivePoint = () => {
+  const dateFormat = "DD/MM/YYYY";
+  const row = 10;
+  const [current, setCurrent] = useState(1);
+
+  const onChangePage = (page: number) => {
+    setCurrent(page);
+  };
+
   const dataMock = [
     {
       key: 1,
@@ -16,7 +35,7 @@ const IndexReceivePoint = () => {
       transectionId: "P00000001",
       taskId: "TK00000001",
       type: "การจ้างงาน",
-      status: "รอดำเนินการ",
+      status: "ได้รับคะแนนสำเร็จ",
       description: [
         {
           source: "Farmer",
@@ -53,6 +72,88 @@ const IndexReceivePoint = () => {
     },
   ];
 
+  const pageTitle = (
+    <>
+      <div
+        className="container d-flex justify-content-between"
+        style={{ padding: "10px" }}
+      >
+        <div>
+          <span
+            className="card-label font-weight-bolder text-dark"
+            style={{
+              fontSize: 22,
+              fontWeight: "bold",
+              padding: "8px",
+            }}
+          >
+            <strong>รายการคะแนน</strong>
+          </span>
+        </div>
+        <div style={{ color: color.Error }}>
+          <RangePicker
+            allowClear
+            format={dateFormat}
+            placeholder={["เลือกวันที่เริ่ม", "เลือกวันที่สิ้นสุด"]}
+          />
+        </div>
+      </div>
+      <div
+        className="container d-flex justify-content-between"
+        style={{ padding: "8px" }}
+      >
+        <div className="col-lg-3 p-1">
+          <Input
+            allowClear
+            prefix={<SearchOutlined style={{ color: color.Disable }} />}
+            placeholder="ค้นหารหัสงาน / งาน / ภารกิจ"
+            className="col-lg-12 p-1"
+          />
+        </div>
+        <div className="col-lg p-1">
+          <Input
+            allowClear
+            prefix={<SearchOutlined style={{ color: color.Disable }} />}
+            placeholder="ค้นหานักบินโดรน/เกษตรกร/เบอร์โทร"
+            className="col-lg-12 p-1"
+          />
+        </div>
+        <div className="col-lg-2">
+          <Select
+            allowClear
+            className="col-lg-12 p-1"
+            placeholder="ประเภทการได้รับคะแนน"
+          >
+            <option value="ได้รับคะแนน">การจ้างงาน</option>
+            <option value="แลกคะแนน">ภารกิจ</option>
+          </Select>
+        </div>
+        <div className="col-lg-2">
+          <Select
+            allowClear
+            className="col-lg-12 p-1"
+            placeholder="เลือกสถานะ"
+          >
+            <option value="รอดำเนินการ">รอดำเนินการ</option>
+            <option value="ได้คะแนนสำเร็จ">ได้คะแนนสำเร็จ</option>
+          </Select>
+        </div>
+        <div className="pt-1">
+          <Button
+            style={{
+              borderColor: color.Success,
+              borderRadius: "5px",
+              color: color.secondary2,
+              backgroundColor: color.Success,
+            }}
+          >
+            ค้นหาข้อมูล
+          </Button>
+        </div>
+      </div>
+    </>
+  );
+
   const expandData = (record: any) => {
     let checkFarmer = record.description.filter(
       (x: any) => x.source === "Farmer"
@@ -61,12 +162,13 @@ const IndexReceivePoint = () => {
       (x: any) => x.source === "Droner"
     );
     return (
-      <Row>
+      <Row justify={"space-between"} gutter={16}>
         {checkFarmer.length !== 0 && (
           <Col span={checkDroner.length !== 0 ? 12 : 24}>
             <Container
               style={{
                 backgroundColor: "rgba(86, 167, 104, 0.1)",
+                borderRadius: "5px",
               }}
               className="p-3"
             >
@@ -101,6 +203,7 @@ const IndexReceivePoint = () => {
             <Container
               style={{
                 backgroundColor: "rgba(235, 87, 87, 0.1)",
+                borderRadius: "5px",
               }}
               className="p-3"
             >
@@ -192,7 +295,21 @@ const IndexReceivePoint = () => {
       key: "status",
       render: (value: any, row: any, index: number) => {
         return {
-          children: <span>{row.status}</span>,
+          children: (
+            <span
+              style={{
+                color:
+                  row.status === "รอดำเนินการ" ? color.Grey : color.Success,
+              }}
+            >
+              <Badge
+                color={
+                  row.status === "รอดำเนินการ" ? color.Grey : color.Success
+                }
+              />{" "}
+              {row.status}
+            </span>
+          ),
         };
       },
     },
@@ -210,7 +327,7 @@ const IndexReceivePoint = () => {
                   color={color.primary1}
                   onClick={() =>
                     (window.location.href =
-                      "/DetailFarmerPoint/id=" + (index + 1))
+                      "/DetailReceivePoint/id=" + (index + 1))
                   }
                 />
               </div>
@@ -220,8 +337,10 @@ const IndexReceivePoint = () => {
       },
     },
   ];
+
   return (
     <Layouts>
+      {pageTitle}
       <CardContainer>
         <Table
           dataSource={dataMock}
@@ -236,6 +355,16 @@ const IndexReceivePoint = () => {
           tableLayout="fixed"
         />
       </CardContainer>
+      <div className="d-flex justify-content-between pt-4">
+          <p>รายการทั้งหมด {dataMock?.length} รายการ</p>
+          <Pagination
+            current={current}
+            total={dataMock.length}
+            onChange={onChangePage}
+            pageSize={row}
+            showSizeChanger={false}
+          />
+        </div>
     </Layouts>
   );
 };
