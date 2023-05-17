@@ -1,5 +1,8 @@
 import {
   Button,
+  Col,
+  DatePicker,
+  Divider,
   Form,
   Input,
   Radio,
@@ -8,6 +11,7 @@ import {
   Select,
   Space,
   Tag,
+  TimePicker,
 } from "antd";
 import { Option } from "antd/lib/mentions";
 import React, { useState } from "react";
@@ -25,19 +29,29 @@ import { formats, modules } from "../../../components/editor/EditorToolbar";
 import Layouts from "../../../components/layout/Layout";
 import { BackIconButton } from "../../../components/button/BackButton";
 import { FooterPage } from "../../../components/footer/FooterPage";
+import RenderReward from "../../../components/mobile/RenderReward";
+import moment from "moment";
 
 const { Map } = require("immutable");
 
 function AddReward() {
+  const dateFormat = "DD/MM/YYYY";
   const navigate = useNavigate();
   const [form] = Form.useForm();
   const [imgReward, setImgReward] = useState<any>();
   const [createImgReward, setCreateImgReward] = useState<UploadImageEntity>(
     UploadImageEntity_INTI
   );
+  
   const [rewardType, setRewardType] = useState<string | null>(null);
+  const [rewardName, setRewardName] = useState<string | null>(null);
   const [points, setPoints] = useState<string | null>(null);
+  const [description, setDescription] = useState<string | null>(null);
+  const [condition, setCondition] = useState<string | null>(null);
+  const [rewardCount, setRewardCount] = useState<any>();
+  const [rewardPoint, setRewardPoint] = useState<any>();
 
+  
   const onChangeImg = async (file: any) => {
     const source = file.target.files[0];
     let newSource: any;
@@ -83,11 +97,27 @@ function AddReward() {
     setImgReward(undefined);
     setCreateImgReward(UploadImageEntity_INTI);
   };
+  const handleRewardName = (e: any) => {
+    setRewardName(e.target.value);
+  };
   const handleRewardType = (type: string) => {
     setRewardType(type);
-    setPoints(type);
   };
-
+  const onChangePoint = (point: any) => {
+    setPoints(point.target.value);
+  };
+  const handleDescription = (des: string) => {
+    setDescription(des);
+  };
+  const handleCondition = (con: string) => {
+    setCondition(con);
+  };
+  const handleRewardCount = (count: any) => {
+    setRewardCount(count.target.value);
+  };
+  const handleRewardPoint = (point: any) => {
+    setRewardPoint(point.target.value);
+  };
   const renderDataReward = (
     <div className="col-lg-7">
       <CardContainer>
@@ -99,7 +129,7 @@ function AddReward() {
                 className="hiddenFileInput"
                 style={{
                   backgroundImage: `url(${
-                    imgReward == undefined ? image.empty_img : imgReward
+                    imgReward == undefined ? image.emptyUpload : imgReward
                   })`,
                 }}
               >
@@ -148,7 +178,7 @@ function AddReward() {
                 },
               ]}
             >
-              <Input placeholder="กรอกชื่อของรางวัล" autoComplete="off" />
+              <Input placeholder="กรอกชื่อของรางวัล" autoComplete="off" onChange={handleRewardName}/>
             </Form.Item>
           </div>
           <div className="row">
@@ -194,23 +224,16 @@ function AddReward() {
               <div className="row">
                 <div className="col-12">
                   <Form.Item name="points">
-                    {rewardType === "DIGITAL" ? (
-                      <Radio.Group>
-                        <Radio value={"POINTS"}>ใช้คะแนน</Radio>
-                        <Radio value={"MISSION"}>ภารกิจ</Radio>
-                      </Radio.Group>
-                    ) : (
-                      <Radio.Group>
-                        <Radio value={"POINTS"}>ใช้คะแนน</Radio>
-                        <Radio value={"MISSION"}>ภารกิจ</Radio>
-                      </Radio.Group>
-                    )}
+                    <Radio.Group onChange={onChangePoint}>
+                      <Radio value={"POINTS"}>ใช้คะแนน</Radio>
+                      <Radio value={"MISSION"}>ภารกิจ</Radio>
+                    </Radio.Group>
                   </Form.Item>
                 </div>
               </div>
             </div>
           </div>
-          {rewardType === "DIGITAL" ? (
+          {points === "MISSION" ? (
             <div className="row">
               <div className="form-group col-lg-6">
                 <label>
@@ -225,7 +248,7 @@ function AddReward() {
                     },
                   ]}
                 >
-                  <Input placeholder="กรอกจำนวน" autoComplete="off" />
+                  <Input placeholder="กรอกจำนวน" autoComplete="off" onChange={handleRewardCount}/>
                 </Form.Item>
               </div>
             </div>
@@ -247,6 +270,8 @@ function AddReward() {
                   <Input
                     placeholder="กรอกคะแนนที่ต้องใช้แลก"
                     autoComplete="off"
+                    suffix="คะแนน"
+                    onChange={handleRewardPoint}
                   />
                 </Form.Item>
               </div>
@@ -268,7 +293,159 @@ function AddReward() {
               </div>
             </div>
           )}
-
+          {points === "POINTS" && (
+            <>
+              <Divider />
+              <p style={{ color: color.Error }}>ช่วงเวลาที่สามารถแลกได้</p>
+              <div className="row">
+                <div className="col-lg-6">
+                  <label>
+                    วันเริ่มต้น<span style={{ color: color.Error }}>*</span>
+                  </label>
+                  <div className="d-flex">
+                    <Form.Item
+                      name="startDate"
+                      rules={[
+                        {
+                          required: true,
+                          message: "กรุณากรอกวันที่!",
+                        },
+                      ]}
+                    >
+                      <DatePicker
+                        placeholder="เลือกวันที่"
+                        format={dateFormat}
+                        // onChange={}
+                      />
+                    </Form.Item>
+                    <Form.Item
+                      name="startTime"
+                      initialValue={moment("00:00", "HH:mm")}
+                    >
+                      <TimePicker
+                        format={"HH:mm"}
+                        className="ms-3"
+                        placeholder="เลือกเวลา"
+                        defaultValue={moment("00:00", "HH:mm")}
+                        allowClear={false}
+                      />
+                    </Form.Item>
+                  </div>
+                </div>
+                <div className="col-lg-6">
+                  <label>
+                    วันสิ้นสุด<span style={{ color: color.Error }}>*</span>
+                  </label>
+                  <div className="d-flex">
+                    <Form.Item
+                      name="endDate"
+                      rules={[
+                        {
+                          required: true,
+                          message: "กรุณากรอกวันที่!",
+                        },
+                      ]}
+                    >
+                      <DatePicker
+                        placeholder="เลือกวันที่"
+                        format={dateFormat}
+                        // onChange={}
+                      />
+                    </Form.Item>
+                    <Form.Item
+                      name="endTime"
+                      initialValue={moment("23:59", "HH:mm")}
+                    >
+                      <TimePicker
+                        format={"HH:mm"}
+                        className="ms-3"
+                        placeholder="เลือกเวลา"
+                        defaultValue={moment("00:00", "HH:mm")}
+                        allowClear={false}
+                      />
+                    </Form.Item>
+                  </div>
+                </div>
+              </div>
+              <Divider />
+            </>
+          )}
+          {rewardType === "DIGITAL" && (
+            <>
+              <p style={{ color: color.Success }}>ช่วงเวลาที่สามารถแลกได้</p>
+              <div className="row">
+                <div className="col-lg-6">
+                  <label>
+                    วันเริ่มต้น<span style={{ color: color.Error }}>*</span>
+                  </label>
+                  <div className="d-flex">
+                    <Form.Item
+                      name="startDate"
+                      rules={[
+                        {
+                          required: true,
+                          message: "กรุณากรอกวันที่!",
+                        },
+                      ]}
+                    >
+                      <DatePicker
+                        placeholder="เลือกวันที่"
+                        format={dateFormat}
+                        // onChange={}
+                      />
+                    </Form.Item>
+                    <Form.Item
+                      name="startTime"
+                      initialValue={moment("00:00", "HH:mm")}
+                    >
+                      <TimePicker
+                        format={"HH:mm"}
+                        className="ms-3"
+                        placeholder="เลือกเวลา"
+                        defaultValue={moment("00:00", "HH:mm")}
+                        allowClear={false}
+                      />
+                    </Form.Item>
+                  </div>
+                </div>
+                <div className="col-lg-6">
+                  <label>
+                    วันสิ้นสุด<span style={{ color: color.Error }}>*</span>
+                  </label>
+                  <div className="d-flex">
+                    <Form.Item
+                      name="endDate"
+                      rules={[
+                        {
+                          required: true,
+                          message: "กรุณากรอกวันที่!",
+                        },
+                      ]}
+                    >
+                      <DatePicker
+                        placeholder="เลือกวันที่"
+                        format={dateFormat}
+                        // onChange={}
+                      />
+                    </Form.Item>
+                    <Form.Item
+                      name="endTime"
+                      initialValue={moment("23:59", "HH:mm")}
+                    >
+                      <TimePicker
+                        format={"HH:mm"}
+                        className="ms-3"
+                        placeholder="เลือกเวลา"
+                        defaultValue={moment("00:00", "HH:mm")}
+                        allowClear={false}
+                      />
+                    </Form.Item>
+                  </div>
+                </div>
+              </div>
+              <Divider />
+            </>
+          )}
           <div className="row py-4">
             <div className="form-group col-lg-12">
               <label>
@@ -287,8 +464,8 @@ function AddReward() {
                 <ReactQuill
                   className="react-editor"
                   theme="snow"
-                  // onChange={handleDescriptionEditor}
-                  placeholder={"กรอกรายละเอียด"}
+                  onChange={handleDescription}
+                  placeholder={"กรอกรายละเอียด (จะแสดงใน Application)"}
                   modules={modules}
                   formats={formats}
                 />
@@ -302,19 +479,19 @@ function AddReward() {
                 <span style={{ color: "red" }}>*</span>
               </label>
               <Form.Item
-                name="description"
+                name="condition"
                 rules={[
                   {
                     required: true,
-                    message: "กรุณากรอกรายละเอียด",
+                    message: "กรุณากรอกเงื่อนไข",
                   },
                 ]}
               >
                 <ReactQuill
                   className="react-editor"
                   theme="snow"
-                  // onChange={handleDescriptionEditor}
-                  placeholder={"กรอกรายละเอียด"}
+                  onChange={handleCondition}
+                  placeholder={"กรอกเงื่อนไข (จะแสดงใน Application)"}
                   modules={modules}
                   formats={formats}
                 />
@@ -327,28 +504,14 @@ function AddReward() {
   );
   const renderRedeem = (
     <div className="col-lg-4">
-      <CardContainer>
-        <div
-          style={{
-            backgroundColor: color.Success,
-            borderRadius: "12px 12px 0px 0px",
-            padding: "10px 10px 10px 10px",
-          }}
-        >
-          <h4
-            className="pt-2 ps-3"
-            style={{ color: "white", textAlign: "center" }}
-          >
-            ตัวอย่างในแอปพลิเคชัน
-          </h4>
-        </div>
-        <Form>
-          <div
-            className="container text-center"
-            style={{ padding: "80px" }}
-          ></div>
-        </Form>
-      </CardContainer>
+      <RenderReward
+        img={imgReward}
+        name={rewardName}
+        description={description}
+        condition={condition}
+        point={rewardPoint}
+        count={'200'}
+      />
     </div>
   );
 
@@ -368,6 +531,7 @@ function AddReward() {
         {renderDataReward}
         {renderRedeem}
       </Row>
+
       <FooterPage onClickBack={() => navigate(-1)} />
     </Layouts>
   );

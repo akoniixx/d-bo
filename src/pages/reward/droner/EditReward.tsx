@@ -2,6 +2,7 @@ import { SearchOutlined } from "@ant-design/icons";
 import {
   Badge,
   Button,
+  DatePicker,
   Divider,
   Form,
   Input,
@@ -10,11 +11,15 @@ import {
   Select,
   Space,
   Tag,
+  TimePicker,
 } from "antd";
 import React, { useState } from "react";
 import ReactQuill from "react-quill";
 import { useNavigate } from "react-router-dom";
-import { UploadImageEntity, UploadImageEntity_INTI } from "../../../entities/UploadImageEntities";
+import {
+  UploadImageEntity,
+  UploadImageEntity_INTI,
+} from "../../../entities/UploadImageEntities";
 import { resizeFileImg } from "../../../utilities/ResizeImage";
 import { CardContainer } from "../../../components/card/CardContainer";
 import { CardHeader } from "../../../components/header/CardHearder";
@@ -24,10 +29,14 @@ import Layouts from "../../../components/layout/Layout";
 import { BackIconButton } from "../../../components/button/BackButton";
 import FooterPage from "../../../components/footer/FooterPage";
 import { image } from "../../../resource";
+import moment from "moment";
 
 const { Map } = require("immutable");
 
 function EditReward() {
+  const points = 'POINTS';
+  
+  const dateFormat = "DD/MM/YYYY";
   const navigate = useNavigate();
   const [form] = Form.useForm();
   const [imgReward, setImgReward] = useState<any>();
@@ -178,8 +187,13 @@ function EditReward() {
             </div>
             <div className="form-group col-lg-6">
               <label>
-                จำนวน <span style={{ color: "red" }}>*</span>
+                จำนวน
+                <span style={{ color: "red" }}>
+                  {` (ต้องไม่น้อยกว่าที่แลกไป)`}
+                </span>{" "}
+                <span style={{ color: "red" }}>*</span>
               </label>
+
               <Form.Item
                 name="type"
                 rules={[
@@ -196,6 +210,83 @@ function EditReward() {
                 />
               </Form.Item>
             </div>
+            {points === "POINTS" && (
+            <>
+              <Divider />
+              <p style={{ color: color.Error }}>ช่วงเวลาที่สามารถแลกได้</p>
+              <div className="row">
+                <div className="col-lg-6">
+                  <label>
+                    วันเริ่มต้น<span style={{ color: color.Error }}>*</span>
+                  </label>
+                  <div className="d-flex">
+                    <Form.Item
+                      name="startDate"
+                      rules={[
+                        {
+                          required: true,
+                          message: "กรุณากรอกวันที่!",
+                        },
+                      ]}
+                    >
+                      <DatePicker
+                        placeholder="เลือกวันที่"
+                        format={dateFormat}
+                        // onChange={}
+                      />
+                    </Form.Item>
+                    <Form.Item
+                      name="startTime"
+                      initialValue={moment("00:00", "HH:mm")}
+                    >
+                      <TimePicker
+                        format={"HH:mm"}
+                        className="ms-3"
+                        placeholder="เลือกเวลา"
+                        defaultValue={moment("00:00", "HH:mm")}
+                        allowClear={false}
+                      />
+                    </Form.Item>
+                  </div>
+                </div>
+                <div className="col-lg-6">
+                  <label>
+                    วันสิ้นสุด<span style={{ color: color.Error }}>*</span>
+                  </label>
+                  <div className="d-flex">
+                    <Form.Item
+                      name="endDate"
+                      rules={[
+                        {
+                          required: true,
+                          message: "กรุณากรอกวันที่!",
+                        },
+                      ]}
+                    >
+                      <DatePicker
+                        placeholder="เลือกวันที่"
+                        format={dateFormat}
+                        // onChange={}
+                      />
+                    </Form.Item>
+                    <Form.Item
+                      name="endTime"
+                      initialValue={moment("23:59", "HH:mm")}
+                    >
+                      <TimePicker
+                        format={"HH:mm"}
+                        className="ms-3"
+                        placeholder="เลือกเวลา"
+                        defaultValue={moment("00:00", "HH:mm")}
+                        allowClear={false}
+                      />
+                    </Form.Item>
+                  </div>
+                </div>
+              </div>
+              <Divider />
+            </>
+           )}
           </div>
           <div className="row py-4">
             <div className="form-group col-lg-12">
