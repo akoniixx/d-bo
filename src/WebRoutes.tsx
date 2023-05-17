@@ -57,6 +57,10 @@ import IndexDetailDronerPoint from "./pages/droner/IndexDetailDronerPoint";
 import EditCampaignPoint from "./pages/campaign/point/EditCampaignPoint";
 import ConditionDroner from "./pages/setting/pointSetting/ConditionDroner";
 import ConditionFarmer from "./pages/setting/pointSetting/ConditionFarmer";
+import IndexReward from "./pages/reward/droner/IndexReward";
+import AddReward from './pages/reward/droner/AddReward';
+import EditReward from './pages/reward/droner/EditReward';
+import RedeemHistory from "./pages/reward/droner/RedeemHistory";
 
 const WebRoutes: React.FC<any> = () => {
   return (
@@ -140,14 +144,13 @@ const WebRoutes: React.FC<any> = () => {
             element={<EditCampaignPoint />}
           />
         </Route>
-        <Route
-            path="/ConditionDroner"
-            element={<ConditionDroner />}
-          />
-           <Route
-            path="/ConditionFarmer"
-            element={<ConditionFarmer />}
-          />
+        <Route path="/ConditionDroner" element={<ConditionDroner />} />
+        <Route path="/ConditionFarmer" element={<ConditionFarmer />} />
+        <Route path="/IndexReward" element={<IndexReward />} />
+        <Route path="/AddReward" element={<AddReward />} />
+        <Route path="/EditReward" element={<EditReward />} />
+        <Route path="/RedeemHistory" element={<RedeemHistory />} />
+
         <Route element={<PublicRoute />}>
           <Route index element={<AuthPage />} />
           <Route path="/ErrorLoginPage" element={<ErrorLoginPage />} />

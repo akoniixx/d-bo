@@ -14,5 +14,6 @@ export default {
   iconcopy: require("./media/images/copy.png"),
   icondelete: require("./media/images/delete.png"),
   injection : require("./media/images/injectionicon.png"),
-  drug : require("./media/images/drugicon.png")
+  drug : require("./media/images/drugicon.png"),
+  inforedeem : require("./media/images/info-redeem.png")
 };
