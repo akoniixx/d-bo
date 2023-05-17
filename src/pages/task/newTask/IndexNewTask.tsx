@@ -71,6 +71,7 @@ const IndexNewTask = () => {
       searchStartDate,
       searchEndDate
     ).then((res) => {
+      console.log(res.data);
       setData(res);
     });
   };
@@ -284,7 +285,7 @@ const IndexNewTask = () => {
           children: (
             <>
               <span>
-                {row.total_price
+                {!row.total_price
                   ? 0.0 + " บาท"
                   : numberWithCommas(parseFloat(row.total_price)) + " บาท"}
               </span>

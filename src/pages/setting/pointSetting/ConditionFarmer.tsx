@@ -94,16 +94,16 @@ function ConditionFarmer() {
     }
   };
   const handleOnMinPoint = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const values = validateOnlyNumber(e.target.value);
+    const convertedNumber = e.target.value.replace(/[^\d]/g, "");
     if (taskId.id) {
       const m = { ...taskId };
-      m.minPoint = values;
+      m.minPoint = convertedNumber;
       form.setFieldsValue({ minPoint: m.minPoint });
       setTaskId(m);
       checkValidate(m);
     } else {
       const m = { ...dataPoint };
-      m.minPoint = values;
+      m.minPoint = convertedNumber;
       form.setFieldsValue({ minPoint: m.minPoint });
       setDataPoint(m);
       checkValidateCreate(m);
@@ -420,7 +420,6 @@ function ConditionFarmer() {
   );
   return (
     <Layouts>
-      {console.log(taskId.point)}
       <Row>
         <span className="p-3">
           <strong style={{ fontSize: "20px" }}>เงื่อนไขเกษตรกร</strong>

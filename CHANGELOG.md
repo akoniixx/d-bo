@@ -1,4 +1,7 @@
 ## [Version - 0]
+## Fix [v0.27.3] 2023-05-17
+- fixed input can fill 0 in min rai at setting point
+- fixed amount service in new task
 ## Fix [v0.27.2] 2023-05-16
 - fixed input can not fill 0 and letters
 - fixed logic delete in campaint point
