@@ -1,4 +1,6 @@
 ## [Version - 0]
+## Fix [v0.27.4] 2023-05-17
+- fixed logic delete & edit in campaign point menu
 ## Fix [v0.27.3] 2023-05-17
 - fixed input can fill 0 in min rai at setting point
 - fixed amount service in new task
