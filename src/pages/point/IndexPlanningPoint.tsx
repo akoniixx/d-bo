@@ -1,5 +1,4 @@
 import {
-  FileTextOutlined,
   InfoCircleFilled,
   SearchOutlined,
 } from "@ant-design/icons";
@@ -21,7 +20,7 @@ import { color } from "../../resource";
 import { DateTimeUtil } from "../../utilities/DateTimeUtil";
 const { RangePicker } = DatePicker;
 
-const IndexReceivePoint = () => {
+const IndexPlanningPoint = () => {
   const dateFormat = "DD/MM/YYYY";
   const row = 10;
   const [current, setCurrent] = useState(1);
@@ -36,7 +35,7 @@ const IndexReceivePoint = () => {
       dateTime: Date(),
       pointNo: "P00000001",
       taskId: "TK00000001",
-      missionId: "-",
+      missionId: "MS00000001",
       type: "การจ้างงาน",
       description: [
         {
@@ -65,12 +64,14 @@ const IndexReceivePoint = () => {
       pointNo: "P00000001",
       taskId: "TK00000001",
       missionId: "MS00000001",
-      type: "ภารกิจ",
+      type: "การจ้างงาน",
+      rai: 100,
+      unitPoint: 3,
       description: [
         {
-          source: "Droner",
+          source: "Farmer",
           farmerId: "f1",
-          dronerName: "รชยา ช่างภักดี",
+          farmerName: "รชยา ช่างภักดี",
           telephone: "0938355808",
           point: 100,
           rai: 50,
@@ -95,7 +96,7 @@ const IndexReceivePoint = () => {
               padding: "8px",
             }}
           >
-            <strong>รายการคะแนน (ได้รับคะแนน)</strong>
+            <strong>รายการคะแนน (รอรับคะแนน)</strong>
           </span>
         </div>
         <div style={{ color: color.Error }}>
@@ -151,8 +152,8 @@ const IndexReceivePoint = () => {
     );
     return (
       <Row justify={"space-between"} gutter={16}>
-        {checkFarmer.length > 0 && (
-          <Col span={checkDroner.length > 0 ? 12 : 24}>
+        {checkFarmer.length !== 0 && (
+          <Col span={12}>
             <Container
               style={{
                 backgroundColor: "rgba(86, 167, 104, 0.1)",
@@ -196,8 +197,8 @@ const IndexReceivePoint = () => {
             </Container>
           </Col>
         )}
-        {checkDroner.length > 0 && (
-          <Col span={checkFarmer.length > 0 ? 12 : 24}>
+        {checkDroner.length !== 0 && (
+          <Col span={12}>
             <Container
               style={{
                 backgroundColor: "rgba(235, 87, 87, 0.1)",
@@ -220,9 +221,9 @@ const IndexReceivePoint = () => {
                     placement="top"
                     title={
                       "คะแนนที่จะได้รับ : " +
-                      checkDroner[0].rai +
+                      checkFarmer[0].rai +
                       " ไร่ x" +
-                      checkDroner[0].unitPoint +
+                      checkFarmer[0].unitPoint +
                       " คะแนน"
                     }
                     key={1}
@@ -276,18 +277,6 @@ const IndexReceivePoint = () => {
       },
     },
     {
-      title: "Mission No",
-      dataIndex: "missionId",
-      width: "20%",
-      render: (value: any, row: any, index: number) => {
-        return {
-          children: row.missionId !== "-" && (
-            <u style={{ color: color.Success }}>{row.missionId}</u>
-          ),
-        };
-      },
-    },
-    {
       title: "ประเภทการได้รับคะแนน",
       dataIndex: "type",
       key: "type",
@@ -330,4 +319,4 @@ const IndexReceivePoint = () => {
     </Layouts>
   );
 };
-export default IndexReceivePoint;
+export default IndexPlanningPoint;

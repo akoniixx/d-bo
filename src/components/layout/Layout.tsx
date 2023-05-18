@@ -191,34 +191,25 @@ const Layouts: React.FC<any> = ({ children }) => {
               title={<span>คะแนนสะสม</span>}
               key={"sub7"}
             >
-              {/* <Menu.SubMenu title={<span>นักบินโดรน</span>} key={"sub9"}>
-                <Menu.Item key="dronerpoint">
+              <Menu.SubMenu title={<span>รายการคะแนน</span>} key={"sub9"}>
+                <Menu.Item key="planningpoint">
                   <Link
-                    to="/IndexDronerPoint"
+                    to="/IndexPlanningPoint"
                     style={{ textDecoration: "none" }}
                   >
-                    <span>รายการคะแนน</span>
+                    <span>รอรับคะแนน</span>
+                  </Link>
+                </Menu.Item>
+                <Menu.Item key="receivepoint">
+                  <Link
+                    to="/IndexReceivePoint"
+                    style={{ textDecoration: "none" }}
+                  >
+                    <span>ได้รับคะแนน</span>
                   </Link>
                 </Menu.Item>
               </Menu.SubMenu>
-              <Menu.SubMenu title={<span>เกษตรกร</span>} key={"sub8"}>
-                <Menu.Item key="farmerpoint">
-                  <Link
-                    to="/IndexFarmerPoint"
-                    style={{ textDecoration: "none" }}
-                  >
-                    <span>รายการคะแนน</span>
-                  </Link>
-                </Menu.Item>
-              </Menu.SubMenu> */}
-              <Menu.Item key="receivepoint">
-                <Link
-                  to="/IndexReceivePoint"
-                  style={{ textDecoration: "none" }}
-                >
-                  <span>รายการคะแนน</span>
-                </Link>
-              </Menu.Item>
+
               <Menu.Item key="campaignpoint">
                 <Link
                   to="/IndexCampaignPoint"

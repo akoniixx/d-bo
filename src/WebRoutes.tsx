@@ -58,6 +58,7 @@ import EditCampaignPoint from "./pages/campaign/point/EditCampaignPoint";
 import ConditionDroner from "./pages/setting/pointSetting/ConditionDroner";
 import ConditionFarmer from "./pages/setting/pointSetting/ConditionFarmer";
 import IndexReceivePoint from "./pages/point/IndexReceivePoint";
+import IndexPlanningPoint from "./pages/point/IndexPlanningPoint";
 import DetailReceivePoint from "./pages/point/DetailReceivePoint";
 
 const WebRoutes: React.FC<any> = () => {
@@ -145,10 +146,11 @@ const WebRoutes: React.FC<any> = () => {
         <Route path="/ConditionDroner" element={<ConditionDroner />} />
         <Route path="/ConditionFarmer" element={<ConditionFarmer />} />
         <Route path="/IndexReceivePoint" element={<IndexReceivePoint />} />
+        <Route path="/IndexPlanningPoint" element={<IndexPlanningPoint />} />
         <Route
-            path="/DetailReceivePoint/:id"
-            element={<DetailReceivePoint />}
-          />
+          path="/DetailReceivePoint/:id"
+          element={<DetailReceivePoint />}
+        />
         <Route element={<PublicRoute />}>
           <Route index element={<AuthPage />} />
           <Route path="/ErrorLoginPage" element={<ErrorLoginPage />} />
