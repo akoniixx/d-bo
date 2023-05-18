@@ -290,18 +290,14 @@ const IndexCampaignPoint = () => {
                 <ActionButton
                   icon={<DeleteOutlined />}
                   color={
-                    row.status === "ACTIVE"
-                      ? row.isDelete
-                        ? color.Grey
-                        : color.Grey
+                    row.isDelete || row.status === "ACTIVE"
+                      ? color.Grey
                       : color.Error
                   }
                   onClick={() => setDeleteCampaign(row.id)}
                   actionDisable={
-                    row.status === "ACTIVE"
+                    row.isDelete || row.status === "ACTIVE"
                       ? row.isDelete
-                        ? row.isDelete
-                        : !row.isDelete
                       : false
                   }
                 />
