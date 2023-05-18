@@ -19,7 +19,6 @@ import { BackIconButton } from "../../../components/button/BackButton";
 import { CardContainer } from "../../../components/card/CardContainer";
 import FooterPage from "../../../components/footer/FooterPage";
 import { CardHeader } from "../../../components/header/CardHearder";
-import Layouts from "../../../components/layout/Layout";
 import GooleMap from "../../../components/map/GoogleMap";
 import ModalSelectedDroner from "../../../components/modal/task/inprogressTask/ModalSelectedDroner";
 import { CouponDataSource } from "../../../datasource/CouponDatasource";
@@ -49,6 +48,7 @@ import {
   numberWithCommas,
   numberWithCommasToFixed,
 } from "../../../utilities/TextFormatter";
+import { DashboardLayout } from "../../../components/layout/Layout";
 const { Option } = Select;
 
 const dateFormat = "DD/MM/YYYY";
@@ -809,7 +809,7 @@ const EditInprogressTask = () => {
 
   return (
     <>
-      <Layouts key={data?.id}>
+      <DashboardLayout key={data?.id}>
         <Row>
           <BackIconButton
             onClick={() => (window.location.href = "/IndexInprogressTask")}
@@ -832,7 +832,7 @@ const EditInprogressTask = () => {
           onClickSave={updateInprogressTask}
           disableSaveBtn={saveBtnDisable}
         />
-      </Layouts>
+      </DashboardLayout>
       {showModel && (
         <ModalSelectedDroner
           show={showModel}

@@ -23,7 +23,6 @@ import { useEffect, useState } from "react";
 import Swal from "sweetalert2";
 import ActionButton from "../../../components/button/ActionButton";
 import { CardContainer } from "../../../components/card/CardContainer";
-import Layouts from "../../../components/layout/Layout";
 import ModalDronerList from "../../../components/modal/task/newTask/ModalDronerList";
 import ModalMapPlot from "../../../components/modal/task/newTask/ModalMapPlot";
 import { TaskDatasource } from "../../../datasource/TaskDatasource";
@@ -42,6 +41,7 @@ import {
   numberWithCommas,
   numberWithCommasToFixed,
 } from "../../../utilities/TextFormatter";
+import { DashboardLayout } from "../../../components/layout/Layout";
 const { RangePicker } = DatePicker;
 const dateFormat = "DD-MM-YYYY";
 const dateSearchFormat = "YYYY-MM-DD";
@@ -476,7 +476,7 @@ const IndexNewTask = () => {
 
   return (
     <>
-      <Layouts>
+      <DashboardLayout>
         {pageTitle}
         <CardContainer>
           <Table
@@ -518,7 +518,7 @@ const IndexNewTask = () => {
             taskId={taskId}
           />
         )}
-      </Layouts>
+      </DashboardLayout>
     </>
   );
 };

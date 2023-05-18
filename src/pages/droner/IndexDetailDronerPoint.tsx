@@ -6,7 +6,7 @@ import { useNavigate } from "react-router-dom";
 import ActionButton from "../../components/button/ActionButton";
 import { BackIconButton } from "../../components/button/BackButton";
 import { CardContainer } from "../../components/card/CardContainer";
-import Layouts from "../../components/layout/Layout";
+import { DashboardLayout } from "../../components/layout/Layout";
 import { color } from "../../resource";
 import { DateTimeUtil } from "../../utilities/DateTimeUtil";
 const { RangePicker } = DatePicker;
@@ -167,7 +167,7 @@ const IndexDetailDronerPoint = () => {
     },
   ];
   return (
-    <Layouts>
+    <DashboardLayout>
       <Row>
         <BackIconButton onClick={() => navigate(-1)} />
         <span className="pt-3">
@@ -209,7 +209,7 @@ const IndexDetailDronerPoint = () => {
           showSizeChanger={false}
         />
       </div>
-    </Layouts>
+    </DashboardLayout>
   );
 };
 

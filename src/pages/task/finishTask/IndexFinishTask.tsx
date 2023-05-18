@@ -12,7 +12,6 @@ import {
 import moment from "moment";
 import React, { useEffect, useState } from "react";
 import ActionButton from "../../../components/button/ActionButton";
-import Layouts from "../../../components/layout/Layout";
 import { LocationDatasource } from "../../../datasource/LocationDatasource";
 import {
   DistrictEntity,
@@ -42,6 +41,7 @@ import {
   numberWithCommas,
   numberWithCommasToFixed,
 } from "../../../utilities/TextFormatter";
+import { DashboardLayout } from "../../../components/layout/Layout";
 export default function IndexFinishTask() {
   const row = 10;
   const [current, setCurrent] = useState(1);
@@ -592,7 +592,7 @@ export default function IndexFinishTask() {
     },
   ];
   return (
-    <Layouts>
+    <DashboardLayout>
       {PageTitle}
       <br />
       <Table
@@ -625,6 +625,6 @@ export default function IndexFinishTask() {
           plotId={plotId}
         />
       )}
-    </Layouts>
+    </DashboardLayout>
   );
 }

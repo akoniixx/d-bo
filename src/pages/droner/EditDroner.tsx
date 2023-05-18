@@ -1,5 +1,4 @@
 import React, { useCallback, useEffect, useState } from "react";
-import Layout from "../../components/layout/Layout";
 import {
   Row,
   Form,
@@ -74,6 +73,7 @@ import locale from "antd/es/date-picker/locale/th_TH";
 import { useLocalStorage } from "../../hook/useLocalStorage";
 import { resizeFileImg } from "../../utilities/ResizeImage";
 import { useNavigate } from "react-router-dom";
+import { DashboardLayout } from "../../components/layout/Layout";
 
 const dateFormat = "DD/MM/YYYY";
 const dateCreateFormat = "YYYY-MM-DD";
@@ -1576,7 +1576,7 @@ function EditDroner() {
   );
 
   return (
-    <Layout>
+    <DashboardLayout>
       <Row>
         <BackIconButton onClick={() => navigate(-1)} />
         <span className="pt-4">
@@ -1616,7 +1616,7 @@ function EditDroner() {
           title="แก้ไขข้อมูลโดรนเกษตร"
         />
       )}
-    </Layout>
+    </DashboardLayout>
   );
 }
 export default EditDroner;

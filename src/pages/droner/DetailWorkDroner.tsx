@@ -1,4 +1,3 @@
-import Layout from "../../components/layout/Layout";
 import React, { useEffect, useState } from "react";
 import { Avatar, Badge, Form, Input, Row, Select, Tag } from "antd";
 import { BackIconButton } from "../../components/button/BackButton";
@@ -38,6 +37,7 @@ import { LocationDatasource } from "../../datasource/LocationDatasource";
 import { CropPurposeSprayEntity } from "../../entities/CropEntities";
 import { PURPOSE_SPRAY } from "../../definitions/PurposeSpray";
 import { CouponDataSource } from "../../datasource/CouponDatasource";
+import { DashboardLayout } from "../../components/layout/Layout";
 const _ = require("lodash");
 let queryString = _.split(window.location.search, "=");
 const dateFormat = "DD/MM/YYYY";
@@ -556,7 +556,7 @@ function DetailWorkDroner() {
   );
 
   return (
-    <Layout>
+    <DashboardLayout>
       <Row>
         <BackIconButton
           onClick={() =>
@@ -588,7 +588,7 @@ function DetailWorkDroner() {
         <CardHeader textHeader="ยอดรวมค่าบริการ" />
         {renderPrice}
       </CardContainer>
-    </Layout>
+    </DashboardLayout>
   );
 }
 

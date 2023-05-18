@@ -20,7 +20,6 @@ import moment from "moment";
 import React, { useEffect, useState } from "react";
 import ActionButton from "../../../components/button/ActionButton";
 import { CardContainer } from "../../../components/card/CardContainer";
-import Layouts from "../../../components/layout/Layout";
 import ModalMapPlot from "../../../components/modal/task/newTask/ModalMapPlot";
 import { LocationDatasource } from "../../../datasource/LocationDatasource";
 import { TaskDatasource } from "../../../datasource/TaskDatasource";
@@ -36,6 +35,7 @@ import {
   numberWithCommas,
   numberWithCommasToFixed,
 } from "../../../utilities/TextFormatter";
+import { DashboardLayout } from "../../../components/layout/Layout";
 
 const { RangePicker } = DatePicker;
 const dateFormat = "DD/MM/YYYY";
@@ -550,8 +550,8 @@ const IndexInprogressTask = () => {
   ];
 
   return (
-    <>
-      <Layouts>
+    <div>
+      <DashboardLayout>
         {PageTitle}
         <CardContainer>
           <Table
@@ -573,7 +573,7 @@ const IndexInprogressTask = () => {
             showSizeChanger={false}
           />
         </div>
-      </Layouts>
+      </DashboardLayout>
       {showModalMap && (
         <ModalMapPlot
           show={showModalMap}
@@ -582,7 +582,7 @@ const IndexInprogressTask = () => {
           plotId={plotId}
         />
       )}
-    </>
+    </div>
   );
 };
 export default IndexInprogressTask;

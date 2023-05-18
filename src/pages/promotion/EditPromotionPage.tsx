@@ -1,4 +1,3 @@
-import Layouts from "../../components/layout/Layout";
 import { BackIconButton } from "../../components/button/BackButton";
 import { useNavigate } from "react-router-dom";
 import { CardHeaderPromotion } from "../../components/header/CardHeaderPromotion";
@@ -42,6 +41,7 @@ import { CropPurposeSprayEntity } from "../../entities/CropEntities";
 import { ProviceEntity } from "../../entities/LocationEntities";
 import { TaskDatasource } from "../../datasource/TaskDatasource";
 import { FarmerDatasource } from "../../datasource/FarmerDatasource";
+import { DashboardLayout } from "../../components/layout/Layout";
 const _ = require("lodash");
 
 let queryString = _.split(window.location.pathname, "=");
@@ -849,7 +849,7 @@ function EditPromotion() {
   };
 
   return (
-    <Layouts>
+    <DashboardLayout>
       <Modal
         title="ยืนยันการเพิ่มคูปอง"
         onCancel={() => {
@@ -1648,7 +1648,7 @@ function EditPromotion() {
           />
         </div>
       </div>
-    </Layouts>
+    </DashboardLayout>
   );
 }
 

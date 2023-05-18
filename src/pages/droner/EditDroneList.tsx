@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import Layout from "../../components/layout/Layout";
 import {
   Row,
   Form,
@@ -46,6 +45,7 @@ import {
 import img_empty from "../../resource/media/empties/uploadImg.png";
 import moment from "moment";
 import image from "../../resource/image";
+import { DashboardLayout } from "../../components/layout/Layout";
 const { Option } = Select;
 const _ = require("lodash");
 const { Map } = require("immutable");
@@ -810,7 +810,7 @@ function EditDroneList() {
   );
 
   return (
-    <Layout>
+    <DashboardLayout>
       <Row>
         <BackIconButton
           onClick={() => (window.location.href = "/DroneList")}
@@ -830,7 +830,7 @@ function EditDroneList() {
         onClickSave={UpdateDronerDrone}
         disableSaveBtn={saveBtnDisable}
       />
-    </Layout>
+    </DashboardLayout>
   );
 }
 export default EditDroneList;

@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import Layouts from "../../components/layout/Layout";
 import { useLocalStorage } from "../../hook/useLocalStorage";
 import packageJson from "../../../package.json";
 import { ModalMaintence } from "../../components/modal/ModalMaintenance";
@@ -10,6 +9,7 @@ import {
 } from "../../entities/MaintenanceSystemEntities";
 import moment from "moment";
 import { convertBuddhistYear } from "../../utilities/ConvertToBuddhistYear";
+import { DashboardLayout } from "../../components/layout/Layout";
 
 export function HomePage() {
   let version = packageJson.version;
@@ -41,7 +41,7 @@ export function HomePage() {
   }, []);
 
   return (
-    <Layouts>
+    <DashboardLayout>
       <div
         className="d-flex flex-column justify-content-center align-items-center"
         style={{ height: "100%" }}
@@ -69,6 +69,6 @@ export function HomePage() {
           data={dataMaintance}
         />
       )}
-    </Layouts>
+    </DashboardLayout>
   );
 }

@@ -2,7 +2,6 @@ import DatePicker from "antd/lib/date-picker";
 import React, { useEffect, useRef, useState } from "react";
 import Search from "antd/lib/input/Search";
 import AddButtton from "../../components/button/AddButton";
-import Layouts from "../../components/layout/Layout";
 import Select from "antd/lib/select";
 import { Option } from "antd/lib/mentions";
 import Table from "antd/lib/table";
@@ -27,6 +26,7 @@ import {
 import { color } from "../../resource";
 import ModalDeleteCoupon from "../../components/modal/ModalDeleteCoupon";
 import { STATUS_COUPON } from "../../definitions/Status";
+import { DashboardLayout } from "../../components/layout/Layout";
 
 function PromotionPage() {
   const dateSearchFormat = "YYYY-MM-DD";
@@ -569,7 +569,7 @@ function PromotionPage() {
   ];
 
   return (
-    <Layouts>
+    <DashboardLayout>
       <ModalDeleteCoupon
         show={modalDelete}
         backButton={() => setModalDelete(!modalDelete)}
@@ -595,7 +595,7 @@ function PromotionPage() {
           showSizeChanger={false}
         />
       </div>
-    </Layouts>
+    </DashboardLayout>
   );
 }
 

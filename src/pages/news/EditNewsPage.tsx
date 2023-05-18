@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react'
-import Layouts from '../../components/layout/Layout'
 import { BackIconButton } from '../../components/button/BackButton'
 import { useNavigate } from 'react-router-dom';
 import { Checkbox, Form, Input, Radio, Tag } from 'antd';
@@ -16,6 +15,7 @@ import { NewsDatasource } from '../../datasource/NewsDatasource';
 import Swal from 'sweetalert2';
 import parse from "html-react-parser";
 import { UploadImageDatasouce } from '../../datasource/UploadImageDatasource';
+import { DashboardLayout } from '../../components/layout/Layout';
 const { Map } = require("immutable");
 const _ = require("lodash");
 
@@ -250,7 +250,7 @@ function EditNewsPage() {
   },[])
 
   return (
-    <Layouts>
+    <DashboardLayout>
       <div className="d-flex align-items-center">
         <BackIconButton onClick={() => navigate(-1)} />
         <strong style={{ fontSize: "20px" }}>เพิ่มข่าวสาร</strong>
@@ -422,7 +422,7 @@ function EditNewsPage() {
           />
         </div>
       </div>
-    </Layouts>
+    </DashboardLayout>
   )
 }
 

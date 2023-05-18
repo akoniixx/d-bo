@@ -15,7 +15,6 @@ import { BackIconButton } from "../../../components/button/BackButton";
 import { CardContainer } from "../../../components/card/CardContainer";
 import FooterPage from "../../../components/footer/FooterPage";
 import { CardHeader } from "../../../components/header/CardHearder";
-import Layout from "../../../components/layout/Layout";
 import { color } from "../../../resource";
 import { DroneDatasource } from "../../../datasource/DroneDatasource";
 import {
@@ -41,6 +40,7 @@ import {
 import { UploadImageDatasouce } from "../../../datasource/UploadImageDatasource";
 import ModalDroneBrand from "../../../components/modal/ModalDroneBrand";
 import Swal from "sweetalert2";
+import { DashboardLayout } from "../../../components/layout/Layout";
 
 const _ = require("lodash");
 const { Map } = require("immutable");
@@ -435,7 +435,7 @@ const EditDroneBrand = () => {
     });
   };
   return (
-    <Layout>
+    <DashboardLayout>
       <Row>
         <BackIconButton
           onClick={() => {
@@ -476,7 +476,7 @@ const EditDroneBrand = () => {
           title="แก้ไขรุ่นโดรน"
         />
       )}
-    </Layout>
+    </DashboardLayout>
   );
 };
 

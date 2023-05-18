@@ -24,7 +24,6 @@ import { useEffect, useState } from "react";
 import ActionButton from "../../../components/button/ActionButton";
 import { CardContainer } from "../../../components/card/CardContainer";
 import { CardHeader } from "../../../components/header/CardHearder";
-import Layouts from "../../../components/layout/Layout";
 import ModalMapPlot from "../../../components/modal/task/finishTask/ModalMapPlot";
 import { LocationDatasource } from "../../../datasource/LocationDatasource";
 import { TaskInprogressDatasource } from "../../../datasource/TaskInprogressDatasource";
@@ -44,6 +43,7 @@ import {
   numberWithCommas,
   numberWithCommasToFixed,
 } from "../../../utilities/TextFormatter";
+import { DashboardLayout } from "../../../components/layout/Layout";
 
 export default function IndexTodayTask() {
   const row = 10;
@@ -749,7 +749,7 @@ export default function IndexTodayTask() {
   ];
 
   return (
-    <Layouts>
+    <DashboardLayout>
       <span
         className="container"
         style={{ fontSize: 22, fontWeight: "bold", padding: "8px" }}
@@ -938,6 +938,6 @@ export default function IndexTodayTask() {
           plotId={plotId}
         />
       )}
-    </Layouts>
+    </DashboardLayout>
   );
 }

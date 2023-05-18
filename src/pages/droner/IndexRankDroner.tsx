@@ -13,7 +13,7 @@ import Search from "antd/lib/input/Search";
 import moment, { min } from "moment";
 import React, { useEffect, useState } from "react";
 import ActionButton from "../../components/button/ActionButton";
-import Layouts from "../../components/layout/Layout";
+import { DashboardLayout } from "../../components/layout/Layout";
 import { LocationDatasource } from "../../datasource/LocationDatasource";
 import {
   DistrictEntity,
@@ -554,7 +554,7 @@ export default function IndexRankDroner() {
     },
   ];
   return (
-    <Layouts>
+    <DashboardLayout>
       {PageTitle}
       <br />
       <Table columns={columns} dataSource={data?.data} pagination={false} />
@@ -568,6 +568,6 @@ export default function IndexRankDroner() {
           showSizeChanger={false}
         />
       </div>
-    </Layouts>
+    </DashboardLayout>
   );
 }

@@ -1,11 +1,11 @@
 import React from 'react'
-import Layouts from '../../components/layout/Layout'
+import { DashboardLayout } from '../../components/layout/Layout'
 
 export function OverviewPage() {
   return (
-    <Layouts>
+    <DashboardLayout>
     <div>OverviewPage</div>
-    </Layouts>
+    </DashboardLayout>
   )
 }
 

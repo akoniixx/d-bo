@@ -33,7 +33,6 @@ import {
 import SaveButton from "../../../components/button/SaveButton";
 import { CardContainer } from "../../../components/card/CardContainer";
 import { CardHeader } from "../../../components/header/CardHearder";
-import Layouts from "../../../components/layout/Layout";
 import GooleMap from "../../../components/map/GoogleMap";
 import { CropDatasource } from "../../../datasource/CropDatasource";
 import { TaskDatasource } from "../../../datasource/TaskDatasource";
@@ -90,6 +89,7 @@ import {
   TaskCoupon,
   TaskCoupon_INIT,
 } from "../../../entities/CalculateTask";
+import { DashboardLayout } from "../../../components/layout/Layout";
 const dateFormat = "DD/MM/YYYY";
 const dateCreateFormat = "YYYY-MM-DD";
 const timeFormat = "HH:mm";
@@ -1900,7 +1900,7 @@ const EditNewTask = () => {
 
   return (
     <>
-      <Layouts key={data?.id}>
+      <DashboardLayout key={data?.id}>
         <Row>
           <BackIconButton
             onClick={() => (window.location.href = "/IndexNewTask")}
@@ -1912,7 +1912,7 @@ const EditNewTask = () => {
           </span>
         </Row>
         {renderStep}
-      </Layouts>
+      </DashboardLayout>
       {showModalSelectedDroner && (
         <ModalSelectedEditDroner
           show={showModalSelectedDroner}

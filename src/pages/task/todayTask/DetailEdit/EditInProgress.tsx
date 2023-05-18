@@ -21,7 +21,6 @@ import { CardContainer } from "../../../../components/card/CardContainer";
 import { CardHeader } from "../../../../components/header/CardHearder";
 import { LAT_LNG_BANGKOK } from "../../../../definitions/Location";
 import color from "../../../../resource/color";
-import Layouts from "../../../../components/layout/Layout";
 import {
   TaskDetailEntity,
   TaskDetailEntity_INIT,
@@ -49,6 +48,7 @@ import {
 } from "../../../../definitions/Status";
 import { CouponDataSource } from "../../../../datasource/CouponDatasource";
 import { numberWithCommas } from "../../../../utilities/TextFormatter";
+import { DashboardLayout } from "../../../../components/layout/Layout";
 const { Map } = require("immutable");
 const _ = require("lodash");
 let queryString = _.split(window.location.search, "=");
@@ -864,7 +864,7 @@ function EditInProgress() {
   };
 
   return (
-    <Layouts>
+    <DashboardLayout>
       <Row>
         <BackIconButton
           onClick={() => (window.location.href = "/IndexTodayTask")}
@@ -899,7 +899,7 @@ function EditInProgress() {
         onClickSave={() => UpdateTaskWaitStart(data)}
         disableSaveBtn={saveBtnDisable}
       />
-    </Layouts>
+    </DashboardLayout>
   );
 }
 

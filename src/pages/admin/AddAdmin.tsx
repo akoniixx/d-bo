@@ -1,4 +1,4 @@
-import Layout from "../../components/layout/Layout";
+import { DashboardLayout } from "../../components/layout/Layout";
 import React, { useState } from "react";
 import { Form, Input, Radio, Row, Select, Space, Tooltip } from "antd";
 import { BackIconButton } from "../../components/button/BackButton";
@@ -281,7 +281,7 @@ const AddAdmin = () => {
   );
 
   return (
-    <Layout>
+    <DashboardLayout>
       <Row>
         <BackIconButton
           onClick={() => (window.location.href = "/IndexAdmin")}
@@ -303,7 +303,7 @@ const AddAdmin = () => {
         }}
         disableSaveBtn={showBtn}
       />
-    </Layout>
+    </DashboardLayout>
   );
 };
 

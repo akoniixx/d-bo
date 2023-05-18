@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import Search from "antd/lib/input/Search";
 import { Option } from "antd/lib/mentions";
 import color from "../../resource/color";
-import Layouts from "../../components/layout/Layout";
+import { DashboardLayout } from "../../components/layout/Layout";
 import ActionButton from "../../components/button/ActionButton";
 import {
   CaretDownOutlined,
@@ -717,7 +717,7 @@ function IndexFarmer() {
   ];
 
   return (
-    <Layouts>
+    <DashboardLayout>
       {pageTitle}
       <CardContainer>
         <Table
@@ -749,7 +749,7 @@ function IndexFarmer() {
           showSizeChanger={false}
         />
       </div>
-    </Layouts>
+    </DashboardLayout>
   );
 }
 

@@ -22,7 +22,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import ActionButton from "../../../components/button/ActionButton";
 import { CardContainer } from "../../../components/card/CardContainer";
-import Layouts from "../../../components/layout/Layout";
+import  { DashboardLayout } from "../../../components/layout/Layout";
 import { CampaignDatasource } from "../../../datasource/CampaignDatasource";
 import { STATUS_COLOR } from "../../../definitions/DronerStatus";
 import { STATUS_COUPON } from "../../../definitions/Status";
@@ -311,7 +311,7 @@ const IndexCampaignPoint = () => {
 
   return (
     <>
-      <Layouts>
+      <DashboardLayout>
         {pageTitle}
         <CardContainer>
           <Table
@@ -332,7 +332,7 @@ const IndexCampaignPoint = () => {
             showSizeChanger={false}
           />
         </div>
-      </Layouts>
+      </DashboardLayout>
       {showModal && (
         <Modal
           title="ยืนยันการลบ"

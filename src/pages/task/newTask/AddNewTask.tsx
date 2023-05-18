@@ -32,7 +32,6 @@ import {
 import SaveButton from "../../../components/button/SaveButton";
 import { CardContainer } from "../../../components/card/CardContainer";
 import { CardHeader } from "../../../components/header/CardHearder";
-import Layouts from "../../../components/layout/Layout";
 import color from "../../../resource/color";
 import { TaskDatasource } from "../../../datasource/TaskDatasource";
 import { FarmerEntity } from "../../../entities/FarmerEntities";
@@ -76,6 +75,7 @@ import {
 } from "../../../entities/CouponEntites";
 import { DateTimeUtil } from "../../../utilities/DateTimeUtil";
 import form from "antd/lib/form";
+import { DashboardLayout } from "../../../components/layout/Layout";
 
 const { Step } = Steps;
 const { Option } = Select;
@@ -2022,7 +2022,7 @@ const AddNewTask = () => {
 
   return (
     <>
-      <Layouts>
+      <DashboardLayout>
         <Row>
           <BackIconButton
             onClick={() => (window.location.href = "/IndexNewTask")}
@@ -2032,7 +2032,7 @@ const AddNewTask = () => {
           </span>
         </Row>
         {renderStep}
-      </Layouts>
+      </DashboardLayout>
       {showModalSelectedDroner && (
         <ModalSelectedDroner
           show={showModalSelectedDroner}

@@ -155,6 +155,7 @@ const WebRoutes: React.FC<any> = () => {
         </Route>
       </Routes>
     </BrowserRouter>
+   
   );
 };
 

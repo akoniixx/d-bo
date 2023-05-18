@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react'
-import Layouts from '../../components/layout/Layout'
 import Search from 'antd/lib/input/Search'
 import Select from 'antd/lib/select'
 import { Option } from "antd/lib/mentions";
@@ -12,6 +11,7 @@ import { NewsDatasource } from '../../datasource/NewsDatasource';
 import { DateTimeUtil } from '../../utilities/DateTimeUtil';
 import { STATUS_COUPON } from '../../definitions/Status';
 import ModalDeleteNews from '../../components/modal/ModalDeleteNews';
+import { DashboardLayout } from '../../components/layout/Layout';
 
 function NewsPage() {
   const navigate = useNavigate();
@@ -529,7 +529,7 @@ function NewsPage() {
   ]
 
   return (
-    <Layouts>
+    <DashboardLayout>
       <ModalDeleteNews
         show={modalDelete}
         backButton={() => setModalDelete(!modalDelete)}
@@ -553,7 +553,7 @@ function NewsPage() {
           showSizeChanger={false}
         />
       </div>
-    </Layouts>
+    </DashboardLayout>
   )
 }
 

@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import Layout from "../../components/layout/Layout";
 import {
   Row,
   Form,
@@ -64,6 +63,7 @@ import moment from "moment";
 import { useLocalStorage } from "../../hook/useLocalStorage";
 import { resizeFileImg } from "../../utilities/ResizeImage";
 import { Navigate, useNavigate } from "react-router-dom";
+import { DashboardLayout } from "../../components/layout/Layout";
 const { Option } = Select;
 
 const dateFormat = "DD/MM/YYYY";
@@ -1067,7 +1067,7 @@ const EditFarmer = () => {
   );
 
   return (
-    <Layout>
+    <DashboardLayout>
       <Row>
         <BackIconButton
           onClick={() => {
@@ -1110,7 +1110,7 @@ const EditFarmer = () => {
           title="แก้ไขแปลงเกษตร"
         />
       )}
-    </Layout>
+    </DashboardLayout>
   );
 };
 

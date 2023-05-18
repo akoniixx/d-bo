@@ -1,4 +1,3 @@
-import Layout from "../../components/layout/Layout";
 import React, { useEffect, useState } from "react";
 import { Form, Input, Radio, Row, Select, Space, Tooltip } from "antd";
 import { BackIconButton } from "../../components/button/BackButton";
@@ -13,6 +12,7 @@ import {
 import { AdminDatasource } from "../../datasource/AdminDatasource";
 import Swal from "sweetalert2";
 import { ExclamationCircleOutlined } from "@ant-design/icons";
+import { DashboardLayout } from "../../components/layout/Layout";
 
 const _ = require("lodash");
 const { Map } = require("immutable");
@@ -230,7 +230,7 @@ const EditAdmin = () => {
   );
 
   return (
-    <Layout>
+    <DashboardLayout>
       <Row>
         <BackIconButton
           onClick={() => (window.location.href = "/IndexAdmin")}
@@ -250,7 +250,7 @@ const EditAdmin = () => {
         onClickSave={() => updateAdmin(data)}
         disableSaveBtn={showBtn}
       />
-    </Layout>
+    </DashboardLayout>
   );
 };
 

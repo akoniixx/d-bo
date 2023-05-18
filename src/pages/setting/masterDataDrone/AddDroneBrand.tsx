@@ -7,7 +7,6 @@ import { BackIconButton } from "../../../components/button/BackButton";
 import { CardContainer } from "../../../components/card/CardContainer";
 import FooterPage from "../../../components/footer/FooterPage";
 import { CardHeader } from "../../../components/header/CardHearder";
-import Layouts from "../../../components/layout/Layout";
 import { color } from "../../../resource";
 import uploadImg from "../../../resource/media/empties/uploadImg.png";
 import emptyData from "../../../resource/media/empties/tabler_drone.png";
@@ -27,6 +26,7 @@ import {
 import { DroneDatasource } from "../../../datasource/DroneDatasource";
 import Swal from "sweetalert2";
 import { UploadImageDatasouce } from "../../../datasource/UploadImageDatasource";
+import { DashboardLayout } from "../../../components/layout/Layout";
 
 const _ = require("lodash");
 const { Map } = require("immutable");
@@ -308,7 +308,7 @@ function AddDroneBrand() {
   );
 
   return (
-    <Layouts>
+    <DashboardLayout>
       <Row>
         <BackIconButton onClick={() => navigate(-1)} />
         <span className="pt-3">
@@ -345,7 +345,7 @@ function AddDroneBrand() {
           title="แก้ไขแปลงเกษตร"
         />
       )}
-    </Layouts>
+    </DashboardLayout>
   );
 }
 

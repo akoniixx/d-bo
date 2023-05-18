@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import Layout from "../../components/layout/Layout";
 import { Row, Form, Input, Pagination, Table, Tag } from "antd";
 import { FileTextFilled } from "@ant-design/icons";
 import { CardContainer } from "../../components/card/CardContainer";
@@ -21,6 +20,7 @@ import emptyData from "../../resource/media/empties/iconoir_farm.png";
 import { StarFilled, FileTextOutlined } from "@ant-design/icons";
 import moment from "moment";
 import image from "../../resource/image";
+import { DashboardLayout } from "../../components/layout/Layout";
 const _ = require("lodash");
 let queryString = _.split(window.location.search, "=");
 const dateFormat = "DD/MM/YYYY";
@@ -364,7 +364,7 @@ function DetailRankDroner() {
     },
   ];
   return (
-    <Layout>
+    <DashboardLayout>
       <Row>
         <BackIconButton
           onClick={() => (window.location.href = "/IndexRankDroner")}
@@ -397,7 +397,7 @@ function DetailRankDroner() {
           />
         </div>
       </Row>
-    </Layout>
+    </DashboardLayout>
   );
 }
 export default DetailRankDroner;

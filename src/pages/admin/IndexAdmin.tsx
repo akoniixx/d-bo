@@ -5,7 +5,6 @@ import React, { useEffect, useState } from "react";
 import ActionButton from "../../components/button/ActionButton";
 import AddButtton from "../../components/button/AddButton";
 import { CardContainer } from "../../components/card/CardContainer";
-import Layout from "../../components/layout/Layout";
 import { AdminDatasource } from "../../datasource/AdminDatasource";
 import { ROLE_ADMIN } from "../../definitions/RoleAdmin";
 import { STATUS_NORMAL_MAPPING } from "../../definitions/Status";
@@ -15,6 +14,7 @@ import {
 } from "../../entities/UserStaffEntities";
 import { color } from "../../resource";
 import { DateTimeUtil } from "../../utilities/DateTimeUtil";
+import { DashboardLayout } from "../../components/layout/Layout";
 
 const IndexAdmin = () => {
   const row = 10;
@@ -182,7 +182,7 @@ const IndexAdmin = () => {
   );
 
   return (
-    <Layout>
+    <DashboardLayout>
       {pageTitle}
       <CardContainer>
         <Table
@@ -202,7 +202,7 @@ const IndexAdmin = () => {
           pageSize={row}
         />
       </div>
-    </Layout>
+    </DashboardLayout>
   );
 };
 export default IndexAdmin;

@@ -3,7 +3,7 @@ import Search from "antd/lib/input/Search";
 import moment from "moment";
 import { useEffect, useState } from "react";
 import ActionButton from "../../components/button/ActionButton";
-import Layouts from "../../components/layout/Layout";
+import { DashboardLayout } from "../../components/layout/Layout";
 import { DroneDatasource } from "../../datasource/DroneDatasource";
 import { DronerDroneDatasource } from "../../datasource/DronerDroneDatasource";
 import { UploadImageDatasouce } from "../../datasource/UploadImageDatasource";
@@ -380,7 +380,7 @@ function DroneList() {
   ];
 
   return (
-    <Layouts>
+    <DashboardLayout>
       {PageTitle}
       <br />
       <Table
@@ -408,7 +408,7 @@ function DroneList() {
           showSizeChanger={false}
         />
       </div>
-    </Layouts>
+    </DashboardLayout>
   );
 }
 

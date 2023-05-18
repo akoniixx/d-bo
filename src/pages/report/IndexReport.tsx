@@ -31,7 +31,6 @@ import {
   SubdistrictEntity,
 } from "../../entities/LocationEntities";
 import { useEffect } from "react";
-import Layouts from "../../components/layout/Layout";
 import moment from "moment";
 import color from "../../resource/color";
 import { useLocalStorage } from "../../hook/useLocalStorage";
@@ -60,6 +59,7 @@ import ActionButton from "../../components/button/ActionButton";
 import ModalMapPlot from "../../components/modal/task/finishTask/ModalMapPlot";
 import { CheckboxValueType } from "antd/lib/checkbox/Group";
 import { CheckboxChangeEvent } from "antd/lib/checkbox";
+import { DashboardLayout } from "../../components/layout/Layout";
 
 interface DataType {
   key: React.Key;
@@ -1308,7 +1308,7 @@ function IndexReport() {
     }
   }
   return (
-    <Layouts>
+    <DashboardLayout>
       <Space direction="vertical" style={{ width: "100%" }}>
         <Spin tip="Loading..." size="large" spinning={loading}>
           {PageTitle}
@@ -1343,7 +1343,7 @@ function IndexReport() {
           plotId={plotId}
         />
       )}
-    </Layouts>
+    </DashboardLayout>
   );
 }
 

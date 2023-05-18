@@ -1,4 +1,3 @@
-import Layout from "../../../../components/layout/Layout";
 import React, { useEffect, useState } from "react";
 import {
   Avatar,
@@ -39,6 +38,7 @@ import {
   numberWithCommas,
   numberWithCommasToFixed,
 } from "../../../../utilities/TextFormatter";
+import { DashboardLayout } from "../../../../components/layout/Layout";
 const _ = require("lodash");
 let queryString = _.split(window.location.search, "=");
 const dateFormat = "DD/MM/YYYY";
@@ -587,7 +587,7 @@ function FinishTasks() {
   );
 
   return (
-    <Layout>
+    <DashboardLayout>
       <Row>
         <BackIconButton
           onClick={() => (window.location.href = "/IndexFinishTask")}
@@ -617,7 +617,7 @@ function FinishTasks() {
         <CardHeader textHeader="ยอดรวมค่าบริการ" />
         {renderPrice}
       </CardContainer>
-    </Layout>
+    </DashboardLayout>
   );
 }
 

@@ -1,4 +1,3 @@
-import Layout from "../../../../components/layout/Layout";
 import React, { useEffect, useState } from "react";
 import { Avatar, Badge, Form, Input, Row, Select } from "antd";
 import { BackIconButton } from "../../../../components/button/BackButton";
@@ -29,6 +28,7 @@ import {
   STATUS_EN_NEWTASK_COLOR_MAPPING,
   STATUS_NEWTASK_MAPPING,
 } from "../../../../definitions/Status";
+import { DashboardLayout } from "../../../../components/layout/Layout";
 const _ = require("lodash");
 let queryString = _.split(window.location.search, "=");
 const dateFormat = "DD/MM/YYYY";
@@ -540,7 +540,7 @@ function CancelTask() {
   );
 
   return (
-    <Layout>
+    <DashboardLayout>
       <Row>
         <BackIconButton
           onClick={() => (window.location.href = "/IndexFinishTask")}
@@ -570,7 +570,7 @@ function CancelTask() {
         <CardHeader textHeader="ยอดรวมค่าบริการ" />
         {renderPrice}
       </CardContainer>
-    </Layout>
+    </DashboardLayout>
   );
 }
 

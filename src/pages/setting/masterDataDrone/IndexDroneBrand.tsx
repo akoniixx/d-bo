@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { Badge, Button, Input, Pagination, Table } from "antd";
-import Layouts from "../../../components/layout/Layout";
 import {
   DroneBrandEntity,
   DroneBrandListEntity,
@@ -16,6 +15,7 @@ import {
   SearchOutlined,
 } from "@ant-design/icons";
 import Swal from "sweetalert2";
+import { DashboardLayout } from "../../../components/layout/Layout";
 
 const IndexDroneBrand: React.FC = () => {
   const [data, setData] = useState<DroneBrandListEntity>(
@@ -246,11 +246,11 @@ const IndexDroneBrand: React.FC = () => {
     },
   ];
   return (
-    <Layouts>
+    <DashboardLayout>
       {pageTitle}
       <Table columns={columns} dataSource={data.data} />
       <p>รายการทั้งหมด {data.count} รายการ</p>
-    </Layouts>
+    </DashboardLayout>
   );
 };
 

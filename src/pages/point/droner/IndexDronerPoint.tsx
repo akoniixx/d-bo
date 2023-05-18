@@ -13,9 +13,9 @@ import {
 import React, { useState } from "react";
 import ActionButton from "../../../components/button/ActionButton";
 import { CardContainer } from "../../../components/card/CardContainer";
-import Layouts from "../../../components/layout/Layout";
 import { color } from "../../../resource";
 import { DateTimeUtil } from "../../../utilities/DateTimeUtil";
+import { DashboardLayout } from "../../../components/layout/Layout";
 
 const { RangePicker } = DatePicker;
 
@@ -225,7 +225,7 @@ const IndexDronerPoint = () => {
 
   return (
     <>
-      <Layouts>
+      <DashboardLayout>
         {pageTitle}
         <CardContainer>
           <Table
@@ -249,7 +249,7 @@ const IndexDronerPoint = () => {
             showSizeChanger={false}
           />
         </div>
-      </Layouts>
+      </DashboardLayout>
     </>
   );
 };
