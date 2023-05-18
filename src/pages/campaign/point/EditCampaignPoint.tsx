@@ -33,6 +33,7 @@ let queryString = _.split(window.location.pathname, "=");
 const EditCampaignPoint = () => {
   const profile = JSON.parse(localStorage.getItem("profile") || "{  }");
   const navigate = useNavigate();
+  const dateSearchFormat = "YYYY-MM-DD";
   const dateFormat = "DD/MM/YYYY";
 
   const [form] = Form.useForm();
@@ -40,17 +41,35 @@ const EditCampaignPoint = () => {
   const [data, setData] = useState<CampaignEntiry>(CampaignEntiry_INIT);
   const [update, setUpdate] = useState<CreateCampaignEntiry>();
   const [isEdit, setIsEdit] = useState(false);
+  const [isActive, setIsActive] = useState(false);
   const [checkDup, setCheckDup] = useState(false);
 
   const fetchCampaignById = () => {
     CampaignDatasource.getCampaignById(queryString[1]).then((res) => {
-      const checkIsEdit =
-        res.status === "ACTIVE"
-          ? moment(Date()).toISOString() >= res.startDate
-            ? true
-            : false
-          : false;
-      setIsEdit(checkIsEdit);
+      const checkIsEdit = () => {
+        if (res.status === "ACTIVE") {
+          setIsActive(
+            moment(res.startDate).format(dateSearchFormat) <=
+              moment(Date()).format(dateSearchFormat)
+              ? true
+              : false
+          );
+        } else if (res.status === "INACTIVE") {
+          setIsEdit(
+            moment(res.endDate).format(dateSearchFormat) <
+              moment(Date()).toISOString()
+              ? true
+              : false
+          );
+          setIsActive(
+            moment(res.endDate).format(dateSearchFormat) <
+              moment(Date()).toISOString()
+              ? true
+              : false
+          );
+        }
+      };
+      checkIsEdit();
       setData(res);
       form.setFieldsValue({
         campaignName: res.campaignName,
@@ -176,7 +195,11 @@ const EditCampaignPoint = () => {
                   },
                 ]}
               >
-                <Input placeholder="กรอกชื่อแคมเปญคะแนน" autoComplete="off" />
+                <Input
+                  placeholder="กรอกชื่อแคมเปญคะแนน"
+                  autoComplete="off"
+                  disabled={isEdit}
+                />
               </Form.Item>
             </Col>
             <Row>
@@ -214,7 +237,7 @@ const EditCampaignPoint = () => {
                     <DatePicker
                       placeholder="เลือกวันที่"
                       format={dateFormat}
-                      disabled={isEdit}
+                      disabled={isActive}
                     />
                   </Form.Item>
                   <Form.Item
@@ -227,7 +250,7 @@ const EditCampaignPoint = () => {
                       placeholder="เลือกเวลา"
                       defaultValue={moment("00:00", "HH:mm")}
                       allowClear={false}
-                      disabled={isEdit}
+                      disabled={isActive}
                     />
                   </Form.Item>
                 </div>
@@ -263,7 +286,11 @@ const EditCampaignPoint = () => {
                       },
                     ]}
                   >
-                    <DatePicker placeholder="เลือกวันที่" format={dateFormat} />
+                    <DatePicker
+                      placeholder="เลือกวันที่"
+                      format={dateFormat}
+                      disabled={isEdit}
+                    />
                   </Form.Item>
                   <Form.Item
                     name="endTime"
@@ -275,6 +302,7 @@ const EditCampaignPoint = () => {
                       placeholder="เลือกเวลา"
                       defaultValue={moment("00:00", "HH:mm")}
                       allowClear={false}
+                      disabled={isEdit}
                     />
                   </Form.Item>
                 </Col>
@@ -304,7 +332,7 @@ const EditCampaignPoint = () => {
                     placeholder="กรอกคะแนนที่ได้รับ"
                     suffix="คะแนน"
                     autoComplete="off"
-                    disabled={isEdit}
+                    disabled={isActive}
                     onChange={(e) => checkNumber(e, "point")}
                   />
                 </Form.Item>
@@ -329,7 +357,7 @@ const EditCampaignPoint = () => {
                     placeholder="กรอกจำนวนไร่ "
                     suffix="ไร่"
                     autoComplete="off"
-                    disabled={isEdit}
+                    disabled={isActive}
                     onChange={(e) => checkNumber(e, "rai")}
                   />
                 </Form.Item>
@@ -348,7 +376,7 @@ const EditCampaignPoint = () => {
                   },
                 ]}
               >
-                <Radio.Group className="d-flex flex-column" disabled={isEdit}>
+                <Radio.Group className="d-flex flex-column" disabled={isActive}>
                   <Radio value={"FARMER"}>Farmer</Radio>
                   <Radio value={"DRONER"}>Droner</Radio>
                 </Radio.Group>
@@ -367,7 +395,7 @@ const EditCampaignPoint = () => {
                   },
                 ]}
               >
-                <Radio.Group className="d-flex flex-column">
+                <Radio.Group className="d-flex flex-column" disabled={isEdit}>
                   <Radio value={"ACTIVE"}>ใช้งาน</Radio>
                   <Radio value={"DRAFTING"}>รอเปิดใช้งาน</Radio>
                   <Radio value={"INACTIVE"}>ปิดการใช้งาน</Radio>
