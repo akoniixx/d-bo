@@ -1,4 +1,3 @@
-import { Navigation } from "react-minimal-side-navigation";
 import { useLocation } from "react-router-dom";
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -7,8 +6,9 @@ import "react-minimal-side-navigation/lib/ReactMinimalSideNavigation.css";
 import { Header } from "antd/lib/layout/layout";
 import icon from "../../resource/icon";
 import { useLocalStorage } from "../../hook/useLocalStorage";
-import { Button, Image } from "antd";
+import { Button, Col, Dropdown, Image } from "antd";
 import { color } from "../../resource";
+import { Navigation } from "react-minimal-side-navigation";
 import {
   ContactsFilled,
   GiftFilled,
@@ -93,13 +93,25 @@ export const NavSidebar = () => {
       >
         <Navigation
           activeItemId={location.pathname}
-          onSelect={({ itemId }) => {
+          onSelect={({ itemId }: any) => {
+            console.log(itemId)
+            if (
+              itemId === "/task" ||
+              itemId === "/droner" ||
+              itemId === "/news" ||
+              itemId === "/point" ||
+              itemId === "/admin" ||
+              itemId === "/setting" ||
+              itemId === "/pointCon"
+            ) {
+              return isSidebarOpen ? "block" : "hidden";
+            } else;
             navigate(itemId);
           }}
           items={[
             {
               title: "ติดตามงาน",
-              itemId: "/IndexNewTask",
+              itemId: "/task",
               elemBefore: () => <ProfileFilled />,
               subNav: [
                 {
@@ -116,6 +128,7 @@ export const NavSidebar = () => {
                 },
                 {
                   title: "งานที่เสร็จแล้ว",
+
                   itemId: "/IndexFinishTask",
                 },
               ],
@@ -127,7 +140,7 @@ export const NavSidebar = () => {
             },
             {
               title: " ข้อมูลนักบินโดรน",
-              itemId: "/IndexDroner",
+              itemId: "/droner",
               elemBefore: () => <MacCommandFilled />,
               subNav: [
                 {
@@ -146,7 +159,7 @@ export const NavSidebar = () => {
             },
             {
               title: " ข่าวสารและโปรโมชั่น",
-              itemId: "/NewsPage",
+              itemId: "/news",
               elemBefore: () => <GiftFilled />,
               subNav: [
                 {
@@ -161,7 +174,7 @@ export const NavSidebar = () => {
             },
             {
               title: " คะแนนสะสม",
-              itemId: "/IndexCampaignPoint",
+              itemId: "/point",
               elemBefore: () => <StarFilled />,
               subNav: [
                 {
@@ -172,7 +185,7 @@ export const NavSidebar = () => {
             },
             {
               title: " ผู้ดูแลระบบ",
-              itemId: "/IndexAdmin",
+              itemId: "/admin",
               elemBefore: () => <UserOutlined />,
               subNav: [
                 {
@@ -183,7 +196,7 @@ export const NavSidebar = () => {
             },
             {
               title: " ตั้งค่า",
-              itemId: "/IndexDroneBrand",
+              itemId: "/setting",
               elemBefore: () => <SettingFilled />,
               subNav: [
                 {
@@ -196,7 +209,7 @@ export const NavSidebar = () => {
                 },
                 {
                   title: "คะแนน",
-                  itemId: "/ConditionFarmer",
+                  itemId: "/pointCon",
                   subNav: [
                     {
                       title: "เงื่อนไขเกษตรกร",

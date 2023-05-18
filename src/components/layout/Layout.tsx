@@ -15,7 +15,6 @@ export const DashboardLayout = ({ children }: any) => {
             <section className="sm:flex-row flex flex-col flex-1">
               <div
                 style={{
-                  height: 'auto',
                   marginLeft: 240,
                   padding: 30,
                   backgroundColor: color.BG,
