@@ -42,6 +42,8 @@ import {
   numberWithCommas,
   numberWithCommasToFixed,
 } from "../../../utilities/TextFormatter";
+import InvoiceTask from "../../../components/popover/InvoiceTask";
+import { InvoiceTaskEntity } from "../../../entities/NewTaskEntities";
 export default function IndexFinishTask() {
   const row = 10;
   const [current, setCurrent] = useState(1);
@@ -410,8 +412,19 @@ export default function IndexFinishTask() {
       title: "ค่าบริการ",
       dataIndex: "subdistrict_subdistrict_name",
       key: "subdistrict_subdistrict_name",
-      width: '12%',
+      width: "12%",
       render: (value: any, row: any, index: number) => {
+        const inv: InvoiceTaskEntity = {
+          raiAmount: row.farm_area_amount,
+          unitPrice: row.unit_price,
+          price: row.price,
+          fee: row.fee,
+          discountFee: row.discount_fee,
+          discountCoupon: row.discount_coupon,
+          discountPromotion: row.discount_promotion,
+          discountPoint: "0",
+          totalPrice: row.totalPrice,
+        };
         return {
           children: (
             <>
@@ -420,103 +433,11 @@ export default function IndexFinishTask() {
                   ? numberWithCommas(row.totalPrice) + " บาท"
                   : "0 บาท"}
               </span>
-              <Popover
-                title={
-                  <span
-                    style={{
-                      color: color.White,
-                    }}
-                  >
-                    รายละเอียดค่าบริการ
-                  </span>
-                }
-                content={
-                  <table style={{ width: "300px" }}>
-                    <tr>
-                      <td>
-                        ค่าบริการ
-                        <br />
-                        <div style={{ fontSize: "12px" }}>
-                          จำนวนไร่{" "}
-                          <span style={{ color: color.Success }}>
-                            {row.farmAreaAmount} ไร่
-                          </span>{" "}
-                          x ค่าบริการ{" "}
-                          <span style={{ color: color.Success }}>
-                            {row.unitPrice} ไร่
-                          </span>
-                        </div>
-                      </td>
-                      <td style={{ textAlign: "right" }}>
-                        {numberWithCommasToFixed(parseFloat(row.price))}
-                      </td>
-                    </tr>
-                    <tr>
-                      <td>ค่าธรรมเนียม (5%)</td>
-                      <td style={{ textAlign: "right" }}>
-                        {numberWithCommasToFixed(parseFloat(row.fee))}
-                      </td>
-                    </tr>
-                    <tr>
-                      <td>ส่วนลดค่าธรรมเนียม</td>
-                      <td style={{ color: color.Error, textAlign: "right" }}>
-                        {parseFloat(row.discountFee)
-                          ? "- " +
-                            numberWithCommasToFixed(parseFloat(row.discountFee))
-                          : 0}
-                      </td>
-                    </tr>
-                    <tr>
-                      <td>ส่วนลดจากคูปอง</td>
-                      <td style={{ color: color.Error, textAlign: "right" }}>
-                        {parseFloat(row.discountCoupon)
-                          ? "- " +
-                            numberWithCommasToFixed(
-                              parseFloat(row.discountCoupon)
-                            )
-                          : 0}
-                      </td>
-                    </tr>
-                    <tr>
-                      <td>ส่วนลดจากโปรโมชั่น</td>
-                      <td style={{ color: color.Error, textAlign: "right" }}>
-                        {parseFloat(row.discountPromotion)
-                          ? "- " +
-                            numberWithCommasToFixed(
-                              parseFloat(row.discountPromotion)
-                            )
-                          : 0}
-                      </td>
-                    </tr>
-                    <tr>
-                      <td colSpan={2}>
-                        <Divider />
-                      </td>
-                    </tr>
-                    <tr>
-                      <td>ยอดรวมค่าบริการ</td>
-                      <td
-                        style={{
-                          textAlign: "right",
-                          color: color.Success,
-                          fontWeight: "bold",
-                        }}
-                      >
-                        {numberWithCommasToFixed(parseFloat(row.totalPrice))}
-                      </td>
-                    </tr>
-                  </table>
-                }
-              >
-                <InfoCircleFilled
-                  style={{
-                    color: color.primary1,
-                    fontSize: "15px",
-                    marginLeft: "7px",
-                    verticalAlign: 0.5,
-                  }}
-                />
-              </Popover>
+              <InvoiceTask
+                iconColor={color.Success}
+                title="รายละเอียดค่าบริการ"
+                data={inv}
+              />
             </>
           ),
         };
