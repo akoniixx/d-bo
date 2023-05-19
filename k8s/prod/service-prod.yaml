@@ -10,7 +10,7 @@ spec:
   selector:
     app: dnds-bo
   ports:
-    - name: dndsBo
+    - name: dndsbo
       port: 80
       targetPort: 80
   type: ClusterIP

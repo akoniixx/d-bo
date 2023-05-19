@@ -73,7 +73,7 @@ deploy-dev:
     - gcloud config set container/cluster $CLUSTER_NAME
     - gcloud config set compute/zone $ZONE
     - gcloud container clusters get-credentials $CLUSTER_NAME --zone $ZONE --project ${PROJECT_ID}
-    - kubectl create namespace ${NAMESPACE}
+    - bash k8s/dev/check-namespace-dev.bash
     - sed -i "s/<VERSION>/${IMAGE_TAG}/g" k8s/dev/deployment-dev.yaml
     - bash k8s/dev/gcr-image-pull-secret-dev.bash
     - kubectl create secret docker-registry ${SECRET_NAME} -n ${NAMESPACE} --docker-server="asia.gcr.io" --docker-username=_json_key --docker-password="$(cat SERVICE_ACCOUNT_KEY.json)" --docker-email=ick.devops@gmail.com
@@ -98,7 +98,7 @@ deploy-dev:
 #     - gcloud config set container/cluster $CLUSTER_NAME
 #     - gcloud config set compute/zone $ZONE
 #     - gcloud container clusters get-credentials $CLUSTER_NAME --zone $ZONE --project ${PROJECT_ID}
-#     - kubectl create namespace ${NAMESPACE}
+#     - bash k8s/staging/check-namespace-staging.bash
 #     - sed -i "s/<VERSION>/${IMAGE_TAG}/g" k8s/staging/deployment-staging.yaml
 #     - bash k8s/staging/gcr-image-pull-secret-staging.bash
 #     - kubectl create secret docker-registry ${SECRET_NAME} -n ${NAMESPACE} --docker-server="asia.gcr.io" --docker-username=_json_key --docker-password="$(cat SERVICE_ACCOUNT_KEY.json)" --docker-email=ick.devops@gmail.com
@@ -123,7 +123,7 @@ deploy-dev:
 #     - gcloud config set container/cluster $CLUSTER_NAME
 #     - gcloud config set compute/zone $ZONE
 #     - gcloud container clusters get-credentials $CLUSTER_NAME --zone $ZONE --project ${PROJECT_ID}
-#     - kubectl create namespace ${NAMESPACE}
+#     - bash k8s/prod/check-namespace-prod.bash
 #     - sed -i "s/<VERSION>/${IMAGE_TAG}/g" k8s/prod/deployment-prod.yaml
 #     - bash k8s/prod/gcr-image-pull-secret-prod.bash
 #     - kubectl create secret docker-registry ${SECRET_NAME} -n ${NAMESPACE} --docker-server="asia.gcr.io" --docker-username=_json_key --docker-password="$(cat SERVICE_ACCOUNT_KEY.json)" --docker-email=ick.devops@gmail.com
