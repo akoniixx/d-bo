@@ -23,4 +23,4 @@ spec:
               service:
                 name: dnds-bo
                 port:
-                  name: dndsBo
+                  name: dndsbo
