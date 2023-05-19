@@ -123,7 +123,7 @@ deploy-dev:
 #     - gcloud container clusters get-credentials $CLUSTER_NAME --zone $ZONE --project ${PROJECT_ID}
 #     - sed -i "s/<VERSION>/${IMAGE_TAG}/g" k8s/prod/deployment-prod.yaml
 #     - bash k8s/prod/gcr-image-pull-secret-prod.bash
-#     - kubectl create secret docker-registry ${SECRET_NAME} -n ${NAMESPACE} --docker-server="asia.gcr.io" --docker-username=_json_key --docker-password="$(cat SERVICE_ACCOUNT_KEY.json)" --docker-email=ick.devops@gmail.com  
+#     - kubectl create secret docker-registry ${SECRET_NAME} -n ${NAMESPACE} --docker-server="asia.gcr.io" --docker-username=_json_key --docker-password="$(cat SERVICE_ACCOUNT_KEY.json)" --docker-email=ick.devops@gmail.com
 #     - kubectl apply -f k8s/prod/configmap-prod.yaml
 #     - kubectl apply -f k8s/prod/deployment-prod.yaml
 #     - kubectl apply -f k8s/prod/service-prod.yaml
