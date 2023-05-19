@@ -297,7 +297,7 @@ const IndexCampaignPoint = () => {
                   onClick={() => setDeleteCampaign(row.id)}
                   actionDisable={
                     row.isDelete || row.status === "ACTIVE"
-                      ? row.isDelete
+                      ? true
                       : false
                   }
                 />

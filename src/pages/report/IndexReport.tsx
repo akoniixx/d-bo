@@ -85,6 +85,7 @@ interface DataType {
   fee: string;
   discountCoupon: string;
   taskHistory: string;
+  unitPrice: string;
 }
 function IndexReport() {
   const [getData, setGetData] = useState<TaskReportListEntity>();
@@ -1223,6 +1224,7 @@ function IndexReport() {
             x.taskHistory.length > 0 ? x.taskHistory[0].beforeValue : []
           )[i]
         }`,
+        unitPrice: `${getData?.data.map((x) => x.unitPrice)[i]}`,
       });
     }
   }
