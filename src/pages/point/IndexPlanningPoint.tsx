@@ -1,7 +1,4 @@
-import {
-  InfoCircleFilled,
-  SearchOutlined,
-} from "@ant-design/icons";
+import { InfoCircleFilled, SearchOutlined } from "@ant-design/icons";
 import {
   Button,
   Col,
@@ -12,74 +9,63 @@ import {
   Table,
   Tooltip,
 } from "antd";
-import React, { useState } from "react";
+import moment from "moment";
+import React, { useEffect, useState } from "react";
 import { Container } from "react-bootstrap";
 import { CardContainer } from "../../components/card/CardContainer";
 import Layouts from "../../components/layout/Layout";
+import { PointReceiveDatasource } from "../../datasource/PointReceiveDatasource";
+import { PlanningPointListEntity } from "../../entities/PointReceiveEntities";
 import { color } from "../../resource";
 import { DateTimeUtil } from "../../utilities/DateTimeUtil";
 const { RangePicker } = DatePicker;
+const dateSearchFormat = "YYYY-MM-DD";
 
 const IndexPlanningPoint = () => {
   const dateFormat = "DD/MM/YYYY";
-  const row = 10;
+  const row = 5;
   const [current, setCurrent] = useState(1);
+  const [data, setData] = useState<PlanningPointListEntity>();
+  const [searchKeyword, setSearchKeyword] = useState("");
+  const [searchTask, setSearchTask] = useState("");
+  const [searchStartDate, setSearchStartDate] = useState<any>(null);
+  const [searchEndDate, setSearchEndDate] = useState<any>(null);
+
+  const fetchPlanningPoint = () => {
+    PointReceiveDatasource.getPlanningPoint(
+      "PENDING",
+      row,
+      current,
+      searchKeyword,
+      searchTask,
+      searchStartDate,
+      searchEndDate
+    ).then((res) => {
+      const mapKey = res.data.map((x, i) => ({
+        ...x,
+        key: i + 1,
+      }));
+      setData({ ...res, data: mapKey });
+    });
+  };
+
+  useEffect(() => {
+    fetchPlanningPoint();
+  }, [searchStartDate, searchEndDate, current]);
 
   const onChangePage = (page: number) => {
     setCurrent(page);
   };
-
-  const dataMock = [
-    {
-      key: 1,
-      dateTime: Date(),
-      pointNo: "P00000001",
-      taskId: "TK00000001",
-      missionId: "MS00000001",
-      type: "การจ้างงาน",
-      description: [
-        {
-          source: "Farmer",
-          farmerId: "f1",
-          farmerName: "รชยา ช่างภักดี",
-          telephone: "0938355808",
-          point: 100,
-          rai: 50,
-          unitPoint: 2,
-        },
-        {
-          source: "Droner",
-          dronerId: "d1",
-          dronerName: "รชยา ทำงานวันหยุด",
-          telephone: "0938355808",
-          point: 200,
-          rai: 100,
-          unitPoint: 4,
-        },
-      ],
-    },
-    {
-      key: 2,
-      dateTime: Date(),
-      pointNo: "P00000001",
-      taskId: "TK00000001",
-      missionId: "MS00000001",
-      type: "การจ้างงาน",
-      rai: 100,
-      unitPoint: 3,
-      description: [
-        {
-          source: "Farmer",
-          farmerId: "f1",
-          farmerName: "รชยา ช่างภักดี",
-          telephone: "0938355808",
-          point: 100,
-          rai: 50,
-          unitPoint: 2,
-        },
-      ],
-    },
-  ];
+  const handleSearchDate = (e: any) => {
+    if (e != null) {
+      setSearchStartDate(moment(new Date(e[0])).format(dateSearchFormat));
+      setSearchEndDate(moment(new Date(e[1])).format(dateSearchFormat));
+    } else {
+      setSearchStartDate(e);
+      setSearchEndDate(e);
+    }
+    setCurrent(1);
+  };
 
   const pageTitle = (
     <>
@@ -104,6 +90,7 @@ const IndexPlanningPoint = () => {
             allowClear
             format={dateFormat}
             placeholder={["เลือกวันที่เริ่ม", "เลือกวันที่สิ้นสุด"]}
+            onCalendarChange={(val) => handleSearchDate(val)}
           />
         </div>
       </div>
@@ -117,6 +104,7 @@ const IndexPlanningPoint = () => {
             prefix={<SearchOutlined style={{ color: color.Disable }} />}
             placeholder="ค้นหานักบินโดรน/เกษตรกร/เบอร์โทร"
             className="col-lg-12 p-1"
+            onChange={(e) => setSearchKeyword(e.target.value)}
           />
         </div>
         <div className="col-lg p-1">
@@ -125,6 +113,7 @@ const IndexPlanningPoint = () => {
             prefix={<SearchOutlined style={{ color: color.Disable }} />}
             placeholder="ค้นหารหัส Task No."
             className="col-lg-12 p-1"
+            onChange={(e) => setSearchTask(e.target.value)}
           />
         </div>
         <div className="pt-1">
@@ -135,6 +124,7 @@ const IndexPlanningPoint = () => {
               color: color.secondary2,
               backgroundColor: color.Success,
             }}
+            onClick={fetchPlanningPoint}
           >
             ค้นหาข้อมูล
           </Button>
@@ -144,15 +134,11 @@ const IndexPlanningPoint = () => {
   );
 
   const expandData = (record: any) => {
-    let checkFarmer = record.description.filter(
-      (x: any) => x.source === "Farmer"
-    );
-    let checkDroner = record.description.filter(
-      (x: any) => x.source === "Droner"
-    );
+    let checkFarmer = record.farmer;
+    let checkDroner = record.droner;
     return (
       <Row justify={"space-between"} gutter={16}>
-        {checkFarmer.length !== 0 && (
+        {checkFarmer !== null && (
           <Col span={12}>
             <Container
               style={{
@@ -162,23 +148,30 @@ const IndexPlanningPoint = () => {
               className="p-3"
             >
               <Row>
-                <Col span={11}>
-                  <label>ชื่อเกษตรกร : </label>{" "}
-                  <span>{checkFarmer[0].farmerName}</span>
+                <Col span={12}>
+                  <label>เกษตรกร : </label>{" "}
+                  <span style={{ color: color.Success }}>
+                    <u>
+                      {checkFarmer[0].first_name +
+                        " " +
+                        checkFarmer[0].last_name}
+                    </u>
+                  </span>
                 </Col>
-                <Col span={8}>
-                  <label>เบอร์โทร : </label>{" "}
-                  <span>{checkFarmer[0].telephone}</span>
+                <Col span={7}>
+                  <label>เบอร์ : </label>{" "}
+                  <span>{checkFarmer[0].telephone_no}</span>
                 </Col>
                 <Col span={5}>
-                  <label>คะแนน :</label> <span>+ {checkFarmer[0].point}</span>
+                  <label>คะแนน :</label>{" "}
+                  <span>+ {checkFarmer[0].receive_point}</span>
                   <Tooltip
                     placement="top"
                     title={
                       "คะแนนที่จะได้รับ : " +
                       checkFarmer[0].rai +
-                      " ไร่ x" +
-                      checkFarmer[0].unitPoint +
+                      " ไร่ x " +
+                      checkFarmer[0].point_per_rai +
                       " คะแนน"
                     }
                     key={1}
@@ -197,7 +190,7 @@ const IndexPlanningPoint = () => {
             </Container>
           </Col>
         )}
-        {checkDroner.length !== 0 && (
+        {checkDroner !== null && (
           <Col span={12}>
             <Container
               style={{
@@ -207,23 +200,30 @@ const IndexPlanningPoint = () => {
               className="p-3"
             >
               <Row>
-                <Col span={11}>
-                  <label>ชื่อนักบินโดรน :</label>{" "}
-                  <span>{checkDroner[0].dronerName}</span>
+                <Col span={12}>
+                  <label>นักบินโดรน :</label>{" "}
+                  <span>
+                    <u style={{ color: color.Warning }}>
+                      {checkDroner[0].first_name +
+                        " " +
+                        checkDroner[0].last_name}
+                    </u>
+                  </span>
                 </Col>
-                <Col span={8}>
-                  <label>เบอร์โทร :</label>{" "}
-                  <span>{checkDroner[0].telephone}</span>
+                <Col span={7}>
+                  <label>เบอร์ :</label>{" "}
+                  <span>{checkDroner[0].telephone_no}</span>
                 </Col>
                 <Col span={5}>
-                  <label>คะแนน :</label> <span>+ {checkDroner[0].point}</span>
+                  <label>คะแนน :</label>{" "}
+                  <span>+ {checkDroner[0].receive_point}</span>
                   <Tooltip
                     placement="top"
                     title={
                       "คะแนนที่จะได้รับ : " +
-                      checkFarmer[0].rai +
-                      " ไร่ x" +
-                      checkFarmer[0].unitPoint +
+                      checkDroner[0].rai +
+                      " ไร่ x " +
+                      checkDroner[0].point_per_rai +
                       " คะแนน"
                     }
                     key={1}
@@ -249,18 +249,16 @@ const IndexPlanningPoint = () => {
   const columns = [
     {
       title: "วันที่อัพเดท",
-      dataIndex: "dateTime",
-      key: "dateTime",
+      dataIndex: "created_at",
+      key: "created_at",
       width: "15%",
       render: (value: any, row: any, index: number) => {
         return {
           children: (
             <>
               <span>
-                {row.dateTime && DateTimeUtil.formatDateTime(row.dateTime)}
+                {row.created_at && DateTimeUtil.formatDateTime(row.created_at)}
               </span>
-              <br />
-              <span style={{ color: color.Grey }}>{row.task_no}</span>
             </>
           ),
         };
@@ -268,22 +266,20 @@ const IndexPlanningPoint = () => {
     },
     {
       title: "Task No",
-      dataIndex: "taskId",
-      width: "20%",
+      dataIndex: "task_no",
+      width: "40%",
       render: (value: any, row: any, index: number) => {
         return {
-          children: <u style={{ color: color.Success }}>{row.taskId}</u>,
+          children: <u style={{ color: color.Success }}>{row.task_no}</u>,
         };
       },
     },
     {
       title: "ประเภทการได้รับคะแนน",
-      dataIndex: "type",
-      key: "type",
       width: "20%",
       render: (value: any, row: any, index: number) => {
         return {
-          children: <span>{row.type}</span>,
+          children: <span>การจ้างงาน</span>,
         };
       },
     },
@@ -294,23 +290,23 @@ const IndexPlanningPoint = () => {
       {pageTitle}
       <CardContainer>
         <Table
-          dataSource={dataMock}
-          columns={columns}
+          dataSource={data?.data}
           expandable={{
             expandedRowRender: (record) => expandData(record),
-            defaultExpandAllRows: true,
             showExpandColumn: false,
+            expandedRowKeys: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
           }}
+          columns={columns}
           pagination={false}
           size="large"
           tableLayout="fixed"
         />
       </CardContainer>
       <div className="d-flex justify-content-between pt-4">
-        <p>รายการทั้งหมด {dataMock?.length} รายการ</p>
+        <p>รายการทั้งหมด {data?.data.length} รายการ</p>
         <Pagination
           current={current}
-          total={dataMock.length}
+          total={data?.count}
           onChange={onChangePage}
           pageSize={row}
           showSizeChanger={false}
