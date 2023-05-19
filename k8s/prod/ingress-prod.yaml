@@ -1,0 +1,26 @@
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: dnds-bo
+  namespace: production-dnds-bo
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  tls:
+    - hosts:
+      - dnds-bo.iconkaset.com
+      secretName: dnds-bo-prod-cert
+  rules:
+    - host: dnds-bo.iconkaset.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: dnds-bo
+                port:
+                  name: dndsBo
