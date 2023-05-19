@@ -191,34 +191,33 @@ const Layouts: React.FC<any> = ({ children }) => {
               title={<span>คะแนนสะสม</span>}
               key={"sub7"}
             >
-              {/* <Menu.SubMenu title={<span>นักบินโดรน</span>} key={"sub9"}>
-                <Menu.Item key="dronerpoint">
+              <Menu.SubMenu title={<span>รายการคะแนน</span>} key={"sub9"}>
+                <Menu.Item key="planningpoint">
                   <Link
-                    to="/IndexDronerPoint"
+                    to="/IndexPlanningPoint"
                     style={{ textDecoration: "none" }}
                   >
-                    <span>รายการคะแนน</span>
+                    <span>รอรับคะแนน</span>
+                  </Link>
+                </Menu.Item>
+                <Menu.Item key="receivepoint">
+                  <Link
+                    to="/IndexReceivePoint"
+                    style={{ textDecoration: "none" }}
+                  >
+                    <span>ได้รับคะแนน</span>
                   </Link>
                 </Menu.Item>
               </Menu.SubMenu>
-              <Menu.SubMenu title={<span>เกษตรกร</span>} key={"sub8"}>
-                <Menu.Item key="farmerpoint">
-                  <Link
-                    to="/IndexFarmerPoint"
-                    style={{ textDecoration: "none" }}
-                  >
-                    <span>รายการคะแนน</span>
-                  </Link>
-                </Menu.Item>
-              </Menu.SubMenu> */}
+
               <Menu.Item key="campaignpoint">
-                  <Link
-                    to="/IndexCampaignPoint"
-                    style={{ textDecoration: "none" }}
-                  >
-                    <span>แคมเปญคะแนน</span>
-                  </Link>
-                </Menu.Item>
+                <Link
+                  to="/IndexCampaignPoint"
+                  style={{ textDecoration: "none" }}
+                >
+                  <span>แคมเปญคะแนน</span>
+                </Link>
+              </Menu.Item>
             </Menu.SubMenu>
             <Menu.SubMenu
               icon={<UserOutlined />}
@@ -246,21 +245,21 @@ const Layouts: React.FC<any> = ({ children }) => {
                   <span>ราคาฉีดพ่น</span>
                 </Link>
               </Menu.Item>
-              <Menu.SubMenu
-              title={<span>คะแนน</span>}
-              key={"sub8"}
-            >
-              <Menu.Item key="conditionFarmer">
-                <Link to="/ConditionFarmer" style={{ textDecoration: "none" }}>
-                  <span>เงื่อนไขเกษตรกร</span>
-                </Link>
-              </Menu.Item>
-              {/* <Menu.Item key="conditionDroner">
+              <Menu.SubMenu title={<span>คะแนน</span>} key={"sub8"}>
+                <Menu.Item key="conditionFarmer">
+                  <Link
+                    to="/ConditionFarmer"
+                    style={{ textDecoration: "none" }}
+                  >
+                    <span>เงื่อนไขเกษตรกร</span>
+                  </Link>
+                </Menu.Item>
+                {/* <Menu.Item key="conditionDroner">
                 <Link to="/ConditionDroner" style={{ textDecoration: "none" }}>
                   <span>เงื่อนไขนักบินโดรน</span>
                 </Link>
               </Menu.Item> */}
-            </Menu.SubMenu>
+              </Menu.SubMenu>
             </Menu.SubMenu>
           </Menu>
         </Sider>

@@ -26,6 +26,7 @@ import { CardContainer } from "../../../components/card/CardContainer";
 import { CardHeader } from "../../../components/header/CardHearder";
 import Layouts from "../../../components/layout/Layout";
 import ModalMapPlot from "../../../components/modal/task/finishTask/ModalMapPlot";
+import InvoiceTask from "../../../components/popover/InvoiceTask";
 import { LocationDatasource } from "../../../datasource/LocationDatasource";
 import { TaskInprogressDatasource } from "../../../datasource/TaskInprogressDatasource";
 import {
@@ -37,6 +38,7 @@ import {
   ProviceEntity,
   SubdistrictEntity,
 } from "../../../entities/LocationEntities";
+import { InvoiceTaskEntity } from "../../../entities/NewTaskEntities";
 import { TaskTodayListEntity } from "../../../entities/TaskInprogressEntities";
 import color from "../../../resource/color";
 import icon from "../../../resource/icon";
@@ -536,10 +538,21 @@ export default function IndexTodayTask() {
       title: "ค่าบริการ",
       dataIndex: "task_total_price",
       key: "task_total_price",
-      width: '12%',
+      width: "12%",
       sorter: (a: any, b: any) =>
         sorter(a.task_total_price, b.task_total_price),
       render: (value: any, row: any, index: number) => {
+        const inv: InvoiceTaskEntity = {
+          raiAmount: row.farmerPlot_rai_amount,
+          unitPrice: row.task_unit_price,
+          price: row.task_price,
+          fee: row.task_fee,
+          discountFee: row.task_discount_fee,
+          discountCoupon: row.task_discount_coupon,
+          discountPromotion: row.task_discount_promotion,
+          discountPoint: row.task_discount_campaign_point,
+          totalPrice: row.task_total_price,
+        };
         return {
           children: (
             <>
@@ -548,107 +561,11 @@ export default function IndexTodayTask() {
                   ? numberWithCommas(row.task_total_price) + " บาท"
                   : "0 บาท"}
               </span>
-              <Popover
-                title={
-                  <span
-                    style={{
-                      color: color.White,
-                    }}
-                  >
-                    รายละเอียดค่าบริการ
-                  </span>
-                }
-                content={
-                  <table style={{ width: "300px" }}>
-                    <tr>
-                      <td>
-                        ค่าบริการ
-                        <br />
-                        <div style={{ fontSize: "12px" }}>
-                          จำนวนไร่{" "}
-                          <span style={{ color: color.Success }}>
-                            {row.farmerPlot_rai_amount} ไร่
-                          </span>{" "}
-                          x ค่าบริการ{" "}
-                          <span style={{ color: color.Success }}>
-                            {row.task_unit_price} ไร่
-                          </span>
-                        </div>
-                      </td>
-                      <td style={{ textAlign: "right" }}>
-                        {numberWithCommasToFixed(parseFloat(row.task_price))}
-                      </td>
-                    </tr>
-                    <tr>
-                      <td>ค่าธรรมเนียม (5%)</td>
-                      <td style={{ textAlign: "right" }}>
-                        {numberWithCommasToFixed(parseFloat(row.task_fee))}
-                      </td>
-                    </tr>
-                    <tr>
-                      <td>ส่วนลดค่าธรรมเนียม</td>
-                      <td style={{ color: color.Error, textAlign: "right" }}>
-                        {parseFloat(row.task_discount_fee)
-                          ? "- " +
-                            numberWithCommasToFixed(
-                              parseFloat(row.task_discount_fee)
-                            )
-                          : 0}
-                      </td>
-                    </tr>
-                    <tr>
-                      <td>ส่วนลดจากคูปอง</td>
-                      <td style={{ color: color.Error, textAlign: "right" }}>
-                        {parseFloat(row.task_discount_coupon)
-                          ? "- " +
-                            numberWithCommasToFixed(
-                              parseFloat(row.task_discount_coupon)
-                            )
-                          : 0}
-                      </td>
-                    </tr>
-                    <tr>
-                      <td>ส่วนลดจากโปรโมชั่น</td>
-                      <td style={{ color: color.Error, textAlign: "right" }}>
-                        {parseFloat(row.task_discount_promotion)
-                          ? "- " +
-                            numberWithCommasToFixed(
-                              parseFloat(row.task_discount_promotion)
-                            )
-                          : 0}
-                      </td>
-                    </tr>
-                    <tr>
-                      <td colSpan={2}>
-                        <Divider />
-                      </td>
-                    </tr>
-                    <tr>
-                      <td>ยอดรวมค่าบริการ</td>
-                      <td
-                        style={{
-                          textAlign: "right",
-                          color: color.Success,
-                          fontWeight: "bold",
-                        }}
-                      >
-                        {numberWithCommasToFixed(
-                          parseFloat(row.task_total_price)
-                        )}
-                      </td>
-                    </tr>
-                  </table>
-                }
-              >
-                <InfoCircleFilled
-                  style={{
-                    color: color.primary1,
-                    fontSize: "15px",
-                    marginLeft: "7px",
-                    verticalAlign: 0.5,
-                  }}
-                />
-              </Popover>
+              <InvoiceTask
+                iconColor={color.Success}
+                title="รายละเอียดค่าบริการ"
+                data={inv}
+              />
             </>
           ),
         };

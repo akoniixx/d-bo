@@ -251,3 +251,15 @@ export const UpdateTaskStatus_INIT: UpdateTaskStatus = {
   statusRemark: "",
   updateBy: "",
 };
+
+export interface InvoiceTaskEntity {
+  raiAmount: string;
+  unitPrice: string;
+  price: string;
+  fee: string;
+  discountFee: string;
+  discountCoupon: string;
+  discountPromotion: string;
+  discountPoint: string;
+  totalPrice: string;
+}

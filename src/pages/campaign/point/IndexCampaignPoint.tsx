@@ -68,7 +68,7 @@ const IndexCampaignPoint = () => {
 
   useEffect(() => {
     fetchCampaignList();
-  }, [searchStartDate, searchEndDate]);
+  }, [searchStartDate, searchEndDate, current]);
 
   const onChangePage = (page: number) => {
     setCurrent(page);
@@ -297,7 +297,7 @@ const IndexCampaignPoint = () => {
                   onClick={() => setDeleteCampaign(row.id)}
                   actionDisable={
                     row.isDelete || row.status === "ACTIVE"
-                      ? row.isDelete
+                      ? true
                       : false
                   }
                 />
@@ -323,7 +323,7 @@ const IndexCampaignPoint = () => {
           />
         </CardContainer>
         <div className="d-flex justify-content-between pt-4">
-          <p>รายการทั้งหมด {data?.count} รายการ</p>
+          <p>รายการทั้งหมด {data?.data.length} รายการ</p>
           <Pagination
             current={current}
             total={data?.count}
