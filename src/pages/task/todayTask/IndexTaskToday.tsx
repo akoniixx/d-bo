@@ -550,7 +550,7 @@ export default function IndexTodayTask() {
           discountFee: row.task_discount_fee,
           discountCoupon: row.task_discount_coupon,
           discountPromotion: row.task_discount_promotion,
-          discountPoint: "0",
+          discountPoint: row.task_discount_campaign_point,
           totalPrice: row.task_total_price,
         };
         return {

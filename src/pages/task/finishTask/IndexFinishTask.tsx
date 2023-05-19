@@ -80,7 +80,6 @@ export default function IndexFinishTask() {
       searchStatus,
       searchText
     ).then((res: TaskFinishListEntity) => {
-      console.log(res);
       setData(res);
     });
   };
@@ -415,14 +414,14 @@ export default function IndexFinishTask() {
       width: "12%",
       render: (value: any, row: any, index: number) => {
         const inv: InvoiceTaskEntity = {
-          raiAmount: row.farm_area_amount,
-          unitPrice: row.unit_price,
+          raiAmount: row.farmAreaAmount,
+          unitPrice: row.unitPrice,
           price: row.price,
           fee: row.fee,
-          discountFee: row.discount_fee,
-          discountCoupon: row.discount_coupon,
-          discountPromotion: row.discount_promotion,
-          discountPoint: "0",
+          discountFee: row.discountFee,
+          discountCoupon: row.discountCoupon,
+          discountPromotion: row.discountPromotion,
+          discountPoint: row.discountCampaignPoint,
           totalPrice: row.totalPrice,
         };
         return {

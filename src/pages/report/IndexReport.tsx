@@ -677,7 +677,6 @@ function IndexReport() {
       width: "12%",
       sorter: (a: any, b: any) => sorter(a.totalPrice, b.totalPrice),
       render: (value: any, row: any, index: number) => {
-        console.log(row);
         const inv: InvoiceTaskEntity = {
           raiAmount: row.farmAreaAmount,
           unitPrice: row.unitPrice,
@@ -691,7 +690,7 @@ function IndexReport() {
         };
         return {
           children: (
-            <div>
+            <>
               <span className="text-dark-75 d-block font-size-lg">
                 {value != null
                   ? numberWithCommasToFixed(parseFloat(value)) + " บาท"
@@ -702,7 +701,7 @@ function IndexReport() {
                 title="รายละเอียดค่าบริการ"
                 data={inv}
               />
-            </div>
+            </>
           ),
         };
       },

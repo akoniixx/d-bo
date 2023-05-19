@@ -291,7 +291,7 @@ const IndexNewTask = () => {
           discountFee: row.discount_fee,
           discountCoupon: row.discount_coupon,
           discountPromotion: row.discount_promotion,
-          discountPoint: "0",
+          discountPoint: row.discount_campaign_point,
           totalPrice: row.total_price,
         };
         return {
