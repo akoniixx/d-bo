@@ -352,7 +352,7 @@ const IndexRedeem = () => {
                   color={color.primary1}
                   onClick={() =>
                     (window.location.href =
-                      "/DetailFarmerPoint/id=" + (index + 1))
+                      "/DetailFarmerRedeem/id=" + (index + 1))
                   }
                 />
               </div>
@@ -509,7 +509,7 @@ const IndexRedeem = () => {
                   color={color.primary1}
                   onClick={() =>
                     (window.location.href =
-                      "/DetailFarmerPoint/id=" + (index + 1))
+                      "/DetailDronerRedeem/id=" + (index + 1))
                   }
                 />
               </div>

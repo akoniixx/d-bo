@@ -61,6 +61,8 @@ import IndexReceivePoint from "./pages/point/IndexReceivePoint";
 import IndexPlanningPoint from "./pages/point/IndexPlanningPoint";
 import DetailReceivePoint from "./pages/point/DetailReceivePoint";
 import IndexRedeem from "./pages/redeem/IndexRedeem";
+import DetailFarmerRedeem from "./pages/redeem/DetailFarmerRedeem";
+import DetailDronerRedeem from "./pages/redeem/DetailDronerRedeem";
 
 const WebRoutes: React.FC<any> = () => {
   return (
@@ -153,6 +155,14 @@ const WebRoutes: React.FC<any> = () => {
           element={<DetailReceivePoint />}
         />
         <Route path="/IndexRedeem" element={<IndexRedeem />} />
+        <Route
+          path="/DetailFarmerRedeem/:id"
+          element={<DetailFarmerRedeem />}
+        />
+        <Route
+          path="/DetailDronerRedeem/:id"
+          element={<DetailDronerRedeem />}
+        />
         <Route element={<PublicRoute />}>
           <Route index element={<AuthPage />} />
           <Route path="/ErrorLoginPage" element={<ErrorLoginPage />} />
