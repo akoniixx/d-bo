@@ -60,6 +60,7 @@ import ConditionFarmer from "./pages/setting/pointSetting/ConditionFarmer";
 import IndexReceivePoint from "./pages/point/IndexReceivePoint";
 import IndexPlanningPoint from "./pages/point/IndexPlanningPoint";
 import DetailReceivePoint from "./pages/point/DetailReceivePoint";
+import IndexRedeem from "./pages/redeem/IndexRedeem";
 
 const WebRoutes: React.FC<any> = () => {
   return (
@@ -151,6 +152,7 @@ const WebRoutes: React.FC<any> = () => {
           path="/DetailReceivePoint/:id"
           element={<DetailReceivePoint />}
         />
+        <Route path="/IndexRedeem" element={<IndexRedeem />} />
         <Route element={<PublicRoute />}>
           <Route index element={<AuthPage />} />
           <Route path="/ErrorLoginPage" element={<ErrorLoginPage />} />

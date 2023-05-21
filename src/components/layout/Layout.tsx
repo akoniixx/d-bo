@@ -208,6 +208,11 @@ const Layouts: React.FC<any> = ({ children }) => {
                     <span>ได้รับคะแนน</span>
                   </Link>
                 </Menu.Item>
+                <Menu.Item key="redeempoint">
+                  <Link to="/IndexRedeem" style={{ textDecoration: "none" }}>
+                    <span>แลกแต้ม</span>
+                  </Link>
+                </Menu.Item>
               </Menu.SubMenu>
 
               <Menu.Item key="campaignpoint">
