@@ -1,4 +1,6 @@
 ## [Version - 0]
+## Fix [v0.28.2] 2023-05-22
+- fixed discount coupon in new task
 ## Fix [v0.28.1] 2023-05-22
 - fixed campoign point entity
 ## Feature [v0.28.0] 2023-05-19
