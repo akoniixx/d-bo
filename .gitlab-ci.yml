@@ -144,6 +144,10 @@ success_notification:
     - chmod +x send.sh
     - /bin/ash ./send.sh success $WEBHOOK_URL
   when: on_success
+  only:
+    - develop
+    - staging
+    - main
 
 failure_notification:
   image: alpine:latest
@@ -154,3 +158,7 @@ failure_notification:
     - chmod +x send.sh
     - /bin/ash ./send.sh failure $WEBHOOK_URL
   when: on_failure
+  only:
+    - develop
+    - staging
+    - main
