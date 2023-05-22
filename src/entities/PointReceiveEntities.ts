@@ -28,3 +28,22 @@ export interface PlanningPointListEntity {
   count: number;
   data: PlanningPointEntity[];
 }
+
+export interface ReceivePointEntity {
+  id: string;
+  taskId: string;
+  taskNo: string;
+  pointNo: string;
+  status: string;
+  dronerTransaction: { campaignId: string; campaignName: string };
+  mission: { id: string; missionNo: string };
+  firstname:string;
+  lastname:string;
+  telephone:string;
+  
+}
+
+export interface ReceivePointListEntity {
+  count: number;
+  history: string;
+}
