@@ -25,23 +25,22 @@ import { color } from "../../resource";
 import image from "../../resource/image";
 import { DateTimeUtil } from "../../utilities/DateTimeUtil";
 
-const _ = require("lodash");
-let queryString = _.split(window.location.pathname, "/");
-
 const { RangePicker } = DatePicker;
 const dateSearchFormat = "YYYY-MM-DD";
 
 const IndexRedeem = () => {
-  console.log(queryString);
   const dateFormat = "DD/MM/YYYY";
   const row = 10;
   const [current, setCurrent] = useState(1);
-  const [source, setSource] = useState<string>(queryString[2]);
+  const [source, setSource] = useState<string>(
+    window.location.pathname.split("/")[2]
+  );
 
   const onChangePage = (page: number) => {
     setCurrent(page);
   };
   const plainOptions = ["Physical", "Digital"];
+  
   const dataMockFarmer = [
     {
       dateTime: Date(),

@@ -114,7 +114,7 @@ const DetailFarmerRedeem = () => {
   const renderTaskDetail = (
     <CardContainer>
       <CardHeader textHeader="ข้อมูลที่เกี่ยวข้อง" bgColor="#2B2B2B" />
-      <Form style={{ padding: "32px" }}>
+      <Form style={{ padding: "20px" }}>
         <Container
           style={{
             backgroundColor: "rgba(43, 43, 43, 0.1)",

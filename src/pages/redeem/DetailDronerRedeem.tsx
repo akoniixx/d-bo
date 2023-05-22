@@ -1,10 +1,12 @@
-import { Badge, Col, Form, Row, Table } from "antd";
+import { Badge, Col, Divider, Form, Input, Radio, Row, Table } from "antd";
+import TextArea from "antd/lib/input/TextArea";
 import React, { useState } from "react";
 import { Container } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import { BackIconButton } from "../../components/button/BackButton";
 import { CardContainer } from "../../components/card/CardContainer";
+import FooterPage from "../../components/footer/FooterPage";
 import { CardHeader } from "../../components/header/CardHearder";
 import Layouts from "../../components/layout/Layout";
 import { color } from "../../resource";
@@ -24,6 +26,10 @@ const NewTable = styled(Table)`
 
 const DetailDronerRedeem = () => {
   const navigate = useNavigate();
+  const [statusShip, setStatusShip] = useState("คำร้องขอแลก");
+
+  const statusOptions = ["คำร้องขอแลก", "เตรียมจัดส่ง", "ส่งแล้ว", "ยกเลิก"];
+
   const dataRewardMock = {
     rewardId: "RD000001",
     dateTime: Date(),
@@ -67,6 +73,26 @@ const DetailDronerRedeem = () => {
       },
     },
     {
+      title: "บริษัทส่งของ",
+      dataIndex: "remark",
+      key: "remark",
+      render: (value: any, row: any, index: number) => {
+        return {
+          children: <span>{row.remark}</span>,
+        };
+      },
+    },
+    {
+      title: "Tracking ID",
+      dataIndex: "remark",
+      key: "remark",
+      render: (value: any, row: any, index: number) => {
+        return {
+          children: <span>{row.remark}</span>,
+        };
+      },
+    },
+    {
       title: "รายละเอียดหรือหมายเหตุ",
       dataIndex: "remark",
       key: "remark",
@@ -104,16 +130,20 @@ const DetailDronerRedeem = () => {
       key: "updateBy",
       render: (value: any, row: any, index: number) => {
         return {
-          children: <span>{row.updateBy} (เกษตรกร)</span>,
+          children: <span>{row.updateBy} (นักบินโดรน)</span>,
         };
       },
     },
   ];
 
+  const onChangeStatusShip = (e: any) => {
+    setStatusShip(e.target.value);
+  };
+
   const renderRewardDetail = (
     <CardContainer>
       <CardHeader textHeader="รายละเอียดของรางวัล" bgColor="#2B2B2B" />
-      <Form style={{ padding: "32px" }}>
+      <Form style={{ padding: "20px" }}>
         <Container
           style={{
             backgroundColor: "rgba(43, 43, 43, 0.1)",
@@ -166,7 +196,9 @@ const DetailDronerRedeem = () => {
             </Col>
             <Col span={3}>
               <div>รวมแต้มทั้งหมด</div>
-              <div>{dataRewardMock.totalPoint} แต้ม</div>
+              <div style={{ color: color.Error }}>
+                {dataRewardMock.totalPoint} แต้ม
+              </div>
             </Col>
           </Row>
         </Container>
@@ -175,12 +207,12 @@ const DetailDronerRedeem = () => {
   );
   const renderDronerDetail = (
     <CardContainer>
-      <CardHeader textHeader="ข้อมูลเกษตรกร" bgColor="#EA973E" />
+      <CardHeader textHeader="ข้อมูลนักบินโดรน" bgColor="#EA973E" />
       <Container className="p-3">
         <Row>
-          <Col span={4}>
-            <div>ชื่อเกษตรกร</div>
-            <div style={{ color: color.Success }}>
+          <Col span={5}>
+            <div>ชื่อนักบินโดรน</div>
+            <div style={{ color: "#EA973E" }}>
               <u>{dataMock.farmerName}</u>
             </div>
           </Col>
@@ -188,15 +220,63 @@ const DetailDronerRedeem = () => {
             <div>เบอร์โทร</div>
             <div>{dataMock.telephone}</div>
           </Col>
-          <Col span={12}>
+          <Col span={15}>
             <div>ที่อยู่</div>
             <div>{dataMock.address}</div>
           </Col>
-          <Col span={4}>
-            <div>แต้มที่แลก</div>
-            <div style={{ color: color.Error }}>- {dataMock.totalPoint}</div>
-          </Col>
         </Row>
+        <Divider />
+        <Col className="pb-4">
+          <div>สถานะ</div>
+          <Radio.Group
+            options={statusOptions}
+            value={statusShip}
+            onChange={(e) => onChangeStatusShip(e)}
+          />
+        </Col>
+        {statusShip === "ส่งแล้ว" && (
+          <Form>
+            <Row justify={"space-between"} gutter={16}>
+              <Col span={12}>
+                <label>
+                  บริษัทส่งของ <span style={{ color: color.Error }}>*</span>
+                </label>
+                <Form.Item
+                  name="shipCompany"
+                  rules={[
+                    {
+                      required: true,
+                      message: "กรุณากรอกบริษัทขนส่ง!",
+                    },
+                  ]}
+                >
+                  <Input placeholder="กรอกบริษัทขนส่ง" autoComplete="off" />
+                </Form.Item>
+              </Col>
+              <Col span={12}>
+                <label>
+                  Tracking ID <span style={{ color: color.Error }}>*</span>
+                </label>
+                <Form.Item
+                  name="trackingId"
+                  rules={[
+                    {
+                      required: true,
+                      message: "กรุณากรอก Tracking ID!",
+                    },
+                  ]}
+                >
+                  <Input placeholder="กรอก Tracking ID" autoComplete="off" />
+                </Form.Item>
+              </Col>
+            </Row>
+          </Form>
+        )}
+        {statusShip !== "คำร้องขอแลก" && (
+          <Col>
+            <TextArea placeholder="กรอกรายละเอียดหรือหมายเหตุ" />
+          </Col>
+        )}
       </Container>
       <NewTable
         columns={columeHis}
@@ -220,6 +300,11 @@ const DetailDronerRedeem = () => {
       {renderRewardDetail}
       <br />
       {renderDronerDetail}
+      <FooterPage
+        onClickBack={() => (window.location.href = "/IndexRedeem/Droner")}
+        styleFooter={{ padding: "6px" }}
+        //onClickSave={() => submit()}
+      />
     </Layouts>
   );
 };

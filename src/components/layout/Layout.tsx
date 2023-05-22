@@ -26,10 +26,8 @@ import {
 const logout = () => {
   localStorage.clear();
   sessionStorage.clear();
-  var url = window.location.href;
-  var arr = url.split("/");
-  var resultUrlHost = arr[0] + "//" + arr[2];
-  window.location.href = "AuthPage";
+  var url = window.location.origin + "/AuthPage";
+  window.location.href = url;
 };
 
 const Layouts: React.FC<any> = ({ children }) => {
@@ -209,7 +207,10 @@ const Layouts: React.FC<any> = ({ children }) => {
                   </Link>
                 </Menu.Item>
                 <Menu.Item key="redeempoint">
-                  <Link to="/IndexRedeem/Farmer" style={{ textDecoration: "none" }}>
+                  <Link
+                    to="/IndexRedeem/Farmer"
+                    style={{ textDecoration: "none" }}
+                  >
                     <span>แลกแต้ม</span>
                   </Link>
                 </Menu.Item>
