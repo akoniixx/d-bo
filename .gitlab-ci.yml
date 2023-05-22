@@ -2,6 +2,7 @@
 stages:
   - build
   - deploy
+  - notification
 
 image: docker:stable
 
@@ -133,3 +134,31 @@ deploy-dev:
 #     - kubectl apply -f k8s/prod/ingress-prod.yaml
 #   only:
 #     - main
+
+success_notification:
+  image: alpine:latest
+  stage: notification
+  script:
+    - apk add --update git curl
+    - wget https://raw.githubusercontent.com/DiscordHooks/gitlab-ci-discord-webhook/master/send.sh
+    - chmod +x send.sh
+    - /bin/ash ./send.sh success $WEBHOOK_URL
+  when: on_success
+  only:
+    - develop
+    - staging
+    - main
+
+failure_notification:
+  image: alpine:latest
+  stage: notification
+  script:
+    - apk add --update git curl
+    - wget https://raw.githubusercontent.com/DiscordHooks/gitlab-ci-discord-webhook/master/send.sh
+    - chmod +x send.sh
+    - /bin/ash ./send.sh failure $WEBHOOK_URL
+  when: on_failure
+  only:
+    - develop
+    - staging
+    - main
