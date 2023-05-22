@@ -509,7 +509,7 @@ function NewsPage() {
                   icon={<EditOutlined />}
                   color={color.primary1}
                   onClick={() => {
-                    window.location.href = "/EditNews/id=" + row.id;
+                    navigate("/EditNews/id=" + row.id)
                   }}
                 />
               </div>
@@ -529,7 +529,7 @@ function NewsPage() {
   ]
 
   return (
-    <DashboardLayout>
+    <>
       <ModalDeleteNews
         show={modalDelete}
         backButton={() => setModalDelete(!modalDelete)}
@@ -553,7 +553,7 @@ function NewsPage() {
           showSizeChanger={false}
         />
       </div>
-    </DashboardLayout>
+    </>
   )
 }
 

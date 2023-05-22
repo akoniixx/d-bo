@@ -44,9 +44,9 @@ import { FarmerDatasource } from "../../datasource/FarmerDatasource";
 import { DashboardLayout } from "../../components/layout/Layout";
 const _ = require("lodash");
 
-let queryString = _.split(window.location.pathname, "=");
 
 function EditPromotion() {
+  let queryString = _.split(window.location.pathname, "=");
   const profile = JSON.parse(localStorage.getItem("profile") || "{  }");
   const dateFormat = "DD/MM/YYYY";
   const [plantName, setPlantName] = useState<CropPurposeSprayEntity[]>();
@@ -835,7 +835,7 @@ function EditPromotion() {
           timer: 1500,
           showConfirmButton: false,
         }).then((time) => {
-          window.location.href = "/PromotionPage";
+          navigate("/PromotionPage");
         });
       })
       .catch((err) => {
@@ -849,7 +849,7 @@ function EditPromotion() {
   };
 
   return (
-    <DashboardLayout>
+    <>
       <Modal
         title="ยืนยันการเพิ่มคูปอง"
         onCancel={() => {
@@ -1648,7 +1648,7 @@ function EditPromotion() {
           />
         </div>
       </div>
-    </DashboardLayout>
+    </>
   );
 }
 

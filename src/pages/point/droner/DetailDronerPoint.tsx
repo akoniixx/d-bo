@@ -22,11 +22,10 @@ import { numberWithCommasToFixed } from "../../../utilities/TextFormatter";
 import { DashboardLayout } from "../../../components/layout/Layout";
 
 const _ = require("lodash");
-let queryString = _.split(window.location.pathname, "=");
 
 const DetailDronerPoint = () => {
   const navigate = useNavigate();
-
+  let queryString = _.split(window.location.pathname, "=");
   const dataMock = {
     dateTime: Date(),
     farmerName: "รชยา ช่างภักดี",
@@ -266,9 +265,7 @@ const DetailDronerPoint = () => {
         textHeader="ข้อมูลนักบินโดรน"
         showButton={true}
         buttonName="เช็คประวัติคะแนน"
-        onClickButoon={() =>
-          (window.location.href = "/IndexDetailDronerPoint/id=" + 1)
-        }
+        onClickButoon={() => navigate("/IndexDetailDronerPoint/id=" + 1)}
       />
       <Form style={{ padding: "32px" }}>
         <Row gutter={8} justify={"space-between"} className="pb-3">
@@ -305,7 +302,7 @@ const DetailDronerPoint = () => {
 
   return (
     <>
-      <DashboardLayout>
+      <>
         <Row>
           <BackIconButton onClick={() => navigate(-1)} />
           <span className="pt-3">
@@ -315,7 +312,7 @@ const DetailDronerPoint = () => {
         {renderPointDetail}
         <br />
         {renderDetailFarmer}
-      </DashboardLayout>
+      </>
     </>
   );
 };

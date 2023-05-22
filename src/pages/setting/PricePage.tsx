@@ -224,7 +224,7 @@ function PricePage() {
   );
 
   return (
-    <DashboardLayout>
+    <>
       {pageTitle}
       <Table columns={columns} dataSource={data?.data} pagination={false} />
       <div className="d-flex justify-content-between pt-5">
@@ -255,7 +255,7 @@ function PricePage() {
           backButton={() => setShowModalCrop((prev) => !prev)}
         />
       )}
-    </DashboardLayout>
+    </>
   );
 }
 export default PricePage;

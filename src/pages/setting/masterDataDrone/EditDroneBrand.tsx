@@ -45,9 +45,9 @@ import { DashboardLayout } from "../../../components/layout/Layout";
 const _ = require("lodash");
 const { Map } = require("immutable");
 
-let queryString = _.split(window.location.pathname, "=");
 
 const EditDroneBrand = () => {
+  let queryString = _.split(window.location.pathname, "=");
   const row = 7;
   const [current, setCurrent] = useState(1);
   const droneBrandId = queryString[1];
@@ -431,11 +431,11 @@ const EditDroneBrand = () => {
       timer: 1500,
       showConfirmButton: false,
     }).then((time) => {
-      window.location.href = "/IndexDroneBrand";
+      navigate("/IndexDroneBrand");
     });
   };
   return (
-    <DashboardLayout>
+    <>
       <Row>
         <BackIconButton
           onClick={() => {
@@ -476,7 +476,7 @@ const EditDroneBrand = () => {
           title="แก้ไขรุ่นโดรน"
         />
       )}
-    </DashboardLayout>
+    </>
   );
 };
 

@@ -155,8 +155,7 @@ const IndexDetailDronerPoint = () => {
                   icon={<FileTextOutlined />}
                   color={color.primary1}
                   onClick={() =>
-                    (window.location.href =
-                      "/DetailFarmerPoint/id=" + (index + 1))
+                    navigate("/DetailFarmerPoint/id=" + (index + 1))
                   }
                 />
               </div>
@@ -167,7 +166,7 @@ const IndexDetailDronerPoint = () => {
     },
   ];
   return (
-    <DashboardLayout>
+    <>
       <Row>
         <BackIconButton onClick={() => navigate(-1)} />
         <span className="pt-3">
@@ -209,7 +208,7 @@ const IndexDetailDronerPoint = () => {
           showSizeChanger={false}
         />
       </div>
-    </DashboardLayout>
+    </>
   );
 };
 

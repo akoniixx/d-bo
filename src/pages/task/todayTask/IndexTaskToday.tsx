@@ -44,8 +44,10 @@ import {
   numberWithCommasToFixed,
 } from "../../../utilities/TextFormatter";
 import { DashboardLayout } from "../../../components/layout/Layout";
+import { useNavigate } from "react-router-dom";
 
 export default function IndexTodayTask() {
+  const navigate = useNavigate();
   const row = 10;
   const [current, setCurrent] = useState(1);
   const [data, setData] = useState<TaskTodayListEntity>();
@@ -729,7 +731,7 @@ export default function IndexTodayTask() {
                   icon={<EditOutlined />}
                   color={color.primary1}
                   onClick={() =>
-                    (window.location.href = "/EditInProgress?=" + row.task_id)
+                    navigate("/EditInProgress?=" + row.task_id)
                   }
                 />
               ) : row.task_status == "WAIT_START" ? (
@@ -737,7 +739,7 @@ export default function IndexTodayTask() {
                   icon={<EditOutlined />}
                   color={color.primary1}
                   onClick={() =>
-                    (window.location.href = "/EditWaitStart?=" + row.task_id)
+                    navigate("/EditWaitStart?=" + row.task_id)
                   }
                 />
               ) : null}
@@ -749,7 +751,7 @@ export default function IndexTodayTask() {
   ];
 
   return (
-    <DashboardLayout>
+    <>
       <span
         className="container"
         style={{ fontSize: 22, fontWeight: "bold", padding: "8px" }}
@@ -938,6 +940,6 @@ export default function IndexTodayTask() {
           plotId={plotId}
         />
       )}
-    </DashboardLayout>
+    </>
   );
 }

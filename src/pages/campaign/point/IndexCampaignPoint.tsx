@@ -282,7 +282,7 @@ const IndexCampaignPoint = () => {
                   icon={<EditOutlined />}
                   color={color.primary1}
                   onClick={() =>
-                    (window.location.href = "/EditCampaignPoint/id=" + row.id)
+                    navigate("/EditCampaignPoint/id=" + row.id)
                   }
                 />
               </div>
@@ -311,7 +311,7 @@ const IndexCampaignPoint = () => {
 
   return (
     <>
-      <DashboardLayout>
+      <>
         {pageTitle}
         <CardContainer>
           <Table
@@ -332,7 +332,7 @@ const IndexCampaignPoint = () => {
             showSizeChanger={false}
           />
         </div>
-      </DashboardLayout>
+      </>
       {showModal && (
         <Modal
           title="ยืนยันการลบ"

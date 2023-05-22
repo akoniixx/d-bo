@@ -22,10 +22,7 @@ import { CardHeader } from "../../components/header/CardHearder";
 import FooterPage from "../../components/footer/FooterPage";
 import { BackIconButton } from "../../components/button/BackButton";
 import TextArea from "antd/lib/input/TextArea";
-import {
-  DronerEntity,
-  DronerEntity_INIT,
-} from "../../entities/DronerEntities";
+import { DronerEntity, DronerEntity_INIT } from "../../entities/DronerEntities";
 import { DronerDatasource } from "../../datasource/DronerDatasource";
 import Swal from "sweetalert2";
 import { LocationDatasource } from "../../datasource/LocationDatasource";
@@ -80,36 +77,32 @@ const dateCreateFormat = "YYYY-MM-DD";
 
 const _ = require("lodash");
 const { Map } = require("immutable");
-let queryString = _.split(window.location.search, "=");
 
 function EditDroner() {
+  let queryString = _.split(window.location.search, "=");
   const [form] = Form.useForm();
   const dronerId = queryString[1];
   const status = Form.useWatch("status", form);
   const navigate = useNavigate();
   const [profile] = useLocalStorage("profile", []);
   const [data, setData] = useState<DronerEntity>(DronerEntity_INIT);
-  const [address, setAddress] = useState<AddressEntity>(
-    AddressEntity_INIT
-  );
+  const [address, setAddress] = useState<AddressEntity>(AddressEntity_INIT);
   const [dronerArea, setDronerArea] = useState<DronerAreaEntity>(
     DronerAreaEntity_INIT
   );
-  const [dronerDroneList, setDronerDroneList] = useState<
-    DronerDroneEntity[]
-  >([DronerDroneEntity_INIT]);
-  const [disableSaveBtn, setDisableSaveBtn] =
-    useState<boolean>(false);
+  const [dronerDroneList, setDronerDroneList] = useState<DronerDroneEntity[]>([
+    DronerDroneEntity_INIT,
+  ]);
+  const [disableSaveBtn, setDisableSaveBtn] = useState<boolean>(false);
   const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [editIndex, setEditIndex] = useState(0);
-  const [editDroneList, setEditDroneList] =
-    useState<DronerDroneEntity>(DronerDroneEntity_INIT);
+  const [editDroneList, setEditDroneList] = useState<DronerDroneEntity>(
+    DronerDroneEntity_INIT
+  );
   const [province, setProvince] = useState<ProviceEntity[]>([]);
   const [district, setDistrict] = useState<DistrictEntity[]>([]);
-  const [subdistrict, setSubdistrict] = useState<SubdistrictEntity[]>(
-    []
-  );
+  const [subdistrict, setSubdistrict] = useState<SubdistrictEntity[]>([]);
   const [imgProfile, setImgProfile] = useState<any>();
   const [imgIdCard, setImgIdCard] = useState<any>();
   const [createImgProfile, setCreateImgProfile] =
@@ -132,109 +125,95 @@ function EditDroner() {
     },
   ];
   const fetchDronerById = useCallback(async () => {
-    await DronerDatasource.getDronerByID(dronerId).then(
-      async (res) => {
-        if (res.birthDate === null) {
-          res.birthDate = moment().format(dateCreateFormat);
-        }
-
-        const checkBoxReason = (res.reason || []).filter((el) => {
-          return el === "บัตรประชาชนไม่ชัดเจน/ไม่ถูกต้อง";
-        });
-        const checkPlantsOther = res.expPlant.filter((el) => {
-          return EXP_PLANT.some((x) => x === el);
-        });
-        const plantsOther = res.expPlant.filter((el) => {
-          return !EXP_PLANT.some((x) => x === el);
-        });
-        if (res) {
-          form.setFieldsValue({
-            ...res,
-            comment: res.comment || "",
-            postcode: res.address.postcode || undefined,
-            province: res.address.provinceId || undefined,
-            district: res.address.districtId || undefined,
-            subdistrict: res.address?.subdistrictId || undefined,
-            dronerCreatedAt: `${moment(res.createdAt).format(
-              "DD/MM/YYYY"
-            )} ${
-              data.createBy === null || data.createBy === undefined
-                ? "(ลงทะเบียนโดยนักบิน)"
-                : `(${res.createBy})`
-            }`,
-            birthDate: moment(res.birthDate) || undefined,
-            latitude: res.dronerArea?.lat || undefined,
-            longitude: res.dronerArea?.long || undefined,
-            address1: res.address?.address1 || undefined,
-            address2: res.address?.address2 || undefined,
-            checkPlantsOther: checkPlantsOther || [],
-            dronerArea: res.dronerArea?.subdistrictId,
-            mapUrl: res.dronerArea?.mapUrl || undefined,
-            status: res.status,
-            reason:
-              (res?.reason || [])?.filter((el) => {
-                return el !== "บัตรประชาชนไม่ชัดเจน/ไม่ถูกต้อง";
-              }).length > 0
-                ? (res?.reason || [])?.filter((el) => {
-                    return el !== "บัตรประชาชนไม่ชัดเจน/ไม่ถูกต้อง";
-                  })
-                : null,
-
-            plantsOther:
-              plantsOther.length > 0
-                ? plantsOther.join(",")
-                : undefined,
-            checkReason: checkBoxReason,
-          });
-        }
-
-        setMapPosition({
-          lat: parseFloat(res.dronerArea?.lat),
-          lng: parseFloat(res.dronerArea?.long),
-        });
-
-        setAddress(res.address);
-        var k = 0;
-        if (res.dronerDrone !== undefined) {
-          for (k; res.dronerDrone.length > k; k++) {
-            res.dronerDrone[k].modalDroneIndex = k + 1;
-          }
-          setDronerDroneList(res.dronerDrone);
-        }
-        setDronerArea(res.dronerArea);
-        const getPathPro = res.file.find(
-          (x) => x.category === "PROFILE_IMAGE"
-        );
-        const getPathCard = res.file.find(
-          (x) => x.category === "ID_CARD_IMAGE"
-        );
-
-        const getImageProfile =
-          getPathPro &&
-          UploadImageDatasouce.getImage(getPathPro?.path).then(
-            (resImg) => {
-              resImg?.url && setImgProfile(resImg.url);
-            }
-          );
-        const getImageCard =
-          getPathCard &&
-          UploadImageDatasouce.getImage(getPathCard?.path).then(
-            (resImg) => {
-              resImg?.url && setImgIdCard(resImg.url);
-            }
-          );
-        const listPromise = [];
-        if (getPathPro) {
-          listPromise.push(getImageProfile);
-        }
-        if (getPathCard) {
-          listPromise.push(getImageCard);
-        }
-        if (listPromise.length > 0) {
-          await Promise.all([...listPromise]);
-        }
+    await DronerDatasource.getDronerByID(dronerId).then(async (res) => {
+      if (res.birthDate === null) {
+        res.birthDate = moment().format(dateCreateFormat);
       }
-    );
+
+      const checkBoxReason = (res.reason || []).filter((el) => {
+        return el === "บัตรประชาชนไม่ชัดเจน/ไม่ถูกต้อง";
+      });
+      const checkPlantsOther = res.expPlant.filter((el) => {
+        return EXP_PLANT.some((x) => x === el);
+      });
+      const plantsOther = res.expPlant.filter((el) => {
+        return !EXP_PLANT.some((x) => x === el);
+      });
+      if (res) {
+        form.setFieldsValue({
+          ...res,
+          comment: res.comment || "",
+          postcode: res.address.postcode || undefined,
+          province: res.address.provinceId || undefined,
+          district: res.address.districtId || undefined,
+          subdistrict: res.address?.subdistrictId || undefined,
+          dronerCreatedAt: `${moment(res.createdAt).format("DD/MM/YYYY")} ${
+            data.createBy === null || data.createBy === undefined
+              ? "(ลงทะเบียนโดยนักบิน)"
+              : `(${res.createBy})`
+          }`,
+          birthDate: moment(res.birthDate) || undefined,
+          latitude: res.dronerArea?.lat || undefined,
+          longitude: res.dronerArea?.long || undefined,
+          address1: res.address?.address1 || undefined,
+          address2: res.address?.address2 || undefined,
+          checkPlantsOther: checkPlantsOther || [],
+          dronerArea: res.dronerArea?.subdistrictId,
+          mapUrl: res.dronerArea?.mapUrl || undefined,
+          status: res.status,
+          reason:
+            (res?.reason || [])?.filter((el) => {
+              return el !== "บัตรประชาชนไม่ชัดเจน/ไม่ถูกต้อง";
+            }).length > 0
+              ? (res?.reason || [])?.filter((el) => {
+                  return el !== "บัตรประชาชนไม่ชัดเจน/ไม่ถูกต้อง";
+                })
+              : null,
+
+          plantsOther:
+            plantsOther.length > 0 ? plantsOther.join(",") : undefined,
+          checkReason: checkBoxReason,
+        });
+      }
+
+      setMapPosition({
+        lat: parseFloat(res.dronerArea?.lat),
+        lng: parseFloat(res.dronerArea?.long),
+      });
+
+      setAddress(res.address);
+      var k = 0;
+      if (res.dronerDrone !== undefined) {
+        for (k; res.dronerDrone.length > k; k++) {
+          res.dronerDrone[k].modalDroneIndex = k + 1;
+        }
+        setDronerDroneList(res.dronerDrone);
+      }
+      setDronerArea(res.dronerArea);
+      const getPathPro = res.file.find((x) => x.category === "PROFILE_IMAGE");
+      const getPathCard = res.file.find((x) => x.category === "ID_CARD_IMAGE");
+
+      const getImageProfile =
+        getPathPro &&
+        UploadImageDatasouce.getImage(getPathPro?.path).then((resImg) => {
+          resImg?.url && setImgProfile(resImg.url);
+        });
+      const getImageCard =
+        getPathCard &&
+        UploadImageDatasouce.getImage(getPathCard?.path).then((resImg) => {
+          resImg?.url && setImgIdCard(resImg.url);
+        });
+      const listPromise = [];
+      if (getPathPro) {
+        listPromise.push(getImageProfile);
+      }
+      if (getPathCard) {
+        listPromise.push(getImageCard);
+      }
+      if (listPromise.length > 0) {
+        await Promise.all([...listPromise]);
+      }
+    });
   }, [dronerId, form]);
   const fetchLocation = useCallback(async (text?: string) => {
     await LocationDatasource.getSubdistrict(0, text).then((res) => {
@@ -242,17 +221,15 @@ function EditDroner() {
     });
   }, []);
   const fetchDronerOnlyDrone = useCallback(async () => {
-    await DronerDatasource.getDronerByID(dronerId).then(
-      async (res) => {
-        if (res.dronerDrone !== undefined) {
-          let k = 0;
-          for (k; res.dronerDrone.length > k; k++) {
-            res.dronerDrone[k].modalDroneIndex = k + 1;
-          }
-          setDronerDroneList(res.dronerDrone);
+    await DronerDatasource.getDronerByID(dronerId).then(async (res) => {
+      if (res.dronerDrone !== undefined) {
+        let k = 0;
+        for (k; res.dronerDrone.length > k; k++) {
+          res.dronerDrone[k].modalDroneIndex = k + 1;
         }
+        setDronerDroneList(res.dronerDrone);
       }
-    );
+    });
   }, [dronerId]);
   useEffect(() => {
     fetchDronerById();
@@ -265,18 +242,14 @@ function EditDroner() {
       setProvince(res);
     });
     if (address?.provinceId) {
-      LocationDatasource.getDistrict(address.provinceId).then(
-        (res) => {
-          setDistrict(res);
-        }
-      );
+      LocationDatasource.getDistrict(address.provinceId).then((res) => {
+        setDistrict(res);
+      });
     }
     if (address?.districtId) {
-      LocationDatasource.getSubdistrict(address.districtId).then(
-        (res) => {
-          setSubdistrict(res);
-        }
-      );
+      LocationDatasource.getSubdistrict(address.districtId).then((res) => {
+        setSubdistrict(res);
+      });
     }
   }, [address.provinceId, address.districtId]);
 
@@ -324,10 +297,7 @@ function EditDroner() {
   const handleSearchLocation = async (value: any) => {
     if (value !== undefined) {
       const a = location.filter((x) => x.subdistrictId === value)[0];
-      const pushProvince = Map(dronerArea).set(
-        "provinceId",
-        a.provinceId
-      );
+      const pushProvince = Map(dronerArea).set("provinceId", a.provinceId);
       const pushDistric = Map(pushProvince.toJS()).set(
         "districtId",
         a.districtId
@@ -390,10 +360,7 @@ function EditDroner() {
             checkFileImg = findDrone?.file
               .map((x) => x)
               .filter(
-                (y) =>
-                  !drone.file
-                    .map((z) => z.category)
-                    .includes(y.category)
+                (y) => !drone.file.map((z) => z.category).includes(y.category)
               );
             if (!!checkFileImg) {
               console.log(checkFileImg);
@@ -420,9 +387,7 @@ function EditDroner() {
               for (let k = 0; checkImg.length > k; k++) {
                 let getDataImg: any = checkImg[k];
                 if (!!getDataImg.file) {
-                  await UploadImageDatasouce.uploadImage(
-                    getDataImg
-                  ).then(res);
+                  await UploadImageDatasouce.uploadImage(getDataImg).then(res);
                 }
               }
             }
@@ -443,14 +408,10 @@ function EditDroner() {
                 path: "",
               });
             }
-            const checkImg = imgDroneList.filter(
-              (x) => x.resourceId !== ""
-            );
+            const checkImg = imgDroneList.filter((x) => x.resourceId !== "");
             for (let k = 0; checkImg.length > k; k++) {
               let getDataImg: any = checkImg[k];
-              await UploadImageDatasouce.uploadImage(getDataImg).then(
-                res
-              );
+              await UploadImageDatasouce.uploadImage(getDataImg).then(res);
             }
           }
         }
@@ -475,13 +436,9 @@ function EditDroner() {
         showCloseButton: true,
       }).then(async (result) => {
         if (result.isConfirmed) {
-          await DronerDroneDatasource.removeDronerDrone(id).then(
-            () => {
-              setDronerDroneList((prev) =>
-                prev.filter((x) => x.id !== id)
-              );
-            }
-          );
+          await DronerDroneDatasource.removeDronerDrone(id).then(() => {
+            setDronerDroneList((prev) => prev.filter((x) => x.id !== id));
+          });
         }
       });
     } catch (e) {
@@ -535,9 +492,7 @@ function EditDroner() {
     imgWindow?.document.write(image.outerHTML);
   };
   const removeImg = () => {
-    const getImg = data.file.filter(
-      (x) => x.category === "PROFILE_IMAGE"
-    )[0];
+    const getImg = data.file.filter((x) => x.category === "PROFILE_IMAGE")[0];
     if (getImg !== undefined) {
       UploadImageDatasouce.deleteImage(getImg.id, getImg.path).then(
         (res) => {}
@@ -591,9 +546,7 @@ function EditDroner() {
     imgWindow?.document.write(image.outerHTML);
   };
   const removeImgIdCard = () => {
-    const getImg = data.file.filter(
-      (x) => x.category === "ID_CARD_IMAGE"
-    )[0];
+    const getImg = data.file.filter((x) => x.category === "ID_CARD_IMAGE")[0];
     if (getImg !== undefined) {
       UploadImageDatasouce.deleteImage(getImg.id, getImg.path).then(
         (res) => {}
@@ -611,11 +564,7 @@ function EditDroner() {
       data.includes(" ") ||
       data.includes("-") ||
       data.includes("+");
-    return data.trim().length !== 0
-      ? checkSyntax
-        ? true
-        : false
-      : true;
+    return data.trim().length !== 0 ? (checkSyntax ? true : false) : true;
   };
 
   const updateDroner = async (values: any) => {
@@ -665,14 +614,10 @@ function EditDroner() {
         for (i; 2 > i; i++) {
           i === 0 &&
             createImgProfile.file !== "" &&
-            UploadImageDatasouce.uploadImage(createImgProfile).then(
-              res
-            );
+            UploadImageDatasouce.uploadImage(createImgProfile).then(res);
           i === 1 &&
             createImgIdCard.file !== "" &&
-            UploadImageDatasouce.uploadImage(createImgIdCard).then(
-              res
-            );
+            UploadImageDatasouce.uploadImage(createImgIdCard).then(res);
         }
         Swal.fire({
           title: "บันทึกสำเร็จ",
@@ -680,7 +625,7 @@ function EditDroner() {
           timer: 1500,
           showConfirmButton: false,
         }).then((time) => {
-          window.location.href = "/IndexDroner";
+          navigate("/IndexDroner");
         });
       } else {
         Swal.fire({
@@ -731,8 +676,7 @@ function EditDroner() {
       expPlant: expPlant?.length > 0,
       reasonList:
         reasonList?.length > 0 ||
-        (currentStatus !== "REJECTED" &&
-          currentStatus !== "INACTIVE"),
+        (currentStatus !== "REJECTED" && currentStatus !== "INACTIVE"),
     }).every((el) => el);
 
     if (!isHasError && isHasValues) {
@@ -747,9 +691,7 @@ function EditDroner() {
       <CardContainer>
         <CardHeader textHeader="ข้อมูลคนบินโดรน" />
         <Form>
-          <div
-            className="container text-center"
-            style={{ padding: "30px" }}>
+          <div className="container text-center" style={{ padding: "30px" }}>
             <div className="form-group text-center">
               <div
                 className="hiddenFileInput zoom"
@@ -757,7 +699,8 @@ function EditDroner() {
                   backgroundImage: `url(${
                     imgProfile === undefined ? uploadImg : imgProfile
                   })`,
-                }}>
+                }}
+              >
                 <input
                   key={imgProfile}
                   type="file"
@@ -774,7 +717,8 @@ function EditDroner() {
                       style={{
                         cursor: "pointer",
                         borderRadius: "5px",
-                      }}>
+                      }}
+                    >
                       View
                     </Tag>
                     <Tag
@@ -783,7 +727,8 @@ function EditDroner() {
                       style={{
                         cursor: "pointer",
                         borderRadius: "5px",
-                      }}>
+                      }}
+                    >
                       Remove
                     </Tag>
                   </>
@@ -796,7 +741,8 @@ function EditDroner() {
           style={{ padding: "32px" }}
           form={form}
           onFieldsChange={onFieldsChange}
-          onFinish={updateDroner}>
+          onFinish={updateDroner}
+        >
           <div className="row">
             <div className="form-group col-lg-6">
               <label>Droner ID</label>
@@ -823,7 +769,8 @@ function EditDroner() {
                     required: true,
                     message: "กรุณากรอกชื่อ!",
                   },
-                ]}>
+                ]}
+              >
                 <Input placeholder="" />
               </Form.Item>
             </div>
@@ -838,7 +785,8 @@ function EditDroner() {
                     required: true,
                     message: "กรุณากรอกนามสกุล!",
                   },
-                ]}>
+                ]}
+              >
                 <Input placeholder="" />
               </Form.Item>
             </div>
@@ -863,7 +811,8 @@ function EditDroner() {
                     min: 10,
                     message: "กรุณากรอกเบอร์โทรให้ครบ 10 หลัก!",
                   },
-                ]}>
+                ]}
+              >
                 <Input
                   placeholder=""
                   maxLength={10}
@@ -881,7 +830,8 @@ function EditDroner() {
                     required: true,
                     message: "กรุณากรอกวันเดือนปีเกิด",
                   },
-                ]}>
+                ]}
+              >
                 <Form.Item
                   name="birthDate"
                   rules={[
@@ -889,7 +839,8 @@ function EditDroner() {
                       required: true,
                       message: "กรุณากรอกวันเดือนปีเกิด",
                     },
-                  ]}>
+                  ]}
+                >
                   <DatePicker
                     placeholder="กรอกวันเดือนปีเกิด"
                     locale={locale}
@@ -917,7 +868,8 @@ function EditDroner() {
                     pattern: new RegExp(/^[0-9\b]+$/),
                     message: "กรุณากรอกรหัสบัตรประชาชนให้ถูกต้อง!",
                   },
-                ]}>
+                ]}
+              >
                 <Input
                   placeholder="กรอกบัตรประชาชน"
                   maxLength={13}
@@ -934,9 +886,9 @@ function EditDroner() {
                   className="hiddenFileInput"
                   style={{
                     backgroundImage: `url(${imgIdCard})`,
-                    display:
-                      imgIdCard !== undefined ? "block" : "none",
-                  }}></div>
+                    display: imgIdCard !== undefined ? "block" : "none",
+                  }}
+                ></div>
                 <div className="text-left ps-4 pt-2">
                   {imgIdCard !== undefined && (
                     <>
@@ -946,7 +898,8 @@ function EditDroner() {
                         style={{
                           cursor: "pointer",
                           borderRadius: "5px",
-                        }}>
+                        }}
+                      >
                         View
                       </Tag>
                       <Tag
@@ -955,7 +908,8 @@ function EditDroner() {
                         style={{
                           cursor: "pointer",
                           borderRadius: "5px",
-                        }}>
+                        }}
+                      >
                         Remove
                       </Tag>
                     </>
@@ -965,9 +919,9 @@ function EditDroner() {
                   className="hiddenFileBtn"
                   style={{
                     backgroundImage: `url(${bth_img_empty})`,
-                    display:
-                      imgIdCard === undefined ? "block" : "none",
-                  }}>
+                    display: imgIdCard === undefined ? "block" : "none",
+                  }}
+                >
                   <input
                     key={imgIdCard}
                     type="file"
@@ -991,7 +945,8 @@ function EditDroner() {
                     required: true,
                     message: "กรุณาเลือกจังหวัด!",
                   },
-                ]}>
+                ]}
+              >
                 <Select
                   showSearch
                   optionFilterProp="children"
@@ -1006,11 +961,10 @@ function EditDroner() {
                   placeholder="เลือกจังหวัด"
                   allowClear
                   onChange={handleProvince}
-                  defaultValue={address.provinceId}>
+                  defaultValue={address.provinceId}
+                >
                   {province.map((item: any, index: any) => (
-                    <Select.Option
-                      key={index}
-                      value={item.provinceId}>
+                    <Select.Option key={index} value={item.provinceId}>
                       {item.provinceName}
                     </Select.Option>
                   ))}
@@ -1029,7 +983,8 @@ function EditDroner() {
                     required: true,
                     message: "กรุณาเลือกอำเภอ!",
                   },
-                ]}>
+                ]}
+              >
                 <Select
                   showSearch
                   allowClear
@@ -1044,11 +999,10 @@ function EditDroner() {
                   }
                   placeholder="เลือกอำเภอ"
                   onChange={handleDistrict}
-                  defaultValue={address.districtId}>
+                  defaultValue={address.districtId}
+                >
                   {district.map((item: any, index: any) => (
-                    <Select.Option
-                      key={index}
-                      value={item.districtId}>
+                    <Select.Option key={index} value={item.districtId}>
                       {item.districtName}
                     </Select.Option>
                   ))}
@@ -1069,7 +1023,8 @@ function EditDroner() {
                     required: true,
                     message: "กรุณาเลือกตำบล!",
                   },
-                ]}>
+                ]}
+              >
                 <Select
                   allowClear
                   showSearch
@@ -1084,11 +1039,10 @@ function EditDroner() {
                   }
                   placeholder="เลือกตำบล"
                   onChange={handleSubDistrict}
-                  defaultValue={address.subdistrictId}>
+                  defaultValue={address.subdistrictId}
+                >
                   {subdistrict?.map((item: any, index: any) => (
-                    <Select.Option
-                      key={index}
-                      value={item.subdistrictId}>
+                    <Select.Option key={index} value={item.subdistrictId}>
                       {item.subdistrictName}
                     </Select.Option>
                   ))}
@@ -1107,7 +1061,8 @@ function EditDroner() {
                     required: true,
                     message: "กรุณาเลือกรหัสไปรษณีย์!",
                   },
-                ]}>
+                ]}
+              >
                 <Input
                   name="postcode"
                   placeholder="กรอกรหัสไปรษณีย์"
@@ -1130,7 +1085,8 @@ function EditDroner() {
                     required: true,
                     message: "กรุณากรอกบ้านเลขที่!",
                   },
-                ]}>
+                ]}
+              >
                 <Input className="col-lg-12" placeholder="" />
               </Form.Item>
             </div>
@@ -1148,7 +1104,8 @@ function EditDroner() {
                     required: true,
                     message: "กรุณากรอกรายละเอียดที่อยู่บ้าน!",
                   },
-                ]}>
+                ]}
+              >
                 <Input className="col-lg-12" placeholder="" />
               </Form.Item>
             </div>
@@ -1171,11 +1128,13 @@ function EditDroner() {
                   }
                   filterOption={(input: any, option: any) =>
                     option.children.includes(input)
-                  }>
+                  }
+                >
                   {location.map((item: any) => (
                     <Select.Option
                       key={item.subdistrictId}
-                      value={item.subdistrictId}>
+                      value={item.subdistrictId}
+                    >
                       {item.subdistrictName +
                         "/" +
                         item.districtName +
@@ -1208,7 +1167,8 @@ function EditDroner() {
                     message: "กรุณากรอกละติจูด!",
                   },
                 ]}
-                key={mapPosition.lat}>
+                key={mapPosition.lat}
+              >
                 <Input
                   placeholder="กรอกข้อมูล Latitude"
                   onBlur={handleOnChangeLat}
@@ -1227,7 +1187,8 @@ function EditDroner() {
                     message: "กรุณากรอกลองติจูด!",
                   },
                 ]}
-                key={mapPosition.lng}>
+                key={mapPosition.lng}
+              >
                 <Input
                   placeholder="กรอกข้อมูล Longitude"
                   onBlur={handleOnChangeLng}
@@ -1272,8 +1233,7 @@ function EditDroner() {
               rules={[
                 {
                   validator: (_, value) => {
-                    const plantsOther =
-                      form.getFieldValue("plantsOther");
+                    const plantsOther = form.getFieldValue("plantsOther");
 
                     if (value?.length < 1 && !plantsOther) {
                       return Promise.reject(
@@ -1284,7 +1244,8 @@ function EditDroner() {
                     }
                   },
                 },
-              ]}>
+              ]}
+            >
               <Checkbox.Group>
                 {EXP_PLANT.map((el) => {
                   return (
@@ -1307,9 +1268,8 @@ function EditDroner() {
                 {
                   validator(rule, value) {
                     const splitValue = value && value.split(",");
-                    const valueCheckbox = form.getFieldValue(
-                      "checkPlantsOther"
-                    );
+                    const valueCheckbox =
+                      form.getFieldValue("checkPlantsOther");
                     const isDuplicate =
                       splitValue &&
                       splitValue.some((el: string) =>
@@ -1333,7 +1293,8 @@ function EditDroner() {
                     }
                   },
                 },
-              ]}>
+              ]}
+            >
               <Input
                 placeholder="กรอกข้อมูลพืชอื่นๆ เช่น ส้ม,มะขาม (กรุณาใช้ (,) ให้กับการเพิ่มพืชมากกว่า 1 อย่าง)"
                 autoComplete="off"
@@ -1346,22 +1307,19 @@ function EditDroner() {
 
           <div className="row">
             <div className="form-group col-lg-12">
-              <label
-                style={{ marginBottom: "10px" }}
-                className="col-lg-12">
+              <label style={{ marginBottom: "10px" }} className="col-lg-12">
                 สถานะ <span style={{ color: "red" }}>*</span>
               </label>
               <br />
               <Form.Item name="status">
                 <Radio.Group
                   className="col-lg-12"
-                  onChange={handleChangeStatus}>
+                  onChange={handleChangeStatus}
+                >
                   <Space direction="vertical" className="col-lg-12">
                     {DRONER_STATUS.filter((x) => x.value !== "ALL").map(
                       (item, index) => (
-                        <Radio
-                          value={item.value}
-                          style={{ width: "100%" }}>
+                        <Radio value={item.value} style={{ width: "100%" }}>
                           {item.name}
                           {status === "REJECTED" && index === 3 ? (
                             <div className="form-group ps-3">
@@ -1377,10 +1335,7 @@ function EditDroner() {
                                       const reasonField =
                                         form.getFieldValue("reason");
 
-                                      if (
-                                        value?.length < 1 &&
-                                        !reasonField
-                                      ) {
+                                      if (value?.length < 1 && !reasonField) {
                                         return Promise.reject(
                                           "กรุณากรอกเหตุผลที่ไม่อนุมัติ/เลือกเหตุผลที่ไม่อนุมัติ"
                                         );
@@ -1389,15 +1344,14 @@ function EditDroner() {
                                       }
                                     },
                                   },
-                                ]}>
+                                ]}
+                              >
                                 <Checkbox.Group>
                                   <Checkbox
                                     value="บัตรประชาชนไม่ชัดเจน/ไม่ถูกต้อง"
                                     style={{ marginRight: 6 }}
                                   />
-                                  <label>
-                                    บัตรประชาชนไม่ชัดเจน/ไม่ถูกต้อง
-                                  </label>
+                                  <label>บัตรประชาชนไม่ชัดเจน/ไม่ถูกต้อง</label>
                                 </Checkbox.Group>
                               </Form.Item>
                               <Form.Item
@@ -1409,14 +1363,9 @@ function EditDroner() {
                                   {
                                     validator: (_, value) => {
                                       const checkReason =
-                                        form.getFieldValue(
-                                          "checkReason"
-                                        );
+                                        form.getFieldValue("checkReason");
 
-                                      if (
-                                        !value &&
-                                        checkReason.length < 1
-                                      ) {
+                                      if (!value && checkReason.length < 1) {
                                         return Promise.reject(
                                           "กรุณากรอกเหตุผลที่ไม่อนุมัติ"
                                         );
@@ -1426,7 +1375,8 @@ function EditDroner() {
                                     },
                                   },
                                 ]}
-                                dependencies={["checkReason"]}>
+                                dependencies={["checkReason"]}
+                              >
                                 <TextArea
                                   className="col-lg-12"
                                   rows={3}
@@ -1453,7 +1403,8 @@ function EditDroner() {
                                         }
                                       },
                                     },
-                                  ]}>
+                                  ]}
+                                >
                                   <TextArea
                                     className="col-lg-12"
                                     rows={3}
@@ -1492,7 +1443,8 @@ function EditDroner() {
             borderRadius: "12px 12px 0px 0px",
             padding: "10px 10px 10px 10px",
           }}
-          className="d-flex justify-content-between">
+          className="d-flex justify-content-between"
+        >
           <h4 className="pt-2 ps-3" style={{ color: "white" }}>
             รายการโดรน
           </h4>
@@ -1504,7 +1456,8 @@ function EditDroner() {
               border: "none",
               borderRadius: "5px",
             }}
-            onClick={() => setShowAddModal((prev) => !prev)}>
+            onClick={() => setShowAddModal((prev) => !prev)}
+          >
             เพิ่มโดรน
           </Button>
         </div>
@@ -1526,8 +1479,7 @@ function EditDroner() {
                       <p style={{ color: "#ccc" }}>{item.serialNo}</p>
                     </div>
                     <div className="col-lg-4">
-                      <span
-                        style={{ color: STATUS_COLOR[item.status] }}>
+                      <span style={{ color: STATUS_COLOR[item.status] }}>
                         <Badge color={STATUS_COLOR[item.status]} />
                         {DRONER_DRONE_MAPPING[item.status]}
                         <br />
@@ -1554,9 +1506,7 @@ function EditDroner() {
               })}
             </div>
           ) : (
-            <div
-              className="container text-center"
-              style={{ padding: "80px" }}>
+            <div className="container text-center" style={{ padding: "80px" }}>
               <img src={emptyData} alt="" />
               <p>ยังไม่มีข้อมูลโดรน</p>
             </div>
@@ -1576,13 +1526,11 @@ function EditDroner() {
   );
 
   return (
-    <DashboardLayout>
+    <>
       <Row>
         <BackIconButton onClick={() => navigate(-1)} />
         <span className="pt-4">
-          <strong style={{ fontSize: "20px" }}>
-            แก้ไขข้อมูลคนบินโดรน
-          </strong>
+          <strong style={{ fontSize: "20px" }}>แก้ไขข้อมูลคนบินโดรน</strong>
         </span>
       </Row>
       <Row className="d-flex justify-content-around" key={data.id}>
@@ -1616,7 +1564,7 @@ function EditDroner() {
           title="แก้ไขข้อมูลโดรนเกษตร"
         />
       )}
-    </DashboardLayout>
+    </>
   );
 }
 export default EditDroner;

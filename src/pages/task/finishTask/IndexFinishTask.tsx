@@ -42,7 +42,9 @@ import {
   numberWithCommasToFixed,
 } from "../../../utilities/TextFormatter";
 import { DashboardLayout } from "../../../components/layout/Layout";
+import { useNavigate } from "react-router-dom";
 export default function IndexFinishTask() {
+  const navigate = useNavigate();
   const row = 10;
   const [current, setCurrent] = useState(1);
   const [data, setData] = useState<TaskFinishListEntity>();
@@ -565,7 +567,7 @@ export default function IndexFinishTask() {
                   icon={<EditOutlined />}
                   color={color.primary1}
                   onClick={() =>
-                    (window.location.href = "/ReviewTask?=" + row.id)
+                    navigate("/ReviewTask?=" + row.id)
                   }
                 />
               ) : row.status == "CANCELED" ? (
@@ -573,7 +575,7 @@ export default function IndexFinishTask() {
                   icon={<FileTextOutlined />}
                   color={color.primary1}
                   onClick={() =>
-                    (window.location.href = "/CancelTask?=" + row.id)
+                    navigate("/CancelTask?=" + row.id)
                   }
                 />
               ) : row.status == "DONE" ? (
@@ -581,7 +583,7 @@ export default function IndexFinishTask() {
                   icon={<FileTextOutlined />}
                   color={color.primary1}
                   onClick={() =>
-                    (window.location.href = "/FinishTasks?=" + row.id)
+                    navigate("/FinishTasks?=" + row.id)
                   }
                 />
               ) : null}
@@ -592,7 +594,7 @@ export default function IndexFinishTask() {
     },
   ];
   return (
-    <DashboardLayout>
+    <>
       {PageTitle}
       <br />
       <Table
@@ -625,6 +627,6 @@ export default function IndexFinishTask() {
           plotId={plotId}
         />
       )}
-    </DashboardLayout>
+    </>
   );
 }

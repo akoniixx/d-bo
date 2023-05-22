@@ -29,12 +29,14 @@ import {
   STATUS_NEWTASK_MAPPING,
 } from "../../../../definitions/Status";
 import { DashboardLayout } from "../../../../components/layout/Layout";
+import { useNavigate } from "react-router-dom";
 const _ = require("lodash");
 let queryString = _.split(window.location.search, "=");
 const dateFormat = "DD/MM/YYYY";
 const timeFormat = "HH:mm";
 
 function CancelTask() {
+  const navigate = useNavigate();
   const taskId = queryString[1];
   const [data, setData] = useState<DetailFinishTask>(DetailFinishTask_INIT);
   const [history, setHistory] = useState<HistoryEntity>(HistoryEntity_INIT);
@@ -540,10 +542,10 @@ function CancelTask() {
   );
 
   return (
-    <DashboardLayout>
+    <>
       <Row>
         <BackIconButton
-          onClick={() => (window.location.href = "/IndexFinishTask")}
+          onClick={() => navigate("/IndexFinishTask")}
         />
         <span className="pt-4">
           <strong style={{ fontSize: "20px" }}>
@@ -570,7 +572,7 @@ function CancelTask() {
         <CardHeader textHeader="ยอดรวมค่าบริการ" />
         {renderPrice}
       </CardContainer>
-    </DashboardLayout>
+    </>
   );
 }
 

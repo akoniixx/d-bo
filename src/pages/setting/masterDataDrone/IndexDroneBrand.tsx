@@ -16,8 +16,10 @@ import {
 } from "@ant-design/icons";
 import Swal from "sweetalert2";
 import { DashboardLayout } from "../../../components/layout/Layout";
+import { useNavigate } from "react-router-dom";
 
 const IndexDroneBrand: React.FC = () => {
+  const navigate = useNavigate();
   const [data, setData] = useState<DroneBrandListEntity>(
     DroneBrandListEntity_INIT,
 );
@@ -121,7 +123,7 @@ const IndexDroneBrand: React.FC = () => {
             color: color.secondary2,
             backgroundColor: color.Success,
           }}
-          onClick={() => (window.location.href = "/AddDroneBrand")}
+          onClick={() => navigate("/AddDroneBrand")}
         >
           + เพิ่มยี่ห้อโดรน
         </Button>
@@ -217,7 +219,7 @@ const IndexDroneBrand: React.FC = () => {
                   icon={<EditOutlined />}
                   color={color.primary1}
                   onClick={() =>
-                    (window.location.href = "/EditDroneBrand/id=" + row.id)
+                    navigate("/EditDroneBrand/id=" + row.id)
                   }
                 />
               </div>
@@ -246,11 +248,11 @@ const IndexDroneBrand: React.FC = () => {
     },
   ];
   return (
-    <DashboardLayout>
+    <>
       {pageTitle}
       <Table columns={columns} dataSource={data.data} />
       <p>รายการทั้งหมด {data.count} รายการ</p>
-    </DashboardLayout>
+    </>
   );
 };
 

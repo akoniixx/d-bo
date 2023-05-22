@@ -42,13 +42,14 @@ import {
   numberWithCommasToFixed,
 } from "../../../utilities/TextFormatter";
 import { DashboardLayout } from "../../../components/layout/Layout";
+import { useNavigate } from "react-router-dom";
 const { RangePicker } = DatePicker;
 const dateFormat = "DD-MM-YYYY";
 const dateSearchFormat = "YYYY-MM-DD";
 
 const IndexNewTask = () => {
   const profile = JSON.parse(localStorage.getItem("profile") || "{  }");
-
+  const navigate = useNavigate();
   const row = 10;
   const [current, setCurrent] = useState(1);
   const [data, setData] = useState<NewTaskPageEntity>();
@@ -128,7 +129,7 @@ const IndexNewTask = () => {
         data.statusRemark = result.value;
         data.updateBy = profile.firstname + " " + profile.lastname;
         await TaskDatasource.cancelNewTask(data).then((res) => {
-          //window.location.href = "/IndexNewTask";
+          //navigate("/IndexNewTask");
         });
       }
       fetchNewTaskList();
@@ -144,12 +145,12 @@ const IndexNewTask = () => {
         {
           label: "เลือกนักบินหลายคน (แบบปกติ)",
           key: "1",
-          onClick: () => (window.location.href = "/AddNewTask=checkbox"),
+          onClick: () => navigate("/AddNewTask=checkbox"),
         },
         {
           label: "บังคับเลือกนักบิน (ติดต่อแล้ว)",
           key: "2",
-          onClick: () => (window.location.href = "/AddNewTask=radio"),
+          onClick: () => navigate("/AddNewTask=radio"),
         },
       ]}
     />
@@ -456,7 +457,7 @@ const IndexNewTask = () => {
                   icon={<EditOutlined />}
                   color={color.primary1}
                   onClick={() =>
-                    (window.location.href = "/EditNewTask/id=" + row.id)
+                    navigate("/EditNewTask/id=" + row.id)
                   }
                 />
               </div>
@@ -476,7 +477,7 @@ const IndexNewTask = () => {
 
   return (
     <>
-      <DashboardLayout>
+      <>
         {pageTitle}
         <CardContainer>
           <Table
@@ -518,7 +519,7 @@ const IndexNewTask = () => {
             taskId={taskId}
           />
         )}
-      </DashboardLayout>
+      </>
     </>
   );
 };

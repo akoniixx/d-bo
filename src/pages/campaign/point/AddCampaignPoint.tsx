@@ -91,7 +91,7 @@ const AddCampaignPoint = () => {
     setCreate(data);
     CampaignDatasource.createCampaign(data).then((res) => {
       if (res.success) {
-        window.location.href = "/IndexCampaignPoint";
+        navigate("/IndexCampaignPoint");
       } else {
         if (res.userMessage === "dupplicate") {
         } else {
@@ -114,7 +114,7 @@ const AddCampaignPoint = () => {
 
   return (
     <>
-      <DashboardLayout>
+      <>
         <Row>
           <BackIconButton onClick={() => navigate(-1)} />
           <span className="pt-3">
@@ -345,7 +345,7 @@ const AddCampaignPoint = () => {
           styleFooter={{ padding: "6px" }}
           onClickSave={() => submit()}
         />
-      </DashboardLayout>
+      </>
       {showModal && (
         <Modal
           title="ยืนยันการเพิ่ม"

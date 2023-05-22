@@ -15,9 +15,9 @@ import { DashboardLayout } from "../../../components/layout/Layout";
 
 const _ = require("lodash");
 const { Map } = require("immutable");
-let queryString = _.split(window.location.search, "=");
 
 function ConditionFarmer() {
+  let queryString = _.split(window.location.search, "=");
   const [form] = Form.useForm();
   const [taskId, setTaskId] = useState<PointSettingEntities>(
     PointSettingEntities_INIT
@@ -419,7 +419,7 @@ function ConditionFarmer() {
     </CardContainer>
   );
   return (
-    <DashboardLayout>
+    <>
       <Row>
         <span className="p-3">
           <strong style={{ fontSize: "20px" }}>เงื่อนไขเกษตรกร</strong>
@@ -455,7 +455,7 @@ function ConditionFarmer() {
           </Button>
         </Row>
       </div>
-    </DashboardLayout>
+    </>
   );
 }
 

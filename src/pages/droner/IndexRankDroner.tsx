@@ -24,8 +24,10 @@ import color from "../../resource/color";
 import { DownOutlined, FileTextOutlined, SearchOutlined, StarFilled } from "@ant-design/icons";
 import { DronerRankDatasource } from "../../datasource/DronerRankDatasource";
 import { DronerRankListEntity } from "../../entities/DronerRankEntities";
+import { useNavigate } from "react-router-dom";
 
 export default function IndexRankDroner() {
+  const navigate = useNavigate();
   const row = 10;
   const [current, setCurrent] = useState(1);
   const [data, setData] = useState<DronerRankListEntity>();
@@ -544,7 +546,7 @@ export default function IndexRankDroner() {
                 icon={<FileTextOutlined />}
                 color={color.primary1}
                 onClick={() =>
-                  (window.location.href = "/DetailRankDroner?=" + row.droner_id)
+                  navigate("/DetailRankDroner?=" + row.droner_id)
                 }
               />
             </div>
@@ -554,7 +556,7 @@ export default function IndexRankDroner() {
     },
   ];
   return (
-    <DashboardLayout>
+    <>
       {PageTitle}
       <br />
       <Table columns={columns} dataSource={data?.data} pagination={false} />
@@ -568,6 +570,6 @@ export default function IndexRankDroner() {
           showSizeChanger={false}
         />
       </div>
-    </DashboardLayout>
+    </>
   );
 }

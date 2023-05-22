@@ -523,7 +523,7 @@ function AddDroner() {
             timer: 1500,
             showConfirmButton: false,
           }).then((time) => {
-            window.location.href = "/IndexDroner";
+            navigate("/IndexDroner");
           });
         } else {
           Swal.fire({
@@ -1205,7 +1205,7 @@ function AddDroner() {
   );
 
   return (
-    <DashboardLayout>
+    <>
       <Row>
         <BackIconButton onClick={() => navigate(-1)} />
         <span className="pt-4">
@@ -1245,7 +1245,7 @@ function AddDroner() {
           title="แก้ไขข้อมูลโดรนเกษตร"
         />
       )}
-    </DashboardLayout>
+    </>
   );
 }
 

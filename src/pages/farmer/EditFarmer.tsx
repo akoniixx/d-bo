@@ -72,9 +72,8 @@ const dateCreateFormat = "YYYY-MM-DD";
 const _ = require("lodash");
 const { Map } = require("immutable");
 
-let queryString = _.split(window.location.pathname, "=");
-
 const EditFarmer = () => {
+  let queryString = _.split(window.location.pathname, "=");
   const [profile] = useLocalStorage("profile", []);
   const navigate = useNavigate();
 
@@ -499,7 +498,7 @@ const EditFarmer = () => {
           timer: 1500,
           showConfirmButton: false,
         }).then((time) => {
-          window.location.href = "/IndexFarmer";
+          navigate("/IndexFarmer");
         });
       } else {
         Swal.fire({
@@ -1067,7 +1066,7 @@ const EditFarmer = () => {
   );
 
   return (
-    <DashboardLayout>
+    <>
       <Row>
         <BackIconButton
           onClick={() => {
@@ -1110,7 +1109,7 @@ const EditFarmer = () => {
           title="แก้ไขแปลงเกษตร"
         />
       )}
-    </DashboardLayout>
+    </>
   );
 };
 

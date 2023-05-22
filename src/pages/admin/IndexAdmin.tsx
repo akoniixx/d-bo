@@ -15,8 +15,10 @@ import {
 import { color } from "../../resource";
 import { DateTimeUtil } from "../../utilities/DateTimeUtil";
 import { DashboardLayout } from "../../components/layout/Layout";
+import { useNavigate } from "react-router-dom";
 
 const IndexAdmin = () => {
+  const navigate = useNavigate();
   const row = 10;
   const [data, setData] = useState<UserStaffPageEntity>(
     UserStaffPageEntity_INIT
@@ -95,8 +97,7 @@ const IndexAdmin = () => {
         return {
           children: (
             <span style={{ color: value ? color.Success : color.Error }}>
-              <Badge color={value ? color.Success : color.Error} />
-              {" "}
+              <Badge color={value ? color.Success : color.Error} />{" "}
               {value ? "ใช้งาน" : "ไม่ใช้งาน"}
             </span>
           ),
@@ -124,9 +125,7 @@ const IndexAdmin = () => {
               <ActionButton
                 icon={<EditOutlined />}
                 color={color.primary1}
-                onClick={() =>
-                  (window.location.href = "/EditAdmin/id=" + value)
-                }
+                onClick={() => navigate("/EditAdmin/id=" + value)}
               />
             </div>
           ),
@@ -175,14 +174,14 @@ const IndexAdmin = () => {
       <div className="col-lg-2">
         <AddButtton
           text="เพิ่มผู้ดูแลระบบ"
-          onClick={() => (window.location.href = "/AddAdmin")}
+          onClick={() => navigate("/AddAdmin")}
         />
       </div>
     </div>
   );
 
   return (
-    <DashboardLayout>
+    <>
       {pageTitle}
       <CardContainer>
         <Table
@@ -202,7 +201,7 @@ const IndexAdmin = () => {
           pageSize={row}
         />
       </div>
-    </DashboardLayout>
+    </>
   );
 };
 export default IndexAdmin;

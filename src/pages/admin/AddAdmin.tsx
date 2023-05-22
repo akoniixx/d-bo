@@ -13,11 +13,13 @@ import {
 import { AdminDatasource } from "../../datasource/AdminDatasource";
 import Swal from "sweetalert2";
 import { ExclamationCircleOutlined } from "@ant-design/icons";
+import { useNavigate } from "react-router-dom";
 
 const _ = require("lodash");
 const { Map } = require("immutable");
 
 const AddAdmin = () => {
+  const navigate = useNavigate();
   const [showBtn, setShowBtn] = useState<boolean>(true);
   const [data, setData] = useState<UserStaffEntity>(UserStaffEntity_INIT);
   const textPassword = (
@@ -86,7 +88,7 @@ const AddAdmin = () => {
           timer: 1500,
           showConfirmButton: false,
         }).then(() => {
-          window.location.href = "/IndexAdmin";
+          navigate("/IndexAdmin")
         });
       } else {
         let messageList = res.response.data.message;
@@ -281,10 +283,10 @@ const AddAdmin = () => {
   );
 
   return (
-    <DashboardLayout>
+    <>
       <Row>
         <BackIconButton
-          onClick={() => (window.location.href = "/IndexAdmin")}
+          onClick={() => navigate("/IndexAdmin")}
         />
         <span className="pt-4">
           <strong style={{ fontSize: "20px" }}>
@@ -297,13 +299,13 @@ const AddAdmin = () => {
         {renderFromData}
       </CardContainer>
       <FooterPage
-        onClickBack={() => (window.location.href = "/IndexAdmin")}
+        onClickBack={() => navigate("/IndexAdmin")}
         onClickSave={() => {
           insertNewAdmin(data);
         }}
         disableSaveBtn={showBtn}
       />
-    </DashboardLayout>
+    </>
   );
 };
 

@@ -3,9 +3,9 @@ import { DashboardLayout } from '../../components/layout/Layout'
 
 export function OverviewPage() {
   return (
-    <DashboardLayout>
+    <>
     <div>OverviewPage</div>
-    </DashboardLayout>
+    </>
   )
 }
 

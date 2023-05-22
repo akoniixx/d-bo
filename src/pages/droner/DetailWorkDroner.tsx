@@ -38,12 +38,14 @@ import { CropPurposeSprayEntity } from "../../entities/CropEntities";
 import { PURPOSE_SPRAY } from "../../definitions/PurposeSpray";
 import { CouponDataSource } from "../../datasource/CouponDatasource";
 import { DashboardLayout } from "../../components/layout/Layout";
+import { useNavigate } from "react-router-dom";
 const _ = require("lodash");
-let queryString = _.split(window.location.search, "=");
 const dateFormat = "DD/MM/YYYY";
 const timeFormat = "HH:mm";
 
 function DetailWorkDroner() {
+  let queryString = _.split(window.location.search, "=");
+  const navigate = useNavigate();
   const taskId = queryString[1];
   const [data, setData] = useState<taskDetailEntity>(taskDetailEntity_INIT);
   let imgList: (string | boolean)[] = [];
@@ -556,11 +558,11 @@ function DetailWorkDroner() {
   );
 
   return (
-    <DashboardLayout>
+    <>
       <Row>
         <BackIconButton
           onClick={() =>
-            (window.location.href = "/DetailRankDroner?=" + data.dronerId)
+            navigate("/DetailRankDroner?=" + data.dronerId)
           }
         />
         <span className="pt-4">
@@ -588,7 +590,7 @@ function DetailWorkDroner() {
         <CardHeader textHeader="ยอดรวมค่าบริการ" />
         {renderPrice}
       </CardContainer>
-    </DashboardLayout>
+    </>
   );
 }
 

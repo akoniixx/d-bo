@@ -13,13 +13,14 @@ import { AdminDatasource } from "../../datasource/AdminDatasource";
 import Swal from "sweetalert2";
 import { ExclamationCircleOutlined } from "@ant-design/icons";
 import { DashboardLayout } from "../../components/layout/Layout";
+import { useNavigate } from "react-router-dom";
 
 const _ = require("lodash");
 const { Map } = require("immutable");
 
-let queryString = _.split(window.location.pathname, "=");
-
 const EditAdmin = () => {
+  let queryString = _.split(window.location.pathname, "=");
+  const navigate = useNavigate();
   const admidId = queryString[1];
   const [showBtn, setShowBtn] = useState<boolean>(true);
   const [data, setData] = useState<UserStaffEntity>(UserStaffEntity_INIT);
@@ -68,7 +69,7 @@ const EditAdmin = () => {
           timer: 1500,
           showConfirmButton: false,
         }).then((time) => {
-          window.location.href = "/IndexAdmin";
+          navigate("/IndexAdmin")
         });
       } else {
         Swal.fire({
@@ -230,10 +231,10 @@ const EditAdmin = () => {
   );
 
   return (
-    <DashboardLayout>
+    <>
       <Row>
         <BackIconButton
-          onClick={() => (window.location.href = "/IndexAdmin")}
+          onClick={() => navigate("/IndexAdmin")}
         />
         <span className="pt-4">
           <strong style={{ fontSize: "20px" }}>
@@ -246,11 +247,11 @@ const EditAdmin = () => {
         {renderFromData}
       </CardContainer>
       <FooterPage
-        onClickBack={() => (window.location.href = "/IndexAdmin")}
+        onClickBack={() => navigate("/IndexAdmin")}
         onClickSave={() => updateAdmin(data)}
         disableSaveBtn={showBtn}
       />
-    </DashboardLayout>
+    </>
   );
 };
 

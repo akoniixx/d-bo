@@ -49,14 +49,16 @@ import {
   numberWithCommasToFixed,
 } from "../../../../utilities/TextFormatter";
 import { DashboardLayout } from "../../../../components/layout/Layout";
+import { useNavigate } from "react-router-dom";
 
 const { Map } = require("immutable");
 const _ = require("lodash");
-let queryString = _.split(window.location.search, "=");
 const dateFormat = "DD/MM/YYYY";
 const timeFormat = "HH:mm";
 
 function ReviewTask() {
+  let queryString = _.split(window.location.search, "=");
+  const navigate = useNavigate();
   const profile = JSON.parse(localStorage.getItem("profile") || "{  }");
   const taskId = queryString[1];
   const [couponData, setCouponData] = useState<{
@@ -172,7 +174,7 @@ function ReviewTask() {
           detailDroner.comment,
           profile.firstname + " " + profile.lastname
         ).then((time) => {
-          window.location.href = "/IndexFinishTask";
+          navigate("/IndexFinishTask")
         });
       }
       fetchDetailTask();
@@ -625,10 +627,10 @@ function ReviewTask() {
   );
 
   return (
-    <DashboardLayout>
+    <>
       <Row>
         <BackIconButton
-          onClick={() => (window.location.href = "/IndexFinishTask")}
+          onClick={() => navigate("/IndexFinishTask")}
         />
         <span className="pt-4">
           <strong style={{ fontSize: "20px" }}>
@@ -656,11 +658,11 @@ function ReviewTask() {
         {renderPrice}
       </CardContainer>
       <FooterPage
-        onClickBack={() => (window.location.href = "/IndexFinishTask")}
+        onClickBack={() => navigate("/IndexFinishTask")}
         onClickSave={() => UpdateReviewDroner(data)}
         disableSaveBtn={saveBtnDisable}
       />
-    </DashboardLayout>
+    </>
   );
 }
 

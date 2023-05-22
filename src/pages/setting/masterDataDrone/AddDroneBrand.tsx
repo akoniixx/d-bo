@@ -134,7 +134,7 @@ function AddDroneBrand() {
           timer: 1500,
           showConfirmButton: false,
         }).then((time) => {
-          window.location.href = "/IndexDroneBrand";
+          navigate("/IndexDroneBrand");
         });
       }
     });
@@ -308,7 +308,7 @@ function AddDroneBrand() {
   );
 
   return (
-    <DashboardLayout>
+    <>
       <Row>
         <BackIconButton onClick={() => navigate(-1)} />
         <span className="pt-3">
@@ -345,7 +345,7 @@ function AddDroneBrand() {
           title="แก้ไขแปลงเกษตร"
         />
       )}
-    </DashboardLayout>
+    </>
   );
 }
 

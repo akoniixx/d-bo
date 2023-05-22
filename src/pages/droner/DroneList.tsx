@@ -18,8 +18,10 @@ import { DronerDroneListEntity } from "../../entities/DronerDroneEntities";
 import color from "../../resource/color";
 import { formatDate } from "../../utilities/TextFormatter";
 import { EditOutlined, FileTextFilled } from "@ant-design/icons";
+import { useNavigate } from "react-router-dom";
 
 function DroneList() {
+  const navigate = useNavigate();
   const row = 10;
   const [current, setCurrent] = useState(1);
   const [droneList, setDroneList] = useState<DronerDroneListEntity>();
@@ -369,7 +371,7 @@ function DroneList() {
                 icon={<EditOutlined />}
                 color={color.primary1}
                 onClick={() =>
-                  (window.location.href = "/EditDroneList?=" + row.id)
+                  navigate("/EditDroneList?=" + row.id)
                 }
               />
             </div>
@@ -380,7 +382,7 @@ function DroneList() {
   ];
 
   return (
-    <DashboardLayout>
+    <>
       {PageTitle}
       <br />
       <Table
@@ -408,7 +410,7 @@ function DroneList() {
           showSizeChanger={false}
         />
       </div>
-    </DashboardLayout>
+    </>
   );
 }
 

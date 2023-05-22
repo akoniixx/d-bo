@@ -722,7 +722,7 @@ export default function AddPromotion() {
           timer: 1500,
           showConfirmButton: false,
         }).then((time) => {
-          window.location.href = "/PromotionPage";
+          navigate("/PromotionPage");
         });
       })
       .catch((err) => {
@@ -741,7 +741,7 @@ export default function AddPromotion() {
   };
 
   return (
-    <DashboardLayout>
+    <>
       <Modal
         title="ยืนยันการเพิ่มคูปอง"
         onCancel={() => {
@@ -1555,6 +1555,6 @@ export default function AddPromotion() {
           />
         </div>
       </div>
-    </DashboardLayout>
+    </>
   );
 }

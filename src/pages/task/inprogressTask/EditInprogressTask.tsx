@@ -49,6 +49,7 @@ import {
   numberWithCommasToFixed,
 } from "../../../utilities/TextFormatter";
 import { DashboardLayout } from "../../../components/layout/Layout";
+import { useNavigate } from "react-router-dom";
 const { Option } = Select;
 
 const dateFormat = "DD/MM/YYYY";
@@ -58,9 +59,10 @@ const timeCreateFormat = "HH:mm:ss";
 
 const _ = require("lodash");
 const { Map } = require("immutable");
-let queryString = _.split(window.location.pathname, "=");
 
 const EditInprogressTask = () => {
+  let queryString = _.split(window.location.pathname, "=");
+  const navigate = useNavigate();
   const profile = JSON.parse(localStorage.getItem("profile") || "{  }");
   const [data, setData] = useState<GetTaskInprogressEntity>(
     GetTaskInprogressEntity_INIT
@@ -800,7 +802,7 @@ const EditInprogressTask = () => {
       if (result.isConfirmed) {
         await TaskDatasource.updateInprogressTask(updateTask).then((res) => {
           if (res.userMessage == "success") {
-            window.location.href = "/IndexInprogressTask";
+            navigate( "/IndexInprogressTask")
           }
         });
       }
@@ -809,10 +811,10 @@ const EditInprogressTask = () => {
 
   return (
     <>
-      <DashboardLayout key={data?.id}>
+      <div key={data?.id}>
         <Row>
           <BackIconButton
-            onClick={() => (window.location.href = "/IndexInprogressTask")}
+            onClick={() => navigate("/IndexInprogressTask")}
           />
           <span className="pt-3">
             <strong style={{ fontSize: "20px" }}>
@@ -828,11 +830,11 @@ const EditInprogressTask = () => {
         <br />
         <CardContainer>{renderServiceCharge}</CardContainer>
         <FooterPage
-          onClickBack={() => (window.location.href = "/IndexInprogressTask")}
+          onClickBack={() => navigate("/IndexInprogressTask")}
           onClickSave={updateInprogressTask}
           disableSaveBtn={saveBtnDisable}
         />
-      </DashboardLayout>
+      </div>
       {showModel && (
         <ModalSelectedDroner
           show={showModel}

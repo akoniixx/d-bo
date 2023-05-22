@@ -60,6 +60,7 @@ import ModalMapPlot from "../../components/modal/task/finishTask/ModalMapPlot";
 import { CheckboxValueType } from "antd/lib/checkbox/Group";
 import { CheckboxChangeEvent } from "antd/lib/checkbox";
 import { DashboardLayout } from "../../components/layout/Layout";
+import { useNavigate } from "react-router-dom";
 
 interface DataType {
   key: React.Key;
@@ -85,6 +86,7 @@ interface DataType {
   taskHistory: string;
 }
 function IndexReport() {
+  const navigate = useNavigate();
   const [getData, setGetData] = useState<TaskReportListEntity>();
   const [row, setRow] = useState(10);
   const [current, setCurrent] = useState(1);
@@ -518,7 +520,7 @@ function IndexReport() {
           await UpdateStatusPaymentDatasource.UpdateStatusPayment(
             updateInfo
           ).then((res) => {
-            window.location.href = "/IndexReport";
+            navigate("/IndexReport");
           });
         } else if (clickPays.map((x) => x.statusPay)[0] === "WAIT_PAYMENT") {
           const updateBy = profile.firstname + " " + profile.lastname;
@@ -529,7 +531,7 @@ function IndexReport() {
           await UpdateStatusPaymentDatasource.UpdateStatusPayment(
             updateInfo
           ).then((res) => {
-            window.location.href = "/IndexReport";
+            navigate("/IndexReport");
           });
         }
         fetchAllReport();
@@ -850,7 +852,7 @@ function IndexReport() {
               <ActionButton
                 icon={<EditOutlined />}
                 color={color.primary1}
-                onClick={() => (window.location.href = "/EditReport?=" + value)}
+                onClick={() => navigate("/EditReport?=" + value)}
               />
             </div>
           ),
@@ -1308,7 +1310,7 @@ function IndexReport() {
     }
   }
   return (
-    <DashboardLayout>
+    <>
       <Space direction="vertical" style={{ width: "100%" }}>
         <Spin tip="Loading..." size="large" spinning={loading}>
           {PageTitle}
@@ -1343,7 +1345,7 @@ function IndexReport() {
           plotId={plotId}
         />
       )}
-    </DashboardLayout>
+    </>
   );
 }
 

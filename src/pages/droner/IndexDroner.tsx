@@ -792,8 +792,9 @@ function IndexDroner() {
               <ActionButton
                 icon={<EditOutlined />}
                 color={color.primary1}
-                onClick={() =>
-                  (window.location.href = "/EditDroner?=" + row.id)
+                onClick={() => {
+                    navigate("/EditDroner?=" + row.id);
+                  }
                 }
               />
             </div>
@@ -804,7 +805,7 @@ function IndexDroner() {
   ];
 
   return (
-    <DashboardLayout>
+    <>
       {PageTitle}
       <br />
       <Table
@@ -832,7 +833,7 @@ function IndexDroner() {
           showSizeChanger={false}
         />
       </div>
-    </DashboardLayout>
+    </>
   );
 }
 export default IndexDroner;

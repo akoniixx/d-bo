@@ -49,13 +49,15 @@ import {
 import { CouponDataSource } from "../../../../datasource/CouponDatasource";
 import { numberWithCommas } from "../../../../utilities/TextFormatter";
 import { DashboardLayout } from "../../../../components/layout/Layout";
+import { useNavigate } from "react-router-dom";
 const { Map } = require("immutable");
 const _ = require("lodash");
-let queryString = _.split(window.location.search, "=");
 const dateFormat = "DD/MM/YYYY";
 const timeFormat = "HH:mm";
 
 function EditInProgress() {
+  let queryString = _.split(window.location.search, "=");
+  const navigate = useNavigate();
   const profile = JSON.parse(localStorage.getItem("profile") || "{  }");
   const taskId = queryString[1];
   const [mapPosition, setMapPosition] = useState<{ lat: number; lng: number }>({
@@ -855,7 +857,7 @@ function EditInProgress() {
         ).set("updateBy", profile.firstname + " " + profile.lastname);
         await TaskInprogressDatasource.UpdateTask(pushUpdateBy.toJS()).then(
           (time) => {
-            window.location.href = "/IndexTodayTask";
+            navigate("/IndexTodayTask")
           }
         );
       }
@@ -864,10 +866,10 @@ function EditInProgress() {
   };
 
   return (
-    <DashboardLayout>
+    <>
       <Row>
         <BackIconButton
-          onClick={() => (window.location.href = "/IndexTodayTask")}
+          onClick={() => navigate("/IndexTodayTask")}
         />
         <span className="pt-4">
           <strong style={{ fontSize: "20px" }}>
@@ -895,11 +897,11 @@ function EditInProgress() {
         {renderPrice}
       </CardContainer>
       <FooterPage
-        onClickBack={() => (window.location.href = "/IndexTodayTask")}
+        onClickBack={() => navigate("/IndexTodayTask")}
         onClickSave={() => UpdateTaskWaitStart(data)}
         disableSaveBtn={saveBtnDisable}
       />
-    </DashboardLayout>
+    </>
   );
 }
 

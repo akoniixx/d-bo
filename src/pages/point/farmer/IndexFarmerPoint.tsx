@@ -1,25 +1,17 @@
-import {
-  FileTextOutlined,
-  SearchOutlined,
-} from "@ant-design/icons";
-import {
-  Button,
-  DatePicker,
-  Input,
-  Pagination,
-  Select,
-  Table,
-} from "antd";
+import { FileTextOutlined, SearchOutlined } from "@ant-design/icons";
+import { Button, DatePicker, Input, Pagination, Select, Table } from "antd";
 import React, { useState } from "react";
 import ActionButton from "../../../components/button/ActionButton";
 import { CardContainer } from "../../../components/card/CardContainer";
 import { color } from "../../../resource";
 import { DateTimeUtil } from "../../../utilities/DateTimeUtil";
 import { DashboardLayout } from "../../../components/layout/Layout";
+import { useNavigate } from "react-router-dom";
 
 const { RangePicker } = DatePicker;
 
 const IndexFarmerPoint = () => {
+  const navigate = useNavigate();
   const dateFormat = "DD/MM/YYYY";
   const dateSearchFormat = "YYYY-MM-DD";
 
@@ -211,8 +203,7 @@ const IndexFarmerPoint = () => {
                   icon={<FileTextOutlined />}
                   color={color.primary1}
                   onClick={() =>
-                    (window.location.href =
-                      "/DetailFarmerPoint/id=" + (index + 1))
+                    navigate("/DetailFarmerPoint/id=" + (index + 1))
                   }
                 />
               </div>
@@ -225,7 +216,7 @@ const IndexFarmerPoint = () => {
 
   return (
     <>
-      <DashboardLayout>
+      <>
         {pageTitle}
         <CardContainer>
           <Table
@@ -249,7 +240,7 @@ const IndexFarmerPoint = () => {
             showSizeChanger={false}
           />
         </div>
-      </DashboardLayout>
+      </>
     </>
   );
 };

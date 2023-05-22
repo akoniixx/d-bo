@@ -404,7 +404,7 @@ const AddFarmer = () => {
           timer: 1500,
           showConfirmButton: false,
         }).then((time) => {
-          window.location.href = "/IndexFarmer";
+          navigate( "/IndexFarmer");
         });
       } else {
         Swal.fire({
@@ -928,7 +928,7 @@ const AddFarmer = () => {
   );
 
   return (
-    <DashboardLayout>
+    <>
       <Row>
         <BackIconButton onClick={() => navigate(-1)} />
         <span className="pt-4">
@@ -967,7 +967,7 @@ const AddFarmer = () => {
           title="แก้ไขแปลงเกษตร"
         />
       )}
-    </DashboardLayout>
+    </>
   );
 };
 

@@ -130,7 +130,7 @@ function PromotionPage() {
           couponConditionProvince: res.couponConditionProvince,
           couponConditionProvinceList: res.couponConditionProvinceList,
           createBy: profile.username + " " + profile.lastname,
-          conditionSpecificFarmer : res.specificFarmer
+          conditionSpecificFarmer: res.specificFarmer,
         };
         CouponDataSource.addCoupon(couponDto)
           .then((resSave) => {
@@ -166,7 +166,7 @@ function PromotionPage() {
                   couponConditionProvinceList:
                     resSave.couponConditionProvinceList,
                   createBy: resSave.createBy,
-                  conditionSpecificFarmer : false
+                  conditionSpecificFarmer: false,
                 },
                 ...data.promotions,
               ],
@@ -540,7 +540,7 @@ function PromotionPage() {
                   icon={<EditOutlined />}
                   color={color.primary1}
                   onClick={() => {
-                    window.location.href = "/EditPromotion/id=" + row.id;
+                    navigate("/EditPromotion/id=" + row.id);
                   }}
                 />
               </div>
@@ -569,7 +569,7 @@ function PromotionPage() {
   ];
 
   return (
-    <DashboardLayout>
+    <>
       <ModalDeleteCoupon
         show={modalDelete}
         backButton={() => setModalDelete(!modalDelete)}
@@ -595,7 +595,7 @@ function PromotionPage() {
           showSizeChanger={false}
         />
       </div>
-    </DashboardLayout>
+    </>
   );
 }
 
