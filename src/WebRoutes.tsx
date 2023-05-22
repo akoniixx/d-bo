@@ -154,7 +154,7 @@ const WebRoutes: React.FC<any> = () => {
           path="/DetailReceivePoint/:id"
           element={<DetailReceivePoint />}
         />
-        <Route path="/IndexRedeem" element={<IndexRedeem />} />
+        <Route path="/IndexRedeem/:type" element={<IndexRedeem />} />
         <Route
           path="/DetailFarmerRedeem/:id"
           element={<DetailFarmerRedeem />}

@@ -209,7 +209,7 @@ const Layouts: React.FC<any> = ({ children }) => {
                   </Link>
                 </Menu.Item>
                 <Menu.Item key="redeempoint">
-                  <Link to="/IndexRedeem" style={{ textDecoration: "none" }}>
+                  <Link to="/IndexRedeem/Farmer" style={{ textDecoration: "none" }}>
                     <span>แลกแต้ม</span>
                   </Link>
                 </Menu.Item>

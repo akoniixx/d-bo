@@ -2,6 +2,7 @@ import { Badge, Col, Form, Row, Table } from "antd";
 import React, { useState } from "react";
 import { Container } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
+import styled from "styled-components";
 import { BackIconButton } from "../../components/button/BackButton";
 import { CardContainer } from "../../components/card/CardContainer";
 import { CardHeader } from "../../components/header/CardHearder";
@@ -10,6 +11,16 @@ import { color } from "../../resource";
 import { DateTimeUtil } from "../../utilities/DateTimeUtil";
 const _ = require("lodash");
 let queryString = _.split(window.location.pathname, "=");
+
+const NewTable = styled(Table)`
+  .ant-table-container table thead tr th {
+    background-color: rgba(169, 203, 98, 0.1) !important;
+    font-family: "Prompt" !important;
+    font-weight: 500 !important;
+    color: #2b2b2b !important;
+    font-weight: bold !important;
+  }
+`;
 
 const DetailFarmerRedeem = () => {
   const navigate = useNavigate();
@@ -102,18 +113,7 @@ const DetailFarmerRedeem = () => {
 
   const renderTaskDetail = (
     <CardContainer>
-      <div
-        style={{
-          backgroundColor: "#2B2B2B",
-          borderRadius: "12px 12px 0px 0px",
-          padding: "10px 10px 10px 10px",
-        }}
-        className="d-flex justify-content-between"
-      >
-        <h4 className="pt-2 ps-3" style={{ color: "white" }}>
-          ข้อมูลที่เกี่ยวข้อง
-        </h4>
-      </div>
+      <CardHeader textHeader="ข้อมูลที่เกี่ยวข้อง" bgColor="#2B2B2B" />
       <Form style={{ padding: "32px" }}>
         <Container
           style={{
@@ -121,15 +121,13 @@ const DetailFarmerRedeem = () => {
           }}
           className="p-3"
         >
-          <div>
-            <b
-              style={{
-                color: "#2B2B2B",
-              }}
-            >
-              งานจ้างที่เกี่ยวข้อง
-            </b>
-          </div>
+          <b
+            style={{
+              color: "#2B2B2B",
+            }}
+          >
+            งานจ้างที่เกี่ยวข้อง
+          </b>
           <Row>
             <Col span={3}>
               <div>รหัสงาน</div>
@@ -193,14 +191,20 @@ const DetailFarmerRedeem = () => {
           </Col>
         </Row>
       </Container>
-      <Table columns={columeHis} dataSource={dataHisMock} pagination={false} />
+      <NewTable
+        columns={columeHis}
+        dataSource={dataHisMock}
+        pagination={false}
+      />
     </CardContainer>
   );
 
   return (
     <Layouts>
       <Row>
-        <BackIconButton onClick={() => navigate(-1)} />
+        <BackIconButton
+          onClick={() => (window.location.href = "/IndexRedeem/Farmer")}
+        />
         <span className="pt-3">
           <strong style={{ fontSize: "20px" }}>
             รายละเอียดการแลกแต้ม | RD0000001
