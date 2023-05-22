@@ -1,4 +1,6 @@
 ## [Version - 0]
+## Fix [v0.28.1] 2023-05-22
+- fixed campoign point entity
 ## Feature [v0.28.0] 2023-05-19
 - added planning point menu
 ## Fix [v0.27.4] 2023-05-17
