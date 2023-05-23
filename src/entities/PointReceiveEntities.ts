@@ -35,15 +35,26 @@ export interface ReceivePointEntity {
   taskNo: string;
   pointNo: string;
   status: string;
-  dronerTransaction: { campaignId: string; campaignName: string };
-  mission: { id: string; missionNo: string };
-  firstname:string;
-  lastname:string;
-  telephone:string;
-  
+  createAt: string;
+  farmerTranaction: {
+    campaignId: string;
+    campaignName: string;
+    amountValue: number;
+    firstname: string;
+    lastname: string;
+    telephoneNo: string;
+  };
+  dronerTransaction: {
+    campaignId: string;
+    campaignName: string;
+    amountValue: number;
+    firstname: string;
+    lastname: string;
+    telephoneNo: string;
+  };
 }
 
 export interface ReceivePointListEntity {
   count: number;
-  history: string;
+  history: ReceivePointEntity[];
 }

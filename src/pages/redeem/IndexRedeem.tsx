@@ -16,7 +16,7 @@ import {
   Table,
   Tooltip,
 } from "antd";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Container } from "react-bootstrap";
 import ActionButton from "../../components/button/ActionButton";
 import { CardContainer } from "../../components/card/CardContainer";
@@ -36,11 +36,13 @@ const IndexRedeem = () => {
     window.location.pathname.split("/")[2]
   );
 
+  useEffect(() => {}, []);
+  
   const onChangePage = (page: number) => {
     setCurrent(page);
   };
   const plainOptions = ["Physical", "Digital"];
-  
+
   const dataMockFarmer = [
     {
       dateTime: Date(),
@@ -156,7 +158,6 @@ const IndexRedeem = () => {
         {/* <Col>
           <Radio.Group
             options={plainOptions}
-            optionType="button"
             buttonStyle="solid"
             defaultValue="Physical"
           />
