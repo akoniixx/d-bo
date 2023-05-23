@@ -28,16 +28,17 @@ interface MenuSideProps {
 }
 
 const ListStyled = styled.div<{ isFocus?: boolean }>`
-padding: 8px;
-cursor: pointer;
-width: 100%;
-display: flex;
-align-items: center;
-height: 50px;
-background-color: ${color.Success};
+  padding: 8px;
+  cursor: pointer;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  height: 50px;
+  background-color: ${color.Success};
 `;
 export const MenuSide: React.FC<MenuSideProps> = ({ lists, isOpenSidebar }) => {
   const navigate = useNavigate();
+  const [checkPath, setCheckPath] = useState<string | undefined>();
   const [current, setCurrent] = useState({
     path: "",
   });
@@ -62,25 +63,25 @@ export const MenuSide: React.FC<MenuSideProps> = ({ lists, isOpenSidebar }) => {
   });
   return (
     <div>
-      <div 
-       style={{
-        cursor: "pointer",
-        width: "100%",
-        height: "50px",
-      }}
+      <div
+        style={{
+          cursor: "pointer",
+          width: "100%",
+          height: "50px",
+        }}
       >
         {lists.map((list: any, idx: any) => {
           if (list?.subMenu?.length < 1) {
             return (
-              <div 
+              <div
                 key={idx}
                 onClick={() => {
-                  setIsCollapse(!isCollapse);
+                  setCheckPath(list.path);
                   setCurrent(list.path);
                   navigate(list.path);
                 }}
               >
-                {!isCollapse ? (
+                {checkPath === list.path ? (
                   <ListStyled
                     style={{ display: "flex", gap: 18, color: "#FFCA37" }}
                   >
@@ -89,16 +90,16 @@ export const MenuSide: React.FC<MenuSideProps> = ({ lists, isOpenSidebar }) => {
                   </ListStyled>
                 ) : (
                   <div
-                  style={{
-                    color: "#7B7B7B",
-                    display: "flex",
-                    gap: 18,
-                    padding: "8px",
-                    cursor: "pointer",
-                    width: "100%",
-                    height: "50px",
-                    alignItems: "center",
-                  }}
+                    style={{
+                      color: "#7B7B7B",
+                      display: "flex",
+                      gap: 18,
+                      padding: "8px",
+                      cursor: "pointer",
+                      width: "100%",
+                      height: "50px",
+                      alignItems: "center",
+                    }}
                   >
                     {IconMenu[list.name as keyof typeof IconMenu]}
                     {list.title}
@@ -117,6 +118,8 @@ export const MenuSide: React.FC<MenuSideProps> = ({ lists, isOpenSidebar }) => {
                 setCurrent={setCurrent}
                 current={current}
                 count={10}
+                checkPath={checkPath}
+                setCheckPath={setCheckPath}
               />
             );
           }

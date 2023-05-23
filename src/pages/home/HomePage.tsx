@@ -10,6 +10,7 @@ import {
 import moment from "moment";
 import { convertBuddhistYear } from "../../utilities/ConvertToBuddhistYear";
 import { DashboardLayout } from "../../components/layout/Layout";
+import color from "../../resource/color";
 
 export function HomePage() {
   let version = packageJson.version;
@@ -46,18 +47,22 @@ export function HomePage() {
         className="d-flex flex-column justify-content-center align-items-center"
         style={{ height: "100%" }}
       >
+        <div style={{height: '84vh',backgroundColor:color.BG}}>
         <h1>ยินดีต้อนรับ</h1>
         <h2>
           คุณ {persistedProfile.firstname + " " + persistedProfile.lastname}
         </h2>
       </div>
+        </div>
+        
 
       <footer
         style={{
           position: "fixed",
           bottom: 0,
-          width: "90%",
+          width: "80%",
           textAlign: "center",
+          backgroundColor: color.BG,
         }}
       >
         <span>version {version}</span>

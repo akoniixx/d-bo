@@ -31,6 +31,8 @@ interface CollapseMenuProps {
     path: string;
   };
   count: number;
+  checkPath: string | undefined;
+  setCheckPath: React.Dispatch<React.SetStateAction<string | undefined>>
 }
 
 const ListStyled = styled.div<{}>`
@@ -61,10 +63,12 @@ export const CollapseMenu: React.FC<CollapseMenuProps> = ({
   current,
   path,
   count,
+  checkPath,
+  setCheckPath
 }) => {
   const [isCollapse, setIsCollapse] = useState(true);
+  console.log(checkPath , path);
   const navigate = useNavigate();
-  console.log(!isCollapse ? "block" : "hidden");
   return (
     <>
       <div
@@ -77,11 +81,16 @@ export const CollapseMenu: React.FC<CollapseMenuProps> = ({
           height: "50px",
         }}
         onClick={() => {
+      
           setCurrent({ path });
-          setIsCollapse(!isCollapse);
+          if(path === checkPath){
+            setCheckPath(undefined)
+          }else{
+            setCheckPath(path)
+          }
         }}
       >
-        {isCollapse ? (
+        {checkPath !==  path ? (
           <>
             <div
               style={{
@@ -119,7 +128,7 @@ export const CollapseMenu: React.FC<CollapseMenuProps> = ({
               )}
             </div>
             <div style={{ paddingRight: "8px" }}>
-              {isCollapse ? (
+              {checkPath !==  current.path ? (
                 <Image
                   src={icon.arrowDown}
                   style={{ width: "16px", height: "9px" }}
@@ -169,7 +178,7 @@ export const CollapseMenu: React.FC<CollapseMenuProps> = ({
                 display: "flex",
               }}
             >
-              {isCollapse ? (
+              {checkPath !== path ? (
                 <Image
                   src={icon.arrowDown}
                   style={{ width: "16px", height: "9px" }}
@@ -186,7 +195,7 @@ export const CollapseMenu: React.FC<CollapseMenuProps> = ({
           </>
         )}
       </div>
-      {!isCollapse && (
+      {checkPath === path && (
         <div
           style={{
             width: "100%",

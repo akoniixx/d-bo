@@ -70,9 +70,9 @@ const WebRoutes: React.FC<any> = () => {
           <Route path="/FinishTasks" element={<FinishTasks />} />
           <Route path="/ReviewTask" element={<ReviewTask />} />
           <Route path="/CancelTask" element={<CancelTask />} />
-          <Route path="/IndexDroner/*" element={<IndexDroner />}/>
+          <Route path="/IndexDroner/*" element={<IndexDroner />} />
           <Route path="/EditDroner" element={<EditDroner />} />
-          <Route path="/IndexFarmer/*" element={<IndexFarmer />}/>
+          <Route path="/IndexFarmer/*" element={<IndexFarmer />} />
           <Route path="AddFarmer" element={<AddFarmer />} />
           <Route path="/EditFarmer/:id" element={<EditFarmer />} />
           <Route path="/TotalIncomePage" element={<TotalIncomePage />} />
@@ -139,16 +139,10 @@ const WebRoutes: React.FC<any> = () => {
             path="/EditCampaignPoint/:id"
             element={<EditCampaignPoint />}
           />
-            <Route
-            path="/ConditionDroner"
-            element={<ConditionDroner />}
-          />
-           <Route
-            path="/ConditionFarmer"
-            element={<ConditionFarmer />}
-          />
+          <Route path="/ConditionDroner" element={<ConditionDroner />} />
+          <Route path="/ConditionFarmer" element={<ConditionFarmer />} />
         </Route>
-      
+
         <Route element={<PublicRoute />}>
           <Route index element={<AuthPage />} />
           <Route path="/ErrorLoginPage" element={<ErrorLoginPage />} />
@@ -156,7 +150,6 @@ const WebRoutes: React.FC<any> = () => {
         </Route>
       </Routes>
     </BrowserRouter>
-   
   );
 };
 
