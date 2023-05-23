@@ -5,4 +5,4 @@ metadata:
   name: dnds-bo-dev
   namespace: development-dnds-bo
 data:
-  BASE_URL: https://api-dnds-auth-dev.iconkaset.com/
+  BASE_URL: https://api-dnds-dev.iconkaset.com/

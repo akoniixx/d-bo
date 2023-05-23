@@ -5,4 +5,4 @@ metadata:
   name: dnds-bo-staging
   namespace: staging-dnds-bo
 data:
-  BASE_URL: https://api-dnds-auth-staging.iconkaset.com/
+  BASE_URL: https://api-dnds-staging.iconkaset.com/
