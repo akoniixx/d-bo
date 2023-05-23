@@ -413,7 +413,7 @@ const AddNewTask = () => {
       if (order === "ยกเลิก") {
         setCouponCode("");
         setCouponUsedBtn([false, true]);
-        form.setFieldsValue({couponCode : ""});
+        form.setFieldsValue({ couponCode: "" });
         setCouponMessage("");
         setCheckKeepCoupon(false);
       } else {
@@ -1939,7 +1939,7 @@ const AddNewTask = () => {
         payload.cropName = farmerPlotSeleced?.plantName;
         payload.couponCode = couponCode;
         payload.couponId = couponId;
-        payload.discount = discountResult ?? 0;
+        payload.discountCoupon = discountResult ?? 0;
         await TaskDatasource.insertNewTask(payload)
           .then(async (res) => {
             if (res.userMessage === "success") {

@@ -68,7 +68,7 @@ const IndexCampaignPoint = () => {
 
   useEffect(() => {
     fetchCampaignList();
-  }, [searchStartDate, searchEndDate]);
+  }, [searchStartDate, searchEndDate, current]);
 
   const onChangePage = (page: number) => {
     setCurrent(page);
@@ -290,14 +290,18 @@ const IndexCampaignPoint = () => {
                 <ActionButton
                   icon={<DeleteOutlined />}
                   color={
-                    row.isDelete || row.status === "ACTIVE"
+                    row.isDeleteFarmer ||
+                    row.isDeleteDroner ||
+                    row.status === "ACTIVE"
                       ? color.Grey
                       : color.Error
                   }
                   onClick={() => setDeleteCampaign(row.id)}
                   actionDisable={
-                    row.isDelete || row.status === "ACTIVE"
-                      ? row.isDelete
+                    row.isDeleteFarmer ||
+                    row.isDeleteDroner ||
+                    row.status === "ACTIVE"
+                      ? true
                       : false
                   }
                 />
@@ -323,7 +327,7 @@ const IndexCampaignPoint = () => {
           />
         </CardContainer>
         <div className="d-flex justify-content-between pt-4">
-          <p>รายการทั้งหมด {data?.count} รายการ</p>
+          <p>รายการทั้งหมด {data?.data.length} รายการ</p>
           <Pagination
             current={current}
             total={data?.count}
