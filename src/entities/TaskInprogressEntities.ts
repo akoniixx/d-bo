@@ -269,6 +269,8 @@ export interface TaskDetailEntity {
   taskDronerTemp: TaskDronerTempEntity;
   discountPromotion: string;
   revenuePromotion: string;
+  discountCampaignPoint: string;
+  usePoint: string;
 }
 export const TaskDetailEntity_INIT: TaskDetailEntity = {
   id: "",
@@ -317,6 +319,8 @@ export const TaskDetailEntity_INIT: TaskDetailEntity = {
   taskDronerTemp: TaskDronerTempEntity_INIT,
   discountPromotion: "",
   revenuePromotion: "",
+  discountCampaignPoint: "",
+  usePoint: "",
 };
 export interface UpdateTask {
   taskId: string;

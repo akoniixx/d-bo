@@ -69,6 +69,8 @@ export interface TaskFinish {
   discountPromotion: string;
   dissountCoupon: string;
   revenuePromotion: string;
+  usePoint: string;
+  discountCampaignPoint: string;
 }
 export const TaskFinish_INIT: TaskFinish = {
   id: "",
@@ -118,6 +120,8 @@ export const TaskFinish_INIT: TaskFinish = {
   discountPromotion: "",
   dissountCoupon: "",
   revenuePromotion: "",
+  usePoint: "",
+  discountCampaignPoint: "",
 };
 export interface TaskFinishListEntity {
   data: TaskFinish[];
@@ -179,6 +183,8 @@ export interface CreateReviewDroner {
   discountPromotion: string;
   dissountCoupon: string;
   revenuePromotion: string;
+  usePoint: string;
+  discountCampaignPoint: string;
 }
 export const CreateReviewDroner_INIT: CreateReviewDroner = {
   id: "",
@@ -222,6 +228,8 @@ export const CreateReviewDroner_INIT: CreateReviewDroner = {
   discountPromotion: "",
   dissountCoupon: "",
   revenuePromotion: "",
+  usePoint: "",
+  discountCampaignPoint: "",
 };
 export interface DetailReviewTask {
   data: CreateReviewDroner;
