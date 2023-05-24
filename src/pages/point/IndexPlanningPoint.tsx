@@ -53,6 +53,11 @@ const IndexPlanningPoint = () => {
     fetchPlanningPoint();
   }, [searchStartDate, searchEndDate, current]);
 
+  const onSearch = () => {
+    setCurrent(1);
+    fetchPlanningPoint();
+  };
+
   const onChangePage = (page: number) => {
     setCurrent(page);
   };
@@ -82,7 +87,7 @@ const IndexPlanningPoint = () => {
               padding: "8px",
             }}
           >
-            <strong>รายการคะแนน (รอรับคะแนน)</strong>
+            <strong>รายการแต้ม (รอรับแต้ม)</strong>
           </span>
         </div>
         <div style={{ color: color.Error }}>
@@ -124,7 +129,7 @@ const IndexPlanningPoint = () => {
               color: color.secondary2,
               backgroundColor: color.Success,
             }}
-            onClick={fetchPlanningPoint}
+            onClick={onSearch}
           >
             ค้นหาข้อมูล
           </Button>
@@ -163,16 +168,16 @@ const IndexPlanningPoint = () => {
                   <span>{checkFarmer[0].telephone_no}</span>
                 </Col>
                 <Col span={5}>
-                  <label>คะแนน :</label>{" "}
+                  <label>แต้ม :</label>{" "}
                   <span>+ {checkFarmer[0].receive_point}</span>
                   <Tooltip
                     placement="top"
                     title={
-                      "คะแนนที่จะได้รับ : " +
+                      "แต้มที่จะได้รับ : " +
                       checkFarmer[0].rai +
                       " ไร่ x " +
                       checkFarmer[0].point_per_rai +
-                      " คะแนน"
+                      " แต้ม"
                     }
                     key={1}
                   >
@@ -215,16 +220,16 @@ const IndexPlanningPoint = () => {
                   <span>{checkDroner[0].telephone_no}</span>
                 </Col>
                 <Col span={5}>
-                  <label>คะแนน :</label>{" "}
+                  <label>แต้ม :</label>{" "}
                   <span>+ {checkDroner[0].receive_point}</span>
                   <Tooltip
                     placement="top"
                     title={
-                      "คะแนนที่จะได้รับ : " +
+                      "แต้มที่จะได้รับ : " +
                       checkDroner[0].rai +
                       " ไร่ x " +
                       checkDroner[0].point_per_rai +
-                      " คะแนน"
+                      " แต้ม"
                     }
                     key={1}
                   >
@@ -275,7 +280,7 @@ const IndexPlanningPoint = () => {
       },
     },
     {
-      title: "ประเภทการได้รับคะแนน",
+      title: "ประเภทการได้รับแต้ม",
       width: "20%",
       render: (value: any, row: any, index: number) => {
         return {
@@ -303,7 +308,7 @@ const IndexPlanningPoint = () => {
         />
       </CardContainer>
       <div className="d-flex justify-content-between pt-4">
-        <p>รายการทั้งหมด {data?.data.length} รายการ</p>
+        <p>รายการทั้งหมด {data?.count} รายการ</p>
         <Pagination
           current={current}
           total={data?.count}

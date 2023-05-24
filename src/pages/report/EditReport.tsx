@@ -82,7 +82,6 @@ function EditReport() {
   const fetchDetailTask = async () => {
     await TaskFinishedDatasource.getDetailFinishTaskById(taskId).then((res) => {
       console.log("report edit", res);
-
       if (res.data.couponId !== null) {
         CouponDataSource.getPromotionCode(res.data.couponId).then((result) =>
           setCouponData({
@@ -513,6 +512,7 @@ function EditReport() {
       <div className="row">
         <div className="col-lg">
           <p>Droner ID</p>
+
           <Input disabled defaultValue={data.data.droner.dronerCode} />
         </div>
         <div className="col-lg">
@@ -764,6 +764,26 @@ function EditReport() {
         </div>
         <div className="row pt-3">
           <div className="form-group col-lg-6 p-2">
+            <label>จำนวนแต้มที่ใช้แลก</label>
+            <Input
+              suffix="แต้ม"
+              value={data.data.usePoint}
+              disabled
+              autoComplete="off"
+            />
+          </div>
+          <div className="form-group col-lg-6 p-2">
+            <label>ส่วนลดจากการใช้แต้ม</label>
+            <Input
+              suffix="บาท"
+              value={data.data.discountCampaignPoint}
+              disabled
+              autoComplete="off"
+            />
+          </div>
+        </div>
+        {/* <div className="row pt-3">
+          <div className="form-group col-lg-6 p-2">
             <label>โปรโมชั่นนักบินโดรน</label>
             <Input
               suffix="บาท"
@@ -781,7 +801,7 @@ function EditReport() {
               autoComplete="off"
             />
           </div>
-        </div>
+        </div> */}
       </Form>
     </Form>
   );

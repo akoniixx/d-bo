@@ -110,7 +110,7 @@ const IndexCampaignPoint = () => {
               padding: "8px",
             }}
           >
-            <strong>แคมเปญคะแนน</strong>
+            <strong>แคมเปญแต้ม</strong>
           </span>
         </Col>
         <Col style={{ borderRight: "solid" }} span={7}>
@@ -143,7 +143,7 @@ const IndexCampaignPoint = () => {
           <Input
             allowClear
             prefix={<SearchOutlined style={{ color: color.Disable }} />}
-            placeholder="ค้นหาชื่อแคมเปญคะแนน"
+            placeholder="ค้นหาชื่อแคมเปญแต้ม"
             className="col-lg-12 p-1"
             defaultValue={keyword}
             onChange={(e) => setKeyword(e.target.value)}
@@ -215,12 +215,12 @@ const IndexCampaignPoint = () => {
       },
     },
     {
-      title: "การได้รับคะแนน",
+      title: "การได้รับแต้ม",
       width: "15%",
       render: (value: any, row: any, index: number) => {
         return {
           children: (
-            <span>{"+" + row.condition[0].point + " คะแนน / ไร่"}</span>
+            <span>{"+" + row.condition[0].point + " แต้ม / ไร่"}</span>
           ),
         };
       },
@@ -354,7 +354,7 @@ const IndexCampaignPoint = () => {
               โปรดตรวจสอบของแคมเปญที่คุณต้องการลบ ก่อนที่จะกดยืนยัน
             </span>
             <p className="text-secondary">
-              เพราะอาจส่งผลต่อการคะแนนในแอปพลิเคชัน
+              เพราะอาจส่งผลต่อการแต้มในแอปพลิเคชัน
             </p>
           </div>
           <Divider

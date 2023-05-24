@@ -7,16 +7,18 @@ interface CardHeaderProps {
   showButton?: boolean;
   onClickButoon?: () => void;
   buttonName?: string;
+  bgColor?: string;
 }
 export const CardHeader: React.FC<CardHeaderProps> = ({
   textHeader,
   showButton,
   onClickButoon,
   buttonName,
+  bgColor,
 }) => (
   <div
     style={{
-      backgroundColor: color.Success,
+      backgroundColor: bgColor ? bgColor : color.Success,
       borderRadius: "12px 12px 0px 0px",
       padding: "10px 10px 10px 10px",
     }}

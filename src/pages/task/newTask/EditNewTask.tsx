@@ -541,7 +541,8 @@ const EditNewTask = () => {
                         value={data?.farmAreaAmount}
                         onChange={handleAmountRai}
                         disabled={
-                          current == 2 ||
+                          current === 2 ||
+                          current === 0 ||
                           checkSelectPlot == "error" ||
                           data.couponId
                             ? true
@@ -678,11 +679,7 @@ const EditNewTask = () => {
                               ? color.White
                               : color.Success,
                         }}
-                        disabled={
-                          current == 2 ||
-                          checkSelectPlot == "error"
-                         
-                        }
+                        disabled={current == 2 || checkSelectPlot == "error"}
                         onClick={(e) => selectPrice(e)}
                       >
                         กรอกข้อมูลเอง
@@ -1720,6 +1717,26 @@ const EditNewTask = () => {
             </div>
             <div className="row pt-3">
               <div className="form-group col-lg-6 p-2">
+                <label>จำนวนแต้มที่ใช้แลก</label>
+                <Input
+                  suffix="แต้ม"
+                  value={data.usePoint}
+                  disabled
+                  autoComplete="off"
+                />
+              </div>
+              <div className="form-group col-lg-6 p-2">
+                <label>ส่วนลดจากการใช้แต้ม</label>
+                <Input
+                  suffix="บาท"
+                  value={data.discountCampaignPoint}
+                  disabled
+                  autoComplete="off"
+                />
+              </div>
+            </div>
+            {/* <div className="row pt-3">
+              <div className="form-group col-lg-6 p-2">
                 <label>โปรโมชั่นนักบินโดรน</label>
                 <Input
                   suffix="บาท"
@@ -1737,7 +1754,7 @@ const EditNewTask = () => {
                   autoComplete="off"
                 />
               </div>
-            </div>
+            </div> */}
           </Form>
         </CardContainer>
       </Form>

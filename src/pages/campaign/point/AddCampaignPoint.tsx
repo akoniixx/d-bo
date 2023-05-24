@@ -118,26 +118,26 @@ const AddCampaignPoint = () => {
         <Row>
           <BackIconButton onClick={() => navigate(-1)} />
           <span className="pt-3">
-            <strong style={{ fontSize: "20px" }}>เพิ่มแคมเปญคะแนน</strong>
+            <strong style={{ fontSize: "20px" }}>เพิ่มแคมเปญแต้ม</strong>
           </span>
         </Row>
         <CardContainer>
-          <CardHeader textHeader="ข้อมูลแคมเปญคะแนน" />
+          <CardHeader textHeader="ข้อมูลแคมเปญแต้ม" />
           <Form style={{ padding: "32px" }} form={form}>
             <Col span={24}>
               <label>
-                ชื่อแคมเปญคะแนน<span style={{ color: color.Error }}>*</span>
+                ชื่อแคมเปญแต้ม<span style={{ color: color.Error }}>*</span>
               </label>
               <Form.Item
                 name="campaignName"
                 rules={[
                   {
                     required: true,
-                    message: "กรุณากรอกชื่อแคมเปญคะแนน!",
+                    message: "กรุณากรอกชื่อแคมเปญแต้ม!",
                   },
                 ]}
               >
-                <Input placeholder="กรอกชื่อแคมเปญคะแนน" autoComplete="off" />
+                <Input placeholder="กรอกชื่อแคมเปญแต้ม" autoComplete="off" />
               </Form.Item>
             </Col>
             <Row>
@@ -253,20 +253,20 @@ const AddCampaignPoint = () => {
             <Row gutter={8} justify={"start"}>
               <Col span={7}>
                 <label>
-                  คะแนนที่ได้รับ<span style={{ color: color.Error }}>*</span>
+                  แต้มที่ได้รับ<span style={{ color: color.Error }}>*</span>
                 </label>
                 <Form.Item
                   name="point"
                   rules={[
                     {
                       required: true,
-                      message: "กรุณากรอกจำนวนคะแนน!",
+                      message: "กรุณากรอกจำนวนแต้ม!",
                     },
                   ]}
                 >
                   <Input
-                    placeholder="กรอกคะแนนที่ได้รับ"
-                    suffix="คะแนน"
+                    placeholder="กรอกแต้มที่ได้รับ"
+                    suffix="แต้ม"
                     autoComplete="off"
                     onChange={(e) => checkNumber(e, "point")}
                   />
@@ -363,7 +363,7 @@ const AddCampaignPoint = () => {
               โปรดตรวจสอบแคมเปญที่คุณต้องการเพิ่ม ก่อนที่จะกดยืนยันการเพิ่ม
             </span>
             <p className="text-secondary">
-              เพราะอาจส่งผลต่อการคะแนนในแอปพลิเคชัน
+              เพราะอาจส่งผลต่อการแต้มในแอปพลิเคชัน
             </p>
           </div>
           <Divider

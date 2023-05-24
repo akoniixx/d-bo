@@ -26,10 +26,8 @@ import {
 const logout = () => {
   localStorage.clear();
   sessionStorage.clear();
-  var url = window.location.href;
-  var arr = url.split("/");
-  var resultUrlHost = arr[0] + "//" + arr[2];
-  window.location.href = "AuthPage";
+  var url = window.location.origin + "/AuthPage";
+  window.location.href = url;
 };
 
 const Layouts: React.FC<any> = ({ children }) => {
@@ -188,16 +186,16 @@ const Layouts: React.FC<any> = ({ children }) => {
             </Menu.SubMenu>
             <Menu.SubMenu
               icon={<StarFilled />}
-              title={<span>คะแนนสะสม</span>}
+              title={<span>แต้มสะสม</span>}
               key={"sub7"}
             >
-              <Menu.SubMenu title={<span>รายการคะแนน</span>} key={"sub9"}>
+              <Menu.SubMenu title={<span>รายการแต้ม</span>} key={"sub9"}>
                 <Menu.Item key="planningpoint">
                   <Link
                     to="/IndexPlanningPoint"
                     style={{ textDecoration: "none" }}
                   >
-                    <span>รอรับคะแนน</span>
+                    <span>รอรับแต้ม</span>
                   </Link>
                 </Menu.Item>
                 <Menu.Item key="receivepoint">
@@ -205,7 +203,15 @@ const Layouts: React.FC<any> = ({ children }) => {
                     to="/IndexReceivePoint"
                     style={{ textDecoration: "none" }}
                   >
-                    <span>ได้รับคะแนน</span>
+                    <span>ได้รับแต้ม</span>
+                  </Link>
+                </Menu.Item>
+                <Menu.Item key="redeempoint">
+                  <Link
+                    to="/IndexRedeem/Farmer"
+                    style={{ textDecoration: "none" }}
+                  >
+                    <span>แลกแต้ม</span>
                   </Link>
                 </Menu.Item>
               </Menu.SubMenu>
@@ -215,7 +221,7 @@ const Layouts: React.FC<any> = ({ children }) => {
                   to="/IndexCampaignPoint"
                   style={{ textDecoration: "none" }}
                 >
-                  <span>แคมเปญคะแนน</span>
+                  <span>แคมเปญแต้ม</span>
                 </Link>
               </Menu.Item>
             </Menu.SubMenu>
@@ -245,7 +251,7 @@ const Layouts: React.FC<any> = ({ children }) => {
                   <span>ราคาฉีดพ่น</span>
                 </Link>
               </Menu.Item>
-              <Menu.SubMenu title={<span>คะแนน</span>} key={"sub8"}>
+              <Menu.SubMenu title={<span>แต้ม</span>} key={"sub8"}>
                 <Menu.Item key="conditionFarmer">
                   <Link
                     to="/ConditionFarmer"

@@ -564,6 +564,26 @@ function FinishTasks() {
         </div>
         <div className="row pt-3">
           <div className="form-group col-lg-6 p-2">
+            <label>จำนวนแต้มที่ใช้แลก</label>
+            <Input
+              suffix="แต้ม"
+              value={data.data.usePoint}
+              disabled
+              autoComplete="off"
+            />
+          </div>
+          <div className="form-group col-lg-6 p-2">
+            <label>ส่วนลดจากการใช้แต้ม</label>
+            <Input
+              suffix="บาท"
+              value={data.data.discountCampaignPoint}
+              disabled
+              autoComplete="off"
+            />
+          </div>
+        </div>
+        {/* <div className="row pt-3">
+          <div className="form-group col-lg-6 p-2">
             <label>โปรโมชั่นนักบินโดรน</label>
             <Input
               suffix="บาท"
@@ -581,7 +601,7 @@ function FinishTasks() {
               autoComplete="off"
             />
           </div>
-        </div>
+        </div> */}
       </Form>
     </Form>
   );

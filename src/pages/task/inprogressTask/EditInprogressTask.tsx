@@ -103,7 +103,6 @@ const EditInprogressTask = () => {
       fetchPurposeSpray(res.farmerPlot.plantName);
       setDronerSelected(res.droner);
       setCheckCrop(!res.targetSpray.includes("อื่นๆ"));
-      console.log("check", res);
       setData(res);
       CouponDataSource.getPromotionCode(res.couponId).then((result) =>
         setCouponData({
@@ -498,7 +497,7 @@ const EditInprogressTask = () => {
               <div className="form-group col-lg-4">
                 <label>จำนวนไร่</label>
                 <Form.Item>
-                  <Input value={data?.farmAreaAmount} />
+                  <Input value={data?.farmAreaAmount} disabled />
                 </Form.Item>
               </div>
             </div>
@@ -710,6 +709,26 @@ const EditInprogressTask = () => {
             </div>
             <div className="row pt-3">
               <div className="form-group col-lg-6 p-2">
+                <label>จำนวนแต้มที่ใช้แลก</label>
+                <Input
+                  suffix="แต้ม"
+                  value={data.usePoint}
+                  disabled
+                  autoComplete="off"
+                />
+              </div>
+              <div className="form-group col-lg-6 p-2">
+                <label>ส่วนลดจากการใช้แต้ม</label>
+                <Input
+                  suffix="บาท"
+                  value={data.discountCampaignPoint}
+                  disabled
+                  autoComplete="off"
+                />
+              </div>
+            </div>
+            {/* <div className="row pt-3">
+              <div className="form-group col-lg-6 p-2">
                 <label>โปรโมชั่นนักบินโดรน</label>
                 <Input
                   suffix="บาท"
@@ -727,7 +746,7 @@ const EditInprogressTask = () => {
                   autoComplete="off"
                 />
               </div>
-            </div>
+            </div> */}
           </Form>
         </CardContainer>
       </Form>

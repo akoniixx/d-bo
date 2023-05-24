@@ -64,6 +64,7 @@ const DetailDronerPoint = () => {
       updateBy: "รชยา ก้าวแปดเมตร",
     },
   ];
+  
   const renderDetailRecipient = () => {
     let checkFarmer: any = dataMock.description.filter(
       (x: any) => x.source === "Farmer"

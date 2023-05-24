@@ -3,17 +3,14 @@ import {
   EditOutlined,
   UserOutlined,
   ExceptionOutlined,
-  InfoCircleFilled,
 } from "@ant-design/icons";
 import {
   Badge,
   Button,
   DatePicker,
-  Divider,
   Dropdown,
   Menu,
   Pagination,
-  Popover,
   Select,
   Table,
 } from "antd";
@@ -42,7 +39,6 @@ import { color } from "../../../resource";
 import { DateTimeUtil } from "../../../utilities/DateTimeUtil";
 import {
   numberWithCommas,
-  numberWithCommasToFixed,
 } from "../../../utilities/TextFormatter";
 const { RangePicker } = DatePicker;
 const dateFormat = "DD-MM-YYYY";
@@ -73,7 +69,6 @@ const IndexNewTask = () => {
       searchStartDate,
       searchEndDate
     ).then((res) => {
-      console.log(res.data);
       setData(res);
     });
   };

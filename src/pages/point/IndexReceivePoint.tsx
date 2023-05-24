@@ -10,75 +10,75 @@ import {
   Input,
   Pagination,
   Row,
+  Select,
   Table,
   Tooltip,
 } from "antd";
-import React, { useState } from "react";
+import moment from "moment";
+import React, { useEffect, useState } from "react";
 import { Container } from "react-bootstrap";
 import { CardContainer } from "../../components/card/CardContainer";
 import Layouts from "../../components/layout/Layout";
+import { PointReceiveDatasource } from "../../datasource/PointReceiveDatasource";
+import { ReceivePointListEntity } from "../../entities/PointReceiveEntities";
 import { color } from "../../resource";
 import { DateTimeUtil } from "../../utilities/DateTimeUtil";
+import { numberWithCommas } from "../../utilities/TextFormatter";
 const { RangePicker } = DatePicker;
+const dateSearchFormat = "YYYY-MM-DD";
+const dateFormat = "DD/MM/YYYY";
 
 const IndexReceivePoint = () => {
-  const dateFormat = "DD/MM/YYYY";
-  const row = 10;
+  const row = 5;
   const [current, setCurrent] = useState(1);
+  const [data, setData] = useState<ReceivePointListEntity>();
+  const [searchKeyword, setSearchKeyword] = useState("");
+  const [searchMission, setSearchMission] = useState("");
+  const [searchStartDate, setSearchStartDate] = useState<any>(null);
+  const [searchEndDate, setSearchEndDate] = useState<any>(null);
+  const [searchType, setSearchType] = useState("");
+
+  const fetchReceivePoint = () => {
+    PointReceiveDatasource.getReceivePoint(
+      row,
+      current,
+      searchKeyword,
+      searchMission,
+      searchStartDate,
+      searchEndDate,
+      searchType
+    ).then((res) => {
+      const mapKey = res.history.map((x, i) => ({
+        ...x,
+        key: i + 1,
+      }));
+      setData({ ...res, history: mapKey });
+    });
+  };
+
+  useEffect(() => {
+    fetchReceivePoint();
+  }, [current, searchStartDate, searchEndDate]);
+
+  const onSearch = () => {
+    setCurrent(1);
+    fetchReceivePoint();
+  };
 
   const onChangePage = (page: number) => {
     setCurrent(page);
   };
 
-  const dataMock = [
-    {
-      key: 1,
-      dateTime: Date(),
-      pointNo: "P00000001",
-      taskId: "TK00000001",
-      missionId: "-",
-      type: "การจ้างงาน",
-      description: [
-        {
-          source: "Farmer",
-          farmerId: "f1",
-          farmerName: "รชยา ช่างภักดี",
-          telephone: "0938355808",
-          point: 100,
-          rai: 50,
-          unitPoint: 2,
-        },
-        {
-          source: "Droner",
-          dronerId: "d1",
-          dronerName: "รชยา ทำงานวันหยุด",
-          telephone: "0938355808",
-          point: 200,
-          rai: 100,
-          unitPoint: 4,
-        },
-      ],
-    },
-    {
-      key: 2,
-      dateTime: Date(),
-      pointNo: "P00000001",
-      taskId: "TK00000001",
-      missionId: "MS00000001",
-      type: "ภารกิจ",
-      description: [
-        {
-          source: "Droner",
-          farmerId: "f1",
-          dronerName: "รชยา ช่างภักดี",
-          telephone: "0938355808",
-          point: 100,
-          rai: 50,
-          unitPoint: 2,
-        },
-      ],
-    },
-  ];
+  const handleSearchDate = (e: any) => {
+    if (e != null) {
+      setSearchStartDate(moment(new Date(e[0])).format(dateSearchFormat));
+      setSearchEndDate(moment(new Date(e[1])).format(dateSearchFormat));
+    } else {
+      setSearchStartDate(e);
+      setSearchEndDate(e);
+    }
+    setCurrent(1);
+  };
 
   const pageTitle = (
     <>
@@ -95,7 +95,7 @@ const IndexReceivePoint = () => {
               padding: "8px",
             }}
           >
-            <strong>รายการคะแนน (ได้รับคะแนน)</strong>
+            <strong>รายการแต้ม (ได้รับแต้ม)</strong>
           </span>
         </div>
         <div style={{ color: color.Error }}>
@@ -103,6 +103,7 @@ const IndexReceivePoint = () => {
             allowClear
             format={dateFormat}
             placeholder={["เลือกวันที่เริ่ม", "เลือกวันที่สิ้นสุด"]}
+            onCalendarChange={(val) => handleSearchDate(val)}
           />
         </div>
       </div>
@@ -116,15 +117,28 @@ const IndexReceivePoint = () => {
             prefix={<SearchOutlined style={{ color: color.Disable }} />}
             placeholder="ค้นหานักบินโดรน/เกษตรกร/เบอร์โทร"
             className="col-lg-12 p-1"
+            onChange={(e) => setSearchKeyword(e.target.value)}
           />
         </div>
         <div className="col-lg p-1">
           <Input
             allowClear
             prefix={<SearchOutlined style={{ color: color.Disable }} />}
-            placeholder="ค้นหารหัส Task No."
+            placeholder="ค้นหารหัส Task No. / Mission No."
             className="col-lg-12 p-1"
+            onChange={(e) => setSearchMission(e.target.value)}
           />
+        </div>
+        <div className="col-lg-2">
+          <Select
+            className="col-lg-12 p-1"
+            placeholder="ประเภทการได้รับแต้ม"
+            allowClear
+            onChange={(e) => setSearchType(e)}
+          >
+            <option value="JOB">การจ้างงาน</option>
+            <option value="MISSION">ภารกิจ</option>
+          </Select>
         </div>
         <div className="pt-1">
           <Button
@@ -134,6 +148,7 @@ const IndexReceivePoint = () => {
               color: color.secondary2,
               backgroundColor: color.Success,
             }}
+            onClick={onSearch}
           >
             ค้นหาข้อมูล
           </Button>
@@ -143,16 +158,12 @@ const IndexReceivePoint = () => {
   );
 
   const expandData = (record: any) => {
-    let checkFarmer = record.description.filter(
-      (x: any) => x.source === "Farmer"
-    );
-    let checkDroner = record.description.filter(
-      (x: any) => x.source === "Droner"
-    );
+    let checkFarmer = record.farmerTransaction;
+    let checkDroner = record.dronerTransaction;
     return (
       <Row justify={"space-between"} gutter={16}>
-        {checkFarmer.length > 0 && (
-          <Col span={checkDroner.length > 0 ? 12 : 24}>
+        {checkFarmer !== null && (
+          <Col span={checkDroner !== null ? 12 : 24}>
             <Container
               style={{
                 backgroundColor: "rgba(86, 167, 104, 0.1)",
@@ -163,41 +174,55 @@ const IndexReceivePoint = () => {
               <Row>
                 <Col span={11}>
                   <label>ชื่อเกษตรกร : </label>{" "}
-                  <span>{checkFarmer[0].farmerName}</span>
+                  <span>
+                    {checkFarmer.mission !== null
+                      ? (checkFarmer.firstname + " " + checkFarmer.lastname)
+                          .length > 20 && checkFarmer.mission === null
+                        ? (
+                            checkFarmer.firstname +
+                            " " +
+                            checkFarmer.lastname
+                          ).substring(0, 20)
+                        : checkFarmer.firstname + " " + checkFarmer.lastname
+                      : checkFarmer.firstname + " " + checkFarmer.lastname}
+                  </span>
                 </Col>
                 <Col span={8}>
                   <label>เบอร์โทร : </label>{" "}
-                  <span>{checkFarmer[0].telephone}</span>
+                  <span>{checkFarmer.telephoneNo}</span>
                 </Col>
                 <Col span={5}>
-                  <label>คะแนน :</label> <span>+ {checkFarmer[0].point}</span>
-                  <Tooltip
-                    placement="top"
-                    title={
-                      "คะแนนที่จะได้รับ : " +
-                      checkFarmer[0].rai +
-                      " ไร่ x" +
-                      checkFarmer[0].unitPoint +
-                      " คะแนน"
-                    }
-                    key={1}
-                  >
-                    <InfoCircleFilled
-                      style={{
-                        position: "relative",
-                        bottom: 3,
-                        left: 4,
-                        color: color.Success,
-                      }}
-                    />
-                  </Tooltip>
+                  <label>แต้ม :</label>{" "}
+                  <span>+ {numberWithCommas(checkFarmer.amountValue)}</span>
+                  {checkFarmer.raiAmount > 0 && (
+                    <Tooltip
+                      placement="top"
+                      title={
+                        "แต้มที่จะได้รับ : " +
+                        checkFarmer.raiAmount +
+                        " ไร่ x " +
+                        checkFarmer.amountValue / checkFarmer.raiAmount +
+                        " แต้ม"
+                      }
+                      key={1}
+                    >
+                      <InfoCircleFilled
+                        style={{
+                          position: "relative",
+                          bottom: 3,
+                          left: 4,
+                          color: color.Success,
+                        }}
+                      />
+                    </Tooltip>
+                  )}
                 </Col>
               </Row>
             </Container>
           </Col>
         )}
-        {checkDroner.length > 0 && (
-          <Col span={checkFarmer.length > 0 ? 12 : 24}>
+        {checkDroner !== null && (
+          <Col span={checkFarmer !== null ? 12 : 24}>
             <Container
               style={{
                 backgroundColor: "rgba(235, 87, 87, 0.1)",
@@ -208,34 +233,46 @@ const IndexReceivePoint = () => {
               <Row>
                 <Col span={11}>
                   <label>ชื่อนักบินโดรน :</label>{" "}
-                  <span>{checkDroner[0].dronerName}</span>
+                  <span>
+                    {(checkDroner.firstname + " " + checkDroner.lastname)
+                      .length > 20 && checkDroner.mission === null
+                      ? (
+                          checkDroner.firstname +
+                          " " +
+                          checkDroner.lastname
+                        ).substring(0, 20) + "..."
+                      : checkDroner.firstname + " " + checkDroner.lastname}
+                  </span>
                 </Col>
                 <Col span={8}>
                   <label>เบอร์โทร :</label>{" "}
-                  <span>{checkDroner[0].telephone}</span>
+                  <span>{checkDroner.telephoneNo}</span>
                 </Col>
                 <Col span={5}>
-                  <label>คะแนน :</label> <span>+ {checkDroner[0].point}</span>
-                  <Tooltip
-                    placement="top"
-                    title={
-                      "คะแนนที่จะได้รับ : " +
-                      checkDroner[0].rai +
-                      " ไร่ x" +
-                      checkDroner[0].unitPoint +
-                      " คะแนน"
-                    }
-                    key={1}
-                  >
-                    <InfoCircleFilled
-                      style={{
-                        position: "relative",
-                        bottom: 3,
-                        left: 4,
-                        color: color.Warning,
-                      }}
-                    />
-                  </Tooltip>
+                  <label>แต้ม :</label>{" "}
+                  <span>+ {numberWithCommas(checkDroner.amountValue)}</span>
+                  {checkDroner.raiAmount > 0 && (
+                    <Tooltip
+                      placement="top"
+                      title={
+                        "แต้มที่จะได้รับ : " +
+                        checkDroner.raiAmount +
+                        " ไร่ x " +
+                        checkDroner.amountValue / checkDroner.raiAmount +
+                        " แต้ม"
+                      }
+                      key={1}
+                    >
+                      <InfoCircleFilled
+                        style={{
+                          position: "relative",
+                          bottom: 3,
+                          left: 4,
+                          color: color.Warning,
+                        }}
+                      />
+                    </Tooltip>
+                  )}
                 </Col>
               </Row>
             </Container>
@@ -256,7 +293,7 @@ const IndexReceivePoint = () => {
           children: (
             <>
               <span>
-                {row.dateTime && DateTimeUtil.formatDateTime(row.dateTime)}
+                {row.createAt && DateTimeUtil.formatDateTime(row.createAt)}
               </span>
               <br />
               <span style={{ color: color.Grey }}>{row.task_no}</span>
@@ -266,12 +303,22 @@ const IndexReceivePoint = () => {
       },
     },
     {
-      title: "Task No",
-      dataIndex: "taskId",
+      title: "Point No",
+      dataIndex: "pointNo",
       width: "20%",
       render: (value: any, row: any, index: number) => {
         return {
-          children: <u style={{ color: color.Success }}>{row.taskId}</u>,
+          children: <span>{row.pointNo}</span>,
+        };
+      },
+    },
+    {
+      title: "Task No",
+      dataIndex: "taskNo",
+      width: "20%",
+      render: (value: any, row: any, index: number) => {
+        return {
+          children: <u style={{ color: color.Success }}>{row.taskNo}</u>,
         };
       },
     },
@@ -281,20 +328,35 @@ const IndexReceivePoint = () => {
       width: "20%",
       render: (value: any, row: any, index: number) => {
         return {
-          children: row.missionId !== "-" && (
-            <u style={{ color: color.Success }}>{row.missionId}</u>
-          ),
+          children:
+            row.dronerTransaction !== null ? (
+              row.dronerTransaction.mission ? (
+                <u style={{ color: color.Success }}>
+                  {row.dronerTransaction.mission.missionNo}
+                </u>
+              ) : (
+                <>-</>
+              )
+            ) : (
+              <>-</>
+            ),
         };
       },
     },
     {
-      title: "ประเภทการได้รับคะแนน",
-      dataIndex: "type",
-      key: "type",
+      title: "ประเภทการได้รับแต้ม",
       width: "20%",
       render: (value: any, row: any, index: number) => {
         return {
-          children: <span>{row.type}</span>,
+          children: (
+            <>
+              <span>
+                {row.taskId ? "การจ้างงาน" : "ภารกิจ"}
+                {row.action === "RETURN" && " (คืนแต้ม)"}
+              </span>
+              <br />
+            </>
+          ),
         };
       },
     },
@@ -305,11 +367,11 @@ const IndexReceivePoint = () => {
       {pageTitle}
       <CardContainer>
         <Table
-          dataSource={dataMock}
+          dataSource={data?.history}
           columns={columns}
           expandable={{
             expandedRowRender: (record) => expandData(record),
-            defaultExpandAllRows: true,
+            expandedRowKeys: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
             showExpandColumn: false,
           }}
           pagination={false}
@@ -318,10 +380,10 @@ const IndexReceivePoint = () => {
         />
       </CardContainer>
       <div className="d-flex justify-content-between pt-4">
-        <p>รายการทั้งหมด {dataMock?.length} รายการ</p>
+        <p>รายการทั้งหมด {data?.count} รายการ</p>
         <Pagination
           current={current}
-          total={dataMock.length}
+          total={data?.count}
           onChange={onChangePage}
           pageSize={row}
           showSizeChanger={false}
