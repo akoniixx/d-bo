@@ -36,6 +36,7 @@ export interface ReceivePointEntity {
   pointNo: string;
   status: string;
   createAt: string;
+  action: string;
   farmerTranaction: {
     campaignId: string;
     campaignName: string;
@@ -43,6 +44,7 @@ export interface ReceivePointEntity {
     firstname: string;
     lastname: string;
     telephoneNo: string;
+    raiAmount: number;
   };
   dronerTransaction: {
     campaignId: string;
@@ -51,6 +53,7 @@ export interface ReceivePointEntity {
     firstname: string;
     lastname: string;
     telephoneNo: string;
+    raiAmount: number;
   };
 }
 

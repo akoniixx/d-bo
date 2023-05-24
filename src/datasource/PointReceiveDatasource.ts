@@ -37,19 +37,31 @@ export class PointReceiveDatasource {
 
   static getReceivePoint(
     take?: number,
-    page?: number
+    page?: number,
+    name?: string,
+    taskMission?: string,
+    startDate?: string,
+    endDate?: string,
+    type?: string
   ): Promise<ReceivePointListEntity> {
     const params = {
       take: take,
       page: page,
+      name: name,
+      taskMission: taskMission,
+      startDate: startDate,
+      endDate: endDate,
+      type: type,
     };
     return httpClient
-      .get(BASE_URL + "/promotion/historypoint-quota/getallhistory", { params })
+      .get(BASE_URL + "/promotion/historypoint-quota/getallhistoryincrease", {
+        params,
+      })
       .then((response) => {
         return response.data;
       })
       .catch((err) => {
-        console.log(err, "err getCoupon");
+        console.log(err, "err get receive point");
       });
   }
 }
