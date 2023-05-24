@@ -290,6 +290,7 @@ export interface TaskReportEntity {
   farmerPlot: FarmerPlotEntity;
   droner: DronerEntity;
   taskDronerTemp: TaskDronerTempEntity[];
+  discountCampaignPoint: string;
 }
 export const TaskReportEntity_INIT: TaskReportEntity = {
   key: "",
@@ -341,6 +342,7 @@ export const TaskReportEntity_INIT: TaskReportEntity = {
   farmerPlot: FarmerPlotEntity_INIT,
   droner: DronerEntity_INIT,
   taskDronerTemp: [TaskDronerTempEntity_INIT],
+  discountCampaignPoint: "",
 };
 export interface summaryReportEntity {
   waitpayment: string;

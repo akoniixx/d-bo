@@ -603,7 +603,7 @@ function EditInProgress() {
           <div className="col-lg-4 text-start">
             <label>จำนวนไร่</label>
             <Form.Item>
-              <Input defaultValue={data.farmAreaAmount} suffix="ไร่" />
+              <Input defaultValue={data.farmAreaAmount} suffix="ไร่" disabled/>
             </Form.Item>
           </div>
         </div>

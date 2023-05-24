@@ -82,7 +82,6 @@ function EditReport() {
   const fetchDetailTask = async () => {
     await TaskFinishedDatasource.getDetailFinishTaskById(taskId).then((res) => {
       console.log("report edit", res);
-
       if (res.data.couponId !== null) {
         CouponDataSource.getPromotionCode(res.data.couponId).then((result) =>
           setCouponData({
@@ -513,6 +512,7 @@ function EditReport() {
       <div className="row">
         <div className="col-lg">
           <p>Droner ID</p>
+
           <Input disabled defaultValue={data.data.droner.dronerCode} />
         </div>
         <div className="col-lg">

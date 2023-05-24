@@ -1,13 +1,14 @@
 import { Badge, Col, Form, Row, Table } from "antd";
 import React, { useEffect, useState } from "react";
 import { Container } from "react-bootstrap";
-import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import { BackIconButton } from "../../components/button/BackButton";
 import { CardContainer } from "../../components/card/CardContainer";
 import { CardHeader } from "../../components/header/CardHearder";
 import Layouts from "../../components/layout/Layout";
+import InvoiceTask from "../../components/popover/InvoiceTask";
 import { RedeemDatasource } from "../../datasource/RedeemDatasource";
+import { InvoiceTaskEntity } from "../../entities/NewTaskEntities";
 import { DetailRedeemFermerEntity } from "../../entities/RedeemEntities";
 import { color } from "../../resource";
 import { DateTimeUtil } from "../../utilities/DateTimeUtil";
@@ -36,9 +37,11 @@ const DetailFarmerRedeem = () => {
       status: string;
     }[]
   >([]);
+  const [dataInvoice, setDataInvoice] = useState<InvoiceTaskEntity>();
 
   const fetchDetailRedeem = () => {
     RedeemDatasource.getRedeemFarmerById(queryString[1]).then((res) => {
+      console.log(res);
       setData(res);
       let his: any = [];
       if (res.status === "CANCELED") {
@@ -68,6 +71,18 @@ const DetailFarmerRedeem = () => {
           },
         ];
       }
+      let inv: InvoiceTaskEntity = {
+        raiAmount: res.farmAreaAmount,
+        unitPrice: res.unitPrice,
+        price: res.price,
+        fee: res.fee,
+        discountFee: res.discountFee,
+        discountCoupon: res.discountCoupon,
+        discountPromotion: res.discountPromotion,
+        discountPoint: res.discountCampaignPoint,
+        totalPrice: res.totalPrice,
+      };
+      setDataInvoice(inv);
       setDataHis(his);
     });
   };
@@ -131,10 +146,12 @@ const DetailFarmerRedeem = () => {
         return {
           children: (
             <span>
-              {row.updateBy}{" "}
+              {index === 0 ? row.createBy : row.updateBy}{" "}
               <span>
-                {row.createBy === row.updatedBy || index === 0
+                {row.createBy === row.updateBy || index === 0
                   ? "(เกษตรกร)"
+                  : row.updateBy === null
+                  ? "-"
                   : "(ผู้ดูแลระบบ)"}
               </span>{" "}
             </span>
@@ -180,7 +197,13 @@ const DetailFarmerRedeem = () => {
             </Col>
             <Col span={3}>
               <div>ชื่อนักบินโดรน</div>
-              <div>{data?.droner.firstname + " " + data?.droner.lastname}</div>
+              {data?.dronerId ? (
+                <div>
+                  {data?.droner.firstname + " " + data?.droner.lastname}
+                </div>
+              ) : (
+                <div>-</div>
+              )}
             </Col>
             <Col span={5}>
               <div>พื้นที่แปลงเกษตร</div>
@@ -205,6 +228,13 @@ const DetailFarmerRedeem = () => {
               <Row>
                 <div>
                   {numberWithCommas(parseFloat(data?.totalPrice || ""))} บาท
+                </div>
+                <div className="pt-0">
+                  <InvoiceTask
+                    data={dataInvoice}
+                    iconColor={color.Success}
+                    title="รายละเอียดค่าบริการ"
+                  />
                 </div>
               </Row>
             </Col>

@@ -27,9 +27,11 @@ export interface DetailRedeemFermerEntity {
   unitPrice: string;
   totalPrice: string;
   fee: string;
+  price: string;
   discountFee: string;
   discountPromotion: string;
   discountCampaignPoint: string;
+  discountCoupon: string;
   farmAreaAmount: string;
   statusRemark: string;
   status: string;
@@ -54,6 +56,7 @@ export interface DetailRedeemFermerEntity {
       postcode: string;
     };
   };
+  dronerId: string;
   droner: {
     id: string;
     firstname: string;
