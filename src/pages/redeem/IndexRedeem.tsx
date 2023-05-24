@@ -16,11 +16,14 @@ import {
   Table,
   Tooltip,
 } from "antd";
+import moment from "moment";
 import React, { useEffect, useState } from "react";
 import { Container } from "react-bootstrap";
 import ActionButton from "../../components/button/ActionButton";
 import { CardContainer } from "../../components/card/CardContainer";
 import Layouts from "../../components/layout/Layout";
+import { RedeemDatasource } from "../../datasource/RedeemDatasource";
+import { RedeemFarmerListEntity } from "../../entities/RedeemEntities";
 import { color } from "../../resource";
 import image from "../../resource/image";
 import { DateTimeUtil } from "../../utilities/DateTimeUtil";
@@ -35,34 +38,49 @@ const IndexRedeem = () => {
   const [source, setSource] = useState<string>(
     window.location.pathname.split("/")[2]
   );
+  const [dataFarmer, setDataFarmer] = useState<RedeemFarmerListEntity>();
+  const [searchKeyword, setSearchKeyword] = useState("");
+  const [searchStartDate, setSearchStartDate] = useState<any>(null);
+  const [searchEndDate, setSearchEndDate] = useState<any>(null);
+  const [searchStatus, setSearchStatus] = useState("");
 
-  useEffect(() => {}, []);
-  
+  const fetchRedeemFarmer = () => {
+    RedeemDatasource.getRedeemFarmer(
+      row,
+      current,
+      searchKeyword,
+      searchStartDate,
+      searchEndDate,
+      searchStatus
+    ).then((res) => {
+      setDataFarmer(res);
+    });
+  };
+
+  useEffect(() => {
+    fetchRedeemFarmer();
+  }, [current, searchStartDate, searchEndDate]);
+
   const onChangePage = (page: number) => {
     setCurrent(page);
   };
+  const onSearch = () => {
+    setCurrent(1);
+    fetchRedeemFarmer();
+  };
+  const handleSearchDate = (e: any) => {
+    if (e != null) {
+      setSearchStartDate(moment(new Date(e[0])).format(dateSearchFormat));
+      setSearchEndDate(moment(new Date(e[1])).format(dateSearchFormat));
+    } else {
+      setSearchStartDate(e);
+      setSearchEndDate(e);
+    }
+    setCurrent(1);
+  };
+
   const plainOptions = ["Physical", "Digital"];
 
-  const dataMockFarmer = [
-    {
-      dateTime: Date(),
-      taskNo: "TK00000001",
-      firstName: "รชยา",
-      lastName: "ช่างภักดี",
-      telephone: "0938355808",
-      point: 100,
-      status: "แลกสำเร็จ",
-    },
-    {
-      dateTime: Date(),
-      taskNo: "TK00000002",
-      firstName: "รชยา",
-      lastName: "เลิกงานแล้วนะ",
-      telephone: "0938355808",
-      point: 100,
-      status: "ยกเลิก",
-    },
-  ];
   const dataMockDroner = [
     {
       key: 1,
@@ -107,7 +125,7 @@ const IndexRedeem = () => {
   const pageTitle = (
     <>
       <Row justify={"space-between"} style={{ padding: "10px" }}>
-        <Col span={14}>
+        <Col span={16}>
           <span
             className="card-label font-weight-bolder text-dark"
             style={{
@@ -119,7 +137,7 @@ const IndexRedeem = () => {
             <strong>รายงานแต้ม (แลกแต้ม)</strong>
           </span>
         </Col>
-        <Col span={4}>
+        <Col span={2}>
           <Radio.Group buttonStyle="outline">
             <Radio.Button
               value="Farmer"
@@ -137,7 +155,7 @@ const IndexRedeem = () => {
             >
               เกษตรกร
             </Radio.Button>
-            <Radio.Button
+            {/* <Radio.Button
               value="Droner"
               style={
                 source === "Droner"
@@ -152,7 +170,7 @@ const IndexRedeem = () => {
               onClick={() => setSource("Droner")}
             >
               นักบินโดรน
-            </Radio.Button>
+            </Radio.Button> */}
           </Radio.Group>
         </Col>
         {/* <Col>
@@ -167,6 +185,7 @@ const IndexRedeem = () => {
             allowClear
             format={dateFormat}
             placeholder={["เลือกวันที่เริ่ม", "เลือกวันที่สิ้นสุด"]}
+            onCalendarChange={(val) => handleSearchDate(val)}
           />
         </Col>
       </Row>
@@ -181,6 +200,7 @@ const IndexRedeem = () => {
               prefix={<SearchOutlined style={{ color: color.Disable }} />}
               placeholder="ค้นหาชื่อเกษตรกร/เบอร์โทร"
               className="col-lg-12 p-1"
+              onChange={(e) => setSearchKeyword(e.target.value)}
             />
           </div>
           <div className="col-lg">
@@ -188,9 +208,10 @@ const IndexRedeem = () => {
               className="col-lg-12 p-1"
               placeholder="สถานะทั้งหมด"
               allowClear
+              onChange={(e) => setSearchStatus(e)}
             >
-              <option value="แลกสำเร็จ">แลกสำเร็จ</option>
-              <option value="ยกเลิก"></option>
+              <option value="SUCCESS">แลกสำเร็จ</option>
+              <option value="CANCELED">ยกเลิก</option>
             </Select>
           </div>
           <div className="pt-1">
@@ -201,6 +222,7 @@ const IndexRedeem = () => {
                 color: color.secondary2,
                 backgroundColor: color.Success,
               }}
+              onClick={onSearch}
             >
               ค้นหาข้อมูล
             </Button>
@@ -269,14 +291,14 @@ const IndexRedeem = () => {
   const columnsFarmer = [
     {
       title: "วันที่อัพเดท",
-      dataIndex: "dateTime",
-      key: "dateTime",
+      dataIndex: "createdAt",
+      key: "createdAt",
       render: (value: any, row: any, index: number) => {
         return {
           children: (
             <>
               <span>
-                {row.dateTime && DateTimeUtil.formatDateTime(row.dateTime)}
+                {row.createdAt && DateTimeUtil.formatDateTime(row.createdAt)}
               </span>
             </>
           ),
@@ -296,7 +318,9 @@ const IndexRedeem = () => {
       title: "ชื่อเกษตรกร",
       render: (value: any, row: any, index: number) => {
         return {
-          children: <span>{row.firstName + " " + row.lastName}</span>,
+          children: (
+            <span>{row.farmer.firstname + " " + row.farmer.lastname}</span>
+          ),
         };
       },
     },
@@ -305,35 +329,42 @@ const IndexRedeem = () => {
       dataIndex: "telephone",
       render: (value: any, row: any, index: number) => {
         return {
-          children: <span>{row.telephone}</span>,
+          children: <span>{row.farmer.telephoneNo}</span>,
         };
       },
     },
     {
       title: "แต้มที่แลก",
       dataIndex: "point",
+      width: "10%",
       render: (value: any, row: any, index: number) => {
         return {
-          children: <span style={{ color: color.Error }}>- {row.point}</span>,
+          children: (
+            <span style={{ color: color.Error }}>- {row.usePoint}</span>
+          ),
         };
       },
     },
     {
       title: "สถานะ",
       dataIndex: "status",
+      width: "10%",
       render: (value: any, row: any, index: number) => {
         return {
           children: (
             <>
               <span
                 style={{
-                  color: row.status === "ยกเลิก" ? color.Error : color.Success,
+                  color:
+                    row.status !== "CANCELED" ? color.Success : color.Error,
                 }}
               >
                 <Badge
-                  color={row.status === "ยกเลิก" ? color.Error : color.Success}
+                  color={
+                    row.status !== "CANCELED" ? color.Success : color.Error
+                  }
                 />{" "}
-                {row.status}
+                {row.status === "CANCELED" ? "ยกเลิก" : "แลกสำเร็จ"}
               </span>
             </>
           ),
@@ -344,6 +375,7 @@ const IndexRedeem = () => {
       title: "",
       dataIndex: "Action",
       key: "Action",
+      width: "8%",
       render: (value: any, row: any, index: number) => {
         return {
           children: (
@@ -353,8 +385,7 @@ const IndexRedeem = () => {
                   icon={<FileTextOutlined />}
                   color={color.primary1}
                   onClick={() =>
-                    (window.location.href =
-                      "/DetailFarmerRedeem/id=" + (index + 1))
+                    (window.location.href = "/DetailFarmerRedeem/id=" + row.id)
                   }
                 />
               </div>
@@ -563,7 +594,7 @@ const IndexRedeem = () => {
       <CardContainer>
         {source === "Farmer" && (
           <Table
-            dataSource={dataMockFarmer}
+            dataSource={dataFarmer?.data}
             columns={columnsFarmer}
             pagination={false}
             size="large"
@@ -588,13 +619,13 @@ const IndexRedeem = () => {
       <div className="d-flex justify-content-between pt-4">
         <p>
           รายการทั้งหมด{" "}
-          {source === "Farmer" ? dataMockFarmer.length : dataMockDroner.length}{" "}
+          {source === "Farmer" ? dataFarmer?.count : dataMockDroner.length}{" "}
           รายการ
         </p>
         <Pagination
           current={current}
           total={
-            source === "Farmer" ? dataMockFarmer.length : dataMockDroner.length
+            source === "Farmer" ? dataFarmer?.count : dataMockDroner.length
           }
           onChange={onChangePage}
           pageSize={row}

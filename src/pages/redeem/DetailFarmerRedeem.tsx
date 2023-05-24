@@ -1,5 +1,5 @@
 import { Badge, Col, Form, Row, Table } from "antd";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Container } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
@@ -7,8 +7,11 @@ import { BackIconButton } from "../../components/button/BackButton";
 import { CardContainer } from "../../components/card/CardContainer";
 import { CardHeader } from "../../components/header/CardHearder";
 import Layouts from "../../components/layout/Layout";
+import { RedeemDatasource } from "../../datasource/RedeemDatasource";
+import { DetailRedeemFermerEntity } from "../../entities/RedeemEntities";
 import { color } from "../../resource";
 import { DateTimeUtil } from "../../utilities/DateTimeUtil";
+import { numberWithCommas } from "../../utilities/TextFormatter";
 const _ = require("lodash");
 let queryString = _.split(window.location.pathname, "=");
 
@@ -23,35 +26,56 @@ const NewTable = styled(Table)`
 `;
 
 const DetailFarmerRedeem = () => {
-  const navigate = useNavigate();
-
-  const dataMock = {
-    dateTime: Date(),
-    farmerName: "รชยา ช่างภักดี",
-    telephone: "0938355808",
-    address: "3888/197  ต.สำโรงเหนือ อ.เมืองสมุทรปราการ จ.สมุทรปราการ 10270",
-    campaignName: "แจกคะแนนขึ้นต่ำ 2 ไร่",
-    pointType: queryString[1] === "1" ? "ได้รับคะแนน" : "แลกคะแนน",
-    totalPoint: queryString[1] === "1" ? 100 : 200,
-    status: "รอดำเนินการ",
-  };
-  const dataTaskMock = {
-    taskId: "TK20230501TH-0000002",
-    dateTime: Date(),
-    farmerName: "รชยา ช่างภักดี",
-    plot: "สำโรงเหนือ/เมืองสมุทรปราการ/สมุทรปราการ",
-    raiAmount: 20,
-    unitPrice: 60,
-    totalPrice: 1200,
-  };
-  const dataHisMock = [
+  const [data, setData] = useState<DetailRedeemFermerEntity>();
+  const [dataHis, setDataHis] = useState<
     {
-      dateTime: Date(),
-      remark: "-",
-      updateBy: "รชยา ช่างภักดี",
-      status: "แลกสำเร็จ",
-    },
-  ];
+      dateTime: string;
+      remark: string;
+      createBy: string;
+      updateBy: string;
+      status: string;
+    }[]
+  >([]);
+
+  const fetchDetailRedeem = () => {
+    RedeemDatasource.getRedeemFarmerById(queryString[1]).then((res) => {
+      setData(res);
+      let his: any = [];
+      if (res.status === "CANCELED") {
+        his = [
+          {
+            dateTime: res.createdAt,
+            remark: "-",
+            createBy: res.createBy,
+            updateBy: res.updateBy,
+            status: "แลกสำเร็จ",
+          },
+          {
+            dateTime: res.updatedAt,
+            remark: res.statusRemark,
+            createBy: res.createBy,
+            updateBy: res.updateBy,
+            status: "ยกเลิก",
+          },
+        ];
+      } else {
+        his = [
+          {
+            dateTime: res.createdAt,
+            remark: "-",
+            updateBy: res.createBy,
+            status: "แลกสำเร็จ",
+          },
+        ];
+      }
+      setDataHis(his);
+    });
+  };
+
+  useEffect(() => {
+    fetchDetailRedeem();
+  }, []);
+
   const columeHis = [
     {
       title: "วันที่อัพเดท",
@@ -105,7 +129,16 @@ const DetailFarmerRedeem = () => {
       key: "updateBy",
       render: (value: any, row: any, index: number) => {
         return {
-          children: <span>{row.updateBy} (เกษตรกร)</span>,
+          children: (
+            <span>
+              {row.updateBy}{" "}
+              <span>
+                {row.createBy === row.updatedBy || index === 0
+                  ? "(เกษตรกร)"
+                  : "(ผู้ดูแลระบบ)"}
+              </span>{" "}
+            </span>
+          ),
         };
       },
     },
@@ -132,33 +165,47 @@ const DetailFarmerRedeem = () => {
             <Col span={3}>
               <div>รหัสงาน</div>
               <div style={{ color: "#2B2B2B" }}>
-                <u>{dataTaskMock.taskId}</u>
+                <u>{data?.taskNo}</u>
               </div>
             </Col>
-            <Col span={4}>
+            <Col span={3}>
               <div>วัน/เวลานัดหมาย</div>
-              <div>{DateTimeUtil.formatDateTime(dataTaskMock.dateTime)}</div>
+              <div>
+                {DateTimeUtil.formatDateTime(data?.dateAppointment || "")}
+              </div>
             </Col>
-            <Col span={4}>
+            <Col span={3}>
               <div>ชื่อเกษตรกร</div>
-              <div>{dataTaskMock.farmerName}</div>
+              <div>{data?.farmer.firstname + " " + data?.farmer.lastname}</div>
+            </Col>
+            <Col span={3}>
+              <div>ชื่อนักบินโดรน</div>
+              <div>{data?.droner.firstname + " " + data?.droner.lastname}</div>
             </Col>
             <Col span={5}>
               <div>พื้นที่แปลงเกษตร</div>
-              <div>{dataTaskMock.plot}</div>
+              <div>
+                {data?.farmerPlot.plotArea.subdistrictName +
+                  "/" +
+                  data?.farmerPlot.plotArea.districtName +
+                  "/" +
+                  data?.farmerPlot.plotArea.provinceName}
+              </div>
             </Col>
             <Col span={2}>
               <div>จำนวนไร่</div>
-              <div>{dataTaskMock.raiAmount} ไร่</div>
+              <div>{data?.farmAreaAmount} ไร่</div>
             </Col>
-            <Col span={3}>
+            <Col span={2}>
               <div>ค่าบริการ/ไร่</div>
-              <div>{dataTaskMock.unitPrice} บาท</div>
+              <div>{data?.unitPrice} บาท</div>
             </Col>
             <Col span={3}>
               <div>ยอดรวมค่าบริการ</div>
               <Row>
-                <div>{dataTaskMock.totalPrice} บาท</div>
+                <div>
+                  {numberWithCommas(parseFloat(data?.totalPrice || ""))} บาท
+                </div>
               </Row>
             </Col>
           </Row>
@@ -174,28 +221,36 @@ const DetailFarmerRedeem = () => {
           <Col span={4}>
             <div>ชื่อเกษตรกร</div>
             <div style={{ color: color.Success }}>
-              <u>{dataMock.farmerName}</u>
+              <u>{data?.farmer.firstname + " " + data?.farmer.lastname}</u>
             </div>
           </Col>
           <Col span={4}>
             <div>เบอร์โทร</div>
-            <div>{dataMock.telephone}</div>
+            <div>{data?.farmer.telephoneNo}</div>
           </Col>
           <Col span={12}>
             <div>ที่อยู่</div>
-            <div>{dataMock.address}</div>
+            <div>
+              {data?.farmer.address.address1 +
+                " " +
+                data?.farmer.address.address2 +
+                " " +
+                data?.farmer.address.subdistrict.subdistrictName +
+                " " +
+                data?.farmer.address.district.districtName +
+                " " +
+                data?.farmer.address.province.provinceName +
+                " " +
+                data?.farmer.address.postcode}
+            </div>
           </Col>
           <Col span={4}>
             <div>แต้มที่แลก</div>
-            <div style={{ color: color.Error }}>- {dataMock.totalPoint}</div>
+            <div style={{ color: color.Error }}>- {data?.usePoint}</div>
           </Col>
         </Row>
       </Container>
-      <NewTable
-        columns={columeHis}
-        dataSource={dataHisMock}
-        pagination={false}
-      />
+      <NewTable columns={columeHis} dataSource={dataHis} pagination={false} />
     </CardContainer>
   );
 
@@ -206,9 +261,7 @@ const DetailFarmerRedeem = () => {
           onClick={() => (window.location.href = "/IndexRedeem/Farmer")}
         />
         <span className="pt-3">
-          <strong style={{ fontSize: "20px" }}>
-            รายละเอียดการแลกแต้ม | RD0000001
-          </strong>
+          <strong style={{ fontSize: "20px" }}>รายละเอียดการแลกแต้ม</strong>
         </span>
       </Row>
       {renderTaskDetail}
