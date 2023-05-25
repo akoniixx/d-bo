@@ -20,7 +20,6 @@ import moment from "moment";
 import React, { useEffect, useState } from "react";
 import ActionButton from "../../../components/button/ActionButton";
 import { CardContainer } from "../../../components/card/CardContainer";
-import Layouts from "../../../components/layout/Layout";
 import ModalMapPlot from "../../../components/modal/task/newTask/ModalMapPlot";
 import InvoiceTask from "../../../components/popover/InvoiceTask";
 import { LocationDatasource } from "../../../datasource/LocationDatasource";
@@ -38,6 +37,8 @@ import {
   numberWithCommas,
   numberWithCommasToFixed,
 } from "../../../utilities/TextFormatter";
+import { DashboardLayout } from "../../../components/layout/Layout";
+import { useNavigate } from "react-router-dom";
 
 const { RangePicker } = DatePicker;
 const dateFormat = "DD/MM/YYYY";
@@ -45,6 +46,7 @@ const timeFormat = "HH:mm";
 const dateSearchFormat = "YYYY-MM-DD";
 
 const IndexInprogressTask = () => {
+  const navigate = useNavigate();
   const row = 10;
   const [current, setCurrent] = useState(1);
   const [data, setData] = useState<TaskInprogressPageEntity>();
@@ -455,8 +457,7 @@ const IndexInprogressTask = () => {
                 icon={<EditOutlined />}
                 color={color.primary1}
                 onClick={() =>
-                  (window.location.href =
-                    "/EditInprogressTask/id=" + row.task_id)
+                  navigate("/EditInprogressTask/id=" + row.task_id)
                 }
               />
             </div>
@@ -467,8 +468,8 @@ const IndexInprogressTask = () => {
   ];
 
   return (
-    <>
-      <Layouts>
+    <div>
+      <>
         {PageTitle}
         <CardContainer>
           <Table
@@ -490,7 +491,7 @@ const IndexInprogressTask = () => {
             showSizeChanger={false}
           />
         </div>
-      </Layouts>
+      </>
       {showModalMap && (
         <ModalMapPlot
           show={showModalMap}
@@ -499,7 +500,7 @@ const IndexInprogressTask = () => {
           plotId={plotId}
         />
       )}
-    </>
+    </div>
   );
 };
 export default IndexInprogressTask;

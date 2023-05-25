@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import Layout from "../../../components/layout/Layout";
 import {
   Row,
   Form,
@@ -69,6 +68,7 @@ import TextArea from "antd/lib/input/TextArea";
 import { useLocalStorage } from "../../../hook/useLocalStorage";
 import { resizeFileImg } from "../../../utilities/ResizeImage";
 import { useNavigate } from "react-router-dom";
+import { DashboardLayout } from "../../../components/layout/Layout";
 const dateFormat = "DD/MM/YYYY";
 const dateCreateFormat = "YYYY-MM-DD";
 
@@ -523,7 +523,7 @@ function AddDroner() {
             timer: 1500,
             showConfirmButton: false,
           }).then((time) => {
-            window.location.href = "/IndexDroner";
+            navigate("/IndexDroner");
           });
         } else {
           Swal.fire({
@@ -1205,7 +1205,7 @@ function AddDroner() {
   );
 
   return (
-    <Layout>
+    <>
       <Row>
         <BackIconButton onClick={() => navigate(-1)} />
         <span className="pt-4">
@@ -1245,7 +1245,7 @@ function AddDroner() {
           title="แก้ไขข้อมูลโดรนเกษตร"
         />
       )}
-    </Layout>
+    </>
   );
 }
 

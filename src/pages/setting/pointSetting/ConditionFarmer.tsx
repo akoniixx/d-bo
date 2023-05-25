@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import Layouts from "../../../components/layout/Layout";
 import { Button, Checkbox, Col, Divider, Form, Input, Row, Space } from "antd";
 import { CardContainer } from "../../../components/card/CardContainer";
 import { CardHeader } from "../../../components/header/CardHearder";
@@ -12,10 +11,10 @@ import { PointSettingDatasource } from "../../../datasource/PointSettingDatasour
 import Swal from "sweetalert2";
 import { validateOnlyNumber } from "../../../utilities/TextFormatter";
 import { useForm } from "antd/es/form/Form";
+import { DashboardLayout } from "../../../components/layout/Layout";
 
 const _ = require("lodash");
 const { Map } = require("immutable");
-let queryString = _.split(window.location.search, "=");
 
 function ConditionFarmer() {
   const [form] = Form.useForm();
@@ -419,7 +418,7 @@ function ConditionFarmer() {
     </CardContainer>
   );
   return (
-    <Layouts>
+    <>
       <Row>
         <span className="p-3">
           <strong style={{ fontSize: "20px" }}>เงื่อนไขเกษตรกร</strong>
@@ -455,7 +454,7 @@ function ConditionFarmer() {
           </Button>
         </Row>
       </div>
-    </Layouts>
+    </>
   );
 }
 

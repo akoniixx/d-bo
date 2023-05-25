@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import Search from "antd/lib/input/Search";
 import { Option } from "antd/lib/mentions";
 import color from "../../resource/color";
-import Layouts from "../../components/layout/Layout";
+import { DashboardLayout } from "../../components/layout/Layout";
 import ActionButton from "../../components/button/ActionButton";
 import {
   CaretDownOutlined,
@@ -333,7 +333,7 @@ function IndexFarmer() {
         <div>
           <AddButtton
             text="เพิ่มเกษตรกร"
-            onClick={() => (window.location.href = "/AddFarmer")}
+            onClick={() => navigate("/AddFarmer")}
           />
         </div>
       </div>
@@ -706,7 +706,7 @@ function IndexFarmer() {
                 icon={<EditOutlined />}
                 color={color.primary1}
                 onClick={() =>
-                  (window.location.href = "/EditFarmer/id=" + row.id)
+                  navigate("/EditFarmer/id=" + row.id)
                 }
               />
             </div>
@@ -717,7 +717,7 @@ function IndexFarmer() {
   ];
 
   return (
-    <Layouts>
+    <>
       {pageTitle}
       <CardContainer>
         <Table
@@ -749,7 +749,7 @@ function IndexFarmer() {
           showSizeChanger={false}
         />
       </div>
-    </Layouts>
+    </>
   );
 }
 

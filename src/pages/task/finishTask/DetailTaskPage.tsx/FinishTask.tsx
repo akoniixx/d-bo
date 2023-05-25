@@ -1,4 +1,3 @@
-import Layout from "../../../../components/layout/Layout";
 import React, { useEffect, useState } from "react";
 import {
   Avatar,
@@ -39,12 +38,15 @@ import {
   numberWithCommas,
   numberWithCommasToFixed,
 } from "../../../../utilities/TextFormatter";
+import { DashboardLayout } from "../../../../components/layout/Layout";
+import { useNavigate } from "react-router-dom";
 const _ = require("lodash");
-let queryString = _.split(window.location.search, "=");
 const dateFormat = "DD/MM/YYYY";
 const timeFormat = "HH:mm";
 
 function FinishTasks() {
+  let queryString = _.split(window.location.search, "=");
+  const navigate = useNavigate();
   const taskId = queryString[1];
   const [couponData, setCouponData] = useState<{
     couponCode: string;
@@ -607,10 +609,10 @@ function FinishTasks() {
   );
 
   return (
-    <Layout>
+    <>
       <Row>
         <BackIconButton
-          onClick={() => (window.location.href = "/IndexFinishTask")}
+          onClick={() => navigate("/IndexFinishTask")}
         />
         <span className="pt-4">
           <strong style={{ fontSize: "20px" }}>
@@ -637,7 +639,7 @@ function FinishTasks() {
         <CardHeader textHeader="ยอดรวมค่าบริการ" />
         {renderPrice}
       </CardContainer>
-    </Layout>
+    </>
   );
 }
 

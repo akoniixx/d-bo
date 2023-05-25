@@ -33,7 +33,6 @@ import {
 import SaveButton from "../../../components/button/SaveButton";
 import { CardContainer } from "../../../components/card/CardContainer";
 import { CardHeader } from "../../../components/header/CardHearder";
-import Layouts from "../../../components/layout/Layout";
 import GooleMap from "../../../components/map/GoogleMap";
 import { CropDatasource } from "../../../datasource/CropDatasource";
 import { TaskDatasource } from "../../../datasource/TaskDatasource";
@@ -90,6 +89,8 @@ import {
   TaskCoupon,
   TaskCoupon_INIT,
 } from "../../../entities/CalculateTask";
+import { DashboardLayout } from "../../../components/layout/Layout";
+import { useNavigate } from "react-router-dom";
 const dateFormat = "DD/MM/YYYY";
 const dateCreateFormat = "YYYY-MM-DD";
 const timeFormat = "HH:mm";
@@ -100,11 +101,11 @@ const { Step } = Steps;
 
 const _ = require("lodash");
 const { Map } = require("immutable");
-let queryString = _.split(window.location.pathname, "=");
 
 const EditNewTask = () => {
+  let queryString = _.split(window.location.pathname, "=");
   const [form] = Form.useForm();
-
+  const navigate =useNavigate();
   const profile = JSON.parse(localStorage.getItem("profile") || "{  }");
   const [current, setCurrent] = useState(0);
   const [data, setData] = useState<GetNewTaskEntity>(GetNewTaskEntity_INIT);
@@ -1843,7 +1844,7 @@ const EditNewTask = () => {
       if (result.isConfirmed) {
         await TaskDatasource.updateNewTask(updateTask).then((res) => {
           if (res.userMessage == "success") {
-            window.location.href = "/IndexNewTask";
+            navigate("/IndexNewTask");
           }
         });
       }
@@ -1889,7 +1890,7 @@ const EditNewTask = () => {
       <Row className="d-flex justify-content-between pt-2">
         {current == 0 && (
           <BackButton
-            onClick={() => (window.location.href = "/IndexNewTask")}
+            onClick={() => navigate("/IndexNewTask")}
           />
         )}
         {current > 0 && (
@@ -1917,10 +1918,10 @@ const EditNewTask = () => {
 
   return (
     <>
-      <Layouts key={data?.id}>
+      <div key={data?.id}>
         <Row>
           <BackIconButton
-            onClick={() => (window.location.href = "/IndexNewTask")}
+            onClick={() => navigate("/IndexNewTask")}
           />
           <span className="pt-3">
             <strong style={{ fontSize: "20px" }}>
@@ -1929,7 +1930,7 @@ const EditNewTask = () => {
           </span>
         </Row>
         {renderStep}
-      </Layouts>
+      </div>
       {showModalSelectedDroner && (
         <ModalSelectedEditDroner
           show={showModalSelectedDroner}

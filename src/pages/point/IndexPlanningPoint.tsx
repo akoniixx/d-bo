@@ -13,7 +13,6 @@ import moment from "moment";
 import React, { useEffect, useState } from "react";
 import { Container } from "react-bootstrap";
 import { CardContainer } from "../../components/card/CardContainer";
-import Layouts from "../../components/layout/Layout";
 import { PointReceiveDatasource } from "../../datasource/PointReceiveDatasource";
 import { PlanningPointListEntity } from "../../entities/PointReceiveEntities";
 import { color } from "../../resource";
@@ -291,7 +290,7 @@ const IndexPlanningPoint = () => {
   ];
 
   return (
-    <Layouts>
+    <>
       {pageTitle}
       <CardContainer>
         <Table
@@ -317,7 +316,7 @@ const IndexPlanningPoint = () => {
           showSizeChanger={false}
         />
       </div>
-    </Layouts>
+    </>
   );
 };
 export default IndexPlanningPoint;

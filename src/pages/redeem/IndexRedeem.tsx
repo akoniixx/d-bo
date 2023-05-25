@@ -21,17 +21,18 @@ import React, { useEffect, useState } from "react";
 import { Container } from "react-bootstrap";
 import ActionButton from "../../components/button/ActionButton";
 import { CardContainer } from "../../components/card/CardContainer";
-import Layouts from "../../components/layout/Layout";
 import { RedeemDatasource } from "../../datasource/RedeemDatasource";
 import { RedeemFarmerListEntity } from "../../entities/RedeemEntities";
 import { color } from "../../resource";
 import image from "../../resource/image";
 import { DateTimeUtil } from "../../utilities/DateTimeUtil";
+import { useNavigate } from "react-router-dom";
 
 const { RangePicker } = DatePicker;
 const dateSearchFormat = "YYYY-MM-DD";
 
 const IndexRedeem = () => {
+  const navigate = useNavigate();
   const dateFormat = "DD/MM/YYYY";
   const row = 10;
   const [current, setCurrent] = useState(1);
@@ -384,9 +385,7 @@ const IndexRedeem = () => {
                 <ActionButton
                   icon={<FileTextOutlined />}
                   color={color.primary1}
-                  onClick={() =>
-                    (window.location.href = "/DetailFarmerRedeem/id=" + row.id)
-                  }
+                  onClick={() => navigate("/DetailFarmerRedeem/id=" + row.id)}
                 />
               </div>
             </div>
@@ -589,7 +588,7 @@ const IndexRedeem = () => {
   };
 
   return (
-    <Layouts>
+    <>
       {pageTitle}
       <CardContainer>
         {source === "Farmer" && (
@@ -632,7 +631,7 @@ const IndexRedeem = () => {
           showSizeChanger={false}
         />
       </div>
-    </Layouts>
+    </>
   );
 };
 

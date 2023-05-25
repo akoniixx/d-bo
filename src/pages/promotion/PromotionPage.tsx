@@ -2,7 +2,6 @@ import DatePicker from "antd/lib/date-picker";
 import React, { useEffect, useRef, useState } from "react";
 import Search from "antd/lib/input/Search";
 import AddButtton from "../../components/button/AddButton";
-import Layouts from "../../components/layout/Layout";
 import Select from "antd/lib/select";
 import { Option } from "antd/lib/mentions";
 import Table from "antd/lib/table";
@@ -27,6 +26,7 @@ import {
 import { color } from "../../resource";
 import ModalDeleteCoupon from "../../components/modal/ModalDeleteCoupon";
 import { STATUS_COUPON } from "../../definitions/Status";
+import { DashboardLayout } from "../../components/layout/Layout";
 
 function PromotionPage() {
   const dateSearchFormat = "YYYY-MM-DD";
@@ -130,7 +130,7 @@ function PromotionPage() {
           couponConditionProvince: res.couponConditionProvince,
           couponConditionProvinceList: res.couponConditionProvinceList,
           createBy: profile.username + " " + profile.lastname,
-          conditionSpecificFarmer : res.specificFarmer
+          conditionSpecificFarmer: res.specificFarmer,
         };
         CouponDataSource.addCoupon(couponDto)
           .then((resSave) => {
@@ -166,7 +166,7 @@ function PromotionPage() {
                   couponConditionProvinceList:
                     resSave.couponConditionProvinceList,
                   createBy: resSave.createBy,
-                  conditionSpecificFarmer : false
+                  conditionSpecificFarmer: false,
                 },
                 ...data.promotions,
               ],
@@ -540,7 +540,7 @@ function PromotionPage() {
                   icon={<EditOutlined />}
                   color={color.primary1}
                   onClick={() => {
-                    window.location.href = "/EditPromotion/id=" + row.id;
+                    navigate("/EditPromotion/id=" + row.id);
                   }}
                 />
               </div>
@@ -569,7 +569,7 @@ function PromotionPage() {
   ];
 
   return (
-    <Layouts>
+    <>
       <ModalDeleteCoupon
         show={modalDelete}
         backButton={() => setModalDelete(!modalDelete)}
@@ -595,7 +595,7 @@ function PromotionPage() {
           showSizeChanger={false}
         />
       </div>
-    </Layouts>
+    </>
   );
 }
 

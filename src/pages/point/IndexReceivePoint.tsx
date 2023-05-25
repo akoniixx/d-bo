@@ -18,7 +18,6 @@ import moment from "moment";
 import React, { useEffect, useState } from "react";
 import { Container } from "react-bootstrap";
 import { CardContainer } from "../../components/card/CardContainer";
-import Layouts from "../../components/layout/Layout";
 import { PointReceiveDatasource } from "../../datasource/PointReceiveDatasource";
 import { ReceivePointListEntity } from "../../entities/PointReceiveEntities";
 import { color } from "../../resource";
@@ -363,7 +362,7 @@ const IndexReceivePoint = () => {
   ];
 
   return (
-    <Layouts>
+    <>
       {pageTitle}
       <CardContainer>
         <Table
@@ -389,7 +388,7 @@ const IndexReceivePoint = () => {
           showSizeChanger={false}
         />
       </div>
-    </Layouts>
+    </>
   );
 };
 export default IndexReceivePoint;

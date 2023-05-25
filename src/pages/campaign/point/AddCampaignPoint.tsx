@@ -17,7 +17,7 @@ import { BackIconButton } from "../../../components/button/BackButton";
 import { CardContainer } from "../../../components/card/CardContainer";
 import FooterPage from "../../../components/footer/FooterPage";
 import { CardHeader } from "../../../components/header/CardHearder";
-import Layouts from "../../../components/layout/Layout";
+import { DashboardLayout } from "../../../components/layout/Layout";
 import { CampaignDatasource } from "../../../datasource/CampaignDatasource";
 import { CreateCampaignEntiry } from "../../../entities/CampaignPointEntites";
 import { color } from "../../../resource";
@@ -91,7 +91,7 @@ const AddCampaignPoint = () => {
     setCreate(data);
     CampaignDatasource.createCampaign(data).then((res) => {
       if (res.success) {
-        window.location.href = "/IndexCampaignPoint";
+        navigate("/IndexCampaignPoint");
       } else {
         if (res.userMessage === "dupplicate") {
         } else {
@@ -114,7 +114,7 @@ const AddCampaignPoint = () => {
 
   return (
     <>
-      <Layouts>
+      <>
         <Row>
           <BackIconButton onClick={() => navigate(-1)} />
           <span className="pt-3">
@@ -345,7 +345,7 @@ const AddCampaignPoint = () => {
           styleFooter={{ padding: "6px" }}
           onClickSave={() => submit()}
         />
-      </Layouts>
+      </>
       {showModal && (
         <Modal
           title="ยืนยันการเพิ่ม"

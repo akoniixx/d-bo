@@ -17,7 +17,7 @@ import { BackIconButton } from "../../../components/button/BackButton";
 import { CardContainer } from "../../../components/card/CardContainer";
 import FooterPage from "../../../components/footer/FooterPage";
 import { CardHeader } from "../../../components/header/CardHearder";
-import Layouts from "../../../components/layout/Layout";
+import { DashboardLayout } from "../../../components/layout/Layout";
 import { CampaignDatasource } from "../../../datasource/CampaignDatasource";
 import {
   CampaignEntiry,
@@ -28,9 +28,8 @@ import { color } from "../../../resource";
 import { validateOnlyNumber } from "../../../utilities/TextFormatter";
 
 const _ = require("lodash");
-let queryString = _.split(window.location.pathname, "=");
-
 const EditCampaignPoint = () => {
+  let queryString = _.split(window.location.pathname, "=");
   const profile = JSON.parse(localStorage.getItem("profile") || "{  }");
   const navigate = useNavigate();
   const dateSearchFormat = "YYYY-MM-DD";
@@ -161,7 +160,7 @@ const EditCampaignPoint = () => {
     setUpdate(update);
     CampaignDatasource.updateCampaign(queryString[1], update).then((res) => {
       if (res.success) {
-        window.location.href = "/IndexCampaignPoint";
+        navigate("/IndexCampaignPoint")
       }
     });
   };
@@ -172,7 +171,7 @@ const EditCampaignPoint = () => {
 
   return (
     <>
-      <Layouts>
+      <>
         <Row>
           <BackIconButton onClick={() => navigate(-1)} />
           <span className="pt-3">
@@ -409,7 +408,7 @@ const EditCampaignPoint = () => {
           styleFooter={{ padding: "6px" }}
           onClickSave={() => submit()}
         />
-      </Layouts>
+      </>
       {showModal && (
         <Modal
           title="ยืนยันการแก้ไข"

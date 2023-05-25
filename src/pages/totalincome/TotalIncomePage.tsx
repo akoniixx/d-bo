@@ -1,11 +1,11 @@
 import React from 'react'
-import Layouts from '../../components/layout/Layout'
+import { DashboardLayout } from '../../components/layout/Layout'
 
 function TotalIncomePage() {
   return (
-    <Layouts>
+    <>
     <div>TotalIncomePage</div>
-    </Layouts>
+    </>
   )
 }
 

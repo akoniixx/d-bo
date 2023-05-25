@@ -1,25 +1,17 @@
-import {
-  FileTextOutlined,
-  SearchOutlined,
-} from "@ant-design/icons";
-import {
-  Button,
-  DatePicker,
-  Input,
-  Pagination,
-  Select,
-  Table,
-} from "antd";
+import { FileTextOutlined, SearchOutlined } from "@ant-design/icons";
+import { Button, DatePicker, Input, Pagination, Select, Table } from "antd";
 import React, { useState } from "react";
 import ActionButton from "../../../components/button/ActionButton";
 import { CardContainer } from "../../../components/card/CardContainer";
-import Layouts from "../../../components/layout/Layout";
 import { color } from "../../../resource";
 import { DateTimeUtil } from "../../../utilities/DateTimeUtil";
+import { DashboardLayout } from "../../../components/layout/Layout";
+import { useNavigate } from "react-router-dom";
 
 const { RangePicker } = DatePicker;
 
 const IndexDronerPoint = () => {
+  const navigate = useNavigate();
   const dateFormat = "DD/MM/YYYY";
   const dateSearchFormat = "YYYY-MM-DD";
 
@@ -211,8 +203,7 @@ const IndexDronerPoint = () => {
                   icon={<FileTextOutlined />}
                   color={color.primary1}
                   onClick={() =>
-                    (window.location.href =
-                      "/DetailDronerPoint/id=" + (index + 1))
+                    navigate("/DetailDronerPoint/id=" + (index + 1))
                   }
                 />
               </div>
@@ -225,7 +216,7 @@ const IndexDronerPoint = () => {
 
   return (
     <>
-      <Layouts>
+      <>
         {pageTitle}
         <CardContainer>
           <Table
@@ -249,7 +240,7 @@ const IndexDronerPoint = () => {
             showSizeChanger={false}
           />
         </div>
-      </Layouts>
+      </>
     </>
   );
 };

@@ -16,15 +16,15 @@ import { useNavigate } from "react-router-dom";
 import { BackIconButton } from "../../../components/button/BackButton";
 import { CardContainer } from "../../../components/card/CardContainer";
 import { CardHeader } from "../../../components/header/CardHearder";
-import Layouts from "../../../components/layout/Layout";
 import color from "../../../resource/color";
 import { DateTimeUtil } from "../../../utilities/DateTimeUtil";
 import { numberWithCommasToFixed } from "../../../utilities/TextFormatter";
+import { DashboardLayout } from "../../../components/layout/Layout";
 
 const _ = require("lodash");
-let queryString = _.split(window.location.pathname, "=");
 
 const DetailFarmerPoint = () => {
+  let queryString = _.split(window.location.pathname, "=");
   const navigate = useNavigate();
   const dataMock = {
     dateTime: Date(),
@@ -269,7 +269,7 @@ const DetailFarmerPoint = () => {
         showButton={true}
         buttonName="เช็คประวัติคะแนน"
         onClickButoon={() =>
-          (window.location.href = "/IndexDetailFarmerPoint/id=" + 1)
+          navigate("/IndexDetailFarmerPoint/id=" + 1)
         }
       />
       <Form style={{ padding: "32px" }}>
@@ -307,7 +307,7 @@ const DetailFarmerPoint = () => {
 
   return (
     <>
-      <Layouts>
+      <>
         <Row>
           <BackIconButton onClick={() => navigate(-1)} />
           <span className="pt-3">
@@ -317,7 +317,7 @@ const DetailFarmerPoint = () => {
         {renderPointDetail}
         <br />
         {renderDetailFarmer}
-      </Layouts>
+      </>
     </>
   );
 };

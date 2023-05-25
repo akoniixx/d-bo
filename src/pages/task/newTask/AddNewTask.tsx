@@ -32,7 +32,6 @@ import {
 import SaveButton from "../../../components/button/SaveButton";
 import { CardContainer } from "../../../components/card/CardContainer";
 import { CardHeader } from "../../../components/header/CardHearder";
-import Layouts from "../../../components/layout/Layout";
 import color from "../../../resource/color";
 import { TaskDatasource } from "../../../datasource/TaskDatasource";
 import { FarmerEntity } from "../../../entities/FarmerEntities";
@@ -76,6 +75,8 @@ import {
 } from "../../../entities/CouponEntites";
 import { DateTimeUtil } from "../../../utilities/DateTimeUtil";
 import form from "antd/lib/form";
+import { DashboardLayout } from "../../../components/layout/Layout";
+import { useNavigate } from "react-router-dom";
 
 const { Step } = Steps;
 const { Option } = Select;
@@ -87,9 +88,9 @@ const timeCreateFormat = "HH:mm:ss";
 const _ = require("lodash");
 const { Map } = require("immutable");
 
-let queryString = _.split(window.location.pathname, "=");
-
 const AddNewTask = () => {
+  let queryString = _.split(window.location.pathname, "=");
+  const navigate = useNavigate();
   const [form] = Form.useForm();
   const profile = JSON.parse(localStorage.getItem("profile") || "{  }");
   const [current, setCurrent] = useState(0);
@@ -1943,10 +1944,10 @@ const AddNewTask = () => {
           .then(async (res) => {
             if (res.userMessage === "success") {
               if (!couponCode) {
-                window.location.href = "/IndexNewTask";
+                navigate("/IndexNewTask");
               } else {
                 await CouponDataSource.usedCoupon(couponCode).then(
-                  (res) => (window.location.href = "/IndexNewTask")
+                  (res) => navigate("/IndexNewTask")
                 );
               }
             }
@@ -1995,7 +1996,7 @@ const AddNewTask = () => {
       <Row className="d-flex justify-content-between pt-2">
         {current === 0 && (
           <BackButton
-            onClick={() => (window.location.href = "/IndexNewTask")}
+            onClick={() => navigate("/IndexNewTask")}
           />
         )}
         {current > 0 && <BackButton onClick={() => previousStep()} />}
@@ -2022,17 +2023,17 @@ const AddNewTask = () => {
 
   return (
     <>
-      <Layouts>
+      <>
         <Row>
           <BackIconButton
-            onClick={() => (window.location.href = "/IndexNewTask")}
+            onClick={() => navigate("/IndexNewTask")}
           />
           <span className="pt-3">
             <strong style={{ fontSize: "20px" }}>เพิ่มงานบินใหม่</strong>
           </span>
         </Row>
         {renderStep}
-      </Layouts>
+      </>
       {showModalSelectedDroner && (
         <ModalSelectedDroner
           show={showModalSelectedDroner}

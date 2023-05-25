@@ -8,11 +8,9 @@ import { BackIconButton } from "../../components/button/BackButton";
 import { CardContainer } from "../../components/card/CardContainer";
 import FooterPage from "../../components/footer/FooterPage";
 import { CardHeader } from "../../components/header/CardHearder";
-import Layouts from "../../components/layout/Layout";
 import { color } from "../../resource";
 import { DateTimeUtil } from "../../utilities/DateTimeUtil";
 const _ = require("lodash");
-let queryString = _.split(window.location.pathname, "=");
 
 const NewTable = styled(Table)`
   .ant-table-container table thead tr th {
@@ -25,6 +23,7 @@ const NewTable = styled(Table)`
 `;
 
 const DetailDronerRedeem = () => {
+  let queryString = _.split(window.location.pathname, "=");
   const navigate = useNavigate();
   const [statusShip, setStatusShip] = useState("คำร้องขอแลก");
 
@@ -286,10 +285,10 @@ const DetailDronerRedeem = () => {
     </CardContainer>
   );
   return (
-    <Layouts>
+    <>
       <Row>
         <BackIconButton
-          onClick={() => (window.location.href = "/IndexRedeem/Droner")}
+          onClick={() => navigate("/IndexRedeem/Droner")}
         />
         <span className="pt-3">
           <strong style={{ fontSize: "20px" }}>
@@ -301,11 +300,11 @@ const DetailDronerRedeem = () => {
       <br />
       {renderDronerDetail}
       <FooterPage
-        onClickBack={() => (window.location.href = "/IndexRedeem/Droner")}
+        onClickBack={() => navigate("/IndexRedeem/Droner")}
         styleFooter={{ padding: "6px" }}
         //onClickSave={() => submit()}
       />
-    </Layouts>
+    </>
   );
 };
 
