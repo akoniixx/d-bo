@@ -42,7 +42,6 @@ export const MenuSide: React.FC<MenuSideProps> = ({ lists, isOpenSidebar }) => {
   const [current, setCurrent] = useState({
     path: "",
   });
-  const [isCollapse, setIsCollapse] = useState(true);
 
   useEffectOnce(() => {
     const pathName = window.location.pathname;
@@ -96,7 +95,7 @@ export const MenuSide: React.FC<MenuSideProps> = ({ lists, isOpenSidebar }) => {
                 ) : (
                   <div
                     style={{
-                      color: "#7B7B7B",
+                      color: "#231F20",
                       display: "flex",
                       gap: 18,
                       padding: "8px",

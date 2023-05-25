@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import { color, icon } from "../../resource";
 import { Image } from "antd";
+import { DownOutlined, UpOutlined } from "@ant-design/icons";
 
 interface CollapseSubMenuProps {
   subLists: {
@@ -13,14 +14,16 @@ interface CollapseSubMenuProps {
   name: string;
   title: string;
   path: string;
-  setCurrent: React.Dispatch<
+  setCurrentSub: React.Dispatch<
     React.SetStateAction<{
       path: string;
     }>
   >;
-  current: {
+  currentSub: {
     path: string;
   };
+  checkPathSub: string | undefined;
+  setCheckPathSub: React.Dispatch<React.SetStateAction<string | undefined>>;
 }
 
 const ListStyled = styled.div<{ isFocus?: boolean }>`
@@ -39,7 +42,7 @@ const SubListItem = styled.div<{ isFocus?: boolean }>`
   padding: 16px;
   padding-left: 64px;
   cursor: pointer;
-  color: ${(props) => (props.isFocus ? color.Success : "#7B7B7B")};
+  color: ${(props) => (props.isFocus ? color.Success : "#231F20")};
   width: 100%;
   font-size: 14px;
   height: 50px;
@@ -49,13 +52,13 @@ export const CollapseSubMenu: React.FC<CollapseSubMenuProps> = ({
   title,
   subLists,
   name,
-  setCurrent,
-  current,
+  setCurrentSub,
+  currentSub,
   path,
+  checkPathSub,
+  setCheckPathSub,
 }) => {
-  const [isCollapseSub, setIsCollapseSub] = useState(true);
   const navigate = useNavigate();
-
   return (
     <>
       <div
@@ -69,16 +72,20 @@ export const CollapseSubMenu: React.FC<CollapseSubMenuProps> = ({
           fontSize: "14px",
         }}
         onClick={() => {
-          setCurrent({ path });
-          setIsCollapseSub(!isCollapseSub);
+          setCurrentSub({ path });
+          if (path === checkPathSub) {
+            setCheckPathSub(undefined);
+          } else {
+            setCheckPathSub(path);
+          }
         }}
       >
-        {isCollapseSub ? (
+        {checkPathSub !== path ? (
           <>
             <div
               style={{
                 padding: "16px",
-                color: "#7B7B7B",
+                color: "#231F20",
                 display: "flex",
                 gap: 18,
                 cursor: "pointer",
@@ -91,18 +98,10 @@ export const CollapseSubMenu: React.FC<CollapseSubMenuProps> = ({
               {title}
             </div>
             <div style={{ paddingRight: "8px" }}>
-              {isCollapseSub ? (
-                <Image
-                  src={icon.arrowDown}
-                  style={{ width: "16px", height: "9px" }}
-                  preview={false}
-                />
+              {checkPathSub !== path ? (
+                <DownOutlined style={{ fontSize: "14px" }} />
               ) : (
-                <Image
-                  src={icon.arrowUp}
-                  style={{ width: "16px", height: "9px" }}
-                  preview={false}
-                />
+                <UpOutlined style={{ fontSize: "14px" }} />
               )}
             </div>
           </>
@@ -122,37 +121,18 @@ export const CollapseSubMenu: React.FC<CollapseSubMenuProps> = ({
                 display: "flex",
               }}
             >
-              {isCollapseSub ? (
-                <Image
-                  src={icon.arrowDown}
-                  style={{ width: "16px", height: "9px" }}
-                  preview={false}
-                />
+              {checkPathSub === path ? (
+                <DownOutlined style={{ fontSize: "14px" }} />
               ) : (
-                <Image
-                  src={icon.arrowGreen}
-                  style={{ width: "16px", height: "9px" }}
-                  preview={false}
+                <UpOutlined
+                  style={{ fontSize: "14px", color: color.Success }}
                 />
               )}
             </div>
           </>
         )}
-        {/* {isCollapseSub ? (
-          <Image
-            src={icon.arrowDown}
-            style={{ width: "16px", height: "9px" }}
-            preview={false}
-          />
-        ) : (
-          <Image
-            src={icon.arrowUp}
-            style={{ width: "16px", height: "9px" }}
-            preview={false}
-          />
-        )} */}
       </div>
-      {!isCollapseSub && (
+      {checkPathSub === path && (
         <div
           style={{
             width: "100%",
@@ -161,10 +141,10 @@ export const CollapseSubMenu: React.FC<CollapseSubMenuProps> = ({
           {subLists.map((subList, idx) => {
             return (
               <SubListItem
-                isFocus={current.path === subList.path}
+                isFocus={currentSub.path === subList.path}
                 key={idx}
                 onClick={() => {
-                  setCurrent({ path: subList.path });
+                  setCurrentSub({ path: subList.path });
                   navigate(subList.path);
                 }}
               >

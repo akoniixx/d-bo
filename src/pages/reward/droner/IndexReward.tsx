@@ -689,7 +689,7 @@ function IndexReward() {
               marginBottom: "20px",
             }}
           />
-          <div className="d-flex justify-content-between px-4 pb-4">
+          <div className="d-flex justify-content-between px-4 pt-3 pb-3">
             <Button
               style={{
                 borderColor: color.Error,

@@ -18,6 +18,8 @@ export default {
   arrowUp: require("./media/images/arrowUp.png"),
   arrowDown: require("./media/images/arrowDown.png"),
   arrowGreen: require('./media/images/arraow-green.png'),
-  inforedeem : require("./media/images/info-redeem.png")
+  inforedeem : require("./media/images/info-redeem.png"),
+  coin : require("./media/images/coin.png")
+
 
 };

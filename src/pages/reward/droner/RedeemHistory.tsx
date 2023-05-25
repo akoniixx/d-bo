@@ -382,7 +382,7 @@ function RedeemHistory() {
       <br />
       <Table columns={columns} dataSource={data} pagination={false} />
 
-      <div className="d-flex justify-content-between pt-5 ">
+      <div className="d-flex justify-content-between pt-3 pb-3 ">
         <p>รายการทั้งหมด {data.length} รายการ</p>
         <Pagination />
       </div>

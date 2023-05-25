@@ -615,7 +615,7 @@ const IndexRedeem = () => {
           />
         )}
       </CardContainer>
-      <div className="d-flex justify-content-between pt-4">
+      <div className="d-flex justify-content-between pt-3 pb-3">
         <p>
           รายการทั้งหมด{" "}
           {source === "Farmer" ? dataFarmer?.count : dataMockDroner.length}{" "}
