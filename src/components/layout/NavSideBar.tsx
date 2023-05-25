@@ -17,10 +17,8 @@ export const NavSidebar = () => {
   const logout = () => {
     localStorage.clear();
     sessionStorage.clear();
-    var url = window.location.href;
-    var arr = url.split("/");
-    var resultUrlHost = arr[0] + "//" + arr[2];
-    window.location.href = "AuthPage";
+    var url = window.location.origin + "/AuthPage";
+    window.location.href = url;
   };
   const isAccount = persistedProfile.username === "ick_accounting";
   return (

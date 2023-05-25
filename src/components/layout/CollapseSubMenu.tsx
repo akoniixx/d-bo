@@ -25,6 +25,7 @@ interface CollapseSubMenuProps {
 
 const ListStyled = styled.div<{ isFocus?: boolean }>`
   padding: 16px;
+  padding-left: 54px;
   cursor: pointer;
   background-color: #ceeed5;
   color: ${color.Success};
@@ -36,6 +37,7 @@ const ListStyled = styled.div<{ isFocus?: boolean }>`
 `;
 const SubListItem = styled.div<{ isFocus?: boolean }>`
   padding: 16px;
+  padding-left: 64px;
   cursor: pointer;
   color: ${(props) => (props.isFocus ? color.Success : "#7B7B7B")};
   width: 100%;
@@ -83,6 +85,7 @@ export const CollapseSubMenu: React.FC<CollapseSubMenuProps> = ({
                 width: "100%",
                 alignItems: "center",
                 height: "50px",
+                paddingLeft: "52px",
               }}
             >
               {title}

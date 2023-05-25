@@ -87,6 +87,7 @@ interface DataType {
   discountCoupon: string;
   taskHistory: string;
   unitPrice: string;
+  discountCampaignPoint: string;
 }
 function IndexReport() {
   const navigate = useNavigate();
@@ -140,6 +141,7 @@ function IndexReport() {
       searchStatusCancel,
       searchText
     ).then((res: TaskReportListEntity) => {
+      console.log(res);
       setGetData(res);
     });
   };
@@ -688,7 +690,7 @@ function IndexReport() {
           discountFee: row.discountFee,
           discountCoupon: row.discountCoupon,
           discountPromotion: row.discountPromotion,
-          discountPoint: "0",
+          discountPoint: row.discountCampaignPoint,
           totalPrice: row.totalPrice,
         };
         return {
@@ -771,8 +773,9 @@ function IndexReport() {
             <div className="d-flex flex-row justify-content-between">
               <ActionButton
                 icon={<EditOutlined />}
-                color={color.primary1}
-                onClick={() => navigate("/EditReport?=" + value)}
+                color={row.status === "CANCELED" ? color.Grey : color.primary1}
+                onClick={() => (window.location.href = "/EditReport?=" + value)}
+                actionDisable={row.status === "CANCELED" ? true : false}
               />
             </div>
           ),
@@ -1227,6 +1230,9 @@ function IndexReport() {
           )[i]
         }`,
         unitPrice: `${getData?.data.map((x) => x.unitPrice)[i]}`,
+        discountCampaignPoint: `${
+          getData?.data.map((x) => x.discountCampaignPoint)[i]
+        }`,
       });
     }
   }

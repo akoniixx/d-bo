@@ -1,4 +1,11 @@
 ## [Version - 0]
+## improve [v0.29.1] 2023-05-25
+- side bar menu
+## Feature [v0.29.0] 2023-05-24
+- added planning point menu
+- added receive point menu
+- added farmer redeem point menu
+- fixed show discount campaign point menu
 ## Fix [v0.28.2] 2023-05-22
 - fixed discount coupon in new task
 ## Fix [v0.28.1] 2023-05-22

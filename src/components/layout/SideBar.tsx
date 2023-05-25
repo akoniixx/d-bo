@@ -1,6 +1,4 @@
-export  const pathLists = ({ isAccounting}:{
-  isAccounting:boolean
-  }) =>  [
+export const pathLists = ({ isAccounting }: { isAccounting: boolean }) => [
   {
     path: "task",
     name: "task",
@@ -82,12 +80,35 @@ export  const pathLists = ({ isAccounting}:{
   {
     path: "campaign",
     name: "campaign",
-    title: "คะแนนสะสม",
+    title: "แต้มสะสม",
     subMenu: [
+      {
+        path: "listPoint",
+        name: "listPoint",
+        title: "รายการแต้ม",
+        subMenu: [
+          {
+            path: "/IndexPlanningPoint",
+            name: "IndexPlanningPoint",
+            title: "รอรับแต้ม",
+          },
+          {
+            path: "/IndexReceivePoint",
+            name: "IndexReceivePoint",
+            title: "ได้รับแต้ม",
+          },
+          {
+            path: "/IndexRedeem/Farmer",
+            name: "IndexRedeem/Farmer",
+            title: "แลกแต้ม",
+          },
+        ],
+      },
+
       {
         path: "/IndexCampaignPoint",
         name: "IndexCampaignPoint",
-        title: "แคมเปญคะแนน",
+        title: "แคมเปญแต้ม",
       },
     ],
   },

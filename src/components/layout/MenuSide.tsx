@@ -83,7 +83,12 @@ export const MenuSide: React.FC<MenuSideProps> = ({ lists, isOpenSidebar }) => {
               >
                 {checkPath === list.path ? (
                   <ListStyled
-                    style={{ display: "flex", gap: 18, color: "#FFCA37" }}
+                    style={{
+                      display: "flex",
+                      gap: 18,
+                      color: "#FFCA37",
+                      paddingLeft: "16px",
+                    }}
                   >
                     {IconMenuInActive[list.name as keyof typeof IconMenu]}
                     {list.title}
@@ -99,6 +104,7 @@ export const MenuSide: React.FC<MenuSideProps> = ({ lists, isOpenSidebar }) => {
                       width: "100%",
                       height: "50px",
                       alignItems: "center",
+                      paddingLeft: "16px",
                     }}
                   >
                     {IconMenu[list.name as keyof typeof IconMenu]}

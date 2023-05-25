@@ -32,7 +32,7 @@ interface CollapseMenuProps {
   };
   count: number;
   checkPath: string | undefined;
-  setCheckPath: React.Dispatch<React.SetStateAction<string | undefined>>
+  setCheckPath: React.Dispatch<React.SetStateAction<string | undefined>>;
 }
 
 const ListStyled = styled.div<{}>`
@@ -47,6 +47,7 @@ const ListStyled = styled.div<{}>`
 `;
 const SubListItem = styled.div<{ isFocus?: boolean }>`
   padding: 16px;
+  padding-left: 52px;
   cursor: pointer;
   background-color: ${(props) => (props.isFocus ? "#ceeed5" : color.White)};
   color: ${(props) => (props.isFocus ? color.Success : "#7B7B7B")};
@@ -64,10 +65,8 @@ export const CollapseMenu: React.FC<CollapseMenuProps> = ({
   path,
   count,
   checkPath,
-  setCheckPath
+  setCheckPath,
 }) => {
-  const [isCollapse, setIsCollapse] = useState(true);
-  console.log(checkPath , path);
   const navigate = useNavigate();
   return (
     <>
@@ -81,16 +80,15 @@ export const CollapseMenu: React.FC<CollapseMenuProps> = ({
           height: "50px",
         }}
         onClick={() => {
-      
           setCurrent({ path });
-          if(path === checkPath){
-            setCheckPath(undefined)
-          }else{
-            setCheckPath(path)
+          if (path === checkPath) {
+            setCheckPath(undefined);
+          } else {
+            setCheckPath(path);
           }
         }}
       >
-        {checkPath !==  path ? (
+        {checkPath !== path ? (
           <>
             <div
               style={{
@@ -102,11 +100,12 @@ export const CollapseMenu: React.FC<CollapseMenuProps> = ({
                 width: "100%",
                 alignItems: "center",
                 height: "50px",
+                paddingLeft: "16px",
               }}
             >
               {IconMenu[name as keyof typeof IconMenu]}
               {title}
-              {path === "task" && (
+              {/* {path === "task" && (
                 <div
                   className="col-lg-10"
                   style={{
@@ -125,10 +124,10 @@ export const CollapseMenu: React.FC<CollapseMenuProps> = ({
                 >
                   {40}
                 </div>
-              )}
+              )} */}
             </div>
             <div style={{ paddingRight: "8px" }}>
-              {checkPath !==  current.path ? (
+              {checkPath !== path ? (
                 <Image
                   src={icon.arrowDown}
                   style={{ width: "16px", height: "9px" }}
@@ -145,10 +144,17 @@ export const CollapseMenu: React.FC<CollapseMenuProps> = ({
           </>
         ) : (
           <>
-            <ListStyled style={{ color: "#FFCA37", display: "flex", gap: 18 }}>
+            <ListStyled
+              style={{
+                color: "#FFCA37",
+                display: "flex",
+                gap: 18,
+                paddingLeft: "16px",
+              }}
+            >
               {IconMenuInActive[name as keyof typeof IconMenu]}
               {title}
-              {path === "task" && (
+              {/* {path === "task" && (
                 <div
                   className="col-lg-10"
                   style={{
@@ -167,7 +173,7 @@ export const CollapseMenu: React.FC<CollapseMenuProps> = ({
                 >
                   {40}
                 </div>
-              )}
+              )} */}
             </ListStyled>
             <div
               style={{
@@ -225,7 +231,7 @@ export const CollapseMenu: React.FC<CollapseMenuProps> = ({
               >
                 <div className="row">
                   <div className="col">{subList.title}</div>
-                  {path === "task" && (
+                  {/* {path === "task" && (
                     <div
                       className="col-lg-10"
                       style={{
@@ -244,7 +250,7 @@ export const CollapseMenu: React.FC<CollapseMenuProps> = ({
                     >
                       {count}
                     </div>
-                  )}
+                  )} */}
                 </div>
               </SubListItem>
             );
