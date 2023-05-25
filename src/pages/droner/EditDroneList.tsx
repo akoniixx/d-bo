@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import Layout from "../../components/layout/Layout";
 import {
   Row,
   Form,
@@ -46,12 +45,15 @@ import {
 import img_empty from "../../resource/media/empties/uploadImg.png";
 import moment from "moment";
 import image from "../../resource/image";
+import { DashboardLayout } from "../../components/layout/Layout";
+import { useNavigate } from "react-router-dom";
 const { Option } = Select;
 const _ = require("lodash");
 const { Map } = require("immutable");
-let queryString = _.split(window.location.search, "=");
 
 function EditDroneList() {
+  let queryString = _.split(window.location.search, "=");
+  const navigate = useNavigate();
   const DronerDroneId = queryString[1];
   const [data, setData] = useState<GetDronerDroneEntity>(
     GetDronerDroneEntity_INIT
@@ -401,7 +403,7 @@ function EditDroneList() {
           timer: 1500,
           showConfirmButton: false,
         }).then((time) => {
-          window.location.href = "/DroneList";
+          navigate("/DroneList");
         });
       }
     });
@@ -810,10 +812,10 @@ function EditDroneList() {
   );
 
   return (
-    <Layout>
+    <>
       <Row>
         <BackIconButton
-          onClick={() => (window.location.href = "/DroneList")}
+          onClick={() => navigate("/DroneList")}
         />
         <span className="pt-4">
           <strong style={{ fontSize: "20px" }}>
@@ -826,11 +828,11 @@ function EditDroneList() {
         {renderFromData}
       </Row>
       <FooterPage
-        onClickBack={() => (window.location.href = "/DroneList")}
+        onClickBack={() => navigate("/DroneList")}
         onClickSave={UpdateDronerDrone}
         disableSaveBtn={saveBtnDisable}
       />
-    </Layout>
+    </>
   );
 }
 export default EditDroneList;

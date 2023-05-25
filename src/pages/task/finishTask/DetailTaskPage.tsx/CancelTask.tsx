@@ -1,4 +1,3 @@
-import Layout from "../../../../components/layout/Layout";
 import React, { useEffect, useState } from "react";
 import { Avatar, Badge, Form, Input, Row, Select } from "antd";
 import { BackIconButton } from "../../../../components/button/BackButton";
@@ -29,12 +28,15 @@ import {
   STATUS_EN_NEWTASK_COLOR_MAPPING,
   STATUS_NEWTASK_MAPPING,
 } from "../../../../definitions/Status";
+import { DashboardLayout } from "../../../../components/layout/Layout";
+import { useNavigate } from "react-router-dom";
 const _ = require("lodash");
 let queryString = _.split(window.location.search, "=");
 const dateFormat = "DD/MM/YYYY";
 const timeFormat = "HH:mm";
 
 function CancelTask() {
+  const navigate = useNavigate();
   const taskId = queryString[1];
   const [data, setData] = useState<DetailFinishTask>(DetailFinishTask_INIT);
   const [history, setHistory] = useState<HistoryEntity>(HistoryEntity_INIT);
@@ -517,6 +519,26 @@ function CancelTask() {
         </div>
         <div className="row pt-3">
           <div className="form-group col-lg-6 p-2">
+            <label>จำนวนแต้มที่ใช้แลก</label>
+            <Input
+              suffix="แต้ม"
+              value={data.data.usePoint}
+              disabled
+              autoComplete="off"
+            />
+          </div>
+          <div className="form-group col-lg-6 p-2">
+            <label>ส่วนลดจากการใช้แต้ม</label>
+            <Input
+              suffix="บาท"
+              value={data.data.discountCampaignPoint}
+              disabled
+              autoComplete="off"
+            />
+          </div>
+        </div>
+        {/* <div className="row pt-3">
+          <div className="form-group col-lg-6 p-2">
             <label>โปรโมชั่นนักบินโดรน</label>
             <Input
               suffix="บาท"
@@ -534,16 +556,16 @@ function CancelTask() {
               autoComplete="off"
             />
           </div>
-        </div>
+        </div> */}
       </Form>
     </Form>
   );
 
   return (
-    <Layout>
+    <>
       <Row>
         <BackIconButton
-          onClick={() => (window.location.href = "/IndexFinishTask")}
+          onClick={() => navigate("/IndexFinishTask")}
         />
         <span className="pt-4">
           <strong style={{ fontSize: "20px" }}>
@@ -570,7 +592,7 @@ function CancelTask() {
         <CardHeader textHeader="ยอดรวมค่าบริการ" />
         {renderPrice}
       </CardContainer>
-    </Layout>
+    </>
   );
 }
 

@@ -26,10 +26,10 @@ import {
 import moment from "moment";
 import AddButtton from "../../components/button/AddButton";
 import { DroneDatasource } from "../../datasource/DroneDatasource";
-import Layouts from "../../components/layout/Layout";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useEffectOnce } from "../../hook/useEffectOnce";
 import SearchDebounce from "../../components/searchDebounce/SearchDebounce";
+import { DashboardLayout } from "../../components/layout/Layout";
 
 interface SearchSelectType {
   label: any;
@@ -792,8 +792,9 @@ function IndexDroner() {
               <ActionButton
                 icon={<EditOutlined />}
                 color={color.primary1}
-                onClick={() =>
-                  (window.location.href = "/EditDroner?=" + row.id)
+                onClick={() => {
+                    navigate("/EditDroner?=" + row.id);
+                  }
                 }
               />
             </div>
@@ -804,7 +805,7 @@ function IndexDroner() {
   ];
 
   return (
-    <Layouts>
+    <>
       {PageTitle}
       <br />
       <Table
@@ -832,7 +833,7 @@ function IndexDroner() {
           showSizeChanger={false}
         />
       </div>
-    </Layouts>
+    </>
   );
 }
 export default IndexDroner;

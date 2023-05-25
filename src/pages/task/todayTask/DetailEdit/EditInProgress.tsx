@@ -21,7 +21,6 @@ import { CardContainer } from "../../../../components/card/CardContainer";
 import { CardHeader } from "../../../../components/header/CardHearder";
 import { LAT_LNG_BANGKOK } from "../../../../definitions/Location";
 import color from "../../../../resource/color";
-import Layouts from "../../../../components/layout/Layout";
 import {
   TaskDetailEntity,
   TaskDetailEntity_INIT,
@@ -49,13 +48,16 @@ import {
 } from "../../../../definitions/Status";
 import { CouponDataSource } from "../../../../datasource/CouponDatasource";
 import { numberWithCommas } from "../../../../utilities/TextFormatter";
+import { DashboardLayout } from "../../../../components/layout/Layout";
+import { useNavigate } from "react-router-dom";
 const { Map } = require("immutable");
 const _ = require("lodash");
-let queryString = _.split(window.location.search, "=");
 const dateFormat = "DD/MM/YYYY";
 const timeFormat = "HH:mm";
 
 function EditInProgress() {
+  let queryString = _.split(window.location.search, "=");
+  const navigate = useNavigate();
   const profile = JSON.parse(localStorage.getItem("profile") || "{  }");
   const taskId = queryString[1];
   const [mapPosition, setMapPosition] = useState<{ lat: number; lng: number }>({
@@ -603,10 +605,7 @@ function EditInProgress() {
           <div className="col-lg-4 text-start">
             <label>จำนวนไร่</label>
             <Form.Item>
-              <Input
-                defaultValue={data.farmAreaAmount}
-                suffix="ไร่"
-              />
+              <Input defaultValue={data.farmAreaAmount} suffix="ไร่" disabled/>
             </Form.Item>
           </div>
         </div>
@@ -817,6 +816,26 @@ function EditInProgress() {
         </div>
         <div className="row pt-3">
           <div className="form-group col-lg-6 p-2">
+            <label>จำนวนแต้มที่ใช้แลก</label>
+            <Input
+              suffix="แต้ม"
+              value={data.usePoint}
+              disabled
+              autoComplete="off"
+            />
+          </div>
+          <div className="form-group col-lg-6 p-2">
+            <label>ส่วนลดจากการใช้แต้ม</label>
+            <Input
+              suffix="บาท"
+              value={data.discountCampaignPoint}
+              disabled
+              autoComplete="off"
+            />
+          </div>
+        </div>
+        {/* <div className="row pt-3">
+          <div className="form-group col-lg-6 p-2">
             <label>โปรโมชั่นนักบินโดรน</label>
             <Input
               suffix="บาท"
@@ -834,7 +853,7 @@ function EditInProgress() {
               autoComplete="off"
             />
           </div>
-        </div>
+        </div> */}
       </Form>
     </Form>
   );
@@ -855,7 +874,7 @@ function EditInProgress() {
         ).set("updateBy", profile.firstname + " " + profile.lastname);
         await TaskInprogressDatasource.UpdateTask(pushUpdateBy.toJS()).then(
           (time) => {
-            window.location.href = "/IndexTodayTask";
+            navigate("/IndexTodayTask")
           }
         );
       }
@@ -864,10 +883,10 @@ function EditInProgress() {
   };
 
   return (
-    <Layouts>
+    <>
       <Row>
         <BackIconButton
-          onClick={() => (window.location.href = "/IndexTodayTask")}
+          onClick={() => navigate("/IndexTodayTask")}
         />
         <span className="pt-4">
           <strong style={{ fontSize: "20px" }}>
@@ -895,11 +914,11 @@ function EditInProgress() {
         {renderPrice}
       </CardContainer>
       <FooterPage
-        onClickBack={() => (window.location.href = "/IndexTodayTask")}
+        onClickBack={() => navigate("/IndexTodayTask")}
         onClickSave={() => UpdateTaskWaitStart(data)}
         disableSaveBtn={saveBtnDisable}
       />
-    </Layouts>
+    </>
   );
 }
 

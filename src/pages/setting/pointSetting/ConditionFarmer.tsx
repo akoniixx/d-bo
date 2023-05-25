@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import Layouts from "../../../components/layout/Layout";
 import { Button, Checkbox, Col, Divider, Form, Input, Row, Space } from "antd";
 import { CardContainer } from "../../../components/card/CardContainer";
 import { CardHeader } from "../../../components/header/CardHearder";
@@ -12,10 +11,10 @@ import { PointSettingDatasource } from "../../../datasource/PointSettingDatasour
 import Swal from "sweetalert2";
 import { validateOnlyNumber } from "../../../utilities/TextFormatter";
 import { useForm } from "antd/es/form/Form";
+import { DashboardLayout } from "../../../components/layout/Layout";
 
 const _ = require("lodash");
 const { Map } = require("immutable");
-let queryString = _.split(window.location.search, "=");
 
 function ConditionFarmer() {
   const [form] = Form.useForm();
@@ -298,7 +297,7 @@ function ConditionFarmer() {
         </Checkbox>
         <div className="row m-2">
           <div className="col-lg-6">
-            <span>การเปรียบเทียบคะแนน/เงิน</span>
+            <span>การเปรียบเทียบแต้ม/เงิน</span>
             <br />
             <Form.Item name="point">
               <Input
@@ -306,8 +305,8 @@ function ConditionFarmer() {
                 disabled={
                   taskId.status != "ACTIVE" && dataPoint.status != "ACTIVE"
                 }
-                placeholder="กรอกคะแนน"
-                suffix="คะแนน / 1 บาท"
+                placeholder="กรอกแต้ม"
+                suffix="แต้ม / 1 บาท"
                 value={taskId.point != "" ? taskId.point : undefined}
                 onChange={(e) => handleOnPoint(e)}
                 autoComplete="off"
@@ -315,15 +314,15 @@ function ConditionFarmer() {
             </Form.Item>
           </div>
           <div className="col-lg-6">
-            <span>การใช้คะแนนขั้นต่ำ</span>
+            <span>การใช้แต้มขั้นต่ำ</span>
             <Form.Item name="minPoint">
               <Input
                 key={taskId.id}
                 disabled={
                   taskId.status != "ACTIVE" && dataPoint.status != "ACTIVE"
                 }
-                placeholder="กรอกคะแนน"
-                suffix="คะแนน"
+                placeholder="กรอกแต้ม"
+                suffix="แต้ม"
                 value={taskId.minPoint != "" ? taskId.minPoint : undefined}
                 onChange={(e) => handleOnMinPoint(e)}
                 autoComplete="off"
@@ -346,12 +345,12 @@ function ConditionFarmer() {
           </Checkbox>
           <div className="row m-2">
             <div className="col-lg-6">
-              <span>การเปรียบเทียบคะแนน/เงิน</span>
+              <span>การเปรียบเทียบแต้ม/เงิน</span>
               <Input
                 key={productId.id}
                 name="point"
                 type="number"
-                placeholder="กรอกคะแนน"
+                placeholder="กรอกแต้ม"
                 onChange={handlePointFer}
                 disabled={
                   productId.status != "ACTIVE" &&
@@ -360,11 +359,11 @@ function ConditionFarmer() {
                 defaultValue={
                   productId.point != "" ? productId.point : undefined
                 }
-                suffix="คะแนน / 1 บาท"
+                suffix="แต้ม / 1 บาท"
               />
             </div>
             <div className="col-lg-6">
-              <span>การใช้คะแนนขั้นต่ำ</span>
+              <span>การใช้แต้มขั้นต่ำ</span>
               <Input
                 key={productId.id}
                 name="minPoint"
@@ -373,11 +372,11 @@ function ConditionFarmer() {
                   productId.status != "ACTIVE" &&
                   dataPointFer.status != "ACTIVE"
                 }
-                placeholder="กรอกคะแนน"
+                placeholder="กรอกแต้ม"
                 defaultValue={
                   productId.minPoint != "" ? productId.minPoint : undefined
                 }
-                suffix="คะแนน"
+                suffix="แต้ม"
                 onChange={handleMinPointFer}
               />
             </div>
@@ -385,7 +384,7 @@ function ConditionFarmer() {
         </>
         {/* <Divider />
         <div className="form-group col-lg-12">
-          <label>การได้รับคะแนน</label>
+          <label>การได้รับแต้ม</label>
           <Form.Item
             initialValue={false}
             name="task"
@@ -419,7 +418,7 @@ function ConditionFarmer() {
     </CardContainer>
   );
   return (
-    <Layouts>
+    <>
       <Row>
         <span className="p-3">
           <strong style={{ fontSize: "20px" }}>เงื่อนไขเกษตรกร</strong>
@@ -455,7 +454,7 @@ function ConditionFarmer() {
           </Button>
         </Row>
       </div>
-    </Layouts>
+    </>
   );
 }
 

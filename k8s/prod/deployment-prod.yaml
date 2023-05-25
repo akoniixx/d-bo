@@ -1,0 +1,45 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dnds-bo
+  namespace: production-dnds-bo
+  labels:
+    app: dnds-bo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: dnds-bo
+  template:
+    metadata:
+      labels:
+        app: dnds-bo
+    spec:
+      containers:
+        - name: dnds-bo
+          image: asia.gcr.io/iconkaset-app/dnds/dnds-bo:<VERSION>
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 80
+          resources:
+            requests:
+              cpu: 20m
+              memory: 100Mi
+            limits:
+              cpu: 50m
+              memory: 200Mi
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 80
+            initialDelaySeconds: 5
+            periodSeconds: 30
+            timeoutSeconds: 60
+          envFrom:
+          # - secretRef:
+          #     name: dnds-bo-prod
+            - configMapRef:
+                name: dnds-bo-prod
+      imagePullSecrets:
+      - name: gcr-image-pull-secret

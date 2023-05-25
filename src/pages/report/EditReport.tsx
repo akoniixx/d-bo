@@ -28,7 +28,6 @@ import { BackIconButton } from "../../components/button/BackButton";
 import { CardContainer } from "../../components/card/CardContainer";
 import FooterPage from "../../components/footer/FooterPage";
 import { CardHeader } from "../../components/header/CardHearder";
-import Layout from "../../components/layout/Layout";
 import GoogleMap from "../../components/map/GoogleMap";
 import { CouponDataSource } from "../../datasource/CouponDatasource";
 import { TaskFinishedDatasource } from "../../datasource/TaskFinishDatasource";
@@ -51,13 +50,16 @@ import {
   HistoryEntity_INIT,
 } from "../../entities/HistoryEntities";
 import { ReportDocDatasource } from "../../datasource/ReportDocument";
+import { DashboardLayout } from "../../components/layout/Layout";
+import { useNavigate } from "react-router-dom";
 const { Map } = require("immutable");
 const _ = require("lodash");
-let queryString = _.split(window.location.search, "=");
 const dateFormat = "DD/MM/YYYY";
 const timeFormat = "HH:mm";
 
 function EditReport() {
+  let queryString = _.split(window.location.search, "=");
+  const navigate = useNavigate();
   const profile = JSON.parse(localStorage.getItem("profile") || "{  }");
   const taskId = queryString[1];
   const [couponData, setCouponData] = useState<{
@@ -82,7 +84,6 @@ function EditReport() {
   const fetchDetailTask = async () => {
     await TaskFinishedDatasource.getDetailFinishTaskById(taskId).then((res) => {
       console.log("report edit", res);
-
       if (res.data.couponId !== null) {
         CouponDataSource.getPromotionCode(res.data.couponId).then((result) =>
           setCouponData({
@@ -139,7 +140,7 @@ function EditReport() {
         await UpdateStatusPaymentDatasource.UpdateStatusPayment(
           updateInfo
         ).then((res) => {
-          window.location.href = "/IndexReport";
+          navigate("/IndexReport")
         });
       }
       fetchDetailTask();
@@ -513,6 +514,7 @@ function EditReport() {
       <div className="row">
         <div className="col-lg">
           <p>Droner ID</p>
+
           <Input disabled defaultValue={data.data.droner.dronerCode} />
         </div>
         <div className="col-lg">
@@ -764,6 +766,26 @@ function EditReport() {
         </div>
         <div className="row pt-3">
           <div className="form-group col-lg-6 p-2">
+            <label>จำนวนแต้มที่ใช้แลก</label>
+            <Input
+              suffix="แต้ม"
+              value={data.data.usePoint}
+              disabled
+              autoComplete="off"
+            />
+          </div>
+          <div className="form-group col-lg-6 p-2">
+            <label>ส่วนลดจากการใช้แต้ม</label>
+            <Input
+              suffix="บาท"
+              value={data.data.discountCampaignPoint}
+              disabled
+              autoComplete="off"
+            />
+          </div>
+        </div>
+        {/* <div className="row pt-3">
+          <div className="form-group col-lg-6 p-2">
             <label>โปรโมชั่นนักบินโดรน</label>
             <Input
               suffix="บาท"
@@ -781,7 +803,7 @@ function EditReport() {
               autoComplete="off"
             />
           </div>
-        </div>
+        </div> */}
       </Form>
     </Form>
   );
@@ -811,12 +833,12 @@ function EditReport() {
     );
   };
   return (
-    <Layout>
+    <>
       <Spin tip="Loading..." size="large" spinning={loading}>
         <div className="container d-flex justify-content-between pt-1">
           <div className="pt-1">
             <BackIconButton
-              onClick={() => (window.location.href = "/IndexReport")}
+              onClick={() => navigate("/IndexReport")}
             />
           </div>
           <div className="col-lg-9 pt-4">
@@ -875,11 +897,11 @@ function EditReport() {
           {renderPrice}
         </CardContainer>
         <FooterPage
-          onClickBack={() => (window.location.href = "/IndexReport")}
+          onClickBack={() => navigate("/IndexReport")}
           onClickSave={() => UpdateStatusPayment()}
         />
       </Spin>
-    </Layout>
+    </>
   );
 }
 

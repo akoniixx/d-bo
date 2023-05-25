@@ -30,7 +30,6 @@ import { CheckboxValueType } from "antd/lib/checkbox/Group";
 import { BackIconButton } from "../../../components/button/BackButton";
 import color from "../../../resource/color";
 import ActionButton from "../../../components/button/ActionButton";
-import Layouts from "../../../components/layout/Layout";
 
 function RedeemHistory() {
   const { RangePicker } = DatePicker;
@@ -375,10 +374,10 @@ function RedeemHistory() {
           ),
         };
       },
-    }
+    },
   ];
   return (
-    <Layouts>
+    <>
       {PageTitle}
       <br />
       <Table columns={columns} dataSource={data} pagination={false} />
@@ -387,7 +386,7 @@ function RedeemHistory() {
         <p>รายการทั้งหมด {data.length} รายการ</p>
         <Pagination />
       </div>
-    </Layouts>
+    </>
   );
 }
 export default RedeemHistory;

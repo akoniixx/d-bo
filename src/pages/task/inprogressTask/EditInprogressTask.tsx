@@ -19,7 +19,6 @@ import { BackIconButton } from "../../../components/button/BackButton";
 import { CardContainer } from "../../../components/card/CardContainer";
 import FooterPage from "../../../components/footer/FooterPage";
 import { CardHeader } from "../../../components/header/CardHearder";
-import Layouts from "../../../components/layout/Layout";
 import GooleMap from "../../../components/map/GoogleMap";
 import ModalSelectedDroner from "../../../components/modal/task/inprogressTask/ModalSelectedDroner";
 import { CouponDataSource } from "../../../datasource/CouponDatasource";
@@ -49,6 +48,8 @@ import {
   numberWithCommas,
   numberWithCommasToFixed,
 } from "../../../utilities/TextFormatter";
+import { DashboardLayout } from "../../../components/layout/Layout";
+import { useNavigate } from "react-router-dom";
 const { Option } = Select;
 
 const dateFormat = "DD/MM/YYYY";
@@ -58,9 +59,10 @@ const timeCreateFormat = "HH:mm:ss";
 
 const _ = require("lodash");
 const { Map } = require("immutable");
-let queryString = _.split(window.location.pathname, "=");
 
 const EditInprogressTask = () => {
+  let queryString = _.split(window.location.pathname, "=");
+  const navigate = useNavigate();
   const profile = JSON.parse(localStorage.getItem("profile") || "{  }");
   const [data, setData] = useState<GetTaskInprogressEntity>(
     GetTaskInprogressEntity_INIT
@@ -103,7 +105,6 @@ const EditInprogressTask = () => {
       fetchPurposeSpray(res.farmerPlot.plantName);
       setDronerSelected(res.droner);
       setCheckCrop(!res.targetSpray.includes("อื่นๆ"));
-      console.log("check", res);
       setData(res);
       CouponDataSource.getPromotionCode(res.couponId).then((result) =>
         setCouponData({
@@ -498,7 +499,7 @@ const EditInprogressTask = () => {
               <div className="form-group col-lg-4">
                 <label>จำนวนไร่</label>
                 <Form.Item>
-                  <Input value={data?.farmAreaAmount} />
+                  <Input value={data?.farmAreaAmount} disabled />
                 </Form.Item>
               </div>
             </div>
@@ -710,6 +711,26 @@ const EditInprogressTask = () => {
             </div>
             <div className="row pt-3">
               <div className="form-group col-lg-6 p-2">
+                <label>จำนวนแต้มที่ใช้แลก</label>
+                <Input
+                  suffix="แต้ม"
+                  value={data.usePoint}
+                  disabled
+                  autoComplete="off"
+                />
+              </div>
+              <div className="form-group col-lg-6 p-2">
+                <label>ส่วนลดจากการใช้แต้ม</label>
+                <Input
+                  suffix="บาท"
+                  value={data.discountCampaignPoint}
+                  disabled
+                  autoComplete="off"
+                />
+              </div>
+            </div>
+            {/* <div className="row pt-3">
+              <div className="form-group col-lg-6 p-2">
                 <label>โปรโมชั่นนักบินโดรน</label>
                 <Input
                   suffix="บาท"
@@ -727,7 +748,7 @@ const EditInprogressTask = () => {
                   autoComplete="off"
                 />
               </div>
-            </div>
+            </div> */}
           </Form>
         </CardContainer>
       </Form>
@@ -800,7 +821,7 @@ const EditInprogressTask = () => {
       if (result.isConfirmed) {
         await TaskDatasource.updateInprogressTask(updateTask).then((res) => {
           if (res.userMessage == "success") {
-            window.location.href = "/IndexInprogressTask";
+            navigate( "/IndexInprogressTask")
           }
         });
       }
@@ -809,10 +830,10 @@ const EditInprogressTask = () => {
 
   return (
     <>
-      <Layouts key={data?.id}>
+      <div key={data?.id}>
         <Row>
           <BackIconButton
-            onClick={() => (window.location.href = "/IndexInprogressTask")}
+            onClick={() => navigate("/IndexInprogressTask")}
           />
           <span className="pt-3">
             <strong style={{ fontSize: "20px" }}>
@@ -828,11 +849,11 @@ const EditInprogressTask = () => {
         <br />
         <CardContainer>{renderServiceCharge}</CardContainer>
         <FooterPage
-          onClickBack={() => (window.location.href = "/IndexInprogressTask")}
+          onClickBack={() => navigate("/IndexInprogressTask")}
           onClickSave={updateInprogressTask}
           disableSaveBtn={saveBtnDisable}
         />
-      </Layouts>
+      </div>
       {showModel && (
         <ModalSelectedDroner
           show={showModel}

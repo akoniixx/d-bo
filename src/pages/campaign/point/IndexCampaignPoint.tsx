@@ -22,7 +22,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import ActionButton from "../../../components/button/ActionButton";
 import { CardContainer } from "../../../components/card/CardContainer";
-import Layouts from "../../../components/layout/Layout";
+import  { DashboardLayout } from "../../../components/layout/Layout";
 import { CampaignDatasource } from "../../../datasource/CampaignDatasource";
 import { STATUS_COLOR } from "../../../definitions/DronerStatus";
 import { STATUS_COUPON } from "../../../definitions/Status";
@@ -68,7 +68,7 @@ const IndexCampaignPoint = () => {
 
   useEffect(() => {
     fetchCampaignList();
-  }, [searchStartDate, searchEndDate]);
+  }, [searchStartDate, searchEndDate, current]);
 
   const onChangePage = (page: number) => {
     setCurrent(page);
@@ -110,7 +110,7 @@ const IndexCampaignPoint = () => {
               padding: "8px",
             }}
           >
-            <strong>แคมเปญคะแนน</strong>
+            <strong>แคมเปญแต้ม</strong>
           </span>
         </Col>
         <Col style={{ borderRight: "solid" }} span={7}>
@@ -143,7 +143,7 @@ const IndexCampaignPoint = () => {
           <Input
             allowClear
             prefix={<SearchOutlined style={{ color: color.Disable }} />}
-            placeholder="ค้นหาชื่อแคมเปญคะแนน"
+            placeholder="ค้นหาชื่อแคมเปญแต้ม"
             className="col-lg-12 p-1"
             defaultValue={keyword}
             onChange={(e) => setKeyword(e.target.value)}
@@ -215,12 +215,12 @@ const IndexCampaignPoint = () => {
       },
     },
     {
-      title: "การได้รับคะแนน",
+      title: "การได้รับแต้ม",
       width: "15%",
       render: (value: any, row: any, index: number) => {
         return {
           children: (
-            <span>{"+" + row.condition[0].point + " คะแนน / ไร่"}</span>
+            <span>{"+" + row.condition[0].point + " แต้ม / ไร่"}</span>
           ),
         };
       },
@@ -282,7 +282,7 @@ const IndexCampaignPoint = () => {
                   icon={<EditOutlined />}
                   color={color.primary1}
                   onClick={() =>
-                    (window.location.href = "/EditCampaignPoint/id=" + row.id)
+                    navigate("/EditCampaignPoint/id=" + row.id)
                   }
                 />
               </div>
@@ -290,14 +290,18 @@ const IndexCampaignPoint = () => {
                 <ActionButton
                   icon={<DeleteOutlined />}
                   color={
-                    row.isDelete || row.status === "ACTIVE"
+                    row.isDeleteFarmer ||
+                    row.isDeleteDroner ||
+                    row.status === "ACTIVE"
                       ? color.Grey
                       : color.Error
                   }
                   onClick={() => setDeleteCampaign(row.id)}
                   actionDisable={
-                    row.isDelete || row.status === "ACTIVE"
-                      ? row.isDelete
+                    row.isDeleteFarmer ||
+                    row.isDeleteDroner ||
+                    row.status === "ACTIVE"
+                      ? true
                       : false
                   }
                 />
@@ -311,7 +315,7 @@ const IndexCampaignPoint = () => {
 
   return (
     <>
-      <Layouts>
+      <>
         {pageTitle}
         <CardContainer>
           <Table
@@ -323,7 +327,7 @@ const IndexCampaignPoint = () => {
           />
         </CardContainer>
         <div className="d-flex justify-content-between pt-4">
-          <p>รายการทั้งหมด {data?.count} รายการ</p>
+          <p>รายการทั้งหมด {data?.data.length} รายการ</p>
           <Pagination
             current={current}
             total={data?.count}
@@ -332,7 +336,7 @@ const IndexCampaignPoint = () => {
             showSizeChanger={false}
           />
         </div>
-      </Layouts>
+      </>
       {showModal && (
         <Modal
           title="ยืนยันการลบ"
@@ -350,7 +354,7 @@ const IndexCampaignPoint = () => {
               โปรดตรวจสอบของแคมเปญที่คุณต้องการลบ ก่อนที่จะกดยืนยัน
             </span>
             <p className="text-secondary">
-              เพราะอาจส่งผลต่อการคะแนนในแอปพลิเคชัน
+              เพราะอาจส่งผลต่อการแต้มในแอปพลิเคชัน
             </p>
           </div>
           <Divider

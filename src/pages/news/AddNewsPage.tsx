@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import Layouts from '../../components/layout/Layout'
+import { DashboardLayout } from '../../components/layout/Layout'
 import { BackIconButton } from '../../components/button/BackButton'
 import { useNavigate } from 'react-router-dom';
 import { Checkbox, Form, Input, Radio, Tag } from 'antd';
@@ -177,7 +177,7 @@ function AddNewsPage() {
         timer: 1500,
         showConfirmButton: false,
       }).then((time) => {
-        window.location.href = "/NewsPage";
+        navigate("/NewsPage");
       });
     }).catch((err) => {
       console.log(err);
@@ -190,7 +190,7 @@ function AddNewsPage() {
   }
 
   return (
-    <Layouts>
+    <>
       <div className="d-flex align-items-center">
         <BackIconButton onClick={() => navigate(-1)} />
         <strong style={{ fontSize: "20px" }}>เพิ่มข่าวสาร</strong>
@@ -362,7 +362,7 @@ function AddNewsPage() {
           />
         </div>
       </div>
-    </Layouts>
+    </>
   )
 }
 

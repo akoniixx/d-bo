@@ -15,5 +15,9 @@ export default {
   icondelete: require("./media/images/delete.png"),
   injection : require("./media/images/injectionicon.png"),
   drug : require("./media/images/drugicon.png"),
+  arrowUp: require("./media/images/arrowUp.png"),
+  arrowDown: require("./media/images/arrowDown.png"),
+  arrowGreen: require('./media/images/arraow-green.png'),
   inforedeem : require("./media/images/info-redeem.png")
+
 };

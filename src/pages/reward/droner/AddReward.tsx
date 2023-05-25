@@ -26,7 +26,6 @@ import { CardContainer } from "../../../components/card/CardContainer";
 import { CardHeader } from "../../../components/header/CardHearder";
 import { color, image } from "../../../resource";
 import { formats, modules } from "../../../components/editor/EditorToolbar";
-import Layouts from "../../../components/layout/Layout";
 import { BackIconButton } from "../../../components/button/BackButton";
 import { FooterPage } from "../../../components/footer/FooterPage";
 import RenderReward from "../../../components/mobile/RenderReward";
@@ -516,7 +515,7 @@ function AddReward() {
   );
 
   return (
-    <Layouts>
+    <>
       <Row>
         <BackIconButton
           onClick={() => {
@@ -533,7 +532,7 @@ function AddReward() {
       </Row>
 
       <FooterPage onClickBack={() => navigate(-1)} />
-    </Layouts>
+    </>
   );
 }
 

@@ -6,15 +6,15 @@ import { useNavigate } from "react-router-dom";
 import ActionButton from "../../components/button/ActionButton";
 import { BackIconButton } from "../../components/button/BackButton";
 import { CardContainer } from "../../components/card/CardContainer";
-import Layouts from "../../components/layout/Layout";
+import { DashboardLayout } from "../../components/layout/Layout";
 import { color } from "../../resource";
 import { DateTimeUtil } from "../../utilities/DateTimeUtil";
 const { RangePicker } = DatePicker;
 
 const _ = require("lodash");
-let queryString = _.split(window.location.pathname, "=");
 
 const IndexDetailFarmerPoint = () => {
+  let queryString = _.split(window.location.pathname, "=");
   const dateFormat = "DD/MM/YYYY";
   const navigate = useNavigate();
   const row = 10;
@@ -158,8 +158,7 @@ const IndexDetailFarmerPoint = () => {
                   icon={<FileTextOutlined />}
                   color={color.primary1}
                   onClick={() =>
-                    (window.location.href =
-                      "/DetailFarmerPoint/id=" + (index + 1))
+                    navigate("/DetailFarmerPoint/id=" + (index + 1))
                   }
                 />
               </div>
@@ -171,7 +170,7 @@ const IndexDetailFarmerPoint = () => {
   ];
 
   return (
-    <Layouts>
+    <>
       <Row>
         <BackIconButton onClick={() => navigate(-1)} />
         <span className="pt-3">
@@ -213,7 +212,7 @@ const IndexDetailFarmerPoint = () => {
           showSizeChanger={false}
         />
       </div>
-    </Layouts>
+    </>
   );
 };
 

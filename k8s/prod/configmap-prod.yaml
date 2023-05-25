@@ -1,0 +1,8 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: dnds-bo-prod
+  namespace: production-dnds-bo
+data:
+  BASE_URL: https://api-dnds.iconkaset.com/

@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react'
-import Layouts from '../../components/layout/Layout'
 import { BackIconButton } from '../../components/button/BackButton'
 import { useNavigate } from 'react-router-dom';
 import { Checkbox, Form, Input, Radio, Tag } from 'antd';
@@ -16,12 +15,12 @@ import { NewsDatasource } from '../../datasource/NewsDatasource';
 import Swal from 'sweetalert2';
 import parse from "html-react-parser";
 import { UploadImageDatasouce } from '../../datasource/UploadImageDatasource';
+import { DashboardLayout } from '../../components/layout/Layout';
 const { Map } = require("immutable");
 const _ = require("lodash");
 
-let queryString = _.split(window.location.pathname, "=");
-
 function EditNewsPage() {
+  let queryString = _.split(window.location.pathname, "=");
   const profile = JSON.parse(localStorage.getItem("profile") || "{  }");
   const [imgProfile, setImgProfile] = useState<any>();
   const [chooseFarmer,setChooseFarmer] = useState<boolean>(false)
@@ -186,7 +185,7 @@ function EditNewsPage() {
           timer: 1500,
           showConfirmButton: false,
         }).then((time) => {
-          window.location.href = "/NewsPage";
+          navigate("/NewsPage")
         });
       }).catch((err) => {
         console.log(err);
@@ -215,7 +214,7 @@ function EditNewsPage() {
           timer: 1500,
           showConfirmButton: false,
         }).then((time) => {
-          window.location.href = "/NewsPage";
+          navigate("/NewsPage");
         });
       }).catch((err) => {
         console.log(err);
@@ -250,7 +249,7 @@ function EditNewsPage() {
   },[])
 
   return (
-    <Layouts>
+    <>
       <div className="d-flex align-items-center">
         <BackIconButton onClick={() => navigate(-1)} />
         <strong style={{ fontSize: "20px" }}>เพิ่มข่าวสาร</strong>
@@ -422,7 +421,7 @@ function EditNewsPage() {
           />
         </div>
       </div>
-    </Layouts>
+    </>
   )
 }
 

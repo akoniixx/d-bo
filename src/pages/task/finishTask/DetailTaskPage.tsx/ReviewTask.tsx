@@ -1,4 +1,3 @@
-import Layout from "../../../../components/layout/Layout";
 import React, { useEffect, useState } from "react";
 import {
   Avatar,
@@ -49,14 +48,17 @@ import {
   numberWithCommas,
   numberWithCommasToFixed,
 } from "../../../../utilities/TextFormatter";
+import { DashboardLayout } from "../../../../components/layout/Layout";
+import { useNavigate } from "react-router-dom";
 
 const { Map } = require("immutable");
 const _ = require("lodash");
-let queryString = _.split(window.location.search, "=");
 const dateFormat = "DD/MM/YYYY";
 const timeFormat = "HH:mm";
 
 function ReviewTask() {
+  let queryString = _.split(window.location.search, "=");
+  const navigate = useNavigate();
   const profile = JSON.parse(localStorage.getItem("profile") || "{  }");
   const taskId = queryString[1];
   const [couponData, setCouponData] = useState<{
@@ -172,7 +174,7 @@ function ReviewTask() {
           detailDroner.comment,
           profile.firstname + " " + profile.lastname
         ).then((time) => {
-          window.location.href = "/IndexFinishTask";
+          navigate("/IndexFinishTask")
         });
       }
       fetchDetailTask();
@@ -602,6 +604,26 @@ function ReviewTask() {
         </div>
         <div className="row pt-3">
           <div className="form-group col-lg-6 p-2">
+            <label>จำนวนแต้มที่ใช้แลก</label>
+            <Input
+              suffix="แต้ม"
+              value={data.data.usePoint}
+              disabled
+              autoComplete="off"
+            />
+          </div>
+          <div className="form-group col-lg-6 p-2">
+            <label>ส่วนลดจากการใช้แต้ม</label>
+            <Input
+              suffix="บาท"
+              value={data.data.discountCampaignPoint}
+              disabled
+              autoComplete="off"
+            />
+          </div>
+        </div>
+        {/* <div className="row pt-3">
+          <div className="form-group col-lg-6 p-2">
             <label>โปรโมชั่นนักบินโดรน</label>
             <Input
               suffix="บาท"
@@ -619,16 +641,16 @@ function ReviewTask() {
               autoComplete="off"
             />
           </div>
-        </div>
+        </div> */}
       </Form>
     </Form>
   );
 
   return (
-    <Layout>
+    <>
       <Row>
         <BackIconButton
-          onClick={() => (window.location.href = "/IndexFinishTask")}
+          onClick={() => navigate("/IndexFinishTask")}
         />
         <span className="pt-4">
           <strong style={{ fontSize: "20px" }}>
@@ -656,11 +678,11 @@ function ReviewTask() {
         {renderPrice}
       </CardContainer>
       <FooterPage
-        onClickBack={() => (window.location.href = "/IndexFinishTask")}
+        onClickBack={() => navigate("/IndexFinishTask")}
         onClickSave={() => UpdateReviewDroner(data)}
         disableSaveBtn={saveBtnDisable}
       />
-    </Layout>
+    </>
   );
 }
 

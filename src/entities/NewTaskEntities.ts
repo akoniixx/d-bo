@@ -144,6 +144,8 @@ export interface GetNewTaskEntity {
   updatedAt?: string;
   revenuePromotion: string;
   discountPromotion: string;
+  usePoint: string;
+  discountCampaignPoint: string;
 }
 export const GetNewTaskEntity_INIT: GetNewTaskEntity = {
   id: "",
@@ -190,6 +192,8 @@ export const GetNewTaskEntity_INIT: GetNewTaskEntity = {
   updatedAt: "",
   revenuePromotion: "",
   discountPromotion: "",
+  usePoint: "",
+  discountCampaignPoint: "",
 };
 export interface UpdateNewTask {
   id: string;
@@ -251,3 +255,15 @@ export const UpdateTaskStatus_INIT: UpdateTaskStatus = {
   statusRemark: "",
   updateBy: "",
 };
+
+export interface InvoiceTaskEntity {
+  raiAmount: string;
+  unitPrice: string;
+  price: string;
+  fee: string;
+  discountFee: string;
+  discountCoupon: string;
+  discountPromotion: string;
+  discountPoint: string;
+  totalPrice: string;
+}

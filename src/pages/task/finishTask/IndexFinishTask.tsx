@@ -12,7 +12,6 @@ import {
 import moment from "moment";
 import React, { useEffect, useState } from "react";
 import ActionButton from "../../../components/button/ActionButton";
-import Layouts from "../../../components/layout/Layout";
 import { LocationDatasource } from "../../../datasource/LocationDatasource";
 import {
   DistrictEntity,
@@ -42,7 +41,12 @@ import {
   numberWithCommas,
   numberWithCommasToFixed,
 } from "../../../utilities/TextFormatter";
+import { DashboardLayout } from "../../../components/layout/Layout";
+import { useNavigate } from "react-router-dom";
+import InvoiceTask from "../../../components/popover/InvoiceTask";
+import { InvoiceTaskEntity } from "../../../entities/NewTaskEntities";
 export default function IndexFinishTask() {
+  const navigate = useNavigate();
   const row = 10;
   const [current, setCurrent] = useState(1);
   const [data, setData] = useState<TaskFinishListEntity>();
@@ -78,7 +82,6 @@ export default function IndexFinishTask() {
       searchStatus,
       searchText
     ).then((res: TaskFinishListEntity) => {
-      console.log(res);
       setData(res);
     });
   };
@@ -410,8 +413,19 @@ export default function IndexFinishTask() {
       title: "ค่าบริการ",
       dataIndex: "subdistrict_subdistrict_name",
       key: "subdistrict_subdistrict_name",
-      width: '12%',
+      width: "12%",
       render: (value: any, row: any, index: number) => {
+        const inv: InvoiceTaskEntity = {
+          raiAmount: row.farmAreaAmount,
+          unitPrice: row.unitPrice,
+          price: row.price,
+          fee: row.fee,
+          discountFee: row.discountFee,
+          discountCoupon: row.discountCoupon,
+          discountPromotion: row.discountPromotion,
+          discountPoint: row.discountCampaignPoint,
+          totalPrice: row.totalPrice,
+        };
         return {
           children: (
             <>
@@ -420,103 +434,11 @@ export default function IndexFinishTask() {
                   ? numberWithCommas(row.totalPrice) + " บาท"
                   : "0 บาท"}
               </span>
-              <Popover
-                title={
-                  <span
-                    style={{
-                      color: color.White,
-                    }}
-                  >
-                    รายละเอียดค่าบริการ
-                  </span>
-                }
-                content={
-                  <table style={{ width: "300px" }}>
-                    <tr>
-                      <td>
-                        ค่าบริการ
-                        <br />
-                        <div style={{ fontSize: "12px" }}>
-                          จำนวนไร่{" "}
-                          <span style={{ color: color.Success }}>
-                            {row.farmAreaAmount} ไร่
-                          </span>{" "}
-                          x ค่าบริการ{" "}
-                          <span style={{ color: color.Success }}>
-                            {row.unitPrice} ไร่
-                          </span>
-                        </div>
-                      </td>
-                      <td style={{ textAlign: "right" }}>
-                        {numberWithCommasToFixed(parseFloat(row.price))}
-                      </td>
-                    </tr>
-                    <tr>
-                      <td>ค่าธรรมเนียม (5%)</td>
-                      <td style={{ textAlign: "right" }}>
-                        {numberWithCommasToFixed(parseFloat(row.fee))}
-                      </td>
-                    </tr>
-                    <tr>
-                      <td>ส่วนลดค่าธรรมเนียม</td>
-                      <td style={{ color: color.Error, textAlign: "right" }}>
-                        {parseFloat(row.discountFee)
-                          ? "- " +
-                            numberWithCommasToFixed(parseFloat(row.discountFee))
-                          : 0}
-                      </td>
-                    </tr>
-                    <tr>
-                      <td>ส่วนลดจากคูปอง</td>
-                      <td style={{ color: color.Error, textAlign: "right" }}>
-                        {parseFloat(row.discountCoupon)
-                          ? "- " +
-                            numberWithCommasToFixed(
-                              parseFloat(row.discountCoupon)
-                            )
-                          : 0}
-                      </td>
-                    </tr>
-                    <tr>
-                      <td>ส่วนลดจากโปรโมชั่น</td>
-                      <td style={{ color: color.Error, textAlign: "right" }}>
-                        {parseFloat(row.discountPromotion)
-                          ? "- " +
-                            numberWithCommasToFixed(
-                              parseFloat(row.discountPromotion)
-                            )
-                          : 0}
-                      </td>
-                    </tr>
-                    <tr>
-                      <td colSpan={2}>
-                        <Divider />
-                      </td>
-                    </tr>
-                    <tr>
-                      <td>ยอดรวมค่าบริการ</td>
-                      <td
-                        style={{
-                          textAlign: "right",
-                          color: color.Success,
-                          fontWeight: "bold",
-                        }}
-                      >
-                        {numberWithCommasToFixed(parseFloat(row.totalPrice))}
-                      </td>
-                    </tr>
-                  </table>
-                }
-              >
-                <InfoCircleFilled
-                  style={{
-                    color: color.primary1,
-                    fontSize: "15px",
-                    marginLeft: "7px",
-                    verticalAlign: 0.5,
-                  }}
-                />
-              </Popover>
+              <InvoiceTask
+                iconColor={color.Success}
+                title="รายละเอียดค่าบริการ"
+                data={inv}
+              />
             </>
           ),
         };
@@ -565,7 +487,7 @@ export default function IndexFinishTask() {
                   icon={<EditOutlined />}
                   color={color.primary1}
                   onClick={() =>
-                    (window.location.href = "/ReviewTask?=" + row.id)
+                    navigate("/ReviewTask?=" + row.id)
                   }
                 />
               ) : row.status == "CANCELED" ? (
@@ -573,7 +495,7 @@ export default function IndexFinishTask() {
                   icon={<FileTextOutlined />}
                   color={color.primary1}
                   onClick={() =>
-                    (window.location.href = "/CancelTask?=" + row.id)
+                    navigate("/CancelTask?=" + row.id)
                   }
                 />
               ) : row.status == "DONE" ? (
@@ -581,7 +503,7 @@ export default function IndexFinishTask() {
                   icon={<FileTextOutlined />}
                   color={color.primary1}
                   onClick={() =>
-                    (window.location.href = "/FinishTasks?=" + row.id)
+                    navigate("/FinishTasks?=" + row.id)
                   }
                 />
               ) : null}
@@ -592,7 +514,7 @@ export default function IndexFinishTask() {
     },
   ];
   return (
-    <Layouts>
+    <>
       {PageTitle}
       <br />
       <Table
@@ -625,6 +547,6 @@ export default function IndexFinishTask() {
           plotId={plotId}
         />
       )}
-    </Layouts>
+    </>
   );
 }

@@ -30,7 +30,6 @@ import { CheckboxValueType } from "antd/lib/checkbox/Group";
 import { color, icon } from "../../../resource";
 import { numberWithCommas } from "../../../utilities/TextFormatter";
 import ActionButton from "../../../components/button/ActionButton";
-import Layouts from "../../../components/layout/Layout";
 import { ColumnsType } from "antd/lib/table";
 import { DateTimeUtil } from "../../../utilities/DateTimeUtil";
 
@@ -649,7 +648,7 @@ function IndexReward() {
   ];
   return (
     <>
-      <Layouts>
+      <>
         {PageTitle}
         <br />
         <Table
@@ -663,7 +662,7 @@ function IndexReward() {
           <p>รายการทั้งหมด {data.length} รายการ</p>
           <Pagination />
         </div>
-      </Layouts>
+      </>
       {showModal && (
         <Modal
           title="ยืนยันการลบ"

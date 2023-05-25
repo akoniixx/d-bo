@@ -57,10 +57,12 @@ import IndexDetailDronerPoint from "./pages/droner/IndexDetailDronerPoint";
 import EditCampaignPoint from "./pages/campaign/point/EditCampaignPoint";
 import ConditionDroner from "./pages/setting/pointSetting/ConditionDroner";
 import ConditionFarmer from "./pages/setting/pointSetting/ConditionFarmer";
-import IndexReward from "./pages/reward/droner/IndexReward";
-import AddReward from './pages/reward/droner/AddReward';
-import EditReward from './pages/reward/droner/EditReward';
-import RedeemHistory from "./pages/reward/droner/RedeemHistory";
+import IndexReceivePoint from "./pages/point/IndexReceivePoint";
+import IndexPlanningPoint from "./pages/point/IndexPlanningPoint";
+import DetailReceivePoint from "./pages/point/DetailReceivePoint";
+import IndexRedeem from "./pages/redeem/IndexRedeem";
+import DetailFarmerRedeem from "./pages/redeem/DetailFarmerRedeem";
+import DetailDronerRedeem from "./pages/redeem/DetailDronerRedeem";
 
 const WebRoutes: React.FC<any> = () => {
   return (
@@ -74,13 +76,15 @@ const WebRoutes: React.FC<any> = () => {
           <Route path="/FinishTasks" element={<FinishTasks />} />
           <Route path="/ReviewTask" element={<ReviewTask />} />
           <Route path="/CancelTask" element={<CancelTask />} />
-          <Route path="/IndexDroner" element={<IndexDroner />} />
-          <Route path="/IndexFarmer" element={<IndexFarmer />} />
+          <Route path="/IndexDroner/*" element={<IndexDroner />} />
+          <Route path="/EditDroner" element={<EditDroner />} />
+          <Route path="/IndexFarmer/*" element={<IndexFarmer />} />
+          <Route path="AddFarmer" element={<AddFarmer />} />
+          <Route path="/EditFarmer/:id" element={<EditFarmer />} />
           <Route path="/TotalIncomePage" element={<TotalIncomePage />} />
           <Route path="/PromotionPage" element={<PromotionPage />} />
           <Route path="/NewsPage" element={<NewsPage />} />
           <Route path="/TotalIncomePage" element={<TotalIncomePage />} />
-          <Route path="/AddFarmer" element={<AddFarmer />} />
           <Route path="/AddDroner" element={<AddDroner />} />
           <Route path="/DroneList" element={<DroneList />} />
           <Route path="/PricePage" element={<PricePage />} />
@@ -91,9 +95,7 @@ const WebRoutes: React.FC<any> = () => {
           <Route path="/DetailRankDroner" element={<DetailRankDroner />} />
           <Route path="/DetailWorkDroner" element={<DetailWorkDroner />} />
           <Route path="/EditDroneList" element={<EditDroneList />} />
-          <Route path="/EditFarmer/:id" element={<EditFarmer />} />
           <Route path="/EditNews/:id" element={<EditNewsPage />} />
-          <Route path="/EditDroner" element={<EditDroner />} />
           <Route path="/IndexAdmin" element={<IndexAdmin />} />
           <Route path="/AddAdmin" element={<AddAdmin />} />
           <Route path="/EditAdmin/:id" element={<EditAdmin />} />
@@ -114,7 +116,6 @@ const WebRoutes: React.FC<any> = () => {
           <Route path="*" element={<PageNotFound />} />
           <Route path="/EditPromotion/:id" element={<EditPromotion />} />
           <Route path="*" element={<PageNotFound />} />
-          IndexReport
           <Route path="/AddPromotion" element={<AddPromotion />} />
           <Route path="/AddNews" element={<AddNewsPage />} />
           <Route path="/IndexReport" element={<IndexReport />} />
@@ -143,14 +144,24 @@ const WebRoutes: React.FC<any> = () => {
             path="/EditCampaignPoint/:id"
             element={<EditCampaignPoint />}
           />
+          <Route path="/ConditionDroner" element={<ConditionDroner />} />
+          <Route path="/ConditionFarmer" element={<ConditionFarmer />} />
+          <Route path="/IndexReceivePoint" element={<IndexReceivePoint />} />
+          <Route path="/IndexPlanningPoint" element={<IndexPlanningPoint />} />
+          <Route
+            path="/DetailReceivePoint/:id"
+            element={<DetailReceivePoint />}
+          />
+          <Route path="/IndexRedeem/:type" element={<IndexRedeem />} />
+          <Route
+            path="/DetailFarmerRedeem/:id"
+            element={<DetailFarmerRedeem />}
+          />
+          <Route
+            path="/DetailDronerRedeem/:id"
+            element={<DetailDronerRedeem />}
+          />
         </Route>
-        <Route path="/ConditionDroner" element={<ConditionDroner />} />
-        <Route path="/ConditionFarmer" element={<ConditionFarmer />} />
-        <Route path="/IndexReward" element={<IndexReward />} />
-        <Route path="/AddReward" element={<AddReward />} />
-        <Route path="/EditReward" element={<EditReward />} />
-        <Route path="/RedeemHistory" element={<RedeemHistory />} />
-
         <Route element={<PublicRoute />}>
           <Route index element={<AuthPage />} />
           <Route path="/ErrorLoginPage" element={<ErrorLoginPage />} />

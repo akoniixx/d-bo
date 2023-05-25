@@ -25,7 +25,6 @@ import { CardContainer } from "../../../components/card/CardContainer";
 import { CardHeader } from "../../../components/header/CardHearder";
 import color from "../../../resource/color";
 import { formats, modules } from "../../../components/editor/EditorToolbar";
-import Layouts from "../../../components/layout/Layout";
 import { BackIconButton } from "../../../components/button/BackButton";
 import FooterPage from "../../../components/footer/FooterPage";
 import { image } from "../../../resource";
@@ -386,7 +385,7 @@ function EditReward() {
   );
 
   return (
-    <Layouts>
+    <>
       <div className="container d-flex justify-content-between pt-1">
         <div className="pt-1">
           <BackIconButton
@@ -409,7 +408,7 @@ function EditReward() {
         // onClickSave={updateReward}
         // disableSaveBtn={saveBtnDisable}
       />
-    </Layouts>
+    </>
   );
 }
 
