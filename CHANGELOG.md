@@ -1,4 +1,6 @@
 ## [Version - 0]
+## Feature [v0.30.0] 2023-05-26
+- added droner summary point menu
 ## improve [v0.29.2] 2023-05-26
 - fixed style & added farmer summary point page
 - added reward page
