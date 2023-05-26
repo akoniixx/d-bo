@@ -104,7 +104,26 @@ export const pathLists = ({ isAccounting }: { isAccounting: boolean }) => [
           },
         ],
       },
-
+      {
+        path: "summaryPoint",
+        name: "summaryPoint",
+        title: "แต้มรายบุคคล",
+        permission: null,
+        subMenu: [
+          {
+            path: "/IndexDronerSummaryPoint",
+            name: "IndexDronerSummaryPoint",
+            title: "นักบินโดรน",
+            permission: null,
+          },
+          // {
+          //   path: "/IndexFarmerSummary",
+          //   name: "IndexDronerSummary",
+          //   title: "เกษตรกร",
+          //   permission: null,
+          // },
+        ],
+      },
       {
         path: "/IndexCampaignPoint",
         name: "IndexCampaignPoint",
@@ -112,6 +131,7 @@ export const pathLists = ({ isAccounting }: { isAccounting: boolean }) => [
       },
     ],
   },
+
   {
     path: "admin",
     name: "admin",

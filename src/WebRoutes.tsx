@@ -63,6 +63,7 @@ import DetailReceivePoint from "./pages/point/DetailReceivePoint";
 import IndexRedeem from "./pages/redeem/IndexRedeem";
 import DetailFarmerRedeem from "./pages/redeem/DetailFarmerRedeem";
 import DetailDronerRedeem from "./pages/redeem/DetailDronerRedeem";
+import IndexDronerSummaryPoint from "./pages/point/droner/IndexDronerSummaryPoint";
 
 const WebRoutes: React.FC<any> = () => {
   return (
@@ -161,6 +162,7 @@ const WebRoutes: React.FC<any> = () => {
             path="/DetailDronerRedeem/:id"
             element={<DetailDronerRedeem />}
           />
+          <Route path="/IndexDronerSummaryPoint" element={<IndexDronerSummaryPoint />} />
         </Route>
         <Route element={<PublicRoute />}>
           <Route index element={<AuthPage />} />
