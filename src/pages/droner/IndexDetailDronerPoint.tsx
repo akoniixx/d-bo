@@ -198,7 +198,7 @@ const IndexDetailDronerPoint = () => {
         />
       </CardContainer>
 
-      <div className="d-flex justify-content-between pt-4">
+      <div className="d-flex justify-content-between pt-3 pb-3">
         <p>รายการทั้งหมด {dataMock?.length} รายการ</p>
         <Pagination
           current={current}

@@ -57,12 +57,18 @@ import IndexDetailDronerPoint from "./pages/droner/IndexDetailDronerPoint";
 import EditCampaignPoint from "./pages/campaign/point/EditCampaignPoint";
 import ConditionDroner from "./pages/setting/pointSetting/ConditionDroner";
 import ConditionFarmer from "./pages/setting/pointSetting/ConditionFarmer";
+import IndexReward from "./pages/reward/droner/IndexReward";
+import AddReward from "./pages/reward/droner/AddReward";
+import EditReward from "./pages/reward/droner/EditReward";
+import RedeemHistory from "./pages/reward/droner/RedeemHistory";
 import IndexReceivePoint from "./pages/point/IndexReceivePoint";
 import IndexPlanningPoint from "./pages/point/IndexPlanningPoint";
 import DetailReceivePoint from "./pages/point/DetailReceivePoint";
 import IndexRedeem from "./pages/redeem/IndexRedeem";
 import DetailFarmerRedeem from "./pages/redeem/DetailFarmerRedeem";
 import DetailDronerRedeem from "./pages/redeem/DetailDronerRedeem";
+import IndexFarmerSummary from "./pages/point/farmer/IndexFarmerSummary";
+import IndexFarmerHistorySum from "./pages/point/farmer/IndexFarmerHistorySum";
 
 const WebRoutes: React.FC<any> = () => {
   return (
@@ -161,7 +167,15 @@ const WebRoutes: React.FC<any> = () => {
             path="/DetailDronerRedeem/:id"
             element={<DetailDronerRedeem />}
           />
+          <Route path="/IndexReward" element={<IndexReward />} />
+          <Route path="/AddReward" element={<AddReward />} />
+          <Route path="/EditReward" element={<EditReward />} />
+          <Route path="/RedeemHistory" element={<RedeemHistory />} />
+          <Route path="/IndexFarmerSummary" element={<IndexFarmerSummary />} />
+          <Route path="/IndexFarmerHistorySum" element={<IndexFarmerHistorySum/>} />
+
         </Route>
+
         <Route element={<PublicRoute />}>
           <Route index element={<AuthPage />} />
           <Route path="/ErrorLoginPage" element={<ErrorLoginPage />} />

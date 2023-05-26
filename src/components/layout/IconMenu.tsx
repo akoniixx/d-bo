@@ -13,115 +13,115 @@ export const IconMenu = {
   task: (
     <ProfileFilled
       style={{
-        fontSize: "20px",
-        color: "#7B7B7B",
+        fontSize: "16px",
+        color: "#231F20",
       }}
     />
   ),
   IndexFarmer: (
     <ContactsFilled
       style={{
-        fontSize: "20px",
-        color: "#7B7B7B",
+        fontSize: "16px",
+        color: "#231F20",
       }}
     />
   ),
   news: (
     <GiftFilled
       style={{
-        fontSize: "20px",
-        color: "#7B7B7B",
+        fontSize: "16px",
+        color: "#231F20",
       }}
     />
   ),
   droner: (
     <MacCommandFilled
       style={{
-        fontSize: "20px",
-        color: "#7B7B7B",
+        fontSize: "16px",
+        color: "#231F20",
       }}
     />
   ),
   campaign: (
     <StarFilled
       style={{
-        fontSize: "20px",
-        color: "#7B7B7B",
+        fontSize: "16px",
+        color: "#231F20",
       }}
     />
   ),
   admin: (
     <UserOutlined
       style={{
-        fontSize: "20px",
-        color: "#7B7B7B",
+        fontSize: "16px",
+        color: "#231F20",
       }}
     />
   ),
   setting: (
     <SettingFilled
       style={{
-        fontSize: "20px",
-        color: "#7B7B7B",
+        fontSize: "16px",
+        color: "#231F20",
       }}
     />
   ),
 };
 export const IconMenuInActive = {
-    task: (
-      <ProfileFilled
-        style={{
-          fontSize: "20px",
-          color: '#FFCA37',
-        }}
-      />
-    ),
-    IndexFarmer: (
-      <ContactsFilled
-        style={{
-          fontSize: "20px",
-          color: '#FFCA37',
-        }}
-      />
-    ),
-    news: (
-      <GiftFilled
-        style={{
-          fontSize: "20px",
-          color: '#FFCA37',
-        }}
-      />
-    ),
-    droner: (
-      <MacCommandFilled
-        style={{
-          fontSize: "20px",
-          color: '#FFCA37',
-        }}
-      />
-    ),
-    campaign: (
-      <StarFilled
-        style={{
-          fontSize: "20px",
-          color: '#FFCA37',
-        }}
-      />
-    ),
-    admin: (
-      <UserOutlined
-        style={{
-          fontSize: "20px",
-          color: '#FFCA37',
-        }}
-      />
-    ),
-    setting: (
-      <SettingFilled
-        style={{
-          fontSize: "20px",
-          color: '#FFCA37',
-        }}
-      />
-    ),
-  };
+  task: (
+    <ProfileFilled
+      style={{
+        fontSize: "16px",
+        color: "#FFCA37",
+      }}
+    />
+  ),
+  IndexFarmer: (
+    <ContactsFilled
+      style={{
+        fontSize: "16px",
+        color: "#FFCA37",
+      }}
+    />
+  ),
+  news: (
+    <GiftFilled
+      style={{
+        fontSize: "16px",
+        color: "#FFCA37",
+      }}
+    />
+  ),
+  droner: (
+    <MacCommandFilled
+      style={{
+        fontSize: "16px",
+        color: "#FFCA37",
+      }}
+    />
+  ),
+  campaign: (
+    <StarFilled
+      style={{
+        fontSize: "16px",
+        color: "#FFCA37",
+      }}
+    />
+  ),
+  admin: (
+    <UserOutlined
+      style={{
+        fontSize: "16px",
+        color: "#FFCA37",
+      }}
+    />
+  ),
+  setting: (
+    <SettingFilled
+      style={{
+        fontSize: "16px",
+        color: "#FFCA37",
+      }}
+    />
+  ),
+};

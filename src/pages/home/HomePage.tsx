@@ -42,31 +42,26 @@ export function HomePage() {
   }, []);
 
   return (
-    <>
-      <div
-        className="d-flex flex-column justify-content-center align-items-center"
-        style={{ height: "100%" }}
-      >
-        <div style={{height: '84vh',backgroundColor:color.BG}}>
+    <div>
+      <div className="d-flex flex-column justify-content-center align-items-center">
         <h1>ยินดีต้อนรับ</h1>
         <h2>
           คุณ {persistedProfile.firstname + " " + persistedProfile.lastname}
         </h2>
-      </div>
-        </div>
-        
-
-      <footer
+        <footer
         style={{
           position: "fixed",
           bottom: 0,
-          width: "80%",
+          // width: "100%",
           textAlign: "center",
-          backgroundColor: color.BG,
+          // backgroundColor: color.BG,
         }}
       >
         <span>version {version}</span>
       </footer>
+      </div>
+      
+
       {dataMaintance.id && (
         <ModalMaintence
           show={showModalMaintance}
@@ -74,6 +69,6 @@ export function HomePage() {
           data={dataMaintance}
         />
       )}
-    </>
+    </div>
   );
 }

@@ -739,7 +739,7 @@ function IndexFarmer() {
           }
         />
       </CardContainer>
-      <div className="d-flex justify-content-between pt-5">
+      <div className="d-flex justify-content-between pt-3 pb-3">
         <p>รายการทั้งหมด {data?.count} รายการ</p>
         <Pagination
           current={current}
