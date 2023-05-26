@@ -46,10 +46,6 @@ import EditReport from "./pages/report/EditReport";
 import NewsPage from "./pages/news/NewsPage";
 import EditNewsPage from "./pages/news/EditNewsPage";
 import AddNewsPage from "./pages/news/AddNewsPage";
-import IndexFarmerPoint from "./pages/point/farmer/IndexFarmerPoint";
-import IndexDronerPoint from "./pages/point/droner/IndexDronerPoint";
-import DetailFarmerPoint from "./pages/point/farmer/DetailFarmerPoint";
-import DetailDronerPoint from "./pages/point/droner/DetailDronerPoint";
 import IndexCampaignPoint from "./pages/campaign/point/IndexCampaignPoint";
 import AddCampaignPoint from "./pages/campaign/point/AddCampaignPoint";
 import IndexDetailFarmerPoint from "./pages/farmer/IndexDetailFarmerPoint";
@@ -70,6 +66,7 @@ import DetailDronerRedeem from "./pages/redeem/DetailDronerRedeem";
 import IndexDronerSummaryPoint from "./pages/point/droner/IndexDronerSummaryPoint";
 import IndexFarmerSummary from "./pages/point/farmer/IndexFarmerSummary";
 import IndexFarmerHistorySum from "./pages/point/farmer/IndexFarmerHistorySum";
+import DetailDronerHistorySum from "./pages/point/droner/DetailDronerHistorySum";
 
 const WebRoutes: React.FC<any> = () => {
   return (
@@ -127,16 +124,6 @@ const WebRoutes: React.FC<any> = () => {
           <Route path="/AddNews" element={<AddNewsPage />} />
           <Route path="/IndexReport" element={<IndexReport />} />
           <Route path="/EditReport" element={<EditReport />} />
-          <Route path="/IndexFarmerPoint" element={<IndexFarmerPoint />} />
-          <Route path="/IndexDronerPoint" element={<IndexDronerPoint />} />
-          <Route
-            path="/DetailFarmerPoint/:id"
-            element={<DetailFarmerPoint />}
-          />
-          <Route
-            path="/DetailDronerPoint/:id"
-            element={<DetailDronerPoint />}
-          />
           <Route path="/IndexCampaignPoint" element={<IndexCampaignPoint />} />
           <Route path="/AddCampaignPoint" element={<AddCampaignPoint />} />
           <Route
@@ -168,14 +155,23 @@ const WebRoutes: React.FC<any> = () => {
             path="/DetailDronerRedeem/:id"
             element={<DetailDronerRedeem />}
           />
-          <Route path="/IndexDronerSummaryPoint" element={<IndexDronerSummaryPoint />} />
+          <Route
+            path="/IndexDronerSummaryPoint"
+            element={<IndexDronerSummaryPoint />}
+          />
           <Route path="/IndexReward" element={<IndexReward />} />
           <Route path="/AddReward" element={<AddReward />} />
           <Route path="/EditReward" element={<EditReward />} />
           <Route path="/RedeemHistory" element={<RedeemHistory />} />
           <Route path="/IndexFarmerSummary" element={<IndexFarmerSummary />} />
-          <Route path="/IndexFarmerHistorySum" element={<IndexFarmerHistorySum/>} />
-
+          <Route
+            path="/IndexFarmerHistorySum"
+            element={<IndexFarmerHistorySum />}
+          />
+          <Route
+            path="/DetailDronerHistorySum/:id"
+            element={<DetailDronerHistorySum />}
+          />
         </Route>
 
         <Route element={<PublicRoute />}>

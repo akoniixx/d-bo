@@ -346,7 +346,7 @@ function IndexDroner() {
   const PageTitle = (
     <>
       <div
-        className="container d-flex justify-content-between"
+        className="d-flex justify-content-between"
         style={{ padding: "10px" }}
       >
         <div>
@@ -807,7 +807,6 @@ function IndexDroner() {
   return (
     <>
       {PageTitle}
-      <br />
       <Table
         columns={columns}
         dataSource={data?.data}

@@ -1,14 +1,19 @@
 import { FileTextOutlined, SearchOutlined } from "@ant-design/icons";
-import { Button, Col, Input, Row, Table } from "antd";
+import { Button, Col, Input, Pagination, Row, Table, Image } from "antd";
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import ActionButton from "../../../components/button/ActionButton";
 import { CardContainer } from "../../../components/card/CardContainer";
-import { color } from "../../../resource";
-import { DateTimeUtil } from "../../../utilities/DateTimeUtil";
+import { color, icon } from "../../../resource";
 
 const IndexDronerSummaryPoint = () => {
   const navigate = useNavigate();
+  const row = 10;
+  const [current, setCurrent] = useState(1);
+
+  const onChangePage = (page: number) => {
+    setCurrent(page);
+  };
   const dataMock = [
     {
       dateTime: Date(),
@@ -28,7 +33,7 @@ const IndexDronerSummaryPoint = () => {
       title: "ชื่อนักบินโดรน",
       dataIndex: "dronerName",
       key: "dronerName",
-      width: '30%',
+      width: "30%",
       render: (value: any, row: any, index: number) => {
         return {
           children: <span>{row.dronerName}</span>,
@@ -38,7 +43,7 @@ const IndexDronerSummaryPoint = () => {
     {
       title: "เบอร์โทร",
       dataIndex: "telephone",
-      width: '50%',
+      width: "50%",
       render: (value: any, row: any, index: number) => {
         return {
           children: <span>{row.telephone}</span>,
@@ -51,7 +56,19 @@ const IndexDronerSummaryPoint = () => {
       key: "totalPoint",
       render: (value: any, row: any, index: number) => {
         return {
-          children: <span>{row.totalPoint + " แต้ม"}</span>,
+          children: (
+            <>
+              <Image
+                src={icon.coin}
+                style={{
+                  width: "26px",
+                  height: "26px",
+                  alignContent: "center",
+                }}
+              />{" "}
+              <span>{value + ` แต้ม`}</span>
+            </>
+          ),
         };
       },
     },
@@ -69,8 +86,7 @@ const IndexDronerSummaryPoint = () => {
                   icon={<FileTextOutlined />}
                   color={color.primary1}
                   onClick={() =>
-                    (window.location.href =
-                      "/DetailDronerRedeem/id=" + (index + 1))
+                    navigate("/DetailDronerHistorySum/id=" + (index + 1))
                   }
                 />
               </div>
@@ -125,6 +141,16 @@ const IndexDronerSummaryPoint = () => {
           tableLayout="fixed"
         />
       </CardContainer>
+      <div className="d-flex justify-content-between pt-3 pb-3">
+        <p>รายการทั้งหมด {dataMock?.length} รายการ</p>
+        <Pagination
+          current={current}
+          total={dataMock.length}
+          onChange={onChangePage}
+          pageSize={row}
+          showSizeChanger={false}
+        />
+      </div>
     </>
   );
 };

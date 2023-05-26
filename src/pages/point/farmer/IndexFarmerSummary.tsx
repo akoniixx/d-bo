@@ -1,24 +1,23 @@
 import { FileTextOutlined, SearchOutlined } from "@ant-design/icons";
 import {
   Button,
+  Col,
   DatePicker,
   Image,
   Input,
   Pagination,
-  Select,
+  Row,
   Table,
 } from "antd";
 import React, { useState } from "react";
 import ActionButton from "../../../components/button/ActionButton";
 import { CardContainer } from "../../../components/card/CardContainer";
 import { color, icon } from "../../../resource";
-import { DateTimeUtil } from "../../../utilities/DateTimeUtil";
-import { DashboardLayout } from "../../../components/layout/Layout";
 import { useNavigate } from "react-router-dom";
 
 const { RangePicker } = DatePicker;
 
-function IndexFarmerSummary () {
+function IndexFarmerSummary() {
   const navigate = useNavigate();
   const dateFormat = "DD/MM/YYYY";
   const dateSearchFormat = "YYYY-MM-DD";
@@ -46,52 +45,37 @@ function IndexFarmerSummary () {
   ];
 
   const pageTitle = (
-    <>
-      <div
-        className="container d-flex justify-content-between"
-        style={{ padding: "10px" }}
-      >
-        <div className="col-lg-5">
-          <span
-            className="card-label font-weight-bolder text-dark"
-            style={{
-              fontSize: 22,
-              fontWeight: "bold",
-              padding: "8px",
-            }}
-          >
-            <strong>แต้มรายบุคคล (เกษตรกร) </strong>
-          </span>
-        </div>
-        <div className="col-lg-3 p-1">
-          <Input
-            allowClear
-            prefix={<SearchOutlined style={{ color: color.Disable }} />}
-            placeholder="ค้นหาชื่อเกษตรกร / เบอร์โทร"
-            className="col-lg-12 p-1"
-          />
-        </div>
-        <div className="col-lg-3 p-1" style={{ color: color.Error }}>
-          <RangePicker
-            allowClear
-            format={dateFormat}
-            placeholder={["เลือกวันที่เริ่ม", "เลือกวันที่สิ้นสุด"]}
-          />
-        </div>
-        <div className="col-lg pt-1">
-          <Button
-            style={{
-              borderColor: color.Success,
-              borderRadius: "5px",
-              color: color.secondary2,
-              backgroundColor: color.Success,
-            }}
-          >
-            ค้นหาข้อมูล
-          </Button>
-        </div>
-      </div>
-    </>
+    <Row gutter={8} className="p-3">
+      <Col span={16}>
+        <span
+          className="card-label font-weight-bolder text-dark"
+          style={{
+            fontSize: 22,
+          }}
+        >
+          <strong>แต้มรายบุคคล (เกษตรกร)</strong>
+        </span>
+      </Col>
+      <Col style={{ color: color.Error }} span={6}>
+        <Input
+          allowClear
+          prefix={<SearchOutlined style={{ color: color.Disable }} />}
+          placeholder="ค้นหาชื่อเกษตรกร/เบอร์โทร"
+        />
+      </Col>
+      <Col span={2}>
+        <Button
+          style={{
+            borderColor: color.Success,
+            borderRadius: "5px",
+            color: color.secondary2,
+            backgroundColor: color.Success,
+          }}
+        >
+          ค้นหาข้อมูล
+        </Button>
+      </Col>
+    </Row>
   );
 
   const columns = [
@@ -99,7 +83,7 @@ function IndexFarmerSummary () {
       title: "ชื่อเกษตรกร",
       dataIndex: "farmerName",
       key: "farmerName",
-      width: "15%",
+      width: "30%",
       render: (value: any, row: any, index: number) => {
         return {
           children: (
@@ -125,26 +109,20 @@ function IndexFarmerSummary () {
       title: "แต้มคงเหลือ",
       dataIndex: "totalPoint",
       key: "totalPoint",
-      width: "20%",
       render: (value: any, row: any, index: number) => {
         return {
           children: (
-            <div className="row">
-              <div className="col-lg-2">
-                <Image
-                  src={icon.coin}
-                  style={{
-                    width: "26px",
-                    height: "26px",
-                    alignContent: "center",
-                  }}
-                />
-              </div>
-              <div className="col">
-                {" "}
-                <span>{value + ` แต้ม`}</span>
-              </div>
-            </div>
+            <>
+              <Image
+                src={icon.coin}
+                style={{
+                  width: "26px",
+                  height: "26px",
+                  alignContent: "center",
+                }}
+              />{" "}
+              <span>{value + ` แต้ม`}</span>
+            </>
           ),
         };
       },
@@ -153,6 +131,7 @@ function IndexFarmerSummary () {
       title: "",
       dataIndex: "Action",
       key: "Action",
+      width: "8%",
       render: (value: any, row: any, index: number) => {
         return {
           children: (
@@ -161,9 +140,7 @@ function IndexFarmerSummary () {
                 <ActionButton
                   icon={<FileTextOutlined />}
                   color={color.primary1}
-                  onClick={() =>
-                    navigate("/IndexFarmerHistorySum")
-                  }
+                  onClick={() => navigate("/IndexFarmerHistorySum")}
                 />
               </div>
             </div>
@@ -199,6 +176,6 @@ function IndexFarmerSummary () {
       </>
     </>
   );
-};
+}
 
 export default IndexFarmerSummary;
