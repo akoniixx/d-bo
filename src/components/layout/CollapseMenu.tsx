@@ -7,6 +7,7 @@ import { IconMenu, IconMenuInActive } from "./IconMenu";
 import { DownOutlined, UpOutlined } from "@ant-design/icons";
 import { Image } from "antd";
 import { useLocalStorage } from "../../hook/useLocalStorage";
+import { useEffectOnce } from "../../hook/useEffectOnce";
 
 interface CollapseMenuProps {
   subLists: {
@@ -50,7 +51,7 @@ const SubListItem = styled.div<{ isFocus?: boolean }>`
   padding-left: 52px;
   cursor: pointer;
   background-color: ${(props) => (props.isFocus ? "#ceeed5" : color.White)};
-  color: ${(props) => (props.isFocus ? color.Success : "#7B7B7B")};
+  color: ${(props) => (props.isFocus ? color.Success : "#231F20")};
   width: 100%;
   font-size: 14px;
   height: 50px;
@@ -68,6 +69,28 @@ export const CollapseMenu: React.FC<CollapseMenuProps> = ({
   setCheckPath,
 }) => {
   const navigate = useNavigate();
+  const [checkPathSub, setCheckPathSub] = useState<string | undefined>();
+  const [currentSub, setCurrentSub] = useState({
+    path: "",
+  });
+  useEffectOnce(() => {
+    const pathName = window.location.pathname;
+    const pathNameSplit = pathName.split("/").filter((item) => item !== "");
+
+    const currentPath = subLists.find(
+      (item) => item.path === `/${pathNameSplit[0]}`
+    );
+    if (currentPath) {
+      const isHaveSubPath = currentPath.subMenu?.find(
+        (el) => el.path === `/${pathNameSplit[1]}`
+      );
+
+      setCurrentSub({
+        path: currentPath.name,
+      });
+    }
+  });
+
   return (
     <>
       <div
@@ -80,6 +103,7 @@ export const CollapseMenu: React.FC<CollapseMenuProps> = ({
           height: "50px",
         }}
         onClick={() => {
+          setCheckPathSub(path);
           setCurrent({ path });
           if (path === checkPath) {
             setCheckPath(undefined);
@@ -92,7 +116,7 @@ export const CollapseMenu: React.FC<CollapseMenuProps> = ({
           <>
             <div
               style={{
-                color: "#7B7B7B",
+                color: "#231F20",
                 display: "flex",
                 gap: 18,
                 padding: "8px",
@@ -128,17 +152,9 @@ export const CollapseMenu: React.FC<CollapseMenuProps> = ({
             </div>
             <div style={{ paddingRight: "8px" }}>
               {checkPath !== path ? (
-                <Image
-                  src={icon.arrowDown}
-                  style={{ width: "16px", height: "9px" }}
-                  preview={false}
-                />
+                <DownOutlined style={{ fontSize: "14px" }} />
               ) : (
-                <Image
-                  src={icon.arrowUp}
-                  style={{ width: "16px", height: "9px" }}
-                  preview={false}
-                />
+                <UpOutlined style={{ fontSize: "14px" }} />
               )}
             </div>
           </>
@@ -185,17 +201,9 @@ export const CollapseMenu: React.FC<CollapseMenuProps> = ({
               }}
             >
               {checkPath !== path ? (
-                <Image
-                  src={icon.arrowDown}
-                  style={{ width: "16px", height: "9px" }}
-                  preview={false}
-                />
+                <DownOutlined style={{ fontSize: "14px" }} />
               ) : (
-                <Image
-                  src={icon.arrowUp}
-                  style={{ width: "16px", height: "9px" }}
-                  preview={false}
-                />
+                <UpOutlined style={{ fontSize: "14px", color: color.White }} />
               )}
             </div>
           </>
@@ -214,9 +222,11 @@ export const CollapseMenu: React.FC<CollapseMenuProps> = ({
                   subLists={subList.subMenu}
                   name={subList.name}
                   title={subList.title}
-                  setCurrent={setCurrent}
-                  current={current}
-                  path=""
+                  setCurrentSub={setCurrentSub}
+                  currentSub={currentSub}
+                  path={subList.path}
+                  checkPathSub={checkPathSub}
+                  setCheckPathSub={setCheckPathSub}
                 />
               );
             }

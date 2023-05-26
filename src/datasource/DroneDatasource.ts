@@ -93,9 +93,13 @@ export class DroneDatasource {
       });
   }
   static getCountDroneBrandList(
+    take?: any,
+    page?: any,
     search?: string
   ): Promise<DroneBrandListEntity> {
     const params = {
+      take: take,
+      page: page,
       search: search,
     };
     return httpClient

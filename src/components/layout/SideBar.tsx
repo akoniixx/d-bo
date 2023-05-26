@@ -111,17 +111,37 @@ export const pathLists = ({ isAccounting }: { isAccounting: boolean }) => [
         permission: null,
         subMenu: [
           {
-            path: "/IndexDronerSummaryPoint",
-            name: "IndexDronerSummaryPoint",
+            path: "/IndexDronerSummary",
+            name: "IndexDronerSummary",
+            title: "นักบินโดรน",
+            permission: null,
+          },
+          {
+            path: "/IndexFarmerSummary",
+            name: "IndexDronerSummary",
+            title: "เกษตรกร",
+            permission: null,
+          },
+        ],
+      },
+      {
+        path: "rewards",
+        name: "rewards",
+        title: "ของรางวัล",
+        permission: null,
+        subMenu: [
+          {
+            path: "/IndexReward",
+            name: "IndexReward",
             title: "นักบินโดรน",
             permission: null,
           },
           // {
-          //   path: "/IndexFarmerSummary",
-          //   name: "IndexDronerSummary",
+          //   path: "/IndexReward",
+          //   name: "IndexReward",
           //   title: "เกษตรกร",
           //   permission: null,
-          // },
+          // }
         ],
       },
       {

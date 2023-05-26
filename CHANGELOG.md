@@ -1,4 +1,7 @@
 ## [Version - 0]
+## improve [v0.29.2] 2023-05-26
+- fixed style & added farmer summary point page
+- added reward page
 ## improve [v0.29.1] 2023-05-25
 - side bar menu
 ## Feature [v0.29.0] 2023-05-24
