@@ -330,9 +330,21 @@ const IndexReceivePoint = () => {
           children:
             row.dronerTransaction !== null ? (
               row.dronerTransaction.mission ? (
-                <u style={{ color: color.Success }}>
-                  {row.dronerTransaction.mission.missionNo}
-                </u>
+                <>
+                  <u style={{ color: color.Success }}>
+                    {row.dronerTransaction.mission.missionNo}
+                  </u>
+                  <Tooltip placement="top" title="" key={row.id}>
+                    <InfoCircleFilled
+                      style={{
+                        position: "relative",
+                        bottom: 3,
+                        left: 4,
+                        color: color.Success,
+                      }}
+                    />
+                  </Tooltip>
+                </>
               ) : (
                 <>-</>
               )

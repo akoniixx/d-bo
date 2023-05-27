@@ -27,6 +27,7 @@ import { color } from "../../resource";
 import image from "../../resource/image";
 import { DateTimeUtil } from "../../utilities/DateTimeUtil";
 import { useNavigate } from "react-router-dom";
+import { numberWithCommas } from "../../utilities/TextFormatter";
 
 const { RangePicker } = DatePicker;
 const dateSearchFormat = "YYYY-MM-DD";
@@ -297,11 +298,9 @@ const IndexRedeem = () => {
       render: (value: any, row: any, index: number) => {
         return {
           children: (
-            <>
-              <span>
-                {row.createdAt && DateTimeUtil.formatDateTime(row.createdAt)}
-              </span>
-            </>
+            <span>
+              {row.createdAt && DateTimeUtil.formatDateTime(row.createdAt)}
+            </span>
           ),
         };
       },
@@ -341,7 +340,9 @@ const IndexRedeem = () => {
       render: (value: any, row: any, index: number) => {
         return {
           children: (
-            <span style={{ color: color.Error }}>- {row.usePoint}</span>
+            <span style={{ color: color.Error }}>
+              {"- " + numberWithCommas(row.usePoint) + " แต้ม"}
+            </span>
           ),
         };
       },
