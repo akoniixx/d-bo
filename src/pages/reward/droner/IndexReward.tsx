@@ -7,6 +7,7 @@ import {
   UserOutlined,
 } from "@ant-design/icons";
 import {
+  Avatar,
   Badge,
   Button,
   Checkbox,
@@ -24,7 +25,7 @@ import {
   Table,
 } from "antd";
 import moment from "moment";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Swal from "sweetalert2";
 import { CheckboxValueType } from "antd/lib/checkbox/Group";
 import { color, icon } from "../../../resource";
@@ -32,12 +33,29 @@ import { numberWithCommas } from "../../../utilities/TextFormatter";
 import ActionButton from "../../../components/button/ActionButton";
 import { ColumnsType } from "antd/lib/table";
 import { DateTimeUtil } from "../../../utilities/DateTimeUtil";
+import { useNavigate } from "react-router-dom";
+import { RewardDatasource } from "../../../datasource/RewardDatasource";
+import { GetAllRewardEntities } from "../../../entities/RewardEntites";
+import { UploadImageDatasouce } from "../../../datasource/UploadImageDatasource";
+import { REWARD_STATUS } from "../../../definitions/Status";
 
 function IndexReward() {
+  const navigate = useNavigate();
   const { RangePicker } = DatePicker;
   const dateFormat = "DD/MM/YYYY";
   const timeFormat = "HH:mm";
-
+  const dateSearchFormat = "YYYY-MM-DD";
+  const row = 10;
+  const [current, setCurrent] = useState(1);
+  const [data, setData] = useState<GetAllRewardEntities>();
+  const [startExchangeDate, setStartExchangeDate] = useState<any>(null);
+  const [expiredExchangeDate, setExpiredExchangeDate] = useState<any>(null);
+  const [status, setStatus] = useState<any>();
+  const [rewardType, setRewardType] = useState<any>();
+  const [rewardExchange, setRewardExchange] = useState<any>();
+  const [searchText, setSearchText] = useState<any>();
+  const [getImg, setGetImg] = useState<any>();
+  const [isCollapse, setIsCollapse] = useState(false);
   const [visible, setVisible] = useState(false);
   const [visibleStatus, setVisibleStatus] = useState(false);
   const handleVisible = (newVisible: any) => {
@@ -54,70 +72,55 @@ function IndexReward() {
 
   const [indeterminate, setIndeterminate] = useState(false);
   const [indeterminateDone, setIndeterminateDone] = useState(false);
-
   const [checkAll, setCheckAll] = useState(false);
   const [checkAllType, setCheckAllType] = useState(false);
   const [statusArr, setStatusArr] = useState<string[]>([]);
-  const statusOptions = ["WAIT_START", "IN_PROGRESS", "WAIT_RECEIVE"];
-  const statusDoneOptions = ["WAIT_PAYMENT", "DONE_PAYMENT", "SUCCESS"];
 
-  const onCheckAllChange = (e: any) => {
-    let value = e.target.value;
-    let checked = e.target.checked;
-    let arr: any = 0;
-    if (checked === true) {
-      arr = [...statusArr, value];
-      setStatusArr([...statusArr, value]);
-    } else {
-      let d: string[] = statusArr.filter((x) => x != value);
-      arr = [...d];
-      setStatusArr(d);
-      if (d.length == 0) {
-        arr = undefined;
-      }
-    }
-    setCheckedList(e.target.checked ? statusOptions : []);
-    setIndeterminate(false);
-    setCheckAll(e.target.checked);
+  const getAllReward = () => {
+    RewardDatasource.getAllReward(
+      row,
+      current,
+      startExchangeDate,
+      expiredExchangeDate,
+      status,
+      rewardType,
+      rewardExchange,
+      searchText
+    ).then((res) => {
+      setData(res);
+    });
   };
-  const onChange = (list: CheckboxValueType[]) => {
-    let arr: any = 0;
-    arr = [...list];
-    setCheckedList(list);
-    setIndeterminate(!!list.length && list.length < statusOptions.length);
-    setCheckAll(list.length === statusOptions.length);
-  };
-  const onCheckAllTypeChange = (e: any) => {
-    let value = e.target.value;
-    let checked = e.target.checked;
-    let arr: any = 0;
-    if (checked === true) {
-      arr = [...statusArr, value];
-      setStatusArr([...statusArr, value]);
-    } else {
-      let d: string[] = statusArr.filter((x) => x != value);
-      arr = [...d];
-      setStatusArr(d);
-      if (d.length == 0) {
-        arr = undefined;
-      }
-    }
-    setCheckedListDone(e.target.checked ? statusDoneOptions : []);
-    setIndeterminateDone(false);
-    setCheckAllType(e.target.checked);
-  };
-  const onChangeType = (list: CheckboxValueType[]) => {
-    let arr: any = 0;
-    arr = [...list];
-    setCheckedListDone(list);
-    setIndeterminateDone(
-      !!list.length && list.length < statusDoneOptions.length
-    );
-    setCheckAllType(list.length === statusOptions.length);
+  const getImgReward = () => {
+    const filterImg = data?.data.filter((x) => x.imagePath);
+    UploadImageDatasouce.getImage(filterImg).then((res) => {
+      setGetImg(res);
+    });
   };
 
-  const onChangeStatus = (checkedValues: CheckboxValueType[]) => {
-    console.log("checked = ", checkedValues);
+  useEffect(() => {
+    getAllReward();
+    getImgReward();
+  }, [current, startExchangeDate, expiredExchangeDate]);
+  const onChangePage = (page: number) => {
+    setCurrent(page);
+  };
+  const handleSearchDate = (e: any) => {
+    if (e != null) {
+      setStartExchangeDate(moment(new Date(e[0])).format(dateSearchFormat));
+      setExpiredExchangeDate(moment(new Date(e[1])).format(dateSearchFormat));
+    } else {
+      setStartExchangeDate(e);
+      setExpiredExchangeDate(e);
+    }
+    setCurrent(1);
+  };
+  const changeTextSearch = (searchText: any) => {
+    setSearchText(searchText.target.value);
+    setCurrent(1);
+  };
+
+  const onChangeStatus = (checkedValues: any) => {
+    setStatus(checkedValues);
   };
   const SubStatusType = (
     <Menu
@@ -127,7 +130,7 @@ function IndexReward() {
             <>
               <Checkbox
                 indeterminate={indeterminateDone}
-                onChange={onCheckAllTypeChange}
+                // onChange={onCheckAllTypeChange}
                 checked={checkAllType}
                 value="DONE"
               >
@@ -137,7 +140,7 @@ function IndexReward() {
               <Checkbox.Group
                 value={checkedListDone}
                 style={{ width: "100%" }}
-                onChange={onChangeType}
+                // onChange={onChangeType}
               >
                 <Row>
                   <Checkbox
@@ -173,7 +176,7 @@ function IndexReward() {
             <>
               <Checkbox
                 indeterminate={indeterminate}
-                onChange={onCheckAllChange}
+                // onChange={onCheckAllChange}
                 checked={checkAll}
                 value="CANCELED"
               >
@@ -183,7 +186,7 @@ function IndexReward() {
               <Checkbox.Group
                 value={checkedList}
                 style={{ width: "100%" }}
-                onChange={onChange}
+                // onChange={onChange}
               >
                 <Row>
                   <Checkbox
@@ -217,26 +220,28 @@ function IndexReward() {
       ]}
     />
   );
-  const SubStatus = (
-    <Menu
-      items={[
-        {
-          label: (
-            <>
-              <Checkbox.Group onChange={onChangeStatus}>
-                <Checkbox value="ALL">ทั้งหมด</Checkbox>
-                <br />
-                <Checkbox value="ACTIVE">ใช้งาน</Checkbox>
-                <br />
-                <Checkbox value="INAVTIVE">ปิดการใช้งาน</Checkbox>
-              </Checkbox.Group>
-            </>
-          ),
-          key: "status",
-        },
-      ]}
-    />
-  );
+  // const SubStatus = (
+  //   <Menu
+  //     items={[
+  //       {
+  //         label: (
+  //           <>
+  //             <Checkbox.Group onChange={onChangeStatus} >
+  //               <Checkbox value="">ทั้งหมด</Checkbox>
+  //               <br />
+  //               <Checkbox value="ACTIVE">ใช้งาน</Checkbox>
+  //               <br />
+  //               <Checkbox value="DRAFTING">รอเปิดใช้งาน</Checkbox>
+  //               <br />
+  //               <Checkbox value="INAVTIVE">ปิดการใช้งาน</Checkbox>
+  //             </Checkbox.Group>
+  //           </>
+  //         ),
+  //         key: "status",
+  //       },
+  //     ]}
+  //   />
+  // );
   const removeReward = (id: string) => {
     setShowModal(!showModal);
     setDeleteId(id);
@@ -295,7 +300,7 @@ function IndexReward() {
         <div className="col-lg">
           <RangePicker
             allowClear
-            // onCalendarChange={SearchDate}
+            onCalendarChange={(val) => handleSearchDate(val)}
             format={dateFormat}
           />
         </div>
@@ -308,7 +313,7 @@ function IndexReward() {
               color: color.secondary2,
               backgroundColor: color.Success,
             }}
-            onClick={() => (window.location.href = "/AddReward")}
+            onClick={() => navigate("/AddReward")}
           >
             + เพิ่มของรางวัล
           </Button>
@@ -324,7 +329,7 @@ function IndexReward() {
             prefix={<SearchOutlined style={{ color: color.Disable }} />}
             placeholder="ค้นหาชื่อของรางวัล/รหัสของรางวัล"
             className="col-lg-12 p-1"
-            // onChange={changeTextSearch}
+            onChange={changeTextSearch}
           />
         </div>
         <div className="col-lg p-1">
@@ -342,7 +347,17 @@ function IndexReward() {
           </Dropdown>
         </div>
         <div className="col-lg p-1">
-          <Dropdown
+          <Select
+            className="col-lg-12"
+            placeholder="เลือกสถานะ"
+            allowClear
+            onChange={onChangeStatus}
+          >
+            {REWARD_STATUS.map((x) => (
+              <Checkbox value={x.value}>{x.name}</Checkbox>
+            ))}
+          </Select>
+          {/* <Dropdown
             overlay={SubStatus}
             trigger={["click"]}
             className="col-lg-12 "
@@ -353,7 +368,7 @@ function IndexReward() {
               เลือกสะถานะ
               <DownOutlined />
             </Button>
-          </Dropdown>
+          </Dropdown> */}
         </div>
         <div className="pt-1">
           <Button
@@ -363,7 +378,7 @@ function IndexReward() {
               color: color.secondary2,
               backgroundColor: color.Success,
             }}
-            // onClick={fetchData}
+            onClick={getAllReward}
           >
             ค้นหาข้อมูล
           </Button>
@@ -371,42 +386,21 @@ function IndexReward() {
       </div>
     </>
   );
-  const data = [
-    {
-      key: "1",
-      date: "18/05/2565, 10:00",
-      name: "บัตรเติมน้ำมัน 500 บาท",
-      type: "Physical",
-      points: "5000 คะแนน",
-      totalCount: "100",
-      remaining: "20",
-      status: "ใช้งาน",
-    },
-    {
-      key: "2",
-      date: "18/05/2565, 10:00",
-      name: "บัตรเติมน้ำมัน 250 บาท",
-      type: "Digital",
-      points: "5000 คะแนน",
-      totalCount: "100",
-      remaining: "20",
-      status: "ไม่ใช้งาน",
-    },
-  ];
   const columns: ColumnsType<any> = [
     {
       title: "วันที่อัพเดต",
-      dataIndex: "date",
-      key: "date",
+      dataIndex: "updateAt",
+      key: "updateAt",
       width: "15%",
-      sorter: (a: any, b: any) => sorter(a.farmAreaAmount, b.farmAreaAmount),
+      fixed: "left",
+      sorter: (a: any, b: any) => sorter(a.updateAt, b.updateAt),
       render: (value: any, row: any, index: number) => {
         return {
           children: (
             <>
               <span className="text-dark-75  d-block font-size-lg">
-                {moment(new Date()).format(dateFormat)},{" "}
-                {moment(new Date()).format(timeFormat)}
+                {moment(row.updateAt).format("DD/MM/YYYY")},{" "}
+                {moment(row.updateAt).format("HH:mm")}
               </span>
               <span style={{ color: color.Grey, fontSize: "12px" }}>
                 <UserOutlined
@@ -421,28 +415,36 @@ function IndexReward() {
     },
     {
       title: "ชื่อของรางวัล",
-      dataIndex: "name",
-      key: "name",
-      width: "18%",
-      sorter: (a: any, b: any) => sorter(a.farmAreaAmount, b.farmAreaAmount),
+      dataIndex: "rewardName",
+      key: "rewardName",
+      width: "25%",
+      fixed: "left",
+      sorter: (a: any, b: any) => sorter(a.rewardName, b.rewardName),
       render: (value: any, row: any, index: number) => {
         return {
           children: (
             <>
               <Row>
                 <Col>
-                  <Image
-                    src="https://filebroker-cdn.lazada.co.th/kf/S06372da13adc45c1b23a475d44d8a49bD.jpg"
-                    preview={false}
-                    style={{ width: 50, height: 50 }}
-                  />
+                  {getImg ? (
+                    <Avatar
+                      size={25}
+                      src={getImg}
+                      style={{ marginRight: "5px" }}
+                    />
+                  ) : (
+                    <Avatar
+                      size={25}
+                      style={{ color: "#0068F4", backgroundColor: "#EFF2F9" }}
+                    />
+                  )}
                 </Col>
                 <Col style={{ padding: 10 }}>
                   <span className="text-dark-75  d-block font-size-lg">
-                    {row.name !== null ? row.name : null}
+                    {row.rewardName !== null ? row.rewardName : null}
                   </span>
                   <span style={{ color: color.Grey, fontSize: "12px" }}>
-                    {"RW0000001"}
+                    {row.rewardNo}
                   </span>
                 </Col>
               </Row>
@@ -453,19 +455,19 @@ function IndexReward() {
     },
     {
       title: "ประเภทของรางวัล",
-      dataIndex: "type",
-      key: "type",
+      dataIndex: "rewardType",
+      key: "rewardType",
       width: "12%",
-      sorter: (a: any, b: any) => sorter(a.farmAreaAmount, b.farmAreaAmount),
+      sorter: (a: any, b: any) => sorter(a.rewardType, b.rewardType),
       render: (value: any, row: any, index: number) => {
         return {
           children: (
             <>
               <span className="text-dark-75  d-block font-size-lg">
-                {row.type}
-                {row.type === "Digital" ? (
+                {row.rewardType === "DIGITAL" ? "Digital" : "Physical"}
+                {row.rewardExchange === "SCORE" ? (
                   <span style={{ color: color.secondary1, fontSize: "12px" }}>
-                    {` (ใช้คะแนน)`}
+                    {` (ใช้แต้ม)`}
                   </span>
                 ) : (
                   <span style={{ color: color.Success, fontSize: "12px" }}>
@@ -479,17 +481,17 @@ function IndexReward() {
       },
     },
     {
-      title: "คะแนนที่ใช้แลก",
-      dataIndex: "points",
-      key: "points",
+      title: "แต้มที่ใช้แลก",
+      dataIndex: "score",
+      key: "score",
       width: "10%",
-      sorter: (a: any, b: any) => sorter(a.farmAreaAmount, b.farmAreaAmount),
+      sorter: (a: any, b: any) => sorter(a.score, b.score),
       render: (value: any, row: any, index: number) => {
         return {
           children: (
             <>
               <span className="text-dark-75  d-block font-size-lg">
-                {numberWithCommas(row.points)}
+                {row.score ? numberWithCommas(row.score) + ` แต้ม` : "-"}
               </span>
             </>
           ),
@@ -498,18 +500,21 @@ function IndexReward() {
     },
     {
       title: "ช่วงเวลาที่แลก",
-      dataIndex: "points",
-      key: "points",
+      dataIndex: "startExchangeDate",
+      key: "startExchangeDate",
       width: "15%",
-      sorter: (a: any, b: any) => sorter(a.farmAreaAmount, b.farmAreaAmount),
+      sorter: (a: any, b: any) =>
+        sorter(a.startExchangeDate, b.startExchangeDate),
       render: (value: any, row: any, index: number) => {
         return {
           children: (
             <>
               <div style={{ paddingLeft: "3px" }}>
-                {DateTimeUtil.formatDateTime(row.startDate) +
-                  " - " +
-                  DateTimeUtil.formatDateTime(row.endDate)}
+                {row.startExchangeDate
+                  ? DateTimeUtil.formatDateTime(row.startExchangeDate) +
+                    " - " +
+                    DateTimeUtil.formatDateTime(row.expiredExchangeDate)
+                  : "-"}
               </div>
             </>
           ),
@@ -518,18 +523,20 @@ function IndexReward() {
     },
     {
       title: "ช่วงเวลาที่ใช้ได้",
-      dataIndex: "points",
-      key: "points",
+      dataIndex: "startUsedDate",
+      key: "startUsedDate",
       width: "15%",
-      sorter: (a: any, b: any) => sorter(a.farmAreaAmount, b.farmAreaAmount),
+      sorter: (a: any, b: any) => sorter(a.startUsedDate, b.startUsedDate),
       render: (value: any, row: any, index: number) => {
         return {
           children: (
             <>
               <div style={{ paddingLeft: "3px" }}>
-                {DateTimeUtil.formatDateTime(row.startDate) +
-                  " - " +
-                  DateTimeUtil.formatDateTime(row.endDate)}
+                {row.startUsedDate
+                  ? DateTimeUtil.formatDateTime(row.startUsedDate) +
+                    " - " +
+                    DateTimeUtil.formatDateTime(row.expiredUsedDate)
+                  : "-"}
               </div>
             </>
           ),
@@ -538,35 +545,52 @@ function IndexReward() {
     },
     {
       title: "ทั้งหมด",
-      dataIndex: "totalCount",
-      key: "totalCount",
+      dataIndex: "amount",
+      key: "amount",
       width: "8%",
-      sorter: (a: any, b: any) => sorter(a.farmAreaAmount, b.farmAreaAmount),
+      sorter: (a: any, b: any) => sorter(a.amount, b.amount),
       render: (value: any, row: any, index: number) => {
         return {
           children: (
             <>
               <span className="text-dark-75  d-block font-size-lg">
-                {row.totalCount}
+                {row.amount}
               </span>
             </>
           ),
         };
       },
     },
-
     {
       title: "แลกแล้ว",
-      dataIndex: "remaining",
-      key: "remaining",
+      dataIndex: "used",
+      key: "used",
       width: "8%",
-      sorter: (a: any, b: any) => sorter(a.farmAreaAmount, b.farmAreaAmount),
+      sorter: (a: any, b: any) => sorter(a.used, b.used),
       render: (value: any, row: any, index: number) => {
         return {
           children: (
             <>
               <span className="text-dark-75  d-block font-size-lg">
-                {row.remaining}
+                {row.used}
+              </span>
+            </>
+          ),
+        };
+      },
+    },
+    {
+      title: "คงเหลือ",
+      dataIndex: "remain",
+      key: "remain",
+      width: "8%",
+      sorter: (a: any, b: any) => sorter(a.remain, b.remain),
+      render: (value: any, row: any, index: number) => {
+        return {
+          children: (
+            <>
+              <span className="text-dark-75  d-block font-size-lg">
+                {row.remain}
               </span>
             </>
           ),
@@ -579,20 +603,27 @@ function IndexReward() {
       key: "status",
       fixed: "right",
       width: "8%",
-      sorter: (a: any, b: any) => sorter(a.farmAreaAmount, b.farmAreaAmount),
+      sorter: (a: any, b: any) => sorter(a.status, b.status),
       render: (value: any, row: any, index: number) => {
         return {
           children: (
             <>
-              {row.status === "ใช้งาน" ? (
+              {row.status === "ACTIVE" && (
                 <span style={{ color: color.Success }}>
                   <Badge color={color.Success} style={{ right: 5 }} />
-                  {row.status}
+                  ใช้งาน
                 </span>
-              ) : (
+              )}
+              {row.status === "INACTIVE" && (
                 <span style={{ color: color.Error }}>
                   <Badge color={color.Error} style={{ right: 5 }} />
-                  {row.status}
+                  ปิดการใช้งาน
+                </span>
+              )}
+              {row.status === "DRAFTING" && (
+                <span style={{ color: color.Grey }}>
+                  <Badge color={color.Grey} style={{ right: 5 }} />
+                  รอเปิดใช้งาน
                 </span>
               )}
             </>
@@ -623,23 +654,34 @@ function IndexReward() {
                     />
                   }
                   color={color.primary1}
-                  onClick={() => (window.location.href = "/RedeemHistory")}
+                  onClick={() => navigate("/RedeemHistory")}
                 />
               </div>
               <div className="col-lg-4">
                 <ActionButton
                   icon={<EditOutlined />}
                   color={color.primary1}
-                  onClick={() => (window.location.href = "/EditReward")}
+                  onClick={() => navigate("/EditReward/id=" + row.id)}
                 />
               </div>
-              <div>
-                <ActionButton
-                  icon={<DeleteOutlined />}
-                  color={color.Error}
-                  onClick={() => removeReward(row.id)}
-                />
-              </div>
+              {row.remain === 0 ? (
+                <div>
+                  <ActionButton
+                    icon={<DeleteOutlined />}
+                    color={color.Error}
+                    onClick={() => removeReward(row.id)}
+                  />
+                </div>
+              ) : (
+                <div>
+                  <Button
+                    disabled
+                    style={{ borderRadius: 5 }}
+                    icon={<DeleteOutlined />}
+                    color={color.Disable}
+                  />
+                </div>
+              )}
             </div>
           ),
         };
@@ -648,21 +690,26 @@ function IndexReward() {
   ];
   return (
     <>
-      <>
-        {PageTitle}
-        <br />
-        <Table
-          columns={columns}
-          dataSource={data}
-          pagination={false}
-          scroll={{ x: 1600 }}
-        />
+      {PageTitle}
+      <br />
+      <Table
+        columns={columns}
+        dataSource={data?.data}
+        pagination={false}
+        scroll={{ x: 1750 }}
+      />
 
-        <div className="d-flex justify-content-between pt-5">
-          <p>รายการทั้งหมด {data.length} รายการ</p>
-          <Pagination />
-        </div>
-      </>
+      <div className="d-flex justify-content-between pt-3 pb-3">
+        <p>รายการทั้งหมด {data?.count} รายการ</p>
+        <Pagination
+          current={current}
+          total={data?.count}
+          onChange={onChangePage}
+          pageSize={row}
+          showSizeChanger={false}
+        />
+      </div>
+
       {showModal && (
         <Modal
           title="ยืนยันการลบ"

@@ -7,15 +7,15 @@ import {
   numberWithCommas,
   numberWithCommasToFixed,
 } from "../../utilities/TextFormatter";
-import { formatMoney } from "../../utilities/TextFormatter";
-
 interface RenderReward {
   img: string;
   name: any;
   description: any;
   condition: any;
   point: any;
-  count: any;
+  type: string | null;
+  dateTimeOut: any;
+  exChange: string | null;
 }
 
 const RenderReward: React.FC<RenderReward> = ({
@@ -24,7 +24,9 @@ const RenderReward: React.FC<RenderReward> = ({
   description,
   condition,
   point,
-  count,
+  type,
+  dateTimeOut,
+  exChange,
 }) => {
   const div = useRef<any>();
   useLayoutEffect(() => {
@@ -67,34 +69,59 @@ const RenderReward: React.FC<RenderReward> = ({
               preview={false}
             />
             <div className="p-4">
-              <p style={{ fontSize: "23px", fontWeight: "600" }}>
+              <h5 style={{ fontWeight: "600" }}>
                 {!name ? "ชื่อของรางวัล" : name}
-              </p>
-              <p style={{ fontSize: "18px", fontWeight: "400" }}>{`ใช้คะแนน  ${
-                !point ? 0 : numberWithCommas(parseFloat(point))
-              } คะแนน`}</p>
-              <div
-                style={{
-                  width: "170px",
-                  height: "62px",
-                  backgroundColor: "#FFEFDD",
-                  borderRadius: 12,
-                }}
-              >
-                <div style={{ paddingLeft: "12px", paddingTop: "8px" }}>
-                  <h1 style={{ color: "#B26003", fontSize: "15px" }}>
-                    จำนวนคงเหลือ
-                  </h1>
-                  <p style={{ fontSize: "17px", fontWeight: "bold" }}>
-                    {count}
-                  </p>
+              </h5>
+
+              {exChange === "MISSION" ? (
+                <p style={{ fontSize: "18px", fontWeight: "500" }}>ภารกิจ</p>
+              ) : (
+                <p style={{ fontSize: "18px", fontWeight: "500" }}>{`ใช้แต้ม  ${
+                  !point ? 0 : numberWithCommas(parseFloat(point))
+                } แต้ม`}</p>
+              )}
+              {type === "DIGITAL" && (
+                <div
+                  style={{
+                    width: "185px",
+                    height: "65px",
+                    backgroundColor: "rgba(220, 241, 254, 1)",
+                    borderRadius: 10,
+                    padding: 10,
+                  }}
+                >
+                  <div
+                    style={{
+                      color: "rgba(12, 100, 141, 1)",
+                      fontSize: "15spanx",
+                      fontWeight: "500",
+                      lineHeight: "22px",
+                      paddingLeft: "12px",
+                    }}
+                  >
+                    หมดอายุอีกวัน
+                  </div>
+                  <div
+                    style={{
+                      color: "black",
+                      fontSize: "18px",
+                      fontWeight: "700",
+                      lineHeight: "22px",
+                      paddingLeft: "12px",
+                    }}
+                  >
+                    {dateTimeOut}
+                  </div>
                 </div>
-              </div>
-              <br />
-              <p>รายละเอียด</p>
-              <p>{!description ? "-" : parse(description)}</p>
+              )}
+              <p className="pt-3">รายละเอียด</p>
+              <p style={{ fontWeight: "400", color: "rgba(107, 117, 128, 1)" }}>
+                {!description ? "-" : parse(description)}
+              </p>
               <p>เงื่อนไข</p>
-              <p>{!condition ? "-" : parse(condition)}</p>
+              <p style={{ fontWeight: "400", color: "rgba(107, 117, 128, 1)" }}>
+                {!condition ? "-" : parse(condition)}
+              </p>
             </div>
           </div>
         </div>
