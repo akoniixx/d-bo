@@ -64,4 +64,30 @@ export class PointReceiveDatasource {
         console.log(err, "err get receive point");
       });
   }
+
+  static getFarmerSumPoint(
+    take?: number,
+    page?: number,
+    search?: string,
+    endDate?: string
+  ): Promise<any> {
+    const params = {
+      take: take,
+      page: page,
+      search: search,
+    };
+    return httpClient
+      .get(
+        BASE_URL + "/promotion/historypoint-quota/getIndividualPointFarmer",
+        {
+          params,
+        }
+      )
+      .then((response) => {
+        return response.data;
+      })
+      .catch((err) => {
+        console.log(err, "err getnewtask");
+      });
+  }
 }

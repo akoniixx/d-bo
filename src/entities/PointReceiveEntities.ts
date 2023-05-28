@@ -61,3 +61,24 @@ export interface ReceivePointListEntity {
   count: number;
   history: ReceivePointEntity[];
 }
+
+export interface FarmerSummaryPointEntity {
+  id: string;
+  farmerId: string;
+  firstname: string;
+  lastname: string;
+  telephoneNo: string;
+  campaignId: string;
+  campaignName: string;
+  allValue: number;
+  amountValue: number;
+  beforeValue: number;
+  balance: number;
+  beforeRai: number;
+  afterRai: number;
+  raiAmount: number;
+  rewardId: string;
+  rewardName: string;
+  createAt: string;
+  updateAt: string;
+}
