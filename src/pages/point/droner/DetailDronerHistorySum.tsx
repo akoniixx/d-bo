@@ -10,7 +10,7 @@ import {
 } from "antd";
 import React, { useState } from "react";
 import { CardContainer } from "../../../components/card/CardContainer";
-import { color } from "../../../resource";
+import { color, icon } from "../../../resource";
 import { useNavigate } from "react-router-dom";
 import { BackIconButton } from "../../../components/button/BackButton";
 import { DateTimeUtil } from "../../../utilities/DateTimeUtil";
@@ -18,7 +18,7 @@ import SummaryPoint from "../../../components/card/SummaryPoint";
 
 const { RangePicker } = DatePicker;
 
-function IndexFarmerHistorySum() {
+function IndexDronerHistorySum() {
   const navigate = useNavigate();
   const dateFormat = "DD/MM/YYYY";
   const dateSearchFormat = "YYYY-MM-DD";
@@ -64,7 +64,7 @@ function IndexFarmerHistorySum() {
               fontWeight: "bold",
             }}
           >
-            <strong>ประวัติแต้ม | เกษตรกร ท่านหนึ่ง </strong>
+            <strong>ประวัติแต้ม | นักบินโดรน ท่านหนึ่ง </strong>
           </span>
         </Col>
         <Col span={4} className="pt-3">
@@ -146,7 +146,7 @@ function IndexFarmerHistorySum() {
           />
         </Col>
       </Row>
-      <br />
+      <br/>
     </>
   );
 
@@ -224,4 +224,4 @@ function IndexFarmerHistorySum() {
   );
 }
 
-export default IndexFarmerHistorySum;
+export default IndexDronerHistorySum;

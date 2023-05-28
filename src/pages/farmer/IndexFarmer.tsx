@@ -315,7 +315,7 @@ function IndexFarmer() {
   const pageTitle = (
     <>
       <div
-        className="container d-flex justify-content-between"
+        className="d-flex justify-content-between"
         style={{ padding: "10px" }}
       >
         <div>

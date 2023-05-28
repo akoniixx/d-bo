@@ -111,8 +111,8 @@ export const pathLists = ({ isAccounting }: { isAccounting: boolean }) => [
         permission: null,
         subMenu: [
           {
-            path: "/IndexDronerSummary",
-            name: "IndexDronerSummary",
+            path: "/IndexDronerSummaryPoint",
+            name: "IndexDronerSummaryPoint",
             title: "นักบินโดรน",
             permission: null,
           },
@@ -151,6 +151,7 @@ export const pathLists = ({ isAccounting }: { isAccounting: boolean }) => [
       },
     ],
   },
+
   {
     path: "admin",
     name: "admin",
