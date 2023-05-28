@@ -151,7 +151,25 @@ export const pathLists = ({ isAccounting }: { isAccounting: boolean }) => [
       },
     ],
   },
-
+  {
+    path: "mission",
+    name: "mission",
+    title: "ภารกิจและชาเลนจ์",
+    subMenu: [
+      {
+        path: "listmission",
+        name: "listmission",
+        title: "ภารกิจ",
+        subMenu: [
+          {
+            path: "/IndexDronerMission",
+            name: "IndexDronerMission",
+            title: "นักบินโดรน",
+          },
+        ],
+      },
+    ],
+  },
   {
     path: "admin",
     name: "admin",

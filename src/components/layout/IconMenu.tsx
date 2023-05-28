@@ -3,6 +3,7 @@ import {
   GiftFilled,
   MacCommandFilled,
   ProfileFilled,
+  RadarChartOutlined,
   SettingFilled,
   StarFilled,
   UserOutlined,
@@ -66,6 +67,14 @@ export const IconMenu = {
       }}
     />
   ),
+  mission: (
+    <RadarChartOutlined
+      style={{
+        fontSize: "16px",
+        color: "#231F20",
+      }}
+    />
+  ),
 };
 export const IconMenuInActive = {
   task: (
@@ -118,6 +127,14 @@ export const IconMenuInActive = {
   ),
   setting: (
     <SettingFilled
+      style={{
+        fontSize: "16px",
+        color: "#FFCA37",
+      }}
+    />
+  ),
+  mission: (
+    <RadarChartOutlined
       style={{
         fontSize: "16px",
         color: "#FFCA37",
