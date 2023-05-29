@@ -1,5 +1,4 @@
 import {
-  FileTextOutlined,
   InfoCircleFilled,
   SearchOutlined,
 } from "@ant-design/icons";

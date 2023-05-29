@@ -53,13 +53,11 @@ export class PointReceiveDatasource {
       endDate: endDate,
       type: type,
     };
-    console.log("p", params);
     return httpClient
       .get(BASE_URL + "/promotion/historypoint-quota/getallhistoryincrease", {
         params,
       })
       .then((response) => {
-        console.log("res", response.data);
         return response.data;
       })
       .catch((err) => {
