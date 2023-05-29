@@ -1,5 +1,8 @@
 import { BASE_URL, httpClient } from "../config/develop-config";
-import { GetAllRewardEntities, RewardEntities } from "../entities/RewardEntites";
+import {
+  GetAllRewardEntities,
+  RewardEntities,
+} from "../entities/RewardEntites";
 
 export class RewardDatasource {
   static addReward(data: RewardEntities) {
@@ -7,16 +10,19 @@ export class RewardDatasource {
     formData.append("rewardName", data.rewardName);
     formData.append("rewardType", data.rewardType);
     formData.append("rewardExchange", data.rewardExchange);
-    formData.append("score", data.score);
+    data.score && formData.append("score", data.score);
     formData.append("amount", data.amount);
     formData.append("description", data.description);
     formData.append("condition", data.condition);
     formData.append("status", data.status);
     formData.append("createBy", data.createBy);
-    formData.append("startExchangeDate", data.startExchangeDate);
-    formData.append("expiredExchangeDate", data.expiredExchangeDate);
-    formData.append("startUsedDate", data.startUsedDate);
-    formData.append("expiredUsedDate", data.expiredUsedDate);
+    data.startExchangeDate &&
+      formData.append("startExchangeDate", data.startExchangeDate);
+    data.expiredExchangeDate &&
+      formData.append("expiredExchangeDate", data.expiredExchangeDate);
+    data.startUsedDate && formData.append("startUsedDate", data.startUsedDate);
+    data.expiredUsedDate &&
+      formData.append("expiredUsedDate", data.expiredUsedDate);
     formData.append("file", data.file);
     return httpClient
       .post(BASE_URL + "/promotion/reward/upload", formData)
@@ -56,10 +62,30 @@ export class RewardDatasource {
         console.log(error);
       });
   }
-  static getAllRewardById(id : string){
-    return httpClient.
-    get(BASE_URL + `/promotion/reward/query/${id}`)
-    .then(res => {return res.data})
-    .catch(err => console.log(err))
-}
+  static getAllRewardById(id: string) {
+    return httpClient
+      .get(BASE_URL + `/promotion/reward/query/${id}`)
+      .then((res) => {
+        return res.data;
+      })
+      .catch((err) => console.log(err));
+  }
+  static deleteReward(id: string) {
+    return httpClient
+      .delete(BASE_URL + `/promotion/reward/query/${id}`)
+      .then((response) => {
+        return response.data;
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  }
+  static updateReward(id: string, dataReward: RewardEntities) {
+    return httpClient
+      .patch(BASE_URL + `/promotion/reward/update/${id}`, dataReward)
+      .then((res) => {
+        return res.data;
+      })
+      .catch((err) => console.log(err));
+  }
 }

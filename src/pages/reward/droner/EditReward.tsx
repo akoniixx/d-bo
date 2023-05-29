@@ -44,7 +44,6 @@ function EditReward() {
   const [createImgReward, setCreateImgReward] = useState<UploadImageEntity>(
     UploadImageEntity_INTI
   );
-
   const [rewardType, setRewardType] = useState<string | null>(null);
   const [rewardName, setRewardName] = useState<string | null>(null);
   const [rewardExchange, setRewardExchange] = useState<string | null>(null);
@@ -65,7 +64,9 @@ function EditReward() {
 
   useEffect(() => {
     RewardDatasource.getAllRewardById(queryString[1]).then((res) => {
+      console.log(res);
       form.setFieldsValue({
+        img : res.imagePath,
         rewardName: res.rewardName,
         rewardType: res.rewardType,
         rewardExchange: res.rewardExchange,
@@ -107,6 +108,7 @@ function EditReward() {
       setDescription(res.description);
       setCondition(res.condition);
       setScore(res.score);
+      setImgReward(res.imagePath)
     });
   }, []);
   const onChangeImg = async (file: any) => {
@@ -319,31 +321,7 @@ function EditReward() {
                 </div>
               </div>
             </div>
-            {rewardExchange === "MISSION" ? (
-              <div className="row">
-                <div className="form-group col-lg-6">
-                  <label>
-                    จำนวน <span style={{ color: "red" }}>*</span>
-                  </label>
-                  <Form.Item
-                    name="amount"
-                    rules={[
-                      {
-                        required: true,
-                        message: "กรุณากรอกจำนวน!",
-                      },
-                    ]}
-                  >
-                    <Input
-                      type="number"
-                      placeholder="กรอกจำนวน"
-                      autoComplete="off"
-                      onChange={handleRewardCount}
-                    />
-                  </Form.Item>
-                </div>
-              </div>
-            ) : (
+            {rewardExchange === "SCORE" ? (
               <div className="row">
                 <div className="form-group col-lg-6">
                   <label>
@@ -388,180 +366,201 @@ function EditReward() {
                   </Form.Item>
                 </div>
               </div>
+            ) : (
+              <div className="row">
+                <div className="form-group col-lg-6">
+                  <label>
+                    จำนวน <span style={{ color: "red" }}>*</span>
+                  </label>
+                  <Form.Item
+                    name="amount"
+                    rules={[
+                      {
+                        required: true,
+                        message: "กรุณากรอกจำนวน!",
+                      },
+                    ]}
+                  >
+                    <Input
+                      type="number"
+                      placeholder="กรอกจำนวน"
+                      autoComplete="off"
+                    />
+                  </Form.Item>
+                </div>
+              </div>
             )}
-            {rewardExchange === "SCORE" && (
-              <>
-                <Divider />
-                <p style={{ color: color.Error }}>ช่วงเวลาที่สามารถแลกได้</p>
-                <div className="row">
-                  <div className="col-lg-6">
-                    <label>
-                      วันเริ่มต้น<span style={{ color: color.Error }}>*</span>
-                    </label>
-                    <div className="d-flex">
-                      <Form.Item
-                        name="startExchangeDate"
-                        rules={[
-                          {
-                            required: true,
-                            message: "กรุณากรอกวันที่!",
-                          },
-                        ]}
-                      >
-                        <DatePicker
-                          placeholder="เลือกวันที่"
-                          onChange={(val) => {
-                            setStartExchangeDate(val);
-                          }}
-                          format={dateFormat}
-                        />
-                      </Form.Item>
-                      <Form.Item
-                        name="startExchangeTime"
-                        initialValue={moment("00:00", "HH:mm")}
-                      >
-                        <TimePicker
-                          format={"HH:mm"}
-                          className="ms-3"
-                          placeholder="เลือกเวลา"
-                          onChange={(val) => {
-                            setStartExchangeTime(val);
-                          }}
-                          defaultValue={moment("00:00", "HH:mm")}
-                          allowClear={false}
-                        />
-                      </Form.Item>
-                    </div>
-                  </div>
-                  <div className="col-lg-6">
-                    <label>
-                      วันสิ้นสุด<span style={{ color: color.Error }}>*</span>
-                    </label>
-                    <div className="d-flex">
-                      <Form.Item
-                        name="expiredExchangeDate"
-                        rules={[
-                          {
-                            required: true,
-                            message: "กรุณากรอกวันที่!",
-                          },
-                        ]}
-                      >
-                        <DatePicker
-                          placeholder="เลือกวันที่"
-                          onChange={(val) => {
-                            setEndExchangeDate(val);
-                          }}
-                          format={dateFormat}
-                        />
-                      </Form.Item>
-                      <Form.Item
-                        name="expiredExchangeTime"
-                        initialValue={moment("23:59", "HH:mm")}
-                      >
-                        <TimePicker
-                          format={"HH:mm"}
-                          className="ms-3"
-                          placeholder="เลือกเวลา"
-                          onChange={(val) => {
-                            setEndExchangeTime(val);
-                          }}
-                          defaultValue={moment("23:59", "HH:mm")}
-                          allowClear={false}
-                        />
-                      </Form.Item>
-                    </div>
+
+            {/* <>
+              <Divider />
+              <p style={{ color: color.Error }}>ช่วงเวลาที่สามารถแลกได้</p>
+              <div className="row">
+                <div className="col-lg-6">
+                  <label>
+                    วันเริ่มต้น<span style={{ color: color.Error }}>*</span>
+                  </label>
+                  <div className="d-flex">
+                    <Form.Item
+                      name="startExchangeDate"
+                      rules={[
+                        {
+                          required: true,
+                          message: "กรุณากรอกวันที่!",
+                        },
+                      ]}
+                    >
+                      <DatePicker
+                        placeholder="เลือกวันที่"
+                        onChange={(val) => {
+                          setStartExchangeDate(val);
+                        }}
+                        format={dateFormat}
+                      />
+                    </Form.Item>
+                    <Form.Item
+                      name="startExchangeTime"
+                      initialValue={moment("00:00", "HH:mm")}
+                    >
+                      <TimePicker
+                        format={"HH:mm"}
+                        className="ms-3"
+                        placeholder="เลือกเวลา"
+                        onChange={(val) => {
+                          setStartExchangeTime(val);
+                        }}
+                        defaultValue={moment("00:00", "HH:mm")}
+                        allowClear={false}
+                      />
+                    </Form.Item>
                   </div>
                 </div>
-                <Divider />
-              </>
-            )}
-            {rewardType === "DIGITAL" && (
-              <>
-                <p style={{ color: color.Success }}>ช่วงเวลาที่ใช้ได้</p>
-                <div className="row">
-                  <div className="col-lg-6">
-                    <label>
-                      วันเริ่มต้น<span style={{ color: color.Error }}>*</span>
-                    </label>
-                    <div className="d-flex">
-                      <Form.Item
-                        name="startUsedDate"
-                        rules={[
-                          {
-                            required: true,
-                            message: "กรุณากรอกวันที่!",
-                          },
-                        ]}
-                      >
-                        <DatePicker
-                          placeholder="เลือกวันที่"
-                          format={dateFormat}
-                          onChange={(val) => {
-                            setStartUsedDate(val);
-                          }}
-                        />
-                      </Form.Item>
-                      <Form.Item
-                        name="startUsedTime"
-                        initialValue={moment("00:00", "HH:mm")}
-                      >
-                        <TimePicker
-                          format={"HH:mm"}
-                          className="ms-3"
-                          placeholder="เลือกเวลา"
-                          defaultValue={moment("00:00", "HH:mm")}
-                          allowClear={false}
-                          onChange={(val) => {
-                            setStartUsedTime(val);
-                          }}
-                        />
-                      </Form.Item>
-                    </div>
-                  </div>
-                  <div className="col-lg-6">
-                    <label>
-                      วันสิ้นสุด<span style={{ color: color.Error }}>*</span>
-                    </label>
-                    <div className="d-flex">
-                      <Form.Item
-                        name="expiredUsedDate"
-                        rules={[
-                          {
-                            required: true,
-                            message: "กรุณากรอกวันที่!",
-                          },
-                        ]}
-                      >
-                        <DatePicker
-                          placeholder="เลือกวันที่"
-                          format={dateFormat}
-                          onChange={(val) => {
-                            setEndUsedDate(val);
-                          }}
-                        />
-                      </Form.Item>
-                      <Form.Item
-                        name="expiredUsedTime"
-                        initialValue={moment("23:59", "HH:mm")}
-                      >
-                        <TimePicker
-                          format={"HH:mm"}
-                          className="ms-3"
-                          placeholder="เลือกเวลา"
-                          defaultValue={moment("00:00", "HH:mm")}
-                          allowClear={false}
-                          onChange={(val) => {
-                            setEndUsedTime(val);
-                          }}
-                        />
-                      </Form.Item>
-                    </div>
+                <div className="col-lg-6">
+                  <label>
+                    วันสิ้นสุด<span style={{ color: color.Error }}>*</span>
+                  </label>
+                  <div className="d-flex">
+                    <Form.Item
+                      name="expiredExchangeDate"
+                      rules={[
+                        {
+                          required: true,
+                          message: "กรุณากรอกวันที่!",
+                        },
+                      ]}
+                    >
+                      <DatePicker
+                        placeholder="เลือกวันที่"
+                        onChange={(val) => {
+                          setEndExchangeDate(val);
+                        }}
+                        format={dateFormat}
+                      />
+                    </Form.Item>
+                    <Form.Item
+                      name="expiredExchangeTime"
+                      initialValue={moment("23:59", "HH:mm")}
+                    >
+                      <TimePicker
+                        format={"HH:mm"}
+                        className="ms-3"
+                        placeholder="เลือกเวลา"
+                        onChange={(val) => {
+                          setEndExchangeTime(val);
+                        }}
+                        defaultValue={moment("23:59", "HH:mm")}
+                        allowClear={false}
+                      />
+                    </Form.Item>
                   </div>
                 </div>
-                <Divider />
-              </>
-            )}
+              </div>
+              <Divider />
+            </>
+            <>
+              <p style={{ color: color.Success }}>ช่วงเวลาที่ใช้ได้</p>
+              <div className="row">
+                <div className="col-lg-6">
+                  <label>
+                    วันเริ่มต้น<span style={{ color: color.Error }}>*</span>
+                  </label>
+                  <div className="d-flex">
+                    <Form.Item
+                      name="startUsedDate"
+                      rules={[
+                        {
+                          required: true,
+                          message: "กรุณากรอกวันที่!",
+                        },
+                      ]}
+                    >
+                      <DatePicker
+                        placeholder="เลือกวันที่"
+                        format={dateFormat}
+                        onChange={(val) => {
+                          setStartUsedDate(val);
+                        }}
+                      />
+                    </Form.Item>
+                    <Form.Item
+                      name="startUsedTime"
+                      initialValue={moment("00:00", "HH:mm")}
+                    >
+                      <TimePicker
+                        format={"HH:mm"}
+                        className="ms-3"
+                        placeholder="เลือกเวลา"
+                        defaultValue={moment("00:00", "HH:mm")}
+                        allowClear={false}
+                        onChange={(val) => {
+                          setStartUsedTime(val);
+                        }}
+                      />
+                    </Form.Item>
+                  </div>
+                </div>
+                <div className="col-lg-6">
+                  <label>
+                    วันสิ้นสุด<span style={{ color: color.Error }}>*</span>
+                  </label>
+                  <div className="d-flex">
+                    <Form.Item
+                      name="expiredUsedDate"
+                      rules={[
+                        {
+                          required: true,
+                          message: "กรุณากรอกวันที่!",
+                        },
+                      ]}
+                    >
+                      <DatePicker
+                        placeholder="เลือกวันที่"
+                        format={dateFormat}
+                        onChange={(val) => {
+                          setEndUsedDate(val);
+                        }}
+                      />
+                    </Form.Item>
+                    <Form.Item
+                      name="expiredUsedTime"
+                      initialValue={moment("23:59", "HH:mm")}
+                    >
+                      <TimePicker
+                        format={"HH:mm"}
+                        className="ms-3"
+                        placeholder="เลือกเวลา"
+                        defaultValue={moment("00:00", "HH:mm")}
+                        allowClear={false}
+                        onChange={(val) => {
+                          setEndUsedTime(val);
+                        }}
+                      />
+                    </Form.Item>
+                  </div>
+                </div>
+              </div>
+              <Divider />
+            </> */}
+
             <div className="row py-4">
               <div className="form-group col-lg-12">
                 <label>
@@ -658,6 +657,7 @@ function EditReward() {
           "DD MMM YY "
         )}
         exChange={rewardExchange}
+        countdownTime={''}
       />
     </div>
   );

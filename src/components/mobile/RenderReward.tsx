@@ -7,6 +7,7 @@ import {
   numberWithCommas,
   numberWithCommasToFixed,
 } from "../../utilities/TextFormatter";
+import { DateTimeUtil } from "../../utilities/DateTimeUtil";
 interface RenderReward {
   img: string;
   name: any;
@@ -16,6 +17,7 @@ interface RenderReward {
   type: string | null;
   dateTimeOut: any;
   exChange: string | null;
+  countdownTime: any;
 }
 
 const RenderReward: React.FC<RenderReward> = ({
@@ -27,6 +29,7 @@ const RenderReward: React.FC<RenderReward> = ({
   type,
   dateTimeOut,
   exChange,
+  countdownTime,
 }) => {
   const div = useRef<any>();
   useLayoutEffect(() => {
@@ -63,6 +66,7 @@ const RenderReward: React.FC<RenderReward> = ({
             }}
           >
             <Image
+              style={{ padding: 20 }}
               src={img ? img : uploadImg}
               width={"100%"}
               height={"26.7%"}
@@ -99,7 +103,7 @@ const RenderReward: React.FC<RenderReward> = ({
                       paddingLeft: "12px",
                     }}
                   >
-                    หมดอายุอีกวัน
+                    หมดอายุอีก 0 วัน
                   </div>
                   <div
                     style={{
@@ -110,7 +114,7 @@ const RenderReward: React.FC<RenderReward> = ({
                       paddingLeft: "12px",
                     }}
                   >
-                    {dateTimeOut}
+                    {/* {dateTimeOut} */}
                   </div>
                 </div>
               )}

@@ -31,6 +31,7 @@ import { RewardDatasource } from "../../../datasource/RewardDatasource";
 import Swal from "sweetalert2";
 import { MONTH_SALE } from "../../../definitions/Month";
 import { convertBuddhistYear } from "../../../utilities/ConvertToBuddhistYear";
+import { UploadImageDatasouce } from "../../../datasource/UploadImageDatasource";
 
 const { Map } = require("immutable");
 
@@ -86,9 +87,10 @@ function AddReward() {
     const d = Map(createImgReward).set(
       "file",
       isFileMoreThan2MB ? newSource : source
-    );
+    );   
     setCreateImgReward(d.toJS());
   };
+
   const onPreviewImg = async () => {
     let src = imgReward;
     if (!src) {
@@ -606,11 +608,9 @@ function AddReward() {
         condition={condition}
         point={score}
         type={rewardType}
-        dateTimeOut={convertBuddhistYear.toBuddhistYear(
-          moment(endUsedDate),
-          "DD MMM YY "
-        )}
+        dateTimeOut={new Date(endUsedDate) }
         exChange={rewardExchange}
+        countdownTime={''}
       />
     </div>
   );
@@ -677,14 +677,13 @@ function AddReward() {
       createBy: profile.firstname + " " + profile.lastname,
     })
       .then((res) => {
-        console.log(res);
         Swal.fire({
           title: "บันทึกสำเร็จ",
           icon: "success",
           timer: 1500,
           showConfirmButton: false,
         }).then((time) => {
-          // navigate("/IndexReward");
+          navigate("/IndexReward");
         });
       })
       .catch((err) => {

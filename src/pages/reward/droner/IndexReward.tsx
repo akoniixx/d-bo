@@ -65,7 +65,7 @@ function IndexReward() {
     setVisibleStatus(newVisible);
   };
   const [showModal, setShowModal] = useState(false);
-  const [deleteId, setDeleteId] = useState<string>("");
+  const [rewardId, setRewardId] = useState("");
 
   const [checkedList, setCheckedList] = useState<CheckboxValueType[]>();
   const [checkedListDone, setCheckedListDone] = useState<CheckboxValueType[]>();
@@ -90,16 +90,9 @@ function IndexReward() {
       setData(res);
     });
   };
-  const getImgReward = () => {
-    const filterImg = data?.data.filter((x) => x.imagePath);
-    UploadImageDatasouce.getImage(filterImg).then((res) => {
-      setGetImg(res);
-    });
-  };
 
   useEffect(() => {
     getAllReward();
-    getImgReward();
   }, [current, startExchangeDate, expiredExchangeDate]);
   const onChangePage = (page: number) => {
     setCurrent(page);
@@ -242,16 +235,20 @@ function IndexReward() {
   //     ]}
   //   />
   // );
-  const removeReward = (id: string) => {
+  const showDelete = (id: string) => {
+    setRewardId(id);
     setShowModal(!showModal);
-    setDeleteId(id);
   };
-  const deleteReward = () => {
-    // CampaignDatasource.deleteCampaign(deleteId).then((res) => {
-    setShowModal(!showModal);
-    setDeleteId("");
-    // });
+  const removeReward = () => {
+    RewardDatasource.deleteReward(rewardId)
+      .then((res) => {
+        setShowModal(!showModal);
+        setRewardId("");
+        getAllReward();
+      })
+      .catch((err) => console.log(err));
   };
+
   const isNumber = (n: any) => {
     return !isNaN(parseFloat(n)) && isFinite(n);
   };
@@ -406,7 +403,7 @@ function IndexReward() {
                 <UserOutlined
                   style={{ padding: "0 4px 0 0", verticalAlign: 2 }}
                 />
-                {`ICONKASET (ADMIN)`}
+                {row.createBy ? row.createBy : '-'}
               </span>
             </>
           ),
@@ -426,18 +423,11 @@ function IndexReward() {
             <>
               <Row>
                 <Col>
-                  {getImg ? (
-                    <Avatar
-                      size={25}
-                      src={getImg}
-                      style={{ marginRight: "5px" }}
-                    />
-                  ) : (
-                    <Avatar
-                      size={25}
-                      style={{ color: "#0068F4", backgroundColor: "#EFF2F9" }}
-                    />
-                  )}
+                  <Image
+                    src={row.imagePath}
+                    style={{ width: 50, height: 50 }}
+                    preview={false}
+                  />
                 </Col>
                 <Col style={{ padding: 10 }}>
                   <span className="text-dark-75  d-block font-size-lg">
@@ -664,24 +654,14 @@ function IndexReward() {
                   onClick={() => navigate("/EditReward/id=" + row.id)}
                 />
               </div>
-              {row.remain === 0 ? (
-                <div>
-                  <ActionButton
-                    icon={<DeleteOutlined />}
-                    color={color.Error}
-                    onClick={() => removeReward(row.id)}
-                  />
-                </div>
-              ) : (
-                <div>
-                  <Button
-                    disabled
-                    style={{ borderRadius: 5 }}
-                    icon={<DeleteOutlined />}
-                    color={color.Disable}
-                  />
-                </div>
-              )}
+              <div>
+                <ActionButton
+                  icon={<DeleteOutlined />}
+                  color={row.remain > 0 ? color.Grey : color.Error}
+                  onClick={() => showDelete(row.id)}
+                  actionDisable={row.remain > 0 ? true : false}
+                />
+              </div>
             </div>
           ),
         };
@@ -754,7 +734,7 @@ function IndexReward() {
                 backgroundColor: color.Error,
                 color: color.White,
               }}
-              // onClick={() => }
+              onClick={() => removeReward()}
             >
               ยืนยัน
             </Button>
