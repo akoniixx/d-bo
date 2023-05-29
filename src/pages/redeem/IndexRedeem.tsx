@@ -22,11 +22,15 @@ import { Container } from "react-bootstrap";
 import ActionButton from "../../components/button/ActionButton";
 import { CardContainer } from "../../components/card/CardContainer";
 import { RedeemDatasource } from "../../datasource/RedeemDatasource";
-import { RedeemFarmerListEntity } from "../../entities/RedeemEntities";
+import {
+  RedeemDronerEntity,
+  RedeemFarmerListEntity,
+} from "../../entities/RedeemEntities";
 import { color } from "../../resource";
 import image from "../../resource/image";
 import { DateTimeUtil } from "../../utilities/DateTimeUtil";
 import { useNavigate } from "react-router-dom";
+import { numberWithCommas } from "../../utilities/TextFormatter";
 
 const { RangePicker } = DatePicker;
 const dateSearchFormat = "YYYY-MM-DD";
@@ -40,6 +44,7 @@ const IndexRedeem = () => {
     window.location.pathname.split("/")[2]
   );
   const [dataFarmer, setDataFarmer] = useState<RedeemFarmerListEntity>();
+  const [dataDroner, setDataDroner] = useState<RedeemDronerEntity[]>();
   const [searchKeyword, setSearchKeyword] = useState("");
   const [searchStartDate, setSearchStartDate] = useState<any>(null);
   const [searchEndDate, setSearchEndDate] = useState<any>(null);
@@ -58,9 +63,24 @@ const IndexRedeem = () => {
     });
   };
 
+  const fetchRedeemDroner = () => {
+    RedeemDatasource.getRedeemDroner(row, current).then((res) => {
+      //console.log("d", res);
+      const mapKey = res.map((x, i) => ({
+        ...x,
+        key: i + 1,
+      }));
+      setDataDroner(mapKey);
+    });
+  };
+
   useEffect(() => {
-    fetchRedeemFarmer();
-  }, [current, searchStartDate, searchEndDate]);
+    if (source === "FARMER") {
+      fetchRedeemFarmer();
+    } else {
+      fetchRedeemDroner();
+    }
+  }, [current, searchStartDate, searchEndDate, source]);
 
   const onChangePage = (page: number) => {
     setCurrent(page);
@@ -82,51 +102,10 @@ const IndexRedeem = () => {
 
   const plainOptions = ["Physical", "Digital"];
 
-  const dataMockDroner = [
-    {
-      key: 1,
-      dateTime: Date(),
-      redeemNo: "RD0000001",
-      rewardNo: "RW000001",
-      missionNo: "",
-      rewardType: "Physical",
-      firstName: "รชยา",
-      lastName: "ช่างภักดี",
-      telephone: "0938355808",
-      status: "คำร้องขอแลก",
-      description: {
-        img: image.reward,
-        name: "บัตรเติมน้ำมัน 500 บาท",
-        point: 100,
-        qty: 5,
-        totalpoint: 500,
-      },
-    },
-    {
-      key: 2,
-      dateTime: Date(),
-      redeemNo: "RD0000002",
-      rewardNo: "RW000002",
-      missionNo: "MS000002",
-      rewardType: "Physical",
-      firstName: "รชยา",
-      lastName: "ช่างภักดี",
-      telephone: "0938355808",
-      status: "คำร้องขอแลก",
-      description: {
-        img: image.reward,
-        name: "บัตรเติมน้ำมัน 500 บาท",
-        point: 100,
-        qty: 5,
-        totalpoint: 500,
-      },
-    },
-  ];
-
   const pageTitle = (
     <>
       <Row justify={"space-between"} style={{ padding: "10px" }}>
-        <Col span={16}>
+        <Col span={14}>
           <span
             className="card-label font-weight-bolder text-dark"
             style={{
@@ -138,7 +117,7 @@ const IndexRedeem = () => {
             <strong>รายงานแต้ม (แลกแต้ม)</strong>
           </span>
         </Col>
-        <Col span={2}>
+        <Col span={4}>
           <Radio.Group buttonStyle="outline">
             <Radio.Button
               value="Farmer"
@@ -156,7 +135,7 @@ const IndexRedeem = () => {
             >
               เกษตรกร
             </Radio.Button>
-            {/* <Radio.Button
+            <Radio.Button
               value="Droner"
               style={
                 source === "Droner"
@@ -171,7 +150,7 @@ const IndexRedeem = () => {
               onClick={() => setSource("Droner")}
             >
               นักบินโดรน
-            </Radio.Button> */}
+            </Radio.Button>
           </Radio.Group>
         </Col>
         {/* <Col>
@@ -337,11 +316,13 @@ const IndexRedeem = () => {
     {
       title: "แต้มที่แลก",
       dataIndex: "point",
-      width: "10%",
+      width: "12%",
       render: (value: any, row: any, index: number) => {
         return {
           children: (
-            <span style={{ color: color.Error }}>- {row.usePoint}</span>
+            <span style={{ color: color.Error }}>
+              - {numberWithCommas(row.usePoint)} แต้ม
+            </span>
           ),
         };
       },
@@ -397,14 +378,14 @@ const IndexRedeem = () => {
   const columnsDroner = [
     {
       title: "วันที่อัพเดท",
-      dataIndex: "dateTime",
-      key: "dateTime",
+      dataIndex: "createAt",
+      key: "createAt",
       width: "13%",
       render: (value: any, row: any, index: number) => {
         return {
           children: (
             <span>
-              {row.dateTime && DateTimeUtil.formatDateTime(row.dateTime)}
+              {row.createAt && DateTimeUtil.formatDateTime(row.createAt)}
             </span>
           ),
         };
@@ -421,10 +402,10 @@ const IndexRedeem = () => {
     },
     {
       title: "Reward No",
-      dataIndex: "rewardNo",
+      dataIndex: "rewardCode",
       render: (value: any, row: any, index: number) => {
         return {
-          children: <span>{row.rewardNo}</span>,
+          children: <span>{row.rewardCode}</span>,
         };
       },
     },
@@ -465,7 +446,7 @@ const IndexRedeem = () => {
         return {
           children: (
             <u style={{ color: color.Success }}>
-              {row.firstName + " " + row.lastName}
+              {row.dronerDetail.firstname + " " + row.dronerDetail.lastname}
             </u>
           ),
         };
@@ -473,10 +454,9 @@ const IndexRedeem = () => {
     },
     {
       title: "เบอร์โทร",
-      dataIndex: "telephone",
       render: (value: any, row: any, index: number) => {
         return {
-          children: <span>{row.telephone}</span>,
+          children: <span>{row.dronerDetail.telephoneNo}</span>,
         };
       },
     },
@@ -488,7 +468,6 @@ const IndexRedeem = () => {
         return {
           children: (
             <>
-              {" "}
               <span>{row.rewardType}</span>
               <span
                 style={{ color: row.key === 1 ? color.Warning : "#A9CB62" }}
@@ -562,24 +541,24 @@ const IndexRedeem = () => {
       >
         <Row>
           <Col span={2}>
-            <img src={record.description.img} width={55} height={55} />
+            <img src={record.reward.imagePath} width={55} height={55} />
           </Col>
           <Col span={10} className="p-2">
             <div>ชื่อของรางวัล</div>
-            <div>{record.description.name}</div>
+            <div>{record.reward.rewardName}</div>
           </Col>
           <Col span={4} className="p-2">
             <div>แต้มที่แลก</div>
-            <div>{record.description.point} แต้ม</div>
+            <div>{numberWithCommas(record.reward.score)} แต้ม</div>
           </Col>
           <Col span={3} className="p-2">
             <div>จำนวน</div>
-            <div>{record.description.qty} ชิ้น</div>
+            <div>{record.rewardQuantity} ชิ้น</div>
           </Col>
           <Col span={3} className="p-2">
             <div>รวมแต้มทั้งหมด</div>
             <div style={{ color: color.Error }}>
-              {record.description.totalpoint} แต้ม
+              {numberWithCommas(record.amountValue)} แต้ม
             </div>
           </Col>
         </Row>
@@ -602,11 +581,11 @@ const IndexRedeem = () => {
         )}
         {source === "Droner" && (
           <Table
-            dataSource={dataMockDroner}
+            dataSource={dataDroner}
             expandable={{
               expandedRowRender: (record) => expandable(record),
               showExpandColumn: false,
-              defaultExpandAllRows: true,
+              defaultExpandedRowKeys: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
             }}
             columns={columnsDroner}
             pagination={false}
@@ -618,14 +597,11 @@ const IndexRedeem = () => {
       <div className="d-flex justify-content-between pt-3 pb-3">
         <p>
           รายการทั้งหมด{" "}
-          {source === "Farmer" ? dataFarmer?.count : dataMockDroner.length}{" "}
-          รายการ
+          {source === "Farmer" ? dataFarmer?.count : dataDroner?.length} รายการ
         </p>
         <Pagination
           current={current}
-          total={
-            source === "Farmer" ? dataFarmer?.count : dataMockDroner.length
-          }
+          total={source === "Farmer" ? dataFarmer?.count : dataDroner?.length}
           onChange={onChangePage}
           pageSize={row}
           showSizeChanger={false}

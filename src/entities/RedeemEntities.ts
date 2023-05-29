@@ -74,3 +74,40 @@ export interface DetailRedeemFermerEntity {
     };
   };
 }
+
+export interface RedeemDronerEntity {
+  id: string;
+  dronerId: string;
+  campaignName: string;
+  campaignId: string;
+  allValue: number;
+  amountValue: number;
+  beforeValue: number;
+  balance: number;
+  beforeRai: number;
+  afterRai: number;
+  rewardId: string;
+  rewardName: string;
+  rewardQuantity: number;
+  createAt: string;
+  updateAt: string;
+  campaign: string;
+  reward: {
+    id: string;
+    rewardName: string;
+    imagePath: string;
+    rewardType: string;
+    rewardNo: string;
+    score: number;
+    amount: number;
+    used: number;
+    remain: number;
+  };
+  mission: string;
+  dronerDetail: {
+    dronerId: string;
+    firstname: string;
+    lastname: string;
+    telephoneNo: string;
+  };
+}
