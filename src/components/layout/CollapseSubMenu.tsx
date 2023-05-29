@@ -22,6 +22,8 @@ interface CollapseSubMenuProps {
   currentSub: {
     path: string;
   };
+  checkPathSubList: string | undefined;
+  setCheckPathSubList: React.Dispatch<React.SetStateAction<string | undefined>>;
   checkPathSub: string | undefined;
   setCheckPathSub: React.Dispatch<React.SetStateAction<string | undefined>>;
 }
@@ -57,6 +59,8 @@ export const CollapseSubMenu: React.FC<CollapseSubMenuProps> = ({
   path,
   checkPathSub,
   setCheckPathSub,
+  setCheckPathSubList,
+  checkPathSubList,
 }) => {
   const navigate = useNavigate();
   return (
@@ -73,14 +77,17 @@ export const CollapseSubMenu: React.FC<CollapseSubMenuProps> = ({
         }}
         onClick={() => {
           setCurrentSub({ path });
-          if (path === checkPathSub) {
+          if (path === checkPathSub && path === checkPathSubList) {
             setCheckPathSub(undefined);
+            setCheckPathSubList(undefined);
           } else {
             setCheckPathSub(path);
+            setCheckPathSubList(path);
           }
+          console.log(checkPathSub);
         }}
       >
-        {checkPathSub !== path ? (
+        {checkPathSub !== path || checkPathSubList !== path ? (
           <>
             <div
               style={{
@@ -98,7 +105,7 @@ export const CollapseSubMenu: React.FC<CollapseSubMenuProps> = ({
               {title}
             </div>
             <div style={{ paddingRight: "8px" }}>
-              {checkPathSub !== path ? (
+              {checkPathSub !== path || checkPathSubList !== path ? (
                 <DownOutlined style={{ fontSize: "14px" }} />
               ) : (
                 <UpOutlined style={{ fontSize: "14px" }} />
@@ -121,7 +128,7 @@ export const CollapseSubMenu: React.FC<CollapseSubMenuProps> = ({
                 display: "flex",
               }}
             >
-              {checkPathSub === path ? (
+              {checkPathSub === path && checkPathSubList !== path ? (
                 <DownOutlined style={{ fontSize: "14px" }} />
               ) : (
                 <UpOutlined
@@ -132,7 +139,7 @@ export const CollapseSubMenu: React.FC<CollapseSubMenuProps> = ({
           </>
         )}
       </div>
-      {checkPathSub === path && (
+      {checkPathSub === path && checkPathSubList === path && (
         <div
           style={{
             width: "100%",
