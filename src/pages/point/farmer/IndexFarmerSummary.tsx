@@ -1,19 +1,13 @@
 import { FileTextOutlined, SearchOutlined } from "@ant-design/icons";
-import {
-  Button,
-  Col,
-  Image,
-  Input,
-  Pagination,
-  Row,
-  Table,
-} from "antd";
+import { Button, Col, Image, Input, Pagination, Row, Table } from "antd";
 import React, { useEffect, useState } from "react";
 import ActionButton from "../../../components/button/ActionButton";
 import { CardContainer } from "../../../components/card/CardContainer";
 import { color, icon } from "../../../resource";
 import { useNavigate } from "react-router-dom";
-import { FarmerSummaryPointEntity } from "../../../entities/PointReceiveEntities";
+import {
+  FarmerSummaryPointListEntity,
+} from "../../../entities/PointReceiveEntities";
 import { PointReceiveDatasource } from "../../../datasource/PointReceiveDatasource";
 import { numberWithCommas } from "../../../utilities/TextFormatter";
 
@@ -21,7 +15,7 @@ function IndexFarmerSummary() {
   const navigate = useNavigate();
   const row = 10;
   const [current, setCurrent] = useState(1);
-  const [data, setData] = useState<FarmerSummaryPointEntity[]>();
+  const [data, setData] = useState<FarmerSummaryPointListEntity>();
   const [searchKeyword, setSearchKeyword] = useState("");
 
   const fetchFarmerSum = () => {
@@ -86,11 +80,7 @@ function IndexFarmerSummary() {
       width: "30%",
       render: (value: any, row: any, index: number) => {
         return {
-          children: (
-            <>
-              <span>{row.firstname + " " + row.lastname}</span>
-            </>
-          ),
+          children: <span>{row.firstname + " " + row.lastname}</span>,
         };
       },
     },
@@ -156,7 +146,7 @@ function IndexFarmerSummary() {
         {pageTitle}
         <CardContainer>
           <Table
-            dataSource={data}
+            dataSource={data?.data}
             columns={columns}
             pagination={false}
             size="large"
@@ -164,10 +154,10 @@ function IndexFarmerSummary() {
           />
         </CardContainer>
         <div className="d-flex justify-content-between pt-4">
-          <p>รายการทั้งหมด {data?.length} รายการ</p>
+          <p>รายการทั้งหมด {data?.count} รายการ</p>
           <Pagination
             current={current}
-            total={data?.length}
+            total={data?.count}
             onChange={onChangePage}
             pageSize={row}
             showSizeChanger={false}

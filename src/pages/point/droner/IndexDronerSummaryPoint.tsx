@@ -1,59 +1,66 @@
 import { FileTextOutlined, SearchOutlined } from "@ant-design/icons";
 import { Button, Col, Input, Pagination, Row, Table, Image } from "antd";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import ActionButton from "../../../components/button/ActionButton";
 import { CardContainer } from "../../../components/card/CardContainer";
+import { PointReceiveDatasource } from "../../../datasource/PointReceiveDatasource";
+import { DronerSummaryPointListEntity } from "../../../entities/PointReceiveEntities";
 import { color, icon } from "../../../resource";
+import { numberWithCommas } from "../../../utilities/TextFormatter";
 
 const IndexDronerSummaryPoint = () => {
   const navigate = useNavigate();
   const row = 10;
   const [current, setCurrent] = useState(1);
+  const [data, setData] = useState<DronerSummaryPointListEntity>();
+  const [searchKeyword, setSearchKeyword] = useState("");
+
+  const fetchDronerSum = () => {
+    PointReceiveDatasource.getDronerSumPoint(row, current, searchKeyword).then(
+      (res) => {
+        setData(res);
+      }
+    );
+  };
+
+  useEffect(() => {
+    fetchDronerSum();
+  }, []);
+
+  const onSearch = () => {
+    setCurrent(1);
+    fetchDronerSum();
+  };
 
   const onChangePage = (page: number) => {
     setCurrent(page);
   };
-  const dataMock = [
-    {
-      dateTime: Date(),
-      dronerName: "สวัสดี นะจ๊ะ",
-      telephone: "0938355808",
-      totalPoint: 200,
-    },
-    {
-      dateTime: Date(),
-      dronerName: "สวัสดี วันศุกร์",
-      telephone: "0938355809",
-      totalPoint: 100,
-    },
-  ];
+
   const columns = [
     {
       title: "ชื่อนักบินโดรน",
-      dataIndex: "dronerName",
-      key: "dronerName",
       width: "30%",
       render: (value: any, row: any, index: number) => {
         return {
-          children: <span>{row.dronerName}</span>,
+          children: <span>{row.firstname + " " + row.lastname}</span>,
         };
       },
     },
     {
       title: "เบอร์โทร",
-      dataIndex: "telephone",
-      width: "50%",
+      dataIndex: "telephoneNo",
+      width: "45%",
       render: (value: any, row: any, index: number) => {
         return {
-          children: <span>{row.telephone}</span>,
+          children: <span>{row.telephoneNo}</span>,
         };
       },
     },
     {
       title: "แต้มคงเหลือ",
-      dataIndex: "totalPoint",
-      key: "totalPoint",
+      dataIndex: "balance",
+      key: "balance",
       render: (value: any, row: any, index: number) => {
         return {
           children: (
@@ -66,7 +73,7 @@ const IndexDronerSummaryPoint = () => {
                   alignContent: "center",
                 }}
               />{" "}
-              <span>{value + ` แต้ม`}</span>
+              <span>{numberWithCommas(row.balance) + ` แต้ม`}</span>
             </>
           ),
         };
@@ -112,7 +119,8 @@ const IndexDronerSummaryPoint = () => {
         <Input
           allowClear
           prefix={<SearchOutlined style={{ color: color.Disable }} />}
-          placeholder="ค้นหาชื่อเกษตรกร/เบอร์โทร"
+          placeholder="ค้นหาชื่อนักบินโดรน/เบอร์โทร"
+          onChange={(e) => setSearchKeyword(e.target.value)}
         />
       </Col>
       <Col span={2}>
@@ -123,6 +131,7 @@ const IndexDronerSummaryPoint = () => {
             color: color.secondary2,
             backgroundColor: color.Success,
           }}
+          onClick={onSearch}
         >
           ค้นหาข้อมูล
         </Button>
@@ -134,7 +143,7 @@ const IndexDronerSummaryPoint = () => {
       {pageTitle}
       <CardContainer>
         <Table
-          dataSource={dataMock}
+          dataSource={data?.data}
           columns={columns}
           pagination={false}
           size="large"
@@ -142,10 +151,10 @@ const IndexDronerSummaryPoint = () => {
         />
       </CardContainer>
       <div className="d-flex justify-content-between pt-3 pb-3">
-        <p>รายการทั้งหมด {dataMock?.length} รายการ</p>
+        <p>รายการทั้งหมด {data?.count} รายการ</p>
         <Pagination
           current={current}
-          total={dataMock.length}
+          total={data?.count}
           onChange={onChangePage}
           pageSize={row}
           showSizeChanger={false}

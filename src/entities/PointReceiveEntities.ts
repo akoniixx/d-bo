@@ -82,3 +82,32 @@ export interface FarmerSummaryPointEntity {
   createAt: string;
   updateAt: string;
 }
+
+export interface FarmerSummaryPointListEntity {
+  count: number;
+  data: FarmerSummaryPointEntity[];
+}
+
+export interface DronerSummaryPointEntity {
+  id: string;
+  dronerId: string;
+  firstname: string;
+  lastname: string;
+  telephoneNo: string;
+  campaignId: string;
+  campaignName: string;
+  allValue: number;
+  amountValue: number;
+  beforeValue: number;
+  balance: number;
+  beforeRai: number;
+  afterRai: number;
+  raiAmount: number;
+  createAt: string;
+  updateAt: string;
+}
+
+export interface DronerSummaryPointListEntity {
+  count: number;
+  data: DronerSummaryPointEntity[];
+}

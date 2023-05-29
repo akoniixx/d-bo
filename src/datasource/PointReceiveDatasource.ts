@@ -1,5 +1,7 @@
 import { BASE_URL, httpClient } from "../config/develop-config";
 import {
+  DronerSummaryPointListEntity,
+  FarmerSummaryPointListEntity,
   PlanningPointListEntity,
   ReceivePointListEntity,
 } from "../entities/PointReceiveEntities";
@@ -70,7 +72,7 @@ export class PointReceiveDatasource {
     page?: number,
     search?: string,
     endDate?: string
-  ): Promise<any> {
+  ): Promise<FarmerSummaryPointListEntity> {
     const params = {
       take: take,
       page: page,
@@ -79,6 +81,31 @@ export class PointReceiveDatasource {
     return httpClient
       .get(
         BASE_URL + "/promotion/historypoint-quota/getIndividualPointFarmer",
+        {
+          params,
+        }
+      )
+      .then((response) => {
+        return response.data;
+      })
+      .catch((err) => {
+        console.log(err, "err getnewtask");
+      });
+  }
+  static getDronerSumPoint(
+    take?: number,
+    page?: number,
+    search?: string,
+    endDate?: string
+  ): Promise<DronerSummaryPointListEntity> {
+    const params = {
+      take: take,
+      page: page,
+      search: search,
+    };
+    return httpClient
+      .get(
+        BASE_URL + "/promotion/historypoint-quota/getIndividualPointDroner",
         {
           params,
         }
