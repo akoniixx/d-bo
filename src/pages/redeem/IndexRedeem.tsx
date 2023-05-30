@@ -518,10 +518,7 @@ const IndexRedeem = () => {
                 <ActionButton
                   icon={<FileTextOutlined />}
                   color={color.primary1}
-                  onClick={() =>
-                    (window.location.href =
-                      "/DetailDronerRedeem/id=" + (index + 1))
-                  }
+                  onClick={() => navigate("/DetailDronerRedeem/id=" + row.id)}
                 />
               </div>
             </div>

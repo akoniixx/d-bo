@@ -1,6 +1,6 @@
 import { Badge, Col, Divider, Form, Input, Radio, Row, Table } from "antd";
 import TextArea from "antd/lib/input/TextArea";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Container } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
@@ -8,6 +8,8 @@ import { BackIconButton } from "../../components/button/BackButton";
 import { CardContainer } from "../../components/card/CardContainer";
 import FooterPage from "../../components/footer/FooterPage";
 import { CardHeader } from "../../components/header/CardHearder";
+import { RedeemDatasource } from "../../datasource/RedeemDatasource";
+import { DetailRedeemDronerEntity } from "../../entities/RedeemEntities";
 import { color } from "../../resource";
 import { DateTimeUtil } from "../../utilities/DateTimeUtil";
 const _ = require("lodash");
@@ -26,8 +28,19 @@ const DetailDronerRedeem = () => {
   let queryString = _.split(window.location.pathname, "=");
   const navigate = useNavigate();
   const [statusShip, setStatusShip] = useState("คำร้องขอแลก");
-
   const statusOptions = ["คำร้องขอแลก", "เตรียมจัดส่ง", "ส่งแล้ว", "ยกเลิก"];
+  const [data, setData] = useState<DetailRedeemDronerEntity>();
+
+  const fetchDetail = () => {
+    RedeemDatasource.getRedeemDronerById(queryString[2]).then((res) => {
+      console.log(res);                                                
+      setData(res);
+    });
+  };
+
+  useEffect(() => {
+    fetchDetail();
+  }, []);
 
   const dataRewardMock = {
     rewardId: "RD000001",
@@ -287,9 +300,7 @@ const DetailDronerRedeem = () => {
   return (
     <>
       <Row>
-        <BackIconButton
-          onClick={() => navigate("/IndexRedeem/Droner")}
-        />
+        <BackIconButton onClick={() => navigate("/IndexRedeem/Droner")} />
         <span className="pt-3">
           <strong style={{ fontSize: "20px" }}>
             รายละเอียดการแลกแต้ม | RD0000001

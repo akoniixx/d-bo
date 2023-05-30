@@ -1,5 +1,6 @@
 import { BASE_URL, httpClient } from "../config/develop-config";
 import {
+  DetailRedeemDronerEntity,
   DetailRedeemFermerEntity,
   RedeemDronerEntity,
   RedeemFarmerListEntity,
@@ -57,6 +58,16 @@ export class RedeemDatasource {
           "/promotion/droner-transactions/get-all-droner-reward-history",
         { params }
       )
+      .then((response) => {
+        return response.data;
+      })
+      .catch((err) => {
+        console.log(err, "err getnewtask");
+      });
+  }
+  static getRedeemDronerById(id:string): Promise<DetailRedeemDronerEntity>{
+    return httpClient
+      .get(BASE_URL + `/promotion/droner-transactions/get-droner-reward-history/${id}`)
       .then((response) => {
         return response.data;
       })
