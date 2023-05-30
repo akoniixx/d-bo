@@ -100,7 +100,7 @@ export const pathLists = ({ isAccounting }: { isAccounting: boolean }) => [
           {
             path: "/IndexRedeem/Farmer",
             name: "IndexRedeem/Farmer",
-            title: "แลกแต้ม",
+            title: "รายงานการแลก",
           },
         ],
       },

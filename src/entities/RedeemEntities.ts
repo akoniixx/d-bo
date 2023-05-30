@@ -104,6 +104,7 @@ export interface RedeemDronerEntity {
     amount: number;
     used: number;
     remain: number;
+    rewardExchange: string;
   };
   mission: string;
   dronerDetail: {
@@ -140,6 +141,7 @@ export interface DetailRedeemDronerEntity {
     rewardName: string;
     imagePath: string;
     rewardType: string;
+    rewardQuantity: number;
     rewardNo: string;
     score: number;
     amount: number;

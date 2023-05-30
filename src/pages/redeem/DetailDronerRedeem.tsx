@@ -12,6 +12,7 @@ import { RedeemDatasource } from "../../datasource/RedeemDatasource";
 import { DetailRedeemDronerEntity } from "../../entities/RedeemEntities";
 import { color } from "../../resource";
 import { DateTimeUtil } from "../../utilities/DateTimeUtil";
+import { numberWithCommas } from "../../utilities/TextFormatter";
 const _ = require("lodash");
 
 const NewTable = styled(Table)`
@@ -32,8 +33,7 @@ const DetailDronerRedeem = () => {
   const [data, setData] = useState<DetailRedeemDronerEntity>();
 
   const fetchDetail = () => {
-    RedeemDatasource.getRedeemDronerById(queryString[2]).then((res) => {
-      console.log(res);                                                
+    RedeemDatasource.getRedeemDronerById(queryString[1]).then((res) => {
       setData(res);
     });
   };
@@ -173,12 +173,12 @@ const DetailDronerRedeem = () => {
             <Col span={4}>
               <div>รหัสของรางวัล</div>
               <div style={{ color: "#2B2B2B" }}>
-                <u>{dataRewardMock.rewardId}</u>
+                <u>{data?.reward.rewardNo}</u>
               </div>
             </Col>
             <Col span={7}>
               <div>ชื่อของรางวัล</div>
-              <div>{dataRewardMock.rewardName}</div>
+              <div>{data?.rewardName}</div>
             </Col>
             <Col span={5}>
               <div>ประเภทของรางวัล</div>
@@ -200,16 +200,16 @@ const DetailDronerRedeem = () => {
             </Col>
             <Col span={3}>
               <div>แต้ม</div>
-              <div>{dataRewardMock.point} แต้ม</div>
+              <div>{numberWithCommas(data?.reward.score || 0)} แต้ม</div>
             </Col>
             <Col span={2}>
               <div>จำนวน</div>
-              <div>{dataRewardMock.qty} ชิ้น</div>
+              <div>{data?.rewardQuantity} ชิ้น</div>
             </Col>
             <Col span={3}>
               <div>รวมแต้มทั้งหมด</div>
               <div style={{ color: color.Error }}>
-                {dataRewardMock.totalPoint} แต้ม
+                {numberWithCommas(data?.amountValue || 0)} แต้ม
               </div>
             </Col>
           </Row>
@@ -303,7 +303,7 @@ const DetailDronerRedeem = () => {
         <BackIconButton onClick={() => navigate("/IndexRedeem/Droner")} />
         <span className="pt-3">
           <strong style={{ fontSize: "20px" }}>
-            รายละเอียดการแลกแต้ม | RD0000001
+            รายละเอียดการแลก | RD0000001
           </strong>
         </span>
       </Row>

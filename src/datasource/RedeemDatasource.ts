@@ -65,9 +65,12 @@ export class RedeemDatasource {
         console.log(err, "err getnewtask");
       });
   }
-  static getRedeemDronerById(id:string): Promise<DetailRedeemDronerEntity>{
+  static getRedeemDronerById(id: string): Promise<DetailRedeemDronerEntity> {
     return httpClient
-      .get(BASE_URL + `/promotion/droner-transactions/get-droner-reward-history/${id}`)
+      .get(
+        BASE_URL +
+          `/promotion/droner-transactions/get-droner-reward-history/${id}`
+      )
       .then((response) => {
         return response.data;
       })

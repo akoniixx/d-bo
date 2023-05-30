@@ -27,7 +27,6 @@ import {
   RedeemFarmerListEntity,
 } from "../../entities/RedeemEntities";
 import { color } from "../../resource";
-import image from "../../resource/image";
 import { DateTimeUtil } from "../../utilities/DateTimeUtil";
 import { useNavigate } from "react-router-dom";
 import { numberWithCommas } from "../../utilities/TextFormatter";
@@ -62,7 +61,6 @@ const IndexRedeem = () => {
       setDataFarmer(res);
     });
   };
-
   const fetchRedeemDroner = () => {
     RedeemDatasource.getRedeemDroner(row, current).then((res) => {
       const mapKey = res.map((x, i) => ({
@@ -113,7 +111,7 @@ const IndexRedeem = () => {
               padding: "8px",
             }}
           >
-            <strong>รายงานแต้ม (แลกแต้ม)</strong>
+            <strong>รายงานการแลก</strong>
           </span>
         </Col>
         <Col span={4}>
@@ -379,7 +377,6 @@ const IndexRedeem = () => {
       title: "วันที่อัพเดท",
       dataIndex: "createAt",
       key: "createAt",
-      width: "13%",
       render: (value: any, row: any, index: number) => {
         return {
           children: (
@@ -461,17 +458,25 @@ const IndexRedeem = () => {
     },
     {
       title: "ประเภทของรางวัล",
-      dataIndex: "rewardType",
-      width: "15%",
       render: (value: any, row: any, index: number) => {
+        const mapWording: any = {
+          PHYSICAL: "Physical",
+        };
         return {
           children: (
             <>
-              <span>{row.rewardType}</span>
+              <span>{mapWording[row.reward.rewardType]}</span>
               <span
-                style={{ color: row.key === 1 ? color.Warning : "#A9CB62" }}
+                style={{
+                  color:
+                    row.reward.rewardExchange === "SCORE"
+                      ? color.Warning
+                      : "#A9CB62",
+                }}
               >
-                {row.key === 1 ? " (ใช้แต้ม)" : " (ภารกิจ)"}
+                {row.reward.rewardExchange === "SCORE"
+                  ? " (ใช้แต้ม)"
+                  : " (ภารกิจ)"}
               </span>
             </>
           ),
@@ -481,7 +486,6 @@ const IndexRedeem = () => {
     {
       title: "สถานะ",
       dataIndex: "status",
-      width: "12%",
       render: (value: any, row: any, index: number) => {
         return {
           children: (
@@ -508,7 +512,6 @@ const IndexRedeem = () => {
       title: "",
       dataIndex: "Action",
       key: "Action",
-      width: "8%",
       render: (value: any, row: any, index: number) => {
         return {
           children: (
@@ -526,6 +529,18 @@ const IndexRedeem = () => {
       },
     },
   ];
+
+  const tableDronerFix = columnsDroner.map((item, idx) => {
+    if (idx < 2) {
+      return {
+        ...item,
+        fixed: true,
+      };
+    }
+    return {
+      ...item,
+    };
+  });
 
   const expandable = (record: any) => {
     return (
@@ -583,7 +598,10 @@ const IndexRedeem = () => {
               showExpandColumn: false,
               defaultExpandedRowKeys: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
             }}
-            columns={columnsDroner}
+            columns={[...tableDronerFix]}
+            scroll={{
+              x: "auto",
+            }}
             pagination={false}
             size="large"
             tableLayout="fixed"
