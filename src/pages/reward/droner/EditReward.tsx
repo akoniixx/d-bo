@@ -652,7 +652,7 @@ function EditReward() {
         condition={condition}
         point={score}
         type={rewardType}
-        dateTimeOut={convertBuddhistYear.toBuddhistYear(
+        endUseDateTime={convertBuddhistYear.toBuddhistYear(
           moment(endUsedDate),
           "DD MMM YY "
         )}

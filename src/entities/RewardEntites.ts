@@ -39,6 +39,7 @@ export interface GetRewardEntities {
   digitalCode: string;
   status: string;
   statusUsed: string;
+  createBy: string;
   createAt: string;
   updateAt: string;
 }

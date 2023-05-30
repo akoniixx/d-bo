@@ -32,6 +32,7 @@ import Swal from "sweetalert2";
 import { MONTH_SALE } from "../../../definitions/Month";
 import { convertBuddhistYear } from "../../../utilities/ConvertToBuddhistYear";
 import { UploadImageDatasouce } from "../../../datasource/UploadImageDatasource";
+import { DateTimeUtil } from "../../../utilities/DateTimeUtil";
 
 const { Map } = require("immutable");
 
@@ -62,7 +63,7 @@ function AddReward() {
   const [endUsedDate, setEndUsedDate] = useState<any>();
   const [endUsedTime, setEndUsedTime] = useState<any>();
   const [saveBtnDisable, setBtnSaveDisable] = useState<boolean>(true);
-  
+
   const onChangeImg = async (file: any) => {
     const source = file.target.files[0];
     let newSource: any;
@@ -87,7 +88,7 @@ function AddReward() {
     const d = Map(createImgReward).set(
       "file",
       isFileMoreThan2MB ? newSource : source
-    );   
+    );
     setCreateImgReward(d.toJS());
   };
 
@@ -128,20 +129,96 @@ function AddReward() {
   const handleRewardCount = (count: any) => {
     setAmount(count.target.value);
   };
-  const changeFormat = (date: any) => {
-    const day = date.split("-");
-    return `${day[2]} ${MONTH_SALE[parseInt(day[1]) - 1].name} ${
-      parseInt(day[0]) + 543
-    }`;
-  };
+
   const handleRewardPoint = (point: any) => {
     setScore(point.target.value);
+  };
+  let start = new Date(startUsedDate).getTime();
+  let expired = new Date(endUsedDate).getTime();
+  let result = (expired - start) / 86400000;
+  const onFieldsChange = () => {
+    const {
+      rewardName,
+      rewardType,
+      rewardExchange,
+      score,
+      amount,
+      description,
+      condition,
+      status,
+      startExchangeDate,
+      startExchangeTime,
+      expiredExchangeDate,
+      expiredExchangeTime,
+      startUsedDate,
+      startUsedTime,
+      expiredUsedDate,
+      expiredUsedTime,
+      file,
+    } = form.getFieldsValue();
+
+    let fieldErr = false;
+    let imgErr = false;
+    let rwTypeErr = false;
+
+    if (
+      rewardName &&
+      amount >= 0 &&
+      description != "<p><br></p>" &&
+      condition != "<p><br></p>" &&
+      status
+    ) {
+      fieldErr = false;
+    } else {
+      fieldErr = true;
+    }
+
+    if (rewardType === "DIGITAL" && rewardExchange === "SCORE") {
+      if (
+        score > 0 &&
+        amount > 0 &&
+        startUsedDate &&
+        endUsedDate &&
+        startExchangeDate &&
+        expiredExchangeDate
+      ) {
+        rwTypeErr = false;
+      } else {
+        rwTypeErr = true;
+      }
+    } else if (rewardType === "DIGITAL" && rewardExchange === "MISSION") {
+      if (amount > 0 && startUsedDate && endUsedDate) {
+        rwTypeErr = false;
+      } else {
+        rwTypeErr = true;
+      }
+    } else if (rewardType === "PHYSICAL" && rewardExchange === "SCORE") {
+      if (score > 0 && amount > 0 && startExchangeDate && expiredExchangeDate) {
+        rwTypeErr = false;
+      } else {
+        rwTypeErr = true;
+      }
+    } else if (rewardType === "PHYSICAL" && rewardExchange === "MISSION") {
+      if (amount > 0) {
+        rwTypeErr = false;
+      } else {
+        rwTypeErr = true;
+      }
+    } else {
+      rwTypeErr = true;
+    }
+    if (!file) {
+      imgErr = true;
+    } else {
+      imgErr = false;
+    }
+    setBtnSaveDisable(fieldErr || imgErr || rwTypeErr);
   };
   const renderDataReward = (
     <div className="col-lg-7">
       <CardContainer>
         <CardHeader textHeader="ข้อมูลของรางวัล" />
-        <Form form={form}>
+        <Form form={form} onFieldsChange={onFieldsChange}>
           <div className="form-group text-center" style={{ marginTop: "5%" }}>
             <Form.Item
               name="file"
@@ -608,9 +685,12 @@ function AddReward() {
         condition={condition}
         point={score}
         type={rewardType}
-        dateTimeOut={new Date(endUsedDate) }
+        endUseDateTime={convertBuddhistYear.toBuddhistYear(
+          moment(endUsedDate),
+          "DD MMM YY"
+        )}
         exChange={rewardExchange}
-        countdownTime={''}
+        countdownTime={result < 0 ? 0 : parseInt(result.toString())}
       />
     </div>
   );
@@ -713,7 +793,11 @@ function AddReward() {
         {renderRedeem}
       </Row>
 
-      <FooterPage onClickBack={() => navigate(-1)} onClickSave={onSubmit} />
+      <FooterPage
+        disableSaveBtn={saveBtnDisable}
+        onClickBack={() => navigate(-1)}
+        onClickSave={onSubmit}
+      />
     </>
   );
 }

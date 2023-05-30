@@ -61,6 +61,9 @@ function IndexReward() {
   const handleVisible = (newVisible: any) => {
     setVisible(newVisible);
   };
+  const [mission, setMission] = useState<any>([]);
+  const [isMission, setIsMission] = useState<boolean>();
+
   const handleVisibleStatus = (newVisible: any) => {
     setVisibleStatus(newVisible);
   };
@@ -115,126 +118,115 @@ function IndexReward() {
   const onChangeStatus = (checkedValues: any) => {
     setStatus(checkedValues);
   };
-  const SubStatusType = (
+  const handleStatus = (e: any) => {
+    let value = e.target.value;
+    let checked = e.target.checked;
+    let arr: any = 0;
+    if (checked) {
+      arr = [...statusArr, value];
+      setStatusArr([...statusArr, value]);
+    } else {
+      let d: string[] = statusArr.filter((x) => x != value);
+      arr = [...d];
+      setStatusArr(d);
+      if (d.length == 0) {
+        arr = undefined;
+      }
+    }
+    setRewardType(arr);
+    setCurrent(1);
+  };
+  const handleSubStatus = (e: any) => {
+    let value = e.target.value;
+    let checked = e.target.checked;
+    let rewardExChange = ["SCORE", "MISSION"];
+    let m: any = [];
+    if (checked) {
+      m = [...mission, value];
+      setRewardExchange(m);
+      if (m.length == 2) {
+        setIsMission(undefined);
+      } else {
+        if (rewardExChange.includes(m[0])) {
+          setIsMission(true);
+        }
+      }
+    } else {
+      m = mission.filter((x: any) => x != value);
+      console.log(m);
+      setRewardExchange(m);
+      if (m.length == 0) {
+        setIsMission(undefined);
+      } else {
+        if (m == "SCORE") {
+          setIsMission(true);
+        } else if (m == "MISSION") {
+          setIsMission(false);
+        }
+      }
+    }
+  };
+  const statusRewardType = (
     <Menu
       items={[
         {
-          label: (
-            <>
-              <Checkbox
-                indeterminate={indeterminateDone}
-                // onChange={onCheckAllTypeChange}
-                checked={checkAllType}
-                value="DONE"
-              >
-                Physical
-              </Checkbox>
-              <br />
-              <Checkbox.Group
-                value={checkedListDone}
-                style={{ width: "100%" }}
-                // onChange={onChangeType}
-              >
-                <Row>
-                  <Checkbox
-                    style={{
-                      marginLeft: "20px",
-                      paddingTop: 3,
-                      paddingBottom: 3,
-                    }}
-                    value="WAIT_PAYMENT"
-                  >
-                    ใช้คะแนน
-                  </Checkbox>
-                </Row>
-                <Row>
-                  <Checkbox
-                    style={{
-                      marginLeft: "20px",
-                      paddingTop: 3,
-                      paddingBottom: 3,
-                    }}
-                    value="DONE_PAYMENT"
-                  >
-                    ภารกิจ
-                  </Checkbox>
-                </Row>
-              </Checkbox.Group>
-            </>
-          ),
+          label: "Physical",
           key: "1",
+          icon: <Checkbox value="PHYSICAL" onClick={(e) => handleStatus(e)} />,
         },
         {
-          label: (
-            <>
-              <Checkbox
-                indeterminate={indeterminate}
-                // onChange={onCheckAllChange}
-                checked={checkAll}
-                value="CANCELED"
-              >
-                Digital
-              </Checkbox>
-              <br />
-              <Checkbox.Group
-                value={checkedList}
-                style={{ width: "100%" }}
-                // onChange={onChange}
-              >
-                <Row>
-                  <Checkbox
-                    style={{
-                      marginLeft: "20px",
-                      paddingTop: 3,
-                      paddingBottom: 3,
-                    }}
-                    value="WAIT_START"
-                  >
-                    ใช้คะแนน
-                  </Checkbox>
-                </Row>
-                <Row>
-                  <Checkbox
-                    style={{
-                      marginLeft: "20px",
-                      paddingTop: 3,
-                      paddingBottom: 3,
-                    }}
-                    value="IN_PROGRESS"
-                  >
-                    ภารกิจ
-                  </Checkbox>
-                </Row>
-              </Checkbox.Group>
-            </>
-          ),
+          label: "ใช้แต้ม",
           key: "2",
+          icon: (
+            <Checkbox
+              style={{ marginLeft: "20px" }}
+              value="SCORE"
+              onClick={(e) => handleSubStatus(e)}
+            />
+          ),
+        },
+        {
+          label: "ภารกิจ",
+          key: "3",
+          icon: (
+            <Checkbox
+              style={{ marginLeft: "20px" }}
+              value="MISSION"
+              onClick={(e) => handleSubStatus(e)}
+            />
+          ),
+        },
+        {
+          label: "Digital",
+          key: "4",
+          icon: <Checkbox value="DIGITAL" onClick={(e) => handleStatus(e)} />,
+        },
+        {
+          label: "ใช้แต้ม",
+          key: "5",
+          icon: (
+            <Checkbox
+              style={{ marginLeft: "20px" }}
+              value="SCORE"
+              onClick={(e) => handleSubStatus(e)}
+            />
+          ),
+        },
+        {
+          label: "ภารกิจ",
+          key: "6",
+          icon: (
+            <Checkbox
+              style={{ marginLeft: "20px" }}
+              value="MISSION"
+              onClick={(e) => handleSubStatus(e)}
+            />
+          ),
         },
       ]}
     />
   );
-  // const SubStatus = (
-  //   <Menu
-  //     items={[
-  //       {
-  //         label: (
-  //           <>
-  //             <Checkbox.Group onChange={onChangeStatus} >
-  //               <Checkbox value="">ทั้งหมด</Checkbox>
-  //               <br />
-  //               <Checkbox value="ACTIVE">ใช้งาน</Checkbox>
-  //               <br />
-  //               <Checkbox value="DRAFTING">รอเปิดใช้งาน</Checkbox>
-  //               <br />
-  //               <Checkbox value="INAVTIVE">ปิดการใช้งาน</Checkbox>
-  //             </Checkbox.Group>
-  //           </>
-  //         ),
-  //         key: "status",
-  //       },
-  //     ]}
-  //   />
-  // );
+
   const showDelete = (id: string) => {
     setRewardId(id);
     setShowModal(!showModal);
@@ -331,7 +323,7 @@ function IndexReward() {
         </div>
         <div className="col-lg p-1">
           <Dropdown
-            overlay={SubStatusType}
+            overlay={statusRewardType}
             trigger={["click"]}
             className="col-lg-12 "
             onVisibleChange={handleVisible}
@@ -403,7 +395,7 @@ function IndexReward() {
                 <UserOutlined
                   style={{ padding: "0 4px 0 0", verticalAlign: 2 }}
                 />
-                {row.createBy ? row.createBy : '-'}
+                {row.createBy ? row.createBy : "-"}
               </span>
             </>
           ),

@@ -15,7 +15,7 @@ interface RenderReward {
   condition: any;
   point: any;
   type: string | null;
-  dateTimeOut: any;
+  endUseDateTime: any;
   exChange: string | null;
   countdownTime: any;
 }
@@ -27,7 +27,7 @@ const RenderReward: React.FC<RenderReward> = ({
   condition,
   point,
   type,
-  dateTimeOut,
+  endUseDateTime,
   exChange,
   countdownTime,
 }) => {
@@ -103,7 +103,7 @@ const RenderReward: React.FC<RenderReward> = ({
                       paddingLeft: "12px",
                     }}
                   >
-                    หมดอายุอีก 0 วัน
+                    {`หมดอายุอีก ${countdownTime} วัน`}
                   </div>
                   <div
                     style={{
@@ -114,7 +114,7 @@ const RenderReward: React.FC<RenderReward> = ({
                       paddingLeft: "12px",
                     }}
                   >
-                    {/* {dateTimeOut} */}
+                    {endUseDateTime !== undefined ? endUseDateTime : "0"}
                   </div>
                 </div>
               )}
