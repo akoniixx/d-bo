@@ -65,7 +65,6 @@ const IndexRedeem = () => {
 
   const fetchRedeemDroner = () => {
     RedeemDatasource.getRedeemDroner(row, current).then((res) => {
-      //console.log("d", res);
       const mapKey = res.map((x, i) => ({
         ...x,
         key: i + 1,
@@ -75,7 +74,7 @@ const IndexRedeem = () => {
   };
 
   useEffect(() => {
-    if (source === "FARMER") {
+    if (source === "Farmer") {
       fetchRedeemFarmer();
     } else {
       fetchRedeemDroner();
