@@ -4,6 +4,7 @@ import styled from "styled-components";
 import { color, icon } from "../../resource";
 import { Image } from "antd";
 import { DownOutlined, UpOutlined } from "@ant-design/icons";
+import { useEffectOnce } from "../../hook/useEffectOnce";
 
 interface CollapseSubMenuProps {
   subLists: {
@@ -63,6 +64,7 @@ export const CollapseSubMenu: React.FC<CollapseSubMenuProps> = ({
   checkPathSubList,
 }) => {
   const navigate = useNavigate();
+ 
   return (
     <>
       <div
@@ -84,7 +86,6 @@ export const CollapseSubMenu: React.FC<CollapseSubMenuProps> = ({
             setCheckPathSub(path);
             setCheckPathSubList(path);
           }
-          console.log(checkPathSub);
         }}
       >
         {checkPathSub !== path || checkPathSubList !== path ? (

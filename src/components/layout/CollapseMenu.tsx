@@ -80,18 +80,21 @@ export const CollapseMenu: React.FC<CollapseMenuProps> = ({
     const pathName = window.location.pathname;
     const pathNameSplit = pathName.split("/").filter((item) => item !== "");
 
-    const currentPath = subLists.find(
-      (item) => item.path === `/${pathNameSplit[0]}`
-    );
-    if (currentPath) {
-      const isHaveSubPath = currentPath.subMenu?.find(
-        (el) => el.path === `/${pathNameSplit[1]}`
+    const currentPath = subLists.find((item) => {
+      if (item.subMenu && item.subMenu.length < 1) {
+        return item.path === `/${pathNameSplit[0]}`;
+      }
+      const isHaveSubPath = item.subMenu.find(
+        (el) => el.path === `/${pathNameSplit[0]}`
       );
+      return !!isHaveSubPath;
+    });
 
-      setCurrentSub({
-        path: currentPath.name,
-      });
-    }
+    setCurrentSub({
+      path: `/${pathNameSplit}`,
+    });
+    setCheckPathSub(currentPath?.path);
+    setCheckPathSubList(currentPath?.path);
   });
 
   return (
