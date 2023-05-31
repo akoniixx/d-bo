@@ -54,8 +54,6 @@ function IndexReward() {
   const [rewardType, setRewardType] = useState<any>();
   const [rewardExchange, setRewardExchange] = useState<any>();
   const [searchText, setSearchText] = useState<any>();
-  const [getImg, setGetImg] = useState<any>();
-  const [isCollapse, setIsCollapse] = useState(false);
   const [visible, setVisible] = useState(false);
   const [visibleStatus, setVisibleStatus] = useState(false);
   const handleVisible = (newVisible: any) => {
@@ -70,14 +68,15 @@ function IndexReward() {
   const [showModal, setShowModal] = useState(false);
   const [rewardId, setRewardId] = useState("");
 
-  const [checkedList, setCheckedList] = useState<CheckboxValueType[]>();
-  const [checkedListDone, setCheckedListDone] = useState<CheckboxValueType[]>();
+  const [checkedListDigi, setCheckedListDigi] = useState<CheckboxValueType[]>();
+  const [checkedListPhy, setCheckedListPhy] = useState<CheckboxValueType[]>();
 
-  const [indeterminate, setIndeterminate] = useState(false);
-  const [indeterminateDone, setIndeterminateDone] = useState(false);
-  const [checkAll, setCheckAll] = useState(false);
-  const [checkAllType, setCheckAllType] = useState(false);
+  const [inDigi, setInDigi] = useState(false);
+  const [inPhy, setInPhy] = useState(false);
+  const [checkAllDigi, setCheckAllDigi] = useState(false);
+  const [checkAllPhy, setCheckAllPhy] = useState(false);
   const [statusArr, setStatusArr] = useState<string[]>([]);
+  const statusOptions = ["SCORE", "MISSION"];
 
   const getAllReward = () => {
     RewardDatasource.getAllReward(
@@ -118,13 +117,15 @@ function IndexReward() {
   const onChangeStatus = (checkedValues: any) => {
     setStatus(checkedValues);
   };
-  const handleStatus = (e: any) => {
+
+  const onCheckAllPhysical = (e: any) => {
     let value = e.target.value;
     let checked = e.target.checked;
     let arr: any = 0;
-    if (checked) {
+    if (checked === true) {
       arr = [...statusArr, value];
       setStatusArr([...statusArr, value]);
+      setRewardType(value);
     } else {
       let d: string[] = statusArr.filter((x) => x != value);
       arr = [...d];
@@ -132,96 +133,136 @@ function IndexReward() {
       if (d.length == 0) {
         arr = undefined;
       }
+      setRewardType(undefined);
     }
     setRewardType(arr);
-    setCurrent(1);
+    setCheckedListPhy(e.target.checked ? statusOptions : []);
+    setInPhy(false);
+    setCheckAllPhy(e.target.checked);
   };
-  const handleSubStatus = (e: any) => {
+  const onCheckAllDigital = (e: any) => {
     let value = e.target.value;
     let checked = e.target.checked;
-    let rewardExChange = ["SCORE", "MISSION"];
-    let m: any = [];
-    if (checked) {
-      m = [...mission, value];
-      setRewardExchange(m);
-      if (m.length == 2) {
-        setIsMission(undefined);
-      } else {
-        if (rewardExChange.includes(m[0])) {
-          setIsMission(true);
-        }
-      }
+    let arr: any = 0;
+    if (checked === true) {
+      arr = [...statusArr, value];
+      setStatusArr([...statusArr, value]);
+      setRewardType(value);
     } else {
-      m = mission.filter((x: any) => x != value);
-      console.log(m);
-      setRewardExchange(m);
-      if (m.length == 0) {
-        setIsMission(undefined);
+      let d: string[] = statusArr.filter((x) => x != value);
+      arr = [...d];
+      setStatusArr(d);
+      if (d.length == 0) {
+        arr = undefined;
+      }
+      setRewardType(undefined);
+    }
+    setRewardType(arr);
+    setCheckedListDigi(e.target.checked ? statusOptions : []);
+    setInDigi(false);
+    setCheckAllDigi(e.target.checked);
+  };
+  const onChangeSubPhy = (list: CheckboxValueType[]) => {
+    let arr: any = 0;
+    arr = [...list];
+    console.log("phy", arr);
+    setRewardType("PHYSICAL");
+    if (arr.length > 0) {
+      setRewardType("PHYSICAL");
+    } else {
+      setRewardType(undefined);
+    }
+    setRewardExchange(arr);
+    setCheckedListPhy(list);
+    setInPhy(!!list.length && list.length < statusOptions.length);
+    setCheckAllPhy(list.length === statusOptions.length);
+  };
+
+  const onChangeSubDigi = (list: CheckboxValueType[]) => {
+    let arr: any = 0;
+    arr = [...list];
+    console.log("digi", arr);
+    console.log(rewardExchange);
+    if (rewardExchange) {
+      setRewardType(rewardType);
+    } else {
+      if (arr.length > 0) {
+        setRewardType("DIGITAL");
       } else {
-        if (m == "SCORE") {
-          setIsMission(true);
-        } else if (m == "MISSION") {
-          setIsMission(false);
-        }
+        setRewardType(undefined);
       }
     }
+    setRewardExchange(arr);
+    setCheckedListDigi(list);
+    setInDigi(!!list.length && list.length < statusOptions.length);
+    setCheckAllDigi(list.length === statusOptions.length);
   };
   const statusRewardType = (
     <Menu
       items={[
         {
-          label: "Physical",
-          key: "1",
-          icon: <Checkbox value="PHYSICAL" onClick={(e) => handleStatus(e)} />,
-        },
-        {
-          label: "ใช้แต้ม",
+          label: (
+            <>
+              <Checkbox
+                indeterminate={inPhy}
+                onChange={onCheckAllPhysical}
+                checked={checkAllPhy}
+                value="PHYSICAL"
+              >
+                Physical
+              </Checkbox>
+              <br />
+              <Checkbox.Group
+                value={checkedListPhy}
+                style={{ width: "100%" }}
+                onChange={onChangeSubPhy}
+              >
+                <Row>
+                  <Checkbox style={{ marginLeft: "20px" }} value="SCORE">
+                    ใช้แต้ม
+                  </Checkbox>
+                </Row>
+                <Row>
+                  <Checkbox style={{ marginLeft: "20px" }} value="MISSION">
+                    ภารกิจ
+                  </Checkbox>
+                </Row>
+              </Checkbox.Group>
+            </>
+          ),
           key: "2",
-          icon: (
-            <Checkbox
-              style={{ marginLeft: "20px" }}
-              value="SCORE"
-              onClick={(e) => handleSubStatus(e)}
-            />
-          ),
         },
         {
-          label: "ภารกิจ",
+          label: (
+            <>
+              <Checkbox
+                indeterminate={inDigi}
+                onChange={onCheckAllDigital}
+                checked={checkAllDigi}
+                value="DIGITAL"
+              >
+                Digital
+              </Checkbox>
+              <br />
+              <Checkbox.Group
+                value={checkedListDigi}
+                style={{ width: "100%" }}
+                onChange={onChangeSubDigi}
+              >
+                <Row>
+                  <Checkbox style={{ marginLeft: "20px" }} value="SCORE">
+                    ใช้แต้ม
+                  </Checkbox>
+                </Row>
+                <Row>
+                  <Checkbox style={{ marginLeft: "20px" }} value="MISSION">
+                    ภารกิจ
+                  </Checkbox>
+                </Row>
+              </Checkbox.Group>
+            </>
+          ),
           key: "3",
-          icon: (
-            <Checkbox
-              style={{ marginLeft: "20px" }}
-              value="MISSION"
-              onClick={(e) => handleSubStatus(e)}
-            />
-          ),
-        },
-        {
-          label: "Digital",
-          key: "4",
-          icon: <Checkbox value="DIGITAL" onClick={(e) => handleStatus(e)} />,
-        },
-        {
-          label: "ใช้แต้ม",
-          key: "5",
-          icon: (
-            <Checkbox
-              style={{ marginLeft: "20px" }}
-              value="SCORE"
-              onClick={(e) => handleSubStatus(e)}
-            />
-          ),
-        },
-        {
-          label: "ภารกิจ",
-          key: "6",
-          icon: (
-            <Checkbox
-              style={{ marginLeft: "20px" }}
-              value="MISSION"
-              onClick={(e) => handleSubStatus(e)}
-            />
-          ),
         },
       ]}
     />

@@ -8,6 +8,8 @@ import {
   numberWithCommasToFixed,
 } from "../../utilities/TextFormatter";
 import { DateTimeUtil } from "../../utilities/DateTimeUtil";
+import { convertBuddhistYear } from "../../utilities/ConvertToBuddhistYear";
+import moment from "moment";
 interface RenderReward {
   img: string;
   name: any;
@@ -45,7 +47,6 @@ const RenderReward: React.FC<RenderReward> = ({
     window.addEventListener("scroll", onScroll);
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
-
   return (
     <div className="col-lg-12">
       <div ref={div}>
@@ -103,7 +104,7 @@ const RenderReward: React.FC<RenderReward> = ({
                       paddingLeft: "12px",
                     }}
                   >
-                    {`หมดอายุอีก ${countdownTime} วัน`}
+                    {`หมดอายุอีก ${countdownTime ? countdownTime : "0"} วัน`}
                   </div>
                   <div
                     style={{
@@ -114,7 +115,12 @@ const RenderReward: React.FC<RenderReward> = ({
                       paddingLeft: "12px",
                     }}
                   >
-                    {endUseDateTime !== undefined ? endUseDateTime : "0"}
+                    {endUseDateTime
+                      ? convertBuddhistYear.toBuddhistYear(
+                          moment(endUseDateTime),
+                          "DD MMM YY"
+                        )
+                      : "-"}
                   </div>
                 </div>
               )}

@@ -80,9 +80,34 @@ export class RewardDatasource {
         console.log(error);
       });
   }
-  static updateReward(id: string, dataReward: RewardEntities) {
+  static updateReward(id: string, data: RewardEntities) {
+    const formData = new FormData();
+    formData.append("rewardName", data.rewardName);
+    formData.append("rewardType", data.rewardType);
+    formData.append("rewardExchange", data.rewardExchange);
+    data.rewardExchange === "SCORE" && formData.append("score", data.score);
+    formData.append("amount", data.amount);
+    formData.append("description", data.description);
+    formData.append("condition", data.condition);
+    formData.append("status", data.status);
+    formData.append("createBy", data.createBy);
+    if (data.rewardType === "PHYSICAL" && data.rewardExchange === "SCORE") {
+      formData.append("startExchangeDate", data.startExchangeDate);
+      formData.append("expiredExchangeDate", data.expiredExchangeDate);
+    }
+    if (data.rewardType === "DIGITAL" && data.rewardExchange === "SCORE") {
+      formData.append("startExchangeDate", data.startExchangeDate);
+      formData.append("expiredExchangeDate", data.expiredExchangeDate);
+      formData.append("startUsedDate", data.startUsedDate);
+      formData.append("expiredUsedDate", data.expiredUsedDate);
+    }
+    if (data.rewardType === "DIGITAL" && data.rewardExchange === "MISSION") {
+      formData.append("startUsedDate", data.startUsedDate);
+      formData.append("expiredUsedDate", data.expiredUsedDate);
+    }
+    formData.append("file", data.file);
     return httpClient
-      .patch(BASE_URL + `/promotion/reward/update/${id}`, dataReward)
+      .patch(BASE_URL + `/promotion/reward/update/${id}`, formData)
       .then((res) => {
         return res.data;
       })

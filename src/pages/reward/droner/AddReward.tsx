@@ -33,6 +33,7 @@ import { MONTH_SALE } from "../../../definitions/Month";
 import { convertBuddhistYear } from "../../../utilities/ConvertToBuddhistYear";
 import { UploadImageDatasouce } from "../../../datasource/UploadImageDatasource";
 import { DateTimeUtil } from "../../../utilities/DateTimeUtil";
+import dayjs from "dayjs";
 
 const { Map } = require("immutable");
 
@@ -136,6 +137,16 @@ function AddReward() {
   let start = new Date(startUsedDate).getTime();
   let expired = new Date(endUsedDate).getTime();
   let result = (expired - start) / 86400000;
+  const disabledDateChange = (current: any) => {
+    const getValueDate = form.getFieldsValue();
+    const startDate = moment(getValueDate.startExchangeDate).format("YYYY-MM-DD");
+    return current && current < dayjs(startDate);
+  };
+  const disabledDateUsed = (current: any) => {
+    const getValueDate = form.getFieldsValue();
+    const startDate = moment(getValueDate.startUsedDate).format("YYYY-MM-DD");
+    return current && current < dayjs(startDate);
+  };
   const onFieldsChange = () => {
     const {
       rewardName,
@@ -187,13 +198,18 @@ function AddReward() {
         rwTypeErr = true;
       }
     } else if (rewardType === "DIGITAL" && rewardExchange === "MISSION") {
-      if (amount > 0 && startUsedDate && endUsedDate) {
+      if (amount > 0 && startUsedDate && endUsedDate ) {
         rwTypeErr = false;
       } else {
         rwTypeErr = true;
       }
     } else if (rewardType === "PHYSICAL" && rewardExchange === "SCORE") {
-      if (score > 0 && amount > 0 && startExchangeDate && expiredExchangeDate) {
+      if (
+        score > 0 &&
+        amount > 0 &&
+        startExchangeDate &&
+        expiredExchangeDate
+      ) {
         rwTypeErr = false;
       } else {
         rwTypeErr = true;
@@ -485,6 +501,7 @@ function AddReward() {
                             setEndExchangeDate(val);
                           }}
                           format={dateFormat}
+                          disabledDate={disabledDateChange}
                         />
                       </Form.Item>
                       <Form.Item
@@ -571,6 +588,7 @@ function AddReward() {
                           onChange={(val) => {
                             setEndUsedDate(val);
                           }}
+                          disabledDate={disabledDateUsed}
                         />
                       </Form.Item>
                       <Form.Item
@@ -685,10 +703,7 @@ function AddReward() {
         condition={condition}
         point={score}
         type={rewardType}
-        endUseDateTime={convertBuddhistYear.toBuddhistYear(
-          moment(endUsedDate),
-          "DD MMM YY"
-        )}
+        endUseDateTime={endUsedDate}
         exChange={rewardExchange}
         countdownTime={result < 0 ? 0 : parseInt(result.toString())}
       />
