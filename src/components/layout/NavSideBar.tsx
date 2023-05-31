@@ -2,11 +2,14 @@ import { Menu, Button } from "antd";
 import Layout, { Content, Footer, Header } from "antd/lib/layout/layout";
 import Sider from "antd/lib/layout/Sider";
 import React, { Children, useEffect, useState } from "react";
-import { LogoutOutlined } from "@ant-design/icons";
+import {
+
+  LogoutOutlined
+} from "@ant-design/icons";
+import { Link, useNavigate } from "react-router-dom";
 import color from "../../resource/color";
 import icon from "../../resource/icon";
 import { useLocalStorage } from "../../hook/useLocalStorage";
-
 import { MenuSide } from "./MenuSide";
 import { pathLists } from "./SideBar";
 const logout = () => {
@@ -21,7 +24,6 @@ const NavSidebar: React.FC<any> = ({ children }) => {
     []
   );
   const isAccount = persistedProfile.username === "ick_accounting";
-  const [isOpenSidebar, setIsOpenSidebar] = useState(true);
 
   return (
     <Layout>
@@ -82,7 +84,6 @@ const NavSidebar: React.FC<any> = ({ children }) => {
         >
           <MenuSide
             lists={pathLists({ isAccounting: isAccount })}
-            isOpenSidebar={isOpenSidebar}
           />
         </Sider>
       </Layout>
