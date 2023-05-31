@@ -1,12 +1,9 @@
 import {
-  Button,
-  Col,
   DatePicker,
   Divider,
   Form,
   Input,
   Radio,
-  RadioChangeEvent,
   Row,
   Select,
   Space,
@@ -30,10 +27,14 @@ import { BackIconButton } from "../../../components/button/BackButton";
 import { FooterPage } from "../../../components/footer/FooterPage";
 import RenderReward from "../../../components/mobile/RenderReward";
 import moment from "moment";
+import { RewardDatasource } from "../../../datasource/RewardDatasource";
+import Swal from "sweetalert2";
+import dayjs from "dayjs";
 
 const { Map } = require("immutable");
 
 function AddReward() {
+  const profile = JSON.parse(localStorage.getItem("profile") || "{  }");
   const dateFormat = "DD/MM/YYYY";
   const navigate = useNavigate();
   const [form] = Form.useForm();
@@ -41,16 +42,25 @@ function AddReward() {
   const [createImgReward, setCreateImgReward] = useState<UploadImageEntity>(
     UploadImageEntity_INTI
   );
-  
+
   const [rewardType, setRewardType] = useState<string | null>(null);
   const [rewardName, setRewardName] = useState<string | null>(null);
-  const [points, setPoints] = useState<string | null>(null);
+  const [rewardExchange, setRewardExchange] = useState<string | null>(null);
   const [description, setDescription] = useState<string | null>(null);
   const [condition, setCondition] = useState<string | null>(null);
-  const [rewardCount, setRewardCount] = useState<any>();
-  const [rewardPoint, setRewardPoint] = useState<any>();
+  const [amount, setAmount] = useState<any>();
+  const [score, setScore] = useState<any>();
+  const [rewardStatus, setRewardStatus] = useState<any>();
+  const [startExchangeDate, setStartExchangeDate] = useState<any>();
+  const [startExchangeTime, setStartExchangeTime] = useState<any>();
+  const [EndExchangeDate, setEndExchangeDate] = useState<any>();
+  const [EndExchangeTime, setEndExchangeTime] = useState<any>();
+  const [startUsedDate, setStartUsedDate] = useState<any>();
+  const [startUsedTime, setStartUsedTime] = useState<any>();
+  const [endUsedDate, setEndUsedDate] = useState<any>();
+  const [endUsedTime, setEndUsedTime] = useState<any>();
+  const [saveBtnDisable, setBtnSaveDisable] = useState<boolean>(true);
 
-  
   const onChangeImg = async (file: any) => {
     const source = file.target.files[0];
     let newSource: any;
@@ -78,6 +88,7 @@ function AddReward() {
     );
     setCreateImgReward(d.toJS());
   };
+
   const onPreviewImg = async () => {
     let src = imgReward;
     if (!src) {
@@ -95,15 +106,13 @@ function AddReward() {
   const onRemoveImg = () => {
     setImgReward(undefined);
     setCreateImgReward(UploadImageEntity_INTI);
-  };
-  const handleRewardName = (e: any) => {
-    setRewardName(e.target.value);
+    form.setFieldValue("img", null);
   };
   const handleRewardType = (type: string) => {
     setRewardType(type);
   };
   const onChangePoint = (point: any) => {
-    setPoints(point.target.value);
+    setRewardExchange(point.target.value);
   };
   const handleDescription = (des: string) => {
     setDescription(des);
@@ -112,18 +121,120 @@ function AddReward() {
     setCondition(con);
   };
   const handleRewardCount = (count: any) => {
-    setRewardCount(count.target.value);
+    setAmount(count.target.value);
   };
+
   const handleRewardPoint = (point: any) => {
-    setRewardPoint(point.target.value);
+    setScore(point.target.value);
+  };
+  let start = new Date(startUsedDate).getTime();
+  let expired = new Date(endUsedDate).getTime();
+  let result = (expired - start) / 86400000;
+  const disabledDateChange = (current: any) => {
+    const getValueDate = form.getFieldsValue();
+    const startDate = moment(getValueDate.startExchangeDate).format(
+      "YYYY-MM-DD"
+    );
+    return current && current < dayjs(startDate);
+  };
+  const disabledDateUsed = (current: any) => {
+    const getValueDate = form.getFieldsValue();
+    const startDate = moment(getValueDate.startUsedDate).format("YYYY-MM-DD");
+    return current && current < dayjs(startDate);
+  };
+  const onFieldsChange = () => {
+    const {
+      rewardName,
+      rewardType,
+      rewardExchange,
+      score,
+      amount,
+      description,
+      condition,
+      status,
+      startExchangeDate,
+      startExchangeTime,
+      expiredExchangeDate,
+      expiredExchangeTime,
+      startUsedDate,
+      startUsedTime,
+      expiredUsedDate,
+      expiredUsedTime,
+      file,
+    } = form.getFieldsValue();
+
+    let fieldErr = false;
+    let imgErr = false;
+    let rwTypeErr = false;
+
+    if (
+      rewardName &&
+      amount >= 0 &&
+      description != "<p><br></p>" &&
+      condition != "<p><br></p>" &&
+      status
+    ) {
+      fieldErr = false;
+    } else {
+      fieldErr = true;
+    }
+
+    if (rewardType === "DIGITAL" && rewardExchange === "SCORE") {
+      if (
+        score > 0 &&
+        amount > 0 &&
+        startUsedDate &&
+        endUsedDate &&
+        startExchangeDate &&
+        expiredExchangeDate
+      ) {
+        rwTypeErr = false;
+      } else {
+        rwTypeErr = true;
+      }
+    } else if (rewardType === "DIGITAL" && rewardExchange === "MISSION") {
+      if (amount > 0 && startUsedDate && endUsedDate) {
+        rwTypeErr = false;
+      } else {
+        rwTypeErr = true;
+      }
+    } else if (rewardType === "PHYSICAL" && rewardExchange === "SCORE") {
+      if (score > 0 && amount > 0 && startExchangeDate && expiredExchangeDate) {
+        rwTypeErr = false;
+      } else {
+        rwTypeErr = true;
+      }
+    } else if (rewardType === "PHYSICAL" && rewardExchange === "MISSION") {
+      if (amount > 0) {
+        rwTypeErr = false;
+      } else {
+        rwTypeErr = true;
+      }
+    } else {
+      rwTypeErr = true;
+    }
+    if (!file) {
+      imgErr = true;
+    } else {
+      imgErr = false;
+    }
+    setBtnSaveDisable(fieldErr || imgErr || rwTypeErr);
   };
   const renderDataReward = (
     <div className="col-lg-7">
       <CardContainer>
         <CardHeader textHeader="ข้อมูลของรางวัล" />
-        <Form>
-          <div>
-            <div className="form-group text-center" style={{ marginTop: "5%" }}>
+        <Form form={form} onFieldsChange={onFieldsChange}>
+          <div className="form-group text-center" style={{ marginTop: "5%" }}>
+            <Form.Item
+              name="file"
+              rules={[
+                {
+                  required: true,
+                  message: "กรุณาใส่รูปภาพ!",
+                },
+              ]}
+            >
               <div
                 className="hiddenFileInput"
                 style={{
@@ -132,369 +243,440 @@ function AddReward() {
                   })`,
                 }}
               >
-                <input type="file" onChange={onChangeImg} title="เลือกรูป" />
+                <input
+                  key={imgReward}
+                  type="file"
+                  onChange={onChangeImg}
+                  title="เลือกรูป"
+                />
               </div>
-              <div>
-                {imgReward != undefined && (
-                  <>
-                    <Tag
-                      color={color.Success}
-                      onClick={onPreviewImg}
-                      style={{
-                        cursor: "pointer",
-                        borderRadius: "5px",
-                      }}
-                    >
-                      View
-                    </Tag>
-                    <Tag
-                      color={color.Error}
-                      onClick={onRemoveImg}
-                      style={{
-                        cursor: "pointer",
-                        borderRadius: "5px",
-                      }}
-                    >
-                      Remove
-                    </Tag>
-                  </>
-                )}
-              </div>
+            </Form.Item>
+            <div>
+              {imgReward != undefined && (
+                <>
+                  <Tag
+                    color={color.Success}
+                    onClick={onPreviewImg}
+                    style={{
+                      cursor: "pointer",
+                      borderRadius: "5px",
+                    }}
+                  >
+                    View
+                  </Tag>
+                  <Tag
+                    color={color.Error}
+                    onClick={onRemoveImg}
+                    style={{
+                      cursor: "pointer",
+                      borderRadius: "5px",
+                    }}
+                  >
+                    Remove
+                  </Tag>
+                </>
+              )}
             </div>
           </div>
-        </Form>
-        <Form form={form} style={{ padding: 30 }}>
-          <div className="form-group col-lg-12">
-            <label>
-              ชื่อของรางวัล <span style={{ color: "red" }}>*</span>
-            </label>
-            <Form.Item
-              name="name"
-              rules={[
-                {
-                  required: true,
-                  message: "กรุณากรอกชื่อของรางวัล!",
-                },
-              ]}
-            >
-              <Input placeholder="กรอกชื่อของรางวัล" autoComplete="off" onChange={handleRewardName}/>
-            </Form.Item>
-          </div>
-          <div className="row">
-            <div className="form-group col-lg-6">
+          <p className="text-center text-danger pt-3 pb-4">
+            **รูปภาพจะต้องมีสัดส่วน 1:1 หรือ 800px * 800px เท่านั้น
+            เพื่อความสวยงามของภาพในแอปพลิเคชัน**
+          </p>
+          <div style={{ padding: 30 }}>
+            <div className="form-group col-lg-12">
               <label>
-                ประเภทของรางวัล <span style={{ color: "red" }}>*</span>
+                ชื่อของรางวัล <span style={{ color: "red" }}>*</span>
               </label>
               <Form.Item
-                name="type"
+                name="rewardName"
                 rules={[
                   {
                     required: true,
-                    message: "กรุณาเลือกประเภทของรางวัล!",
+                    message: "กรุณากรอกชื่อของรางวัล!",
                   },
                 ]}
               >
-                <Select
-                  className="col-lg-12 p-1"
-                  placeholder="เลือกประเภทของรางวัล"
-                  onChange={handleRewardType}
-                  showSearch
-                  value={rewardType}
-                  allowClear
-                  optionFilterProp="children"
-                  filterOption={(input: any, option: any) =>
-                    option.children.includes(input)
-                  }
-                  filterSort={(optionA, optionB) =>
-                    optionA.children
-                      .toLowerCase()
-                      .localeCompare(optionB.children.toLowerCase())
-                  }
-                >
-                  <Option value={"PHYSICAL"}>Physical</Option>
-                  <Option value={"DIGITAL"}>Digital</Option>
-                </Select>
+                <Input
+                  placeholder="กรอกชื่อของรางวัล"
+                  autoComplete="off"
+                  onChange={(e) => {
+                    setRewardName(e.target.value);
+                  }}
+                />
               </Form.Item>
             </div>
-            <div className="form-group col-lg-6">
-              <label>
-                การแลกเปลี่ยน <span style={{ color: "red" }}>*</span>
-              </label>
+            <div className="row">
+              <div className="form-group col-lg-6">
+                <label>
+                  ประเภทของรางวัล <span style={{ color: "red" }}>*</span>
+                </label>
+                <Form.Item
+                  name="rewardType"
+                  rules={[
+                    {
+                      required: true,
+                      message: "กรุณาเลือกประเภทของรางวัล!",
+                    },
+                  ]}
+                >
+                  <Select
+                    className="col-lg-12 p-1"
+                    placeholder="เลือกประเภทของรางวัล"
+                    onChange={handleRewardType}
+                    showSearch
+                    value={rewardType}
+                    allowClear
+                    optionFilterProp="children"
+                    filterOption={(input: any, option: any) =>
+                      option.children.includes(input)
+                    }
+                    filterSort={(optionA, optionB) =>
+                      optionA.children
+                        .toLowerCase()
+                        .localeCompare(optionB.children.toLowerCase())
+                    }
+                  >
+                    <Option value={"PHYSICAL"}>Physical</Option>
+                    <Option value={"DIGITAL"}>Digital</Option>
+                  </Select>
+                </Form.Item>
+              </div>
+              <div className="form-group col-lg-6">
+                <label>
+                  การแลกเปลี่ยน <span style={{ color: "red" }}>*</span>
+                </label>
+                <div className="row">
+                  <div className="col-12">
+                    <Form.Item name="rewardExchange">
+                      <Radio.Group onChange={onChangePoint}>
+                        <Radio value={"SCORE"}>ใช้แต้ม</Radio>
+                        <Radio value={"MISSION"}>ภารกิจ</Radio>
+                      </Radio.Group>
+                    </Form.Item>
+                  </div>
+                </div>
+              </div>
+            </div>
+            {rewardExchange === "MISSION" ? (
               <div className="row">
-                <div className="col-12">
-                  <Form.Item name="points">
-                    <Radio.Group onChange={onChangePoint}>
-                      <Radio value={"POINTS"}>ใช้คะแนน</Radio>
-                      <Radio value={"MISSION"}>ภารกิจ</Radio>
-                    </Radio.Group>
+                <div className="form-group col-lg-6">
+                  <label>
+                    จำนวน <span style={{ color: "red" }}>*</span>
+                  </label>
+                  <Form.Item
+                    name="amount"
+                    rules={[
+                      {
+                        required: true,
+                        message: "กรุณากรอกจำนวน!",
+                      },
+                    ]}
+                  >
+                    <Input
+                      type="number"
+                      placeholder="กรอกจำนวน"
+                      autoComplete="off"
+                      onChange={handleRewardCount}
+                    />
                   </Form.Item>
                 </div>
               </div>
-            </div>
-          </div>
-          {points === "MISSION" ? (
-            <div className="row">
-              <div className="form-group col-lg-6">
-                <label>
-                  จำนวน <span style={{ color: "red" }}>*</span>
-                </label>
-                <Form.Item
-                  name="count"
-                  rules={[
-                    {
-                      required: true,
-                      message: "กรุณากรอกจำนวน!",
-                    },
-                  ]}
-                >
-                  <Input placeholder="กรอกจำนวน" autoComplete="off" onChange={handleRewardCount}/>
-                </Form.Item>
+            ) : (
+              <div className="row">
+                <div className="form-group col-lg-6">
+                  <label>
+                    แต้มที่ต้องใช้แลก <span style={{ color: "red" }}>*</span>
+                  </label>
+                  <Form.Item
+                    name="score"
+                    rules={[
+                      {
+                        required: true,
+                        message: "กรุณากรอกแต้มที่ต้องการใช้แลก!",
+                      },
+                    ]}
+                  >
+                    <Input
+                      type="number"
+                      placeholder="กรอกแต้มที่ต้องใช้แลก"
+                      autoComplete="off"
+                      suffix="แต้ม"
+                      onChange={handleRewardPoint}
+                    />
+                  </Form.Item>
+                </div>
+                <div className="form-group col-lg-6">
+                  <label>
+                    จำนวน <span style={{ color: "red" }}>*</span>
+                  </label>
+                  <Form.Item
+                    name="amount"
+                    rules={[
+                      {
+                        required: true,
+                        message: "กรุณากรอกจำนวน!",
+                      },
+                    ]}
+                  >
+                    <Input
+                      type="number"
+                      placeholder="กรอกจำนวน"
+                      autoComplete="off"
+                    />
+                  </Form.Item>
+                </div>
               </div>
-            </div>
-          ) : (
-            <div className="row">
-              <div className="form-group col-lg-6">
+            )}
+            {rewardExchange === "SCORE" && (
+              <>
+                <Divider />
+                <p style={{ color: color.Error }}>ช่วงเวลาที่สามารถแลกได้</p>
+                <div className="row">
+                  <div className="col-lg-6">
+                    <label>
+                      วันเริ่มต้น<span style={{ color: color.Error }}>*</span>
+                    </label>
+                    <div className="d-flex">
+                      <Form.Item
+                        name="startExchangeDate"
+                        rules={[
+                          {
+                            required: true,
+                            message: "กรุณากรอกวันที่!",
+                          },
+                        ]}
+                      >
+                        <DatePicker
+                          placeholder="เลือกวันที่"
+                          onChange={(val) => {
+                            setStartExchangeDate(val);
+                          }}
+                          format={dateFormat}
+                        />
+                      </Form.Item>
+                      <Form.Item
+                        name="startExchangeTime"
+                        initialValue={moment("00:00", "HH:mm")}
+                      >
+                        <TimePicker
+                          format={"HH:mm"}
+                          className="ms-3"
+                          placeholder="เลือกเวลา"
+                          onChange={(val) => {
+                            setStartExchangeTime(val);
+                          }}
+                          defaultValue={moment("00:00", "HH:mm")}
+                          allowClear={false}
+                        />
+                      </Form.Item>
+                    </div>
+                  </div>
+                  <div className="col-lg-6">
+                    <label>
+                      วันสิ้นสุด<span style={{ color: color.Error }}>*</span>
+                    </label>
+                    <div className="d-flex">
+                      <Form.Item
+                        name="expiredExchangeDate"
+                        rules={[
+                          {
+                            required: true,
+                            message: "กรุณากรอกวันที่!",
+                          },
+                        ]}
+                      >
+                        <DatePicker
+                          placeholder="เลือกวันที่"
+                          onChange={(val) => {
+                            setEndExchangeDate(val);
+                          }}
+                          format={dateFormat}
+                          disabledDate={disabledDateChange}
+                        />
+                      </Form.Item>
+                      <Form.Item
+                        name="expiredExchangeTime"
+                        initialValue={moment("23:59", "HH:mm")}
+                      >
+                        <TimePicker
+                          format={"HH:mm"}
+                          className="ms-3"
+                          placeholder="เลือกเวลา"
+                          onChange={(val) => {
+                            setEndExchangeTime(val);
+                          }}
+                          defaultValue={moment("23:59", "HH:mm")}
+                          allowClear={false}
+                        />
+                      </Form.Item>
+                    </div>
+                  </div>
+                </div>
+                <Divider />
+              </>
+            )}
+            {rewardType === "DIGITAL" && (
+              <>
+                <p style={{ color: color.Success }}>ช่วงเวลาที่ใช้ได้</p>
+                <div className="row">
+                  <div className="col-lg-6">
+                    <label>
+                      วันเริ่มต้น<span style={{ color: color.Error }}>*</span>
+                    </label>
+                    <div className="d-flex">
+                      <Form.Item
+                        name="startUsedDate"
+                        rules={[
+                          {
+                            required: true,
+                            message: "กรุณากรอกวันที่!",
+                          },
+                        ]}
+                      >
+                        <DatePicker
+                          placeholder="เลือกวันที่"
+                          format={dateFormat}
+                          onChange={(val) => {
+                            setStartUsedDate(val);
+                          }}
+                        />
+                      </Form.Item>
+                      <Form.Item
+                        name="startUsedTime"
+                        initialValue={moment("00:00", "HH:mm")}
+                      >
+                        <TimePicker
+                          format={"HH:mm"}
+                          className="ms-3"
+                          placeholder="เลือกเวลา"
+                          defaultValue={moment("00:00", "HH:mm")}
+                          allowClear={false}
+                          onChange={(val) => {
+                            setStartUsedTime(val);
+                          }}
+                        />
+                      </Form.Item>
+                    </div>
+                  </div>
+                  <div className="col-lg-6">
+                    <label>
+                      วันสิ้นสุด<span style={{ color: color.Error }}>*</span>
+                    </label>
+                    <div className="d-flex">
+                      <Form.Item
+                        name="expiredUsedDate"
+                        rules={[
+                          {
+                            required: true,
+                            message: "กรุณากรอกวันที่!",
+                          },
+                        ]}
+                      >
+                        <DatePicker
+                          placeholder="เลือกวันที่"
+                          format={dateFormat}
+                          onChange={(val) => {
+                            setEndUsedDate(val);
+                          }}
+                          disabledDate={disabledDateUsed}
+                        />
+                      </Form.Item>
+                      <Form.Item
+                        name="expiredUsedTime"
+                        initialValue={moment("23:59", "HH:mm")}
+                      >
+                        <TimePicker
+                          format={"HH:mm"}
+                          className="ms-3"
+                          placeholder="เลือกเวลา"
+                          defaultValue={moment("00:00", "HH:mm")}
+                          allowClear={false}
+                          onChange={(val) => {
+                            setEndUsedTime(val);
+                          }}
+                        />
+                      </Form.Item>
+                    </div>
+                  </div>
+                </div>
+                <Divider />
+              </>
+            )}
+            <div className="row py-4">
+              <div className="form-group col-lg-12">
                 <label>
-                  คะแนนที่ต้องใช้แลก <span style={{ color: "red" }}>*</span>
+                  รายละเอียด (จะแสดงใน Application){" "}
+                  <span style={{ color: "red" }}>*</span>
                 </label>
                 <Form.Item
-                  name="redeem"
+                  name="description"
                   rules={[
                     {
                       required: true,
-                      message: "กรุณากรอกคะแนนที่ต้องการใช้แลก!",
+                      message: "กรุณากรอกรายละเอียด",
                     },
                   ]}
                 >
-                  <Input
-                    placeholder="กรอกคะแนนที่ต้องใช้แลก"
-                    autoComplete="off"
-                    suffix="คะแนน"
-                    onChange={handleRewardPoint}
+                  <ReactQuill
+                    className="react-editor"
+                    theme="snow"
+                    onChange={handleDescription}
+                    placeholder={"กรอกรายละเอียด (จะแสดงใน Application)"}
+                    modules={modules}
+                    formats={formats}
                   />
                 </Form.Item>
               </div>
-              <div className="form-group col-lg-6">
+            </div>
+            <div className="row py-4">
+              <div className="form-group col-lg-12">
                 <label>
-                  จำนวน <span style={{ color: "red" }}>*</span>
+                  เงื่อนไข (จะแสดงใน Application)
+                  <span style={{ color: "red" }}>*</span>
                 </label>
                 <Form.Item
-                  name="count"
+                  name="condition"
                   rules={[
                     {
                       required: true,
-                      message: "กรุณากรอกจำนวน!",
+                      message: "กรุณากรอกเงื่อนไข",
                     },
                   ]}
                 >
-                  <Input placeholder="กรอกจำนวน" autoComplete="off" />
+                  <ReactQuill
+                    className="react-editor"
+                    theme="snow"
+                    onChange={handleCondition}
+                    placeholder={"กรอกเงื่อนไข (จะแสดงใน Application)"}
+                    modules={modules}
+                    formats={formats}
+                  />
                 </Form.Item>
               </div>
             </div>
-          )}
-          {points === "POINTS" && (
-            <>
-              <Divider />
-              <p style={{ color: color.Error }}>ช่วงเวลาที่สามารถแลกได้</p>
-              <div className="row">
-                <div className="col-lg-6">
-                  <label>
-                    วันเริ่มต้น<span style={{ color: color.Error }}>*</span>
-                  </label>
-                  <div className="d-flex">
-                    <Form.Item
-                      name="startDate"
-                      rules={[
-                        {
-                          required: true,
-                          message: "กรุณากรอกวันที่!",
-                        },
-                      ]}
-                    >
-                      <DatePicker
-                        placeholder="เลือกวันที่"
-                        format={dateFormat}
-                        // onChange={}
-                      />
-                    </Form.Item>
-                    <Form.Item
-                      name="startTime"
-                      initialValue={moment("00:00", "HH:mm")}
-                    >
-                      <TimePicker
-                        format={"HH:mm"}
-                        className="ms-3"
-                        placeholder="เลือกเวลา"
-                        defaultValue={moment("00:00", "HH:mm")}
-                        allowClear={false}
-                      />
-                    </Form.Item>
-                  </div>
-                </div>
-                <div className="col-lg-6">
-                  <label>
-                    วันสิ้นสุด<span style={{ color: color.Error }}>*</span>
-                  </label>
-                  <div className="d-flex">
-                    <Form.Item
-                      name="endDate"
-                      rules={[
-                        {
-                          required: true,
-                          message: "กรุณากรอกวันที่!",
-                        },
-                      ]}
-                    >
-                      <DatePicker
-                        placeholder="เลือกวันที่"
-                        format={dateFormat}
-                        // onChange={}
-                      />
-                    </Form.Item>
-                    <Form.Item
-                      name="endTime"
-                      initialValue={moment("23:59", "HH:mm")}
-                    >
-                      <TimePicker
-                        format={"HH:mm"}
-                        className="ms-3"
-                        placeholder="เลือกเวลา"
-                        defaultValue={moment("00:00", "HH:mm")}
-                        allowClear={false}
-                      />
-                    </Form.Item>
-                  </div>
-                </div>
+            <div className="row pt-3">
+              <div className="form-group col-lg-12 d-flex flex-column">
+                <label>
+                  สถานะ<span style={{ color: "red" }}> *</span>
+                </label>
+                <Form.Item
+                  name="status"
+                  rules={[
+                    {
+                      required: true,
+                      message: "กรุณาเลือกสถานะ",
+                    },
+                  ]}
+                >
+                  <Radio.Group
+                    className="d-flex flex-column"
+                    onChange={(e) => setRewardStatus(e.target.value)}
+                  >
+                    <Radio value={"DRAFTING"}>รอเปิดใช้งาน</Radio>
+                    <Radio value={"ACTIVE"}>ใช้งาน</Radio>
+                  </Radio.Group>
+                </Form.Item>
               </div>
-              <Divider />
-            </>
-          )}
-          {rewardType === "DIGITAL" && (
-            <>
-              <p style={{ color: color.Success }}>ช่วงเวลาที่สามารถแลกได้</p>
-              <div className="row">
-                <div className="col-lg-6">
-                  <label>
-                    วันเริ่มต้น<span style={{ color: color.Error }}>*</span>
-                  </label>
-                  <div className="d-flex">
-                    <Form.Item
-                      name="startDate"
-                      rules={[
-                        {
-                          required: true,
-                          message: "กรุณากรอกวันที่!",
-                        },
-                      ]}
-                    >
-                      <DatePicker
-                        placeholder="เลือกวันที่"
-                        format={dateFormat}
-                        // onChange={}
-                      />
-                    </Form.Item>
-                    <Form.Item
-                      name="startTime"
-                      initialValue={moment("00:00", "HH:mm")}
-                    >
-                      <TimePicker
-                        format={"HH:mm"}
-                        className="ms-3"
-                        placeholder="เลือกเวลา"
-                        defaultValue={moment("00:00", "HH:mm")}
-                        allowClear={false}
-                      />
-                    </Form.Item>
-                  </div>
-                </div>
-                <div className="col-lg-6">
-                  <label>
-                    วันสิ้นสุด<span style={{ color: color.Error }}>*</span>
-                  </label>
-                  <div className="d-flex">
-                    <Form.Item
-                      name="endDate"
-                      rules={[
-                        {
-                          required: true,
-                          message: "กรุณากรอกวันที่!",
-                        },
-                      ]}
-                    >
-                      <DatePicker
-                        placeholder="เลือกวันที่"
-                        format={dateFormat}
-                        // onChange={}
-                      />
-                    </Form.Item>
-                    <Form.Item
-                      name="endTime"
-                      initialValue={moment("23:59", "HH:mm")}
-                    >
-                      <TimePicker
-                        format={"HH:mm"}
-                        className="ms-3"
-                        placeholder="เลือกเวลา"
-                        defaultValue={moment("00:00", "HH:mm")}
-                        allowClear={false}
-                      />
-                    </Form.Item>
-                  </div>
-                </div>
-              </div>
-              <Divider />
-            </>
-          )}
-          <div className="row py-4">
-            <div className="form-group col-lg-12">
-              <label>
-                รายละเอียด (จะแสดงใน Application){" "}
-                <span style={{ color: "red" }}>*</span>
-              </label>
-              <Form.Item
-                name="description"
-                rules={[
-                  {
-                    required: true,
-                    message: "กรุณากรอกรายละเอียด",
-                  },
-                ]}
-              >
-                <ReactQuill
-                  className="react-editor"
-                  theme="snow"
-                  onChange={handleDescription}
-                  placeholder={"กรอกรายละเอียด (จะแสดงใน Application)"}
-                  modules={modules}
-                  formats={formats}
-                />
-              </Form.Item>
-            </div>
-          </div>
-          <div className="row py-4">
-            <div className="form-group col-lg-12">
-              <label>
-                เงื่อนไข (จะแสดงใน Application)
-                <span style={{ color: "red" }}>*</span>
-              </label>
-              <Form.Item
-                name="condition"
-                rules={[
-                  {
-                    required: true,
-                    message: "กรุณากรอกเงื่อนไข",
-                  },
-                ]}
-              >
-                <ReactQuill
-                  className="react-editor"
-                  theme="snow"
-                  onChange={handleCondition}
-                  placeholder={"กรอกเงื่อนไข (จะแสดงใน Application)"}
-                  modules={modules}
-                  formats={formats}
-                />
-              </Form.Item>
             </div>
           </div>
         </Form>
@@ -508,11 +690,95 @@ function AddReward() {
         name={rewardName}
         description={description}
         condition={condition}
-        point={rewardPoint}
-        count={'200'}
+        point={score}
+        type={rewardType}
+        endUseDateTime={endUsedDate}
+        exChange={rewardExchange}
+        countdownTime={result < 0 ? 0 : parseInt(result.toString())}
       />
     </div>
   );
+  const onSubmit = () => {
+    const {
+      rewardName,
+      rewardType,
+      rewardExchange,
+      score,
+      amount,
+      description,
+      condition,
+      status,
+      startExchangeDate,
+      startExchangeTime,
+      expiredExchangeDate,
+      expiredExchangeTime,
+      startUsedDate,
+      startUsedTime,
+      expiredUsedDate,
+      expiredUsedTime,
+    } = form.getFieldsValue();
+    const startDate = new Date(
+      moment(startExchangeDate).format("YYYY-MM-DD") +
+        " " +
+        moment(startExchangeTime).format("HH:mm:ss")
+    ).getTime();
+    const dateNow = Date.now();
+    if (status === "DRAFTING") {
+      if (startDate - dateNow > 0) {
+        setRewardStatus("ACTIVE");
+      } else {
+        setRewardStatus("DRAFTING");
+      }
+    } else {
+      setRewardStatus(status);
+    }
+    RewardDatasource.addReward({
+      rewardName: rewardName,
+      rewardType: rewardType,
+      rewardExchange: rewardExchange,
+      score: score,
+      amount: amount,
+      description: description,
+      condition: condition,
+      status: rewardStatus,
+      startExchangeDate:
+        moment(startExchangeDate).format("YYYY-MM-DD") +
+        " " +
+        moment(startExchangeTime).format("HH:mm:ss"),
+      expiredExchangeDate:
+        moment(expiredExchangeDate).format("YYYY-MM-DD") +
+        " " +
+        moment(expiredExchangeTime).format("HH:mm:ss"),
+      startUsedDate:
+        moment(startUsedDate).format("YYYY-MM-DD") +
+        " " +
+        moment(startUsedTime).format("HH:mm:ss"),
+      expiredUsedDate:
+        moment(expiredUsedDate).format("YYYY-MM-DD") +
+        " " +
+        moment(expiredUsedTime).format("HH:mm:ss"),
+      file: createImgReward.file,
+      createBy: profile.firstname + " " + profile.lastname,
+    })
+      .then((res) => {
+        Swal.fire({
+          title: "บันทึกสำเร็จ",
+          icon: "success",
+          timer: 1500,
+          showConfirmButton: false,
+        }).then((time) => {
+          navigate("/IndexReward");
+        });
+      })
+      .catch((err) => {
+        console.log(err);
+        Swal.fire({
+          title: "เกิดข้อผิดพลาก",
+          icon: "error",
+          showConfirmButton: true,
+        });
+      });
+  };
 
   return (
     <>
@@ -531,7 +797,11 @@ function AddReward() {
         {renderRedeem}
       </Row>
 
-      <FooterPage onClickBack={() => navigate(-1)} />
+      <FooterPage
+        disableSaveBtn={saveBtnDisable}
+        onClickBack={() => navigate(-1)}
+        onClickSave={onSubmit}
+      />
     </>
   );
 }
