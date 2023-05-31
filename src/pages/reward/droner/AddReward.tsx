@@ -29,10 +29,6 @@ import RenderReward from "../../../components/mobile/RenderReward";
 import moment from "moment";
 import { RewardDatasource } from "../../../datasource/RewardDatasource";
 import Swal from "sweetalert2";
-import { MONTH_SALE } from "../../../definitions/Month";
-import { convertBuddhistYear } from "../../../utilities/ConvertToBuddhistYear";
-import { UploadImageDatasouce } from "../../../datasource/UploadImageDatasource";
-import { DateTimeUtil } from "../../../utilities/DateTimeUtil";
 import dayjs from "dayjs";
 
 const { Map } = require("immutable");
@@ -112,9 +108,6 @@ function AddReward() {
     setCreateImgReward(UploadImageEntity_INTI);
     form.setFieldValue("img", null);
   };
-  const handleRewardName = (e: any) => {
-    setRewardName(e.target.value);
-  };
   const handleRewardType = (type: string) => {
     setRewardType(type);
   };
@@ -139,7 +132,9 @@ function AddReward() {
   let result = (expired - start) / 86400000;
   const disabledDateChange = (current: any) => {
     const getValueDate = form.getFieldsValue();
-    const startDate = moment(getValueDate.startExchangeDate).format("YYYY-MM-DD");
+    const startDate = moment(getValueDate.startExchangeDate).format(
+      "YYYY-MM-DD"
+    );
     return current && current < dayjs(startDate);
   };
   const disabledDateUsed = (current: any) => {
@@ -198,18 +193,13 @@ function AddReward() {
         rwTypeErr = true;
       }
     } else if (rewardType === "DIGITAL" && rewardExchange === "MISSION") {
-      if (amount > 0 && startUsedDate && endUsedDate ) {
+      if (amount > 0 && startUsedDate && endUsedDate) {
         rwTypeErr = false;
       } else {
         rwTypeErr = true;
       }
     } else if (rewardType === "PHYSICAL" && rewardExchange === "SCORE") {
-      if (
-        score > 0 &&
-        amount > 0 &&
-        startExchangeDate &&
-        expiredExchangeDate
-      ) {
+      if (score > 0 && amount > 0 && startExchangeDate && expiredExchangeDate) {
         rwTypeErr = false;
       } else {
         rwTypeErr = true;
@@ -684,7 +674,6 @@ function AddReward() {
                   >
                     <Radio value={"DRAFTING"}>รอเปิดใช้งาน</Radio>
                     <Radio value={"ACTIVE"}>ใช้งาน</Radio>
-                    <Radio value={"INACTIVE"}>ปิดการใช้งาน</Radio>
                   </Radio.Group>
                 </Form.Item>
               </div>

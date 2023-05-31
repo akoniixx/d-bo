@@ -26,7 +26,6 @@ import {
 } from "antd";
 import moment from "moment";
 import React, { useEffect, useState } from "react";
-import Swal from "sweetalert2";
 import { CheckboxValueType } from "antd/lib/checkbox/Group";
 import { color, icon } from "../../../resource";
 import { numberWithCommas } from "../../../utilities/TextFormatter";
@@ -43,7 +42,6 @@ function IndexReward() {
   const navigate = useNavigate();
   const { RangePicker } = DatePicker;
   const dateFormat = "DD/MM/YYYY";
-  const timeFormat = "HH:mm";
   const dateSearchFormat = "YYYY-MM-DD";
   const row = 10;
   const [current, setCurrent] = useState(1);
@@ -55,15 +53,8 @@ function IndexReward() {
   const [rewardExchange, setRewardExchange] = useState<any>();
   const [searchText, setSearchText] = useState<any>();
   const [visible, setVisible] = useState(false);
-  const [visibleStatus, setVisibleStatus] = useState(false);
   const handleVisible = (newVisible: any) => {
     setVisible(newVisible);
-  };
-  const [mission, setMission] = useState<any>([]);
-  const [isMission, setIsMission] = useState<boolean>();
-
-  const handleVisibleStatus = (newVisible: any) => {
-    setVisibleStatus(newVisible);
   };
   const [showModal, setShowModal] = useState(false);
   const [rewardId, setRewardId] = useState("");
@@ -165,8 +156,6 @@ function IndexReward() {
   const onChangeSubPhy = (list: CheckboxValueType[]) => {
     let arr: any = 0;
     arr = [...list];
-    console.log("phy", arr);
-    setRewardType("PHYSICAL");
     if (arr.length > 0) {
       setRewardType("PHYSICAL");
     } else {
@@ -181,16 +170,10 @@ function IndexReward() {
   const onChangeSubDigi = (list: CheckboxValueType[]) => {
     let arr: any = 0;
     arr = [...list];
-    console.log("digi", arr);
-    console.log(rewardExchange);
-    if (rewardExchange) {
-      setRewardType(rewardType);
+    if (arr.length > 0) {
+      setRewardType("DIGITAL");
     } else {
-      if (arr.length > 0) {
-        setRewardType("DIGITAL");
-      } else {
-        setRewardType(undefined);
-      }
+      setRewardType(undefined);
     }
     setRewardExchange(arr);
     setCheckedListDigi(list);
@@ -447,7 +430,7 @@ function IndexReward() {
       title: "ชื่อของรางวัล",
       dataIndex: "rewardName",
       key: "rewardName",
-      width: "25%",
+      width: "28%",
       fixed: "left",
       sorter: (a: any, b: any) => sorter(a.rewardName, b.rewardName),
       render: (value: any, row: any, index: number) => {
@@ -709,7 +692,7 @@ function IndexReward() {
         columns={columns}
         dataSource={data?.data}
         pagination={false}
-        scroll={{ x: 1750 }}
+        scroll={{ x: 1800 }}
       />
 
       <div className="d-flex justify-content-between pt-3 pb-3">

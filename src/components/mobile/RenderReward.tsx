@@ -10,6 +10,7 @@ import {
 import { DateTimeUtil } from "../../utilities/DateTimeUtil";
 import { convertBuddhistYear } from "../../utilities/ConvertToBuddhistYear";
 import moment from "moment";
+import color from "../../resource/color";
 interface RenderReward {
   img: string;
   name: any;
@@ -66,13 +67,16 @@ const RenderReward: React.FC<RenderReward> = ({
               height: "100%",
             }}
           >
-            <Image
-              style={{ padding: 20 }}
-              src={img ? img : uploadImg}
-              width={"100%"}
-              height={"26.7%"}
-              preview={false}
-            />
+            <div className="p-3">
+              <Image
+                style={{ borderRadius: 10 }}
+                src={img ? img : uploadImg}
+                width={"100%"}
+                height={"26.7%"}
+                preview={false}
+              />
+            </div>
+
             <div className="p-4">
               <h5 style={{ fontWeight: "600" }}>
                 {!name ? "ชื่อของรางวัล" : name}

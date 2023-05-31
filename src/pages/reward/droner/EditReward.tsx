@@ -29,8 +29,6 @@ import RenderReward from "../../../components/mobile/RenderReward";
 import moment from "moment";
 import { RewardDatasource } from "../../../datasource/RewardDatasource";
 import Swal from "sweetalert2";
-import { MONTH_SALE } from "../../../definitions/Month";
-import { convertBuddhistYear } from "../../../utilities/ConvertToBuddhistYear";
 import dayjs from "dayjs";
 import { RewardEntities } from "../../../entities/RewardEntites";
 
@@ -51,7 +49,6 @@ function EditReward() {
   const [rewardExchange, setRewardExchange] = useState<string | null>(null);
   const [description, setDescription] = useState<string | null>(null);
   const [condition, setCondition] = useState<string | null>(null);
-  const [amount, setAmount] = useState<any>();
   const [score, setScore] = useState<any>();
   const [rewardStatus, setRewardStatus] = useState<any>();
   const [startExchangeDate, setStartExchangeDate] = useState<any>();
@@ -718,7 +715,6 @@ function EditReward() {
                     className="d-flex flex-column"
                     onChange={(e) => setRewardStatus(e.target.value)}
                   >
-                    <Radio value={"DRAFTING"}>รอเปิดใช้งาน</Radio>
                     <Radio value={"ACTIVE"}>ใช้งาน</Radio>
                     <Radio value={"INACTIVE"}>ปิดการใช้งาน</Radio>
                   </Radio.Group>
@@ -799,7 +795,7 @@ function EditReward() {
         : moment(EndExchangeDate).format("YYYY-MM-DD") +
           " " +
           moment(EndExchangeTime).format("HH:mm:ss"),
-      startUsedDate: 
+      startUsedDate:
         moment(startUsedDate).format("YYYY-MM-DD") +
         " " +
         moment(startUsedTime).format("HH:mm:ss"),
@@ -813,10 +809,8 @@ function EditReward() {
       file: !createImgReward.file ? imgReward : createImgReward.file,
       createBy: profile.firstname + " " + profile.lastname,
     };
-
     RewardDatasource.updateReward(queryString[1], rewardData)
       .then((res) => {
-        console.log(res);
         Swal.fire({
           title: "บันทึกสำเร็จ",
           icon: "success",
