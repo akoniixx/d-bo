@@ -23,7 +23,7 @@ import ActionButton from "../../components/button/ActionButton";
 import { CardContainer } from "../../components/card/CardContainer";
 import { RedeemDatasource } from "../../datasource/RedeemDatasource";
 import {
-  RedeemDronerEntity,
+  RedeemDronerListEntity,
   RedeemFarmerListEntity,
 } from "../../entities/RedeemEntities";
 import { color } from "../../resource";
@@ -43,15 +43,17 @@ const IndexRedeem = () => {
     window.location.pathname.split("/")[2]
   );
   const [dataFarmer, setDataFarmer] = useState<RedeemFarmerListEntity>();
-  const [dataDroner, setDataDroner] = useState<RedeemDronerEntity[]>();
+  const [dataDroner, setDataDroner] = useState<RedeemDronerListEntity>();
   const [searchKeyword, setSearchKeyword] = useState("");
   const [searchStartDate, setSearchStartDate] = useState<any>(null);
   const [searchEndDate, setSearchEndDate] = useState<any>(null);
   const [searchStatus, setSearchStatus] = useState("");
+  const [searchMission, setSearchMission] = useState("");
+  const [searchType, setSearchType] = useState("PHYSICAL");
 
   const fetchRedeemFarmer = () => {
     RedeemDatasource.getRedeemFarmer(
-      row,
+      10,
       current,
       searchKeyword,
       searchStartDate,
@@ -62,12 +64,20 @@ const IndexRedeem = () => {
     });
   };
   const fetchRedeemDroner = () => {
-    RedeemDatasource.getRedeemDroner(row, current).then((res) => {
-      const mapKey = res.map((x, i) => ({
+    RedeemDatasource.getRedeemDroner(
+      5,
+      current,
+      searchKeyword,
+      searchStartDate,
+      searchEndDate,
+      searchStatus,
+      searchMission
+    ).then((res) => {
+      const mapKey = res.data.map((x, i) => ({
         ...x,
         key: i + 1,
       }));
-      setDataDroner(mapKey);
+      setDataDroner({ ...res, data: mapKey });
     });
   };
 
@@ -84,7 +94,11 @@ const IndexRedeem = () => {
   };
   const onSearch = () => {
     setCurrent(1);
-    fetchRedeemFarmer();
+    if (source === "Farmer") {
+      fetchRedeemFarmer();
+    } else {
+      fetchRedeemDroner();
+    }
   };
   const handleSearchDate = (e: any) => {
     if (e != null) {
@@ -97,12 +111,10 @@ const IndexRedeem = () => {
     setCurrent(1);
   };
 
-  const plainOptions = ["Physical", "Digital"];
-
   const pageTitle = (
     <>
       <Row justify={"space-between"} style={{ padding: "10px" }}>
-        <Col span={14}>
+        <Col span={source === "Farmer" ? 14 : 10}>
           <span
             className="card-label font-weight-bolder text-dark"
             style={{
@@ -150,13 +162,17 @@ const IndexRedeem = () => {
             </Radio.Button>
           </Radio.Group>
         </Col>
-        {/* <Col>
-          <Radio.Group
-            options={plainOptions}
-            buttonStyle="solid"
-            defaultValue="Physical"
-          />
-        </Col> */}
+        {source === "Droner" && (
+          <Col span={4} className="pt-1">
+            <Radio.Group
+              onChange={(e) => setSearchType(e.target.value)}
+              defaultValue={searchType}
+            >
+              <Radio value="PHYSICAL">Physical</Radio>
+              <Radio value="DIGITAL">Digital</Radio>
+            </Radio.Group>
+          </Col>
+        )}
         <Col span={6} style={{ color: color.Error }}>
           <RangePicker
             allowClear
@@ -215,8 +231,9 @@ const IndexRedeem = () => {
             <Input
               allowClear
               prefix={<SearchOutlined style={{ color: color.Disable }} />}
-              placeholder="ค้นหาชื่อเกษตรกร/เบอร์โทร"
+              placeholder="ค้นหาชื่อนักบินโดรน/เบอร์โทร"
               className="col-lg-12 p-1"
+              onChange={(e) => setSearchKeyword(e.target.value)}
             />
           </div>
           <div className="col-lg p-1">
@@ -225,6 +242,7 @@ const IndexRedeem = () => {
               prefix={<SearchOutlined style={{ color: color.Disable }} />}
               placeholder="ค้นหารหัส Mission No."
               className="col-lg-12 p-1"
+              onChange={(e) => setSearchMission(e.target.value)}
             />
           </div>
           <div className="col-lg">
@@ -233,22 +251,44 @@ const IndexRedeem = () => {
               placeholder="ประเภทของรางวัล"
               allowClear
             >
-              <option value="Physical">Physical</option>
-              <option value="Digital">Digital</option>
+              <option value="ใช้แต้ม">
+                {searchType === "PHYSICAL" ? "Physical" : "Digital"} (ใช้แต้ม)
+              </option>
+              <option value="ภารกิจ">
+                {searchType === "PHYSICAL" ? "Physical" : "Digital"} (ภารกิจ)
+              </option>
             </Select>
           </div>
-          <div className="col-lg">
-            <Select
-              className="col-lg-12 p-1"
-              placeholder="สถานะทั้งหมด"
-              allowClear
-            >
-              <option value="คำร้องขอแลก">คำร้องขอแลก</option>
-              <option value="เตรียมจัดส่ง">เตรียมจัดส่ง</option>
-              <option value="ส่งแล้ว">ส่งแล้ว</option>
-              <option value="ยกเลิก">ยกเลิก</option>
-            </Select>
-          </div>
+          {searchType === "PHYSICAL" ? (
+            <div className="col-lg">
+              <Select
+                className="col-lg-12 p-1"
+                placeholder="สถานะทั้งหมด"
+                allowClear
+                onChange={(e) => setSearchStatus(e)}
+              >
+                <option value="REQUEST">คำร้องขอแลก</option>
+                <option value="PREPARE">เตรียมจัดส่ง</option>
+                <option value="DONE">ส่งแล้ว</option>
+                <option value="CANCEL">ยกเลิก</option>
+              </Select>
+            </div>
+          ) : (
+            <div className="col-lg">
+              <Select
+                className="col-lg-12 p-1"
+                placeholder="สถานะทั้งหมด"
+                allowClear
+                onChange={(e) => setSearchStatus(e)}
+              >
+                <option value="REQUEST">คำร้องขอแลก</option>
+                <option value="USED">ใช้แล้ว</option>
+                <option value="PREPARE">พร้อมใช้</option>
+                <option value="EXPIRED">หมดอายุ</option>
+                <option value="CANCEL">ยกเลิก</option>
+              </Select>
+            </div>
+          )}
           <div className="pt-1">
             <Button
               style={{
@@ -257,6 +297,7 @@ const IndexRedeem = () => {
                 color: color.secondary2,
                 backgroundColor: color.Success,
               }}
+              onClick={onSearch}
             >
               ค้นหาข้อมูล
             </Button>
@@ -401,7 +442,7 @@ const IndexRedeem = () => {
       dataIndex: "rewardCode",
       render: (value: any, row: any, index: number) => {
         return {
-          children: <span>{row.rewardCode}</span>,
+          children: <span>{row.reward.rewardNo}</span>,
         };
       },
     },
@@ -461,6 +502,7 @@ const IndexRedeem = () => {
       render: (value: any, row: any, index: number) => {
         const mapWording: any = {
           PHYSICAL: "Physical",
+          DIGITAL: "Digital",
         };
         return {
           children: (
@@ -487,21 +529,24 @@ const IndexRedeem = () => {
       title: "สถานะ",
       dataIndex: "status",
       render: (value: any, row: any, index: number) => {
+        const mapStatus: any = {
+          REQUEST: "คำร้องขอแลก",
+          PREPARE: "เตรียมจัดส่ง",
+          DONE: "ส่งแล้ว",
+          CANCEL: "ยกเลิก",
+        };
+        const mapColor: any = {
+          REQUEST: "#FFCA37",
+          PREPARE: "#EA973E",
+          DONE: "#219653",
+          CANCEL: color.Error,
+        };
         return {
           children: (
             <>
-              <span
-                style={{
-                  color:
-                    row.status === "ยกเลิก" ? color.Error : color.secondary2,
-                }}
-              >
-                <Badge
-                  color={
-                    row.status === "ยกเลิก" ? color.Error : color.secondary2
-                  }
-                />{" "}
-                {row.status}
+              <span style={{ color: mapColor[row.redeemDetail?.redeemStatus] }}>
+                <Badge color={mapColor[row.redeemDetail?.redeemStatus]} />{" "}
+                {mapStatus[row.redeemDetail?.redeemStatus]}
               </span>
             </>
           ),
@@ -592,7 +637,7 @@ const IndexRedeem = () => {
         )}
         {source === "Droner" && (
           <Table
-            dataSource={dataDroner}
+            dataSource={dataDroner?.data}
             expandable={{
               expandedRowRender: (record) => expandable(record),
               showExpandColumn: false,
@@ -611,13 +656,13 @@ const IndexRedeem = () => {
       <div className="d-flex justify-content-between pt-3 pb-3">
         <p>
           รายการทั้งหมด{" "}
-          {source === "Farmer" ? dataFarmer?.count : dataDroner?.length} รายการ
+          {source === "Farmer" ? dataFarmer?.count : dataDroner?.count} รายการ
         </p>
         <Pagination
           current={current}
-          total={source === "Farmer" ? dataFarmer?.count : dataDroner?.length}
+          total={source === "Farmer" ? dataFarmer?.count : dataDroner?.count}
           onChange={onChangePage}
-          pageSize={row}
+          pageSize={source === "Farmer" ? 10 : 5}
           showSizeChanger={false}
         />
       </div>

@@ -106,6 +106,10 @@ export interface RedeemDronerEntity {
     remain: number;
     rewardExchange: string;
   };
+  redeemDetail: {
+    redeemStatus: string;
+    rewardType: string;
+  };
   mission: string;
   dronerDetail: {
     dronerId: string;
@@ -114,9 +118,14 @@ export interface RedeemDronerEntity {
     telephoneNo: string;
   };
 }
+export interface RedeemDronerListEntity {
+  count: number;
+  data: RedeemDronerEntity[];
+}
 
 export interface DetailRedeemDronerEntity {
   id: string;
+  redeemNo: string;
   dronerId: string;
   campaignId: string;
   campaignName: string;
@@ -131,16 +140,38 @@ export interface DetailRedeemDronerEntity {
   rewardName: string;
   rewardQuantity: number;
   rewardCode: string;
-  receiverDetail: string;
+  receiverDetail: {
+    firstname: string;
+    lastname: string;
+    tel: string;
+    address: string;
+  };
   createAt: string;
   updateAt: string;
-  dronerRedeemHitories: string[];
+  redeemDetail: {
+    redeemStatus: string;
+    rewardType: string;
+    remark: string;
+    deliveryCompany: string;
+    trackingNo: string;
+  };
+  dronerRedeemHistories: {
+    id: string;
+    remark: string;
+    status: string;
+    trackingNo: string;
+    beforeStatus: string;
+    createAt: string;
+    deliveryCompany: string;
+    dronerTransactionId: string;
+  }[];
   campaign: string;
   reward: {
     id: string;
     rewardName: string;
     imagePath: string;
     rewardType: string;
+    rewardExchange: string;
     rewardQuantity: number;
     rewardNo: string;
     score: number;
@@ -156,3 +187,20 @@ export interface DetailRedeemDronerEntity {
     telephoneNo: string;
   };
 }
+
+export interface UpdateRedeemDronerEntity {
+  dronerTransactionId: string | null | "" | undefined;
+  status: string;
+  updateBy: string;
+  deliveryCompany: string;
+  trackingNo: string;
+  remark: string;
+}
+export const UpdateRedeemDronerEntity_INIT: UpdateRedeemDronerEntity = {
+  dronerTransactionId: "",
+  status: "",
+  updateBy: "",
+  deliveryCompany: "",
+  trackingNo: "",
+  remark: "",
+};

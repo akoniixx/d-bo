@@ -3,7 +3,9 @@ import {
   DetailRedeemDronerEntity,
   DetailRedeemFermerEntity,
   RedeemDronerEntity,
+  RedeemDronerListEntity,
   RedeemFarmerListEntity,
+  UpdateRedeemDronerEntity,
 } from "../entities/RedeemEntities";
 
 export class RedeemDatasource {
@@ -45,12 +47,22 @@ export class RedeemDatasource {
   static getRedeemDroner(
     take: number,
     page: number,
-    search?: string
-  ): Promise<RedeemDronerEntity[]> {
+    search?: string,
+    startDate?: string,
+    endDate?: string,
+    status?: string,
+    missionNo?: string,
+    rewardType?: string
+  ): Promise<RedeemDronerListEntity> {
     const params = {
       take: take,
       page: page,
       search: search,
+      startDate: startDate,
+      endDate: endDate,
+      status: status,
+      missionNo: missionNo,
+      rewardType: rewardType,
     };
     return httpClient
       .get(
@@ -76,6 +88,19 @@ export class RedeemDatasource {
       })
       .catch((err) => {
         console.log(err, "err getnewtask");
+      });
+  }
+  static updateStatusRedeem(data: UpdateRedeemDronerEntity) {
+    return httpClient
+      .post(
+        BASE_URL + "/promotion/droner-transactions/update-redeem-status",
+        data
+      )
+      .then((response) => {
+        return response.data;
+      })
+      .catch((error) => {
+        console.log(error);
       });
   }
 }
