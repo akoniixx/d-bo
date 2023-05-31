@@ -141,7 +141,6 @@ function IndexReport() {
       searchStatusCancel,
       searchText
     ).then((res: TaskReportListEntity) => {
-      console.log(res);
       setGetData(res);
     });
   };
