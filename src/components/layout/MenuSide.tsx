@@ -47,18 +47,19 @@ export const MenuSide: React.FC<MenuSideProps> = ({ lists, isOpenSidebar }) => {
     const pathName = window.location.pathname;
     const pathNameSplit = pathName.split("/").filter((item) => item !== "");
 
-    const currentPath = lists.find(
-      (item) => item.path === `/${pathNameSplit[0]}`
-    );
-    if (currentPath) {
-      const isHaveSubPath = currentPath.subMenu?.find(
-        (el) => el.path === `/${pathNameSplit[1]}`
+    const currentPath = lists.find((item) => {
+      if (item.subMenu && item.subMenu?.length < 1) {
+        return item.path === `/${pathNameSplit[0]}`;
+      }
+      const isHaveSubPath = item.subMenu?.find(
+        (el) => el.path === `/${pathNameSplit[0]}`
       );
-
-      setCurrent({
-        path: currentPath.name,
-      });
-    }
+      return !!isHaveSubPath;
+    });
+    setCheckPath(currentPath?.path);
+    setCurrent({
+      path: `/${pathNameSplit[0]}`,
+    });
   });
   return (
     <div>

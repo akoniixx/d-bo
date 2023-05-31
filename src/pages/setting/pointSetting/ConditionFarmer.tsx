@@ -434,7 +434,7 @@ function ConditionFarmer() {
               borderRadius: "5px",
               color: color.Success,
             }}
-            onClick={() => window.location.reload()}
+            onClick={() => getDataPoint()}
           >
             คืนค่าเดิม
           </Button>

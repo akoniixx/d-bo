@@ -184,7 +184,7 @@ function PromotionPage() {
     CouponDataSource.deleteCoupon(couponId)
       .then((res) => {
         setModalDelete(!modalDelete);
-        window.location.reload();
+        fetchCouponList();
       })
       .catch((err) => console.log(err));
   };

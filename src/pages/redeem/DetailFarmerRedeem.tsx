@@ -67,6 +67,7 @@ const DetailFarmerRedeem = () => {
           {
             dateTime: res.createdAt,
             remark: "-",
+            createBy: res.createBy,
             updateBy: res.createBy,
             status: "แลกสำเร็จ",
           },
@@ -277,7 +278,11 @@ const DetailFarmerRedeem = () => {
           </Col>
           <Col span={4}>
             <div>แต้มที่แลก</div>
-            <div style={{ color: color.Error }}>- {data?.usePoint}</div>
+            <div style={{ color: color.Error }}>
+              {"- " +
+                numberWithCommas(parseFloat(data?.usePoint!) || 0) +
+                " แต้ม"}
+            </div>
           </Col>
         </Row>
       </Container>
@@ -288,9 +293,7 @@ const DetailFarmerRedeem = () => {
   return (
     <>
       <Row>
-        <BackIconButton
-          onClick={() => navigate("/IndexRedeem/Farmer")}
-        />
+        <BackIconButton onClick={() => navigate("/IndexRedeem/Farmer")} />
         <span className="pt-3">
           <strong style={{ fontSize: "20px" }}>รายละเอียดการแลกแต้ม</strong>
         </span>

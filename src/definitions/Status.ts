@@ -148,3 +148,9 @@ export const STATUS_COUPON: any = {
   DRAFTING: "รอเปิดการใช้งาน",
   INACTIVE: "ปิดการใช้งาน",
 };
+export const REWARD_STATUS = [
+  { value: "", name: "ทั้งหมด" },
+  { value: "ACTIVE", name: "ใช้งาน" },
+  { value: "DRAFTING", name: "รอเปิดใช้งาน" },
+  { value: "INACTIVE", name: "ปิดการใช้งาน" }
+];

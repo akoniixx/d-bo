@@ -41,7 +41,6 @@ function DroneList() {
       droneBrandId,
       searchText
     ).then((res) => {
-      console.log(res)
       setDroneList(res);
     });
   };

@@ -1,4 +1,9 @@
 ## [Version - 0]
+## Feature [v0.31.0] 2023-05-31
+- added master reward menu
+## Fix [v0.30.1] 2023-05-31
+- fixed api history point
+- added format comma number in history point
 ## Feature [v0.30.0] 2023-05-26
 - added droner summary point menu
 ## improve [v0.29.2] 2023-05-26

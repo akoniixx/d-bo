@@ -314,11 +314,9 @@ const IndexRedeem = () => {
       render: (value: any, row: any, index: number) => {
         return {
           children: (
-            <>
-              <span>
-                {row.createdAt && DateTimeUtil.formatDateTime(row.createdAt)}
-              </span>
-            </>
+            <span>
+              {row.createdAt && DateTimeUtil.formatDateTime(row.createdAt)}
+            </span>
           ),
         };
       },
