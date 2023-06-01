@@ -28,6 +28,7 @@ export const STATUS_COLOR_MAPPING: any = {
   REJECTED: color.Error,
   INACTIVE: color.Error,
   OPEN: color.Grey,
+  DRAFT: color.Grey,
 };
 
 export const FARMER_STATUS_SEARCH = [
@@ -152,5 +153,5 @@ export const REWARD_STATUS = [
   { value: "", name: "ทั้งหมด" },
   { value: "ACTIVE", name: "ใช้งาน" },
   { value: "DRAFTING", name: "รอเปิดใช้งาน" },
-  { value: "INACTIVE", name: "ปิดการใช้งาน" }
+  { value: "INACTIVE", name: "ปิดการใช้งาน" },
 ];

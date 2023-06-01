@@ -3,12 +3,24 @@ export interface CampaignConditionEntity {
   rai: number;
   point: number;
   rewardId: string | null;
+  rewardName?: string | null;
+  descriptionReward?: string | null;
+  conditionReward?: string | null;
+  missionName?: string | null;
+  quata?: number;
+  rewardRound?: number;
 }
 export const CampaignConditionEntity_INIT: CampaignConditionEntity = {
   num: 0,
   rai: 0,
   point: 0,
   rewardId: null,
+  rewardName: null,
+  descriptionReward: null,
+  conditionReward: null,
+  missionName: null,
+  quata: 0,
+  rewardRound: 0,
 };
 
 export interface CampaignEntiry {

@@ -19,6 +19,12 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import ActionButton from "../../../components/button/ActionButton";
 import { CardContainer } from "../../../components/card/CardContainer";
+import { CampaignDatasource } from "../../../datasource/CampaignDatasource";
+import {
+  STATUS_COLOR_MAPPING,
+  STATUS_COUPON,
+} from "../../../definitions/Status";
+import { CampaignListEntity } from "../../../entities/CampaignPointEntites";
 import { color } from "../../../resource";
 import { DateTimeUtil } from "../../../utilities/DateTimeUtil";
 const { RangePicker } = DatePicker;
@@ -28,29 +34,24 @@ const IndexDronerMission = () => {
   const dateFormat = "DD/MM/YYYY";
   const row = 5;
   const [current, setCurrent] = useState(1);
+  const [data, setData] = useState<CampaignListEntity>();
+
+  const fetchMission = () => {
+    CampaignDatasource.getCampaignList("MISSION_REWARD", row, current).then(
+      (res) => {
+        console.log(res);
+        setData(res);
+      }
+    );
+  };
+
+  useEffect(() => {
+    fetchMission();
+  }, [current]);
 
   const onChangePage = (page: number) => {
     setCurrent(page);
   };
-
-  const dataMock = [
-    {
-      missionId: "MS00000001",
-      missionName: "ยิ่งบินยิ่งได้รับ โชคชั้นที่ 2",
-      startDate: Date(),
-      endDate: Date() + 1,
-      totalSubMission: 2,
-      status: "ACTIVE",
-    },
-    {
-      missionId: "MS00000002",
-      missionName: "ยิ่งบินยิ่งได้รับ โชคชั้นที่ 3",
-      startDate: Date(),
-      endDate: Date() + 5,
-      totalSubMission: 4,
-      status: "INACTIVE",
-    },
-  ];
 
   const pageTitle = (
     <>
@@ -134,16 +135,16 @@ const IndexDronerMission = () => {
   const columns = [
     {
       title: "ชื่อภารกิจ",
-      dataIndex: "missionName",
-      key: "missionName",
+      dataIndex: "campaignName",
+      key: "campaignName",
       width: "35%",
       render: (value: any, row: any, index: number) => {
         return {
           children: (
             <>
-              <span>{row.missionName}</span>
+              <span>{row.campaignName}</span>
               <br />
-              <span style={{ color: color.Grey }}>{row.missionId}</span>
+              <span style={{ color: color.Grey }}>{row.missionNo}</span>
             </>
           ),
         };
@@ -168,10 +169,9 @@ const IndexDronerMission = () => {
     },
     {
       title: "ภารกิจย่อย",
-      dataIndex: "totalSubMission",
       render: (value: any, row: any, index: number) => {
         return {
-          children: <span>{row.totalSubMission} ภารกิจ</span>,
+          children: <span>{row.condition.length} ภารกิจ</span>,
         };
       },
     },
@@ -185,13 +185,11 @@ const IndexDronerMission = () => {
             <>
               <span
                 style={{
-                  color: row.status === "ACTIVE" ? color.Success : color.Error,
+                  color: STATUS_COUPON[row.status],
                 }}
               >
-                <Badge
-                  color={row.status === "ACTIVE" ? color.Success : color.Error}
-                />{" "}
-                {row.status === "ACTIVE" ? "ใช้งาน" : "ปิดการใช้งาน"}
+                <Badge color={STATUS_COLOR_MAPPING[row.status]} />{" "}
+                {STATUS_COUPON[row.status]}
               </span>
             </>
           ),
@@ -239,13 +237,13 @@ const IndexDronerMission = () => {
     <>
       {pageTitle}
       <CardContainer>
-        <Table columns={columns} dataSource={dataMock} pagination={false} />
+        <Table columns={columns} dataSource={data?.data} pagination={false} />
       </CardContainer>
       <div className="d-flex justify-content-between pt-3 pb-3">
-        <p>รายการทั้งหมด {dataMock.length} รายการ</p>
+        <p>รายการทั้งหมด {data?.count} รายการ</p>
         <Pagination
           current={current}
-          total={dataMock?.length}
+          total={data?.count}
           onChange={onChangePage}
           pageSize={row}
           showSizeChanger={false}

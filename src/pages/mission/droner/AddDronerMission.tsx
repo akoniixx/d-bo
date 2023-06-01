@@ -188,8 +188,9 @@ const AddDronerMission = () => {
           expandedRowRender: (record) => {
             return subMissionTextArea(record);
           },
-          expandIcon: ({ expanded, onExpand, record }) =>
-            expanded ? (
+          defaultExpandedRowKeys: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+          expandIcon: ({ expanded, onExpand, record }) => {
+            return expanded ? (
               <UpCircleFilled
                 className="pb-2"
                 style={{ fontSize: "20px", color: "#A9CB62" }}
@@ -201,7 +202,8 @@ const AddDronerMission = () => {
                 style={{ fontSize: "20px", color: "#A9CB62" }}
                 onClick={(e) => onExpand(record, e)}
               />
-            ),
+            );
+          },
         }}
       />
     </>
