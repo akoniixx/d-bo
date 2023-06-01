@@ -26,13 +26,54 @@ import ActionButton from "../../../components/button/ActionButton";
 import { BackIconButton } from "../../../components/button/BackButton";
 import { CardContainer } from "../../../components/card/CardContainer";
 import { CardHeader } from "../../../components/header/CardHearder";
+import { CampaignDatasource } from "../../../datasource/CampaignDatasource";
+import {
+  CampaignConditionEntity,
+  CampaignEntiry,
+} from "../../../entities/CampaignPointEntites";
 import { color } from "../../../resource";
+const _ = require("lodash");
 
-const AddDronerMission = () => {
+const EditDronerMission = () => {
+  let queryString = _.split(window.location.pathname, "=");
   const navigate = useNavigate();
   const dateFormat = "DD/MM/YYYY";
   const [form] = Form.useForm();
   const [formSub] = Form.useForm();
+  const [data, setData] = useState<CampaignEntiry>();
+  const [dataSubMission, setDataSubMission] =
+    useState<CampaignConditionEntity[]>();
+
+  const fetchMissionById = () => {
+    CampaignDatasource.getCampaignById(queryString[1]).then((res) => {
+      const mapKey = res.condition.map((x: any, i: any) => ({
+        ...x,
+        key: i + 1,
+      }));
+      setDataSubMission(mapKey);
+      setData({ ...res, condition: mapKey });
+      form.setFieldsValue({
+        missionName: res.campaignName,
+        status: res.status,
+        startDate: !res.startDate
+          ? moment(new Date().toUTCString())
+          : moment(new Date(res.startDate).toUTCString()),
+        endDate: !res.endDate
+          ? moment(new Date().toUTCString())
+          : moment(new Date(res.startDate).toUTCString()),
+        startTime: !res.startDate
+          ? moment(new Date().getTime())
+          : moment(new Date(res.startDate).getTime()),
+        endTime: !res.endDate
+          ? moment(new Date().getTime())
+          : moment(new Date(res.endDate).getTime()),
+      });
+    });
+  };
+
+  useEffect(() => {
+    fetchMissionById();
+  }, []);
 
   const columns = [
     {
@@ -162,6 +203,7 @@ const AddDronerMission = () => {
               color: color.Success,
               backgroundColor: "rgba(33, 150, 83, 0.1)",
             }}
+            //onClick={() => addRow()}
           >
             + เพิ่มภารกิจย่อย
           </Button>
@@ -169,7 +211,7 @@ const AddDronerMission = () => {
       </Row>
       <Table
         columns={columns}
-        //dataSource={dataSubMission}
+        dataSource={dataSubMission}
         pagination={false}
         expandable={{
           expandedRowRender: (record) => subMissionTextArea(record),
@@ -199,7 +241,7 @@ const AddDronerMission = () => {
       <Row>
         <BackIconButton onClick={() => navigate(-1)} />
         <span className="pt-3">
-          <strong style={{ fontSize: "20px" }}>เพิ่มภารกิจ</strong>
+          <strong style={{ fontSize: "20px" }}>แก้ไขภารกิจ</strong>
         </span>
       </Row>
       <CardContainer>
@@ -310,4 +352,4 @@ const AddDronerMission = () => {
   );
 };
 
-export default AddDronerMission;
+export default EditDronerMission;

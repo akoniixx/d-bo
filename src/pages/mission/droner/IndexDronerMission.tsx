@@ -15,6 +15,7 @@ import {
   Select,
   Table,
 } from "antd";
+import moment from "moment";
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import ActionButton from "../../../components/button/ActionButton";
@@ -28,6 +29,7 @@ import { CampaignListEntity } from "../../../entities/CampaignPointEntites";
 import { color } from "../../../resource";
 import { DateTimeUtil } from "../../../utilities/DateTimeUtil";
 const { RangePicker } = DatePicker;
+const dateSearchFormat = "YYYY-MM-DD";
 
 const IndexDronerMission = () => {
   const navigate = useNavigate();
@@ -35,22 +37,48 @@ const IndexDronerMission = () => {
   const row = 5;
   const [current, setCurrent] = useState(1);
   const [data, setData] = useState<CampaignListEntity>();
+  const [searchKeyword, setSearchKeyword] = useState("");
+  const [searchStartDate, setSearchStartDate] = useState<any>(null);
+  const [searchEndDate, setSearchEndDate] = useState<any>(null);
+  const [searchStatus, setSearchStatus] = useState("");
 
   const fetchMission = () => {
-    CampaignDatasource.getCampaignList("MISSION_REWARD", row, current).then(
-      (res) => {
-        console.log(res);
-        setData(res);
-      }
-    );
+    CampaignDatasource.getCampaignList(
+      "MISSION_REWARD",
+      row,
+      current,
+      searchStartDate,
+      searchEndDate,
+      searchStatus,
+      searchKeyword
+    ).then((res) => {
+      console.log(res);
+      setData(res);
+    });
   };
 
   useEffect(() => {
     fetchMission();
-  }, [current]);
+  }, [current, searchStartDate, searchEndDate]);
 
   const onChangePage = (page: number) => {
     setCurrent(page);
+  };
+
+  const onSearch = () => {
+    setCurrent(1);
+    fetchMission();
+  };
+
+  const handleSearchDate = (e: any) => {
+    if (e != null) {
+      setSearchStartDate(moment(new Date(e[0])).format(dateSearchFormat));
+      setSearchEndDate(moment(new Date(e[1])).format(dateSearchFormat));
+    } else {
+      setSearchStartDate(e);
+      setSearchEndDate(e);
+    }
+    setCurrent(1);
   };
 
   const pageTitle = (
@@ -73,7 +101,7 @@ const IndexDronerMission = () => {
             allowClear
             format={dateFormat}
             placeholder={["เลือกวันที่เริ่ม", "เลือกวันที่สิ้นสุด"]}
-            //onCalendarChange={(val) => handleSearchDate(val)}
+            onCalendarChange={(val) => handleSearchDate(val)}
           />
         </Col>
         <Col span={2}>
@@ -100,7 +128,7 @@ const IndexDronerMission = () => {
             prefix={<SearchOutlined style={{ color: color.Disable }} />}
             placeholder="ค้นหาชื่อภารกิจ / Mission No."
             className="col-lg-12 p-1"
-            //onChange={(e) => setSearchKeyword(e.target.value)}
+            onChange={(e) => setSearchKeyword(e.target.value)}
           />
         </div>
         <div className="col-lg">
@@ -108,7 +136,7 @@ const IndexDronerMission = () => {
             className="col-lg-12 p-1"
             placeholder="สถานะทั้งหมด"
             allowClear
-            //onChange={(e) => setSearchStatus(e)}
+            onChange={(e) => setSearchStatus(e)}
           >
             <option value="ACTIVE">ใช้งาน</option>
             <option value="DRAFTING">รอเปิดการใช้งาน</option>
@@ -123,7 +151,7 @@ const IndexDronerMission = () => {
               color: color.secondary2,
               backgroundColor: color.Success,
             }}
-            //onClick={onSearch}
+            onClick={onSearch}
           >
             ค้นหาข้อมูล
           </Button>
@@ -185,7 +213,7 @@ const IndexDronerMission = () => {
             <>
               <span
                 style={{
-                  color: STATUS_COUPON[row.status],
+                  color: STATUS_COLOR_MAPPING[row.status],
                 }}
               >
                 <Badge color={STATUS_COLOR_MAPPING[row.status]} />{" "}
@@ -216,7 +244,7 @@ const IndexDronerMission = () => {
                 <ActionButton
                   icon={<EditOutlined />}
                   color={color.primary1}
-                  //onClick={() => navigate("/DetailFarmerRedeem/id=" + row.id)}
+                  onClick={() => navigate("/EditDronerMission/id=" + row.id)}
                 />
               </div>
               <div className="col-lg-4">
