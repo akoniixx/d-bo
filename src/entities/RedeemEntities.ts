@@ -1,3 +1,5 @@
+import { string } from "yup";
+
 export interface RedeemFarmerEntity {
   id: string;
   taskNo: string;
@@ -74,3 +76,137 @@ export interface DetailRedeemFermerEntity {
     };
   };
 }
+
+export interface RedeemDronerEntity {
+  id: string;
+  dronerId: string;
+  campaignName: string;
+  campaignId: string;
+  allValue: number;
+  amountValue: number;
+  beforeValue: number;
+  balance: number;
+  beforeRai: number;
+  afterRai: number;
+  rewardId: string;
+  rewardName: string;
+  rewardQuantity: number;
+  createAt: string;
+  updateAt: string;
+  campaign: string;
+  reward: {
+    id: string;
+    rewardName: string;
+    imagePath: string;
+    rewardType: string;
+    rewardNo: string;
+    score: number;
+    amount: number;
+    used: number;
+    remain: number;
+    rewardExchange: string;
+  };
+  redeemDetail: {
+    redeemStatus: string;
+    rewardType: string;
+  };
+  mission: string;
+  dronerDetail: {
+    dronerId: string;
+    firstname: string;
+    lastname: string;
+    telephoneNo: string;
+  };
+  receiverDetail: {
+    firstname: string;
+    lastname: string;
+    tel: string;
+    address: string;
+  };
+}
+export interface RedeemDronerListEntity {
+  count: number;
+  data: RedeemDronerEntity[];
+}
+
+export interface DetailRedeemDronerEntity {
+  id: string;
+  redeemNo: string;
+  dronerId: string;
+  campaignId: string;
+  campaignName: string;
+  allValue: number;
+  amountValue: number;
+  beforeValue: number;
+  balance: number;
+  beforeRai: number;
+  afterRai: number;
+  raiAmount: number;
+  rewardId: string;
+  rewardName: string;
+  rewardQuantity: number;
+  rewardCode: string;
+  receiverDetail: {
+    firstname: string;
+    lastname: string;
+    tel: string;
+    address: string;
+  };
+  createAt: string;
+  updateAt: string;
+  redeemDetail: {
+    redeemStatus: string;
+    rewardType: string;
+    remark: string;
+    deliveryCompany: string;
+    trackingNo: string;
+  };
+  dronerRedeemHistories: {
+    id: string;
+    remark: string;
+    status: string;
+    trackingNo: string;
+    beforeStatus: string;
+    createAt: string;
+    deliveryCompany: string;
+    dronerTransactionId: string;
+  }[];
+  campaign: string;
+  reward: {
+    id: string;
+    rewardName: string;
+    imagePath: string;
+    rewardType: string;
+    rewardExchange: string;
+    rewardQuantity: number;
+    rewardNo: string;
+    score: number;
+    amount: number;
+    used: number;
+    remain: number;
+  };
+  mission: string;
+  dronerDetail: {
+    dronerId: string;
+    firstname: string;
+    lastname: string;
+    telephoneNo: string;
+  };
+}
+
+export interface UpdateRedeemDronerEntity {
+  dronerTransactionId: string | null | "" | undefined;
+  status: string;
+  updateBy: string;
+  deliveryCompany: string;
+  trackingNo: string;
+  remark: string;
+}
+export const UpdateRedeemDronerEntity_INIT: UpdateRedeemDronerEntity = {
+  dronerTransactionId: "",
+  status: "",
+  updateBy: "",
+  deliveryCompany: "",
+  trackingNo: "",
+  remark: "",
+};
