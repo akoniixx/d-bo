@@ -1,4 +1,6 @@
 ## [Version - 0]
+## Feature [v0.32.0] 2023-06-01
+- added droner & farmer summary point
 ## Feature [v0.31.0] 2023-05-31
 - added master reward menu
 ## Fix [v0.30.1] 2023-05-31
