@@ -259,13 +259,16 @@ const DetailDronerRedeem = () => {
             ของรางวัล
           </b>
           <Row>
-            <Col span={4}>
+            <Col span={2}>
+              <img src={data?.reward.imagePath} width={60} height={60}/>
+            </Col>
+            <Col span={3}>
               <div>รหัสของรางวัล</div>
               <div style={{ color: "#2B2B2B" }}>
-                <u>{data?.reward.rewardNo}</u>
+                <div>{data?.reward.rewardNo}</div>
               </div>
             </Col>
-            <Col span={7}>
+            <Col span={6}>
               <div>ชื่อของรางวัล</div>
               <div>{data?.rewardName}</div>
             </Col>

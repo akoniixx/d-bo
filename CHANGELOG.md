@@ -1,4 +1,6 @@
 ## [Version - 0]
+## improve [v0.32.1] 2023-06-01
+- enhance droner dereem reward 
 ## Feature [v0.32.0] 2023-06-01
 - added droner & farmer summary point
 ## Feature [v0.31.0] 2023-05-31
