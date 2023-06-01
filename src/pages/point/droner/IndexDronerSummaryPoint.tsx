@@ -65,11 +65,11 @@ const IndexDronerSummaryPoint = () => {
         return {
           children: (
             <>
-              <Image
-                src={icon.coin}
+              <img
+                src={icon.coinDroner}
                 style={{
-                  width: "26px",
-                  height: "26px",
+                  width: "24px",
+                  height: "24px",
                   alignContent: "center",
                 }}
               />{" "}
@@ -93,7 +93,7 @@ const IndexDronerSummaryPoint = () => {
                   icon={<FileTextOutlined />}
                   color={color.primary1}
                   onClick={() =>
-                    navigate("/DetailDronerHistorySum/id=" + (index + 1))
+                    navigate("/DetailDronerHistorySum/id=" + row.dronerId)
                   }
                 />
               </div>

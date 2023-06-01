@@ -111,3 +111,26 @@ export interface DronerSummaryPointListEntity {
   count: number;
   data: DronerSummaryPointEntity[];
 }
+
+export interface DetailSummaryEntity {
+  histoPointQuotaId: string;
+  taskNo: string;
+  pointNo: string;
+  redeemNo: string;
+  action: string;
+  farmerTransactionsId: string;
+  amountValue: number;
+  updateAt: string;
+}
+
+export interface DetailSummaryListEntity {
+  count: number;
+  data: DetailSummaryEntity[];
+  summary: {
+    allPoint: number;
+    balance: number;
+    pointAllUsed: number;
+  };
+  farmerName?: string;
+  dronerName?: string;
+}

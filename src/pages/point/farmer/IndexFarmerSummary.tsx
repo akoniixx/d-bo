@@ -5,9 +5,7 @@ import ActionButton from "../../../components/button/ActionButton";
 import { CardContainer } from "../../../components/card/CardContainer";
 import { color, icon } from "../../../resource";
 import { useNavigate } from "react-router-dom";
-import {
-  FarmerSummaryPointListEntity,
-} from "../../../entities/PointReceiveEntities";
+import { FarmerSummaryPointListEntity } from "../../../entities/PointReceiveEntities";
 import { PointReceiveDatasource } from "../../../datasource/PointReceiveDatasource";
 import { numberWithCommas } from "../../../utilities/TextFormatter";
 
@@ -103,8 +101,8 @@ function IndexFarmerSummary() {
         return {
           children: (
             <>
-              <Image
-                src={icon.coin}
+              <img
+                src={icon.coinFarmer}
                 style={{
                   width: "26px",
                   height: "26px",
@@ -130,7 +128,9 @@ function IndexFarmerSummary() {
                 <ActionButton
                   icon={<FileTextOutlined />}
                   color={color.primary1}
-                  onClick={() => navigate("/IndexFarmerHistorySum")}
+                  onClick={() =>
+                    navigate("/IndexFarmerHistorySum/id=" + row.farmerId)
+                  }
                 />
               </div>
             </div>
