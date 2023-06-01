@@ -45,8 +45,8 @@ const NewTable = styled(Table)`
 
 const DetailDronerRedeem = () => {
   const profile = JSON.parse(localStorage.getItem("profile") || "{  }");
-  const [from] = useForm();
-  const [fromRemark] = useForm();
+  const [form] = useForm();
+  const [formRemark] = useForm();
   let queryString = _.split(window.location.pathname, "=");
   const navigate = useNavigate();
   const [statusShip, setStatusShip] = useState("");
@@ -71,11 +71,11 @@ const DetailDronerRedeem = () => {
     RedeemDatasource.getRedeemDronerById(queryString[1]).then((res) => {
       setStatusShip(res.redeemDetail.redeemStatus);
       onCheckStatus(res.redeemDetail.redeemStatus);
-      from.setFieldsValue({
+      form.setFieldsValue({
         shipCompany: res.redeemDetail.deliveryCompany,
         trackingId: res.redeemDetail.trackingNo,
       });
-      fromRemark.setFieldsValue({
+      formRemark.setFieldsValue({
         remark: res.redeemDetail.remark,
       });
       setData(res);
@@ -203,14 +203,18 @@ const DetailDronerRedeem = () => {
 
   const onChangeStatusShip = (e: any) => {
     setStatusShip(e.target.value);
-    onCheckStatus(e.target.value);
+    form.setFieldsValue({
+      shipCompany: null,
+      trackingId: null,
+    });
   };
 
-  const submit = () => {
+  const submit = async () => {
+    await form.validateFields();
     const update = { ...dataUpdate };
-    const getFrom = from.getFieldsValue();
+    const getFrom = form.getFieldsValue();
     update.dronerTransactionId = data?.id;
-    update.remark = fromRemark.getFieldsValue().remark;
+    update.remark = formRemark.getFieldsValue().remark;
     update.status = statusShip;
     update.deliveryCompany = getFrom.shipCompany;
     update.trackingNo = getFrom.trackingId;
@@ -345,7 +349,7 @@ const DetailDronerRedeem = () => {
               </Radio.Group>
             </Col>
             {statusShip === "DONE" && (
-              <Form form={from}>
+              <Form form={form}>
                 <Row justify={"space-between"} gutter={16}>
                   <Col span={12}>
                     <label>
@@ -396,7 +400,7 @@ const DetailDronerRedeem = () => {
             )}
             {statusShip !== "REQUEST" && (
               <Col>
-                <Form form={fromRemark}>
+                <Form form={formRemark}>
                   <Form.Item name="remark">
                     <TextArea placeholder="กรอกรายละเอียดหรือหมายเหตุ" />
                   </Form.Item>

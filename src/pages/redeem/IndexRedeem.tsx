@@ -71,7 +71,8 @@ const IndexRedeem = () => {
       searchStartDate,
       searchEndDate,
       searchStatus,
-      searchMission
+      searchMission,
+      searchType
     ).then((res) => {
       const mapKey = res.data.map((x, i) => ({
         ...x,
@@ -87,7 +88,7 @@ const IndexRedeem = () => {
     } else {
       fetchRedeemDroner();
     }
-  }, [current, searchStartDate, searchEndDate, source]);
+  }, [current, searchStartDate, searchEndDate, source, searchType]);
 
   const onChangePage = (page: number) => {
     setCurrent(page);
@@ -140,7 +141,10 @@ const IndexRedeem = () => {
                     }
                   : {}
               }
-              onClick={() => setSource("Farmer")}
+              onClick={() => {
+                setCurrent(1);
+                setSource("Farmer");
+              }}
             >
               เกษตรกร
             </Radio.Button>
@@ -156,7 +160,10 @@ const IndexRedeem = () => {
                     }
                   : {}
               }
-              onClick={() => setSource("Droner")}
+              onClick={() => {
+                setCurrent(1);
+                setSource("Droner");
+              }}
             >
               นักบินโดรน
             </Radio.Button>
@@ -481,7 +488,7 @@ const IndexRedeem = () => {
         return {
           children: (
             <u style={{ color: color.Success }}>
-              {row.dronerDetail.firstname + " " + row.dronerDetail.lastname}
+              {row.receiverDetail.firstname + " " + row.receiverDetail.lastname}
             </u>
           ),
         };
@@ -491,7 +498,7 @@ const IndexRedeem = () => {
       title: "เบอร์โทร",
       render: (value: any, row: any, index: number) => {
         return {
-          children: <span>{row.dronerDetail.telephoneNo}</span>,
+          children: <span>{row.receiverDetail.tel}</span>,
         };
       },
     },

@@ -117,6 +117,12 @@ export interface RedeemDronerEntity {
     lastname: string;
     telephoneNo: string;
   };
+  receiverDetail: {
+    firstname: string;
+    lastname: string;
+    tel: string;
+    address: string;
+  };
 }
 export interface RedeemDronerListEntity {
   count: number;
