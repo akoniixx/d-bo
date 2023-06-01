@@ -19,7 +19,6 @@ export default {
   arrowDown: require("./media/images/arrowDown.png"),
   arrowGreen: require('./media/images/arraow-green.png'),
   inforedeem : require("./media/images/info-redeem.png"),
-  coin : require("./media/images/coin.png")
-
-
+  coinFarmer : require("./media/images/coin.png"),
+  coinDroner : require("./media/images/coinDroner.png")
 };

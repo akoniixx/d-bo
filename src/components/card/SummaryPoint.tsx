@@ -1,23 +1,23 @@
 import { SearchOutlined } from "@ant-design/icons";
-import { Button, Col, Image, Input, Modal, Row, Select, Table } from "antd";
+import { Image } from "antd";
 import React, { useEffect, useState } from "react";
-import { LocationPriceDatasource } from "../../datasource/LocationPriceDatasource";
-import { AllLocatePriceEntity } from "../../entities/LocationPrice";
 import { color } from "../../resource";
 import { CardContainer } from "./CardContainer";
-import icon from "../../resource/icon";
+import { numberWithCommas } from "./../../utilities/TextFormatter";
 
 interface SummaryProps {
   title: string;
   bgColor: string;
   label: string;
-  point: string;
+  point: number;
+  icon?: string;
 }
 const SummaryPoint: React.FC<SummaryProps> = ({
   title,
   bgColor,
   label,
   point,
+  icon,
 }) => {
   return (
     <>
@@ -45,8 +45,8 @@ const SummaryPoint: React.FC<SummaryProps> = ({
               <div className="d-flex justify-content-between">
                 <div>
                   <Image
-                  preview={false}
-                    src={icon.coin}
+                    preview={false}
+                    src={icon}
                     style={{ width: "36px", height: "24px", paddingRight: 10 }}
                   />
                 </div>
@@ -54,7 +54,9 @@ const SummaryPoint: React.FC<SummaryProps> = ({
                   <span>{label}</span>
                 </div>
               </div>
-              <div style={{ fontSize: "16px" }}>{`${point} แต้ม`}</div>
+              <div style={{ fontSize: "16px" }}>
+                {numberWithCommas(point) + " แต้ม"}
+              </div>
             </div>
           </CardContainer>
         </div>
