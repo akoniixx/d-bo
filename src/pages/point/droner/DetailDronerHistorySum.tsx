@@ -1,56 +1,72 @@
-import { FileTextOutlined, SearchOutlined } from "@ant-design/icons";
-import {
-  Button,
-  Col,
-  DatePicker,
-  Pagination,
-  Radio,
-  Row,
-  Table,
-} from "antd";
-import React, { useState } from "react";
+import { Button, Col, DatePicker, Pagination, Radio, Row, Table } from "antd";
+import React, { useEffect, useState } from "react";
 import { CardContainer } from "../../../components/card/CardContainer";
 import { color, icon } from "../../../resource";
 import { useNavigate } from "react-router-dom";
 import { BackIconButton } from "../../../components/button/BackButton";
 import { DateTimeUtil } from "../../../utilities/DateTimeUtil";
 import SummaryPoint from "../../../components/card/SummaryPoint";
-
+import { DetailSummaryListEntity } from "../../../entities/PointReceiveEntities";
+import { PointReceiveDatasource } from "../../../datasource/PointReceiveDatasource";
+import { numberWithCommas } from "../../../utilities/TextFormatter";
+import moment from "moment";
 const { RangePicker } = DatePicker;
+const _ = require("lodash");
 
 function IndexDronerHistorySum() {
+  let queryString = _.split(window.location.pathname, "=");
   const navigate = useNavigate();
   const dateFormat = "DD/MM/YYYY";
   const dateSearchFormat = "YYYY-MM-DD";
 
-  const profile = JSON.parse(localStorage.getItem("profile") || "{  }");
   const row = 10;
   const [current, setCurrent] = useState(1);
-  const [type, setType] = useState("receive");
+  const [type, setType] = useState("INCREASE");
+  const [data, setData] = useState<DetailSummaryListEntity>();
+  const [searchStartDate, setSearchStartDate] = useState<any>(null);
+  const [searchEndDate, setSearchEndDate] = useState<any>(null);
+
+  const fetchDronerSumById = () => {
+    PointReceiveDatasource.getDronerSumById(
+      queryString[1],
+      type,
+      row,
+      current,
+      searchStartDate,
+      searchEndDate
+    ).then((res) => {
+      setData(res);
+    });
+  };
+
+  useEffect(() => {
+    fetchDronerSumById();
+  }, [type, current]);
 
   const onChangePage = (page: number) => {
     setCurrent(page);
   };
-  const dataMock = [
-    {
-      dateTime: Date(),
-      pointNum: "P256605170001",
-      totalPoint: 100,
-      status: "รอดำเนินการ",
-    },
-    {
-      dateTime: Date(),
-      pointNum: "P256605170002",
-      totalPoint: 200,
-      status: "รอดำเนินการ",
-    },
-  ];
   const handleType = (e: any) => {
     setType(e.target.value);
   };
+  const handleSearchDate = (e: any) => {
+    if (e != null) {
+      setSearchStartDate(moment(new Date(e[0])).format(dateSearchFormat));
+      setSearchEndDate(moment(new Date(e[1])).format(dateSearchFormat));
+    } else {
+      setSearchStartDate(e);
+      setSearchEndDate(e);
+    }
+    setCurrent(1);
+  };
+  const onSearch = () => {
+    setCurrent(1);
+    fetchDronerSumById();
+  };
+
   const pageTitle = (
     <>
-      <Row className="p-2">
+      <Row justify={"space-between"}>
         <BackIconButton
           onClick={() => {
             navigate(-1);
@@ -64,7 +80,7 @@ function IndexDronerHistorySum() {
               fontWeight: "bold",
             }}
           >
-            <strong>ประวัติแต้ม | นักบินโดรน ท่านหนึ่ง </strong>
+            <strong>ประวัติแต้ม | {data?.dronerName}</strong>
           </span>
         </Col>
         <Col span={4} className="pt-3">
@@ -75,11 +91,11 @@ function IndexDronerHistorySum() {
                 borderBottomLeftRadius: 5,
                 borderTopLeftRadius: 5,
                 backgroundColor:
-                  type === "receive" ? "rgba(33, 150, 83, 0.1)" : color.White,
-                color: type === "receive" ? color.Success : color.BK,
-                borderColor: type === "receive" ? color.Success : color.BK,
+                  type === "INCREASE" ? "rgba(33, 150, 83, 0.1)" : color.White,
+                color: type === "INCREASE" ? color.Success : color.BK,
+                borderColor: type === "INCREASE" ? color.Success : color.BK,
               }}
-              value="receive"
+              value="INCREASE"
             >
               ได้รับแต้ม
             </Radio.Button>
@@ -89,11 +105,11 @@ function IndexDronerHistorySum() {
                 borderBottomRightRadius: 5,
                 borderTopRightRadius: 5,
                 backgroundColor:
-                  type === "redeem" ? "rgba(235, 87, 87, 0.1)" : color.White,
-                color: type === "redeem" ? color.Error : color.BK,
-                borderColor: type === "redeem" ? color.Error : color.BK,
+                  type === "DECREASE" ? "rgba(235, 87, 87, 0.1)" : color.White,
+                color: type === "DECREASE" ? color.Error : color.BK,
+                borderColor: type === "DECREASE" ? color.Error : color.BK,
               }}
-              value="redeem"
+              value="DECREASE"
             >
               แลกแต้ม
             </Radio.Button>
@@ -104,7 +120,7 @@ function IndexDronerHistorySum() {
             allowClear
             format={dateFormat}
             placeholder={["เลือกวันที่เริ่ม", "เลือกวันที่สิ้นสุด"]}
-            style={{ width: "280px" }}
+            onCalendarChange={(val) => handleSearchDate(val)}
           />
         </Col>
         <Col span={2} className="pt-3">
@@ -115,6 +131,7 @@ function IndexDronerHistorySum() {
               color: color.secondary2,
               backgroundColor: color.Success,
             }}
+            onClick={onSearch}
           >
             ค้นหาข้อมูล
           </Button>
@@ -125,28 +142,31 @@ function IndexDronerHistorySum() {
           <SummaryPoint
             title={"แต้มทั้งหมดที่ได้รับ"}
             bgColor={color.Success}
-            point={"20,000"}
+            point={data?.summary.allPoint || 0}
             label={"แต้มที่ได้"}
+            icon={icon.coinDroner}
           />
         </Col>
         <Col span={8}>
           <SummaryPoint
             title={"แต้มใช้ไปแล้ว"}
             bgColor={color.Error}
-            point={"10,000"}
+            point={data?.summary.pointAllUsed || 0}
             label={"แต้มที่ใช้"}
+            icon={icon.coinDroner}
           />
         </Col>
         <Col span={8}>
           <SummaryPoint
             title={"แต้มคงเหลือ"}
             bgColor={color.secondary3}
-            point={"10,000"}
+            point={data?.summary.balance || 0}
             label={"แต้มคงเหลือ"}
+            icon={icon.coinDroner}
           />
         </Col>
       </Row>
-      <br/>
+      <br />
     </>
   );
 
@@ -167,29 +187,31 @@ function IndexDronerHistorySum() {
       },
     },
     {
-      title: "Point No",
-      dataIndex: "pointNum",
-      key: "pointNum",
+      title: type === "INCREASE" ? "Point No" : "Redeem No",
       width: "50%",
       render: (value: any, row: any, index: number) => {
         return {
-          children: <span>{value}</span>,
+          children: (
+            <span>{type === "INCREASE" ? row.pointNo : row.redeemNo}</span>
+          ),
         };
       },
     },
     {
       title: "จำนวนแต้ม",
-      dataIndex: "totalPoint",
-      key: "totalPoint",
+      dataIndex: "amountValue",
+      key: "amountValue",
       width: "20%",
       render: (value: any, row: any, index: number) => {
         return {
           children: (
             <>
-              {type === "redeem" ? (
-                <span style={{ color: color.Error }}>{value + ` แต้ม`}</span>
+              {type !== "INCREASE" ? (
+                <span style={{ color: color.Error }}>
+                  {numberWithCommas(value) + ` แต้ม`}
+                </span>
               ) : (
-                <span>{value + ` แต้ม`}</span>
+                <span>{numberWithCommas(value) + ` แต้ม`}</span>
               )}
             </>
           ),
@@ -203,7 +225,7 @@ function IndexDronerHistorySum() {
       {pageTitle}
       <CardContainer>
         <Table
-          dataSource={dataMock}
+          dataSource={data?.data}
           columns={columns}
           pagination={false}
           size="large"
@@ -211,10 +233,10 @@ function IndexDronerHistorySum() {
         />
       </CardContainer>
       <div className="d-flex justify-content-between pt-3 pb-3">
-        <p>รายการทั้งหมด {dataMock?.length} รายการ</p>
+        <p>รายการทั้งหมด {data?.count} รายการ</p>
         <Pagination
           current={current}
-          total={dataMock.length}
+          total={data?.count}
           onChange={onChangePage}
           pageSize={row}
           showSizeChanger={false}

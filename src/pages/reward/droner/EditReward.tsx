@@ -31,6 +31,10 @@ import { RewardDatasource } from "../../../datasource/RewardDatasource";
 import Swal from "sweetalert2";
 import dayjs from "dayjs";
 import { RewardEntities } from "../../../entities/RewardEntites";
+import {
+  numberWithCommas,
+  validateOnlyNumber,
+} from "../../../utilities/TextFormatter";
 
 const { Map } = require("immutable");
 const _ = require("lodash");
@@ -60,6 +64,7 @@ function EditReward() {
   const [endUsedDate, setEndUsedDate] = useState<any>();
   const [endUsedTime, setEndUsedTime] = useState<any>();
   const [saveBtnDisable, setBtnSaveDisable] = useState<boolean>(false);
+  const [checkStatus, setCheckStatus] = useState();
 
   useEffect(() => {
     RewardDatasource.getAllRewardById(queryString[1]).then((res) => {
@@ -107,6 +112,7 @@ function EditReward() {
       setImgReward(res.imagePath);
       setUsedDate(res.startUsedDate);
       setEndUsedDate(res.expiredUsedDate);
+      setCheckStatus(res.status);
     });
   }, []);
   const onChangeImg = async (file: any) => {
@@ -170,9 +176,7 @@ function EditReward() {
   const handleCondition = (con: string) => {
     setCondition(con);
   };
-  const handleRewardPoint = (point: any) => {
-    setScore(point.target.value);
-  };
+
   let start = new Date(usedDate).getTime();
   let expired = new Date(endUsedDate).getTime();
   let result = (expired - start) / 86400000;
@@ -203,7 +207,6 @@ function EditReward() {
       startUsedDate,
       file,
     } = form.getFieldsValue();
-
     let fieldErr: boolean = true;
     let imgErr: boolean = true;
     let rwTypeErr: boolean = true;
@@ -259,6 +262,14 @@ function EditReward() {
       imgErr = false;
     }
     setBtnSaveDisable(fieldErr || imgErr || rwTypeErr);
+  };
+  const checkNumber = (
+    e: React.ChangeEvent<HTMLInputElement>,
+    name: string
+  ) => {
+    const { value: inputValue } = e.target;
+    const convertedNumber = validateOnlyNumber(inputValue);
+    form.setFieldsValue({ [name]: convertedNumber });
   };
   const renderDataReward = (
     <div className="col-lg-7">
@@ -350,58 +361,75 @@ function EditReward() {
                 <label>
                   ประเภทของรางวัล <span style={{ color: "red" }}>*</span>
                 </label>
-                <Form.Item
-                  name="rewardType"
-                  rules={[
-                    {
-                      required: true,
-                      message: "กรุณาเลือกประเภทของรางวัล!",
-                    },
-                  ]}
-                >
-                  <Select
-                    className="col-lg-12 p-1"
-                    placeholder="เลือกประเภทของรางวัล"
-                    onChange={handleRewardType}
-                    showSearch
-                    value={rewardType}
-                    allowClear
-                    optionFilterProp="children"
-                    filterOption={(input: any, option: any) =>
-                      option.children.includes(input)
-                    }
-                    filterSort={(optionA, optionB) =>
-                      optionA.children
-                        .toLowerCase()
-                        .localeCompare(optionB.children.toLowerCase())
-                    }
+                {checkStatus === "DRAFTING" ? (
+                  <Form.Item
+                    name="rewardType"
+                    rules={[
+                      {
+                        required: true,
+                        message: "กรุณาเลือกประเภทของรางวัล!",
+                      },
+                    ]}
                   >
-                    <Option value={"PHYSICAL"}>Physical</Option>
-                    <Option value={"DIGITAL"}>Digital</Option>
-                  </Select>
-                </Form.Item>
+                    <Select
+                      className="col-lg-12 p-1"
+                      placeholder="เลือกประเภทของรางวัล"
+                      onChange={handleRewardType}
+                      showSearch
+                      value={rewardType}
+                      allowClear
+                      optionFilterProp="children"
+                      filterOption={(input: any, option: any) =>
+                        option.children.includes(input)
+                      }
+                      filterSort={(optionA, optionB) =>
+                        optionA.children
+                          .toLowerCase()
+                          .localeCompare(optionB.children.toLowerCase())
+                      }
+                    >
+                      <Option value={"PHYSICAL"}>Physical</Option>
+                      <Option value={"DIGITAL"}>Digital</Option>
+                    </Select>
+                  </Form.Item>
+                ) : (
+                  <Form.Item name="rewardType">
+                    <span>
+                      {rewardType === "PHYSICAL" ? "Physical" : "Digital"}
+                    </span>
+                  </Form.Item>
+                )}
               </div>
               <div className="form-group col-lg-6">
                 <label>
                   การแลกเปลี่ยน <span style={{ color: "red" }}>*</span>
                 </label>
-                <div className="row">
-                  <div className="col-12">
-                    <Form.Item name="rewardExchange">
-                      <Radio.Group onChange={onChangePoint}>
-                        <Radio value={"SCORE"}>ใช้แต้ม</Radio>
-                        <Radio value={"MISSION"}>ภารกิจ</Radio>
-                      </Radio.Group>
-                    </Form.Item>
+                {checkStatus === "DRAFTING" ? (
+                  <div className="row">
+                    <div className="col-12">
+                      <Form.Item name="rewardExchange">
+                        <Radio.Group onChange={onChangePoint}>
+                          <Radio value={"SCORE"}>ใช้แต้ม</Radio>
+                          <Radio value={"MISSION"}>ภารกิจ</Radio>
+                        </Radio.Group>
+                      </Form.Item>
+                    </div>
                   </div>
-                </div>
+                ) : (
+                  <Form.Item name="rewardExchange">
+                    <p>{rewardExchange === "SCORE" ? "ใช้แต้ม" : "ภารกิจ"}</p>
+                  </Form.Item>
+                )}
               </div>
             </div>
             {rewardExchange === "MISSION" ? (
               <div className="row">
                 <div className="form-group col-lg-6">
                   <label>
-                    จำนวน <span style={{ color: "red" }}>*</span>
+                    จำนวน{" "}
+                    <span style={{ color: "red" }}>
+                      (ต้องไม่น้อยกว่าที่แลกไป)*
+                    </span>
                   </label>
                   <Form.Item
                     name="amount"
@@ -416,6 +444,7 @@ function EditReward() {
                       type="number"
                       placeholder="กรอกจำนวน"
                       autoComplete="off"
+                      onChange={(e) => checkNumber(e, "amount")}
                     />
                   </Form.Item>
                 </div>
@@ -426,27 +455,39 @@ function EditReward() {
                   <label>
                     แต้มที่ต้องใช้แลก <span style={{ color: "red" }}>*</span>
                   </label>
-                  <Form.Item
-                    name="score"
-                    rules={[
-                      {
-                        required: true,
-                        message: "กรุณากรอกแต้มที่ต้องการใช้แลก!",
-                      },
-                    ]}
-                  >
-                    <Input
-                      type="number"
-                      placeholder="กรอกแต้มที่ต้องใช้แลก"
-                      autoComplete="off"
-                      suffix="แต้ม"
-                      onChange={handleRewardPoint}
-                    />
-                  </Form.Item>
+                  {checkStatus === "DRAFTING" ? (
+                    <Form.Item
+                      name="score"
+                      rules={[
+                        {
+                          required: true,
+                          message: "กรุณากรอกแต้มที่ต้องการใช้แลก!",
+                        },
+                      ]}
+                    >
+                      <Input
+                        type="number"
+                        placeholder="กรอกแต้มที่ต้องใช้แลก"
+                        autoComplete="off"
+                        suffix="แต้ม"
+                        onChange={(e) => {
+                          checkNumber(e, "score");
+                          setScore(e.target.value);
+                        }}
+                      />
+                    </Form.Item>
+                  ) : (
+                    <Form.Item name="score">
+                      <p>{numberWithCommas(score) + " " + "แต้ม"}</p>
+                    </Form.Item>
+                  )}
                 </div>
                 <div className="form-group col-lg-6">
                   <label>
-                    จำนวน <span style={{ color: "red" }}>*</span>
+                    จำนวน{" "}
+                    <span style={{ color: "red" }}>
+                      (ต้องไม่น้อยกว่าที่แลกไป) *
+                    </span>
                   </label>
                   <Form.Item
                     name="amount"
@@ -461,6 +502,7 @@ function EditReward() {
                       type="number"
                       placeholder="กรอกจำนวน"
                       autoComplete="off"
+                      onChange={(e) => checkNumber(e, "amount")}
                     />
                   </Form.Item>
                 </div>

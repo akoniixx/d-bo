@@ -1,48 +1,40 @@
 import { FileTextOutlined, SearchOutlined } from "@ant-design/icons";
-import {
-  Button,
-  Col,
-  DatePicker,
-  Image,
-  Input,
-  Pagination,
-  Row,
-  Table,
-} from "antd";
-import React, { useState } from "react";
+import { Button, Col, Image, Input, Pagination, Row, Table } from "antd";
+import React, { useEffect, useState } from "react";
 import ActionButton from "../../../components/button/ActionButton";
 import { CardContainer } from "../../../components/card/CardContainer";
 import { color, icon } from "../../../resource";
 import { useNavigate } from "react-router-dom";
-
-const { RangePicker } = DatePicker;
+import { FarmerSummaryPointListEntity } from "../../../entities/PointReceiveEntities";
+import { PointReceiveDatasource } from "../../../datasource/PointReceiveDatasource";
+import { numberWithCommas } from "../../../utilities/TextFormatter";
 
 function IndexFarmerSummary() {
   const navigate = useNavigate();
-  const dateFormat = "DD/MM/YYYY";
-  const dateSearchFormat = "YYYY-MM-DD";
-
-  const profile = JSON.parse(localStorage.getItem("profile") || "{  }");
   const row = 10;
   const [current, setCurrent] = useState(1);
+  const [data, setData] = useState<FarmerSummaryPointListEntity>();
+  const [searchKeyword, setSearchKeyword] = useState("");
+
+  const fetchFarmerSum = () => {
+    PointReceiveDatasource.getFarmerSumPoint(row, current, searchKeyword).then(
+      (res) => {
+        setData(res);
+      }
+    );
+  };
+
+  useEffect(() => {
+    fetchFarmerSum();
+  }, [current]);
 
   const onChangePage = (page: number) => {
     setCurrent(page);
   };
-  const dataMock = [
-    {
-      farmerName: "เกษตรกร ท่านหนึ่ง",
-      phone: "0980006666",
-      totalPoint: 100,
-      status: "รอดำเนินการ",
-    },
-    {
-      farmerName: "เกษตรกร ท่านสอง",
-      phone: "0920007777",
-      totalPoint: 200,
-      status: "รอดำเนินการ",
-    },
-  ];
+  const onSearch = () => {
+    setCurrent(1);
+    fetchFarmerSum();
+  };
 
   const pageTitle = (
     <Row gutter={8} className="p-3">
@@ -61,6 +53,7 @@ function IndexFarmerSummary() {
           allowClear
           prefix={<SearchOutlined style={{ color: color.Disable }} />}
           placeholder="ค้นหาชื่อเกษตรกร/เบอร์โทร"
+          onChange={(e) => setSearchKeyword(e.target.value)}
         />
       </Col>
       <Col span={2}>
@@ -71,6 +64,7 @@ function IndexFarmerSummary() {
             color: color.secondary2,
             backgroundColor: color.Success,
           }}
+          onClick={onSearch}
         >
           ค้นหาข้อมูล
         </Button>
@@ -81,47 +75,41 @@ function IndexFarmerSummary() {
   const columns = [
     {
       title: "ชื่อเกษตรกร",
-      dataIndex: "farmerName",
-      key: "farmerName",
       width: "30%",
       render: (value: any, row: any, index: number) => {
         return {
-          children: (
-            <>
-              <span>{value}</span>
-            </>
-          ),
+          children: <span>{row.firstname + " " + row.lastname}</span>,
         };
       },
     },
     {
       title: "เบอร์โทร",
-      dataIndex: "phone",
-      key: "phone",
-      width: "50%",
+      dataIndex: "telephoneNo",
+      key: "telephoneNo",
+      width: "45%",
       render: (value: any, row: any, index: number) => {
         return {
-          children: <span>{value}</span>,
+          children: <span>{row.telephoneNo}</span>,
         };
       },
     },
     {
       title: "แต้มคงเหลือ",
-      dataIndex: "totalPoint",
-      key: "totalPoint",
+      dataIndex: "balance",
+      key: "balance",
       render: (value: any, row: any, index: number) => {
         return {
           children: (
             <>
-              <Image
-                src={icon.coin}
+              <img
+                src={icon.coinFarmer}
                 style={{
                   width: "26px",
                   height: "26px",
                   alignContent: "center",
                 }}
               />{" "}
-              <span>{value + ` แต้ม`}</span>
+              <span>{numberWithCommas(row.balance) + ` แต้ม`}</span>
             </>
           ),
         };
@@ -140,7 +128,9 @@ function IndexFarmerSummary() {
                 <ActionButton
                   icon={<FileTextOutlined />}
                   color={color.primary1}
-                  onClick={() => navigate("/IndexFarmerHistorySum")}
+                  onClick={() =>
+                    navigate("/IndexFarmerHistorySum/id=" + row.farmerId)
+                  }
                 />
               </div>
             </div>
@@ -156,7 +146,7 @@ function IndexFarmerSummary() {
         {pageTitle}
         <CardContainer>
           <Table
-            dataSource={dataMock}
+            dataSource={data?.data}
             columns={columns}
             pagination={false}
             size="large"
@@ -164,10 +154,10 @@ function IndexFarmerSummary() {
           />
         </CardContainer>
         <div className="d-flex justify-content-between pt-4">
-          <p>รายการทั้งหมด {dataMock?.length} รายการ</p>
+          <p>รายการทั้งหมด {data?.count} รายการ</p>
           <Pagination
             current={current}
-            total={dataMock.length}
+            total={data?.count}
             onChange={onChangePage}
             pageSize={row}
             showSizeChanger={false}

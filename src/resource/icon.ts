@@ -24,4 +24,6 @@ export default {
   pointRankInActive: require("./media/images/point-rank-inactive.png"),
   targetActive: require("./media/images/target-active.png"),
   targetInActive: require("./media/images/target-inactive.png"),
+  coinFarmer : require("./media/images/coin.png"),
+  coinDroner : require("./media/images/coinDroner.png")
 };
