@@ -644,6 +644,7 @@ function IndexReward() {
       width: "10%",
       fixed: "right",
       render: (value: any, row: any, index: number) => {
+        const checkDelete = row.status === "INACTIVE" || row.used === 0;
         return {
           children: (
             <div
@@ -673,9 +674,15 @@ function IndexReward() {
               <div>
                 <ActionButton
                   icon={<DeleteOutlined />}
-                  color={row.remain > 0 ? color.Grey : color.Error}
+                  color={
+                    row.status === "DRAFTING" || checkDelete === true
+                      ? color.Error
+                      : color.Grey
+                  }
                   onClick={() => showDelete(row.id)}
-                  actionDisable={row.remain > 0 ? true : false}
+                  actionDisable={
+                    row.status === "DRAFTING" || checkDelete === true ? false : true
+                  }
                 />
               </div>
             </div>

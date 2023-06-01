@@ -1,4 +1,6 @@
 ## [Version - 0]
+## Fix [v0.32.2] 2023-06-01
+- fixed defect master reward menu 
 ## improve [v0.32.1] 2023-06-01
 - enhance droner dereem reward 
 ## Feature [v0.32.0] 2023-06-01
