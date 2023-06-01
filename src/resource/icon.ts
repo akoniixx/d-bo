@@ -13,13 +13,15 @@ export default {
   adminlogo: require("./media/images/adminlogo.png"),
   iconcopy: require("./media/images/copy.png"),
   icondelete: require("./media/images/delete.png"),
-  injection : require("./media/images/injectionicon.png"),
-  drug : require("./media/images/drugicon.png"),
+  injection: require("./media/images/injectionicon.png"),
+  drug: require("./media/images/drugicon.png"),
   arrowUp: require("./media/images/arrowUp.png"),
   arrowDown: require("./media/images/arrowDown.png"),
-  arrowGreen: require('./media/images/arraow-green.png'),
-  inforedeem : require("./media/images/info-redeem.png"),
-  coin : require("./media/images/coin.png")
-
-
+  arrowGreen: require("./media/images/arraow-green.png"),
+  inforedeem: require("./media/images/info-redeem.png"),
+  coin: require("./media/images/coin.png"),
+  pointRankActive: require("./media/images/point-rank-active.png"),
+  pointRankInActive: require("./media/images/point-rank-inactive.png"),
+  targetActive: require("./media/images/target-active.png"),
+  targetInActive: require("./media/images/target-inactive.png"),
 };

@@ -67,6 +67,7 @@ import IndexDronerSummaryPoint from "./pages/point/droner/IndexDronerSummaryPoin
 import IndexFarmerSummary from "./pages/point/farmer/IndexFarmerSummary";
 import IndexFarmerHistorySum from "./pages/point/farmer/IndexFarmerHistorySum";
 import DetailDronerHistorySum from "./pages/point/droner/DetailDronerHistorySum";
+import MissionReport from "./pages/mission/MissionReport";
 
 const WebRoutes: React.FC<any> = () => {
   return (
@@ -172,6 +173,8 @@ const WebRoutes: React.FC<any> = () => {
             path="/DetailDronerHistorySum/:id"
             element={<DetailDronerHistorySum />}
           />
+          <Route path="/MissionReport" element={<MissionReport/>} />
+
         </Route>
 
         <Route element={<PublicRoute />}>

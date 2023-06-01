@@ -7,7 +7,9 @@ import {
   StarFilled,
   UserOutlined,
 } from "@ant-design/icons";
+import { Image } from "antd";
 import React from "react";
+import { color, icon } from "../../resource";
 
 export const IconMenu = {
   task: (
@@ -43,11 +45,10 @@ export const IconMenu = {
     />
   ),
   campaign: (
-    <StarFilled
-      style={{
-        fontSize: "16px",
-        color: "#231F20",
-      }}
+    <Image
+      src={icon.pointRankInActive}
+      preview={false}
+      style={{ width: 18, height: 22, color: color.BK, paddingBottom: 4 }}
     />
   ),
   admin: (
@@ -64,6 +65,13 @@ export const IconMenu = {
         fontSize: "16px",
         color: "#231F20",
       }}
+    />
+  ),
+  missionQuota: (
+    <Image
+      src={icon.targetInActive}
+      preview={false}
+      style={{ width: 18, height: 18, color: color.BK }}
     />
   ),
 };
@@ -101,11 +109,10 @@ export const IconMenuInActive = {
     />
   ),
   campaign: (
-    <StarFilled
-      style={{
-        fontSize: "16px",
-        color: "#FFCA37",
-      }}
+    <Image
+      src={icon.pointRankActive}
+      preview={false}
+      style={{ width: 18, height: 22, color: color.BK, paddingBottom: 4 }}
     />
   ),
   admin: (
@@ -122,6 +129,13 @@ export const IconMenuInActive = {
         fontSize: "16px",
         color: "#FFCA37",
       }}
+    />
+  ),
+  missionQuota: (
+    <Image
+      src={icon.targetActive}
+      preview={false}
+      style={{ width: 18, height: 18 }}
     />
   ),
 };
