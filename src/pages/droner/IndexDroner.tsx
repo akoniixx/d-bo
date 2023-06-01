@@ -1,4 +1,4 @@
-import { Avatar, Badge, Pagination, Select, Table } from "antd";
+import { Avatar, Badge, Pagination, Row, Select, Table } from "antd";
 import React, { useEffect, useState } from "react";
 import { Option } from "antd/lib/mentions";
 import color from "../../resource/color";
@@ -780,24 +780,20 @@ function IndexDroner() {
       render: (value: any, row: any, index: number) => {
         return {
           children: (
-            <div className="d-flex flex-row justify-content-between">
-              {/* <ActionButton
+            <Row justify={"space-between"}>
+              <ActionButton
                 icon={<FolderViewOutlined />}
                 color={color.primary1}
-                onClick={() =>
-                  (window.location.href =
-                    "/IndexDetailDronerPoint/id=" + row.id)
-                }
-              /> */}
+                onClick={() => navigate("/DetailDronerHistorySum/id=" + row.id)}
+              />
               <ActionButton
                 icon={<EditOutlined />}
                 color={color.primary1}
                 onClick={() => {
-                    navigate("/EditDroner?=" + row.id);
-                  }
-                }
+                  navigate("/EditDroner?=" + row.id);
+                }}
               />
-            </div>
+            </Row>
           ),
         };
       },
