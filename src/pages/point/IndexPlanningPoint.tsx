@@ -17,6 +17,7 @@ import { PointReceiveDatasource } from "../../datasource/PointReceiveDatasource"
 import { PlanningPointListEntity } from "../../entities/PointReceiveEntities";
 import { color } from "../../resource";
 import { DateTimeUtil } from "../../utilities/DateTimeUtil";
+import { numberWithCommas } from "../../utilities/TextFormatter";
 const { RangePicker } = DatePicker;
 const dateSearchFormat = "YYYY-MM-DD";
 
@@ -168,7 +169,9 @@ const IndexPlanningPoint = () => {
                 </Col>
                 <Col span={5}>
                   <label>แต้ม :</label>{" "}
-                  <span>+ {checkFarmer[0].receive_point}</span>
+                  <span>
+                    + {numberWithCommas(checkFarmer[0].receive_point)}
+                  </span>
                   <Tooltip
                     placement="top"
                     title={
@@ -220,7 +223,9 @@ const IndexPlanningPoint = () => {
                 </Col>
                 <Col span={5}>
                   <label>แต้ม :</label>{" "}
-                  <span>+ {checkDroner[0].receive_point}</span>
+                  <span>
+                    + {numberWithCommas(checkDroner[0].receive_point)}
+                  </span>
                   <Tooltip
                     placement="top"
                     title={

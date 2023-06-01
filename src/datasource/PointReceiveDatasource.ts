@@ -1,5 +1,8 @@
 import { BASE_URL, httpClient } from "../config/develop-config";
 import {
+  DetailSummaryListEntity,
+  DronerSummaryPointListEntity,
+  FarmerSummaryPointListEntity,
   PlanningPointListEntity,
   ReceivePointListEntity,
 } from "../entities/PointReceiveEntities";
@@ -62,6 +65,115 @@ export class PointReceiveDatasource {
       })
       .catch((err) => {
         console.log(err, "err get receive point");
+      });
+  }
+
+  static getFarmerSumPoint(
+    take?: number,
+    page?: number,
+    search?: string,
+    endDate?: string
+  ): Promise<FarmerSummaryPointListEntity> {
+    const params = {
+      take: take,
+      page: page,
+      search: search,
+    };
+    return httpClient
+      .get(
+        BASE_URL + "/promotion/historypoint-quota/getIndividualPointFarmer",
+        {
+          params,
+        }
+      )
+      .then((response) => {
+        return response.data;
+      })
+      .catch((err) => {
+        console.log(err, "err getnewtask");
+      });
+  }
+  static getFarmerSumById(
+    id: string,
+    action: string,
+    take: number,
+    page: number,
+    startDate?: string,
+    endDate?: string
+  ): Promise<DetailSummaryListEntity> {
+    const params = {
+      action: action,
+      take: take,
+      page: page,
+      startDate: startDate,
+      endDate: endDate,
+    };
+    return httpClient
+      .get(
+        BASE_URL +
+          `/promotion/historypoint-quota/getIndividualPointDetailFarmer/${id}`,
+        { params }
+      )
+      .then((response) => {
+        return response.data;
+      })
+      .catch((err) => {
+        console.log(err, "err get farmer sum");
+      });
+  }
+
+  static getDronerSumPoint(
+    take?: number,
+    page?: number,
+    search?: string,
+    endDate?: string
+  ): Promise<DronerSummaryPointListEntity> {
+    const params = {
+      take: take,
+      page: page,
+      search: search,
+    };
+    return httpClient
+      .get(
+        BASE_URL + "/promotion/historypoint-quota/getIndividualPointDroner",
+        {
+          params,
+        }
+      )
+      .then((response) => {
+        return response.data;
+      })
+      .catch((err) => {
+        console.log(err, "err getnewtask");
+      });
+  }
+
+  static getDronerSumById(
+    id: string,
+    action: string,
+    take: number,
+    page: number,
+    startDate?: string,
+    endDate?: string
+  ): Promise<DetailSummaryListEntity> {
+    const params = {
+      action: action,
+      take: take,
+      page: page,
+      startDate: startDate,
+      endDate: endDate,
+    };
+    return httpClient
+      .get(
+        BASE_URL +
+          `/promotion/historypoint-quota/getIndividualPointDetailDroner/${id}`,
+        { params }
+      )
+      .then((response) => {
+        return response.data;
+      })
+      .catch((err) => {
+        console.log(err, "err get droner sum");
       });
   }
 }
