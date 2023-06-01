@@ -148,7 +148,7 @@ function EditDroner() {
           district: res.address.districtId || undefined,
           subdistrict: res.address?.subdistrictId || undefined,
           dronerCreatedAt: `${moment(res.createdAt).format("DD/MM/YYYY")} ${
-            data.createBy === null || data.createBy === undefined
+            res.createBy === null || res.createBy === undefined
               ? "(ลงทะเบียนโดยนักบิน)"
               : `(${res.createBy})`
           }`,
