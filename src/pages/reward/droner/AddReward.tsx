@@ -30,6 +30,7 @@ import moment from "moment";
 import { RewardDatasource } from "../../../datasource/RewardDatasource";
 import Swal from "sweetalert2";
 import dayjs from "dayjs";
+import { validateOnlyNumber } from "../../../utilities/TextFormatter";
 
 const { Map } = require("immutable");
 
@@ -106,7 +107,8 @@ function AddReward() {
   const onRemoveImg = () => {
     setImgReward(undefined);
     setCreateImgReward(UploadImageEntity_INTI);
-    form.setFieldValue("img", null);
+    form.setFieldValue("file", null);
+    onFieldsChange();
   };
   const handleRewardType = (type: string) => {
     setRewardType(type);
@@ -119,9 +121,6 @@ function AddReward() {
   };
   const handleCondition = (con: string) => {
     setCondition(con);
-  };
-  const handleRewardCount = (count: any) => {
-    setAmount(count.target.value);
   };
 
   const handleRewardPoint = (point: any) => {
@@ -169,7 +168,7 @@ function AddReward() {
 
     if (
       rewardName &&
-      amount >= 0 &&
+      amount > 0 &&
       description != "<p><br></p>" &&
       condition != "<p><br></p>" &&
       status
@@ -219,6 +218,14 @@ function AddReward() {
       imgErr = false;
     }
     setBtnSaveDisable(fieldErr || imgErr || rwTypeErr);
+  };
+  const checkNumber = (
+    e: React.ChangeEvent<HTMLInputElement>,
+    name: string
+  ) => {
+    const { value: inputValue } = e.target;
+    const convertedNumber = validateOnlyNumber(inputValue);
+    form.setFieldsValue({ [name]: convertedNumber });
   };
   const renderDataReward = (
     <div className="col-lg-7">
@@ -376,7 +383,10 @@ function AddReward() {
                       type="number"
                       placeholder="กรอกจำนวน"
                       autoComplete="off"
-                      onChange={handleRewardCount}
+                      onChange={(e) => {
+                        checkNumber(e, "amount");
+                        setAmount(e.target.value);
+                      }}
                     />
                   </Form.Item>
                 </div>
@@ -401,7 +411,10 @@ function AddReward() {
                       placeholder="กรอกแต้มที่ต้องใช้แลก"
                       autoComplete="off"
                       suffix="แต้ม"
-                      onChange={handleRewardPoint}
+                      onChange={(e) => {
+                        checkNumber(e, "score");
+                        setScore(e.target.value);
+                      }}
                     />
                   </Form.Item>
                 </div>
@@ -422,6 +435,7 @@ function AddReward() {
                       type="number"
                       placeholder="กรอกจำนวน"
                       autoComplete="off"
+                      onChange={(e) => checkNumber(e, "amount")}
                     />
                   </Form.Item>
                 </div>
