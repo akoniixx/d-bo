@@ -52,7 +52,6 @@ const IndexDronerMission = () => {
       searchStatus,
       searchKeyword
     ).then((res) => {
-      console.log(res);
       setData(res);
     });
   };
