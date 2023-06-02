@@ -644,7 +644,7 @@ function IndexReward() {
       width: "10%",
       fixed: "right",
       render: (value: any, row: any, index: number) => {
-        const checkDelete = row.status === "INACTIVE" || row.used === 0;
+        const checkDelete = row.status === "INACTIVE" && row.used === 0;
         return {
           children: (
             <div
