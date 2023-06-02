@@ -50,6 +50,7 @@ const IndexRedeem = () => {
   const [searchStatus, setSearchStatus] = useState("");
   const [searchMission, setSearchMission] = useState("");
   const [searchType, setSearchType] = useState("PHYSICAL");
+  const [searchRewardEx, setSearchRewardEx] = useState("");
 
   const fetchRedeemFarmer = () => {
     RedeemDatasource.getRedeemFarmer(
@@ -72,7 +73,8 @@ const IndexRedeem = () => {
       searchEndDate,
       searchStatus,
       searchMission,
-      searchType
+      searchType,
+      searchRewardEx
     ).then((res) => {
       const mapKey = res.data.map((x, i) => ({
         ...x,
@@ -257,11 +259,12 @@ const IndexRedeem = () => {
               className="col-lg-12 p-1"
               placeholder="ประเภทของรางวัล"
               allowClear
+              onChange={(e) => setSearchRewardEx(e)}
             >
-              <option value="ใช้แต้ม">
+              <option value="SCORE">
                 {searchType === "PHYSICAL" ? "Physical" : "Digital"} (ใช้แต้ม)
               </option>
-              <option value="ภารกิจ">
+              <option value="MISSION">
                 {searchType === "PHYSICAL" ? "Physical" : "Digital"} (ภารกิจ)
               </option>
             </Select>
@@ -453,18 +456,15 @@ const IndexRedeem = () => {
     },
     {
       title: "Mission No",
-      dataIndex: "missionNo",
       render: (value: any, row: any, index: number) => {
         return {
           children: (
             <>
-              <span>{row.missionNo}</span>
-              {row.missionNo && (
+              <span>{row.mission ? row.mission.missionNo : "-"}</span>
+              {row.mission && (
                 <Tooltip
                   placement="top"
-                  title={
-                    "ชื่อภารกิจ : สะสมการบินครบ 1,000 ไร่, รับไปเลย 100 แต้ม"
-                  }
+                  title={row.mission.missionName}
                   key={row.key}
                 >
                   <InfoCircleFilled
@@ -610,7 +610,11 @@ const IndexRedeem = () => {
           </Col>
           <Col span={4} className="p-2">
             <div>แต้มที่แลก</div>
-            <div>{numberWithCommas(record.reward.score)} แต้ม</div>
+            <div>
+              {!record.reward.score
+                ? "-"
+                : numberWithCommas(record.reward.score) + " แต้ม"}
+            </div>
           </Col>
           <Col span={3} className="p-2">
             <div>จำนวน</div>
@@ -619,7 +623,9 @@ const IndexRedeem = () => {
           <Col span={3} className="p-2">
             <div>รวมแต้มทั้งหมด</div>
             <div style={{ color: color.Error }}>
-              {numberWithCommas(record.amountValue)} แต้ม
+              {record.amountValue === 0
+                ? "-"
+                : numberWithCommas(record.amountValue) + " แต้ม"}
             </div>
           </Col>
         </Row>

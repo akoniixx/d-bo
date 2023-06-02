@@ -52,7 +52,8 @@ export class RedeemDatasource {
     endDate?: string,
     status?: string,
     missionNo?: string,
-    rewardType?: string
+    rewardType?: string,
+    rewardExchange?: string
   ): Promise<RedeemDronerListEntity> {
     const params = {
       take: take,
@@ -63,6 +64,7 @@ export class RedeemDatasource {
       status: status,
       missionNo: missionNo,
       rewardType: rewardType,
+      rewardExchange: rewardExchange,
     };
     return httpClient
       .get(
