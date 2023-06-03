@@ -61,6 +61,7 @@ const AddDronerMission = () => {
     });
   };
   const mapKey = () => {
+    console.log("k", dataSubMission);
     return dataSubMission.map((x: any, i: any) => ({
       ...x,
       num: i + 1,
@@ -74,13 +75,14 @@ const AddDronerMission = () => {
   }, [count]);
 
   const addRow = () => {
+    console.log(formSub.getFieldsValue());
+    console.log(formTable.getFieldsValue());
     setCount(count + 1);
     setDataSubMission([...dataSubMission, CampaignConditionEntity_INIT]);
   };
 
   const removeRow = (key: number) => {
     console.log(key);
-    //console.log(dataSubMission);
     if (key) {
       formSub.setFieldValue(`${key}_description`, "");
       formSub.setFieldValue(`${key}_condition`, "");
@@ -88,10 +90,16 @@ const AddDronerMission = () => {
       formTable.setFieldValue(`${key}_rai`, "");
       formTable.setFieldValue(`${key}_rewardId`, "");
     }
-    //console.log(formSub.getFieldsValue());
-    //console.log(formTable.getFieldsValue());
-    const e = dataSubMission.filter((x) => x.num !== key);
-    console.log(e);
+    console.log(formSub.getFieldsValue(true));
+    console.log(formTable.getFieldsValue(true));
+    const e = dataSubMission
+      .filter((x) => x.num !== key)
+      // .map((x: any, i: any) => ({
+      //   ...x,
+      //   num: i + 1,
+      //   key: i + 1,
+      // }));
+    console.log("e", e);
     setDataSubMission(e);
     setCount(count - 1);
   };
@@ -114,7 +122,7 @@ const AddDronerMission = () => {
           children: (
             <Form.Item
               style={{ margin: 0 }}
-              name={`${row.key}_missionName`}
+              name={`${row.num}_missionName`}
               rules={[
                 {
                   required: true,
@@ -137,7 +145,7 @@ const AddDronerMission = () => {
           children: (
             <Form.Item
               style={{ margin: 0 }}
-              name={`${row.key}_rai`}
+              name={`${row.num}_rai`}
               rules={[
                 {
                   required: true,
@@ -158,7 +166,7 @@ const AddDronerMission = () => {
           children: (
             <Form.Item
               style={{ margin: 0 }}
-              name={`${row.key}_rewardId`}
+              name={`${row.num}_rewardId`}
               rules={[
                 {
                   required: true,
@@ -217,7 +225,7 @@ const AddDronerMission = () => {
                   icon={<DeleteOutlined />}
                   color={count > 1 ? color.Error : color.Grey}
                   actionDisable={count > 1 ? false : true}
-                  onClick={() => removeRow(row.key)}
+                  onClick={() => removeRow(row.num)}
                 />
               </div>
             </div>
@@ -235,7 +243,7 @@ const AddDronerMission = () => {
             <label>รายละเอียด</label>
             <Form.Item
               style={{ margin: 0 }}
-              name={`${recode.key}_description`}
+              name={`${recode.num}_description`}
               rules={[
                 {
                   required: true,
@@ -250,7 +258,7 @@ const AddDronerMission = () => {
             <label>เงื่อนไข</label>
             <Form.Item
               style={{ margin: 0 }}
-              name={`${recode.key}_condition`}
+              name={`${recode.num}_condition`}
               rules={[
                 {
                   required: true,
