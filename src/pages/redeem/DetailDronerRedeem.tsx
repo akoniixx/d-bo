@@ -207,14 +207,14 @@ const DetailDronerRedeem = () => {
       }
       setOptionPhysical(mapStatus);
     } else {
-      let mapStatus = optionDigital;
+      let mapStatus = optionPhysical;
       if (e === "PREPARE") {
         mapStatus[0].disable = true;
       } else if (e === "DONE") {
         mapStatus[0].disable = true;
         mapStatus[1].disable = true;
       }
-      setOptionDigital(mapStatus);
+      setOptionPhysical(mapStatus);
     }
   };
 

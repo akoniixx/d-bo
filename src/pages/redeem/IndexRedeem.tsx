@@ -76,6 +76,7 @@ const IndexRedeem = () => {
       searchType,
       searchRewardEx
     ).then((res) => {
+      console.log(res);
       const mapKey = res.data.map((x, i) => ({
         ...x,
         key: i + 1,
@@ -174,7 +175,10 @@ const IndexRedeem = () => {
         {source === "Droner" && (
           <Col span={4} className="pt-1">
             <Radio.Group
-              onChange={(e) => setSearchType(e.target.value)}
+              onChange={(e) => {
+                setCurrent(1);
+                setSearchType(e.target.value);
+              }}
               defaultValue={searchType}
             >
               <Radio value="PHYSICAL">Physical</Radio>
