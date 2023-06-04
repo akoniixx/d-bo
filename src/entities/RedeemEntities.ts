@@ -110,12 +110,10 @@ export interface RedeemDronerEntity {
     redeemStatus: string;
     rewardType: string;
   };
-  mission: string;
-  dronerDetail: {
-    dronerId: string;
-    firstname: string;
-    lastname: string;
-    telephoneNo: string;
+  mission: {
+    id: string;
+    missionNo: string;
+    missionName: string;
   };
   receiverDetail: {
     firstname: string;
@@ -160,6 +158,8 @@ export interface DetailRedeemDronerEntity {
     remark: string;
     deliveryCompany: string;
     trackingNo: string;
+    missionName:string;
+    missionNo:string
   };
   dronerRedeemHistories: {
     id: string;
@@ -185,12 +185,10 @@ export interface DetailRedeemDronerEntity {
     used: number;
     remain: number;
   };
-  mission: string;
-  dronerDetail: {
-    dronerId: string;
-    firstname: string;
-    lastname: string;
-    telephoneNo: string;
+  mission: {
+    id: string;
+    missionNo: string;
+    missionName: string;
   };
 }
 
