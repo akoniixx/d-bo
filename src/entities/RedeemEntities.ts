@@ -158,6 +158,8 @@ export interface DetailRedeemDronerEntity {
     remark: string;
     deliveryCompany: string;
     trackingNo: string;
+    missionName:string;
+    missionNo:string
   };
   dronerRedeemHistories: {
     id: string;

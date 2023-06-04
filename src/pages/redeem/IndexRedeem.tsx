@@ -37,7 +37,6 @@ const dateSearchFormat = "YYYY-MM-DD";
 const IndexRedeem = () => {
   const navigate = useNavigate();
   const dateFormat = "DD/MM/YYYY";
-  const row = 10;
   const [current, setCurrent] = useState(1);
   const [source, setSource] = useState<string>(
     window.location.pathname.split("/")[2]
@@ -76,7 +75,6 @@ const IndexRedeem = () => {
       searchType,
       searchRewardEx
     ).then((res) => {
-      console.log(res);
       const mapKey = res.data.map((x, i) => ({
         ...x,
         key: i + 1,
@@ -464,11 +462,11 @@ const IndexRedeem = () => {
         return {
           children: (
             <>
-              <span>{row.mission ? row.mission.missionNo : "-"}</span>
-              {row.mission && (
+              <span>{row.missionId ? row.redeemDetail.missionNo : "-"}</span>
+              {row.missionId && row.redeemDetail.missionNo && (
                 <Tooltip
                   placement="top"
-                  title={row.mission.missionName}
+                  title={"ชื่อภารกิจ: " + row.redeemDetail.missionName}
                   key={row.key}
                 >
                   <InfoCircleFilled
@@ -627,7 +625,7 @@ const IndexRedeem = () => {
           <Col span={3} className="p-2">
             <div>รวมแต้มทั้งหมด</div>
             <div style={{ color: color.Error }}>
-              {record.amountValue === 0
+              {record.amountValue === 0 || !record.amountValue
                 ? "-"
                 : numberWithCommas(record.amountValue) + " แต้ม"}
             </div>

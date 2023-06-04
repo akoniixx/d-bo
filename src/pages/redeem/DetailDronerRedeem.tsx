@@ -324,7 +324,7 @@ const DetailDronerRedeem = () => {
             <Col span={3}>
               <div>รวมแต้มทั้งหมด</div>
               <div style={{ color: color.Error }}>
-                {data?.amountValue === 0
+                {data?.amountValue === 0 || !data?.amountValue
                   ? "-"
                   : numberWithCommas(data?.amountValue || 0) + " แต้ม"}
               </div>
@@ -492,12 +492,12 @@ const DetailDronerRedeem = () => {
             <Col span={5}>
               <div>Mission No.</div>
               <div style={{ color: "#2B2B2B" }}>
-                <div>{data?.mission?.missionNo}</div>
+                <div>{data?.redeemDetail?.missionNo}</div>
               </div>
             </Col>
             <Col span={19}>
               <div>ชื่อภารกิจ</div>
-              <div>{data?.mission?.missionName}</div>
+              <div>{data?.redeemDetail?.missionName}</div>
             </Col>
           </Row>
         </Container>
