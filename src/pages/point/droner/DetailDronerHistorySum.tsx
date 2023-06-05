@@ -46,9 +46,6 @@ function IndexDronerHistorySum() {
   const onChangePage = (page: number) => {
     setCurrent(page);
   };
-  const handleType = (e: any) => {
-    setType(e.target.value);
-  };
   const handleSearchDate = (e: any) => {
     if (e != null) {
       setSearchStartDate(moment(new Date(e[0])).format(dateSearchFormat));
@@ -84,7 +81,12 @@ function IndexDronerHistorySum() {
           </span>
         </Col>
         <Col span={4} className="pt-3">
-          <Radio.Group onChange={handleType}>
+          <Radio.Group
+            onChange={(e) => {
+              setCurrent(1);
+              setType(e.target.value);
+            }}
+          >
             <Radio.Button
               style={{
                 width: "90px",
@@ -173,8 +175,8 @@ function IndexDronerHistorySum() {
   const columns = [
     {
       title: "วันที่อัพเดต",
-      dataIndex: "dateTime",
-      key: "dateTime",
+      dataIndex: "updateAt",
+      key: "updateAt",
       width: "15%",
       render: (value: any, row: any, index: number) => {
         return {
