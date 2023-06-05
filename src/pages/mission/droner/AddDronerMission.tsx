@@ -26,6 +26,7 @@ import { useNavigate } from "react-router-dom";
 import ActionButton from "../../../components/button/ActionButton";
 import { BackIconButton } from "../../../components/button/BackButton";
 import { CardContainer } from "../../../components/card/CardContainer";
+import FooterPage from "../../../components/footer/FooterPage";
 import { CardHeader } from "../../../components/header/CardHearder";
 import { RewardDatasource } from "../../../datasource/RewardDatasource";
 import {
@@ -60,47 +61,66 @@ const AddDronerMission = () => {
       setRewardList(res);
     });
   };
-  const mapKey = () => {
-    console.log("k", dataSubMission);
-    return dataSubMission.map((x: any, i: any) => ({
+  const mapKey = (e: any) => {
+    console.log("e",e);
+    const mapList = e.map((x: any, i: any) => ({
       ...x,
       num: i + 1,
-      key: i + 1,
+      key: i + 1,//แก้ตรงนี้
     }));
+    console.log("m", mapList);
+    const fSub = formSub.getFieldsValue();
+    const sTable = formTable.getFieldsValue();
+    mapList.map((y: any) => {
+      //set to entity
+      y.missionName = sTable[`${y.key}_missionName`];
+      y.rai = sTable[`${y.key}_rai`];
+      y.rewardId = sTable[`${y.key}_rewardId`];
+      y.descriptionReward = fSub[`${y.key}_description`];
+      y.conditionReward = fSub[`${y.key}_condition`];
+    });
+    mapList.forEach((y: any, i: number) => {
+      //set to form
+      formSub.setFieldValue(`${y.key}_missionName`, y.missionName);
+      formSub.setFieldValue(`${y.key}_rai`, y.rai);
+      formSub.setFieldValue(`${y.key}_rewardId`, y.rewardId);
+      formTable.setFieldValue(`${y.key}_description`, y.descriptionReward);
+      formTable.setFieldValue(`${y.key}_condition`, y.conditionReward);
+    });
+    //console.log(fSub);
+    //console.log("c", mapList);
+    return mapList;
   };
 
   useEffect(() => {
     fetchRewardList();
-    setDataSubMission(mapKey());
+    setDataSubMission(mapKey(dataSubMission));
   }, [count]);
 
   const addRow = () => {
-    console.log(formSub.getFieldsValue());
-    console.log(formTable.getFieldsValue());
     setCount(count + 1);
     setDataSubMission([...dataSubMission, CampaignConditionEntity_INIT]);
   };
 
   const removeRow = (key: number) => {
-    console.log(key);
-    if (key) {
+    const data = mapKey(dataSubMission);
+    // console.log("d", data);
+    data.forEach((y: any, i: number) => {
       formSub.setFieldValue(`${key}_description`, "");
       formSub.setFieldValue(`${key}_condition`, "");
       formTable.setFieldValue(`${key}_missionName`, "");
       formTable.setFieldValue(`${key}_rai`, "");
       formTable.setFieldValue(`${key}_rewardId`, "");
-    }
-    console.log(formSub.getFieldsValue(true));
-    console.log(formTable.getFieldsValue(true));
-    const e = dataSubMission
-      .filter((x) => x.num !== key)
-      // .map((x: any, i: any) => ({
-      //   ...x,
-      //   num: i + 1,
-      //   key: i + 1,
-      // }));
-    console.log("e", e);
-    setDataSubMission(e);
+    });
+    // if (key) {
+    //   formSub.setFieldValue(`${key}_description`, "");
+    //   formSub.setFieldValue(`${key}_condition`, "");
+    //   formTable.setFieldValue(`${key}_missionName`, "");
+    //   formTable.setFieldValue(`${key}_rai`, "");
+    //   formTable.setFieldValue(`${key}_rewardId`, "");
+    // }
+    const e = data.filter((x: any) => x.num !== key);
+    setDataSubMission(mapKey(e));
     setCount(count - 1);
   };
 
@@ -130,7 +150,7 @@ const AddDronerMission = () => {
                 },
               ]}
             >
-              <Input placeholder="กรอกชื่อภารกิจย่อย" />
+              <Input placeholder="กรอกชื่อภารกิจย่อย" autoComplete="off" />
             </Form.Item>
           ),
         };
@@ -153,7 +173,11 @@ const AddDronerMission = () => {
                 },
               ]}
             >
-              <Input placeholder="กรอกจำนวนไร่" suffix="ไร่" />
+              <Input
+                placeholder="กรอกจำนวนไร่"
+                suffix="ไร่"
+                autoComplete="off"
+              />
             </Form.Item>
           ),
         };
@@ -436,6 +460,11 @@ const AddDronerMission = () => {
           <Divider />
           {subMission}
         </Form>
+        <FooterPage
+          onClickBack={() => navigate("/IndexDronerMission/")}
+          styleFooter={{ padding: "6px" }}
+          //onClickSave={() => submit()}
+        />
       </CardContainer>
     </>
   );

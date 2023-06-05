@@ -26,6 +26,7 @@ import { useNavigate } from "react-router-dom";
 import ActionButton from "../../../components/button/ActionButton";
 import { BackIconButton } from "../../../components/button/BackButton";
 import { CardContainer } from "../../../components/card/CardContainer";
+import FooterPage from "../../../components/footer/FooterPage";
 import { CardHeader } from "../../../components/header/CardHearder";
 import { CampaignDatasource } from "../../../datasource/CampaignDatasource";
 import { RewardDatasource } from "../../../datasource/RewardDatasource";
@@ -450,6 +451,11 @@ const EditDronerMission = () => {
           <Divider />
           {subMission}
         </Form>
+        <FooterPage
+          onClickBack={() => navigate("/IndexDronerMission/")}
+          styleFooter={{ padding: "6px" }}
+          //onClickSave={() => submit()}
+        />
       </CardContainer>
     </>
   );
