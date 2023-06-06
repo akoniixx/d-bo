@@ -54,23 +54,29 @@ const DetailDronerRedeem = () => {
     UpdateRedeemDronerEntity_INIT
   );
   const [delivery, setDelivery] = useState<DeliveryListEntity>();
-  const [optionStatus, setOptionStatus] = useState<any[]>([
+  const [exchange, setExchange] = useState("");
+  const [data, setData] = useState<DetailRedeemDronerEntity>();
+
+  const [optionPhysical, setOptionPhysical] = useState<any[]>([
     { value: "REQUEST", lable: "คำร้องขอแลก", disable: false },
     { value: "PREPARE", lable: "เตรียมจัดส่ง", disable: false },
     { value: "DONE", lable: "ส่งแล้ว", disable: false },
     { value: "CANCEL", lable: "ยกเลิก", disable: false },
   ]);
-  const statusDigital = [
-    { value: "REQUEST", lable: "พร้อมใช้" },
-    { value: "USED", lable: "ใช้แล้ว" },
-    { value: "EXPIRED", lable: "หมดอายุ" },
-  ];
-  const [data, setData] = useState<DetailRedeemDronerEntity>();
+  const [optionDigital, setOptionDigital] = useState<any[]>([
+    { value: "REQUEST", lable: "พร้อมใช้", disable: false },
+    { value: "USED", lable: "ใช้แล้ว", disable: false },
+    { value: "EXPIRED", lable: "หมดอายุ", disable: false },
+  ]);
 
   const fetchDetail = () => {
     RedeemDatasource.getRedeemDronerById(queryString[1]).then((res) => {
+      setExchange(res.mission !== null ? "MISSION" : "SCORE");
       setStatusShip(res.redeemDetail.redeemStatus);
-      onCheckStatus(res.redeemDetail.redeemStatus);
+      onCheckStatus(
+        res.redeemDetail.redeemStatus,
+        res.mission !== null ? "MISSION" : "SCORE"
+      );
       form.setFieldsValue({
         shipCompany: res.redeemDetail.deliveryCompany,
         trackingId: res.redeemDetail.trackingNo,
@@ -185,20 +191,31 @@ const DetailDronerRedeem = () => {
       },
     },
   ];
-  const onCheckStatus = (e: string) => {
-    let mapStatus = optionStatus;
-    if (e === "PREPARE") {
-      mapStatus[0].disable = true;
-    } else if (e === "DONE") {
-      mapStatus[0].disable = true;
-      mapStatus[1].disable = true;
-      mapStatus[3].disable = true;
-    } else if (e === "CANCEL") {
-      mapStatus[0].disable = true;
-      mapStatus[1].disable = true;
-      mapStatus[2].disable = true;
+  const onCheckStatus = (e: string, status?: string) => {
+    if (status === "SCORE") {
+      let mapStatus = optionPhysical;
+      if (e === "PREPARE") {
+        mapStatus[0].disable = true;
+      } else if (e === "DONE") {
+        mapStatus[0].disable = true;
+        mapStatus[1].disable = true;
+        mapStatus[3].disable = true;
+      } else if (e === "CANCEL") {
+        mapStatus[0].disable = true;
+        mapStatus[1].disable = true;
+        mapStatus[2].disable = true;
+      }
+      setOptionPhysical(mapStatus);
+    } else {
+      let mapStatus = optionPhysical;
+      if (e === "PREPARE") {
+        mapStatus[0].disable = true;
+      } else if (e === "DONE") {
+        mapStatus[0].disable = true;
+        mapStatus[1].disable = true;
+      }
+      setOptionPhysical(mapStatus);
     }
-    setOptionStatus(mapStatus);
   };
 
   const onChangeStatusShip = (e: any) => {
@@ -260,7 +277,7 @@ const DetailDronerRedeem = () => {
           </b>
           <Row>
             <Col span={2}>
-              <img src={data?.reward.imagePath} width={60} height={60}/>
+              <img src={data?.reward.imagePath} width={60} height={60} />
             </Col>
             <Col span={3}>
               <div>รหัสของรางวัล</div>
@@ -294,7 +311,11 @@ const DetailDronerRedeem = () => {
             </Col>
             <Col span={3}>
               <div>แต้ม</div>
-              <div>{numberWithCommas(data?.reward.score || 0)} แต้ม</div>
+              <div>
+                {!data?.reward.score
+                  ? "-"
+                  : numberWithCommas(data?.reward.score || 0) + "  แต้ม"}
+              </div>
             </Col>
             <Col span={2}>
               <div>จำนวน</div>
@@ -303,7 +324,9 @@ const DetailDronerRedeem = () => {
             <Col span={3}>
               <div>รวมแต้มทั้งหมด</div>
               <div style={{ color: color.Error }}>
-                {numberWithCommas(data?.amountValue || 0)} แต้ม
+                {data?.amountValue === 0 || !data?.amountValue
+                  ? "-"
+                  : numberWithCommas(data?.amountValue || 0) + " แต้ม"}
               </div>
             </Col>
           </Row>
@@ -344,11 +367,25 @@ const DetailDronerRedeem = () => {
                 onChange={(e) => onChangeStatusShip(e)}
                 value={statusShip}
               >
-                {optionStatus.map((item) => (
-                  <Radio value={item.value} disabled={item.disable}>
-                    {item.lable}
-                  </Radio>
-                ))}
+                {data?.mission !== null ? (
+                  <>
+                    {optionPhysical
+                      .filter((x) => x.value !== "CANCEL")
+                      .map((item) => (
+                        <Radio value={item.value} disabled={item.disable}>
+                          {item.lable}
+                        </Radio>
+                      ))}
+                  </>
+                ) : (
+                  <>
+                    {optionPhysical.map((item) => (
+                      <Radio value={item.value} disabled={item.disable}>
+                        {item.lable}
+                      </Radio>
+                    ))}
+                  </>
+                )}
               </Radio.Group>
             </Col>
             {statusShip === "DONE" && (
@@ -419,7 +456,7 @@ const DetailDronerRedeem = () => {
               onChange={(e) => onChangeStatusShip(e)}
               value={statusShip}
             >
-              {statusDigital.map((item) => (
+              {optionDigital.map((item) => (
                 <Radio value={item.value}>{item.lable}</Radio>
               ))}
             </Radio.Group>
@@ -431,6 +468,40 @@ const DetailDronerRedeem = () => {
         dataSource={data?.dronerRedeemHistories}
         pagination={false}
       />
+    </CardContainer>
+  );
+
+  const renderMissionDetail = (
+    <CardContainer>
+      <CardHeader textHeader="รายละเอียดของภารกิจ" bgColor="#2B2B2B" />
+      <Form style={{ padding: "20px" }}>
+        <Container
+          style={{
+            backgroundColor: "rgba(43, 43, 43, 0.1)",
+          }}
+          className="p-3"
+        >
+          <b
+            style={{
+              color: "#2B2B2B",
+            }}
+          >
+            ภารกิจ
+          </b>
+          <Row>
+            <Col span={5}>
+              <div>Mission No.</div>
+              <div style={{ color: "#2B2B2B" }}>
+                <div>{data?.redeemDetail?.missionNo}</div>
+              </div>
+            </Col>
+            <Col span={19}>
+              <div>ชื่อภารกิจ</div>
+              <div>{data?.redeemDetail?.missionName}</div>
+            </Col>
+          </Row>
+        </Container>
+      </Form>
     </CardContainer>
   );
   return (
@@ -445,11 +516,18 @@ const DetailDronerRedeem = () => {
       </Row>
       {renderRewardDetail}
       <br />
+      {exchange === "MISSION" && (
+        <>
+          {renderMissionDetail} <br />
+        </>
+      )}
+
       {renderDronerDetail}
       <FooterPage
         onClickBack={() => navigate("/IndexRedeem/Droner")}
         styleFooter={{ padding: "6px" }}
         onClickSave={() => submit()}
+        disableSaveBtn={statusShip !== "REQUEST" ? false : true}
       />
     </>
   );
