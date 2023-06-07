@@ -11,6 +11,7 @@ import { DetailSummaryListEntity } from "../../../entities/PointReceiveEntities"
 import { numberWithCommas } from "../../../utilities/TextFormatter";
 import moment from "moment";
 const { RangePicker } = DatePicker;
+
 const _ = require("lodash");
 
 function IndexFarmerHistorySum() {
@@ -56,9 +57,6 @@ function IndexFarmerHistorySum() {
   const onChangePage = (page: number) => {
     setCurrent(page);
   };
-  const handleType = (e: any) => {
-    setType(e.target.value);
-  };
   const onSearch = () => {
     setCurrent(1);
     fetchFarmerSumById();
@@ -84,7 +82,12 @@ function IndexFarmerHistorySum() {
           </span>
         </Col>
         <Col span={4} className="pt-3">
-          <Radio.Group onChange={handleType}>
+          <Radio.Group
+            onChange={(e) => {
+              setCurrent(1);
+              setType(e.target.value);
+            }}
+          >
             <Radio.Button
               style={{
                 width: "90px",
@@ -207,9 +210,15 @@ function IndexFarmerHistorySum() {
           children: (
             <>
               {type !== "INCREASE" ? (
-                <span style={{ color: color.Error }}>
-                  {numberWithCommas(value) + ` แต้ม`}
-                </span>
+                row.action !== "RETURN" ? (
+                  <span style={{ color: color.Error }}>
+                    {numberWithCommas(value) + ` แต้ม`}
+                  </span>
+                ) : (
+                  <span style={{ color: color.Success }}>
+                    {"+" + numberWithCommas(value) + ` แต้ม`}
+                  </span>
+                )
               ) : (
                 <span>{numberWithCommas(value) + ` แต้ม`}</span>
               )}
