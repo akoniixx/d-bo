@@ -432,7 +432,7 @@ const IndexRedeem = () => {
         return {
           children: (
             <span>
-              {row.createAt && DateTimeUtil.formatDateTime(row.createAt)}
+              {row.updateAt && DateTimeUtil.formatDateTime(row.updateAt)}
             </span>
           ),
         };
