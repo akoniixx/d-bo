@@ -209,9 +209,15 @@ function IndexDronerHistorySum() {
           children: (
             <>
               {type !== "INCREASE" ? (
-                <span style={{ color: color.Error }}>
-                  {numberWithCommas(value) + ` แต้ม`}
-                </span>
+                row.action !== "RETURN" ? (
+                  <span style={{ color: color.Error }}>
+                    {numberWithCommas(value) + ` แต้ม`}
+                  </span>
+                ) : (
+                  <span style={{ color: color.Success }}>
+                    {"+" + numberWithCommas(value) + ` แต้ม`}
+                  </span>
+                )
               ) : (
                 <span>{numberWithCommas(value) + ` แต้ม`}</span>
               )}
