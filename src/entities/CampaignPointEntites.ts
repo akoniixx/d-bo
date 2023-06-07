@@ -11,7 +11,7 @@ export interface CampaignConditionEntity {
   rewardRound?: number;
 }
 export const CampaignConditionEntity_INIT: CampaignConditionEntity = {
-  num: 0,
+  num: 1,
   rai: 0,
   point: 0,
   rewardId: null,

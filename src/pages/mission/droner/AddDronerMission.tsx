@@ -21,7 +21,7 @@ import {
 } from "antd";
 import TextArea from "antd/lib/input/TextArea";
 import moment from "moment";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import ActionButton from "../../../components/button/ActionButton";
 import { BackIconButton } from "../../../components/button/BackButton";
@@ -40,7 +40,6 @@ const AddDronerMission = () => {
   const navigate = useNavigate();
   const dateFormat = "DD/MM/YYYY";
   const [form] = Form.useForm();
-  const [formSub] = Form.useForm();
   const [formTable] = Form.useForm();
   const [rewardList, setRewardList] = useState<GetAllRewardEntities>();
   const [dataSubMission, setDataSubMission] = useState<
@@ -61,66 +60,67 @@ const AddDronerMission = () => {
       setRewardList(res);
     });
   };
-  const mapKey = (e: any) => {
-    console.log("e",e);
-    const mapList = e.map((x: any, i: any) => ({
-      ...x,
-      num: i + 1,
-      key: i + 1,//แก้ตรงนี้
-    }));
-    console.log("m", mapList);
-    const fSub = formSub.getFieldsValue();
-    const sTable = formTable.getFieldsValue();
-    mapList.map((y: any) => {
-      //set to entity
-      y.missionName = sTable[`${y.key}_missionName`];
-      y.rai = sTable[`${y.key}_rai`];
-      y.rewardId = sTable[`${y.key}_rewardId`];
-      y.descriptionReward = fSub[`${y.key}_description`];
-      y.conditionReward = fSub[`${y.key}_condition`];
-    });
-    mapList.forEach((y: any, i: number) => {
-      //set to form
-      formSub.setFieldValue(`${y.key}_missionName`, y.missionName);
-      formSub.setFieldValue(`${y.key}_rai`, y.rai);
-      formSub.setFieldValue(`${y.key}_rewardId`, y.rewardId);
-      formTable.setFieldValue(`${y.key}_description`, y.descriptionReward);
-      formTable.setFieldValue(`${y.key}_condition`, y.conditionReward);
-    });
-    //console.log(fSub);
-    //console.log("c", mapList);
-    return mapList;
-  };
 
   useEffect(() => {
     fetchRewardList();
-    setDataSubMission(mapKey(dataSubMission));
   }, [count]);
+
+  const mapKey = (e: any) => {
+    const mapList = e;
+    const sTable = formTable.getFieldsValue();
+    const value = mapList.map((y: any, i: number) => {
+      console.log(y.num - 1);
+      return {
+        ...y,
+        num: i + 1,
+        missionName: sTable[`${y.num - 1}_missionName`],
+        rai: sTable[`${y.num - 1}_rai`],
+        rewardId: sTable[`${y.num - 1}_rewardId`],
+        descriptionReward: sTable[`${y.num - 1}_description`],
+        conditionReward: sTable[`${y.num - 1}_condition`],
+      };
+    }); //แก้ตรงนี้
+    //console.log("v", value);
+    return value;
+  };
+
+  const newDataSubMission = useMemo(() => {
+    let data = dataSubMission.filter((x) => x.num !== 0);
+    if (data.length > 0) {
+      const d = data.map((el: any, index: any) => {
+        return {
+          ...el,
+          key: index + 1,
+          num: index + 1,
+        };
+      });
+      console.log("d", d);
+      return d;
+    }
+  }, [dataSubMission]);
 
   const addRow = () => {
     setCount(count + 1);
-    setDataSubMission([...dataSubMission, CampaignConditionEntity_INIT]);
+    const addList = mapKey([
+      ...dataSubMission,
+      { ...CampaignConditionEntity_INIT, num: dataSubMission.length + 1 },
+    ]);
+    setDataSubMission(addList);
   };
 
-  const removeRow = (key: number) => {
-    const data = mapKey(dataSubMission);
-    // console.log("d", data);
-    data.forEach((y: any, i: number) => {
-      formSub.setFieldValue(`${key}_description`, "");
-      formSub.setFieldValue(`${key}_condition`, "");
-      formTable.setFieldValue(`${key}_missionName`, "");
-      formTable.setFieldValue(`${key}_rai`, "");
-      formTable.setFieldValue(`${key}_rewardId`, "");
-    });
-    // if (key) {
-    //   formSub.setFieldValue(`${key}_description`, "");
-    //   formSub.setFieldValue(`${key}_condition`, "");
-    //   formTable.setFieldValue(`${key}_missionName`, "");
-    //   formTable.setFieldValue(`${key}_rai`, "");
-    //   formTable.setFieldValue(`${key}_rewardId`, "");
-    // }
-    const e = data.filter((x: any) => x.num !== key);
-    setDataSubMission(mapKey(e));
+  const removeRow = async (key: number) => {
+    const mapData = await mapKey(dataSubMission);
+    formTable.setFieldValue(`${key}_description`, "");
+    formTable.setFieldValue(`${key}_condition`, "");
+    formTable.setFieldValue(`${key}_missionName`, "");
+    formTable.setFieldValue(`${key}_rai`, "");
+    formTable.setFieldValue(`${key}_rewardId`, "");
+
+    const e = mapData.filter((x: any) => x.num !== key);
+    console.log("e", e);
+    //const mData = await mapKey(e);
+    //console.log("f", mData);
+    setDataSubMission([...e, { ...CampaignConditionEntity_INIT, num: 0 }]);
     setCount(count - 1);
   };
 
@@ -261,40 +261,38 @@ const AddDronerMission = () => {
 
   const subMissionTextArea = (recode: any) => {
     return (
-      <Form form={formSub}>
-        <Row justify={"space-between"} gutter={16}>
-          <Col span={12}>
-            <label>รายละเอียด</label>
-            <Form.Item
-              style={{ margin: 0 }}
-              name={`${recode.num}_description`}
-              rules={[
-                {
-                  required: true,
-                  message: "กรุณาเลือกชื่อของรางวัล",
-                },
-              ]}
-            >
-              <TextArea placeholder="กรอกรายละเอียด" rows={4} />
-            </Form.Item>
-          </Col>
-          <Col span={12}>
-            <label>เงื่อนไข</label>
-            <Form.Item
-              style={{ margin: 0 }}
-              name={`${recode.num}_condition`}
-              rules={[
-                {
-                  required: true,
-                  message: "กรุณาเลือกชื่อของรางวัล",
-                },
-              ]}
-            >
-              <TextArea placeholder="กรอกเงื่อนไข" rows={4} />
-            </Form.Item>
-          </Col>
-        </Row>
-      </Form>
+      <Row justify={"space-between"} gutter={16}>
+        <Col span={12}>
+          <label>รายละเอียด</label>
+          <Form.Item
+            style={{ margin: 0 }}
+            name={`${recode.num}_description`}
+            rules={[
+              {
+                required: true,
+                message: "กรุณาเลือกชื่อของรางวัล",
+              },
+            ]}
+          >
+            <TextArea placeholder="กรอกรายละเอียด" rows={4} />
+          </Form.Item>
+        </Col>
+        <Col span={12}>
+          <label>เงื่อนไข</label>
+          <Form.Item
+            style={{ margin: 0 }}
+            name={`${recode.num}_condition`}
+            rules={[
+              {
+                required: true,
+                message: "กรุณาเลือกชื่อของรางวัล",
+              },
+            ]}
+          >
+            <TextArea placeholder="กรอกเงื่อนไข" rows={4} />
+          </Form.Item>
+        </Col>
+      </Row>
     );
   };
 
@@ -323,7 +321,7 @@ const AddDronerMission = () => {
       <Form form={formTable}>
         <Table
           columns={columns}
-          dataSource={dataSubMission}
+          dataSource={newDataSubMission}
           pagination={false}
           expandable={{
             expandedRowRender: (record) => subMissionTextArea(record),
