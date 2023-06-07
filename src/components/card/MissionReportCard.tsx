@@ -1,82 +1,65 @@
 import { SearchOutlined } from "@ant-design/icons";
-import {
-  Button,
-  Card,
-  Col,
-  Divider,
-  Image,
-  Input,
-  Modal,
-  Row,
-  Select,
-  Table,
-} from "antd";
-import React, { useEffect, useState } from "react";
-import { LocationPriceDatasource } from "../../datasource/LocationPriceDatasource";
-import { AllLocatePriceEntity } from "../../entities/LocationPrice";
+import { Image } from "antd";
+import React, { useState } from "react";
 import { color } from "../../resource";
-import { CardContainer } from "./CardContainer";
-import icon from "../../resource/icon";
 import styled from "styled-components";
 
 export const ListStyled = styled.div<{ isFocus?: boolean }>`
   border: solid ${color.Success};
-  border-width: 1px;
-  width: 440px;
+  border-width: 1.5px;
   background-color: White;
   padding-left: 10px;
   padding-right: 10px;
 `;
 
 interface MissionReportProps {
-  data: any[];
-  index: any;
+  id: string;
   title: string;
   raiAmount: string;
   successPoint: string;
   unsuccessPoint: string;
   img: string;
   missionName: string;
+  checkCard: string | undefined;
+  setCheckCard: React.Dispatch<React.SetStateAction<string | undefined>>;
 }
 const MissionReportCard: React.FC<MissionReportProps> = ({
-  data,
-  index,
+  id,
   title,
   raiAmount,
   successPoint,
   unsuccessPoint,
   img,
   missionName,
+  checkCard,
+  setCheckCard,
 }) => {
-  const [checked, setChecked] = useState(true);
-  const [checkPathSub, setCheckPathSub] = useState<string | undefined>();
-
-
   return (
     <div
       onClick={() => {
-        setChecked(!checked);
-        setCheckPathSub(data[index])
-        console.log(data[index], !checked)
-
+        if (id === checkCard) {
+          setCheckCard(undefined);
+        } else {
+          setCheckCard(id);
+        }
       }}
     >
-      {!checked && checkPathSub ? (
-        <ListStyled style={{ borderRadius: 5 }}>
+      {checkCard === id ? (
+        <ListStyled style={{ borderRadius: "10px" }}>
           <div className="row p-2">
             <div className="col-lg">
               <span style={{ fontWeight: "bold" }}>{title}</span>
               <p>{`จำนวนไร่สะสม : ${raiAmount} ไร่`}</p>
             </div>
-            <div className="col-lg-5 p-1">
+            <div className="col-lg-5">
               <div className="row">
                 <div
                   style={{
                     width: "90px",
-                    padding: 6,
+                    padding: 12,
                     backgroundColor: "rgba(235, 87, 87, 0.1)",
-                    borderBottomLeftRadius: 3,
-                    borderTopLeftRadius: 3,
+                    borderBottomLeftRadius: 5,
+                    borderTopLeftRadius: 5,
                     color: color.Error,
                     textAlign: "center",
                   }}
@@ -89,9 +72,9 @@ const MissionReportCard: React.FC<MissionReportProps> = ({
                   style={{
                     width: "90px",
                     textAlign: "center",
-                    borderBottomRightRadius: 3,
-                    borderTopRightRadius: 3,
-                    padding: 6,
+                    borderBottomRightRadius: 5,
+                    borderTopRightRadius: 5,
+                    padding: 12,
                     backgroundColor: "rgba(33, 150, 83, 0.1)",
                     color: color.Success,
                   }}
@@ -107,19 +90,18 @@ const MissionReportCard: React.FC<MissionReportProps> = ({
             <div
               style={{
                 backgroundColor: "rgba(33, 150, 83, 0.1)",
-                width: "440px",
               }}
             >
-              <div className="row p-3">
+              <div className="row">
                 <div className="col-lg-2">
                   <Image
                     src={img}
-                    style={{ width: 45, height: 45 }}
+                    style={{ width: 45, height: 45, padding: "6px" }}
                     preview={false}
                   />
                 </div>
-                <div className="col">
-                  <span style={{ fontSize: "12px" }}>{missionName}</span>
+                <div className="col" style={{ alignSelf: "center" }}>
+                  <span>{missionName}</span>
                 </div>
               </div>
             </div>
@@ -130,28 +112,27 @@ const MissionReportCard: React.FC<MissionReportProps> = ({
           style={{
             border: "solid",
             borderWidth: "1px",
-            width: "440px",
             backgroundColor: "White",
             paddingLeft: "10px",
             paddingRight: "10px",
-            borderRadius: "5px",
+            borderRadius: "10px",
             borderColor: color.Disable,
           }}
         >
           <div className="row p-2">
-            <div className="col-lg">
+            <div className="col-lg-7">
               <span style={{ fontWeight: "bold" }}>{title}</span>
               <p>{`จำนวนไร่สะสม : ${raiAmount} ไร่`}</p>
             </div>
-            <div className="col-lg-5 p-1">
+            <div className="col-lg">
               <div className="row">
                 <div
                   style={{
                     width: "90px",
-                    padding: 6,
+                    padding: 12,
                     backgroundColor: "rgba(235, 87, 87, 0.1)",
-                    borderBottomLeftRadius: 3,
-                    borderTopLeftRadius: 3,
+                    borderBottomLeftRadius: 5,
+                    borderTopLeftRadius: 5,
                     color: color.Error,
                     textAlign: "center",
                   }}
@@ -164,9 +145,9 @@ const MissionReportCard: React.FC<MissionReportProps> = ({
                   style={{
                     width: "90px",
                     textAlign: "center",
-                    borderBottomRightRadius: 3,
-                    borderTopRightRadius: 3,
-                    padding: 6,
+                    borderBottomRightRadius: 5,
+                    borderTopRightRadius: 5,
+                    padding: 12,
                     backgroundColor: "rgba(33, 150, 83, 0.1)",
                     color: color.Success,
                   }}
@@ -182,19 +163,18 @@ const MissionReportCard: React.FC<MissionReportProps> = ({
             <div
               style={{
                 backgroundColor: "rgba(226, 226, 226, 0.44)",
-                width: "440px",
               }}
             >
-              <div className="row p-3">
+              <div className="row">
                 <div className="col-lg-2">
                   <Image
                     src={img}
-                    style={{ width: 45, height: 45 }}
+                    style={{ width: 45, height: 45, padding: "6px" }}
                     preview={false}
                   />
                 </div>
-                <div className="col">
-                  <span style={{ fontSize: "12px" }}>{missionName}</span>
+                <div className="col" style={{ alignSelf: "center" }}>
+                  <span>{missionName}</span>
                 </div>
               </div>
             </div>
