@@ -1,4 +1,7 @@
 ## [Version - 0]
+## Fix [v0.32.4] 2023-06-07
+- fixed date time in point summary
+- added point return in point summary
 ## Fix [v0.32.3] 2023-06-04
 - added droner redeem by mission 
 ## Fix [v0.32.2] 2023-06-01
