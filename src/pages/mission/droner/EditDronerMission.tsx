@@ -21,7 +21,7 @@ import {
 } from "antd";
 import TextArea from "antd/lib/input/TextArea";
 import moment from "moment";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import ActionButton from "../../../components/button/ActionButton";
 import { BackIconButton } from "../../../components/button/BackButton";
@@ -41,7 +41,9 @@ const _ = require("lodash");
 
 const EditDronerMission = () => {
   let queryString = _.split(window.location.pathname, "=");
+  const profile = JSON.parse(localStorage.getItem("profile") || "{  }");
   const navigate = useNavigate();
+  const dateSearchFormat = "YYYY-MM-DD";
   const dateFormat = "DD/MM/YYYY";
   const [form] = Form.useForm();
   const [formSub] = Form.useForm();
@@ -52,13 +54,17 @@ const EditDronerMission = () => {
   >([CampaignConditionEntity_INIT]);
   const [rewardList, setRewardList] = useState<GetAllRewardEntities>();
   const [count, setCount] = useState(1);
+  const [isActive, setIsActive] = useState(false);
 
   const fetchMissionById = () => {
     CampaignDatasource.getCampaignById(queryString[1]).then((res) => {
-      const mapKey = res.condition.map((x: any, i: any) => ({
-        ...x,
-        key: i + 1,
-      }));
+      const mapKey = res.condition;
+      setIsActive(
+        moment(res.startDate).format(dateSearchFormat) <
+          moment(Date()).toISOString()
+          ? true
+          : false
+      );
       setDataSubMission(mapKey);
       setCount(mapKey.length);
       setData({ ...res, condition: mapKey });
@@ -82,9 +88,10 @@ const EditDronerMission = () => {
         formTable.setFieldValue(`${p.key}_missionName`, p.missionName);
         formTable.setFieldValue(`${p.key}_rai`, p.rai);
         formTable.setFieldValue(`${p.key}_rewardId`, p.rewardId);
-        formSub.setFieldValue(`${p.key}_description`, p.descriptionReward);
-        formSub.setFieldValue(`${p.key}_condition`, p.conditionReward);
+        formTable.setFieldValue(`${p.key}_description`, p.descriptionReward);
+        formTable.setFieldValue(`${p.key}_condition`, p.conditionReward);
       });
+      console.log(res);
     });
   };
   const fetchRewardList = () => {
@@ -98,7 +105,6 @@ const EditDronerMission = () => {
       "MISSION"
     ).then((res) => {
       setRewardList(res);
-      console.log(res);
     });
   };
 
@@ -107,16 +113,84 @@ const EditDronerMission = () => {
     fetchRewardList();
   }, []);
 
+  const newDataSubMission = useMemo(() => {
+    if (dataSubMission.length > 0) {
+      const d = dataSubMission.map((el: any, index: any) => {
+        return {
+          ...el,
+          key: index + 1,
+          num: index + 1,
+        };
+      });
+      return d;
+    }
+  }, [dataSubMission]);
+
+  const mapCondition = (e: any) => {
+    const mapList = e;
+    const sTable = formTable.getFieldsValue();
+    const value = mapList.map((y: any, i: number) => {
+      return {
+        ...y,
+        num: i + 1,
+        missionName: sTable[`${y.num}_missionName`],
+        rai: sTable[`${y.num}_rai`],
+        rewardId: sTable[`${y.num}_rewardId`],
+        descriptionReward: sTable[`${y.num}_description`],
+        conditionReward: sTable[`${y.num}_condition`],
+      };
+    });
+    return value;
+  };
+
+  const mapForm = (e: any) => {
+    const mapList = e;
+    mapList.map((y: any, i: number) => {
+      formTable.setFieldValue(`${y.num}_description`, y.descriptionReward);
+      formTable.setFieldValue(`${y.num}_condition`, y.conditionReward);
+      formTable.setFieldValue(`${y.num}_missionName`, y.missionName);
+      formTable.setFieldValue(`${y.num}_rai`, y.rai);
+      formTable.setFieldValue(`${y.num}_rewardId`, y.rewardId);
+    });
+  };
+
   const addRow = () => {
     setCount(count + 1);
-    const mapKey = () => {
-      let map = [...dataSubMission, CampaignConditionEntity_INIT];
-      return map.map((x: any, i: any) => ({
-        ...x,
-        key: i + 1,
-      }));
-    };
-    setDataSubMission(mapKey);
+    const addList = mapCondition([
+      ...dataSubMission,
+      { ...CampaignConditionEntity_INIT, num: dataSubMission.length + 1 },
+    ]);
+    setDataSubMission(addList);
+  };
+
+  const removeRow = async (key: number) => {
+    const mapData = await mapCondition(dataSubMission);
+    const e = mapData.filter((x: any) => x.num !== key);
+    const mData = await mapCondition(e);
+    console.log("m", mData);
+    mapForm(mData);
+    setDataSubMission(e);
+    setCount(count - 1);
+    formTable.setFieldValue(`${e.length + 1}_description`, "");
+    formTable.setFieldValue(`${e.length + 1}_condition`, "");
+    formTable.setFieldValue(`${e.length + 1}_missionName`, "");
+    formTable.setFieldValue(`${e.length + 1}_rai`, "");
+    formTable.setFieldValue(`${e.length + 1}_rewardId`, "");
+  };
+
+  const checkLimit = () => {
+    const v = formTable.getFieldsValue();
+    const d = [];
+    if (count > 1) {
+      for (let i = 0; count > i; i++) {
+        d.push(parseFloat(v[`${i + 1}_rai`]));
+      }
+      if (d[0] < d[1] && d[d.length - 2] <= d[d.length - 1]) {
+        return false;
+      } else {
+        return true;
+      }
+    }
   };
 
   const columns = [
@@ -137,7 +211,7 @@ const EditDronerMission = () => {
           children: (
             <Form.Item
               style={{ margin: 0 }}
-              name={`${row.key}_missionName`}
+              name={`${row.num}_missionName`}
               rules={[
                 {
                   required: true,
@@ -145,7 +219,7 @@ const EditDronerMission = () => {
                 },
               ]}
             >
-              <Input placeholder="กรอกชื่อภารกิจย่อย" />
+              <Input placeholder="กรอกชื่อภารกิจย่อย" autoComplete="off" />
             </Form.Item>
           ),
         };
@@ -154,21 +228,37 @@ const EditDronerMission = () => {
     {
       title: "จำนวนไร่สะสม",
       dataIndex: "rai",
-      width: "12%",
+      width: "18%",
       render: (value: any, row: any, index: number) => {
         return {
           children: (
             <Form.Item
               style={{ margin: 0 }}
-              name={`${row.key}_rai`}
+              name={`${row.num}_rai`}
               rules={[
                 {
                   required: true,
-                  message: "กรุณากรอกชื่อจำนวนไร่",
+                  message: "กรุณากรอกจำนวนไร่",
+                },
+                {
+                  validator: (rules, value) => {
+                    return new Promise(async (resolve, reject) => {
+                      if (checkLimit()) {
+                        reject("จำนวนไร่ต้องไม่น้อยกว่าภารกิจย่อยก่อนหน้า");
+                      } else {
+                        resolve("");
+                      }
+                    });
+                  },
                 },
               ]}
             >
-              <Input placeholder="กรอกจำนวนไร่" suffix="ไร่" />
+              <Input
+                placeholder="กรอกจำนวนไร่"
+                suffix="ไร่"
+                autoComplete="off"
+                disabled={isActive}
+              />
             </Form.Item>
           ),
         };
@@ -181,7 +271,7 @@ const EditDronerMission = () => {
           children: (
             <Form.Item
               style={{ margin: 0 }}
-              name={`${row.key}_rewardId`}
+              name={`${row.num}_rewardId`}
               rules={[
                 {
                   required: true,
@@ -240,6 +330,7 @@ const EditDronerMission = () => {
                   icon={<DeleteOutlined />}
                   color={count > 1 ? color.Error : color.Grey}
                   actionDisable={count > 1 ? false : true}
+                  onClick={() => removeRow(row.num)}
                 />
               </div>
             </div>
@@ -250,42 +341,21 @@ const EditDronerMission = () => {
   ];
 
   const subMissionTextArea = (recode: any) => {
-    //console.log(recode);
     return (
-      <Form form={formSub}>
-        <Row justify={"space-between"} gutter={16}>
-          <Col span={12}>
-            <label>รายละเอียด</label>
-            <Form.Item
-              style={{ margin: 0 }}
-              name={`${recode.key}_description`}
-              rules={[
-                {
-                  required: true,
-                  message: "กรุณาเลือกชื่อของรางวัล",
-                },
-              ]}
-            >
-              <TextArea placeholder="กรอกรายละเอียด" rows={4} />
-            </Form.Item>
-          </Col>
-          <Col span={12}>
-            <label>เงื่อนไข</label>
-            <Form.Item
-              style={{ margin: 0 }}
-              name={`${recode.key}_condition`}
-              rules={[
-                {
-                  required: true,
-                  message: "กรุณาเลือกชื่อของรางวัล",
-                },
-              ]}
-            >
-              <TextArea placeholder="กรอกเงื่อนไข" rows={4} />
-            </Form.Item>
-          </Col>
-        </Row>
-      </Form>
+      <Row justify={"space-between"} gutter={16}>
+        <Col span={12}>
+          <label>รายละเอียด</label>
+          <Form.Item style={{ margin: 0 }} name={`${recode.num}_description`}>
+            <TextArea placeholder="กรอกรายละเอียด" rows={4} />
+          </Form.Item>
+        </Col>
+        <Col span={12}>
+          <label>เงื่อนไข</label>
+          <Form.Item style={{ margin: 0 }} name={`${recode.num}_condition`}>
+            <TextArea placeholder="กรอกเงื่อนไข" rows={4} />
+          </Form.Item>
+        </Col>
+      </Row>
     );
   };
 
@@ -294,27 +364,32 @@ const EditDronerMission = () => {
       <Row className="pb-3">
         <Col span={21}>
           <label>
-            ภารกิจย่อย <span style={{ color: color.Error }}>*</span>
+            ภารกิจย่อย{" "}
+            <span style={{ color: color.Error }}>
+              * จำนวนไร่สะสมจะต้องไม่น้อยกว่าภารกิจย่อยก่อนหน้า *
+            </span>
           </label>
         </Col>
-        <Col span={3}>
-          <Button
-            style={{
-              borderColor: "rgba(33, 150, 83, 0.1)",
-              borderRadius: "5px",
-              color: color.Success,
-              backgroundColor: "rgba(33, 150, 83, 0.1)",
-            }}
-            onClick={() => addRow()}
-          >
-            + เพิ่มภารกิจย่อย
-          </Button>
-        </Col>
+        {!isActive && (
+          <Col span={3}>
+            <Button
+              style={{
+                borderColor: "rgba(33, 150, 83, 0.1)",
+                borderRadius: "5px",
+                color: color.Success,
+                backgroundColor: "rgba(33, 150, 83, 0.1)",
+              }}
+              onClick={() => addRow()}
+            >
+              + เพิ่มภารกิจย่อย
+            </Button>
+          </Col>
+        )}
       </Row>
       <Form form={formTable}>
         <Table
           columns={columns}
-          dataSource={dataSubMission}
+          dataSource={newDataSubMission}
           pagination={false}
           expandable={{
             expandedRowRender: (record) => subMissionTextArea(record),
@@ -339,6 +414,50 @@ const EditDronerMission = () => {
       </Form>
     </>
   );
+
+  const submit = async () => {
+    const dataSub = newDataSubMission;
+    await form.validateFields();
+    await formTable.validateFields();
+
+    const create: any = {};
+    const f = form.getFieldsValue();
+    const fs = formTable.getFieldsValue();
+    const condition = dataSub?.map((y: any, i: number) => {
+      return {
+        ...y,
+        num: i + 1,
+        missionName: fs[`${y.num}_missionName`],
+        rai: fs[`${y.num}_rai`],
+        rewardId: fs[`${y.num}_rewardId`],
+        descriptionReward: fs[`${y.num}_description`],
+        conditionReward: fs[`${y.num}_condition`],
+      };
+    });
+    create.campaignName = f.missionName;
+    create.campaignType = "MISSION_REWARD";
+    create.application = "DRONER";
+    create.status = f.status;
+    create.condition = condition;
+    create.updateBy = profile.firstname + " " + profile.lastname;
+    create.startDate = new Date(
+      moment(f.startDate).format("YYYY-MM-DD") +
+        " " +
+        moment(f.startTime).format("HH:mm:ss")
+    ).toISOString();
+    create.endDate = new Date(
+      moment(f.endDate).format("YYYY-MM-DD") +
+        " " +
+        moment(f.endTime).format("HH:mm:ss")
+    ).toISOString();
+    console.log(create);
+    CampaignDatasource.updateCampaign(queryString[1], create).then((res) => {
+      console.log(res);
+      if (res.success) {
+        navigate("/IndexDronerMission");
+      }
+    });
+  };
 
   return (
     <>
@@ -382,7 +501,11 @@ const EditDronerMission = () => {
                     },
                   ]}
                 >
-                  <DatePicker placeholder="เลือกวันที่" format={dateFormat} />
+                  <DatePicker
+                    placeholder="เลือกวันที่"
+                    format={dateFormat}
+                    disabled={isActive}
+                  />
                 </Form.Item>
                 <Form.Item
                   name="startTime"
@@ -394,6 +517,7 @@ const EditDronerMission = () => {
                     placeholder="เลือกเวลา"
                     defaultValue={moment("00:00", "HH:mm")}
                     allowClear={false}
+                    disabled={isActive}
                   />
                 </Form.Item>
               </div>
@@ -442,9 +566,10 @@ const EditDronerMission = () => {
                 },
               ]}
             >
-              <Radio.Group className="d-flex flex-column" defaultValue="ACTIVE">
+              <Radio.Group className="d-flex flex-column">
                 <Radio value={"ACTIVE"}>ใช้งาน</Radio>
                 <Radio value={"DRAFTING"}>รอเปิดใช้งาน</Radio>
+                <Radio value={"INACTIVE"}>ปิดการใช้งาน</Radio>
               </Radio.Group>
             </Form.Item>
           </Col>
@@ -454,7 +579,7 @@ const EditDronerMission = () => {
         <FooterPage
           onClickBack={() => navigate("/IndexDronerMission/")}
           styleFooter={{ padding: "6px" }}
-          //onClickSave={() => submit()}
+          onClickSave={() => submit()}
         />
       </CardContainer>
     </>

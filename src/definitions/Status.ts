@@ -28,7 +28,7 @@ export const STATUS_COLOR_MAPPING: any = {
   REJECTED: color.Error,
   INACTIVE: color.Error,
   OPEN: color.Grey,
-  DRAFT: color.Grey,
+  DRAFTING: color.Grey,
 };
 
 export const FARMER_STATUS_SEARCH = [

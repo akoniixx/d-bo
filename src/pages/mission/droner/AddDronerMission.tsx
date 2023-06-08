@@ -28,15 +28,19 @@ import { BackIconButton } from "../../../components/button/BackButton";
 import { CardContainer } from "../../../components/card/CardContainer";
 import FooterPage from "../../../components/footer/FooterPage";
 import { CardHeader } from "../../../components/header/CardHearder";
+import { CampaignDatasource } from "../../../datasource/CampaignDatasource";
 import { RewardDatasource } from "../../../datasource/RewardDatasource";
 import {
   CampaignConditionEntity,
   CampaignConditionEntity_INIT,
+  CreateCampaignEntiry,
 } from "../../../entities/CampaignPointEntites";
 import { GetAllRewardEntities } from "../../../entities/RewardEntites";
 import { color } from "../../../resource";
+import dayjs from "dayjs";
 
 const AddDronerMission = () => {
+  const profile = JSON.parse(localStorage.getItem("profile") || "{  }");
   const navigate = useNavigate();
   const dateFormat = "DD/MM/YYYY";
   const [form] = Form.useForm();
@@ -65,43 +69,59 @@ const AddDronerMission = () => {
     fetchRewardList();
   }, [count]);
 
-  const mapKey = (e: any) => {
+  const mapCondition = (e: any) => {
     const mapList = e;
     const sTable = formTable.getFieldsValue();
     const value = mapList.map((y: any, i: number) => {
-      console.log(y.num - 1);
       return {
         ...y,
         num: i + 1,
-        missionName: sTable[`${y.num - 1}_missionName`],
-        rai: sTable[`${y.num - 1}_rai`],
-        rewardId: sTable[`${y.num - 1}_rewardId`],
-        descriptionReward: sTable[`${y.num - 1}_description`],
-        conditionReward: sTable[`${y.num - 1}_condition`],
+        missionName: sTable[`${y.num}_missionName`],
+        rai: sTable[`${y.num}_rai`],
+        rewardId: sTable[`${y.num}_rewardId`],
+        descriptionReward: sTable[`${y.num}_description`],
+        conditionReward: sTable[`${y.num}_condition`],
       };
-    }); //แก้ตรงนี้
-    //console.log("v", value);
+    });
     return value;
+  };
+  
+  const mapForm = (e: any) => {
+    const mapList = e;
+    mapList.map((y: any, i: number) => {
+      formTable.setFieldValue(`${y.num}_description`, y.descriptionReward);
+      formTable.setFieldValue(`${y.num}_condition`, y.conditionReward);
+      formTable.setFieldValue(`${y.num}_missionName`, y.missionName);
+      formTable.setFieldValue(`${y.num}_rai`, y.rai);
+      formTable.setFieldValue(`${y.num}_rewardId`, y.rewardId);
+    });
   };
 
   const newDataSubMission = useMemo(() => {
-    let data = dataSubMission.filter((x) => x.num !== 0);
-    if (data.length > 0) {
-      const d = data.map((el: any, index: any) => {
+    if (dataSubMission.length > 0) {
+      const d = dataSubMission.map((el: any, index: any) => {
         return {
           ...el,
           key: index + 1,
           num: index + 1,
         };
       });
-      console.log("d", d);
       return d;
     }
   }, [dataSubMission]);
 
+  const disabledDateStart = (current: any) => {
+    return current && current < dayjs();
+  };
+  const disabledDateEnd = (current: any) => {
+    const f = form.getFieldsValue();
+    const startDate = moment(f.startDate).format("YYYY-MM-DD");
+    return current && current < dayjs(startDate);
+  };
+
   const addRow = () => {
     setCount(count + 1);
-    const addList = mapKey([
+    const addList = mapCondition([
       ...dataSubMission,
       { ...CampaignConditionEntity_INIT, num: dataSubMission.length + 1 },
     ]);
@@ -109,19 +129,32 @@ const AddDronerMission = () => {
   };
 
   const removeRow = async (key: number) => {
-    const mapData = await mapKey(dataSubMission);
-    formTable.setFieldValue(`${key}_description`, "");
-    formTable.setFieldValue(`${key}_condition`, "");
-    formTable.setFieldValue(`${key}_missionName`, "");
-    formTable.setFieldValue(`${key}_rai`, "");
-    formTable.setFieldValue(`${key}_rewardId`, "");
-
+    const mapData = await mapCondition(dataSubMission);
     const e = mapData.filter((x: any) => x.num !== key);
-    console.log("e", e);
-    //const mData = await mapKey(e);
-    //console.log("f", mData);
-    setDataSubMission([...e, { ...CampaignConditionEntity_INIT, num: 0 }]);
+    const mData = await mapCondition(e);
+    mapForm(mData);
+    setDataSubMission(e);
     setCount(count - 1);
+    formTable.setFieldValue(`${e.length + 1}_description`, "");
+    formTable.setFieldValue(`${e.length + 1}_condition`, "");
+    formTable.setFieldValue(`${e.length + 1}_missionName`, "");
+    formTable.setFieldValue(`${e.length + 1}_rai`, "");
+    formTable.setFieldValue(`${e.length + 1}_rewardId`, "");
+  };
+
+  const checkLimit = () => {
+    const v = formTable.getFieldsValue();
+    const d = [];
+    if (count > 1) {
+      for (let i = 0; count > i; i++) {
+        d.push(parseFloat(v[`${i + 1}_rai`]));
+      }
+      if (d[0] < d[1] && d[d.length - 2] <= d[d.length - 1]) {
+        return false;
+      } else {
+        return true;
+      }
+    }
   };
 
   const columns = [
@@ -170,6 +203,17 @@ const AddDronerMission = () => {
                 {
                   required: true,
                   message: "กรุณากรอกจำนวนไร่",
+                },
+                {
+                  validator: (rules, value) => {
+                    return new Promise(async (resolve, reject) => {
+                      if (checkLimit()) {
+                        reject("จำนวนไร่ต้องไม่น้อยกว่าภารกิจย่อยก่อนหน้า");
+                      } else {
+                        resolve("");
+                      }
+                    });
+                  },
                 },
               ]}
             >
@@ -264,31 +308,13 @@ const AddDronerMission = () => {
       <Row justify={"space-between"} gutter={16}>
         <Col span={12}>
           <label>รายละเอียด</label>
-          <Form.Item
-            style={{ margin: 0 }}
-            name={`${recode.num}_description`}
-            rules={[
-              {
-                required: true,
-                message: "กรุณาเลือกชื่อของรางวัล",
-              },
-            ]}
-          >
+          <Form.Item style={{ margin: 0 }} name={`${recode.num}_description`}>
             <TextArea placeholder="กรอกรายละเอียด" rows={4} />
           </Form.Item>
         </Col>
         <Col span={12}>
           <label>เงื่อนไข</label>
-          <Form.Item
-            style={{ margin: 0 }}
-            name={`${recode.num}_condition`}
-            rules={[
-              {
-                required: true,
-                message: "กรุณาเลือกชื่อของรางวัล",
-              },
-            ]}
-          >
+          <Form.Item style={{ margin: 0 }} name={`${recode.num}_condition`}>
             <TextArea placeholder="กรอกเงื่อนไข" rows={4} />
           </Form.Item>
         </Col>
@@ -301,7 +327,10 @@ const AddDronerMission = () => {
       <Row className="pb-3">
         <Col span={21}>
           <label>
-            ภารกิจย่อย <span style={{ color: color.Error }}>*</span>
+            ภารกิจย่อย{" "}
+            <span style={{ color: color.Error }}>
+              * จำนวนไร่สะสมจะต้องไม่น้อยกว่าภารกิจย่อยก่อนหน้า *
+            </span>
           </label>
         </Col>
         <Col span={3}>
@@ -347,6 +376,54 @@ const AddDronerMission = () => {
     </>
   );
 
+  const submit = async () => {
+    const dataSub = newDataSubMission;
+    await form.validateFields();
+    await formTable.validateFields();
+
+    const create: any = {};
+    const f = form.getFieldsValue();
+    const fs = formTable.getFieldsValue();
+    const condition = dataSub?.map((y: any, i: number) => {
+      return {
+        ...y,
+        num: i + 1,
+        missionName: fs[`${y.num}_missionName`],
+        rai: fs[`${y.num}_rai`],
+        rewardId: fs[`${y.num}_rewardId`],
+        descriptionReward: fs[`${y.num}_description`],
+        conditionReward: fs[`${y.num}_condition`],
+      };
+    });
+    create.campaignName = f.missionName;
+    create.campaignType = "MISSION_REWARD";
+    create.application = "DRONER";
+    create.status = f.status;
+    create.condition = condition;
+    create.createBy = profile.firstname + " " + profile.lastname;
+    create.updateBy = profile.firstname + " " + profile.lastname;
+    create.startDate = new Date(
+      moment(f.startDate).format("YYYY-MM-DD") +
+        " " +
+        moment(f.startTime).format("HH:mm:ss")
+    ).toISOString();
+    create.endDate = new Date(
+      moment(f.endDate).format("YYYY-MM-DD") +
+        " " +
+        moment(f.endTime).format("HH:mm:ss")
+    ).toISOString();
+
+    CampaignDatasource.createCampaign(create).then((res) => {
+      if (res.success) {
+        navigate("/IndexDronerMission");
+      } else {
+        if (res.userMessage === "dupplicate") {
+        } else {
+        }
+      }
+    });
+  };
+
   return (
     <>
       <Row>
@@ -389,7 +466,11 @@ const AddDronerMission = () => {
                     },
                   ]}
                 >
-                  <DatePicker placeholder="เลือกวันที่" format={dateFormat} />
+                  <DatePicker
+                    placeholder="เลือกวันที่"
+                    format={dateFormat}
+                    disabledDate={disabledDateStart}
+                  />
                 </Form.Item>
                 <Form.Item
                   name="startTime"
@@ -419,7 +500,11 @@ const AddDronerMission = () => {
                     },
                   ]}
                 >
-                  <DatePicker placeholder="เลือกวันที่" format={dateFormat} />
+                  <DatePicker
+                    placeholder="เลือกวันที่"
+                    format={dateFormat}
+                    disabledDate={disabledDateEnd}
+                  />
                 </Form.Item>
                 <Form.Item
                   name="endTime"
@@ -449,7 +534,7 @@ const AddDronerMission = () => {
                 },
               ]}
             >
-              <Radio.Group className="d-flex flex-column" defaultValue="ACTIVE">
+              <Radio.Group className="d-flex flex-column">
                 <Radio value={"ACTIVE"}>ใช้งาน</Radio>
                 <Radio value={"DRAFTING"}>รอเปิดใช้งาน</Radio>
               </Radio.Group>
@@ -461,7 +546,7 @@ const AddDronerMission = () => {
         <FooterPage
           onClickBack={() => navigate("/IndexDronerMission/")}
           styleFooter={{ padding: "6px" }}
-          //onClickSave={() => submit()}
+          onClickSave={() => submit()}
         />
       </CardContainer>
     </>
