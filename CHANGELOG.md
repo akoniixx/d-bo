@@ -1,5 +1,5 @@
 ## [Version - 0]
-## Fix [v0.32.5] 2023-06-07
+## Fix [v0.32.6] 2023-06-08
 - commented history reward button
 - changed search param droner redeem point
 ## Fix [v0.32.4] 2023-06-07
