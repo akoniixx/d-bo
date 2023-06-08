@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { BackIconButton } from "../../components/button/BackButton";
 import { useNavigate } from "react-router-dom";
-import { color, icon, image } from "../../resource";
+import { color } from "../../resource";
 import {
   Button,
   Col,
@@ -12,7 +12,6 @@ import {
   Row,
   Table,
 } from "antd";
-import styled from "styled-components";
 import MissionReportCard from "../../components/card/MissionReportCard";
 import { SearchOutlined } from "@ant-design/icons";
 import { ColumnsType } from "antd/lib/table";
@@ -315,18 +314,45 @@ function MissionReport() {
               ผู้เข้าร่วมที่สำเร็จ (500)
             </Radio.Button>
           </Radio.Group>
-          <div className="row justify-content-center pt-2">
-            <Input
-              style={{
-                width: type === "unsuccess" ? "81%" : "45%",
-                right: type === "unsuccess" ? "1%" : "2%",
-              }}
-              allowClear
-              prefix={<SearchOutlined style={{ color: color.Disable }} />}
-              placeholder="ค้นหาชื่อนักบินโดรน / เบอร์โทร"
-              // onChange={changeTextSearch}
-            />
-            {type === "success" && (
+          {type === "unsuccess" && (
+            <div className="row justify-content-center pt-2">
+              <Input
+                style={{
+                  width: "81%",
+                  right: "1%",
+                }}
+                allowClear
+                prefix={<SearchOutlined style={{ color: color.Disable }} />}
+                placeholder="ค้นหาชื่อนักบินโดรน / เบอร์โทร"
+                // onChange={changeTextSearch}
+              />
+              <Button
+                style={{
+                  borderColor: color.Success,
+                  borderRadius: "5px",
+                  color: color.secondary2,
+                  backgroundColor: color.Success,
+                  width: "15%",
+                  justifyContent: "flex-start",
+                }}
+                // onClick={fetchSearch}
+              >
+                ค้นหาข้อมูล
+              </Button>
+            </div>
+          )}
+          {type === "success" && (
+            <div className="row justify-content-center pt-2">
+              <Input
+                style={{
+                  width: "45%",
+                  right: "2%",
+                }}
+                allowClear
+                prefix={<SearchOutlined style={{ color: color.Disable }} />}
+                placeholder="ค้นหาชื่อนักบินโดรน / เบอร์โทร"
+                // onChange={changeTextSearch}
+              />
               <RangePicker
                 style={{ right: "1%" }}
                 className="col-lg-4"
@@ -334,22 +360,22 @@ function MissionReport() {
                 onCalendarChange={(val) => handleSearchDate(val)}
                 format={dateFormat}
               />
-            )}
 
-            <Button
-              style={{
-                borderColor: color.Success,
-                borderRadius: "5px",
-                color: color.secondary2,
-                backgroundColor: color.Success,
-                width: "15%",
-                justifyContent: "flex-start",
-              }}
-              // onClick={fetchSearch}
-            >
-              ค้นหาข้อมูล
-            </Button>
-          </div>
+              <Button
+                style={{
+                  borderColor: color.Success,
+                  borderRadius: "5px",
+                  color: color.secondary2,
+                  backgroundColor: color.Success,
+                  width: "15%",
+                  justifyContent: "flex-start",
+                }}
+                // onClick={fetchSearch}
+              >
+                ค้นหาข้อมูล
+              </Button>
+            </div>
+          )}
 
           <Table
             className="pt-3"
