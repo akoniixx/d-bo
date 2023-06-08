@@ -154,3 +154,11 @@ export const REWARD_STATUS = [
   { value: "DRAFTING", name: "รอเปิดใช้งาน" },
   { value: "INACTIVE", name: "ปิดการใช้งาน" }
 ];
+export const REWARD_REDEEM_HIS_STATUS = [
+  { value: "", name: "ทั้งหมด" },
+  { value: "REQUEST", name: "คำร้องขอแลก" },
+  { value: "PREPARE", name: "เตรียมจัดส่ง" },
+  { value: "DONE", name: "จัดส่งแล้ว" },
+  { value: "CANCEL", name: "ยกเลิก" }
+
+];

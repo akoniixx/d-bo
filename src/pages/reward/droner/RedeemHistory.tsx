@@ -23,64 +23,90 @@ import {
   Table,
 } from "antd";
 import moment from "moment";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Swal from "sweetalert2";
 import { useNavigate } from "react-router-dom";
 import { CheckboxValueType } from "antd/lib/checkbox/Group";
 import { BackIconButton } from "../../../components/button/BackButton";
 import color from "../../../resource/color";
 import ActionButton from "../../../components/button/ActionButton";
+import { RewardDatasource } from "../../../datasource/RewardDatasource";
+import {
+  GetAllDronerRewardHistoryEntities,
+  GetAllRewardEntities,
+  RewardEntities,
+} from "../../../entities/RewardEntites";
+import { numberWithCommas } from "../../../utilities/TextFormatter";
+import { REWARD_REDEEM_HIS_STATUS } from "../../../definitions/Status";
 
+const _ = require("lodash");
 function RedeemHistory() {
+  let queryString = _.split(window.location.pathname, "=");
   const { RangePicker } = DatePicker;
+  const [data, setData] = useState<GetAllDronerRewardHistoryEntities>();
+  const [dataRewardNo, setDataRewardNo] = useState<any | undefined>();
+  const [rewardType, setRewardType] = useState<any | undefined>();
+  const [rewardExChange, setRewardExchange] = useState<any | undefined>();
+  const [current, setCurrent] = useState(1);
+  const row = 10;
+  const [startDate, setStartDate] = useState<any>(null);
+  const [endDate, setEndDate] = useState<any>(null);
+  const [status, setStatus] = useState();
+  const [searchText, setSearchText] = useState();
   const dateFormat = "DD/MM/YYYY";
-  const timeFormat = "HH:mm";
   const dateSearchFormat = "YYYY-MM-DD";
   const navigate = useNavigate();
-  const [visible, setVisible] = useState(false);
-
-  const onChangeStatus = (checkedValues: CheckboxValueType[]) => {
-    console.log("checked = ", checkedValues);
-  };
-  const removeReward = () => {
-    Swal.fire({
-      title: "ยืนยันการลบ",
-      text: "โปรดตรวจสอบของรางวัลที่คุณต้องการลบ ก่อนที่จะกดยืนยันการลบ เพราะอาจส่งผลต่อการแลกของรางวัลในระบบ",
-      cancelButtonText: "ยกเลิก",
-      confirmButtonText: "ลบ",
-      confirmButtonColor: "#d33",
-      showCancelButton: true,
-      showCloseButton: true,
-    }).then(async (result) => {
-      if (result.isConfirmed) {
-        // await DroneDatasource.deleteDroneBrand(data.id);
-      }
-      // fetchDrone();
+  const fetchData = () => {
+    RewardDatasource.getAllDronerRewardHistory(
+      queryString[1],
+      current,
+      row,
+      startDate,
+      endDate,
+      status,
+      searchText
+    ).then((res) => {
+      setData(res);
     });
   };
-  const handleVisible = (newVisible: any) => {
-    setVisible(newVisible);
+  useEffect(() => {
+    const getAllReward = () => {
+      RewardDatasource.getAllReward(0, 0).then((res) => {
+        if (res.data) {
+          let dataFilter = res.data.filter((x) => x.id === queryString[1]);
+          setDataRewardNo(dataFilter.map((x) => x.rewardNo)[0]);
+          setRewardType(dataFilter.map((x) => x.rewardType)[0]);
+          setRewardExchange(dataFilter.map((x) => x.rewardExchange)[0]);
+        }
+      });
+    };
+    getAllReward();
+  }, []);
+  useEffect(() => {
+    fetchData();
+  }, [current, startDate, endDate]);
+
+  const onChangePage = (page: number) => {
+    setCurrent(page);
   };
-  const SubStatus = (
-    <Menu
-      items={[
-        {
-          label: (
-            <>
-              <Checkbox.Group onChange={onChangeStatus}>
-                <Checkbox value="ยัง">ยังไม่ได้แลก</Checkbox>
-                <br />
-                <Checkbox value="กำลัง">กำลังดำเนินการแลก</Checkbox>
-                <br />
-                <Checkbox value="เสร็จ">แลกสำเร็จ</Checkbox>
-              </Checkbox.Group>
-            </>
-          ),
-          key: "status",
-        },
-      ]}
-    />
-  );
+  const handleSearchDate = (e: any) => {
+    if (e != null) {
+      setStartDate(moment(new Date(e[0])).format(dateSearchFormat));
+      setEndDate(moment(new Date(e[1])).format(dateSearchFormat));
+    } else {
+      setStartDate(e);
+      setEndDate(e);
+    }
+    setCurrent(1);
+  };
+  const changeTextSearch = (searchText: any) => {
+    setSearchText(searchText.target.value);
+    setCurrent(1);
+  };
+
+  const onChangeStatus = (checkedValues: any) => {
+    setStatus(checkedValues);
+  };
   const isNumber = (n: any) => {
     return !isNaN(parseFloat(n)) && isFinite(n);
   };
@@ -112,40 +138,26 @@ function RedeemHistory() {
     <>
       <div className="container d-flex" style={{ padding: "8px" }}>
         <BackIconButton onClick={() => navigate(-1)} />
-        <div className="col-lg-6 p-3">
+        <div className="col-lg-8 p-3">
           <span
             className="card-label font-weight-bolder text-dark"
             style={{ fontSize: 22, fontWeight: "bold" }}
           >
             <strong>
-              {" "}
-              ประวัติการแลก | RW00000001 | Physical
-              <span style={{ color: color.secondary3 }}>{` (ใช้คะแนน)`}</span>
+              ประวัติการแลก {dataRewardNo} | {rewardType}
+              <span style={{ color: color.secondary3 }}>{` ${
+                rewardExChange === "SCORE" ? "(ใช้แต้ม)" : "(ภารกิจ)"
+              } `}</span>
             </strong>
           </span>
         </div>
-        <div className="col-lg-3 p-3">
+        <div className="col-lg-4 p-3">
           <RangePicker
-            className="col-lg-12"
-            style={{ alignSelf: "" }}
+            className="col-lg"
             allowClear
-            // onCalendarChange={SearchDate}
+            onCalendarChange={handleSearchDate}
             format={dateFormat}
           />
-        </div>
-        <div className="col-lg p-3">
-          <Button
-            style={{
-              borderColor: color.Success,
-              borderRadius: "5px",
-              color: color.secondary2,
-              backgroundColor: color.Success,
-            }}
-            className="col-lg-12"
-            // onClick={fetchLocationPrice}
-          >
-            ดาวน์โหลดรหัสของรางวัล
-          </Button>
         </div>
       </div>
       <div
@@ -156,24 +168,22 @@ function RedeemHistory() {
           <Input
             allowClear
             prefix={<SearchOutlined style={{ color: color.Disable }} />}
-            placeholder="ค้นหาชื่อนักบินโดรน / เบอร์โทร / รหัสคะแนน / รหัสนักบินโดรน"
+            placeholder="ค้นหาชื่อนักบินโดรน / เบอร์โทร / รหัส Redeem No."
             className="col-lg-12 p-1"
-            // onChange={changeTextSearch}
+            onChange={changeTextSearch}
           />
         </div>
         <div className="col-lg-2 p-1">
-          <Dropdown
-            overlay={SubStatus}
-            trigger={["click"]}
-            className="col-lg-12 "
-            onVisibleChange={handleVisible}
-            visible={visible}
+          <Select
+            className="col-lg-12"
+            placeholder="เลือกสถานะ"
+            allowClear
+            onChange={onChangeStatus}
           >
-            <Button style={{ color: color.Disable }}>
-              เลือกสถานะ
-              <DownOutlined />
-            </Button>
-          </Dropdown>
+            {REWARD_REDEEM_HIS_STATUS.map((x) => (
+              <Checkbox value={x.value}>{x.name}</Checkbox>
+            ))}
+          </Select>
         </div>
         <div className="pt-1">
           <Button
@@ -183,7 +193,7 @@ function RedeemHistory() {
               color: color.secondary2,
               backgroundColor: color.Success,
             }}
-            // onClick={fetchData}
+            onClick={fetchData}
           >
             ค้นหาข้อมูล
           </Button>
@@ -191,63 +201,24 @@ function RedeemHistory() {
       </div>
     </>
   );
-  const data = [
-    {
-      key: "1",
-      idReward: "RW000001",
-      name: "มานี มีเยอะ",
-      phone: "098-8887777",
-      date: "18/05/2565, 10:00",
-      points: "5000 คะแนน",
-      remaining: "20 ชิ้น",
-      status: "คำร้องขอแลก",
-    },
-    {
-      key: "2",
-      idReward: "RW000002",
-      name: "มานี มีเยอะ",
-      phone: "098-8887777",
-      date: "18/05/2565, 10:00",
-      points: "5000 คะแนน",
-      remaining: "20 ชิ้น",
-      status: "แลกสำเร็จ",
-    },
-    {
-      key: "3",
-      idReward: "RW000003",
-      name: "มานี มีเยอะ",
-      phone: "098-8887777",
-      date: "18/05/2565, 10:00",
-      points: "2000 คะแนน",
-      remaining: "20 ชิ้น",
-      status: "กำลังดำเนินการแลก",
-    },
-    {
-      key: "4",
-      idReward: "RW000004",
-      name: "มานี มีเยอะ",
-      phone: "098-8887777",
-      date: "18/05/2565, 10:00",
-      points: "2000 คะแนน",
-      remaining: "20 ชิ้น",
-      status: "ยกเลิก",
-    },
-  ];
   const columns = [
     {
       title: "วันที่อัพเดต",
-      dataIndex: "date",
-      key: "date",
-      sorter: (a: any, b: any) => sorter(a.farmAreaAmount, b.farmAreaAmount),
-      // render: (value: any, row: any, index: number) => {
-      //   return {
-      //     children: (
-      //       <>
-
-      //       </>
-      //     ),
-      //   };
-      // },
+      dataIndex: "updateAt",
+      key: "updateAt",
+      sorter: (a: any, b: any) => sorter(a.updateAt, b.updateAt),
+      render: (value: any, row: any, index: number) => {
+        return {
+          children: (
+            <>
+              <span className="text-dark-75  d-block font-size-lg">
+                {moment(row.updateAt).format("DD/MM/YYYY")},{" "}
+                {moment(row.updateAt).format("HH:mm")}
+              </span>
+            </>
+          ),
+        };
+      },
     },
     {
       title: "ชื่อผู้ใช้งาน",
@@ -257,17 +228,13 @@ function RedeemHistory() {
         return {
           children: (
             <>
-              <span
-                style={{
-                  cursor: "pointer",
-                  color: color.Success,
-                  textDecorationLine: "underline",
-                  fontWeight: "700",
-                }}
-                // onClick={() => previewData(row)}
-              >
-                {row.name}
-              </span>
+              <u style={{ color: color.Success }}>
+                {row.receiverDetail !== null
+                  ? row.receiverDetail.firstname +
+                    " " +
+                    row.receiverDetail.lastname
+                  : "-"}
+              </u>
             </>
           ),
         };
@@ -275,35 +242,14 @@ function RedeemHistory() {
     },
     {
       title: "เบอร์โทร",
-      dataIndex: "phone",
-      key: "phone",
-      // render: (value: any, row: any, index: number) => {
-      //   return {
-      //     children: (
-      //       <>
-      //       </>
-      //     ),
-      //   };
-      // },
-    },
-    {
-      title: "Redeem Transection",
-      dataIndex: "idReward",
-      key: "idReward",
+      dataIndex: "tel",
+      key: "tel",
       render: (value: any, row: any, index: number) => {
         return {
           children: (
             <>
-              <span
-                style={{
-                  cursor: "pointer",
-                  color: color.Success,
-                  textDecorationLine: "underline",
-                  fontWeight: "700",
-                }}
-                // onClick={() => previewData(row)}
-              >
-                {row.idReward}
+              <span>
+                {row.receiverDetail !== null ? row.receiverDetail.tel : "-"}
               </span>
             </>
           ),
@@ -311,63 +257,87 @@ function RedeemHistory() {
       },
     },
     {
-      title: "จำนวน",
-      dataIndex: "remaining",
-      key: "remaining",
-      // render: (value: any, row: any, index: number) => {
-      //   return {
-      //     children: (
-      //       <>
-
-      //       </>
-      //     ),
-      //   };
-      // },
-    },
-    {
-      title: "คะแนนที่ใช้แลก",
-      dataIndex: "points",
-      key: "points",
-      // render: (value: any, row: any, index: number) => {
-      //   return {
-      //     children: (
-      //       <>
-
-      //       </>
-      //     ),
-      //   };
-      // },
-    },
-    {
-      title: "สถานะ",
-      dataIndex: "status",
-      key: "status",
+      title: "Redeem No.",
+      dataIndex: "redeemNo",
+      key: "redeemNo",
       render: (value: any, row: any, index: number) => {
         return {
           children: (
             <>
-              {row.status === "คำร้องขอแลก" && (
+              <u style={{ color: color.Success }}>
+                {row.redeemNo !== null ? row.redeemNo : "-"}
+              </u>
+            </>
+          ),
+        };
+      },
+    },
+    {
+      title: "จำนวน",
+      dataIndex: "rewardQuantity",
+      key: "rewardQuantity",
+      render: (value: any, row: any, index: number) => {
+        return {
+          children: (
+            <>
+              <span>
+                {row.rewardQuantity !== null
+                  ? numberWithCommas(row.rewardQuantity) + " " + "ชิ้น"
+                  : "-"}
+              </span>
+            </>
+          ),
+        };
+      },
+    },
+    {
+      title: "แต้มที่ใช้แลก",
+      dataIndex: "score",
+      key: "score",
+      render: (value: any, row: any, index: number) => {
+        return {
+          children: (
+            <>
+              <span>
+                {row.reward.score !== null
+                  ? numberWithCommas(row.reward.score) + " " + "แต้ม"
+                  : "-"}
+              </span>
+            </>
+          ),
+        };
+      },
+    },
+    {
+      title: "สถานะ",
+      dataIndex: "redeemStatus",
+      key: "redeemStatus",
+      render: (value: any, row: any, index: number) => {
+        return {
+          children: (
+            <>
+              {row.redeemDetail.redeemStatus === "REQUEST" && (
                 <span style={{ color: color.secondary2 }}>
                   <Badge color={color.secondary2} style={{ right: 5 }} />
-                  {row.status}
+                  คำร้องขอแลก
                 </span>
               )}
-              {row.status === "แลกสำเร็จ" && (
+              {row.redeemDetail.redeemStatus === "PREPARE" && (
+                <span style={{ color: color.secondary1 }}>
+                  <Badge color={color.secondary1} style={{ right: 5 }} />
+                  เตรียมจัดส่ง
+                </span>
+              )}
+              {row.redeemDetail.redeemStatus === "DONE" && (
                 <span style={{ color: color.Success }}>
                   <Badge color={color.Success} style={{ right: 5 }} />
-                  {row.status}
+                  จัดส่งแล้ว
                 </span>
               )}
-              {row.status === "กำลังดำเนินการแลก" && (
-                <span style={{ color: color.Warning }}>
-                  <Badge color={color.Warning} style={{ right: 5 }} />
-                  {row.status}
-                </span>
-              )}
-              {row.status === "ยกเลิก" && (
+              {row.redeemDetail.redeemStatus === "CANCEL" && (
                 <span style={{ color: color.Error }}>
                   <Badge color={color.Error} style={{ right: 5 }} />
-                  {row.status}
+                  ยกเลิก
                 </span>
               )}
             </>
@@ -380,11 +350,17 @@ function RedeemHistory() {
     <>
       {PageTitle}
       <br />
-      <Table columns={columns} dataSource={data} pagination={false} />
+      <Table columns={columns} dataSource={data?.data} pagination={false} />
 
-      <div className="d-flex justify-content-between pt-3 pb-3 ">
-        <p>รายการทั้งหมด {data.length} รายการ</p>
-        <Pagination />
+      <div className="d-flex justify-content-between pt-3 pb-3">
+        <p>รายการทั้งหมด {data?.count} รายการ</p>
+        <Pagination
+          current={current}
+          total={data?.count}
+          onChange={onChangePage}
+          pageSize={row}
+          showSizeChanger={false}
+        />
       </div>
     </>
   );
