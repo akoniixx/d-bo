@@ -547,7 +547,7 @@ function IndexReward() {
           children: (
             <>
               <span className="text-dark-75  d-block font-size-lg">
-                {row.amount}
+                {numberWithCommas(row.amount)}
               </span>
             </>
           ),
@@ -565,7 +565,7 @@ function IndexReward() {
           children: (
             <>
               <span className="text-dark-75  d-block font-size-lg">
-                {row.used}
+                {numberWithCommas(row.used)}
               </span>
             </>
           ),
@@ -583,7 +583,7 @@ function IndexReward() {
           children: (
             <>
               <span className="text-dark-75  d-block font-size-lg">
-                {row.remain}
+                {numberWithCommas(row.remain)}
               </span>
             </>
           ),
@@ -638,7 +638,7 @@ function IndexReward() {
               className="d-flex flex-row"
               style={{ justifyContent: "center" }}
             >
-              <div className="col-lg-4">
+              {/* <div className="col-lg-4">
                 <ActionButton
                   icon={
                     <Image
@@ -650,7 +650,7 @@ function IndexReward() {
                   color={color.primary1}
                   onClick={() => navigate("/RedeemHistory/id=" + row.id)}
                 />
-              </div>
+              </div> */}
               <div className="col-lg-4">
                 <ActionButton
                   icon={<EditOutlined />}
@@ -668,7 +668,9 @@ function IndexReward() {
                   }
                   onClick={() => showDelete(row.id)}
                   actionDisable={
-                    row.status === "DRAFTING" || checkDelete === true ? false : true
+                    row.status === "DRAFTING" || checkDelete === true
+                      ? false
+                      : true
                   }
                 />
               </div>

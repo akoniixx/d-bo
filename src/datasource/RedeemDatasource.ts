@@ -51,7 +51,7 @@ export class RedeemDatasource {
     startDate?: string,
     endDate?: string,
     status?: string,
-    missionNo?: string,
+    secondSearch?: string,
     rewardType?: string,
     rewardExchange?: string
   ): Promise<RedeemDronerListEntity> {
@@ -62,7 +62,7 @@ export class RedeemDatasource {
       startDate: startDate,
       endDate: endDate,
       status: status,
-      missionNo: missionNo,
+      secondSearch: secondSearch,
       rewardType: rewardType,
       rewardExchange: rewardExchange,
     };
