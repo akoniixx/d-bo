@@ -391,7 +391,7 @@ const IndexInprogressTask = () => {
       key: "subdistrict_name",
       render: (value: any, row: any, index: number) => {
         const inv: InvoiceTaskEntity = {
-          raiAmount: row.farmerPlot_rai_amount,
+          raiAmount: row.task_farm_area_amount,
           unitPrice: row.task_unit_price,
           price: row.task_price,
           fee: row.task_fee,

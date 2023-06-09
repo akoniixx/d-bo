@@ -856,13 +856,13 @@ const AddNewTask = () => {
                   .map((x) => x)
                   .find((y) => y === item.crop)
                   ? true
-                  : item.isChecked
+                  : false
               )
             ).map((x, index) => (
               <div className="form-group">
                 <input
                   type="checkbox"
-                  value={x.crop}
+                  defaultValue={x.crop}
                   disabled={current === 2 || checkSelectPlot === "error"}
                   onChange={handlePurposeSpray}
                   checked={x.isChecked}
@@ -1946,8 +1946,8 @@ const AddNewTask = () => {
               if (!couponCode) {
                 navigate("/IndexNewTask");
               } else {
-                await CouponDataSource.usedCoupon(couponCode).then(
-                  (res) => navigate("/IndexNewTask")
+                await CouponDataSource.usedCoupon(couponCode).then((res) =>
+                  navigate("/IndexNewTask")
                 );
               }
             }
@@ -1995,9 +1995,7 @@ const AddNewTask = () => {
       <div className="steps-content">{titleStep[current].content}</div>
       <Row className="d-flex justify-content-between pt-2">
         {current === 0 && (
-          <BackButton
-            onClick={() => navigate("/IndexNewTask")}
-          />
+          <BackButton onClick={() => navigate("/IndexNewTask")} />
         )}
         {current > 0 && <BackButton onClick={() => previousStep()} />}
         {current < titleStep.length - 1 && (
@@ -2025,9 +2023,7 @@ const AddNewTask = () => {
     <>
       <>
         <Row>
-          <BackIconButton
-            onClick={() => navigate("/IndexNewTask")}
-          />
+          <BackIconButton onClick={() => navigate("/IndexNewTask")} />
           <span className="pt-3">
             <strong style={{ fontSize: "20px" }}>เพิ่มงานบินใหม่</strong>
           </span>
