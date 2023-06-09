@@ -1,4 +1,9 @@
 ## [Version - 0]
+## improve [v0.32.7] 2023-06-08
+- call api droner reward history in reward page
+## Fix [v0.32.6] 2023-06-08
+- commented history reward button
+- changed search param droner redeem point
 ## Fix [v0.32.4] 2023-06-07
 - fixed date time in point summary
 - added point return in point summary

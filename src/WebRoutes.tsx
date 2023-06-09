@@ -163,7 +163,7 @@ const WebRoutes: React.FC<any> = () => {
           <Route path="/IndexReward" element={<IndexReward />} />
           <Route path="/AddReward" element={<AddReward />} />
           <Route path="/EditReward/:id" element={<EditReward />} />
-          <Route path="/RedeemHistory" element={<RedeemHistory />} />
+          <Route path="/RedeemHistory/:id" element={<RedeemHistory />} />
           <Route path="/IndexFarmerSummary" element={<IndexFarmerSummary />} />
           <Route
             path="/IndexFarmerHistorySum/:id"
