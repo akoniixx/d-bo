@@ -1,15 +1,6 @@
 import React, { useLayoutEffect, useRef } from "react";
-import { Divider, Image } from "antd";
-import parse from "html-react-parser";
+import {Image } from "antd";
 import { CardHeaderPromotion } from "../header/CardHeaderPromotion";
-import uploadImgQuota from "../../resource/media/empties/upload_img_quota.png";
-import {
-  numberWithCommas,
-  numberWithCommasToFixed,
-} from "../../utilities/TextFormatter";
-import { DateTimeUtil } from "../../utilities/DateTimeUtil";
-import { convertBuddhistYear } from "../../utilities/ConvertToBuddhistYear";
-import moment from "moment";
 import color from "../../resource/color";
 import { image } from "../../resource";
 import styled from "styled-components";
@@ -74,7 +65,10 @@ const RenderQuota: React.FC<RenderQuota> = ({
           className="bg-white"
         >
           <div>
-            <Image src={imgCover ? imgCover : uploadImgQuota} preview={false} />
+            <Image
+              src={imgCover ? imgCover : image.empty_cover}
+              preview={false}
+            />
           </div>
           <div className="p-3">
             <div

@@ -11,5 +11,7 @@ export default {
   uploadImgQuota : require("./media/empties/upload_img_quota.png"),
   condition : require("./media/images/condition.png"),
   tableLucky: require("./media/images/tableLucky.png"),
-  announce: require("./media/images/announcement.png")
+  announce: require("./media/images/announcement.png"),
+  empty_cover: require("./media/empties/empty-cover.png"),
+  upload_Img_btn : require("./media/empties/upload_Img_btn.png")
 };
