@@ -83,7 +83,6 @@ function IndexReward() {
       setData(res);
     });
   };
-
   useEffect(() => {
     getAllReward();
   }, [current, startExchangeDate, expiredExchangeDate]);
@@ -370,18 +369,6 @@ function IndexReward() {
               <Checkbox value={x.value}>{x.name}</Checkbox>
             ))}
           </Select>
-          {/* <Dropdown
-            overlay={SubStatus}
-            trigger={["click"]}
-            className="col-lg-12 "
-            onVisibleChange={handleVisibleStatus}
-            visible={visibleStatus}
-          >
-            <Button style={{ color: color.Disable }}>
-              เลือกสะถานะ
-              <DownOutlined />
-            </Button>
-          </Dropdown> */}
         </div>
         <div className="pt-1">
           <Button
@@ -651,7 +638,7 @@ function IndexReward() {
               className="d-flex flex-row"
               style={{ justifyContent: "center" }}
             >
-              {/* <div className="col-lg-4">
+              <div className="col-lg-4">
                 <ActionButton
                   icon={
                     <Image
@@ -661,9 +648,9 @@ function IndexReward() {
                     />
                   }
                   color={color.primary1}
-                  onClick={() => navigate("/RedeemHistory")}
+                  onClick={() => navigate("/RedeemHistory/id=" + row.id)}
                 />
-              </div> */}
+              </div>
               <div className="col-lg-4">
                 <ActionButton
                   icon={<EditOutlined />}
