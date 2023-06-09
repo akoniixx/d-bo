@@ -83,7 +83,6 @@ function IndexReward() {
       setData(res);
     });
   };
-
   useEffect(() => {
     getAllReward();
   }, [current, startExchangeDate, expiredExchangeDate]);
@@ -370,18 +369,6 @@ function IndexReward() {
               <Checkbox value={x.value}>{x.name}</Checkbox>
             ))}
           </Select>
-          {/* <Dropdown
-            overlay={SubStatus}
-            trigger={["click"]}
-            className="col-lg-12 "
-            onVisibleChange={handleVisibleStatus}
-            visible={visibleStatus}
-          >
-            <Button style={{ color: color.Disable }}>
-              เลือกสะถานะ
-              <DownOutlined />
-            </Button>
-          </Dropdown> */}
         </div>
         <div className="pt-1">
           <Button
@@ -560,7 +547,7 @@ function IndexReward() {
           children: (
             <>
               <span className="text-dark-75  d-block font-size-lg">
-                {row.amount}
+                {numberWithCommas(row.amount)}
               </span>
             </>
           ),
@@ -578,7 +565,7 @@ function IndexReward() {
           children: (
             <>
               <span className="text-dark-75  d-block font-size-lg">
-                {row.used}
+                {numberWithCommas(row.used)}
               </span>
             </>
           ),
@@ -596,7 +583,7 @@ function IndexReward() {
           children: (
             <>
               <span className="text-dark-75  d-block font-size-lg">
-                {row.remain}
+                {numberWithCommas(row.remain)}
               </span>
             </>
           ),
@@ -661,7 +648,7 @@ function IndexReward() {
                     />
                   }
                   color={color.primary1}
-                  onClick={() => navigate("/RedeemHistory")}
+                  onClick={() => navigate("/RedeemHistory/id=" + row.id)}
                 />
               </div>
               <div className="col-lg-4">
@@ -681,7 +668,9 @@ function IndexReward() {
                   }
                   onClick={() => showDelete(row.id)}
                   actionDisable={
-                    row.status === "DRAFTING" || checkDelete === true ? false : true
+                    row.status === "DRAFTING" || checkDelete === true
+                      ? false
+                      : true
                   }
                 />
               </div>

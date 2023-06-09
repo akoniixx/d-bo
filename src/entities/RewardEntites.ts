@@ -47,3 +47,62 @@ export interface GetAllRewardEntities {
   data: GetRewardEntities[];
   count: number;
 }
+
+export interface DronerRewardHistoryEntities {
+  id: string;
+  dronerId: string;
+  campaignId: string;
+  campaignName: string;
+  missionId: string;
+  allValue: string;
+  amountValue: string;
+  beforeValue: string;
+  balance: string;
+  beforeRai: string;
+  afterRai: string;
+  raiAmount: string;
+  rewardId: string;
+  rewardName: string;
+  rewardQuantity: number;
+  redeemNo: string;
+  receiverDetail: {
+    tel: string;
+    address: string;
+    lastname: string;
+    addressId: string;
+    firstname: string;
+  };
+  redeemDetail: {
+    step: number;
+    missionNo: string;
+    rewardType: string;
+    missionName: string;
+    redeemStatus: string;
+    rewardExchange: string;
+    rewardQuantity: number;
+  };
+  createAt: string;
+  updateAt: string;
+  mission: {
+    id: string;
+    farmerId: string;
+    dronerId: string;
+    campaignId: string;
+    status: {
+      status1: string;
+      status2: string;
+      status3: string;
+      status4: string;
+    };
+    missionType: string;
+    missionNo: string;
+    allraiAmount: number;
+    createAt: string;
+    updateAt: string;
+  };
+  reward: GetRewardEntities;
+}
+export interface GetAllDronerRewardHistoryEntities {
+  data: DronerRewardHistoryEntities[];
+  count: number;
+}

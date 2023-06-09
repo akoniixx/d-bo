@@ -238,7 +238,7 @@ const IndexRedeem = () => {
           className="container d-flex justify-content-between"
           style={{ padding: "8px" }}
         >
-          <div className="col-lg-4 p-1">
+          <div className="col-lg-3 p-1">
             <Input
               allowClear
               prefix={<SearchOutlined style={{ color: color.Disable }} />}
@@ -251,7 +251,7 @@ const IndexRedeem = () => {
             <Input
               allowClear
               prefix={<SearchOutlined style={{ color: color.Disable }} />}
-              placeholder="ค้นหารหัส Mission No."
+              placeholder="ค้นหารหัส Reward No./Mission No."
               className="col-lg-12 p-1"
               onChange={(e) => setSearchMission(e.target.value)}
             />

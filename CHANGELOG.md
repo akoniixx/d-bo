@@ -1,4 +1,13 @@
 ## [Version - 0]
+## Fix [v0.32.8] 2023-06-09
+- fixed paginaton droner summary point menu
+- fixed render rai in task menu
+- fixed render checkbox in new task
+## improve [v0.32.7] 2023-06-08
+- call api droner reward history in reward page
+## Fix [v0.32.6] 2023-06-08
+- commented history reward button
+- changed search param droner redeem point
 ## Fix [v0.32.4] 2023-06-07
 - fixed date time in point summary
 - added point return in point summary

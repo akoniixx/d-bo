@@ -1,5 +1,6 @@
 import { BASE_URL, httpClient } from "../config/develop-config";
 import {
+  GetAllDronerRewardHistoryEntities,
   GetAllRewardEntities,
   RewardEntities,
 } from "../entities/RewardEntites";
@@ -112,5 +113,38 @@ export class RewardDatasource {
         return res.data;
       })
       .catch((err) => console.log(err));
+  }
+  static getAllDronerRewardHistory(
+    rewardId: string,
+    page: number,
+    take: number,
+    startDate?: string,
+    endDate?: string,
+    status?: string,
+    search?: string
+  ): Promise<GetAllDronerRewardHistoryEntities> {
+    const params = {
+      rewardId:rewardId,
+      page: page,
+      take: take,
+      startDate: startDate,
+      endDate: endDate,
+      status: status,
+      search: search,
+    };
+    return httpClient
+      .get(
+        BASE_URL +
+          "/promotion/droner-transactions/get-all-droner-reward-history",
+        {
+          params,
+        }
+      )
+      .then((response) => {
+        return response.data;
+      })
+      .catch((error) => {
+        console.log(error);
+      });
   }
 }
