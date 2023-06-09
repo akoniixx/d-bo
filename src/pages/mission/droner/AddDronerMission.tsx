@@ -38,6 +38,7 @@ import {
 import { GetAllRewardEntities } from "../../../entities/RewardEntites";
 import { color } from "../../../resource";
 import dayjs from "dayjs";
+import Swal from "sweetalert2";
 
 const AddDronerMission = () => {
   const profile = JSON.parse(localStorage.getItem("profile") || "{  }");
@@ -85,7 +86,7 @@ const AddDronerMission = () => {
     });
     return value;
   };
-  
+
   const mapForm = (e: any) => {
     const mapList = e;
     mapList.map((y: any, i: number) => {
@@ -386,10 +387,9 @@ const AddDronerMission = () => {
     const fs = formTable.getFieldsValue();
     const condition = dataSub?.map((y: any, i: number) => {
       return {
-        ...y,
         num: i + 1,
         missionName: fs[`${y.num}_missionName`],
-        rai: fs[`${y.num}_rai`],
+        rai: parseFloat(fs[`${y.num}_rai`]),
         rewardId: fs[`${y.num}_rewardId`],
         descriptionReward: fs[`${y.num}_description`],
         conditionReward: fs[`${y.num}_condition`],
@@ -412,10 +412,16 @@ const AddDronerMission = () => {
         " " +
         moment(f.endTime).format("HH:mm:ss")
     ).toISOString();
-
     CampaignDatasource.createCampaign(create).then((res) => {
       if (res.success) {
-        navigate("/IndexDronerMission");
+        Swal.fire({
+          title: "บันทึกสำเร็จ",
+          icon: "success",
+          timer: 1500,
+          showConfirmButton: false,
+        }).then((time) => {
+          navigate("/IndexDronerMission");
+        });
       } else {
         if (res.userMessage === "dupplicate") {
         } else {

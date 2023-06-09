@@ -23,6 +23,7 @@ import TextArea from "antd/lib/input/TextArea";
 import moment from "moment";
 import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import Swal from "sweetalert2";
 import ActionButton from "../../../components/button/ActionButton";
 import { BackIconButton } from "../../../components/button/BackButton";
 import { CardContainer } from "../../../components/card/CardContainer";
@@ -76,7 +77,7 @@ const EditDronerMission = () => {
           : moment(new Date(res.startDate).toUTCString()),
         endDate: !res.endDate
           ? moment(new Date().toUTCString())
-          : moment(new Date(res.startDate).toUTCString()),
+          : moment(new Date(res.endDate).toUTCString()),
         startTime: !res.startDate
           ? moment(new Date().getTime())
           : moment(new Date(res.startDate).getTime()),
@@ -85,13 +86,12 @@ const EditDronerMission = () => {
           : moment(new Date(res.endDate).getTime()),
       });
       mapKey?.forEach((p: any) => {
-        formTable.setFieldValue(`${p.key}_missionName`, p.missionName);
-        formTable.setFieldValue(`${p.key}_rai`, p.rai);
-        formTable.setFieldValue(`${p.key}_rewardId`, p.rewardId);
-        formTable.setFieldValue(`${p.key}_description`, p.descriptionReward);
-        formTable.setFieldValue(`${p.key}_condition`, p.conditionReward);
+        formTable.setFieldValue(`${p.num}_missionName`, p.missionName);
+        formTable.setFieldValue(`${p.num}_rai`, p.rai);
+        formTable.setFieldValue(`${p.num}_rewardId`, p.rewardId);
+        formTable.setFieldValue(`${p.num}_description`, p.descriptionReward);
+        formTable.setFieldValue(`${p.num}_condition`, p.conditionReward);
       });
-      console.log(res);
     });
   };
   const fetchRewardList = () => {
@@ -425,10 +425,9 @@ const EditDronerMission = () => {
     const fs = formTable.getFieldsValue();
     const condition = dataSub?.map((y: any, i: number) => {
       return {
-        ...y,
         num: i + 1,
         missionName: fs[`${y.num}_missionName`],
-        rai: fs[`${y.num}_rai`],
+        rai: parseFloat(fs[`${y.num}_rai`]),
         rewardId: fs[`${y.num}_rewardId`],
         descriptionReward: fs[`${y.num}_description`],
         conditionReward: fs[`${y.num}_condition`],
@@ -450,11 +449,16 @@ const EditDronerMission = () => {
         " " +
         moment(f.endTime).format("HH:mm:ss")
     ).toISOString();
-    console.log(create);
     CampaignDatasource.updateCampaign(queryString[1], create).then((res) => {
-      console.log(res);
       if (res.success) {
-        navigate("/IndexDronerMission");
+        Swal.fire({
+          title: "บันทึกสำเร็จ",
+          icon: "success",
+          timer: 1500,
+          showConfirmButton: false,
+        }).then((time) => {
+          navigate("/IndexDronerMission");
+        });
       }
     });
   };

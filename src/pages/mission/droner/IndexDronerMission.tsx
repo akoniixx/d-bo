@@ -9,7 +9,9 @@ import {
   Button,
   Col,
   DatePicker,
+  Divider,
   Input,
+  Modal,
   Pagination,
   Row,
   Select,
@@ -41,6 +43,8 @@ const IndexDronerMission = () => {
   const [searchStartDate, setSearchStartDate] = useState<any>(null);
   const [searchEndDate, setSearchEndDate] = useState<any>(null);
   const [searchStatus, setSearchStatus] = useState("");
+  const [showModal, setShowModal] = useState(false);
+  const [deleteId, setDeleteId] = useState<string>("");
 
   const fetchMission = () => {
     CampaignDatasource.getCampaignList(
@@ -159,6 +163,14 @@ const IndexDronerMission = () => {
     </>
   );
 
+  const deleteCampaign = () => {
+    CampaignDatasource.deleteCampaign(deleteId).then((res) => {
+      setShowModal(!showModal);
+      setDeleteId("");
+      fetchMission();
+    });
+  };
+
   const columns = [
     {
       title: "ชื่อภารกิจ",
@@ -250,7 +262,10 @@ const IndexDronerMission = () => {
                 <ActionButton
                   icon={<DeleteOutlined />}
                   color={color.Error}
-                  //onClick={() => navigate("/DetailFarmerRedeem/id=" + row.id)}
+                  onClick={() => {
+                    setShowModal(!showModal);
+                    setDeleteId(row.id);
+                  }}
                 />
               </div>
             </div>
@@ -276,6 +291,56 @@ const IndexDronerMission = () => {
           showSizeChanger={false}
         />
       </div>
+      {showModal && (
+        <Modal
+          title="ยืนยันการลบ"
+          onCancel={() => {
+            setShowModal(!showModal);
+          }}
+          open={showModal}
+          footer={null}
+          bodyStyle={{
+            padding: 0,
+          }}
+        >
+          <div className="px-4 pt-4">
+            <span className="text-secondary">
+              โปรดตรวจสอบของภารกิจที่คุณต้องการลบ ก่อนที่จะกดยืนยัน
+            </span>
+            <p className="text-secondary">
+              เพราะอาจส่งผลต่อภารกิจที่จะแสดงในแอปพลิเคชัน
+            </p>
+          </div>
+          <Divider
+            style={{
+              marginBottom: "20px",
+            }}
+          />
+          <div className="d-flex justify-content-between px-4 pb-4">
+            <Button
+              style={{
+                borderColor: color.Error,
+                color: color.Error,
+              }}
+              onClick={() => {
+                setShowModal(!showModal);
+              }}
+            >
+              ยกเลิก
+            </Button>
+            <Button
+              style={{
+                borderColor: color.Error,
+                backgroundColor: color.Error,
+                color: color.White,
+              }}
+              onClick={() => deleteCampaign()}
+            >
+              ยืนยัน
+            </Button>
+          </div>
+        </Modal>
+      )}
     </>
   );
 };
