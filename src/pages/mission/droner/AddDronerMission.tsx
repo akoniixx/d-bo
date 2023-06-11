@@ -1,9 +1,6 @@
 import {
   DeleteOutlined,
   DownCircleFilled,
-  EditOutlined,
-  MinusCircleTwoTone,
-  PlusCircleTwoTone,
   UpCircleFilled,
 } from "@ant-design/icons";
 import {
@@ -64,6 +61,14 @@ const AddDronerMission = () => {
     ).then((res) => {
       setRewardList(res);
     });
+  };
+
+  const countExpand = () => {
+    const allCount = [];
+    for (let i = 0; 50 > i; i++) {
+      allCount.push(i + 1);
+    }
+    return allCount;
   };
 
   useEffect(() => {
@@ -355,7 +360,7 @@ const AddDronerMission = () => {
           pagination={false}
           expandable={{
             expandedRowRender: (record) => subMissionTextArea(record),
-            defaultExpandedRowKeys: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+            defaultExpandedRowKeys: countExpand(),
             expandIcon: ({ expanded, onExpand, record }) => {
               return expanded ? (
                 <UpCircleFilled

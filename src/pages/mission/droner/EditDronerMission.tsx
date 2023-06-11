@@ -1,9 +1,6 @@
 import {
   DeleteOutlined,
   DownCircleFilled,
-  EditOutlined,
-  MinusCircleTwoTone,
-  PlusCircleTwoTone,
   UpCircleFilled,
 } from "@ant-design/icons";
 import {
@@ -56,16 +53,35 @@ const EditDronerMission = () => {
   const [rewardList, setRewardList] = useState<GetAllRewardEntities>();
   const [count, setCount] = useState(1);
   const [isActive, setIsActive] = useState(false);
+  const [isEdit, setIsEdit] = useState(false);
 
   const fetchMissionById = () => {
     CampaignDatasource.getCampaignById(queryString[1]).then((res) => {
       const mapKey = res.condition;
-      setIsActive(
-        moment(res.startDate).format(dateSearchFormat) <
-          moment(Date()).toISOString()
-          ? true
-          : false
-      );
+      const checkIsEdit = () => {
+        if (res.status === "ACTIVE") {
+          setIsActive(
+            moment(res.startDate).format(dateSearchFormat) <=
+              moment(Date()).format(dateSearchFormat)
+              ? true
+              : false
+          );
+        } else if (res.status === "INACTIVE") {
+          setIsEdit(
+            moment(res.endDate).format(dateSearchFormat) <
+              moment(Date()).toISOString()
+              ? true
+              : false
+          );
+          setIsActive(
+            moment(res.endDate).format(dateSearchFormat) <
+              moment(Date()).toISOString()
+              ? true
+              : false
+          );
+        }
+      };
+      checkIsEdit();
       setDataSubMission(mapKey);
       setCount(mapKey.length);
       setData({ ...res, condition: mapKey });
@@ -107,6 +123,15 @@ const EditDronerMission = () => {
       setRewardList(res);
     });
   };
+
+  const countExpand = () => {
+    const allCount = [];
+    for (let i = 0; 50 > i; i++) {
+      allCount.push(i + 1);
+    }
+    return allCount;
+  };
+
 
   useEffect(() => {
     fetchMissionById();
@@ -219,7 +244,7 @@ const EditDronerMission = () => {
                 },
               ]}
             >
-              <Input placeholder="กรอกชื่อภารกิจย่อย" autoComplete="off" />
+              <Input placeholder="กรอกชื่อภารกิจย่อย" autoComplete="off" disabled={isEdit}/>
             </Form.Item>
           ),
         };
@@ -279,7 +304,7 @@ const EditDronerMission = () => {
                 },
               ]}
             >
-              <Select placeholder="เลือกชื่อของรางวัล" allowClear>
+              <Select placeholder="เลือกชื่อของรางวัล" allowClear disabled={isEdit}> 
                 {rewardList?.data.map((item) => (
                   <option value={item.id}>
                     <Row
@@ -346,13 +371,13 @@ const EditDronerMission = () => {
         <Col span={12}>
           <label>รายละเอียด</label>
           <Form.Item style={{ margin: 0 }} name={`${recode.num}_description`}>
-            <TextArea placeholder="กรอกรายละเอียด" rows={4} />
+            <TextArea placeholder="กรอกรายละเอียด" rows={4} disabled={isEdit}/>
           </Form.Item>
         </Col>
         <Col span={12}>
           <label>เงื่อนไข</label>
           <Form.Item style={{ margin: 0 }} name={`${recode.num}_condition`}>
-            <TextArea placeholder="กรอกเงื่อนไข" rows={4} />
+            <TextArea placeholder="กรอกเงื่อนไข" rows={4} disabled={isEdit}/>
           </Form.Item>
         </Col>
       </Row>
@@ -393,7 +418,7 @@ const EditDronerMission = () => {
           pagination={false}
           expandable={{
             expandedRowRender: (record) => subMissionTextArea(record),
-            defaultExpandedRowKeys: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+            defaultExpandedRowKeys: countExpand(),
             expandIcon: ({ expanded, onExpand, record }) => {
               return expanded ? (
                 <UpCircleFilled
@@ -487,7 +512,7 @@ const EditDronerMission = () => {
                 },
               ]}
             >
-              <Input placeholder="กรอกชื่อภารกิจ" autoComplete="off" />
+              <Input placeholder="กรอกชื่อภารกิจ" autoComplete="off" disabled={isEdit}/>
             </Form.Item>
           </Col>
           <Row>
@@ -540,7 +565,11 @@ const EditDronerMission = () => {
                     },
                   ]}
                 >
-                  <DatePicker placeholder="เลือกวันที่" format={dateFormat} />
+                  <DatePicker
+                    placeholder="เลือกวันที่"
+                    format={dateFormat}
+                    disabled={isEdit}
+                  />
                 </Form.Item>
                 <Form.Item
                   name="endTime"
@@ -552,6 +581,7 @@ const EditDronerMission = () => {
                     placeholder="เลือกเวลา"
                     defaultValue={moment("00:00", "HH:mm")}
                     allowClear={false}
+                    disabled={isEdit}
                   />
                 </Form.Item>
               </Col>
