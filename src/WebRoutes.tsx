@@ -67,6 +67,9 @@ import IndexDronerSummaryPoint from "./pages/point/droner/IndexDronerSummaryPoin
 import IndexFarmerSummary from "./pages/point/farmer/IndexFarmerSummary";
 import IndexFarmerHistorySum from "./pages/point/farmer/IndexFarmerHistorySum";
 import DetailDronerHistorySum from "./pages/point/droner/DetailDronerHistorySum";
+import IndexDronerMission from "./pages/mission/droner/IndexDronerMission";
+import AddDronerMission from "./pages/mission/droner/AddDronerMission";
+import EditDronerMission from "./pages/mission/droner/EditDronerMission";
 
 const WebRoutes: React.FC<any> = () => {
   return (
@@ -172,8 +175,13 @@ const WebRoutes: React.FC<any> = () => {
             path="/DetailDronerHistorySum/:id"
             element={<DetailDronerHistorySum />}
           />
+          <Route path="/IndexDronerMission" element={<IndexDronerMission />} />
+          <Route path="/AddDronerMission" element={<AddDronerMission />} />
+          <Route
+            path="/EditDronerMission/:id"
+            element={<EditDronerMission />}
+          />
         </Route>
-
         <Route element={<PublicRoute />}>
           <Route index element={<AuthPage />} />
           <Route path="/ErrorLoginPage" element={<ErrorLoginPage />} />

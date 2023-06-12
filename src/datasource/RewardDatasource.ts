@@ -33,8 +33,8 @@ export class RewardDatasource {
       .catch((err) => console.log(err));
   }
   static getAllReward(
-    take: number,
-    page: number,
+    take?: number,
+    page?: number,
     startExchangeDate?: string,
     expiredExchangeDate?: string,
     status?: string,
