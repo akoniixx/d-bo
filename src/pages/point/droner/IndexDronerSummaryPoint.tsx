@@ -26,7 +26,7 @@ const IndexDronerSummaryPoint = () => {
 
   useEffect(() => {
     fetchDronerSum();
-  }, []);
+  }, [current]);
 
   const onSearch = () => {
     setCurrent(1);
