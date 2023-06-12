@@ -179,7 +179,7 @@ const WebRoutes: React.FC<any> = () => {
             path="/DetailDronerHistorySum/:id"
             element={<DetailDronerHistorySum />}
           />
-          <Route path="/MissionReport" element={<MissionReport/>} />
+          <Route path="/MissionReport/:id" element={<MissionReport/>} />
 
           <Route path="/IndexQuota" element={<IndexQuota />} />
           <Route path="/AddQuota" element={<AddQuota />} />

@@ -1,5 +1,7 @@
 import { BASE_URL, httpClient } from "../config/develop-config";
 import { CreateCampaignEntiry } from "../entities/CampaignPointEntites";
+import { MissionDetailEntity } from "../entities/MissionEntities";
+import { DetailRedeemDronerEntity, RedeemDronerListEntity } from "../entities/RedeemEntities";
 
 export class CampaignDatasource {
   static getCampaignList(
@@ -77,6 +79,50 @@ export class CampaignDatasource {
     };
     return httpClient
       .post(BASE_URL + `/promotion/campaign/check-dupplicate-date`, params)
+      .then((res) => {
+        return res.data;
+      })
+      .catch((err) => console.log(err));
+  }
+  static detailMissionInprogress(
+    campaignId: string,
+    num: number,
+    take: number,
+    page: number,
+    search?: string
+  ): Promise<MissionDetailEntity> {
+    const params = {
+      campaignId: campaignId,
+      num: num,
+      take: take,
+      page: page,
+      search: search,
+    };
+    return httpClient
+      .get(BASE_URL + `/promotion/mission-campaign/query`, { params })
+      .then((res) => {
+        return res.data;
+      })
+      .catch((err) => console.log(err));
+  }
+  static detailMissionSuccess(
+    status: string,
+    num: number,
+    take: number,
+    page: number,
+    missionNo?: string,
+    search?: string
+  ): Promise<RedeemDronerListEntity> {
+    const params = {
+      status: status,
+      step: num,
+      take: take,
+      missionNo: missionNo,
+      page: page,
+      search: search,
+    };
+    return httpClient
+      .get(BASE_URL + `/promotion/droner-transactions/get-mission-reward`, { params })
       .then((res) => {
         return res.data;
       })

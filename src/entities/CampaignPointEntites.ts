@@ -9,6 +9,7 @@ export interface CampaignConditionEntity {
   missionName?: string | null;
   quata?: number;
   rewardRound?: number;
+  isDelete: boolean;
 }
 export const CampaignConditionEntity_INIT: CampaignConditionEntity = {
   num: 1,
@@ -21,6 +22,7 @@ export const CampaignConditionEntity_INIT: CampaignConditionEntity = {
   missionName: null,
   quata: 0,
   rewardRound: 0,
+  isDelete: false,
 };
 
 export interface CampaignEntiry {
@@ -77,4 +79,6 @@ export interface CreateCampaignEntiry {
   updateBy: string;
   status: string;
   application: string;
+  isDeleteDroner: boolean;
+  isDeleteFarmer: boolean;
 }

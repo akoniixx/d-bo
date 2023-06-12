@@ -248,24 +248,25 @@ const IndexDronerMission = () => {
                 <ActionButton
                   icon={<FileTextOutlined />}
                   color={color.primary1}
-                  onClick={() => navigate("/MissionReport")}
+                  onClick={() => navigate(`/MissionReport/id=${row.id}`)}
                 />
               </div>
               <div className="col-lg-4">
                 <ActionButton
                   icon={<EditOutlined />}
                   color={color.primary1}
-                  onClick={() => navigate("/EditDronerMission/id=" + row.id)}
+                  onClick={() => navigate(`/EditDronerMission/id=${row.id}`)}
                 />
               </div>
               <div className="col-lg-4">
                 <ActionButton
                   icon={<DeleteOutlined />}
-                  color={color.Error}
+                  color={row.isDeleteDroner ? color.Grey : color.Error}
                   onClick={() => {
                     setShowModal(!showModal);
                     setDeleteId(row.id);
                   }}
+                  actionDisable={row.isDeleteDroner}
                 />
               </div>
             </div>
