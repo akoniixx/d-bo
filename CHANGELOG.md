@@ -1,4 +1,14 @@
 ## [Version - 0]
+## improve [v0.34.1] 2023-06-12
+- added mission report page
+## Feature [v0.34.0] 2023-06-12
+- added quota setting menu
+## Feature [v0.33.0] 2023-06-12
+- added mission setting menu
+## Fix [v0.32.8] 2023-06-09
+- fixed paginaton droner summary point menu
+- fixed render rai in task menu
+- fixed render checkbox in new task
 ## improve [v0.32.7] 2023-06-08
 - call api droner reward history in reward page
 ## Fix [v0.32.6] 2023-06-08

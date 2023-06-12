@@ -545,7 +545,7 @@ export default function IndexTodayTask() {
         sorter(a.task_total_price, b.task_total_price),
       render: (value: any, row: any, index: number) => {
         const inv: InvoiceTaskEntity = {
-          raiAmount: row.farmerPlot_rai_amount,
+          raiAmount: row.task_farm_area_amount,
           unitPrice: row.task_unit_price,
           price: row.task_price,
           fee: row.task_fee,
