@@ -67,6 +67,9 @@ import IndexDronerSummaryPoint from "./pages/point/droner/IndexDronerSummaryPoin
 import IndexFarmerSummary from "./pages/point/farmer/IndexFarmerSummary";
 import IndexFarmerHistorySum from "./pages/point/farmer/IndexFarmerHistorySum";
 import DetailDronerHistorySum from "./pages/point/droner/DetailDronerHistorySum";
+import IndexQuota from "./pages/quotaSetting/droner/IndexQuota";
+import AddQuota from "./pages/quotaSetting/droner/AddQuota";
+import EditQuota from "./pages/quotaSetting/droner/EditQuota";
 import IndexDronerMission from "./pages/mission/droner/IndexDronerMission";
 import AddDronerMission from "./pages/mission/droner/AddDronerMission";
 import EditDronerMission from "./pages/mission/droner/EditDronerMission";
@@ -178,6 +181,9 @@ const WebRoutes: React.FC<any> = () => {
           />
           <Route path="/MissionReport" element={<MissionReport/>} />
 
+          <Route path="/IndexQuota" element={<IndexQuota />} />
+          <Route path="/AddQuota" element={<AddQuota />} />
+          <Route path="/EditQuota/:id" element={<EditQuota />} />
           <Route path="/IndexDronerMission" element={<IndexDronerMission />} />
           <Route path="/AddDronerMission" element={<AddDronerMission />} />
           <Route
