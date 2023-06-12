@@ -1,4 +1,6 @@
 ## [Version - 0]
+## improve [v0.34.1] 2023-06-12
+- added mission report page
 ## Feature [v0.34.0] 2023-06-12
 - added quota setting menu
 ## Feature [v0.33.0] 2023-06-12

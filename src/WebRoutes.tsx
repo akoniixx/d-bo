@@ -73,6 +73,7 @@ import EditQuota from "./pages/quotaSetting/droner/EditQuota";
 import IndexDronerMission from "./pages/mission/droner/IndexDronerMission";
 import AddDronerMission from "./pages/mission/droner/AddDronerMission";
 import EditDronerMission from "./pages/mission/droner/EditDronerMission";
+import MissionReport from "./pages/mission/droner/MissionReport";
 
 const WebRoutes: React.FC<any> = () => {
   return (
@@ -178,6 +179,8 @@ const WebRoutes: React.FC<any> = () => {
             path="/DetailDronerHistorySum/:id"
             element={<DetailDronerHistorySum />}
           />
+          <Route path="/MissionReport" element={<MissionReport/>} />
+
           <Route path="/IndexQuota" element={<IndexQuota />} />
           <Route path="/AddQuota" element={<AddQuota />} />
           <Route path="/EditQuota/:id" element={<EditQuota />} />

@@ -248,7 +248,7 @@ const IndexDronerMission = () => {
                 <ActionButton
                   icon={<FileTextOutlined />}
                   color={color.primary1}
-                  //onClick={() => navigate("/DetailFarmerRedeem/id=" + row.id)}
+                  onClick={() => navigate("/MissionReport")}
                 />
               </div>
               <div className="col-lg-4">
