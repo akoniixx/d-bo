@@ -1,4 +1,6 @@
 ## [Version - 0]
+## Feature [v0.33.0] 2023-06-12
+- added mission setting menu
 ## Fix [v0.32.8] 2023-06-09
 - fixed paginaton droner summary point menu
 - fixed render rai in task menu

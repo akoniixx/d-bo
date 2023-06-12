@@ -168,26 +168,24 @@ export const pathLists = ({ isAccounting }: { isAccounting: boolean }) => [
     ],
   },
   {
-    path: "missionQuota",
-    name: "missionQuota",
+    path: "mission",
+    name: "mission",
     title: "ภารกิจและชาเลนจ์",
     subMenu: [
       {
-        path: "mission",
-        name: "mission",
+        path: "listmission",
+        name: "listmission",
         title: "ภารกิจ",
         subMenu: [
           {
-            path: "/MissionReport",
-            name: "MissionReport",
+            path: "/IndexDronerMission",
+            name: "IndexDronerMission",
             title: "นักบินโดรน",
-            subMenu: [],
           },
         ],
       },
     ],
   },
-
   {
     path: "admin",
     name: "admin",

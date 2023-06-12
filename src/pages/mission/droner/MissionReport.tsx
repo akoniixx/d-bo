@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
-import { BackIconButton } from "../../components/button/BackButton";
+import { BackIconButton } from "../../../components/button/BackButton";
 import { useNavigate } from "react-router-dom";
-import { color } from "../../resource";
+import { color } from "../../../resource";
 import {
   Button,
   Col,
@@ -12,16 +12,16 @@ import {
   Row,
   Table,
 } from "antd";
-import MissionReportCard from "../../components/card/MissionReportCard";
+import MissionReportCard from "../../../components/card/MissionReportCard";
 import { SearchOutlined } from "@ant-design/icons";
 import { ColumnsType } from "antd/lib/table";
-import { FarmerDatasource } from "../../datasource/FarmerDatasource";
-import { FarmerPageEntity } from "../../entities/FarmerEntities";
+import { FarmerDatasource } from "../../../datasource/FarmerDatasource";
+import { FarmerPageEntity } from "../../../entities/FarmerEntities";
 import moment from "moment";
-import { DronerDatasource } from "../../datasource/DronerDatasource";
-import { DronerListEntity } from "../../entities/DronerEntities";
-import { RewardDatasource } from "../../datasource/RewardDatasource";
-import { GetAllRewardEntities } from "../../entities/RewardEntites";
+import { DronerDatasource } from "../../../datasource/DronerDatasource";
+import { DronerListEntity } from "../../../entities/DronerEntities";
+import { RewardDatasource } from "../../../datasource/RewardDatasource";
+import { GetAllRewardEntities } from "../../../entities/RewardEntites";
 
 function MissionReport() {
   const [type, setType] = useState("unsuccess");
@@ -134,7 +134,6 @@ function MissionReport() {
           children: (
             <span
               style={{
-                cursor: "pointer",
                 color: color.Success,
                 textDecorationLine: "underline",
                 fontWeight: "700",
@@ -188,9 +187,7 @@ function MissionReport() {
                 <div>
                   <span
                     style={{
-                      cursor: "pointer",
                       color: color.Success,
-                      textDecorationLine: "underline",
                       fontWeight: "700",
                     }}
                   >

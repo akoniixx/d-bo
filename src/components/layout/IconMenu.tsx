@@ -3,6 +3,7 @@ import {
   GiftFilled,
   MacCommandFilled,
   ProfileFilled,
+  RadarChartOutlined,
   SettingFilled,
   StarFilled,
   UserOutlined,
@@ -67,7 +68,7 @@ export const IconMenu = {
       }}
     />
   ),
-  missionQuota: (
+  mission: (
     <Image
       src={icon.targetInActive}
       preview={false}
@@ -131,7 +132,7 @@ export const IconMenuInActive = {
       }}
     />
   ),
-  missionQuota: (
+  mission: (
     <Image
       src={icon.targetActive}
       preview={false}
