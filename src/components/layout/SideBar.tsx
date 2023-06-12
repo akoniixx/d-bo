@@ -184,6 +184,18 @@ export const pathLists = ({ isAccounting }: { isAccounting: boolean }) => [
           },
         ],
       },
+      {
+        path: "listquota",
+        name: "listquota",
+        title: "ชาเลนจ์",
+        subMenu: [
+          {
+            path: "/IndexQuota",
+            name: "IndexQuota",
+            title: "นักบินโดรน",
+          },
+        ],
+      },
     ],
   },
   {
