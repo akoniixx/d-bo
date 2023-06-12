@@ -28,6 +28,7 @@ import RenderQuota from "../../../components/mobile/RenderQuota";
 import uploadImgQuota from "../../../resource/media/empties/upload_img_quota.png";
 import TextArea from "antd/lib/input/TextArea";
 import { DeleteOutlined } from "@ant-design/icons";
+import { validateOnlyNumber } from "../../../utilities/TextFormatter";
 
 const { Map } = require("immutable");
 
@@ -196,6 +197,14 @@ function AddQuota() {
     const startDate = moment(getValueDate.startDate).format("YYYY-MM-DD");
     return current && current < dayjs(startDate);
   };
+  const checkNumber = (
+    e: React.ChangeEvent<HTMLInputElement>,
+    name: string
+  ) => {
+    const { value: inputValue } = e.target;
+    const convertedNumber = validateOnlyNumber(inputValue);
+    form.setFieldsValue({ [name]: convertedNumber });
+  };
   const renderData = (
     <div className="col-lg-7">
       <CardContainer>
@@ -331,8 +340,8 @@ function AddQuota() {
                           width: "65px",
                           height: "90px",
                           overflow: "hidden",
-                          backgroundRepeat: 'no-repeat',
-                          backgroundPosition: 'center',
+                          backgroundRepeat: "no-repeat",
+                          backgroundPosition: "center",
                           backgroundSize: "100%",
                         }}
                       />
@@ -417,8 +426,8 @@ function AddQuota() {
                             width: "65px",
                             height: "90px",
                             overflow: "hidden",
-                            backgroundRepeat: 'no-repeat',
-                            backgroundPosition: 'center',
+                            backgroundRepeat: "no-repeat",
+                            backgroundPosition: "center",
                             backgroundSize: "100%",
                           }}
                         />
@@ -552,10 +561,12 @@ function AddQuota() {
                   ]}
                 >
                   <Input
+                    type="number"
                     placeholder="กรอกจำนวน"
                     autoComplete="off"
                     suffix={"ไร่/สิทธิ์"}
                     onChange={(e) => {
+                      checkNumber(e, "raiAmount");
                       setRaiAmount(e.target.value);
                     }}
                   />
@@ -574,7 +585,14 @@ function AddQuota() {
                     },
                   ]}
                 >
-                  <Input placeholder="กรอกจำนวนรอบ" autoComplete="off" />
+                  <Input
+                    type="number"
+                    placeholder="กรอกจำนวนรอบ"
+                    autoComplete="off"
+                    onChange={(e) => {
+                      checkNumber(e, "luckyDraw");
+                    }}
+                  />
                 </Form.Item>
               </div>
             </div>
@@ -602,12 +620,12 @@ function AddQuota() {
                           backgroundImage: `url(${imgTableLucky})`,
                           display:
                             imgTableLucky != undefined ? "block" : "none",
-                            width: "65px",
-                            height: "90px",
-                            overflow: "hidden",
-                            backgroundRepeat: 'no-repeat',
-                            backgroundPosition: 'center',
-                            backgroundSize: "100%",
+                          width: "65px",
+                          height: "90px",
+                          overflow: "hidden",
+                          backgroundRepeat: "no-repeat",
+                          backgroundPosition: "center",
+                          backgroundSize: "100%",
                         }}
                       />
                     </div>
