@@ -1,6 +1,6 @@
 import axios from "axios";
 
-export const BASE_URL = `https://api-dev-dnds.iconkaset.com`;
+export const BASE_URL = `https://api-dnds-dev.iconkaset.com`;
 
 const token = JSON.parse(localStorage.getItem("token") || "{  }");
 
