@@ -1,23 +1,33 @@
 import { Col, Image, Row } from "antd";
 import React, { useState } from "react";
 import { color } from "../../resource";
+import { numberWithCommas } from "../../utilities/TextFormatter";
 
+export interface detailReward {
+  rewardId: string;
+  rewardName: string;
+  rewardNo: string;
+  rewardExchange: string;
+  remain: number;
+  imagePath: string;
+  rewardType: string;
+}
 interface MissionReportProps {
   title?: string;
-  raiAmount?: string;
-  successPoint?: string;
-  unsuccessPoint?: string;
-  img?: string;
-  missionName?: any;
+  raiAmount?: number;
+  successMission: string;
+  unsuccessMission: string;
+  unconfirmMission: string;
+  detailReward?: detailReward;
   checkCard?: boolean;
 }
 const MissionReportCard: React.FC<MissionReportProps> = ({
   title,
   raiAmount,
-  successPoint,
-  unsuccessPoint,
-  img,
-  missionName,
+  successMission,
+  unsuccessMission,
+  unconfirmMission,
+  detailReward,
   checkCard,
 }) => {
   return (
@@ -31,11 +41,11 @@ const MissionReportCard: React.FC<MissionReportProps> = ({
       }}
     >
       <Row gutter={16} style={{ padding: 10 }}>
-        <Col span={16}>
+        <Col span={12}>
           <span style={{ fontWeight: "bold" }}>{title}</span>
-          <p>{`จำนวนไร่สะสม : ${raiAmount} ไร่`}</p>
+          <p>{`จำนวนไร่สะสม : ${numberWithCommas(raiAmount || 0)} ไร่`}</p>
         </Col>
-        <Col span={8}>
+        <Col span={12}>
           <Row gutter={8}>
             <div
               style={{
@@ -48,10 +58,24 @@ const MissionReportCard: React.FC<MissionReportProps> = ({
               }}
             >
               <span style={{ color: color.Error, fontWeight: "bold" }}>
-                {unsuccessPoint}{" "}
+                {unsuccessMission}{" "}
               </span>
               <br />
               <span style={{ color: color.BK }}>ยังไม่สำเร็จ</span>
+            </div>
+            <div
+              style={{
+                width: "90px",
+                padding: 12,
+                backgroundColor: "rgba(255, 250, 235, 1)",
+                textAlign: "center",
+              }}
+            >
+              <span style={{ color: '#FFCA37', fontWeight: "bold" }}>
+                {unconfirmMission}{" "}
+              </span>
+              <br />
+              <span style={{ color: color.BK }}>รอกดแลก</span>
             </div>
             <div
               style={{
@@ -64,7 +88,7 @@ const MissionReportCard: React.FC<MissionReportProps> = ({
               }}
             >
               <span style={{ color: color.Success, fontWeight: "bold" }}>
-                {successPoint}{" "}
+                {successMission}{" "}
               </span>
               <br />
               <span style={{ color: color.BK }}>สำเร็จ</span>
@@ -74,7 +98,7 @@ const MissionReportCard: React.FC<MissionReportProps> = ({
       </Row>
       <Row
         style={{
-          backgroundColor: checkCard ? "rgba(33, 150, 83, 0.1)" : "#C6C6C6",
+          backgroundColor: checkCard ? "rgba(33, 150, 83, 0.1)" : "#F4F4F4",
           padding: 10,
           borderBottomLeftRadius: "8px",
           borderBottomRightRadius: "8px",
@@ -82,13 +106,29 @@ const MissionReportCard: React.FC<MissionReportProps> = ({
       >
         <Col span={2}>
           <Image
-            src={img}
+            src={detailReward?.imagePath}
             style={{ width: 48, height: 48, padding: "6px", borderRadius: 5 }}
             preview={false}
           />
         </Col>
         <Col span={20} style={{ padding: "5px" }}>
-          <span>{missionName}</span>
+          <span>
+            {detailReward?.rewardName} | {detailReward?.rewardNo} |{" "}
+            {detailReward?.rewardType === "PHYSICAL" ? "Physical" : "Digital"}{" "}
+            <span
+              style={{
+                color:
+                  detailReward?.rewardExchange === "MISSION"
+                    ? "#A9CB62"
+                    : "#EA973E",
+              }}
+            >
+              {detailReward?.rewardExchange === "MISSION"
+                ? "(ภารกิจ) "
+                : "(ใช้แต้ม) "}
+            </span>
+            | คงเหลือ {detailReward?.remain} ชิ้น
+          </span>
         </Col>
       </Row>
     </div>

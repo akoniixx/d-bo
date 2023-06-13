@@ -13,7 +13,7 @@ export interface MissionDetailEntity {
   createAt: string;
   updateAt: string;
   missionNo: string;
-  amoutPeople: number;
+  amountPeople: number;
   data: {
     id: string;
     farmerId: string;
@@ -43,5 +43,6 @@ export interface ConditionMission {
     rewardNo: string;
     amountInprogressCount: number;
     amountSuccessCount: number;
+    amountRequestCount: number;
   };
 }

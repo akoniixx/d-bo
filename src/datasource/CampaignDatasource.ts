@@ -1,7 +1,10 @@
 import { BASE_URL, httpClient } from "../config/develop-config";
 import { CreateCampaignEntiry } from "../entities/CampaignPointEntites";
 import { MissionDetailEntity } from "../entities/MissionEntities";
-import { DetailRedeemDronerEntity, RedeemDronerListEntity } from "../entities/RedeemEntities";
+import {
+  DetailRedeemDronerEntity,
+  RedeemDronerListEntity,
+} from "../entities/RedeemEntities";
 
 export class CampaignDatasource {
   static getCampaignList(
@@ -89,6 +92,7 @@ export class CampaignDatasource {
     num: number,
     take: number,
     page: number,
+    status: string,
     search?: string
   ): Promise<MissionDetailEntity> {
     const params = {
@@ -96,6 +100,7 @@ export class CampaignDatasource {
       num: num,
       take: take,
       page: page,
+      status: status,
       search: search,
     };
     return httpClient
@@ -122,7 +127,9 @@ export class CampaignDatasource {
       search: search,
     };
     return httpClient
-      .get(BASE_URL + `/promotion/droner-transactions/get-mission-reward`, { params })
+      .get(BASE_URL + `/promotion/droner-transactions/get-mission-reward`, {
+        params,
+      })
       .then((res) => {
         return res.data;
       })

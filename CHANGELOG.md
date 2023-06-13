@@ -1,4 +1,8 @@
 ## [Version - 0]
+## improve [v0.34.2] 2023-06-13
+- fixed path url cancel task
+- enhanced mission setting menu
+- connected api report mission
 ## improve [v0.34.1] 2023-06-12
 - added mission report page
 ## Feature [v0.34.0] 2023-06-12
