@@ -14,21 +14,31 @@ import {
   Table,
 } from "antd";
 import { ColumnsType } from "antd/lib/table";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { color, icon } from "../../../resource";
 import { InfoCircleFilled, SearchOutlined } from "@ant-design/icons";
 import { BackIconButton } from "../../../components/button/BackButton";
 import { numberWithCommas } from "../../../utilities/TextFormatter";
 import TextArea from "antd/lib/input/TextArea";
+import { QuotaDatasource } from "../../../datasource/QuotaDatasource";
+import { AllQuotaReportEntity } from "../../../entities/QuotaReportEntities";
+import { DateTimeUtil } from "../../../utilities/DateTimeUtil";
 
+const _ = require("lodash");
 function QuotaReport() {
+  let queryString = _.split(window.location.pathname, "=");
+
+  const id = "274d2935-95ac-447b-a671-b89b6b1719ae";
   const navigate = useNavigate();
   const row = 10;
   const [current, setCurrent] = useState(1);
   const onChangePage = (page: number) => {
     setCurrent(page);
   };
+  const [rewardName, setRewardName] = useState<string>();
+  const [searchText, setSearchText] = useState<any>();
+  const [data, setData] = useState<AllQuotaReportEntity>();
   const [showModal, setShowModal] = useState(false);
   const [visible, setVisible] = useState(false);
   const handleVisible = (newVisible: any) => {
@@ -41,6 +51,16 @@ function QuotaReport() {
   const isNumber = (n: any) => {
     return !isNaN(parseFloat(n)) && isFinite(n);
   };
+  const getQuotaReport = async () => {
+    await QuotaDatasource.getAllQuotaReport(id, row, current, searchText).then(
+      (res) => {
+        setData(res);
+      }
+    );
+  };
+  useEffect(() => {
+    getQuotaReport();
+  }, [current]);
   const sorter = (a: any, b: any) => {
     if (a === null) {
       return 1;
@@ -65,6 +85,10 @@ function QuotaReport() {
     }
     return a > b ? 1 : -1;
   };
+  const changeTextSearch = (searchText: any) => {
+    setSearchText(searchText.target.value);
+    setCurrent(1);
+  };
   const downloadListName = (
     <Menu
       items={[
@@ -79,62 +103,6 @@ function QuotaReport() {
       ]}
     />
   );
-  const dataSource = [
-    {
-      key: "1",
-      updateAt: "16/05/2565, 10:00",
-      droner: "สายไหม นักบินโดรน",
-      phoneNo: "0989284761",
-      raiAmount: "5,000 ไร่",
-      receive: "10",
-      rewardReceive: "1",
-    },
-    {
-      key: "2",
-      updateAt: "20/05/2565, 10:00",
-      droner: "ไม่สาย นักบินโดรน",
-      phoneNo: "0989284761",
-      raiAmount: "5,000 ไร่",
-      receive: "10",
-      rewardReceive: "2",
-    },
-    {
-      key: "3",
-      updateAt: "22/05/2565, 10:00",
-      droner: "นักบินโดรน บินเร็ว",
-      phoneNo: "0989284761",
-      raiAmount: "5,000 ไร่",
-      receive: "10",
-      rewardReceive: "1",
-    },
-    {
-      key: "4",
-      updateAt: "23/05/2565, 10:00",
-      droner: "วิภาพร สมคิด",
-      phoneNo: "0989284761",
-      raiAmount: "5,000 ไร่",
-      receive: "10",
-      rewardReceive: "2",
-    },
-    {
-      key: "5",
-      updateAt: "23/05/2565, 10:00",
-      droner: "นักบินโดรน เบอร์สอง",
-      phoneNo: "0989284761",
-      raiAmount: "5,000 ไร่",
-      receive: "10",
-      rewardReceive: "1",
-    },
-    {
-      key: "6",
-      updateAt: "28/05/2565, 10:00",
-      droner: "นักบินโดรน เบอร์าม",
-      phoneNo: "0989284761",
-      raiAmount: "5,000 ไร่",
-      receive: "10",
-      rewardReceive: "4",
-    },
-  ];
   const PageTitle = (
     <>
       <div
@@ -200,7 +168,7 @@ function QuotaReport() {
             prefix={<SearchOutlined style={{ color: color.Disable }} />}
             placeholder="ค้นหาชื่อนักบินโดรน / เบอร์โทร"
             className="col-lg-12 p-1"
-            //   onChange={changeTextSearch}
+            onChange={changeTextSearch}
           />
         </div>
         <div>
@@ -212,7 +180,7 @@ function QuotaReport() {
               color: color.secondary2,
               backgroundColor: color.Success,
             }}
-            //   onClick={fetchData}
+            onClick={getQuotaReport}
           >
             ค้นหาข้อมูล
           </Button>
@@ -226,54 +194,72 @@ function QuotaReport() {
       dataIndex: "updateAt",
       key: "updateAt",
       sorter: (a: any, b: any) => sorter(a.updateAt, b.updateAt),
-      //   render: (value: any, row: any, index: number) => {
-      //     return {
-      //       children: <></>,
-      //     };
-      //   },
+      render: (value: any, row: any, index: number) => {
+        return {
+          children: (
+            <>
+              {row.updateAt ? DateTimeUtil.formatDateTime(row.updateAt) : " - "}
+            </>
+          ),
+        };
+      },
     },
     {
       title: "ชื่อนักบินโดรน",
       dataIndex: "droner",
       key: "droner",
       width: "20%",
-      //   render: (value: any, row: any, index: number) => {
-      //     return {
-      //       children: <></>,
-      //     };
-      //   },
+      render: (value: any, row: any, index: number) => {
+        return {
+          children: (
+            <>
+              <span
+              // style={{
+              //   color: color.Success,
+              //   cursor: "pointer",
+              //   fontWeight: "bold",
+              // }}
+              // onClick={() => navigate}
+              >
+                {row.firstname + " " + row.lastname}
+              </span>
+            </>
+          ),
+        };
+      },
     },
     {
       title: "เบอร์โทร",
       dataIndex: "phoneNo",
       key: "phoneNo",
-      //   render: (value: any, row: any, index: number) => {
-      //     return {
-      //       children: <></>,
-      //     };
-      //   },
+      render: (value: any, row: any, index: number) => {
+        return {
+          children: <span>{row.telephoneNo}</span>,
+        };
+      },
     },
     {
       title: "จำนวนไร่สะสม",
       dataIndex: "raiAmount",
       key: "raiAmount",
       sorter: (a: any, b: any) => sorter(a.raiAmount, b.raiAmount),
-      //   render: (value: any, row: any, index: number) => {
-      //     return {
-      //       children: <>=</>,
-      //     };
-      //   },
+      render: (value: any, row: any, index: number) => {
+        return {
+          children: <span>{numberWithCommas(row.allRai)}</span>,
+        };
+      },
     },
     {
       title: "จำนวนสิทธิที่ได้รับ",
-      dataIndex: "receive",
-      key: "receive",
-      sorter: (a: any, b: any) => sorter(a.receive, b.receive),
+      dataIndex: "quotaAmount",
+      key: "quotaAmount",
+      sorter: (a: any, b: any) => sorter(a.quotaAmount, b.quotaAmount),
       render: (value: any, row: any, index: number) => {
+        var sumAmount = row.quotaAmount - row.amountReceive;
         return {
           children: (
             <>
-              <span>{value}</span>
+              <span>{numberWithCommas(row.quotaAmount)}</span>
               <Popover
                 title={
                   <span
@@ -295,13 +281,13 @@ function QuotaReport() {
                         </div>
                       </td>
                       <td style={{ textAlign: "right" }}>
-                        {numberWithCommas(10)}
+                        {numberWithCommas(row.quotaAmount)}
                       </td>
                     </tr>
                     <tr>
                       <td style={{ paddingTop: 10 }}>จำนวนรางวัลที่ได้รับ</td>
                       <td style={{ textAlign: "right", color: color.Error }}>
-                        {numberWithCommas(1)}
+                        {numberWithCommas(row.amountReceive)}
                       </td>
                     </tr>
 
@@ -319,7 +305,7 @@ function QuotaReport() {
                           fontWeight: "bold",
                         }}
                       >
-                        {numberWithCommas(9)}
+                        {numberWithCommas(sumAmount)}
                       </td>
                     </tr>
                   </table>
@@ -341,9 +327,9 @@ function QuotaReport() {
     },
     {
       title: "จำนวนรางวัลที่ได้รับ",
-      dataIndex: "rewardReceive",
-      key: "rewardReceive",
-      sorter: (a: any, b: any) => sorter(a.rewardReceive, b.rewardReceive),
+      dataIndex: "amountReceive",
+      key: "amountReceive",
+      sorter: (a: any, b: any) => sorter(a.amountReceive, b.amountReceive),
       render: (value: any, row: any, index: number) => {
         return {
           children: (
@@ -355,7 +341,7 @@ function QuotaReport() {
                   textDecorationLine: "underline",
                 }}
               >
-                {value}
+                {row.amountReceive}
               </span>
             </>
           ),
@@ -395,12 +381,12 @@ function QuotaReport() {
     <>
       {PageTitle}
       <br />
-      <Table columns={columns} dataSource={dataSource} pagination={false} />
+      <Table columns={columns} dataSource={data?.data} pagination={false} />
       <div className="d-flex justify-content-between pt-3 pb-3">
-        <p>รายการทั้งหมด {dataSource.length} รายการ</p>
+        <p>รายการทั้งหมด {data?.count} รายการ</p>
         <Pagination
           current={current}
-          total={dataSource.length}
+          total={data?.count}
           onChange={onChangePage}
           pageSize={row}
           showSizeChanger={false}
@@ -438,7 +424,7 @@ function QuotaReport() {
                   placeholder="กรอกชื่อของรางวัล"
                   autoComplete="off"
                   onChange={(e) => {
-                    // setRewardName(e.target.value);
+                    setRewardName(e.target.value);
                   }}
                 />
               </Form.Item>
