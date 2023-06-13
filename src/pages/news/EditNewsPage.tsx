@@ -1,21 +1,24 @@
-import React, { useEffect, useState } from 'react'
-import { BackIconButton } from '../../components/button/BackButton'
-import { useNavigate } from 'react-router-dom';
-import { Checkbox, Form, Input, Radio, Tag } from 'antd';
-import { CardHeaderPromotion } from '../../components/header/CardHeaderPromotion';
+import React, { useEffect, useState } from "react";
+import { BackIconButton } from "../../components/button/BackButton";
+import { useNavigate } from "react-router-dom";
+import { Checkbox, Form, Input, Radio, Select, Tag } from "antd";
+import { CardHeaderPromotion } from "../../components/header/CardHeaderPromotion";
 import uploadImg from "../../resource/media/empties/upload_img_news.png";
-import { color } from '../../resource';
-import { resizeFileImg } from '../../utilities/ResizeImage';
-import { UploadImageEntity, UploadImageEntity_INTI } from '../../entities/UploadImageEntities';
-import { formats, modules } from '../../components/editor/EditorToolbar';
-import ReactQuill from 'react-quill';
-import FooterPage from '../../components/footer/FooterPage';
-import RenderNews from '../../components/mobile/RenderNews';
-import { NewsDatasource } from '../../datasource/NewsDatasource';
-import Swal from 'sweetalert2';
+import { color } from "../../resource";
+import { resizeFileImg } from "../../utilities/ResizeImage";
+import {
+  UploadImageEntity,
+  UploadImageEntity_INTI,
+} from "../../entities/UploadImageEntities";
+import { formats, modules } from "../../components/editor/EditorToolbar";
+import ReactQuill from "react-quill";
+import FooterPage from "../../components/footer/FooterPage";
+import RenderNews from "../../components/mobile/RenderNews";
+import { NewsDatasource } from "../../datasource/NewsDatasource";
+import Swal from "sweetalert2";
 import parse from "html-react-parser";
-import { UploadImageDatasouce } from '../../datasource/UploadImageDatasource';
-import { DashboardLayout } from '../../components/layout/Layout';
+import { UploadImageDatasouce } from "../../datasource/UploadImageDatasource";
+import { DashboardLayout } from "../../components/layout/Layout";
 const { Map } = require("immutable");
 const _ = require("lodash");
 
@@ -23,10 +26,10 @@ function EditNewsPage() {
   let queryString = _.split(window.location.pathname, "=");
   const profile = JSON.parse(localStorage.getItem("profile") || "{  }");
   const [imgProfile, setImgProfile] = useState<any>();
-  const [chooseFarmer,setChooseFarmer] = useState<boolean>(false)
-  const [chooseDroner,setChooseDroner] = useState<boolean>(false)
-  const [application,setApplication] = useState<string>("")
-  const [newsName,setNewsName] = useState<string>("")
+  const [chooseFarmer, setChooseFarmer] = useState<boolean>(false);
+  const [chooseDroner, setChooseDroner] = useState<boolean>(false);
+  const [application, setApplication] = useState<string>("");
+  const [newsName, setNewsName] = useState<string>("");
   const [descriptionEditor, setDescriptionEditor] = useState<string | null>(
     null
   );
@@ -64,7 +67,7 @@ function EditNewsPage() {
     );
     const e = Map(d.toJS()).set("resource", "FARMER");
     const f = Map(e.toJS()).set("category", "PROFILE_IMAGE");
-    console.log(f.toJS().file)
+    console.log(f.toJS().file);
     setCreateImgProfile(f.toJS());
   };
 
@@ -87,10 +90,8 @@ function EditNewsPage() {
     setImgProfile(undefined);
     setCreateImgProfile(UploadImageEntity_INTI);
     setBtnSaveDisable(true);
-    form.setFieldValue(
-      "img",null
-    )
-    onFieldsChange()
+    form.setFieldValue("img", null);
+    onFieldsChange();
     // checkValidate(data);
   };
 
@@ -103,150 +104,153 @@ function EditNewsPage() {
     setDescriptionEditor(editor.getHTML());
   };
 
-  const handleChooseFarmer = (e : any) =>{
-    setChooseFarmer(e.target.checked)
-    handleChooseApplication(e.target.checked,chooseDroner)
-  }
+  const handleChooseFarmer = (e: any) => {
+    setChooseFarmer(e.target.checked);
+    handleChooseApplication(e.target.checked, chooseDroner);
+  };
 
-  const handleChooseDroner = (e : any) =>{
-    setChooseDroner(e.target.checked)
-    handleChooseApplication(chooseFarmer,e.target.checked)
-  }
+  const handleChooseDroner = (e: any) => {
+    setChooseDroner(e.target.checked);
+    handleChooseApplication(chooseFarmer, e.target.checked);
+  };
 
-  const handleChooseApplication = (farmer : boolean,droner : boolean) =>{
-    if(farmer === false && droner === false){
-      setApplication("")
+  const handleChooseApplication = (farmer: boolean, droner: boolean) => {
+    if (farmer === false && droner === false) {
+      setApplication("");
+    } else if (farmer === true && droner === false) {
+      setApplication("FARMER");
+    } else if (farmer === false && droner === true) {
+      setApplication("DRONER");
+    } else {
+      setApplication("ALL");
     }
-    else if(farmer === true && droner === false){
-      setApplication("FARMER")
-    }
-    else if(farmer === false && droner === true){
-      setApplication("DRONER")
-    }
-    else{
-      setApplication("ALL")
-    }
-  }
+  };
 
   const onFieldsChange = () => {
-    const {
-      newsName,
-      newsDescription,
-      newsStatus,
-      FarmerApp,
-      DronerApp,
-      img
-    } = form.getFieldsValue()
+    const { newsName, newsDescription, newsStatus, FarmerApp, DronerApp, img } =
+      form.getFieldsValue();
     let fieldInfo = false;
     let fieldapp = false;
     let fieldimg = false;
-    if(newsName && (newsDescription != "<p><br></p>") && newsStatus){
-      fieldInfo = false
+    if (newsName && newsDescription != "<p><br></p>" && newsStatus) {
+      fieldInfo = false;
+    } else {
+      fieldInfo = true;
     }
-    else{
-      fieldInfo = true
-    }
-    if(FarmerApp || DronerApp){
-      fieldapp = false
-    }
-    else{
-      fieldapp = true
+    if (FarmerApp || DronerApp) {
+      fieldapp = false;
+    } else {
+      fieldapp = true;
     }
 
-    if(!img){
-      fieldimg = true
+    if (!img) {
+      fieldimg = true;
+    } else {
+      fieldimg = false;
     }
-    else{
-      fieldimg = false
-    }
-    setBtnSaveDisable(fieldInfo || fieldapp || fieldimg)
-  }
+    setBtnSaveDisable(fieldInfo || fieldapp || fieldimg);
+  };
 
-  const onSubmit = ()=>{
-    const {
-      newsName,
-      newsDescription,
-      newsStatus
-    } = form.getFieldsValue()
-    if(!createImgProfile.file){
-      NewsDatasource.editNews(
-        {
-          id : queryString[1],
-          title : newsName,
-          details : newsDescription,
-          status : newsStatus,
-          application : application,
-          createBy : profile.firstname + " " + profile.lastname,
-        }
-      ).then(res => {
-        Swal.fire({
-          title: "บันทึกสำเร็จ",
-          icon: "success",
-          timer: 1500,
-          showConfirmButton: false,
-        }).then((time) => {
-          navigate("/NewsPage")
-        });
-      }).catch((err) => {
-        console.log(err);
-        Swal.fire({
-          title: "เกิดข้อผิดพลาก",
-          icon: "error",
-          showConfirmButton: true,
-        });
-      });
-    }
-    else{
-      NewsDatasource.editNews(
-        {
-          id : queryString[1],
-          title : newsName,
-          details : newsDescription,
-          status : newsStatus,
-          application : application,
-          file : createImgProfile.file,
-          createBy : profile.firstname + " " + profile.lastname,
-        }
-      ).then(res => {
-        Swal.fire({
-          title: "บันทึกสำเร็จ",
-          icon: "success",
-          timer: 1500,
-          showConfirmButton: false,
-        }).then((time) => {
-          navigate("/NewsPage");
-        });
-      }).catch((err) => {
-        console.log(err);
-        Swal.fire({
-          title: "เกิดข้อผิดพลาก",
-          icon: "error",
-          showConfirmButton: true,
-        });
-      });
-    }
-  }
-
-  useEffect(()=>{
-    NewsDatasource.getNewsById(queryString[1]).then(
-      res=> {
-        form.setFieldsValue({
-          img : res.imagePath,
-          newsName : res.title,
-          newsStatus : res.status,
-          newsDescription : res.details,
-          FarmerApp : res.application === "ALL" ? true : res.application === "FARMER" ? true : false,
-          DronerApp : res.application === "ALL" ? true : res.application === "DRONER" ? true : false
+  const onSubmit = () => {
+    const { newsName, newsDescription, newsStatus } = form.getFieldsValue();
+    if (!createImgProfile.file) {
+      NewsDatasource.editNews({
+        id: queryString[1],
+        title: newsName,
+        details: newsDescription,
+        status: newsStatus,
+        application: application,
+        createBy: profile.firstname + " " + profile.lastname,
+      })
+        .then((res) => {
+          Swal.fire({
+            title: "บันทึกสำเร็จ",
+            icon: "success",
+            timer: 1500,
+            showConfirmButton: false,
+          }).then((time) => {
+            navigate("/NewsPage");
+          });
         })
-        setNewsName(res.title)
-        setDescriptionEditor(res.details);
-        setImgProfile(res.imagePath)
-        setApplication(res.application)
-        setChooseFarmer(res.application === "ALL" ? true : res.application === "FARMER" ? true : false)
-        setChooseDroner(res.application === "ALL" ? true : res.application === "DRONER" ? true : false)
-      }
-    )
-  },[])
+        .catch((err) => {
+          console.log(err);
+          Swal.fire({
+            title: "เกิดข้อผิดพลาก",
+            icon: "error",
+            showConfirmButton: true,
+          });
+        });
+    } else {
+      NewsDatasource.editNews({
+        id: queryString[1],
+        title: newsName,
+        details: newsDescription,
+        status: newsStatus,
+        application: application,
+        file: createImgProfile.file,
+        createBy: profile.firstname + " " + profile.lastname,
+      })
+        .then((res) => {
+          Swal.fire({
+            title: "บันทึกสำเร็จ",
+            icon: "success",
+            timer: 1500,
+            showConfirmButton: false,
+          }).then((time) => {
+            navigate("/NewsPage");
+          });
+        })
+        .catch((err) => {
+          console.log(err);
+          Swal.fire({
+            title: "เกิดข้อผิดพลาก",
+            icon: "error",
+            showConfirmButton: true,
+          });
+        });
+    }
+  };
+
+  useEffect(() => {
+    NewsDatasource.getNewsById(queryString[1]).then((res) => {
+      form.setFieldsValue({
+        img: res.imagePath,
+        newsName: res.title,
+        newsStatus: res.status,
+        newsDescription: res.details,
+        FarmerApp:
+          res.application === "ALL"
+            ? true
+            : res.application === "FARMER"
+            ? true
+            : false,
+        DronerApp:
+          res.application === "ALL"
+            ? true
+            : res.application === "DRONER"
+            ? true
+            : false,
+      });
+      setNewsName(res.title);
+      setDescriptionEditor(res.details);
+      setImgProfile(res.imagePath);
+      setApplication(res.application);
+      setChooseFarmer(
+        res.application === "ALL"
+          ? true
+          : res.application === "FARMER"
+          ? true
+          : false
+      );
+      setChooseDroner(
+        res.application === "ALL"
+          ? true
+          : res.application === "DRONER"
+          ? true
+          : false
+      );
+    });
+  }, []);
 
   return (
     <>
@@ -262,27 +266,30 @@ function EditNewsPage() {
             <Form form={form} onFieldsChange={onFieldsChange}>
               <div className="row">
                 <div className="form-group text-center pt-4">
-                  <Form.Item name="img" rules={[
+                  <Form.Item
+                    name="img"
+                    rules={[
                       {
                         required: true,
                         message: "กรุณาใส่รูปภาพ!",
                       },
-                  ]}>
-                  <div
-                    className="hiddenFileInputNews"
-                    style={{
-                      backgroundImage: `url(${
-                        imgProfile == undefined ? uploadImg : imgProfile
-                      })`,
-                    }}
+                    ]}
                   >
-                    <input
-                      key={imgProfile}
-                      type="file"
-                      onChange={onChangeProfile}
-                      title="เลือกรูป"
-                    />
-                  </div>
+                    <div
+                      className="hiddenFileInputNews"
+                      style={{
+                        backgroundImage: `url(${
+                          imgProfile == undefined ? uploadImg : imgProfile
+                        })`,
+                      }}
+                    >
+                      <input
+                        key={imgProfile}
+                        type="file"
+                        onChange={onChangeProfile}
+                        title="เลือกรูป"
+                      />
+                    </div>
                   </Form.Item>
                   <div>
                     {imgProfile != undefined && (
@@ -311,7 +318,10 @@ function EditNewsPage() {
                     )}
                   </div>
                 </div>
-                <p className='text-center text-danger pt-1 pb-4'>*รูปภาพจะต้องมีสัดส่วน 16:6 หรือ 1,000px * 375px เท่านั้น เพื่อความสวยงามของภาพในแอปพลิเคชัน*</p>
+                <p className="text-center text-danger pt-1 pb-4">
+                  *รูปภาพจะต้องมีสัดส่วน 16:6 หรือ 1,000px * 375px เท่านั้น
+                  เพื่อความสวยงามของภาพในแอปพลิเคชัน*
+                </p>
               </div>
               <div className="form-group col-lg-12">
                 <label>
@@ -330,7 +340,7 @@ function EditNewsPage() {
                     placeholder="กรอกหัวข้อข่าว"
                     autoComplete="off"
                     onChange={(e) => {
-                      setNewsName(e.target.value)
+                      setNewsName(e.target.value);
                     }}
                   />
                 </Form.Item>
@@ -362,25 +372,121 @@ function EditNewsPage() {
               </div>
               <div className="form-group col-lg-12">
                 <label>
+                  ผู้เขียน <span style={{ color: "red" }}>*</span>
+                </label>
+                <Form.Item name="author">
+                  <Input placeholder="admin" autoComplete="off" disabled />
+                </Form.Item>
+              </div>
+              <div className="form-group col-lg-12 pb-4">
+                <label>
+                  ตั้งค่าข่าวสาร <span style={{ color: "red" }}>*</span>
+                </label>
+                <Form.Item
+                  initialValue={false}
+                  name="mainPage"
+                  valuePropName="checked"
+                  className="my-0"
+                >
+                  <Checkbox
+                    // onChange={handleChooseFarmer}
+                    // checked={chooseFarmer}
+                    className="pt-2"
+                  >
+                    ปักหมุดในหน้าหลัก
+                  </Checkbox>
+                </Form.Item>
+                <Form.Item
+                  initialValue={false}
+                  name="allNews"
+                  valuePropName="checked"
+                  className="my-0"
+                >
+                  <Checkbox
+                    // onChange={handleChooseDroner}
+                    // checked={chooseDroner}
+                    className="mt-0"
+                  >
+                    ปักหมุดในหน้าข่าวสารทั้งหมด
+                  </Checkbox>
+                </Form.Item>
+              </div>
+              <div className="form-group col-lg-12">
+                <label>
                   แอปพลิเคชั่น <span style={{ color: "red" }}>*</span>
                 </label>
-                <Form.Item initialValue={false} name="FarmerApp" valuePropName="checked" className='my-0'>
-                    <Checkbox
-                      onChange={handleChooseFarmer}
-                      checked={chooseFarmer}
-                      className="pt-2"
-                    >
-                      Farmer Application
-                    </Checkbox>
+                <Form.Item
+                  initialValue={false}
+                  name="FarmerApp"
+                  valuePropName="checked"
+                  className="my-0"
+                >
+                  <Checkbox
+                    onChange={handleChooseFarmer}
+                    checked={chooseFarmer}
+                    className="pt-2"
+                  >
+                    Farmer Application
+                  </Checkbox>
                 </Form.Item>
-                <Form.Item initialValue={false} name="DronerApp" valuePropName="checked" className='my-0'>
-                    <Checkbox
-                      onChange={handleChooseDroner}
-                      checked={chooseDroner}
-                      className="mt-0"
-                    >
-                      Droner Application
-                    </Checkbox>
+                <Form.Item
+                  initialValue={false}
+                  name="DronerApp"
+                  valuePropName="checked"
+                  className="my-0"
+                >
+                  <Checkbox
+                    onChange={handleChooseDroner}
+                    checked={chooseDroner}
+                    className="mt-0"
+                  >
+                    Droner Application
+                  </Checkbox>
+                </Form.Item>
+              </div>
+              <div className="form-group col-lg-12 pt-4 ">
+                <label>
+                  หมวดหมู่ <span style={{ color: "red" }}>*</span>
+                </label>
+                <Form.Item
+                  initialValue={false}
+                  name="news"
+                  valuePropName="checked"
+                  className="my-0"
+                >
+                  <Checkbox
+                    // onChange={handleChooseFarmer}
+                    // checked={chooseFarmer}
+                    className="pt-2"
+                  >
+                    ข่าวสาร
+                  </Checkbox>
+                </Form.Item>
+                <Form.Item
+                  initialValue={false}
+                  name="challenge"
+                  valuePropName="checked"
+                  className="my-0"
+                >
+                  <Checkbox
+                    // onChange={handleChooseDroner}
+                    // checked={chooseDroner}
+                    className="mt-0"
+                  >
+                    ชาเลนจ์
+                  </Checkbox>
+                  <Select
+                    style={{ width: 550, left: 20 }}
+                    // onChange={handleChange}
+                    options={[
+                      {
+                        value: "บินปั๊บรับแต้ม แถมโชค 3 ชั้น",
+                        label: "บินปั๊บรับแต้ม แถมโชค 3 ชั้น",
+                      },
+                      { value: "ทดสอบ", label: "ทดสอบ" },
+                      { value: "เทสเทส", label: "เทสเทส" },
+                    ]}
+                  />
                 </Form.Item>
               </div>
               <div className="row pt-3">
@@ -408,7 +514,7 @@ function EditNewsPage() {
             </Form>
           </div>
         </div>
-        <RenderNews 
+        <RenderNews
           img={imgProfile}
           description={descriptionEditor!}
           name={newsName}
@@ -422,7 +528,7 @@ function EditNewsPage() {
         </div>
       </div>
     </>
-  )
+  );
 }
 
-export default EditNewsPage
+export default EditNewsPage;
