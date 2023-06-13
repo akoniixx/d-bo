@@ -57,6 +57,7 @@ const EditDronerMission = () => {
 
   const fetchMissionById = () => {
     CampaignDatasource.getCampaignById(queryString[1]).then((res) => {
+      console.log(res);
       const mapKey = res.condition;
       const checkIsEdit = () => {
         if (res.status === "ACTIVE") {
@@ -101,6 +102,7 @@ const EditDronerMission = () => {
           ? moment(new Date().getTime())
           : moment(new Date(res.endDate).getTime()),
       });
+      console.log(res);
       mapKey?.forEach((p: any) => {
         formTable.setFieldValue(`${p.num}_missionName`, p.missionName);
         formTable.setFieldValue(`${p.num}_rai`, p.rai);
@@ -131,7 +133,6 @@ const EditDronerMission = () => {
     }
     return allCount;
   };
-
 
   useEffect(() => {
     fetchMissionById();
@@ -244,7 +245,11 @@ const EditDronerMission = () => {
                 },
               ]}
             >
-              <Input placeholder="กรอกชื่อภารกิจย่อย" autoComplete="off" disabled={isEdit}/>
+              <Input
+                placeholder="กรอกชื่อภารกิจย่อย"
+                autoComplete="off"
+                disabled={isEdit}
+              />
             </Form.Item>
           ),
         };
@@ -304,7 +309,11 @@ const EditDronerMission = () => {
                 },
               ]}
             >
-              <Select placeholder="เลือกชื่อของรางวัล" allowClear disabled={isEdit}> 
+              <Select
+                placeholder="เลือกชื่อของรางวัล"
+                allowClear
+                disabled={isEdit}
+              >
                 {rewardList?.data.map((item) => (
                   <option value={item.id}>
                     <Row
@@ -353,8 +362,14 @@ const EditDronerMission = () => {
               <div className="col-lg-4">
                 <ActionButton
                   icon={<DeleteOutlined />}
-                  color={count > 1 ? color.Error : color.Grey}
-                  actionDisable={count > 1 ? false : true}
+                  color={
+                    count > 1
+                      ? row.isDelete
+                        ? color.Grey
+                        : color.Error
+                      : color.Grey
+                  }
+                  actionDisable={count > 1 ? row.isDelete : true}
                   onClick={() => removeRow(row.num)}
                 />
               </div>
@@ -371,13 +386,13 @@ const EditDronerMission = () => {
         <Col span={12}>
           <label>รายละเอียด</label>
           <Form.Item style={{ margin: 0 }} name={`${recode.num}_description`}>
-            <TextArea placeholder="กรอกรายละเอียด" rows={4} disabled={isEdit}/>
+            <TextArea placeholder="กรอกรายละเอียด" rows={4} disabled={isEdit} />
           </Form.Item>
         </Col>
         <Col span={12}>
           <label>เงื่อนไข</label>
           <Form.Item style={{ margin: 0 }} name={`${recode.num}_condition`}>
-            <TextArea placeholder="กรอกเงื่อนไข" rows={4} disabled={isEdit}/>
+            <TextArea placeholder="กรอกเงื่อนไข" rows={4} disabled={isEdit} />
           </Form.Item>
         </Col>
       </Row>
@@ -512,7 +527,11 @@ const EditDronerMission = () => {
                 },
               ]}
             >
-              <Input placeholder="กรอกชื่อภารกิจ" autoComplete="off" disabled={isEdit}/>
+              <Input
+                placeholder="กรอกชื่อภารกิจ"
+                autoComplete="off"
+                disabled={isEdit}
+              />
             </Form.Item>
           </Col>
           <Row>
