@@ -333,7 +333,7 @@ function IndexQuota() {
                     row.status === "DRAFTING" ? color.Grey : color.primary1
                   }
                   actionDisable={row.status === "DRAFTING" ? true : false}
-                  // onClick={() => navigate("/" + row.id)}
+                  onClick={() => navigate("/QuotaReport/id=" + row.id)}
                 />
               </div>
               <div className="col-lg-4">

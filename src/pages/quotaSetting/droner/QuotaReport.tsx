@@ -16,10 +16,10 @@ import {
 import { ColumnsType } from "antd/lib/table";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { color, icon } from "../../resource";
+import { color, icon } from "../../../resource";
 import { InfoCircleFilled, SearchOutlined } from "@ant-design/icons";
-import { BackIconButton } from "../../components/button/BackButton";
-import { numberWithCommas } from "../../utilities/TextFormatter";
+import { BackIconButton } from "../../../components/button/BackButton";
+import { numberWithCommas } from "../../../utilities/TextFormatter";
 import TextArea from "antd/lib/input/TextArea";
 
 function QuotaReport() {
