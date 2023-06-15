@@ -1,186 +1,136 @@
-import { SearchOutlined } from "@ant-design/icons";
-import { Image } from "antd";
+import { Col, Image, Row } from "antd";
 import React, { useState } from "react";
 import { color } from "../../resource";
-import styled from "styled-components";
+import { numberWithCommas } from "../../utilities/TextFormatter";
 
-export const ListStyled = styled.div<{ isFocus?: boolean }>`
-  border: solid ${color.Success};
-  border-width: 1.5px;
-  background-color: White;
-  padding-left: 10px;
-  padding-right: 10px;
-`;
-
+export interface detailReward {
+  rewardId: string;
+  rewardName: string;
+  rewardNo: string;
+  rewardExchange: string;
+  remain: number;
+  imagePath: string;
+  rewardType: string;
+}
 interface MissionReportProps {
-  id: string;
-  title: string;
-  raiAmount: string;
-  successPoint: string;
-  unsuccessPoint: string;
-  img: string;
-  missionName: string;
-  checkCard: string | undefined;
-  setCheckCard: React.Dispatch<React.SetStateAction<string | undefined>>;
+  title?: string;
+  raiAmount?: number;
+  successMission: string;
+  unsuccessMission: string;
+  unconfirmMission: string;
+  detailReward?: detailReward;
+  checkCard?: boolean;
 }
 const MissionReportCard: React.FC<MissionReportProps> = ({
-  id,
   title,
   raiAmount,
-  successPoint,
-  unsuccessPoint,
-  img,
-  missionName,
+  successMission,
+  unsuccessMission,
+  unconfirmMission,
+  detailReward,
   checkCard,
-  setCheckCard,
 }) => {
   return (
     <div
-      onClick={() => {
-        if (id === checkCard) {
-          setCheckCard(undefined);
-        } else {
-          setCheckCard(id);
-        }
+      style={{
+        border: "solid",
+        borderColor: checkCard ? color.Success : "#C6C6C6",
+        borderWidth: "1.5px",
+        backgroundColor: "white",
+        borderRadius: "10px",
       }}
     >
-      {checkCard === id ? (
-        <ListStyled style={{ borderRadius: "10px" }}>
-          <div className="row p-2">
-            <div className="col-lg">
-              <span style={{ fontWeight: "bold" }}>{title}</span>
-              <p>{`จำนวนไร่สะสม : ${raiAmount} ไร่`}</p>
-            </div>
-            <div className="col-lg-5">
-              <div className="row">
-                <div
-                  style={{
-                    width: "90px",
-                    padding: 12,
-                    backgroundColor: "rgba(235, 87, 87, 0.1)",
-                    borderBottomLeftRadius: 5,
-                    borderTopLeftRadius: 5,
-                    color: color.Error,
-                    textAlign: "center",
-                  }}
-                >
-                  {unsuccessPoint}
-                  <br />
-                  <span style={{ color: color.BK }}>ยังไม่สำเร็จ</span>
-                </div>
-                <div
-                  style={{
-                    width: "90px",
-                    textAlign: "center",
-                    borderBottomRightRadius: 5,
-                    borderTopRightRadius: 5,
-                    padding: 12,
-                    backgroundColor: "rgba(33, 150, 83, 0.1)",
-                    color: color.Success,
-                  }}
-                >
-                  {successPoint}
-                  <br />
-                  <span style={{ color: color.BK }}>สำเร็จ</span>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div className="row">
+      <Row gutter={16} style={{ padding: 10 }}>
+        <Col span={12}>
+          <span style={{ fontWeight: "bold" }}>{title}</span>
+          <p>{`จำนวนไร่สะสม : ${numberWithCommas(raiAmount || 0)} ไร่`}</p>
+        </Col>
+        <Col span={12}>
+          <Row gutter={8}>
             <div
               style={{
+                width: "90px",
+                padding: 12,
+                backgroundColor: "rgba(235, 87, 87, 0.1)",
+                borderBottomLeftRadius: 5,
+                borderTopLeftRadius: 5,
+                textAlign: "center",
+              }}
+            >
+              <span style={{ color: color.Error, fontWeight: "bold" }}>
+                {unsuccessMission}{" "}
+              </span>
+              <br />
+              <span style={{ color: color.BK }}>ยังไม่สำเร็จ</span>
+            </div>
+            <div
+              style={{
+                width: "90px",
+                padding: 12,
+                backgroundColor: "rgba(255, 250, 235, 1)",
+                textAlign: "center",
+              }}
+            >
+              <span style={{ color: '#FFCA37', fontWeight: "bold" }}>
+                {unconfirmMission}{" "}
+              </span>
+              <br />
+              <span style={{ color: color.BK }}>รอกดแลก</span>
+            </div>
+            <div
+              style={{
+                width: "90px",
+                padding: 12,
                 backgroundColor: "rgba(33, 150, 83, 0.1)",
+                borderBottomRightRadius: 5,
+                borderTopRightRadius: 5,
+                textAlign: "center",
               }}
             >
-              <div className="row">
-                <div className="col-lg-2">
-                  <Image
-                    src={img}
-                    style={{ width: 45, height: 45, padding: "6px" }}
-                    preview={false}
-                  />
-                </div>
-                <div className="col" style={{ alignSelf: "center" }}>
-                  <span>{missionName}</span>
-                </div>
-              </div>
+              <span style={{ color: color.Success, fontWeight: "bold" }}>
+                {successMission}{" "}
+              </span>
+              <br />
+              <span style={{ color: color.BK }}>สำเร็จ</span>
             </div>
-          </div>
-        </ListStyled>
-      ) : (
-        <div
-          style={{
-            border: "solid",
-            borderWidth: "1px",
-            backgroundColor: "White",
-            paddingLeft: "10px",
-            paddingRight: "10px",
-            borderRadius: "10px",
-            borderColor: color.Disable,
-          }}
-        >
-          <div className="row p-2">
-            <div className="col-lg-7">
-              <span style={{ fontWeight: "bold" }}>{title}</span>
-              <p>{`จำนวนไร่สะสม : ${raiAmount} ไร่`}</p>
-            </div>
-            <div className="col-lg">
-              <div className="row">
-                <div
-                  style={{
-                    width: "90px",
-                    padding: 12,
-                    backgroundColor: "rgba(235, 87, 87, 0.1)",
-                    borderBottomLeftRadius: 5,
-                    borderTopLeftRadius: 5,
-                    color: color.Error,
-                    textAlign: "center",
-                  }}
-                >
-                  {unsuccessPoint}
-                  <br />
-                  <span style={{ color: color.BK }}>ยังไม่สำเร็จ</span>
-                </div>
-                <div
-                  style={{
-                    width: "90px",
-                    textAlign: "center",
-                    borderBottomRightRadius: 5,
-                    borderTopRightRadius: 5,
-                    padding: 12,
-                    backgroundColor: "rgba(33, 150, 83, 0.1)",
-                    color: color.Success,
-                  }}
-                >
-                  {successPoint}
-                  <br />
-                  <span style={{ color: color.BK }}>สำเร็จ</span>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div className="row">
-            <div
+          </Row>
+        </Col>
+      </Row>
+      <Row
+        style={{
+          backgroundColor: checkCard ? "rgba(33, 150, 83, 0.1)" : "#F4F4F4",
+          padding: 10,
+          borderBottomLeftRadius: "8px",
+          borderBottomRightRadius: "8px",
+        }}
+      >
+        <Col span={2}>
+          <Image
+            src={detailReward?.imagePath}
+            style={{ width: 48, height: 48, padding: "6px", borderRadius: 5 }}
+            preview={false}
+          />
+        </Col>
+        <Col span={20} style={{ padding: "5px" }}>
+          <span>
+            {detailReward?.rewardName} | {detailReward?.rewardNo} |{" "}
+            {detailReward?.rewardType === "PHYSICAL" ? "Physical" : "Digital"}{" "}
+            <span
               style={{
-                backgroundColor: "rgba(226, 226, 226, 0.44)",
+                color:
+                  detailReward?.rewardExchange === "MISSION"
+                    ? "#A9CB62"
+                    : "#EA973E",
               }}
             >
-              <div className="row">
-                <div className="col-lg-2">
-                  <Image
-                    src={img}
-                    style={{ width: 45, height: 45, padding: "6px" }}
-                    preview={false}
-                  />
-                </div>
-                <div className="col" style={{ alignSelf: "center" }}>
-                  <span>{missionName}</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+              {detailReward?.rewardExchange === "MISSION"
+                ? "(ภารกิจ) "
+                : "(ใช้แต้ม) "}
+            </span>
+            | คงเหลือ {detailReward?.remain} ชิ้น
+          </span>
+        </Col>
+      </Row>
     </div>
   );
 };
