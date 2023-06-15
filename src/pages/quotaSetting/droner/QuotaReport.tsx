@@ -22,8 +22,13 @@ import { BackIconButton } from "../../../components/button/BackButton";
 import { numberWithCommas } from "../../../utilities/TextFormatter";
 import TextArea from "antd/lib/input/TextArea";
 import { QuotaDatasource } from "../../../datasource/QuotaDatasource";
-import { AllQuotaReportEntity } from "../../../entities/QuotaReportEntities";
+import {
+  AddQuotaRedeemHisEntity,
+  AddQuotaRedeemHisEntity_INIT,
+  AllQuotaReportEntity,
+} from "../../../entities/QuotaReportEntities";
 import { DateTimeUtil } from "../../../utilities/DateTimeUtil";
+import ModalQuotaRedeem from "../../../components/modal/ModalQuotaRedeem";
 
 const _ = require("lodash");
 function QuotaReport() {
@@ -44,9 +49,15 @@ function QuotaReport() {
   const handleVisible = (newVisible: any) => {
     setVisible(newVisible);
   };
-  const showModalAddReward = (e: any) => {
+  const [addQuota, setAddQuota] = useState<AddQuotaRedeemHisEntity>(
+    AddQuotaRedeemHisEntity_INIT
+  );
+
+  const showModalAddReward = (e: any, index: any) => {
     setShowModal(!showModal);
+    setEditIndex(index);
   };
+  const [editIndex, setEditIndex] = useState();
 
   const isNumber = (n: any) => {
     return !isNaN(parseFloat(n)) && isFinite(n);
@@ -357,7 +368,7 @@ function QuotaReport() {
           children: (
             <div>
               <Button
-                onClick={() => showModalAddReward(row)}
+                onClick={() => showModalAddReward(row, index)}
                 style={{
                   padding: 5,
                   borderColor: color.Success,
@@ -377,6 +388,9 @@ function QuotaReport() {
       },
     },
   ];
+  const updateRewardReceive = (dataQuotaRedeem: AddQuotaRedeemHisEntity) => {
+    console.log(1);
+  };
   return (
     <>
       {PageTitle}
@@ -394,103 +408,14 @@ function QuotaReport() {
       </div>
 
       {showModal && (
-        <Modal
-          title="เพิ่มรางวัลที่ได้รับ"
-          onCancel={() => {
-            setShowModal(!showModal);
-          }}
-          open={showModal}
-          footer={null}
-          bodyStyle={{
-            padding: 0,
-          }}
-          style={{ top: "25%" }}
-        >
-          <div className="p-4">
-            <div className="form-group col-lg-12">
-              <label>
-                ชื่อของรางวัล <span style={{ color: "red" }}>*</span>
-              </label>
-              <Form.Item
-                name="rewardName"
-                rules={[
-                  {
-                    required: true,
-                    message: "กรุณากรอกชื่อของรางวัล!",
-                  },
-                ]}
-              >
-                <Input
-                  placeholder="กรอกชื่อของรางวัล"
-                  autoComplete="off"
-                  onChange={(e) => {
-                    setRewardName(e.target.value);
-                  }}
-                />
-              </Form.Item>
-            </div>
-            <div className="form-group col-lg-12">
-              <label>
-                เลือกรอบที่จับรางวัล <span style={{ color: "red" }}>*</span>
-              </label>
-              <Form.Item
-                name="rewardName"
-                rules={[
-                  {
-                    required: true,
-                    message: "กรุณาเลือกรอบรางวัลที่จับ!",
-                  },
-                ]}
-              >
-                <Select placeholder="เลือกรอบรางวัลที่จับ" />
-              </Form.Item>
-            </div>
-            <div className="form-group col-lg-12">
-              <label>หมายเหตุ</label>
-              <Form.Item
-                name="rewardName"
-                rules={[
-                  {
-                    required: true,
-                    message: "กรุณากรอกชื่อของรางวัล!",
-                  },
-                ]}
-              >
-                <TextArea rows={6} placeholder="กรอกหมายเหตุ" />
-              </Form.Item>
-            </div>
-          </div>
-          <Divider
-            style={{
-              marginBottom: "20px",
-            }}
-          />
-          <div className="d-flex justify-content-between px-4 pt-3 pb-3">
-            <Button
-              style={{
-                borderColor: color.Success,
-                color: color.Success,
-              }}
-              onClick={() => {
-                setShowModal(!showModal);
-              }}
-            >
-              ยกเลิก
-            </Button>
-            <Button
-              style={{
-                borderColor: color.Success,
-                backgroundColor: color.Success,
-                color: color.White,
-              }}
-              onClick={() => {
-                setShowModal(!showModal);
-              }}
-            >
-              บันทึก
-            </Button>
-          </div>
-        </Modal>
+        <ModalQuotaRedeem
+          // isEditModal
+          show={showModal}
+          backButton={() => setShowModal((prev) => !prev)}
+          callBack={updateRewardReceive}
+          data={addQuota}
+          editIndex={editIndex}
+        />
       )}
     </>
   );
