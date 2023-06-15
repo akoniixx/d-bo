@@ -111,7 +111,6 @@ export class CampaignDatasource {
       .catch((err) => console.log(err));
   }
   static detailMissionSuccess(
-    status: string,
     num: number,
     take: number,
     page: number,
@@ -119,7 +118,6 @@ export class CampaignDatasource {
     search?: string
   ): Promise<RedeemDronerListEntity> {
     const params = {
-      status: status,
       step: num,
       take: take,
       missionNo: missionNo,

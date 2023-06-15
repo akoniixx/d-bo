@@ -60,6 +60,15 @@ function MissionReport() {
   const [statusMission, setStatusMission] = useState("INPROGRESS");
   const [isLoading, setIsLoading] = useState(false);
 
+  interface DataTable {
+    updateAt: string;
+    name: string;
+    telephone: string;
+    allraiAmount: string;
+    raiAmount: string;
+  }
+  const [dataTable, setDataTable] = useState<DataTable[]>();
+
   const fetchMissionInprogress = () => {
     setIsLoading(true);
     CampaignDatasource.detailMissionInprogress(
@@ -69,23 +78,21 @@ function MissionReport() {
       current,
       statusMission
     ).then((res) => {
+      console.log("res", res);
       setDataCondition(res.condition);
       setDataMission(res);
+      fetchMissionSuccess(res.missionNo);
       setIsLoading(false);
     });
   };
 
-  const fetchMissionSuccess = () => {
-    CampaignDatasource.detailMissionSuccess(
-      "DONE",
-      num,
-      row,
-      current,
-      dataMission?.missionNo
-    ).then((res) => {
-      setDataMissionSuc(res);
-      setIsLoading(false);
-    });
+  const fetchMissionSuccess = (missionNo: string) => {
+    CampaignDatasource.detailMissionSuccess(num, row, current, missionNo).then(
+      (res) => {
+        setDataMissionSuc(res);
+        setIsLoading(false);
+      }
+    );
   };
 
   const checkSubmission = (i: number) => {
@@ -94,8 +101,6 @@ function MissionReport() {
 
   useEffect(() => {
     fetchMissionInprogress();
-    fetchMissionSuccess();
-    
   }, [current, num, statusMission]);
 
   const handleSearchDate = (e: any) => {
@@ -149,7 +154,7 @@ function MissionReport() {
     successMission: color.Success,
   };
 
-  const columns = [
+  const columns: any = [
     {
       title: "วันที่อัพเดต",
       dataIndex: "updatedAt",
@@ -189,61 +194,59 @@ function MissionReport() {
         };
       },
     },
-    type === "unsuccessMission"
-      ? {
-          title: "จำนวนไร่สะสม",
-          dataIndex: "allraiAmount",
-          key: "allraiAmount",
-          sorter: (a: any, b: any) => sorter(a.allraiAmount, b.allraiAmount),
-          render: (value: any, row: any, index: number) => {
-            const calRai = () => {
-              let cal = (
-                dataCondition?.find((x) => x.num === num)?.rai! -
-                row.allraiAmount
-              ).toFixed(2);
-              return numberWithCommas(Number(cal));
-            };
-            return {
-              children: (
-                <div>
-                  <>
-                    <span>
-                      {numberWithCommas(row.allraiAmount)
-                        ? numberWithCommas(row.allraiAmount)
-                        : 0}{" "}
-                      ไร่
-                    </span>
-                    <br />
-                    <span style={{ color: color.Disable, fontSize: "12px" }}>
-                      {`(ขาดอีก ${calRai()} ไร่)`}
-                    </span>
-                  </>
-                </div>
-              ),
-            };
-          },
-        }
-      : {
-          title: "Redeem No.",
-          dataIndex: "raiAmount",
-          key: "raiAmount",
-          render: (value: any, row: any, index: number) => {
-            return {
-              children: (
-                <div>
-                  <span
-                    style={{
-                      color: color.Success,
-                      fontWeight: "700",
-                    }}
-                  >
-                    {"RD0000001"}
-                  </span>
-                </div>
-              ),
-            };
-          },
-        },
+    {
+      title: "จำนวนไร่สะสม",
+      dataIndex: "allraiAmount",
+      key: "allraiAmount",
+      sorter: (a: any, b: any) => sorter(a.allraiAmount, b.allraiAmount),
+      render: (value: any, row: any, index: number) => {
+        const calRai = () => {
+          let cal = (
+            dataCondition?.find((x) => x.num === num)?.rai! - row.allraiAmount
+          ).toFixed(2);
+          return numberWithCommas(Number(cal));
+        };
+        return {
+          children: (
+            <div>
+              <>
+                <span>
+                  {numberWithCommas(row.allraiAmount)
+                    ? numberWithCommas(row.allraiAmount)
+                    : 0}{" "}
+                  ไร่
+                </span>
+                <br />
+                <span style={{ color: color.Disable, fontSize: "12px" }}>
+                  {`(ขาดอีก ${calRai()} ไร่)`}
+                </span>
+              </>
+            </div>
+          ),
+        };
+      },
+    },
+    {
+      title: "Redeem No.",
+      dataIndex: "raiAmount",
+      key: "raiAmount",
+      render: (value: any, row: any, index: number) => {
+        return {
+          children: (
+            <div>
+              <span
+                style={{
+                  color: color.Success,
+                  fontWeight: "700",
+                }}
+              >
+                {"RD0000001"}
+              </span>
+            </div>
+          ),
+        };
+      },
+    },
   ];
 
   const renderSubmission = (
@@ -441,7 +444,13 @@ function MissionReport() {
       )}
       <NewTable
         className="pt-3"
-        columns={columns}
+        columns={
+          type === "successMission"
+            ? columns.slice(0, -1)
+            : type === "unconfirmMission"
+            ? columns.slice(0, -2)
+            : columns
+        }
         dataSource={dataMission?.data}
         pagination={false}
         loading={isLoading}
