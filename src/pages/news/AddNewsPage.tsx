@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { DashboardLayout } from "../../components/layout/Layout";
 import { BackIconButton } from "../../components/button/BackButton";
 import { useNavigate } from "react-router-dom";
@@ -17,6 +17,7 @@ import FooterPage from "../../components/footer/FooterPage";
 import RenderNews from "../../components/mobile/RenderNews";
 import { NewsDatasource } from "../../datasource/NewsDatasource";
 import Swal from "sweetalert2";
+import { CampaignDatasource } from "../../datasource/CampaignDatasource";
 const { Map } = require("immutable");
 
 function AddNewsPage() {
@@ -32,7 +33,12 @@ function AddNewsPage() {
   const [createImgProfile, setCreateImgProfile] = useState<UploadImageEntity>(
     UploadImageEntity_INTI
   );
+  const [categoryNews, setCategoryNews] = useState<string>("");
+  const [campId, setCampId] = useState<string>("");
+  const [chooseChallenge, setChooseChallenge] = useState<boolean>(false);
+  const [chooseNews, setChooseNews] = useState<boolean>(false);
   const [saveBtnDisable, setBtnSaveDisable] = useState<boolean>(true);
+  const [cName, setCname] = useState<any[]>([]);
   const navigate = useNavigate();
   const [form] = Form.useForm();
   const onChangeProfile = async (file: any) => {
@@ -119,18 +125,59 @@ function AddNewsPage() {
       setApplication("ALL");
     }
   };
-
+  const handleChooseChallenge = (e: any) => {
+    setChooseChallenge(e.target.checked);
+    handleChooseCategoryNews(e.target.checked, chooseNews);
+  };
+  const handleChooseNews = (e: any) => {
+    setChooseNews(e.target.checked);
+    handleChooseCategoryNews(chooseChallenge, e.target.checked);
+  };
+  const handleChooseCategoryNews = (challenge: boolean, news: boolean) => {
+    if (challenge === false && news === false) {
+      setCategoryNews("");
+    } else if (challenge === true && news === false) {
+      setCategoryNews("CHALLENGE");
+    } else if (challenge === false && news === true) {
+      setCategoryNews("NEWS");
+    } else {
+      setCategoryNews("ALL");
+    }
+  };
+  const handleCampName = (e: any) => {
+    setCampId(e);
+  };
+  useEffect(() => {
+    CampaignDatasource.getCampaignList("QUATA", 0, 0).then((res) => {
+      setCname(res.data);
+    });
+  }, []);
   const onFieldsChange = () => {
-    const { newsName, newsDescription, newsStatus, FarmerApp, DronerApp, img } =
-      form.getFieldsValue();
+    const {
+      newsName,
+      newsDescription,
+      newsStatus,
+      FarmerApp,
+      DronerApp,
+      img,
+      challenge,
+      news,
+      campName,
+    } = form.getFieldsValue();
     let fieldInfo = false;
     let fieldapp = false;
     let fieldimg = false;
+    let fieldCateGory = false;
 
     if (newsName && newsDescription != "<p><br></p>" && newsStatus) {
       fieldInfo = false;
     } else {
       fieldInfo = true;
+    }
+    if ((challenge && campName) || news) {
+      fieldCateGory = false;
+    } else {
+      fieldCateGory = true;
     }
     if (FarmerApp || DronerApp) {
       fieldapp = false;
@@ -143,7 +190,7 @@ function AddNewsPage() {
     } else {
       fieldimg = false;
     }
-    setBtnSaveDisable(fieldInfo || fieldapp || fieldimg);
+    setBtnSaveDisable(fieldInfo || fieldapp || fieldimg || fieldCateGory);
   };
 
   const onSubmit = () => {
@@ -153,6 +200,8 @@ function AddNewsPage() {
       details: newsDescription,
       status: newsStatus,
       application: application,
+      categoryNews: categoryNews,
+      campaignId: campId,
       file: createImgProfile.file,
       createBy: profile.firstname + " " + profile.lastname,
     })
@@ -360,7 +409,7 @@ function AddNewsPage() {
                   </Checkbox>
                 </Form.Item>
               </div>
-              <div className="form-group col-lg-12 pt-4 ">
+              <div className="form-group col-lg-12 pt-4">
                 <label>
                   หมวดหมู่ <span style={{ color: "red" }}>*</span>
                 </label>
@@ -371,39 +420,45 @@ function AddNewsPage() {
                   className="my-0"
                 >
                   <Checkbox
-                    // onChange={handleChooseFarmer}
-                    // checked={chooseFarmer}
+                    onChange={handleChooseNews}
+                    checked={chooseNews}
                     className="pt-2"
                   >
                     ข่าวสาร
                   </Checkbox>
                 </Form.Item>
-                <Form.Item
-                  initialValue={false}
-                  name="challenge"
-                  valuePropName="checked"
-                  className="my-0"
-                >
-                  <Checkbox
-                    // onChange={handleChooseDroner}
-                    // checked={chooseDroner}
-                    className="mt-0"
-                  >
-                    ชาเลนจ์
-                  </Checkbox>
-                  <Select
-                    style={{ width: 550, left: 20 }}
-                    // onChange={handleChange}
-                    options={[
-                      {
-                        value: "บินปั๊บรับแต้ม แถมโชค 3 ชั้น",
-                        label: "บินปั๊บรับแต้ม แถมโชค 3 ชั้น",
-                      },
-                      { value: "ทดสอบ", label: "ทดสอบ" },
-                      { value: "เทสเทส", label: "เทสเทส" },
-                    ]}
-                  />
-                </Form.Item>
+                <div className="row">
+                  <div className="col-lg">
+                    <Form.Item
+                      initialValue={false}
+                      name="challenge"
+                      valuePropName="checked"
+                      className="my-0"
+                    >
+                      <Checkbox
+                        onChange={handleChooseChallenge}
+                        checked={chooseChallenge}
+                        className="mt-0"
+                      >
+                        ชาเลนจ์
+                      </Checkbox>
+                    </Form.Item>
+                  </div>
+                  <div className="col-lg-10">
+                    <Form.Item name="campName">
+                      <Select
+                        disabled={!chooseChallenge}
+                        allowClear
+                        placeholder="เลือกชื่อชาเลนจ์"
+                        onChange={handleCampName}
+                      >
+                        {cName.map((item) => (
+                          <option value={item.id}>{item.campaignName}</option>
+                        ))}
+                      </Select>
+                    </Form.Item>
+                  </div>
+                </div>
               </div>
               <div className="row pt-3">
                 <div className="form-group col-lg-12 d-flex flex-column">

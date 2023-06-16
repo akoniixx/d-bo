@@ -41,6 +41,14 @@ function NewsPage() {
   const [sortDirection3, setSortDirection3] = useState<string | undefined>(
     undefined
   );
+  const [sortDirection4, setSortDirection4] = useState<string | undefined>(
+    undefined
+  );
+  const [sortDirection5, setSortDirection5] = useState<string | undefined>(
+    undefined
+  );
+  const [showModalHis, setShowModalHis] = useState<boolean>(false);
+
   const [sortField, setSortField] = useState<string | undefined>(undefined);
   const [modalDelete, setModalDelete] = useState<boolean>(false);
   const [search, setSearch] = useState<string>("");
@@ -98,7 +106,9 @@ function NewsPage() {
     });
     setModalDelete(!modalDelete);
   };
-
+  const handleModalHistory = (taskId: string) => {
+    setShowModalHis((prev) => !prev);
+  };
   useEffect(() => {
     fetchNews();
   }, [current, sortDirection]);
@@ -458,38 +468,176 @@ function NewsPage() {
       },
     },
     {
-      title: "หมวดหมู่",
-      dataIndex: "",
-      key: "",
+      title: () => {
+        return (
+          <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+            หมวดหมู่
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                cursor: "pointer",
+              }}
+              onClick={() => {
+                setSortField("category_news");
+                setSortDirection((prev) => {
+                  if (prev === "ASC") {
+                    return "DESC";
+                  } else if (prev === undefined) {
+                    return "ASC";
+                  } else {
+                    return undefined;
+                  }
+                });
+                setSortDirection5((prev) => {
+                  if (prev === "ASC") {
+                    return "DESC";
+                  } else if (prev === undefined) {
+                    return "ASC";
+                  } else {
+                    return undefined;
+                  }
+                });
+              }}
+            >
+              <CaretUpOutlined
+                style={{
+                  position: "relative",
+                  top: 2,
+                  color: sortDirection5 === "ASC" ? "#ffca37" : "white",
+                }}
+              />
+              <CaretDownOutlined
+                style={{
+                  position: "relative",
+                  bottom: 2,
+                  color: sortDirection5 === "DESC" ? "#ffca37" : "white",
+                }}
+              />
+            </div>
+          </div>
+        );
+      },
+      dataIndex: "category_news",
+      key: "category_news",
       render: (value: any, row: any, index: number) => {
         return {
           children: (
-            <>
-              <span>ชาเลนจ์</span>
-              <Tooltip title={"ชื่อชาเลนจ์ : บินปั๊บรับแต้ม แถมโชค 3 ชั้น"}>
-                <InfoCircleFilled
-                  style={{
-                    color: color.Success,
-                    fontSize: "15px",
-                    marginLeft: "7px",
-                    verticalAlign: 0.5,
-                  }}
-                />
-              </Tooltip>
-            </>
+            <div className="row">
+              {row.category_news === "ALL" ? (
+                <div className="container d-flex flex-column">
+                  <span
+                    style={{
+                      color: "#000",
+                    }}
+                  >
+                    {"ข่าวสาร, ชาเลนจ์"}
+                    <Tooltip title={`ชื่อชาเลนจ์ : ${row.campaign_name}`}>
+                      <InfoCircleFilled
+                        style={{
+                          color: color.Success,
+                          fontSize: "15px",
+                          marginLeft: "7px",
+                          verticalAlign: 0.5,
+                        }}
+                      />
+                    </Tooltip>
+                  </span>
+                </div>
+              ) : row.category_news === "NEWS" ? (
+                <div className="container">
+                  <span
+                    style={{
+                      color: "#000",
+                    }}
+                  >
+                    {"ข่าวสาร"}
+                  </span>
+                </div>
+              ) : (
+                <div className="container">
+                  <span
+                    style={{
+                      color: "#000",
+                    }}
+                  >
+                    {"ชาเลนจ์"}
+                  </span>
+                  <Tooltip title={`ชื่อชาเลนจ์ : ${row.campaign_name}`}>
+                    <InfoCircleFilled
+                      style={{
+                        color: color.Success,
+                        fontSize: "15px",
+                        marginLeft: "7px",
+                        verticalAlign: 0.5,
+                      }}
+                    />
+                  </Tooltip>
+                </div>
+              )}
+            </div>
           ),
         };
       },
     },
     {
-      title: "คิวที่รอแจ้งเตือน",
-      dataIndex: "",
-      key: "",
+      title: () => {
+        return (
+          <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+            คิวที่รอแจ้งเตือน
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                cursor: "pointer",
+              }}
+              onClick={() => {
+                setSortField("count_queue");
+                setSortDirection((prev) => {
+                  if (prev === "ASC") {
+                    return "DESC";
+                  } else if (prev === undefined) {
+                    return "ASC";
+                  } else {
+                    return undefined;
+                  }
+                });
+                setSortDirection4((prev) => {
+                  if (prev === "ASC") {
+                    return "DESC";
+                  } else if (prev === undefined) {
+                    return "ASC";
+                  } else {
+                    return undefined;
+                  }
+                });
+              }}
+            >
+              <CaretUpOutlined
+                style={{
+                  position: "relative",
+                  top: 2,
+                  color: sortDirection4 === "ASC" ? "#ffca37" : "white",
+                }}
+              />
+              <CaretDownOutlined
+                style={{
+                  position: "relative",
+                  bottom: 2,
+                  color: sortDirection4 === "DESC" ? "#ffca37" : "white",
+                }}
+              />
+            </div>
+          </div>
+        );
+      },
+      dataIndex: "count_queue",
+      key: "count_queue",
       render: (value: any, row: any, index: number) => {
         return {
           children: (
             <div className="container">
-              <span>จำนวน 0 คิว</span>
+              <span>จำนวน {row.count_queue} คิว</span>
               <br />
               <u
                 style={{
@@ -497,6 +645,7 @@ function NewsPage() {
                   fontWeight: "bold",
                   cursor: "pointer",
                 }}
+                onClick={() => handleModalHistory(row)}
               >
                 ดูประวัติแจ้งเตือน
               </u>

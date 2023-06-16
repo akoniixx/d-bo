@@ -19,6 +19,7 @@ import Swal from "sweetalert2";
 import parse from "html-react-parser";
 import { UploadImageDatasouce } from "../../datasource/UploadImageDatasource";
 import { DashboardLayout } from "../../components/layout/Layout";
+import { CampaignDatasource } from "../../datasource/CampaignDatasource";
 const { Map } = require("immutable");
 const _ = require("lodash");
 
@@ -28,7 +29,12 @@ function EditNewsPage() {
   const [imgProfile, setImgProfile] = useState<any>();
   const [chooseFarmer, setChooseFarmer] = useState<boolean>(false);
   const [chooseDroner, setChooseDroner] = useState<boolean>(false);
+  const [chooseChallenge, setChooseChallenge] = useState<boolean>(false);
+  const [chooseNews, setChooseNews] = useState<boolean>(false);
   const [application, setApplication] = useState<string>("");
+  const [categoryNews, setCategoryNews] = useState<string>("");
+  const [campId, setCampId] = useState<string>("");
+  const [cName, setCname] = useState<any[]>([]);
   const [newsName, setNewsName] = useState<string>("");
   const [descriptionEditor, setDescriptionEditor] = useState<string | null>(
     null
@@ -126,6 +132,28 @@ function EditNewsPage() {
     }
   };
 
+  const handleChooseChallenge = (e: any) => {
+    setChooseChallenge(e.target.checked);
+    handleChooseCategoryNews(e.target.checked, chooseNews);
+  };
+  const handleChooseNews = (e: any) => {
+    setChooseNews(e.target.checked);
+    handleChooseCategoryNews(chooseChallenge, e.target.checked);
+  };
+  const handleChooseCategoryNews = (challenge: boolean, news: boolean) => {
+    if (challenge === false && news === false) {
+      setCategoryNews("");
+    } else if (challenge === true && news === false) {
+      setCategoryNews("CHALLENGE");
+    } else if (challenge === false && news === true) {
+      setCategoryNews("NEWS");
+    } else {
+      setCategoryNews("ALL");
+    }
+  };
+  const handleCampName = (e: any) => {
+    setCampId(e);
+  };
   const onFieldsChange = () => {
     const { newsName, newsDescription, newsStatus, FarmerApp, DronerApp, img } =
       form.getFieldsValue();
@@ -160,6 +188,8 @@ function EditNewsPage() {
         details: newsDescription,
         status: newsStatus,
         application: application,
+        categoryNews: categoryNews,
+        campaignId: campId,
         createBy: profile.firstname + " " + profile.lastname,
       })
         .then((res) => {
@@ -187,6 +217,8 @@ function EditNewsPage() {
         details: newsDescription,
         status: newsStatus,
         application: application,
+        categoryNews: categoryNews,
+        campaignId: campId,
         file: createImgProfile.file,
         createBy: profile.firstname + " " + profile.lastname,
       })
@@ -217,6 +249,7 @@ function EditNewsPage() {
         img: res.imagePath,
         newsName: res.title,
         newsStatus: res.status,
+        campName: res.campaign.campaignName,
         newsDescription: res.details,
         FarmerApp:
           res.application === "ALL"
@@ -230,11 +263,25 @@ function EditNewsPage() {
             : res.application === "DRONER"
             ? true
             : false,
+        challenge:
+          res.categoryNews === "ALL"
+            ? true
+            : res.categoryNews === "CHALLENGE"
+            ? true
+            : false,
+        news:
+          res.categoryNews === "ALL"
+            ? true
+            : res.categoryNews === "NEWS"
+            ? true
+            : false,
+        createBy: res.createBy,
       });
       setNewsName(res.title);
       setDescriptionEditor(res.details);
       setImgProfile(res.imagePath);
       setApplication(res.application);
+      setCategoryNews(res.categoryNews);
       setChooseFarmer(
         res.application === "ALL"
           ? true
@@ -249,14 +296,32 @@ function EditNewsPage() {
           ? true
           : false
       );
+      setChooseChallenge(
+        res.categoryNews === "ALL"
+          ? true
+          : res.categoryNews === "CHALLENGE"
+          ? true
+          : false
+      );
+      setChooseNews(
+        res.categoryNews === "ALL"
+          ? true
+          : res.categoryNews === "NEWS"
+          ? true
+          : false
+      );
     });
   }, []);
-
+  useEffect(() => {
+    CampaignDatasource.getCampaignList("QUATA", 0, 0).then((res) => {
+      setCname(res.data);
+    });
+  }, []);
   return (
     <>
       <div className="d-flex align-items-center">
         <BackIconButton onClick={() => navigate(-1)} />
-        <strong style={{ fontSize: "20px" }}>เพิ่มข่าวสาร</strong>
+        <strong style={{ fontSize: "20px" }}>แก้ไขข่าวสาร</strong>
       </div>
       <br />
       <div className="row">
@@ -374,8 +439,8 @@ function EditNewsPage() {
                 <label>
                   ผู้เขียน <span style={{ color: "red" }}>*</span>
                 </label>
-                <Form.Item name="author">
-                  <Input placeholder="admin" autoComplete="off" disabled />
+                <Form.Item name="createBy">
+                  <Input autoComplete="off" disabled />
                 </Form.Item>
               </div>
               <div className="form-group col-lg-12 pb-4">
@@ -444,7 +509,7 @@ function EditNewsPage() {
                   </Checkbox>
                 </Form.Item>
               </div>
-              <div className="form-group col-lg-12 pt-4 ">
+              <div className="form-group col-lg-12 pt-4">
                 <label>
                   หมวดหมู่ <span style={{ color: "red" }}>*</span>
                 </label>
@@ -455,39 +520,43 @@ function EditNewsPage() {
                   className="my-0"
                 >
                   <Checkbox
-                    // onChange={handleChooseFarmer}
-                    // checked={chooseFarmer}
+                    onChange={handleChooseNews}
+                    checked={chooseNews}
                     className="pt-2"
                   >
                     ข่าวสาร
                   </Checkbox>
                 </Form.Item>
-                <Form.Item
-                  initialValue={false}
-                  name="challenge"
-                  valuePropName="checked"
-                  className="my-0"
-                >
-                  <Checkbox
-                    // onChange={handleChooseDroner}
-                    // checked={chooseDroner}
-                    className="mt-0"
-                  >
-                    ชาเลนจ์
-                  </Checkbox>
-                  <Select
-                    style={{ width: 550, left: 20 }}
-                    // onChange={handleChange}
-                    options={[
-                      {
-                        value: "บินปั๊บรับแต้ม แถมโชค 3 ชั้น",
-                        label: "บินปั๊บรับแต้ม แถมโชค 3 ชั้น",
-                      },
-                      { value: "ทดสอบ", label: "ทดสอบ" },
-                      { value: "เทสเทส", label: "เทสเทส" },
-                    ]}
-                  />
-                </Form.Item>
+                <div className="row">
+                  <div className="col-lg">
+                    <Form.Item
+                      initialValue={false}
+                      name="challenge"
+                      valuePropName="checked"
+                      className="my-0"
+                    >
+                      <Checkbox
+                        onChange={handleChooseChallenge}
+                        checked={chooseChallenge}
+                        className="mt-0"
+                      >
+                        ชาเลนจ์
+                      </Checkbox>
+                    </Form.Item>
+                  </div>
+                  <div className="col-lg-10">
+                    <Form.Item name="campName">
+                      <Select
+                        placeholder="เลือกชื่อชาเลนจ์"
+                        onChange={handleCampName}
+                      >
+                        {cName.map((item) => (
+                          <option value={item.id}>{item.campaignName}</option>
+                        ))}
+                      </Select>
+                    </Form.Item>
+                  </div>
+                </div>
               </div>
               <div className="row pt-3">
                 <div className="form-group col-lg-12 d-flex flex-column">
