@@ -1,4 +1,6 @@
 ## [Version - 0]
+## improve [v0.34.3] 2023-06-16
+- enhanced mission report
 ## improve [v0.34.2] 2023-06-13
 - fixed path url cancel task
 - enhanced mission setting menu
@@ -26,7 +28,7 @@
 ## Fix [v0.32.2] 2023-06-01
 - fixed defect master reward menu 
 ## improve [v0.32.1] 2023-06-01
-- enhance droner dereem reward 
+- enhance droner redeem reward 
 ## Feature [v0.32.0] 2023-06-01
 - added droner & farmer summary point
 ## Feature [v0.31.0] 2023-05-31

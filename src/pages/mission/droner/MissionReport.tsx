@@ -88,10 +88,9 @@ function MissionReport() {
         };
         tableList.push(table);
       }
-      const mapPage = res.condition.slice(0, rowCard);
-      console.log("m", mapPage);
+      const mapPage = res.condition.slice(4 * (current - 1), 4 * current);
       setDataInpro(tableList);
-      setDataCondition(res.condition);
+      setDataCondition(mapPage);
       setDataMission(res);
       fetchMissionSuccess(res.missionNo);
       setIsLoading(false);
@@ -132,12 +131,13 @@ function MissionReport() {
 
   useEffect(() => {
     fetchMissionInprogress();
-  }, [currentTable, num, statusMission]);
+  }, [currentTable, num, statusMission, current]);
 
   const onChangePage = (page: number) => {
     setCurrentTable(page);
   };
   const onChangePageCard = (page: number) => {
+    setNum(1);
     setCurrent(page);
   };
 
@@ -302,7 +302,7 @@ function MissionReport() {
           ผู้เข้าร่วมภารกิจ : {dataMission?.amountPeople} คน
         </h5>
       </div>
-      {dataMission?.condition.map((item: any, index: any) => {
+      {dataCondition?.map((item: any, index: any) => {
         const detailReward: any = {
           rewardId: item.reward.id,
           rewardName: item.reward.rewardName,
@@ -315,14 +315,14 @@ function MissionReport() {
         return (
           <div
             className="pt-3"
-            key={index}
+            key={item.num}
             onClick={() => {
               setNum(item.num);
             }}
             style={{ cursor: "pointer" }}
           >
             <MissionReportCard
-              checkCard={checkSubmission(index + 1)}
+              checkCard={checkSubmission(item.num)}
               title={`ภารกิจ ${item.num}  ${item.missionName}`}
               raiAmount={item.rai}
               successMission={item.reward.amountSuccessCount}
@@ -379,7 +379,7 @@ function MissionReport() {
           {`(${
             dataCondition?.find((x) => x.num === num)?.reward
               .amountInprogressCount
-          })`}
+          })` || 0}
         </Radio.Button>
         <Radio.Button
           className="col"
@@ -399,7 +399,7 @@ function MissionReport() {
           ผู้เข้าร่วมที่รอกดแลก{" "}
           {`(${
             dataCondition?.find((x) => x.num === num)?.reward.amountRequestCount
-          })`}
+          })` || 0}
         </Radio.Button>
         <Radio.Button
           className="col"
@@ -420,7 +420,7 @@ function MissionReport() {
           ผู้เข้าร่วมที่สำเร็จ{" "}
           {`(${
             dataCondition?.find((x) => x.num === num)?.reward.amountSuccessCount
-          })`}
+          })` || 0}
         </Radio.Button>
       </Radio.Group>
       {(type === "unsuccessMission" || type === "unconfirmMission") && (
