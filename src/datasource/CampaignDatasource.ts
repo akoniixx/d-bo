@@ -115,7 +115,9 @@ export class CampaignDatasource {
     take: number,
     page: number,
     missionNo?: string,
-    search?: string
+    search?: string,
+    startDate?: string,
+    endDate?: string
   ): Promise<RedeemDronerListEntity> {
     const params = {
       step: num,
@@ -123,6 +125,8 @@ export class CampaignDatasource {
       missionNo: missionNo,
       page: page,
       search: search,
+      startDate: startDate,
+      endDate: endDate,
     };
     return httpClient
       .get(BASE_URL + `/promotion/droner-transactions/get-mission-reward`, {

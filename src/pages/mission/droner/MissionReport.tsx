@@ -22,7 +22,6 @@ import {
 import { CampaignDatasource } from "../../../datasource/CampaignDatasource";
 import { DateTimeUtil } from "../../../utilities/DateTimeUtil";
 import { numberWithCommas } from "../../../utilities/TextFormatter";
-import { RedeemDronerListEntity } from "../../../entities/RedeemEntities";
 import styled from "styled-components";
 const _ = require("lodash");
 
@@ -42,7 +41,7 @@ function MissionReport() {
   let queryString = _.split(window.location.pathname, "=");
   const [type, setType] = useState("unsuccessMission");
   const row = 10;
-  const rowCard = 5;
+  const rowCard = 4;
   const [num, setNum] = useState<number>(1);
   const [current, setCurrent] = useState(1);
   const [currentTable, setCurrentTable] = useState(1);
@@ -52,33 +51,46 @@ function MissionReport() {
 
   const navigate = useNavigate();
   const [dataMission, setDataMission] = useState<MissionDetailEntity>();
-  const [dataMisionSucc, setDataMissionSuc] =
-    useState<RedeemDronerListEntity>();
   const [dataCondition, setDataCondition] = useState<ConditionMission[]>();
   const [startDate, setStartDate] = useState<any>(null);
   const [endDate, setEndDate] = useState<any>(null);
   const [statusMission, setStatusMission] = useState("INPROGRESS");
   const [isLoading, setIsLoading] = useState(false);
+  const [search, setSearch] = useState("");
 
   interface DataTable {
     updateAt: string;
     name: string;
     telephone: string;
     allraiAmount: string;
-    raiAmount: string;
+    redeemNo: string;
   }
-  const [dataTable, setDataTable] = useState<DataTable[]>();
+  const [dataInpro, setDataInpro] = useState<DataTable[]>();
+  const [dataSuccess, setDataSuccess] = useState<DataTable[]>();
 
   const fetchMissionInprogress = () => {
     setIsLoading(true);
     CampaignDatasource.detailMissionInprogress(
       queryString[1],
       num,
-      rowCard,
-      current,
-      statusMission
+      row,
+      currentTable,
+      statusMission,
+      search
     ).then((res) => {
-      console.log("res", res);
+      const tableList = [];
+      for (let i = 0; res.data.length > i; i++) {
+        const table: any = {
+          updateAt: res.data[i].updateAt,
+          name: res.data[i].firstname + " " + res.data[i].lastname,
+          telephone: res.data[i].telephoneNo,
+          allraiAmount: res.data[i].allraiAmount,
+        };
+        tableList.push(table);
+      }
+      const mapPage = res.condition.slice(0, rowCard);
+      console.log("m", mapPage);
+      setDataInpro(tableList);
       setDataCondition(res.condition);
       setDataMission(res);
       fetchMissionSuccess(res.missionNo);
@@ -87,12 +99,31 @@ function MissionReport() {
   };
 
   const fetchMissionSuccess = (missionNo: string) => {
-    CampaignDatasource.detailMissionSuccess(num, row, current, missionNo).then(
-      (res) => {
-        setDataMissionSuc(res);
-        setIsLoading(false);
+    CampaignDatasource.detailMissionSuccess(
+      num,
+      row,
+      currentTable,
+      missionNo,
+      search,
+      startDate,
+      endDate
+    ).then((res) => {
+      const tableList = [];
+      for (let i = 0; res.data.length > i; i++) {
+        const table: any = {
+          updateAt: res.data[i].updateAt,
+          name:
+            res.data[i].receiverDetail.firstname +
+            " " +
+            res.data[i].receiverDetail.lastname,
+          telephone: res.data[i].receiverDetail.tel,
+          redeemNo: res.data[i].redeemNo,
+        };
+        tableList.push(table);
       }
-    );
+      setDataSuccess(tableList);
+      setIsLoading(false);
+    });
   };
 
   const checkSubmission = (i: number) => {
@@ -101,7 +132,14 @@ function MissionReport() {
 
   useEffect(() => {
     fetchMissionInprogress();
-  }, [current, num, statusMission]);
+  }, [currentTable, num, statusMission]);
+
+  const onChangePage = (page: number) => {
+    setCurrentTable(page);
+  };
+  const onChangePageCard = (page: number) => {
+    setCurrent(page);
+  };
 
   const handleSearchDate = (e: any) => {
     if (e != null) {
@@ -168,8 +206,8 @@ function MissionReport() {
     },
     {
       title: "ชื่อนักบินโดรน",
-      dataIndex: "droner",
-      key: "droner",
+      dataIndex: "name",
+      key: "name",
       render: (value: any, row: any, index: number) => {
         return {
           children: (
@@ -178,7 +216,7 @@ function MissionReport() {
                 color: color.Success,
               }}
             >
-              {row.firstname + " " + row.lastname}
+              {row.name}
             </u>
           ),
         };
@@ -186,11 +224,11 @@ function MissionReport() {
     },
     {
       title: "เบอร์โทร",
-      dataIndex: "telephoneNo",
-      key: "telephoneNo",
+      dataIndex: "telephone",
+      key: "telephone",
       render: (value: any, row: any, index: number) => {
         return {
-          children: <span>{row.telephoneNo}</span>,
+          children: <span>{row.telephone}</span>,
         };
       },
     },
@@ -228,8 +266,8 @@ function MissionReport() {
     },
     {
       title: "Redeem No.",
-      dataIndex: "raiAmount",
-      key: "raiAmount",
+      dataIndex: "redeemNo",
+      key: "redeemNo",
       render: (value: any, row: any, index: number) => {
         return {
           children: (
@@ -240,7 +278,7 @@ function MissionReport() {
                   fontWeight: "700",
                 }}
               >
-                {"RD0000001"}
+                {row.redeemNo}
               </span>
             </div>
           ),
@@ -299,9 +337,9 @@ function MissionReport() {
         <p>รายการทั้งหมด {dataMission?.condition.length} รายการ</p>
         <Pagination
           current={current}
-          total={10}
-          // onChange={onChangePage}
-          pageSize={row}
+          total={dataMission?.condition?.length}
+          onChange={onChangePageCard}
+          pageSize={rowCard}
           showSizeChanger={false}
         />
       </div>
@@ -311,7 +349,12 @@ function MissionReport() {
   const renderDetailSubmission = (
     <Col span={12}>
       <Radio.Group
-        onChange={(v) => setType(v.target.value)}
+        onChange={(v) => {
+          setStartDate(null);
+          setEndDate(null);
+          setSearch("");
+          setType(v.target.value);
+        }}
         className="row "
         style={{ width: "100%", paddingLeft: "8px" }}
       >
@@ -353,7 +396,7 @@ function MissionReport() {
           value="unconfirmMission"
           onClick={() => setStatusMission("REQUEST")}
         >
-          ยังไม่กดยืนยัน{" "}
+          ผู้เข้าร่วมที่รอกดแลก{" "}
           {`(${
             dataCondition?.find((x) => x.num === num)?.reward.amountRequestCount
           })`}
@@ -387,10 +430,11 @@ function MissionReport() {
               width: "81%",
               right: "1%",
             }}
+            value={search}
             allowClear
             prefix={<SearchOutlined style={{ color: color.Disable }} />}
             placeholder="ค้นหาชื่อนักบินโดรน / เบอร์โทร"
-            // onChange={changeTextSearch}
+            onChange={(e) => setSearch(e.target.value)}
           />
           <Button
             style={{
@@ -401,7 +445,7 @@ function MissionReport() {
               width: "15%",
               justifyContent: "flex-start",
             }}
-            // onClick={fetchSearch}
+            onClick={fetchMissionInprogress}
           >
             ค้นหาข้อมูล
           </Button>
@@ -414,10 +458,11 @@ function MissionReport() {
               width: "45%",
               right: "2%",
             }}
+            value={search}
             allowClear
             prefix={<SearchOutlined style={{ color: color.Disable }} />}
             placeholder="ค้นหาชื่อนักบินโดรน / เบอร์โทร"
-            // onChange={changeTextSearch}
+            onChange={(e) => setSearch(e.target.value)}
           />
           <RangePicker
             style={{ right: "1%" }}
@@ -436,7 +481,7 @@ function MissionReport() {
               width: "15%",
               justifyContent: "flex-start",
             }}
-            // onClick={fetchSearch}
+            onClick={fetchMissionInprogress}
           >
             ค้นหาข้อมูล
           </Button>
@@ -446,22 +491,26 @@ function MissionReport() {
         className="pt-3"
         columns={
           type === "successMission"
-            ? columns.slice(0, -1)
+            ? columns.filter((x: any) => x.key !== "allraiAmount")
             : type === "unconfirmMission"
             ? columns.slice(0, -2)
-            : columns
+            : columns.slice(0, -1)
         }
-        dataSource={dataMission?.data}
+        dataSource={type === "successMission" ? dataSuccess : dataInpro}
         pagination={false}
         loading={isLoading}
         colors={mapTableColor[type]}
       />
       <div className="d-flex justify-content-between pt-3 pb-3">
-        <p>รายการทั้งหมด {dataMission?.data.length} รายการ</p>
+        <p>
+          รายการทั้งหมด{" "}
+          {type === "successMission" ? dataSuccess?.length : dataInpro?.length}{" "}
+          รายการ
+        </p>
         <Pagination
-          current={current}
+          current={currentTable}
           total={10}
-          //onChange={onChangePage}
+          onChange={onChangePage}
           pageSize={row}
           showSizeChanger={false}
         />
