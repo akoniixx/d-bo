@@ -23,12 +23,12 @@ import { color, image } from "../../../resource";
 import { BackIconButton } from "../../../components/button/BackButton";
 import { FooterPage } from "../../../components/footer/FooterPage";
 import moment from "moment";
-import { RewardDatasource } from "../../../datasource/RewardDatasource";
 import dayjs from "dayjs";
 import RenderQuota from "../../../components/mobile/RenderQuota";
 import uploadImgQuota from "../../../resource/media/empties/upload_img_quota.png";
 import TextArea from "antd/lib/input/TextArea";
 import { DeleteOutlined } from "@ant-design/icons";
+import { CampaignDatasource } from "../../../datasource/CampaignDatasource";
 
 const { Map } = require("immutable");
 const _ = require("lodash");
@@ -60,52 +60,9 @@ function EditQuota() {
   );
   const [createImgTableLucky, setCreateImgTableLucky] =
     useState<UploadImageEntity>(UploadImageEntity_INTI);
-  //call api reward
   useEffect(() => {
-    RewardDatasource.getAllRewardById(queryString[1]).then((res) => {
-      form.setFieldsValue({
-        imgCover: res.imagePath,
-        nameChallenge: res.rewardName,
-        luckyDraw: res.score,
-        raiAmount: res.amount,
-        description: res.description,
-        detail: res.condition,
-        status: res.status,
-        startDate: !res.startExchangeDate
-          ? moment(new Date().toUTCString())
-          : moment(new Date(res.startExchangeDate).toUTCString()),
-        startTime: !res.startExchangeDate
-          ? moment(new Date().getTime())
-          : moment(new Date(res.startExchangeDate).getTime()),
-        endDate: !res.expiredExchangeDate
-          ? moment(new Date().toUTCString())
-          : moment(new Date(res.expiredExchangeDate).toUTCString()),
-        endTime: !res.expiredExchangeDate
-          ? moment(new Date().getTime())
-          : moment(new Date(res.expiredExchangeDate).getTime()),
-        startUsedDate: !res.startUsedDate
-          ? moment(new Date().toUTCString())
-          : moment(new Date(res.startUsedDate).toUTCString()),
-        startUsedTime: !res.startUsedDate
-          ? moment(new Date().getTime())
-          : moment(new Date(res.startUsedDate).getTime()),
-        expiredUsedDate: !res.expiredUsedDate
-          ? moment(new Date().toUTCString())
-          : moment(new Date(res.expiredUsedDate).toUTCString()),
-        expiredUsedTime: !res.expiredUsedDate
-          ? moment(new Date().getTime())
-          : moment(new Date(res.expiredUsedDate).getTime()),
-      });
-      setNameChallenge(res.rewardName);
-      setNameReward(res.rewardType);
-      setDetail(res.description);
-      setCondition(res.condition);
-      setRaiAmount(res.score);
-      setImgCover(res.imagePath);
-      setImgReward(res.imagePath);
-      setImgButton(res.imagePath);
-      setImgTableLucky(res.imagePath);
-      setCheckStatus(res.status);
+    CampaignDatasource.getCampaignById(queryString[1]).then((res) => {
+      // console.log(res);
     });
   }, []);
   const onChangeImg = async (file: any) => {

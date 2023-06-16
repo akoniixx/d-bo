@@ -1,4 +1,6 @@
 ## [Version - 0]
+## improve [v0.34.4] 2023-06-16
+- enhanced quota report
 ## improve [v0.34.3] 2023-06-16
 - enhanced mission report
 ## improve [v0.34.2] 2023-06-13
