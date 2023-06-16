@@ -19,11 +19,13 @@ export default {
   arrowDown: require("./media/images/arrowDown.png"),
   arrowGreen: require("./media/images/arraow-green.png"),
   inforedeem: require("./media/images/info-redeem.png"),
+  coinFarmer: require("./media/images/coin.png"),
+  coinDroner: require("./media/images/coinDroner.png"),
+  iconQuotaReport: require("./media/images/icon-quota-report.png"),
+  arrowReport: require("./media/images/arrowReport.png"),
   coin: require("./media/images/coin.png"),
   pointRankActive: require("./media/images/point-rank-active.png"),
   pointRankInActive: require("./media/images/point-rank-inactive.png"),
   targetActive: require("./media/images/target-active.png"),
   targetInActive: require("./media/images/target-inactive.png"),
-  coinFarmer : require("./media/images/coin.png"),
-  coinDroner : require("./media/images/coinDroner.png")
 };

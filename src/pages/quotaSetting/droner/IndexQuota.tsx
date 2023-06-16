@@ -1,43 +1,31 @@
 import {
   DeleteOutlined,
-  DownOutlined,
   EditOutlined,
-  FileSearchOutlined,
   FolderViewOutlined,
   SearchOutlined,
-  UserOutlined,
 } from "@ant-design/icons";
 import {
-  Avatar,
   Badge,
   Button,
   Checkbox,
-  Col,
   DatePicker,
   Divider,
-  Dropdown,
-  Image,
   Input,
-  Menu,
   Modal,
   Pagination,
-  Row,
   Select,
   Table,
 } from "antd";
 import moment from "moment";
 import React, { useEffect, useState } from "react";
-import { CheckboxValueType } from "antd/lib/checkbox/Group";
 import { color, icon } from "../../../resource";
-import { numberWithCommas } from "../../../utilities/TextFormatter";
 import ActionButton from "../../../components/button/ActionButton";
 import { ColumnsType } from "antd/lib/table";
 import { DateTimeUtil } from "../../../utilities/DateTimeUtil";
 import { useNavigate } from "react-router-dom";
-import { RewardDatasource } from "../../../datasource/RewardDatasource";
 import { GetAllRewardEntities } from "../../../entities/RewardEntites";
-import { UploadImageDatasouce } from "../../../datasource/UploadImageDatasource";
 import { REWARD_STATUS } from "../../../definitions/Status";
+import { CampaignDatasource } from "../../../datasource/CampaignDatasource";
 
 function IndexQuota() {
   const navigate = useNavigate();
@@ -50,29 +38,26 @@ function IndexQuota() {
   const [startDate, setStartDate] = useState<any>(null);
   const [endDate, setEndDate] = useState<any>(null);
   const [status, setStatus] = useState<any>();
-  const [rewardType, setRewardType] = useState<any>();
-  const [rewardExchange, setRewardExchange] = useState<any>();
   const [searchText, setSearchText] = useState<any>();
   const [showModal, setShowModal] = useState(false);
   const [quotaId, setQuotaId] = useState("");
 
-  const getAllReward = () => {
-    RewardDatasource.getAllReward(
+  const getAllQuota = () => {
+    CampaignDatasource.getCampaignList(
+      "QUATA",
       row,
       current,
       startDate,
       endDate,
       status,
-      rewardType,
-      rewardExchange,
-      searchText
+      searchText,
+      "DRONER"
     ).then((res) => {
       setData(res);
     });
   };
-
   useEffect(() => {
-    getAllReward();
+    getAllQuota();
   }, [current, startDate, endDate]);
   const onChangePage = (page: number) => {
     setCurrent(page);
@@ -99,7 +84,11 @@ function IndexQuota() {
     setShowModal(!showModal);
   };
   const removeQuotaList = () => {
-    setShowModal(!showModal);
+    // CampaignDatasource.deleteCampaign(quotaId).then((res) => {
+    //   setShowModal(!showModal);
+    //   setQuotaId("");
+    //   getAllQuota();
+    // });
   };
   const isNumber = (n: any) => {
     return !isNaN(parseFloat(n)) && isFinite(n);
@@ -201,7 +190,7 @@ function IndexQuota() {
               color: color.secondary2,
               backgroundColor: color.Success,
             }}
-            onClick={getAllReward}
+            onClick={getAllQuota}
           >
             ค้นหาข้อมูล
           </Button>
@@ -212,18 +201,18 @@ function IndexQuota() {
   const columns: ColumnsType<any> = [
     {
       title: "ชื่อชาเลนจ์",
-      dataIndex: "rewardName",
-      key: "rewardName",
-      sorter: (a: any, b: any) => sorter(a.rewardName, b.rewardName),
+      dataIndex: "campaignName",
+      key: "campaignName",
+      sorter: (a: any, b: any) => sorter(a.campaignName, b.campaignName),
       render: (value: any, row: any, index: number) => {
         return {
           children: (
             <>
               <span className="text-dark-75  d-block font-size-lg">
-                {row.rewardName}
+                {row.campaignName}
               </span>
               <span style={{ color: color.Grey, fontSize: "12px" }}>
-                {row.rewardNo}
+                {row.missionNo ? row.missionNo : "-"}
               </span>
             </>
           ),
@@ -232,18 +221,18 @@ function IndexQuota() {
     },
     {
       title: "เวลาเริ่ม - สิ้นสุด",
-      dataIndex: "updateAt",
-      key: "updateAt",
-      sorter: (a: any, b: any) => sorter(a.updateAt, b.updateAt),
+      dataIndex: "startDate",
+      key: "startDate",
+      sorter: (a: any, b: any) => sorter(a.startDate, b.startDate),
       render: (value: any, row: any, index: number) => {
         return {
           children: (
             <>
               <div style={{ paddingLeft: "3px" }}>
-                {row.updateAt
-                  ? DateTimeUtil.formatDateTime(row.updateAt) +
+                {row.startDate
+                  ? DateTimeUtil.formatDateTime(row.startDate) +
                     " - " +
-                    DateTimeUtil.formatDateTime(row.updateAt)
+                    DateTimeUtil.formatDateTime(row.endDate)
                   : "-"}
               </div>
             </>
@@ -333,7 +322,7 @@ function IndexQuota() {
                     row.status === "DRAFTING" ? color.Grey : color.primary1
                   }
                   actionDisable={row.status === "DRAFTING" ? true : false}
-                  // onClick={() => navigate("/" + row.id)}
+                  onClick={() => navigate("/QuotaReport/id=" + row.id)}
                 />
               </div>
               <div className="col-lg-4">
