@@ -10,9 +10,7 @@ import { QuotaDatasource } from "../../../datasource/QuotaDatasource";
 import {
   AddQuotaRedeemHisEntity,
   AddQuotaRedeemHisEntity_INIT,
-  AllQuotaRRedeemEntity,
-  QuotaRedeemEntity,
-} from "../../../entities/QuotaReportEntities";
+  AllQuotaRRedeemEntity} from "../../../entities/QuotaReportEntities";
 import { DateTimeUtil } from "../../../utilities/DateTimeUtil";
 import ModalQuotaRedeem from "../../../components/modal/ModalQuotaRedeem";
 import Swal from "sweetalert2";

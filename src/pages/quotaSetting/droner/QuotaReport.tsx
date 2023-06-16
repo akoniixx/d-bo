@@ -1,16 +1,12 @@
 import {
   Button,
-  DatePicker,
   Divider,
   Dropdown,
-  Form,
   Image,
   Input,
   Menu,
-  Modal,
   Pagination,
   Popover,
-  Select,
   Table,
 } from "antd";
 import { ColumnsType } from "antd/lib/table";
@@ -20,7 +16,6 @@ import { color, icon } from "../../../resource";
 import { InfoCircleFilled, SearchOutlined } from "@ant-design/icons";
 import { BackIconButton } from "../../../components/button/BackButton";
 import { numberWithCommas } from "../../../utilities/TextFormatter";
-import TextArea from "antd/lib/input/TextArea";
 import { QuotaDatasource } from "../../../datasource/QuotaDatasource";
 import {
   AddQuotaRedeemHisEntity,
@@ -37,8 +32,6 @@ const _ = require("lodash");
 const { Map } = require("immutable");
 function QuotaReport() {
   let queryString = _.split(window.location.pathname, "=");
-
-  const id = "274d2935-95ac-447b-a671-b89b6b1719ae";
   const navigate = useNavigate();
   const row = 10;
   const [current, setCurrent] = useState(1);
@@ -47,6 +40,9 @@ function QuotaReport() {
   };
   const [getRow, setGetRow] = useState<QuotaReportEntity>();
   const [rewardRound, setRewardRound] = useState<any>();
+  const [clNo, setCLNo] = useState<any>();
+  const [campaignName, setCampaignName] = useState<any>();
+
   const [searchText, setSearchText] = useState<any>();
   const [data, setData] = useState<AllQuotaReportEntity>();
   const [showModal, setShowModal] = useState(false);
@@ -54,10 +50,11 @@ function QuotaReport() {
   const handleVisible = (newVisible: any) => {
     setVisible(newVisible);
   };
-
   useEffect(() => {
     const getRewardRound = async () => {
-      await CampaignDatasource.getCampaignById(id).then((res) => {
+      await CampaignDatasource.getCampaignById(queryString[1]).then((res) => {
+        setCLNo(res.missionNo);
+        setCampaignName(res.campaignName);
         setRewardRound(res.condition[0]);
       });
     };
@@ -67,11 +64,14 @@ function QuotaReport() {
     return !isNaN(parseFloat(n)) && isFinite(n);
   };
   const getQuotaReport = async () => {
-    await QuotaDatasource.getAllQuotaReport(id, row, current, searchText).then(
-      (res) => {
-        setData(res);
-      }
-    );
+    await QuotaDatasource.getAllQuotaReport(
+      queryString[1],
+      row,
+      current,
+      searchText
+    ).then((res) => {
+      setData(res);
+    });
   };
   useEffect(() => {
     getQuotaReport();
@@ -141,7 +141,7 @@ function QuotaReport() {
             }}
           >
             <strong>
-              จัดการคนที่ได้รับสิทธิ | บินปั๊บรับแต้ม แถมโชค 3 ชั้น | CL00000003
+              จัดการคนที่ได้รับสิทธิ | {campaignName} | {clNo}
             </strong>
           </span>
         </div>
