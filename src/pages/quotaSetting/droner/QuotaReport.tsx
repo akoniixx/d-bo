@@ -26,11 +26,15 @@ import {
   AddQuotaRedeemHisEntity,
   AddQuotaRedeemHisEntity_INIT,
   AllQuotaReportEntity,
+  QuotaReportEntity,
 } from "../../../entities/QuotaReportEntities";
 import { DateTimeUtil } from "../../../utilities/DateTimeUtil";
 import ModalQuotaRedeem from "../../../components/modal/ModalQuotaRedeem";
+import Swal from "sweetalert2";
+import { CampaignDatasource } from "../../../datasource/CampaignDatasource";
 
 const _ = require("lodash");
+const { Map } = require("immutable");
 function QuotaReport() {
   let queryString = _.split(window.location.pathname, "=");
 
@@ -41,7 +45,8 @@ function QuotaReport() {
   const onChangePage = (page: number) => {
     setCurrent(page);
   };
-  const [rewardName, setRewardName] = useState<string>();
+  const [getRow, setGetRow] = useState<QuotaReportEntity>();
+  const [rewardRound, setRewardRound] = useState<any>();
   const [searchText, setSearchText] = useState<any>();
   const [data, setData] = useState<AllQuotaReportEntity>();
   const [showModal, setShowModal] = useState(false);
@@ -49,16 +54,15 @@ function QuotaReport() {
   const handleVisible = (newVisible: any) => {
     setVisible(newVisible);
   };
-  const [addQuota, setAddQuota] = useState<AddQuotaRedeemHisEntity>(
-    AddQuotaRedeemHisEntity_INIT
-  );
 
-  const showModalAddReward = (e: any, index: any) => {
-    setShowModal(!showModal);
-    setEditIndex(index);
-  };
-  const [editIndex, setEditIndex] = useState();
-
+  useEffect(() => {
+    const getRewardRound = async () => {
+      await CampaignDatasource.getCampaignById(id).then((res) => {
+        setRewardRound(res.condition[0]);
+      });
+    };
+    getRewardRound();
+  }, []);
   const isNumber = (n: any) => {
     return !isNaN(parseFloat(n)) && isFinite(n);
   };
@@ -224,16 +228,7 @@ function QuotaReport() {
         return {
           children: (
             <>
-              <span
-              // style={{
-              //   color: color.Success,
-              //   cursor: "pointer",
-              //   fontWeight: "bold",
-              // }}
-              // onClick={() => navigate}
-              >
-                {row.firstname + " " + row.lastname}
-              </span>
+              <span>{row.firstname + " " + row.lastname}</span>
             </>
           ),
         };
@@ -251,12 +246,16 @@ function QuotaReport() {
     },
     {
       title: "จำนวนไร่สะสม",
-      dataIndex: "raiAmount",
-      key: "raiAmount",
-      sorter: (a: any, b: any) => sorter(a.raiAmount, b.raiAmount),
+      dataIndex: "allRai",
+      key: "allRai",
+      sorter: (a: any, b: any) => sorter(a.allRai, b.allRai),
       render: (value: any, row: any, index: number) => {
         return {
-          children: <span>{numberWithCommas(row.allRai)}</span>,
+          children: (
+            <span>
+              {row.allRai ? numberWithCommas(row.allRai) : 0} {"ไร่"}
+            </span>
+          ),
         };
       },
     },
@@ -350,7 +349,9 @@ function QuotaReport() {
                   cursor: "pointer",
                   color: color.Success,
                   textDecorationLine: "underline",
+                  fontWeight: "bold",
                 }}
+                onClick={() => navigate("/RewardReceived/id=" + row.dronerId)}
               >
                 {row.amountReceive}
               </span>
@@ -368,7 +369,10 @@ function QuotaReport() {
           children: (
             <div>
               <Button
-                onClick={() => showModalAddReward(row, index)}
+                onClick={() => {
+                  setShowModal((prev) => !prev);
+                  setGetRow(row);
+                }}
                 style={{
                   padding: 5,
                   borderColor: color.Success,
@@ -388,8 +392,23 @@ function QuotaReport() {
       },
     },
   ];
-  const updateRewardReceive = (dataQuotaRedeem: AddQuotaRedeemHisEntity) => {
-    console.log(1);
+  const updateRewardReceive = async (
+    dataQuotaRedeem: AddQuotaRedeemHisEntity
+  ) => {
+    const fName = Map(dataQuotaRedeem).set("firstName", getRow?.firstname);
+    const lName = Map(fName.toJS()).set("lastName", getRow?.lastname);
+    const dronerId = Map(lName.toJS()).set("dronerId", getRow?.dronerId);
+    await QuotaDatasource.addQuotaRedeem(dronerId.toJS()).then((res) => {
+      Swal.fire({
+        title: "บันทึกสำเร็จ",
+        icon: "success",
+        timer: 1500,
+        showConfirmButton: false,
+      }).then((time) => {
+        getQuotaReport();
+      });
+      setShowModal(false);
+    });
   };
   return (
     <>
@@ -409,12 +428,11 @@ function QuotaReport() {
 
       {showModal && (
         <ModalQuotaRedeem
-          // isEditModal
           show={showModal}
           backButton={() => setShowModal((prev) => !prev)}
           callBack={updateRewardReceive}
-          data={addQuota}
-          editIndex={editIndex}
+          data={AddQuotaRedeemHisEntity_INIT}
+          round={rewardRound.rewardRound}
         />
       )}
     </>

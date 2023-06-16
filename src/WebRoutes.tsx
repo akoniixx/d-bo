@@ -75,6 +75,7 @@ import AddDronerMission from "./pages/mission/droner/AddDronerMission";
 import EditDronerMission from "./pages/mission/droner/EditDronerMission";
 import MissionReport from "./pages/mission/droner/MissionReport";
 import QuotaReport from "./pages/quotaSetting/droner/QuotaReport";
+import RewardReceived from "./pages/quotaSetting/droner/RewardReceived";
 
 const WebRoutes: React.FC<any> = () => {
   return (
@@ -188,6 +189,8 @@ const WebRoutes: React.FC<any> = () => {
           <Route path="/EditQuota/:id" element={<EditQuota />} />
           <Route path="/IndexDronerMission" element={<IndexDronerMission />} />
           <Route path="/AddDronerMission" element={<AddDronerMission />} />
+          <Route path="/RewardReceived/:id" element={<RewardReceived />} />
+
           <Route
             path="/EditDronerMission/:id"
             element={<EditDronerMission />}

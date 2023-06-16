@@ -13,20 +13,37 @@ export interface AllQuotaReportEntity {
   data: QuotaReportEntity[];
 }
 export interface AddQuotaRedeemHisEntity {
-  id?: string;
+  id?: any;
   dronerId: string;
   firstName: string;
   lastName: string;
-  roundNo: number;
+  roundNo: any;
   rewardName: string;
   description: string;
+  QuotaId: number;
 }
 export const AddQuotaRedeemHisEntity_INIT: AddQuotaRedeemHisEntity = {
   id: "",
   dronerId: "",
   firstName: "",
   lastName: "",
-  roundNo: 0,
+  roundNo: undefined,
   rewardName: "",
   description: "",
+  QuotaId: 0,
 };
+export interface QuotaRedeemEntity {
+  createAt: string ;
+  description: string;
+  dronerId: string;
+  firstName: string;
+  id: string;
+  lastName: string;
+  rewardName: string;
+  roundNo: any;
+  updateAt: string;
+}
+export interface AllQuotaRRedeemEntity {
+  count: number;
+  data: QuotaRedeemEntity[];
+}
