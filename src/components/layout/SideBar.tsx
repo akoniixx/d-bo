@@ -167,37 +167,37 @@ export const pathLists = ({ isAccounting }: { isAccounting: boolean }) => [
       },
     ],
   },
-  {
-    path: "mission",
-    name: "mission",
-    title: "ภารกิจและชาเลนจ์",
-    subMenu: [
-      {
-        path: "listmission",
-        name: "listmission",
-        title: "ภารกิจ",
-        subMenu: [
-          {
-            path: "/IndexDronerMission",
-            name: "IndexDronerMission",
-            title: "นักบินโดรน",
-          },
-        ],
-      },
-      {
-        path: "listquota",
-        name: "listquota",
-        title: "ชาเลนจ์",
-        subMenu: [
-          {
-            path: "/IndexQuota",
-            name: "IndexQuota",
-            title: "นักบินโดรน",
-          },
-        ],
-      },
-    ],
-  },
+  // {
+  //   path: "mission",
+  //   name: "mission",
+  //   title: "ภารกิจและชาเลนจ์",
+  //   subMenu: [
+  //     {
+  //       path: "listmission",
+  //       name: "listmission",
+  //       title: "ภารกิจ",
+  //       subMenu: [
+  //         {
+  //           path: "/IndexDronerMission",
+  //           name: "IndexDronerMission",
+  //           title: "นักบินโดรน",
+  //         },
+  //       ],
+  //     },
+  //     {
+  //       path: "listquota",
+  //       name: "listquota",
+  //       title: "ชาเลนจ์",
+  //       subMenu: [
+  //         {
+  //           path: "/IndexQuota",
+  //           name: "IndexQuota",
+  //           title: "นักบินโดรน",
+  //         },
+  //       ],
+  //     },
+  //   ],
+  // },
   {
     path: "admin",
     name: "admin",
