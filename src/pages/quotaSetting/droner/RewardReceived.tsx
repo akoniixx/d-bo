@@ -10,7 +10,8 @@ import { QuotaDatasource } from "../../../datasource/QuotaDatasource";
 import {
   AddQuotaRedeemHisEntity,
   AddQuotaRedeemHisEntity_INIT,
-  AllQuotaRRedeemEntity} from "../../../entities/QuotaReportEntities";
+  AllQuotaRRedeemEntity,
+} from "../../../entities/QuotaReportEntities";
 import { DateTimeUtil } from "../../../utilities/DateTimeUtil";
 import ModalQuotaRedeem from "../../../components/modal/ModalQuotaRedeem";
 import Swal from "sweetalert2";
@@ -23,7 +24,6 @@ function RewardReceived() {
   const navigate = useNavigate();
   const row = 10;
   const [current, setCurrent] = useState(1);
-  const id = "274d2935-95ac-447b-a671-b89b6b1719ae";
   const [editIndex, setEditIndex] = useState(0);
   const [dronerName, setDronerName] = useState<any | undefined>();
   const [showEditModal, setShowEditModal] = useState(false);
@@ -36,15 +36,23 @@ function RewardReceived() {
   const [rewardRound, setRewardRound] = useState<any>();
   useEffect(() => {
     const getRewardRound = async () => {
-      await CampaignDatasource.getCampaignById(id).then((res) => {
-        setRewardRound(res.condition[0]);
+      await CampaignDatasource.getCampaignQuota("DRONER").then((res) => {
+        if (res.data) {
+          const camId = localStorage.getItem("id");
+          let dataFilter = res.data.filter((x: any) => x.id === camId);
+          setRewardRound(
+            dataFilter.map((x: any) => x.condition[0].rewardRound)[0]
+          );
+        }
       });
     };
     getRewardRound();
   }, []);
   useEffect(() => {
     const getQuotaReport = async () => {
-      await QuotaDatasource.getAllQuotaReport(id).then((res) => {
+      const camId: any = localStorage.getItem("id");
+
+      await QuotaDatasource.getAllQuotaReport(camId).then((res) => {
         if (res.data) {
           let dataFilter = res.data.filter(
             (x) => x.dronerId === queryString[1]
@@ -58,8 +66,10 @@ function RewardReceived() {
     getQuotaReport();
   }, []);
   const getQuotaRedeem = async () => {
+    const camId: any = localStorage.getItem("id");
     await QuotaDatasource.getQuotaRedeemHisId(
       queryString[1],
+      camId,
       current,
       row
     ).then((res) => {
@@ -113,11 +123,14 @@ function RewardReceived() {
   const updateRewardReceive = async (
     dataQuotaRedeem: AddQuotaRedeemHisEntity
   ) => {
+    const camId: any = localStorage.getItem("id");
     const fName = Map(dataQuotaRedeem).set("firstName", editRedeem.firstName);
     const lName = Map(fName.toJS()).set("lastName", editRedeem.lastName);
     const dronerId = Map(lName.toJS()).set("dronerId", editRedeem.dronerId);
     const dataId = Map(dronerId.toJS()).set("id", editRedeem.id);
-    await QuotaDatasource.editQuotaRedeem(dataId.toJS()).then((res) => {
+    const cpId = Map(dataId.toJS()).set("campaignId", camId);
+
+    await QuotaDatasource.editQuotaRedeem(cpId.toJS()).then((res) => {
       Swal.fire({
         title: "บันทึกสำเร็จ",
         icon: "success",
@@ -325,7 +338,7 @@ function RewardReceived() {
           callBack={updateRewardReceive}
           data={editRedeem}
           editIndex={editIndex}
-          round={rewardRound.rewardRound}
+          round={rewardRound}
         />
       )}
     </>

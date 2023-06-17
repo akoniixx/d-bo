@@ -44,18 +44,22 @@ export class QuotaDatasource {
   }
   static getQuotaRedeemHisId(
     dronerId: string,
+    campaignId: string,
     page: any,
     take: any
   ): Promise<AllQuotaRRedeemEntity> {
     const params = {
-      dronerId: dronerId,
       page: page,
       take: take,
     };
     return httpClient
-      .get(BASE_URL + "/promotion/quota-privilege/get-quota-redeem-history", {
-        params,
-      })
+      .get(
+        BASE_URL +
+          `/promotion/quota-privilege/get-quota-redeem-history?dronerId=${dronerId}&campaignId=${campaignId}`,
+        {
+          params,
+        }
+      )
       .then((response) => {
         return response.data;
       })

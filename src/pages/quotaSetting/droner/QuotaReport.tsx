@@ -28,6 +28,7 @@ import ModalQuotaRedeem from "../../../components/modal/ModalQuotaRedeem";
 import Swal from "sweetalert2";
 import { CampaignDatasource } from "../../../datasource/CampaignDatasource";
 
+
 const _ = require("lodash");
 const { Map } = require("immutable");
 function QuotaReport() {
@@ -41,6 +42,7 @@ function QuotaReport() {
   const [getRow, setGetRow] = useState<QuotaReportEntity>();
   const [rewardRound, setRewardRound] = useState<any>();
   const [clNo, setCLNo] = useState<any>();
+  const [campId, setCampId] = useState<any>();
   const [campaignName, setCampaignName] = useState<any>();
 
   const [searchText, setSearchText] = useState<any>();
@@ -56,6 +58,7 @@ function QuotaReport() {
         setCLNo(res.missionNo);
         setCampaignName(res.campaignName);
         setRewardRound(res.condition[0]);
+        setCampId(res.id)
       });
     };
     getRewardRound();
@@ -351,7 +354,10 @@ function QuotaReport() {
                   textDecorationLine: "underline",
                   fontWeight: "bold",
                 }}
-                onClick={() => navigate("/RewardReceived/id=" + row.dronerId)}
+                onClick={() => {
+                  navigate("/RewardReceived/id=" + row.dronerId); 
+                  localStorage.setItem("id", campId);            
+                }}
               >
                 {row.amountReceive}
               </span>
@@ -398,7 +404,8 @@ function QuotaReport() {
     const fName = Map(dataQuotaRedeem).set("firstName", getRow?.firstname);
     const lName = Map(fName.toJS()).set("lastName", getRow?.lastname);
     const dronerId = Map(lName.toJS()).set("dronerId", getRow?.dronerId);
-    await QuotaDatasource.addQuotaRedeem(dronerId.toJS()).then((res) => {
+    const cpId = Map(dronerId.toJS()).set("campaignId", campId);
+    await QuotaDatasource.addQuotaRedeem(cpId.toJS()).then((res) => {
       Swal.fire({
         title: "บันทึกสำเร็จ",
         icon: "success",
