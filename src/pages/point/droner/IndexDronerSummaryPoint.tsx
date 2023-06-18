@@ -1,4 +1,9 @@
-import { FileTextOutlined, SearchOutlined } from "@ant-design/icons";
+import {
+  CaretDownOutlined,
+  CaretUpOutlined,
+  FileTextOutlined,
+  SearchOutlined,
+} from "@ant-design/icons";
 import { Button, Col, Input, Pagination, Row, Table, Image } from "antd";
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -15,18 +20,24 @@ const IndexDronerSummaryPoint = () => {
   const [current, setCurrent] = useState(1);
   const [data, setData] = useState<DronerSummaryPointListEntity>();
   const [searchKeyword, setSearchKeyword] = useState("");
+  const [sortDirection, setSortDirection] = useState<string | undefined>(
+    undefined
+  );
 
   const fetchDronerSum = () => {
-    PointReceiveDatasource.getDronerSumPoint(row, current, searchKeyword).then(
-      (res) => {
-        setData(res);
-      }
-    );
+    PointReceiveDatasource.getDronerSumPoint(
+      row,
+      current,
+      searchKeyword,
+      sortDirection
+    ).then((res) => {
+      setData(res);
+    });
   };
 
   useEffect(() => {
     fetchDronerSum();
-  }, [current]);
+  }, [current, sortDirection]);
 
   const onSearch = () => {
     setCurrent(1);
@@ -35,6 +46,49 @@ const IndexDronerSummaryPoint = () => {
 
   const onChangePage = (page: number) => {
     setCurrent(page);
+  };
+
+  const sortTitle = (title: string, field?: string) => {
+    return (
+      <>
+        <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+          {title}
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              cursor: "pointer",
+            }}
+            onClick={() => {
+              setSortDirection((prev: any) => {
+                if (prev === "ASC") {
+                  return "DESC";
+                } else if (prev === undefined) {
+                  return "ASC";
+                } else {
+                  return undefined;
+                }
+              });
+            }}
+          >
+            <CaretUpOutlined
+              style={{
+                position: "relative",
+                top: 2,
+                color: sortDirection === "ASC" ? "#ffca37" : "white",
+              }}
+            />
+            <CaretDownOutlined
+              style={{
+                position: "relative",
+                bottom: 2,
+                color: sortDirection === "DESC" ? "#ffca37" : "white",
+              }}
+            />
+          </div>
+        </div>
+      </>
+    );
   };
 
   const columns = [
@@ -58,7 +112,7 @@ const IndexDronerSummaryPoint = () => {
       },
     },
     {
-      title: "แต้มคงเหลือ",
+      title: () => sortTitle("จำนวนแต้ม"),
       dataIndex: "balance",
       key: "balance",
       render: (value: any, row: any, index: number) => {

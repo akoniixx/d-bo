@@ -10,6 +10,8 @@ import { PointReceiveDatasource } from "../../../datasource/PointReceiveDatasour
 import { DetailSummaryListEntity } from "../../../entities/PointReceiveEntities";
 import { numberWithCommas } from "../../../utilities/TextFormatter";
 import moment from "moment";
+import { sorter } from "../../../utilities/Sorting";
+import { CaretDownOutlined, CaretUpOutlined } from "@ant-design/icons";
 const { RangePicker } = DatePicker;
 
 const _ = require("lodash");
@@ -25,6 +27,10 @@ function IndexFarmerHistorySum() {
   const [data, setData] = useState<DetailSummaryListEntity>();
   const [searchStartDate, setSearchStartDate] = useState<any>(null);
   const [searchEndDate, setSearchEndDate] = useState<any>(null);
+  const [sortField, setSortField] = useState<string | undefined>(undefined);
+  const [sortDirection, setSortDirection] = useState<string | undefined>(
+    undefined
+  );
 
   const fetchFarmerSumById = () => {
     PointReceiveDatasource.getFarmerSumById(
@@ -33,7 +39,9 @@ function IndexFarmerHistorySum() {
       row,
       current,
       searchStartDate,
-      searchEndDate
+      searchEndDate,
+      sortField,
+      sortDirection
     ).then((res) => {
       setData(res);
     });
@@ -41,7 +49,7 @@ function IndexFarmerHistorySum() {
 
   useEffect(() => {
     fetchFarmerSumById();
-  }, [type, current]);
+  }, [type, current, sortField, sortDirection]);
 
   const handleSearchDate = (e: any) => {
     if (e != null) {
@@ -60,6 +68,59 @@ function IndexFarmerHistorySum() {
   const onSearch = () => {
     setCurrent(1);
     fetchFarmerSumById();
+  };
+
+  const setField = (field?: string) => {
+    setSortField(field);
+  };
+  const sortTitle = (title: string, field?: string) => {
+    return (
+      <>
+        <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+          {title}
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              cursor: "pointer",
+            }}
+            onClick={() => {
+              setField(field);
+              setSortDirection((prev: any) => {
+                if (prev === "ASC") {
+                  return "DESC";
+                } else if (prev === undefined) {
+                  return "ASC";
+                } else {
+                  return undefined;
+                }
+              });
+            }}
+          >
+            <CaretUpOutlined
+              style={{
+                position: "relative",
+                top: 2,
+                color:
+                  sortDirection === "ASC" && field === sortField
+                    ? "#ffca37"
+                    : "white",
+              }}
+            />
+            <CaretDownOutlined
+              style={{
+                position: "relative",
+                bottom: 2,
+                color:
+                  sortDirection === "DESC" && field === sortField
+                    ? "#ffca37"
+                    : "white",
+              }}
+            />
+          </div>
+        </div>
+      </>
+    );
   };
 
   const pageTitle = (
@@ -84,6 +145,8 @@ function IndexFarmerHistorySum() {
         <Col span={4} className="pt-3">
           <Radio.Group
             onChange={(e) => {
+              setSortField(undefined);
+              setSortDirection(undefined);
               setCurrent(1);
               setType(e.target.value);
             }}
@@ -175,7 +238,7 @@ function IndexFarmerHistorySum() {
 
   const columns = [
     {
-      title: "วันที่อัพเดต",
+      title: (a: any) => sortTitle("วันที่อัพเดต", "updateAt"),
       dataIndex: "updateAt",
       key: "updateAt",
       width: "15%",
@@ -190,7 +253,13 @@ function IndexFarmerHistorySum() {
       },
     },
     {
-      title: type === "INCREASE" ? "Point No" : "Task No",
+      title: (a: any) =>
+        sortTitle(
+          type === "INCREASE" ? "Point No" : "Taks No",
+          type === "INCREASE" ? "pointNo" : "taskNo"
+        ),
+      dataIndex: type === "INCREASE" ? "pointNo" : "taskNo",
+      key: type === "INCREASE" ? "pointNo" : "taskNo",
       width: "50%",
       render: (value: any, row: any, index: number) => {
         return {
@@ -201,7 +270,7 @@ function IndexFarmerHistorySum() {
       },
     },
     {
-      title: "จำนวนแต้ม",
+      title: (a: any) => sortTitle("จำนวนแต้ม", "amountValue"),
       dataIndex: "amountValue",
       key: "amountValue",
       width: "20%",
