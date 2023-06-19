@@ -73,7 +73,6 @@ function EditNewsPage() {
     );
     const e = Map(d.toJS()).set("resource", "FARMER");
     const f = Map(e.toJS()).set("category", "PROFILE_IMAGE");
-    console.log(f.toJS().file);
     setCreateImgProfile(f.toJS());
   };
 
