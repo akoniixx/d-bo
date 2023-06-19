@@ -249,7 +249,7 @@ function EditNewsPage() {
         img: res.imagePath,
         newsName: res.title,
         newsStatus: res.status,
-        campName: res.campaign.campaignName,
+        campName: res.campaign ? res.campaign.campaignName : null,
         newsDescription: res.details,
         FarmerApp:
           res.application === "ALL"
@@ -443,7 +443,7 @@ function EditNewsPage() {
                   <Input autoComplete="off" disabled />
                 </Form.Item>
               </div>
-              <div className="form-group col-lg-12 pb-4">
+              {/* <div className="form-group col-lg-12 pb-4">
                 <label>
                   ตั้งค่าข่าวสาร <span style={{ color: "red" }}>*</span>
                 </label>
@@ -454,8 +454,6 @@ function EditNewsPage() {
                   className="my-0"
                 >
                   <Checkbox
-                    // onChange={handleChooseFarmer}
-                    // checked={chooseFarmer}
                     className="pt-2"
                   >
                     ปักหมุดในหน้าหลัก
@@ -468,14 +466,12 @@ function EditNewsPage() {
                   className="my-0"
                 >
                   <Checkbox
-                    // onChange={handleChooseDroner}
-                    // checked={chooseDroner}
                     className="mt-0"
                   >
                     ปักหมุดในหน้าข่าวสารทั้งหมด
                   </Checkbox>
                 </Form.Item>
-              </div>
+              </div> */}
               <div className="form-group col-lg-12">
                 <label>
                   แอปพลิเคชั่น <span style={{ color: "red" }}>*</span>

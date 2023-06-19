@@ -18,7 +18,7 @@ import { NewsDatasource } from "../../datasource/NewsDatasource";
 import { DateTimeUtil } from "../../utilities/DateTimeUtil";
 import { STATUS_COUPON } from "../../definitions/Status";
 import ModalDeleteNews from "../../components/modal/ModalDeleteNews";
-import { DashboardLayout } from "../../components/layout/Layout";
+import ModalNotiHistory from "../../components/modal/ModalNotiHistory";
 
 function NewsPage() {
   const navigate = useNavigate();
@@ -639,7 +639,7 @@ function NewsPage() {
             <div className="container">
               <span>จำนวน {row.count_queue} คิว</span>
               <br />
-              <u
+              {/* <u
                 style={{
                   color: color.Success,
                   fontWeight: "bold",
@@ -648,7 +648,7 @@ function NewsPage() {
                 onClick={() => handleModalHistory(row)}
               >
                 ดูประวัติแจ้งเตือน
-              </u>
+              </u> */}
             </div>
           ),
         };
@@ -762,6 +762,14 @@ function NewsPage() {
           showSizeChanger={false}
         />
       </div>
+      {/* {showModalHis && (
+        <ModalNotiHistory
+          show={showModalHis}
+          backButton={() => setShowModalHis((prev) => !prev)}
+          title="ประวัติการแจ้งเตือนข่าว “รอบรู้เกษตร กับกูรู้กูรูเกษตร”"
+          newsId={""}
+        />
+      )} */}
     </>
   );
 }
