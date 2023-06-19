@@ -26,6 +26,8 @@ import { useNavigate } from "react-router-dom";
 import { GetAllRewardEntities } from "../../../entities/RewardEntites";
 import { REWARD_STATUS } from "../../../definitions/Status";
 import { CampaignDatasource } from "../../../datasource/CampaignDatasource";
+import { CampaignQuotaListEntity } from "../../../entities/CampaignPointEntites";
+import { numberWithCommas } from "../../../utilities/TextFormatter";
 
 function IndexQuota() {
   const navigate = useNavigate();
@@ -34,7 +36,7 @@ function IndexQuota() {
   const dateSearchFormat = "YYYY-MM-DD";
   const row = 10;
   const [current, setCurrent] = useState(1);
-  const [data, setData] = useState<GetAllRewardEntities>();
+  const [data, setData] = useState<CampaignQuotaListEntity>();
   const [startDate, setStartDate] = useState<any>(null);
   const [endDate, setEndDate] = useState<any>(null);
   const [status, setStatus] = useState<any>();
@@ -43,15 +45,14 @@ function IndexQuota() {
   const [quotaId, setQuotaId] = useState("");
 
   const getAllQuota = () => {
-    CampaignDatasource.getCampaignList(
-      "QUATA",
+    CampaignDatasource.getCampaignQuota(
+      "DRONER",
       row,
       current,
       startDate,
       endDate,
       status,
       searchText,
-      "DRONER"
     ).then((res) => {
       setData(res);
     });
@@ -242,14 +243,16 @@ function IndexQuota() {
     },
     {
       title: "จำนวนผู้ใช้ที่ได้สิทธิ",
-      dataIndex: "rewardType",
-      key: "rewardType",
-      sorter: (a: any, b: any) => sorter(a.rewardType, b.rewardType),
+      dataIndex: "quotaAmount",
+      key: "quotaAmount",
+      sorter: (a: any, b: any) => sorter(a.quotaAmount, b.quotaAmount),
       render: (value: any, row: any, index: number) => {
         return {
           children: (
             <>
-              <span style={{ color: color.Success }}>500 สิทธิ</span>
+              <span style={{ color: color.Success }}>
+                {numberWithCommas(row.quotaAmount) + " " + "สิทธิ"}
+              </span>
             </>
           ),
         };
@@ -257,14 +260,16 @@ function IndexQuota() {
     },
     {
       title: "จำนวนผู้ใช้ที่ได้รับรางวัล",
-      dataIndex: "score",
-      key: "score",
-      sorter: (a: any, b: any) => sorter(a.score, b.score),
+      dataIndex: "amountReceive",
+      key: "amountReceive",
+      sorter: (a: any, b: any) => sorter(a.amountReceive, b.amountReceive),
       render: (value: any, row: any, index: number) => {
         return {
           children: (
             <>
-              <span style={{ color: color.Success }}>13 คน</span>
+              <span style={{ color: color.Success }}>
+                {numberWithCommas(row.amountReceive) + " " + "คน"}
+              </span>
             </>
           ),
         };

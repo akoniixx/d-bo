@@ -137,4 +137,30 @@ export class CampaignDatasource {
       })
       .catch((err) => console.log(err));
   }
+  static getCampaignQuota(
+    app: string,
+    take?: number,
+    page?: number,
+    startDate?: string,
+    endStart?: string,
+    status?: string,
+    search?: string
+  ) {
+    const params = {
+      application: app,
+
+      take: take,
+      page: page,
+      startDate: startDate,
+      endDate: endStart,
+      status: status,
+      search: search,
+    };
+    return httpClient
+      .get(BASE_URL + `/promotion/campaign/find-all-campaign-quota`, { params })
+      .then((res) => {
+        return res.data;
+      })
+      .catch((err) => console.log(err));
+  }
 }

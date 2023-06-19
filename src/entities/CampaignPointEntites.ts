@@ -11,6 +11,7 @@ export interface CampaignConditionEntity {
   rewardRound?: number;
   isDelete: boolean;
 }
+
 export const CampaignConditionEntity_INIT: CampaignConditionEntity = {
   num: 1,
   rai: 0,
@@ -81,4 +82,46 @@ export interface CreateCampaignEntiry {
   application: string;
   isDeleteDroner: boolean;
   isDeleteFarmer: boolean;
+}
+export interface CampaignConQuotaEntity {
+  num: number;
+  rai: number;
+  point: string;
+  quata: number;
+  rewardId: null;
+  rewardName: string;
+  missionName: null;
+  rewardRound: number;
+  conditionReward: string;
+  descriptionReward: string;
+}
+export interface CampaignQuotaEntiry {
+  id: string;
+  condition: CampaignConQuotaEntity[];
+  status: string;
+  application: string;
+  description: string;
+  campaignName: string;
+  campaignType: string;
+  startDate: string;
+  endDate: string;
+  createBy: string;
+  updateBy: string;
+  pathImageBanner: string;
+  pathImageReward: string;
+  pathImageFloating: string;
+  pathImageRewardRound: string;
+  missionNo: string;
+  rulesCampaign: string;
+  createdAt: string;
+  updatedAt: string;
+  isDeleteFarmer: boolean;
+  isDeleteDroner: boolean;
+  quotaAmount: number;
+  amountReceive: number;
+  countSubMission: number;
+}
+export interface CampaignQuotaListEntity {
+  count: number;
+  data: CampaignQuotaEntiry[];
 }
