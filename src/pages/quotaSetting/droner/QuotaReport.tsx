@@ -1,5 +1,6 @@
 import {
   Button,
+  Col,
   Divider,
   Dropdown,
   Image,
@@ -7,9 +8,9 @@ import {
   Menu,
   Pagination,
   Popover,
+  Row,
   Table,
 } from "antd";
-import { ColumnsType } from "antd/lib/table";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { color, icon } from "../../../resource";
@@ -27,7 +28,6 @@ import { DateTimeUtil } from "../../../utilities/DateTimeUtil";
 import ModalQuotaRedeem from "../../../components/modal/ModalQuotaRedeem";
 import Swal from "sweetalert2";
 import { CampaignDatasource } from "../../../datasource/CampaignDatasource";
-
 
 const _ = require("lodash");
 const { Map } = require("immutable");
@@ -52,20 +52,15 @@ function QuotaReport() {
   const handleVisible = (newVisible: any) => {
     setVisible(newVisible);
   };
-  useEffect(() => {
-    const getRewardRound = async () => {
-      await CampaignDatasource.getCampaignById(queryString[1]).then((res) => {
-        setCLNo(res.missionNo);
-        setCampaignName(res.campaignName);
-        setRewardRound(res.condition[0]);
-        setCampId(res.id)
-      });
-    };
-    getRewardRound();
-  }, []);
-  const isNumber = (n: any) => {
-    return !isNaN(parseFloat(n)) && isFinite(n);
+  const getRewardRound = async () => {
+    await CampaignDatasource.getCampaignById(queryString[1]).then((res) => {
+      setCLNo(res.missionNo);
+      setCampaignName(res.campaignName);
+      setRewardRound(res.condition[0]);
+      setCampId(res.id);
+    });
   };
+
   const getQuotaReport = async () => {
     await QuotaDatasource.getAllQuotaReport(
       queryString[1],
@@ -76,37 +71,16 @@ function QuotaReport() {
       setData(res);
     });
   };
+
   useEffect(() => {
     getQuotaReport();
+    getRewardRound();
   }, [current]);
-  const sorter = (a: any, b: any) => {
-    if (a === null) {
-      return 1;
-    }
-    if (b === null) {
-      return -1;
-    }
-    if (isNumber(a) && isNumber(b)) {
-      if (parseInt(a, 10) === parseInt(b, 10)) {
-        return 0;
-      }
-      return parseInt(a, 10) > parseInt(b, 10) ? 1 : -1;
-    }
-    if (isNumber(a)) {
-      return -1;
-    }
-    if (isNumber(b)) {
-      return 1;
-    }
-    if (a === b) {
-      return 0;
-    }
-    return a > b ? 1 : -1;
+
+  const isNumber = (n: any) => {
+    return !isNaN(parseFloat(n)) && isFinite(n);
   };
-  const changeTextSearch = (searchText: any) => {
-    setSearchText(searchText.target.value);
-    setCurrent(1);
-  };
+
   const downloadListName = (
     <Menu
       items={[
@@ -121,20 +95,18 @@ function QuotaReport() {
       ]}
     />
   );
+
   const PageTitle = (
     <>
-      <div
-        className="container d-flex justify-content-start"
-        style={{ padding: "8px" }}
-      >
-        <div className="col-lg-0">
+      <Row justify={"space-between"} gutter={8}>
+        <Col span={1}>
           <BackIconButton
             onClick={() => {
               navigate(-1);
             }}
           />
-        </div>
-        <div className="col-lg-9 pt-3">
+        </Col>
+        <Col span={19} className="p-3">
           <span
             className="card-label font-weight-bolder text-dark"
             style={{
@@ -147,19 +119,16 @@ function QuotaReport() {
               จัดการคนที่ได้รับสิทธิ | {campaignName} | {clNo}
             </strong>
           </span>
-        </div>
-        <div className="col-lg" />
-        <div className="col-lg pt-3">
+        </Col>
+        <Col span={4} className="p-3">
           <Dropdown
             overlay={downloadListName}
             trigger={["click"]}
-            className="col-lg-12 "
             onVisibleChange={handleVisible}
             visible={visible}
           >
             <Button
               style={{
-                width: 225,
                 borderColor: color.Success,
                 borderRadius: "5px",
                 color: color.secondary2,
@@ -174,44 +143,42 @@ function QuotaReport() {
               />
             </Button>
           </Dropdown>
-        </div>
-      </div>
-      <div
-        className="container d-flex justify-content-between"
-        style={{ padding: "8px" }}
-      >
-        <div className="col-lg-10">
+        </Col>
+      </Row>
+      <Row justify={"space-between"} gutter={8}>
+        <Col span={22}>
           <Input
-            allowClear
             prefix={<SearchOutlined style={{ color: color.Disable }} />}
             placeholder="ค้นหาชื่อนักบินโดรน / เบอร์โทร"
-            className="col-lg-12 p-1"
-            onChange={changeTextSearch}
+            onChange={(e) => setSearchText(searchText.target.value)}
+            allowClear
           />
-        </div>
-        <div>
+        </Col>
+        <Col span={2}>
           <Button
             style={{
-              width: 170,
               borderColor: color.Success,
               borderRadius: "5px",
               color: color.secondary2,
               backgroundColor: color.Success,
             }}
-            onClick={getQuotaReport}
+            onClick={() => {
+              setCurrent(1);
+              getRewardRound();
+            }}
           >
             ค้นหาข้อมูล
           </Button>
-        </div>
-      </div>
+        </Col>
+      </Row>
     </>
   );
-  const columns: ColumnsType<any> = [
+
+  const columns = [
     {
       title: "วันที่อัพเดต",
       dataIndex: "updateAt",
       key: "updateAt",
-      sorter: (a: any, b: any) => sorter(a.updateAt, b.updateAt),
       render: (value: any, row: any, index: number) => {
         return {
           children: (
@@ -251,7 +218,6 @@ function QuotaReport() {
       title: "จำนวนไร่สะสม",
       dataIndex: "allRai",
       key: "allRai",
-      sorter: (a: any, b: any) => sorter(a.allRai, b.allRai),
       render: (value: any, row: any, index: number) => {
         return {
           children: (
@@ -266,7 +232,6 @@ function QuotaReport() {
       title: "จำนวนสิทธิที่ได้รับ",
       dataIndex: "quotaAmount",
       key: "quotaAmount",
-      sorter: (a: any, b: any) => sorter(a.quotaAmount, b.quotaAmount),
       render: (value: any, row: any, index: number) => {
         var sumAmount = row.quotaAmount - row.amountReceive;
         return {
@@ -342,7 +307,6 @@ function QuotaReport() {
       title: "จำนวนรางวัลที่ได้รับ",
       dataIndex: "amountReceive",
       key: "amountReceive",
-      sorter: (a: any, b: any) => sorter(a.amountReceive, b.amountReceive),
       render: (value: any, row: any, index: number) => {
         return {
           children: (
@@ -355,8 +319,8 @@ function QuotaReport() {
                   fontWeight: "bold",
                 }}
                 onClick={() => {
-                  navigate("/RewardReceived/id=" + row.dronerId); 
-                  localStorage.setItem("id", campId);            
+                  navigate("/RewardReceived/id=" + row.dronerId);
+                  localStorage.setItem("id", campId);
                 }}
               >
                 {row.amountReceive}
@@ -398,6 +362,7 @@ function QuotaReport() {
       },
     },
   ];
+
   const updateRewardReceive = async (
     dataQuotaRedeem: AddQuotaRedeemHisEntity
   ) => {
@@ -417,6 +382,7 @@ function QuotaReport() {
       setShowModal(false);
     });
   };
+
   return (
     <>
       {PageTitle}

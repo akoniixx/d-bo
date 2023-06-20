@@ -59,7 +59,6 @@ function IndexQuota() {
       status,
       searchText
     ).then((res) => {
-      console.log(res);
       setData(res);
     });
   };
