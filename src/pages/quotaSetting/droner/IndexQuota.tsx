@@ -20,9 +20,8 @@ import {
 } from "antd";
 import moment from "moment";
 import React, { useEffect, useState } from "react";
-import { color, icon } from "../../../resource";
+import { color } from "../../../resource";
 import ActionButton from "../../../components/button/ActionButton";
-import { ColumnsType } from "antd/lib/table";
 import { DateTimeUtil } from "../../../utilities/DateTimeUtil";
 import { useNavigate } from "react-router-dom";
 import {
@@ -60,6 +59,7 @@ function IndexQuota() {
       status,
       searchText
     ).then((res) => {
+      console.log(res);
       setData(res);
     });
   };
@@ -87,12 +87,13 @@ function IndexQuota() {
     setShowModal(!showModal);
   };
   const removeQuotaList = () => {
-    // CampaignDatasource.deleteCampaign(quotaId).then((res) => {
-    //   setShowModal(!showModal);
-    //   setQuotaId("");
-    //   getAllQuota();
-    // });
+    CampaignDatasource.deleteCampaign(quotaId).then((res) => {
+      setShowModal(!showModal);
+      setQuotaId("");
+      getAllQuota();
+    });
   };
+
   const pageTitle = (
     <>
       <Row justify={"space-between"} style={{ padding: "10px" }} gutter={16}>
@@ -203,8 +204,6 @@ function IndexQuota() {
     },
     {
       title: "เวลาเริ่ม - สิ้นสุด",
-      dataIndex: "startDate",
-      key: "startDate",
       render: (value: any, row: any, index: number) => {
         return {
           children: (

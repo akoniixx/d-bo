@@ -10,7 +10,7 @@ import {
   Tag,
   TimePicker,
 } from "antd";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   UploadImageEntity,
@@ -37,7 +37,6 @@ const { Map } = require("immutable");
 function AddQuota() {
   const profile = JSON.parse(localStorage.getItem("profile") || "{  }");
   const dateFormat = "DD/MM/YYYY";
-  const dateSearchFormat = "YYYY-MM-DD";
   const navigate = useNavigate();
   const [form] = Form.useForm();
   const [imgReward, setImgReward] = useState<any>();
@@ -61,6 +60,10 @@ function AddQuota() {
   );
   const [createImgTableLucky, setCreateImgTableLucky] =
     useState<UploadImageEntity>(UploadImageEntity_INTI);
+
+  const [checkDup, setCheckDup] = useState(false);
+
+  useEffect(() => {}, [checkDup]);
 
   const onChangeImg = async (file: any) => {
     const source = file.target.files[0];
@@ -210,6 +213,31 @@ function AddQuota() {
     const convertedNumber = validateOnlyNumber(inputValue);
     form.setFieldsValue({ [name]: convertedNumber });
   };
+  const checkDupCampiagn = async () => {
+    const getForm = form.getFieldsValue();
+    let startDate = new Date(
+      moment(getForm.startDate).format("YYYY-MM-DD")
+    ).toISOString();
+    let endDate = new Date(
+      moment(getForm.endDate).format("YYYY-MM-DD")
+    ).toISOString();
+    let application = "DRONER";
+    let check = await CampaignDatasource.checkDupCampaign(
+      "QUATA",
+      startDate,
+      endDate,
+      application,
+      ""
+    ).then((res) => {
+      if (!res.success) {
+        setCheckDup(true);
+      } else {
+        setCheckDup(false);
+      }
+      return !res.success;
+    });
+    return check;
+  };
 
   const onSubmit = () => {
     const f = form.getFieldsValue();
@@ -239,7 +267,6 @@ function AddQuota() {
     create.status = f.status;
     create.createBy = profile.firstname + " " + profile.lastname;
     create.updateBy = profile.firstname + " " + profile.lastname;
-    console.log(create);
     CampaignDatasource.createCampaignQuota(
       create,
       createImgCover,
@@ -530,6 +557,17 @@ function AddQuota() {
                     required: true,
                     message: "กรุณากรอกวันที่!",
                   },
+                  {
+                    validator: (rules, value) => {
+                      return new Promise(async (resolve, reject) => {
+                        if (await checkDupCampiagn()) {
+                          reject("");
+                        } else {
+                          resolve(true);
+                        }
+                      });
+                    },
+                  },
                 ]}
               >
                 <DatePicker
@@ -541,7 +579,7 @@ function AddQuota() {
                 />
               </Form.Item>
               <Form.Item
-                name="startExchangeTime"
+                name="startTime"
                 initialValue={moment("00:00", "HH:mm")}
               >
                 <TimePicker
@@ -566,6 +604,17 @@ function AddQuota() {
                     required: true,
                     message: "กรุณากรอกวันที่!",
                   },
+                  {
+                    validator: (rules, value) => {
+                      return new Promise(async (resolve, reject) => {
+                        if (await checkDupCampiagn()) {
+                          reject("");
+                        } else {
+                          resolve(true);
+                        }
+                      });
+                    },
+                  },
                 ]}
               >
                 <DatePicker
@@ -589,6 +638,12 @@ function AddQuota() {
             </div>
           </div>
         </div>
+        {checkDup && (
+          <p style={{ color: color.Error }}>
+            กรุณาเปลี่ยนแปลงช่วงเวลา “วันเริ่มต้น” หรือ “วันสิ้นสุด”
+            เนื่องจากซ้ำกับช่วงเวลาของแคมเปญอื่นที่สร้างไว้ก่อนหน้า
+          </p>
+        )}
         <div className="row">
           <div className="col-lg-4">
             <label>

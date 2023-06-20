@@ -38,6 +38,7 @@ function EditQuota() {
   let queryString = _.split(window.location.pathname, "=");
   const profile = JSON.parse(localStorage.getItem("profile") || "{  }");
   const dateFormat = "DD/MM/YYYY";
+  const dateSearchFormat = "YYYY-MM-DD";
   const navigate = useNavigate();
   const [form] = Form.useForm();
   const [imgReward, setImgReward] = useState<any>();
@@ -61,10 +62,36 @@ function EditQuota() {
   );
   const [createImgTableLucky, setCreateImgTableLucky] =
     useState<UploadImageEntity>(UploadImageEntity_INTI);
+  const [checkDup, setCheckDup] = useState(false);
+  const [isActive, setIsActive] = useState(false);
+  const [isEdit, setIsEdit] = useState(false);
 
   const fetchQuota = () => {
     CampaignDatasource.getCampaignById(queryString[1]).then((res) => {
-      console.log(res);
+      const checkIsEdit = () => {
+        if (res.status === "ACTIVE") {
+          setIsActive(
+            moment(res.startDate).format(dateSearchFormat) <=
+              moment(Date()).format(dateSearchFormat)
+              ? true
+              : false
+          );
+        } else if (res.status === "INACTIVE") {
+          setIsEdit(
+            moment(res.endDate).format(dateSearchFormat) <
+              moment(Date()).toISOString()
+              ? true
+              : false
+          );
+          setIsActive(
+            moment(res.endDate).format(dateSearchFormat) <
+              moment(Date()).toISOString()
+              ? true
+              : false
+          );
+        }
+      };
+      checkIsEdit();
       form.setFieldsValue({
         campaignName: res.campaignName,
         description: res.description,
@@ -101,7 +128,7 @@ function EditQuota() {
 
   useEffect(() => {
     fetchQuota();
-  }, []);
+  }, [checkDup]);
 
   const onChangeImg = async (file: any) => {
     const source = file.target.files[0];
@@ -124,18 +151,18 @@ function EditQuota() {
     });
 
     setImgCover(img_base64);
-    const d = Map(createImgReward).set(
+    const d = Map(createImgCover).set(
       "file",
       isFileMoreThan2MB ? newSource : source
     );
-    setCreateImgReward(d.toJS());
+    setCreateImgCover(d.toJS());
   };
   const onPreviewImg = async () => {
-    let src = imgReward;
+    let src = imgCover;
     if (!src) {
       src = await new Promise((resolve) => {
         const reader = new FileReader();
-        reader.readAsDataURL(imgReward);
+        reader.readAsDataURL(imgCover);
         reader.onload = () => resolve(reader.result);
       });
     }
@@ -254,6 +281,31 @@ function EditQuota() {
     const convertedNumber = validateOnlyNumber(inputValue);
     form.setFieldsValue({ [name]: convertedNumber });
   };
+  const checkDupCampiagn = async () => {
+    const getForm = form.getFieldsValue();
+    let startDate = new Date(
+      moment(getForm.startDate).format("YYYY-MM-DD")
+    ).toISOString();
+    let endDate = new Date(
+      moment(getForm.endDate).format("YYYY-MM-DD")
+    ).toISOString();
+    let application = "DRONER";
+    let check = await CampaignDatasource.checkDupCampaign(
+      "QUATA",
+      startDate,
+      endDate,
+      application,
+      ""
+    ).then((res) => {
+      if (!res.success) {
+        setCheckDup(true);
+      } else {
+        setCheckDup(false);
+      }
+      return !res.success;
+    });
+    return check;
+  };
 
   const onSubmit = () => {
     const f = form.getFieldsValue();
@@ -282,7 +334,6 @@ function EditQuota() {
     create.campaignType = "QUATA";
     create.status = f.status;
     create.updateBy = profile.firstname + " " + profile.lastname;
-    console.log(create);
     CampaignDatasource.updateCampaignQuota(
       queryString[1],
       create,
@@ -574,6 +625,17 @@ function EditQuota() {
                     required: true,
                     message: "กรุณากรอกวันที่!",
                   },
+                  {
+                    validator: (rules, value) => {
+                      return new Promise(async (resolve, reject) => {
+                        if (await checkDupCampiagn()) {
+                          reject("");
+                        } else {
+                          resolve(true);
+                        }
+                      });
+                    },
+                  },
                 ]}
               >
                 <DatePicker
@@ -582,10 +644,11 @@ function EditQuota() {
                     setStartDate(val);
                   }}
                   format={dateFormat}
+                  disabled={isActive}
                 />
               </Form.Item>
               <Form.Item
-                name="startExchangeTime"
+                name="startTime"
                 initialValue={moment("00:00", "HH:mm")}
               >
                 <TimePicker
@@ -594,6 +657,7 @@ function EditQuota() {
                   placeholder="เลือกเวลา"
                   defaultValue={moment("00:00", "HH:mm")}
                   allowClear={false}
+                  disabled={isActive}
                 />
               </Form.Item>
             </div>
@@ -610,6 +674,17 @@ function EditQuota() {
                     required: true,
                     message: "กรุณากรอกวันที่!",
                   },
+                  {
+                    validator: (rules, value) => {
+                      return new Promise(async (resolve, reject) => {
+                        if (await checkDupCampiagn()) {
+                          reject("");
+                        } else {
+                          resolve(true);
+                        }
+                      });
+                    },
+                  },
                 ]}
               >
                 <DatePicker
@@ -619,6 +694,7 @@ function EditQuota() {
                   }}
                   format={dateFormat}
                   disabledDate={disabledDateChange}
+                  disabled={isEdit}
                 />
               </Form.Item>
               <Form.Item name="endTime" initialValue={moment("23:59", "HH:mm")}>
@@ -628,6 +704,7 @@ function EditQuota() {
                   placeholder="เลือกเวลา"
                   defaultValue={moment("23:59", "HH:mm")}
                   allowClear={false}
+                  disabled={isEdit}
                 />
               </Form.Item>
             </div>
@@ -655,6 +732,7 @@ function EditQuota() {
                   checkNumber(e, "raiAmount");
                   setRaiAmount(e.target.value);
                 }}
+                disabled={isActive}
               />
             </Form.Item>
           </div>

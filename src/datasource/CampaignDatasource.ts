@@ -1,10 +1,7 @@
 import { BASE_URL, httpClient } from "../config/develop-config";
 import { CreateCampaignEntiry } from "../entities/CampaignPointEntites";
 import { MissionDetailEntity } from "../entities/MissionEntities";
-import {
-  DetailRedeemDronerEntity,
-  RedeemDronerListEntity,
-} from "../entities/RedeemEntities";
+import { RedeemDronerListEntity } from "../entities/RedeemEntities";
 
 export class CampaignDatasource {
   static getCampaignList(
