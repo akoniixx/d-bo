@@ -38,7 +38,7 @@ export class RewardDatasource {
     startExchangeDate?: string,
     expiredExchangeDate?: string,
     status?: string,
-    rewardType?: string,
+    rewardType?: string[],
     rewardExchange?: string,
     search?: string
   ): Promise<GetAllRewardEntities> {

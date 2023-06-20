@@ -53,6 +53,7 @@ const IndexCampaignPoint = () => {
 
   const fetchCampaignList = () => {
     CampaignDatasource.getCampaignList(
+      searchApp,
       "POINT",
       row,
       current,
@@ -60,7 +61,6 @@ const IndexCampaignPoint = () => {
       searchEndDate,
       searchStatus,
       keyword,
-      searchApp
     ).then((res) => {
       setData(res);
     });

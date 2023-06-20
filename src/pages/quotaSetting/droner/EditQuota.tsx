@@ -1,14 +1,14 @@
 import {
-  Button,
+  Col,
   DatePicker,
   Divider,
   Form,
   Input,
   Radio,
   Row,
+  Space,
   Tag,
   TimePicker,
-  Upload,
 } from "antd";
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -29,6 +29,8 @@ import uploadImgQuota from "../../../resource/media/empties/upload_img_quota.png
 import TextArea from "antd/lib/input/TextArea";
 import { DeleteOutlined } from "@ant-design/icons";
 import { CampaignDatasource } from "../../../datasource/CampaignDatasource";
+import { validateOnlyNumber } from "../../../utilities/TextFormatter";
+import Swal from "sweetalert2";
 
 const { Map } = require("immutable");
 const _ = require("lodash");
@@ -46,9 +48,8 @@ function EditQuota() {
   const [detail, setDetail] = useState<string | null>(null);
   const [nameReward, setNameReward] = useState<string | null>(null);
   const [raiAmount, setRaiAmount] = useState<string | null>(null);
-  const [condition, setCondition] = useState<any>();
-  const [saveBtnDisable, setBtnSaveDisable] = useState<boolean>(false);
-  const [checkStatus, setCheckStatus] = useState();
+  const [startDate, setStartDate] = useState<any>(null);
+  const [endDate, setEndDate] = useState<any>(null);
   const [createImgReward, setCreateImgReward] = useState<UploadImageEntity>(
     UploadImageEntity_INTI
   );
@@ -60,11 +61,48 @@ function EditQuota() {
   );
   const [createImgTableLucky, setCreateImgTableLucky] =
     useState<UploadImageEntity>(UploadImageEntity_INTI);
-  useEffect(() => {
+
+  const fetchQuota = () => {
     CampaignDatasource.getCampaignById(queryString[1]).then((res) => {
-      // console.log(res);
+      console.log(res);
+      form.setFieldsValue({
+        campaignName: res.campaignName,
+        description: res.description,
+        rulesCampaign: res.rulesCampaign,
+        rewardName: res.condition[0].rewardName,
+        rai: res.condition[0].rai,
+        rewardRound: res.condition[0].rewardRound,
+        status: res.status,
+        startDate: !res.startDate
+          ? moment(new Date().toUTCString())
+          : moment(new Date(res.startDate).toUTCString()),
+        endDate: !res.endDate
+          ? moment(new Date().toUTCString())
+          : moment(new Date(res.endDate).toUTCString()),
+        startTime: !res.startDate
+          ? moment(new Date().getTime())
+          : moment(new Date(res.startDate).getTime()),
+        endTime: !res.endDate
+          ? moment(new Date().getTime())
+          : moment(new Date(res.endDate).getTime()),
+      });
+      setNameChallenge(res.campaignName);
+      setNameReward(res.condition[0].rewardName);
+      setDetail(res.description);
+      setRaiAmount(res.condition[0].rai);
+      setStartDate(moment(new Date(res.startDate).toUTCString()));
+      setEndDate(moment(new Date(res.endDate).toUTCString()));
+      setImgCover(res.pathImageBanner);
+      setImgReward(res.pathImageReward);
+      setImgButton(res.pathImageFloating);
+      setImgTableLucky(res.pathImageRewardRound);
     });
+  };
+
+  useEffect(() => {
+    fetchQuota();
   }, []);
+
   const onChangeImg = async (file: any) => {
     const source = file.target.files[0];
     let newSource: any;
@@ -138,7 +176,6 @@ function EditQuota() {
     );
     setCreateImgButton(d.toJS());
   };
-
   const onChangeImgReward = async (file: any) => {
     const source = file.target.files[0];
     let newSource: any;
@@ -209,544 +246,549 @@ function EditQuota() {
     );
     return current && current < dayjs(startDate);
   };
+  const checkNumber = (
+    e: React.ChangeEvent<HTMLInputElement>,
+    name: string
+  ) => {
+    const { value: inputValue } = e.target;
+    const convertedNumber = validateOnlyNumber(inputValue);
+    form.setFieldsValue({ [name]: convertedNumber });
+  };
+
+  const onSubmit = () => {
+    const f = form.getFieldsValue();
+    const create: any = {};
+    const reward: any = {};
+    reward.num = 1;
+    reward.rewardName = f.rewardName;
+    reward.rewardRound = f.rewardRound;
+    reward.rai = f.rai;
+
+    create.startDate = new Date(
+      moment(f.startDate).format("YYYY-MM-DD") +
+        " " +
+        moment(f.startTime).format("HH:mm:ss")
+    ).toISOString();
+    create.endDate = new Date(
+      moment(f.endDate).format("YYYY-MM-DD") +
+        " " +
+        moment(f.endTime).format("HH:mm:ss")
+    ).toISOString();
+    create.campaignName = f.campaignName;
+    create.application = "DRONER";
+    create.condition = JSON.stringify(reward);
+    create.description = f.description;
+    create.rulesCampaign = f.rulesCampaign;
+    create.campaignType = "QUATA";
+    create.status = f.status;
+    create.updateBy = profile.firstname + " " + profile.lastname;
+    console.log(create);
+    CampaignDatasource.updateCampaignQuota(
+      queryString[1],
+      create,
+      createImgCover,
+      createImgButton,
+      createImgReward,
+      createImgTableLucky
+    ).then((res) => {
+      if (res.success) {
+        Swal.fire({
+          title: "บันทึกสำเร็จ",
+          icon: "success",
+          timer: 1500,
+          showConfirmButton: false,
+        }).then((time) => {
+          navigate("/IndexQuota");
+        });
+      }
+    });
+  };
+
   const renderData = (
-    <div className="col-lg-7">
-      <CardContainer>
-        <CardHeader textHeader="ข้อมูลชาเลนจ์" />
-        <Form form={form} className="p-5">
-          <div className="row">
-            <div className="form-group text-center pt-2">
-              <Form.Item
-                name="imgCover"
-                rules={[
-                  {
-                    required: true,
-                    message: "กรุณาใส่รูปภาพ!",
-                  },
-                ]}
+    <CardContainer>
+      <CardHeader textHeader="ข้อมูลชาเลนจ์" />
+      <Form form={form} className="p-5">
+        <div className="row">
+          <div className="form-group text-center pt-2">
+            <Form.Item
+              name="imgCover"
+              rules={[
+                {
+                  required: true,
+                  message: "กรุณาใส่รูปภาพ!",
+                },
+              ]}
+            >
+              <div
+                className="hiddenFileInputQuota"
+                style={{
+                  backgroundImage: `url(${
+                    imgCover == undefined ? uploadImgQuota : imgCover
+                  })`,
+                }}
               >
-                <div
-                  className="hiddenFileInputQuota"
-                  style={{
-                    backgroundImage: `url(${
-                      imgCover == undefined ? uploadImgQuota : imgCover
-                    })`,
-                  }}
-                >
-                  <input
-                    key={imgCover}
-                    type="file"
-                    onChange={onChangeImg}
-                    title="เลือกรูป"
-                  />
-                </div>
-              </Form.Item>
-              <div>
-                {imgCover != undefined && (
-                  <>
-                    <Tag
-                      color={color.Success}
-                      onClick={onPreviewImg}
-                      style={{
-                        cursor: "pointer",
-                        borderRadius: "5px",
-                      }}
-                    >
-                      View
-                    </Tag>
-                    <Tag
-                      color={color.Error}
-                      onClick={onRemoveImg}
-                      style={{
-                        cursor: "pointer",
-                        borderRadius: "5px",
-                      }}
-                    >
-                      Remove
-                    </Tag>
-                  </>
-                )}
+                <input
+                  key={imgCover}
+                  type="file"
+                  onChange={onChangeImg}
+                  title="เลือกรูป"
+                />
               </div>
-            </div>
-            <p className="text-center text-danger pt-3">
-              *รูปภาพจะต้องมีสัดส่วน 1:1 หรือ 375px * 375px เท่านั้น
-              เพื่อความสวยงามของภาพในแอปพลิเคชัน*
-            </p>
-          </div>
-          <div>
-            <div className="form-group col-lg-12">
-              <label>
-                ชื่อชาเลนจ์ <span style={{ color: "red" }}>*</span>
-              </label>
-              <Form.Item
-                name="nameChallenge"
-                rules={[
-                  {
-                    required: true,
-                    message: "กรุณากรอกชื่อชาเลนจ์!",
-                  },
-                ]}
-              >
-                <Input
-                  placeholder="กรอกชื่อชาเลนจ์"
-                  autoComplete="off"
-                  onChange={(e) => {
-                    setNameChallenge(e.target.value);
-                  }}
-                />
-              </Form.Item>
-            </div>
-            <div className="form-group col-lg-12">
-              <label>
-                รายละเอียด <span style={{ color: "red" }}>*</span>
-              </label>
-              <Form.Item
-                name="detail"
-                rules={[
-                  {
-                    required: true,
-                    message: "กรุณากรอกรายละเอียด!",
-                  },
-                ]}
-              >
-                <TextArea
-                  rows={4}
-                  placeholder="กรอกรายละเอียด"
-                  autoComplete="off"
-                  onChange={(e) => {
-                    setDetail(e.target.value);
-                  }}
-                />
-              </Form.Item>
-            </div>
-            <div className="form-group col-lg-12">
-              <label>
-                รูปภาพปุ่มชาเลนจ์ <span style={{ color: "red" }}>*</span>
-              </label>
-              <div className="form-group col-lg-6 p-3">
-                <div className="pt-2">
-                  <div
-                    className="row"
+            </Form.Item>
+            <div>
+              {imgCover != undefined && (
+                <>
+                  <Tag
+                    color={color.Success}
+                    onClick={onPreviewImg}
                     style={{
-                      border: imgButton && "dotted",
-                      borderWidth: imgButton && 0.5,
-                      borderRadius: imgButton && "8px",
-                      width: imgButton && 600,
-                      height: imgButton && 90,
-                      paddingLeft: imgButton && 26,
+                      cursor: "pointer",
+                      borderRadius: "5px",
                     }}
                   >
-                    <div className="col-lg align-self-center">
-                      <span
-                        style={{
-                          backgroundImage: `url(${imgButton})`,
-                          display: imgButton != undefined ? "block" : "none",
-                          width: "65px",
-                          height: "90px",
-                          overflow: "hidden",
-                          backgroundRepeat: "no-repeat",
-                          backgroundPosition: "center",
-                          backgroundSize: "100%",
-                        }}
-                      />
-                    </div>
-                    <div className="col-lg-8 align-self-center">
-                      <span>{imgButton && createImgButton.file.name}</span>
-                    </div>
-                    <div className="col-lg-2 align-self-center">
-                      <span>
-                        {imgButton && (
-                          <DeleteOutlined
-                            style={{ fontSize: 20, color: color.Error }}
-                            onClick={onRemoveImgButton}
-                          />
-                        )}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-                <div
-                  className="hiddenFileBtn"
-                  style={{
-                    backgroundImage: `url(${image.upload_Img_btn})`,
-                    display: imgButton == undefined ? "block" : "none",
-                  }}
-                >
-                  <input
-                    key={imgButton}
-                    type="file"
-                    onChange={onChangeImgButton}
-                    title="เลือกรูป"
-                  />
-                </div>
-              </div>
-            </div>
-            <Divider />
-            <div className="form-group col-lg-12">
-              <label>
-                ชื่อของรางวัล <span style={{ color: "red" }}>*</span>
-              </label>
-              <Form.Item
-                name="nameReward"
-                rules={[
-                  {
-                    required: true,
-                    message: "กรุณากรอกชื่อของรางวัล!",
-                  },
-                ]}
-              >
-                <Input
-                  placeholder="กรอกชื่อของรางวัล"
-                  autoComplete="off"
-                  onChange={(e) => {
-                    setNameReward(e.target.value);
-                  }}
-                />
-              </Form.Item>
-            </div>
-            <div className="form-group col-lg-12">
-              <label>
-                รูปภาพของรางวัล <span style={{ color: "red" }}>*</span>
-              </label>
-              <div className="row">
-                <div className="form-group col-lg-6 p-3">
-                  <div className="pb-2 pt-2">
-                    <div
-                      className="row"
-                      style={{
-                        border: imgReward && "dotted",
-                        borderWidth: imgReward && 0.5,
-                        borderRadius: imgReward && "8px",
-                        width: imgReward && 600,
-                        height: imgReward && 90,
-                        paddingLeft: imgReward && 26,
-                      }}
-                    >
-                      <div className="col-lg align-self-center">
-                        <span
-                          style={{
-                            backgroundImage: `url(${imgReward})`,
-                            display: imgReward != undefined ? "block" : "none",
-                            width: "65px",
-                            height: "90px",
-                            overflow: "hidden",
-                            backgroundRepeat: "no-repeat",
-                            backgroundPosition: "center",
-                            backgroundSize: "100%",
-                          }}
-                        />
-                      </div>
-                      <div className="col-lg-8 align-self-center">
-                        <span>{imgReward && createImgReward.file.name}</span>
-                      </div>
-                      <div className="col-lg-2 align-self-center">
-                        <span>
-                          {imgReward && (
-                            <DeleteOutlined
-                              style={{ fontSize: 20, color: color.Error }}
-                              onClick={onRemoveImgReward}
-                            />
-                          )}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                  <div
-                    className="hiddenFileBtn"
+                    View
+                  </Tag>
+                  <Tag
+                    color={color.Error}
+                    onClick={onRemoveImg}
                     style={{
-                      backgroundImage: `url(${image.upload_Img_btn})`,
-                      display: imgReward == undefined ? "block" : "none",
+                      cursor: "pointer",
+                      borderRadius: "5px",
                     }}
                   >
-                    <input
-                      key={imgReward}
-                      type="file"
-                      onChange={onChangeImgReward}
-                      title="เลือกรูป"
-                    />
-                  </div>
-                </div>
-              </div>
-            </div>
-            <Divider />
-            <div className="row">
-              <div className="col-lg-6">
-                <label>
-                  วันเริ่มต้น<span style={{ color: color.Error }}>*</span>
-                </label>
-                <div className="d-flex">
-                  <Form.Item
-                    name="startDate"
-                    rules={[
-                      {
-                        required: true,
-                        message: "กรุณากรอกวันที่!",
-                      },
-                    ]}
-                  >
-                    <DatePicker
-                      disabled={
-                        checkStatus === "ACTIVE" || checkStatus === "INACTIVE"
-                      }
-                      placeholder="เลือกวันที่"
-                      onChange={(val) => {
-                        // setStartExchangeDate(val);
-                      }}
-                      format={dateFormat}
-                    />
-                  </Form.Item>
-                  <Form.Item
-                    name="startExchangeTime"
-                    initialValue={moment("00:00", "HH:mm")}
-                  >
-                    <TimePicker
-                      disabled={
-                        checkStatus === "ACTIVE" || checkStatus === "INACTIVE"
-                      }
-                      format={"HH:mm"}
-                      className="ms-3"
-                      placeholder="เลือกเวลา"
-                      onChange={(val) => {
-                        // setStartExchangeTime(val);
-                      }}
-                      defaultValue={moment("00:00", "HH:mm")}
-                      allowClear={false}
-                    />
-                  </Form.Item>
-                </div>
-              </div>
-              <div className="col-lg-6">
-                <label>
-                  วันสิ้นสุด<span style={{ color: color.Error }}>*</span>
-                </label>
-                <div className="d-flex">
-                  <Form.Item
-                    name="endDate"
-                    rules={[
-                      {
-                        required: true,
-                        message: "กรุณากรอกวันที่!",
-                      },
-                    ]}
-                  >
-                    <DatePicker
-                      disabled={checkStatus === "INACTIVE"}
-                      placeholder="เลือกวันที่"
-                      onChange={(val) => {
-                        // setEndExchangeDate(val);
-                      }}
-                      format={dateFormat}
-                      disabledDate={disabledDateChange}
-                    />
-                  </Form.Item>
-                  <Form.Item
-                    name="endTime"
-                    initialValue={moment("23:59", "HH:mm")}
-                  >
-                    <TimePicker
-                      disabled={checkStatus === "INACTIVE"}
-                      format={"HH:mm"}
-                      className="ms-3"
-                      placeholder="เลือกเวลา"
-                      onChange={(val) => {
-                        // setEndExchangeTime(val);
-                      }}
-                      defaultValue={moment("23:59", "HH:mm")}
-                      allowClear={false}
-                    />
-                  </Form.Item>
-                </div>
-              </div>
-            </div>
-            <div className="row">
-              <div className="col-lg-4">
-                <label>
-                  จำนวนไร่/สิทธิ์ <span style={{ color: "red" }}>*</span>
-                </label>
-                <Form.Item
-                  name="raiAmount"
-                  rules={[
-                    {
-                      required: true,
-                      message: "กรุณากรอกจำนวน!",
-                    },
-                  ]}
-                >
-                  <Input
-                    disabled={
-                      checkStatus === "ACTIVE" || checkStatus === "INACTIVE"
-                    }
-                    placeholder="กรอกจำนวน"
-                    autoComplete="off"
-                    suffix={"ไร่/สิทธิ์"}
-                    onChange={(e) => {
-                      setRaiAmount(e.target.value);
-                    }}
-                  />
-                </Form.Item>
-              </div>
-              <div className="col-lg-4">
-                <label>
-                  รอบการจับรางวัล <span style={{ color: "red" }}>*</span>
-                </label>
-                <Form.Item
-                  name="luckyDraw"
-                  rules={[
-                    {
-                      required: true,
-                      message: "กรุณากรอกจำนวนรอบ!",
-                    },
-                  ]}
-                >
-                  <Input
-                    disabled={checkStatus === "INACTIVE"}
-                    placeholder="กรอกจำนวนรอบ"
-                    autoComplete="off"
-                  />
-                </Form.Item>
-              </div>
-            </div>
-            <Divider />
-            <div className="form-group col-lg-12">
-              <label>
-                ตารางจับรางวัล <span style={{ color: "red" }}>*</span>
-              </label>
-              <div className="form-group col-lg-6 p-3">
-                <div className="pb-2 pt-2">
-                  <div
-                    className="row"
-                    style={{
-                      border: imgTableLucky && "dotted",
-                      borderWidth: imgTableLucky && 0.5,
-                      borderRadius: imgTableLucky && "8px",
-                      width: imgTableLucky && 600,
-                      height: imgTableLucky && 90,
-                      paddingLeft: imgTableLucky && 26,
-                    }}
-                  >
-                    <div className="col-lg align-self-center">
-                      <span
-                        style={{
-                          backgroundImage: `url(${imgTableLucky})`,
-                          display:
-                            imgTableLucky != undefined ? "block" : "none",
-                          width: "65px",
-                          height: "90px",
-                          overflow: "hidden",
-                          backgroundRepeat: "no-repeat",
-                          backgroundPosition: "center",
-                          backgroundSize: "100%",
-                        }}
-                      />
-                    </div>
-                    <div className="col-lg-8 align-self-center">
-                      <span>
-                        {imgTableLucky && createImgTableLucky.file.name}
-                      </span>
-                    </div>
-                    <div className="col-lg-2 align-self-center">
-                      <span>
-                        {imgTableLucky && (
-                          <DeleteOutlined
-                            style={{ fontSize: 20, color: color.Error }}
-                            onClick={onRemoveImgTableLucky}
-                          />
-                        )}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-                <div
-                  className="hiddenFileBtn"
-                  style={{
-                    backgroundImage: `url(${image.upload_Img_btn})`,
-                    display: imgTableLucky == undefined ? "block" : "none",
-                  }}
-                >
-                  <input
-                    key={imgTableLucky}
-                    type="file"
-                    onChange={onChangeImgTableLucky}
-                    title="เลือกรูป"
-                  />
-                </div>
-              </div>
-            </div>
-            <div className="form-group col-lg-12">
-              <label>
-                กติกาและเงื่อนไข <span style={{ color: "red" }}>*</span>
-              </label>
-              <Form.Item
-                name="condition"
-                rules={[
-                  {
-                    required: true,
-                    message: "กรุณากรอกกติกาและเงื่อนไข!",
-                  },
-                ]}
-              >
-                <TextArea
-                  rows={4}
-                  placeholder="กรอกกติกาและเงื่อนไข"
-                  autoComplete="off"
-                  defaultValue={condition}
-                />
-              </Form.Item>
-            </div>
-            <Divider />
-            <div className="row">
-              <div className="form-group col-lg-12 d-flex flex-column">
-                <label>
-                  สถานะ<span style={{ color: "red" }}> *</span>
-                </label>
-                <Form.Item
-                  name="status"
-                  rules={[
-                    {
-                      required: true,
-                      message: "กรุณาเลือกสถานะ",
-                    },
-                  ]}
-                >
-                  <Radio.Group className="d-flex flex-column">
-                    {(checkStatus === "ACTIVE" && (
-                      <>
-                        <Radio value={"ACTIVE"}>ใช้งาน</Radio>
-                        <Radio value={"DRAFTING"}>ปิดการใช้งาน</Radio>
-                      </>
-                    )) ||
-                      (checkStatus === "DRAFTING" && (
-                        <>
-                          <Radio value={"ACTIVE"}>ใช้งาน</Radio>
-                          <Radio value={"DRAFTING"}>รอเปิดใช้งาน</Radio>
-                        </>
-                      )) ||
-                      (checkStatus === "INACTIVE" && (
-                        <>
-                          <Radio value={"INACTIVE"}>ปิดการใช้งาน</Radio>
-                        </>
-                      ))}
-                  </Radio.Group>
-                </Form.Item>
-              </div>
+                    Remove
+                  </Tag>
+                </>
+              )}
             </div>
           </div>
-        </Form>
-      </CardContainer>
-    </div>
-  );
-  const renderMobile = (
-    <div className="col-lg-4">
-      <RenderQuota
-        imgCover={imgCover}
-        nameChallenge={nameChallenge}
-        detailChallenge={detail}
-        imgButton={imgButton}
-        nameReward={nameReward}
-        imgReward={imgReward}
-        raiAmount={raiAmount}
-      />
-    </div>
+          <p className="text-center text-danger pt-3">
+            *รูปภาพจะต้องมีสัดส่วน 1:1 หรือ 375px * 375px เท่านั้น
+            เพื่อความสวยงามของภาพในแอปพลิเคชัน*
+          </p>
+        </div>
+
+        <div className="form-group col-lg-12">
+          <label>
+            ชื่อชาเลนจ์ <span style={{ color: "red" }}>*</span>
+          </label>
+          <Form.Item
+            name="campaignName"
+            rules={[
+              {
+                required: true,
+                message: "กรุณากรอกชื่อชาเลนจ์!",
+              },
+            ]}
+          >
+            <Input
+              placeholder="กรอกชื่อชาเลนจ์"
+              autoComplete="off"
+              onChange={(e) => {
+                setNameChallenge(e.target.value);
+              }}
+            />
+          </Form.Item>
+        </div>
+        <div className="form-group col-lg-12">
+          <label>
+            รายละเอียด <span style={{ color: "red" }}>*</span>
+          </label>
+          <Form.Item
+            name="description"
+            rules={[
+              {
+                required: true,
+                message: "กรุณากรอกรายละเอียด!",
+              },
+            ]}
+          >
+            <TextArea
+              rows={4}
+              placeholder="กรอกรายละเอียด"
+              autoComplete="off"
+              onChange={(e) => {
+                setDetail(e.target.value);
+              }}
+            />
+          </Form.Item>
+        </div>
+        <div className="form-group col-lg-12">
+          <label>
+            รูปภาพปุ่มชาเลนจ์ <span style={{ color: "red" }}>*</span>
+          </label>
+          <div className="form-group col-lg-12">
+            <div className="p-2">
+              <Row
+                style={{
+                  border: imgButton && "dotted",
+                  borderWidth: imgButton && 0.5,
+                  borderRadius: imgButton && "8px",
+                  width: imgButton && "100%",
+                  height: imgButton && 90,
+                  paddingLeft: imgButton && 5,
+                }}
+                gutter={8}
+              >
+                <Col span={4} className="align-self-center">
+                  <span
+                    style={{
+                      backgroundImage: `url(${imgButton})`,
+                      display: imgButton != undefined ? "block" : "none",
+                      width: "65px",
+                      height: "65px",
+                      overflow: "hidden",
+                      backgroundRepeat: "no-repeat",
+                      backgroundPosition: "center",
+                      backgroundSize: "100%",
+                    }}
+                  />
+                </Col>
+                <Col span={18} className="align-self-center">
+                  <span>{imgButton && createImgButton.file.name}</span>
+                </Col>
+                <Col span={2} className="align-self-center">
+                  <span>
+                    {imgButton && (
+                      <DeleteOutlined
+                        style={{ fontSize: 20, color: color.Error }}
+                        onClick={onRemoveImgButton}
+                      />
+                    )}
+                  </span>
+                </Col>
+              </Row>
+            </div>
+            <div
+              className="hiddenFileBtn"
+              style={{
+                backgroundImage: `url(${image.upload_Img_btn})`,
+                display: imgButton == undefined ? "block" : "none",
+              }}
+            >
+              <input
+                key={imgButton}
+                type="file"
+                onChange={onChangeImgButton}
+                title="เลือกรูป"
+              />
+            </div>
+          </div>
+        </div>
+        <Divider />
+        <div className="form-group col-lg-12">
+          <label>
+            ชื่อของรางวัล <span style={{ color: "red" }}>*</span>
+          </label>
+          <Form.Item
+            name="rewardName"
+            rules={[
+              {
+                required: true,
+                message: "กรุณากรอกชื่อของรางวัล!",
+              },
+            ]}
+          >
+            <Input
+              placeholder="กรอกชื่อของรางวัล"
+              autoComplete="off"
+              onChange={(e) => {
+                setNameReward(e.target.value);
+              }}
+            />
+          </Form.Item>
+        </div>
+        <div className="form-group col-lg-12">
+          <label>
+            รูปภาพของรางวัล <span style={{ color: "red" }}>*</span>
+          </label>
+          <div className="form-group col-lg-12">
+            <div className="p-2">
+              <Row
+                style={{
+                  border: imgReward && "dotted",
+                  borderWidth: imgReward && 0.5,
+                  borderRadius: imgReward && "8px",
+                  width: imgReward && "100%",
+                  height: imgReward && 90,
+                  paddingLeft: imgReward && 5,
+                }}
+                gutter={8}
+              >
+                <Col span={4} className="align-self-center">
+                  <span
+                    style={{
+                      backgroundImage: `url(${imgReward})`,
+                      display: imgReward != undefined ? "block" : "none",
+                      width: "65px",
+                      height: "65px",
+                      overflow: "hidden",
+                      backgroundRepeat: "no-repeat",
+                      backgroundPosition: "center",
+                      backgroundSize: "100%",
+                    }}
+                  />
+                </Col>
+                <Col span={18} className="align-self-center">
+                  <span>{imgReward && createImgReward.file.name}</span>
+                </Col>
+                <Col span={2} className="align-self-center">
+                  <span>
+                    {imgReward && (
+                      <DeleteOutlined
+                        style={{ fontSize: 20, color: color.Error }}
+                        onClick={onRemoveImgReward}
+                      />
+                    )}
+                  </span>
+                </Col>
+              </Row>
+            </div>
+            <div
+              className="hiddenFileBtn"
+              style={{
+                backgroundImage: `url(${image.upload_Img_btn})`,
+                display: imgReward == undefined ? "block" : "none",
+              }}
+            >
+              <input
+                key={imgReward}
+                type="file"
+                onChange={onChangeImgReward}
+                title="เลือกรูป"
+              />
+            </div>
+          </div>
+        </div>
+        <Divider />
+        <div className="row">
+          <div className="col-lg-6">
+            <label>
+              วันเริ่มต้น<span style={{ color: color.Error }}>*</span>
+            </label>
+            <div className="d-flex">
+              <Form.Item
+                name="startDate"
+                rules={[
+                  {
+                    required: true,
+                    message: "กรุณากรอกวันที่!",
+                  },
+                ]}
+              >
+                <DatePicker
+                  placeholder="เลือกวันที่"
+                  onChange={(val) => {
+                    setStartDate(val);
+                  }}
+                  format={dateFormat}
+                />
+              </Form.Item>
+              <Form.Item
+                name="startExchangeTime"
+                initialValue={moment("00:00", "HH:mm")}
+              >
+                <TimePicker
+                  format={"HH:mm"}
+                  className="ms-3"
+                  placeholder="เลือกเวลา"
+                  defaultValue={moment("00:00", "HH:mm")}
+                  allowClear={false}
+                />
+              </Form.Item>
+            </div>
+          </div>
+          <div className="col-lg-6">
+            <label>
+              วันสิ้นสุด<span style={{ color: color.Error }}>*</span>
+            </label>
+            <div className="d-flex">
+              <Form.Item
+                name="endDate"
+                rules={[
+                  {
+                    required: true,
+                    message: "กรุณากรอกวันที่!",
+                  },
+                ]}
+              >
+                <DatePicker
+                  placeholder="เลือกวันที่"
+                  onChange={(val) => {
+                    setEndDate(val);
+                  }}
+                  format={dateFormat}
+                  disabledDate={disabledDateChange}
+                />
+              </Form.Item>
+              <Form.Item name="endTime" initialValue={moment("23:59", "HH:mm")}>
+                <TimePicker
+                  format={"HH:mm"}
+                  className="ms-3"
+                  placeholder="เลือกเวลา"
+                  defaultValue={moment("23:59", "HH:mm")}
+                  allowClear={false}
+                />
+              </Form.Item>
+            </div>
+          </div>
+        </div>
+        <div className="row">
+          <div className="col-lg-4">
+            <label>
+              จำนวนไร่/สิทธิ์ <span style={{ color: "red" }}>*</span>
+            </label>
+            <Form.Item
+              name="rai"
+              rules={[
+                {
+                  required: true,
+                  message: "กรุณากรอกจำนวน!",
+                },
+              ]}
+            >
+              <Input
+                placeholder="กรอกจำนวน"
+                autoComplete="off"
+                suffix={"ไร่/สิทธิ์"}
+                onChange={(e) => {
+                  checkNumber(e, "raiAmount");
+                  setRaiAmount(e.target.value);
+                }}
+              />
+            </Form.Item>
+          </div>
+          <div className="col-lg-4">
+            <label>
+              รอบการจับรางวัล <span style={{ color: "red" }}>*</span>
+            </label>
+            <Form.Item
+              name="rewardRound"
+              rules={[
+                {
+                  required: true,
+                  message: "กรุณากรอกจำนวนรอบ!",
+                },
+              ]}
+            >
+              <Input
+                placeholder="กรอกจำนวนรอบ"
+                autoComplete="off"
+                onChange={(e) => {
+                  checkNumber(e, "luckyDraw");
+                }}
+              />
+            </Form.Item>
+          </div>
+        </div>
+        <Divider />
+        <div className="form-group col-lg-12">
+          <label>
+            ตารางจับรางวัล <span style={{ color: "red" }}>*</span>
+          </label>
+          <div className="form-group col-lg-12">
+            <div className="p-2">
+              <Row
+                style={{
+                  border: imgTableLucky && "dotted",
+                  borderWidth: imgTableLucky && 0.5,
+                  borderRadius: imgTableLucky && "8px",
+                  width: imgTableLucky && "100%",
+                  height: imgTableLucky && 90,
+                  paddingLeft: imgTableLucky && 5,
+                }}
+                gutter={8}
+              >
+                <Col span={4} className="align-self-center">
+                  <span
+                    style={{
+                      backgroundImage: `url(${imgTableLucky})`,
+                      display: imgTableLucky != undefined ? "block" : "none",
+                      width: "65px",
+                      height: "65px",
+                      overflow: "hidden",
+                      backgroundRepeat: "no-repeat",
+                      backgroundPosition: "center",
+                      backgroundSize: "100%",
+                    }}
+                  />
+                </Col>
+                <Col span={18} className="align-self-center">
+                  <span>{imgTableLucky && createImgTableLucky.file.name}</span>
+                </Col>
+                <Col span={2} className="align-self-center">
+                  <span>
+                    {imgTableLucky && (
+                      <DeleteOutlined
+                        style={{ fontSize: 20, color: color.Error }}
+                        onClick={onRemoveImgTableLucky}
+                      />
+                    )}
+                  </span>
+                </Col>
+              </Row>
+            </div>
+            <div
+              className="hiddenFileBtn"
+              style={{
+                backgroundImage: `url(${image.upload_Img_btn})`,
+                display: imgTableLucky == undefined ? "block" : "none",
+              }}
+            >
+              <input
+                key={imgTableLucky}
+                type="file"
+                onChange={onChangeImgTableLucky}
+                title="เลือกรูป"
+              />
+            </div>
+          </div>
+        </div>
+        <br />
+        <div className="form-group col-lg-12">
+          <label>
+            กติกาและเงื่อนไข <span style={{ color: "red" }}>*</span>
+          </label>
+          <Form.Item
+            name="rulesCampaign"
+            rules={[
+              {
+                required: true,
+                message: "กรุณากรอกกติกาและเงื่อนไข!",
+              },
+            ]}
+          >
+            <TextArea
+              rows={4}
+              placeholder="กรอกกติกาและเงื่อนไข"
+              autoComplete="off"
+            />
+          </Form.Item>
+        </div>
+        <Divider />
+        <div className="form-group col-lg-12 d-flex flex-column">
+          <label>
+            สถานะ<span style={{ color: "red" }}> *</span>
+          </label>
+          <Form.Item
+            name="status"
+            rules={[
+              {
+                required: true,
+                message: "กรุณาเลือกสถานะ",
+              },
+            ]}
+          >
+            <Radio.Group>
+              <Space direction="vertical">
+                <Radio value={"ACTIVE"}>ใช้งาน</Radio>
+                <Radio value={"DRAFTING"}>รอเปิดใช้งาน</Radio>
+              </Space>
+            </Radio.Group>
+          </Form.Item>
+        </div>
+      </Form>
+    </CardContainer>
   );
 
   return (
@@ -761,15 +803,26 @@ function EditQuota() {
           <strong style={{ fontSize: "20px" }}>แก้ไขชาเลนจ์</strong>
         </span>
       </Row>
-      <Row className="d-flex justify-content-around">
-        {renderData}
-        {renderMobile}
+      <Row justify={"space-between"} gutter={16}>
+        <Col span={16}>{renderData}</Col>
+        <Col span={8}>
+          <RenderQuota
+            imgCover={imgCover}
+            nameChallenge={nameChallenge}
+            detailChallenge={detail}
+            imgButton={imgButton}
+            nameReward={nameReward}
+            imgReward={imgReward}
+            raiAmount={raiAmount}
+            startDate={startDate}
+            endDate={endDate}
+          />
+        </Col>
       </Row>
-
       <FooterPage
-        disableSaveBtn={saveBtnDisable}
+        styleFooter={{ padding: "6px" }}
         onClickBack={() => navigate(-1)}
-        // onClickSave={onSubmit}
+        onClickSave={onSubmit}
       />
     </>
   );

@@ -112,7 +112,7 @@ const IndexDronerSummaryPoint = () => {
       },
     },
     {
-      title: () => sortTitle("จำนวนแต้ม"),
+      title: () => sortTitle("แต้มคงเหลือ"),
       dataIndex: "balance",
       key: "balance",
       render: (value: any, row: any, index: number) => {
