@@ -66,6 +66,7 @@ const DetailDronerRedeem = () => {
   const [optionDigital, setOptionDigital] = useState<any[]>([
     { value: "REQUEST", lable: "พร้อมใช้", disable: false },
     { value: "USED", lable: "ใช้แล้ว", disable: false },
+    { value: "CANCEL", lable: "ยกเลิก", disable: false },
     { value: "EXPIRED", lable: "หมดอายุ", disable: false },
   ]);
 
@@ -75,7 +76,8 @@ const DetailDronerRedeem = () => {
       setStatusShip(res.redeemDetail.redeemStatus);
       onCheckStatus(
         res.redeemDetail.redeemStatus,
-        res.mission !== null ? "MISSION" : "SCORE"
+        res.mission !== null ? "MISSION" : "SCORE",
+        res.redeemDetail.rewardType
       );
       form.setFieldsValue({
         shipCompany: res.redeemDetail.deliveryCompany,
@@ -99,7 +101,7 @@ const DetailDronerRedeem = () => {
     fetchDelivery();
   }, []);
 
-  const columeHis = [
+  const columeHisPhysical = [
     {
       title: "วันที่อัพเดท",
       dataIndex: "updateAt",
@@ -191,30 +193,178 @@ const DetailDronerRedeem = () => {
       },
     },
   ];
-  const onCheckStatus = (e: string, status?: string) => {
-    if (status === "SCORE") {
-      let mapStatus = optionPhysical;
-      if (e === "PREPARE") {
-        mapStatus[0].disable = true;
-      } else if (e === "DONE") {
-        mapStatus[0].disable = true;
-        mapStatus[1].disable = true;
-        mapStatus[3].disable = true;
-      } else if (e === "CANCEL") {
-        mapStatus[0].disable = true;
-        mapStatus[1].disable = true;
-        mapStatus[2].disable = true;
+  const columeHisDigital = [
+    {
+      title: "วันที่อัพเดท",
+      dataIndex: "updateAt",
+      key: "updateAt",
+      render: (value: any, row: any, index: number) => {
+        return {
+          children: (
+            <span>
+              {row.updateAt && DateTimeUtil.formatDateTime(row.updateAt)}
+            </span>
+          ),
+        };
+      },
+    },
+    {
+      title: "Redeem Code",
+      dataIndex: "Redeem Code",
+      key: "Redeem Code",
+      render: (value: any, row: any, index: number) => {
+        return {
+          children: <span>{row.redeemCode || "-"}</span>,
+        };
+      },
+    },
+    {
+      title: "Branch Code",
+      dataIndex: "branchName",
+      key: "branchName",
+      render: (value: any, row: any, index: number) => {
+        return {
+          children: (
+            <span>
+              {(row.branchCode && row.branchCode + " - " + row.branchName) ||
+                "-"}
+            </span>
+          ),
+        };
+      },
+    },
+    {
+      title: "รายละเอียดหรือหมายเหตุ",
+      dataIndex: "remark",
+      key: "remark",
+      render: (value: any, row: any, index: number) => {
+        return {
+          children: <span>{row.remark || "-"}</span>,
+        };
+      },
+    },
+    {
+      title: "สถานะ",
+      dataIndex: "status",
+      render: (value: any, row: any, index: number) => {
+        const mapStatus: any = {
+          REQUEST:
+            data?.redeemDetail.rewardType === "PHYSICAL"
+              ? "คำร้องขอแลก"
+              : "พร้อมใช้",
+          PREPARE: "เตรียมจัดส่ง",
+          DONE: "ส่งแล้ว",
+          CANCEL: "ยกเลิก",
+          USED: "ใช้งาน",
+          EXPIRED: "หมดอายุ",
+        };
+        const mapColor: any = {
+          REQUEST:
+            data?.redeemDetail.rewardType === "PHYSICAL"
+              ? "#FFCA37"
+              : "#EA973E",
+          PREPARE: "#EA973E",
+          DONE: "#219653",
+          CANCEL: color.Error,
+          USED: "#219653",
+          EXPIRED: "#7B7B7B",
+        };
+        return {
+          children: (
+            <>
+              <span
+                style={{
+                  color: mapColor[row.status],
+                }}
+              >
+                <Badge color={mapColor[row.status]} /> {mapStatus[row.status]}
+              </span>
+            </>
+          ),
+        };
+      },
+    },
+    {
+      title: "ผู้ใช้ที่อัพเดต",
+      dataIndex: "updateBy",
+      key: "updateBy",
+      render: (value: any, row: any, index: number) => {
+        return {
+          children: (
+            <span>
+              {row.updateBy}{" "}
+              {row.status !== "REQUEST" && row.status !== "USED"
+                ? "(ผู้ดูแลระบบ)"
+                : "(นักบินโดรน)"}
+            </span>
+          ),
+        };
+      },
+    },
+  ];
+  const onCheckStatus = (e: string, status?: string, type?: string) => {
+    if (type === "PHYSICAL") {
+      if (status === "SCORE") {
+        let mapStatus = optionPhysical;
+        if (e === "PREPARE") {
+          mapStatus[0].disable = true;
+        } else if (e === "DONE") {
+          mapStatus[0].disable = true;
+          mapStatus[1].disable = true;
+          mapStatus[3].disable = true;
+        } else if (e === "CANCEL") {
+          mapStatus[0].disable = true;
+          mapStatus[1].disable = true;
+          mapStatus[2].disable = true;
+        }
+        setOptionPhysical(mapStatus);
+      } else {
+        let mapStatus = optionPhysical;
+        if (e === "PREPARE") {
+          mapStatus[0].disable = true;
+        } else if (e === "DONE") {
+          mapStatus[0].disable = true;
+          mapStatus[1].disable = true;
+        }
+        setOptionPhysical(mapStatus);
       }
-      setOptionPhysical(mapStatus);
     } else {
-      let mapStatus = optionPhysical;
-      if (e === "PREPARE") {
-        mapStatus[0].disable = true;
-      } else if (e === "DONE") {
-        mapStatus[0].disable = true;
-        mapStatus[1].disable = true;
+      if (status === "SCORE") {
+        let mapStatus = optionDigital;
+        if (e === "REQUEST") {
+          mapStatus[1].disable = true;
+          mapStatus[3].disable = true;
+        } else if (e === "USED") {
+          mapStatus[0].disable = true;
+          mapStatus[2].disable = true;
+          mapStatus[3].disable = true;
+        } else if (e === "CANCEL") {
+          mapStatus[0].disable = true;
+          mapStatus[1].disable = true;
+          mapStatus[3].disable = true;
+        } else {
+          mapStatus[0].disable = true;
+          mapStatus[1].disable = true;
+          mapStatus[2].disable = true;
+        }
+        setOptionDigital(mapStatus);
+      } else {
+        let mapStatus = optionDigital;
+        if (e === "REQUEST") {
+          mapStatus[1].disable = true;
+          mapStatus[2].disable = true;
+          mapStatus[3].disable = true;
+        } else if (e === "USED") {
+          mapStatus[0].disable = true;
+          mapStatus[2].disable = true;
+          mapStatus[3].disable = true;
+        } else {
+          mapStatus[0].disable = true;
+          mapStatus[1].disable = true;
+          mapStatus[2].disable = true;
+        }
+        setOptionDigital(mapStatus);
       }
-      setOptionPhysical(mapStatus);
     }
   };
 
@@ -224,6 +374,14 @@ const DetailDronerRedeem = () => {
       shipCompany: null,
       trackingId: null,
     });
+  };
+
+  const checkDiscable = () => {
+    if (data?.redeemDetail?.rewardType === "PHYSICAL") {
+      return statusShip !== "REQUEST" ? false : true;
+    } else {
+      return statusShip === "CANCEL" ? false : true;
+    }
   };
 
   const submit = async () => {
@@ -236,6 +394,7 @@ const DetailDronerRedeem = () => {
     update.deliveryCompany = getFrom.shipCompany;
     update.trackingNo = getFrom.trackingId;
     update.updateBy = profile.firstname + " " + profile.lastname;
+    setDataUpdate(update);
     RedeemDatasource.updateStatusRedeem(update).then((res) => {
       if (res.id) {
         Swal.fire({
@@ -353,13 +512,15 @@ const DetailDronerRedeem = () => {
             <div>เบอร์โทร</div>
             <div>{data?.receiverDetail.tel}</div>
           </Col>
-          <Col span={15}>
-            <div>ที่อยู่</div>
-            <div>{data?.receiverDetail.address}</div>
-          </Col>
+          {data?.redeemDetail?.rewardType === "PHYSICAL" && (
+            <Col span={15}>
+              <div>ที่อยู่</div>
+              <div>{data?.receiverDetail.address}</div>
+            </Col>
+          )}
         </Row>
         <Divider />
-        {data?.redeemDetail.rewardType === "PHYSICAL" && (
+        {data?.redeemDetail.rewardType === "PHYSICAL" ? (
           <>
             <Col className="pb-4">
               <div>สถานะ</div>
@@ -448,29 +609,58 @@ const DetailDronerRedeem = () => {
               </Col>
             )}
           </>
-        )}
-        {data?.redeemDetail.rewardType === "DIGITAL" && (
-          <Col className="pb-4">
-            <div>สถานะ</div>
-            <Radio.Group
-              onChange={(e) => onChangeStatusShip(e)}
-              value={statusShip}
-            >
-              {optionDigital.map((item) => (
-                <Radio value={item.value}>{item.lable}</Radio>
-              ))}
-            </Radio.Group>
-          </Col>
+        ) : (
+          <>
+            <Col className="pb-4">
+              <div>สถานะ</div>
+              <Radio.Group
+                onChange={(e) => onChangeStatusShip(e)}
+                value={statusShip}
+              >
+                {data?.redeemDetail.rewardExchange === "SCORE" ? (
+                  <>
+                    {optionDigital?.map((item) => (
+                      <Radio value={item.value} disabled={item.disable}>
+                        {item.lable}
+                      </Radio>
+                    ))}
+                  </>
+                ) : (
+                  <>
+                    {optionDigital
+                      ?.filter((x) => x.value !== "CANCEL")
+                      .map((item) => (
+                        <Radio value={item.value} disabled={item.disable}>
+                          {item.lable}
+                        </Radio>
+                      ))}
+                  </>
+                )}
+              </Radio.Group>
+            </Col>
+            {statusShip === "CANCEL" && (
+              <Col>
+                <Form form={formRemark}>
+                  <Form.Item name="remark">
+                    <TextArea placeholder="กรอกรายละเอียดหรือหมายเหตุ" />
+                  </Form.Item>
+                </Form>
+              </Col>
+            )}
+          </>
         )}
       </Container>
       <NewTable
-        columns={columeHis}
+        columns={
+          data?.redeemDetail.rewardType === "PHYSICAL"
+            ? columeHisPhysical
+            : columeHisDigital
+        }
         dataSource={data?.dronerRedeemHistories}
         pagination={false}
       />
     </CardContainer>
   );
-
   const renderMissionDetail = (
     <CardContainer>
       <CardHeader textHeader="รายละเอียดของภารกิจ" bgColor="#2B2B2B" />
@@ -504,6 +694,7 @@ const DetailDronerRedeem = () => {
       </Form>
     </CardContainer>
   );
+
   return (
     <>
       <Row>
@@ -521,13 +712,12 @@ const DetailDronerRedeem = () => {
           {renderMissionDetail} <br />
         </>
       )}
-
       {renderDronerDetail}
       <FooterPage
         onClickBack={() => navigate("/IndexRedeem/Droner")}
         styleFooter={{ padding: "6px" }}
         onClickSave={() => submit()}
-        disableSaveBtn={statusShip !== "REQUEST" ? false : true}
+        disableSaveBtn={checkDiscable()}
       />
     </>
   );

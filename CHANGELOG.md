@@ -1,4 +1,6 @@
 ## [Version - 0]
+## improve [v0.34.8] 2023-06-21
+- added digital redeem (point)
 ## improve [v0.34.7] 2023-06-21
 - added soring in point menu
 - connected api create & edit & delete qtota

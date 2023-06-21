@@ -293,9 +293,8 @@ const IndexRedeem = () => {
                 allowClear
                 onChange={(e) => setSearchStatus(e)}
               >
-                <option value="REQUEST">คำร้องขอแลก</option>
+                <option value="REQUEST">พร้อมใช้</option>
                 <option value="USED">ใช้แล้ว</option>
-                <option value="PREPARE">พร้อมใช้</option>
                 <option value="EXPIRED">หมดอายุ</option>
                 <option value="CANCEL">ยกเลิก</option>
               </Select>
@@ -537,16 +536,24 @@ const IndexRedeem = () => {
       dataIndex: "status",
       render: (value: any, row: any, index: number) => {
         const mapStatus: any = {
-          REQUEST: "คำร้องขอแลก",
+          REQUEST:
+            row?.redeemDetail.rewardType === "PHYSICAL"
+              ? "คำร้องขอแลก"
+              : "พร้อมใช้",
           PREPARE: "เตรียมจัดส่ง",
           DONE: "ส่งแล้ว",
           CANCEL: "ยกเลิก",
+          USED: "ใช้งาน",
+          EXPIRED: "หมดอายุ",
         };
         const mapColor: any = {
-          REQUEST: "#FFCA37",
+          REQUEST:
+            row?.redeemDetail.rewardType === "PHYSICAL" ? "#FFCA37" : "#EA973E",
           PREPARE: "#EA973E",
           DONE: "#219653",
           CANCEL: color.Error,
+          USED: "#219653",
+          EXPIRED: "#7B7B7B",
         };
         return {
           children: (
