@@ -48,6 +48,7 @@ const IndexDronerMission = () => {
 
   const fetchMission = () => {
     CampaignDatasource.getCampaignList(
+      "DRONER",
       "MISSION_REWARD",
       row,
       current,

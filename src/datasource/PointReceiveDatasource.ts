@@ -72,12 +72,13 @@ export class PointReceiveDatasource {
     take?: number,
     page?: number,
     search?: string,
-    endDate?: string
+    sortDirection?: string
   ): Promise<FarmerSummaryPointListEntity> {
     const params = {
       take: take,
       page: page,
       search: search,
+      sortDirection: sortDirection,
     };
     return httpClient
       .get(
@@ -99,7 +100,9 @@ export class PointReceiveDatasource {
     take: number,
     page: number,
     startDate?: string,
-    endDate?: string
+    endDate?: string,
+    sortField?: string,
+    sortDirection?: string
   ): Promise<DetailSummaryListEntity> {
     const params = {
       action: action,
@@ -107,6 +110,8 @@ export class PointReceiveDatasource {
       page: page,
       startDate: startDate,
       endDate: endDate,
+      sortField: sortField,
+      sortDirection: sortDirection,
     };
     return httpClient
       .get(
@@ -126,12 +131,13 @@ export class PointReceiveDatasource {
     take?: number,
     page?: number,
     search?: string,
-    endDate?: string
+    sortDirection?: string
   ): Promise<DronerSummaryPointListEntity> {
     const params = {
       take: take,
       page: page,
       search: search,
+      sortDirection: sortDirection,
     };
     return httpClient
       .get(
@@ -154,7 +160,9 @@ export class PointReceiveDatasource {
     take: number,
     page: number,
     startDate?: string,
-    endDate?: string
+    endDate?: string,
+    sortField?: string,
+    sortDirection?: string
   ): Promise<DetailSummaryListEntity> {
     const params = {
       action: action,
@@ -162,6 +170,8 @@ export class PointReceiveDatasource {
       page: page,
       startDate: startDate,
       endDate: endDate,
+      sortField: sortField,
+      sortDirection: sortDirection,
     };
     return httpClient
       .get(

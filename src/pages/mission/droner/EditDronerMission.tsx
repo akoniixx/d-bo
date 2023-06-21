@@ -57,7 +57,6 @@ const EditDronerMission = () => {
 
   const fetchMissionById = () => {
     CampaignDatasource.getCampaignById(queryString[1]).then((res) => {
-      console.log(res);
       const mapKey = res.condition;
       const checkIsEdit = () => {
         if (res.status === "ACTIVE") {
@@ -119,7 +118,7 @@ const EditDronerMission = () => {
       "",
       "",
       "ACTIVE",
-      "PHYSICAL",
+      ["PHYSICAL", "DIGITAL"],
       "MISSION"
     ).then((res) => {
       setRewardList(res);

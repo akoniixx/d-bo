@@ -14,6 +14,15 @@ export class DateTimeUtil {
     });
   };
 
+  static formatDateThShort = (date: string) => {
+    const formatDate = new Date(date);
+    return formatDate.toLocaleDateString("th-TH", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+    });
+  };
+
   static formatTime = (date: string) => {
     const formatTime = new Date(date);
     return formatTime.toLocaleTimeString("th-TH", {

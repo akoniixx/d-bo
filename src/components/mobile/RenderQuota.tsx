@@ -1,9 +1,10 @@
 import React, { useLayoutEffect, useRef } from "react";
-import {Image } from "antd";
+import { Image } from "antd";
 import { CardHeaderPromotion } from "../header/CardHeaderPromotion";
 import color from "../../resource/color";
 import { image } from "../../resource";
 import styled from "styled-components";
+import { DateTimeUtil } from "./../../utilities/DateTimeUtil";
 
 const TextCard = styled.div<{ isFocus?: boolean }>`
   color: #523a19;
@@ -26,6 +27,8 @@ interface RenderQuota {
   nameReward: any;
   imgReward: any;
   raiAmount: any;
+  startDate?: any;
+  endDate?: any;
 }
 
 const RenderQuota: React.FC<RenderQuota> = ({
@@ -36,6 +39,8 @@ const RenderQuota: React.FC<RenderQuota> = ({
   nameReward,
   imgReward,
   raiAmount,
+  startDate,
+  endDate,
 }) => {
   const div = useRef<any>();
   useLayoutEffect(() => {
@@ -113,11 +118,14 @@ const RenderQuota: React.FC<RenderQuota> = ({
                 }}
               >
                 <div className="row space-between">
-                  <div className="col-lg-3" style={{ paddingLeft: "10%" }}>
+                  <div
+                    className="col-lg-3 align-self-center"
+                    style={{ paddingLeft: "10%" }}
+                  >
                     <Image
                       preview={false}
                       src={imgReward ? imgReward : image.emptyImgReward}
-                      style={{ width: 90, height: 90 }}
+                      style={{ width: "80px", height: "80px" }}
                     />
                   </div>
                   <div className="col-lg pt-4">
@@ -177,7 +185,10 @@ const RenderQuota: React.FC<RenderQuota> = ({
                       เริ่มนับจำนวนไร่สะสม
                     </span>
                     <br />
-                    <span>ตั้งแต่ (วัน/เดือน/ปี) ถึง (วัน/เดือน/ปี)</span>
+                    <span>
+                      ตั้งแต่ {DateTimeUtil.formatDateThShort(startDate)} ถึง{" "}
+                      {DateTimeUtil.formatDateThShort(endDate)}
+                    </span>
                   </div>
                   <div className="col" style={{ fontWeight: "600" }}>
                     <span style={{ color: "#FB8705" }}>XX</span>/

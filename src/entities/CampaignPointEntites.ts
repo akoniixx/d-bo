@@ -83,6 +83,19 @@ export interface CreateCampaignEntiry {
   isDeleteDroner: boolean;
   isDeleteFarmer: boolean;
 }
+export const CreateCampaignEntiry_INIT: CreateCampaignEntiry = {
+  campaignName: "",
+  campaignType: "",
+  startDate: "",
+  endDate: "",
+  condition: [CampaignConditionEntity_INIT],
+  createBy: "",
+  updateBy: "",
+  status: "",
+  application: "",
+  isDeleteFarmer: false,
+  isDeleteDroner: false,
+};
 export interface CampaignConQuotaEntity {
   num: number;
   rai: number;

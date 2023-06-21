@@ -1,4 +1,9 @@
-import { FileTextOutlined, SearchOutlined } from "@ant-design/icons";
+import {
+  CaretDownOutlined,
+  CaretUpOutlined,
+  FileTextOutlined,
+  SearchOutlined,
+} from "@ant-design/icons";
 import { Button, Col, Image, Input, Pagination, Row, Table } from "antd";
 import React, { useEffect, useState } from "react";
 import ActionButton from "../../../components/button/ActionButton";
@@ -8,6 +13,7 @@ import { useNavigate } from "react-router-dom";
 import { FarmerSummaryPointListEntity } from "../../../entities/PointReceiveEntities";
 import { PointReceiveDatasource } from "../../../datasource/PointReceiveDatasource";
 import { numberWithCommas } from "../../../utilities/TextFormatter";
+import { sorter } from "../../../utilities/Sorting";
 
 function IndexFarmerSummary() {
   const navigate = useNavigate();
@@ -15,18 +21,24 @@ function IndexFarmerSummary() {
   const [current, setCurrent] = useState(1);
   const [data, setData] = useState<FarmerSummaryPointListEntity>();
   const [searchKeyword, setSearchKeyword] = useState("");
+  const [sortDirection, setSortDirection] = useState<string | undefined>(
+    undefined
+  );
 
   const fetchFarmerSum = () => {
-    PointReceiveDatasource.getFarmerSumPoint(row, current, searchKeyword).then(
-      (res) => {
-        setData(res);
-      }
-    );
+    PointReceiveDatasource.getFarmerSumPoint(
+      row,
+      current,
+      searchKeyword,
+      sortDirection
+    ).then((res) => {
+      setData(res);
+    });
   };
 
   useEffect(() => {
     fetchFarmerSum();
-  }, [current]);
+  }, [current, sortDirection]);
 
   const onChangePage = (page: number) => {
     setCurrent(page);
@@ -34,6 +46,49 @@ function IndexFarmerSummary() {
   const onSearch = () => {
     setCurrent(1);
     fetchFarmerSum();
+  };
+
+  const sortTitle = (title: string, field?: string) => {
+    return (
+      <>
+        <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+          {title}
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              cursor: "pointer",
+            }}
+            onClick={() => {
+              setSortDirection((prev: any) => {
+                if (prev === "ASC") {
+                  return "DESC";
+                } else if (prev === undefined) {
+                  return "ASC";
+                } else {
+                  return undefined;
+                }
+              });
+            }}
+          >
+            <CaretUpOutlined
+              style={{
+                position: "relative",
+                top: 2,
+                color: sortDirection === "ASC" ? "#ffca37" : "white",
+              }}
+            />
+            <CaretDownOutlined
+              style={{
+                position: "relative",
+                bottom: 2,
+                color: sortDirection === "DESC" ? "#ffca37" : "white",
+              }}
+            />
+          </div>
+        </div>
+      </>
+    );
   };
 
   const pageTitle = (
@@ -94,7 +149,7 @@ function IndexFarmerSummary() {
       },
     },
     {
-      title: "แต้มคงเหลือ",
+      title: () => sortTitle("แต้มคงเหลือ"),
       dataIndex: "balance",
       key: "balance",
       render: (value: any, row: any, index: number) => {
@@ -142,28 +197,26 @@ function IndexFarmerSummary() {
 
   return (
     <>
-      <>
-        {pageTitle}
-        <CardContainer>
-          <Table
-            dataSource={data?.data}
-            columns={columns}
-            pagination={false}
-            size="large"
-            tableLayout="fixed"
-          />
-        </CardContainer>
-        <div className="d-flex justify-content-between pt-4">
-          <p>รายการทั้งหมด {data?.count} รายการ</p>
-          <Pagination
-            current={current}
-            total={data?.count}
-            onChange={onChangePage}
-            pageSize={row}
-            showSizeChanger={false}
-          />
-        </div>
-      </>
+      {pageTitle}
+      <CardContainer>
+        <Table
+          dataSource={data?.data}
+          columns={columns}
+          pagination={false}
+          size="large"
+          tableLayout="fixed"
+        />
+      </CardContainer>
+      <div className="d-flex justify-content-between pt-4">
+        <p>รายการทั้งหมด {data?.count} รายการ</p>
+        <Pagination
+          current={current}
+          total={data?.count}
+          onChange={onChangePage}
+          pageSize={row}
+          showSizeChanger={false}
+        />
+      </div>
     </>
   );
 }

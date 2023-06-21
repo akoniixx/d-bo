@@ -2,10 +2,7 @@ import { Menu, Button } from "antd";
 import Layout, { Content, Footer, Header } from "antd/lib/layout/layout";
 import Sider from "antd/lib/layout/Sider";
 import React, { Children, useEffect, useState } from "react";
-import {
-
-  LogoutOutlined
-} from "@ant-design/icons";
+import { LogoutOutlined } from "@ant-design/icons";
 import { Link, useNavigate } from "react-router-dom";
 import color from "../../resource/color";
 import icon from "../../resource/icon";
@@ -24,6 +21,7 @@ const NavSidebar: React.FC<any> = ({ children }) => {
     []
   );
   const isAccount = persistedProfile.username === "ick_accounting";
+  const navigate = useNavigate();
 
   return (
     <Layout>
@@ -41,7 +39,12 @@ const NavSidebar: React.FC<any> = ({ children }) => {
       >
         <div className="d-flex justify-content-between">
           <div>
-            <img src={icon.logoHeader} width={140} />
+            <img
+              style={{ cursor: "pointer" }}
+              src={icon.logoHeader}
+              width={140}
+              onClick={() => navigate("/HomePage")}
+            />
           </div>
           <div className="d-flex align-items-center">
             <div className="me-4">
@@ -82,9 +85,7 @@ const NavSidebar: React.FC<any> = ({ children }) => {
             cursor: "pointer",
           }}
         >
-          <MenuSide
-            lists={pathLists({ isAccounting: isAccount })}
-          />
+          <MenuSide lists={pathLists({ isAccounting: isAccount })} />
         </Sider>
       </Layout>
     </Layout>
