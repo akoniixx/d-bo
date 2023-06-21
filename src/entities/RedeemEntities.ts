@@ -161,6 +161,7 @@ export interface DetailRedeemDronerEntity {
     trackingNo: string;
     missionName: string;
     missionNo: string;
+    rewardExchange: string;
   };
   dronerRedeemHistories: {
     id: string;
@@ -171,6 +172,9 @@ export interface DetailRedeemDronerEntity {
     createAt: string;
     deliveryCompany: string;
     dronerTransactionId: string;
+    branchCode: string;
+    branchName: string;
+    redeemCode: string;
   }[];
   campaign: string;
   reward: {
