@@ -1,35 +1,44 @@
-import React, { useState } from 'react'
-import { DashboardLayout } from '../../components/layout/Layout'
-import { BackIconButton } from '../../components/button/BackButton'
-import { useNavigate } from 'react-router-dom';
-import { Checkbox, Form, Input, Radio, Tag } from 'antd';
-import { CardHeaderPromotion } from '../../components/header/CardHeaderPromotion';
+import React, { useEffect, useState } from "react";
+import { DashboardLayout } from "../../components/layout/Layout";
+import { BackIconButton } from "../../components/button/BackButton";
+import { useNavigate } from "react-router-dom";
+import { Checkbox, Form, Input, Radio, Select, Tag } from "antd";
+import { CardHeaderPromotion } from "../../components/header/CardHeaderPromotion";
 import uploadImg from "../../resource/media/empties/upload_img_news.png";
-import { color } from '../../resource';
-import { resizeFileImg } from '../../utilities/ResizeImage';
-import { UploadImageEntity, UploadImageEntity_INTI } from '../../entities/UploadImageEntities';
-import { formats, modules } from '../../components/editor/EditorToolbar';
-import ReactQuill from 'react-quill';
-import FooterPage from '../../components/footer/FooterPage';
-import RenderNews from '../../components/mobile/RenderNews';
-import { NewsDatasource } from '../../datasource/NewsDatasource';
-import Swal from 'sweetalert2';
+import { color } from "../../resource";
+import { resizeFileImg } from "../../utilities/ResizeImage";
+import {
+  UploadImageEntity,
+  UploadImageEntity_INTI,
+} from "../../entities/UploadImageEntities";
+import { formats, modules } from "../../components/editor/EditorToolbar";
+import ReactQuill from "react-quill";
+import FooterPage from "../../components/footer/FooterPage";
+import RenderNews from "../../components/mobile/RenderNews";
+import { NewsDatasource } from "../../datasource/NewsDatasource";
+import Swal from "sweetalert2";
+import { CampaignDatasource } from "../../datasource/CampaignDatasource";
 const { Map } = require("immutable");
 
 function AddNewsPage() {
   const profile = JSON.parse(localStorage.getItem("profile") || "{  }");
   const [imgProfile, setImgProfile] = useState<any>();
-  const [chooseFarmer,setChooseFarmer] = useState<boolean>(false)
-  const [chooseDroner,setChooseDroner] = useState<boolean>(false)
-  const [application,setApplication] = useState<string>("")
-  const [newsName,setNewsName] = useState<string>("")
+  const [chooseFarmer, setChooseFarmer] = useState<boolean>(false);
+  const [chooseDroner, setChooseDroner] = useState<boolean>(false);
+  const [application, setApplication] = useState<string>("");
+  const [newsName, setNewsName] = useState<string>("");
   const [descriptionEditor, setDescriptionEditor] = useState<string | null>(
     null
   );
   const [createImgProfile, setCreateImgProfile] = useState<UploadImageEntity>(
     UploadImageEntity_INTI
   );
+  const [categoryNews, setCategoryNews] = useState<string>("");
+  const [campId, setCampId] = useState<string>("");
+  const [chooseChallenge, setChooseChallenge] = useState<boolean>(false);
+  const [chooseNews, setChooseNews] = useState<boolean>(false);
   const [saveBtnDisable, setBtnSaveDisable] = useState<boolean>(true);
+  const [cName, setCname] = useState<any[]>([]);
   const navigate = useNavigate();
   const [form] = Form.useForm();
   const onChangeProfile = async (file: any) => {
@@ -81,10 +90,8 @@ function AddNewsPage() {
   const removeImgProfile = () => {
     setImgProfile(undefined);
     setCreateImgProfile(UploadImageEntity_INTI);
-    form.setFieldValue(
-      "img",null
-    )
-    onFieldsChange()
+    form.setFieldValue("img", null);
+    onFieldsChange();
     // checkValidate(data);
   };
 
@@ -97,31 +104,54 @@ function AddNewsPage() {
     setDescriptionEditor(editor.getHTML());
   };
 
-  const handleChooseFarmer = (e : any) =>{
-    setChooseFarmer(e.target.checked)
-    handleChooseApplication(e.target.checked,chooseDroner)
-  }
+  const handleChooseFarmer = (e: any) => {
+    setChooseFarmer(e.target.checked);
+    handleChooseApplication(e.target.checked, chooseDroner);
+  };
 
-  const handleChooseDroner = (e : any) =>{
-    setChooseDroner(e.target.checked)
-    handleChooseApplication(chooseFarmer,e.target.checked)
-  }
+  const handleChooseDroner = (e: any) => {
+    setChooseDroner(e.target.checked);
+    handleChooseApplication(chooseFarmer, e.target.checked);
+  };
 
-  const handleChooseApplication = (farmer : boolean,droner : boolean) =>{
-    if(farmer === false && droner === false){
-      setApplication("")
+  const handleChooseApplication = (farmer: boolean, droner: boolean) => {
+    if (farmer === false && droner === false) {
+      setApplication("");
+    } else if (farmer === true && droner === false) {
+      setApplication("FARMER");
+    } else if (farmer === false && droner === true) {
+      setApplication("DRONER");
+    } else {
+      setApplication("ALL");
     }
-    else if(farmer === true && droner === false){
-      setApplication("FARMER")
+  };
+  const handleChooseChallenge = (e: any) => {
+    setChooseChallenge(e.target.checked);
+    handleChooseCategoryNews(e.target.checked, chooseNews);
+  };
+  const handleChooseNews = (e: any) => {
+    setChooseNews(e.target.checked);
+    handleChooseCategoryNews(chooseChallenge, e.target.checked);
+  };
+  const handleChooseCategoryNews = (challenge: boolean, news: boolean) => {
+    if (challenge === false && news === false) {
+      setCategoryNews("");
+    } else if (challenge === true && news === false) {
+      setCategoryNews("CHALLENGE");
+    } else if (challenge === false && news === true) {
+      setCategoryNews("NEWS");
+    } else {
+      setCategoryNews("ALL");
     }
-    else if(farmer === false && droner === true){
-      setApplication("DRONER")
-    }
-    else{
-      setApplication("ALL")
-    }
-  }
-
+  };
+  const handleCampName = (e: any) => {
+    setCampId(e);
+  };
+  useEffect(() => {
+    CampaignDatasource.getCampaignList("QUATA", 0, 0).then((res) => {
+      setCname(res.data);
+    });
+  }, []);
   const onFieldsChange = () => {
     const {
       newsName,
@@ -129,65 +159,71 @@ function AddNewsPage() {
       newsStatus,
       FarmerApp,
       DronerApp,
-      img
-    } = form.getFieldsValue()
+      img,
+      challenge,
+      news,
+      campName,
+    } = form.getFieldsValue();
     let fieldInfo = false;
     let fieldapp = false;
     let fieldimg = false;
+    let fieldCateGory = false;
 
-    if(newsName && (newsDescription != "<p><br></p>") && newsStatus){
-      fieldInfo = false
+    if (newsName && newsDescription != "<p><br></p>" && newsStatus) {
+      fieldInfo = false;
+    } else {
+      fieldInfo = true;
     }
-    else{
-      fieldInfo = true
+    if ((challenge && campName) || news) {
+      fieldCateGory = false;
+    } else {
+      fieldCateGory = true;
     }
-    if(FarmerApp || DronerApp){
-      fieldapp = false
-    }
-    else{
-      fieldapp = true
+    if (FarmerApp || DronerApp) {
+      fieldapp = false;
+    } else {
+      fieldapp = true;
     }
 
-    if(!img){
-      fieldimg = true
+    if (!img) {
+      fieldimg = true;
+    } else {
+      fieldimg = false;
     }
-    else{
-      fieldimg = false
-    }
-    setBtnSaveDisable(fieldInfo || fieldapp || fieldimg)
-  }
+    setBtnSaveDisable(fieldInfo || fieldapp || fieldimg || fieldCateGory);
+  };
 
-  const onSubmit = ()=>{
-    const {
-      newsName,
-      newsDescription,
-      newsStatus
-    } = form.getFieldsValue()
+  const onSubmit = () => {
+    const { newsName, newsDescription, newsStatus } = form.getFieldsValue();
     NewsDatasource.addNews({
-      title : newsName,
-      details : newsDescription,
-      status : newsStatus,
-      application : application,
-      file : createImgProfile.file,
-      createBy : profile.firstname + " " + profile.lastname,
-    }).then(res => {
-      Swal.fire({
-        title: "บันทึกสำเร็จ",
-        icon: "success",
-        timer: 1500,
-        showConfirmButton: false,
-      }).then((time) => {
-        navigate("/NewsPage");
+      title: newsName,
+      details: newsDescription,
+      status: newsStatus,
+      application: application,
+      categoryNews: categoryNews,
+      campaignId: campId,
+      file: createImgProfile.file,
+      createBy: profile.firstname + " " + profile.lastname,
+    })
+      .then((res) => {
+        Swal.fire({
+          title: "บันทึกสำเร็จ",
+          icon: "success",
+          timer: 1500,
+          showConfirmButton: false,
+        }).then((time) => {
+          navigate("/NewsPage");
+        });
+      })
+      .catch((err) => {
+        console.log(err);
+        Swal.fire({
+          title: "เกิดข้อผิดพลาก",
+          icon: "error",
+          showConfirmButton: true,
+        });
       });
-    }).catch((err) => {
-      console.log(err);
-      Swal.fire({
-        title: "เกิดข้อผิดพลาก",
-        icon: "error",
-        showConfirmButton: true,
-      });
-    });
-  }
+  };
 
   return (
     <>
@@ -203,27 +239,30 @@ function AddNewsPage() {
             <Form form={form} onFieldsChange={onFieldsChange}>
               <div className="row">
                 <div className="form-group text-center pt-4">
-                  <Form.Item name="img" rules={[
+                  <Form.Item
+                    name="img"
+                    rules={[
                       {
                         required: true,
                         message: "กรุณาใส่รูปภาพ!",
                       },
-                  ]}>
-                  <div
-                    className="hiddenFileInputNews"
-                    style={{
-                      backgroundImage: `url(${
-                        imgProfile == undefined ? uploadImg : imgProfile
-                      })`,
-                    }}
+                    ]}
                   >
-                    <input
-                      key={imgProfile}
-                      type="file"
-                      onChange={onChangeProfile}
-                      title="เลือกรูป"
-                    />
-                  </div>
+                    <div
+                      className="hiddenFileInputNews"
+                      style={{
+                        backgroundImage: `url(${
+                          imgProfile == undefined ? uploadImg : imgProfile
+                        })`,
+                      }}
+                    >
+                      <input
+                        key={imgProfile}
+                        type="file"
+                        onChange={onChangeProfile}
+                        title="เลือกรูป"
+                      />
+                    </div>
                   </Form.Item>
                   <div>
                     {imgProfile != undefined && (
@@ -252,7 +291,10 @@ function AddNewsPage() {
                     )}
                   </div>
                 </div>
-                <p className='text-center text-danger pt-1 pb-4'>*รูปภาพจะต้องมีสัดส่วน 16:6 หรือ 1,000px * 375px เท่านั้น เพื่อความสวยงามของภาพในแอปพลิเคชัน*</p>
+                <p className="text-center text-danger pt-1 pb-4">
+                  *รูปภาพจะต้องมีสัดส่วน 16:6 หรือ 1,000px * 375px เท่านั้น
+                  เพื่อความสวยงามของภาพในแอปพลิเคชัน*
+                </p>
               </div>
               <div className="form-group col-lg-12">
                 <label>
@@ -271,7 +313,7 @@ function AddNewsPage() {
                     placeholder="กรอกหัวข้อข่าว"
                     autoComplete="off"
                     onChange={(e) => {
-                      setNewsName(e.target.value)
+                      setNewsName(e.target.value);
                     }}
                   />
                 </Form.Item>
@@ -301,28 +343,118 @@ function AddNewsPage() {
                   </Form.Item>
                 </div>
               </div>
+              {/* <div className="form-group col-lg-12 pt-2 pb-4">
+                <label>
+                  ตั้งค่าข่าวสาร <span style={{ color: "red" }}>*</span>
+                </label>
+                <Form.Item
+                  initialValue={false}
+                  name="mainPage"
+                  valuePropName="checked"
+                  className="my-0"
+                >
+                  <Checkbox
+                    className="pt-2"
+                  >
+                    ปักหมุดในหน้าหลัก
+                  </Checkbox>
+                </Form.Item>
+                <Form.Item
+                  initialValue={false}
+                  name="allNews"
+                  valuePropName="checked"
+                  className="my-0"
+                >
+                  <Checkbox
+                    className="mt-0"
+                  >
+                    ปักหมุดในหน้าข่าวสารทั้งหมด
+                  </Checkbox>
+                </Form.Item>
+              </div> */}
               <div className="form-group col-lg-12">
                 <label>
                   แอปพลิเคชั่น <span style={{ color: "red" }}>*</span>
                 </label>
-                <Form.Item initialValue={false} name="FarmerApp" valuePropName="checked" className='my-0'>
-                    <Checkbox
-                      onChange={handleChooseFarmer}
-                      checked={chooseFarmer}
-                      className="pt-2"
-                    >
-                      Farmer Application
-                    </Checkbox>
+                <Form.Item
+                  initialValue={false}
+                  name="FarmerApp"
+                  valuePropName="checked"
+                  className="my-0"
+                >
+                  <Checkbox
+                    onChange={handleChooseFarmer}
+                    checked={chooseFarmer}
+                    className="pt-2"
+                  >
+                    Farmer Application
+                  </Checkbox>
                 </Form.Item>
-                <Form.Item initialValue={false} name="DronerApp" valuePropName="checked" className='my-0'>
-                    <Checkbox
-                      onChange={handleChooseDroner}
-                      checked={chooseDroner}
-                      className="mt-0"
-                    >
-                      Droner Application
-                    </Checkbox>
+                <Form.Item
+                  initialValue={false}
+                  name="DronerApp"
+                  valuePropName="checked"
+                  className="my-0"
+                >
+                  <Checkbox
+                    onChange={handleChooseDroner}
+                    checked={chooseDroner}
+                    className="mt-0"
+                  >
+                    Droner Application
+                  </Checkbox>
                 </Form.Item>
+              </div>
+              <div className="form-group col-lg-12 pt-4">
+                <label>
+                  หมวดหมู่ <span style={{ color: "red" }}>*</span>
+                </label>
+                <Form.Item
+                  initialValue={false}
+                  name="news"
+                  valuePropName="checked"
+                  className="my-0"
+                >
+                  <Checkbox
+                    onChange={handleChooseNews}
+                    checked={chooseNews}
+                    className="pt-2"
+                  >
+                    ข่าวสาร
+                  </Checkbox>
+                </Form.Item>
+                <div className="row">
+                  <div className="col-lg">
+                    <Form.Item
+                      initialValue={false}
+                      name="challenge"
+                      valuePropName="checked"
+                      className="my-0"
+                    >
+                      <Checkbox
+                        onChange={handleChooseChallenge}
+                        checked={chooseChallenge}
+                        className="mt-0"
+                      >
+                        ชาเลนจ์
+                      </Checkbox>
+                    </Form.Item>
+                  </div>
+                  <div className="col-lg-10">
+                    <Form.Item name="campName">
+                      <Select
+                        disabled={!chooseChallenge}
+                        allowClear
+                        placeholder="เลือกชื่อชาเลนจ์"
+                        onChange={handleCampName}
+                      >
+                        {cName.map((item) => (
+                          <option value={item.id}>{item.campaignName}</option>
+                        ))}
+                      </Select>
+                    </Form.Item>
+                  </div>
+                </div>
               </div>
               <div className="row pt-3">
                 <div className="form-group col-lg-12 d-flex flex-column">
@@ -349,7 +481,7 @@ function AddNewsPage() {
             </Form>
           </div>
         </div>
-        <RenderNews 
+        <RenderNews
           img={imgProfile}
           description={descriptionEditor!}
           name={newsName}
@@ -363,7 +495,7 @@ function AddNewsPage() {
         </div>
       </div>
     </>
-  )
+  );
 }
 
-export default AddNewsPage
+export default AddNewsPage;
