@@ -312,7 +312,9 @@ function EditNewsPage() {
     });
   }, []);
   useEffect(() => {
-    CampaignDatasource.getCampaignList("QUATA", 0, 0).then((res) => {
+    CampaignDatasource.getCampaignList(undefined, "QUATA").then((res) => {
+      console.log(res);
+
       setCname(res.data);
     });
   }, []);
