@@ -148,7 +148,7 @@ function AddNewsPage() {
     setCampId(e);
   };
   useEffect(() => {
-    CampaignDatasource.getCampaignList("QUATA", 0, 0).then((res) => {
+    CampaignDatasource.getCampaignList("ALL", "QUATA").then((res) => {
       setCname(res.data);
     });
   }, []);
