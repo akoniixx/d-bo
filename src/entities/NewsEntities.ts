@@ -5,5 +5,7 @@ export interface NewsEntities{
     status : string;
     createBy : string;
     application : string;
+    categoryNews: string;
+    campaignId: string;
     file? : any;
 }

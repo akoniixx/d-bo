@@ -10,6 +10,8 @@ export class NewsDatasource{
         formData.append("status",data.status)
         formData.append("createBy",data.createBy)
         formData.append("application",data.application)
+        formData.append("categoryNews",data.categoryNews)
+        formData.append("campaignId",data.campaignId)
         return httpClient
         .post(BASE_URL + "/promotion/news/upload",formData)
         .then(res => {return res.data})
@@ -54,6 +56,8 @@ export class NewsDatasource{
             formData.append("status",data.status)
             formData.append("createBy",data.createBy)
             formData.append("application",data.application)
+            formData.append("categoryNews",data.categoryNews)
+            formData.append("campaignId",data.campaignId)
         }
         else{
             formData.append("file",data.file)
@@ -62,6 +66,8 @@ export class NewsDatasource{
             formData.append("status",data.status)
             formData.append("createBy",data.createBy)
             formData.append("application",data.application)
+            formData.append("categoryNews",data.categoryNews)
+            formData.append("campaignId",data.campaignId)
         }
         return httpClient
         .post(BASE_URL + `/promotion/news/update/${data.id}`,formData)
