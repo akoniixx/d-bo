@@ -1,4 +1,8 @@
 ## [Version - 0]
+## improve [v0.34.9] 2023-06-21
+- fixed input type number in mission setting
+- fixed create date promotion in mission setting
+- fixed create rai can type decimal in mission setting
 ## improve [v0.34.8] 2023-06-21
 - added digital redeem (point)
 ## improve [v0.34.7] 2023-06-21
