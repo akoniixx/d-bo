@@ -503,7 +503,6 @@ const EditDronerMission = () => {
         " " +
         moment(f.endTime).format("HH:mm:ss")
     ).toISOString();
-    console.log(create);
     CampaignDatasource.updateCampaign(queryString[1], create).then((res) => {
       if (res.success) {
         Swal.fire({
