@@ -30,12 +30,12 @@ import { RewardDatasource } from "../../../datasource/RewardDatasource";
 import {
   CampaignConditionEntity,
   CampaignConditionEntity_INIT,
-  CreateCampaignEntiry,
 } from "../../../entities/CampaignPointEntites";
 import { GetAllRewardEntities } from "../../../entities/RewardEntites";
 import { color } from "../../../resource";
 import dayjs from "dayjs";
 import Swal from "sweetalert2";
+import { validateOnlyNumWDecimal } from "../../../utilities/TextFormatter";
 
 const AddDronerMission = () => {
   const profile = JSON.parse(localStorage.getItem("profile") || "{  }");
@@ -155,12 +155,20 @@ const AddDronerMission = () => {
       for (let i = 0; count > i; i++) {
         d.push(parseFloat(v[`${i + 1}_rai`]));
       }
-      if (d[0] < d[1] && d[d.length - 2] <= d[d.length - 1]) {
-        return false;
-      } else {
-        return true;
-      }
     }
+    if (d[0] < d[1] && d[d.length - 2] <= d[d.length - 1]) {
+      return false;
+    } else {
+      return true;
+    }
+  };
+  const checkNumber = (
+    e: React.ChangeEvent<HTMLInputElement>,
+    name: string
+  ) => {
+    const { value: inputValue } = e.target;
+    const convertedNumber = validateOnlyNumWDecimal(inputValue);
+    formTable.setFieldsValue({ [name]: convertedNumber });
   };
 
   const columns = [
@@ -227,6 +235,7 @@ const AddDronerMission = () => {
                 placeholder="กรอกจำนวนไร่"
                 suffix="ไร่"
                 autoComplete="off"
+                onChange={(e) => checkNumber(e, `${row.num}_rai`)}
               />
             </Form.Item>
           ),
@@ -394,7 +403,7 @@ const AddDronerMission = () => {
       return {
         num: i + 1,
         missionName: fs[`${y.num}_missionName`],
-        rai: parseFloat(fs[`${y.num}_rai`]),
+        rai: parseFloat(fs[`${y.num}_rai`]).toFixed(2),
         rewardId: fs[`${y.num}_rewardId`],
         descriptionReward: fs[`${y.num}_description`],
         conditionReward: fs[`${y.num}_condition`],

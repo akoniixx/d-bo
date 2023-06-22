@@ -152,34 +152,6 @@ function MissionReport() {
     setCurrent(1);
   };
 
-  const isNumber = (n: any) => {
-    return !isNaN(parseFloat(n)) && isFinite(n);
-  };
-  const sorter = (a: any, b: any) => {
-    if (a === null) {
-      return 1;
-    }
-    if (b === null) {
-      return -1;
-    }
-    if (isNumber(a) && isNumber(b)) {
-      if (parseInt(a, 10) === parseInt(b, 10)) {
-        return 0;
-      }
-      return parseInt(a, 10) > parseInt(b, 10) ? 1 : -1;
-    }
-    if (isNumber(a)) {
-      return -1;
-    }
-    if (isNumber(b)) {
-      return 1;
-    }
-    if (a === b) {
-      return 0;
-    }
-    return a > b ? 1 : -1;
-  };
-
   const mapColor: any = {
     unsuccessMission: "rgba(235, 87, 87, 0.1)",
     unconfirmMission: "rgba(255, 250, 235, 1)",
@@ -197,7 +169,6 @@ function MissionReport() {
       title: "วันที่อัพเดต",
       dataIndex: "updatedAt",
       key: "updatedAt",
-      sorter: (a: any, b: any) => sorter(a.updatedAt, b.updatedAt),
       render: (value: any, row: any, index: number) => {
         return {
           children: <span>{DateTimeUtil.formatDateTime(row.updateAt)}</span>,
@@ -236,7 +207,6 @@ function MissionReport() {
       title: "จำนวนไร่สะสม",
       dataIndex: "allraiAmount",
       key: "allraiAmount",
-      sorter: (a: any, b: any) => sorter(a.allraiAmount, b.allraiAmount),
       render: (value: any, row: any, index: number) => {
         const calRai = () => {
           let cal = (
