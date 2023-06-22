@@ -88,7 +88,10 @@ function MissionReport() {
         };
         tableList.push(table);
       }
-      const mapPage = res.condition.slice(4 * (current - 1), 4 * current);
+      const mapPage = res.condition.slice(
+        rowCard * (current - 1),
+        rowCard * current
+      );
       setDataInpro(tableList);
       setDataCondition(mapPage);
       setDataMission(res);
@@ -137,7 +140,7 @@ function MissionReport() {
     setCurrentTable(page);
   };
   const onChangePageCard = (page: number) => {
-    setNum(1);
+    setNum(rowCard * (page - 1) + 1);
     setCurrent(page);
   };
 
@@ -245,7 +248,6 @@ function MissionReport() {
               <span
                 style={{
                   color: color.Success,
-                  fontWeight: "700",
                 }}
               >
                 {row.redeemNo}
