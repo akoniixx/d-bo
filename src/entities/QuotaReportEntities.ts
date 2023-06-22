@@ -2,6 +2,7 @@ export interface QuotaReportEntity {
   dronerId: string;
   allRai: number;
   quotaAmount: number;
+  allValue: string;
   amountReceive: number;
   updateAt: string;
   firstname: string;
