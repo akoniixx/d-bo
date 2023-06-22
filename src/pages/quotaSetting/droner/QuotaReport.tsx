@@ -76,7 +76,7 @@ function QuotaReport() {
     getQuotaReport();
     getRewardRound();
   }, [current]);
-  console.log(data);
+  
   const isNumber = (n: any) => {
     return !isNaN(parseFloat(n)) && isFinite(n);
   };
