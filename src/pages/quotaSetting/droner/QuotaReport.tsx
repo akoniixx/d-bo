@@ -76,7 +76,7 @@ function QuotaReport() {
     getQuotaReport();
     getRewardRound();
   }, [current]);
-
+  console.log(data);
   const isNumber = (n: any) => {
     return !isNaN(parseFloat(n)) && isFinite(n);
   };
@@ -95,6 +95,7 @@ function QuotaReport() {
       ]}
     />
   );
+  console.log(data);
 
   const PageTitle = (
     <>
@@ -233,7 +234,6 @@ function QuotaReport() {
       dataIndex: "quotaAmount",
       key: "quotaAmount",
       render: (value: any, row: any, index: number) => {
-        var sumAmount = row.quotaAmount - row.amountReceive;
         return {
           children: (
             <>
@@ -259,7 +259,7 @@ function QuotaReport() {
                         </div>
                       </td>
                       <td style={{ textAlign: "right" }}>
-                        {numberWithCommas(row.quotaAmount)}
+                        {numberWithCommas(row.allValue)}
                       </td>
                     </tr>
                     <tr>
@@ -283,7 +283,7 @@ function QuotaReport() {
                           fontWeight: "bold",
                         }}
                       >
-                        {numberWithCommas(sumAmount)}
+                        {numberWithCommas(row.quotaAmount)}
                       </td>
                     </tr>
                   </table>
