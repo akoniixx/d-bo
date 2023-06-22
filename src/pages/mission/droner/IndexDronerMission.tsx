@@ -36,7 +36,7 @@ const dateSearchFormat = "YYYY-MM-DD";
 const IndexDronerMission = () => {
   const navigate = useNavigate();
   const dateFormat = "DD/MM/YYYY";
-  const row = 5;
+  const row = 10;
   const [current, setCurrent] = useState(1);
   const [data, setData] = useState<CampaignListEntity>();
   const [searchKeyword, setSearchKeyword] = useState("");

@@ -1,5 +1,11 @@
 ## [Version - 0]
 
+## improve [v0.34.10] 2023-06-21
+
+- fixed input type number in mission setting
+- fixed create date promotion in mission setting
+- fixed create rai can type decimal in mission setting
+
 ## improve [v0.34.9] 2023-06-22
 
 - change display field quota report

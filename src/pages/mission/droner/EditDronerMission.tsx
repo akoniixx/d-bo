@@ -35,6 +35,7 @@ import {
 } from "../../../entities/CampaignPointEntites";
 import { GetAllRewardEntities } from "../../../entities/RewardEntites";
 import { color } from "../../../resource";
+import { validateOnlyNumWDecimal } from "../../../utilities/TextFormatter";
 const _ = require("lodash");
 
 const EditDronerMission = () => {
@@ -44,7 +45,6 @@ const EditDronerMission = () => {
   const dateSearchFormat = "YYYY-MM-DD";
   const dateFormat = "DD/MM/YYYY";
   const [form] = Form.useForm();
-  const [formSub] = Form.useForm();
   const [formTable] = Form.useForm();
   const [data, setData] = useState<CampaignEntiry>();
   const [dataSubMission, setDataSubMission] = useState<
@@ -101,7 +101,6 @@ const EditDronerMission = () => {
           ? moment(new Date().getTime())
           : moment(new Date(res.endDate).getTime()),
       });
-      console.log(res);
       mapKey?.forEach((p: any) => {
         formTable.setFieldValue(`${p.num}_missionName`, p.missionName);
         formTable.setFieldValue(`${p.num}_rai`, p.rai);
@@ -210,12 +209,24 @@ const EditDronerMission = () => {
       for (let i = 0; count > i; i++) {
         d.push(parseFloat(v[`${i + 1}_rai`]));
       }
-      if (d[0] < d[1] && d[d.length - 2] <= d[d.length - 1]) {
-        return false;
-      } else {
-        return true;
-      }
     }
+    if (d[0] < d[1] && d[d.length - 2] <= d[d.length - 1]) {
+      return false;
+    } else {
+      return true;
+    }
+  };
+  const checkNumber = (
+    e: React.ChangeEvent<HTMLInputElement>,
+    name: string
+  ) => {
+    const { value: inputValue } = e.target;
+    const convertedNumber = validateOnlyNumWDecimal(inputValue);
+    formTable.setFieldsValue({ [name]: convertedNumber });
+  };
+  const disabledDateChange = (current: any) => {
+    const f = form.getFieldsValue();
+    return current && current < f.startDate;
   };
 
   const columns = [
@@ -287,6 +298,7 @@ const EditDronerMission = () => {
                 suffix="ไร่"
                 autoComplete="off"
                 disabled={isActive}
+                onChange={(e) => checkNumber(e, `${row.num}_rai`)}
               />
             </Form.Item>
           ),
@@ -463,10 +475,13 @@ const EditDronerMission = () => {
     const f = form.getFieldsValue();
     const fs = formTable.getFieldsValue();
     const condition = dataSub?.map((y: any, i: number) => {
+      const mapNum = parseFloat(fs[`${y.num}_rai`]).toString().includes(".");
       return {
         num: i + 1,
         missionName: fs[`${y.num}_missionName`],
-        rai: parseFloat(fs[`${y.num}_rai`]),
+        rai: mapNum
+          ? parseFloat(fs[`${y.num}_rai`]).toFixed(2)
+          : parseFloat(fs[`${y.num}_rai`]),
         rewardId: fs[`${y.num}_rewardId`],
         descriptionReward: fs[`${y.num}_description`],
         conditionReward: fs[`${y.num}_condition`],
@@ -552,6 +567,7 @@ const EditDronerMission = () => {
                     placeholder="เลือกวันที่"
                     format={dateFormat}
                     disabled={isActive}
+                    disabledDate={disabledDateChange}
                   />
                 </Form.Item>
                 <Form.Item
@@ -587,6 +603,7 @@ const EditDronerMission = () => {
                     placeholder="เลือกวันที่"
                     format={dateFormat}
                     disabled={isEdit}
+                    disabledDate={disabledDateChange}
                   />
                 </Form.Item>
                 <Form.Item
