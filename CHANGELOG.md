@@ -1,4 +1,7 @@
 ## [Version - 0]
+## improve [v0.34.11] 2023-06-23
+
+- added param creare & update qaota menu
 
 ## improve [v0.34.10] 2023-06-21
 

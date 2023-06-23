@@ -312,6 +312,7 @@ function EditQuota() {
     const create: any = {};
     const reward: any = {};
     reward.num = 1;
+    reward.quata = 1;
     reward.rewardName = f.rewardName;
     reward.rewardRound = f.rewardRound;
     reward.rai = f.rai;
