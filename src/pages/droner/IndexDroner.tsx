@@ -1,4 +1,4 @@
-import { Avatar, Badge, Pagination, Row, Select, Table } from "antd";
+import { Avatar, Badge, Col, Pagination, Row, Select, Table } from "antd";
 import React, { useEffect, useState } from "react";
 import { Option } from "antd/lib/mentions";
 import color from "../../resource/color";
@@ -761,7 +761,7 @@ function IndexDroner() {
           children: (
             <>
               <span style={{ color: STATUS_COLOR[row.status] }}>
-                <Badge color={STATUS_COLOR[row.status]} />
+                <Badge color={STATUS_COLOR[row.status]} />{" "}
                 {DRONER_STATUS_MAPPING[row.status]}
                 <br />
               </span>
@@ -780,19 +780,25 @@ function IndexDroner() {
       render: (value: any, row: any, index: number) => {
         return {
           children: (
-            <Row justify={"space-between"}>
-              <ActionButton
-                icon={<FolderViewOutlined />}
-                color={color.primary1}
-                onClick={() => navigate("/DetailDronerHistorySum/id=" + row.id)}
-              />
-              <ActionButton
-                icon={<EditOutlined />}
-                color={color.primary1}
-                onClick={() => {
-                  navigate("/EditDroner?=" + row.id);
-                }}
-              />
+            <Row justify={"space-between"} gutter={8}>
+              <Col span={12}>
+                <ActionButton
+                  icon={<FolderViewOutlined />}
+                  color={color.primary1}
+                  onClick={() =>
+                    navigate("/DetailDronerHistorySum/id=" + row.id)
+                  }
+                />
+              </Col>
+              <Col span={12}>
+                <ActionButton
+                  icon={<EditOutlined />}
+                  color={color.primary1}
+                  onClick={() => {
+                    navigate("/EditDroner?=" + row.id);
+                  }}
+                />
+              </Col>
             </Row>
           ),
         };

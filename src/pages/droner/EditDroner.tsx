@@ -13,6 +13,7 @@ import {
   Avatar,
   DatePicker,
   Checkbox,
+  Col,
 } from "antd";
 import emptyData from "../../resource/media/empties/tabler_drone.png";
 import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
@@ -71,6 +72,7 @@ import { useLocalStorage } from "../../hook/useLocalStorage";
 import { resizeFileImg } from "../../utilities/ResizeImage";
 import { useNavigate } from "react-router-dom";
 import { DashboardLayout } from "../../components/layout/Layout";
+import { Container } from "react-bootstrap";
 
 const dateFormat = "DD/MM/YYYY";
 const dateCreateFormat = "YYYY-MM-DD";
@@ -126,19 +128,27 @@ function EditDroner() {
   ];
   const fetchDronerById = useCallback(async () => {
     await DronerDatasource.getDronerByID(dronerId).then(async (res) => {
-      if (res.birthDate === null) {
-        res.birthDate = moment().format(dateCreateFormat);
-      }
-
       const checkBoxReason = (res.reason || []).filter((el) => {
         return el === "บัตรประชาชนไม่ชัดเจน/ไม่ถูกต้อง";
       });
-      const checkPlantsOther = res.expPlant.filter((el) => {
-        return EXP_PLANT.some((x) => x === el);
-      });
-      const plantsOther = res.expPlant.filter((el) => {
-        return !EXP_PLANT.some((x) => x === el);
-      });
+      const checkPlantsOther = () => {
+        if (res.expPlant) {
+          res.expPlant.filter((el) => {
+            return EXP_PLANT.some((x) => x === el);
+          });
+        } else {
+          return [];
+        }
+      };
+      const plantsOther = () => {
+        if (res.expPlant) {
+          res.expPlant.filter((el) => {
+            return !EXP_PLANT.some((x) => x === el);
+          });
+        } else {
+          return [];
+        }
+      };
       if (res) {
         form.setFieldsValue({
           ...res,
@@ -152,12 +162,12 @@ function EditDroner() {
               ? "(ลงทะเบียนโดยนักบิน)"
               : `(${res.createBy})`
           }`,
-          birthDate: moment(res.birthDate) || undefined,
+          birthDate: res.birthDate ? moment(res.birthDate) : res.birthDate,
           latitude: res.dronerArea?.lat || undefined,
           longitude: res.dronerArea?.long || undefined,
           address1: res.address?.address1 || undefined,
           address2: res.address?.address2 || undefined,
-          checkPlantsOther: checkPlantsOther || [],
+          checkPlantsOther: checkPlantsOther() || [],
           dronerArea: res.dronerArea?.subdistrictId,
           mapUrl: res.dronerArea?.mapUrl || undefined,
           status: res.status,
@@ -171,7 +181,9 @@ function EditDroner() {
               : null,
 
           plantsOther:
-            plantsOther.length > 0 ? plantsOther.join(",") : undefined,
+            plantsOther()?.length || 0 > 0
+              ? plantsOther()?.join(",")
+              : undefined,
           checkReason: checkBoxReason,
         });
       }
@@ -363,7 +375,6 @@ function EditDroner() {
                 (y) => !drone.file.map((z) => z.category).includes(y.category)
               );
             if (!!checkFileImg) {
-              console.log(checkFileImg);
               UploadImageDatasouce.deleteImage(
                 checkFileImg[0].id,
                 checkFileImg[0].path
@@ -742,6 +753,7 @@ function EditDroner() {
           form={form}
           onFieldsChange={onFieldsChange}
           onFinish={updateDroner}
+          initialValues={{ birthDate: null }}
         >
           <div className="row">
             <div className="form-group col-lg-6">
@@ -821,36 +833,17 @@ function EditDroner() {
               </Form.Item>
             </div>
             <div className="form-group col-lg-6">
-              <label>
-                วันเดือนปีเกิด <span style={{ color: "red" }}>*</span>
-              </label>
-              <Form.Item
-                rules={[
-                  {
-                    required: true,
-                    message: "กรุณากรอกวันเดือนปีเกิด",
-                  },
-                ]}
-              >
-                <Form.Item
-                  name="birthDate"
-                  rules={[
-                    {
-                      required: true,
-                      message: "กรุณากรอกวันเดือนปีเกิด",
-                    },
-                  ]}
-                >
-                  <DatePicker
-                    placeholder="กรอกวันเดือนปีเกิด"
-                    locale={locale}
-                    format={dateFormat}
-                    disabledDate={(current) =>
-                      current && current > moment().endOf("day")
-                    }
-                    className="col-lg-12"
-                  />
-                </Form.Item>
+              <label>วันเดือนปีเกิด</label>
+              <Form.Item name="birthDate">
+                <DatePicker
+                  placeholder="กรอกวันเดือนปีเกิด"
+                  locale={locale}
+                  format={dateFormat}
+                  disabledDate={(current) =>
+                    current && current > moment().endOf("day")
+                  }
+                  className="col-lg-12"
+                />
               </Form.Item>
             </div>
           </div>
@@ -1222,7 +1215,6 @@ function EditDroner() {
               <span style={{ color: color.Disable }}>
                 (กรุณาเลือกอย่างน้อย 1 อย่าง)
               </span>
-              <span style={{ color: "red" }}>*</span>
             </label>
             <Form.Item
               name="checkPlantsOther"
@@ -1230,32 +1222,15 @@ function EditDroner() {
               style={{
                 marginBottom: "0px",
               }}
-              rules={[
-                {
-                  validator: (_, value) => {
-                    const plantsOther = form.getFieldValue("plantsOther");
-
-                    if (value?.length < 1 && !plantsOther) {
-                      return Promise.reject(
-                        "กรุณาเลือกพืชที่เคยฉีดพ่นอย่างน้อย 1 อย่าง"
-                      );
-                    } else {
-                      return Promise.resolve();
-                    }
-                  },
-                },
-              ]}
             >
               <Checkbox.Group>
-                {EXP_PLANT.map((el) => {
-                  return (
-                    <Row>
-                      <Checkbox value={el}>
-                        <label>{el}</label>
-                      </Checkbox>
-                    </Row>
-                  );
-                })}
+                <Space direction="vertical">
+                  {EXP_PLANT.map((el) => (
+                    <Checkbox value={el}>
+                      <label>{el}</label>
+                    </Checkbox>
+                  ))}
+                </Space>
               </Checkbox.Group>
             </Form.Item>
           </div>
@@ -1466,42 +1441,44 @@ function EditDroner() {
             <div className="container">
               {dronerDroneList.map((item, index) => {
                 return (
-                  <div className="row pt-3 pb-3">
-                    <div className="col-lg-1">
+                  <Row justify={'space-between'} gutter={16} className="p-2">
+                    <Col span={2}>
                       <Avatar
                         size={25}
                         src={item.drone?.droneBrand.logoImagePath}
                         style={{ marginRight: "5px" }}
                       />
-                    </div>
-                    <div className="col-lg-5">
+                    </Col>
+                    <Col span={7}>
                       <h6>{item.drone?.droneBrand.name}</h6>
                       <p style={{ color: "#ccc" }}>{item.serialNo}</p>
-                    </div>
-                    <div className="col-lg-4">
+                    </Col>
+                    <Col span={8}>
                       <span style={{ color: STATUS_COLOR[item.status] }}>
-                        <Badge color={STATUS_COLOR[item.status]} />
+                        <Badge color={STATUS_COLOR[item.status]} />{" "}
                         {DRONER_DRONE_MAPPING[item.status]}
                         <br />
                       </span>
-                    </div>
-                    <div className="col-lg-2 d-flex justify-content-between">
-                      <div className="col-lg-6">
-                        <ActionButton
-                          icon={<EditOutlined />}
-                          color={color.primary1}
-                          onClick={() => editDroner(item, index + 1)}
-                        />
-                      </div>
-                      <div className="col-lg-6">
-                        <ActionButton
-                          icon={<DeleteOutlined />}
-                          color={color.Error}
-                          onClick={() => removeDrone(item.id)}
-                        />
-                      </div>
-                    </div>
-                  </div>
+                    </Col>
+                    <Col span={5}>
+                      <Row justify={"space-between"} gutter={16}>
+                        <Col span={12}>
+                          <ActionButton
+                            icon={<EditOutlined />}
+                            color={color.primary1}
+                            onClick={() => editDroner(item, index + 1)}
+                          />
+                        </Col>
+                        <Col span={12}>
+                          <ActionButton
+                            icon={<DeleteOutlined />}
+                            color={color.Error}
+                            onClick={() => removeDrone(item.id)}
+                          />
+                        </Col>
+                      </Row>
+                    </Col>
+                  </Row>
                 );
               })}
             </div>

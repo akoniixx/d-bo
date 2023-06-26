@@ -83,14 +83,13 @@ function EditReport() {
   });
   const fetchDetailTask = async () => {
     await TaskFinishedDatasource.getDetailFinishTaskById(taskId).then((res) => {
-      console.log("report edit", res);
       if (res.data.couponId !== null) {
         CouponDataSource.getPromotionCode(res.data.couponId).then((result) =>
           setCouponData({
             couponCode: res.data.couponCode ?? "",
-            couponDiscount: !res.data.discount
+            couponDiscount: !res.data.discountCoupon
               ? null
-              : parseInt(res.data.discount),
+              : parseInt(res.data.discountCoupon),
             couponName: result.couponName ?? "",
           })
         );
