@@ -129,8 +129,8 @@ function RewardReceived() {
     const dronerId = Map(lName.toJS()).set("dronerId", editRedeem.dronerId);
     const dataId = Map(dronerId.toJS()).set("id", editRedeem.id);
     const cpId = Map(dataId.toJS()).set("campaignId", camId);
-
-    await QuotaDatasource.editQuotaRedeem(cpId.toJS()).then((res) => {
+    const tel = Map(cpId.toJS()).set("telephoneNo", editRedeem.telephoneNo);
+    await QuotaDatasource.editQuotaRedeem(tel.toJS()).then((res) => {
       Swal.fire({
         title: "บันทึกสำเร็จ",
         icon: "success",

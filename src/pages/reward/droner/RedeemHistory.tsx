@@ -1,43 +1,29 @@
-import {
-  DeleteOutlined,
-  DownOutlined,
-  EditOutlined,
-  FileSearchOutlined,
-  FileTextOutlined,
-  SearchOutlined,
-  UserOutlined,
-} from "@ant-design/icons";
+import { SearchOutlined } from "@ant-design/icons";
 import {
   Badge,
   Button,
   Checkbox,
-  Col,
   DatePicker,
-  Dropdown,
-  Image,
   Input,
-  Menu,
   Pagination,
-  Row,
   Select,
   Table,
 } from "antd";
 import moment from "moment";
 import React, { useEffect, useState } from "react";
-import Swal from "sweetalert2";
 import { useNavigate } from "react-router-dom";
-import { CheckboxValueType } from "antd/lib/checkbox/Group";
 import { BackIconButton } from "../../../components/button/BackButton";
 import color from "../../../resource/color";
-import ActionButton from "../../../components/button/ActionButton";
 import { RewardDatasource } from "../../../datasource/RewardDatasource";
-import {
-  GetAllDronerRewardHistoryEntities,
-  GetAllRewardEntities,
-  RewardEntities,
-} from "../../../entities/RewardEntites";
+import { GetAllDronerRewardHistoryEntities } from "../../../entities/RewardEntites";
 import { numberWithCommas } from "../../../utilities/TextFormatter";
-import { REWARD_REDEEM_HIS_STATUS } from "../../../definitions/Status";
+import {
+  COLOR_QUOTA_REDEEM,
+  COLOR_QUOTA_REDEEM_DIG,
+  REWARD_REDEEM_HIS_STATUS,
+  STATUS_QUOTA_REDEEM,
+  STATUS_QUOTA_REDEEM_DIG,
+} from "../../../definitions/Status";
 
 const _ = require("lodash");
 function RedeemHistory() {
@@ -316,28 +302,32 @@ function RedeemHistory() {
         return {
           children: (
             <>
-              {row.redeemDetail.redeemStatus === "REQUEST" && (
-                <span style={{ color: color.secondary2 }}>
-                  <Badge color={color.secondary2} style={{ right: 5 }} />
-                  คำร้องขอแลก
+              {rewardType === "DIGITAL" ? (
+                <span
+                  style={{
+                    color:
+                      COLOR_QUOTA_REDEEM_DIG[row.redeemDetail.redeemStatus],
+                  }}
+                >
+                  <Badge
+                    style={{ right: 5 }}
+                    color={
+                      COLOR_QUOTA_REDEEM_DIG[row.redeemDetail.redeemStatus]
+                    }
+                  />
+                  {STATUS_QUOTA_REDEEM_DIG[row.redeemDetail.redeemStatus]}
                 </span>
-              )}
-              {row.redeemDetail.redeemStatus === "PREPARE" && (
-                <span style={{ color: color.secondary1 }}>
-                  <Badge color={color.secondary1} style={{ right: 5 }} />
-                  เตรียมจัดส่ง
-                </span>
-              )}
-              {row.redeemDetail.redeemStatus === "DONE" && (
-                <span style={{ color: color.Success }}>
-                  <Badge color={color.Success} style={{ right: 5 }} />
-                  จัดส่งแล้ว
-                </span>
-              )}
-              {row.redeemDetail.redeemStatus === "CANCEL" && (
-                <span style={{ color: color.Error }}>
-                  <Badge color={color.Error} style={{ right: 5 }} />
-                  ยกเลิก
+              ) : (
+                <span
+                  style={{
+                    color: COLOR_QUOTA_REDEEM[row.redeemDetail.redeemStatus],
+                  }}
+                >
+                  <Badge
+                    style={{ right: 5 }}
+                    color={COLOR_QUOTA_REDEEM[row.redeemDetail.redeemStatus]}
+                  />
+                  {STATUS_QUOTA_REDEEM[row.redeemDetail.redeemStatus]}
                 </span>
               )}
             </>
