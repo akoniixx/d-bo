@@ -1,3 +1,4 @@
+import axios from "axios";
 import { BASE_URL, httpClient } from "../config/develop-config";
 import {
   AddQuotaRedeemHisEntity,
@@ -107,6 +108,50 @@ export class QuotaDatasource {
       })
       .catch((err) => {
         console.log(err, "err editQuotaRedeem");
+      });
+  }
+  static reportExcel(
+    campaignId: string,
+    downloadBy: string,
+    idFileName: string
+  ) {
+    const params = {
+      campaignId: campaignId,
+      downloadBy: downloadBy,
+      idFileName: idFileName,
+    };
+    return axios
+      .post(
+        BASE_URL + `/promotion/report-document/report-excel-quota`,
+        params,
+        {
+          responseType: "arraybuffer",
+        }
+      )
+      .then((response) => {
+        return response.data;
+      });
+  }
+  static reportExcelQuotaReceive(
+    campaignId: string,
+    downloadBy: string,
+    idFileName: string
+  ) {
+    const params = {
+      campaignId: campaignId,
+      downloadBy: downloadBy,
+      idFileName: idFileName,
+    };
+    return axios
+      .post(
+        BASE_URL + `/promotion/report-document/report-excel-quota_receive`,
+        params,
+        {
+          responseType: "arraybuffer",
+        }
+      )
+      .then((response) => {
+        return response.data;
       });
   }
 }

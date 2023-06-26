@@ -28,6 +28,7 @@ import { DateTimeUtil } from "../../../utilities/DateTimeUtil";
 import ModalQuotaRedeem from "../../../components/modal/ModalQuotaRedeem";
 import Swal from "sweetalert2";
 import { CampaignDatasource } from "../../../datasource/CampaignDatasource";
+import { useLocalStorage } from "../../../hook/useLocalStorage";
 
 const _ = require("lodash");
 const { Map } = require("immutable");
@@ -44,7 +45,6 @@ function QuotaReport() {
   const [clNo, setCLNo] = useState<any>();
   const [campId, setCampId] = useState<any>();
   const [campaignName, setCampaignName] = useState<any>();
-
   const [searchText, setSearchText] = useState<any>();
   const [data, setData] = useState<AllQuotaReportEntity>();
   const [showModal, setShowModal] = useState(false);
@@ -52,6 +52,11 @@ function QuotaReport() {
   const handleVisible = (newVisible: any) => {
     setVisible(newVisible);
   };
+  const [persistedProfile, setPersistedProfile] = useLocalStorage(
+    "profile",
+    []
+  );
+
   const getRewardRound = async () => {
     await CampaignDatasource.getCampaignById(queryString[1]).then((res) => {
       setCLNo(res.missionNo);
@@ -76,26 +81,66 @@ function QuotaReport() {
     getQuotaReport();
     getRewardRound();
   }, [current]);
-  
-  const isNumber = (n: any) => {
-    return !isNaN(parseFloat(n)) && isFinite(n);
+
+  const DownloadExcelQuota = async () => {
+    const downloadBy = `${persistedProfile.firstname} ${persistedProfile.lastname}`;
+    await QuotaDatasource.reportExcel(
+      campId,
+      downloadBy,
+      "รายชื่อผู้มีสิทธิ"
+    ).then((res) => {
+      const blob = new Blob([res], {
+        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      });
+      const a = document.createElement("a");
+      a.href = window.URL.createObjectURL(blob);
+      a.download = "รายชื่อผู้มีสิทธิ";
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    });
+  };
+  const DownloadExcelQuotaReceive = async () => {
+    const downloadBy = `${persistedProfile.firstname} ${persistedProfile.lastname}`;
+    await QuotaDatasource.reportExcelQuotaReceive(
+      campId,
+      downloadBy,
+      "รายชื่อผู้ใช้ที่ได้รับของรางวัล"
+    ).then((res) => {
+      const blob = new Blob([res], {
+        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      });
+      const a = document.createElement("a");
+      a.href = window.URL.createObjectURL(blob);
+      a.download = "รายชื่อผู้ใช้ที่ได้รับของรางวัล";
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    });
   };
 
   const downloadListName = (
     <Menu
       items={[
         {
-          label: <span>ดาวน์โหลดรายชื่อผู้ใช้ที่มีสิทธิ</span>,
+          label: (
+            <span onClick={DownloadExcelQuota}>
+              ดาวน์โหลดรายชื่อผู้ใช้ที่มีสิทธิ
+            </span>
+          ),
           key: "1",
         },
         {
-          label: <span>ดาวน์โหลดรายชื่อผู้ใช้ที่ได้รับรางวัล</span>,
+          label: (
+            <span onClick={DownloadExcelQuotaReceive}>
+              ดาวน์โหลดรายชื่อผู้ใช้ที่ได้รับรางวัล
+            </span>
+          ),
           key: "2",
         },
       ]}
     />
   );
-  console.log(data);
 
   const PageTitle = (
     <>
@@ -124,9 +169,9 @@ function QuotaReport() {
         <Col span={4} className="p-3">
           <Dropdown
             overlay={downloadListName}
-            trigger={["click"]}
-            onVisibleChange={handleVisible}
-            visible={visible}
+            // trigger={["click"]}
+            // onVisibleChange={handleVisible}
+            // visible={visible}
           >
             <Button
               style={{
@@ -370,7 +415,8 @@ function QuotaReport() {
     const lName = Map(fName.toJS()).set("lastName", getRow?.lastname);
     const dronerId = Map(lName.toJS()).set("dronerId", getRow?.dronerId);
     const cpId = Map(dronerId.toJS()).set("campaignId", campId);
-    await QuotaDatasource.addQuotaRedeem(cpId.toJS()).then((res) => {
+    const tel = Map(cpId.toJS()).set("telephoneNo", getRow?.telephoneNo);
+    await QuotaDatasource.addQuotaRedeem(tel.toJS()).then((res) => {
       Swal.fire({
         title: "บันทึกสำเร็จ",
         icon: "success",

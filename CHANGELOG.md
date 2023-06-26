@@ -1,4 +1,10 @@
 ## [Version - 0]
+
+## improve [v0.34.12] 2023-06-26
+
+- call api download excel quota manage
+- fixed status history reward type digital
+
 ## improve [v0.34.11] 2023-06-23
 
 - added param creare & update qaota menu

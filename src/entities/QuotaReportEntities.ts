@@ -18,6 +18,7 @@ export interface AddQuotaRedeemHisEntity {
   dronerId: string;
   firstName: string;
   lastName: string;
+  telephoneNo: string;
   roundNo: any;
   rewardName: string;
   description: string;
@@ -28,6 +29,7 @@ export const AddQuotaRedeemHisEntity_INIT: AddQuotaRedeemHisEntity = {
   dronerId: "",
   firstName: "",
   lastName: "",
+  telephoneNo: "",
   roundNo: undefined,
   rewardName: "",
   description: "",
