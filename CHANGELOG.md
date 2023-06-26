@@ -1,5 +1,10 @@
 ## [Version - 0]
 
+## improve [v0.34.13] 2023-06-26
+
+- fixed droner data without address
+- fixed discount task in account report
+
 ## improve [v0.34.12] 2023-06-26
 
 - call api download excel quota manage
