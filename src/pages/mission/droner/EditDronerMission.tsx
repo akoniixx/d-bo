@@ -112,14 +112,15 @@ const EditDronerMission = () => {
   };
   const fetchRewardList = () => {
     RewardDatasource.getAllReward(
-      0,
-      0,
+      50,
+      1,
       "",
       "",
       "ACTIVE",
       ["PHYSICAL", "DIGITAL"],
       "MISSION"
     ).then((res) => {
+      console.log(res);
       setRewardList(res);
     });
   };
