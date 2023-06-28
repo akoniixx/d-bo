@@ -36,6 +36,7 @@ import {
 import { GetAllRewardEntities } from "../../../entities/RewardEntites";
 import { color } from "../../../resource";
 import { validateOnlyNumWDecimal } from "../../../utilities/TextFormatter";
+import dayjs from 'dayjs';
 const _ = require("lodash");
 
 const EditDronerMission = () => {
@@ -120,7 +121,6 @@ const EditDronerMission = () => {
       ["PHYSICAL", "DIGITAL"],
       "MISSION"
     ).then((res) => {
-      console.log(res);
       setRewardList(res);
     });
   };
@@ -192,7 +192,6 @@ const EditDronerMission = () => {
     const mapData = await mapCondition(dataSubMission);
     const e = mapData.filter((x: any) => x.num !== key);
     const mData = await mapCondition(e);
-    console.log("m", mData);
     mapForm(mData);
     setDataSubMission(e);
     setCount(count - 1);
@@ -211,12 +210,15 @@ const EditDronerMission = () => {
         d.push(parseFloat(v[`${i + 1}_rai`]));
       }
     }
-    if (d[0] < d[1] && d[d.length - 2] <= d[d.length - 1]) {
-      return false;
-    } else {
-      return true;
+    if (d.length > 0) {
+      if (d[0] < d[1] && d[d.length - 2] <= d[d.length - 1]) {
+        return false;
+      } else {
+        return true;
+      }
     }
   };
+
   const checkNumber = (
     e: React.ChangeEvent<HTMLInputElement>,
     name: string
@@ -225,9 +227,13 @@ const EditDronerMission = () => {
     const convertedNumber = validateOnlyNumWDecimal(inputValue);
     formTable.setFieldsValue({ [name]: convertedNumber });
   };
-  const disabledDateChange = (current: any) => {
+
+  const disabledDateChangeStart = (current: any) => {
     const f = form.getFieldsValue();
     return current && current < f.startDate;
+  };
+  const disabledDateChangeEnd = (current: any) => {
+    return current && current < dayjs().endOf('day');
   };
 
   const columns = [
@@ -568,7 +574,7 @@ const EditDronerMission = () => {
                     placeholder="เลือกวันที่"
                     format={dateFormat}
                     disabled={isActive}
-                    disabledDate={disabledDateChange}
+                    disabledDate={disabledDateChangeStart}
                   />
                 </Form.Item>
                 <Form.Item
@@ -604,7 +610,7 @@ const EditDronerMission = () => {
                     placeholder="เลือกวันที่"
                     format={dateFormat}
                     disabled={isEdit}
-                    disabledDate={disabledDateChange}
+                    disabledDate={disabledDateChangeEnd}
                   />
                 </Form.Item>
                 <Form.Item

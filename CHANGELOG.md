@@ -1,5 +1,10 @@
 ## [Version - 0]
 
+## improve [v0.34.14] 2023-06-28
+
+- added task no in point menu
+- fixed defect mission menu
+
 ## improve [v0.34.13] 2023-06-26
 
 - fixed droner data without address
