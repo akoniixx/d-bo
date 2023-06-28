@@ -41,7 +41,7 @@ function MissionReport() {
   let queryString = _.split(window.location.pathname, "=");
   const [type, setType] = useState("unsuccessMission");
   const row = 10;
-  const rowCard = 4;
+  const rowCard = 5;
   const [num, setNum] = useState<number>(1);
   const [current, setCurrent] = useState(1);
   const [currentTable, setCurrentTable] = useState(1);
@@ -67,6 +67,8 @@ function MissionReport() {
   }
   const [dataInpro, setDataInpro] = useState<DataTable[]>();
   const [dataSuccess, setDataSuccess] = useState<DataTable[]>();
+  const [countSuccess, setCountSuccess] = useState(0);
+  const [countInpro, setCountInpro] = useState(0);
 
   const fetchMissionInprogress = () => {
     setIsLoading(true);
@@ -78,6 +80,7 @@ function MissionReport() {
       statusMission,
       search
     ).then((res) => {
+      setCountInpro(res.count);
       const tableList = [];
       for (let i = 0; res.data.length > i; i++) {
         const table: any = {
@@ -110,6 +113,7 @@ function MissionReport() {
       startDate,
       endDate
     ).then((res) => {
+      setCountSuccess(res.count);
       const tableList = [];
       for (let i = 0; res.data.length > i; i++) {
         const table: any = {
@@ -475,13 +479,12 @@ function MissionReport() {
       />
       <div className="d-flex justify-content-between pt-3 pb-3">
         <p>
-          รายการทั้งหมด{" "}
-          {type === "successMission" ? dataSuccess?.length : dataInpro?.length}{" "}
+          รายการทั้งหมด {type === "successMission" ? countSuccess : countInpro}{" "}
           รายการ
         </p>
         <Pagination
           current={currentTable}
-          total={10}
+          total={type === "successMission" ? countSuccess : countInpro}
           onChange={onChangePage}
           pageSize={row}
           showSizeChanger={false}

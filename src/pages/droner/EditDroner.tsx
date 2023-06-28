@@ -131,24 +131,14 @@ function EditDroner() {
       const checkBoxReason = (res.reason || []).filter((el) => {
         return el === "บัตรประชาชนไม่ชัดเจน/ไม่ถูกต้อง";
       });
-      const checkPlantsOther = () => {
-        if (res.expPlant) {
-          res.expPlant.filter((el) => {
-            return EXP_PLANT.some((x) => x === el);
-          });
-        } else {
-          return [];
-        }
-      };
-      const plantsOther = () => {
-        if (res.expPlant) {
-          res.expPlant.filter((el) => {
-            return !EXP_PLANT.some((x) => x === el);
-          });
-        } else {
-          return [];
-        }
-      };
+      const checkPlants =
+        (res.expPlant || []).filter((el) => {
+          return EXP_PLANT.some((x) => x === el);
+        }) || [];
+      const plantsOther =
+        (res.expPlant || []).filter((el) => {
+          return !EXP_PLANT.some((x) => x === el);
+        }) || [];
       if (res) {
         form.setFieldsValue({
           ...res,
@@ -167,7 +157,7 @@ function EditDroner() {
           longitude: res.dronerArea?.long || undefined,
           address1: res.address?.address1 || undefined,
           address2: res.address?.address2 || undefined,
-          checkPlantsOther: checkPlantsOther() || [],
+          checkPlantsOther: checkPlants.length > 0 ? checkPlants : [],
           dronerArea: res.dronerArea?.subdistrictId,
           mapUrl: res.dronerArea?.mapUrl || undefined,
           status: res.status,
@@ -181,9 +171,7 @@ function EditDroner() {
               : null,
 
           plantsOther:
-            plantsOther()?.length || 0 > 0
-              ? plantsOther()?.join(",")
-              : undefined,
+            plantsOther?.length > 0 ? plantsOther?.join(",") : undefined,
           checkReason: checkBoxReason,
         });
       }
@@ -1441,7 +1429,7 @@ function EditDroner() {
             <div className="container">
               {dronerDroneList.map((item, index) => {
                 return (
-                  <Row justify={'space-between'} gutter={16} className="p-2">
+                  <Row justify={"space-between"} gutter={16} className="p-2">
                     <Col span={2}>
                       <Avatar
                         size={25}

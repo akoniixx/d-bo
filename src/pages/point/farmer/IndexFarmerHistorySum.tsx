@@ -260,12 +260,23 @@ function IndexFarmerHistorySum() {
         ),
       dataIndex: type === "INCREASE" ? "pointNo" : "taskNo",
       key: type === "INCREASE" ? "pointNo" : "taskNo",
-      width: "50%",
+      width: type === "INCREASE" ? "20%" : "50%",
       render: (value: any, row: any, index: number) => {
         return {
           children: (
             <span>{type === "INCREASE" ? row.pointNo : row.taskNo}</span>
           ),
+        };
+      },
+    },
+    {
+      title: "Task No.",
+      dataIndex: "taskNo1",
+      key: "taskNo1",
+      width: "30%",
+      render: (value: any, row: any, index: number) => {
+        return {
+          children: <span>{row.taskNo}</span>,
         };
       },
     },
@@ -304,7 +315,11 @@ function IndexFarmerHistorySum() {
       <CardContainer>
         <Table
           dataSource={data?.data}
-          columns={columns}
+          columns={
+            type === "INCREASE"
+              ? columns
+              : columns.filter((x) => x.key !== "taskNo1")
+          }
           pagination={false}
           size="large"
           tableLayout="fixed"

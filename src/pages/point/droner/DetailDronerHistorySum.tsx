@@ -257,12 +257,23 @@ function IndexDronerHistorySum() {
         ),
       dataIndex: type === "INCREASE" ? "pointNo" : "redeemNo",
       key: type === "INCREASE" ? "pointNo" : "redeemNo",
-      width: "50%",
+      width: type === "INCREASE" ? "20%" : "50%",
       render: (value: any, row: any, index: number) => {
         return {
           children: (
             <span>{type === "INCREASE" ? row.pointNo : row.redeemNo}</span>
           ),
+        };
+      },
+    },
+    {
+      title: "Task No.",
+      dataIndex: "taskNo",
+      key: "taskNo",
+      width: "30%",
+      render: (value: any, row: any, index: number) => {
+        return {
+          children: <span>{row.taskNo}</span>,
         };
       },
     },
@@ -301,7 +312,11 @@ function IndexDronerHistorySum() {
       <CardContainer>
         <Table
           dataSource={data?.data}
-          columns={columns}
+          columns={
+            type === "INCREASE"
+              ? columns
+              : columns.filter((x) => x.key !== "taskNo")
+          }
           pagination={false}
           size="large"
           tableLayout="fixed"
