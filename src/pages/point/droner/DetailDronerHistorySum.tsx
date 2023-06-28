@@ -42,7 +42,6 @@ function IndexDronerHistorySum() {
       sortField,
       sortDirection
     ).then((res) => {
-      console.log(res);
       setData(res);
     });
   };
