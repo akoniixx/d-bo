@@ -208,6 +208,7 @@ export class CampaignDatasource {
     formData.append("application", data.application);
     formData.append("rulesCampaign", data.rulesCampaign);
     formData.append("description", data.description);
+    formData.append("roundDate", data.roundDate);
     formData.append("floatingFile", floatingFile.file);
     formData.append("rewardFile", rewardFile.file);
     formData.append("rewardRoundFile", rewardRoundFile.file);

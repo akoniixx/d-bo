@@ -11,7 +11,6 @@ import {
   Form,
   Input,
   Radio,
-  RadioChangeEvent,
   Row,
   Select,
   Space,
@@ -528,7 +527,7 @@ function EditReport() {
       <div className="row pt-4">
         <div className="col-lg-4">
           <p>เบอร์โทร</p>
-          <Input disabled defaultValue="0957796588" />
+          <Input disabled defaultValue={data.data.droner.telephoneNo} />
         </div>
         <div className="col-lg-4">
           <p>โดรน</p>

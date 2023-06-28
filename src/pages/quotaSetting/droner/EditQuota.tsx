@@ -1,4 +1,5 @@
 import {
+  Button,
   Col,
   DatePicker,
   Divider,
@@ -7,10 +8,11 @@ import {
   Radio,
   Row,
   Space,
+  Table,
   Tag,
   TimePicker,
 } from "antd";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   UploadImageEntity,
@@ -31,6 +33,7 @@ import { DeleteOutlined } from "@ant-design/icons";
 import { CampaignDatasource } from "../../../datasource/CampaignDatasource";
 import { validateOnlyNumber } from "../../../utilities/TextFormatter";
 import Swal from "sweetalert2";
+import ActionButton from "../../../components/button/ActionButton";
 
 const { Map } = require("immutable");
 const _ = require("lodash");
@@ -65,9 +68,23 @@ function EditQuota() {
   const [checkDup, setCheckDup] = useState(false);
   const [isActive, setIsActive] = useState(false);
   const [isEdit, setIsEdit] = useState(false);
+  const [rewardRound, setRewardRound] = useState<
+    { index: number; dateRound: string }[]
+  >([{ index: 1, dateRound: "" }]);
+  const [count, setCount] = useState(1);
 
   const fetchQuota = () => {
     CampaignDatasource.getCampaignById(queryString[1]).then((res) => {
+      setCount(res.roundDate.length);
+      setRewardRound(
+        res.roundDate.map((el: any, index: any) => {
+          return {
+            ...el,
+            index: index + 1,
+            dateRound: el,
+          };
+        })
+      );
       const checkIsEdit = () => {
         if (res.status === "ACTIVE") {
           setIsActive(
@@ -113,6 +130,9 @@ function EditQuota() {
           ? moment(new Date().getTime())
           : moment(new Date(res.endDate).getTime()),
       });
+      res.roundDate.forEach((x: any, i: number) => {
+        form.setFieldValue(`${i + 1}_roundDate`, moment(x));
+      });
       setNameChallenge(res.campaignName);
       setNameReward(res.condition[0].rewardName);
       setDetail(res.description);
@@ -123,6 +143,7 @@ function EditQuota() {
       setImgReward(res.pathImageReward);
       setImgButton(res.pathImageFloating);
       setImgTableLucky(res.pathImageRewardRound);
+      console.log("f", form.getFieldsValue());
     });
   };
 
@@ -268,9 +289,7 @@ function EditQuota() {
   };
   const disabledDateChange = (current: any) => {
     const getValueDate = form.getFieldsValue();
-    const startDate = moment(getValueDate.startExchangeDate).format(
-      "YYYY-MM-DD"
-    );
+    const startDate = moment(getValueDate.startDate).format("YYYY-MM-DD");
     return current && current < dayjs(startDate);
   };
   const checkNumber = (
@@ -306,15 +325,168 @@ function EditQuota() {
     });
     return check;
   };
+  const newDataRound = useMemo(() => {
+    if (rewardRound.length > 0) {
+      const d = rewardRound.map((el: any, index: any) => {
+        return {
+          ...el,
+          index: index + 1,
+        };
+      });
+      return d;
+    }
+  }, [rewardRound]);
 
-  const onSubmit = () => {
+  const mapRound = (e: any) => {
+    const mapList = e;
+    const sTable = form.getFieldsValue();
+    const value = mapList.map((y: any, i: number) => {
+      return {
+        ...y,
+        index: i + 1,
+        dateRound: sTable[`${y.index}_roundDate`],
+      };
+    });
+    return value;
+  };
+  const mapForm = (e: any) => {
+    const mapList = e;
+    mapList.map((y: any, i: number) => {
+      form.setFieldValue(`${y.index}_roundDate`, y.dateRound);
+    });
+  };
+
+  const addRound = () => {
+    setCount(count + 1);
+    const addList = mapRound([
+      ...rewardRound,
+      { index: rewardRound.length + 1, dateRound: "" },
+    ]);
+    setRewardRound(addList);
+  };
+  const deleteRound = async (index: number) => {
+    const mapData = await mapRound(rewardRound);
+    const filter = mapData.filter((x: any) => x.index !== index);
+    const mData = await mapRound(filter);
+    mapForm(mData);
+    setRewardRound(filter);
+    setCount(count - 1);
+    form.setFieldValue(`${filter.length + 1}_roundDate`, "");
+  };
+  const disabledDate = (current: any) => {
+    const v = form.getFieldsValue();
+    return current && current < dayjs(v.startDate);
+  };
+  const checkLimit = () => {
+    const v = form.getFieldsValue();
+    const d = [];
+    if (count > 1) {
+      for (let i = 0; count > i; i++) {
+        d.push(v[`${i + 1}_roundDate`]);
+      }
+    }
+    if (d.length > 0) {
+      if (d[0] < d[1] && d[d.length - 2] <= d[d.length - 1]) {
+        return false;
+      } else {
+        return true;
+      }
+    }
+  };
+
+  const columns = [
+    {
+      title: "รอบที่",
+      width: "40%",
+      render: (value: any, row: any, index: number) => {
+        return {
+          children: <div className="pb-4">{row.index}</div>,
+        };
+      },
+    },
+    {
+      title: "วันที่การจับรางวัล",
+      width: "20%",
+      render: (value: any, row: any, index: number) => {
+        const f = form.getFieldsValue();
+        const isDisable = () => {
+          if (row.dateRound) {
+            return dayjs() > row.dateRound;
+          }
+          return f.startDate ? false : true;
+        };
+        return {
+          children: (
+            <Form.Item
+              name={`${row.index}_roundDate`}
+              rules={[
+                {
+                  required: true,
+                  message: "กรุณากรอกวันที่!",
+                },
+                {
+                  validator: (rules, value) => {
+                    return new Promise(async (resolve, reject) => {
+                      if (checkLimit()) {
+                        reject("วันที่ต้องไม่น้อยกว่าวันที่ก่อนหน้า");
+                      } else {
+                        resolve("");
+                      }
+                    });
+                  },
+                },
+              ]}
+            >
+              <DatePicker
+                placeholder="เลือกวันที่"
+                format={dateFormat}
+                disabledDate={disabledDate}
+                disabled={isDisable()}
+              />
+            </Form.Item>
+          ),
+        };
+      },
+    },
+    {
+      title: "",
+      dataIndex: "Action",
+      key: "Action",
+      width: "8%",
+      render: (value: any, row: any, index: number) => {
+        return {
+          children: (
+            <div className="pb-4">
+              <ActionButton
+                icon={<DeleteOutlined />}
+                color={count > 1 ? color.Error : color.Grey}
+                actionDisable={count > 1 ? false : true}
+                onClick={() => deleteRound(row.index)}
+              />
+            </div>
+          ),
+        };
+      },
+    },
+  ];
+
+  const onSubmit = async () => {
+    await form.validateFields();
     const f = form.getFieldsValue();
     const create: any = {};
     const reward: any = {};
+
+    const roundDate: any = [];
+    if (count > 1) {
+      for (let i = 0; count > i; i++) {
+        roundDate.push(moment(f[`${i + 1}_roundDate`]).format("YYYY-MM-DD"));
+      }
+    }
+
     reward.num = 1;
     reward.quata = 1;
     reward.rewardName = f.rewardName;
-    reward.rewardRound = f.rewardRound;
+    reward.rewardRound = roundDate.length;
     reward.rai = f.rai;
 
     create.startDate = new Date(
@@ -335,6 +507,7 @@ function EditQuota() {
     create.campaignType = "QUATA";
     create.status = f.status;
     create.updateBy = profile.firstname + " " + profile.lastname;
+    create.roundDate = roundDate;
     CampaignDatasource.updateCampaignQuota(
       queryString[1],
       create,
@@ -362,31 +535,21 @@ function EditQuota() {
       <Form form={form} className="p-5">
         <div className="row">
           <div className="form-group text-center pt-2">
-            <Form.Item
-              name="imgCover"
-              rules={[
-                {
-                  required: true,
-                  message: "กรุณาใส่รูปภาพ!",
-                },
-              ]}
+            <div
+              className="hiddenFileInputQuota"
+              style={{
+                backgroundImage: `url(${
+                  imgCover == undefined ? uploadImgQuota : imgCover
+                })`,
+              }}
             >
-              <div
-                className="hiddenFileInputQuota"
-                style={{
-                  backgroundImage: `url(${
-                    imgCover == undefined ? uploadImgQuota : imgCover
-                  })`,
-                }}
-              >
-                <input
-                  key={imgCover}
-                  type="file"
-                  onChange={onChangeImg}
-                  title="เลือกรูป"
-                />
-              </div>
-            </Form.Item>
+              <input
+                key={imgCover}
+                type="file"
+                onChange={onChangeImg}
+                title="เลือกรูป"
+              />
+            </div>
             <div>
               {imgCover != undefined && (
                 <>
@@ -712,7 +875,7 @@ function EditQuota() {
           </div>
         </div>
         <div className="row">
-          <div className="col-lg-4">
+          <div className="col-lg-5">
             <label>
               จำนวนไร่/สิทธิ์ <span style={{ color: "red" }}>*</span>
             </label>
@@ -730,37 +893,40 @@ function EditQuota() {
                 autoComplete="off"
                 suffix={"ไร่/สิทธิ์"}
                 onChange={(e) => {
-                  checkNumber(e, "raiAmount");
+                  checkNumber(e, "rai");
                   setRaiAmount(e.target.value);
                 }}
                 disabled={isActive}
               />
             </Form.Item>
           </div>
-          <div className="col-lg-4">
-            <label>
-              รอบการจับรางวัล <span style={{ color: "red" }}>*</span>
-            </label>
-            <Form.Item
-              name="rewardRound"
-              rules={[
-                {
-                  required: true,
-                  message: "กรุณากรอกจำนวนรอบ!",
-                },
-              ]}
-            >
-              <Input
-                placeholder="กรอกจำนวนรอบ"
-                autoComplete="off"
-                onChange={(e) => {
-                  checkNumber(e, "luckyDraw");
-                }}
-              />
-            </Form.Item>
-          </div>
         </div>
         <Divider />
+        <Row>
+          <Col span={21}>
+            <label>
+              รอบการจับรางวัล{" "}
+              <span style={{ color: color.Error }}>
+                * วันที่ในการจับรางวัลต้องไม่ซ้ำกัน และไม่ตรงกันกับรอบก่อนหน้า
+              </span>
+            </label>
+          </Col>
+          <Col span={2}>
+            <Button
+              style={{
+                borderColor: "rgba(33, 150, 83, 0.1)",
+                borderRadius: "5px",
+                color: color.Success,
+                backgroundColor: "rgba(33, 150, 83, 0.1)",
+              }}
+              onClick={() => addRound()}
+            >
+              เพิ่มรอบ
+            </Button>
+          </Col>
+        </Row>
+        <br />
+        <Table columns={columns} dataSource={newDataRound} pagination={false} />
         <div className="form-group col-lg-12">
           <label>
             ตารางจับรางวัล <span style={{ color: "red" }}>*</span>
