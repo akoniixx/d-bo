@@ -1,5 +1,5 @@
 ## [Version - 0]
-## improve [v0.34.15] 2023-06-28
+## improve [v0.34.15] 2023-06-29
 - rename table columns
 - added sumQuotaAmount & sumAmountReceive fields
 - disable button rewards if ineligible
