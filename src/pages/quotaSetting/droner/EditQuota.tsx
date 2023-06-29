@@ -75,7 +75,6 @@ function EditQuota() {
 
   const fetchQuota = () => {
     CampaignDatasource.getCampaignById(queryString[1]).then((res) => {
-      console.log(res);
       setCount(res.roundDate.length);
       setRewardRound(
         res.roundDate.map((el: any, index: any) => {
@@ -470,7 +469,6 @@ function EditQuota() {
   ];
 
   const onSubmit = async () => {
-    console.log(form.getFieldsValue().startDate);
     await form.validateFields();
     const f = form.getFieldsValue();
     const create: any = {};
