@@ -156,10 +156,12 @@ const AddDronerMission = () => {
         d.push(parseFloat(v[`${i + 1}_rai`]));
       }
     }
-    if (d[0] < d[1] && d[d.length - 2] <= d[d.length - 1]) {
-      return false;
-    } else {
-      return true;
+    if (d.length > 0) {
+      if (d[0] < d[1] && d[d.length - 2] <= d[d.length - 1]) {
+        return false;
+      } else {
+        return true;
+      }
     }
   };
   const checkNumber = (
