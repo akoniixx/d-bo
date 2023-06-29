@@ -75,6 +75,7 @@ function EditQuota() {
 
   const fetchQuota = () => {
     CampaignDatasource.getCampaignById(queryString[1]).then((res) => {
+      console.log(res);
       setCount(res.roundDate.length);
       setRewardRound(
         res.roundDate.map((el: any, index: any) => {
@@ -143,7 +144,6 @@ function EditQuota() {
       setImgReward(res.pathImageReward);
       setImgButton(res.pathImageFloating);
       setImgTableLucky(res.pathImageRewardRound);
-      console.log("f", form.getFieldsValue());
     });
   };
 
@@ -314,7 +314,7 @@ function EditQuota() {
       startDate,
       endDate,
       application,
-      ""
+      queryString[1]
     ).then((res) => {
       if (!res.success) {
         setCheckDup(true);
@@ -355,7 +355,6 @@ function EditQuota() {
       form.setFieldValue(`${y.index}_roundDate`, y.dateRound);
     });
   };
-
   const addRound = () => {
     setCount(count + 1);
     const addList = mapRound([
@@ -471,6 +470,7 @@ function EditQuota() {
   ];
 
   const onSubmit = async () => {
+    console.log(form.getFieldsValue().startDate);
     await form.validateFields();
     const f = form.getFieldsValue();
     const create: any = {};
