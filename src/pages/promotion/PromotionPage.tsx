@@ -446,7 +446,7 @@ function PromotionPage() {
           children: (
             <div className="container">
               <span className="text-dark-75  d-block font-size-lg">
-                {row.count | 0} สิทธิ
+                {row.count | 0} สิทธิ์
               </span>
             </div>
           ),
@@ -462,7 +462,7 @@ function PromotionPage() {
           children: (
             <div className="container">
               <span className="text-dark-75  d-block font-size-lg">
-                {(row.count - row.keep) | 0} สิทธิ
+                {(row.count - row.keep) | 0} สิทธิ์
               </span>
             </div>
           ),
@@ -478,7 +478,7 @@ function PromotionPage() {
           children: (
             <div className="container">
               <span className="text-dark-75  d-block font-size-lg">
-                {row.used | 0} สิทธิ
+                {row.used | 0} สิทธิ์
               </span>
             </div>
           ),

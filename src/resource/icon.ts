@@ -28,4 +28,6 @@ export default {
   pointRankInActive: require("./media/images/point-rank-inactive.png"),
   targetActive: require("./media/images/target-active.png"),
   targetInActive: require("./media/images/target-inactive.png"),
+  quotaReport: require("./media/images/quotaReport_inactive.png"),
+
 };

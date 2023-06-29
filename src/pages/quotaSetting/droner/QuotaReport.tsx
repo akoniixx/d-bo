@@ -87,14 +87,14 @@ function QuotaReport() {
     await QuotaDatasource.reportExcel(
       campId,
       downloadBy,
-      "รายชื่อผู้มีสิทธิ"
+      "รายชื่อผู้มีสิทธิ์"
     ).then((res) => {
       const blob = new Blob([res], {
         type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
       });
       const a = document.createElement("a");
       a.href = window.URL.createObjectURL(blob);
-      a.download = "รายชื่อผู้มีสิทธิ";
+      a.download = "รายชื่อผู้มีสิทธิ์";
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
@@ -125,7 +125,7 @@ function QuotaReport() {
         {
           label: (
             <span onClick={DownloadExcelQuota}>
-              ดาวน์โหลดรายชื่อผู้ใช้ที่มีสิทธิ
+              ดาวน์โหลดรายชื่อผู้ใช้ที่มีสิทธิ์
             </span>
           ),
           key: "1",
@@ -162,7 +162,7 @@ function QuotaReport() {
             }}
           >
             <strong>
-              จัดการคนที่ได้รับสิทธิ | {campaignName} | {clNo}
+              จัดการคนที่ได้รับสิทธิ์ | {campaignName} | {clNo}
             </strong>
           </span>
         </Col>
@@ -275,7 +275,7 @@ function QuotaReport() {
       },
     },
     {
-      title: "จำนวนสิทธิที่ได้รับ",
+      title: "จำนวนสิทธิ์คงเหลือ",
       dataIndex: "quotaAmount",
       key: "quotaAmount",
       render: (value: any, row: any, index: number) => {
@@ -290,17 +290,17 @@ function QuotaReport() {
                       color: color.White,
                     }}
                   >
-                    รายละเอียดสิทธิ
+                    รายละเอียดสิทธิ์
                   </span>
                 }
                 content={
                   <table style={{ width: "300px" }}>
                     <tr>
                       <td>
-                        สิทธิที่ได้รับทั้งหมด
+                        สิทธิ์ที่ได้รับทั้งหมด
                         <br />
                         <div style={{ fontSize: "12px", color: color.Disable }}>
-                          (500 ไร่ / 1 สิทธิ)
+                          (500 ไร่ / 1 สิทธิ์)
                         </div>
                       </td>
                       <td style={{ textAlign: "right" }}>
@@ -320,7 +320,7 @@ function QuotaReport() {
                       </td>
                     </tr>
                     <tr>
-                      <td>จำนวนสิทธิคงเหลือ</td>
+                      <td>จำนวนสิทธิ์คงเหลือ</td>
                       <td
                         style={{
                           textAlign: "right",
@@ -384,19 +384,25 @@ function QuotaReport() {
           children: (
             <div>
               <Button
+                disabled={row.quotaAmount === 0}
                 onClick={() => {
                   setShowModal((prev) => !prev);
                   setGetRow(row);
                 }}
                 style={{
                   padding: 5,
-                  borderColor: color.Success,
+                  borderColor:
+                    row.quotaAmount === 0 ? color.Grey : color.Success,
                   borderRadius: 5,
                   paddingTop: 2,
                 }}
               >
                 <Image
-                  src={icon.iconQuotaReport}
+                  src={
+                    row.quotaAmount === 0
+                      ? icon.quotaReport
+                      : icon.iconQuotaReport
+                  }
                   style={{ width: 20, height: 20 }}
                   preview={false}
                 />
