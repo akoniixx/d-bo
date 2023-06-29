@@ -45,6 +45,7 @@ function QuotaReport() {
   const [clNo, setCLNo] = useState<any>();
   const [campId, setCampId] = useState<any>();
   const [campaignName, setCampaignName] = useState<any>();
+  const [raiQuota, setRaiQuota] = useState<any>();
   const [searchText, setSearchText] = useState<any>();
   const [data, setData] = useState<AllQuotaReportEntity>();
   const [showModal, setShowModal] = useState(false);
@@ -59,6 +60,7 @@ function QuotaReport() {
 
   const getRewardRound = async () => {
     await CampaignDatasource.getCampaignById(queryString[1]).then((res) => {
+      setRaiQuota(res.condition[0]);
       setCLNo(res.missionNo);
       setCampaignName(res.campaignName);
       setRewardRound(res.condition[0]);
@@ -300,7 +302,7 @@ function QuotaReport() {
                         สิทธิ์ที่ได้รับทั้งหมด
                         <br />
                         <div style={{ fontSize: "12px", color: color.Disable }}>
-                          (500 ไร่ / 1 สิทธิ์)
+                          ({raiQuota.rai} ไร่ / {raiQuota.quata} สิทธิ์)
                         </div>
                       </td>
                       <td style={{ textAlign: "right" }}>
