@@ -990,7 +990,7 @@ export default function AddPromotion() {
                 </div>
                 <div className="form-group col-lg-6">
                   <label>
-                    จำนวนสิทธิ <span style={{ color: "red" }}>*</span>
+                    จำนวนสิทธิ์ <span style={{ color: "red" }}>*</span>
                   </label>
                   <div className="mt-1">
                     <Form.Item
@@ -998,13 +998,13 @@ export default function AddPromotion() {
                       rules={[
                         {
                           required: true,
-                          message: "กรุณากรอกจำนวนสิทธิ!",
+                          message: "กรุณากรอกจำนวนสิทธิ์!",
                         },
                       ]}
                     >
                       <Input
                         type="number"
-                        placeholder="กรอกจำนวนสิทธิ"
+                        placeholder="กรอกจำนวนสิทธิ์"
                         autoComplete="off"
                         onChange={(e) => {
                           setRenderMobile({

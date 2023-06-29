@@ -220,7 +220,7 @@ function IndexQuota() {
       },
     },
     {
-      title: "จำนวนผู้ใช้ที่ได้สิทธิ",
+      title: "จำนวนผู้ใช้ที่ได้สิทธิ์",
       dataIndex: "quotaAmount",
       key: "quotaAmount",
       render: (value: any, row: any, index: number) => {
@@ -228,8 +228,9 @@ function IndexQuota() {
           children: (
             <>
               <span style={{ color: color.Success }}>
-                {numberWithCommas(row.quotaAmount) + " " + "สิทธิ"}
+                {numberWithCommas(row.sumQuotaAmount) + " " + "สิทธิ์"}
               </span>
+              <span>{` (${numberWithCommas(row.quotaAmount)}คน)`}</span>
             </>
           ),
         };
@@ -244,8 +245,9 @@ function IndexQuota() {
           children: (
             <>
               <span style={{ color: color.Success }}>
-                {numberWithCommas(row.amountReceive) + " " + "คน"}
+                {numberWithCommas(row.sumAmountReceive) + " " + "สิทธิ์"}
               </span>
+              <span>{` (${numberWithCommas(row.amountReceive)}คน)`}</span>
             </>
           ),
         };

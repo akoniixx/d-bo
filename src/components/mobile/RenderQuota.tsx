@@ -221,7 +221,7 @@ const RenderQuota: React.FC<RenderQuota> = ({
                     <span>ทั้งหมด</span>
                     <br />
                     <span style={{ fontSize: "20px", top: "4px" }}>XX</span>
-                    <span style={{ fontWeight: "lighter" }}> สิทธิ</span>
+                    <span style={{ fontWeight: "lighter" }}> สิทธิ์</span>
                   </div>
                   <div className="col-lg">
                     <span>ใช้ไป</span>
@@ -229,7 +229,7 @@ const RenderQuota: React.FC<RenderQuota> = ({
                     <span>(ได้รับทอง)</span>
                     <br />
                     <span style={{ fontSize: "20px", top: "4px" }}>XX</span>
-                    <span style={{ fontWeight: "lighter" }}> สิทธิ</span>
+                    <span style={{ fontWeight: "lighter" }}> สิทธิ์</span>
                   </div>
                   <div className="col-lg-4">
                     <span>คงเหลือ</span>
@@ -241,7 +241,7 @@ const RenderQuota: React.FC<RenderQuota> = ({
                     >
                       XX
                     </span>
-                    <span style={{ fontWeight: "lighter" }}> สิทธิ</span>
+                    <span style={{ fontWeight: "lighter" }}> สิทธิ์</span>
                   </div>
                 </div>
               </div>

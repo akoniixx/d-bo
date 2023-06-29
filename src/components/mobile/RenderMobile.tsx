@@ -234,7 +234,7 @@ const RenderMobile: React.FC<RenderMobile> = ({
                       color: "#000",
                     }}
                   >
-                    /{count === "" ? "XX" : count} สิทธิ
+                    /{count === "" ? "XX" : count} สิทธิ์
                   </span>
                 </p>
               </div>
