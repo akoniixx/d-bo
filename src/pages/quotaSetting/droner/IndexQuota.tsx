@@ -228,9 +228,9 @@ function IndexQuota() {
           children: (
             <>
               <span style={{ color: color.Success }}>
-                {numberWithCommas(row.sumQuotaAmount) + " " + "สิทธิ์"}
+                {numberWithCommas(row.sumQuotaAmount) + " สิทธิ์"}
               </span>
-              <span>{` (${numberWithCommas(row.quotaAmount)}คน)`}</span>
+              <span>{` (${numberWithCommas(row.quotaAmount)} คน)`}</span>
             </>
           ),
         };
@@ -245,9 +245,9 @@ function IndexQuota() {
           children: (
             <>
               <span style={{ color: color.Success }}>
-                {numberWithCommas(row.sumAmountReceive) + " " + "สิทธิ์"}
+                {numberWithCommas(row.sumAmountReceive) + " สิทธิ์"}
               </span>
-              <span>{` (${numberWithCommas(row.amountReceive)}คน)`}</span>
+              <span>{` (${numberWithCommas(row.amountReceive)} คน)`}</span>
             </>
           ),
         };

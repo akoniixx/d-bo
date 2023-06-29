@@ -1,5 +1,12 @@
 ## [Version - 0]
+
+## improve [v0.34.16] 2023-06-29
+
+- added reward round in quota menu
+- fixed telephone hard code in finish task for account
+
 ## improve [v0.34.15] 2023-06-29
+
 - rename table columns
 - added sumQuotaAmount & sumAmountReceive fields
 - disable button rewards if ineligible
