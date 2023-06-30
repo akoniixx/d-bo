@@ -1,4 +1,5 @@
 import {
+  Button,
   Col,
   DatePicker,
   Divider,
@@ -7,10 +8,11 @@ import {
   Radio,
   Row,
   Space,
+  Table,
   Tag,
   TimePicker,
 } from "antd";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   UploadImageEntity,
@@ -28,9 +30,13 @@ import RenderQuota from "../../../components/mobile/RenderQuota";
 import uploadImgQuota from "../../../resource/media/empties/upload_img_quota.png";
 import TextArea from "antd/lib/input/TextArea";
 import { DeleteOutlined } from "@ant-design/icons";
-import { validateOnlyNumber } from "../../../utilities/TextFormatter";
+import {
+  validateOnlyNumber,
+  validateOnlyNumWDecimal,
+} from "../../../utilities/TextFormatter";
 import { CampaignDatasource } from "../../../datasource/CampaignDatasource";
 import Swal from "sweetalert2";
+import ActionButton from "../../../components/button/ActionButton";
 
 const { Map } = require("immutable");
 
@@ -62,8 +68,12 @@ function AddQuota() {
     useState<UploadImageEntity>(UploadImageEntity_INTI);
 
   const [checkDup, setCheckDup] = useState(false);
+  const [rewardRound, setRewardRound] = useState<
+    { index: number; dateRound: string }[]
+  >([{ index: 1, dateRound: "" }]);
+  const [count, setCount] = useState(1);
 
-  useEffect(() => {}, [checkDup]);
+  useEffect(() => {}, [checkDup, count]);
 
   const onChangeImg = async (file: any) => {
     const source = file.target.files[0];
@@ -239,14 +249,166 @@ function AddQuota() {
     return check;
   };
 
-  const onSubmit = () => {
+  const newDataRound = useMemo(() => {
+    if (rewardRound.length > 0) {
+      const d = rewardRound.map((el: any, index: any) => {
+        return {
+          ...el,
+          index: index + 1,
+        };
+      });
+      return d;
+    }
+  }, [rewardRound]);
+
+  const mapRound = (e: any) => {
+    const mapList = e;
+    const sTable = form.getFieldsValue();
+    const value = mapList.map((y: any, i: number) => {
+      return {
+        ...y,
+        index: i + 1,
+        dateRound: sTable[`${y.index}_roundDate`],
+      };
+    });
+    return value;
+  };
+  const mapForm = (e: any) => {
+    const mapList = e;
+    mapList.map((y: any, i: number) => {
+      form.setFieldValue(`${y.index}_roundDate`, y.dateRound);
+    });
+  };
+
+  const addRound = () => {
+    setCount(count + 1);
+    const addList = mapRound([
+      ...rewardRound,
+      { index: rewardRound.length + 1, dateRound: "" },
+    ]);
+    setRewardRound(addList);
+  };
+  const deleteRound = async (index: number) => {
+    const mapData = await mapRound(rewardRound);
+    const filter = mapData.filter((x: any) => x.index !== index);
+    const mData = await mapRound(filter);
+    mapForm(mData);
+    setRewardRound(filter);
+    setCount(count - 1);
+    form.setFieldValue(`${filter.length + 1}_roundDate`, "");
+  };
+  const disabledDate = (current: any) => {
+    const v = form.getFieldsValue();
+    return current && current < dayjs(v.startDate);
+  };
+  const checkLimit = () => {
+    const v = form.getFieldsValue();
+    const d = [];
+    if (count > 1) {
+      for (let i = 0; count > i; i++) {
+        d.push(v[`${i + 1}_roundDate`]);
+      }
+    }
+    if (d.length > 0) {
+      if (d[0] < d[1] && d[d.length - 2] <= d[d.length - 1]) {
+        return false;
+      } else {
+        return true;
+      }
+    }
+  };
+
+  const columns = [
+    {
+      title: "รอบที่",
+      width: "40%",
+      render: (value: any, row: any, index: number) => {
+        return {
+          children: <div className="pb-4">{row.index}</div>,
+        };
+      },
+    },
+    {
+      title: "วันที่การจับรางวัล",
+      width: "20%",
+      render: (value: any, row: any, index: number) => {
+        const f = form.getFieldsValue();
+        const isDisable = () => {
+          if (row.dateRound) {
+            return Date > row.dateRound;
+          }
+          return f.startDate ? false : true;
+        };
+        return {
+          children: (
+            <Form.Item
+              name={`${row.index}_roundDate`}
+              rules={[
+                {
+                  required: true,
+                  message: "กรุณากรอกวันที่!",
+                },
+                {
+                  validator: (rules, value) => {
+                    return new Promise(async (resolve, reject) => {
+                      if (checkLimit()) {
+                        reject("วันที่ต้องไม่น้อยกว่าวันที่ก่อนหน้า");
+                      } else {
+                        resolve("");
+                      }
+                    });
+                  },
+                },
+              ]}
+            >
+              <DatePicker
+                placeholder="เลือกวันที่"
+                format={dateFormat}
+                disabledDate={disabledDate}
+                disabled={isDisable()}
+              />
+            </Form.Item>
+          ),
+        };
+      },
+    },
+    {
+      title: "",
+      dataIndex: "Action",
+      key: "Action",
+      width: "8%",
+      render: (value: any, row: any, index: number) => {
+        return {
+          children: (
+            <div className="pb-4">
+              <ActionButton
+                icon={<DeleteOutlined />}
+                color={count > 1 ? color.Error : color.Grey}
+                actionDisable={count > 1 ? false : true}
+                onClick={() => deleteRound(row.index)}
+              />
+            </div>
+          ),
+        };
+      },
+    },
+  ];
+
+  const onSubmit = async () => {
+    await form.validateFields();
     const f = form.getFieldsValue();
     const create: any = {};
     const reward: any = {};
+    const roundDate: any = [];
+    if (count > 1) {
+      for (let i = 0; count > i; i++) {
+        roundDate.push(moment(f[`${i + 1}_roundDate`]).format("YYYY-MM-DD"));
+      }
+    }
     reward.num = 1;
     reward.quata = 1;
     reward.rewardName = f.rewardName;
-    reward.rewardRound = f.rewardRound;
+    reward.rewardRound = roundDate.length;
     reward.rai = f.rai;
 
     create.startDate = new Date(
@@ -268,6 +430,7 @@ function AddQuota() {
     create.status = f.status;
     create.createBy = profile.firstname + " " + profile.lastname;
     create.updateBy = profile.firstname + " " + profile.lastname;
+    create.roundDate = roundDate;
     CampaignDatasource.createCampaignQuota(
       create,
       createImgCover,
@@ -642,11 +805,11 @@ function AddQuota() {
         {checkDup && (
           <p style={{ color: color.Error }}>
             กรุณาเปลี่ยนแปลงช่วงเวลา “วันเริ่มต้น” หรือ “วันสิ้นสุด”
-            เนื่องจากซ้ำกับช่วงเวลาของแคมเปญอื่นที่สร้างไว้ก่อนหน้า
+            เนื่องจากซ้ำกับช่วงเวลาของชาเลนจ์อื่นที่สร้างไว้ก่อนหน้า
           </p>
         )}
         <div className="row">
-          <div className="col-lg-4">
+          <div className="col-lg-5">
             <label>
               จำนวนไร่/สิทธิ์ <span style={{ color: "red" }}>*</span>
             </label>
@@ -664,35 +827,39 @@ function AddQuota() {
                 autoComplete="off"
                 suffix={"ไร่/สิทธิ์"}
                 onChange={(e) => {
-                  checkNumber(e, "raiAmount");
+                  checkNumber(e, "rai");
                   setRaiAmount(e.target.value);
                 }}
               />
             </Form.Item>
           </div>
-          <div className="col-lg-4">
-            <label>
-              รอบการจับรางวัล <span style={{ color: "red" }}>*</span>
-            </label>
-            <Form.Item
-              name="rewardRound"
-              rules={[
-                {
-                  required: true,
-                  message: "กรุณากรอกจำนวนรอบ!",
-                },
-              ]}
-            >
-              <Input
-                placeholder="กรอกจำนวนรอบ"
-                autoComplete="off"
-                onChange={(e) => {
-                  checkNumber(e, "luckyDraw");
-                }}
-              />
-            </Form.Item>
-          </div>
         </div>
+        <Divider />
+        <Row>
+          <Col span={21}>
+            <label>
+              รอบการจับรางวัล{" "}
+              <span style={{ color: color.Error }}>
+                * วันที่ในการจับรางวัลต้องไม่ซ้ำกัน และไม่ตรงกันกับรอบก่อนหน้า
+              </span>
+            </label>
+          </Col>
+          <Col span={2}>
+            <Button
+              style={{
+                borderColor: "rgba(33, 150, 83, 0.1)",
+                borderRadius: "5px",
+                color: color.Success,
+                backgroundColor: "rgba(33, 150, 83, 0.1)",
+              }}
+              onClick={() => addRound()}
+            >
+              เพิ่มรอบ
+            </Button>
+          </Col>
+        </Row>
+        <br />
+        <Table columns={columns} dataSource={newDataRound} pagination={false} />
         <Divider />
         <div className="form-group col-lg-12">
           <label>
