@@ -14,6 +14,7 @@ import {
   DatePicker,
   Checkbox,
   Col,
+  Divider,
 } from "antd";
 import emptyData from "../../resource/media/empties/tabler_drone.png";
 import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
@@ -89,6 +90,9 @@ function EditDroner() {
   const [profile] = useLocalStorage("profile", []);
   const [data, setData] = useState<DronerEntity>(DronerEntity_INIT);
   const [address, setAddress] = useState<AddressEntity>(AddressEntity_INIT);
+  const [otherAddress, setOtherAddress] =
+    useState<AddressEntity>(AddressEntity_INIT);
+
   const [dronerArea, setDronerArea] = useState<DronerAreaEntity>(
     DronerAreaEntity_INIT
   );
@@ -105,6 +109,11 @@ function EditDroner() {
   const [province, setProvince] = useState<ProviceEntity[]>([]);
   const [district, setDistrict] = useState<DistrictEntity[]>([]);
   const [subdistrict, setSubdistrict] = useState<SubdistrictEntity[]>([]);
+  const [otherProvince, setOtherProvince] = useState<ProviceEntity[]>([]);
+  const [otherDistrict, setOtherDistrict] = useState<DistrictEntity[]>([]);
+  const [otherSubdistrict, setOtherSubdistrict] = useState<SubdistrictEntity[]>(
+    []
+  );
   const [imgProfile, setImgProfile] = useState<any>();
   const [imgIdCard, setImgIdCard] = useState<any>();
   const [createImgProfile, setCreateImgProfile] =
@@ -232,14 +241,32 @@ function EditDroner() {
     });
   }, [dronerId]);
   useEffect(() => {
+    const getDronerAddress = async () => {
+      await DronerDatasource.getDronerAddressByID(dronerId).then((res) => {
+        if (res.otherAddress) {
+          form.setFieldsValue({
+            ...res.otherAddress,
+            otherPostcode: res.address.postcode || undefined,
+            otherProvince: res.address.provinceId || undefined,
+            otherDistrict: res.address.districtId || undefined,
+            otherSubdistrict: res.address?.subdistrictId || undefined,
+            otherAddress1: res.address?.address1 || undefined,
+            otherAddress2: res.address?.address2 || undefined,
+          });
+        }
+        setOtherAddress(res.otherAddress);
+      });
+    };
     fetchDronerById();
     fetchLocation(searchLocation);
+    getDronerAddress();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchLocation]);
 
   useEffect(() => {
     LocationDatasource.getProvince().then((res) => {
       setProvince(res);
+      setOtherProvince(res);
     });
     if (address?.provinceId) {
       LocationDatasource.getDistrict(address.provinceId).then((res) => {
@@ -251,7 +278,22 @@ function EditDroner() {
         setSubdistrict(res);
       });
     }
-  }, [address.provinceId, address.districtId]);
+    if (otherAddress?.provinceId) {
+      LocationDatasource.getDistrict(otherAddress.provinceId).then((res) => {
+        setOtherDistrict(res);
+      });
+    }
+    if (otherAddress?.districtId) {
+      LocationDatasource.getSubdistrict(otherAddress.districtId).then((res) => {
+        setOtherSubdistrict(res);
+      });
+    }
+  }, [
+    address.provinceId,
+    address.districtId,
+    otherAddress.districtId,
+    otherAddress.districtId,
+  ]);
 
   //#region data droner
 
@@ -286,6 +328,32 @@ function EditDroner() {
     )[0].postcode;
     const m = Map(add).set("postcode", filterSubDistrict);
     setAddress(m.toJS());
+    form.setFieldsValue({
+      postcode: m.toJS().postcode,
+    });
+  };
+
+  //#region OtherAddress
+  const handleOtherProvince = async (provinceId: number) => {
+    const d = Map(otherAddress).set("provinceId", provinceId);
+    setOtherAddress(d.toJS());
+  };
+  const handleOtherDistrict = async (districtId: number) => {
+    const d = Map(otherAddress).set("districtId", districtId);
+    setOtherAddress(d.toJS());
+  };
+  const handleOtherSubDistrict = async (subdistrictId: number) => {
+    const d = Map(otherAddress).set("subdistrictId", subdistrictId);
+    setOtherAddress(d.toJS());
+
+    await handelOtherPostCode(d.toJS());
+  };
+  const handelOtherPostCode = (add: AddressEntity) => {
+    let filterSubDistrict = otherSubdistrict.filter(
+      (item) => item.subdistrictId === add.subdistrictId
+    )[0].postcode;
+    const m = Map(add).set("postcode", filterSubDistrict);
+    setOtherAddress(m.toJS());
     form.setFieldsValue({
       postcode: m.toJS().postcode,
     });
@@ -588,6 +656,12 @@ function EditDroner() {
       ...values,
       birthDate: moment(values.birthDate).toISOString(),
       address: {
+        ...address,
+        address1: values.address1,
+        address2: values.address2,
+        postcode: values.postcode,
+      },
+      otherAddress: {
         ...address,
         address1: values.address1,
         address2: values.address2,
@@ -912,7 +986,9 @@ function EditDroner() {
                 </div>
               </div>
             </div>
+            <Divider />
           </div>
+          <h6>ที่อยู่นักบินโดรน</h6>
           <div className="row">
             <div className="form-group col-lg-6">
               <label>
@@ -1087,10 +1163,196 @@ function EditDroner() {
                   },
                 ]}
               >
+                <TextArea rows={4} className="col-lg-12" placeholder="" />
+              </Form.Item>
+            </div>
+          </div>
+          <Divider />
+          <h6>ที่อยู่จัดส่ง</h6>
+          <div className="row">
+            <div className="form-group col-lg-6">
+              <label>
+                จังหวัด
+                <span style={{ color: "red" }}>*</span>
+              </label>
+              <Form.Item
+                key={otherAddress.id}
+                name="otherProvince"
+                rules={[
+                  {
+                    required: true,
+                    message: "กรุณาเลือกจังหวัด!",
+                  },
+                ]}
+              >
+                <Select
+                  showSearch
+                  optionFilterProp="children"
+                  filterOption={(input: any, option: any) =>
+                    option.children.includes(input)
+                  }
+                  filterSort={(optionA, optionB) =>
+                    optionA.children
+                      .toLowerCase()
+                      .localeCompare(optionB.children.toLowerCase())
+                  }
+                  placeholder="เลือกจังหวัด"
+                  allowClear
+                  onChange={handleOtherProvince}
+                  defaultValue={otherAddress.provinceId}
+                >
+                  {otherProvince.map((item: any, index: any) => (
+                    <Select.Option key={index} value={item.provinceId}>
+                      {item.provinceName}
+                    </Select.Option>
+                  ))}
+                </Select>
+              </Form.Item>
+            </div>
+            <div className="form-group col-lg-6">
+              <label>
+                อำเภอ
+                <span style={{ color: "red" }}>*</span>
+              </label>
+              <Form.Item
+                key={otherAddress.id}
+                name="otherDistrict"
+                rules={[
+                  {
+                    required: true,
+                    message: "กรุณาเลือกอำเภอ!",
+                  },
+                ]}
+              >
+                <Select
+                  showSearch
+                  allowClear
+                  optionFilterProp="children"
+                  filterOption={(input: any, option: any) =>
+                    option.children.includes(input)
+                  }
+                  filterSort={(optionA, optionB) =>
+                    optionA.children
+                      .toLowerCase()
+                      .localeCompare(optionB.children.toLowerCase())
+                  }
+                  placeholder="เลือกอำเภอ"
+                  onChange={handleOtherDistrict}
+                  defaultValue={otherAddress.districtId}
+                >
+                  {otherDistrict.map((item: any, index: any) => (
+                    <Select.Option key={index} value={item.districtId}>
+                      {item.districtName}
+                    </Select.Option>
+                  ))}
+                </Select>
+              </Form.Item>
+            </div>
+          </div>
+          <div className="row">
+            <div className="form-group col-lg-6">
+              <label>
+                ตำบล
+                <span style={{ color: "red" }}>*</span>
+              </label>
+              <Form.Item
+                key={otherAddress.id}
+                name="otherSubdistrict"
+                rules={[
+                  {
+                    required: true,
+                    message: "กรุณาเลือกตำบล!",
+                  },
+                ]}
+              >
+                <Select
+                  allowClear
+                  showSearch
+                  optionFilterProp="children"
+                  filterOption={(input: any, option: any) =>
+                    option.children.includes(input)
+                  }
+                  filterSort={(optionA, optionB) =>
+                    optionA.children
+                      .toLowerCase()
+                      .localeCompare(optionB.children.toLowerCase())
+                  }
+                  placeholder="เลือกตำบล"
+                  onChange={handleOtherSubDistrict}
+                  defaultValue={otherAddress.subdistrictId}
+                >
+                  {otherSubdistrict?.map((item: any, index: any) => (
+                    <Select.Option key={index} value={item.subdistrictId}>
+                      {item.subdistrictName}
+                    </Select.Option>
+                  ))}
+                </Select>
+              </Form.Item>
+            </div>
+            <div className="form-group col-lg-6">
+              <label>
+                รหัสไปรษณีย์
+                <span style={{ color: "red" }}>*</span>
+              </label>
+              <Form.Item
+                name="otherPostcode"
+                rules={[
+                  {
+                    required: true,
+                    message: "กรุณาเลือกรหัสไปรษณีย์!",
+                  },
+                ]}
+              >
+                <Input
+                  name="otherPostcode"
+                  placeholder="กรอกรหัสไปรษณีย์"
+                  defaultValue={otherAddress.postcode}
+                  key={otherAddress.postcode}
+                  disabled
+                />
+              </Form.Item>
+            </div>
+          </div>
+          <div className="row">
+            <div className="form-group">
+              <label>
+                บ้านเลขที่ <span style={{ color: "red" }}>*</span>
+              </label>
+              <Form.Item
+                key={otherAddress.id}
+                name="otherAddress1"
+                rules={[
+                  {
+                    required: true,
+                    message: "กรุณากรอกบ้านเลขที่!",
+                  },
+                ]}
+              >
                 <Input className="col-lg-12" placeholder="" />
               </Form.Item>
             </div>
           </div>
+          <div className="row">
+            <div className="form-group">
+              <label>
+                รายละเอียดที่อยู่ (หมู่, ถนน){" "}
+                <span style={{ color: "red" }}>*</span>
+              </label>
+              <Form.Item
+                key={otherAddress.id}
+                name="otherAddress2"
+                rules={[
+                  {
+                    required: true,
+                    message: "กรุณากรอกรายละเอียดที่อยู่บ้าน!",
+                  },
+                ]}
+              >
+                <TextArea rows={4} className="col-lg-12" placeholder="" />
+              </Form.Item>
+            </div>
+          </div>
+          <Divider />
           <div className="row">
             <div className="form-group">
               <label>พื้นที่ให้บริการ</label>

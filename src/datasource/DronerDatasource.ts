@@ -110,4 +110,15 @@ export class DronerDatasource {
         console.log(error);
       });
   }
+
+  static async getDronerAddressByID(id: string): Promise<DronerEntity> {
+    return httpClient
+      .get(BASE_URL + "/droner/droner-address/" + id)
+      .then((res) => {
+        return res.data;
+      })
+      .catch((err) => {
+        console.log(err, "err getDronerAddressById");
+      });
+  }
 }

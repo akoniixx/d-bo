@@ -29,5 +29,6 @@ export default {
   targetActive: require("./media/images/target-active.png"),
   targetInActive: require("./media/images/target-inactive.png"),
   quotaReport: require("./media/images/quotaReport_inactive.png"),
+  arrowDownWhite : require('./media/images/arrow_down_white.png')
 
 };
