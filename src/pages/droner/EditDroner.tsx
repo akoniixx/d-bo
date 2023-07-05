@@ -337,14 +337,17 @@ function EditDroner() {
   const handleOtherProvince = async (provinceId: number) => {
     const d = Map(otherAddress).set("provinceId", provinceId);
     setOtherAddress(d.toJS());
+    setDisableSaveBtn(false);
   };
   const handleOtherDistrict = async (districtId: number) => {
     const d = Map(otherAddress).set("districtId", districtId);
     setOtherAddress(d.toJS());
+    setDisableSaveBtn(false);
   };
   const handleOtherSubDistrict = async (subdistrictId: number) => {
     const d = Map(otherAddress).set("subdistrictId", subdistrictId);
     setOtherAddress(d.toJS());
+    setDisableSaveBtn(false);
     await handelOtherPostCode(d.toJS());
   };
   const handelOtherPostCode = (add: AddressEntity) => {
@@ -354,16 +357,18 @@ function EditDroner() {
     const m = Map(add).set("postcode", filterSubDistrict);
     setOtherAddress(m.toJS());
     form.setFieldsValue({
-      postcode: m.toJS().postcode,
+      otherPostcode: m.toJS().postcode,
     });
   };
   const handleAddress1 = (e: any) => {
     const d = Map(otherAddress).set("address1", e.target.value);
     setOtherAddress(d.toJS());
+    setDisableSaveBtn(false);
   };
   const handleAddress2 = (e: any) => {
     const d = Map(otherAddress).set("address2", e.target.value);
     setOtherAddress(d.toJS());
+    setDisableSaveBtn(false);
   };
 
   //#endregion
@@ -653,6 +658,7 @@ function EditDroner() {
     setBookBank(sumData);
     setDisableSaveBtn(false);
   };
+
   const updateDroner = async (values: any) => {
     const reason = [];
     const splitPlant = values?.plantsOther
@@ -1215,7 +1221,7 @@ function EditDroner() {
           <div className="row">
             <div className="form-group col-lg-6">
               <label>จังหวัด</label>
-              <Form.Item key={otherAddress.provinceId} name="otherProvince">
+              <Form.Item key={otherAddress.provinceId}>
                 <Select
                   showSearch
                   optionFilterProp="children"
@@ -1246,7 +1252,7 @@ function EditDroner() {
             </div>
             <div className="form-group col-lg-6">
               <label>อำเภอ</label>
-              <Form.Item key={otherAddress.districtId} name="otherDistrict">
+              <Form.Item key={otherAddress.districtId}>
                 <Select
                   showSearch
                   allowClear
@@ -1279,10 +1285,7 @@ function EditDroner() {
           <div className="row">
             <div className="form-group col-lg-6">
               <label>ตำบล</label>
-              <Form.Item
-                key={otherAddress.subdistrictId}
-                name="otherSubdistrict"
-              >
+              <Form.Item key={otherAddress.subdistrictId}>
                 <Select
                   allowClear
                   showSearch
@@ -1313,10 +1316,9 @@ function EditDroner() {
             </div>
             <div className="form-group col-lg-6">
               <label>รหัสไปรษณีย์</label>
-              <Form.Item name="otherPostcode">
+              <Form.Item>
                 <Input
                   key={otherAddress.postcode}
-                  name="otherPostcode"
                   placeholder="กรอกรหัสไปรษณีย์"
                   defaultValue={otherAddress.postcode}
                   disabled

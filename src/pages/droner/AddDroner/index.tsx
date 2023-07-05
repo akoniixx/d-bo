@@ -542,12 +542,13 @@ function AddDroner() {
       isConsentBookBank: bookBank?.isConsentBookBank,
       isBookBank: bookBank?.isBookBank,
       file: imgBB,
-
     };
     await DronerDatasource.createDronerList(payload).then(async (res) => {
       if (res !== undefined) {
-        if(imgBB){
-          UploadImageDatasouce.uploadImage(Map(imgBB).set("resourceId", res.id).toJS());
+        if (imgBB) {
+          UploadImageDatasouce.uploadImage(
+            Map(imgBB).set("resourceId", res.id).toJS()
+          );
         }
         const fileList = [createImgProfile, createImgIdCard]
           .filter((el) => {
@@ -1008,7 +1009,7 @@ function AddDroner() {
           <div className="row">
             <div className="form-group col-lg-6">
               <label>จังหวัด</label>
-              <Form.Item name="otherProvinceId">
+              <Form.Item>
                 <Select
                   allowClear
                   showSearch
@@ -1033,7 +1034,7 @@ function AddDroner() {
             </div>
             <div className="form-group col-lg-6">
               <label>อำเภอ</label>
-              <Form.Item name="otherDistrictId">
+              <Form.Item>
                 <Select
                   showSearch
                   disabled={otherAddress?.provinceId === undefined}
@@ -1068,7 +1069,7 @@ function AddDroner() {
           <div className="row">
             <div className="form-group col-lg-6">
               <label>ตำบล</label>
-              <Form.Item name="otherSubdistrictId">
+              <Form.Item>
                 <Select
                   disabled={otherAddress?.districtId === undefined}
                   showSearch
@@ -1099,9 +1100,8 @@ function AddDroner() {
             </div>
             <div className="form-group col-lg-6">
               <label>รหัสไปรษณีย์</label>
-              <Form.Item name="otherPostcode">
+              <Form.Item>
                 <Input
-                  name="otherPostcode"
                   placeholder="กรอกรหัสไปรษณีย์"
                   key={otherAddress?.subdistrictId}
                   disabled
@@ -1112,7 +1112,7 @@ function AddDroner() {
           <div className="row">
             <div className="form-group">
               <label>ที่อยู่บ้าน</label>
-              <Form.Item name="otherAddress1">
+              <Form.Item>
                 <Input
                   className="col-lg-12"
                   placeholder="กรุณากรอกบ้านเลขที่"
@@ -1123,7 +1123,7 @@ function AddDroner() {
           <div className="row">
             <div className="form-group">
               <label>รายละเอียดที่อยู่ (หมู่, ถนน) </label>
-              <Form.Item name="otherAddress2">
+              <Form.Item>
                 <TextArea
                   rows={4}
                   className="col-lg-12"
