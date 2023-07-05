@@ -7,8 +7,21 @@ import icon from "../../resource/icon";
 import { resizeFileImg } from "../../utilities/ResizeImage";
 import { DeleteOutlined } from "@ant-design/icons";
 import { BookBankDatasource } from "../../datasource/BookBankDatasource";
-import { DronerEntity } from "../../entities/DronerEntities";
+import {
+  BookBankEntities,
+  BookBankEntities_INIT,
+  DronerEntity,
+  DronerEntity_INIT,
+} from "../../entities/DronerEntities";
 import { CheckboxValueType } from "antd/lib/checkbox/Group";
+import { CheckboxChangeEvent } from "antd/lib/checkbox";
+import { DronerDatasource } from "../../datasource/DronerDatasource";
+import { UploadImageDatasouce } from "../../datasource/UploadImageDatasource";
+import {
+  ImageEntity_INTI,
+  UploadImageEntity,
+  UploadImageEntity_INTI,
+} from "../../entities/UploadImageEntities";
 
 const _ = require("lodash");
 const { Map } = require("immutable");
@@ -16,14 +29,23 @@ const { Map } = require("immutable");
 interface BookBankDronerProps {
   callBack: (data: DronerEntity) => void;
   data: DronerEntity;
+  dronerId: string;
 }
-const BookBankDroner: React.FC<BookBankDronerProps> = ({ callBack, data }) => {
+const BookBankDroner: React.FC<BookBankDronerProps> = ({
+  callBack,
+  data,
+  dronerId,
+}) => {
   const [form] = Form.useForm();
   const [bankImg, setBankImg] = useState<any>();
   const [bank, setBank] = useState<any>();
-  const [bankName, setBankName] = useState<any>();
-  const [bankImgCreate, setBankImgCreate] = useState<any>();
-  const [dataBookBank, setDataBookBank] = useState<DronerEntity>(data);
+  const [defaultData, setDefaultData] =
+    useState<DronerEntity>(DronerEntity_INIT);
+  const [bankImgCreate, setBankImgCreate] =
+    useState<UploadImageEntity>(ImageEntity_INTI);
+  const [dataBookBank, setDataBookBank] =
+    useState<DronerEntity>(DronerEntity_INIT);
+  const [imgName, setImagName] = useState<any>();
 
   useEffect(() => {
     const getBank = async () => {
@@ -33,57 +55,79 @@ const BookBankDroner: React.FC<BookBankDronerProps> = ({ callBack, data }) => {
     };
     getBank();
   }, []);
-
-  const onChangeImage = async (e: any) => {
-    const source = e.target.files[0];
-    let newSource: any;
-
-    const isFileMoreThan2MB = source.size > 2 * 1024 * 1024;
-    if (isFileMoreThan2MB) {
-      newSource = await resizeFileImg({
-        file: source,
-        compressFormat: source?.type.split("/")[1],
-        quality: 70,
-        rotation: 0,
-        responseUriFunc: (res: any) => {},
+  useEffect(() => {
+    const getDronerById = async () => {
+      await DronerDatasource.getDronerByID(dronerId).then((res) => {
+        setDefaultData(res);
+        setImagName(res.file.find((x) => x.category === "BOOK_BANK")?.fileName);
+        const getPathPro = res.file.find((x) => x.category === "BOOK_BANK");
+        getPathPro &&
+          UploadImageDatasouce.getImage(getPathPro?.path).then((resImg) => {
+            resImg?.url && setBankImg(resImg.url);
+          });
       });
-    }
-    const img_base64 = await new Promise((resolve) => {
+    };
+    getDronerById();
+  }, []);
+
+  const onChangeImage = async (file: any) => {
+    let src = file.target.files[0];
+    src = await new Promise((resolve) => {
       const reader = new FileReader();
-      reader.readAsDataURL(isFileMoreThan2MB ? newSource : source);
+      reader.readAsDataURL(src);
       reader.onload = () => resolve(reader.result);
     });
-
-    setBankImg(img_base64);
-    const d = Map(bankImgCreate).set(
-      "file",
-      isFileMoreThan2MB ? newSource : source
-    );
-    setBankImgCreate(d.toJS());
+    setBankImg(src);
+    const d = Map(bankImgCreate).set("file", file.target.files[0]);
+    const e = Map(d.toJS()).set("resource", "DRONER");
+    const f = Map(e.toJS()).set("category", "BOOK_BANK");
+    const g = Map(f.toJS()).set("path", "");
+    setBankImgCreate(g.toJS());
+    const pushImg = Map(dataBookBank).set("file", [
+      ...dataBookBank.file.filter((x) => x.file != ""),
+      g.toJS(),
+    ]);
+    setDataBookBank(pushImg.toJS());
+    checkValidate(pushImg.toJS());
   };
-
+  const removeImg = () => {
+    const getImg =
+      defaultData.file &&
+      defaultData.file.filter((x) => x.category === "BOOK_BANK")[0];
+    if (getImg !== undefined) {
+      UploadImageDatasouce.deleteImage(getImg.id, getImg.path).then(
+        (res) => {}
+      );
+    }
+    setBankImgCreate(ImageEntity_INTI);
+    setBankImg(undefined);
+    setImagName(undefined);
+  };
   const onChangeBankName = (e: any) => {
     const value = Map(dataBookBank).set("bankName", e);
     setDataBookBank(value.toJS());
+    checkValidate(value.toJS());
   };
   const onChangeBankAccountName = (e: any) => {
     const value = Map(dataBookBank).set("bankAccountName", e.target.value);
     setDataBookBank(value.toJS());
+    checkValidate(value.toJS());
   };
   const onChangeBankAccountNumber = (e: any) => {
     const value = Map(dataBookBank).set("accountNumber", e.target.value);
     setDataBookBank(value.toJS());
+    checkValidate(value.toJS());
   };
-  const confirmData = (e:  CheckboxValueType) => {
-    if (e === true) {
-      const value = Map(dataBookBank).set("isConsentBookBank", true);
-      setDataBookBank(value.toJS());
-    } else {
-      const value = Map(dataBookBank).set("isConsentBookBank", false);
-      setDataBookBank(value.toJS());
-    }
+
+  const confirmData = (e: CheckboxChangeEvent) => {
+    const value = Map(dataBookBank).set("isConsentBookBank", e.target.checked);
+    setDataBookBank(value.toJS());
+    checkValidate(value.toJS());
   };
-      console.log(dataBookBank);
+
+  const checkValidate = async (data: DronerEntity) => {
+    callBack(data);
+  };
 
   return (
     <div className="col-lg">
@@ -106,14 +150,26 @@ const BookBankDroner: React.FC<BookBankDronerProps> = ({ callBack, data }) => {
             />
           </div>
         </div>
-        <Form form={form} className="p-4">
+        <Form form={form} key={defaultData?.id} className="p-4">
           <div className="form-group">
-            <label>ธนาคาร</label>
-            <Form.Item name="bank">
+            <label>
+              ธนาคาร
+              <span style={{ color: "red" }}>*</span>
+            </label>
+            <Form.Item
+              name="bankName"
+              rules={[
+                {
+                  required: true,
+                  message: "กรุณาเลือกบัญชีธนาคาร!",
+                },
+              ]}
+            >
               <Select
                 placeholder="เลือกบัญชีธนาคาร"
                 allowClear
                 onChange={onChangeBankName}
+                defaultValue={defaultData?.bankName}
               >
                 {bank?.map((item: any, index: any) => (
                   <option key={index} value={item.bankName}>
@@ -124,20 +180,46 @@ const BookBankDroner: React.FC<BookBankDronerProps> = ({ callBack, data }) => {
             </Form.Item>
           </div>
           <div className="form-group ">
-            <label>ชื่อบัญชี</label>
-            <Form.Item name="bankName">
+            <label>
+              ชื่อบัญชี
+              <span style={{ color: "red" }}>*</span>
+            </label>
+            <Form.Item
+              name="bankAccountName"
+              rules={[
+                {
+                  required: true,
+                  message: "กรุณากรอกชื่อบัญชี!",
+                },
+              ]}
+            >
               <Input
+                defaultValue={defaultData?.bankAccountName}
                 placeholder="กรอกชื่อบัญชี"
+                autoComplete="off"
                 onChange={onChangeBankAccountName}
               />
             </Form.Item>
           </div>
           <div className="form-group ">
-            <label>เลขบัญชีธนาคาร</label>
-            <Form.Item name="bankNumber">
+            <label>
+              เลขบัญชีธนาคาร
+              <span style={{ color: "red" }}>*</span>
+            </label>
+            <Form.Item
+              name="accountNumber"
+              rules={[
+                {
+                  required: true,
+                  message: "กรุณากรอกเลขบัญชีธนาคาร!",
+                },
+              ]}
+            >
               <Input
                 placeholder="กรอกกรอกเลขบัญชีธนาคาร"
                 type="number"
+                autoComplete="off"
+                defaultValue={defaultData?.accountNumber}
                 onChange={onChangeBankAccountNumber}
               />
             </Form.Item>
@@ -171,14 +253,14 @@ const BookBankDroner: React.FC<BookBankDronerProps> = ({ callBack, data }) => {
                   />
                 </Col>
                 <Col span={14} className="align-self-center">
-                  <span>{bankImg && bankImgCreate.file.name}</span>
+                  <span>{(bankImg && bankImgCreate.file.name) || imgName}</span>
                 </Col>
                 <Col span={2} className="align-self-center">
                   <span>
                     {bankImg && (
                       <DeleteOutlined
                         style={{ fontSize: 18, color: color.Error }}
-                        onClick={() => setBankImg(undefined)}
+                        onClick={removeImg}
                       />
                     )}
                   </span>
@@ -202,8 +284,11 @@ const BookBankDroner: React.FC<BookBankDronerProps> = ({ callBack, data }) => {
           </div>
           <div className="form-group ">
             <label>เงื่อนไขพิเศษ</label>
-            <Form.Item name="bankNumber">
-              <Checkbox onChange={(e:any)=> confirmData(e.target.checked)}>
+            <Form.Item name="isConsentBookBank">
+              <Checkbox
+                onChange={confirmData}
+                defaultChecked={defaultData?.isConsentBookBank}
+              >
                 <span style={{ fontWeight: "lighter" }}>
                   ยินยอมให้โอนเงินเข้าชื่อบัญชีบุคคล ที่ไม่ใช่ชื่อบัญชีของคุณเอง
                 </span>

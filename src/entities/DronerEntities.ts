@@ -32,7 +32,6 @@ export interface DronerEntity {
   bankAccountName: string;
   accountNumber: string;
   isConsentBookBank: boolean;
-  otherAddress: FullAddressEntity;
   pin: string;
   dronerDrone?: DronerDroneEntity[];
   dronerArea: DronerAreaEntity;
@@ -62,7 +61,6 @@ export const DronerEntity_INIT: DronerEntity = {
   bankAccountName: "",
   accountNumber: "",
   isConsentBookBank: false,
-  otherAddress: FullAddressEntiry_INIT,
   pin: "",
   dronerDrone: [DronerDroneEntity_INIT],
   dronerArea: DronerAreaEntity_INIT,
@@ -123,4 +121,52 @@ export const CreateDronerEntity_INIT: CreateDronerEntity = {
 export interface DronerListEntity {
   data: DronerEntity[];
   count: number;
+}
+export interface DronerByAddressEntity {
+  id: string;
+  dronerCode: string;
+  firstname: string;
+  lastname: string;
+  idNo: string;
+  telephoneNo: string;
+  status: string;
+  reason: [string];
+  birthDate: string;
+  isOpenReceiveTask: boolean;
+  expYear: number;
+  expMonth: number;
+  expPlant: [string];
+  addressId: string;
+  dronerAreaId: string;
+  createdAt: string;
+  updatedAt: string;
+  isDelete: boolean;
+  deleteDate: string;
+  comment: string;
+  updateBy: string;
+  createBy: string;
+  isBookBank: boolean;
+  bankName: string;
+  bankAccountName: string;
+  accountNumber: string;
+  isConsentBookBank: boolean;
+  otherAddressId:string;
+  percentSuccess: number;
+  address: FullAddressEntity
+  otherAddress: FullAddressEntity
+}
+
+export interface BookBankEntities  {
+  isBookBank: boolean;
+  bankName: string;
+  bankAccountName: string;
+  accountNumber: string;
+  isConsentBookBank: boolean;
+}
+export const BookBankEntities_INIT : BookBankEntities = {
+  isBookBank: false,
+  bankName: "",
+  bankAccountName: "",
+  accountNumber: "",
+  isConsentBookBank: false,
 }

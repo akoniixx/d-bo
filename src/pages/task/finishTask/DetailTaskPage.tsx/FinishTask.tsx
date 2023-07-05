@@ -40,6 +40,8 @@ import {
 } from "../../../../utilities/TextFormatter";
 import { DashboardLayout } from "../../../../components/layout/Layout";
 import { useNavigate } from "react-router-dom";
+import ImagCards from "../../../../components/card/ImagCard";
+import image from "../../../../resource/image";
 const _ = require("lodash");
 const dateFormat = "DD/MM/YYYY";
 const timeFormat = "HH:mm";
@@ -62,6 +64,8 @@ function FinishTasks() {
     lat: LAT_LNG_BANGKOK.lat,
     lng: LAT_LNG_BANGKOK.lng,
   });
+  const [imgControl, setImgControl] = useState<any>();
+  const [imgDrug, setImgDrug] = useState<any>();
   const fetchDetailTask = async () => {
     await TaskFinishedDatasource.getDetailFinishTaskById(taskId).then((res) => {
       if (res.data.couponId !== null) {
@@ -74,6 +78,18 @@ function FinishTasks() {
             couponName: result.couponName ?? "",
           })
         );
+      }
+      if (res.data.imagePathFinishTask) {
+        UploadImageDatasouce.getImage(res.data.imagePathFinishTask).then(
+          (resImg) => {
+            setImgControl(resImg.url);
+          }
+        );
+      }
+      if (res.data.imagePathDrug) {
+        UploadImageDatasouce.getImage(res.data.imagePathDrug).then((resImg) => {
+          setImgDrug(resImg.url);
+        });
       }
       setData(res);
       setMapPosition({
@@ -93,8 +109,8 @@ function FinishTasks() {
       return i > 0 && c !== "." && (a.length - i) % 3 === 0 ? "," + c : c;
     });
   };
-  const onPreviewImg = async () => {
-    let src = data.imageTaskUrl;
+  const onPreviewImg = async (e: any) => {
+    let src = e;
     if (!src) {
       src = await new Promise((resolve) => {
         const reader = new FileReader();
@@ -173,32 +189,30 @@ function FinishTasks() {
               {data.data.preparationBy !== null ? data.data.preparationBy : "-"}
             </span>
           </Form.Item>
-          <label>ภาพงานจากนักบินโดรน</label>
-          <br />
-          <div className="pb-2">
-            <div
-              className="hiddenFileInput"
-              style={{
-                backgroundImage: `url(${data.imageTaskUrl})`,
-                display:
-                  data.imageTaskUrl !== null
-                    ? `url(${data.imageTaskUrl})`
-                    : undefined,
-              }}
-            ></div>
-            <div className="ps-5">
-              {data.imageTaskUrl !== "object" &&
-              Object.keys(data.imageTaskUrl).length !== 0 ? (
-                <>
-                  <Tag
-                    color={color.Success}
-                    onClick={onPreviewImg}
-                    style={{ cursor: "pointer", borderRadius: "5px" }}
-                  >
-                    View
-                  </Tag>
-                </>
-              ) : undefined}
+          <div className="row">
+            <div className="col-lg">
+              <label>ภาพ Controller ควบคุม </label>
+              <br />
+              <ImagCards
+                imageName={
+                  data.data?.imagePathFinishTask
+                    ? data.data?.imagePathFinishTask
+                    : ""
+                }
+                image={imgControl ? imgControl : image.empty_cover}
+                onClick={() => onPreviewImg(imgControl)}
+              />
+            </div>
+            <div className="col-lg">
+              <label>ภาพปุ๋ยและยา</label>
+              <br />
+              <ImagCards
+                imageName={
+                  data.data?.imagePathDrug ? data.data?.imagePathDrug : ""
+                }
+                image={imgDrug ? imgDrug : image.empty_cover}
+                onClick={() => onPreviewImg(imgDrug)}
+              />
             </div>
           </div>
 
@@ -611,9 +625,7 @@ function FinishTasks() {
   return (
     <>
       <Row>
-        <BackIconButton
-          onClick={() => navigate("/IndexFinishTask")}
-        />
+        <BackIconButton onClick={() => navigate("/IndexFinishTask")} />
         <span className="pt-4">
           <strong style={{ fontSize: "20px" }}>
             รายละเอียดงาน #{data.data.taskNo}

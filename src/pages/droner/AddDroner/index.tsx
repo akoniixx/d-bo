@@ -22,6 +22,8 @@ import color from "../../../resource/color";
 import { CardHeader } from "../../../components/header/CardHearder";
 import Swal from "sweetalert2";
 import {
+  BookBankEntities,
+  BookBankEntities_INIT,
   CreateDronerEntity,
   CreateDronerEntity_INIT,
   DronerEntity,
@@ -73,6 +75,7 @@ import { resizeFileImg } from "../../../utilities/ResizeImage";
 import { useNavigate } from "react-router-dom";
 import { DashboardLayout } from "../../../components/layout/Layout";
 import BookBankDroner from "../../../components/bookbank/BookBankDroner";
+import { OtherAddressDatasource } from "../../../datasource/OtherAddress";
 const dateFormat = "DD/MM/YYYY";
 const dateCreateFormat = "YYYY-MM-DD";
 
@@ -83,18 +86,20 @@ function AddDroner() {
   const navigate = useNavigate();
   const [profile] = useLocalStorage("profile", []);
   const [data] = useState<CreateDronerEntity>(CreateDronerEntity_INIT);
-  const [dataBookBank] = useState<any>()
+  const [dataBookBank] = useState<any>();
   const [address, setAddress] = useState<CreateAddressEntity>(
     CreateAddressEntity_INIT
   );
-  const [otherAddress, setOtherAddress] = useState<CreateAddressEntity>(
-    CreateAddressEntity_INIT
-  );
+  const [otherAddress, setOtherAddress] = useState<CreateAddressEntity>();
   const [dronerArea, setDronerArea] = useState<DronerAreaEntity>(
     DronerAreaEntity_INIT
   );
   const [dronerDroneList, setDronerDroneList] = useState<DronerDroneEntity[]>(
     []
+  );
+  const [imgBB, setImgBB] = useState<any>();
+  const [bookBank, setBookBank] = useState<BookBankEntities>(
+    BookBankEntities_INIT
   );
   const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
@@ -134,6 +139,7 @@ function AddDroner() {
   const [createImgIdCard, setCreateImgIdCard] = useState<UploadImageEntity>(
     UploadImageEntity_INTI
   );
+  const [imagBookBank, setImagBookBank] = useState<any>();
   const [mapPosition, setMapPosition] = useState<{
     lat?: number;
     lng?: number;
@@ -145,7 +151,6 @@ function AddDroner() {
     fetchProvince();
     fetchLocation(searchLocation);
   }, [searchLocation]);
-
   //#region data droner
   const fetchProvince = async () => {
     await LocationDatasource.getProvince().then((res) => {
@@ -331,8 +336,18 @@ function AddDroner() {
     setShowEditModal(false);
     setEditIndex(0);
   };
-  const insertBookBank = (data: any) => {
-    console.log(data);
+  const insertBookBank = (data: DronerEntity) => {
+    const sumData = {
+      bankName: data.bankName,
+      bankAccountName: data.bankAccountName,
+      accountNumber: data.accountNumber,
+      isConsentBookBank: data.isConsentBookBank,
+      isBookBank: data.isConsentBookBank,
+    };
+    const filterImg = data.file.find((x: any) => x.category === "BOOK_BANK");
+    setImgBB(filterImg);
+    setBookBank(sumData);
+    setBtnSaveDisable(false);
   };
   //#endregion
 
@@ -511,15 +526,29 @@ function AddDroner() {
         address1: values.address1,
         address2: values.address2,
       },
+      otherAddress: {
+        ...pushOtherPlant.toJS().otherAddress,
+        address1: values.otherAddress1,
+        address2: values.otherAddress2,
+      },
       dronerArea: {
         ...pushOtherPlant.toJS().dronerArea,
         mapUrl: values.mapUrl,
       },
       createBy: `${profile?.firstname} ${profile?.lastname}`,
-    };
+      bankName: bookBank?.bankName,
+      bankAccountName: bookBank?.bankAccountName,
+      accountNumber: bookBank?.accountNumber,
+      isConsentBookBank: bookBank?.isConsentBookBank,
+      isBookBank: bookBank?.isBookBank,
+      file: imgBB,
 
+    };
     await DronerDatasource.createDronerList(payload).then(async (res) => {
       if (res !== undefined) {
+        if(imgBB){
+          UploadImageDatasouce.uploadImage(Map(imgBB).set("resourceId", res.id).toJS());
+        }
         const fileList = [createImgProfile, createImgIdCard]
           .filter((el) => {
             return el.file !== "" && el.file !== undefined;
@@ -978,18 +1007,8 @@ function AddDroner() {
           <h6>ที่อยู่จัดส่ง</h6>
           <div className="row">
             <div className="form-group col-lg-6">
-              <label>
-                จังหวัด <span style={{ color: "red" }}>*</span>
-              </label>
-              <Form.Item
-                name="otherProvinceId"
-                rules={[
-                  {
-                    required: true,
-                    message: "กรุณาเลือกจังหวัด",
-                  },
-                ]}
-              >
+              <label>จังหวัด</label>
+              <Form.Item name="otherProvinceId">
                 <Select
                   allowClear
                   showSearch
@@ -1004,7 +1023,7 @@ function AddDroner() {
                       .localeCompare(optionB.children.toLowerCase())
                   }
                   onChange={handleOtherProvince}
-                  key={otherAddress.provinceId}
+                  key={otherAddress?.provinceId}
                 >
                   {otherProvince?.map((item) => (
                     <Option value={item.provinceId}>{item.provinceName}</Option>
@@ -1013,21 +1032,11 @@ function AddDroner() {
               </Form.Item>
             </div>
             <div className="form-group col-lg-6">
-              <label>
-                อำเภอ <span style={{ color: "red" }}>*</span>
-              </label>
-              <Form.Item
-                name="otherDistrictId"
-                rules={[
-                  {
-                    required: true,
-                    message: "กรุณาเลือกอำเภอ",
-                  },
-                ]}
-              >
+              <label>อำเภอ</label>
+              <Form.Item name="otherDistrictId">
                 <Select
                   showSearch
-                  disabled={otherAddress.provinceId === undefined}
+                  disabled={otherAddress?.provinceId === undefined}
                   optionFilterProp="children"
                   filterOption={(input: any, option: any) =>
                     option.children.includes(input)
@@ -1058,20 +1067,10 @@ function AddDroner() {
           </div>
           <div className="row">
             <div className="form-group col-lg-6">
-              <label>
-                ตำบล <span style={{ color: "red" }}>*</span>
-              </label>
-              <Form.Item
-                name="otherSubdistrictId"
-                rules={[
-                  {
-                    required: true,
-                    message: "กรุณาเลือกตำบล",
-                  },
-                ]}
-              >
+              <label>ตำบล</label>
+              <Form.Item name="otherSubdistrictId">
                 <Select
-                  disabled={otherAddress.districtId === undefined}
+                  disabled={otherAddress?.districtId === undefined}
                   showSearch
                   optionFilterProp="children"
                   filterOption={(input: any, option: any) =>
@@ -1099,14 +1098,12 @@ function AddDroner() {
               </Form.Item>
             </div>
             <div className="form-group col-lg-6">
-              <label>
-                รหัสไปรษณีย์ <span style={{ color: "red" }}>*</span>
-              </label>
+              <label>รหัสไปรษณีย์</label>
               <Form.Item name="otherPostcode">
                 <Input
                   name="otherPostcode"
                   placeholder="กรอกรหัสไปรษณีย์"
-                  key={otherAddress.subdistrictId}
+                  key={otherAddress?.subdistrictId}
                   disabled
                 />
               </Form.Item>
@@ -1114,18 +1111,8 @@ function AddDroner() {
           </div>
           <div className="row">
             <div className="form-group">
-              <label>
-                ที่อยู่บ้าน <span style={{ color: "red" }}>*</span>
-              </label>
-              <Form.Item
-                name="otherAddress1"
-                rules={[
-                  {
-                    required: true,
-                    message: "กรุณากรอกบ้านเลขที่!",
-                  },
-                ]}
-              >
+              <label>ที่อยู่บ้าน</label>
+              <Form.Item name="otherAddress1">
                 <Input
                   className="col-lg-12"
                   placeholder="กรุณากรอกบ้านเลขที่"
@@ -1135,19 +1122,8 @@ function AddDroner() {
           </div>
           <div className="row">
             <div className="form-group">
-              <label>
-                รายละเอียดที่อยู่ (หมู่, ถนน){" "}
-                <span style={{ color: "red" }}>*</span>
-              </label>
-              <Form.Item
-                name="otherAddress2"
-                rules={[
-                  {
-                    required: true,
-                    message: "กรุณากรอกรายละเอียดที่อยู่บ้าน!",
-                  },
-                ]}
-              >
+              <label>รายละเอียดที่อยู่ (หมู่, ถนน) </label>
+              <Form.Item name="otherAddress2">
                 <TextArea
                   rows={4}
                   className="col-lg-12"
@@ -1442,7 +1418,11 @@ function AddDroner() {
             <Pagination defaultCurrent={1} total={1} />
           )}
         </div>
-        <BookBankDroner callBack={insertBookBank} data={dataBookBank} />
+        <BookBankDroner
+          callBack={insertBookBank}
+          data={dataBookBank}
+          dronerId=""
+        />
       </div>
     </>
   );

@@ -40,7 +40,6 @@ const ModalQuotaRedeem: React.FC<ModalQuotaRedeemProps> = ({
     }
   }, [data, form, isEditModal]);
   const checkValidate = (data: AddQuotaRedeemHisEntity) => {
-    console.log(data);
     let checkEmpty = ![data.rewardName, data.roundNo].includes("");
     let checkNo = ![data.roundNo].includes(undefined);
     if (checkEmpty && checkNo) {

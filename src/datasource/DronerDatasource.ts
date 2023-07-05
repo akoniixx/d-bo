@@ -92,7 +92,6 @@ export class DronerDatasource {
     return httpClient
       .post(BASE_URL + "/droner", data)
       .then((response) => {
-        console.log("response", response.data);
         return response.data;
       })
       .catch((error) => {
@@ -108,17 +107,6 @@ export class DronerDatasource {
       })
       .catch((error) => {
         console.log(error);
-      });
-  }
-
-  static async getDronerAddressByID(id: string): Promise<DronerEntity> {
-    return httpClient
-      .get(BASE_URL + "/droner/droner-address/" + id)
-      .then((res) => {
-        return res.data;
-      })
-      .catch((err) => {
-        console.log(err, "err getDronerAddressById");
       });
   }
 }
