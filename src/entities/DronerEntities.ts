@@ -1,7 +1,4 @@
-import {
-  DronerAreaEntity,
-  DronerAreaEntity_INIT,
-} from "./DronerAreaEntities";
+import { DronerAreaEntity, DronerAreaEntity_INIT } from "./DronerAreaEntities";
 import { ImageEntity, ImageEntity_INTI } from "./UploadImageEntities";
 import {
   DronerDroneEntity,
@@ -30,6 +27,11 @@ export interface DronerEntity {
   expMonth: number;
   expPlant: string[];
   address: FullAddressEntity;
+  isBookBank: boolean;
+  bankName: string;
+  bankAccountName: string;
+  accountNumber: string;
+  isConsentBookBank: boolean;
   pin: string;
   dronerDrone?: DronerDroneEntity[];
   dronerArea: DronerAreaEntity;
@@ -54,6 +56,11 @@ export const DronerEntity_INIT: DronerEntity = {
   expMonth: 0,
   expPlant: [""],
   address: FullAddressEntiry_INIT,
+  isBookBank: false,
+  bankName: "",
+  bankAccountName: "",
+  accountNumber: "",
+  isConsentBookBank: false,
   pin: "",
   dronerDrone: [DronerDroneEntity_INIT],
   dronerArea: DronerAreaEntity_INIT,
@@ -64,6 +71,7 @@ export const DronerEntity_INIT: DronerEntity = {
   birthDate: "",
 };
 export interface CreateDronerEntity {
+  id?: string;
   firstname: string;
   lastname: string;
   idNo: string;
@@ -73,6 +81,12 @@ export interface CreateDronerEntity {
   expMonth: number;
   expPlant: string[];
   address: CreateAddressEntity;
+  isBookBank: boolean;
+  bankName: string;
+  bankAccountName: string;
+  accountNumber: string;
+  isConsentBookBank: boolean;
+  otherAddress: CreateAddressEntity;
   pin: string;
   dronerDrone: DronerDroneEntity[];
   file: ImageEntity[];
@@ -81,6 +95,7 @@ export interface CreateDronerEntity {
 }
 
 export const CreateDronerEntity_INIT: CreateDronerEntity = {
+  id: "",
   firstname: "",
   lastname: "",
   idNo: "",
@@ -90,6 +105,12 @@ export const CreateDronerEntity_INIT: CreateDronerEntity = {
   expMonth: 0,
   expPlant: [""],
   address: CreateAddressEntity_INIT,
+  isBookBank: false,
+  bankName: "",
+  bankAccountName: "",
+  accountNumber: "",
+  isConsentBookBank: false,
+  otherAddress: CreateAddressEntity_INIT,
   pin: "123456",
   dronerDrone: [DronerDroneEntity_INIT],
   file: [ImageEntity_INTI],
@@ -100,4 +121,52 @@ export const CreateDronerEntity_INIT: CreateDronerEntity = {
 export interface DronerListEntity {
   data: DronerEntity[];
   count: number;
+}
+export interface DronerByAddressEntity {
+  id: string;
+  dronerCode: string;
+  firstname: string;
+  lastname: string;
+  idNo: string;
+  telephoneNo: string;
+  status: string;
+  reason: [string];
+  birthDate: string;
+  isOpenReceiveTask: boolean;
+  expYear: number;
+  expMonth: number;
+  expPlant: [string];
+  addressId: string;
+  dronerAreaId: string;
+  createdAt: string;
+  updatedAt: string;
+  isDelete: boolean;
+  deleteDate: string;
+  comment: string;
+  updateBy: string;
+  createBy: string;
+  isBookBank: boolean;
+  bankName: string;
+  bankAccountName: string;
+  accountNumber: string;
+  isConsentBookBank: boolean;
+  otherAddressId:string;
+  percentSuccess: number;
+  address: FullAddressEntity
+  otherAddress: FullAddressEntity
+}
+
+export interface BookBankEntities  {
+  isBookBank: boolean;
+  bankName: string;
+  bankAccountName: string;
+  accountNumber: string;
+  isConsentBookBank: boolean;
+}
+export const BookBankEntities_INIT : BookBankEntities = {
+  isBookBank: false,
+  bankName: "",
+  bankAccountName: "",
+  accountNumber: "",
+  isConsentBookBank: false,
 }

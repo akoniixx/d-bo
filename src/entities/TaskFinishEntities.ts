@@ -57,6 +57,7 @@ export interface TaskFinish {
   reviewFarmerScore: string;
   reviewFarmerComment: string;
   imagePathFinishTask: string;
+  imagePathDrug: string;
   comment: null;
   countResend: string;
   couponCode: string;
@@ -108,6 +109,7 @@ export const TaskFinish_INIT: TaskFinish = {
   reviewFarmerScore: "",
   reviewFarmerComment: "",
   imagePathFinishTask: "",
+  imagePathDrug: "",
   comment: null,
   countResend: "",
   couponCode: "",
@@ -176,6 +178,7 @@ export interface CreateReviewDroner {
   reviewFarmerScore: string;
   reviewFarmerComment: string;
   imagePathFinishTask: string;
+  imagePathDrug: string;
   comment: null;
   farmer: FarmerEntity;
   farmerPlot: FarmerPlotEntity;
@@ -221,6 +224,7 @@ export const CreateReviewDroner_INIT: CreateReviewDroner = {
   reviewFarmerScore: "",
   reviewFarmerComment: "",
   imagePathFinishTask: "",
+  imagePathDrug: "",
   comment: null,
   farmerPlot: FarmerPlotEntity_INIT,
   farmer: FarmerEntity_INIT,

@@ -118,8 +118,8 @@ export const GetDronerDroneEntity_INIT: GetDronerDroneEntity = {
   createdAt: "",
   updatedAt: "",
 };
-
 export interface DronerDroneListEntity {
   data: GetDronerDroneEntity[];
   count: number;
 }
+

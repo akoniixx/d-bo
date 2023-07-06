@@ -92,7 +92,6 @@ export class DronerDatasource {
     return httpClient
       .post(BASE_URL + "/droner", data)
       .then((response) => {
-        console.log("response", response.data);
         return response.data;
       })
       .catch((error) => {

@@ -1,5 +1,11 @@
 ## [Version - 0]
 
+## improve [v0.34.17] 2023-07-05
+
+- display 2 image task finished
+- book bank droner menu
+- added other address
+
 ## improve [v0.34.16] 2023-06-29
 
 - added reward round in quota menu

@@ -50,6 +50,9 @@ import {
 } from "../../../../utilities/TextFormatter";
 import { DashboardLayout } from "../../../../components/layout/Layout";
 import { useNavigate } from "react-router-dom";
+import ImagCards from "../../../../components/card/ImagCard";
+import icon from "../../../../resource/icon";
+import { image } from "../../../../resource";
 
 const { Map } = require("immutable");
 const _ = require("lodash");
@@ -71,11 +74,16 @@ function ReviewTask() {
     couponDiscount: null,
   });
   const [data, setData] = useState<DetailReviewTask>(DetailReviewTask_INIT);
+  const [imgTask, setImgTask] = useState<DetailReviewTask>(
+    DetailReviewTask_INIT
+  );
   const [detailDroner, setDetailDroner] = useState<any>();
   const [mapPosition, setMapPosition] = useState<{ lat: number; lng: number }>({
     lat: LAT_LNG_BANGKOK.lat,
     lng: LAT_LNG_BANGKOK.lng,
   });
+  const [imgControl, setImgControl] = useState<any>();
+  const [imgDrug, setImgDrug] = useState<any>();
   const [saveBtnDisable, setBtnSaveDisable] = useState<boolean>(true);
   const [saveRate, setSaveRate] = useState<boolean>(true);
   const fetchDetailTask = async () => {
@@ -91,7 +99,20 @@ function ReviewTask() {
           });
         });
       }
+      if (res.data.imagePathFinishTask) {
+        UploadImageDatasouce.getImage(res.data.imagePathFinishTask).then(
+          (resImg) => {
+            setImgControl(resImg.url);
+          }
+        );
+      }
+      if (res.data.imagePathDrug) {
+        UploadImageDatasouce.getImage(res.data.imagePathDrug).then((resImg) => {
+          setImgDrug(resImg.url);
+        });
+      }
       setData(res);
+      setImgTask(data);
       setMapPosition({
         lat: parseFloat(res.data.farmerPlot.lat),
         lng: parseFloat(res.data.farmerPlot.long),
@@ -102,7 +123,6 @@ function ReviewTask() {
   useEffect(() => {
     fetchDetailTask();
   }, []);
-
   const onChangeCanReview = (e: any) => {
     const m = Map(detailDroner).set("canReview", e.target.value);
     const n = Map(m.toJS()).set("taskId", taskId);
@@ -141,8 +161,8 @@ function ReviewTask() {
     const n = Map(m.toJS()).set("taskId", taskId);
     setDetailDroner(n.toJS());
   };
-  const onPreviewImg = async () => {
-    let src = data.imageTaskUrl;
+  const onPreviewImg = async (e: any) => {
+    let src = e;
     if (!src) {
       src = await new Promise((resolve) => {
         const reader = new FileReader();
@@ -174,7 +194,7 @@ function ReviewTask() {
           detailDroner.comment,
           profile.firstname + " " + profile.lastname
         ).then((time) => {
-          navigate("/IndexFinishTask")
+          navigate("/IndexFinishTask");
         });
       }
       fetchDetailTask();
@@ -237,34 +257,33 @@ function ReviewTask() {
               {data.data.preparationBy !== null ? data.data.preparationBy : "-"}
             </span>
           </Form.Item>
-          <label>ภาพงานจากนักบินโดรน</label>
-          <br />
-          <div className="pb-2">
-            <div
-              className="hiddenFileInput"
-              style={{
-                backgroundImage: `url(${data.imageTaskUrl})`,
-                display:
-                  data.imageTaskUrl != null
-                    ? `url(${data.imageTaskUrl})`
-                    : undefined,
-              }}
-            ></div>
-            <div className="ps-5">
-              {data.imageTaskUrl !== "object" &&
-              Object.keys(data.imageTaskUrl).length !== 0 ? (
-                <>
-                  <Tag
-                    color={color.Success}
-                    onClick={onPreviewImg}
-                    style={{ cursor: "pointer", borderRadius: "5px" }}
-                  >
-                    View
-                  </Tag>
-                </>
-              ) : undefined}
+          <div className="row">
+            <div className="col-lg">
+              <label>ภาพ Controller ควบคุม </label>
+              <br />
+              <ImagCards
+                imageName={
+                  data.data?.imagePathFinishTask
+                    ? data.data?.imagePathFinishTask
+                    : ""
+                }
+                image={imgControl ? imgControl : image.empty_cover}
+                onClick={() => onPreviewImg(imgControl)}
+              />
+            </div>
+            <div className="col-lg">
+              <label>ภาพปุ๋ยและยา</label>
+              <br />
+              <ImagCards
+                imageName={
+                  data.data?.imagePathDrug ? data.data?.imagePathDrug : ""
+                }
+                image={imgDrug ? imgDrug : image.empty_cover}
+                onClick={() => onPreviewImg(imgDrug)}
+              />
             </div>
           </div>
+
           <br />
           <label>หมายเหตุ</label>
           <Form.Item>
@@ -649,9 +668,7 @@ function ReviewTask() {
   return (
     <>
       <Row>
-        <BackIconButton
-          onClick={() => navigate("/IndexFinishTask")}
-        />
+        <BackIconButton onClick={() => navigate("/IndexFinishTask")} />
         <span className="pt-4">
           <strong style={{ fontSize: "20px" }}>
             รายละเอียดงาน #{data.data.taskNo}
