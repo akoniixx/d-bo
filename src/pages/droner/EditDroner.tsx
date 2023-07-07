@@ -351,14 +351,22 @@ function EditDroner() {
     await handelOtherPostCode(d.toJS());
   };
   const handelOtherPostCode = (add: AddressEntity) => {
-    let filterSubDistrict = otherSubdistrict.filter(
-      (item) => item.subdistrictId === add.subdistrictId
-    )[0].postcode;
-    const m = Map(add).set("postcode", filterSubDistrict);
-    setOtherAddress(m.toJS());
-    form.setFieldsValue({
-      otherPostcode: m.toJS().postcode,
-    });
+    if (add.subdistrictId !== undefined) {
+      let filterSubDistrict = otherSubdistrict.filter(
+        (item) => item.subdistrictId === add.subdistrictId
+      )[0].postcode;
+      const m = Map(add).set("postcode", filterSubDistrict);
+      setOtherAddress(m.toJS());
+      form.setFieldsValue({
+        otherPostcode: m.toJS().postcode,
+      });
+    } else {
+      const m = Map(add).set("postcode", "");
+      setOtherAddress(m.toJS());
+      form.setFieldsValue({
+        otherPostcode: m.toJS().postcode,
+      });
+    }
   };
   const handleAddress1 = (e: any) => {
     const d = Map(otherAddress).set("address1", e.target.value);
@@ -658,7 +666,6 @@ function EditDroner() {
     setBookBank(sumData);
     setDisableSaveBtn(false);
   };
-
   const updateDroner = async (values: any) => {
     const reason = [];
     const splitPlant = values?.plantsOther
@@ -700,9 +707,7 @@ function EditDroner() {
       accountNumber: bookBank.accountNumber
         ? bookBank.accountNumber
         : data.accountNumber,
-      isConsentBookBank: bookBank.isConsentBookBank
-        ? bookBank.isConsentBookBank
-        : data.isConsentBookBank,
+      isConsentBookBank: bookBank.isConsentBookBank,
       isBookBank: !bookBank ? false : true,
       file: imgBB,
     };
@@ -721,15 +726,23 @@ function EditDroner() {
       payload.isDelete = false;
       payload.isOpenReceiveTask = true;
     }
-    if (otherAddress != null) {
-      if (!otherAdd.id) {
-        OtherAddressDatasource.addOtherAddress(dronerId, otherAdd).then(
-          (res) => {}
-        );
-      } else {
-        OtherAddressDatasource.updateOtherAddress(otherAdd).then((res) => {});
-      }
-    }
+    console.log(payload)
+    // if (!otherAdd.id) {
+    //   OtherAddressDatasource.addOtherAddress(dronerId, otherAdd).then(
+    //     (res) => {}
+    //   );
+    // } else if (otherAdd.id) {
+    //   if (
+    //     otherAdd.provinceId === undefined &&
+    //     otherAdd.districtId === undefined &&
+    //     otherAdd.subdistrictId === undefined
+    //   ) {
+    //     //delete id other address
+    //     console.log(1);
+    //   } else {
+    //     OtherAddressDatasource.updateOtherAddress(otherAdd).then((res) => {});
+    //   }
+    // }
     if (imgBB) {
       UploadImageDatasouce.uploadImage(imgBB).then((res) => {});
     }
@@ -750,7 +763,7 @@ function EditDroner() {
           timer: 1500,
           showConfirmButton: false,
         }).then((time) => {
-          navigate("/IndexDroner");
+          // navigate("/IndexDroner");
         });
       } else {
         Swal.fire({
@@ -992,7 +1005,7 @@ function EditDroner() {
                     backgroundImage: `url(${imgIdCard})`,
                     display: imgIdCard !== undefined ? "block" : "none",
                   }}
-                ></div>
+                />
                 <div className="text-left ps-4 pt-2">
                   {imgIdCard !== undefined && (
                     <>
@@ -1318,7 +1331,7 @@ function EditDroner() {
               <label>รหัสไปรษณีย์</label>
               <Form.Item>
                 <Input
-                  key={otherAddress.postcode}
+                  key={otherAddress.subdistrictId}
                   placeholder="กรอกรหัสไปรษณีย์"
                   defaultValue={otherAddress.postcode}
                   disabled

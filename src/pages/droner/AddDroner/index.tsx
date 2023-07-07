@@ -202,6 +202,7 @@ function AddDroner() {
   };
   //#otherAddress
   const handleOtherProvince = async (otherProvinceId: number) => {
+    console.log(otherProvinceId);
     await getOtherProvince(otherProvinceId, CreateAddressEntity_INIT);
   };
   const getOtherProvince = async (
@@ -877,7 +878,7 @@ function AddDroner() {
               >
                 <Select
                   showSearch
-                  disabled={address.provinceId === undefined}
+                  disabled={address.provinceId === 0}
                   optionFilterProp="children"
                   filterOption={(input: any, option: any) =>
                     option.children.includes(input)
@@ -921,7 +922,7 @@ function AddDroner() {
                 ]}
               >
                 <Select
-                  disabled={address.districtId === undefined}
+                  disabled={address.districtId === 0}
                   showSearch
                   optionFilterProp="children"
                   filterOption={(input: any, option: any) =>
@@ -1009,7 +1010,7 @@ function AddDroner() {
           <div className="row">
             <div className="form-group col-lg-6">
               <label>จังหวัด</label>
-              <Form.Item>
+              <Form.Item name={"otherProvince"}>
                 <Select
                   allowClear
                   showSearch
@@ -1024,7 +1025,6 @@ function AddDroner() {
                       .localeCompare(optionB.children.toLowerCase())
                   }
                   onChange={handleOtherProvince}
-                  key={otherAddress?.provinceId}
                 >
                   {otherProvince?.map((item) => (
                     <Option value={item.provinceId}>{item.provinceName}</Option>
@@ -1034,10 +1034,10 @@ function AddDroner() {
             </div>
             <div className="form-group col-lg-6">
               <label>อำเภอ</label>
-              <Form.Item>
+              <Form.Item name={"otherDistrictId"}>
                 <Select
                   showSearch
-                  disabled={otherAddress?.provinceId === undefined}
+                  disabled={otherAddress?.provinceId === 0}
                   optionFilterProp="children"
                   filterOption={(input: any, option: any) =>
                     option.children.includes(input)
@@ -1069,9 +1069,9 @@ function AddDroner() {
           <div className="row">
             <div className="form-group col-lg-6">
               <label>ตำบล</label>
-              <Form.Item>
+              <Form.Item name={"otherSubdistrictId"}>
                 <Select
-                  disabled={otherAddress?.districtId === undefined}
+                  disabled={otherAddress?.districtId === 0}
                   showSearch
                   optionFilterProp="children"
                   filterOption={(input: any, option: any) =>
@@ -1100,7 +1100,7 @@ function AddDroner() {
             </div>
             <div className="form-group col-lg-6">
               <label>รหัสไปรษณีย์</label>
-              <Form.Item>
+              <Form.Item name={"otherPostcode"}>
                 <Input
                   placeholder="กรอกรหัสไปรษณีย์"
                   key={otherAddress?.subdistrictId}
@@ -1112,7 +1112,7 @@ function AddDroner() {
           <div className="row">
             <div className="form-group">
               <label>ที่อยู่บ้าน</label>
-              <Form.Item>
+              <Form.Item name={"otherAddress1"}>
                 <Input
                   className="col-lg-12"
                   placeholder="กรุณากรอกบ้านเลขที่"
@@ -1123,7 +1123,7 @@ function AddDroner() {
           <div className="row">
             <div className="form-group">
               <label>รายละเอียดที่อยู่ (หมู่, ถนน) </label>
-              <Form.Item>
+              <Form.Item name={"otherAddress2"}>
                 <TextArea
                   rows={4}
                   className="col-lg-12"
