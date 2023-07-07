@@ -26,6 +26,7 @@ export class NewsDatasource{
         sortField : string | undefined,
         sortDirection : string | undefined,
         search : string | undefined,
+        pageType: string | undefined,
     ){
         return httpClient
         .post(BASE_URL + "/promotion/news/find-all-news",{
@@ -35,7 +36,8 @@ export class NewsDatasource{
             sortField : sortField,
             sortDirection : sortDirection,
             search : search,
-            application : application
+            application : application,
+            pageType : pageType
         })
         .then(res => {return res.data})
         .catch(err => console.log(err))

@@ -65,8 +65,10 @@ function NewsPage() {
       status,
       sortField,
       sortDirection,
-      search
+      search,
+      "BO"
     ).then((res) => {
+      console.log(res);
       setData({
         count: res.count,
         news: res.data,
@@ -347,13 +349,15 @@ function NewsPage() {
           children: (
             <div className="container">
               <span className="text-dark-75  d-block font-size-lg">
-                <Tooltip title={`ปักหมุด : หน้าหลัก,หน้าข่าวสารทั้งหมด`}>
+                {row.pin_all === true || row.pin_main === true &&
+                  <Tooltip title={`ปักหมุด : ${row.pin_all === true ? 'หน้าหลัก,' : "" }${row.pin_main === true && 'หน้าข่าวสารทั้งหมด'}`}>
                   <Image
                     preview={false}
                     src={icon.pin}
                     style={{ width: "22", height: "22px", paddingRight: 5 }}
                   />
-                </Tooltip>
+                </Tooltip>}
+              
                 {row.title}
               </span>
             </div>
