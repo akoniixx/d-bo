@@ -36,6 +36,7 @@ function EditNewsPage() {
   const [campId, setCampId] = useState<string>("");
   const [cName, setCname] = useState<any[]>([]);
   const [newsName, setNewsName] = useState<string>("");
+  const [pinCount, setPinCount] = useState<number>(0);
   const [descriptionEditor, setDescriptionEditor] = useState<string | null>(
     null
   );
@@ -313,8 +314,6 @@ function EditNewsPage() {
   }, []);
   useEffect(() => {
     CampaignDatasource.getCampaignList(undefined, "QUATA").then((res) => {
-      console.log(res);
-
       setCname(res.data);
     });
   }, []);
@@ -444,35 +443,6 @@ function EditNewsPage() {
                   <Input autoComplete="off" disabled />
                 </Form.Item>
               </div>
-              {/* <div className="form-group col-lg-12 pb-4">
-                <label>
-                  ตั้งค่าข่าวสาร <span style={{ color: "red" }}>*</span>
-                </label>
-                <Form.Item
-                  initialValue={false}
-                  name="mainPage"
-                  valuePropName="checked"
-                  className="my-0"
-                >
-                  <Checkbox
-                    className="pt-2"
-                  >
-                    ปักหมุดในหน้าหลัก
-                  </Checkbox>
-                </Form.Item>
-                <Form.Item
-                  initialValue={false}
-                  name="allNews"
-                  valuePropName="checked"
-                  className="my-0"
-                >
-                  <Checkbox
-                    className="mt-0"
-                  >
-                    ปักหมุดในหน้าข่าวสารทั้งหมด
-                  </Checkbox>
-                </Form.Item>
-              </div> */}
               <div className="form-group col-lg-12">
                 <label>
                   แอปพลิเคชั่น <span style={{ color: "red" }}>*</span>
@@ -491,6 +461,51 @@ function EditNewsPage() {
                     Farmer Application
                   </Checkbox>
                 </Form.Item>
+                <div
+                  className="form-group col-lg "
+                  style={{ paddingLeft: "3%" }}
+                >
+                  <Form.Item
+                    initialValue={false}
+                    name="mainPageFarmer"
+                    valuePropName="checked"
+                    className="my-0"
+                  >
+                    <Checkbox
+                      className="pt-2"
+                      disabled={!chooseFarmer || pinCount === 0}
+                    >
+                      ปักหมุดในหน้าหลัก
+                      <span
+                        style={{
+                          color:
+                            !chooseFarmer || pinCount === 0
+                              ? color.Disable
+                              : color.Grey,
+                        }}
+                      >
+                        {` (เหลือปักหมุด ${0} อัน)`}
+                      </span>
+                    </Checkbox>
+                  </Form.Item>
+                  <Form.Item
+                    initialValue={false}
+                    name="allNewsFarmer"
+                    valuePropName="checked"
+                    className="my-0"
+                  >
+                    <Checkbox disabled={!chooseFarmer}>
+                      ปักหมุดในหน้าข่าวสารทั้งหมด
+                      <span
+                        style={{
+                          color: !chooseFarmer ? color.Disable : color.Grey,
+                        }}
+                      >
+                        {` (เหลือปักหมุด 5 อัน)`}
+                      </span>
+                    </Checkbox>
+                  </Form.Item>
+                </div>
                 <Form.Item
                   initialValue={false}
                   name="DronerApp"
@@ -505,6 +520,51 @@ function EditNewsPage() {
                     Droner Application
                   </Checkbox>
                 </Form.Item>
+                <div
+                  className="form-group col-lg "
+                  style={{ paddingLeft: "3%" }}
+                >
+                  <Form.Item
+                    initialValue={false}
+                    name="mainPageDroner"
+                    valuePropName="checked"
+                    className="my-0"
+                  >
+                    <Checkbox
+                      className="pt-2"
+                      disabled={!chooseDroner}
+                    >
+                      ปักหมุดในหน้าหลัก
+                      <span
+                        style={{
+                          color:
+                            !chooseDroner
+                              ? color.Disable
+                              : color.Grey,
+                        }}
+                      >
+                        {` (เหลือปักหมุด 5 อัน)`}
+                      </span>
+                    </Checkbox>
+                  </Form.Item>
+                  <Form.Item
+                    initialValue={false}
+                    name="allNewsDroner"
+                    valuePropName="checked"
+                    className="my-0"
+                  >
+                    <Checkbox disabled={!chooseDroner}>
+                      ปักหมุดในหน้าข่าวสารทั้งหมด
+                      <span
+                        style={{
+                          color: !chooseDroner ? color.Disable : color.Grey,
+                        }}
+                      >
+                        {` (เหลือปักหมุด 5 อัน)`}
+                      </span>
+                    </Checkbox>
+                  </Form.Item>
+                </div>
               </div>
               <div className="form-group col-lg-12 pt-4">
                 <label>

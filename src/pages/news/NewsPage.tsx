@@ -2,8 +2,8 @@ import React, { useEffect, useState } from "react";
 import Search from "antd/lib/input/Search";
 import Select from "antd/lib/select";
 import { Option } from "antd/lib/mentions";
-import { Badge, Button, Pagination, Table, Tooltip } from "antd";
-import { color } from "../../resource";
+import { Badge, Button, Image, Pagination, Table, Tooltip } from "antd";
+import { color, icon } from "../../resource";
 import ActionButton from "../../components/button/ActionButton";
 import {
   CaretDownOutlined,
@@ -347,6 +347,13 @@ function NewsPage() {
           children: (
             <div className="container">
               <span className="text-dark-75  d-block font-size-lg">
+                <Tooltip title={`ปักหมุด : หน้าหลัก,หน้าข่าวสารทั้งหมด`}>
+                  <Image
+                    preview={false}
+                    src={icon.pin}
+                    style={{ width: "22", height: "22px", paddingRight: 5 }}
+                  />
+                </Tooltip>
                 {row.title}
               </span>
             </div>
