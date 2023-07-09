@@ -100,7 +100,6 @@ function EditDroner() {
   const [otherAddress, setOtherAddress] =
     useState<AddressEntity>(AddressEntity_INIT);
   const [dataBookBank] = useState<any>();
-
   const [dronerArea, setDronerArea] = useState<DronerAreaEntity>(
     DronerAreaEntity_INIT
   );
@@ -117,6 +116,7 @@ function EditDroner() {
   const [bookBank, setBookBank] = useState<BookBankEntities>(
     BookBankEntities_INIT
   );
+  const [locatNull, setLocatNull] = useState<any>();
   const [imgBB, setImgBB] = useState<any>();
   const [province, setProvince] = useState<ProviceEntity[]>([]);
   const [district, setDistrict] = useState<DistrictEntity[]>([]);
@@ -243,6 +243,10 @@ function EditDroner() {
   }, [dronerId, form]);
   const fetchLocation = useCallback(async (text?: string) => {
     await LocationDatasource.getSubdistrict(0, text).then((res) => {
+      if (res) {
+        const findId = res.find((x) => x.provinceId === 0);
+        setLocatNull(findId);
+      }
       setLocation(res);
     });
   }, []);
@@ -265,9 +269,12 @@ function EditDroner() {
 
   useEffect(() => {
     LocationDatasource.getProvince().then((res) => {
+      // const pushProvince = res;
+      // pushProvince.push({ provinceId: 0, provinceName: "-" });
       setProvince(res);
       setOtherProvince(res);
     });
+
     if (address?.provinceId) {
       LocationDatasource.getDistrict(address.provinceId).then((res) => {
         setDistrict(res);
@@ -294,9 +301,7 @@ function EditDroner() {
     otherAddress.provinceId,
     otherAddress.districtId,
   ]);
-
   //#region data droner
-
   const handleChangeStatus = (e: any) => {
     form.setFieldsValue({
       reason: "",
@@ -726,23 +731,21 @@ function EditDroner() {
       payload.isDelete = false;
       payload.isOpenReceiveTask = true;
     }
-    console.log(payload)
-    // if (!otherAdd.id) {
-    //   OtherAddressDatasource.addOtherAddress(dronerId, otherAdd).then(
-    //     (res) => {}
-    //   );
-    // } else if (otherAdd.id) {
-    //   if (
-    //     otherAdd.provinceId === undefined &&
-    //     otherAdd.districtId === undefined &&
-    //     otherAdd.subdistrictId === undefined
-    //   ) {
-    //     //delete id other address
-    //     console.log(1);
-    //   } else {
-    //     OtherAddressDatasource.updateOtherAddress(otherAdd).then((res) => {});
-    //   }
-    // }
+    if (!otherAdd.id) {
+      OtherAddressDatasource.addOtherAddress(dronerId, otherAdd).then(
+        (res) => {}
+      );
+    } else if (otherAdd.id) {
+      if (
+        otherAdd.provinceId === undefined &&
+        otherAdd.districtId === undefined &&
+        otherAdd.subdistrictId === undefined
+      ) {
+        //delete id other address
+      } else {
+        OtherAddressDatasource.updateOtherAddress(otherAdd).then((res) => {});
+      }
+    }
     if (imgBB) {
       UploadImageDatasouce.uploadImage(imgBB).then((res) => {});
     }
@@ -763,7 +766,7 @@ function EditDroner() {
           timer: 1500,
           showConfirmButton: false,
         }).then((time) => {
-          // navigate("/IndexDroner");
+          navigate("/IndexDroner");
         });
       } else {
         Swal.fire({
@@ -789,6 +792,9 @@ function EditDroner() {
       comment,
       dronerCode,
       status: currentStatus,
+      provinceId,
+      districtId,
+      subdistrictId,
       ...rest
     } = form.getFieldsValue();
     const reasonList = [];
@@ -806,6 +812,7 @@ function EditDroner() {
     if (plantsOther) {
       expPlant.push(...plantsOther);
     }
+
     const isHasValues = Object.values({
       ...rest,
       expPlant: expPlant?.length > 0,
@@ -813,13 +820,18 @@ function EditDroner() {
         reasonList?.length > 0 ||
         (currentStatus !== "REJECTED" && currentStatus !== "INACTIVE"),
     }).every((el) => el);
-
-    if (!isHasError && isHasValues) {
+    if (
+      (!isHasError && isHasValues) ||
+      (address.districtId === 0 &&
+        address.districtId === 0 &&
+        address.subdistrictId === 0)
+    ) {
       setDisableSaveBtn(false);
     } else {
       setDisableSaveBtn(true);
     }
   };
+  // console.log(address);
 
   const renderFromData = (
     <div className="col-lg-7">
@@ -1059,12 +1071,12 @@ function EditDroner() {
               </label>
               <Form.Item
                 name="province"
-                rules={[
-                  {
-                    required: true,
-                    message: "กรุณาเลือกจังหวัด!",
-                  },
-                ]}
+                // rules={[
+                //   {
+                //     required: true,
+                //     message: "กรุณาเลือกจังหวัด!",
+                //   },
+                // ]}
               >
                 <Select
                   showSearch
@@ -1080,7 +1092,11 @@ function EditDroner() {
                   placeholder="เลือกจังหวัด"
                   allowClear
                   onChange={handleProvince}
-                  defaultValue={address.provinceId}
+                  defaultValue={
+                    address.provinceId !== 0
+                      ? address.provinceId
+                      : locatNull?.provinceName
+                  }
                 >
                   {province.map((item: any, index: any) => (
                     <Select.Option key={index} value={item.provinceId}>
@@ -1097,12 +1113,12 @@ function EditDroner() {
               </label>
               <Form.Item
                 name="district"
-                rules={[
-                  {
-                    required: true,
-                    message: "กรุณาเลือกอำเภอ!",
-                  },
-                ]}
+                // rules={[
+                //   {
+                //     required: true,
+                //     message: "กรุณาเลือกอำเภอ!",
+                //   },
+                // ]}
               >
                 <Select
                   showSearch
@@ -1118,7 +1134,14 @@ function EditDroner() {
                   }
                   placeholder="เลือกอำเภอ"
                   onChange={handleDistrict}
-                  defaultValue={address.districtId}
+                  defaultValue={
+                    address.districtId !== 0
+                      ? address.districtId
+                      : locatNull?.districtName
+                  }
+                  disabled={
+                    address.provinceId === undefined || address.provinceId === 0
+                  }
                 >
                   {district.map((item: any, index: any) => (
                     <Select.Option key={index} value={item.districtId}>
@@ -1137,12 +1160,12 @@ function EditDroner() {
               </label>
               <Form.Item
                 name="subdistrict"
-                rules={[
-                  {
-                    required: true,
-                    message: "กรุณาเลือกตำบล!",
-                  },
-                ]}
+                // rules={[
+                //   {
+                //     required: true,
+                //     message: "กรุณาเลือกตำบล!",
+                //   },
+                // ]}
               >
                 <Select
                   allowClear
@@ -1158,7 +1181,14 @@ function EditDroner() {
                   }
                   placeholder="เลือกตำบล"
                   onChange={handleSubDistrict}
-                  defaultValue={address.subdistrictId}
+                  defaultValue={
+                    address.subdistrictId !== 0
+                      ? address.subdistrictId
+                      : locatNull?.subdistrictName
+                  }
+                  disabled={
+                    address.districtId === undefined || address.districtId === 0
+                  }
                 >
                   {subdistrict?.map((item: any, index: any) => (
                     <Select.Option key={index} value={item.subdistrictId}>
@@ -1175,12 +1205,12 @@ function EditDroner() {
               </label>
               <Form.Item
                 name="postcode"
-                rules={[
-                  {
-                    required: true,
-                    message: "กรุณาเลือกรหัสไปรษณีย์!",
-                  },
-                ]}
+                // rules={[
+                //   {
+                //     required: true,
+                //     message: "กรุณาเลือกรหัสไปรษณีย์!",
+                //   },
+                // ]}
               >
                 <Input
                   name="postcode"
@@ -1195,16 +1225,17 @@ function EditDroner() {
           <div className="row">
             <div className="form-group">
               <label>
-                บ้านเลขที่ <span style={{ color: "red" }}>*</span>
+                บ้านเลขที่
+                <span style={{ color: "red" }}>*</span>
               </label>
               <Form.Item
                 name="address1"
-                rules={[
-                  {
-                    required: true,
-                    message: "กรุณากรอกบ้านเลขที่!",
-                  },
-                ]}
+                // rules={[
+                //   {
+                //     required: true,
+                //     message: "กรุณากรอกบ้านเลขที่!",
+                //   },
+                // ]}
               >
                 <Input className="col-lg-12" placeholder="" />
               </Form.Item>
@@ -1218,12 +1249,12 @@ function EditDroner() {
               </label>
               <Form.Item
                 name="address2"
-                rules={[
-                  {
-                    required: true,
-                    message: "กรุณากรอกรายละเอียดที่อยู่บ้าน!",
-                  },
-                ]}
+                // rules={[
+                //   {
+                //     required: true,
+                //     message: "กรุณากรอกรายละเอียดที่อยู่บ้าน!",
+                //   },
+                // ]}
               >
                 <TextArea rows={4} className="col-lg-12" placeholder="" />
               </Form.Item>
@@ -1278,6 +1309,7 @@ function EditDroner() {
                       .toLowerCase()
                       .localeCompare(optionB.children.toLowerCase())
                   }
+                  disabled={!otherAddress.provinceId}
                   placeholder="เลือกอำเภอ"
                   onChange={handleOtherDistrict}
                   defaultValue={
@@ -1313,6 +1345,7 @@ function EditDroner() {
                   }
                   placeholder="เลือกตำบล"
                   onChange={handleOtherSubDistrict}
+                  disabled={!otherAddress.districtId}
                   defaultValue={
                     otherAddress.subdistrictId !== 0
                       ? otherAddress.subdistrictId
