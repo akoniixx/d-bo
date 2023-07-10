@@ -83,4 +83,10 @@ export class NewsDatasource{
         .then(res => {return res.data})
         .catch(err => console.log(err))
     }
+    static checkCountPoint(app : string){
+        return httpClient.
+        get(BASE_URL + `/promotion/news/check-count-pin?application=${app}`)
+        .then(res => {return res.data})
+        .catch(err => console.log(err))
+    }
 }
