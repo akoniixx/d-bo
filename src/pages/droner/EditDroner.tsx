@@ -139,6 +139,7 @@ function EditDroner() {
     lat: LAT_LNG_BANGKOK.lat,
     lng: LAT_LNG_BANGKOK.lng,
   });
+  const [birthDay, setBirthDay] = useState<string>();
   const [location, setLocation] = useState<SubdistrictEntity[]>([]);
   const [searchLocation] = useState("");
 
@@ -165,15 +166,14 @@ function EditDroner() {
           ...res,
           comment: res.comment || "",
           postcode: res.address.postcode || undefined,
-          province: res.address.provinceId || undefined,
-          district: res.address.districtId || undefined,
-          subdistrict: res.address?.subdistrictId || undefined,
+          province: res.address.provinceId || undefined || "-",
+          district: res.address.districtId || undefined || "-",
+          subdistrict: res.address?.subdistrictId || undefined || "-",
           dronerCreatedAt: `${moment(res.createdAt).format("DD/MM/YYYY")} ${
             res.createBy === null || res.createBy === undefined
               ? "(ลงทะเบียนโดยนักบิน)"
               : `(${res.createBy})`
           }`,
-          birthDate: res.birthDate ? moment(res.birthDate) : res.birthDate,
           latitude: res.dronerArea?.lat || undefined,
           longitude: res.dronerArea?.long || undefined,
           address1: res.address?.address1 || undefined,
@@ -269,8 +269,6 @@ function EditDroner() {
 
   useEffect(() => {
     LocationDatasource.getProvince().then((res) => {
-      // const pushProvince = res;
-      // pushProvince.push({ provinceId: 0, provinceName: "-" });
       setProvince(res);
       setOtherProvince(res);
     });
@@ -441,7 +439,6 @@ function EditDroner() {
   };
   const updateDrone = async (drone: DronerDroneEntity) => {
     const d = Map(drone).set("dronerId", dronerId);
-
     if (d.toJS().id !== "") {
       await DronerDroneDatasource.updateDronerDrone(d.toJS()).then(
         async (res) => {
@@ -690,7 +687,7 @@ function EditDroner() {
     const payload = {
       ...data,
       ...values,
-      birthDate: moment(values.birthDate).toISOString(),
+      birthDate: birthDay,
       address: {
         ...address,
         address1: values.address1,
@@ -735,17 +732,19 @@ function EditDroner() {
       OtherAddressDatasource.addOtherAddress(dronerId, otherAdd).then(
         (res) => {}
       );
-    } else if (otherAdd.id) {
-      if (
-        otherAdd.provinceId === undefined &&
-        otherAdd.districtId === undefined &&
-        otherAdd.subdistrictId === undefined
-      ) {
-        //delete id other address
-      } else {
-        OtherAddressDatasource.updateOtherAddress(otherAdd).then((res) => {});
-      }
+    } else if (
+      otherAdd.id &&
+      otherAdd.provinceId === undefined &&
+      otherAdd.districtId === undefined &&
+      otherAdd.subdistrictId === undefined
+    ) {
+      OtherAddressDatasource.deleteOtherAddress(dronerId, otherAddress.id).then(
+        (res) => {}
+      );
+    } else {
+      OtherAddressDatasource.updateOtherAddress(otherAdd).then((res) => {});
     }
+
     if (imgBB) {
       UploadImageDatasouce.uploadImage(imgBB).then((res) => {});
     }
@@ -831,7 +830,6 @@ function EditDroner() {
       setDisableSaveBtn(true);
     }
   };
-  // console.log(address);
 
   const renderFromData = (
     <div className="col-lg-7">
@@ -970,7 +968,7 @@ function EditDroner() {
             </div>
             <div className="form-group col-lg-6">
               <label>วันเดือนปีเกิด</label>
-              <Form.Item name="birthDate">
+              <Form.Item>
                 <DatePicker
                   placeholder="กรอกวันเดือนปีเกิด"
                   locale={locale}
@@ -978,6 +976,10 @@ function EditDroner() {
                   disabledDate={(current) =>
                     current && current > moment().endOf("day")
                   }
+                  defaultValue={moment(data.birthDate)}
+                  onChange={(e) => {
+                    setBirthDay(moment(e).toISOString());
+                  }}
                   className="col-lg-12"
                 />
               </Form.Item>
@@ -1071,12 +1073,12 @@ function EditDroner() {
               </label>
               <Form.Item
                 name="province"
-                // rules={[
-                //   {
-                //     required: true,
-                //     message: "กรุณาเลือกจังหวัด!",
-                //   },
-                // ]}
+                rules={[
+                  {
+                    required: true,
+                    message: "กรุณาเลือกจังหวัด!",
+                  },
+                ]}
               >
                 <Select
                   showSearch
@@ -1107,18 +1109,15 @@ function EditDroner() {
               </Form.Item>
             </div>
             <div className="form-group col-lg-6">
-              <label>
-                อำเภอ
-                <span style={{ color: "red" }}>*</span>
-              </label>
+              <label>อำเภอ</label>
               <Form.Item
                 name="district"
-                // rules={[
-                //   {
-                //     required: true,
-                //     message: "กรุณาเลือกอำเภอ!",
-                //   },
-                // ]}
+                rules={[
+                  {
+                    required: true,
+                    message: "กรุณาเลือกอำเภอ!",
+                  },
+                ]}
               >
                 <Select
                   showSearch
@@ -1160,12 +1159,12 @@ function EditDroner() {
               </label>
               <Form.Item
                 name="subdistrict"
-                // rules={[
-                //   {
-                //     required: true,
-                //     message: "กรุณาเลือกตำบล!",
-                //   },
-                // ]}
+                rules={[
+                  {
+                    required: true,
+                    message: "กรุณาเลือกตำบล!",
+                  },
+                ]}
               >
                 <Select
                   allowClear
@@ -1205,17 +1204,17 @@ function EditDroner() {
               </label>
               <Form.Item
                 name="postcode"
-                // rules={[
-                //   {
-                //     required: true,
-                //     message: "กรุณาเลือกรหัสไปรษณีย์!",
-                //   },
-                // ]}
+                rules={[
+                  {
+                    required: true,
+                    message: "กรุณาเลือกรหัสไปรษณีย์!",
+                  },
+                ]}
               >
                 <Input
                   name="postcode"
                   placeholder="กรอกรหัสไปรษณีย์"
-                  defaultValue={address.postcode}
+                  defaultValue={address.postcode ? address.postcode : "-"}
                   key={address.postcode}
                   disabled
                 />
@@ -1230,14 +1229,17 @@ function EditDroner() {
               </label>
               <Form.Item
                 name="address1"
-                // rules={[
-                //   {
-                //     required: true,
-                //     message: "กรุณากรอกบ้านเลขที่!",
-                //   },
-                // ]}
+                rules={[
+                  {
+                    required: true,
+                    message: "กรุณากรอกบ้านเลขที่!",
+                  },
+                ]}
               >
-                <Input className="col-lg-12" placeholder="" />
+                <Input
+                  className="col-lg-12"
+                  placeholder="กรุณากรอกบ้านเลขที่"
+                />
               </Form.Item>
             </div>
           </div>
@@ -1249,14 +1251,18 @@ function EditDroner() {
               </label>
               <Form.Item
                 name="address2"
-                // rules={[
-                //   {
-                //     required: true,
-                //     message: "กรุณากรอกรายละเอียดที่อยู่บ้าน!",
-                //   },
-                // ]}
+                rules={[
+                  {
+                    required: true,
+                    message: "กรุณากรอกรายละเอียดที่อยู่บ้าน!",
+                  },
+                ]}
               >
-                <TextArea rows={4} className="col-lg-12" placeholder="" />
+                <TextArea
+                  rows={4}
+                  className="col-lg-12"
+                  placeholder="กรุณากรอกรายละเอียดที่อยู่บ้าน"
+                />
               </Form.Item>
             </div>
           </div>

@@ -107,6 +107,7 @@ function AddDroner() {
   const [editDrone, setEditDrone] = useState<DronerDroneEntity>(
     DronerDroneEntity_INIT
   );
+  const [birthDay, setBirthDay] = useState<string>();
   const [saveBtnDisable, setBtnSaveDisable] = useState<boolean>(true);
   const [province, setProvince] = useState<ProviceEntity[]>([
     ProvinceEntity_INIT,
@@ -202,7 +203,6 @@ function AddDroner() {
   };
   //#otherAddress
   const handleOtherProvince = async (otherProvinceId: number) => {
-    console.log(otherProvinceId);
     await getOtherProvince(otherProvinceId, CreateAddressEntity_INIT);
   };
   const getOtherProvince = async (
@@ -521,7 +521,7 @@ function AddDroner() {
       ...pushOtherPlant.toJS(),
       ...values,
       expPlant: expPlant,
-      birthDate: moment(values.birthDate).format("YYYY-MM-DD"),
+      birthDate: birthDay,
       address: {
         ...pushOtherPlant.toJS().address,
         address1: values.address1,
@@ -529,8 +529,8 @@ function AddDroner() {
       },
       otherAddress: {
         ...pushOtherPlant.toJS().otherAddress,
-        address1: values.otherAddress1,
-        address2: values.otherAddress2,
+        address1: otherAddress?.address1,
+        address2: otherAddress?.address2,
       },
       dronerArea: {
         ...pushOtherPlant.toJS().dronerArea,
@@ -602,7 +602,6 @@ function AddDroner() {
       }
     });
   };
-
   const renderFromData = (
     <div className="col-lg-7">
       <CardContainer>
@@ -722,18 +721,8 @@ function AddDroner() {
               </Form.Item>
             </div>
             <div className="form-group col-lg-6">
-              <label>
-                วันเดือนปีเกิด <span style={{ color: "red" }}>*</span>
-              </label>
-              <Form.Item
-                name="birthDate"
-                rules={[
-                  {
-                    required: true,
-                    message: "กรุณากรอกวันเดือนปีเกิด",
-                  },
-                ]}
-              >
+              <label>วันเดือนปีเกิด</label>
+              <Form.Item>
                 <DatePicker
                   placeholder="กรอกวันเดือนปีเกิด"
                   format={dateFormat}
@@ -741,6 +730,9 @@ function AddDroner() {
                   disabledDate={(current) =>
                     current && current > moment().endOf("day")
                   }
+                  onChange={(e) => {
+                    setBirthDay(moment(e).toISOString());
+                  }}
                   className="col-lg-12"
                 />
               </Form.Item>
@@ -878,7 +870,9 @@ function AddDroner() {
               >
                 <Select
                   showSearch
-                  disabled={address.provinceId === 0}
+                  disabled={
+                    address.provinceId === undefined || address.provinceId === 0
+                  }
                   optionFilterProp="children"
                   filterOption={(input: any, option: any) =>
                     option.children.includes(input)
@@ -922,7 +916,9 @@ function AddDroner() {
                 ]}
               >
                 <Select
-                  disabled={address.districtId === 0}
+                  disabled={
+                    address.districtId === undefined || address.districtId === 0
+                  }
                   showSearch
                   optionFilterProp="children"
                   filterOption={(input: any, option: any) =>
@@ -1010,7 +1006,7 @@ function AddDroner() {
           <div className="row">
             <div className="form-group col-lg-6">
               <label>จังหวัด</label>
-              <Form.Item name={"otherProvince"}>
+              <Form.Item>
                 <Select
                   allowClear
                   showSearch
@@ -1025,6 +1021,7 @@ function AddDroner() {
                       .localeCompare(optionB.children.toLowerCase())
                   }
                   onChange={handleOtherProvince}
+                  defaultValue={otherAddress?.provinceId}
                 >
                   {otherProvince?.map((item) => (
                     <Option value={item.provinceId}>{item.provinceName}</Option>
@@ -1034,10 +1031,10 @@ function AddDroner() {
             </div>
             <div className="form-group col-lg-6">
               <label>อำเภอ</label>
-              <Form.Item name={"otherDistrictId"}>
+              <Form.Item>
                 <Select
                   showSearch
-                  disabled={otherAddress?.provinceId === 0}
+                  disabled={otherAddress?.provinceId === undefined}
                   optionFilterProp="children"
                   filterOption={(input: any, option: any) =>
                     option.children.includes(input)
@@ -1054,10 +1051,10 @@ function AddDroner() {
                       otherSubdistrictId: undefined,
                     })
                   }
-                  value={otherAddress?.districtId}
                   placeholder="เลือกอำเภอ"
                   allowClear
                   onChange={handleOtherDistrict}
+                  defaultValue={otherAddress?.districtId}
                 >
                   {otherDistrict?.map((item) => (
                     <Option value={item.districtId}>{item.districtName}</Option>
@@ -1069,9 +1066,12 @@ function AddDroner() {
           <div className="row">
             <div className="form-group col-lg-6">
               <label>ตำบล</label>
-              <Form.Item name={"otherSubdistrictId"}>
+              <Form.Item>
                 <Select
-                  disabled={otherAddress?.districtId === 0}
+                  disabled={
+                    otherAddress?.districtId === undefined ||
+                    otherAddress?.districtId === 0
+                  }
                   showSearch
                   optionFilterProp="children"
                   filterOption={(input: any, option: any) =>
@@ -1082,7 +1082,7 @@ function AddDroner() {
                       .toLowerCase()
                       .localeCompare(optionB.children.toLowerCase())
                   }
-                  value={otherAddress?.subdistrictId}
+                  defaultValue={otherAddress?.subdistrictId}
                   placeholder="เลือกตำบล"
                   allowClear
                   onClear={() =>
@@ -1100,10 +1100,11 @@ function AddDroner() {
             </div>
             <div className="form-group col-lg-6">
               <label>รหัสไปรษณีย์</label>
-              <Form.Item name={"otherPostcode"}>
+              <Form.Item>
                 <Input
                   placeholder="กรอกรหัสไปรษณีย์"
                   key={otherAddress?.subdistrictId}
+                  defaultValue={otherAddress?.postcode}
                   disabled
                 />
               </Form.Item>
@@ -1112,10 +1113,14 @@ function AddDroner() {
           <div className="row">
             <div className="form-group">
               <label>ที่อยู่บ้าน</label>
-              <Form.Item name={"otherAddress1"}>
+              <Form.Item>
                 <Input
                   className="col-lg-12"
                   placeholder="กรุณากรอกบ้านเลขที่"
+                  onChange={(e) => {
+                    const m = Map(otherAddress).set("address1", e.target.value);
+                    setOtherAddress(m.toJS());
+                  }}
                 />
               </Form.Item>
             </div>
@@ -1123,11 +1128,15 @@ function AddDroner() {
           <div className="row">
             <div className="form-group">
               <label>รายละเอียดที่อยู่ (หมู่, ถนน) </label>
-              <Form.Item name={"otherAddress2"}>
+              <Form.Item>
                 <TextArea
                   rows={4}
                   className="col-lg-12"
                   placeholder="กรอกรายละเอียดที่อยู่บ้าน"
+                  onChange={(e) => {
+                    const m = Map(otherAddress).set("address2", e.target.value);
+                    setOtherAddress(m.toJS());
+                  }}
                 />
               </Form.Item>
             </div>
