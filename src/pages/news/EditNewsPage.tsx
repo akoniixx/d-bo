@@ -220,6 +220,8 @@ function EditNewsPage() {
         categoryNews: categoryNews,
         campaignId: campId,
         createBy: profile.firstname + " " + profile.lastname,
+        pinAll: (farmPinAll && farmPinAll) || (dronePinAll && dronePinAll),
+        pinMain: (farmPinMain && farmPinMain) || (dronePinMain && dronePinMain),
       })
         .then((res) => {
           Swal.fire({
@@ -250,6 +252,8 @@ function EditNewsPage() {
         campaignId: campId,
         file: createImgProfile.file,
         createBy: profile.firstname + " " + profile.lastname,
+        pinAll: (farmPinAll && farmPinAll) || (dronePinAll && dronePinAll),
+        pinMain: (farmPinMain && farmPinMain) || (dronePinMain && dronePinMain),
       })
         .then((res) => {
           Swal.fire({
@@ -274,19 +278,20 @@ function EditNewsPage() {
 
   useEffect(() => {
     NewsDatasource.getNewsById(queryString[1]).then((res) => {
-      console.log(res);
+      console.log(res)
       if (res) {
-        NewsDatasource.checkCountPoint(res.application).then((res) => {
-          if (res.responseData.application === "DRONER") {
-            setDroneCountPoint(res.responseData);
-          } else if (res.responseData.application === "FARMER") {
-            setFarmCountPoint(res.responseData);
-          } else if (res.responseData.application === "ALL") {
-            setAllCountPoint(res.responseData);
-          }
+        NewsDatasource.checkCountPoint("DRONER").then((res) => {
+          setDroneCountPoint(res.responseData);
+        });
+        NewsDatasource.checkCountPoint("FARMER").then((res) => {
+          setFarmCountPoint(res.responseData);
+        });
+        NewsDatasource.checkCountPoint("ALL").then((res) => {
+          setAllCountPoint(res.responseData);
         });
 
         if (res.application === "FARMER") {
+          console.log(res.pinAll, res.pinMain);
           setFarmPinMain(res.pinMain);
           setFarmPinAll(res.pinAll);
         } else if (res.application === "DRONER") {
@@ -331,52 +336,7 @@ function EditNewsPage() {
             ? true
             : false,
         createBy: res.createBy,
-        pinAll:
-          res.application === "ALL"
-            ? res.pinAll
-            : res.application === "FARMER"
-            ? res.pinAll
-            : res.application === "DRONER"
-            ? res.pinAll
-            : false,
-        pinMain:
-          res.application === "ALL"
-            ? res.pinMain
-            : res.application === "FARMER"
-            ? res.pinMain
-            : res.application === "DRONER"
-            ? res.pinMain
-            : false,
-
-        // dpinMain:
-        //   res.application === "DRONER" ||
-        //   (res.application === "ALL" && res.pinMain),
-        // dpinAll:
-        //   res.application === "DRONER" ||
-        //   (res.application === "ALL" && res.pinAll),
-        // fpinMain:
-        //   res.application === "FARMER" ||
-        //   (res.application === "ALL" && res.pinMain),
-        // fpinAll:
-        //   res.application === "FARMER" ||
-        //   (res.application === "ALL" && res.pinAll),
       });
-      setFarmPinAll(
-        res.application === "FARMER" ||
-          (res.application === "ALL" && res.pinAll)
-      );
-      setFarmPinMain(
-        res.application === "FARMER" ||
-          (res.application === "ALL" && res.pinMain)
-      );
-      setDronePinAll(
-        res.application === "DRONER" ||
-          (res.application === "ALL" && res.pinAll)
-      );
-      setDronePinMain(
-        res.application === "DRONER" ||
-          (res.application === "ALL" && res.pinMain)
-      );
       setNewsName(res.title);
       setDescriptionEditor(res.details);
       setImgProfile(res.imagePath);
@@ -417,6 +377,7 @@ function EditNewsPage() {
       setCname(res.data);
     });
   }, []);
+
   return (
     <>
       <div className="d-flex align-items-center">
@@ -566,7 +527,6 @@ function EditNewsPage() {
                   style={{ paddingLeft: "3%" }}
                 >
                   <Form.Item
-                    name="pinMain"
                     initialValue={false}
                     valuePropName="checked"
                     className="my-0"
@@ -575,15 +535,13 @@ function EditNewsPage() {
                       onChange={handlePinMain}
                       checked={farmPinMain}
                       className="pt-2"
-                      // disabled={
-                      //   !chooseFarmer || farmCountPoint?.remainPinMain === 0
-                      // }
+                      disabled={!chooseFarmer || farmCountPoint?.disablePinMain}
                     >
                       ปักหมุดในหน้าหลัก
                       <span
                         style={{
                           color:
-                            !chooseFarmer || farmCountPoint?.remainPinMain === 0
+                            !chooseFarmer || farmCountPoint?.disablePinMain
                               ? color.Disable
                               : color.Grey,
                         }}
@@ -593,7 +551,6 @@ function EditNewsPage() {
                     </Checkbox>
                   </Form.Item>
                   <Form.Item
-                    name="pinAll"
                     initialValue={false}
                     valuePropName="checked"
                     className="my-0"
@@ -601,13 +558,13 @@ function EditNewsPage() {
                     <Checkbox
                       onChange={handlePinAll}
                       checked={farmPinAll}
-                      // disabled={  !chooseFarmer || farmCountPoint?.disablePinAll === 0}
+                      disabled={!chooseFarmer || farmCountPoint?.disablePinAll}
                     >
                       ปักหมุดในหน้าข่าวสารทั้งหมด
                       <span
                         style={{
                           color:
-                            !chooseFarmer || farmCountPoint?.remainPinAll === 0
+                            !chooseFarmer || farmCountPoint?.disablePinAll
                               ? color.Disable
                               : color.Grey,
                         }}
@@ -636,7 +593,6 @@ function EditNewsPage() {
                   style={{ paddingLeft: "3%" }}
                 >
                   <Form.Item
-                    name="pinMain"
                     initialValue={false}
                     valuePropName="checked"
                     className="my-0"
@@ -645,20 +601,24 @@ function EditNewsPage() {
                       onChange={handlePinMain}
                       checked={dronePinMain}
                       className="pt-2"
-                      // disabled={!chooseDroner || droneCountPoint?.disablePinAll}
+                      disabled={
+                        !chooseDroner || droneCountPoint?.disablePinMain
+                      }
                     >
                       ปักหมุดในหน้าหลัก
                       <span
                         style={{
-                          color: !chooseDroner ? color.Disable : color.Grey,
+                          color:
+                            !chooseDroner || droneCountPoint?.disablePinMain
+                              ? color.Disable
+                              : color.Grey,
                         }}
                       >
-                        {` (เหลือปักหมุด ${droneCountPoint?.remainPinAll} อัน)`}
+                        {` (เหลือปักหมุด ${droneCountPoint?.remainPinMain} อัน)`}
                       </span>
                     </Checkbox>
                   </Form.Item>
                   <Form.Item
-                    name="pinAll"
                     initialValue={false}
                     valuePropName="checked"
                     className="my-0"
@@ -666,12 +626,15 @@ function EditNewsPage() {
                     <Checkbox
                       onChange={handlePinAll}
                       checked={dronePinAll}
-                      // disabled={droneCountPoint?.disablePinAll}
+                      disabled={!chooseDroner || droneCountPoint?.disablePinAll}
                     >
                       ปักหมุดในหน้าข่าวสารทั้งหมด
                       <span
                         style={{
-                          color: !chooseDroner ? color.Disable : color.Grey,
+                          color:
+                            !chooseDroner || droneCountPoint?.disablePinAll
+                              ? color.Disable
+                              : color.Grey,
                         }}
                       >
                         {` (เหลือปักหมุด ${droneCountPoint?.remainPinAll} อัน)`}

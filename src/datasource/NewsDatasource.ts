@@ -12,6 +12,8 @@ export class NewsDatasource{
         formData.append("application",data.application)
         formData.append("categoryNews",data.categoryNews)
         formData.append("campaignId",data.campaignId)
+        formData.append("pinAll",new Boolean(data.pinAll).toString())
+        formData.append("pinMain",new Boolean(data.pinMain).toString())
         return httpClient
         .post(BASE_URL + "/promotion/news/upload",formData)
         .then(res => {return res.data})
@@ -60,6 +62,8 @@ export class NewsDatasource{
             formData.append("application",data.application)
             formData.append("categoryNews",data.categoryNews)
             formData.append("campaignId",data.campaignId)
+            formData.append("pinAll",new Boolean(data.pinAll).toString())
+            formData.append("pinMain",new Boolean(data.pinMain).toString())
         }
         else{
             formData.append("file",data.file)
@@ -70,6 +74,8 @@ export class NewsDatasource{
             formData.append("application",data.application)
             formData.append("categoryNews",data.categoryNews)
             formData.append("campaignId",data.campaignId)
+            formData.append("pinAll",new Boolean(data.pinAll).toString())
+            formData.append("pinMain",new Boolean(data.pinMain).toString())
         }
         return httpClient
         .post(BASE_URL + `/promotion/news/update/${data.id}`,formData)
