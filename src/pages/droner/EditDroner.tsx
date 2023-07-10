@@ -100,7 +100,6 @@ function EditDroner() {
   const [otherAddress, setOtherAddress] =
     useState<AddressEntity>(AddressEntity_INIT);
   const [dataBookBank] = useState<any>();
-
   const [dronerArea, setDronerArea] = useState<DronerAreaEntity>(
     DronerAreaEntity_INIT
   );
@@ -117,6 +116,7 @@ function EditDroner() {
   const [bookBank, setBookBank] = useState<BookBankEntities>(
     BookBankEntities_INIT
   );
+  const [locatNull, setLocatNull] = useState<any>();
   const [imgBB, setImgBB] = useState<any>();
   const [province, setProvince] = useState<ProviceEntity[]>([]);
   const [district, setDistrict] = useState<DistrictEntity[]>([]);
@@ -139,6 +139,7 @@ function EditDroner() {
     lat: LAT_LNG_BANGKOK.lat,
     lng: LAT_LNG_BANGKOK.lng,
   });
+  const [birthDay, setBirthDay] = useState<string>();
   const [location, setLocation] = useState<SubdistrictEntity[]>([]);
   const [searchLocation] = useState("");
 
@@ -165,15 +166,14 @@ function EditDroner() {
           ...res,
           comment: res.comment || "",
           postcode: res.address.postcode || undefined,
-          province: res.address.provinceId || undefined,
-          district: res.address.districtId || undefined,
-          subdistrict: res.address?.subdistrictId || undefined,
+          province: res.address.provinceId || undefined || "-",
+          district: res.address.districtId || undefined || "-",
+          subdistrict: res.address?.subdistrictId || undefined || "-",
           dronerCreatedAt: `${moment(res.createdAt).format("DD/MM/YYYY")} ${
             res.createBy === null || res.createBy === undefined
               ? "(ลงทะเบียนโดยนักบิน)"
               : `(${res.createBy})`
           }`,
-          birthDate: res.birthDate ? moment(res.birthDate) : res.birthDate,
           latitude: res.dronerArea?.lat || undefined,
           longitude: res.dronerArea?.long || undefined,
           address1: res.address?.address1 || undefined,
@@ -243,6 +243,10 @@ function EditDroner() {
   }, [dronerId, form]);
   const fetchLocation = useCallback(async (text?: string) => {
     await LocationDatasource.getSubdistrict(0, text).then((res) => {
+      if (res) {
+        const findId = res.find((x) => x.provinceId === 0);
+        setLocatNull(findId);
+      }
       setLocation(res);
     });
   }, []);
@@ -268,6 +272,7 @@ function EditDroner() {
       setProvince(res);
       setOtherProvince(res);
     });
+
     if (address?.provinceId) {
       LocationDatasource.getDistrict(address.provinceId).then((res) => {
         setDistrict(res);
@@ -294,9 +299,7 @@ function EditDroner() {
     otherAddress.provinceId,
     otherAddress.districtId,
   ]);
-
   //#region data droner
-
   const handleChangeStatus = (e: any) => {
     form.setFieldsValue({
       reason: "",
@@ -351,14 +354,22 @@ function EditDroner() {
     await handelOtherPostCode(d.toJS());
   };
   const handelOtherPostCode = (add: AddressEntity) => {
-    let filterSubDistrict = otherSubdistrict.filter(
-      (item) => item.subdistrictId === add.subdistrictId
-    )[0].postcode;
-    const m = Map(add).set("postcode", filterSubDistrict);
-    setOtherAddress(m.toJS());
-    form.setFieldsValue({
-      otherPostcode: m.toJS().postcode,
-    });
+    if (add.subdistrictId !== undefined) {
+      let filterSubDistrict = otherSubdistrict.filter(
+        (item) => item.subdistrictId === add.subdistrictId
+      )[0].postcode;
+      const m = Map(add).set("postcode", filterSubDistrict);
+      setOtherAddress(m.toJS());
+      form.setFieldsValue({
+        otherPostcode: m.toJS().postcode,
+      });
+    } else {
+      const m = Map(add).set("postcode", "");
+      setOtherAddress(m.toJS());
+      form.setFieldsValue({
+        otherPostcode: m.toJS().postcode,
+      });
+    }
   };
   const handleAddress1 = (e: any) => {
     const d = Map(otherAddress).set("address1", e.target.value);
@@ -428,7 +439,6 @@ function EditDroner() {
   };
   const updateDrone = async (drone: DronerDroneEntity) => {
     const d = Map(drone).set("dronerId", dronerId);
-
     if (d.toJS().id !== "") {
       await DronerDroneDatasource.updateDronerDrone(d.toJS()).then(
         async (res) => {
@@ -658,7 +668,6 @@ function EditDroner() {
     setBookBank(sumData);
     setDisableSaveBtn(false);
   };
-
   const updateDroner = async (values: any) => {
     const reason = [];
     const splitPlant = values?.plantsOther
@@ -678,7 +687,7 @@ function EditDroner() {
     const payload = {
       ...data,
       ...values,
-      birthDate: moment(values.birthDate).toISOString(),
+      birthDate: birthDay,
       address: {
         ...address,
         address1: values.address1,
@@ -700,9 +709,7 @@ function EditDroner() {
       accountNumber: bookBank.accountNumber
         ? bookBank.accountNumber
         : data.accountNumber,
-      isConsentBookBank: bookBank.isConsentBookBank
-        ? bookBank.isConsentBookBank
-        : data.isConsentBookBank,
+      isConsentBookBank: bookBank.isConsentBookBank,
       isBookBank: !bookBank ? false : true,
       file: imgBB,
     };
@@ -721,15 +728,23 @@ function EditDroner() {
       payload.isDelete = false;
       payload.isOpenReceiveTask = true;
     }
-    if (otherAddress != null) {
-      if (!otherAdd.id) {
-        OtherAddressDatasource.addOtherAddress(dronerId, otherAdd).then(
-          (res) => {}
-        );
-      } else {
-        OtherAddressDatasource.updateOtherAddress(otherAdd).then((res) => {});
-      }
+    if (!otherAdd.id) {
+      OtherAddressDatasource.addOtherAddress(dronerId, otherAdd).then(
+        (res) => {}
+      );
+    } else if (
+      otherAdd.id &&
+      otherAdd.provinceId === undefined &&
+      otherAdd.districtId === undefined &&
+      otherAdd.subdistrictId === undefined
+    ) {
+      OtherAddressDatasource.deleteOtherAddress(dronerId, otherAddress.id).then(
+        (res) => {}
+      );
+    } else {
+      OtherAddressDatasource.updateOtherAddress(otherAdd).then((res) => {});
     }
+
     if (imgBB) {
       UploadImageDatasouce.uploadImage(imgBB).then((res) => {});
     }
@@ -776,6 +791,9 @@ function EditDroner() {
       comment,
       dronerCode,
       status: currentStatus,
+      provinceId,
+      districtId,
+      subdistrictId,
       ...rest
     } = form.getFieldsValue();
     const reasonList = [];
@@ -793,6 +811,7 @@ function EditDroner() {
     if (plantsOther) {
       expPlant.push(...plantsOther);
     }
+
     const isHasValues = Object.values({
       ...rest,
       expPlant: expPlant?.length > 0,
@@ -800,8 +819,12 @@ function EditDroner() {
         reasonList?.length > 0 ||
         (currentStatus !== "REJECTED" && currentStatus !== "INACTIVE"),
     }).every((el) => el);
-
-    if (!isHasError && isHasValues) {
+    if (
+      (!isHasError && isHasValues) ||
+      (address.districtId === 0 &&
+        address.districtId === 0 &&
+        address.subdistrictId === 0)
+    ) {
       setDisableSaveBtn(false);
     } else {
       setDisableSaveBtn(true);
@@ -945,7 +968,7 @@ function EditDroner() {
             </div>
             <div className="form-group col-lg-6">
               <label>วันเดือนปีเกิด</label>
-              <Form.Item name="birthDate">
+              <Form.Item>
                 <DatePicker
                   placeholder="กรอกวันเดือนปีเกิด"
                   locale={locale}
@@ -953,6 +976,10 @@ function EditDroner() {
                   disabledDate={(current) =>
                     current && current > moment().endOf("day")
                   }
+                  defaultValue={moment(data.birthDate)}
+                  onChange={(e) => {
+                    setBirthDay(moment(e).toISOString());
+                  }}
                   className="col-lg-12"
                 />
               </Form.Item>
@@ -992,7 +1019,7 @@ function EditDroner() {
                     backgroundImage: `url(${imgIdCard})`,
                     display: imgIdCard !== undefined ? "block" : "none",
                   }}
-                ></div>
+                />
                 <div className="text-left ps-4 pt-2">
                   {imgIdCard !== undefined && (
                     <>
@@ -1067,7 +1094,11 @@ function EditDroner() {
                   placeholder="เลือกจังหวัด"
                   allowClear
                   onChange={handleProvince}
-                  defaultValue={address.provinceId}
+                  defaultValue={
+                    address.provinceId !== 0
+                      ? address.provinceId
+                      : locatNull?.provinceName
+                  }
                 >
                   {province.map((item: any, index: any) => (
                     <Select.Option key={index} value={item.provinceId}>
@@ -1078,10 +1109,7 @@ function EditDroner() {
               </Form.Item>
             </div>
             <div className="form-group col-lg-6">
-              <label>
-                อำเภอ
-                <span style={{ color: "red" }}>*</span>
-              </label>
+              <label>อำเภอ</label>
               <Form.Item
                 name="district"
                 rules={[
@@ -1105,7 +1133,14 @@ function EditDroner() {
                   }
                   placeholder="เลือกอำเภอ"
                   onChange={handleDistrict}
-                  defaultValue={address.districtId}
+                  defaultValue={
+                    address.districtId !== 0
+                      ? address.districtId
+                      : locatNull?.districtName
+                  }
+                  disabled={
+                    address.provinceId === undefined || address.provinceId === 0
+                  }
                 >
                   {district.map((item: any, index: any) => (
                     <Select.Option key={index} value={item.districtId}>
@@ -1145,7 +1180,14 @@ function EditDroner() {
                   }
                   placeholder="เลือกตำบล"
                   onChange={handleSubDistrict}
-                  defaultValue={address.subdistrictId}
+                  defaultValue={
+                    address.subdistrictId !== 0
+                      ? address.subdistrictId
+                      : locatNull?.subdistrictName
+                  }
+                  disabled={
+                    address.districtId === undefined || address.districtId === 0
+                  }
                 >
                   {subdistrict?.map((item: any, index: any) => (
                     <Select.Option key={index} value={item.subdistrictId}>
@@ -1172,7 +1214,7 @@ function EditDroner() {
                 <Input
                   name="postcode"
                   placeholder="กรอกรหัสไปรษณีย์"
-                  defaultValue={address.postcode}
+                  defaultValue={address.postcode ? address.postcode : "-"}
                   key={address.postcode}
                   disabled
                 />
@@ -1182,7 +1224,8 @@ function EditDroner() {
           <div className="row">
             <div className="form-group">
               <label>
-                บ้านเลขที่ <span style={{ color: "red" }}>*</span>
+                บ้านเลขที่
+                <span style={{ color: "red" }}>*</span>
               </label>
               <Form.Item
                 name="address1"
@@ -1193,7 +1236,10 @@ function EditDroner() {
                   },
                 ]}
               >
-                <Input className="col-lg-12" placeholder="" />
+                <Input
+                  className="col-lg-12"
+                  placeholder="กรุณากรอกบ้านเลขที่"
+                />
               </Form.Item>
             </div>
           </div>
@@ -1212,7 +1258,11 @@ function EditDroner() {
                   },
                 ]}
               >
-                <TextArea rows={4} className="col-lg-12" placeholder="" />
+                <TextArea
+                  rows={4}
+                  className="col-lg-12"
+                  placeholder="กรุณากรอกรายละเอียดที่อยู่บ้าน"
+                />
               </Form.Item>
             </div>
           </div>
@@ -1265,6 +1315,7 @@ function EditDroner() {
                       .toLowerCase()
                       .localeCompare(optionB.children.toLowerCase())
                   }
+                  disabled={!otherAddress.provinceId}
                   placeholder="เลือกอำเภอ"
                   onChange={handleOtherDistrict}
                   defaultValue={
@@ -1300,6 +1351,7 @@ function EditDroner() {
                   }
                   placeholder="เลือกตำบล"
                   onChange={handleOtherSubDistrict}
+                  disabled={!otherAddress.districtId}
                   defaultValue={
                     otherAddress.subdistrictId !== 0
                       ? otherAddress.subdistrictId
@@ -1318,7 +1370,7 @@ function EditDroner() {
               <label>รหัสไปรษณีย์</label>
               <Form.Item>
                 <Input
-                  key={otherAddress.postcode}
+                  key={otherAddress.subdistrictId}
                   placeholder="กรอกรหัสไปรษณีย์"
                   defaultValue={otherAddress.postcode}
                   disabled

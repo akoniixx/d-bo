@@ -1,7 +1,10 @@
-import { Checkbox, Col, Form, Image, Input, Row, Select } from "antd";
+import { Checkbox, Col, Form, Input, Row, Select } from "antd";
 import React, { useEffect, useState } from "react";
 import { color, image } from "../../resource";
-import { numberWithCommas } from "../../utilities/TextFormatter";
+import {
+  numberWithCommas,
+  validateNumber,
+} from "../../utilities/TextFormatter";
 import { CardContainer } from "../card/CardContainer";
 import icon from "../../resource/icon";
 import { resizeFileImg } from "../../utilities/ResizeImage";
@@ -37,6 +40,7 @@ const BookBankDroner: React.FC<BookBankDronerProps> = ({
   dronerId,
 }) => {
   const [form] = Form.useForm();
+  const [formTable] = Form.useForm();
   const [bankImg, setBankImg] = useState<any>();
   const [bank, setBank] = useState<any>();
   const [defaultData, setDefaultData] =
@@ -90,6 +94,20 @@ const BookBankDroner: React.FC<BookBankDronerProps> = ({
     setDataBookBank(pushImg.toJS());
     checkValidate(pushImg.toJS());
   };
+  const onPreviewImg = async () => {
+    let src = bankImg;
+    if (!src) {
+      src = await new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(bankImg);
+        reader.onload = () => resolve(reader.result);
+      });
+    }
+    const image = new Image();
+    image.src = src;
+    const imgWindow = window.open(src);
+    imgWindow?.document.write(image.outerHTML);
+  };
   const removeImg = () => {
     const getImg =
       defaultData.file &&
@@ -113,18 +131,19 @@ const BookBankDroner: React.FC<BookBankDronerProps> = ({
     setDataBookBank(value.toJS());
     checkValidate(value.toJS());
   };
-  const onChangeBankAccountNumber = (e: any) => {
-    const value = Map(dataBookBank).set("accountNumber", e.target.value);
-    setDataBookBank(value.toJS());
-    checkValidate(value.toJS());
-  };
 
   const confirmData = (e: CheckboxChangeEvent) => {
     const value = Map(dataBookBank).set("isConsentBookBank", e.target.checked);
     setDataBookBank(value.toJS());
     checkValidate(value.toJS());
   };
-
+  const checkNumber = (e: React.ChangeEvent<HTMLInputElement>, name: any) => {
+    const { value: inputValue } = e.target;
+    const convertedNumber = validateNumber(inputValue);
+    const value = Map(dataBookBank).set("accountNumber", convertedNumber);
+    setDataBookBank(value.toJS());
+    checkValidate(value.toJS());
+  };
   const checkValidate = async (data: DronerEntity) => {
     callBack(data);
   };
@@ -144,7 +163,7 @@ const BookBankDroner: React.FC<BookBankDronerProps> = ({
             ข้อมูลธนาคาร
           </h4>
           <div className="pt-2">
-            <Image
+            <img
               src={icon.arrowDownWhite}
               style={{ width: "16px", height: "9px" }}
             />
@@ -169,7 +188,13 @@ const BookBankDroner: React.FC<BookBankDronerProps> = ({
                 placeholder="เลือกบัญชีธนาคาร"
                 allowClear
                 onChange={onChangeBankName}
-                defaultValue={defaultData?.bankName}
+                defaultValue={
+                  !defaultData?.bankName ? (
+                    <p style={{ color: color.Disable }}>เลือกบัญชีธนาคาร</p>
+                  ) : (
+                    defaultData?.bankName
+                  )
+                }
               >
                 {bank?.map((item: any, index: any) => (
                   <option key={index} value={item.bankName}>
@@ -213,14 +238,19 @@ const BookBankDroner: React.FC<BookBankDronerProps> = ({
                   required: true,
                   message: "กรุณากรอกเลขบัญชีธนาคาร!",
                 },
+
+                {
+                  pattern: new RegExp(/^[0-9\b]+$/),
+                  message: "กรุณากรอกเลขบัญชีธนาคารให้ถูกต้อง!",
+                },
               ]}
             >
               <Input
-                placeholder="กรอกกรอกเลขบัญชีธนาคาร"
                 type="number"
+                placeholder="กรอกกรอกเลขบัญชีธนาคาร"
                 autoComplete="off"
                 defaultValue={defaultData?.accountNumber}
-                onChange={onChangeBankAccountNumber}
+                onChange={(e) => checkNumber(e, "accountNumber")}
               />
             </Form.Item>
           </div>
@@ -238,7 +268,11 @@ const BookBankDroner: React.FC<BookBankDronerProps> = ({
                 }}
                 gutter={8}
               >
-                <Col span={6} className="align-self-center">
+                <Col
+                  span={6}
+                  className="align-self-center"
+                  onClick={onPreviewImg}
+                >
                   <span
                     style={{
                       backgroundImage: `url(${bankImg})`,
@@ -249,6 +283,7 @@ const BookBankDroner: React.FC<BookBankDronerProps> = ({
                       backgroundRepeat: "no-repeat",
                       backgroundPosition: "center",
                       backgroundSize: "100%",
+                      cursor: "pointer",
                     }}
                   />
                 </Col>

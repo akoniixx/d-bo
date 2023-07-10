@@ -107,6 +107,7 @@ function AddDroner() {
   const [editDrone, setEditDrone] = useState<DronerDroneEntity>(
     DronerDroneEntity_INIT
   );
+  const [birthDay, setBirthDay] = useState<string>();
   const [saveBtnDisable, setBtnSaveDisable] = useState<boolean>(true);
   const [province, setProvince] = useState<ProviceEntity[]>([
     ProvinceEntity_INIT,
@@ -520,7 +521,7 @@ function AddDroner() {
       ...pushOtherPlant.toJS(),
       ...values,
       expPlant: expPlant,
-      birthDate: moment(values.birthDate).format("YYYY-MM-DD"),
+      birthDate: birthDay,
       address: {
         ...pushOtherPlant.toJS().address,
         address1: values.address1,
@@ -528,8 +529,8 @@ function AddDroner() {
       },
       otherAddress: {
         ...pushOtherPlant.toJS().otherAddress,
-        address1: values.otherAddress1,
-        address2: values.otherAddress2,
+        address1: otherAddress?.address1,
+        address2: otherAddress?.address2,
       },
       dronerArea: {
         ...pushOtherPlant.toJS().dronerArea,
@@ -601,7 +602,6 @@ function AddDroner() {
       }
     });
   };
-
   const renderFromData = (
     <div className="col-lg-7">
       <CardContainer>
@@ -721,18 +721,8 @@ function AddDroner() {
               </Form.Item>
             </div>
             <div className="form-group col-lg-6">
-              <label>
-                วันเดือนปีเกิด <span style={{ color: "red" }}>*</span>
-              </label>
-              <Form.Item
-                name="birthDate"
-                rules={[
-                  {
-                    required: true,
-                    message: "กรุณากรอกวันเดือนปีเกิด",
-                  },
-                ]}
-              >
+              <label>วันเดือนปีเกิด</label>
+              <Form.Item>
                 <DatePicker
                   placeholder="กรอกวันเดือนปีเกิด"
                   format={dateFormat}
@@ -740,6 +730,9 @@ function AddDroner() {
                   disabledDate={(current) =>
                     current && current > moment().endOf("day")
                   }
+                  onChange={(e) => {
+                    setBirthDay(moment(e).toISOString());
+                  }}
                   className="col-lg-12"
                 />
               </Form.Item>
@@ -877,7 +870,9 @@ function AddDroner() {
               >
                 <Select
                   showSearch
-                  disabled={address.provinceId === undefined}
+                  disabled={
+                    address.provinceId === undefined || address.provinceId === 0
+                  }
                   optionFilterProp="children"
                   filterOption={(input: any, option: any) =>
                     option.children.includes(input)
@@ -921,7 +916,9 @@ function AddDroner() {
                 ]}
               >
                 <Select
-                  disabled={address.districtId === undefined}
+                  disabled={
+                    address.districtId === undefined || address.districtId === 0
+                  }
                   showSearch
                   optionFilterProp="children"
                   filterOption={(input: any, option: any) =>
@@ -1024,7 +1021,7 @@ function AddDroner() {
                       .localeCompare(optionB.children.toLowerCase())
                   }
                   onChange={handleOtherProvince}
-                  key={otherAddress?.provinceId}
+                  defaultValue={otherAddress?.provinceId}
                 >
                   {otherProvince?.map((item) => (
                     <Option value={item.provinceId}>{item.provinceName}</Option>
@@ -1054,10 +1051,10 @@ function AddDroner() {
                       otherSubdistrictId: undefined,
                     })
                   }
-                  value={otherAddress?.districtId}
                   placeholder="เลือกอำเภอ"
                   allowClear
                   onChange={handleOtherDistrict}
+                  defaultValue={otherAddress?.districtId}
                 >
                   {otherDistrict?.map((item) => (
                     <Option value={item.districtId}>{item.districtName}</Option>
@@ -1071,7 +1068,10 @@ function AddDroner() {
               <label>ตำบล</label>
               <Form.Item>
                 <Select
-                  disabled={otherAddress?.districtId === undefined}
+                  disabled={
+                    otherAddress?.districtId === undefined ||
+                    otherAddress?.districtId === 0
+                  }
                   showSearch
                   optionFilterProp="children"
                   filterOption={(input: any, option: any) =>
@@ -1082,7 +1082,7 @@ function AddDroner() {
                       .toLowerCase()
                       .localeCompare(optionB.children.toLowerCase())
                   }
-                  value={otherAddress?.subdistrictId}
+                  defaultValue={otherAddress?.subdistrictId}
                   placeholder="เลือกตำบล"
                   allowClear
                   onClear={() =>
@@ -1104,6 +1104,7 @@ function AddDroner() {
                 <Input
                   placeholder="กรอกรหัสไปรษณีย์"
                   key={otherAddress?.subdistrictId}
+                  defaultValue={otherAddress?.postcode}
                   disabled
                 />
               </Form.Item>
@@ -1116,6 +1117,10 @@ function AddDroner() {
                 <Input
                   className="col-lg-12"
                   placeholder="กรุณากรอกบ้านเลขที่"
+                  onChange={(e) => {
+                    const m = Map(otherAddress).set("address1", e.target.value);
+                    setOtherAddress(m.toJS());
+                  }}
                 />
               </Form.Item>
             </div>
@@ -1128,6 +1133,10 @@ function AddDroner() {
                   rows={4}
                   className="col-lg-12"
                   placeholder="กรอกรายละเอียดที่อยู่บ้าน"
+                  onChange={(e) => {
+                    const m = Map(otherAddress).set("address2", e.target.value);
+                    setOtherAddress(m.toJS());
+                  }}
                 />
               </Form.Item>
             </div>

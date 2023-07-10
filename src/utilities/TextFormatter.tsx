@@ -44,3 +44,9 @@ export function validateOnlyNumWDecimal(t: string): string {
   const convertedNumber = inputValue.replace(/^0+|[^0-9.]/g, "");
   return convertedNumber;
 }
+
+export function validateNumber(t: string): string {
+  const inputValue = t;
+  const convertedNumber = inputValue.replace(/\D+/g, "");
+  return convertedNumber;
+}

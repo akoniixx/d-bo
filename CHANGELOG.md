@@ -1,5 +1,10 @@
 ## [Version - 0]
 
+## improve [v0.34.18] 2023-07-10
+
+- fixed defect other address & address droner
+- fixed defect book bank
+
 ## improve [v0.34.17] 2023-07-05
 
 - display 2 image task finished
