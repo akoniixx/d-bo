@@ -35,4 +35,14 @@ export class OtherAddressDatasource {
         console.log(err, "err addDronerAddressById");
       });
   }
+  static async deleteOtherAddress(dronerId: string, otherAddressId: string): Promise<any> {
+    return httpClient
+      .delete(BASE_URL + `/droner/delete-other-address?dronerId=${dronerId}&otherAddressId=${otherAddressId}`)
+      .then((res) => {
+        return res.data;
+      })
+      .catch((err) => {
+        console.log(err, "err deleteOtherAddress");
+      });
+  }
 }
