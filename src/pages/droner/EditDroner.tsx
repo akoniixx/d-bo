@@ -730,8 +730,6 @@ function EditDroner() {
       payload.isDelete = false;
       payload.isOpenReceiveTask = true;
     }
-    console.log(payload);
-
     if (
       !otherAdd.id &&
       otherAdd.provinceId !== 0 &&
