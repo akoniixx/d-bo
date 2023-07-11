@@ -229,7 +229,6 @@ function AddNewsPage() {
     }
     setBtnSaveDisable(fieldInfo || fieldapp || fieldimg || fieldCateGory);
   };
-console.log(dronePinAll, dronePinMain)
   const onSubmit = () => {
     const { newsName, newsDescription, newsStatus } = form.getFieldsValue();
     NewsDatasource.addNews({
@@ -251,7 +250,7 @@ console.log(dronePinAll, dronePinMain)
           timer: 1500,
           showConfirmButton: false,
         }).then((time) => {
-          // navigate("/NewsPage");
+          navigate("/NewsPage");
         });
       })
       .catch((err) => {
@@ -406,7 +405,6 @@ console.log(dronePinAll, dronePinMain)
                 >
                   <Form.Item
                     initialValue={false}
-                    name="mainPageFarmer"
                     valuePropName="checked"
                     className="my-0"
                   >
@@ -431,7 +429,6 @@ console.log(dronePinAll, dronePinMain)
                   </Form.Item>
                   <Form.Item
                     initialValue={false}
-                    name="allNewsFarmer"
                     valuePropName="checked"
                     className="my-0"
                   >
@@ -474,7 +471,6 @@ console.log(dronePinAll, dronePinMain)
                 >
                   <Form.Item
                     initialValue={false}
-                    name="mainPageDroner"
                     valuePropName="checked"
                     className="my-0"
                   >
@@ -501,7 +497,6 @@ console.log(dronePinAll, dronePinMain)
                   </Form.Item>
                   <Form.Item
                     initialValue={false}
-                    name="allNewsDroner"
                     valuePropName="checked"
                     className="my-0"
                   >

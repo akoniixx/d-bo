@@ -27,6 +27,7 @@ function EditNewsPage() {
   let queryString = _.split(window.location.pathname, "=");
   const profile = JSON.parse(localStorage.getItem("profile") || "{  }");
   const [imgProfile, setImgProfile] = useState<any>();
+  const [status, setStatus] = useState<any>();
   const [chooseFarmer, setChooseFarmer] = useState<boolean>(false);
   const [chooseDroner, setChooseDroner] = useState<boolean>(false);
   const [chooseChallenge, setChooseChallenge] = useState<boolean>(false);
@@ -38,7 +39,6 @@ function EditNewsPage() {
   const [newsName, setNewsName] = useState<string>("");
   const [farmCountPoint, setFarmCountPoint] = useState<any>();
   const [droneCountPoint, setDroneCountPoint] = useState<any>();
-  const [allCountPoint, setAllCountPoint] = useState<any>();
   const [farmPinMain, setFarmPinMain] = useState<boolean>(false);
   const [farmPinAll, setFarmPinAll] = useState<boolean>(false);
   const [dronePinMain, setDronePinMain] = useState<boolean>(false);
@@ -278,7 +278,6 @@ function EditNewsPage() {
 
   useEffect(() => {
     NewsDatasource.getNewsById(queryString[1]).then((res) => {
-      console.log(res)
       if (res) {
         NewsDatasource.checkCountPoint("DRONER").then((res) => {
           setDroneCountPoint(res.responseData);
@@ -286,20 +285,10 @@ function EditNewsPage() {
         NewsDatasource.checkCountPoint("FARMER").then((res) => {
           setFarmCountPoint(res.responseData);
         });
-        NewsDatasource.checkCountPoint("ALL").then((res) => {
-          setAllCountPoint(res.responseData);
-        });
-
         if (res.application === "FARMER") {
-          console.log(res.pinAll, res.pinMain);
           setFarmPinMain(res.pinMain);
           setFarmPinAll(res.pinAll);
         } else if (res.application === "DRONER") {
-          setDronePinMain(res.pinMain);
-          setDronePinAll(res.pinAll);
-        } else if (res.application === "ALL") {
-          setFarmPinMain(res.pinMain);
-          setFarmPinAll(res.pinAll);
           setDronePinMain(res.pinMain);
           setDronePinAll(res.pinAll);
         }
@@ -337,6 +326,7 @@ function EditNewsPage() {
             : false,
         createBy: res.createBy,
       });
+      setStatus(res.status);
       setNewsName(res.title);
       setDescriptionEditor(res.details);
       setImgProfile(res.imagePath);
@@ -377,7 +367,6 @@ function EditNewsPage() {
       setCname(res.data);
     });
   }, []);
-
   return (
     <>
       <div className="d-flex align-items-center">
@@ -518,6 +507,7 @@ function EditNewsPage() {
                     onChange={handleChooseFarmer}
                     checked={chooseFarmer}
                     className="pt-2"
+                    disabled={chooseDroner}
                   >
                     Farmer Application
                   </Checkbox>
@@ -533,15 +523,26 @@ function EditNewsPage() {
                   >
                     <Checkbox
                       onChange={handlePinMain}
-                      checked={farmPinMain}
+                      checked={
+                        status === "DRAFTING" &&
+                        farmCountPoint?.remainPinMain === 0
+                          ? false
+                          : farmPinMain
+                      }
                       className="pt-2"
-                      disabled={!chooseFarmer || farmCountPoint?.disablePinMain}
+                      disabled={
+                        (status === "DRAFTING" &&
+                          farmCountPoint?.remainPinMain === 0) ||
+                        !chooseFarmer ||
+                        (farmCountPoint?.disablePinMain && !farmPinMain)
+                      }
                     >
                       ปักหมุดในหน้าหลัก
                       <span
                         style={{
                           color:
-                            !chooseFarmer || farmCountPoint?.disablePinMain
+                            !chooseFarmer ||
+                            (farmCountPoint?.disablePinMain && !farmPinMain)
                               ? color.Disable
                               : color.Grey,
                         }}
@@ -557,14 +558,25 @@ function EditNewsPage() {
                   >
                     <Checkbox
                       onChange={handlePinAll}
-                      checked={farmPinAll}
-                      disabled={!chooseFarmer || farmCountPoint?.disablePinAll}
+                      checked={
+                        status === "DRAFTING" &&
+                        farmCountPoint?.remainPinAll === 0
+                          ? false
+                          : farmPinAll
+                      }
+                      disabled={
+                        (status === "DRAFTING" &&
+                          farmCountPoint?.remainPinAll === 0) ||
+                        !chooseFarmer ||
+                        (farmCountPoint?.disablePinAll && !farmPinAll)
+                      }
                     >
                       ปักหมุดในหน้าข่าวสารทั้งหมด
                       <span
                         style={{
                           color:
-                            !chooseFarmer || farmCountPoint?.disablePinAll
+                            !chooseFarmer ||
+                            (farmCountPoint?.disablePinAll && !farmPinAll)
                               ? color.Disable
                               : color.Grey,
                         }}
@@ -584,6 +596,7 @@ function EditNewsPage() {
                     onChange={handleChooseDroner}
                     checked={chooseDroner}
                     className="mt-0"
+                    disabled={chooseFarmer}
                   >
                     Droner Application
                   </Checkbox>
@@ -599,17 +612,28 @@ function EditNewsPage() {
                   >
                     <Checkbox
                       onChange={handlePinMain}
-                      checked={dronePinMain}
+                      checked={
+                        status === "DRAFTING" &&
+                        droneCountPoint?.remainPinMain === 0
+                          ? false
+                          : dronePinMain
+                      }
                       className="pt-2"
                       disabled={
-                        !chooseDroner || droneCountPoint?.disablePinMain
+                        (status === "DRAFTING" &&
+                          droneCountPoint?.remainPinMain === 0) ||
+                        !chooseDroner ||
+                        (droneCountPoint?.disablePinMain && !dronePinMain)
                       }
                     >
                       ปักหมุดในหน้าหลัก
                       <span
                         style={{
                           color:
-                            !chooseDroner || droneCountPoint?.disablePinMain
+                            (status === "DRAFTING" &&
+                              droneCountPoint?.remainPinMain === 0) ||
+                            !chooseDroner ||
+                            (droneCountPoint?.disablePinMain && !dronePinMain)
                               ? color.Disable
                               : color.Grey,
                         }}
@@ -625,14 +649,23 @@ function EditNewsPage() {
                   >
                     <Checkbox
                       onChange={handlePinAll}
-                      checked={dronePinAll}
-                      disabled={!chooseDroner || droneCountPoint?.disablePinAll}
+                      checked={
+                        status === "DRAFTING" &&
+                        droneCountPoint?.remainPinAll === 0
+                          ? false
+                          : dronePinAll
+                      }
+                      disabled={
+                        !chooseDroner ||
+                        (droneCountPoint?.disablePinAll && !dronePinAll)
+                      }
                     >
                       ปักหมุดในหน้าข่าวสารทั้งหมด
                       <span
                         style={{
                           color:
-                            !chooseDroner || droneCountPoint?.disablePinAll
+                            !chooseDroner ||
+                            (droneCountPoint?.disablePinAll && !dronePinAll)
                               ? color.Disable
                               : color.Grey,
                         }}
