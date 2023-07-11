@@ -7,5 +7,7 @@ export interface NewsEntities{
     application : string;
     categoryNews: string;
     campaignId: string;
+    pinAll: boolean;
+    pinMain: boolean;
     file? : any;
 }

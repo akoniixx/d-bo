@@ -2,8 +2,8 @@ import React, { useEffect, useState } from "react";
 import Search from "antd/lib/input/Search";
 import Select from "antd/lib/select";
 import { Option } from "antd/lib/mentions";
-import { Badge, Button, Pagination, Table, Tooltip } from "antd";
-import { color } from "../../resource";
+import { Badge, Button, Image, Pagination, Table, Tooltip } from "antd";
+import { color, icon } from "../../resource";
 import ActionButton from "../../components/button/ActionButton";
 import {
   CaretDownOutlined,
@@ -65,7 +65,8 @@ function NewsPage() {
       status,
       sortField,
       sortDirection,
-      search
+      search,
+      "BO"
     ).then((res) => {
       setData({
         count: res.count,
@@ -90,7 +91,6 @@ function NewsPage() {
   };
 
   const deleteNews = (id: string, path: string) => {
-    console.log(id, path);
     NewsDatasource.deleteNews(id, path)
       .then((res) => {
         setModalDelete(!modalDelete);
@@ -347,6 +347,23 @@ function NewsPage() {
           children: (
             <div className="container">
               <span className="text-dark-75  d-block font-size-lg">
+                {row.pin_all === true || row.pin_main === true ? (
+                  <Tooltip
+                    title={`ปักหมุด : ${
+                      row.pin_main === true ? "หน้าหลัก" : ""
+                    }
+                    ${
+                      row.pin_all === true && row.pin_main === true ? "," : ""
+                    }${row.pin_all === true ? "หน้าข่าวสารทั้งหมด" : ""}`}
+                  >
+                    <Image
+                      preview={false}
+                      src={icon.pin}
+                      style={{ width: "22", height: "22px", paddingRight: 5 }}
+                    />
+                  </Tooltip>
+                ) : null}
+
                 {row.title}
               </span>
             </div>

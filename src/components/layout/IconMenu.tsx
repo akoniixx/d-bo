@@ -14,50 +14,45 @@ import { color, icon } from "../../resource";
 
 export const IconMenu = {
   task: (
-    <ProfileFilled
-      style={{
-        fontSize: "16px",
-        color: "#231F20",
-      }}
+    <Image
+      src={icon.task_inactive}
+      preview={false}
+      style={{ width: 18, height: 22, color: color.BK, paddingBottom: 4 }}
     />
   ),
   IndexFarmer: (
-    <ContactsFilled
-      style={{
-        fontSize: "16px",
-        color: "#231F20",
-      }}
+    <Image
+      src={icon.farmer_inactive}
+      preview={false}
+      style={{ width: 18, height: 22, color: color.BK, paddingBottom: 4 }}
     />
   ),
   news: (
-    <GiftFilled
-      style={{
-        fontSize: "16px",
-        color: "#231F20",
-      }}
+    <Image
+      src={icon.news_inactive}
+      preview={false}
+      style={{ width: 18, height: 22, color: color.BK, paddingBottom: 4 }}
     />
   ),
   droner: (
-    <MacCommandFilled
-      style={{
-        fontSize: "16px",
-        color: "#231F20",
-      }}
+    <Image
+      src={icon.droner_inactive}
+      preview={false}
+      style={{ width: 18, height: 22, color: color.BK, paddingBottom: 4 }}
     />
   ),
   campaign: (
     <Image
       src={icon.pointRankInActive}
       preview={false}
-      style={{ width: 18, height: 22, color: color.BK, paddingBottom: 4 }}
+      style={{ width: 19, height: 22, color: color.BK, paddingBottom: 4 }}
     />
   ),
   admin: (
-    <UserOutlined
-      style={{
-        fontSize: "16px",
-        color: "#231F20",
-      }}
+    <Image
+      src={icon.admin_inactive}
+      preview={false}
+      style={{ width: 18, height: 22, color: color.BK, paddingBottom: 4 }}
     />
   ),
   setting: (
@@ -78,35 +73,31 @@ export const IconMenu = {
 };
 export const IconMenuInActive = {
   task: (
-    <ProfileFilled
-      style={{
-        fontSize: "16px",
-        color: "#FFCA37",
-      }}
+    <Image
+      src={icon.task_active}
+      preview={false}
+      style={{ width: 18, height: 22, color: color.BK, paddingBottom: 4 }}
     />
   ),
   IndexFarmer: (
-    <ContactsFilled
-      style={{
-        fontSize: "16px",
-        color: "#FFCA37",
-      }}
+    <Image
+      src={icon.farmer_active}
+      preview={false}
+      style={{ width: 18, height: 22, color: color.BK, paddingBottom: 4 }}
     />
   ),
   news: (
-    <GiftFilled
-      style={{
-        fontSize: "16px",
-        color: "#FFCA37",
-      }}
+    <Image
+      src={icon.news_active}
+      preview={false}
+      style={{ width: 18, height: 22, color: color.BK, paddingBottom: 4 }}
     />
   ),
   droner: (
-    <MacCommandFilled
-      style={{
-        fontSize: "16px",
-        color: "#FFCA37",
-      }}
+    <Image
+      src={icon.droner_active}
+      preview={false}
+      style={{ width: 18, height: 22, color: color.BK, paddingBottom: 4 }}
     />
   ),
   campaign: (
@@ -117,11 +108,10 @@ export const IconMenuInActive = {
     />
   ),
   admin: (
-    <UserOutlined
-      style={{
-        fontSize: "16px",
-        color: "#FFCA37",
-      }}
+    <Image
+      src={icon.admin_active}
+      preview={false}
+      style={{ width: 18, height: 19, color: color.BK, paddingBottom: 4 }}
     />
   ),
   setting: (

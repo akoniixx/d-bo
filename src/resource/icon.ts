@@ -29,6 +29,16 @@ export default {
   targetActive: require("./media/images/target-active.png"),
   targetInActive: require("./media/images/target-inactive.png"),
   quotaReport: require("./media/images/quotaReport_inactive.png"),
-  arrowDownWhite : require('./media/images/arrow_down_white.png')
-
+  arrowDownWhite: require("./media/images/arrow_down_white.png"),
+  pin: require("./media/images/pin.png"),
+  task_active: require("./media/images/task_active.png"),
+  task_inactive: require("./media/images/task_inactive.png"),
+  news_active: require("./media/images/news_active.png"),
+  news_inactive: require("./media/images/news_inactive.png"),
+  farmer_active: require("./media/images/farmer_active.png"),
+  farmer_inactive: require("./media/images/farmer_inactive.png"),
+  droner_inactive: require("./media/images/droner_inactive.png"),
+  droner_active: require("./media/images/droner_active.png"),
+  admin_inactive: require("./media/images/admin_inactive.png"),
+  admin_active: require("./media/images/admin_active.png"),
 };
