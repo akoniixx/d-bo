@@ -11,8 +11,6 @@ import { resizeFileImg } from "../../utilities/ResizeImage";
 import { DeleteOutlined } from "@ant-design/icons";
 import { BookBankDatasource } from "../../datasource/BookBankDatasource";
 import {
-  BookBankEntities,
-  BookBankEntities_INIT,
   DronerEntity,
   DronerEntity_INIT,
 } from "../../entities/DronerEntities";
@@ -132,11 +130,12 @@ const BookBankDroner: React.FC<BookBankDronerProps> = ({
     checkValidate(value.toJS());
   };
 
-  const confirmData = (e: CheckboxChangeEvent) => {
+  const confirmData = (e: any) => {
     const value = Map(dataBookBank).set("isConsentBookBank", e.target.checked);
     setDataBookBank(value.toJS());
     checkValidate(value.toJS());
   };
+
   const checkNumber = (e: React.ChangeEvent<HTMLInputElement>, name: any) => {
     const { value: inputValue } = e.target;
     const convertedNumber = validateNumber(inputValue);

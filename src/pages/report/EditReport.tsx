@@ -245,7 +245,7 @@ function EditReport() {
           </Form.Item>
           <div className="row">
             <div className="col-lg">
-              <label>ภาพ Controller ควบคุม </label>
+              <label>ภาพหลักฐานการบิน</label>
               <br />
               <ImagCards
                 imageName={

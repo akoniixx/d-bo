@@ -347,11 +347,10 @@ function NewsPage() {
           children: (
             <div className="container">
               <span className="text-dark-75  d-block font-size-lg">
-                {row.pin_all === true || row.pin_main === true ? (
+                {(row.status === "ACTIVE" && row.pin_all === true) ||
+                (row.status === "ACTIVE" && row.pin_main === true) ? (
                   <Tooltip
-                    title={`ปักหมุด : ${
-                      row.pin_main === true ? "หน้าหลัก" : ""
-                    }
+                    title={`ปักหมุด : ${row.pin_main === true ? "หน้าหลัก" : ""}
                     ${
                       row.pin_all === true && row.pin_main === true ? "," : ""
                     }${row.pin_all === true ? "หน้าข่าวสารทั้งหมด" : ""}`}
