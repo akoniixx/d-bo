@@ -344,12 +344,9 @@ const ModalDrone: React.FC<ModalDroneProps> = ({
     serise?: DroneBrandEntity,
     img?: any
   ) => {
-    let checkEmptyMain = ![
-      main.droneId,
-      main.serialNo,
-      main.status,
-      serise?.name,
-    ].includes("");
+    let checkEmptyMain = ![main.droneId, main.status, serise?.name].includes(
+      ""
+    );
     setBtnSaveDisable(checkEmptyMain ? false : true);
   };
   const checkValidateReason = (
@@ -404,7 +401,11 @@ const ModalDrone: React.FC<ModalDroneProps> = ({
                 placeholder="เลือกยี่ห้อโดรน"
                 allowClear
                 onChange={handleBrand}
-                defaultValue={dataDrone.drone.droneBrandId}
+                defaultValue={
+                  dataDrone.drone.droneBrandId
+                    ? dataDrone.drone.droneBrandId
+                    : undefined
+                }
               >
                 {droneList?.map((item: any) => (
                   <Option value={item.id}>{item.name}</Option>
@@ -428,7 +429,7 @@ const ModalDrone: React.FC<ModalDroneProps> = ({
               <Select
                 placeholder="เลือกรุ่น"
                 allowClear
-                defaultValue={dataDrone.droneId}
+                defaultValue={dataDrone.droneId ? dataDrone.droneId : undefined}
                 onChange={handleSeries}
               >
                 {searchSeriesDrone?.map((item: any, index: any) => (
@@ -440,18 +441,8 @@ const ModalDrone: React.FC<ModalDroneProps> = ({
             </Form.Item>
           </div>
           <div className="form-group ">
-            <label>
-              เลขตัวถังโดรน <span style={{ color: "red" }}>*</span>
-            </label>
-            <Form.Item
-              name="serialNo"
-              rules={[
-                {
-                  required: true,
-                  message: "กรุณากรอกเลขตัวถังโดรน",
-                },
-              ]}
-            >
+            <label>เลขตัวถังโดรน</label>
+            <Form.Item>
               <Input
                 onChange={handleSerialNo}
                 placeholder="กรอกเลขตัวถังโดรน"
@@ -479,7 +470,11 @@ const ModalDrone: React.FC<ModalDroneProps> = ({
                   className="col-lg-6"
                   placeholder="เลือกเดือน"
                   onChange={handleMonth}
-                  defaultValue={dataDrone.purchaseMonth}
+                  defaultValue={
+                    dataDrone.purchaseMonth
+                      ? dataDrone.purchaseMonth
+                      : undefined
+                  }
                 >
                   {MONTH_SALE.map((item) => (
                     <Option value={item.name}>{item.name}</Option>
@@ -609,6 +604,7 @@ const ModalDrone: React.FC<ModalDroneProps> = ({
             <label>หมายเหตุ</label>
             <TextArea
               value={dataDrone.comment}
+              placeholder="กรอกหมายเหตุ"
               onChange={(e) => {
                 setDataDrone((prev) => ({
                   ...prev,

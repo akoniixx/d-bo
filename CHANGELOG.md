@@ -1,5 +1,11 @@
 ## [Version - 0]
 
+## improve [v0.34.21] 2023-07-11
+
+- fixed wording image finished task
+- status inactive hide icon pin
+- fixed isConsentBookBank
+
 ## improve [v0.34.20] 2023-07-11
 
 - fixed birthDay & other address & isConsentBookBank

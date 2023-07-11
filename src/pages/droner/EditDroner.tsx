@@ -126,6 +126,7 @@ function EditDroner() {
   const [otherSubdistrict, setOtherSubdistrict] = useState<SubdistrictEntity[]>(
     []
   );
+  const [isConSent, setIsConSent] = useState<any>();
   const [imgProfile, setImgProfile] = useState<any>();
   const [imgIdCard, setImgIdCard] = useState<any>();
   const [createImgProfile, setCreateImgProfile] =
@@ -452,11 +453,13 @@ function EditDroner() {
                 (y) => !drone.file.map((z) => z.category).includes(y.category)
               );
             if (!!checkFileImg) {
-              UploadImageDatasouce.deleteImage(
-                checkFileImg[0].id,
-                checkFileImg[0].path
-              ).then(res);
-              fetchDronerById();
+              if (!!checkFileImg === false) {
+                UploadImageDatasouce.deleteImage(
+                  checkFileImg[0].id,
+                  checkFileImg[0].path
+                ).then(res);
+                fetchDronerById();
+              }
             } else {
               for (let i: number = 0; drone.file.length > i; i++) {
                 let getImg = drone.file[i];
@@ -471,7 +474,6 @@ function EditDroner() {
               const checkImg = (imgDroneList || []).filter(
                 (x) => x.resourceId !== ""
               );
-
               for (let k = 0; checkImg.length > k; k++) {
                 let getDataImg: any = checkImg[k];
                 if (!!getDataImg.file) {
@@ -653,16 +655,19 @@ function EditDroner() {
       data.includes("+");
     return data.trim().length !== 0 ? (checkSyntax ? true : false) : true;
   };
-  const insertBookBank = (data: DronerEntity) => {
+  const insertBookBank = (e: DronerEntity) => {
     const sumData = {
-      bankName: data.bankName,
-      bankAccountName: data.bankAccountName,
-      accountNumber: data.accountNumber,
-      isConsentBookBank: data.isConsentBookBank,
-      isBookBank: data.isConsentBookBank,
+      bankName: e.bankName,
+      bankAccountName: e.bankAccountName,
+      accountNumber: e.accountNumber,
+      isConsentBookBank: e.isConsentBookBank,
+      isBookBank: e.isConsentBookBank,
     };
-    const filterImg = data.file.find((x: any) => x.category === "BOOK_BANK");
+    const filterImg = e.file.find((x: any) => x.category === "BOOK_BANK");
     const mapId = Map(filterImg).set("resourceId", dronerId);
+    const mapIsCons = Map(data).set("isConsentBookBank", e.isConsentBookBank);
+    setIsConSent(mapIsCons.toJS());
+
     setImgBB(mapId.toJS());
     setBookBank(sumData);
     setDisableSaveBtn(false);
@@ -709,10 +714,19 @@ function EditDroner() {
       accountNumber: bookBank.accountNumber
         ? bookBank.accountNumber
         : data.accountNumber,
-      isConsentBookBank: bookBank.isConsentBookBank
-        ? bookBank.isConsentBookBank
-        : data.isConsentBookBank,
-      isBookBank: !bookBank ? false : true,
+      isConsentBookBank:
+        isConSent !== undefined
+          ? isConSent.isConsentBookBank
+          : data.isConsentBookBank,
+      isBookBank:
+        !bookBank.accountNumber &&
+        !data.accountNumber &&
+        !bookBank.bankName &&
+        !data.bankName &&
+        !bookBank.bankAccountName &&
+        !data.bankAccountName
+          ? false
+          : true,
       file: imgBB,
     };
     const otherAdd = {
