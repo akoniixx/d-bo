@@ -1,5 +1,9 @@
 ## [Version - 0]
 
+## improve [v0.34.20] 2023-07-11
+
+- fixed birthDay & other address & isConsentBookBank
+
 ## improve [v0.34.19] 2023-07-11
 
 - added pin in news menu

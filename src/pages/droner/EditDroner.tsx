@@ -307,7 +307,6 @@ function EditDroner() {
       status: e.target.value,
     });
   };
-
   //#endregion
 
   //#region address
@@ -668,6 +667,7 @@ function EditDroner() {
     setBookBank(sumData);
     setDisableSaveBtn(false);
   };
+
   const updateDroner = async (values: any) => {
     const reason = [];
     const splitPlant = values?.plantsOther
@@ -709,7 +709,9 @@ function EditDroner() {
       accountNumber: bookBank.accountNumber
         ? bookBank.accountNumber
         : data.accountNumber,
-      isConsentBookBank: bookBank.isConsentBookBank,
+      isConsentBookBank: bookBank.isConsentBookBank
+        ? bookBank.isConsentBookBank
+        : data.isConsentBookBank,
       isBookBank: !bookBank ? false : true,
       file: imgBB,
     };
@@ -728,21 +730,28 @@ function EditDroner() {
       payload.isDelete = false;
       payload.isOpenReceiveTask = true;
     }
-    if (!otherAdd.id) {
+    console.log(payload);
+
+    if (
+      !otherAdd.id &&
+      otherAdd.provinceId !== 0 &&
+      otherAdd.districtId !== 0 &&
+      otherAdd.subdistrictId !== 0
+    ) {
       OtherAddressDatasource.addOtherAddress(dronerId, otherAdd).then(
         (res) => {}
       );
     } else if (
       otherAdd.id &&
-      otherAdd.provinceId === undefined &&
-      otherAdd.districtId === undefined &&
-      otherAdd.subdistrictId === undefined
+      otherAdd.provinceId > 0 &&
+      otherAdd.districtId > 0 &&
+      otherAdd.subdistrictId > 0
     ) {
+      OtherAddressDatasource.updateOtherAddress(otherAdd).then((res) => {});
+    } else {
       OtherAddressDatasource.deleteOtherAddress(dronerId, otherAddress.id).then(
         (res) => {}
       );
-    } else {
-      OtherAddressDatasource.updateOtherAddress(otherAdd).then((res) => {});
     }
 
     if (imgBB) {
@@ -976,7 +985,9 @@ function EditDroner() {
                   disabledDate={(current) =>
                     current && current > moment().endOf("day")
                   }
-                  defaultValue={moment(data.birthDate)}
+                  defaultValue={
+                    data.birthDate !== null ? moment(data.birthDate) : undefined
+                  }
                   onChange={(e) => {
                     setBirthDay(moment(e).toISOString());
                   }}
