@@ -68,7 +68,6 @@ function NewsPage() {
       search,
       "BO"
     ).then((res) => {
-      console.log(res);
       setData({
         count: res.count,
         news: res.data,
