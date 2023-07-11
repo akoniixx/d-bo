@@ -1,5 +1,10 @@
 ## [Version - 0]
 
+## improve [v0.34.19] 2023-07-11
+
+- added pin in news menu
+- change icon menu
+
 ## improve [v0.34.18] 2023-07-10
 
 - fixed defect other address & address droner
