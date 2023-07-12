@@ -104,13 +104,15 @@ const AddNewTask = () => {
     FarmerPlotEntity_INIT
   );
   const [selectionType] = useState<RowSelectionType>(queryString[1]);
-  const [searchFarmer, setSearchFarmer] = useState<string>();
+  const [searchFarmer, setSearchFarmer] = useState<string>("");
   const [checkSelectPlot, setCheckSelectPlot] = useState<any>("error");
 
   let [otherSpray, setOtherSpray] = useState<any>();
   const [cropSelected, setCropSelected] = useState<any>("");
   const [periodSpray, setPeriodSpray] = useState<CropPurposeSprayEntity>();
   const [checkCrop, setCheckCrop] = useState<boolean>(true);
+  const [page, setPage] = useState<number>(0);
+  const [dataStore, setDataStore] = useState<any[]>([]);
   const [validateComma, setValidateComma] = useState<{
     status: any;
     message: string;
@@ -145,9 +147,39 @@ const AddNewTask = () => {
 
   const fetchFarmerList = async (text?: string) => {
     await TaskDatasource.getFarmerList(text).then((res) => {
-      setFarmerList(res);
+      setPage(0);
+      let filter = res.filter(
+        (str) =>
+          str.firstname.includes(searchFarmer) ||
+          str.telephoneNo.includes(searchFarmer) ||
+          str.idNo.includes(searchFarmer)
+      );
+      let arr = [];
+      for (let i = 0; i < 10; i++) {
+        if (filter !== undefined) {
+          if (!!filter[i]) {
+            arr.push(filter[i]);
+          }
+          setDataStore(filter);
+        }
+      }
+      setFarmerList(arr);
     });
   };
+
+  useEffect(() => {
+    let arr = [];
+    let skip = dataStore.length;
+    for (
+      let i = 10 * page;
+      i < (10 + 10 * page > skip ? skip : 10 + 10 * page);
+      i++
+    ) {
+      arr.push(dataStore[i]);
+    }
+    let newarr = farmerList?.concat(arr);
+    setFarmerList(newarr);
+  }, [page]);
   const fetchPurposeSpray = async () => {
     await CropDatasource.getPurposeByCroupName(cropSelected).then((res) => {
       setPeriodSpray(res);
@@ -211,7 +243,7 @@ const AddNewTask = () => {
   useEffect(() => {
     fetchFarmerList(searchFarmer);
     fetchPurposeSpray();
-  }, [searchFarmer, cropSelected]);
+  }, [searchFarmer, cropSelected,page]);
 
   //#region Step1 & Step3
   const handleSearchFarmer = (value: any, id: any) => {
@@ -490,7 +522,15 @@ const AddNewTask = () => {
                       }}
                       allowClear
                       placeholder="ค้นหาชื่อเกษตรกร/เบอร์โทร/เลขบัตรปชช."
-                      onSearch={(e: any) => setSearchFarmer(e)}
+                      onSearch={(e: any) => {
+                        if (farmerList !== undefined) {
+                          if (dataStore.length > farmerList?.length) {
+                            setPage(page + 1);
+                          }
+                        }
+                        console.log(page)
+                        setSearchFarmer(e);
+                      }}
                       onSelect={onSelectFarmer}
                       onChange={handleSearchFarmer}
                     >
