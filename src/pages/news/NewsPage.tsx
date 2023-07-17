@@ -732,18 +732,24 @@ function NewsPage() {
               <div className="pr-1">
                 <ActionButton
                   icon={<DeleteOutlined />}
-                  color={row.used > 0 ? color.Grey : color.Error}
+                  color={
+                    row.read > 0 || row.status === "ACTIVE"
+                      ? color.Grey
+                      : color.Error
+                  }
                   onClick={() =>
                     showDelete(
                       row.id,
                       row.image_path
                         .split(
-                          "https://storage.googleapis.com/dnds/news-image/"
+                          "https://storage.googleapis.com/dnds-public-dev/news-image/"
                         )[1]
                         .split("?")[0]
                     )
                   }
-                  actionDisable={row.used > 0 ? true : false}
+                  actionDisable={
+                    row.read > 0 || row.status === "ACTIVE" ? true : false
+                  }
                 />
               </div>
             </div>
