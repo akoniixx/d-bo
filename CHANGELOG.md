@@ -1,5 +1,10 @@
 ## [Version - 0]
 
+## Fix [v0.34.23] 2023-07-17
+
+- fixed duplicate data in add news page
+- fixed deletion conditions
+
 ## improve [v0.34.22] 2023-07-13
 
 - added account for report page

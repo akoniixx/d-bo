@@ -231,6 +231,7 @@ function AddNewsPage() {
   };
   const onSubmit = () => {
     const { newsName, newsDescription, newsStatus } = form.getFieldsValue();
+    setBtnSaveDisable(true);
     NewsDatasource.addNews({
       title: newsName,
       details: newsDescription,
@@ -244,6 +245,7 @@ function AddNewsPage() {
       pinMain: (farmPinMain && farmPinMain) || (dronePinMain && dronePinMain),
     })
       .then((res) => {
+        setBtnSaveDisable(false);
         Swal.fire({
           title: "บันทึกสำเร็จ",
           icon: "success",
@@ -395,6 +397,7 @@ function AddNewsPage() {
                     onChange={handleChooseFarmer}
                     checked={chooseFarmer}
                     className="pt-2"
+                    disabled={chooseDroner}
                   >
                     Farmer Application
                   </Checkbox>
@@ -461,6 +464,7 @@ function AddNewsPage() {
                     onChange={handleChooseDroner}
                     checked={chooseDroner}
                     className="mt-0"
+                    disabled={chooseFarmer}
                   >
                     Droner Application
                   </Checkbox>
