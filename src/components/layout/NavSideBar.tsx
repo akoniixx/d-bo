@@ -20,7 +20,16 @@ const NavSidebar: React.FC<any> = ({ children }) => {
     "profile",
     []
   );
-  const isAccount = persistedProfile.username === "ick_accounting";
+  const listAcc = [
+    "ick_accounting",
+    "minkact",
+    "arisa.m@iconkaset",
+    "nathapon",
+  ];
+  const checkBoolean = listAcc.find((x) => x === persistedProfile.username)
+    ? true
+    : false;
+  const isAccount = checkBoolean;
   const navigate = useNavigate();
 
   return (
