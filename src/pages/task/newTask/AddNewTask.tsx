@@ -317,7 +317,6 @@ const AddNewTask = () => {
   };
   const handleSelectFarmer = () => {
     const f = Map(createNewTask).set("farmerId", farmerSelected.id);
-    console.log(f.toJS());
     setCheckSelectPlot("error");
     setDronerSelected([]);
     setCreateNewTask(f.toJS());
