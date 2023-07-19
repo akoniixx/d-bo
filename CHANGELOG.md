@@ -1,5 +1,9 @@
 ## [Version - 0]
 
+## improve [v0.34.24] 2023-07-19
+
+- search task in add & edit new task page
+
 ## Fix [v0.34.23] 2023-07-17
 
 - fixed duplicate data in add news page

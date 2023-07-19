@@ -1,6 +1,6 @@
 {
   "name": "bo-drone",
-  "version": "0.34.23",
+  "version": "0.34.24",
   "private": true,
   "dependencies": {
     "@ant-design/icons": "^4.7.0",
@@ -26,6 +26,8 @@
     "react-quill": "^2.0.0",
     "react-router-dom": "^6.3.0",
     "react-scripts": "5.0.1",
+    "react-select": "^5.7.4",
+    "react-select-async-paginate": "^0.7.3",
     "recoil": "^0.7.4",
     "styled-components": "^5.3.5",
     "sweetalert": "^2.1.2",

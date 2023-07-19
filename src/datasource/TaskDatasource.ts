@@ -49,6 +49,16 @@ export class TaskDatasource {
         console.log(err, "err getAdmin");
       });
   }
+  static getFarmerListTask(text?: string, page?: number, take?: number): Promise<FarmerEntity[]> {
+    return httpClient
+      .get(BASE_URL + `/tasks/farmer?search=${text}&page=${page}&take=${take}`)
+      .then((response) => {
+        return response.data;
+      })
+      .catch((err) => {
+        console.log(err, "err getAdmin");
+      });
+  }
   static insertNewTask(data: CreateNewTaskEntity): Promise<any> {
     return httpClient
       .post(BASE_URL + "/tasks/task/create-task-bo", data)

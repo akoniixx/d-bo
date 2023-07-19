@@ -25,7 +25,7 @@ import {
 import TextArea from "antd/lib/input/TextArea";
 import { RowSelectionType } from "antd/lib/table/interface";
 import moment, { utc } from "moment";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
   BackButton,
   BackIconButton,
@@ -91,6 +91,10 @@ import {
 } from "../../../entities/CalculateTask";
 import { DashboardLayout } from "../../../components/layout/Layout";
 import { useNavigate } from "react-router-dom";
+import { AsyncPaginate } from "react-select-async-paginate";
+import { OptionType } from "./AddNewTask";
+import type { GroupBase, OptionsOrGroups } from "react-select";
+
 const dateFormat = "DD/MM/YYYY";
 const dateCreateFormat = "YYYY-MM-DD";
 const timeFormat = "HH:mm";
@@ -105,7 +109,7 @@ const { Map } = require("immutable");
 const EditNewTask = () => {
   let queryString = _.split(window.location.pathname, "=");
   const [form] = Form.useForm();
-  const navigate =useNavigate();
+  const navigate = useNavigate();
   const profile = JSON.parse(localStorage.getItem("profile") || "{  }");
   const [current, setCurrent] = useState(0);
   const [data, setData] = useState<GetNewTaskEntity>(GetNewTaskEntity_INIT);
@@ -118,7 +122,7 @@ const EditNewTask = () => {
   const [farmerPlotSeleced, setFarmerPlotSelected] = useState<FarmerPlotEntity>(
     FarmerPlotEntity_INIT
   );
-  const [searchFarmer, setSearchFarmer] = useState<string>();
+  const [searchFarmer, setSearchFarmer] = useState<string>("");
   const [checkSelectPlot, setCheckSelectPlot] = useState<any>("");
   const [dronerSelected, setDronerSelected] = useState<TaskSearchDroner[]>([
     TaskSearchDroner_INIT,
@@ -159,7 +163,10 @@ const EditNewTask = () => {
   const [disableBtn, setDisableBtn] = useState<boolean>(false);
   const [priceMethod, setPriceMethod] = useState<string>("อัตโนมัติ");
   const [loading, setLoading] = useState<boolean>(true);
+  const options: OptionType[] = [];
+  const [currenSearch, setCurrentSearch] = useState(1);
 
+  const twice = useRef<boolean>(true);
   const fetchNewTask = async () => {
     await TaskDatasource.getNewTaskById(queryString[1]).then(async (res) => {
       delete res["updatedAt"];
@@ -198,35 +205,89 @@ const EditNewTask = () => {
       setCouponData(res.responseData);
     });
   };
-  const fetchFarmerList = async (text?: string) => {
-    await TaskDatasource.getFarmerList(text).then((res) => {
-      setFarmerList(res);
-    });
-  };
   const fetchPurposeSpray = async (crop: string) => {
     await CropDatasource.getPurposeByCroupName(crop).then((res) => {
       setPeriodSpray(res);
     });
   };
-
   useEffect(() => {
     fetchNewTask();
-    fetchFarmerList(searchFarmer);
-  }, [searchFarmer]);
+    fetchFarmerList();
+  }, []);
 
   //#region step 1
-  const handleSearchFarmer = (value: any, id: any) => {
-    if (value != undefined) {
-      setFarmerSelected(farmerList?.filter((x) => x.id == id.id)[0]);
+  const fetchFarmerList = async () => {
+    await TaskDatasource.getFarmerListTask("", currenSearch, 0).then((res) => {
+      if (res) {
+        setFarmerList(res);
+        if (twice.current) {
+          for (let i = 0; i < res.length; ++i) {
+            options.push({
+              value: res.map((item) => item.id)[i],
+              label: res.map((item) => item.firstname + " " + item.lastname)[i],
+              tel: res.map((item) => item.telephoneNo)[i],
+              idNo: res.map((item) => item.idNo)[i],
+            });
+          }
+          twice.current = false;
+          setCurrentSearch(currenSearch + 1);
+        } else {
+          twice.current = true;
+        }
+      }
+    });
+  };
+
+  const sleep = (ms: number) =>
+    new Promise((resolve) => {
+      setTimeout(() => {
+        resolve(undefined);
+      }, ms);
+    });
+
+  const loadOptions = async (
+    search: string,
+    prevOptions: OptionsOrGroups<OptionType, GroupBase<OptionType>>
+  ) => {
+    await sleep(1000);
+    let filteredName: OptionType[];
+
+    if (!search) {
+      filteredName = options;
     } else {
-      setFarmerSelected(FarmerEntity_INIT);
+      const searchLower = search.toLowerCase();
+      filteredName = options.filter(({ label, tel, idNo }: OptionType) => {
+        const lowerLabel = label.toLowerCase();
+        const lowerTel = tel ? tel.toLowerCase() : "";
+        const lowerIdNo = idNo ? idNo.toLowerCase() : "";
+        return (
+          lowerLabel.includes(searchLower) ||
+          lowerTel.includes(searchLower) ||
+          lowerIdNo.includes(searchLower)
+        );
+      });
     }
+
+    let hasMore = filteredName.length > prevOptions.length + 10;
+    let slicedOptions = filteredName.slice(
+      prevOptions.length,
+      prevOptions.length + 10
+    );
+
+    return {
+      options: slicedOptions,
+      hasMore,
+    };
   };
-  const onSelectFarmer = (e: any, id: any) => {
-    setFarmerSelected(FarmerEntity_INIT);
-    const findFarmer = farmerList?.filter((x) => x.id == id.id)[0];
-    setFarmerSelected(findFarmer);
+
+  const wrappedLoadOptions = useCallback<typeof loadOptions>((...args) => {
+    return loadOptions(...args);
+  }, []);
+
+  const handleSearchFarmer = (id: any) => {
+    setFarmerSelected(farmerList?.filter((x) => x.id === id.value)[0]);
   };
+
   const fetchLocationPrice = async (
     proId?: number,
     plant?: string,
@@ -440,28 +501,14 @@ const EditNewTask = () => {
               <div className="row">
                 <div className="form-group col-lg-6">
                   <Form.Item name="searchAddress">
-                    <Input.Group>
-                      <AutoComplete
-                        style={{
-                          width: "100%",
-                        }}
-                        allowClear
-                        placeholder="ค้นหาชื่อเกษตรกร/เบอร์โทร/เลขบัตรปชช."
-                        onSearch={(e: any) => setSearchFarmer(e)}
-                        onSelect={onSelectFarmer}
-                        onChange={handleSearchFarmer}
-                        disabled={data.couponId ? true : false}
-                      >
-                        {farmerList?.map((item) => (
-                          <Option
-                            value={item.firstname + " " + item.lastname}
-                            id={item.id}
-                          >
-                            {item.firstname + " " + item.lastname}
-                          </Option>
-                        ))}
-                      </AutoComplete>
-                    </Input.Group>
+                    <AsyncPaginate
+                      isClearable
+                      debounceTimeout={300}
+                      loadOptions={wrappedLoadOptions}
+                      onChange={(e) => handleSearchFarmer(e)}
+                      placeholder="ค้นหาชื่อเกษตรกร/เบอร์โทร/เลขบัตรปชช."
+                      defaultOptions
+                    />
                   </Form.Item>
                 </div>
                 <div className="form-group col-lg-6">
@@ -1889,9 +1936,7 @@ const EditNewTask = () => {
       <div className="steps-content">{titleStep[current].content}</div>
       <Row className="d-flex justify-content-between pt-2">
         {current == 0 && (
-          <BackButton
-            onClick={() => navigate("/IndexNewTask")}
-          />
+          <BackButton onClick={() => navigate("/IndexNewTask")} />
         )}
         {current > 0 && (
           <BackButton onClick={() => setCurrent((prev) => prev - 1)} />
@@ -1920,9 +1965,7 @@ const EditNewTask = () => {
     <>
       <div key={data?.id}>
         <Row>
-          <BackIconButton
-            onClick={() => navigate("/IndexNewTask")}
-          />
+          <BackIconButton onClick={() => navigate("/IndexNewTask")} />
           <span className="pt-3">
             <strong style={{ fontSize: "20px" }}>
               แก้ไขงานบินใหม่ {data.taskNo}
