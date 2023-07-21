@@ -126,7 +126,6 @@ function IndexReport() {
     updateStatusPays_INIT
   );
   const [loading, setLoading] = useState(false);
-
   const { RangePicker } = DatePicker;
   const dateSearchFormat = "YYYY-MM-DD";
   const dateFormat = "DD/MM/YYYY";
