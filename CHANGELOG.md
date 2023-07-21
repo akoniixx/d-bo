@@ -1,5 +1,11 @@
 ## [Version - 0]
 
+## improve [v0.34.24] 2023-07-21
+
+- added column check doc
+- filter dropdown check doc
+- time date wait payment
+
 ## Fix [v0.34.23] 2023-07-17
 
 - fixed duplicate data in add news page

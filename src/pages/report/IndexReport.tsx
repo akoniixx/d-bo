@@ -65,6 +65,7 @@ import { useNavigate } from "react-router-dom";
 import InvoiceTask from "../../components/popover/InvoiceTask";
 import { InvoiceTaskEntity } from "../../entities/NewTaskEntities";
 import { icon } from "../../resource";
+import { DronerEntity } from "../../entities/DronerEntities";
 
 interface DataType {
   key: React.Key;
@@ -90,6 +91,9 @@ interface DataType {
   taskHistory: string;
   unitPrice: string;
   discountCampaignPoint: string;
+  file: any;
+  isBookBank: boolean;
+  dateWaitPayment: any;
 }
 function IndexReport() {
   const navigate = useNavigate();
@@ -100,6 +104,7 @@ function IndexReport() {
   const [searchStatus, setSearchStatus] = useState();
   const [searchStatusPayment, setSearchStatusPayment] = useState();
   const [searchStatusCancel, setSearchStatusCancel] = useState();
+  const [documentPersons, setDocumentPersons] = useState<any>();
   const [startDate, setStartDate] = useState<any>(null);
   const [endDate, setEndDate] = useState<any>(null);
   const [searchProvince, setSearchProvince] = useState<any>();
@@ -113,6 +118,7 @@ function IndexReport() {
   const [plotId, setPlotId] = useState<string>("");
   const [visibleRating, setVisibleRating] = useState(false);
   const [visibleCheckDoc, setVisibleCheckDoc] = useState(false);
+  const [statusArrDoc, setStatusArrDoc] = useState<string[]>([]);
   const [statusArr, setStatusArr] = useState<string[]>([]);
   const [CheckEnum, setCheckEnum] = useState<string[]>([]);
   const [clickPays, setClickPays] = useState<any[]>([]);
@@ -142,7 +148,8 @@ function IndexReport() {
       searchStatus,
       searchStatusPayment,
       searchStatusCancel,
-      searchText
+      searchText,
+      documentPersons
     ).then((res: TaskReportListEntity) => {
       setGetData(res);
     });
@@ -209,7 +216,23 @@ function IndexReport() {
     setCurrent(1);
   };
   const handleCheckDocument = (e: any) => {
-    console.log(e.target.checked);
+    console.log(e.target.value);
+    let value = e.target.value;
+    let checked = e.target.checked;
+    let arr: any = 0;
+    if (checked) {
+      arr = [...statusArrDoc, value];
+      setStatusArrDoc([...statusArrDoc, value]);
+    } else {
+      let d: string[] = statusArrDoc.filter((x) => x != value);
+      arr = [...d];
+      setStatusArrDoc(d);
+      if (d.length == 0) {
+        arr = undefined;
+      }
+    }
+    setDocumentPersons(arr);
+    setCurrent(1);
   };
   const handleProvince = (provinceId: number) => {
     setSearchProvince(provinceId);
@@ -428,12 +451,19 @@ function IndexReport() {
         {
           label: "บัตรประชาชน",
           key: "1",
-          icon: <Checkbox value="1" onClick={(e) => handleCheckDocument(e)} />,
+          icon: (
+            <Checkbox value="ID_CARD" onClick={(e) => handleCheckDocument(e)} />
+          ),
         },
         {
           label: "สมุดบัญชีธนาคาร",
           key: "2",
-          icon: <Checkbox value="2" onClick={(e) => handleCheckDocument(e)} />,
+          icon: (
+            <Checkbox
+              value="BOOKBANK"
+              onClick={(e) => handleCheckDocument(e)}
+            />
+          ),
         },
       ]}
     />
@@ -708,7 +738,7 @@ function IndexReport() {
             <>
               <div>
                 <Image
-                  src={icon.check}
+                  src={row.file ? icon.check : icon.cancel}
                   preview={false}
                   style={{ width: 18, height: 18, marginRight: 6 }}
                 />
@@ -716,7 +746,7 @@ function IndexReport() {
               </div>
               <div>
                 <Image
-                  src={icon.cancel}
+                  src={row.isBookBank === true ? icon.check : icon.cancel}
                   preview={false}
                   style={{ width: 18, height: 18, marginRight: 6 }}
                 />
@@ -767,6 +797,17 @@ function IndexReport() {
       dataIndex: "status",
       fixed: "right",
       render: (value: any, row: any, index: number) => {
+        const countDay = () => {
+          if (row.dateWaitPayment != null) {
+            const nowDate = new Date(Date.now());
+            const rowDate = new Date(row.dateWaitPayment);
+            const diffTime = nowDate.getTime() - rowDate.getTime();
+            let diffDay = Math.floor(diffTime / (1000 * 3600 * 24));
+            diffDay = diffDay == 0 ? 1 : diffDay;
+            return diffDay;
+          }
+        };
+
         return {
           children: (
             <>
@@ -789,9 +830,12 @@ function IndexReport() {
                     <span style={{ color: STATUS_COLOR_TASK[row.statusPay] }}>
                       <Badge color={STATUS_COLOR_TASK[row.statusPay]} />{" "}
                       {FINISH_TASK[row.statusPay]}
-                      {FINISH_TASK[row.statusPay] === "รอจ่ายเงิน" && (
-                        <span style={{ color: "red" }}> (3 วัน)</span>
-                      )}
+                      <span style={{ color: color.Error }}>
+                        {row.statusPay === "WAIT_PAYMENT" &&
+                        countDay() != undefined
+                          ? ` (${countDay()} วัน)`
+                          : null}
+                      </span>
                     </span>
                   ) : (
                     <span style={{ color: STATUS_COLOR_TASK[value] }}>
@@ -1226,7 +1270,8 @@ function IndexReport() {
                 searchStatus,
                 searchStatusPayment,
                 searchStatusCancel,
-                searchText
+                searchText,
+                documentPersons
               ).then((res: TaskReportListEntity) => {
                 setGetData(res);
                 setCurrent(1);
@@ -1310,6 +1355,11 @@ function IndexReport() {
         discountCampaignPoint: `${
           getData?.data.map((x) => x.discountCampaignPoint)[i]
         }`,
+        file: getData.data.map(
+          (x) => x.droner && (x.droner.file.length > 0 ? x.droner.file : [])
+        )[i],
+        isBookBank: getData.data.map((x) => x.droner && x.droner.isBookBank)[i],
+        dateWaitPayment: getData.data.map((x) => x.dateWaitPayment)[i],
       });
     }
   }
