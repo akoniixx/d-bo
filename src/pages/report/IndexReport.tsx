@@ -215,7 +215,6 @@ function IndexReport() {
     setCurrent(1);
   };
   const handleCheckDocument = (e: any) => {
-    console.log(e.target.value);
     let value = e.target.value;
     let checked = e.target.checked;
     let arr: any = 0;
