@@ -7,6 +7,7 @@ import {
   DatePicker,
   Divider,
   Dropdown,
+  Image,
   Input,
   Menu,
   Pagination,
@@ -63,6 +64,7 @@ import { DashboardLayout } from "../../components/layout/Layout";
 import { useNavigate } from "react-router-dom";
 import InvoiceTask from "../../components/popover/InvoiceTask";
 import { InvoiceTaskEntity } from "../../entities/NewTaskEntities";
+import { icon } from "../../resource";
 
 interface DataType {
   key: React.Key;
@@ -110,6 +112,7 @@ function IndexReport() {
   const [showModalMap, setShowModalMap] = useState<boolean>(false);
   const [plotId, setPlotId] = useState<string>("");
   const [visibleRating, setVisibleRating] = useState(false);
+  const [visibleCheckDoc, setVisibleCheckDoc] = useState(false);
   const [statusArr, setStatusArr] = useState<string[]>([]);
   const [CheckEnum, setCheckEnum] = useState<string[]>([]);
   const [clickPays, setClickPays] = useState<any[]>([]);
@@ -205,6 +208,9 @@ function IndexReport() {
     setSearchStatus(arr);
     setCurrent(1);
   };
+  const handleCheckDocument = (e: any) => {
+    console.log(e.target.checked);
+  };
   const handleProvince = (provinceId: number) => {
     setSearchProvince(provinceId);
     fetchDistrict(provinceId);
@@ -252,6 +258,9 @@ function IndexReport() {
   };
   const handleVisibleRating = (newVisible: any) => {
     setVisibleRating(newVisible);
+  };
+  const handleCheckDoc = (newVisible: any) => {
+    setVisibleCheckDoc(newVisible);
   };
 
   const statusOptions = ["WAIT_START", "IN_PROGRESS", "WAIT_RECEIVE"];
@@ -413,6 +422,23 @@ function IndexReport() {
       ]}
     />
   );
+  const SubCheckDoc = (
+    <Menu
+      items={[
+        {
+          label: "บัตรประชาชน",
+          key: "1",
+          icon: <Checkbox value="1" onClick={(e) => handleCheckDocument(e)} />,
+        },
+        {
+          label: "สมุดบัญชีธนาคาร",
+          key: "2",
+          icon: <Checkbox value="2" onClick={(e) => handleCheckDocument(e)} />,
+        },
+      ]}
+    />
+  );
+
   const DownloadPDF = async () => {
     setLoading(true);
     if (clickPays.length > 1) {
@@ -639,7 +665,6 @@ function IndexReport() {
     {
       title: "จำนวนไร่",
       dataIndex: "farmAreaAmount",
-      width: "9%",
       sorter: (a: any, b: any) => sorter(a.farmAreaAmount, b.farmAreaAmount),
       render: (value: any, row: any, index: number) => {
         return {
@@ -650,7 +675,6 @@ function IndexReport() {
     {
       title: "Rating",
       dataIndex: "rating",
-      width: "8%",
       sorter: (a: any, b: any) => sorter(a.rating, b.rating),
       render: (value: any, row: any, index: number) => {
         return {
@@ -675,10 +699,38 @@ function IndexReport() {
       },
     },
     {
+      title: "ตรวจเอกสาร",
+      dataIndex: "",
+      sorter: (a: any, b: any) => sorter(a.rating, b.rating),
+      render: (value: any, row: any, index: number) => {
+        return {
+          children: (
+            <>
+              <div>
+                <Image
+                  src={icon.check}
+                  preview={false}
+                  style={{ width: 18, height: 18, marginRight: 6 }}
+                />
+                บัตรประชาชน
+              </div>
+              <div>
+                <Image
+                  src={icon.cancel}
+                  preview={false}
+                  style={{ width: 18, height: 18, marginRight: 6 }}
+                />
+                สมุดบัญชีธนาคาร
+              </div>
+            </>
+          ),
+        };
+      },
+    },
+    {
       title: "ยอดรวมค่าบริการ",
       dataIndex: "totalPrice",
       fixed: "right",
-      width: "12%",
       sorter: (a: any, b: any) => sorter(a.totalPrice, b.totalPrice),
       render: (value: any, row: any, index: number) => {
         const inv: InvoiceTaskEntity = {
@@ -695,16 +747,16 @@ function IndexReport() {
         return {
           children: (
             <>
-              <span className="text-dark-75 d-block font-size-lg">
+              <span className="text-dark-75 d-block">
                 {value != null
                   ? numberWithCommasToFixed(parseFloat(value)) + " บาท"
                   : "0 บาท"}
+                <InvoiceTask
+                  iconColor={color.Success}
+                  title="รายละเอียดค่าบริการ"
+                  data={inv}
+                />
               </span>
-              <InvoiceTask
-                iconColor={color.Success}
-                title="รายละเอียดค่าบริการ"
-                data={inv}
-              />
             </>
           ),
         };
@@ -714,7 +766,6 @@ function IndexReport() {
       title: "สถานะ",
       dataIndex: "status",
       fixed: "right",
-      width: "15%",
       render: (value: any, row: any, index: number) => {
         return {
           children: (
@@ -738,6 +789,9 @@ function IndexReport() {
                     <span style={{ color: STATUS_COLOR_TASK[row.statusPay] }}>
                       <Badge color={STATUS_COLOR_TASK[row.statusPay]} />{" "}
                       {FINISH_TASK[row.statusPay]}
+                      {FINISH_TASK[row.statusPay] === "รอจ่ายเงิน" && (
+                        <span style={{ color: "red" }}> (3 วัน)</span>
+                      )}
                     </span>
                   ) : (
                     <span style={{ color: STATUS_COLOR_TASK[value] }}>
@@ -785,7 +839,7 @@ function IndexReport() {
   const PageTitle = (
     <>
       <div
-        className="container d-flex justify-content-between"
+        className=" d-flex justify-content-between"
         style={{ padding: "10px" }}
       >
         <div className="col-lg-6">
@@ -889,7 +943,7 @@ function IndexReport() {
           </>
         )}
       </div>
-      <div className="container d-flex justify-content-between pt-3">
+      <div className=" d-flex justify-content-between pt-3">
         <CardContainer
           style={{
             width: "20%",
@@ -915,7 +969,9 @@ function IndexReport() {
                 <span>รอรีวิว</span>
                 <strong>
                   {getData?.summary != undefined
-                    ? getData?.summary[0].waitreview
+                    ? numberWithCommas(
+                        parseFloat(getData?.summary[0].waitreview)
+                      )
                     : "0"}
                 </strong>
               </div>
@@ -948,7 +1004,9 @@ function IndexReport() {
                 <span>รอจ่ายเงิน</span>
                 <strong>
                   {getData?.summary != undefined
-                    ? getData?.summary[0].waitpayment
+                    ? numberWithCommas(
+                        parseFloat(getData?.summary[0].waitpayment)
+                      )
                     : "0"}
                 </strong>
               </div>
@@ -969,7 +1027,9 @@ function IndexReport() {
                 <span>จ่ายเงินแล้ว (บริษัท)</span>
                 <strong>
                   {getData?.summary != undefined
-                    ? getData?.summary[0].donepayment
+                    ? numberWithCommas(
+                        parseFloat(getData?.summary[0].donepayment)
+                      )
                     : "0"}
                 </strong>
               </div>
@@ -990,7 +1050,9 @@ function IndexReport() {
                 <span>เสร็จสิ้น</span>
                 <strong>
                   {getData?.summary != undefined
-                    ? getData?.summary[0].successpayment
+                    ? numberWithCommas(
+                        parseFloat(getData?.summary[0].successpayment)
+                      )
                     : "0"}
                 </strong>
               </div>
@@ -1022,7 +1084,9 @@ function IndexReport() {
                 <span>ยกเลิก</span>
                 <strong>
                   {getData?.summary != undefined
-                    ? getData?.summary[0].canceledtask
+                    ? numberWithCommas(
+                        parseFloat(getData?.summary[0].canceledtask)
+                      )
                     : "0"}
                 </strong>
               </div>
@@ -1030,8 +1094,8 @@ function IndexReport() {
           </div>
         </CardContainer>
       </div>
-      <div className="container d-flex justify-content-between pt-3">
-        <div className="col-lg-4 p-1">
+      <div className=" d-flex justify-content-between pt-3">
+        <div className="col-lg-3 p-1">
           <Input
             allowClear
             prefix={<SearchOutlined style={{ color: color.Disable }} />}
@@ -1113,6 +1177,20 @@ function IndexReport() {
               </option>
             ))}
           </Select>
+        </div>
+        <div className="col-lg p-1">
+          <Dropdown
+            overlay={SubCheckDoc}
+            trigger={["click"]}
+            className="col-lg-12"
+            onVisibleChange={handleCheckDoc}
+            visible={visibleCheckDoc}
+          >
+            <Button style={{ color: color.Disable }}>
+              เลือกการตรวจเอกสาร
+              <DownOutlined />
+            </Button>
+          </Dropdown>
         </div>
         <div className="col-lg p-1">
           <Dropdown
@@ -1248,7 +1326,7 @@ function IndexReport() {
             columns={columns}
             dataSource={data}
             pagination={false}
-            scroll={{ x: 1400 }}
+            scroll={{ x: "max-content" }}
           />
         </Spin>
       </Space>
