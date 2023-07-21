@@ -30,6 +30,7 @@ build-dev:
     - docker push ${REGISTRY_HOSTNAME}/${IMAGE_NAME}:develop-latest
     - docker image rm ${REGISTRY_HOSTNAME}/${IMAGE_NAME}:${IMAGE_TAG}
     - docker image rm ${REGISTRY_HOSTNAME}/${IMAGE_NAME}:develop-latest
+    - docker system prune -f
   only:
     - develop
 
@@ -46,6 +47,7 @@ build-staging:
     - docker push ${REGISTRY_HOSTNAME}/${IMAGE_NAME}:staging-latest
     - docker image rm ${REGISTRY_HOSTNAME}/${IMAGE_NAME}:${IMAGE_TAG}
     - docker image rm ${REGISTRY_HOSTNAME}/${IMAGE_NAME}:staging-latest
+    - docker system prune -f
   only:
     - staging
 
@@ -62,6 +64,7 @@ build-prod:
     - docker push ${REGISTRY_HOSTNAME}/${IMAGE_NAME}:main-latest
     - docker image rm ${REGISTRY_HOSTNAME}/${IMAGE_NAME}:${IMAGE_TAG}
     - docker image rm ${REGISTRY_HOSTNAME}/${IMAGE_NAME}:main-latest
+    - docker system prune -f
   only:
     - main
 
