@@ -41,4 +41,7 @@ export default {
   droner_active: require("./media/images/droner_active.png"),
   admin_inactive: require("./media/images/admin_inactive.png"),
   admin_active: require("./media/images/admin_active.png"),
+  check: require("./media/images/check.png"),
+  cancel: require("./media/images/cancel.png"),
+
 };
