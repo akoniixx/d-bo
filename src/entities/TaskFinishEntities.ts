@@ -55,6 +55,7 @@ export interface TaskFinish {
   fee: string;
   discountFee: string;
   reviewFarmerScore: string;
+  dateWaitPayment: string;
   reviewFarmerComment: string;
   imagePathFinishTask: string;
   imagePathDrug: string;
@@ -96,6 +97,7 @@ export const TaskFinish_INIT: TaskFinish = {
   updateBy: "",
   distance: "",
   status: "",
+  dateWaitPayment: "",
   statusRemark: "",
   reviewDronerAvg: "",
   reviewDronerDetail: reviewDronerDetail_INIT,
@@ -262,6 +264,7 @@ export interface TaskReportEntity {
   createBy: string;
   updateBy: string;
   distance: string;
+  dateWaitPayment: string;
   status: string;
   statusRemark: string;
   reviewDronerAvg: string;
@@ -311,6 +314,7 @@ export const TaskReportEntity_INIT: TaskReportEntity = {
   preparationBy: "",
   createdAt: "",
   updatedAt: "",
+  dateWaitPayment:"",
   createBy: "",
   updateBy: "",
   distance: "",
