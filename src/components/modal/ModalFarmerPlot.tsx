@@ -1,5 +1,13 @@
 import React, { useEffect, useState } from "react";
-import { Form, Input, Modal, Radio, RadioChangeEvent, Select, Space } from "antd";
+import {
+  Form,
+  Input,
+  Modal,
+  Radio,
+  RadioChangeEvent,
+  Select,
+  Space,
+} from "antd";
 import FooterPage from "../footer/FooterPage";
 import { FarmerPlotEntity } from "../../entities/FarmerPlotEntities";
 import { EXP_PLANT } from "../../definitions/ExpPlant";
@@ -8,6 +16,7 @@ import { SubdistrictEntity } from "../../entities/LocationEntities";
 import { LocationDatasource } from "../../datasource/LocationDatasource";
 import { LAT_LNG_BANGKOK } from "../../definitions/Location";
 import TextArea from "antd/lib/input/TextArea";
+import { CropDatasource } from "../../datasource/CropDatasource";
 
 const { Option } = Select;
 
@@ -33,12 +42,11 @@ const ModalFarmerPlot: React.FC<ModalFarmerPlotProps> = ({
   isEditModal = false,
 }) => {
   const [form] = Form.useForm();
-  const [farmerPlot, setFarmerPlot] =
-    useState<FarmerPlotEntity>(data);
+  const [farmerPlot, setFarmerPlot] = useState<FarmerPlotEntity>(data);
   const [saveBtnDisable, setBtnSaveDisable] = useState<boolean>(
     isEditModal ? false : true
   );
-  const [comment,setComment] = useState(data.comment)
+  const [comment, setComment] = useState(data.comment);
   const [mapPosition, setMapPosition] = useState<
     | {
         lat?: number;
@@ -55,20 +63,28 @@ const ModalFarmerPlot: React.FC<ModalFarmerPlotProps> = ({
   );
   const [location, setLocation] = useState<SubdistrictEntity[]>([]);
   const [searchLocation] = useState("");
+  const [cropsName, setCropsName] = useState<any[]>([]);
 
   const fetchLocation = async (text?: string) => {
     await LocationDatasource.getSubdistrict(0, text).then((res) => {
       setLocation(res);
     });
   };
+  useEffect(() => {
+    const getCropJustName = () => {
+      CropDatasource.getCropJustName().then((res) => {
+        setCropsName(res);
+      });
+    };
+    getCropJustName();
+  }, []);
 
   useEffect(() => {
     fetchLocation(searchLocation);
     if (data) {
       form.setFieldsValue({
         ...data,
-        plotAreaId:
-          data.plotAreaId === 0 ? undefined : data.plotAreaId,
+        plotAreaId: data.plotAreaId === 0 ? undefined : data.plotAreaId,
         lat: isEditModal ? parseFloat(data.lat) : undefined,
         long: isEditModal ? parseFloat(data.long) : undefined,
       });
@@ -92,17 +108,17 @@ const ModalFarmerPlot: React.FC<ModalFarmerPlotProps> = ({
     }
   };
 
-  const handleShowComment = (e : RadioChangeEvent) =>{
+  const handleShowComment = (e: RadioChangeEvent) => {
     setFarmerPlot({
       ...farmerPlot,
-      status : e.target.value
-    })
-    if(e.target.value != "REJECTED"){
+      status: e.target.value,
+    });
+    if (e.target.value != "REJECTED") {
       form.setFieldsValue({
-        reason : ""
+        reason: "",
       });
     }
-  }
+  };
 
   const handleOnChangeLat = (value: any) => {
     setFarmerPlot((prev) => ({
@@ -164,11 +180,7 @@ const ModalFarmerPlot: React.FC<ModalFarmerPlotProps> = ({
       data.landmark,
       data.raiAmount,
     ].includes("");
-    let checkEmptyNumber = ![
-      data.plotAreaId,
-      data.lat,
-      data.long,
-    ].includes(0);
+    let checkEmptyNumber = ![data.plotAreaId, data.lat, data.long].includes(0);
     if (checkEmpty && checkEmptyNumber) {
       setBtnSaveDisable(false);
     } else {
@@ -188,7 +200,8 @@ const ModalFarmerPlot: React.FC<ModalFarmerPlotProps> = ({
             style={{
               width: "100%",
               cursor: "move",
-            }}>
+            }}
+          >
             {title}
           </div>
         }
@@ -200,12 +213,14 @@ const ModalFarmerPlot: React.FC<ModalFarmerPlotProps> = ({
             onClickSave={() => form.submit()}
             disableSaveBtn={saveBtnDisable}
           />,
-        ]}>
+        ]}
+      >
         <Form
           key={data.plotId}
           form={form}
           onFinish={handelCallBack}
-          onFieldsChange={onFieldsChange}>
+          onFieldsChange={onFieldsChange}
+        >
           <div className="form-group">
             <label>
               ชื่อแปลง <span style={{ color: "red" }}>*</span>
@@ -217,7 +232,8 @@ const ModalFarmerPlot: React.FC<ModalFarmerPlotProps> = ({
                   required: true,
                   message: "กรุณากรอกชื่อแปลง!",
                 },
-              ]}>
+              ]}
+            >
               <Input placeholder="กรอกชื่อแปลง" autoComplete="off" />
             </Form.Item>
           </div>
@@ -226,9 +242,25 @@ const ModalFarmerPlot: React.FC<ModalFarmerPlotProps> = ({
               พืชที่ปลูก <span style={{ color: "red" }}>*</span>
             </label>
             <Form.Item name="plantName">
-              <Select allowClear placeholder="เลือกพืชที่ปลูก">
-                {EXP_PLANT.map((x) => (
-                  <Select.Option value={x}>{x}</Select.Option>
+              <Select
+                allowClear
+                showSearch
+                placeholder="เลือกพืชที่ปลูก"
+                optionFilterProp="children"
+                filterSort={(optionA, optionB) =>
+                  optionA.children
+                    .toLowerCase()
+                    .localeCompare(optionB.children.toLowerCase())
+                }
+                filterOption={(input: any, option: any) =>
+                  option.children.includes(input)
+                }
+                defaultValue={data.plantName != undefined ? data.plantName : undefined}
+              >
+                {cropsName.map((item) => (
+                  <Option key={item.id} value={item.cropName}>
+                    {item.cropName}
+                  </Option>
                 ))}
               </Select>
             </Form.Item>
@@ -244,12 +276,9 @@ const ModalFarmerPlot: React.FC<ModalFarmerPlotProps> = ({
                   required: true,
                   message: "กรุณากรอกจำนวนไร่!",
                 },
-              ]}>
-              <Input
-                placeholder="ไร่"
-                autoComplete="off"
-                suffix="ไร่"
-              />
+              ]}
+            >
+              <Input placeholder="ไร่" autoComplete="off" suffix="ไร่" />
             </Form.Item>
           </div>
           <div className="form-group">
@@ -270,9 +299,8 @@ const ModalFarmerPlot: React.FC<ModalFarmerPlotProps> = ({
                 filterOption={(input: any, option: any) =>
                   option.children.includes(input)
                 }
-                defaultValue={
-                  data.plotAreaId === 0 ? null : data.plotAreaId
-                }>
+                defaultValue={data.plotAreaId === 0 ? null : data.plotAreaId}
+              >
                 {location.map((item) => (
                   <Option value={item.subdistrictId}>
                     {item.districtName +
@@ -306,7 +334,8 @@ const ModalFarmerPlot: React.FC<ModalFarmerPlotProps> = ({
                     message: "กรุณากรอกละติจูด!",
                   },
                 ]}
-                key={mapPosition?.lat}>
+                key={mapPosition?.lat}
+              >
                 <Input
                   placeholder="กรอกข้อมูล Latitude"
                   defaultValue={mapPosition?.lat}
@@ -325,7 +354,8 @@ const ModalFarmerPlot: React.FC<ModalFarmerPlotProps> = ({
                     message: "กรุณากรอกลองติจูด!",
                   },
                 ]}
-                key={mapPosition?.lng}>
+                key={mapPosition?.lng}
+              >
                 <Input
                   placeholder="กรอกข้อมูล Longitude"
                   defaultValue={mapPosition?.lng}
@@ -335,11 +365,11 @@ const ModalFarmerPlot: React.FC<ModalFarmerPlotProps> = ({
             </div>
           </div>
           <GoogleMap
-            changeLatLng={(lat,lng)=>{
+            changeLatLng={(lat, lng) => {
               form.setFieldsValue({
-                lat : lat,
-                long : lng
-              })
+                lat: lat,
+                long: lng,
+              });
             }}
             isEdit={true}
             width="470px"
@@ -373,30 +403,35 @@ const ModalFarmerPlot: React.FC<ModalFarmerPlotProps> = ({
                   required: true,
                   message: "กรุณาเลือกสถานะ!",
                 },
-              ]}>
-              {
-                isEditModal?
-                <Radio.Group defaultValue={farmerPlot.status} onChange={handleShowComment}>
+              ]}
+            >
+              {isEditModal ? (
+                <Radio.Group
+                  defaultValue={farmerPlot.status}
+                  onChange={handleShowComment}
+                >
                   <Space direction="vertical">
                     <Radio value={"ACTIVE"}>ใช้งาน</Radio>
                     <Radio value={"PENDING"}>รอการตรวจสอบ</Radio>
                     <Radio value={"REJECTED"}>
-                      ไม่อนุมัติ 
+                      ไม่อนุมัติ
                       {farmerPlot.status == "REJECTED" && (
                         <div className="form-group">
                           <br />
-                          <Form.Item name="reason"
+                          <Form.Item
+                            name="reason"
                             rules={[
                               {
                                 required: farmerPlot.status === "REJECTED",
                                 message: "กรุณากรอกเหตุผลที่ไม่อนุมัติ!",
                               },
-                            ]}>
+                            ]}
+                          >
                             <TextArea
                               className="col-lg-12"
                               rows={3}
                               placeholder="กรอกเหตุผล/เหตุหมายเพิ่มเติม"
-                              autoComplete="off"                    
+                              autoComplete="off"
                             />
                           </Form.Item>
                         </div>
@@ -407,42 +442,42 @@ const ModalFarmerPlot: React.FC<ModalFarmerPlotProps> = ({
                       {farmerPlot.status === "INACTIVE" && (
                         <div className="form-group">
                           <br />
-                          <Form.Item name="reason"
+                          <Form.Item
+                            name="reason"
                             rules={[
                               {
                                 required: farmerPlot.status === "INACTIVE",
                                 message: "กรุณากรอกเหตุผลที่ไม่อนุมัติ!",
                               },
-                            ]}>
+                            ]}
+                          >
                             <TextArea
                               className="col-lg-12"
                               rows={3}
                               placeholder="กรอกเหตุผล/เหตุหมายเพิ่มเติม"
-                              autoComplete="off"                    
+                              autoComplete="off"
                             />
                           </Form.Item>
                         </div>
                       )}
                     </Radio>
                   </Space>
-                </Radio.Group>:
+                </Radio.Group>
+              ) : (
                 <Radio.Group defaultValue={farmerPlot.status}>
                   <Space direction="vertical">
                     <Radio value={"ACTIVE"}>ใช้งาน</Radio>
                     <Radio value={"PENDING"}>รอการตรวจสอบ</Radio>
                   </Space>
                 </Radio.Group>
-              }
+              )}
             </Form.Item>
-          <div className="form-group " style={{ marginTop: 16 }}>
-            <label>หมายเหตุ</label>
-            <Form.Item name="comment">
-              <TextArea
-              className="col-lg-12"
-                autoComplete="off"    
-              />
-            </Form.Item>
-          </div>
+            <div className="form-group " style={{ marginTop: 16 }}>
+              <label>หมายเหตุ</label>
+              <Form.Item name="comment">
+                <TextArea className="col-lg-12" autoComplete="off" />
+              </Form.Item>
+            </div>
           </div>
         </Form>
       </Modal>

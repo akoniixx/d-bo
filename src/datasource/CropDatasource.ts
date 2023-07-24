@@ -13,7 +13,7 @@ export class CropDatasource {
       });
   }
 
-  static getAllCropPlantName() : Promise<CropPurposeSprayEntity[]> {
+  static getAllCropPlantName(): Promise<CropPurposeSprayEntity[]> {
     return httpClient
       .get(BASE_URL + "/tasks/crop")
       .then((response) => {
@@ -21,6 +21,17 @@ export class CropDatasource {
       })
       .catch((err) => {
         console.log(err, "err getCropPlantName");
-    });
+      });
+  }
+
+  static getCropJustName(): Promise<any> {
+    return httpClient
+      .get(BASE_URL + "/tasks/crop/crop-name-all")
+      .then((response) => {
+        return response.data;
+      })
+      .catch((err) => {
+        console.log(err, "err getCropName");
+      });
   }
 }

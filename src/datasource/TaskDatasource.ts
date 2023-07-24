@@ -1,5 +1,5 @@
 import { BASE_URL, httpClient } from "../config/develop-config";
-import { FarmerEntity } from "../entities/FarmerEntities";
+import { FarmerEntity, FarmerPageEntity } from "../entities/FarmerEntities";
 import {
   CreateNewTaskEntity,
   GetNewTaskEntity,
@@ -42,6 +42,16 @@ export class TaskDatasource {
   static getFarmerList(text?: string): Promise<FarmerEntity[]> {
     return httpClient
       .get(BASE_URL + "/tasks/farmer?search=" + text)
+      .then((response) => {
+        return response.data;
+      })
+      .catch((err) => {
+        console.log(err, "err getAdmin");
+      });
+  }
+  static getFarmerListTask(text?: string, page?: number, take?: number): Promise<FarmerPageEntity> {
+    return httpClient
+      .get(BASE_URL + `/tasks/farmer?search=${text}&page=${page}&take=${take}`)
       .then((response) => {
         return response.data;
       })

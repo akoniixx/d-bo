@@ -24,7 +24,7 @@ import {
   Tooltip,
 } from "antd";
 import moment from "moment";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
   BackButton,
   BackIconButton,
@@ -34,7 +34,10 @@ import { CardContainer } from "../../../components/card/CardContainer";
 import { CardHeader } from "../../../components/header/CardHearder";
 import color from "../../../resource/color";
 import { TaskDatasource } from "../../../datasource/TaskDatasource";
-import { FarmerEntity } from "../../../entities/FarmerEntities";
+import {
+  FarmerEntity,
+  FarmerEntity_INIT,
+} from "../../../entities/FarmerEntities";
 import {
   FarmerPlotEntity,
   FarmerPlotEntity_INIT,
@@ -77,7 +80,17 @@ import { DateTimeUtil } from "../../../utilities/DateTimeUtil";
 import form from "antd/lib/form";
 import { DashboardLayout } from "../../../components/layout/Layout";
 import { useNavigate } from "react-router-dom";
-
+import { FarmerDatasource } from "../../../datasource/FarmerDatasource";
+import { AsyncPaginate } from "react-select-async-paginate";
+import type { GroupBase, OptionsOrGroups } from "react-select";
+import { FarmerPageEntity } from "../../../entities/FarmerEntities";
+import { FarmerPageEntity_INIT } from "../../../entities/FarmerEntities";
+export type OptionType = {
+  value: any;
+  label: any;
+  tel: any;
+  idNo: any;
+};
 const { Step } = Steps;
 const { Option } = Select;
 const dateFormat = "DD/MM/YYYY";
@@ -98,13 +111,14 @@ const AddNewTask = () => {
     CreateNewTaskEntity_INIT
   );
   const [dataFarmer, setDataFarmer] = useState<FarmerEntity>();
-  const [farmerList, setFarmerList] = useState<FarmerEntity[]>();
-  const [farmerSelected, setFarmerSelected] = useState<FarmerEntity>();
+  const [farmerList, setFarmerList] = useState<FarmerEntity[]>([
+    FarmerEntity_INIT,
+  ]);
+  const [farmerSelected, setFarmerSelected] = useState<any>();
   const [farmerPlotSeleced, setFarmerPlotSelected] = useState<FarmerPlotEntity>(
     FarmerPlotEntity_INIT
   );
   const [selectionType] = useState<RowSelectionType>(queryString[1]);
-  const [searchFarmer, setSearchFarmer] = useState<string>();
   const [checkSelectPlot, setCheckSelectPlot] = useState<any>("error");
 
   let [otherSpray, setOtherSpray] = useState<any>();
@@ -118,7 +132,6 @@ const AddNewTask = () => {
     status: "",
     message: "",
   });
-
   const [dateAppointment, setDateAppointment] = useState<any>(
     moment(new Date()).format("YYYY-MM-DD")
   );
@@ -139,15 +152,85 @@ const AddNewTask = () => {
   const [discountResult, setDiscountResult] = useState<number | null>();
   const [loading, setLoading] = useState<boolean>(true);
   const [couponKeepList, setCouponKeepList] = useState<CouponKeepByFarmer[]>();
-
   const [checkKeepCoupon, setCheckKeepCoupon] = useState<boolean>(false);
   const [dataCouponKeep, setCouponKeep] = useState<CouponKeepByFarmer>();
+  const options: OptionType[] = [];
+  const [currenSearch, setCurrentSearch] = useState(1);
 
-  const fetchFarmerList = async (text?: string) => {
-    await TaskDatasource.getFarmerList(text).then((res) => {
-      setFarmerList(res);
-    });
+  const twice = useRef<boolean>(true);
+
+  const fetchFarmerList = async () => {
+    await TaskDatasource.getFarmerListTask("", currenSearch, 0).then(
+      (res: FarmerPageEntity) => {
+        if (res) {
+          setFarmerList(res.data);
+          if (twice.current) {
+            for (let i = 0; i < res.count; ++i) {
+              options.push({
+                value: res.data.map((item) => item.id)[i],
+                label: res.data.map(
+                  (item) => item.firstname + " " + item.lastname
+                )[i],
+                tel: res.data.map((item) => item.telephoneNo)[i],
+                idNo: res.data.map((item) => item.idNo)[i],
+              });
+            }
+            twice.current = false;
+            setCurrentSearch(currenSearch + 1);
+          } else {
+            twice.current = true;
+          }
+        }
+      }
+    );
   };
+
+  const sleep = (ms: number) =>
+    new Promise((resolve) => {
+      setTimeout(() => {
+        resolve(undefined);
+      }, ms);
+    });
+
+  const loadOptions = async (
+    search: string,
+    prevOptions: OptionsOrGroups<OptionType, GroupBase<OptionType>>
+  ) => {
+    await sleep(1000);
+    let filteredName: OptionType[];
+
+    if (!search) {
+      filteredName = options;
+    } else {
+      const searchLower = search.toLowerCase();
+      filteredName = options.filter(({ label, tel, idNo }: OptionType) => {
+        const lowerLabel = label.toLowerCase();
+        const lowerTel = tel ? tel.toLowerCase() : "";
+        const lowerIdNo = idNo ? idNo.toLowerCase() : "";
+        return (
+          lowerLabel.includes(searchLower) ||
+          lowerTel.includes(searchLower) ||
+          lowerIdNo.includes(searchLower)
+        );
+      });
+    }
+
+    let hasMore = filteredName.length > prevOptions.length + 10;
+    let slicedOptions = filteredName.slice(
+      prevOptions.length,
+      prevOptions.length + 10
+    );
+
+    return {
+      options: slicedOptions,
+      hasMore,
+    };
+  };
+
+  const wrappedLoadOptions = useCallback<typeof loadOptions>((...args) => {
+    return loadOptions(...args);
+  }, []);
+
   const fetchPurposeSpray = async () => {
     await CropDatasource.getPurposeByCroupName(cropSelected).then((res) => {
       setPeriodSpray(res);
@@ -209,17 +292,13 @@ const AddNewTask = () => {
     useState<boolean>(false);
 
   useEffect(() => {
-    fetchFarmerList(searchFarmer);
+    fetchFarmerList();
     fetchPurposeSpray();
-  }, [searchFarmer, cropSelected]);
+  }, [cropSelected]);
 
   //#region Step1 & Step3
-  const handleSearchFarmer = (value: any, id: any) => {
-    if (value != undefined) {
-      setFarmerSelected(farmerList?.filter((x) => x.id === id.id)[0]);
-    } else {
-      setFarmerSelected(undefined);
-    }
+  const handleSearchFarmer = (id: any) => {
+    setFarmerSelected(farmerList.filter((x) => x.id === id.value)[0]);
   };
   const fetchLocationPrice = async (
     proId?: number,
@@ -243,7 +322,8 @@ const AddNewTask = () => {
     });
   };
   const handleSelectFarmer = () => {
-    const f = Map(createNewTask).set("farmerId", farmerSelected?.id);
+    const f = Map(createNewTask).set("farmerId", farmerSelected.id);
+    console.log(f.toJS());
     setCheckSelectPlot("error");
     setDronerSelected([]);
     setCreateNewTask(f.toJS());
@@ -252,7 +332,7 @@ const AddNewTask = () => {
   };
   const handleSelectFarmerPlot = (value: any) => {
     let plotSelected = farmerSelected?.farmerPlot.filter(
-      (x) => x.id === value
+      (x: any) => x.id === value
     )[0];
     setPriceMethod("อัตโนมัติ");
     setCropSelected(plotSelected?.plantName);
@@ -266,11 +346,7 @@ const AddNewTask = () => {
     );
     setFarmerPlotId(value);
   };
-  const onSelectFarmer = (e: any, id: any) => {
-    setFarmerSelected(undefined);
-    const findFarmer = farmerList?.filter((x) => x.id === id.id)[0];
-    setFarmerSelected(findFarmer);
-  };
+
   const handleAmountRai = (e: React.ChangeEvent<HTMLInputElement>) => {
     const payload = {
       ...createNewTask,
@@ -483,27 +559,14 @@ const AddNewTask = () => {
             <div className="row">
               <div className="form-group col-lg-6">
                 <Form.Item name="searchAddress">
-                  <Input.Group>
-                    <AutoComplete
-                      style={{
-                        width: "100%",
-                      }}
-                      allowClear
-                      placeholder="ค้นหาชื่อเกษตรกร/เบอร์โทร/เลขบัตรปชช."
-                      onSearch={(e: any) => setSearchFarmer(e)}
-                      onSelect={onSelectFarmer}
-                      onChange={handleSearchFarmer}
-                    >
-                      {farmerList?.map((item) => (
-                        <Option
-                          value={item.firstname + " " + item.lastname}
-                          id={item.id}
-                        >
-                          {item.firstname + " " + item.lastname}
-                        </Option>
-                      ))}
-                    </AutoComplete>
-                  </Input.Group>
+                  <AsyncPaginate
+                    isClearable
+                    debounceTimeout={300}
+                    loadOptions={wrappedLoadOptions}
+                    onChange={(e) => handleSearchFarmer(e)}
+                    placeholder="ค้นหาชื่อเกษตรกร/เบอร์โทร/เลขบัตรปชช."
+                    defaultOptions
+                  />
                 </Form.Item>
               </div>
               <div className="form-group col-lg-6">
