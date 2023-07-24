@@ -29,7 +29,6 @@ const RenderOffline:React.FC<RenderMobile> = ({id})=> {
     useEffect(()=>{
         CouponDataSource.getAllOffline(id,page,10).then(
             res => {
-                console.log(res.promotions)
                 setData(res.promotions)
             }
         )

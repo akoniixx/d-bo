@@ -219,14 +219,14 @@ const EditNewTask = () => {
   const fetchFarmerList = async () => {
     await TaskDatasource.getFarmerListTask("", currenSearch, 0).then((res) => {
       if (res) {
-        setFarmerList(res);
+        setFarmerList(res.data);
         if (twice.current) {
-          for (let i = 0; i < res.length; ++i) {
+          for (let i = 0; i < res.count; ++i) {
             options.push({
-              value: res.map((item) => item.id)[i],
-              label: res.map((item) => item.firstname + " " + item.lastname)[i],
-              tel: res.map((item) => item.telephoneNo)[i],
-              idNo: res.map((item) => item.idNo)[i],
+              value: res.data.map((item) => item.id)[i],
+              label: res.data.map((item) => item.firstname + " " + item.lastname)[i],
+              tel: res.data.map((item) => item.telephoneNo)[i],
+              idNo: res.data.map((item) => item.idNo)[i],
             });
           }
           twice.current = false;

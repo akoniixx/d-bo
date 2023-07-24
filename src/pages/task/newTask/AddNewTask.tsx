@@ -83,6 +83,8 @@ import { useNavigate } from "react-router-dom";
 import { FarmerDatasource } from "../../../datasource/FarmerDatasource";
 import { AsyncPaginate } from "react-select-async-paginate";
 import type { GroupBase, OptionsOrGroups } from "react-select";
+import { FarmerPageEntity } from "../../../entities/FarmerEntities";
+import { FarmerPageEntity_INIT } from "../../../entities/FarmerEntities";
 export type OptionType = {
   value: any;
   label: any;
@@ -158,25 +160,29 @@ const AddNewTask = () => {
   const twice = useRef<boolean>(true);
 
   const fetchFarmerList = async () => {
-    await TaskDatasource.getFarmerListTask("", currenSearch, 0).then((res) => {
-      if (res) {
-        setFarmerList(res);
-        if (twice.current) {
-          for (let i = 0; i < res.length; ++i) {
-            options.push({
-              value: res.map((item) => item.id)[i],
-              label: res.map((item) => item.firstname + " " + item.lastname)[i],
-              tel: res.map((item) => item.telephoneNo)[i],
-              idNo: res.map((item) => item.idNo)[i],
-            });
+    await TaskDatasource.getFarmerListTask("", currenSearch, 0).then(
+      (res: FarmerPageEntity) => {
+        if (res) {
+          setFarmerList(res.data);
+          if (twice.current) {
+            for (let i = 0; i < res.count; ++i) {
+              options.push({
+                value: res.data.map((item) => item.id)[i],
+                label: res.data.map(
+                  (item) => item.firstname + " " + item.lastname
+                )[i],
+                tel: res.data.map((item) => item.telephoneNo)[i],
+                idNo: res.data.map((item) => item.idNo)[i],
+              });
+            }
+            twice.current = false;
+            setCurrentSearch(currenSearch + 1);
+          } else {
+            twice.current = true;
           }
-          twice.current = false;
-          setCurrentSearch(currenSearch + 1);
-        } else {
-          twice.current = true;
         }
       }
-    });
+    );
   };
 
   const sleep = (ms: number) =>
@@ -292,7 +298,7 @@ const AddNewTask = () => {
 
   //#region Step1 & Step3
   const handleSearchFarmer = (id: any) => {
-    setFarmerSelected(farmerList?.filter((x) => x.id === id.value)[0]);
+    setFarmerSelected(farmerList.filter((x) => x.id === id.value)[0]);
   };
   const fetchLocationPrice = async (
     proId?: number,
@@ -317,6 +323,7 @@ const AddNewTask = () => {
   };
   const handleSelectFarmer = () => {
     const f = Map(createNewTask).set("farmerId", farmerSelected.id);
+    console.log(f.toJS());
     setCheckSelectPlot("error");
     setDronerSelected([]);
     setCreateNewTask(f.toJS());

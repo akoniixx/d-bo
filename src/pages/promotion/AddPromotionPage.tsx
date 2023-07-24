@@ -163,50 +163,50 @@ export default function AddPromotion() {
       .catch((err) => console.log(err));
   };
   const fetchFarmerList = async (dataProvice?: any) => {
-    const data = await (
-      await TaskDatasource.getFarmerListTask("", currenSearch, 0).then(
-        (res) => {
-          return res;
-        }
-      )
-    ).map((x: any) => {
-      const res = { ...x, provinceName: "" };
-      return res;
-    });
-    const mapData = data.map((x) => {
-      const matching = dataProvice.find(
-        (i: any) => `${i.provinceId}` === `${x.address.provinceId}`
-      );
-      if (matching) {
-        return { ...x, provinceName: matching.provinceName };
-      }
-      return {
-        ...x,
-        provinceName: x.provinceName,
-      };
-    });
-    setFarmerList(mapData);
-    if (twice.current) {
-      for (let i = 0; i < mapData.length; ++i) {
-        options.push({
-          value: mapData?.map((item) => item.id)[i],
-          label: mapData?.map(
-            (item) =>
-              item.firstname +
-              " " +
-              item.lastname +
-              ` | ` +
-              `จังหวัด ${item.provinceName}`
-          )[i],
-          tel: undefined,
-          idNo: undefined,
-        });
-      }
-      twice.current = false;
-      setCurrentSearch(currenSearch + 1);
-    } else {
-      twice.current = true;
-    }
+    // const data = await (
+    //   await TaskDatasource.getFarmerListTask("", currenSearch, 0).then(
+    //     (res) => {
+    //       return res;
+    //     }
+    //   )
+    // ).map((x: any) => {
+    //   const res = { ...x, provinceName: "" };
+    //   return res;
+    // });
+    // const mapData = data.map((x) => {
+    //   const matching = dataProvice.find(
+    //     (i: any) => `${i.provinceId}` === `${x.address.provinceId}`
+    //   );
+    //   if (matching) {
+    //     return { ...x, provinceName: matching.provinceName };
+    //   }
+    //   return {
+    //     ...x,
+    //     provinceName: x.provinceName,
+    //   };
+    // });
+    // setFarmerList(mapData);
+    // if (twice.current) {
+    //   for (let i = 0; i < mapData.length; ++i) {
+    //     options.push({
+    //       value: mapData?.map((item) => item.id)[i],
+    //       label: mapData?.map(
+    //         (item) =>
+    //           item.firstname +
+    //           " " +
+    //           item.lastname +
+    //           ` | ` +
+    //           `จังหวัด ${item.provinceName}`
+    //       )[i],
+    //       tel: undefined,
+    //       idNo: undefined,
+    //     });
+    //   }
+    //   twice.current = false;
+    //   setCurrentSearch(currenSearch + 1);
+    // } else {
+    //   twice.current = true;
+    // }
   };
   const sleep = (ms: number) =>
     new Promise((resolve) => {

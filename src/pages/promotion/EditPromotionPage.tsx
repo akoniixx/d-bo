@@ -51,7 +51,12 @@ import { DashboardLayout } from "../../components/layout/Layout";
 import { OptionType } from "../task/newTask/AddNewTask";
 import { AsyncPaginate } from "react-select-async-paginate";
 import type { GroupBase, OptionsOrGroups } from "react-select";
-
+import { CheckPicker } from "rsuite";
+import "rsuite/dist/rsuite.min.css";
+import {
+  FarmerPageEntity,
+  FarmerPageEntity_INIT,
+} from "../../entities/FarmerEntities";
 const _ = require("lodash");
 
 function EditPromotion() {
@@ -93,8 +98,9 @@ function EditPromotion() {
   const twice = useRef<boolean>(true);
   const options: any[] = [];
   const [currenSearch, setCurrentSearch] = useState(1);
+  const [count, setCount] = useState<number>(0);
   const [provinceListId, setProvinceListId] = useState<ProviceEntity[]>([]);
-  const [searchFarmer, setSearchFarmer] = useState<string>("");
+  const [defaultFarmerList, setDefaultFarmerList] = useState<any>();
   const [couponConditionFarmerList, setCouponConditionFarmerList] = useState<
     any[]
   >([]);
@@ -129,86 +135,74 @@ function EditPromotion() {
 
   useEffect(() => {
     fetchFarmerList(provinceListId);
-    fetchOption();
-  }, [provinceListId]);
+  }, []);
 
   const fetchFarmerList = async (dataProvice?: any) => {
-    const data = await(
-      await TaskDatasource.getFarmerListTask("", currenSearch, 0).then(
-        (res) => {
-        const result = res.map((item)=> {
-          const matching:ProviceEntity = dataProvice.find(
+    if (twice.current) {
+      const data = await TaskDatasource.getFarmerListTask(
+        "",
+        currenSearch,
+        10
+      ).then((res) => {
+        setCount(res.count);
+        const result = res.data.map((item) => {
+          const matching: ProviceEntity = dataProvice.find(
             (i: any) => `${i.provinceId}` === `${item.address?.provinceId}`
           );
-          const provinceName = matching ? {...item, provinceName: matching?.provinceName}: 'test'
+          const provinceName = matching ? ` ${matching.provinceName}` : " -";
           return {
             ...item,
-            completeName: `${item.firstname} ${item.lastname} | ${provinceName}`,
+            completeName: `${item.firstname} ${item.lastname} | จังหวัด${provinceName}`,
+          };
+        });
+        return result;
+      });
+      setCurrentSearch(currenSearch + 1);
+      setFarmerList(
+        data.map((item: any) => {
+          return {
+            value: item.id,
+            label: item.completeName,
           };
         })
-        return result;
-        }
-      )
-    )
-    setFarmerList(data);
-    if (twice.current) {
-      setCurrentSearch(currenSearch + 1);
-      for (let i = 0; i < data.length; ++i) {
-        options.push({
-          value: data[i].id,
-          label: data[i].completeName,
-          tel: "",
-          idNo: "",
-        });
-      }
+      );
       twice.current = false;
     } else {
       twice.current = true;
     }
   };
+  const farmerSearch = () => {};
 
-  const fetchOption = () => {
-    
-  };
-
-  const sleep = (ms: number) =>
-    new Promise((resolve) => {
-      setTimeout(() => {
-        resolve(undefined);
-      }, ms);
-    });
-
-  const loadOptions = async (
-    search: string,
-    prevOptions: OptionsOrGroups<OptionType, GroupBase<OptionType>>
-  ) => {
-    await sleep(1000);
-    let filteredName: any[];
-    if (!search) {
-      filteredName = options;
-    } else {
-      const searchLower = search.toLowerCase();
-      filteredName = options.filter(({ label }: OptionType) => {
-        const lowerLabel = label.toLowerCase();
-        return lowerLabel.includes(searchLower);
+  const onNextPage = async (dataProvice: any) => {
+    const data = await TaskDatasource.getFarmerListTask(
+      "",
+      currenSearch,
+      10
+    ).then((res: FarmerPageEntity) => {
+      const result = res.data.map((item) => {
+        const matching: ProviceEntity = dataProvice.find(
+          (i: any) => `${i.provinceId}` === `${item.address?.provinceId}`
+        );
+        const provinceName = matching ? matching.provinceName : "";
+        return {
+          ...item,
+          completeName: `${item.firstname} ${item.lastname} | จังหวัด ${provinceName}`,
+        };
       });
-    }
-
-    let hasMore = filteredName.length > prevOptions.length + 10;
-    let slicedOptions = filteredName.slice(
-      prevOptions.length,
-      prevOptions.length + 10
-    );
-
-    return {
-      options: slicedOptions,
-      hasMore,
-    };
+      return result;
+    });
+    setCurrentSearch(currenSearch + 1);
+    setFarmerList([
+      ...farmerList,
+      ...data.map((item) => {
+        return {
+          value: item.id,
+          label: item.completeName,
+        };
+      }),
+    ]);
   };
 
-  const wrappedLoadOptions = useCallback<typeof loadOptions>((...args) => {
-    return loadOptions(...args);
-  }, []);
   const getPromotion = (id: string) => {
     CouponDataSource.queryCoupon(id)
       .then(async (res) => {
@@ -260,6 +254,7 @@ function EditPromotion() {
         setSpecificFarmer(res.conditionSpecificFarmer);
         getCropinjectionTimingInit(res.couponConditionPlantList);
         getInfoFarmerManual(res.specificFarmerList);
+        setDefaultFarmerList(res.specificFarmerList.map((item) => item.farmerId))
         setRenderMobile({
           couponName: res.couponName,
           couponType: res.couponType,
@@ -671,23 +666,28 @@ function EditPromotion() {
   };
 
   const handleCouponConditionFarmerList = (value: any[]) => {
-    const defalutId = couponConditionFarmerList.map((x) => x.farmerId);
     if (value.length != 0) {
-      if (defalutId.find((x) => x === value[value.length - 1].value)) {
-        setCouponConditionFarmerList(value);
-      } else {
-        const oldState = couponConditionFarmerList;
-        const newState = {
-          farmerId: value[value.length - 1].value,
-          keep: false,
-        };
-        oldState.push(newState);
-        setCouponConditionFarmerList(oldState);
-      }
+      const oldState = couponConditionFarmerList;
+      const newDefault = defaultFarmerList;
+
+
+      const newState = {
+        farmerId: value[value.length - 1],
+        keep: false,
+      };
+      oldState.push(newState);
+      newDefault.push(value);
+
+      console.log(newDefault)
+
+      setDefaultFarmerList(newDefault);
+      setCouponConditionFarmerList(oldState);
     } else {
+      setDefaultFarmerList([]);
       setCouponConditionFarmerList([]);
     }
   };
+
   function checkRai(min: number | null, max: number | null): string {
     let result;
     if (!min && !max) {
@@ -1408,35 +1408,38 @@ function EditPromotion() {
                   <div
                     style={{
                       width: "100%",
-                      paddingLeft: "16px",
+                      // paddingLeft: "16px",
                     }}
                   >
-                    <Form.Item
-                      name="couponConditionFarmerList"
+                    {/* <Form.Item
+                      name=""
                       rules={[
                         {
                           required: couponProvince,
                           message: "กรุณากรอกเลือกจังหวัด",
                         },
                       ]}
-                    >
-                      <AsyncPaginate
-                        isMulti
-                        closeMenuOnSelect={false}
-                        name="couponConditionFarmerList"
-                        isDisabled={!specificFarmer}
-                        isClearable
-                        debounceTimeout={300}
-                        loadOptions={wrappedLoadOptions}
-                        onChange={(e: any) =>
-                          handleCouponConditionFarmerList(e)
-                        }
-                        // value={couponConditionFarmerList}
-                        defaultValue={couponConditionFarmerList}
+                    > */}
+                      <CheckPicker
+                        disabled={!specificFarmer}
+                        data={farmerList}
+                        virtualized
+                        style={{ width: "100%" }}
                         placeholder="เลือกเกษตรกร"
-                        defaultOptions
+                        onChange={(e) => handleCouponConditionFarmerList(e)}
+                        value={defaultFarmerList}
+                        listProps={{
+                          onItemsRendered(props) {
+                            if (
+                              props.visibleStopIndex >=
+                              farmerList.length - 1
+                            ) {
+                              onNextPage(provinceListId);
+                            }
+                          },
+                        }}
                       />
-                    </Form.Item>
+                    {/* </Form.Item> */}
                   </div>
                 </div>
               </div>
