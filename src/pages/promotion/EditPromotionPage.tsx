@@ -171,7 +171,6 @@ function EditPromotion() {
       twice.current = true;
     }
   };
-  const farmerSearch = () => {};
 
   const onNextPage = async (dataProvice: any) => {
     const data = await TaskDatasource.getFarmerListTask(
@@ -254,7 +253,7 @@ function EditPromotion() {
         setSpecificFarmer(res.conditionSpecificFarmer);
         getCropinjectionTimingInit(res.couponConditionPlantList);
         getInfoFarmerManual(res.specificFarmerList);
-        setDefaultFarmerList(res.specificFarmerList.map((item) => item.farmerId))
+        setDefaultFarmerList(res.specificFarmerList.map((item:any) => item.farmerId))
         setRenderMobile({
           couponName: res.couponName,
           couponType: res.couponType,
@@ -668,19 +667,12 @@ function EditPromotion() {
   const handleCouponConditionFarmerList = (value: any[]) => {
     if (value.length != 0) {
       const oldState = couponConditionFarmerList;
-      const newDefault = defaultFarmerList;
-
-
       const newState = {
         farmerId: value[value.length - 1],
         keep: false,
       };
       oldState.push(newState);
-      newDefault.push(value);
-
-      console.log(newDefault)
-
-      setDefaultFarmerList(newDefault);
+      setDefaultFarmerList(value);
       setCouponConditionFarmerList(oldState);
     } else {
       setDefaultFarmerList([]);
