@@ -1,5 +1,15 @@
 ## [Version - 0]
 
+## improve [v0.34.25] 2023-07-24
+
+- search task in add & edit new task page
+
+## improve [v0.34.24] 2023-07-21
+
+- added column check doc
+- filter dropdown check doc
+- time date wait payment
+
 ## Fix [v0.34.23] 2023-07-17
 
 - fixed duplicate data in add news page
