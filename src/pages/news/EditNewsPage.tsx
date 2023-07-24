@@ -43,7 +43,6 @@ function EditNewsPage() {
   const [farmPinAll, setFarmPinAll] = useState<boolean>(false);
   const [dronePinMain, setDronePinMain] = useState<boolean>(false);
   const [dronePinAll, setDronePinAll] = useState<boolean>(false);
-
   const [descriptionEditor, setDescriptionEditor] = useState<string | null>(
     null
   );
@@ -278,12 +277,65 @@ function EditNewsPage() {
 
   useEffect(() => {
     NewsDatasource.getNewsById(queryString[1]).then((res) => {
+      let dataAll = res;
       if (res) {
         NewsDatasource.checkCountPoint("DRONER").then((res) => {
-          setDroneCountPoint(res.responseData);
+          if (res) {
+            setDroneCountPoint(res.responseData);
+            if (
+              dataAll.status === "DRAFTING" ||
+              dataAll.status === "INACTIVE"
+            ) {
+              if (
+                res.responseData.remainPinMain === 0 ||
+                res.responseData.remainPinAll === 0
+              ) {
+                const { newsName, newsDescription, newsStatus } =
+                  form.getFieldsValue();
+                NewsDatasource.editNews({
+                  id: queryString[1],
+                  title: newsName,
+                  details: newsDescription,
+                  status: newsStatus,
+                  application: application,
+                  categoryNews: categoryNews,
+                  campaignId: campId,
+                  createBy: profile.firstname + " " + profile.lastname,
+                  pinAll: res.responseData.remainPinAll === 0 && false,
+                  pinMain: res.responseData.remainPinMain === 0 && false,
+                }).then((res) => {});
+              }
+            }
+          }
         });
         NewsDatasource.checkCountPoint("FARMER").then((res) => {
-          setFarmCountPoint(res.responseData);
+          if (res) {
+            setFarmCountPoint(res.responseData);
+            if (
+              dataAll.status === "DRAFTING" ||
+              dataAll.status === "INACTIVE"
+            ) {
+              if (
+                res.responseData.remainPinMain === 0 ||
+                res.responseData.remainPinAll === 0
+              ) {
+                const { newsName, newsDescription, newsStatus } =
+                  form.getFieldsValue();
+                NewsDatasource.editNews({
+                  id: queryString[1],
+                  title: newsName,
+                  details: newsDescription,
+                  status: newsStatus,
+                  application: application,
+                  categoryNews: categoryNews,
+                  campaignId: campId,
+                  createBy: profile.firstname + " " + profile.lastname,
+                  pinAll: false,
+                  pinMain: false,
+                }).then((res) => {});
+              }
+            }
+          }
         });
         if (res.application === "FARMER") {
           setFarmPinMain(res.pinMain);
@@ -524,14 +576,16 @@ function EditNewsPage() {
                     <Checkbox
                       onChange={handlePinMain}
                       checked={
-                        status === "DRAFTING" &&
-                        farmCountPoint?.remainPinMain === 0
+                        status === "DRAFTING" ||
+                        (status === "INACTIVE" &&
+                          farmCountPoint?.remainPinMain === 0)
                           ? false
                           : farmPinMain
                       }
                       className="pt-2"
                       disabled={
-                        (status === "DRAFTING" &&
+                        status === "DRAFTING" ||
+                        (status === "INACTIVE" &&
                           farmCountPoint?.remainPinMain === 0) ||
                         !chooseFarmer ||
                         (farmCountPoint?.disablePinMain && !farmPinMain)
@@ -559,13 +613,15 @@ function EditNewsPage() {
                     <Checkbox
                       onChange={handlePinAll}
                       checked={
-                        status === "DRAFTING" &&
-                        farmCountPoint?.remainPinAll === 0
+                        status === "DRAFTING" ||
+                        (status === "INACTIVE" &&
+                          farmCountPoint?.remainPinAll === 0)
                           ? false
                           : farmPinAll
                       }
                       disabled={
-                        (status === "DRAFTING" &&
+                        status === "DRAFTING" ||
+                        (status === "INACTIVE" &&
                           farmCountPoint?.remainPinAll === 0) ||
                         !chooseFarmer ||
                         (farmCountPoint?.disablePinAll && !farmPinAll)

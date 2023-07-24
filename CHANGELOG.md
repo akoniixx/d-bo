@@ -1,5 +1,9 @@
 ## [Version - 0]
 
+## Fix [v0.34.26] 2023-07-24
+
+- clear pin if status is Draft.
+
 ## improve [v0.34.25] 2023-07-24
 
 - search task in add & edit new task page
