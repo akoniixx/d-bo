@@ -5,4 +5,4 @@ metadata:
   name: dnds-bo-prod
   namespace: production-dnds-bo
 data:
-  NODE_ENV: production
+  REACT_APP_URL_HOST: "https://api-dnds.iconkaset.com"

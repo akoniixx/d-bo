@@ -5,4 +5,4 @@ metadata:
   name: dnds-bo-staging
   namespace: staging-dnds-bo
 data:
-  NODE_ENV: staging
+  REACT_APP_URL_HOST: "https://api-dnds-staging.iconkaset.com"
