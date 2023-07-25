@@ -576,16 +576,14 @@ function EditNewsPage() {
                     <Checkbox
                       onChange={handlePinMain}
                       checked={
-                        status === "DRAFTING" ||
-                        (status === "INACTIVE" &&
-                          farmCountPoint?.remainPinMain === 0)
+                        status === "DRAFTING" &&
+                        farmCountPoint?.remainPinMain === 0
                           ? false
                           : farmPinMain
                       }
                       className="pt-2"
                       disabled={
-                        status === "DRAFTING" ||
-                        (status === "INACTIVE" &&
+                        (status === "DRAFTING" &&
                           farmCountPoint?.remainPinMain === 0) ||
                         !chooseFarmer ||
                         (farmCountPoint?.disablePinMain && !farmPinMain)
@@ -595,6 +593,8 @@ function EditNewsPage() {
                       <span
                         style={{
                           color:
+                            (status === "DRAFTING" &&
+                              farmCountPoint?.remainPinMain === 0) ||
                             !chooseFarmer ||
                             (farmCountPoint?.disablePinMain && !farmPinMain)
                               ? color.Disable
@@ -613,15 +613,13 @@ function EditNewsPage() {
                     <Checkbox
                       onChange={handlePinAll}
                       checked={
-                        status === "DRAFTING" ||
-                        (status === "INACTIVE" &&
-                          farmCountPoint?.remainPinAll === 0)
+                        status === "DRAFTING" &&
+                        farmCountPoint?.remainPinAll === 0
                           ? false
                           : farmPinAll
                       }
                       disabled={
-                        status === "DRAFTING" ||
-                        (status === "INACTIVE" &&
+                        (status === "DRAFTING" &&
                           farmCountPoint?.remainPinAll === 0) ||
                         !chooseFarmer ||
                         (farmCountPoint?.disablePinAll && !farmPinAll)
@@ -631,6 +629,8 @@ function EditNewsPage() {
                       <span
                         style={{
                           color:
+                            (status === "DRAFTING" &&
+                              farmCountPoint?.remainPinAll === 0) ||
                             !chooseFarmer ||
                             (farmCountPoint?.disablePinAll && !farmPinAll)
                               ? color.Disable
@@ -712,6 +712,8 @@ function EditNewsPage() {
                           : dronePinAll
                       }
                       disabled={
+                        (status === "DRAFTING" &&
+                          droneCountPoint?.remainPinAll === 0) ||
                         !chooseDroner ||
                         (droneCountPoint?.disablePinAll && !dronePinAll)
                       }
@@ -720,6 +722,8 @@ function EditNewsPage() {
                       <span
                         style={{
                           color:
+                            (status === "DRAFTING" &&
+                              droneCountPoint?.remainPinAll === 0) ||
                             !chooseDroner ||
                             (droneCountPoint?.disablePinAll && !dronePinAll)
                               ? color.Disable
