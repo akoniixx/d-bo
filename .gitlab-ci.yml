@@ -31,6 +31,8 @@ build-dev:
     - docker image rm ${REGISTRY_HOSTNAME}/${IMAGE_NAME}:${IMAGE_TAG}
     - docker image rm ${REGISTRY_HOSTNAME}/${IMAGE_NAME}:develop-latest
     - docker system prune -f
+  environment:
+    name: development
   only:
     - develop
 
@@ -48,6 +50,8 @@ build-staging:
     - docker image rm ${REGISTRY_HOSTNAME}/${IMAGE_NAME}:${IMAGE_TAG}
     - docker image rm ${REGISTRY_HOSTNAME}/${IMAGE_NAME}:staging-latest
     - docker system prune -f
+  environment:
+    name: staging
   only:
     - staging
 
@@ -65,6 +69,8 @@ build-prod:
     - docker image rm ${REGISTRY_HOSTNAME}/${IMAGE_NAME}:${IMAGE_TAG}
     - docker image rm ${REGISTRY_HOSTNAME}/${IMAGE_NAME}:main-latest
     - docker system prune -f
+  environment:
+    name: production
   only:
     - main
 
@@ -91,6 +97,8 @@ deploy-dev:
     - kubectl apply -f k8s/dev/deployment-dev.yaml
     - kubectl apply -f k8s/dev/service-dev.yaml
     - kubectl apply -f k8s/dev/ingress-dev.yaml
+  environment:
+    name: development
   only:
     - develop
 
@@ -116,6 +124,8 @@ deploy-staging:
     - kubectl apply -f k8s/staging/deployment-staging.yaml
     - kubectl apply -f k8s/staging/service-staging.yaml
     - kubectl apply -f k8s/staging/ingress-staging.yaml
+  environment:
+    name: staging
   only:
     - staging
 
@@ -141,6 +151,8 @@ deploy-prod:
     - kubectl apply -f k8s/prod/deployment-prod.yaml
     - kubectl apply -f k8s/prod/service-prod.yaml
     - kubectl apply -f k8s/prod/ingress-prod.yaml
+  environment:
+    name: production
   only:
     - main
 
