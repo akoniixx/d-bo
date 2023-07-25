@@ -11,6 +11,7 @@ import moment from "moment";
 import { convertBuddhistYear } from "../../utilities/ConvertToBuddhistYear";
 import { DashboardLayout } from "../../components/layout/Layout";
 import color from "../../resource/color";
+import { BASE_URL } from "../../config/config";
 
 export function HomePage() {
   let version = packageJson.version;
@@ -58,7 +59,6 @@ export function HomePage() {
         }}
       >
         <span>version {version}</span>
-        <span>{process.env.NODE_ENV}</span>
       </footer>
       </div>
       
