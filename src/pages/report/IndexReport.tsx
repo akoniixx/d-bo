@@ -625,7 +625,7 @@ function IndexReport() {
                 {moment(new Date(value)).format(dateFormat)},{" "}
                 {moment(new Date(value)).format(timeFormat)}
               </span>
-              <span style={{ color: color.Disable, fontSize: "12px" }}>
+              <span style={{ color: color.Grey, fontSize: "12px" }}>
                 {row.taskNo}
               </span>
             </>
@@ -748,7 +748,7 @@ function IndexReport() {
                   preview={false}
                   style={{ width: 18, height: 18, marginRight: 6 }}
                 />
-                สมุดบัญชีธนาคาร
+                สมุดบัญชี
               </div>
             </>
           ),

@@ -81,6 +81,7 @@ import { DashboardLayout } from "../../components/layout/Layout";
 import { Container } from "react-bootstrap";
 import { OtherAddressDatasource } from "../../datasource/OtherAddress";
 import BookBankDroner from "../../components/bookbank/BookBankDroner";
+import { CropDatasource } from "../../datasource/CropDatasource";
 
 const dateFormat = "DD/MM/YYYY";
 const dateCreateFormat = "YYYY-MM-DD";
@@ -143,60 +144,65 @@ function EditDroner() {
   const [birthDay, setBirthDay] = useState<string>();
   const [location, setLocation] = useState<SubdistrictEntity[]>([]);
   const [searchLocation] = useState("");
+  const [plantsName, setPlantsName] = useState<any[]>();
 
   let imgDroneList = [
     {
       ...UploadImageEntity_INTI,
     },
   ];
+  
   const fetchDronerById = useCallback(async () => {
     await DronerDatasource.getDronerByID(dronerId).then(async (res) => {
-      const checkBoxReason = (res.reason || []).filter((el) => {
-        return el === "บัตรประชาชนไม่ชัดเจน/ไม่ถูกต้อง";
-      });
-      const checkPlants =
-        (res.expPlant || []).filter((el) => {
-          return EXP_PLANT.some((x) => x === el);
-        }) || [];
-      const plantsOther =
-        (res.expPlant || []).filter((el) => {
-          return !EXP_PLANT.some((x) => x === el);
-        }) || [];
-      if (res) {
-        form.setFieldsValue({
-          ...res,
-          comment: res.comment || "",
-          postcode: res.address.postcode || undefined,
-          province: res.address.provinceId || undefined || "-",
-          district: res.address.districtId || undefined || "-",
-          subdistrict: res.address?.subdistrictId || undefined || "-",
-          dronerCreatedAt: `${moment(res.createdAt).format("DD/MM/YYYY")} ${
-            res.createBy === null || res.createBy === undefined
-              ? "(ลงทะเบียนโดยนักบิน)"
-              : `(${res.createBy})`
-          }`,
-          latitude: res.dronerArea?.lat || undefined,
-          longitude: res.dronerArea?.long || undefined,
-          address1: res.address?.address1 || undefined,
-          address2: res.address?.address2 || undefined,
-          checkPlantsOther: checkPlants.length > 0 ? checkPlants : [],
-          dronerArea: res.dronerArea?.subdistrictId,
-          mapUrl: res.dronerArea?.mapUrl || undefined,
-          status: res.status,
-          reason:
-            (res?.reason || [])?.filter((el) => {
-              return el !== "บัตรประชาชนไม่ชัดเจน/ไม่ถูกต้อง";
-            }).length > 0
-              ? (res?.reason || [])?.filter((el) => {
-                  return el !== "บัตรประชาชนไม่ชัดเจน/ไม่ถูกต้อง";
-                })
-              : null,
-
-          plantsOther:
-            plantsOther?.length > 0 ? plantsOther?.join(",") : undefined,
-          checkReason: checkBoxReason,
+      await CropDatasource.getCropJustName().then((crops) => {
+        setPlantsName(crops);
+        const checkBoxReason = (res.reason || []).filter((el) => {
+          return el === "บัตรประชาชนไม่ชัดเจน/ไม่ถูกต้อง";
         });
-      }
+        const checkPlants =
+          (res.expPlant || []).filter((el) => {
+            return crops.some((x: any) => x.cropName === el);
+          }) || [];
+        const plantsOther =
+          (res.expPlant || []).filter((el) => {
+            return !crops.some((x: any) => x.cropName === el);
+          }) || [];
+        if (res) {
+          form.setFieldsValue({
+            ...res,
+            comment: res.comment || "",
+            postcode: res.address.postcode || undefined,
+            province: res.address.provinceId || undefined || "-",
+            district: res.address.districtId || undefined || "-",
+            subdistrict: res.address?.subdistrictId || undefined || "-",
+            dronerCreatedAt: `${moment(res.createdAt).format("DD/MM/YYYY")} ${
+              res.createBy === null || res.createBy === undefined
+                ? "(ลงทะเบียนโดยนักบิน)"
+                : `(${res.createBy})`
+            }`,
+            latitude: res.dronerArea?.lat || undefined,
+            longitude: res.dronerArea?.long || undefined,
+            address1: res.address?.address1 || undefined,
+            address2: res.address?.address2 || undefined,
+            checkPlantsOther: checkPlants.length > 0 ? checkPlants : [],
+            dronerArea: res.dronerArea?.subdistrictId,
+            mapUrl: res.dronerArea?.mapUrl || undefined,
+            status: res.status,
+            reason:
+              (res?.reason || [])?.filter((el) => {
+                return el !== "บัตรประชาชนไม่ชัดเจน/ไม่ถูกต้อง";
+              }).length > 0
+                ? (res?.reason || [])?.filter((el) => {
+                    return el !== "บัตรประชาชนไม่ชัดเจน/ไม่ถูกต้อง";
+                  })
+                : null,
+
+            plantsOther:
+              plantsOther?.length > 0 ? plantsOther?.join(",") : undefined,
+            checkReason: checkBoxReason,
+          });
+        }
+      });
 
       setMapPosition({
         lat: parseFloat(res.dronerArea?.lat),
@@ -262,6 +268,7 @@ function EditDroner() {
       }
     });
   }, [dronerId]);
+
   useEffect(() => {
     fetchDronerById();
     fetchLocation(searchLocation);
@@ -1551,9 +1558,9 @@ function EditDroner() {
             >
               <Checkbox.Group>
                 <Space direction="vertical">
-                  {EXP_PLANT.map((el) => (
-                    <Checkbox value={el}>
-                      <label>{el}</label>
+                  {plantsName?.map((el) => (
+                    <Checkbox key={el.id} value={el.cropName}>
+                      <label>{el.cropName}</label>
                     </Checkbox>
                   ))}
                 </Space>
@@ -1602,7 +1609,7 @@ function EditDroner() {
                 defaultValue={
                   data.expPlant &&
                   data.expPlant
-                    .filter((a) => !EXP_PLANT.some((x) => x === a))
+                    .filter((a) => !plantsName?.some((x) => x.cropName === a))
                     .join(",")
                 }
               />
