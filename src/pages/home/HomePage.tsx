@@ -59,8 +59,6 @@ export function HomePage() {
         }}
       >
         <span>version {version}</span>
-        <span>{process.env.NODE_ENV}</span>
-        <span>{BASE_URL}</span>
       </footer>
       </div>
       
