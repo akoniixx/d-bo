@@ -1,4 +1,4 @@
-import { httpClient, BASE_URL } from "../config/develop-config";
+import { httpClient, BASE_URL } from "../config/config";
 import { MaintenanceSystem } from "../entities/MaintenanceSystemEntities";
 
 export class MaintenanceDataSource {

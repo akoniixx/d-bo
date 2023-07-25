@@ -6,7 +6,7 @@ import {
   UpdateDroneBrand,
 } from "./../entities/DroneBrandEntities";
 import { DroneEntity, DroneListEntity } from "./../entities/DroneEntities";
-import { BASE_URL, httpClient } from "../config/develop-config";
+import { BASE_URL, httpClient } from "../config/config";
 
 export class DroneDatasource {
   static getDroneList(

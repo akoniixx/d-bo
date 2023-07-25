@@ -1,4 +1,4 @@
-import { httpClient, BASE_URL } from "../config/develop-config";
+import { httpClient, BASE_URL } from "../config/config";
 import { PointSettingEntities } from '../entities/PointSettingEntities';
 
 export class PointSettingDatasource {

@@ -1,4 +1,4 @@
-import { httpClient, BASE_URL } from "../config/develop-config";
+import { httpClient, BASE_URL } from "../config/config";
 import { FarmerPlotEntity } from "../entities/FarmerPlotEntities";
 
 
