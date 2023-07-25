@@ -1,7 +1,6 @@
 import axios from "axios";
 
-const DEV_URL = 'https://api-dnds-dev.iconkaset.com'
-export const BASE_URL = process.env.NODE_ENV === "development" ? DEV_URL : process.env.REACT_APP_URL_HOST;;
+export const BASE_URL = process.env.REACT_APP_URL_HOST;
 
 const token = JSON.parse(localStorage.getItem("token") || "{  }");
 
