@@ -13,6 +13,7 @@ import {
   Checkbox,
   Col,
   Divider,
+  Space,
 } from "antd";
 import { CardContainer } from "../../../components/card/CardContainer";
 import { BackIconButton } from "../../../components/button/BackButton";
@@ -76,6 +77,7 @@ import { useNavigate } from "react-router-dom";
 import { DashboardLayout } from "../../../components/layout/Layout";
 import BookBankDroner from "../../../components/bookbank/BookBankDroner";
 import { OtherAddressDatasource } from "../../../datasource/OtherAddress";
+import { CropDatasource } from "../../../datasource/CropDatasource";
 const dateFormat = "DD/MM/YYYY";
 const dateCreateFormat = "YYYY-MM-DD";
 
@@ -118,6 +120,7 @@ function AddDroner() {
   const [subdistrict, setSubdistrict] = useState<SubdistrictEntity[]>([
     SubdistrictEntity_INIT,
   ]);
+  const [plantsName, setPlantsName] = useState<any[]>([]);
   const [otherProvince, setOtherProvince] = useState<ProviceEntity[]>([
     ProvinceEntity_INIT,
   ]);
@@ -150,6 +153,7 @@ function AddDroner() {
 
   useEffect(() => {
     fetchProvince();
+    getCropsName();
     fetchLocation(searchLocation);
   }, [searchLocation]);
   //#region data droner
@@ -162,6 +166,11 @@ function AddDroner() {
   const fetchLocation = async (text?: string) => {
     await LocationDatasource.getSubdistrict(0, text).then((res) => {
       setLocation(res);
+    });
+  };
+  const getCropsName = async () => {
+    await CropDatasource.getCropJustName().then((res) => {
+      setPlantsName(res);
     });
   };
 
@@ -1277,15 +1286,13 @@ function AddDroner() {
               ]}
             >
               <Checkbox.Group>
-                {EXP_PLANT.map((el) => {
-                  return (
-                    <Row>
-                      <Checkbox value={el}>
-                        <label>{el}</label>
-                      </Checkbox>
-                    </Row>
-                  );
-                })}
+                <Space direction="vertical">
+                  {plantsName.map((el) => (
+                    <Checkbox key={el.id} value={el.cropName}>
+                      <label>{el.cropName}</label>
+                    </Checkbox>
+                  ))}
+                </Space>
               </Checkbox.Group>
             </Form.Item>
           </div>

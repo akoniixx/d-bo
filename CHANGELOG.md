@@ -1,5 +1,10 @@
 ## [Version - 0]
 
+## improve [v0.34.27] 2023-07-25
+
+- fixed wording finished task page
+- call api crop name
+
 ## Fix [v0.34.26] 2023-07-24
 
 - clear pin if status is Draft.
