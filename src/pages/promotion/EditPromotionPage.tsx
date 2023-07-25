@@ -89,7 +89,7 @@ function EditPromotion() {
     any[]
   >([]);
   const twice = useRef<boolean>(true);
-  const [currenSearch, setCurrentSearch] = useState<number>(1);
+  const [currenSearch, setCurrentSearch] = useState(1);
   const [count, setCount] = useState<number>(0);
   const [renderMobile, setRenderMobile] = useState({
     couponName: "",
@@ -144,7 +144,6 @@ function EditPromotion() {
         });
         return result;
       });
-      setCurrentSearch(currenSearch + 1);
       setFarmerList(
         data.map((item: any) => {
           return {
@@ -188,7 +187,6 @@ function EditPromotion() {
       }),
     ]);
   };
-
   const getPromotion = (id: string) => {
     CouponDataSource.queryCoupon(id)
       .then(async (res) => {
@@ -1392,7 +1390,7 @@ function EditPromotion() {
                       paddingLeft: "16px",
                     }}
                   >
-                    <Form.Item
+                    {/* <Form.Item
                       name="couponConditionFarmerList"
                       rules={[
                         {
@@ -1400,7 +1398,7 @@ function EditPromotion() {
                           message: "กรุณากรอกเลือกจังหวัด",
                         },
                       ]}
-                    >
+                    > */}
                       <CheckPicker
                         disabled={!specificFarmer}
                         data={farmerList}
@@ -1420,7 +1418,7 @@ function EditPromotion() {
                           },
                         }}
                       />
-                    </Form.Item>
+                    {/* </Form.Item> */}
                   </div>
                 </div>
               </div>
