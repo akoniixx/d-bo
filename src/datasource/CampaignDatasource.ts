@@ -1,4 +1,4 @@
-import { BASE_URL, httpClient } from "../config/develop-config";
+import { BASE_URL, httpClient } from "../config/config";
 import { CreateCampaignEntiry } from "../entities/CampaignPointEntites";
 import { MissionDetailEntity } from "../entities/MissionEntities";
 import { RedeemDronerListEntity } from "../entities/RedeemEntities";

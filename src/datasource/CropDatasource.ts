@@ -1,4 +1,4 @@
-import { BASE_URL, httpClient } from "../config/develop-config";
+import { BASE_URL, httpClient } from "../config/config";
 import { CropPurposeSprayEntity } from "../entities/CropEntities";
 
 export class CropDatasource {

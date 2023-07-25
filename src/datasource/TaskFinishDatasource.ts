@@ -1,5 +1,5 @@
 import { TaskFinishListEntity, TaskReportListEntity } from "./../entities/TaskFinishEntities";
-import { BASE_URL, httpClient } from "../config/develop-config";
+import { BASE_URL, httpClient } from "../config/config";
 
 export class TaskFinishedDatasource {
   static getTaskFinishList(

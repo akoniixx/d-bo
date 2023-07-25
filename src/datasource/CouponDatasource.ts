@@ -1,4 +1,4 @@
-import { BASE_URL, httpClient } from "../config/develop-config";
+import { BASE_URL, httpClient } from "../config/config";
 import { GetTaskCoupon } from "../entities/CalculateTask";
 import { CouponEntities, CouponFarmerUsed } from "../entities/CouponEntites";
 

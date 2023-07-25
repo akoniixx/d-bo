@@ -1,6 +1,6 @@
 import { message } from "antd";
 import axios from "axios";
-import { httpClient, BASE_URL } from "../config/develop-config";
+import { httpClient, BASE_URL } from "../config/config";
 
 export class AuthDatasource {
   static login(username: string, password: string) {

@@ -1,4 +1,4 @@
-import { BASE_URL, httpClient } from "../config/develop-config";
+import { BASE_URL, httpClient } from "../config/config";
 import { TaskDetailEntity, TaskTodayListEntity, UpdateTask } from "../entities/TaskInprogressEntities";
 
 export class TaskInprogressDatasource {
