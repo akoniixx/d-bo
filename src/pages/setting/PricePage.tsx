@@ -2,7 +2,6 @@ import { EditOutlined, SearchOutlined } from "@ant-design/icons";
 import { Button, Input, Pagination, Select, Table } from "antd";
 import { useEffect, useState } from "react";
 import ActionButton from "../../components/button/ActionButton";
-import Layouts from "../../components/layout/Layout";
 import ModalCropByProvince from "../../components/modal/ModalCropByProvince";
 import ModalEditLocationPrice from "../../components/modal/ModalEditLocationPrice";
 import color from "../../resource/color";
@@ -14,6 +13,7 @@ import {
   UpdateLocationPrice_INIT,
 } from "../../entities/LocationPrice";
 import moment from "moment";
+import { DashboardLayout } from "../../components/layout/Layout";
 
 function PricePage() {
   const row = 10;
@@ -224,10 +224,10 @@ function PricePage() {
   );
 
   return (
-    <Layouts>
+    <>
       {pageTitle}
       <Table columns={columns} dataSource={data?.data} pagination={false} />
-      <div className="d-flex justify-content-between pt-5">
+      <div className="d-flex justify-content-between pt-3 pb-3">
         <p>รายการทั้งหมด {data?.count} รายการ</p>
         <Pagination
           current={current}
@@ -255,7 +255,7 @@ function PricePage() {
           backButton={() => setShowModalCrop((prev) => !prev)}
         />
       )}
-    </Layouts>
+    </>
   );
 }
 export default PricePage;

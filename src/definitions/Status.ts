@@ -28,6 +28,7 @@ export const STATUS_COLOR_MAPPING: any = {
   REJECTED: color.Error,
   INACTIVE: color.Error,
   OPEN: color.Grey,
+  DRAFTING: color.Grey,
 };
 
 export const FARMER_STATUS_SEARCH = [
@@ -147,4 +148,41 @@ export const STATUS_COUPON: any = {
   ACTIVE: "ใช้งาน",
   DRAFTING: "รอเปิดการใช้งาน",
   INACTIVE: "ปิดการใช้งาน",
+};
+export const REWARD_STATUS = [
+  //{ value: "", name: "ทั้งหมด" },
+  { value: "ACTIVE", name: "ใช้งาน" },
+  { value: "DRAFTING", name: "รอเปิดใช้งาน" },
+  { value: "INACTIVE", name: "ปิดการใช้งาน" },
+];
+export const REWARD_REDEEM_HIS_STATUS = [
+  { value: "", name: "ทั้งหมด" },
+  { value: "REQUEST", name: "คำร้องขอแลก" },
+  { value: "PREPARE", name: "เตรียมจัดส่ง" },
+  { value: "DONE", name: "จัดส่งแล้ว" },
+  { value: "CANCEL", name: "ยกเลิก" },
+];
+export const COLOR_QUOTA_REDEEM: any = {
+  REQUEST: color.secondary2,
+  PREPARE: color.secondary1,
+  DONE: color.Success,
+  CANCEL: color.Error,
+};
+export const COLOR_QUOTA_REDEEM_DIG: any = {
+  REQUEST: color.secondary1,  
+  CANCEL: color.Error,
+  USED: color.Success,
+  EXPIRED: color.Grey,
+};
+export const STATUS_QUOTA_REDEEM: any = {
+  REQUEST: "คำร้องขอแลก",
+  PREPARE: "เตรียมจัดส่ง",
+  DONE: "จัดส่งแล้ว",
+  CANCEL: "ยกเลิก",
+};
+export const STATUS_QUOTA_REDEEM_DIG: any = {
+  REQUEST: "พร้อมใช้",
+  CANCEL: "ยกเลิก",
+  USED: "ใช้แล้ว",
+  EXPIRED: "หมดอายุ",
 };

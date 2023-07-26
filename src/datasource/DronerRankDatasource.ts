@@ -1,5 +1,5 @@
 import { DronerRankDetailEntity, DronerRankListEntity, taskDetailEntity } from './../entities/DronerRankEntities';
-import { BASE_URL, httpClient } from "../config/develop-config";
+import { BASE_URL, httpClient } from "../config/config";
 export class DronerRankDatasource {
   static getDronerRank(
     page: number,

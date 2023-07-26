@@ -5,7 +5,6 @@ import React, { useEffect, useState } from "react";
 import ActionButton from "../../components/button/ActionButton";
 import AddButtton from "../../components/button/AddButton";
 import { CardContainer } from "../../components/card/CardContainer";
-import Layout from "../../components/layout/Layout";
 import { AdminDatasource } from "../../datasource/AdminDatasource";
 import { ROLE_ADMIN } from "../../definitions/RoleAdmin";
 import { STATUS_NORMAL_MAPPING } from "../../definitions/Status";
@@ -15,8 +14,11 @@ import {
 } from "../../entities/UserStaffEntities";
 import { color } from "../../resource";
 import { DateTimeUtil } from "../../utilities/DateTimeUtil";
+import { DashboardLayout } from "../../components/layout/Layout";
+import { useNavigate } from "react-router-dom";
 
 const IndexAdmin = () => {
+  const navigate = useNavigate();
   const row = 10;
   const [data, setData] = useState<UserStaffPageEntity>(
     UserStaffPageEntity_INIT
@@ -95,8 +97,7 @@ const IndexAdmin = () => {
         return {
           children: (
             <span style={{ color: value ? color.Success : color.Error }}>
-              <Badge color={value ? color.Success : color.Error} />
-              {" "}
+              <Badge color={value ? color.Success : color.Error} />{" "}
               {value ? "ใช้งาน" : "ไม่ใช้งาน"}
             </span>
           ),
@@ -124,9 +125,7 @@ const IndexAdmin = () => {
               <ActionButton
                 icon={<EditOutlined />}
                 color={color.primary1}
-                onClick={() =>
-                  (window.location.href = "/EditAdmin/id=" + value)
-                }
+                onClick={() => navigate("/EditAdmin/id=" + value)}
               />
             </div>
           ),
@@ -175,14 +174,14 @@ const IndexAdmin = () => {
       <div className="col-lg-2">
         <AddButtton
           text="เพิ่มผู้ดูแลระบบ"
-          onClick={() => (window.location.href = "/AddAdmin")}
+          onClick={() => navigate("/AddAdmin")}
         />
       </div>
     </div>
   );
 
   return (
-    <Layout>
+    <>
       {pageTitle}
       <CardContainer>
         <Table
@@ -193,7 +192,7 @@ const IndexAdmin = () => {
           tableLayout="fixed"
         />
       </CardContainer>
-      <div className="d-flex justify-content-between pt-5">
+      <div className="d-flex justify-content-between pt-3 pb-3">
         <p>รายการทั้งหมด {data.total} รายการ</p>
         <Pagination
           current={current}
@@ -202,7 +201,7 @@ const IndexAdmin = () => {
           pageSize={row}
         />
       </div>
-    </Layout>
+    </>
   );
 };
 export default IndexAdmin;

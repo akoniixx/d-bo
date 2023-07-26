@@ -12,7 +12,6 @@ import {
 import moment from "moment";
 import React, { useEffect, useState } from "react";
 import ActionButton from "../../../components/button/ActionButton";
-import Layouts from "../../../components/layout/Layout";
 import { LocationDatasource } from "../../../datasource/LocationDatasource";
 import {
   DistrictEntity,
@@ -42,9 +41,12 @@ import {
   numberWithCommas,
   numberWithCommasToFixed,
 } from "../../../utilities/TextFormatter";
+import { DashboardLayout } from "../../../components/layout/Layout";
+import { useNavigate } from "react-router-dom";
 import InvoiceTask from "../../../components/popover/InvoiceTask";
 import { InvoiceTaskEntity } from "../../../entities/NewTaskEntities";
 export default function IndexFinishTask() {
+  const navigate = useNavigate();
   const row = 10;
   const [current, setCurrent] = useState(1);
   const [data, setData] = useState<TaskFinishListEntity>();
@@ -485,7 +487,7 @@ export default function IndexFinishTask() {
                   icon={<EditOutlined />}
                   color={color.primary1}
                   onClick={() =>
-                    (window.location.href = "/ReviewTask?=" + row.id)
+                    navigate("/ReviewTask?=" + row.id)
                   }
                 />
               ) : row.status == "CANCELED" ? (
@@ -493,7 +495,7 @@ export default function IndexFinishTask() {
                   icon={<FileTextOutlined />}
                   color={color.primary1}
                   onClick={() =>
-                    (window.location.href = "/CancelTask?=" + row.id)
+                    navigate("/CancelTask?=" + row.id)
                   }
                 />
               ) : row.status == "DONE" ? (
@@ -501,7 +503,7 @@ export default function IndexFinishTask() {
                   icon={<FileTextOutlined />}
                   color={color.primary1}
                   onClick={() =>
-                    (window.location.href = "/FinishTasks?=" + row.id)
+                    navigate("/FinishTasks?=" + row.id)
                   }
                 />
               ) : null}
@@ -512,7 +514,7 @@ export default function IndexFinishTask() {
     },
   ];
   return (
-    <Layouts>
+    <>
       {PageTitle}
       <br />
       <Table
@@ -527,7 +529,7 @@ export default function IndexFinishTask() {
             : "table-row-lasted"
         }
       />
-      <div className="d-flex justify-content-between pt-5">
+      <div className="d-flex justify-content-between pt-3 pb-3">
         <p>รายการทั้งหมด {data?.count} รายการ</p>
         <Pagination
           current={current}
@@ -545,6 +547,6 @@ export default function IndexFinishTask() {
           plotId={plotId}
         />
       )}
-    </Layouts>
+    </>
   );
 }

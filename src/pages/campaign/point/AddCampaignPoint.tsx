@@ -17,7 +17,7 @@ import { BackIconButton } from "../../../components/button/BackButton";
 import { CardContainer } from "../../../components/card/CardContainer";
 import FooterPage from "../../../components/footer/FooterPage";
 import { CardHeader } from "../../../components/header/CardHearder";
-import Layouts from "../../../components/layout/Layout";
+import { DashboardLayout } from "../../../components/layout/Layout";
 import { CampaignDatasource } from "../../../datasource/CampaignDatasource";
 import { CreateCampaignEntiry } from "../../../entities/CampaignPointEntites";
 import { color } from "../../../resource";
@@ -91,7 +91,7 @@ const AddCampaignPoint = () => {
     setCreate(data);
     CampaignDatasource.createCampaign(data).then((res) => {
       if (res.success) {
-        window.location.href = "/IndexCampaignPoint";
+        navigate("/IndexCampaignPoint");
       } else {
         if (res.userMessage === "dupplicate") {
         } else {
@@ -114,238 +114,236 @@ const AddCampaignPoint = () => {
 
   return (
     <>
-      <Layouts>
-        <Row>
-          <BackIconButton onClick={() => navigate(-1)} />
-          <span className="pt-3">
-            <strong style={{ fontSize: "20px" }}>เพิ่มแคมเปญแต้ม</strong>
-          </span>
-        </Row>
-        <CardContainer>
-          <CardHeader textHeader="ข้อมูลแคมเปญแต้ม" />
-          <Form style={{ padding: "32px" }} form={form}>
-            <Col span={24}>
+      <Row>
+        <BackIconButton onClick={() => navigate(-1)} />
+        <span className="pt-3">
+          <strong style={{ fontSize: "20px" }}>เพิ่มแคมเปญแต้ม</strong>
+        </span>
+      </Row>
+      <CardContainer>
+        <CardHeader textHeader="ข้อมูลแคมเปญแต้ม" />
+        <Form style={{ padding: "32px" }} form={form}>
+          <Col span={24}>
+            <label>
+              ชื่อแคมเปญแต้ม<span style={{ color: color.Error }}>*</span>
+            </label>
+            <Form.Item
+              name="campaignName"
+              rules={[
+                {
+                  required: true,
+                  message: "กรุณากรอกชื่อแคมเปญแต้ม!",
+                },
+              ]}
+            >
+              <Input placeholder="กรอกชื่อแคมเปญแต้ม" autoComplete="off" />
+            </Form.Item>
+          </Col>
+          <Row>
+            <Col span={7}>
               <label>
-                ชื่อแคมเปญแต้ม<span style={{ color: color.Error }}>*</span>
+                วันเริ่มต้น<span style={{ color: color.Error }}>*</span>
               </label>
-              <Form.Item
-                name="campaignName"
-                rules={[
-                  {
-                    required: true,
-                    message: "กรุณากรอกชื่อแคมเปญแต้ม!",
-                  },
-                ]}
-              >
-                <Input placeholder="กรอกชื่อแคมเปญแต้ม" autoComplete="off" />
-              </Form.Item>
-            </Col>
-            <Row>
-              <Col span={7}>
-                <label>
-                  วันเริ่มต้น<span style={{ color: color.Error }}>*</span>
-                </label>
-                <div className="d-flex">
-                  <Form.Item
-                    dependencies={[
-                      "endDate",
-                      "application",
-                      "startTime",
-                      "endTime",
-                    ]}
-                    name="startDate"
-                    rules={[
-                      {
-                        required: true,
-                        message: "กรุณากรอกวันที่!",
-                      },
-                      {
-                        validator: (rules, value) => {
-                          return new Promise(async (resolve, reject) => {
-                            if (await checkDupCampiagn()) {
-                              reject("");
-                            } else {
-                              resolve(true);
-                            }
-                          });
-                        },
-                      },
-                    ]}
-                  >
-                    <DatePicker
-                      placeholder="เลือกวันที่"
-                      format={dateFormat}
-                      onChange={checkDupCampiagn}
-                    />
-                  </Form.Item>
-                  <Form.Item
-                    name="startTime"
-                    initialValue={moment("00:00", "HH:mm")}
-                  >
-                    <TimePicker
-                      format={"HH:mm"}
-                      className="ms-3"
-                      placeholder="เลือกเวลา"
-                      defaultValue={moment("00:00", "HH:mm")}
-                      allowClear={false}
-                    />
-                  </Form.Item>
-                </div>
-              </Col>
-              <Col span={12}>
-                <label>
-                  วันสิ้นสุด<span style={{ color: color.Error }}>*</span>
-                </label>
-                <Col className="d-flex">
-                  <Form.Item
-                    dependencies={[
-                      "endDate",
-                      "application",
-                      "startTime",
-                      "endTime",
-                    ]}
-                    name="endDate"
-                    rules={[
-                      {
-                        required: true,
-                        message: "กรุณากรอกวันที่!",
-                      },
-                      {
-                        validator: (rules, value) => {
-                          return new Promise(async (resolve, reject) => {
-                            if (await checkDupCampiagn()) {
-                              reject("");
-                            } else {
-                              resolve(true);
-                            }
-                          });
-                        },
-                      },
-                    ]}
-                  >
-                    <DatePicker
-                      placeholder="เลือกวันที่"
-                      format={dateFormat}
-                      onChange={checkDupCampiagn}
-                    />
-                  </Form.Item>
-                  <Form.Item
-                    name="endTime"
-                    initialValue={moment("23:59", "HH:mm")}
-                  >
-                    <TimePicker
-                      format={"HH:mm"}
-                      className="ms-3"
-                      placeholder="เลือกเวลา"
-                      defaultValue={moment("00:00", "HH:mm")}
-                      allowClear={false}
-                    />
-                  </Form.Item>
-                </Col>
-              </Col>
-            </Row>
-            {checkDup && (
-              <p style={{ color: color.Error }}>
-                กรุณาเปลี่ยนแปลงช่วงเวลา “วันเริ่มต้น” หรือ “วันสิ้นสุด”
-                เนื่องจากซ้ำกับช่วงเวลาของแคมเปญอื่นที่สร้างไว้ก่อนหน้า
-              </p>
-            )}
-            <Row gutter={8} justify={"start"}>
-              <Col span={7}>
-                <label>
-                  แต้มที่ได้รับ<span style={{ color: color.Error }}>*</span>
-                </label>
+              <div className="d-flex">
                 <Form.Item
-                  name="point"
+                  dependencies={[
+                    "endDate",
+                    "application",
+                    "startTime",
+                    "endTime",
+                  ]}
+                  name="startDate"
                   rules={[
                     {
                       required: true,
-                      message: "กรุณากรอกจำนวนแต้ม!",
+                      message: "กรุณากรอกวันที่!",
+                    },
+                    {
+                      validator: (rules, value) => {
+                        return new Promise(async (resolve, reject) => {
+                          if (await checkDupCampiagn()) {
+                            reject("");
+                          } else {
+                            resolve(true);
+                          }
+                        });
+                      },
                     },
                   ]}
                 >
-                  <Input
-                    placeholder="กรอกแต้มที่ได้รับ"
-                    suffix="แต้ม"
-                    autoComplete="off"
-                    onChange={(e) => checkNumber(e, "point")}
+                  <DatePicker
+                    placeholder="เลือกวันที่"
+                    format={dateFormat}
+                    onChange={checkDupCampiagn}
                   />
                 </Form.Item>
-              </Col>
-              <Col>
-                <label style={{ paddingTop: "25px" }}> : </label>
-              </Col>
-              <Col span={7}>
-                <label>
-                  จำนวนไร่ <span style={{ color: color.Error }}>*</span>
-                </label>
                 <Form.Item
-                  name="rai"
+                  name="startTime"
+                  initialValue={moment("00:00", "HH:mm")}
+                >
+                  <TimePicker
+                    format={"HH:mm"}
+                    className="ms-3"
+                    placeholder="เลือกเวลา"
+                    defaultValue={moment("00:00", "HH:mm")}
+                    allowClear={false}
+                  />
+                </Form.Item>
+              </div>
+            </Col>
+            <Col span={12}>
+              <label>
+                วันสิ้นสุด<span style={{ color: color.Error }}>*</span>
+              </label>
+              <Col className="d-flex">
+                <Form.Item
+                  dependencies={[
+                    "endDate",
+                    "application",
+                    "startTime",
+                    "endTime",
+                  ]}
+                  name="endDate"
                   rules={[
                     {
                       required: true,
-                      message: "กรุณากรอกจำนวนไร่!",
+                      message: "กรุณากรอกวันที่!",
+                    },
+                    {
+                      validator: (rules, value) => {
+                        return new Promise(async (resolve, reject) => {
+                          if (await checkDupCampiagn()) {
+                            reject("");
+                          } else {
+                            resolve(true);
+                          }
+                        });
+                      },
                     },
                   ]}
                 >
-                  <Input
-                    placeholder="กรอกจำนวนไร่ "
-                    suffix="ไร่"
-                    autoComplete="off"
-                    onChange={(e) => checkNumber(e, "rai")}
+                  <DatePicker
+                    placeholder="เลือกวันที่"
+                    format={dateFormat}
+                    onChange={checkDupCampiagn}
+                  />
+                </Form.Item>
+                <Form.Item
+                  name="endTime"
+                  initialValue={moment("23:59", "HH:mm")}
+                >
+                  <TimePicker
+                    format={"HH:mm"}
+                    className="ms-3"
+                    placeholder="เลือกเวลา"
+                    defaultValue={moment("00:00", "HH:mm")}
+                    allowClear={false}
                   />
                 </Form.Item>
               </Col>
-            </Row>
-            <Col>
+            </Col>
+          </Row>
+          {checkDup && (
+            <p style={{ color: color.Error }}>
+              กรุณาเปลี่ยนแปลงช่วงเวลา “วันเริ่มต้น” หรือ “วันสิ้นสุด”
+              เนื่องจากซ้ำกับช่วงเวลาของแคมเปญอื่นที่สร้างไว้ก่อนหน้า
+            </p>
+          )}
+          <Row gutter={8} justify={"start"}>
+            <Col span={7}>
               <label>
-                แอปพลิเคชัน <span style={{ color: color.Error }}>*</span>
+                แต้มที่ได้รับ<span style={{ color: color.Error }}>*</span>
               </label>
               <Form.Item
-                name="application"
+                name="point"
                 rules={[
                   {
                     required: true,
-                    message: "กรุณาเลือกแอปพลิเคชัน",
+                    message: "กรุณากรอกจำนวนแต้ม!",
                   },
                 ]}
               >
-                <Radio.Group
-                  className="d-flex flex-column"
-                  onChange={checkDupCampiagn}
-                >
-                  <Radio value={"FARMER"}>Farmer</Radio>
-                  <Radio value={"DRONER"}>Droner</Radio>
-                </Radio.Group>
+                <Input
+                  placeholder="กรอกแต้มที่ได้รับ"
+                  suffix="แต้ม"
+                  autoComplete="off"
+                  onChange={(e) => checkNumber(e, "point")}
+                />
               </Form.Item>
             </Col>
             <Col>
+              <label style={{ paddingTop: "25px" }}> : </label>
+            </Col>
+            <Col span={7}>
               <label>
-                สถานะ <span style={{ color: color.Error }}>*</span>
+                จำนวนไร่ <span style={{ color: color.Error }}>*</span>
               </label>
               <Form.Item
-                name="status"
+                name="rai"
                 rules={[
                   {
                     required: true,
-                    message: "กรุณาเลือกแอปพลิเคชัน",
+                    message: "กรุณากรอกจำนวนไร่!",
                   },
                 ]}
               >
-                <Radio.Group className="d-flex flex-column">
-                  <Radio value={"ACTIVE"}>ใช้งาน</Radio>
-                  <Radio value={"DRAFTING"}>รอเปิดใช้งาน</Radio>
-                </Radio.Group>
+                <Input
+                  placeholder="กรอกจำนวนไร่ "
+                  suffix="ไร่"
+                  autoComplete="off"
+                  onChange={(e) => checkNumber(e, "rai")}
+                />
               </Form.Item>
             </Col>
-          </Form>
-        </CardContainer>
-        <FooterPage
-          onClickBack={() => navigate(-1)}
-          styleFooter={{ padding: "6px" }}
-          onClickSave={() => submit()}
-        />
-      </Layouts>
+          </Row>
+          <Col>
+            <label>
+              แอปพลิเคชัน <span style={{ color: color.Error }}>*</span>
+            </label>
+            <Form.Item
+              name="application"
+              rules={[
+                {
+                  required: true,
+                  message: "กรุณาเลือกแอปพลิเคชัน",
+                },
+              ]}
+            >
+              <Radio.Group
+                className="d-flex flex-column"
+                onChange={checkDupCampiagn}
+              >
+                <Radio value={"FARMER"}>Farmer</Radio>
+                <Radio value={"DRONER"}>Droner</Radio>
+              </Radio.Group>
+            </Form.Item>
+          </Col>
+          <Col>
+            <label>
+              สถานะ <span style={{ color: color.Error }}>*</span>
+            </label>
+            <Form.Item
+              name="status"
+              rules={[
+                {
+                  required: true,
+                  message: "กรุณาเลือกแอปพลิเคชัน",
+                },
+              ]}
+            >
+              <Radio.Group className="d-flex flex-column">
+                <Radio value={"ACTIVE"}>ใช้งาน</Radio>
+                <Radio value={"DRAFTING"}>รอเปิดใช้งาน</Radio>
+              </Radio.Group>
+            </Form.Item>
+          </Col>
+        </Form>
+      </CardContainer>
+      <FooterPage
+        onClickBack={() => navigate(-1)}
+        styleFooter={{ padding: "6px" }}
+        onClickSave={() => submit()}
+      />
       {showModal && (
         <Modal
           title="ยืนยันการเพิ่ม"

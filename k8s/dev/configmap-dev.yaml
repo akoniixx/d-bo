@@ -5,4 +5,5 @@ metadata:
   name: dnds-bo-dev
   namespace: development-dnds-bo
 data:
-  BASE_URL: https://api-dnds-dev.iconkaset.com/
+  NODE_ENV: "development"
+  REACT_APP_URL_HOST: "https://api-dnds-dev.iconkaset.com"

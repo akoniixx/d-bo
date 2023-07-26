@@ -3,6 +3,7 @@ export interface UploadImageEntity {
   resource: string;
   category: string;
   file: any;
+  fileName?: string;
   path: string;
 }
 
@@ -16,6 +17,7 @@ export const ImageEntity_INTI: ImageEntity = {
   resource: "",
   category: "",
   file: "",
+  fileName: "",
   path: "",
 };
 
@@ -24,5 +26,6 @@ export const UploadImageEntity_INTI: UploadImageEntity = {
   resource: "",
   category: "",
   file: "",
+  fileName: "",
   path: "",
 };

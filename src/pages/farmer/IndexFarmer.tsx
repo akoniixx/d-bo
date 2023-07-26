@@ -1,9 +1,7 @@
-import { Badge, Pagination, Select, Table } from "antd";
+import { Badge, Pagination, Row, Select, Table } from "antd";
 import React, { useEffect, useState } from "react";
-import Search from "antd/lib/input/Search";
 import { Option } from "antd/lib/mentions";
 import color from "../../resource/color";
-import Layouts from "../../components/layout/Layout";
 import ActionButton from "../../components/button/ActionButton";
 import {
   CaretDownOutlined,
@@ -315,7 +313,7 @@ function IndexFarmer() {
   const pageTitle = (
     <>
       <div
-        className="container d-flex justify-content-between"
+        className="d-flex justify-content-between"
         style={{ padding: "10px" }}
       >
         <div>
@@ -333,7 +331,7 @@ function IndexFarmer() {
         <div>
           <AddButtton
             text="เพิ่มเกษตรกร"
-            onClick={() => (window.location.href = "/AddFarmer")}
+            onClick={() => navigate("/AddFarmer")}
           />
         </div>
       </div>
@@ -493,6 +491,7 @@ function IndexFarmer() {
 
   const columns = [
     {
+      width: "16%",
       title: () => {
         return (
           <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
@@ -637,6 +636,7 @@ function IndexFarmer() {
       title: "จำนวนแปลง",
       dataIndex: "totalPlotCount",
       key: "totalPlotCount",
+      width: "10%",
       render: (value: any, row: any, index: number) => {
         return {
           children: <span>{row.totalPlotCount} แปลง</span>,
@@ -647,6 +647,7 @@ function IndexFarmer() {
       title: "จำนวนไร่",
       dataIndex: "totalRaiCount",
       key: "totalRaiCount",
+      width: "8%",
       render: (value: any, row: any, index: number) => {
         return {
           children: (
@@ -694,22 +695,18 @@ function IndexFarmer() {
       render: (value: any, row: any, index: number) => {
         return {
           children: (
-            <div className="d-flex flex-row justify-content-between">
-              {/* <ActionButton
+            <Row justify={'space-between'}>
+              <ActionButton
                 icon={<FolderViewOutlined />}
                 color={color.primary1}
-                onClick={() =>
-                  (window.location.href = "/IndexDetailFarmerPoint/id=" + row.id)
-                }
-              /> */}
+                onClick={() => navigate("/IndexFarmerHistorySum/id=" + row.id)}
+              />
               <ActionButton
                 icon={<EditOutlined />}
                 color={color.primary1}
-                onClick={() =>
-                  (window.location.href = "/EditFarmer/id=" + row.id)
-                }
+                onClick={() => navigate("/EditFarmer/id=" + row.id)}
               />
-            </div>
+            </Row>
           ),
         };
       },
@@ -717,7 +714,7 @@ function IndexFarmer() {
   ];
 
   return (
-    <Layouts>
+    <>
       {pageTitle}
       <CardContainer>
         <Table
@@ -739,7 +736,7 @@ function IndexFarmer() {
           }
         />
       </CardContainer>
-      <div className="d-flex justify-content-between pt-5">
+      <div className="d-flex justify-content-between pt-3 pb-3">
         <p>รายการทั้งหมด {data?.count} รายการ</p>
         <Pagination
           current={current}
@@ -749,7 +746,7 @@ function IndexFarmer() {
           showSizeChanger={false}
         />
       </div>
-    </Layouts>
+    </>
   );
 }
 

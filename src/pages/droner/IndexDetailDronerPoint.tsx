@@ -6,7 +6,7 @@ import { useNavigate } from "react-router-dom";
 import ActionButton from "../../components/button/ActionButton";
 import { BackIconButton } from "../../components/button/BackButton";
 import { CardContainer } from "../../components/card/CardContainer";
-import Layouts from "../../components/layout/Layout";
+import { DashboardLayout } from "../../components/layout/Layout";
 import { color } from "../../resource";
 import { DateTimeUtil } from "../../utilities/DateTimeUtil";
 const { RangePicker } = DatePicker;
@@ -155,8 +155,7 @@ const IndexDetailDronerPoint = () => {
                   icon={<FileTextOutlined />}
                   color={color.primary1}
                   onClick={() =>
-                    (window.location.href =
-                      "/DetailFarmerPoint/id=" + (index + 1))
+                    navigate("/DetailFarmerPoint/id=" + (index + 1))
                   }
                 />
               </div>
@@ -167,7 +166,7 @@ const IndexDetailDronerPoint = () => {
     },
   ];
   return (
-    <Layouts>
+    <>
       <Row>
         <BackIconButton onClick={() => navigate(-1)} />
         <span className="pt-3">
@@ -199,7 +198,7 @@ const IndexDetailDronerPoint = () => {
         />
       </CardContainer>
 
-      <div className="d-flex justify-content-between pt-4">
+      <div className="d-flex justify-content-between pt-3 pb-3">
         <p>รายการทั้งหมด {dataMock?.length} รายการ</p>
         <Pagination
           current={current}
@@ -209,7 +208,7 @@ const IndexDetailDronerPoint = () => {
           showSizeChanger={false}
         />
       </div>
-    </Layouts>
+    </>
   );
 };
 

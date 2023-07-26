@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import Layout from "../../components/layout/Layout";
 import { Row, Form, Input, Pagination, Table, Tag } from "antd";
 import { FileTextFilled } from "@ant-design/icons";
 import { CardContainer } from "../../components/card/CardContainer";
@@ -21,12 +20,15 @@ import emptyData from "../../resource/media/empties/iconoir_farm.png";
 import { StarFilled, FileTextOutlined } from "@ant-design/icons";
 import moment from "moment";
 import image from "../../resource/image";
+import { DashboardLayout } from "../../components/layout/Layout";
+import { useNavigate } from "react-router-dom";
 const _ = require("lodash");
-let queryString = _.split(window.location.search, "=");
 const dateFormat = "DD/MM/YYYY";
 const timeFormat = "HH:mm";
 
 function DetailRankDroner() {
+  let queryString = _.split(window.location.search, "=");
+  const navigate = useNavigate();
   const style: React.CSSProperties = {
     backgroundColor: "#2196531A",
     width: "30%",
@@ -354,7 +356,7 @@ function DetailRankDroner() {
                 icon={<FileTextOutlined />}
                 color={color.primary1}
                 onClick={() =>
-                  (window.location.href = "/DetailWorkDroner?=" + row.id)
+                  navigate("/DetailWorkDroner?=" + row.id)
                 }
               />
             </>
@@ -364,10 +366,10 @@ function DetailRankDroner() {
     },
   ];
   return (
-    <Layout>
+    <>
       <Row>
         <BackIconButton
-          onClick={() => (window.location.href = "/IndexRankDroner")}
+          onClick={() => navigate("/IndexRankDroner")}
         />
         <span className="pt-4">
           <strong style={{ fontSize: "20px" }}>
@@ -397,7 +399,7 @@ function DetailRankDroner() {
           />
         </div>
       </Row>
-    </Layout>
+    </>
   );
 }
 export default DetailRankDroner;

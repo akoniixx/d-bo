@@ -5,7 +5,6 @@ import styled from "styled-components";
 import { BackIconButton } from "../../components/button/BackButton";
 import { CardContainer } from "../../components/card/CardContainer";
 import { CardHeader } from "../../components/header/CardHearder";
-import Layouts from "../../components/layout/Layout";
 import InvoiceTask from "../../components/popover/InvoiceTask";
 import { RedeemDatasource } from "../../datasource/RedeemDatasource";
 import { InvoiceTaskEntity } from "../../entities/NewTaskEntities";
@@ -13,8 +12,8 @@ import { DetailRedeemFermerEntity } from "../../entities/RedeemEntities";
 import { color } from "../../resource";
 import { DateTimeUtil } from "../../utilities/DateTimeUtil";
 import { numberWithCommas } from "../../utilities/TextFormatter";
+import { useNavigate } from "react-router-dom";
 const _ = require("lodash");
-let queryString = _.split(window.location.pathname, "=");
 
 const NewTable = styled(Table)`
   .ant-table-container table thead tr th {
@@ -27,6 +26,8 @@ const NewTable = styled(Table)`
 `;
 
 const DetailFarmerRedeem = () => {
+  const navigate = useNavigate();
+  let queryString = _.split(window.location.pathname, "=");
   const [data, setData] = useState<DetailRedeemFermerEntity>();
   const [dataHis, setDataHis] = useState<
     {
@@ -66,6 +67,7 @@ const DetailFarmerRedeem = () => {
           {
             dateTime: res.createdAt,
             remark: "-",
+            createBy: res.createBy,
             updateBy: res.createBy,
             status: "แลกสำเร็จ",
           },
@@ -276,7 +278,11 @@ const DetailFarmerRedeem = () => {
           </Col>
           <Col span={4}>
             <div>แต้มที่แลก</div>
-            <div style={{ color: color.Error }}>- {data?.usePoint}</div>
+            <div style={{ color: color.Error }}>
+              {"- " +
+                numberWithCommas(parseFloat(data?.usePoint!) || 0) +
+                " แต้ม"}
+            </div>
           </Col>
         </Row>
       </Container>
@@ -285,11 +291,9 @@ const DetailFarmerRedeem = () => {
   );
 
   return (
-    <Layouts>
+    <>
       <Row>
-        <BackIconButton
-          onClick={() => (window.location.href = "/IndexRedeem/Farmer")}
-        />
+        <BackIconButton onClick={() => navigate("/IndexRedeem/Farmer")} />
         <span className="pt-3">
           <strong style={{ fontSize: "20px" }}>รายละเอียดการแลกแต้ม</strong>
         </span>
@@ -297,7 +301,7 @@ const DetailFarmerRedeem = () => {
       {renderTaskDetail}
       <br />
       {renderFarmerDetail}
-    </Layouts>
+    </>
   );
 };
 

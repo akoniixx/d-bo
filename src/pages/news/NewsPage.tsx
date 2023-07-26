@@ -1,40 +1,63 @@
-import React, { useEffect, useState } from 'react'
-import Layouts from '../../components/layout/Layout'
-import Search from 'antd/lib/input/Search'
-import Select from 'antd/lib/select'
+import React, { useEffect, useState } from "react";
+import Search from "antd/lib/input/Search";
+import Select from "antd/lib/select";
 import { Option } from "antd/lib/mentions";
-import { Badge, Button, Pagination, Table } from 'antd';
-import { color } from '../../resource';
-import ActionButton from '../../components/button/ActionButton';
-import { CaretDownOutlined, CaretUpOutlined, DeleteOutlined, EditOutlined, UserOutlined } from '@ant-design/icons';
-import { useNavigate } from 'react-router-dom';
-import { NewsDatasource } from '../../datasource/NewsDatasource';
-import { DateTimeUtil } from '../../utilities/DateTimeUtil';
-import { STATUS_COUPON } from '../../definitions/Status';
-import ModalDeleteNews from '../../components/modal/ModalDeleteNews';
+import { Badge, Button, Image, Pagination, Table, Tooltip } from "antd";
+import { color, icon } from "../../resource";
+import ActionButton from "../../components/button/ActionButton";
+import {
+  CaretDownOutlined,
+  CaretUpOutlined,
+  DeleteOutlined,
+  EditOutlined,
+  InfoCircleFilled,
+  UserOutlined,
+} from "@ant-design/icons";
+import { useNavigate } from "react-router-dom";
+import { NewsDatasource } from "../../datasource/NewsDatasource";
+import { DateTimeUtil } from "../../utilities/DateTimeUtil";
+import { STATUS_COUPON } from "../../definitions/Status";
+import ModalDeleteNews from "../../components/modal/ModalDeleteNews";
+import ModalNotiHistory from "../../components/modal/ModalNotiHistory";
 
 function NewsPage() {
   const navigate = useNavigate();
   const row = 10;
-  const [newsDelete,setNewsDelete] = useState<any>({
-    newsId : "",
-    newsPath : ""
-  })
-  const [status,setStatus] = useState<string | undefined>(undefined)
-  const [application,setApplication] = useState<string | undefined>(undefined)
-  const [sortDirection,setSortDirection] = useState<string | undefined>(undefined)
-  const [sortDirection1,setSortDirection1] = useState<string | undefined>(undefined)
-  const [sortDirection2,setSortDirection2] = useState<string | undefined>(undefined)
-  const [sortDirection3,setSortDirection3] = useState<string | undefined>(undefined)
-  const [sortField,setSortField] = useState<string | undefined>(undefined)
+  const [newsDelete, setNewsDelete] = useState<any>({
+    newsId: "",
+    newsPath: "",
+  });
+  const [status, setStatus] = useState<string | undefined>(undefined);
+  const [application, setApplication] = useState<string | undefined>(undefined);
+  const [sortDirection, setSortDirection] = useState<string | undefined>(
+    undefined
+  );
+  const [sortDirection1, setSortDirection1] = useState<string | undefined>(
+    undefined
+  );
+  const [sortDirection2, setSortDirection2] = useState<string | undefined>(
+    undefined
+  );
+  const [sortDirection3, setSortDirection3] = useState<string | undefined>(
+    undefined
+  );
+  const [sortDirection4, setSortDirection4] = useState<string | undefined>(
+    undefined
+  );
+  const [sortDirection5, setSortDirection5] = useState<string | undefined>(
+    undefined
+  );
+  const [showModalHis, setShowModalHis] = useState<boolean>(false);
+
+  const [sortField, setSortField] = useState<string | undefined>(undefined);
   const [modalDelete, setModalDelete] = useState<boolean>(false);
-  const [search,setSearch] = useState<string>("")
+  const [search, setSearch] = useState<string>("");
   const [current, setCurrent] = useState(1);
   const [data, setData] = useState<any>({
     count: 0,
     news: [],
   });
-  const fetchNews = ()=>{
+  const fetchNews = () => {
     NewsDatasource.getNews(
       row,
       current,
@@ -42,59 +65,60 @@ function NewsPage() {
       status,
       sortField,
       sortDirection,
-      search
-    ).then(res => {
+      search,
+      "BO"
+    ).then((res) => {
       setData({
-        count : res.count,
-        news : res.data
-      })
-    })
-  }
+        count: res.count,
+        news: res.data,
+      });
+    });
+  };
+  const onChangeSearch = (e: any) => {
+    setSearch(e.target.value);
+  };
 
-  const onChangeSearch =(e : any)=>{
-    setSearch(e.target.value)
-  }
+  const onChangeStatus = (status: string) => {
+    setStatus(status);
+  };
 
-  const onChangeStatus = (status : string)=>{
-    setStatus(status)
-  }
-
-  const onChangeApplication = (application : string)=>{
-    setApplication(application)
-  }
+  const onChangeApplication = (application: string) => {
+    setApplication(application);
+  };
 
   const onChangePage = (page: number) => {
     setCurrent(page);
   };
 
-  const deleteNews = (id: string,path: string) => {
-    console.log(id,path)
-    NewsDatasource.deleteNews(id,path)      
-    .then((res) => {
-      setModalDelete(!modalDelete);
-      window.location.reload();
-    })
-    .catch((err) => console.log(err));
+  const deleteNews = (id: string, path: string) => {
+    NewsDatasource.deleteNews(id, path)
+      .then((res) => {
+        setModalDelete(!modalDelete);
+        window.location.reload();
+      })
+      .catch((err) => console.log(err));
   };
 
-  const showDelete = (id: string,path : string) => {
+  const showDelete = (id: string, path: string) => {
     setNewsDelete({
-      newsId : id,
-      newsPath : path
-    })
+      newsId: id,
+      newsPath: path,
+    });
     setModalDelete(!modalDelete);
   };
-
-  useEffect(()=>{
-    fetchNews()
-  },[current,sortDirection])
+  const handleModalHistory = (taskId: string) => {
+    setShowModalHis((prev) => !prev);
+  };
+  useEffect(() => {
+    fetchNews();
+  }, [current, sortDirection]);
   const PageTitle = (
     <>
       <div
         className="container d-flex justify-content-between"
         style={{ padding: "10px" }}
       >
-      <div>
+        <div>
           <span
             className="card-label font-weight-bolder text-dark"
             style={{
@@ -116,95 +140,94 @@ function NewsPage() {
             />
           </div>
           <div className="col">
-          <Select
-            className="col-lg-12 p-1"
-            placeholder="เลือกสถานะ"
-            onChange={onChangeStatus}
-            showSearch
-            value={status}
-            allowClear
-            optionFilterProp="children"
-            filterOption={(input: any, option: any) =>
-              option.children.includes(input)
-            }
-            filterSort={(optionA, optionB) =>
-              optionA.children
-                .toLowerCase()
-                .localeCompare(optionB.children.toLowerCase())
-            }
-          >
-            <Option value={"ACTIVE"}>ใช้งาน</Option>
-            <Option value={"DRAFTING"}>รอเปิดใช้งาน</Option>
-            <Option value={"INACTIVE"}>ปิดการใช้งาน</Option>
-          </Select>
-        </div>
-        <div className="col">
-          <Select
-            className="col-lg-12 p-1"
-            placeholder="เลือกแอปพลิเคชั่น"
-            onChange={onChangeApplication}
-            showSearch
-            value={application}
-            allowClear
-            optionFilterProp="children"
-            filterOption={(input: any, option: any) =>
-              option.children.includes(input)
-            }
-            filterSort={(optionA, optionB) =>
-              optionA.children
-                .toLowerCase()
-                .localeCompare(optionB.children.toLowerCase())
-            }
-          >
-            <Option value={"FARMER"}>Farmer App</Option>
-            <Option value={"DRONER"}>Droner App</Option>
-            <Option value={"ALL"}>All</Option>
-          </Select>
+            <Select
+              className="col-lg-12 p-1"
+              placeholder="เลือกสถานะ"
+              onChange={onChangeStatus}
+              showSearch
+              value={status}
+              allowClear
+              optionFilterProp="children"
+              filterOption={(input: any, option: any) =>
+                option.children.includes(input)
+              }
+              filterSort={(optionA, optionB) =>
+                optionA.children
+                  .toLowerCase()
+                  .localeCompare(optionB.children.toLowerCase())
+              }
+            >
+              <Option value={"ACTIVE"}>ใช้งาน</Option>
+              <Option value={"DRAFTING"}>รอเปิดใช้งาน</Option>
+              <Option value={"INACTIVE"}>ปิดการใช้งาน</Option>
+            </Select>
+          </div>
+          <div className="col">
+            <Select
+              className="col-lg-12 p-1"
+              placeholder="เลือกแอปพลิเคชั่น"
+              onChange={onChangeApplication}
+              showSearch
+              value={application}
+              allowClear
+              optionFilterProp="children"
+              filterOption={(input: any, option: any) =>
+                option.children.includes(input)
+              }
+              filterSort={(optionA, optionB) =>
+                optionA.children
+                  .toLowerCase()
+                  .localeCompare(optionB.children.toLowerCase())
+              }
+            >
+              <Option value={"FARMER"}>Farmer App</Option>
+              <Option value={"DRONER"}>Droner App</Option>
+              <Option value={"ALL"}>All</Option>
+            </Select>
           </div>
           <div className="pt-1 me-1">
-          <Button
-            style={{
-              borderColor: color.Success,
-              borderRadius: "5px",
-              color: color.secondary2,
-              backgroundColor: color.Success,
-            }}
-            onClick={()=>{
-              setCurrent(1)
-              if(current === 1){
-                fetchNews()
-              }
-            }}
-          >
-            ค้นหาข้อมูล
-          </Button>
-        </div>
-        <div className="pt-1 col">
-          <Button
-            onClick={()=>navigate("/AddNews")}
-            style={{
-              borderColor: color.Success,
-              borderRadius: "5px",
-              color: color.secondary2,
-              backgroundColor: color.Success,
-              paddingLeft : "50px",
-              paddingRight : '50px'
-            }}
-          >
-            + เพิ่มข่าวสาร
-          </Button>
-        </div>
+            <Button
+              style={{
+                borderColor: color.Success,
+                borderRadius: "5px",
+                color: color.secondary2,
+                backgroundColor: color.Success,
+              }}
+              onClick={() => {
+                setCurrent(1);
+                if (current === 1) {
+                  fetchNews();
+                }
+              }}
+            >
+              ค้นหาข้อมูล
+            </Button>
+          </div>
+          <div className="pt-1 col">
+            <Button
+              onClick={() => navigate("/AddNews")}
+              style={{
+                borderColor: color.Success,
+                borderRadius: "5px",
+                color: color.secondary2,
+                backgroundColor: color.Success,
+                paddingLeft: "50px",
+                paddingRight: "50px",
+              }}
+            >
+              + เพิ่มข่าวสาร
+            </Button>
+          </div>
         </div>
       </div>
     </>
-  )
+  );
 
   const columns = [
     {
       title: () => {
         return (
-          <div
-            style={{ display: "flex", gap: 8, alignItems: "center" }}>
+          <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
             วันที่เผยแพร่
             <div
               style={{
@@ -213,7 +236,7 @@ function NewsPage() {
                 cursor: "pointer",
               }}
               onClick={() => {
-                setSortField("created_at")
+                setSortField("created_at");
                 setSortDirection((prev) => {
                   if (prev === "ASC") {
                     return "DESC";
@@ -232,7 +255,8 @@ function NewsPage() {
                     return undefined;
                   }
                 });
-              }}>
+              }}
+            >
               <CaretUpOutlined
                 style={{
                   position: "relative",
@@ -268,8 +292,7 @@ function NewsPage() {
     {
       title: () => {
         return (
-          <div
-            style={{ display: "flex", gap: 8, alignItems: "center" }}>
+          <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
             ชื่อข่าวสาร
             <div
               style={{
@@ -278,7 +301,7 @@ function NewsPage() {
                 cursor: "pointer",
               }}
               onClick={() => {
-                setSortField("title")
+                setSortField("title");
                 setSortDirection((prev) => {
                   if (prev === "ASC") {
                     return "DESC";
@@ -297,7 +320,8 @@ function NewsPage() {
                     return undefined;
                   }
                 });
-              }}>
+              }}
+            >
               <CaretUpOutlined
                 style={{
                   position: "relative",
@@ -323,6 +347,22 @@ function NewsPage() {
           children: (
             <div className="container">
               <span className="text-dark-75  d-block font-size-lg">
+                {(row.status === "ACTIVE" && row.pin_all === true) ||
+                (row.status === "ACTIVE" && row.pin_main === true) ? (
+                  <Tooltip
+                    title={`ปักหมุด : ${row.pin_main === true ? "หน้าหลัก" : ""}
+                    ${
+                      row.pin_all === true && row.pin_main === true ? "," : ""
+                    }${row.pin_all === true ? "หน้าข่าวสารทั้งหมด" : ""}`}
+                  >
+                    <Image
+                      preview={false}
+                      src={icon.pin}
+                      style={{ width: "22", height: "22px", paddingRight: 5 }}
+                    />
+                  </Tooltip>
+                ) : null}
+
                 {row.title}
               </span>
             </div>
@@ -333,8 +373,7 @@ function NewsPage() {
     {
       title: () => {
         return (
-          <div
-            style={{ display: "flex", gap: 8, alignItems: "center" }}>
+          <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
             อ่านแล้ว
             <div
               style={{
@@ -343,7 +382,7 @@ function NewsPage() {
                 cursor: "pointer",
               }}
               onClick={() => {
-                setSortField("read")
+                setSortField("read");
                 setSortDirection((prev) => {
                   if (prev === "ASC") {
                     return "DESC";
@@ -362,7 +401,8 @@ function NewsPage() {
                     return undefined;
                   }
                 });
-              }}>
+              }}
+            >
               <CaretUpOutlined
                 style={{
                   position: "relative",
@@ -401,54 +441,230 @@ function NewsPage() {
       key: "application",
       render: (value: any, row: any, index: number) => {
         return {
+          children:
+            row.application === "ALL" ? (
+              <div className="container d-flex flex-column">
+                <span
+                  style={{
+                    color: "#000",
+                  }}
+                >
+                  <Badge color="#000" /> {"Farmer App"}
+                </span>
+                <span
+                  style={{
+                    color: "#000",
+                  }}
+                >
+                  <Badge color="#000" /> {"Droner App"}
+                </span>
+              </div>
+            ) : row.application === "FARMER" ? (
+              <div className="container">
+                <span
+                  style={{
+                    color: "#000",
+                  }}
+                >
+                  <Badge color="#000" /> {"Farmer App"}
+                </span>
+              </div>
+            ) : (
+              <div className="container">
+                <span
+                  style={{
+                    color: "#000",
+                  }}
+                >
+                  <Badge color="#000" /> {"Droner App"}
+                </span>
+              </div>
+            ),
+        };
+      },
+    },
+    {
+      title: () => {
+        return (
+          <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+            หมวดหมู่
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                cursor: "pointer",
+              }}
+              onClick={() => {
+                setSortField("category_news");
+                setSortDirection((prev) => {
+                  if (prev === "ASC") {
+                    return "DESC";
+                  } else if (prev === undefined) {
+                    return "ASC";
+                  } else {
+                    return undefined;
+                  }
+                });
+                setSortDirection5((prev) => {
+                  if (prev === "ASC") {
+                    return "DESC";
+                  } else if (prev === undefined) {
+                    return "ASC";
+                  } else {
+                    return undefined;
+                  }
+                });
+              }}
+            >
+              <CaretUpOutlined
+                style={{
+                  position: "relative",
+                  top: 2,
+                  color: sortDirection5 === "ASC" ? "#ffca37" : "white",
+                }}
+              />
+              <CaretDownOutlined
+                style={{
+                  position: "relative",
+                  bottom: 2,
+                  color: sortDirection5 === "DESC" ? "#ffca37" : "white",
+                }}
+              />
+            </div>
+          </div>
+        );
+      },
+      dataIndex: "category_news",
+      key: "category_news",
+      render: (value: any, row: any, index: number) => {
+        return {
           children: (
-            row.application === "ALL"?
-            <div className="container d-flex flex-column">
-              <span
+            <div className="row">
+              {row.category_news === "ALL" ? (
+                <div className="container d-flex flex-column">
+                  <span
+                    style={{
+                      color: "#000",
+                    }}
+                  >
+                    {"ข่าวสาร, ชาเลนจ์"}
+                    <Tooltip title={`ชื่อชาเลนจ์ : ${row.campaign_name}`}>
+                      <InfoCircleFilled
+                        style={{
+                          color: color.Success,
+                          fontSize: "15px",
+                          marginLeft: "7px",
+                          verticalAlign: 0.5,
+                        }}
+                      />
+                    </Tooltip>
+                  </span>
+                </div>
+              ) : row.category_news === "NEWS" ? (
+                <div className="container">
+                  <span
+                    style={{
+                      color: "#000",
+                    }}
+                  >
+                    {"ข่าวสาร"}
+                  </span>
+                </div>
+              ) : (
+                <div className="container">
+                  <span
+                    style={{
+                      color: "#000",
+                    }}
+                  >
+                    {"ชาเลนจ์"}
+                  </span>
+                  <Tooltip title={`ชื่อชาเลนจ์ : ${row.campaign_name}`}>
+                    <InfoCircleFilled
+                      style={{
+                        color: color.Success,
+                        fontSize: "15px",
+                        marginLeft: "7px",
+                        verticalAlign: 0.5,
+                      }}
+                    />
+                  </Tooltip>
+                </div>
+              )}
+            </div>
+          ),
+        };
+      },
+    },
+    {
+      title: () => {
+        return (
+          <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+            คิวที่รอแจ้งเตือน
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                cursor: "pointer",
+              }}
+              onClick={() => {
+                setSortField("count_queue");
+                setSortDirection((prev) => {
+                  if (prev === "ASC") {
+                    return "DESC";
+                  } else if (prev === undefined) {
+                    return "ASC";
+                  } else {
+                    return undefined;
+                  }
+                });
+                setSortDirection4((prev) => {
+                  if (prev === "ASC") {
+                    return "DESC";
+                  } else if (prev === undefined) {
+                    return "ASC";
+                  } else {
+                    return undefined;
+                  }
+                });
+              }}
+            >
+              <CaretUpOutlined
                 style={{
-                  color : '#000'
+                  position: "relative",
+                  top: 2,
+                  color: sortDirection4 === "ASC" ? "#ffca37" : "white",
                 }}
-              >
-                <Badge
-                  color="#000"
-                />{" "}
-                {"Farmer App"}
-              </span>
-              <span
+              />
+              <CaretDownOutlined
                 style={{
-                  color : '#000'
+                  position: "relative",
+                  bottom: 2,
+                  color: sortDirection4 === "DESC" ? "#ffca37" : "white",
                 }}
-              >
-                <Badge
-                  color="#000"
-                />{" "}
-                {"Droner App"}
-              </span>
-            </div>:
-            row.application === "FARMER"?
+              />
+            </div>
+          </div>
+        );
+      },
+      dataIndex: "count_queue",
+      key: "count_queue",
+      render: (value: any, row: any, index: number) => {
+        return {
+          children: (
             <div className="container">
-              <span
+              <span>จำนวน {row.count_queue} คิว</span>
+              <br />
+              {/* <u
                 style={{
-                  color : '#000'
+                  color: color.Success,
+                  fontWeight: "bold",
+                  cursor: "pointer",
                 }}
+                onClick={() => handleModalHistory(row)}
               >
-                <Badge
-                  color="#000"
-                />{" "}
-                {"Farmer App"}
-              </span>
-            </div>:
-            <div className="container">
-              <span
-                style={{
-                  color : '#000'
-                }}
-              >
-                <Badge
-                  color="#000"
-                />{" "}
-                {"Droner App"}
-              </span>
+                ดูประวัติแจ้งเตือน
+              </u> */}
             </div>
           ),
         };
@@ -509,16 +725,31 @@ function NewsPage() {
                   icon={<EditOutlined />}
                   color={color.primary1}
                   onClick={() => {
-                    window.location.href = "/EditNews/id=" + row.id;
+                    navigate("/EditNews/id=" + row.id);
                   }}
                 />
               </div>
               <div className="pr-1">
                 <ActionButton
                   icon={<DeleteOutlined />}
-                  color={row.used > 0 ? color.Grey : color.Error}
-                  onClick={() => showDelete(row.id,row.image_path.split("https://storage.googleapis.com/dnds/news-image/")[1].split("?")[0])}
-                  actionDisable={row.used > 0 ? true : false}
+                  color={
+                    row.read > 0 || row.status === "ACTIVE"
+                      ? color.Grey
+                      : color.Error
+                  }
+                  onClick={() =>
+                    showDelete(
+                      row.id,
+                      row.image_path
+                        .split(
+                          "https://storage.googleapis.com/dnds-public-dev/news-image/"
+                        )[1]
+                        .split("?")[0]
+                    )
+                  }
+                  actionDisable={
+                    row.read > 0 || row.status === "ACTIVE" ? true : false
+                  }
                 />
               </div>
             </div>
@@ -526,14 +757,14 @@ function NewsPage() {
         };
       },
     },
-  ]
+  ];
 
   return (
-    <Layouts>
+    <>
       <ModalDeleteNews
         show={modalDelete}
         backButton={() => setModalDelete(!modalDelete)}
-        callBack={()=>deleteNews(newsDelete.newsId,newsDelete.newsPath)}
+        callBack={() => deleteNews(newsDelete.newsId, newsDelete.newsPath)}
       />
       {PageTitle}
       <br />
@@ -543,7 +774,7 @@ function NewsPage() {
         pagination={false}
         scroll={{ x: "max-content" }}
       />
-      <div className="d-flex justify-content-between pt-5">
+      <div className="d-flex justify-content-between pt-3 pb-3">
         <p>รายการทั้งหมด {data.count} รายการ</p>
         <Pagination
           current={current}
@@ -553,8 +784,16 @@ function NewsPage() {
           showSizeChanger={false}
         />
       </div>
-    </Layouts>
-  )
+      {/* {showModalHis && (
+        <ModalNotiHistory
+          show={showModalHis}
+          backButton={() => setShowModalHis((prev) => !prev)}
+          title="ประวัติการแจ้งเตือนข่าว “รอบรู้เกษตร กับกูรู้กูรูเกษตร”"
+          newsId={""}
+        />
+      )} */}
+    </>
+  );
 }
 
-export default NewsPage
+export default NewsPage;

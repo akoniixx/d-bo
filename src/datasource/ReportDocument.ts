@@ -1,5 +1,5 @@
 import axios from "axios";
-import { BASE_URL, httpClient } from "../config/develop-config";
+import { BASE_URL, httpClient } from "../config/config";
 import { TaskReportListEntity } from "../entities/TaskFinishEntities";
 export class ReportDocDatasource {
   static getAllReportDroner(
@@ -13,7 +13,8 @@ export class ReportDocDatasource {
     status?: string,
     statusPayment?: string,
     statusCancel?: string,
-    searchText?: string
+    searchText?: string,
+    documentPersons?: string
   ): Promise<TaskReportListEntity> {
     const params = {
       page: page,
@@ -27,6 +28,7 @@ export class ReportDocDatasource {
       statusPayment: statusPayment,
       statusCancel: statusCancel,
       searchText: searchText,
+      documentPersons: documentPersons
     };
     return httpClient
       .get(BASE_URL + "/tasks/task-finish/get-all-task-finish-account", {

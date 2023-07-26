@@ -11,7 +11,6 @@ import {
   Form,
   Input,
   Radio,
-  RadioChangeEvent,
   Row,
   Select,
   Space,
@@ -28,7 +27,6 @@ import { BackIconButton } from "../../components/button/BackButton";
 import { CardContainer } from "../../components/card/CardContainer";
 import FooterPage from "../../components/footer/FooterPage";
 import { CardHeader } from "../../components/header/CardHearder";
-import Layout from "../../components/layout/Layout";
 import GoogleMap from "../../components/map/GoogleMap";
 import { CouponDataSource } from "../../datasource/CouponDatasource";
 import { TaskFinishedDatasource } from "../../datasource/TaskFinishDatasource";
@@ -51,13 +49,19 @@ import {
   HistoryEntity_INIT,
 } from "../../entities/HistoryEntities";
 import { ReportDocDatasource } from "../../datasource/ReportDocument";
+import { DashboardLayout } from "../../components/layout/Layout";
+import { useNavigate } from "react-router-dom";
+import { UploadImageDatasouce } from "../../datasource/UploadImageDatasource";
+import ImagCards from "../../components/card/ImagCard";
+import image from "../../resource/image";
 const { Map } = require("immutable");
 const _ = require("lodash");
-let queryString = _.split(window.location.search, "=");
 const dateFormat = "DD/MM/YYYY";
 const timeFormat = "HH:mm";
 
 function EditReport() {
+  let queryString = _.split(window.location.search, "=");
+  const navigate = useNavigate();
   const profile = JSON.parse(localStorage.getItem("profile") || "{  }");
   const taskId = queryString[1];
   const [couponData, setCouponData] = useState<{
@@ -71,6 +75,8 @@ function EditReport() {
   });
   const [data, setData] = useState<DetailFinishTask>(DetailFinishTask_INIT);
   const [statusPayment, setStatusPayment] = useState<any>();
+  const [imgControl, setImgControl] = useState<any>();
+  const [imgDrug, setImgDrug] = useState<any>();
   const [updateStatusPayment, setUpdateStatusPayment] =
     useState<updateStatusPays>(updateStatusPays_INIT);
   const [history, setHistory] = useState<HistoryEntity>(HistoryEntity_INIT);
@@ -81,17 +87,28 @@ function EditReport() {
   });
   const fetchDetailTask = async () => {
     await TaskFinishedDatasource.getDetailFinishTaskById(taskId).then((res) => {
-      console.log("report edit", res);
       if (res.data.couponId !== null) {
         CouponDataSource.getPromotionCode(res.data.couponId).then((result) =>
           setCouponData({
             couponCode: res.data.couponCode ?? "",
-            couponDiscount: !res.data.discount
+            couponDiscount: !res.data.discountCoupon
               ? null
-              : parseInt(res.data.discount),
+              : parseInt(res.data.discountCoupon),
             couponName: result.couponName ?? "",
           })
         );
+      }
+      if (res.data.imagePathFinishTask) {
+        UploadImageDatasouce.getImage(res.data.imagePathFinishTask).then(
+          (resImg) => {
+            setImgControl(resImg.url);
+          }
+        );
+      }
+      if (res.data.imagePathDrug) {
+        UploadImageDatasouce.getImage(res.data.imagePathDrug).then((resImg) => {
+          setImgDrug(resImg.url);
+        });
       }
       setHistory(res.data.taskHistory[0]);
       setData(res);
@@ -104,8 +121,8 @@ function EditReport() {
   useEffect(() => {
     fetchDetailTask();
   }, []);
-  const onPreviewImg = async () => {
-    let src = data.imageTaskUrl;
+  const onPreviewImg = async (e:any) => {
+    let src = e;
     if (!src) {
       src = await new Promise((resolve) => {
         const reader = new FileReader();
@@ -138,7 +155,7 @@ function EditReport() {
         await UpdateStatusPaymentDatasource.UpdateStatusPayment(
           updateInfo
         ).then((res) => {
-          window.location.href = "/IndexReport";
+          navigate("/IndexReport");
         });
       }
       fetchDetailTask();
@@ -226,32 +243,30 @@ function EditReport() {
               {data.data.preparationBy !== null ? data.data.preparationBy : "-"}
             </span>
           </Form.Item>
-          <label>ภาพงานจากนักบินโดรน</label>
-          <br />
-          <div className="pb-2">
-            <div
-              className="hiddenFileInput"
-              style={{
-                backgroundImage: `url(${data.imageTaskUrl})`,
-                display:
-                  data.imageTaskUrl !== null
-                    ? `url(${data.imageTaskUrl})`
-                    : undefined,
-              }}
-            ></div>
-            <div className="ps-5">
-              {data.imageTaskUrl !== "object" &&
-              Object.keys(data.imageTaskUrl).length !== 0 ? (
-                <>
-                  <Tag
-                    color={color.Success}
-                    onClick={onPreviewImg}
-                    style={{ cursor: "pointer", borderRadius: "5px" }}
-                  >
-                    View
-                  </Tag>
-                </>
-              ) : undefined}
+          <div className="row">
+            <div className="col-lg">
+              <label>ภาพหลักฐานการบิน</label>
+              <br />
+              <ImagCards
+                imageName={
+                  data.data?.imagePathFinishTask
+                    ? data.data?.imagePathFinishTask
+                    : ""
+                }
+                image={imgControl ? imgControl : image.empty_cover}
+                onClick={()=>onPreviewImg(imgControl)}
+              />
+            </div>
+            <div className="col-lg">
+              <label>ภาพปุ๋ยและยา</label>
+              <br />
+              <ImagCards
+                imageName={
+                  data.data?.imagePathDrug ? data.data?.imagePathDrug : ""
+                }
+                image={imgDrug ? imgDrug : image.empty_cover}
+                onClick={() => onPreviewImg(imgDrug)}
+              />
             </div>
           </div>
           <br />
@@ -527,7 +542,7 @@ function EditReport() {
       <div className="row pt-4">
         <div className="col-lg-4">
           <p>เบอร์โทร</p>
-          <Input disabled defaultValue="0957796588" />
+          <Input disabled defaultValue={data.data.droner.telephoneNo} />
         </div>
         <div className="col-lg-4">
           <p>โดรน</p>
@@ -831,13 +846,11 @@ function EditReport() {
     );
   };
   return (
-    <Layout>
+    <>
       <Spin tip="Loading..." size="large" spinning={loading}>
         <div className="container d-flex justify-content-between pt-1">
           <div className="pt-1">
-            <BackIconButton
-              onClick={() => (window.location.href = "/IndexReport")}
-            />
+            <BackIconButton onClick={() => navigate("/IndexReport")} />
           </div>
           <div className="col-lg-9 pt-4">
             <strong style={{ fontSize: "20px" }}>
@@ -895,11 +908,11 @@ function EditReport() {
           {renderPrice}
         </CardContainer>
         <FooterPage
-          onClickBack={() => (window.location.href = "/IndexReport")}
+          onClickBack={() => navigate("/IndexReport")}
           onClickSave={() => UpdateStatusPayment()}
         />
       </Spin>
-    </Layout>
+    </>
   );
 }
 

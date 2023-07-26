@@ -6,7 +6,6 @@ import { useNavigate } from "react-router-dom";
 import { BackIconButton } from "../../components/button/BackButton";
 import { CardContainer } from "../../components/card/CardContainer";
 import { CardHeader } from "../../components/header/CardHearder";
-import Layouts from "../../components/layout/Layout";
 import { color } from "../../resource";
 import { DateTimeUtil } from "../../utilities/DateTimeUtil";
 import { numberWithCommasToFixed } from "../../utilities/TextFormatter";
@@ -362,7 +361,7 @@ const DetailDronerPoint = () => {
   };
 
   return (
-    <Layouts>
+    <>
       <Row>
         <BackIconButton onClick={() => navigate(-1)} />
         <span className="pt-3">
@@ -374,7 +373,7 @@ const DetailDronerPoint = () => {
       {renderDetailTask()}
       <br />
       {renderHistory()}
-    </Layouts>
+    </>
   );
 };
 

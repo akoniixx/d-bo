@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import Layout from "../../components/layout/Layout";
 import {
   Row,
   Form,
@@ -64,6 +63,7 @@ import moment from "moment";
 import { useLocalStorage } from "../../hook/useLocalStorage";
 import { resizeFileImg } from "../../utilities/ResizeImage";
 import { Navigate, useNavigate } from "react-router-dom";
+import { DashboardLayout } from "../../components/layout/Layout";
 const { Option } = Select;
 
 const dateFormat = "DD/MM/YYYY";
@@ -72,9 +72,8 @@ const dateCreateFormat = "YYYY-MM-DD";
 const _ = require("lodash");
 const { Map } = require("immutable");
 
-let queryString = _.split(window.location.pathname, "=");
-
 const EditFarmer = () => {
+  let queryString = _.split(window.location.pathname, "=");
   const [profile] = useLocalStorage("profile", []);
   const navigate = useNavigate();
 
@@ -481,8 +480,6 @@ const EditFarmer = () => {
     };
     delete payload.farmerPlot;
     await FarmerDatasource.updateFarmer(payload).then((res) => {
-      console.log(payload);
-      console.log(res);
       if (res !== undefined) {
         let i = 0;
         for (i; 2 > i; i++) {
@@ -499,7 +496,7 @@ const EditFarmer = () => {
           timer: 1500,
           showConfirmButton: false,
         }).then((time) => {
-          window.location.href = "/IndexFarmer";
+          navigate("/IndexFarmer");
         });
       } else {
         Swal.fire({
@@ -1067,7 +1064,7 @@ const EditFarmer = () => {
   );
 
   return (
-    <Layout>
+    <>
       <Row>
         <BackIconButton
           onClick={() => {
@@ -1110,7 +1107,7 @@ const EditFarmer = () => {
           title="แก้ไขแปลงเกษตร"
         />
       )}
-    </Layout>
+    </>
   );
 };
 

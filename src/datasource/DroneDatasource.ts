@@ -6,7 +6,7 @@ import {
   UpdateDroneBrand,
 } from "./../entities/DroneBrandEntities";
 import { DroneEntity, DroneListEntity } from "./../entities/DroneEntities";
-import { BASE_URL, httpClient } from "../config/develop-config";
+import { BASE_URL, httpClient } from "../config/config";
 
 export class DroneDatasource {
   static getDroneList(
@@ -93,9 +93,13 @@ export class DroneDatasource {
       });
   }
   static getCountDroneBrandList(
+    take?: any,
+    page?: any,
     search?: string
   ): Promise<DroneBrandListEntity> {
     const params = {
+      take: take,
+      page: page,
       search: search,
     };
     return httpClient

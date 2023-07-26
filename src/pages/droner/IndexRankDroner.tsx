@@ -13,7 +13,7 @@ import Search from "antd/lib/input/Search";
 import moment, { min } from "moment";
 import React, { useEffect, useState } from "react";
 import ActionButton from "../../components/button/ActionButton";
-import Layouts from "../../components/layout/Layout";
+import { DashboardLayout } from "../../components/layout/Layout";
 import { LocationDatasource } from "../../datasource/LocationDatasource";
 import {
   DistrictEntity,
@@ -24,8 +24,10 @@ import color from "../../resource/color";
 import { DownOutlined, FileTextOutlined, SearchOutlined, StarFilled } from "@ant-design/icons";
 import { DronerRankDatasource } from "../../datasource/DronerRankDatasource";
 import { DronerRankListEntity } from "../../entities/DronerRankEntities";
+import { useNavigate } from "react-router-dom";
 
 export default function IndexRankDroner() {
+  const navigate = useNavigate();
   const row = 10;
   const [current, setCurrent] = useState(1);
   const [data, setData] = useState<DronerRankListEntity>();
@@ -544,7 +546,7 @@ export default function IndexRankDroner() {
                 icon={<FileTextOutlined />}
                 color={color.primary1}
                 onClick={() =>
-                  (window.location.href = "/DetailRankDroner?=" + row.droner_id)
+                  navigate("/DetailRankDroner?=" + row.droner_id)
                 }
               />
             </div>
@@ -554,11 +556,11 @@ export default function IndexRankDroner() {
     },
   ];
   return (
-    <Layouts>
+    <>
       {PageTitle}
       <br />
       <Table columns={columns} dataSource={data?.data} pagination={false} />
-      <div className="d-flex justify-content-between pt-5">
+      <div className="d-flex justify-content-between pt-3 pb-3">
         <p>รายการทั้งหมด {data?.count} รายการ</p>
         <Pagination
           current={current}
@@ -568,6 +570,6 @@ export default function IndexRankDroner() {
           showSizeChanger={false}
         />
       </div>
-    </Layouts>
+    </>
   );
 }

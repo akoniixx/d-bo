@@ -22,7 +22,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import ActionButton from "../../../components/button/ActionButton";
 import { CardContainer } from "../../../components/card/CardContainer";
-import Layouts from "../../../components/layout/Layout";
+import  { DashboardLayout } from "../../../components/layout/Layout";
 import { CampaignDatasource } from "../../../datasource/CampaignDatasource";
 import { STATUS_COLOR } from "../../../definitions/DronerStatus";
 import { STATUS_COUPON } from "../../../definitions/Status";
@@ -53,6 +53,7 @@ const IndexCampaignPoint = () => {
 
   const fetchCampaignList = () => {
     CampaignDatasource.getCampaignList(
+      searchApp,
       "POINT",
       row,
       current,
@@ -60,7 +61,6 @@ const IndexCampaignPoint = () => {
       searchEndDate,
       searchStatus,
       keyword,
-      searchApp
     ).then((res) => {
       setData(res);
     });
@@ -282,7 +282,7 @@ const IndexCampaignPoint = () => {
                   icon={<EditOutlined />}
                   color={color.primary1}
                   onClick={() =>
-                    (window.location.href = "/EditCampaignPoint/id=" + row.id)
+                    navigate("/EditCampaignPoint/id=" + row.id)
                   }
                 />
               </div>
@@ -315,7 +315,7 @@ const IndexCampaignPoint = () => {
 
   return (
     <>
-      <Layouts>
+      <>
         {pageTitle}
         <CardContainer>
           <Table
@@ -326,7 +326,7 @@ const IndexCampaignPoint = () => {
             tableLayout="fixed"
           />
         </CardContainer>
-        <div className="d-flex justify-content-between pt-4">
+        <div className="d-flex justify-content-between pt-3 pb-3">
           <p>รายการทั้งหมด {data?.data.length} รายการ</p>
           <Pagination
             current={current}
@@ -336,7 +336,7 @@ const IndexCampaignPoint = () => {
             showSizeChanger={false}
           />
         </div>
-      </Layouts>
+      </>
       {showModal && (
         <Modal
           title="ยืนยันการลบ"

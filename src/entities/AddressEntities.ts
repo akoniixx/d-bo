@@ -74,3 +74,5 @@ export const CreateAddressEntity_INIT: CreateAddressEntity = {
   subdistrictId: 0,
   postcode: "",
 };
+
+

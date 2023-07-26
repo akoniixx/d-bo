@@ -3,7 +3,7 @@ import {
   DronerDroneListEntity,
   GetDronerDroneEntity,
 } from "./../entities/DronerDroneEntities";
-import { BASE_URL, httpClient } from "../config/develop-config";
+import { BASE_URL, httpClient } from "../config/config";
 
 export class DronerDroneDatasource {
   static getDronerDrone(

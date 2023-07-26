@@ -61,6 +61,11 @@ export interface DronerEntity {
   dronerDrone: DronerDroneEntity[];
   dronerArea: DronerAreaEntity;
   file: ImageEntity[];
+  isBookBank: boolean;
+  bankName: string;
+  bankAccountName: string;
+  accountNumber: string;
+  isConsentBookBank: boolean;
   createdAt: string;
   updatedAt: string;
   totalDroneCount: number;
@@ -82,6 +87,11 @@ export const DronerEntity_INIT: DronerEntity = {
   dronerDrone: [DronerDroneEntity_INIT],
   dronerArea: DronerAreaEntity_INIT,
   file: [ImageEntity_INTI],
+  isBookBank: false,
+  bankName: "",
+  bankAccountName: "",
+  accountNumber: "",
+  isConsentBookBank: false,
   createdAt: "",
   updatedAt: "",
   totalDroneCount: 0,
@@ -118,8 +128,8 @@ export const GetDronerDroneEntity_INIT: GetDronerDroneEntity = {
   createdAt: "",
   updatedAt: "",
 };
-
 export interface DronerDroneListEntity {
   data: GetDronerDroneEntity[];
   count: number;
 }
+

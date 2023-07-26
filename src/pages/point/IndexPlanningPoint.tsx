@@ -13,11 +13,11 @@ import moment from "moment";
 import React, { useEffect, useState } from "react";
 import { Container } from "react-bootstrap";
 import { CardContainer } from "../../components/card/CardContainer";
-import Layouts from "../../components/layout/Layout";
 import { PointReceiveDatasource } from "../../datasource/PointReceiveDatasource";
 import { PlanningPointListEntity } from "../../entities/PointReceiveEntities";
 import { color } from "../../resource";
 import { DateTimeUtil } from "../../utilities/DateTimeUtil";
+import { numberWithCommas } from "../../utilities/TextFormatter";
 const { RangePicker } = DatePicker;
 const dateSearchFormat = "YYYY-MM-DD";
 
@@ -169,7 +169,9 @@ const IndexPlanningPoint = () => {
                 </Col>
                 <Col span={5}>
                   <label>แต้ม :</label>{" "}
-                  <span>+ {checkFarmer[0].receive_point}</span>
+                  <span>
+                    + {numberWithCommas(checkFarmer[0].receive_point)}
+                  </span>
                   <Tooltip
                     placement="top"
                     title={
@@ -221,7 +223,9 @@ const IndexPlanningPoint = () => {
                 </Col>
                 <Col span={5}>
                   <label>แต้ม :</label>{" "}
-                  <span>+ {checkDroner[0].receive_point}</span>
+                  <span>
+                    + {numberWithCommas(checkDroner[0].receive_point)}
+                  </span>
                   <Tooltip
                     placement="top"
                     title={
@@ -291,7 +295,7 @@ const IndexPlanningPoint = () => {
   ];
 
   return (
-    <Layouts>
+    <>
       {pageTitle}
       <CardContainer>
         <Table
@@ -307,7 +311,7 @@ const IndexPlanningPoint = () => {
           tableLayout="fixed"
         />
       </CardContainer>
-      <div className="d-flex justify-content-between pt-4">
+      <div className="d-flex justify-content-between pt-3 pb-3">
         <p>รายการทั้งหมด {data?.count} รายการ</p>
         <Pagination
           current={current}
@@ -317,7 +321,7 @@ const IndexPlanningPoint = () => {
           showSizeChanger={false}
         />
       </div>
-    </Layouts>
+    </>
   );
 };
 export default IndexPlanningPoint;

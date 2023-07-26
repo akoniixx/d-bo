@@ -3,7 +3,7 @@ import Search from "antd/lib/input/Search";
 import moment from "moment";
 import { useEffect, useState } from "react";
 import ActionButton from "../../components/button/ActionButton";
-import Layouts from "../../components/layout/Layout";
+import { DashboardLayout } from "../../components/layout/Layout";
 import { DroneDatasource } from "../../datasource/DroneDatasource";
 import { DronerDroneDatasource } from "../../datasource/DronerDroneDatasource";
 import { UploadImageDatasouce } from "../../datasource/UploadImageDatasource";
@@ -18,8 +18,10 @@ import { DronerDroneListEntity } from "../../entities/DronerDroneEntities";
 import color from "../../resource/color";
 import { formatDate } from "../../utilities/TextFormatter";
 import { EditOutlined, FileTextFilled } from "@ant-design/icons";
+import { useNavigate } from "react-router-dom";
 
 function DroneList() {
+  const navigate = useNavigate();
   const row = 10;
   const [current, setCurrent] = useState(1);
   const [droneList, setDroneList] = useState<DronerDroneListEntity>();
@@ -39,7 +41,6 @@ function DroneList() {
       droneBrandId,
       searchText
     ).then((res) => {
-      console.log(res)
       setDroneList(res);
     });
   };
@@ -369,7 +370,7 @@ function DroneList() {
                 icon={<EditOutlined />}
                 color={color.primary1}
                 onClick={() =>
-                  (window.location.href = "/EditDroneList?=" + row.id)
+                  navigate("/EditDroneList?=" + row.id)
                 }
               />
             </div>
@@ -380,7 +381,7 @@ function DroneList() {
   ];
 
   return (
-    <Layouts>
+    <>
       {PageTitle}
       <br />
       <Table
@@ -398,7 +399,7 @@ function DroneList() {
             : "table-row-lasted"
         }
       />
-      <div className="d-flex justify-content-between pt-5">
+      <div className="d-flex justify-content-between pt-3 pb-3">
         <p>รายการทั้งหมด {droneList?.count} รายการ</p>
         <Pagination
           current={current}
@@ -408,7 +409,7 @@ function DroneList() {
           showSizeChanger={false}
         />
       </div>
-    </Layouts>
+    </>
   );
 }
 

@@ -15,7 +15,6 @@ import { BackIconButton } from "../../../components/button/BackButton";
 import { CardContainer } from "../../../components/card/CardContainer";
 import FooterPage from "../../../components/footer/FooterPage";
 import { CardHeader } from "../../../components/header/CardHearder";
-import Layout from "../../../components/layout/Layout";
 import { color } from "../../../resource";
 import { DroneDatasource } from "../../../datasource/DroneDatasource";
 import {
@@ -41,13 +40,14 @@ import {
 import { UploadImageDatasouce } from "../../../datasource/UploadImageDatasource";
 import ModalDroneBrand from "../../../components/modal/ModalDroneBrand";
 import Swal from "sweetalert2";
+import { DashboardLayout } from "../../../components/layout/Layout";
 
 const _ = require("lodash");
 const { Map } = require("immutable");
 
-let queryString = _.split(window.location.pathname, "=");
 
 const EditDroneBrand = () => {
+  let queryString = _.split(window.location.pathname, "=");
   const row = 7;
   const [current, setCurrent] = useState(1);
   const droneBrandId = queryString[1];
@@ -431,11 +431,11 @@ const EditDroneBrand = () => {
       timer: 1500,
       showConfirmButton: false,
     }).then((time) => {
-      window.location.href = "/IndexDroneBrand";
+      navigate("/IndexDroneBrand");
     });
   };
   return (
-    <Layout>
+    <>
       <Row>
         <BackIconButton
           onClick={() => {
@@ -476,7 +476,7 @@ const EditDroneBrand = () => {
           title="แก้ไขรุ่นโดรน"
         />
       )}
-    </Layout>
+    </>
   );
 };
 

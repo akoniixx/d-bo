@@ -1,4 +1,4 @@
-import { Avatar, Badge, Pagination, Select, Table } from "antd";
+import { Avatar, Badge, Col, Pagination, Row, Select, Table } from "antd";
 import React, { useEffect, useState } from "react";
 import { Option } from "antd/lib/mentions";
 import color from "../../resource/color";
@@ -26,10 +26,10 @@ import {
 import moment from "moment";
 import AddButtton from "../../components/button/AddButton";
 import { DroneDatasource } from "../../datasource/DroneDatasource";
-import Layouts from "../../components/layout/Layout";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useEffectOnce } from "../../hook/useEffectOnce";
 import SearchDebounce from "../../components/searchDebounce/SearchDebounce";
+import { DashboardLayout } from "../../components/layout/Layout";
 
 interface SearchSelectType {
   label: any;
@@ -346,7 +346,7 @@ function IndexDroner() {
   const PageTitle = (
     <>
       <div
-        className="container d-flex justify-content-between"
+        className="d-flex justify-content-between"
         style={{ padding: "10px" }}
       >
         <div>
@@ -761,7 +761,7 @@ function IndexDroner() {
           children: (
             <>
               <span style={{ color: STATUS_COLOR[row.status] }}>
-                <Badge color={STATUS_COLOR[row.status]} />
+                <Badge color={STATUS_COLOR[row.status]} />{" "}
                 {DRONER_STATUS_MAPPING[row.status]}
                 <br />
               </span>
@@ -780,23 +780,26 @@ function IndexDroner() {
       render: (value: any, row: any, index: number) => {
         return {
           children: (
-            <div className="d-flex flex-row justify-content-between">
-              {/* <ActionButton
-                icon={<FolderViewOutlined />}
-                color={color.primary1}
-                onClick={() =>
-                  (window.location.href =
-                    "/IndexDetailDronerPoint/id=" + row.id)
-                }
-              /> */}
-              <ActionButton
-                icon={<EditOutlined />}
-                color={color.primary1}
-                onClick={() =>
-                  (window.location.href = "/EditDroner?=" + row.id)
-                }
-              />
-            </div>
+            <Row justify={"space-between"} gutter={8}>
+              <Col span={12}>
+                <ActionButton
+                  icon={<FolderViewOutlined />}
+                  color={color.primary1}
+                  onClick={() =>
+                    navigate("/DetailDronerHistorySum/id=" + row.id)
+                  }
+                />
+              </Col>
+              <Col span={12}>
+                <ActionButton
+                  icon={<EditOutlined />}
+                  color={color.primary1}
+                  onClick={() => {
+                    navigate("/EditDroner?=" + row.id);
+                  }}
+                />
+              </Col>
+            </Row>
           ),
         };
       },
@@ -804,9 +807,8 @@ function IndexDroner() {
   ];
 
   return (
-    <Layouts>
+    <>
       {PageTitle}
-      <br />
       <Table
         columns={columns}
         dataSource={data?.data}
@@ -822,7 +824,7 @@ function IndexDroner() {
             : "table-row-lasted"
         }
       />
-      <div className="d-flex justify-content-between pt-5">
+      <div className="d-flex justify-content-between pt-3 pb-3">
         <p>รายการทั้งหมด {data?.count} รายการ</p>
         <Pagination
           current={current}
@@ -832,7 +834,7 @@ function IndexDroner() {
           showSizeChanger={false}
         />
       </div>
-    </Layouts>
+    </>
   );
 }
 export default IndexDroner;

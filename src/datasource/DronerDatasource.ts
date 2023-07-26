@@ -3,7 +3,7 @@ import {
   CreateDronerEntity,
   DronerListEntity,
 } from "./../entities/DronerEntities";
-import { BASE_URL, httpClient } from "../config/develop-config";
+import { BASE_URL, httpClient } from "../config/config";
 
 export class DronerDatasource {
   static async getDronerList(
@@ -92,7 +92,6 @@ export class DronerDatasource {
     return httpClient
       .post(BASE_URL + "/droner", data)
       .then((response) => {
-        console.log("response", response.data);
         return response.data;
       })
       .catch((error) => {

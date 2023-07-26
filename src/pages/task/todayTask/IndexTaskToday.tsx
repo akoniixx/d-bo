@@ -24,7 +24,6 @@ import { useEffect, useState } from "react";
 import ActionButton from "../../../components/button/ActionButton";
 import { CardContainer } from "../../../components/card/CardContainer";
 import { CardHeader } from "../../../components/header/CardHearder";
-import Layouts from "../../../components/layout/Layout";
 import ModalMapPlot from "../../../components/modal/task/finishTask/ModalMapPlot";
 import InvoiceTask from "../../../components/popover/InvoiceTask";
 import { LocationDatasource } from "../../../datasource/LocationDatasource";
@@ -46,8 +45,11 @@ import {
   numberWithCommas,
   numberWithCommasToFixed,
 } from "../../../utilities/TextFormatter";
+import { DashboardLayout } from "../../../components/layout/Layout";
+import { useNavigate } from "react-router-dom";
 
 export default function IndexTodayTask() {
+  const navigate = useNavigate();
   const row = 10;
   const [current, setCurrent] = useState(1);
   const [data, setData] = useState<TaskTodayListEntity>();
@@ -543,7 +545,7 @@ export default function IndexTodayTask() {
         sorter(a.task_total_price, b.task_total_price),
       render: (value: any, row: any, index: number) => {
         const inv: InvoiceTaskEntity = {
-          raiAmount: row.farmerPlot_rai_amount,
+          raiAmount: row.task_farm_area_amount,
           unitPrice: row.task_unit_price,
           price: row.task_price,
           fee: row.task_fee,
@@ -646,7 +648,7 @@ export default function IndexTodayTask() {
                   icon={<EditOutlined />}
                   color={color.primary1}
                   onClick={() =>
-                    (window.location.href = "/EditInProgress?=" + row.task_id)
+                    navigate("/EditInProgress?=" + row.task_id)
                   }
                 />
               ) : row.task_status == "WAIT_START" ? (
@@ -654,7 +656,7 @@ export default function IndexTodayTask() {
                   icon={<EditOutlined />}
                   color={color.primary1}
                   onClick={() =>
-                    (window.location.href = "/EditWaitStart?=" + row.task_id)
+                    navigate("/EditWaitStart?=" + row.task_id)
                   }
                 />
               ) : null}
@@ -666,7 +668,7 @@ export default function IndexTodayTask() {
   ];
 
   return (
-    <Layouts>
+    <>
       <span
         className="container"
         style={{ fontSize: 22, fontWeight: "bold", padding: "8px" }}
@@ -837,7 +839,7 @@ export default function IndexTodayTask() {
             : "table-row-lasted"
         }
       />
-      <div className="d-flex justify-content-between pt-5">
+      <div className="d-flex justify-content-between pt-3 pb-3">
         <p>รายการทั้งหมด {data?.count} รายการ</p>
         <Pagination
           current={current}
@@ -855,6 +857,6 @@ export default function IndexTodayTask() {
           plotId={plotId}
         />
       )}
-    </Layouts>
+    </>
   );
 }

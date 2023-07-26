@@ -1,5 +1,4 @@
 import {
-  FileTextOutlined,
   InfoCircleFilled,
   SearchOutlined,
 } from "@ant-design/icons";
@@ -18,7 +17,6 @@ import moment from "moment";
 import React, { useEffect, useState } from "react";
 import { Container } from "react-bootstrap";
 import { CardContainer } from "../../components/card/CardContainer";
-import Layouts from "../../components/layout/Layout";
 import { PointReceiveDatasource } from "../../datasource/PointReceiveDatasource";
 import { ReceivePointListEntity } from "../../entities/PointReceiveEntities";
 import { color } from "../../resource";
@@ -331,9 +329,21 @@ const IndexReceivePoint = () => {
           children:
             row.dronerTransaction !== null ? (
               row.dronerTransaction.mission ? (
-                <u style={{ color: color.Success }}>
-                  {row.dronerTransaction.mission.missionNo}
-                </u>
+                <>
+                  <u style={{ color: color.Success }}>
+                    {row.dronerTransaction.mission.missionNo}
+                  </u>
+                  <Tooltip placement="top" title="" key={row.id}>
+                    <InfoCircleFilled
+                      style={{
+                        position: "relative",
+                        bottom: 3,
+                        left: 4,
+                        color: color.Success,
+                      }}
+                    />
+                  </Tooltip>
+                </>
               ) : (
                 <>-</>
               )
@@ -363,7 +373,7 @@ const IndexReceivePoint = () => {
   ];
 
   return (
-    <Layouts>
+    <>
       {pageTitle}
       <CardContainer>
         <Table
@@ -379,7 +389,7 @@ const IndexReceivePoint = () => {
           tableLayout="fixed"
         />
       </CardContainer>
-      <div className="d-flex justify-content-between pt-4">
+      <div className="d-flex justify-content-between pt-3 pb-3">
         <p>รายการทั้งหมด {data?.count} รายการ</p>
         <Pagination
           current={current}
@@ -389,7 +399,7 @@ const IndexReceivePoint = () => {
           showSizeChanger={false}
         />
       </div>
-    </Layouts>
+    </>
   );
 };
 export default IndexReceivePoint;

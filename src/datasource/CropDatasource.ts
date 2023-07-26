@@ -1,4 +1,4 @@
-import { BASE_URL, httpClient } from "../config/develop-config";
+import { BASE_URL, httpClient } from "../config/config";
 import { CropPurposeSprayEntity } from "../entities/CropEntities";
 
 export class CropDatasource {
@@ -13,7 +13,7 @@ export class CropDatasource {
       });
   }
 
-  static getAllCropPlantName() : Promise<CropPurposeSprayEntity[]> {
+  static getAllCropPlantName(): Promise<CropPurposeSprayEntity[]> {
     return httpClient
       .get(BASE_URL + "/tasks/crop")
       .then((response) => {
@@ -21,6 +21,17 @@ export class CropDatasource {
       })
       .catch((err) => {
         console.log(err, "err getCropPlantName");
-    });
+      });
+  }
+
+  static getCropJustName(): Promise<any> {
+    return httpClient
+      .get(BASE_URL + "/tasks/crop/crop-name-all")
+      .then((response) => {
+        return response.data;
+      })
+      .catch((err) => {
+        console.log(err, "err getCropName");
+      });
   }
 }

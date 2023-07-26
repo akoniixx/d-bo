@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import Layout from "../../../components/layout/Layout";
 import {
   Row,
   Form,
@@ -12,6 +11,9 @@ import {
   Avatar,
   DatePicker,
   Checkbox,
+  Col,
+  Divider,
+  Space,
 } from "antd";
 import { CardContainer } from "../../../components/card/CardContainer";
 import { BackIconButton } from "../../../components/button/BackButton";
@@ -21,8 +23,11 @@ import color from "../../../resource/color";
 import { CardHeader } from "../../../components/header/CardHearder";
 import Swal from "sweetalert2";
 import {
+  BookBankEntities,
+  BookBankEntities_INIT,
   CreateDronerEntity,
   CreateDronerEntity_INIT,
+  DronerEntity,
 } from "../../../entities/DronerEntities";
 import {
   CreateAddressEntity,
@@ -69,6 +74,10 @@ import TextArea from "antd/lib/input/TextArea";
 import { useLocalStorage } from "../../../hook/useLocalStorage";
 import { resizeFileImg } from "../../../utilities/ResizeImage";
 import { useNavigate } from "react-router-dom";
+import { DashboardLayout } from "../../../components/layout/Layout";
+import BookBankDroner from "../../../components/bookbank/BookBankDroner";
+import { OtherAddressDatasource } from "../../../datasource/OtherAddress";
+import { CropDatasource } from "../../../datasource/CropDatasource";
 const dateFormat = "DD/MM/YYYY";
 const dateCreateFormat = "YYYY-MM-DD";
 
@@ -78,24 +87,29 @@ function AddDroner() {
   const [form] = Form.useForm();
   const navigate = useNavigate();
   const [profile] = useLocalStorage("profile", []);
-  const [data] = useState<CreateDronerEntity>(
-    CreateDronerEntity_INIT
-  );
+  const [data] = useState<CreateDronerEntity>(CreateDronerEntity_INIT);
+  const [dataBookBank] = useState<any>();
   const [address, setAddress] = useState<CreateAddressEntity>(
     CreateAddressEntity_INIT
   );
+  const [otherAddress, setOtherAddress] = useState<CreateAddressEntity>();
   const [dronerArea, setDronerArea] = useState<DronerAreaEntity>(
     DronerAreaEntity_INIT
   );
-  const [dronerDroneList, setDronerDroneList] = useState<
-    DronerDroneEntity[]
-  >([]);
+  const [dronerDroneList, setDronerDroneList] = useState<DronerDroneEntity[]>(
+    []
+  );
+  const [imgBB, setImgBB] = useState<any>();
+  const [bookBank, setBookBank] = useState<BookBankEntities>(
+    BookBankEntities_INIT
+  );
   const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [editIndex, setEditIndex] = useState(0);
   const [editDrone, setEditDrone] = useState<DronerDroneEntity>(
     DronerDroneEntity_INIT
   );
+  const [birthDay, setBirthDay] = useState<string>();
   const [saveBtnDisable, setBtnSaveDisable] = useState<boolean>(true);
   const [province, setProvince] = useState<ProviceEntity[]>([
     ProvinceEntity_INIT,
@@ -103,7 +117,17 @@ function AddDroner() {
   const [district, setDistrict] = useState<DistrictEntity[]>([
     DistrictEntity_INIT,
   ]);
-  const [subdistrict, setSubdistrict] = useState<SubdistrictEntity[]>(
+  const [subdistrict, setSubdistrict] = useState<SubdistrictEntity[]>([
+    SubdistrictEntity_INIT,
+  ]);
+  const [plantsName, setPlantsName] = useState<any[]>([]);
+  const [otherProvince, setOtherProvince] = useState<ProviceEntity[]>([
+    ProvinceEntity_INIT,
+  ]);
+  const [otherDistrict, setOtherDistrict] = useState<DistrictEntity[]>([
+    DistrictEntity_INIT,
+  ]);
+  const [otherSubdistrict, setOtherSubdistrict] = useState<SubdistrictEntity[]>(
     [SubdistrictEntity_INIT]
   );
 
@@ -113,10 +137,13 @@ function AddDroner() {
     UploadImageEntity_INTI,
   ]);
 
-  const [createImgProfile, setCreateImgProfile] =
-    useState<UploadImageEntity>(UploadImageEntity_INTI);
-  const [createImgIdCard, setCreateImgIdCard] =
-    useState<UploadImageEntity>(UploadImageEntity_INTI);
+  const [createImgProfile, setCreateImgProfile] = useState<UploadImageEntity>(
+    UploadImageEntity_INTI
+  );
+  const [createImgIdCard, setCreateImgIdCard] = useState<UploadImageEntity>(
+    UploadImageEntity_INTI
+  );
+  const [imagBookBank, setImagBookBank] = useState<any>();
   const [mapPosition, setMapPosition] = useState<{
     lat?: number;
     lng?: number;
@@ -126,18 +153,24 @@ function AddDroner() {
 
   useEffect(() => {
     fetchProvince();
+    getCropsName();
     fetchLocation(searchLocation);
   }, [searchLocation]);
-
   //#region data droner
   const fetchProvince = async () => {
     await LocationDatasource.getProvince().then((res) => {
       setProvince(res);
+      setOtherProvince(res);
     });
   };
   const fetchLocation = async (text?: string) => {
     await LocationDatasource.getSubdistrict(0, text).then((res) => {
       setLocation(res);
+    });
+  };
+  const getCropsName = async () => {
+    await CropDatasource.getCropJustName().then((res) => {
+      setPlantsName(res);
     });
   };
 
@@ -148,10 +181,7 @@ function AddDroner() {
   const handleOnChangeProvince = async (provinceId: number) => {
     await getProvince(provinceId, CreateAddressEntity_INIT);
   };
-  const getProvince = async (
-    provinceId: number,
-    addr: CreateAddressEntity
-  ) => {
+  const getProvince = async (provinceId: number, addr: CreateAddressEntity) => {
     const d = Map(addr).set("provinceId", provinceId);
     setAddress(d.toJS());
     await LocationDatasource.getDistrict(provinceId).then((res) => {
@@ -161,11 +191,9 @@ function AddDroner() {
   const handleOnChangeDistrict = async (districtId: number) => {
     const d = Map(address).set("districtId", districtId);
     setAddress(d.toJS());
-    await LocationDatasource.getSubdistrict(districtId).then(
-      (res) => {
-        setSubdistrict(res);
-      }
-    );
+    await LocationDatasource.getSubdistrict(districtId).then((res) => {
+      setSubdistrict(res);
+    });
   };
   const handleOnChangeSubdistrict = async (subdistrictId: number) => {
     const d = Map(address).set("subdistrictId", subdistrictId);
@@ -182,16 +210,49 @@ function AddDroner() {
       postcode: c.toJS().postcode,
     });
   };
+  //#otherAddress
+  const handleOtherProvince = async (otherProvinceId: number) => {
+    await getOtherProvince(otherProvinceId, CreateAddressEntity_INIT);
+  };
+  const getOtherProvince = async (
+    otherProvinceId: number,
+    otherAddr: CreateAddressEntity
+  ) => {
+    const d = Map(otherAddr).set("provinceId", otherProvinceId);
+    setOtherAddress(d.toJS());
+    await LocationDatasource.getDistrict(otherProvinceId).then((res) => {
+      setOtherDistrict(res);
+    });
+  };
+  const handleOtherDistrict = async (otherDistrictId: number) => {
+    const d = Map(otherAddress).set("districtId", otherDistrictId);
+    setOtherAddress(d.toJS());
+    await LocationDatasource.getSubdistrict(otherDistrictId).then((res) => {
+      setOtherSubdistrict(res);
+    });
+  };
+  const handleOtherSubdistrict = async (otherSubdistrictId: number) => {
+    const d = Map(otherAddress).set("subdistrictId", otherSubdistrictId);
+    setOtherAddress(d.toJS());
+    await handleOtherPostcode(d.toJS());
+  };
+  const handleOtherPostcode = (addr: CreateAddressEntity) => {
+    let getPostcode = otherSubdistrict.filter(
+      (x) => x.subdistrictId === addr.subdistrictId
+    )[0].postcode;
+    const c = Map(addr).set("postcode", getPostcode);
+    setOtherAddress(c.toJS());
+    form.setFieldsValue({
+      otherPostcode: c.toJS().postcode,
+    });
+  };
   //#endregion
 
   //#region map
   const handleSearchLocation = async (value: any) => {
     if (!!value) {
       const a = location.filter((x) => x.subdistrictId === value)[0];
-      const pushProvince = Map(dronerArea).set(
-        "provinceId",
-        a.provinceId
-      );
+      const pushProvince = Map(dronerArea).set("provinceId", a.provinceId);
       const pushDistric = Map(pushProvince.toJS()).set(
         "districtId",
         a.districtId
@@ -222,10 +283,7 @@ function AddDroner() {
             " " +
             location[3].long_name;
         });
-      const l = Map(pushLong.toJS()).set(
-        "locationName",
-        locationName
-      );
+      const l = Map(pushLong.toJS()).set("locationName", locationName);
       setDronerArea(l.toJS());
       setMapPosition({
         lat: a.lat != null ? parseFloat(a.lat) : 0,
@@ -287,6 +345,19 @@ function AddDroner() {
     setShowAddModal(false);
     setShowEditModal(false);
     setEditIndex(0);
+  };
+  const insertBookBank = (data: DronerEntity) => {
+    const sumData = {
+      bankName: data.bankName,
+      bankAccountName: data.bankAccountName,
+      accountNumber: data.accountNumber,
+      isConsentBookBank: data.isConsentBookBank,
+      isBookBank: data.isConsentBookBank,
+    };
+    const filterImg = data.file.find((x: any) => x.category === "BOOK_BANK");
+    setImgBB(filterImg);
+    setBookBank(sumData);
+    setBtnSaveDisable(false);
   };
   //#endregion
 
@@ -393,11 +464,7 @@ function AddDroner() {
       data.includes(" ") ||
       data.includes("-") ||
       data.includes("+");
-    return data.trim().length !== 0
-      ? checkSyntax
-        ? true
-        : false
-      : true;
+    return data.trim().length !== 0 ? (checkSyntax ? true : false) : true;
   };
 
   const onFieldsChange = () => {
@@ -438,12 +505,11 @@ function AddDroner() {
       : [];
     const valuePlant = values?.checkPlantsOther || [];
     const expPlant =
-      splitPlant.length > 0
-        ? [...valuePlant, ...splitPlant]
-        : valuePlant;
+      splitPlant.length > 0 ? [...valuePlant, ...splitPlant] : valuePlant;
 
     const pushAdd = Map(data).set("address", address);
-    const pushDronerArea = Map(pushAdd.toJS()).set(
+    const pushOtherAdd = Map(pushAdd.toJS()).set("otherAddress", otherAddress);
+    const pushDronerArea = Map(pushOtherAdd.toJS()).set(
       "dronerArea",
       dronerArea
     );
@@ -464,78 +530,87 @@ function AddDroner() {
       ...pushOtherPlant.toJS(),
       ...values,
       expPlant: expPlant,
-      birthDate: moment(values.birthDate).format("YYYY-MM-DD"),
+      birthDate: birthDay,
       address: {
         ...pushOtherPlant.toJS().address,
         address1: values.address1,
         address2: values.address2,
+      },
+      otherAddress: {
+        ...pushOtherPlant.toJS().otherAddress,
+        address1: otherAddress?.address1,
+        address2: otherAddress?.address2,
       },
       dronerArea: {
         ...pushOtherPlant.toJS().dronerArea,
         mapUrl: values.mapUrl,
       },
       createBy: `${profile?.firstname} ${profile?.lastname}`,
+      bankName: bookBank?.bankName,
+      bankAccountName: bookBank?.bankAccountName,
+      accountNumber: bookBank?.accountNumber,
+      isConsentBookBank: bookBank?.isConsentBookBank,
+      isBookBank: bookBank?.isBookBank,
+      file: imgBB,
     };
-    await DronerDatasource.createDronerList(payload).then(
-      async (res) => {
-        if (res !== undefined) {
-          const fileList = [createImgProfile, createImgIdCard]
-            .filter((el) => {
-              return el.file !== "" && el.file !== undefined;
-            })
-            .map((el) => {
-              return UploadImageDatasouce.uploadImage(
-                Map(el).set("resourceId", res.id).toJS()
-              );
-            });
-
-          await Promise.all(fileList);
-
-          for (let i = 0; res.dronerDrone.length > i; i++) {
-            let findId = res.dronerDrone[i];
-            let getData = dronerDroneList.filter(
-              (x) => x.serialNo === findId.serialNo
-            )[0];
-
-            for (let j = 0; getData.file.length > j; j++) {
-              let getImg = getData.file[j];
-              imgDroneList?.push({
-                resourceId: findId.id,
-                category: getImg.category,
-                file: getImg.file,
-                resource: getImg.resource,
-                path: "",
-              });
-            }
-          }
-          const checkImg = imgDroneList.filter(
-            (x) => x.resourceId !== ""
+    await DronerDatasource.createDronerList(payload).then(async (res) => {
+      if (res !== undefined) {
+        if (imgBB) {
+          UploadImageDatasouce.uploadImage(
+            Map(imgBB).set("resourceId", res.id).toJS()
           );
-          for (let k = 0; checkImg.length > k; k++) {
-            let getDataImg: any = checkImg[k];
-            await UploadImageDatasouce.uploadImage(getDataImg).then(
-              res
-            );
-          }
-          Swal.fire({
-            title: "บันทึกสำเร็จ",
-            icon: "success",
-            timer: 1500,
-            showConfirmButton: false,
-          }).then((time) => {
-            window.location.href = "/IndexDroner";
-          });
-        } else {
-          Swal.fire({
-            title: "เบอร์โทร หรือ รหัสบัตรประชาชน <br/> ซ้ำในระบบ",
-            icon: "error",
-            showConfirmButton: true,
-          });
         }
-      }
-    );
-  };
+        const fileList = [createImgProfile, createImgIdCard]
+          .filter((el) => {
+            return el.file !== "" && el.file !== undefined;
+          })
+          .map((el) => {
+            return UploadImageDatasouce.uploadImage(
+              Map(el).set("resourceId", res.id).toJS()
+            );
+          });
 
+        await Promise.all(fileList);
+
+        for (let i = 0; res.dronerDrone.length > i; i++) {
+          let findId = res.dronerDrone[i];
+          let getData = dronerDroneList.filter(
+            (x) => x.serialNo === findId.serialNo
+          )[0];
+
+          for (let j = 0; getData.file.length > j; j++) {
+            let getImg = getData.file[j];
+            imgDroneList?.push({
+              resourceId: findId.id,
+              category: getImg.category,
+              file: getImg.file,
+              resource: getImg.resource,
+              path: "",
+            });
+          }
+        }
+        const checkImg = imgDroneList.filter((x) => x.resourceId !== "");
+        for (let k = 0; checkImg.length > k; k++) {
+          let getDataImg: any = checkImg[k];
+          await UploadImageDatasouce.uploadImage(getDataImg).then(res);
+        }
+        Swal.fire({
+          title: "บันทึกสำเร็จ",
+          icon: "success",
+          timer: 1500,
+          showConfirmButton: false,
+        }).then((time) => {
+          navigate("/IndexDroner");
+        });
+      } else {
+        Swal.fire({
+          title: "เบอร์โทร หรือ รหัสบัตรประชาชน <br/> ซ้ำในระบบ",
+          icon: "error",
+          showConfirmButton: true,
+        });
+      }
+    });
+  };
   const renderFromData = (
     <div className="col-lg-7">
       <CardContainer>
@@ -544,7 +619,8 @@ function AddDroner() {
           style={{ padding: "32px" }}
           onFinish={insertDroner}
           onFieldsChange={onFieldsChange}
-          form={form}>
+          form={form}
+        >
           <div className="row">
             <div className="form-group text-center pb-5">
               <div
@@ -553,7 +629,8 @@ function AddDroner() {
                   backgroundImage: `url(${
                     imgProfile === undefined ? img_empty : imgProfile
                   })`,
-                }}>
+                }}
+              >
                 <input
                   key={imgProfile}
                   type="file"
@@ -570,7 +647,8 @@ function AddDroner() {
                       style={{
                         cursor: "pointer",
                         borderRadius: "5px",
-                      }}>
+                      }}
+                    >
                       View
                     </Tag>
                     <Tag
@@ -579,7 +657,8 @@ function AddDroner() {
                       style={{
                         cursor: "pointer",
                         borderRadius: "5px",
-                      }}>
+                      }}
+                    >
                       Remove
                     </Tag>
                   </>
@@ -599,7 +678,8 @@ function AddDroner() {
                     required: true,
                     message: "กรุณากรอกชื่อ!",
                   },
-                ]}>
+                ]}
+              >
                 <Input placeholder="กรอกชื่อ" autoComplete="off" />
               </Form.Item>
             </div>
@@ -614,7 +694,8 @@ function AddDroner() {
                     required: true,
                     message: "กรุณากรอกนามสกุล!",
                   },
-                ]}>
+                ]}
+              >
                 <Input placeholder="กรอกนามสกุล" autoComplete="off" />
               </Form.Item>
             </div>
@@ -639,7 +720,8 @@ function AddDroner() {
                     min: 10,
                     message: "กรุณากรอกเบอร์โทรให้ครบ 10 หลัก!",
                   },
-                ]}>
+                ]}
+              >
                 <Input
                   placeholder="กรอกเบอร์โทร"
                   autoComplete="off"
@@ -648,17 +730,8 @@ function AddDroner() {
               </Form.Item>
             </div>
             <div className="form-group col-lg-6">
-              <label>
-                วันเดือนปีเกิด <span style={{ color: "red" }}>*</span>
-              </label>
-              <Form.Item
-                name="birthDate"
-                rules={[
-                  {
-                    required: true,
-                    message: "กรุณากรอกวันเดือนปีเกิด",
-                  },
-                ]}>
+              <label>วันเดือนปีเกิด</label>
+              <Form.Item>
                 <DatePicker
                   placeholder="กรอกวันเดือนปีเกิด"
                   format={dateFormat}
@@ -666,6 +739,9 @@ function AddDroner() {
                   disabledDate={(current) =>
                     current && current > moment().endOf("day")
                   }
+                  onChange={(e) => {
+                    setBirthDay(moment(e).toISOString());
+                  }}
                   className="col-lg-12"
                 />
               </Form.Item>
@@ -685,7 +761,8 @@ function AddDroner() {
                     pattern: new RegExp(/^[0-9\b]+$/),
                     message: "กรุณากรอกรหัสบัตรประชาชนให้ถูกต้อง!",
                   },
-                ]}>
+                ]}
+              >
                 <Input
                   placeholder="กรอกบัตรประชาชน"
                   maxLength={13}
@@ -703,9 +780,9 @@ function AddDroner() {
                   className="hiddenFileInput"
                   style={{
                     backgroundImage: `url(${imgIdCard})`,
-                    display:
-                      imgIdCard !== undefined ? "block" : "none",
-                  }}></div>
+                    display: imgIdCard !== undefined ? "block" : "none",
+                  }}
+                ></div>
               </div>
               <div className="text-left ps-4">
                 {imgIdCard !== undefined && (
@@ -716,7 +793,8 @@ function AddDroner() {
                       style={{
                         cursor: "pointer",
                         borderRadius: "5px",
-                      }}>
+                      }}
+                    >
                       View
                     </Tag>
                     <Tag
@@ -725,7 +803,8 @@ function AddDroner() {
                       style={{
                         cursor: "pointer",
                         borderRadius: "5px",
-                      }}>
+                      }}
+                    >
                       Remove
                     </Tag>
                   </>
@@ -736,7 +815,8 @@ function AddDroner() {
                 style={{
                   backgroundImage: `url(${bth_img_empty})`,
                   display: imgIdCard === undefined ? "block" : "none",
-                }}>
+                }}
+              >
                 <input
                   type="file"
                   key={imgIdCard}
@@ -745,7 +825,9 @@ function AddDroner() {
                 />
               </div>
             </div>
+            <Divider />
           </div>
+          <h6>ที่อยู่นักบินโดรน</h6>
           <div className="row">
             <div className="form-group col-lg-6">
               <label>
@@ -758,7 +840,8 @@ function AddDroner() {
                     required: true,
                     message: "กรุณาเลือกจังหวัด",
                   },
-                ]}>
+                ]}
+              >
                 <Select
                   allowClear
                   showSearch
@@ -773,11 +856,10 @@ function AddDroner() {
                       .localeCompare(optionB.children.toLowerCase())
                   }
                   onChange={handleOnChangeProvince}
-                  key={address.provinceId}>
+                  key={address.provinceId}
+                >
                   {province?.map((item) => (
-                    <Option value={item.provinceId}>
-                      {item.provinceName}
-                    </Option>
+                    <Option value={item.provinceId}>{item.provinceName}</Option>
                   ))}
                 </Select>
               </Form.Item>
@@ -793,10 +875,13 @@ function AddDroner() {
                     required: true,
                     message: "กรุณาเลือกอำเภอ",
                   },
-                ]}>
+                ]}
+              >
                 <Select
                   showSearch
-                  disabled={address.provinceId === undefined}
+                  disabled={
+                    address.provinceId === undefined || address.provinceId === 0
+                  }
                   optionFilterProp="children"
                   filterOption={(input: any, option: any) =>
                     option.children.includes(input)
@@ -816,11 +901,10 @@ function AddDroner() {
                   value={address?.districtId}
                   placeholder="เลือกอำเภอ"
                   allowClear
-                  onChange={handleOnChangeDistrict}>
+                  onChange={handleOnChangeDistrict}
+                >
                   {district?.map((item) => (
-                    <Option value={item.districtId}>
-                      {item.districtName}
-                    </Option>
+                    <Option value={item.districtId}>{item.districtName}</Option>
                   ))}
                 </Select>
               </Form.Item>
@@ -838,9 +922,12 @@ function AddDroner() {
                     required: true,
                     message: "กรุณาเลือกตำบล",
                   },
-                ]}>
+                ]}
+              >
                 <Select
-                  disabled={address.districtId === undefined}
+                  disabled={
+                    address.districtId === undefined || address.districtId === 0
+                  }
                   showSearch
                   optionFilterProp="children"
                   filterOption={(input: any, option: any) =>
@@ -854,10 +941,9 @@ function AddDroner() {
                   value={address?.subdistrictId}
                   placeholder="เลือกตำบล"
                   allowClear
-                  onClear={() =>
-                    form.setFieldsValue({ postcode: undefined })
-                  }
-                  onChange={handleOnChangeSubdistrict}>
+                  onClear={() => form.setFieldsValue({ postcode: undefined })}
+                  onChange={handleOnChangeSubdistrict}
+                >
                   {subdistrict?.map((item) => (
                     <Option value={item.subdistrictId}>
                       {item.subdistrictName}
@@ -892,7 +978,8 @@ function AddDroner() {
                     required: true,
                     message: "กรุณากรอกบ้านเลขที่!",
                   },
-                ]}>
+                ]}
+              >
                 <Input
                   className="col-lg-12"
                   placeholder="กรุณากรอกบ้านเลขที่"
@@ -913,14 +1000,158 @@ function AddDroner() {
                     required: true,
                     message: "กรุณากรอกรายละเอียดที่อยู่บ้าน!",
                   },
-                ]}>
-                <Input
+                ]}
+              >
+                <TextArea
+                  rows={4}
                   className="col-lg-12"
                   placeholder="กรอกรายละเอียดที่อยู่บ้าน"
                 />
               </Form.Item>
             </div>
           </div>
+          <Divider />
+          <h6>ที่อยู่จัดส่ง</h6>
+          <div className="row">
+            <div className="form-group col-lg-6">
+              <label>จังหวัด</label>
+              <Form.Item>
+                <Select
+                  allowClear
+                  showSearch
+                  placeholder="เลือกจังหวัด"
+                  optionFilterProp="children"
+                  filterOption={(input: any, option: any) =>
+                    option.children.includes(input)
+                  }
+                  filterSort={(optionA, optionB) =>
+                    optionA.children
+                      .toLowerCase()
+                      .localeCompare(optionB.children.toLowerCase())
+                  }
+                  onChange={handleOtherProvince}
+                  defaultValue={otherAddress?.provinceId}
+                >
+                  {otherProvince?.map((item) => (
+                    <Option value={item.provinceId}>{item.provinceName}</Option>
+                  ))}
+                </Select>
+              </Form.Item>
+            </div>
+            <div className="form-group col-lg-6">
+              <label>อำเภอ</label>
+              <Form.Item>
+                <Select
+                  showSearch
+                  disabled={otherAddress?.provinceId === undefined}
+                  optionFilterProp="children"
+                  filterOption={(input: any, option: any) =>
+                    option.children.includes(input)
+                  }
+                  filterSort={(optionA, optionB) =>
+                    optionA.children
+                      .toLowerCase()
+                      .localeCompare(optionB.children.toLowerCase())
+                  }
+                  onClear={() =>
+                    form.setFieldsValue({
+                      otherPostcode: undefined,
+                      otherDistrictId: undefined,
+                      otherSubdistrictId: undefined,
+                    })
+                  }
+                  placeholder="เลือกอำเภอ"
+                  allowClear
+                  onChange={handleOtherDistrict}
+                  defaultValue={otherAddress?.districtId}
+                >
+                  {otherDistrict?.map((item) => (
+                    <Option value={item.districtId}>{item.districtName}</Option>
+                  ))}
+                </Select>
+              </Form.Item>
+            </div>
+          </div>
+          <div className="row">
+            <div className="form-group col-lg-6">
+              <label>ตำบล</label>
+              <Form.Item>
+                <Select
+                  disabled={
+                    otherAddress?.districtId === undefined ||
+                    otherAddress?.districtId === 0
+                  }
+                  showSearch
+                  optionFilterProp="children"
+                  filterOption={(input: any, option: any) =>
+                    option.children.includes(input)
+                  }
+                  filterSort={(optionA, optionB) =>
+                    optionA.children
+                      .toLowerCase()
+                      .localeCompare(optionB.children.toLowerCase())
+                  }
+                  defaultValue={otherAddress?.subdistrictId}
+                  placeholder="เลือกตำบล"
+                  allowClear
+                  onClear={() =>
+                    form.setFieldsValue({ otherPostcode: undefined })
+                  }
+                  onChange={handleOtherSubdistrict}
+                >
+                  {otherSubdistrict?.map((item) => (
+                    <Option value={item.subdistrictId}>
+                      {item.subdistrictName}
+                    </Option>
+                  ))}
+                </Select>
+              </Form.Item>
+            </div>
+            <div className="form-group col-lg-6">
+              <label>รหัสไปรษณีย์</label>
+              <Form.Item>
+                <Input
+                  placeholder="กรอกรหัสไปรษณีย์"
+                  key={otherAddress?.subdistrictId}
+                  defaultValue={otherAddress?.postcode}
+                  disabled
+                />
+              </Form.Item>
+            </div>
+          </div>
+          <div className="row">
+            <div className="form-group">
+              <label>ที่อยู่บ้าน</label>
+              <Form.Item>
+                <Input
+                  className="col-lg-12"
+                  placeholder="กรุณากรอกบ้านเลขที่"
+                  onChange={(e) => {
+                    const m = Map(otherAddress).set("address1", e.target.value);
+                    setOtherAddress(m.toJS());
+                  }}
+                />
+              </Form.Item>
+            </div>
+          </div>
+          <div className="row">
+            <div className="form-group">
+              <label>รายละเอียดที่อยู่ (หมู่, ถนน) </label>
+              <Form.Item>
+                <TextArea
+                  rows={4}
+                  className="col-lg-12"
+                  placeholder="กรอกรายละเอียดที่อยู่บ้าน"
+                  onChange={(e) => {
+                    const m = Map(otherAddress).set("address2", e.target.value);
+                    setOtherAddress(m.toJS());
+                  }}
+                />
+              </Form.Item>
+            </div>
+          </div>
+          <Divider />
+
           <div className="form-group">
             <label>พื้นที่ให้บริการหลัก </label>
             <Form.Item name="dronerArea">
@@ -937,7 +1168,8 @@ function AddDroner() {
                 }
                 filterOption={(input: any, option: any) =>
                   option.children.includes(input)
-                }>
+                }
+              >
                 {location?.map((item) => (
                   <Option value={item.subdistrictId}>
                     {item.subdistrictName +
@@ -971,7 +1203,8 @@ function AddDroner() {
                     message: "กรุณากรอกละติจูด!",
                   },
                 ]}
-                key={mapPosition?.lat}>
+                key={mapPosition?.lat}
+              >
                 <Input
                   placeholder="กรอกข้อมูล Latitude"
                   value={mapPosition?.lat}
@@ -991,7 +1224,8 @@ function AddDroner() {
                     message: "กรุณากรอกลองติจูด!",
                   },
                 ]}
-                key={mapPosition?.lng}>
+                key={mapPosition?.lng}
+              >
                 <Input
                   placeholder="กรอกข้อมูล Longitude"
                   value={mapPosition?.lng}
@@ -1038,13 +1272,9 @@ function AddDroner() {
               rules={[
                 {
                   validator: (_, value) => {
-                    const plantsOther =
-                      form.getFieldValue("plantsOther");
+                    const plantsOther = form.getFieldValue("plantsOther");
 
-                    if (
-                      (!value || value.length === 0) &&
-                      !plantsOther
-                    ) {
+                    if ((!value || value.length === 0) && !plantsOther) {
                       return Promise.reject(
                         "กรุณาเลือกพืชที่เคยฉีดพ่นอย่างน้อย 1 อย่าง"
                       );
@@ -1053,17 +1283,16 @@ function AddDroner() {
                     }
                   },
                 },
-              ]}>
+              ]}
+            >
               <Checkbox.Group>
-                {EXP_PLANT.map((el) => {
-                  return (
-                    <Row>
-                      <Checkbox value={el}>
-                        <label>{el}</label>
-                      </Checkbox>
-                    </Row>
-                  );
-                })}
+                <Space direction="vertical">
+                  {plantsName.map((el) => (
+                    <Checkbox key={el.id} value={el.cropName}>
+                      <label>{el.cropName}</label>
+                    </Checkbox>
+                  ))}
+                </Space>
               </Checkbox.Group>
             </Form.Item>
           </div>
@@ -1075,11 +1304,9 @@ function AddDroner() {
               rules={[
                 {
                   validator(rule, value) {
-                    const splitValue =
-                      (value && value.split(",")) || [];
-                    const valueCheckbox = form.getFieldValue(
-                      "checkPlantsOther"
-                    );
+                    const splitValue = (value && value.split(",")) || [];
+                    const valueCheckbox =
+                      form.getFieldValue("checkPlantsOther");
                     const isDuplicate =
                       splitValue &&
                       splitValue.some((el: string) =>
@@ -1095,10 +1322,7 @@ function AddDroner() {
                       return Promise.reject(
                         "กรุณากรอกพืชที่เคยฉีดพ่นให้ถูกต้อง ไม่ควรมีพืชที่ซ้ำกัน"
                       );
-                    } else if (
-                      !value &&
-                      valueCheckbox?.length === 0
-                    ) {
+                    } else if (!value && valueCheckbox?.length === 0) {
                       return Promise.reject(
                         "กรุณาเลือกพืชที่เคยฉีดพ่น/กรอกพืชที่เคยฉีดพ่นอย่างน้อย 1 อย่าง"
                       );
@@ -1107,7 +1331,8 @@ function AddDroner() {
                     }
                   },
                 },
-              ]}>
+              ]}
+            >
               <Input
                 placeholder="กรอกข้อมูลพืชอื่นๆ เช่น ส้ม,มะขาม (กรุณาใช้ (,) ให้กับการเพิ่มพืชมากกว่า 1 อย่าง)"
                 autoComplete="off"
@@ -1126,86 +1351,100 @@ function AddDroner() {
   );
 
   const renderDrone = (
-    <div className="col-lg-4">
-      <CardContainer>
-        <div
-          style={{
-            backgroundColor: color.Success,
-            borderRadius: "12px 12px 0px 0px",
-            padding: "10px 10px 10px 10px",
-          }}
-          className="d-flex justify-content-between">
-          <h4 className="pt-2 ps-3" style={{ color: "white" }}>
-            รายการโดรน
-          </h4>
-          <Button
-            className="pt-2"
-            style={{
-              backgroundColor: color.secondary1,
-              color: "white",
-              border: "none",
-              borderRadius: "5px",
-            }}
-            onClick={() => setShowAddModal((prev) => !prev)}>
-            เพิ่มโดรน
-          </Button>
-        </div>
-        {dronerDroneList?.length !== 0 ? (
-          <Form>
-            {dronerDroneList
-              .sort((x, y) => x.modalDroneIndex - y.modalDroneIndex)
-              .map((item, index) => (
-                <div className="container">
-                  <div className="row pt-3">
-                    <div className="col-lg-1 text-center">
-                      <Avatar
-                        size={25}
-                        src={item.drone.droneBrand.logoImagePath}
-                        style={{ marginRight: "5px" }}
-                      />
-                    </div>
-                    <div className="col-lg-5">
-                      <h6>{item.drone.droneBrand.name}</h6>
-                      <p style={{ color: "#ccc" }}>{item.serialNo}</p>
-                    </div>
-                    <div className="col-lg-4">
-                      <span
-                        style={{ color: STATUS_COLOR[item.status] }}>
-                        <Badge color={STATUS_COLOR[item.status]} />
-                        {DRONER_DRONE_MAPPING[item.status]}
-                      </span>
-                    </div>
-                    <div className="col-lg-2">
-                      <ActionButton
-                        icon={<EditOutlined />}
-                        color={color.primary1}
-                        onClick={() => editDroneList(item, index + 1)}
-                      />
-                    </div>
-                  </div>
-                </div>
-              ))}
-          </Form>
-        ) : (
+    <>
+      <div className="col-lg-4">
+        <CardContainer>
           <div
-            className="container text-center"
-            style={{ padding: "80px" }}>
-            <img src={emptyData} alt="" />
-            <p>ยังไม่มีข้อมูลโดรน</p>
+            style={{
+              backgroundColor: color.Success,
+              borderRadius: "12px 12px 0px 0px",
+              padding: "10px 10px 10px 10px",
+            }}
+            className="d-flex justify-content-between"
+          >
+            <h4 className="pt-2 ps-3" style={{ color: "white" }}>
+              รายการโดรน
+            </h4>
+            <Button
+              className="pt-2"
+              style={{
+                backgroundColor: color.secondary1,
+                color: "white",
+                border: "none",
+                borderRadius: "5px",
+              }}
+              onClick={() => setShowAddModal((prev) => !prev)}
+            >
+              เพิ่มโดรน
+            </Button>
           </div>
-        )}
-      </CardContainer>
-      <div className="d-flex justify-content-between pt-3">
-        <p>รายการทั้งหมด {dronerDroneList.length} รายการ</p>
-        {dronerDroneList.length > 10 && (
-          <Pagination defaultCurrent={1} total={1} />
-        )}
+          <Form>
+            {dronerDroneList?.length !== 0 ? (
+              <>
+                {dronerDroneList
+                  .sort((x, y) => x.modalDroneIndex - y.modalDroneIndex)
+                  .map((item, index) => (
+                    <Row justify={"space-between"} gutter={16} className="p-2">
+                      <Col span={2}>
+                        <Avatar
+                          size={25}
+                          src={item.drone?.droneBrand.logoImagePath}
+                          style={{ marginRight: "5px" }}
+                        />
+                      </Col>
+                      <Col span={8}>
+                        <h6>{item.drone?.droneBrand.name}</h6>
+                        <p style={{ color: "#ccc" }}>{item.serialNo}</p>
+                      </Col>
+                      <Col span={8}>
+                        <span style={{ color: STATUS_COLOR[item.status] }}>
+                          <Badge color={STATUS_COLOR[item.status]} />{" "}
+                          {DRONER_DRONE_MAPPING[item.status]}
+                          <br />
+                        </span>
+                      </Col>
+                      <Col span={4}>
+                        <Row justify={"space-between"} gutter={16}>
+                          <Col span={12}>
+                            <ActionButton
+                              icon={<EditOutlined />}
+                              color={color.primary1}
+                              onClick={() => editDroneList(item, index + 1)}
+                            />
+                          </Col>
+                        </Row>
+                      </Col>
+                    </Row>
+                  ))}
+              </>
+            ) : (
+              <div
+                className="container text-center"
+                style={{ padding: "80px" }}
+              >
+                <img src={emptyData} alt="" />
+                <p>ยังไม่มีข้อมูลโดรน</p>
+              </div>
+            )}
+          </Form>
+        </CardContainer>
+        <div className="d-flex justify-content-between pt-3">
+          <p>รายการทั้งหมด {dronerDroneList.length} รายการ</p>
+          {dronerDroneList.length > 10 && (
+            <Pagination defaultCurrent={1} total={1} />
+          )}
+        </div>
+        <BookBankDroner
+          callBack={insertBookBank}
+          data={dataBookBank}
+          dronerId=""
+        />
       </div>
-    </div>
+    </>
   );
 
   return (
-    <Layout>
+    <>
       <Row>
         <BackIconButton onClick={() => navigate(-1)} />
         <span className="pt-4">
@@ -1218,7 +1457,6 @@ function AddDroner() {
         {renderFromData}
         {renderDrone}
       </Row>
-
       <FooterPage
         onClickBack={() => navigate(-1)}
         onClickSave={() => form.submit()}
@@ -1245,7 +1483,7 @@ function AddDroner() {
           title="แก้ไขข้อมูลโดรนเกษตร"
         />
       )}
-    </Layout>
+    </>
   );
 }
 

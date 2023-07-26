@@ -1,4 +1,3 @@
-import Layouts from "../../components/layout/Layout";
 import { BackIconButton } from "../../components/button/BackButton";
 import { useNavigate } from "react-router-dom";
 import { CardHeaderPromotion } from "../../components/header/CardHeaderPromotion";
@@ -41,6 +40,7 @@ import { CropPurposeSprayEntity } from "../../entities/CropEntities";
 import { FarmerEntity } from "../../entities/FarmerEntities";
 import { TaskDatasource } from "../../datasource/TaskDatasource";
 import { ProviceEntity } from "../../entities/LocationEntities";
+import { DashboardLayout } from "../../components/layout/Layout";
 
 export default function AddPromotion() {
   const profile = JSON.parse(localStorage.getItem("profile") || "{  }");
@@ -722,7 +722,7 @@ export default function AddPromotion() {
           timer: 1500,
           showConfirmButton: false,
         }).then((time) => {
-          window.location.href = "/PromotionPage";
+          navigate("/PromotionPage");
         });
       })
       .catch((err) => {
@@ -741,7 +741,7 @@ export default function AddPromotion() {
   };
 
   return (
-    <Layouts>
+    <>
       <Modal
         title="ยืนยันการเพิ่มคูปอง"
         onCancel={() => {
@@ -990,7 +990,7 @@ export default function AddPromotion() {
                 </div>
                 <div className="form-group col-lg-6">
                   <label>
-                    จำนวนสิทธิ <span style={{ color: "red" }}>*</span>
+                    จำนวนสิทธิ์ <span style={{ color: "red" }}>*</span>
                   </label>
                   <div className="mt-1">
                     <Form.Item
@@ -998,13 +998,13 @@ export default function AddPromotion() {
                       rules={[
                         {
                           required: true,
-                          message: "กรุณากรอกจำนวนสิทธิ!",
+                          message: "กรุณากรอกจำนวนสิทธิ์!",
                         },
                       ]}
                     >
                       <Input
                         type="number"
-                        placeholder="กรอกจำนวนสิทธิ"
+                        placeholder="กรอกจำนวนสิทธิ์"
                         autoComplete="off"
                         onChange={(e) => {
                           setRenderMobile({
@@ -1555,6 +1555,6 @@ export default function AddPromotion() {
           />
         </div>
       </div>
-    </Layouts>
+    </>
   );
 }

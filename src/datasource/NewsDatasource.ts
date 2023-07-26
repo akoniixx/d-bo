@@ -1,4 +1,4 @@
-import { BASE_URL, httpClient } from "../config/develop-config";
+import { BASE_URL, httpClient } from "../config/config";
 import { NewsEntities } from "../entities/NewsEntities";
 
 export class NewsDatasource{
@@ -10,6 +10,10 @@ export class NewsDatasource{
         formData.append("status",data.status)
         formData.append("createBy",data.createBy)
         formData.append("application",data.application)
+        formData.append("categoryNews",data.categoryNews)
+        formData.append("campaignId",data.campaignId)
+        formData.append("pinAll",new Boolean(data.pinAll).toString())
+        formData.append("pinMain",new Boolean(data.pinMain).toString())
         return httpClient
         .post(BASE_URL + "/promotion/news/upload",formData)
         .then(res => {return res.data})
@@ -24,6 +28,7 @@ export class NewsDatasource{
         sortField : string | undefined,
         sortDirection : string | undefined,
         search : string | undefined,
+        pageType: string | undefined,
     ){
         return httpClient
         .post(BASE_URL + "/promotion/news/find-all-news",{
@@ -33,7 +38,8 @@ export class NewsDatasource{
             sortField : sortField,
             sortDirection : sortDirection,
             search : search,
-            application : application
+            application : application,
+            pageType : pageType
         })
         .then(res => {return res.data})
         .catch(err => console.log(err))
@@ -54,6 +60,10 @@ export class NewsDatasource{
             formData.append("status",data.status)
             formData.append("createBy",data.createBy)
             formData.append("application",data.application)
+            formData.append("categoryNews",data.categoryNews)
+            formData.append("campaignId",data.campaignId)
+            formData.append("pinAll",new Boolean(data.pinAll).toString())
+            formData.append("pinMain",new Boolean(data.pinMain).toString())
         }
         else{
             formData.append("file",data.file)
@@ -62,6 +72,10 @@ export class NewsDatasource{
             formData.append("status",data.status)
             formData.append("createBy",data.createBy)
             formData.append("application",data.application)
+            formData.append("categoryNews",data.categoryNews)
+            formData.append("campaignId",data.campaignId)
+            formData.append("pinAll",new Boolean(data.pinAll).toString())
+            formData.append("pinMain",new Boolean(data.pinMain).toString())
         }
         return httpClient
         .post(BASE_URL + `/promotion/news/update/${data.id}`,formData)
@@ -72,6 +86,12 @@ export class NewsDatasource{
     static deleteNews(id : string,path : string){
         return httpClient
         .delete(BASE_URL + `/promotion/news/delete?id=${id}&path=${path}`)
+        .then(res => {return res.data})
+        .catch(err => console.log(err))
+    }
+    static checkCountPoint(app : string){
+        return httpClient.
+        get(BASE_URL + `/promotion/news/check-count-pin?application=${app}`)
         .then(res => {return res.data})
         .catch(err => console.log(err))
     }
