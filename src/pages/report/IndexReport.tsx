@@ -607,8 +607,9 @@ function IndexReport() {
     },
     getCheckboxProps: (record: DataType) => ({
       disabled:
-        record.statusPay != "DONE_PAYMENT" &&
-        record.statusPay != "WAIT_PAYMENT",
+        record.status === "WAIT_REVIEW" ||
+        (record.statusPay != "DONE_PAYMENT" &&
+          record.statusPay != "WAIT_PAYMENT"),
       statusPay: record.statusPay,
     }),
   };
@@ -1354,13 +1355,14 @@ function IndexReport() {
           getData?.data.map((x) => x.discountCampaignPoint)[i]
         }`,
         file: getData.data.map(
-          (x) => x.droner && (x.droner.file.length > 0 ? x.droner.file : [])
+          (x) => x.droner && (x.droner.file.length > 0 ? x.droner.file : null)
         )[i],
         isBookBank: getData.data.map((x) => x.droner && x.droner.isBookBank)[i],
         dateWaitPayment: getData.data.map((x) => x.dateWaitPayment)[i],
       });
     }
   }
+
   return (
     <>
       <Space direction="vertical" style={{ width: "100%" }}>

@@ -1,5 +1,10 @@
 ## [Version - 0]
 
+## Fix [v0.34.28] 2023-07-26
+
+- fixed condition check doc in account report page
+- disable status wait_review
+
 ## improve [v0.34.27] 2023-07-25
 
 - fixed wording finished task page
