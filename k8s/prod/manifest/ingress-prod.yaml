@@ -12,7 +12,7 @@ metadata:
     nginx.org/proxy-read-timeout: "900s"
     nginx.org/proxy-send-timeout: "900s"
 spec:
-  ingressClassNmae: nginx
+  ingressClassName: nginx
   tls:
     - hosts:
       - dnds-bo.iconkaset.com
