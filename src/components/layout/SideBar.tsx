@@ -29,6 +29,12 @@ export const pathLists = ({ isAccounting }: { isAccounting: boolean }) => [
         title: "งานที่เสร็จสิ้น",
         subMenu: [],
       },
+      {
+        path: "/IndexAdminTask",
+        name: "IndexAdminTask",
+        title: "การแก้ไข/ประวัติงาน",
+        subMenu: [],
+      },
     ],
   },
   {
