@@ -198,7 +198,7 @@ function QuotaReport() {
           <Input
             prefix={<SearchOutlined style={{ color: color.Disable }} />}
             placeholder="ค้นหาชื่อนักบินโดรน / เบอร์โทร"
-            onChange={(e) => setSearchText(searchText.target.value)}
+            onChange={(e) => setSearchText(e.target.value)}
             allowClear
           />
         </Col>
@@ -212,7 +212,7 @@ function QuotaReport() {
             }}
             onClick={() => {
               setCurrent(1);
-              getRewardRound();
+              getQuotaReport();
             }}
           >
             ค้นหาข้อมูล
