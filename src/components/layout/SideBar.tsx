@@ -32,11 +32,26 @@ export const pathLists = ({ isAccounting }: { isAccounting: boolean }) => [
     ],
   },
   {
-    path: "/IndexFarmer",
-    name: "IndexFarmer",
+    path: "farmer",
+    name: "farmer",
     title: "ข้อมูลเกษตรกร",
     permission: null,
-    subMenu: [],
+    subMenu: [
+      {
+        path: "/IndexFarmer",
+        name: "IndexFarmer",
+        title: "รายชื่อเกษตรกร",
+        permission: null,
+        subMenu: [],
+      },
+      {
+        path: "/IndexPlotList",
+        name: "IndexPlotList",
+        title: "รายการแปลงเกษตร",
+        permission: null,
+        subMenu: [],
+      },
+    ],
   },
   {
     path: "droner",

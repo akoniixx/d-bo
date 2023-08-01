@@ -713,7 +713,6 @@ function IndexReward() {
           bodyStyle={{
             padding: 0,
           }}
-          style={{ top: "25%" }}
         >
           <div className="px-4 pt-4">
             <span className="text-secondary">
