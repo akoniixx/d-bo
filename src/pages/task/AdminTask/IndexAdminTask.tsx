@@ -25,6 +25,9 @@ import TextArea from "antd/lib/input/TextArea";
 import { DateTimeUtil } from "../../../utilities/DateTimeUtil";
 import styled from "styled-components";
 import { Container } from "react-bootstrap";
+import { InputPicker } from "rsuite";
+import { TaskDatasource } from "../../../datasource/TaskDatasource";
+import { NewTaskPageEntity } from "../../../entities/NewTaskEntities";
 
 const NewTable = styled(Table)`
   .ant-table-container table thead tr th {
@@ -38,56 +41,65 @@ const NewTable = styled(Table)`
 
 const IndexAdminTask = () => {
   const profile = JSON.parse(localStorage.getItem("profile") || "{  }");
-  const [data, setData] = useState();
-  const [taskList, setTaskList] = useState();
-  const options: OptionType[] = [];
+  const [current, setCurrent] = useState(1);
+  const [taskList, setTaskList] = useState<any>();
+  const [searchTaskList, setSearchTaskList] = useState<any>();
   const [source, setSource] = useState<string>("EDIT");
   const [showModal, setShowModal] = useState<boolean>(false);
   const [search, setSearch] = useState<boolean>(false);
+  const [taskSelected, setTaskSelected] = useState<any>("");
+  const [taskNo, setTaskNo] = useState();
+  const [count, setCount] = useState<number>(0);
 
-  const sleep = (ms: number) =>
-    new Promise((resolve) => {
-      setTimeout(() => {
-        resolve(undefined);
-      }, ms);
-    });
-  const loadOptions = async (
-    search: string,
-    prevOptions: OptionsOrGroups<OptionType, GroupBase<OptionType>>
-  ) => {
-    await sleep(1000);
-    let filteredName: OptionType[];
-
-    if (!search) {
-      filteredName = options;
-    } else {
-      const searchLower = search.toLowerCase();
-      filteredName = options.filter(({ label, tel, idNo }: OptionType) => {
-        const lowerLabel = label.toLowerCase();
-        const lowerTel = tel ? tel.toLowerCase() : "";
-        const lowerIdNo = idNo ? idNo.toLowerCase() : "";
-        return (
-          lowerLabel.includes(searchLower) ||
-          lowerTel.includes(searchLower) ||
-          lowerIdNo.includes(searchLower)
-        );
-      });
-    }
-
-    let hasMore = filteredName.length > prevOptions.length + 10;
-    let slicedOptions = filteredName.slice(
-      prevOptions.length,
-      prevOptions.length + 10
+  const fetchTaskList = () => {
+    TaskDatasource.getNewTaskList(10, current, "", taskNo).then(
+      (res: NewTaskPageEntity) => {
+        console.log("res", res.data);
+        setTaskList(res.data);
+        const data = res.data.map((item) => {
+          return {
+            ...item,
+            label: `${item.task_no} | ${item.task_status}`,
+            value: item.id,
+          };
+        });
+        setCount(res.count);
+        setSearchTaskList(data);
+      }
     );
-
-    return {
-      options: slicedOptions,
-      hasMore,
-    };
   };
-  const wrappedLoadOptions = useCallback<typeof loadOptions>((...args) => {
-    return loadOptions(...args);
-  }, []);
+
+  useEffect(() => {
+    fetchTaskList();
+  }, [taskNo]);
+
+  const onItemsRendered = (props: any) => {
+    if (props.visibleStopIndex >= searchTaskList.length - 1) {
+      if (searchTaskList.length < count) {
+        TaskDatasource.getNewTaskList(10, current + 1, "", taskNo).then(
+          (res: NewTaskPageEntity) => {
+            console.log(current+1, res.data);
+            setTaskList([...taskList, res.data]);
+            const data = res.data.map((item) => {
+              return {
+                ...item,
+                label: `${item.task_no} | ${item.task_status}`,
+                value: item.id,
+              };
+            });
+            setCurrent(current + 1);
+            setSearchTaskList([...searchTaskList, ...data]);
+          }
+        );
+      }
+    }
+  };
+  const handleSearchTask = (id: any) => {
+    console.log(id);
+    console.log(searchTaskList.filter((x: any) => x.id === id)[0]);
+    setTaskSelected(searchTaskList.filter((x: any) => x.id === id)[0]);
+    //setSearchTaskList(searchTaskList.filter((x : any) => x.id === id)[0]);
+  };
 
   const pageTitle = (
     <Row style={{ padding: "10px" }}>
@@ -139,10 +151,10 @@ const IndexAdminTask = () => {
             span={12}
             style={{ textAlign: "center", borderRight: "2px groove" }}
           >
-            มานี มีนาเยอะ (081-234-5679)
+            {`${taskSelected.firstname} ${taskSelected.lastname} (${taskSelected.telephone_no})`}
           </Col>
           <Col span={12} style={{ textAlign: "center" }}>
-            สมศักดิ์ บินโดรน (081-234-5610)
+            {`${taskSelected.firstname} ${taskSelected.lastname} (${taskSelected.telephone_no})`}
           </Col>
         </Row>
       </Card>
@@ -164,7 +176,9 @@ const IndexAdminTask = () => {
             </Col>
           </>
           <>
-            <Col span={8}>18/05/2565, 11:00</Col>
+            <Col span={8}>
+              {DateTimeUtil.formatDateTime(taskSelected.date_appointment)}
+            </Col>
             <Col span={8}>คุมเลน</Col>
             <Col span={8}>หญ้า, หนอน</Col>
           </>
@@ -689,13 +703,30 @@ const IndexAdminTask = () => {
             <Row gutter={8}>
               <Col span={12}>
                 <Form.Item name="searchAddress">
-                  <AsyncPaginate
-                    isClearable
-                    debounceTimeout={300}
-                    loadOptions={wrappedLoadOptions}
-                    //onChange={(e) => handleSearchFarmer(e)}
+                  <InputPicker
+                    virtualized
+                    value={taskNo}
+                    listProps={{
+                      onItemsRendered,
+                    }}
+                    searchBy={(keyword: string, label, item) => true}
+                    onChange={handleSearchTask}
                     placeholder="ค้นหารหัสงาน (Task No.)"
-                    defaultOptions
+                    onSearch={(val: any) => {
+                      const uppercase = val.toUpperCase();
+                      if (!!uppercase) {
+                        setCurrent(1);
+                        setTaskNo(uppercase);
+                      }
+                    }}
+                    onClean={() => {
+                      setCurrent(1);
+                      setTaskNo(undefined);
+                    }}
+                    data={searchTaskList}
+                    style={{
+                      width: "100%",
+                    }}
                   />
                 </Form.Item>
               </Col>
