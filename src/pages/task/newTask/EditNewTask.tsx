@@ -49,6 +49,7 @@ import {
 import {
   FarmerEntity,
   FarmerEntity_INIT,
+  FarmerPageEntity,
 } from "../../../entities/FarmerEntities";
 import {
   FarmerPlotEntity,
@@ -94,6 +95,8 @@ import { useNavigate } from "react-router-dom";
 import { AsyncPaginate } from "react-select-async-paginate";
 import { OptionType } from "./AddNewTask";
 import type { GroupBase, OptionsOrGroups } from "react-select";
+import { InputPicker } from 'rsuite';
+import 'rsuite/dist/rsuite.min.css';
 
 const dateFormat = "DD/MM/YYYY";
 const dateCreateFormat = "YYYY-MM-DD";
@@ -165,6 +168,12 @@ const EditNewTask = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const options: OptionType[] = [];
   const [currenSearch, setCurrentSearch] = useState(1);
+  const [selectFarmer,setSelectFarmer] = useState<string>("")
+  const [searchFilterFarmer,setSearchFilterFarmer] = useState<string>("")
+  const [farmerListDropdown,setFarmerListDropdown] = useState<any>([])
+  const [count,setCount] = useState<number>(0)
+  const [showData,setShowData] = useState<boolean>(true)
+  const [farmerPlotId, setFarmerPlotId] = useState<string>("");
 
   const twice = useRef<boolean>(true);
   const fetchNewTask = async () => {
@@ -215,28 +224,79 @@ const EditNewTask = () => {
     fetchFarmerList();
   }, []);
 
-  //#region step 1
-  const fetchFarmerList = async () => {
-    await TaskDatasource.getFarmerListTask("", currenSearch, 0).then((res) => {
-      if (res) {
-        setFarmerList(res.data);
-        if (twice.current) {
-          for (let i = 0; i < res.count; ++i) {
-            options.push({
-              value: res.data.map((item) => item.id)[i],
-              label: res.data.map((item) => item.firstname + " " + item.lastname)[i],
-              tel: res.data.map((item) => item.telephoneNo)[i],
-              idNo: res.data.map((item) => item.idNo)[i],
-            });
-          }
-          twice.current = false;
-          setCurrentSearch(currenSearch + 1);
-        } else {
-          twice.current = true;
+  useEffect(()=>{
+    TaskDatasource.getFarmerListTask(searchFilterFarmer, currenSearch, 10).then(
+      (res: FarmerPageEntity) => {
+       const data = res.data.map((item)=>{
+        return {
+          ...item,
+          label : item.firstname + " " + item.lastname + " | " + item.telephoneNo,
+          value : item.id
         }
+       })
+       setCount(res.count)
+       setFarmerListDropdown(data)
       }
-    });
-  };
+    );
+  },[searchFilterFarmer])
+
+  // #region step 1
+  // const fetchFarmerList = async () => {
+  //   await TaskDatasource.getFarmerListTask("", currenSearch, 0).then((res) => {
+  //     if (res) {
+  //       setFarmerList(res.data);
+  //       if (twice.current) {
+  //         for (let i = 0; i < res.count; ++i) {
+  //           options.push({
+  //             value: res.data.map((item) => item.id)[i],
+  //             label: res.data.map((item) => item.firstname + " " + item.lastname)[i],
+  //             tel: res.data.map((item) => item.telephoneNo)[i],
+  //             idNo: res.data.map((item) => item.idNo)[i],
+  //           });
+  //         }
+  //         twice.current = false;
+  //         setCurrentSearch(currenSearch + 1);
+  //       } else {
+  //         twice.current = true;
+  //       }
+  //     }
+  //   });
+  // };
+  const fetchFarmerList = () => {
+    TaskDatasource.getFarmerListTask(searchFilterFarmer, currenSearch, 10).then(
+     (res: FarmerPageEntity) => {
+      const data = res.data.map((item)=>{
+       return {
+         ...item,
+         label : item.firstname + " " + item.lastname + " | " + item.telephoneNo,
+         value : item.id
+       }
+      })
+      setCount(res.count)
+      setFarmerListDropdown(data)
+     }
+   );
+ };
+
+ const onItemsRendered = (props : any)=> {
+  if (props.visibleStopIndex >= farmerListDropdown.length - 1) {
+     if(farmerListDropdown.length < count){
+      TaskDatasource.getFarmerListTask(searchFilterFarmer, currenSearch+1, 10).then(
+        (res: FarmerPageEntity) => {
+         const data = res.data.map((item)=>{
+          return {
+            ...item,
+            label : item.firstname + " " + item.lastname + " | " + item.telephoneNo,
+            value : item.id
+          }
+         })
+         setCurrentSearch(currenSearch+1)
+         setFarmerListDropdown([...farmerListDropdown,...data])
+        }
+      );
+     }
+  }
+};
 
   const sleep = (ms: number) =>
     new Promise((resolve) => {
@@ -285,7 +345,9 @@ const EditNewTask = () => {
   }, []);
 
   const handleSearchFarmer = (id: any) => {
-    setFarmerSelected(farmerList?.filter((x) => x.id === id.value)[0]);
+    setSelectFarmer(id)
+    setFarmerSelected(farmerListDropdown.filter((x : any) => x.id === id)[0]);
+    setShowData(false)
   };
 
   const fetchLocationPrice = async (
@@ -349,6 +411,7 @@ const EditNewTask = () => {
     newData.droner = "";
     newData.farmerPlot = FarmerPlotEntity_INIT;
     setData(newData);
+    setShowData(true)
     setCheckSelectPlot("error");
     setDronerSelected([]);
     setDataFarmer(farmerSelected);
@@ -501,14 +564,41 @@ const EditNewTask = () => {
               <div className="row">
                 <div className="form-group col-lg-6">
                   <Form.Item name="searchAddress">
-                    <AsyncPaginate
+                  <InputPicker 
+                    virtualized
+                    value={selectFarmer}
+                    onChange={handleSearchFarmer}
+                    listProps={{
+                      onItemsRendered
+                     }}
+                    searchBy={(keyword:string, label, item)=>true}
+                    onClean={()=>{
+                        setCurrentSearch(1)
+                        setSearchFilterFarmer("")
+                        setDataFarmer(FarmerEntity_INIT)
+                        setFarmerPlotId("")
+                        setShowData(false)
+                    }}
+                    onSearch={(val)=>{
+                      if(!!val){
+                        setCurrentSearch(1)
+                        setSearchFilterFarmer(val)
+                      }
+                    }}
+                    style={{
+                      width : '100%'
+                    }}
+                    placeholder="ค้นหาชื่อเกษตรกร/เบอร์โทร/เลขบัตรปชช."
+                    data={farmerListDropdown}
+                  />
+                    {/* <AsyncPaginate
                       isClearable
                       debounceTimeout={300}
                       loadOptions={wrappedLoadOptions}
                       onChange={(e) => handleSearchFarmer(e)}
                       placeholder="ค้นหาชื่อเกษตรกร/เบอร์โทร/เลขบัตรปชช."
                       defaultOptions
-                    />
+                    /> */}
                   </Form.Item>
                 </div>
                 <div className="form-group col-lg-6">
@@ -527,7 +617,7 @@ const EditNewTask = () => {
                 </div>
               </div>
             )}
-            {dataFarmer && (
+            {dataFarmer && showData && (
               <div className="col-lg-12" key={dataFarmer.id}>
                 <div className="row">
                   <div className="form-group col-lg-4">
@@ -681,7 +771,7 @@ const EditNewTask = () => {
                 </div>
               </div>
             )}
-            {dataFarmer && (
+            {dataFarmer && showData && (
               <CardContainer
                 style={{ backgroundColor: "rgba(33, 150, 83, 0.1)" }}
               >
@@ -1835,6 +1925,7 @@ const EditNewTask = () => {
         payload.priceStandard = 0;
         payload.unitPriceStandard = 0;
       }
+      console.log(payload)
       setData(payload);
     } else {
       const payload = { ...data };
