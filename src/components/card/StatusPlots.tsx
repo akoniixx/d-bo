@@ -1,4 +1,3 @@
-import { SearchOutlined } from "@ant-design/icons";
 import { Image } from "antd";
 import React, { useEffect, useState } from "react";
 import { color } from "../../resource";
@@ -10,8 +9,8 @@ interface statusPlotProps {
   title2: string;
   bgColor1: string;
   bgColor2: string;
-  countPlot1: number;
-  countPlot2: number;
+  countPlot1: any;
+  countPlot2: any;
 }
 const StatusPlots: React.FC<statusPlotProps> = ({
   title1,
@@ -21,6 +20,8 @@ const StatusPlots: React.FC<statusPlotProps> = ({
   countPlot1,
   countPlot2,
 }) => {
+  
+
   return (
     <>
       <CardContainer
@@ -50,7 +51,7 @@ const StatusPlots: React.FC<statusPlotProps> = ({
                   </div>
                 </div>
                 <div style={{ fontSize: "16px" }}>
-                  {numberWithCommas(countPlot1) + " แปลง"}
+                  {numberWithCommas(countPlot1)}
                 </div>
               </div>
             </CardContainer>
@@ -74,7 +75,7 @@ const StatusPlots: React.FC<statusPlotProps> = ({
                   </div>
                 </div>
                 <div style={{ fontSize: "16px" }}>
-                  {numberWithCommas(countPlot2) + " แปลง"}
+                  {numberWithCommas(countPlot2)}
                 </div>
               </div>
             </CardContainer>

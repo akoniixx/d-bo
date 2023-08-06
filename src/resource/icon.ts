@@ -43,5 +43,8 @@ export default {
   admin_active: require("./media/images/admin_active.png"),
   check: require("./media/images/check.png"),
   cancel: require("./media/images/cancel.png"),
-
+  dronerApp: require("./media/images/dronerApp.png"),
+  farmerApp: require("./media/images/farmerApp.png"),
+  lineApp: require("./media/images/line.png"),
+  bo: require("./media/images/bo.png"),
 };

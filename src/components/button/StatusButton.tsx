@@ -12,9 +12,9 @@ const StatusButton: React.FC<statusProps> = ({ label1, label2, onClick }) => {
     <>
       <Radio.Group buttonStyle="outline">
         <Radio.Button
-          value="รอตรวจสอบ"
+          value="PENDING"
           style={
-            label1 === "รอตรวจสอบ"
+            label1 === "PENDING"
               ? {
                   width: "130px",
                   backgroundColor: color.bgWarning,
@@ -36,9 +36,9 @@ const StatusButton: React.FC<statusProps> = ({ label1, label2, onClick }) => {
           <div style={{ textAlign: "center" }}>รอตรวจสอบ</div>
         </Radio.Button>
         <Radio.Button
-          value="ใช้งาน"
+          value="ACTIVE"
           style={
-            label1 === "ใช้งาน"
+            label1 === "ACTIVE"
               ? {
                   width: "130px",
                   backgroundColor: color.bgSuccess,

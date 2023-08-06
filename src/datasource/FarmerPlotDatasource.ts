@@ -1,7 +1,6 @@
 import { httpClient, BASE_URL } from "../config/config";
 import { FarmerPlotEntity } from "../entities/FarmerPlotEntities";
 
-
 export class FarmerPlotDatasource {
   static insertFarmerPlot(data: FarmerPlotEntity): Promise<any> {
     delete data.id;
@@ -42,6 +41,38 @@ export class FarmerPlotDatasource {
       })
       .catch((err) => {
         console.log(err, "err deleteFarmerPlot");
+      });
+  }
+
+  static getFarmerPlotAll(
+    mainStatus: string,
+    plantName: number,
+    status: string[],
+    waitPendingDate: string[],
+    page: number,
+    take: number,
+    sortField?: string,
+    sortDirection?: string,
+    search?: string
+  ): Promise<any> {
+    const params = {
+      mainStatus: mainStatus,
+      plantName: plantName,
+      status: status,
+      waitPendingDate: waitPendingDate,
+      page: page,
+      take: take,
+      sortField: sortField,
+      sortDirection: sortDirection,
+      search: search,
+    };
+    return httpClient
+      .get(BASE_URL + "/farmer-plot/farmer-plot-all" , {params})
+      .then((response) => {
+        return response.data;
+      })
+      .catch((err) => {
+        console.log(err, "err getFarmerPlotAll");
       });
   }
 }

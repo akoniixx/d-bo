@@ -7,9 +7,12 @@ import {
 
 export class FarmerDatasource {
   static getFarmerList(
+    mainStatus: string[],
+    waitPendingDate: string[],
+    applicationType: string[],
     page: number,
     row: number,
-    status?: string,
+    status?: string[],
     search?: string,
     provinceId?: number,
     districtId?: number,
@@ -18,6 +21,9 @@ export class FarmerDatasource {
     sortField?: string
   ): Promise<FarmerPageEntity> {
     const params = {
+      mainStatus: mainStatus,
+      waitPendingDate: waitPendingDate,
+      applicationType: applicationType,
       status: status,
       page: page,
       take: row,

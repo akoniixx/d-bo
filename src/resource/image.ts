@@ -13,5 +13,6 @@ export default {
   tableLucky: require("./media/images/tableLucky.png"),
   announce: require("./media/images/announcement.png"),
   empty_cover: require("./media/empties/empty-cover.png"),
-  upload_Img_btn : require("./media/empties/upload_Img_btn.png")
+  upload_Img_btn : require("./media/empties/upload_Img_btn.png"),
+  empty_table_farmer: require('./media/empties/empty_table_farmer.png')
 };

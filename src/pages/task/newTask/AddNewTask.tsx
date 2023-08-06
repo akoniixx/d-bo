@@ -84,7 +84,6 @@ import { FarmerDatasource } from "../../../datasource/FarmerDatasource";
 import { AsyncPaginate } from "react-select-async-paginate";
 import type { GroupBase, OptionsOrGroups } from "react-select";
 import { FarmerPageEntity } from "../../../entities/FarmerEntities";
-import { FarmerPageEntity_INIT } from "../../../entities/FarmerEntities";
 export type OptionType = {
   value: any;
   label: any;

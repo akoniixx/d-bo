@@ -16,6 +16,8 @@ import {
   Table,
 } from "antd";
 import {
+  CaretDownOutlined,
+  CaretUpOutlined,
   DeleteOutlined,
   DownOutlined,
   EditOutlined,
@@ -35,67 +37,126 @@ import { useNavigate } from "react-router-dom";
 import ModalDelete from "../../../components/modal/ModalDelete";
 import ModalMapPlot from "../../../components/modal/task/newTask/ModalMapPlot";
 import ModalFarmerPlot from "../../../components/modal/ModalFarmerPlot";
-import { FarmerPlotEntity_INIT } from "../../../entities/FarmerPlotEntities";
+import {
+  FarmerPlotEntity,
+  FarmerPlotEntity_INIT,
+  SumPlotEntity,
+} from "../../../entities/FarmerPlotEntities";
+import { FarmerPlotDatasource } from "../../../datasource/FarmerPlotDatasource";
+import { numberWithCommas } from "../../../utilities/TextFormatter";
+import { Option } from "antd/lib/mentions";
 
+const _ = require("lodash");
+const { Map } = require("immutable");
 function IndexPlotList() {
-  const navigate = useNavigate();
-  const [source, setSource] = useState<any>("รอตรวจสอบ");
+  const [mainStatus, setMainStatus] = useState<any>("PENDING");
   const [sumPlotCard, setSumPlotCard] = useState<any>({
     card1: "รอตรวจสอบ",
     card2: "ไม่อนุมัติ",
   });
-  const [plant, setPlant] = useState<any>();
-  const [searchText, setSearchText] = useState<any>();
+  const [cropName, setCropName] = useState<any[]>([]);
   const [visibleStatus, setVisibleStatus] = useState(false);
   const [indeterminatePending, setIndeterminatePending] = useState(false);
   const [checkAllPending, setCheckAllPending] = useState(false);
-  const [checkedListPending, setCheckedListPending] =
-    useState<CheckboxValueType[]>();
   const [statusArr, setStatusArr] = useState<string[]>([]);
+  const [statusArrMain, setStatusArrMain] = useState<string[]>([]);
   const [status, setStatus] = useState<any>();
-  const [plotsData, setPlotsData] = useState<any>();
-  const statusListPend = ["02DAYS", "36DAYS", "7DAYS"];
+  const [plotsData, setPlotsData] = useState<SumPlotEntity>();
+  const statusListPend = ["FIRST", "SECOND", "THIRD"];
   const [modalDelete, setModalDelete] = useState<boolean>(false);
   const [modalEdit, setModalEdit] = useState<boolean>(false);
-
+  const [plantName, setPlantName] = useState<any>();
+  const [waitPendingDate, setWaitPendingDate] = useState<any>();
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [sortField, setSortField] = useState<any>();
+  const [searchText, setSearchText] = useState<any>();
+  const [row, setRow] = useState(10);
   const [plotDelete, setPlotsDelete] = useState<any>();
-  const [plotEdit, setPlotsEdit] = useState<any>();
   const [showModalMap, setShowModalMap] = useState<boolean>(false);
   const [plotId, setPlotId] = useState<string>("");
-  const [currentPage, setCurrentPage] = useState<number>(1);
-  const [row, setRow] = useState<number>(10);
+  const [summary, setSummary] = useState<any>();
+  const [editFarmerPlot, setEditFarmerPlot] = useState<FarmerPlotEntity>(
+    FarmerPlotEntity_INIT
+  );
+  const [farmerId, setFarmerId] = useState<any>();
+  const [farmerPlotId, setFarmerPlotId] = useState<string>("");
+  const [editIndex, setEditIndex] = useState(0);
+  const [sortDirection, setSortDirection] = useState<string | undefined>(
+    undefined
+  );
+  const [sortDirection1, setSortDirection1] = useState<string | undefined>(
+    undefined
+  );
+  const [sortDirection2, setSortDirection2] = useState<string | undefined>(
+    undefined
+  );
+  const [sortDirection3, setSortDirection3] = useState<string | undefined>(
+    undefined
+  );
+  const [sortDirection4, setSortDirection4] = useState<string | undefined>(
+    undefined
+  );
+  const [sortDirection5, setSortDirection5] = useState<string | undefined>(
+    undefined
+  );
+  useEffect(() => {
+    getPlotsData();
+  }, [currentPage, mainStatus, row, sortDirection]);
+  const getPlotsData = async () => {
+    await FarmerPlotDatasource.getFarmerPlotAll(
+      mainStatus,
+      plantName,
+      status,
+      waitPendingDate,
+      currentPage,
+      row,
+      sortField,
+      sortDirection,
+      searchText
+    ).then((res) => {
+      setPlotsData(res);
+      setSummary(res.summary[0]);
+    });
+  };
 
   useEffect(() => {
-    getPlants();
-    getPlotsData();
-  }, [currentPage, row]);
-  const getPlotsData = async () => {
-    await FarmerDatasource.getFarmerList(currentPage, row).then((res) => {
-      setPlotsData(res);
-    });
-  };
-  const getPlants = async () => {
-    await CropDatasource.getCropJustName().then((res) => {
-      setPlant(res);
-    });
-  };
+    const getCropJustName = () => {
+      CropDatasource.getCropJustName().then((res) => {
+        setCropName(res);
+      });
+    };
+    getCropJustName();
+  }, []);
+
   const onSearchText = (e: any) => {
     setSearchText(e.target.value);
+    setCurrentPage(1);
   };
+
+  const searchPlants = (e: any) => {
+    setPlantName(e);
+    setCurrentPage(1);
+  };
+
   const CheckStatus = (e: any) => {
-    if (e.target.value === "รอตรวจสอบ") {
+    if (e.target.value === "PENDING") {
+      setStatus(undefined);
+      setWaitPendingDate(undefined);
       setSumPlotCard({
         card1: "รอตรวจสอบ",
         card2: "ไม่อนุมัติ",
       });
     } else {
+      setStatus(undefined);
+      setWaitPendingDate(undefined);
       setSumPlotCard({
         card1: "ใช้งาน",
         card2: "ปิดการใช้งาน",
       });
     }
-    setSource(e.target.value);
+    setMainStatus(e.target.value);
   };
+
   const handleVisibleStatus = (newVisible: any) => {
     setVisibleStatus(newVisible);
   };
@@ -110,6 +171,7 @@ function IndexPlotList() {
     setCurrentPage(current);
     setRow(pageSize);
   };
+
   const onChangePage = (page: number) => {
     setCurrentPage(page);
   };
@@ -130,32 +192,43 @@ function IndexPlotList() {
       }
     }
     setStatus(arr);
-    setCheckedListPending(e.target.checked ? statusListPend : []);
+    setWaitPendingDate(e.target.checked ? statusListPend : []);
     setIndeterminatePending(false);
     setCheckAllPending(e.target.checked);
   };
   const onChangeListPending = (list: CheckboxValueType[]) => {
-    setStatus(undefined);
+    setStatus([]);
     let arr: any = 0;
     arr = [...list];
-    setCheckedListPending(list);
+    setWaitPendingDate(list);
     setIndeterminatePending(
       !!list.length && list.length < statusListPend.length
     );
     setCheckAllPending(list.length === statusListPend.length);
   };
   const onSearchStatus = (e: any) => {
-    if (e.target.checked) {
-      setStatus(e.target.value);
+    let value = e.target.value;
+    let checked = e.target.checked;
+    let arr: any = 0;
+    if (checked === true) {
+      arr = [...statusArrMain, value];
+      setStatusArrMain([...statusArrMain, value]);
+      setStatus(value);
     } else {
-      setStatus(undefined);
+      let d: string[] = statusArrMain.filter((x) => x != value);
+      arr = [...d];
+      setStatusArrMain(d);
+      if (d.length == 0) {
+        arr = undefined;
+      }
     }
+    setStatus(arr);
   };
 
   const SubStatus = (
     <Menu
       items={[
-        source === "รอตรวจสอบ"
+        mainStatus === "PENDING"
           ? {
               label: (
                 <>
@@ -169,19 +242,19 @@ function IndexPlotList() {
                   </Checkbox>
                   <br />
                   <Checkbox.Group
-                    value={checkedListPending}
+                    value={waitPendingDate}
                     style={{ width: "100%" }}
                     onChange={onChangeListPending}
                   >
-                    <Checkbox style={{ marginLeft: "20px" }} value="02DAYS">
+                    <Checkbox style={{ marginLeft: "20px" }} value="FIRST">
                       0-2 วัน
                     </Checkbox>
                     <br />
-                    <Checkbox style={{ marginLeft: "20px" }} value="36DAYS">
+                    <Checkbox style={{ marginLeft: "20px" }} value="SECOND">
                       3-6 วัน
                     </Checkbox>
                     <br />
-                    <Checkbox style={{ marginLeft: "20px" }} value="7DAYS">
+                    <Checkbox style={{ marginLeft: "20px" }} value="THIRD">
                       7 วันขึ้นไป
                     </Checkbox>
                   </Checkbox.Group>
@@ -197,9 +270,9 @@ function IndexPlotList() {
                   </Checkbox>
                 </>
               ),
-              key: "1",
+              key: "2",
             },
-        source === "รอตรวจสอบ"
+        mainStatus === "PENDING"
           ? {
               label: (
                 <>
@@ -208,7 +281,7 @@ function IndexPlotList() {
                   </Checkbox>
                 </>
               ),
-              key: "2",
+              key: "3",
             }
           : {
               label: (
@@ -218,37 +291,94 @@ function IndexPlotList() {
                   </Checkbox>
                 </>
               ),
-              key: "2",
+              key: "4",
             },
       ]}
     />
   );
-  const showEdit = (id: string) => {
-    setPlotsEdit(id);
+  const showEdit = (item: FarmerPlotEntity, index: any) => {
+    setEditFarmerPlot(item);
+    setEditIndex(index);
     setModalEdit(!modalEdit);
   };
   const showDelete = (id: string) => {
     setPlotsDelete(id);
     setModalDelete(!modalDelete);
   };
-  const editPlots = (id: string) => {
-    setModalEdit(!modalEdit);
-  };
-  const deletePlots = (id: string) => {
+
+  const deletePlots = async (data: FarmerPlotEntity) => {
     setModalDelete(!modalDelete);
-    // FarmerPlotDatasource.deleteFarmerPlot(id)
-    //   .then((res) => {
-    //     setModalDelete(!modalDelete);
-    //     window.location.reload();
-    //   })
-    //   .catch((err) => console.log(err));
+    await FarmerPlotDatasource.deleteFarmerPlot(data.id);
+    getPlotsData();
+  };
+
+  const updateFarmerPlot = async (plot: FarmerPlotEntity) => {
+    const setId = Map(plot).set("id", farmerPlotId);
+    const payload = {
+      ...setId.toJS(),
+      farmerId,
+    };
+    if (payload.id) {
+      await FarmerPlotDatasource.updateFarmerPlot(payload);
+      setModalEdit((prev) => !prev);
+    }
+    getPlotsData();
   };
 
   const columns = [
     {
-      title: "วันที่อัพเดท",
-      dataIndex: "date",
-      key: "date",
+      title: () => {
+        return (
+          <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+            วันที่อัพเดต
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                cursor: "pointer",
+              }}
+              onClick={() => {
+                setSortField("updatedAt");
+                setSortDirection((prev) => {
+                  if (prev === "ASC") {
+                    return "DESC";
+                  } else if (prev === undefined) {
+                    return "ASC";
+                  } else {
+                    return undefined;
+                  }
+                });
+                setSortDirection1((prev) => {
+                  if (prev === "ASC") {
+                    return "DESC";
+                  } else if (prev === undefined) {
+                    return "ASC";
+                  } else {
+                    return undefined;
+                  }
+                });
+              }}
+            >
+              <CaretUpOutlined
+                style={{
+                  position: "relative",
+                  top: 2,
+                  color: sortDirection1 === "ASC" ? "#ffca37" : "white",
+                }}
+              />
+              <CaretDownOutlined
+                style={{
+                  position: "relative",
+                  bottom: 2,
+                  color: sortDirection1 === "DESC" ? "#ffca37" : "white",
+                }}
+              />
+            </div>
+          </div>
+        );
+      },
+      dataIndex: "updatedAt",
+      key: "updatedAt",
       render: (value: any, row: any, index: number) => {
         return {
           children: (
@@ -258,27 +388,125 @@ function IndexPlotList() {
       },
     },
     {
-      title: "ชื่อแปลงเกษตร",
+      title: () => {
+        return (
+          <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+            ชื่อแปลงเกษตร
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                cursor: "pointer",
+              }}
+              onClick={() => {
+                setSortField("plotName");
+                setSortDirection((prev) => {
+                  if (prev === "ASC") {
+                    return "DESC";
+                  } else if (prev === undefined) {
+                    return "ASC";
+                  } else {
+                    return undefined;
+                  }
+                });
+                setSortDirection2((prev) => {
+                  if (prev === "ASC") {
+                    return "DESC";
+                  } else if (prev === undefined) {
+                    return "ASC";
+                  } else {
+                    return undefined;
+                  }
+                });
+              }}
+            >
+              <CaretUpOutlined
+                style={{
+                  position: "relative",
+                  top: 2,
+                  color: sortDirection2 === "ASC" ? "#ffca37" : "white",
+                }}
+              />
+              <CaretDownOutlined
+                style={{
+                  position: "relative",
+                  bottom: 2,
+                  color: sortDirection2 === "DESC" ? "#ffca37" : "white",
+                }}
+              />
+            </div>
+          </div>
+        );
+      },
       dataIndex: "plot",
       key: "plot",
       render: (value: any, row: any, index: number) => {
         return {
-          children: <span>แปลง 1 นาข้าว</span>,
+          children: <span>{row.plotName ? row.plotName : "-"}</span>,
         };
       },
     },
     {
-      title: "ชื่อเกษตรกร",
+      title: () => {
+        return (
+          <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+            ชื่อเกษตรกร
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                cursor: "pointer",
+              }}
+              onClick={() => {
+                setSortField("firstname");
+                setSortDirection((prev) => {
+                  if (prev === "ASC") {
+                    return "DESC";
+                  } else if (prev === undefined) {
+                    return "ASC";
+                  } else {
+                    return undefined;
+                  }
+                });
+                setSortDirection3((prev) => {
+                  if (prev === "ASC") {
+                    return "DESC";
+                  } else if (prev === undefined) {
+                    return "ASC";
+                  } else {
+                    return undefined;
+                  }
+                });
+              }}
+            >
+              <CaretUpOutlined
+                style={{
+                  position: "relative",
+                  top: 2,
+                  color: sortDirection3 === "ASC" ? "#ffca37" : "white",
+                }}
+              />
+              <CaretDownOutlined
+                style={{
+                  position: "relative",
+                  bottom: 2,
+                  color: sortDirection3 === "DESC" ? "#ffca37" : "white",
+                }}
+              />
+            </div>
+          </div>
+        );
+      },
       dataIndex: "farmer",
       key: "farmer",
       render: (value: any, row: any, index: number) => {
         return {
           children: (
             <>
-              <span>{row.firstname + " " + row.lastname}</span>
+              <span>{row.farmer.firstname + " " + row.farmer.lastname}</span>
               <br />
               <span style={{ color: color.Grey, fontSize: 12 }}>
-                {row.farmerCode}
+                {row.farmer.farmerCode}
               </span>
             </>
           ),
@@ -291,27 +519,128 @@ function IndexPlotList() {
       key: "tel",
       render: (value: any, row: any, index: number) => {
         return {
-          children: <span>{row.telephoneNo}</span>,
+          children: (
+            <span>{row.farmer.telephoneNo ? row.farmer.telephoneNo : "-"}</span>
+          ),
         };
       },
     },
     {
-      title: "พืชที่ปลูก",
-      dataIndex: "plant",
-      key: "plant",
+      title: () => {
+        return (
+          <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+            พืชที่ปลูก
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                cursor: "pointer",
+              }}
+              onClick={() => {
+                setSortField("plantName");
+                setSortDirection((prev) => {
+                  if (prev === "ASC") {
+                    return "DESC";
+                  } else if (prev === undefined) {
+                    return "ASC";
+                  } else {
+                    return undefined;
+                  }
+                });
+
+                setSortDirection4((prev) => {
+                  if (prev === "ASC") {
+                    return "DESC";
+                  } else if (prev === undefined) {
+                    return "ASC";
+                  } else {
+                    return undefined;
+                  }
+                });
+              }}
+            >
+              <CaretUpOutlined
+                style={{
+                  position: "relative",
+                  top: 2,
+                  color: sortDirection4 === "ASC" ? "#ffca37" : "white",
+                }}
+              />
+              <CaretDownOutlined
+                style={{
+                  position: "relative",
+                  bottom: 2,
+                  color: sortDirection4 === "DESC" ? "#ffca37" : "white",
+                }}
+              />
+            </div>
+          </div>
+        );
+      },
+      dataIndex: "plantName",
+      key: "plantName",
       render: (value: any, row: any, index: number) => {
         return {
-          children: <span>นาข้าว</span>,
+          children: <span>{row.plantName ? row.plantName : "-"}</span>,
         };
       },
     },
     {
-      title: "จำนวนไร่",
+      title: () => {
+        return (
+          <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+            จำนวนไร่
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                cursor: "pointer",
+              }}
+              onClick={() => {
+                setSortField("raiAmount");
+                setSortDirection((prev) => {
+                  if (prev === "ASC") {
+                    return "DESC";
+                  } else if (prev === undefined) {
+                    return "ASC";
+                  } else {
+                    return undefined;
+                  }
+                });
+                setSortDirection5((prev) => {
+                  if (prev === "ASC") {
+                    return "DESC";
+                  } else if (prev === undefined) {
+                    return "ASC";
+                  } else {
+                    return undefined;
+                  }
+                });
+              }}
+            >
+              <CaretUpOutlined
+                style={{
+                  position: "relative",
+                  top: 2,
+                  color: sortDirection5 === "ASC" ? "#ffca37" : "white",
+                }}
+              />
+              <CaretDownOutlined
+                style={{
+                  position: "relative",
+                  bottom: 2,
+                  color: sortDirection5 === "DESC" ? "#ffca37" : "white",
+                }}
+              />
+            </div>
+          </div>
+        );
+      },
       dataIndex: "plotCount",
       key: "plotCount",
       render: (value: any, row: any, index: number) => {
         return {
-          children: <span>40</span>,
+          children: <span>{numberWithCommas(row.raiAmount) + " ไร่"}</span>,
         };
       },
     },
@@ -323,12 +652,16 @@ function IndexPlotList() {
         return {
           children: (
             <>
-              <div
-                onClick={() => handleModalMap(row.farmer_plot_id)}
-                style={{ color: color.primary1, cursor: "pointer" }}
+              <span
+                onClick={() => handleModalMap(row.id)}
+                style={{
+                  color: color.primary1,
+                  cursor: "pointer",
+                  textDecorationLine: "underline",
+                }}
               >
                 ดูแผนที่แปลง
-              </div>
+              </span>
             </>
           ),
         };
@@ -339,6 +672,16 @@ function IndexPlotList() {
       dataIndex: "status",
       key: "status",
       render: (value: any, row: any, index: number) => {
+        const countDay = () => {
+          if (row.dateWaitPending != null) {
+            const nowDate = new Date(Date.now());
+            const rowDate = new Date(row.dateWaitPending);
+            const diffTime = nowDate.getTime() - rowDate.getTime();
+            let diffDay = Math.floor(diffTime / (1000 * 3600 * 24));
+            diffDay = diffDay == 0 ? 1 : diffDay;
+            return diffDay;
+          }
+        };
         return {
           children: (
             <>
@@ -346,6 +689,11 @@ function IndexPlotList() {
                 <Badge color={STATUS_COLOR_MAPPING[row.status]} />{" "}
                 {STATUS_FARMER_MAPPING[row.status]}
                 <br />
+              </span>
+              <span style={{ color: color.Grey }}>
+                {row.status === "PENDING" && row.dateWaitPending != null
+                  ? ` (รอไปแล้ว ${countDay()} วัน)`
+                  : null}
               </span>
             </>
           ),
@@ -363,12 +711,16 @@ function IndexPlotList() {
               <ActionButton
                 icon={<EditOutlined />}
                 color={color.primary1}
-                onClick={() => showEdit(row.id)}
+                onClick={() => {
+                  showEdit(row, index);
+                  setFarmerId(row.farmer.id);
+                  setFarmerPlotId(row.id);
+                }}
               />
               <ActionButton
                 icon={<DeleteOutlined />}
                 color={color.Error}
-                onClick={() => showDelete(row.id)}
+                onClick={() => showDelete(row)}
               />
             </Row>
           ),
@@ -393,8 +745,8 @@ function IndexPlotList() {
         </div>
         <div className="col-lg pt-1">
           <StatusButton
-            label1={source}
-            label2={source}
+            label1={mainStatus}
+            label2={mainStatus}
             onClick={(e: any) => CheckStatus(e)}
           />
         </div>
@@ -408,11 +760,19 @@ function IndexPlotList() {
         bgColor2={
           sumPlotCard?.card2 === "ไม่อนุมัติ" ? color.Grey : color.Error
         }
-        countPlot1={100}
-        countPlot2={100}
+        countPlot1={
+          mainStatus === "PENDING"
+            ? numberWithCommas(summary?.count_pending) + " แปลง"
+            : numberWithCommas(summary?.count_active) + " แปลง"
+        }
+        countPlot2={
+          mainStatus === "ACTIVE"
+            ? numberWithCommas(summary?.count_inactive) + " แปลง"
+            : numberWithCommas(summary?.count_reject) + " แปลง"
+        }
       />
-      <div className="row pt-3 pb-3">
-        <div className="col-lg-6">
+      <div className="d-flex justify-content-between pt-3 pb-3">
+        <div className="col-lg-6 p-1">
           <Input
             allowClear
             prefix={<SearchOutlined style={{ color: color.Disable }} />}
@@ -421,20 +781,31 @@ function IndexPlotList() {
             onChange={onSearchText}
           />
         </div>
-        <div className="col-lg">
+        <div className="col-lg p-1">
           <Select
             className="col-lg-12"
-            placeholder="เลือกพืชที่ปลูก"
             allowClear
+            showSearch
+            placeholder="เลือกพืชที่ปลูก"
+            optionFilterProp="children"
+            filterSort={(optionA, optionB) =>
+              optionA.children
+                .toLowerCase()
+                .localeCompare(optionB.children.toLowerCase())
+            }
+            filterOption={(input: any, option: any) =>
+              option.children.includes(input)
+            }
+            onChange={(e) => searchPlants(e)}
           >
-            {plant?.map((i: any) => (
-              <option key={i.id} value={i.cropName}>
-                {i.cropName}
-              </option>
+            {cropName.map((item) => (
+              <Option key={item.id} value={item.cropName}>
+                {item.cropName}
+              </Option>
             ))}
           </Select>
         </div>
-        <div className="col-lg">
+        <div className="col-lg p-1">
           <Dropdown
             overlay={SubStatus}
             trigger={["click"]}
@@ -448,26 +819,43 @@ function IndexPlotList() {
             </Button>
           </Dropdown>
         </div>
-        <div className="col-lg-1" style={{textAlign: 'end'}}>
+        <div className="col-lg-1 p-1" style={{ textAlign: "end" }}>
           <Button
+            className="col-lg-12"
             style={{
               borderColor: color.Success,
               borderRadius: "5px",
               color: color.secondary2,
               backgroundColor: color.Success,
             }}
-            // onClick={onSearch}
+            onClick={getPlotsData}
           >
             ค้นหาข้อมูล
           </Button>
         </div>
       </div>
-    
+
       <CardContainer>
         <Table
           dataSource={plotsData?.data}
           columns={columns}
           pagination={false}
+          scroll={{ x: "max-content" }}
+          rowClassName={(a) =>
+            (a.status === "PENDING" && a.dateWaitPending) != null &&
+            moment(Date.now()).diff(
+              moment(new Date(a.dateWaitPending)),
+              "day"
+            ) >= 3
+              ? "PENDING" &&
+                moment(Date.now()).diff(
+                  moment(new Date(a.dateWaitPending)),
+                  "day"
+                ) >= 7
+                ? "table-row-older"
+                : "table-row-old"
+              : "table-row-lasted"
+          }
         />
       </CardContainer>
       <div className="d-flex justify-content-between pt-4 pb-3">
@@ -481,15 +869,16 @@ function IndexPlotList() {
         />
       </div>
 
-      <ModalFarmerPlot 
+      <ModalFarmerPlot
+        isEditModal
         show={modalEdit}
         backButton={() => setModalEdit((prev) => !prev)}
-        callBack={(e)=> console.log(e)}
-        data={FarmerPlotEntity_INIT}
-        editIndex={0}
-        title="เพิ่มแปลงเกษตร"    
+        callBack={updateFarmerPlot}
+        data={editFarmerPlot}
+        editIndex={editIndex}
+        title="แก้ไขแปลงเกษตร"
+        callBackModal={(val) => setModalEdit(!val)}
       />
-
       <ModalDelete
         show={modalDelete}
         title1="โปรดตรวจสอบแปลงเกษตรที่คุณต้องการลบ"
@@ -506,7 +895,6 @@ function IndexPlotList() {
           plotId={plotId}
         />
       )}
-      
     </>
   );
 }
