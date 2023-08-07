@@ -76,6 +76,7 @@ import EditDronerMission from "./pages/mission/droner/EditDronerMission";
 import MissionReport from "./pages/mission/droner/MissionReport";
 import QuotaReport from "./pages/quotaSetting/droner/QuotaReport";
 import RewardReceived from "./pages/quotaSetting/droner/RewardReceived";
+import IndexPlotList from "./pages/farmer/plotList/IndexPlotList";
 
 const WebRoutes: React.FC<any> = () => {
   return (
@@ -182,7 +183,7 @@ const WebRoutes: React.FC<any> = () => {
             element={<DetailDronerHistorySum />}
           />
           <Route path="/QuotaReport/:id" element={<QuotaReport />} />
-          <Route path="/MissionReport/:id" element={<MissionReport/>} />
+          <Route path="/MissionReport/:id" element={<MissionReport />} />
 
           <Route path="/IndexQuota" element={<IndexQuota />} />
           <Route path="/AddQuota" element={<AddQuota />} />
@@ -190,11 +191,11 @@ const WebRoutes: React.FC<any> = () => {
           <Route path="/IndexDronerMission" element={<IndexDronerMission />} />
           <Route path="/AddDronerMission" element={<AddDronerMission />} />
           <Route path="/RewardReceived/:id" element={<RewardReceived />} />
-
           <Route
             path="/EditDronerMission/:id"
             element={<EditDronerMission />}
           />
+          <Route path="/IndexPlotList" element={<IndexPlotList />} />
         </Route>
         <Route element={<PublicRoute />}>
           <Route index element={<AuthPage />} />

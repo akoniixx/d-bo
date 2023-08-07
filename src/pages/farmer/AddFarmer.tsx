@@ -954,6 +954,8 @@ const AddFarmer = () => {
           data={FarmerPlotEntity_INIT}
           editIndex={editIndex}
           title="เพิ่มแปลงเกษตร"
+          callBackModal={(val)=> setShowAddModal(!val)}
+
         />
       )}
       {showEditModal && (
@@ -965,6 +967,8 @@ const AddFarmer = () => {
           data={editFarmerPlot}
           editIndex={editIndex}
           title="แก้ไขแปลงเกษตร"
+          callBackModal={(val)=> setShowEditModal(!val)}
+
         />
       )}
     </>

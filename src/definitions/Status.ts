@@ -25,7 +25,7 @@ export const STATUS_FARMER_MAPPING: any = {
 export const STATUS_COLOR_MAPPING: any = {
   PENDING: "#EA973E",
   ACTIVE: color.Success,
-  REJECTED: color.Error,
+  REJECTED: color.Grey,
   INACTIVE: color.Error,
   OPEN: color.Grey,
   DRAFTING: color.Grey,

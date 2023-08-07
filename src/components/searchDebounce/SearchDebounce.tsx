@@ -10,11 +10,7 @@ interface Props {
   placeholder?: string;
   onSearch: (value: string) => void;
 }
-function SearchDebounce({
-  searchDefault,
-  onSearch,
-  ...props
-}: Props) {
+function SearchDebounce({ searchDefault, onSearch, ...props }: Props) {
   const [form] = Form.useForm();
   const [searchQuery] = useSearchParams();
 
@@ -33,9 +29,11 @@ function SearchDebounce({
       form={form}
       initialValues={{
         search: searchDefault,
-      }}>
+      }}
+    >
       <Form.Item name="search">
         <Search
+          allowClear
           {...props}
           onSearch={(value) => {
             onSearch(value);
