@@ -115,7 +115,8 @@ const ModalFarmerPlot: React.FC<ModalFarmerPlotProps> = ({
     setModalEdit(!modalEdit);
     callBackModal(!modalEdit!);
   };
-  const showHistory = () => {
+  const showHistory = (e: FarmerPlotEntity) => {
+    setEditFarmerPlot(e);
     setModalHistory(!modalHistory);
     callBackModal(!modalEdit!);
   };
@@ -180,7 +181,6 @@ const ModalFarmerPlot: React.FC<ModalFarmerPlotProps> = ({
     const payload = {
       ...plot,
     };
-    console.log(payload);
   };
 
   const handelCallBack = async (values: FarmerPlotEntity) => {
@@ -371,7 +371,7 @@ const ModalFarmerPlot: React.FC<ModalFarmerPlotProps> = ({
                 </Button>
               </div>
               <Button
-                onClick={showHistory}
+               onClick={() => showHistory(data)}
                 type="dashed"
                 className="col-lg-3"
                 style={{
@@ -597,6 +597,7 @@ const ModalFarmerPlot: React.FC<ModalFarmerPlotProps> = ({
 
       <ModalHistory
         show={modalHistory}
+        data={editFarmerPlot}
         backButton={() => setModalHistory((prev) => !prev)}
       />
     </>

@@ -5,7 +5,17 @@ import FooterPage from "../footer/FooterPage";
 import TextArea from "antd/lib/input/TextArea";
 import { color } from "../../resource";
 import bth_img_empty from "../../resource/media/empties/upload_Img_btn.png";
-import { FarmerPlotEntity } from "../../entities/FarmerPlotEntities";
+import {
+  FarmerPlotEntity,
+  HistoryEditRaiEntity,
+  HistoryFarmerPlotEntity,
+} from "../../entities/FarmerPlotEntities";
+import { resizeFileImg } from "../../utilities/ResizeImage";
+import {
+  UploadImageEntity,
+  UploadImageEntity_INTI,
+} from "../../entities/UploadImageEntities";
+import { FarmerPlotDatasource } from "../../datasource/FarmerPlotDatasource";
 
 interface ModalEditRaiAmountProps {
   show: boolean;
@@ -14,6 +24,8 @@ interface ModalEditRaiAmountProps {
   data: FarmerPlotEntity;
   callBackEditRai: (data: FarmerPlotEntity) => void;
 }
+const _ = require("lodash");
+const { Map } = require("immutable");
 const ModalEditRaiAmount: React.FC<ModalEditRaiAmountProps> = ({
   show,
   backButton,
@@ -21,15 +33,19 @@ const ModalEditRaiAmount: React.FC<ModalEditRaiAmountProps> = ({
   data,
   callBackEditRai,
 }) => {
+  const profile = JSON.parse(localStorage.getItem("profile") || "{  }");
+
   const [form] = Form.useForm();
   const [saveBtnDisable, setBtnSaveDisable] = useState<boolean>(
     isEditModal ? false : true
   );
-  const [imgEvidence, setImgEvidence] = useState<any>();
-  const checkValidate = (data: FarmerPlotEntity) => {
-    let checkEmpty = ![data.raiAmount].includes("");
-    let checkEmptyNumber = ![data.plotAreaId].includes(0);
-    if (checkEmpty && checkEmptyNumber) {
+  const [img, setImg] = useState<any>();
+  const [createImg, setCreateImg] = useState<UploadImageEntity>(
+    UploadImageEntity_INTI
+  );
+  const checkValidate = (data: HistoryEditRaiEntity) => {
+    let checkEmpty = ![data.raiAfter, !data.file].includes("");
+    if (checkEmpty) {
       setBtnSaveDisable(false);
     } else {
       setBtnSaveDisable(true);
@@ -39,13 +55,68 @@ const ModalEditRaiAmount: React.FC<ModalEditRaiAmountProps> = ({
     const valuesForm = form.getFieldsValue();
     checkValidate(valuesForm);
   };
+  const onChangeImg = async (file: any) => {
+    const source = file.target.files[0];
+    let newSource: any;
+
+    const isFileMoreThan2MB = source.size > 2 * 1024 * 1024;
+    if (isFileMoreThan2MB) {
+      newSource = await resizeFileImg({
+        file: source,
+        compressFormat: source?.type.split("/")[1],
+        quality: 70,
+        rotation: 0,
+        responseUriFunc: (res: any) => {},
+      });
+    }
+    const img_base64 = await new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(isFileMoreThan2MB ? newSource : source);
+      reader.onload = () => resolve(reader.result);
+    });
+
+    setImg(img_base64);
+    const d = Map(createImg).set(
+      "file",
+      isFileMoreThan2MB ? newSource : source
+    );
+    setCreateImg(d.toJS());
+  };
+  const onPreviewImg = async () => {
+    let src = img;
+    if (!src) {
+      src = await new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(img);
+        reader.onload = () => resolve(reader.result);
+      });
+    }
+    const image = new Image();
+    image.src = src;
+    const imgWindow = window.open(src);
+    imgWindow?.document.write(image.outerHTML);
+  };
+  const removeImg = () => {
+    setImg(undefined);
+    setCreateImg(UploadImageEntity_INTI);
+  };
   const handelCallBack = async (values: any) => {
     const payload = {
       ...values,
+      farmerId: data.farmerId,
       plotId: data.id,
+      raiBefore: data.raiAmount,
+      createBy: profile.firstname + " " + profile.lastname,
+      file: createImg ? createImg.file : undefined,
     };
-    callBackEditRai(payload);
     console.log(payload);
+    if (payload) {
+      FarmerPlotDatasource.updateHistoryFarmerPlot(payload).then((res) => {
+        console.log(res);
+      });
+    }
+
+    // callBackEditRai(payload);
   };
 
   return (
@@ -103,69 +174,61 @@ const ModalEditRaiAmount: React.FC<ModalEditRaiAmountProps> = ({
               อัพโหลดหลักฐาน <span style={{ color: "red" }}>*</span>
             </label>
             <br />
-            <div className="pb-2">
+            <Form.Item name="file">
+              <div className="pb-2">
+                <div
+                  className="hiddenFileInput"
+                  style={{
+                    backgroundImage: `url(${img})`,
+                    display: img != undefined ? "block" : "none",
+                  }}
+                />
+              </div>
+              <div className="text-left ps-4">
+                {img != undefined && (
+                  <>
+                    <Tag
+                      color={color.Success}
+                      onClick={onPreviewImg}
+                      style={{
+                        cursor: "pointer",
+                        borderRadius: "5px",
+                      }}
+                    >
+                      View
+                    </Tag>
+                    <Tag
+                      color={color.Error}
+                      onClick={removeImg}
+                      style={{
+                        cursor: "pointer",
+                        borderRadius: "5px",
+                      }}
+                    >
+                      Remove
+                    </Tag>
+                  </>
+                )}
+              </div>
               <div
-                className="hiddenFileInput"
+                className="hiddenFileBtn"
                 style={{
-                  backgroundImage: `url(${imgEvidence})`,
-                  display: imgEvidence != undefined ? "block" : "none",
+                  backgroundImage: `url(${bth_img_empty})`,
+                  display: img == undefined ? "block" : "none",
                 }}
-              />
-            </div>
-            <div className="text-left ps-4">
-              {imgEvidence != undefined && (
-                <>
-                  <Tag
-                    color={color.Success}
-                    // onClick={onPreviewIdCard}
-                    style={{
-                      cursor: "pointer",
-                      borderRadius: "5px",
-                    }}
-                  >
-                    View
-                  </Tag>
-                  <Tag
-                    color={color.Error}
-                    // onClick={removeImgIdCard}
-                    style={{
-                      cursor: "pointer",
-                      borderRadius: "5px",
-                    }}
-                  >
-                    Remove
-                  </Tag>
-                </>
-              )}
-            </div>
-            <div
-              className="hiddenFileBtn"
-              style={{
-                backgroundImage: `url(${bth_img_empty})`,
-                display: imgEvidence == undefined ? "block" : "none",
-              }}
-            >
-              <input
-                key={imgEvidence}
-                type="file"
-                // onChange={onChangeIdCard}
-                title="เลือกรูป"
-              />
-            </div>
+              >
+                <input
+                  key={img}
+                  type="file"
+                  onChange={onChangeImg}
+                  title="เลือกรูป"
+                />
+              </div>
+            </Form.Item>
           </div>
           <div className="form-group">
-            <label>
-              หมายเหตุ <span style={{ color: "red" }}>*</span>
-            </label>
-            <Form.Item
-              name="reason"
-              rules={[
-                {
-                  required: true,
-                  message: "กรอกหมายเหตุเพิ่มเติม!",
-                },
-              ]}
-            >
+            <label>หมายเหตุ</label>
+            <Form.Item name="reason">
               <TextArea
                 placeholder="กรอกหมายเหตุเพิ่มเติม"
                 autoComplete="off"
