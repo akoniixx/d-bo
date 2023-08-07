@@ -190,12 +190,6 @@ const ModalEditRaiAmount: React.FC<ModalEditRaiAmountProps> = ({
             </label>
             <Form.Item
               name="file"
-              rules={[
-                {
-                  required: true,
-                  message: "กรุณาแนบรูปหลักฐาน!",
-                },
-              ]}
             >
               <div className="pb-2">
                 <div

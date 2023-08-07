@@ -1,12 +1,14 @@
 import React, { useEffect, useState } from "react";
 import StatusButton from "../../../components/button/StatusButton";
-import { color } from "../../../resource";
+import { color, image } from "../../../resource";
 import StatusPlots from "../../../components/card/StatusPlots";
 import {
   Badge,
   Button,
   Checkbox,
+  ConfigProvider,
   Dropdown,
+  Image,
   Input,
   Menu,
   Pagination,
@@ -27,14 +29,12 @@ import {
 import { CardContainer } from "../../../components/card/CardContainer";
 import { CropDatasource } from "../../../datasource/CropDatasource";
 import { CheckboxValueType } from "antd/lib/checkbox/Group";
-import { FarmerDatasource } from "../../../datasource/FarmerDatasource";
 import moment from "moment";
 import {
   STATUS_COLOR_MAPPING,
   STATUS_FARMER_MAPPING,
 } from "../../../definitions/Status";
 import ActionButton from "../../../components/button/ActionButton";
-import { useNavigate } from "react-router-dom";
 import ModalDelete from "../../../components/modal/ModalDelete";
 import ModalMapPlot from "../../../components/modal/task/newTask/ModalMapPlot";
 import ModalFarmerPlot from "../../../components/modal/ModalFarmerPlot";
@@ -46,6 +46,7 @@ import {
 import { FarmerPlotDatasource } from "../../../datasource/FarmerPlotDatasource";
 import { numberWithCommas } from "../../../utilities/TextFormatter";
 import { Option } from "antd/lib/mentions";
+import emptyPlot from "../../../resource/media/empties/iconoir_farm.png";
 
 const _ = require("lodash");
 const { Map } = require("immutable");
@@ -734,6 +735,16 @@ function IndexPlotList() {
       },
     },
   ];
+  const customizeRenderEmpty = () => (
+    <div style={{ textAlign: "center", padding: "10%" }}>
+      <Image
+        src={emptyPlot}
+        preview={false}
+        style={{ width: 90, height: 70 }}
+      />
+      <p>ไม่มีข้อมูลรายการแปลงเกษตร</p>
+    </div>
+  );
   return (
     <>
       <div className="row" style={{ padding: "10px" }}>
@@ -840,32 +851,34 @@ function IndexPlotList() {
           </Button>
         </div>
       </div>
-      <Spin tip="กำลังโหลดข้อมูล..." size="large" spinning={loading}>
-        <CardContainer>
-          <Table
-            dataSource={plotsData?.data}
-            columns={columns}
-            pagination={false}
-            scroll={{ x: "max-content" }}
-            rowClassName={(a) =>
-              a.status === "PENDING" &&
-              a.dateWaitPending != null &&
-              moment(Date.now()).diff(
-                moment(new Date(a.dateWaitPending)),
-                "day"
-              ) >= 3
-                ? "PENDING" &&
-                  moment(Date.now()).diff(
-                    moment(new Date(a.dateWaitPending)),
-                    "day"
-                  ) >= 7
-                  ? "table-row-older"
-                  : "table-row-old"
-                : "table-row-lasted"
-            }
-          />
-        </CardContainer>
-      </Spin>
+      <CardContainer>
+        <Spin tip="กำลังโหลดข้อมูล..." size="large" spinning={loading}>
+          <ConfigProvider renderEmpty={customizeRenderEmpty}>
+            <Table
+              dataSource={plotsData?.data}
+              columns={columns}
+              pagination={false}
+              scroll={{ x: "max-content" }}
+              rowClassName={(a) =>
+                a.status === "PENDING" &&
+                a.dateWaitPending != null &&
+                moment(Date.now()).diff(
+                  moment(new Date(a.dateWaitPending)),
+                  "day"
+                ) >= 3
+                  ? "PENDING" &&
+                    moment(Date.now()).diff(
+                      moment(new Date(a.dateWaitPending)),
+                      "day"
+                    ) >= 7
+                    ? "table-row-older"
+                    : "table-row-old"
+                  : "table-row-lasted"
+              }
+            />
+          </ConfigProvider>
+        </Spin>
+      </CardContainer>
 
       <div className="d-flex justify-content-between pt-4 pb-3">
         <p>รายการทั้งหมด {plotsData?.count} รายการ</p>
