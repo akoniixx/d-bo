@@ -2,12 +2,12 @@ import { Button, Radio } from "antd";
 import React, { useEffect, useState } from "react";
 import { color } from "../../resource";
 
-interface statusProps {
+interface StatusProps {
   label1: string;
   label2: string;
   onClick?: (e: any) => void;
 }
-const StatusButton: React.FC<statusProps> = ({ label1, label2, onClick }) => {
+const StatusButton: React.FC<StatusProps> = ({ label1, label2, onClick }) => {
   return (
     <>
       <Radio.Group buttonStyle="outline">
