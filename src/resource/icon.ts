@@ -47,4 +47,5 @@ export default {
   farmerApp: require("./media/images/farmerApp.png"),
   lineApp: require("./media/images/line.png"),
   bo: require("./media/images/bo.png"),
+  folder_icon: require("./media/images/folder_icon.png")
 };

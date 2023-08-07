@@ -5,9 +5,10 @@ import { color, icon } from "../../resource";
 
 interface listProps {
   onSearchType: (e: any) => void;
-  list: string[];
+  list: any;
+  title: string;
 }
-const ListCreateBy: React.FC<listProps> = ({ onSearchType, list }) => {
+const ListCheck: React.FC<listProps> = ({ onSearchType, list, title }) => {
   const [visibleCreateBy, setVisibleCreateBy] = useState(false);
 
   const handleVisibleCreateBy = (newVisible: any) => {
@@ -84,7 +85,6 @@ const ListCreateBy: React.FC<listProps> = ({ onSearchType, list }) => {
       ),
     },
   ];
-
   return (
     <>
       <div className="col-lg pt-1">
@@ -102,12 +102,10 @@ const ListCreateBy: React.FC<listProps> = ({ onSearchType, list }) => {
               textAlign: "start",
               backgroundColor: color.White,
               height: 32,
-              cursor: 'pointer',
-              
+              cursor: "pointer",
             }}
           >
-            เลือกรูปแบบการสร้าง
-
+            {title}
             <DownOutlined
               style={{
                 paddingLeft: list != undefined ? "75%" : 0,
@@ -121,4 +119,4 @@ const ListCreateBy: React.FC<listProps> = ({ onSearchType, list }) => {
   );
 };
 
-export default ListCreateBy;
+export default ListCheck;

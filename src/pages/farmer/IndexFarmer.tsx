@@ -9,6 +9,7 @@ import {
   Menu,
   MenuProps,
   Pagination,
+  PaginationProps,
   Popover,
   Row,
   Select,
@@ -61,7 +62,6 @@ interface SearchSelectType {
   value: any;
 }
 function IndexFarmer() {
-  const row = 10;
   const [current, setCurrent] = useState(1);
   const navigate = useNavigate();
   const [data, setData] = useState<FarmerPageEntity>();
@@ -77,6 +77,7 @@ function IndexFarmer() {
   const [sortField, setSortField] = useState<string | undefined>();
   const statusListPend = ["FIRST", "SECOND", "THIRD"];
   const [appTypeArr, setAppTypeArr] = useState<string[]>([]);
+  const [row, setRow] = useState(10);
 
   const [searchQuery] = useSearchParams();
   const [sumPlotCard, setSumPlotCard] = useState<any>({
@@ -101,52 +102,6 @@ function IndexFarmer() {
   const [sortDirection3, setSortDirection3] = useState<string | undefined>(
     undefined
   );
-  const [sortDirection4, setSortDirection4] = useState<string | undefined>(
-    undefined
-  );
-  const [sortDirection5, setSortDirection5] = useState<string | undefined>(
-    undefined
-  );
-  const genQuery = ({
-    searchDistrict,
-    searchDroneBrand,
-    searchProvince,
-    searchStatus,
-    searchSubdistrict,
-    searchText,
-  }: {
-    searchStatus?: string;
-    searchText?: string;
-    searchProvince?: string;
-    searchDistrict?: string;
-    searchSubdistrict?: string;
-    searchDroneBrand?: string;
-  }) => {
-    const query: any = {};
-    if (searchStatus) {
-      query.status = searchStatus;
-    }
-    if (searchText) {
-      query.searchText = searchText;
-    }
-    if (searchProvince) {
-      query.province = searchProvince;
-    }
-    if (searchDistrict) {
-      query.district = searchDistrict;
-    }
-    if (searchSubdistrict) {
-      query.subdistrict = searchSubdistrict;
-    }
-    if (searchDroneBrand) {
-      query.droneBrand = searchDroneBrand;
-    }
-    const queryString = Object.keys(query);
-    if (queryString.length > 0) {
-      return "?" + queryString.map((key) => key + "=" + query[key]).join("&");
-    }
-    return "";
-  };
 
   const fetchFarmer = async () => {
     await FarmerDatasource.getFarmerList(
@@ -168,8 +123,6 @@ function IndexFarmer() {
     });
   };
 
-  console.log(sortDirection);
-
   const fetchProvince = async () => {
     await LocationDatasource.getProvince().then((res) => {
       setProvince(res);
@@ -188,7 +141,7 @@ function IndexFarmer() {
   useEffect(() => {
     fetchFarmer();
     fetchProvince();
-  }, [sortDirection, current, mainStatus]);
+  }, [sortDirection, current, mainStatus, row]);
 
   const onChangePage = (page: number) => {
     setCurrent(page);
@@ -373,69 +326,13 @@ function IndexFarmer() {
     }
     setAppType(arr);
   };
-
-  // useEffectOnce(() => {
-  //   const getInitialSearch = async () => {
-  //     const provinceData = await fetchProvince();
-  //     let findProvince: any;
-  //     let findDistrict: any;
-  //     if (searchQuery) {
-  //       const status = searchQuery.get("status");
-  //       const searchText = searchQuery.get("searchText");
-  //       const provinceQuery = searchQuery.get("province");
-  //       const districtQuery = searchQuery.get("district");
-  //       const subdistrictQuery = searchQuery.get("subdistrict");
-  //       if (status) {
-  //         const statusData = FARMER_STATUS_SEARCH.find((el: any) => {
-  //           return el.name === status;
-  //         });
-  //         setSearchStatus({
-  //           label: statusData?.name || "",
-  //           value: statusData?.value || "",
-  //         });
-  //       }
-
-  //       if (searchText) {
-  //         setSearchText(searchText);
-  //       }
-  //       if (provinceQuery && provinceData) {
-  //         findProvince = provinceData.find((el: any) => {
-  //           return el.provinceName === provinceQuery;
-  //         });
-  //         setSearchProvince({
-  //           label: findProvince?.provinceName || "",
-  //           value: findProvince?.provinceId || "",
-  //         });
-  //       }
-
-  //       if (districtQuery && findProvince) {
-  //         const districtData = await LocationDatasource.getDistrict(
-  //           findProvince?.provinceId
-  //         );
-  //         findDistrict = districtData.find((el: any) => {
-  //           return el.districtName === districtQuery;
-  //         });
-  //         setSearchDistrict({
-  //           label: findDistrict?.districtName || "",
-  //           value: findDistrict?.districtId || "",
-  //         });
-  //       }
-  //       if (subdistrictQuery && findDistrict) {
-  //         const subdistrictData = await LocationDatasource.getSubdistrict(
-  //           findDistrict?.districtId
-  //         );
-  //         const findSubdistrict = subdistrictData.find((el: any) => {
-  //           return el.subdistrictName === subdistrictQuery;
-  //         });
-  //         setSearchSubdistrict({
-  //           label: findSubdistrict?.subdistrictName || "",
-  //           value: findSubdistrict?.subdistrictId || "",
-  //         });
-  //       }
-  //     }
-  //   };
-  //   getInitialSearch();
-  // });
+  const onShowSizeChange: PaginationProps["onShowSizeChange"] = (
+    current,
+    pageSize
+  ) => {
+    setCurrent(current);
+    setRow(pageSize);
+  };
   const pageTitle = (
     <>
       <div
@@ -577,6 +474,7 @@ function IndexFarmer() {
           <ListCreateBy
             onSearchType={(e) => onSearchCreateBy(e)}
             list={appType}
+            title="เลือกรูปแบบการสร้าง"
           />
         </div>
         <div className="col-lg pt-1 p-1">
@@ -1026,7 +924,13 @@ function IndexFarmer() {
           children: (
             <Row justify={"space-between"}>
               <ActionButton
-                icon={<FolderViewOutlined />}
+                icon={
+                  <Image
+                    src={icon.folder_icon}
+                    preview={false}
+                    style={{ width: 22, height: 22 }}
+                  />
+                }
                 color={color.primary1}
                 onClick={() => navigate("/IndexFarmerHistorySum/id=" + row.id)}
               />
@@ -1083,10 +987,10 @@ function IndexFarmer() {
         <p>รายการทั้งหมด {data?.count} รายการ</p>
         <Pagination
           current={current}
-          total={data?.count}
+          showSizeChanger
           onChange={onChangePage}
-          pageSize={row}
-          showSizeChanger={false}
+          onShowSizeChange={onShowSizeChange}
+          total={data?.count}
         />
       </div>
     </>

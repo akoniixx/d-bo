@@ -842,7 +842,8 @@ function IndexPlotList() {
           pagination={false}
           scroll={{ x: "max-content" }}
           rowClassName={(a) =>
-            (a.status === "PENDING" && a.dateWaitPending) != null &&
+            a.status === "PENDING" &&
+            a.dateWaitPending != null &&
             moment(Date.now()).diff(
               moment(new Date(a.dateWaitPending)),
               "day"
