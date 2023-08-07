@@ -15,76 +15,30 @@ const ListCheck: React.FC<listProps> = ({ onSearchType, list, title }) => {
     setVisibleCreateBy(newVisible);
   };
 
-  const items: MenuProps["items"] = [
-    {
-      key: "1",
-      label: (
-        <>
-          <Checkbox onClick={onSearchType} value="BO">
-            <div>
-              <Image
-                src={icon.bo}
-                preview={false}
-                style={{ width: 20, height: 20 }}
-              />
-              <span> Back Office Website</span>
-            </div>
-          </Checkbox>
-        </>
-      ),
-    },
-    // {
-    //   key: "2",
-    //   label: (
-    //     <>
-    //       <Checkbox onClick={onSearchType} value="LINE">
-    //         <div>
-    //           <Image
-    //             src={icon.lineApp}
-    //             preview={false}
-    //             style={{ width: 20, height: 20 }}
-    //           />
-    //           <span> Line Official Account</span>
-    //         </div>
-    //       </Checkbox>
-    //     </>
-    //   ),
-    // },
-    {
-      key: "3",
-      label: (
-        <>
-          <Checkbox onClick={onSearchType} value="DRONER">
-            <div>
-              <Image
-                src={icon.dronerApp}
-                preview={false}
-                style={{ width: 20, height: 20 }}
-              />
-              <span> Droner Application</span>
-            </div>
-          </Checkbox>
-        </>
-      ),
-    },
-    {
-      key: "4",
-      label: (
-        <>
-          <Checkbox onClick={onSearchType} value="FARMER">
-            <div>
-              <Image
-                src={icon.farmerApp}
-                preview={false}
-                style={{ width: 20, height: 20 }}
-              />
-              <span> Farmer Application</span>
-            </div>
-          </Checkbox>
-        </>
-      ),
-    },
+  const listApp = [
+    { title: "Back Office Website", icon: icon.bo, value: "BO" },
+    { title: "Droner Application", icon: icon.dronerApp, value: "DRONER" },
+    { title: "Farmer Application", icon: icon.farmerApp, value: "FARMER" },
   ];
+  const items: MenuProps["items"] = listApp.map((v, i) => {
+    return {
+      key: i,
+      label: (
+        <>
+          <Checkbox onClick={onSearchType} value={v.value}>
+            <div>
+              <Image
+                src={v.icon}
+                preview={false}
+                style={{ width: 20, height: 20 }}
+              />
+              <span>{v.title}</span>
+            </div>
+          </Checkbox>
+        </>
+      ),
+    };
+  });
   return (
     <>
       <div className="col-lg pt-1">
