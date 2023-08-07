@@ -1,5 +1,8 @@
 import { httpClient, BASE_URL } from "../config/config";
-import { FarmerPlotEntity, HistoryEditRaiEntity } from "../entities/FarmerPlotEntities";
+import {
+  FarmerPlotEntity,
+  HistoryEditRaiEntity,
+} from "../entities/FarmerPlotEntities";
 
 export class FarmerPlotDatasource {
   static insertFarmerPlot(data: FarmerPlotEntity): Promise<any> {
@@ -95,14 +98,20 @@ export class FarmerPlotDatasource {
         console.log(err, "err getHistoryFarmerPlot");
       });
   }
-  static updateHistoryFarmerPlot(data: HistoryEditRaiEntity): Promise<any> {
+  static updateHistoryFarmerPlot(data: HistoryEditRaiEntity) {
+    const formData = new FormData();
+    formData.append("createBy", data.createBy);
+    formData.append("farmerId", data.farmerId);
+    formData.append("farmerPlotId", data.farmerPlotId);
+    formData.append("file", data.file);
+    formData.append("raiBefore", data.raiBefore);
+    formData.append("raiAfter", data.raiAfter);
+    formData.append("reason", data.reason);
     return httpClient
-      .post(BASE_URL + "/history-farmer-plot/edit-rai" , data)
-      .then((response) => {
-        return response.data;
+      .post(BASE_URL + "/history-farmer-plot/edit-rai", formData)
+      .then((res) => {
+        return res.data;
       })
-      .catch((err) => {
-        console.log(err, "err updateFarmerPlot");
-      });
+      .catch((err) => console.log(err));
   }
 }

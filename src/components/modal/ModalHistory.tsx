@@ -147,9 +147,11 @@ const ModalHistory: React.FC<ModalHistoryProps> = ({
         <div className="d-flex justify-content-between pt-4 pb-3">
           <p>รายการทั้งหมด {historyPlot?.count} รายการ</p>
           <Pagination
-            current={1}
-            onChange={onChangePage}
+            current={current}
             total={historyPlot?.count}
+            onChange={onChangePage}
+            pageSize={row}
+            showSizeChanger={false}
           />
         </div>
       </Modal>

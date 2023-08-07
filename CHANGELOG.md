@@ -1,5 +1,9 @@
 ## [Version - 0]
 
+## Feature [v0.35.0] 2023-08-07
+
+- manage plot menu
+
 ## improve [v0.34.30] 2023-08-07
 
 - improve index farmer page

@@ -13,6 +13,7 @@ import {
   Popover,
   Row,
   Select,
+  Spin,
   Table,
 } from "antd";
 import React, { useEffect, useState } from "react";
@@ -78,7 +79,7 @@ function IndexFarmer() {
   const statusListPend = ["FIRST", "SECOND", "THIRD"];
   const [appTypeArr, setAppTypeArr] = useState<string[]>([]);
   const [row, setRow] = useState(10);
-
+  const [loading, setLoading] = useState(false);
   const [searchQuery] = useSearchParams();
   const [sumPlotCard, setSumPlotCard] = useState<any>({
     card1: "รอตรวจสอบ",
@@ -104,6 +105,7 @@ function IndexFarmer() {
   );
 
   const fetchFarmer = async () => {
+    setLoading(true);
     await FarmerDatasource.getFarmerList(
       mainStatus,
       waitPendingDate,
@@ -117,10 +119,13 @@ function IndexFarmer() {
       searchSubdistrict,
       sortDirection,
       sortField
-    ).then((res) => {
-      setData(res);
-      setSummary(res.summary[0]);
-    });
+    )
+      .then((res) => {
+        setData(res);
+        setSummary(res.summary[0]);
+      })
+      .catch((err) => console.log(err))
+      .finally(() => setLoading(false));
   };
 
   const fetchProvince = async () => {
@@ -959,29 +964,31 @@ function IndexFarmer() {
     <>
       {pageTitle}
       <CardContainer>
-        <ConfigProvider renderEmpty={customizeRenderEmpty}>
-          <Table
-            dataSource={data?.data}
-            columns={columns}
-            pagination={false}
-            scroll={{ x: "max-content" }}
-            rowClassName={(a) =>
-              a.status === "PENDING" &&
-              moment(Date.now()).diff(
-                moment(new Date(a.dateWaitPending)),
-                "day"
-              ) >= 3
-                ? "PENDING" &&
-                  moment(Date.now()).diff(
-                    moment(new Date(a.dateWaitPending)),
-                    "day"
-                  ) >= 7
-                  ? "table-row-older"
-                  : "table-row-old"
-                : "table-row-lasted"
-            }
-          />
-        </ConfigProvider>
+        <Spin tip="กำลังโหลดข้อมูล..." size="large" spinning={loading}>
+          <ConfigProvider renderEmpty={customizeRenderEmpty}>
+            <Table
+              dataSource={data?.data}
+              columns={columns}
+              pagination={false}
+              scroll={{ x: "max-content" }}
+              rowClassName={(a) =>
+                a.status === "PENDING" &&
+                moment(Date.now()).diff(
+                  moment(new Date(a.dateWaitPending)),
+                  "day"
+                ) >= 3
+                  ? "PENDING" &&
+                    moment(Date.now()).diff(
+                      moment(new Date(a.dateWaitPending)),
+                      "day"
+                    ) >= 7
+                    ? "table-row-older"
+                    : "table-row-old"
+                  : "table-row-lasted"
+              }
+            />
+          </ConfigProvider>
+        </Spin>
       </CardContainer>
       <div className="d-flex justify-content-between pt-3 pb-3">
         <p>รายการทั้งหมด {data?.count} รายการ</p>

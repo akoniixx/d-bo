@@ -290,6 +290,7 @@ const EditFarmer = () => {
       ...plot,
       farmerId,
     };
+    console.log(payload);
     if (payload.id !== "") {
       await FarmerPlotDatasource.updateFarmerPlot(payload);
       setShowEditModal((prev) => !prev);
@@ -1086,30 +1087,26 @@ const EditFarmer = () => {
         onClickSave={updateFarmer}
         disableSaveBtn={saveBtnDisable}
       />
-      {showAddModal && (
-        <ModalFarmerPlot
-          show={showAddModal}
-          backButton={() => setShowAddModal((prev) => !prev)}
-          callBack={updateFarmerPlot}
-          data={FarmerPlotEntity_INIT}
-          editIndex={editIndex}
-          title="เพิ่มแปลงเกษตร"
-          callBackModal={(val) => setShowAddModal(!val)}
-        />
-      )}
-
-      {showEditModal && (
-        <ModalFarmerPlot
-          isEditModal
-          show={showEditModal}
-          backButton={() => setShowEditModal((prev) => !prev)}
-          callBack={updateFarmerPlot}
-          data={editFarmerPlot}
-          editIndex={editIndex}
-          title="แก้ไขแปลงเกษตร"
-          callBackModal={(val) => setShowEditModal(!val)}
-        />
-      )}
+      <ModalFarmerPlot
+        show={showAddModal}
+        backButton={() => setShowAddModal((prev) => !prev)}
+        callBack={updateFarmerPlot}
+        data={FarmerPlotEntity_INIT}
+        editIndex={editIndex}
+        title="เพิ่มแปลงเกษตร"
+        callBackModal={(val) => setShowAddModal(!val)}
+      />
+     
+      <ModalFarmerPlot
+        isEditModal
+        show={showEditModal}
+        backButton={() => setShowEditModal((prev) => !prev)}
+        callBack={updateFarmerPlot}
+        data={editFarmerPlot}
+        editIndex={editIndex}
+        title="แก้ไขแปลงเกษตร"
+        callBackModal={(val) => setShowEditModal(!val)}
+      />
     </>
   );
 };

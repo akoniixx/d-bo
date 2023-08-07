@@ -13,6 +13,7 @@ import {
   PaginationProps,
   Row,
   Select,
+  Spin,
   Table,
 } from "antd";
 import {
@@ -78,6 +79,7 @@ function IndexPlotList() {
   const [editFarmerPlot, setEditFarmerPlot] = useState<FarmerPlotEntity>(
     FarmerPlotEntity_INIT
   );
+  const [loading, setLoading] = useState(false);
   const [farmerId, setFarmerId] = useState<any>();
   const [farmerPlotId, setFarmerPlotId] = useState<string>("");
   const [editIndex, setEditIndex] = useState(0);
@@ -103,6 +105,7 @@ function IndexPlotList() {
     getPlotsData();
   }, [currentPage, mainStatus, row, sortDirection]);
   const getPlotsData = async () => {
+    setLoading(true);
     await FarmerPlotDatasource.getFarmerPlotAll(
       mainStatus,
       plantName,
@@ -113,10 +116,13 @@ function IndexPlotList() {
       sortField,
       sortDirection,
       searchText
-    ).then((res) => {
-      setPlotsData(res);
-      setSummary(res.summary[0]);
-    });
+    )
+      .then((res) => {
+        setPlotsData(res);
+        setSummary(res.summary[0]);
+      })
+      .catch((err) => console.log(err))
+      .finally(() => setLoading(false));
   };
 
   useEffect(() => {
@@ -834,31 +840,33 @@ function IndexPlotList() {
           </Button>
         </div>
       </div>
+      <Spin tip="กำลังโหลดข้อมูล..." size="large" spinning={loading}>
+        <CardContainer>
+          <Table
+            dataSource={plotsData?.data}
+            columns={columns}
+            pagination={false}
+            scroll={{ x: "max-content" }}
+            rowClassName={(a) =>
+              a.status === "PENDING" &&
+              a.dateWaitPending != null &&
+              moment(Date.now()).diff(
+                moment(new Date(a.dateWaitPending)),
+                "day"
+              ) >= 3
+                ? "PENDING" &&
+                  moment(Date.now()).diff(
+                    moment(new Date(a.dateWaitPending)),
+                    "day"
+                  ) >= 7
+                  ? "table-row-older"
+                  : "table-row-old"
+                : "table-row-lasted"
+            }
+          />
+        </CardContainer>
+      </Spin>
 
-      <CardContainer>
-        <Table
-          dataSource={plotsData?.data}
-          columns={columns}
-          pagination={false}
-          scroll={{ x: "max-content" }}
-          rowClassName={(a) =>
-            a.status === "PENDING" &&
-            a.dateWaitPending != null &&
-            moment(Date.now()).diff(
-              moment(new Date(a.dateWaitPending)),
-              "day"
-            ) >= 3
-              ? "PENDING" &&
-                moment(Date.now()).diff(
-                  moment(new Date(a.dateWaitPending)),
-                  "day"
-                ) >= 7
-                ? "table-row-older"
-                : "table-row-old"
-              : "table-row-lasted"
-          }
-        />
-      </CardContainer>
       <div className="d-flex justify-content-between pt-4 pb-3">
         <p>รายการทั้งหมด {plotsData?.count} รายการ</p>
         <Pagination

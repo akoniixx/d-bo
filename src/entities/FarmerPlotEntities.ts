@@ -83,8 +83,8 @@ export interface SumPlotEntity {
 export interface HistoryFarmerPlotEntity {
   id: string;
   farmerId: string;
-  raiBefore: number;
-  raiAfter: 100;
+  raiBefore: string;
+  raiAfter: string;
   pathFile: string;
   fileName: string;
   reason: string;
@@ -95,12 +95,12 @@ export interface HistoryFarmerPlotEntity {
 }
 export interface HistoryEditRaiEntity {
   farmerId: string;
-  farmerPlotId: number;
-  raiBefore: 100;
+  farmerPlotId: string;
+  raiBefore: string;
   raiAfter: string;
   reason: string;
   createBy: string;
-  file: UploadImageEntity;
+  file : any;
 }
 
 export interface AllHistoryFarmerPlotEntity {
