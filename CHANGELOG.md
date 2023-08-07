@@ -1,10 +1,13 @@
 ## [Version - 0]
 
+## improve [v0.34.30] 2023-08-07
+
+- improve index farmer page
+
 ## Fix [v0.34.29] 2023-08-11
 
 - fixed search farmer for add or edit new task
 - fixed search droner gold quota
-
 
 ## Fix [v0.34.28] 2023-07-26
 

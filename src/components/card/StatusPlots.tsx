@@ -4,7 +4,7 @@ import { color } from "../../resource";
 import { CardContainer } from "./CardContainer";
 import { numberWithCommas } from "./../../utilities/TextFormatter";
 
-interface statusPlotProps {
+interface StatusPlotProps {
   title1: string;
   title2: string;
   bgColor1: string;
@@ -12,7 +12,7 @@ interface statusPlotProps {
   countPlot1: any;
   countPlot2: any;
 }
-const StatusPlots: React.FC<statusPlotProps> = ({
+const StatusPlots: React.FC<StatusPlotProps> = ({
   title1,
   title2,
   bgColor1,
