@@ -267,3 +267,72 @@ export interface InvoiceTaskEntity {
   discountPoint: string;
   totalPrice: string;
 }
+
+export interface AllTaskListEntity {
+  count: number;
+  data: AllTaskEntity[];
+}
+
+export interface AllTaskEntity {
+  id: string;
+  taskNo: string;
+  createdAt: string;
+  updatedAt: string;
+  status: string;
+}
+
+export interface TaskManageEntity {
+  data: {
+    dateAppointment: string;
+    discountCampaignPoint: string;
+    discountCoupon: string;
+    discountFee: string;
+    droner: {
+      firstname: string;
+      lastname: string;
+      telephoneNo: string;
+    };
+    dronerId: string;
+    farmAreaAmount: string;
+    farmer: {
+      firstname: string;
+      lastname: string;
+      telephoneNo: string;
+    };
+    farmerId: string;
+    farmerPlot: {
+      plotName?: string;
+      raiAmount?: string;
+    };
+    fee: number;
+    id: string;
+    preparationBy: string;
+    price?: string;
+    purposeSpray: {
+      crop: {
+        cropName: string;
+      };
+      purposeSprayName: string;
+    };
+    status: string;
+    targetSpray: string[];
+    taskHistory: [];
+    totalPrice: number;
+    unitPrice: number;
+    usePoint: string;
+  };
+  taskEstimatePoint: {
+    application: string;
+    campaignId: string;
+    campaignName: string;
+    createAt: string;
+    dronerId: string;
+    farmerId: string;
+    id: string;
+    pointPerRai: string;
+    receivePoint: number;
+    status: string;
+    taskId: string;
+    updatedAt: string;
+  }[];
+}

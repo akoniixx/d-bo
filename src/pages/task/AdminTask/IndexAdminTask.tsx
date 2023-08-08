@@ -12,14 +12,14 @@ import {
   Table,
   Modal,
 } from "antd";
-import { useCallback, useEffect, useState } from "react";
-import { AsyncPaginate } from "react-select-async-paginate";
+import { useEffect, useState } from "react";
 import { CardContainer } from "../../../components/card/CardContainer";
 import { CardHeader } from "../../../components/header/CardHearder";
-import type { GroupBase, OptionsOrGroups } from "react-select";
-import { OptionType } from "../newTask/AddNewTask";
 import { color } from "../../../resource";
-import { STATUS_NEWTASK_COLOR_MAPPING } from "../../../definitions/Status";
+import {
+  ALL_TASK_COLOR_MAPPING,
+  ALL_TASK_MAPPING,
+} from "../../../definitions/Status";
 import icon from "../../../resource/icon";
 import TextArea from "antd/lib/input/TextArea";
 import { DateTimeUtil } from "../../../utilities/DateTimeUtil";
@@ -27,7 +27,15 @@ import styled from "styled-components";
 import { Container } from "react-bootstrap";
 import { InputPicker } from "rsuite";
 import { TaskDatasource } from "../../../datasource/TaskDatasource";
-import { NewTaskPageEntity } from "../../../entities/NewTaskEntities";
+import {
+  AllTaskListEntity,
+  TaskManageEntity,
+} from "../../../entities/NewTaskEntities";
+import {
+  numberWithCommas,
+  numberWithCommasToFixed,
+  validateOnlyNumber,
+} from "../../../utilities/TextFormatter";
 
 const NewTable = styled(Table)`
   .ant-table-container table thead tr th {
@@ -40,6 +48,7 @@ const NewTable = styled(Table)`
 `;
 
 const IndexAdminTask = () => {
+  const [form] = Form.useForm();
   const profile = JSON.parse(localStorage.getItem("profile") || "{  }");
   const [current, setCurrent] = useState(1);
   const [taskList, setTaskList] = useState<any>();
@@ -47,19 +56,21 @@ const IndexAdminTask = () => {
   const [source, setSource] = useState<string>("EDIT");
   const [showModal, setShowModal] = useState<boolean>(false);
   const [search, setSearch] = useState<boolean>(false);
-  const [taskSelected, setTaskSelected] = useState<any>("");
+  const [taskSelected, setTaskSelected] = useState<TaskManageEntity>();
   const [taskNo, setTaskNo] = useState();
   const [count, setCount] = useState<number>(0);
+  const [taskId, setTaskId] = useState("");
+  const [edit, setEdit] = useState<any>();
+  const [history, setHistory] = useState<any>();
 
   const fetchTaskList = () => {
-    TaskDatasource.getNewTaskList(10, current, "", taskNo).then(
-      (res: NewTaskPageEntity) => {
-        console.log("res", res.data);
+    TaskDatasource.getAllTaskList(10, current, taskNo).then(
+      (res: AllTaskListEntity) => {
         setTaskList(res.data);
         const data = res.data.map((item) => {
           return {
             ...item,
-            label: `${item.task_no} | ${item.task_status}`,
+            label: `${item.taskNo} (สถานะ : ${ALL_TASK_MAPPING[item.status]})`,
             value: item.id,
           };
         });
@@ -76,14 +87,15 @@ const IndexAdminTask = () => {
   const onItemsRendered = (props: any) => {
     if (props.visibleStopIndex >= searchTaskList.length - 1) {
       if (searchTaskList.length < count) {
-        TaskDatasource.getNewTaskList(10, current + 1, "", taskNo).then(
-          (res: NewTaskPageEntity) => {
-            console.log(current+1, res.data);
+        TaskDatasource.getAllTaskList(10, current + 1, taskNo).then(
+          (res: AllTaskListEntity) => {
             setTaskList([...taskList, res.data]);
             const data = res.data.map((item) => {
               return {
                 ...item,
-                label: `${item.task_no} | ${item.task_status}`,
+                label: `${item.taskNo} (สถานะ : ${
+                  ALL_TASK_MAPPING[item.status]
+                })`,
                 value: item.id,
               };
             });
@@ -94,11 +106,58 @@ const IndexAdminTask = () => {
       }
     }
   };
-  const handleSearchTask = (id: any) => {
-    console.log(id);
-    console.log(searchTaskList.filter((x: any) => x.id === id)[0]);
-    setTaskSelected(searchTaskList.filter((x: any) => x.id === id)[0]);
-    //setSearchTaskList(searchTaskList.filter((x : any) => x.id === id)[0]);
+
+  const handleSearchTask = () => {
+    TaskDatasource.getManageTaskByTaskId(taskId).then((res) => {
+      setTaskSelected(res);
+      setHistory(res.data.taskHistory);
+      console.log(res.data.taskHistory);
+      form.setFieldsValue({
+        unitPrice: res.data.unitPrice,
+        farmAreaAmount: res.data.farmAreaAmount,
+      });
+    });
+  };
+  const calculateTask = () => {
+    TaskDatasource.calculateManageTask(
+      taskId,
+      form.getFieldValue("farmAreaAmount"),
+      form.getFieldValue("unitPrice"),
+      form.getFieldValue("remark"),
+      `${profile.firstname} ${profile.lastname}`
+    ).then((res) => {
+      setEdit(res.responseData);
+    });
+  };
+  const checkNumber = (
+    e: React.ChangeEvent<HTMLInputElement>,
+    name: string
+  ) => {
+    const { value: inputValue } = e.target;
+    const convertedNumber = validateOnlyNumber(inputValue);
+    form.setFieldsValue({ [name]: convertedNumber });
+  };
+  const checkRai = () => {
+    const oldRai = Number(taskSelected?.data.farmerPlot.raiAmount);
+    const newRai = Number(form.getFieldValue("farmAreaAmount"));
+    return newRai > oldRai;
+  };
+  const onSubmit = async () => {
+    TaskDatasource.insertManageTask(
+      taskId,
+      form.getFieldValue("farmAreaAmount"),
+      form.getFieldValue("unitPrice"),
+      form.getFieldValue("remark"),
+      `${profile.firstname} ${profile.lastname}`
+    ).then((res) => {
+      if (res.success) {
+        handleSearchTask();
+        setShowModal(!showModal);
+        form.setFieldsValue({
+          remark: "",
+        });
+      }
+    });
   };
 
   const pageTitle = (
@@ -151,14 +210,30 @@ const IndexAdminTask = () => {
             span={12}
             style={{ textAlign: "center", borderRight: "2px groove" }}
           >
-            {`${taskSelected.firstname} ${taskSelected.lastname} (${taskSelected.telephone_no})`}
+            {taskSelected?.data.farmer && (
+              <>
+                {`${taskSelected?.data.farmer.firstname || "-"} ${
+                  taskSelected?.data.farmer.lastname || "-"
+                }`}
+                <br />
+                {`(${taskSelected?.data.farmer.telephoneNo || "-"})`}
+              </>
+            )}
           </Col>
           <Col span={12} style={{ textAlign: "center" }}>
-            {`${taskSelected.firstname} ${taskSelected.lastname} (${taskSelected.telephone_no})`}
+            {taskSelected?.data.droner && (
+              <>
+                {`${taskSelected?.data.droner.firstname || "-"} ${
+                  taskSelected?.data.droner.lastname || "-"
+                }`}
+                <br />
+                {`(${taskSelected?.data.droner.telephoneNo || "-"})`}
+              </>
+            )}
           </Col>
         </Row>
       </Card>
-      <Card style={{ height: "412px" }}>
+      <Card style={{ height: "435px" }}>
         <Row
           justify={"space-between"}
           gutter={8}
@@ -177,10 +252,17 @@ const IndexAdminTask = () => {
           </>
           <>
             <Col span={8}>
-              {DateTimeUtil.formatDateTime(taskSelected.date_appointment)}
+              {DateTimeUtil.formatDateTime(
+                taskSelected?.data.dateAppointment || ""
+              )}
             </Col>
-            <Col span={8}>คุมเลน</Col>
-            <Col span={8}>หญ้า, หนอน</Col>
+            <Col span={8}>
+              {taskSelected?.data.purposeSpray.purposeSprayName}
+            </Col>
+            <Col span={8}>
+              {taskSelected?.data.targetSpray &&
+                taskSelected?.data.targetSpray.join(",")}
+            </Col>
           </>
         </Row>
         <Row
@@ -200,9 +282,11 @@ const IndexAdminTask = () => {
             </Col>
           </>
           <>
-            <Col span={8}>เกษตรกรเตรียมยาเอง</Col>
-            <Col span={8}>แปลง 1 นาข้าว</Col>
-            <Col span={8}>ข้าว</Col>
+            <Col span={8}>{taskSelected?.data.preparationBy || "-"}</Col>
+            <Col span={8}>{taskSelected?.data.farmerPlot.plotName || "-"}</Col>
+            <Col span={8}>
+              {taskSelected?.data.purposeSpray.crop.cropName || "-"}
+            </Col>
           </>
         </Row>
         <Row
@@ -222,18 +306,19 @@ const IndexAdminTask = () => {
             </Col>
           </>
           <>
-            <Col span={8}>55 บาท/ไร่</Col>
-            <Col span={8}>20 ไร่</Col>
+            <Col span={8}>{taskSelected?.data.unitPrice} บาท/ไร่</Col>
+            <Col span={8}>{taskSelected?.data.farmAreaAmount} ไร่</Col>
             <Col span={8}>
               <Badge
-                color={STATUS_NEWTASK_COLOR_MAPPING["รอนักบินโดรนรับงาน"]}
+                color={ALL_TASK_COLOR_MAPPING[taskSelected?.data.status || ""]}
               />{" "}
               <span
                 style={{
-                  color: STATUS_NEWTASK_COLOR_MAPPING["รอนักบินโดรนรับงาน"],
+                  color:
+                    ALL_TASK_COLOR_MAPPING[taskSelected?.data.status || ""],
                 }}
               >
-                รอนักบินโดรนรับงาน
+                {ALL_TASK_MAPPING[taskSelected?.data.status || ""]}
               </span>
             </Col>
           </>
@@ -265,13 +350,21 @@ const IndexAdminTask = () => {
               fontWeight: "bold",
             }}
           >
-            1,100.00 บาท
+            {numberWithCommasToFixed(
+              Number(taskSelected?.data.price || 0) -
+                Number(taskSelected?.data.discountCoupon || 0) -
+                Number(taskSelected?.data.discountCampaignPoint || 0)
+            )}
           </Col>
           <Col
             span={12}
             style={{ fontSize: 18, textAlign: "center", fontWeight: "bold" }}
           >
-            1,220.00 บาท
+            {numberWithCommasToFixed(
+              Number(taskSelected?.data.price || 0) +
+                Number(taskSelected?.data.discountCoupon || 0) +
+                Number(taskSelected?.data.discountCampaignPoint || 0)
+            )}
           </Col>
         </Row>
         <Divider />
@@ -293,9 +386,19 @@ const IndexAdminTask = () => {
             </Col>
           </>
           <>
-            <Col span={8}>1,100.00 บาท</Col>
-            <Col span={8}>250.00 บาท</Col>
-            <Col span={8}>250.00 บาท</Col>
+            <Col span={8}>
+              {numberWithCommasToFixed(Number(taskSelected?.data.price) || 0)}{" "}
+              บาท
+            </Col>
+            <Col span={8}>
+              {numberWithCommasToFixed(Number(taskSelected?.data.fee) || 0)} บาท
+            </Col>
+            <Col span={8}>
+              {numberWithCommasToFixed(
+                Number(taskSelected?.data.discountFee) || 0
+              )}{" "}
+              บาท
+            </Col>
           </>
         </Row>
         <Row justify={"space-between"} gutter={8}>
@@ -308,8 +411,18 @@ const IndexAdminTask = () => {
             </Col>
           </>
           <>
-            <Col span={8}>100.00 บาท</Col>
-            <Col span={16}>20.00 บาท</Col>
+            <Col span={8}>
+              {numberWithCommasToFixed(
+                Number(taskSelected?.data.discountCoupon)
+              ) || 0}{" "}
+              บาท
+            </Col>
+            <Col span={16}>
+              {numberWithCommasToFixed(
+                Number(taskSelected?.data.discountCampaignPoint)
+              ) || 0}{" "}
+              บาท
+            </Col>
           </>
         </Row>
         <Divider />
@@ -341,7 +454,14 @@ const IndexAdminTask = () => {
               src={icon.coinFarmer}
               style={{ width: "25px", height: "25px" }}
             />{" "}
-            400 แต้ม
+            {numberWithCommas(
+              Number(
+                taskSelected?.taskEstimatePoint.find(
+                  (x) => x.application === "FARMER"
+                )?.receivePoint
+              )
+            ) || 0}{" "}
+            แต้ม
           </Col>
           <Col span={12} style={{ textAlign: "center" }}>
             <Image
@@ -349,7 +469,14 @@ const IndexAdminTask = () => {
               src={icon.coinDroner}
               style={{ width: "25px", height: "25px" }}
             />{" "}
-            400 แต้ม
+            {numberWithCommas(
+              Number(
+                taskSelected?.taskEstimatePoint.find(
+                  (x) => x.application === "DRONER"
+                )?.receivePoint
+              )
+            ) || 0}{" "}
+            แต้ม
           </Col>
         </Row>
       </Card>
@@ -398,10 +525,26 @@ const IndexAdminTask = () => {
             span={12}
             style={{ textAlign: "center", borderRight: "2px groove" }}
           >
-            มานี มีนาเยอะ (081-234-5679)
+            {taskSelected?.data.farmer && (
+              <>
+                {`${taskSelected?.data.farmer.firstname || "-"} ${
+                  taskSelected?.data.farmer.lastname || "-"
+                }`}
+                <br />
+                {`(${taskSelected?.data.farmer.telephoneNo || "-"})`}
+              </>
+            )}
           </Col>
           <Col span={12} style={{ textAlign: "center" }}>
-            สมศักดิ์ บินโดรน (081-234-5610)
+            {taskSelected?.data.droner && (
+              <>
+                {`${taskSelected?.data.droner.firstname || "-"} ${
+                  taskSelected?.data.droner.lastname || "-"
+                }`}
+                <br />
+                {`(${taskSelected?.data.droner.telephoneNo || "-"})`}
+              </>
+            )}
           </Col>
         </Row>
       </Card>
@@ -422,11 +565,16 @@ const IndexAdminTask = () => {
               เป้าหมายการพ่น
             </Col>
           </>
-          <>
-            <Col span={8}>18/05/2565, 11:00</Col>
-            <Col span={8}>คุมเลน</Col>
-            <Col span={8}>หญ้า, หนอน</Col>
-          </>
+          <Col span={8}>
+            {DateTimeUtil.formatDateTime(
+              taskSelected?.data.dateAppointment || ""
+            )}
+          </Col>
+          <Col span={8}>{taskSelected?.data.purposeSpray.purposeSprayName}</Col>
+          <Col span={8}>
+            {taskSelected?.data.targetSpray &&
+              taskSelected?.data.targetSpray.join(",")}
+          </Col>
         </Row>
         <Row justify={"space-between"} gutter={8}>
           <>
@@ -441,37 +589,84 @@ const IndexAdminTask = () => {
             </Col>
           </>
           <>
-            <Col span={8}>เกษตรกรเตรียมยาเอง</Col>
-            <Col span={8}>แปลง 1 นาข้าว</Col>
-            <Col span={8}>ข้าว</Col>
+            <Col span={8}>{taskSelected?.data.preparationBy || "-"}</Col>
+            <Col span={8}>{taskSelected?.data.farmerPlot.plotName || "-"}</Col>
+            <Col span={8}>
+              {taskSelected?.data.purposeSpray.crop.cropName || "-"}
+            </Col>
           </>
         </Row>
         <Divider />
-        <Row justify={"space-between"} gutter={8}>
-          <Col span={12}>
-            <Form.Item>
+        <Form form={form}>
+          <Row justify={"space-between"} gutter={8}>
+            <Col span={12}>
               <label style={{ fontWeight: "bold" }}>ค่าบริการ/ไร่</label>
-              <Input suffix="บาท/ไร่" />
-            </Form.Item>
-          </Col>
-          <Col span={12}>
-            <Form.Item>
+              <Form.Item
+                name="unitPrice"
+                rules={[
+                  {
+                    required: true,
+                    message: "กรุณากรอกค่าบริการ",
+                  },
+                ]}
+              >
+                <Input
+                  suffix="บาท/ไร่"
+                  onChange={(e) => {
+                    checkNumber(e, "unitPrice");
+                    calculateTask();
+                  }}
+                  disabled
+                />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
               <label style={{ fontWeight: "bold" }}>
                 จำนวนไร่{" "}
                 <span style={{ color: color.Error, fontSize: "12px" }}>
                   *ปรับได้ตั้งแต่ 1 - จำนวนไร่สูงสุด*
                 </span>
               </label>
-              <Input suffix="ไร่" />
+              <Form.Item
+                name="farmAreaAmount"
+                rules={[
+                  {
+                    required: true,
+                    message: "กรุณากรอกจำนวนไร่",
+                  },
+                  {
+                    validator: (rules, value) => {
+                      return new Promise(async (resolve, reject) => {
+                        if (checkRai()) {
+                          reject(
+                            `จำนวนไร่ต้องไม่มากกว่า ${taskSelected?.data.farmerPlot.raiAmount} ไร่`
+                          );
+                        } else {
+                          resolve("");
+                        }
+                      });
+                    },
+                  },
+                ]}
+              >
+                <Input
+                  suffix="ไร่"
+                  onChange={(e) => {
+                    checkNumber(e, "farmAreaAmount");
+                    calculateTask();
+                  }}
+                  autoComplete="off"
+                />
+              </Form.Item>
+            </Col>
+          </Row>
+          <Col span={24}>
+            <label style={{ fontWeight: "bold" }}>หมายเหตุ</label>
+            <Form.Item name="remark">
+              <TextArea rows={2} />
             </Form.Item>
           </Col>
-        </Row>
-        <Col span={24}>
-          <Form.Item>
-            <label style={{ fontWeight: "bold" }}>หมายเหตุ</label>
-            <TextArea rows={2} />
-          </Form.Item>
-        </Col>
+        </Form>
         <Button
           style={{
             backgroundColor: color.Success,
@@ -479,7 +674,10 @@ const IndexAdminTask = () => {
             width: "100%",
             borderRadius: "5px",
           }}
-          onClick={() => setShowModal(!showModal)}
+          onClick={async () => {
+            await form.validateFields();
+            setShowModal(!showModal);
+          }}
         >
           บันทึก
         </Button>
@@ -511,7 +709,17 @@ const IndexAdminTask = () => {
               fontWeight: "bold",
             }}
           >
-            1,100.00 บาท
+            {numberWithCommasToFixed(
+              Number(`${edit?.task.price}` || 0) -
+                Number(`${edit?.task.discountCoupon}` || 0) -
+                Number(`${edit?.task.discountCampaignPoint}` || 0)
+            ) ||
+              numberWithCommasToFixed(
+                Number(taskSelected?.data.price || 0) -
+                  Number(taskSelected?.data.discountCoupon || 0) -
+                  Number(taskSelected?.data.discountCampaignPoint || 0)
+              )}{" "}
+            บาท
           </Col>
           <Col
             span={12}
@@ -522,7 +730,17 @@ const IndexAdminTask = () => {
               fontWeight: "bold",
             }}
           >
-            1,220.00 บาท
+            {numberWithCommasToFixed(
+              Number(`${edit?.task.price}` || 0) +
+                Number(`${edit?.task.discountCoupon}` || 0) +
+                Number(`${edit?.task.discountCampaignPoint}` || 0)
+            ) ||
+              numberWithCommasToFixed(
+                Number(taskSelected?.data.price || 0) +
+                  Number(taskSelected?.data.discountCoupon || 0) +
+                  Number(taskSelected?.data.discountCampaignPoint || 0)
+              )}{" "}
+            บาท
           </Col>
         </Row>
         <Divider />
@@ -544,9 +762,27 @@ const IndexAdminTask = () => {
             </Col>
           </>
           <>
-            <Col span={8}>1,100.00 บาท</Col>
-            <Col span={8}>250.00 บาท</Col>
-            <Col span={8}>250.00 บาท</Col>
+            <Col span={8}>
+              {numberWithCommasToFixed(edit?.task.price) ||
+                numberWithCommasToFixed(
+                  Number(taskSelected?.data.price) || 0
+                )}{" "}
+              บาท
+            </Col>
+            <Col span={8}>
+              {numberWithCommasToFixed(edit?.task.fee) ||
+                numberWithCommasToFixed(
+                  Number(taskSelected?.data.fee) || 0
+                )}{" "}
+              บาท
+            </Col>
+            <Col span={8}>
+              {numberWithCommasToFixed(Number(edit?.task.discountFee)) ||
+                numberWithCommasToFixed(
+                  Number(taskSelected?.data.discountFee) || 0
+                )}{" "}
+              บาท
+            </Col>
           </>
         </Row>
         <Row justify={"space-between"} gutter={8}>
@@ -559,8 +795,22 @@ const IndexAdminTask = () => {
             </Col>
           </>
           <>
-            <Col span={8}>100.00 บาท</Col>
-            <Col span={16}>20.00 บาท</Col>
+            <Col span={8}>
+              {numberWithCommasToFixed(
+                Number(`${edit?.task.discountCoupon}`) ||
+                  Number(taskSelected?.data.discountCoupon) ||
+                  0
+              )}{" "}
+              บาท
+            </Col>
+            <Col span={16}>
+              {numberWithCommasToFixed(
+                Number(`${edit?.task.discountCampaignPoint}`) ||
+                  Number(taskSelected?.data.discountCampaignPoint) ||
+                  0
+              )}{" "}
+              บาท
+            </Col>
           </>
         </Row>
         <Divider />
@@ -592,7 +842,15 @@ const IndexAdminTask = () => {
               src={icon.coinFarmer}
               style={{ width: "25px", height: "25px" }}
             />{" "}
-            400 แต้ม
+            {numberWithCommas(Number(`${edit?.farmerPoint}`)) ||
+              numberWithCommas(
+                Number(
+                  taskSelected?.taskEstimatePoint.find(
+                    (x) => x.application === "FARMER"
+                  )?.receivePoint
+                ) || 0
+              )}{" "}
+            แต้ม
           </Col>
           <Col span={12} style={{ textAlign: "center" }}>
             <Image
@@ -600,7 +858,15 @@ const IndexAdminTask = () => {
               src={icon.coinDroner}
               style={{ width: "25px", height: "25px" }}
             />{" "}
-            400 แต้ม
+            {numberWithCommas(Number(`${edit?.dronerPoint}`)) ||
+              numberWithCommas(
+                Number(
+                  taskSelected?.taskEstimatePoint.find(
+                    (x) => x.application === "DRONER"
+                  )?.receivePoint
+                ) || 0
+              )}{" "}
+            แต้ม
           </Col>
         </Row>
       </Card>
@@ -609,89 +875,84 @@ const IndexAdminTask = () => {
   const columns = [
     {
       title: "วันที่อัพเดต",
-      dataIndex: "date_appointment",
-      key: "date_appointment",
+      dataIndex: "createdAt",
+      key: "createdAt",
+      render: (value: any, row: any, index: number) => {
+        return {
+          children: <span>{DateTimeUtil.formatDateTime(value)}</span>,
+        };
+      },
+    },
+    {
+      title: "กิจกรรม",
+      dataIndex: "action",
+      key: "action",
+      render: (value: any, row: any, index: number) => {
+        return {
+          children: <span>{value}</span>,
+        };
+      },
+    },
+    {
+      title: "ก่อนเปลี่ยนแปลง",
+      dataIndex: "beforeValue",
+      key: "beforeValue",
       render: (value: any, row: any, index: number) => {
         return {
           children: (
-            <>
-              <span>{DateTimeUtil.formatDateTime(value)}</span>
-              <br />
-              <span style={{ backgroundColor: "rgba(169, 203, 98, 0.10)" }}>
-                {row.task_no}
-              </span>
-            </>
+            <span>
+              {row.action === "แก้ไขจำนวนแปลง" ? `${value} ไร่` : value}
+            </span>
           ),
         };
       },
     },
     {
-      title: "ค่าบริการ",
-      dataIndex: "fullname",
-      key: "fullname",
+      title: "หลังเปลี่ยนแปลง",
+      dataIndex: "afterValue",
+      key: "afterValue",
       render: (value: any, row: any, index: number) => {
         return {
           children: (
-            <>
-              <span>{row.firstname + " " + row.lastname}</span>
-              <br />
-              <span style={{ color: color.Grey }}>{row.telephone_no}</span>
-            </>
-          ),
-        };
-      },
-    },
-    {
-      title: "จำนวนไร่",
-      dataIndex: "fullname",
-      key: "fullname",
-      render: (value: any, row: any, index: number) => {
-        return {
-          children: (
-            <>
-              <span>{row.firstname + " " + row.lastname}</span>
-              <br />
-              <span style={{ color: color.Grey }}>{row.telephone_no}</span>
-            </>
+            <span>
+              {row.action === "แก้ไขจำนวนแปลง" ? `${value} ไร่` : value}
+            </span>
           ),
         };
       },
     },
     {
       title: "หมายเหตุ",
-      dataIndex: "fullname",
-      key: "fullname",
-      width: "40%",
+      dataIndex: "remark",
+      key: "remark",
+      width: "30%",
       render: (value: any, row: any, index: number) => {
         return {
-          children: (
-            <>
-              <span>{row.firstname + " " + row.lastname}</span>
-              <br />
-              <span style={{ color: color.Grey }}>{row.telephone_no}</span>
-            </>
-          ),
+          children: <span>{value}</span>,
         };
       },
     },
     {
       title: "ผู้ใช้ที่อัพเดต",
-      dataIndex: "fullname",
-      key: "fullname",
+      dataIndex: "createdBy",
+      key: "createdBy",
       render: (value: any, row: any, index: number) => {
         return {
-          children: (
-            <>
-              <span>{row.firstname + " " + row.lastname}</span>
-              <br />
-              <span style={{ color: color.Grey }}>{row.telephone_no}</span>
-            </>
-          ),
+          children: <span>{value}</span>,
         };
       },
     },
   ];
-  const cardHistoryTask = <NewTable columns={columns} pagination={false} />;
+  const cardHistoryTask = (
+    <NewTable
+      columns={columns}
+      pagination={false}
+      dataSource={history
+        .filter((x: any) => x.createdBy !== "System")
+        ?.sort((a: any, b: any) => (a.createdAt < b.createdAt ? 1 : -1))}
+      scroll={{ y: 500 }}
+    />
+  );
 
   return (
     <>
@@ -710,7 +971,7 @@ const IndexAdminTask = () => {
                       onItemsRendered,
                     }}
                     searchBy={(keyword: string, label, item) => true}
-                    onChange={handleSearchTask}
+                    onChange={(e) => setTaskId(e)}
                     placeholder="ค้นหารหัสงาน (Task No.)"
                     onSearch={(val: any) => {
                       const uppercase = val.toUpperCase();
@@ -741,14 +1002,15 @@ const IndexAdminTask = () => {
                     height: 35,
                   }}
                   onClick={() => {
-                    setSearch(!search);
+                    handleSearchTask();
+                    setSearch(taskId ? true : false);
                     setSource("EDIT");
                   }}
                 >
                   ค้นหา
                 </Button>
               </Col>
-              {search && (
+              {taskId && search && (
                 <Col span={4}>
                   <Radio.Group buttonStyle="outline">
                     <Radio.Button
@@ -794,7 +1056,8 @@ const IndexAdminTask = () => {
               )}
             </Row>
           </Container>
-          {search &&
+          {taskId &&
+            search &&
             (source === "EDIT" ? (
               <Container style={{ paddingBottom: "10px" }}>
                 <Row gutter={8} justify={"space-between"}>
@@ -851,7 +1114,7 @@ const IndexAdminTask = () => {
                 backgroundColor: color.Success,
                 color: color.White,
               }}
-              //onClick={() => removeReward()}
+              onClick={() => onSubmit()}
             >
               ยืนยัน
             </Button>
