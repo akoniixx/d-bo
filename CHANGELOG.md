@@ -1,6 +1,6 @@
 ## [Version - 0]
 
-## Feature [v0.35.0] 2023-08-07
+## Feature [v0.35.0] 2023-08-08
 
 - manage plot menu
 
