@@ -20,7 +20,7 @@ export const IconMenu = {
       style={{ width: 18, height: 22, color: color.BK, paddingBottom: 4 }}
     />
   ),
-  IndexFarmer: (
+  farmer: (
     <Image
       src={icon.farmer_inactive}
       preview={false}
@@ -79,7 +79,7 @@ export const IconMenuInActive = {
       style={{ width: 18, height: 22, color: color.BK, paddingBottom: 4 }}
     />
   ),
-  IndexFarmer: (
+  farmer: (
     <Image
       src={icon.farmer_active}
       preview={false}

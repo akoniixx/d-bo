@@ -12,6 +12,7 @@ import {
   FarmerPlotEntity_INIT,
 } from "./FarmerPlotEntities";
 import { ImageEntity, ImageEntity_INTI } from "./UploadImageEntities";
+import { summaryEntity, summaryEntity_INIT } from "./TaskInprogressEntities";
 
 export interface FarmerEntity {
   id: string;
@@ -25,6 +26,10 @@ export interface FarmerEntity {
   updatedAt: string;
   address: FullAddressEntity;
   farmerPlot: FarmerPlotEntity[];
+  applicationType: string;
+  dateWaitPending: string;
+  totalPlotCount: number;
+  totalRaiCount: number;
 }
 export const FarmerEntity_INIT: FarmerEntity = {
   id: "",
@@ -38,6 +43,10 @@ export const FarmerEntity_INIT: FarmerEntity = {
   updatedAt: "",
   address: FullAddressEntiry_INIT,
   farmerPlot: [FarmerPlotEntity_INIT],
+  applicationType: "",
+  dateWaitPending: "",
+  totalPlotCount: 0,
+  totalRaiCount: 0,
 };
 
 export interface GetFarmerEntity {
@@ -76,11 +85,8 @@ export const GetFarmerEntity_INIT: GetFarmerEntity = {
 export interface FarmerPageEntity {
   data: FarmerEntity[];
   count: number;
+  summary: summaryEntity[];
 }
-export const FarmerPageEntity_INIT: FarmerPageEntity = {
-  data: [FarmerEntity_INIT],
-  count: 0,
-};
 
 export interface CreateFarmerEntity {
   firstname: string;

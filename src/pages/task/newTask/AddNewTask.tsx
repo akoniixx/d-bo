@@ -84,7 +84,6 @@ import { FarmerDatasource } from "../../../datasource/FarmerDatasource";
 import { AsyncPaginate } from "react-select-async-paginate";
 import type { GroupBase, OptionsOrGroups } from "react-select";
 import { FarmerPageEntity } from "../../../entities/FarmerEntities";
-import { FarmerPageEntity_INIT } from "../../../entities/FarmerEntities";
 import { InputPicker, SelectPicker } from 'rsuite';
 import 'rsuite/dist/rsuite.min.css';
 export type OptionType = {

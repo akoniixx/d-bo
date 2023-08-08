@@ -12,5 +12,8 @@ export default {
     Success: '#219653',
     Warning: '#F2994A',
     Error : '#EB5757',
-    blue: '#2F80ED'
+    blue: '#2F80ED',
+    bgWarning: '#FDF5EC',
+    bgSuccess: '#E9F4EE',
+    font: '#2B2B2B'
 }
