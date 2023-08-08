@@ -1,5 +1,9 @@
 ## [Version - 0]
 
+## Feature [v0.36.0] 2023-08-08
+
+- add task for admin menu
+
 ## Feature [v0.35.0] 2023-08-08
 
 - manage plot menu

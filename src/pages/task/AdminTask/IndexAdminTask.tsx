@@ -19,6 +19,7 @@ import { color } from "../../../resource";
 import {
   ALL_TASK_COLOR_MAPPING,
   ALL_TASK_MAPPING,
+  HISTORY_TASK,
 } from "../../../definitions/Status";
 import icon from "../../../resource/icon";
 import TextArea from "antd/lib/input/TextArea";
@@ -111,7 +112,6 @@ const IndexAdminTask = () => {
     TaskDatasource.getManageTaskByTaskId(taskId).then((res) => {
       setTaskSelected(res);
       setHistory(res.data.taskHistory);
-      console.log(res.data.taskHistory);
       form.setFieldsValue({
         unitPrice: res.data.unitPrice,
         farmAreaAmount: res.data.farmAreaAmount,
@@ -178,7 +178,7 @@ const IndexAdminTask = () => {
   );
   const cardCurrentTask = (
     <Col span={12}>
-      <Card style={{ backgroundColor: "#F2F5FC" }}>
+      <Card style={{ backgroundColor: "#F2F5FC", height: '160px' }}>
         <Row
           justify={"center"}
           gutter={8}
@@ -233,7 +233,7 @@ const IndexAdminTask = () => {
           </Col>
         </Row>
       </Card>
-      <Card style={{ height: "435px" }}>
+      <Card style={{ height: '45%' }}>
         <Row
           justify={"space-between"}
           gutter={8}
@@ -484,7 +484,7 @@ const IndexAdminTask = () => {
   );
   const cardEditTask = (
     <Col span={12}>
-      <Card style={{ backgroundColor: "rgba(33, 150, 83, 0.1)" }}>
+      <Card style={{ backgroundColor: "rgba(33, 150, 83, 0.1)", height: '160px' }}>
         <Row
           justify={"center"}
           gutter={8}
@@ -548,7 +548,7 @@ const IndexAdminTask = () => {
           </Col>
         </Row>
       </Card>
-      <Card>
+      <Card style={{height: '45%'}}>
         <Row
           justify={"space-between"}
           gutter={8}
@@ -889,7 +889,7 @@ const IndexAdminTask = () => {
       key: "action",
       render: (value: any, row: any, index: number) => {
         return {
-          children: <span>{value}</span>,
+          children: <span>{HISTORY_TASK[value.replace(" ", "")]}</span>,
         };
       },
     },
@@ -901,7 +901,10 @@ const IndexAdminTask = () => {
         return {
           children: (
             <span>
-              {row.action === "แก้ไขจำนวนแปลง" ? `${value} ไร่` : value}
+              {row.action.replace(" ", "") === "ChangeStatus"
+                ? ALL_TASK_MAPPING[value]
+                : value}
+              {row.action === "แก้ไขจำนวนแปลง" && " ไร่"}
             </span>
           ),
         };
@@ -915,7 +918,10 @@ const IndexAdminTask = () => {
         return {
           children: (
             <span>
-              {row.action === "แก้ไขจำนวนแปลง" ? `${value} ไร่` : value}
+              {row.action.replace(" ", "") === "ChangeStatus"
+                ? ALL_TASK_MAPPING[value]
+                : value}
+              {row.action === "แก้ไขจำนวนแปลง" && " ไร่"}
             </span>
           ),
         };
@@ -947,7 +953,7 @@ const IndexAdminTask = () => {
     <NewTable
       columns={columns}
       pagination={false}
-      dataSource={history
+      dataSource={(history || [])
         .filter((x: any) => x.createdBy !== "System")
         ?.sort((a: any, b: any) => (a.createdAt < b.createdAt ? 1 : -1))}
       scroll={{ y: 500 }}
@@ -970,8 +976,10 @@ const IndexAdminTask = () => {
                     listProps={{
                       onItemsRendered,
                     }}
-                    searchBy={(keyword: string, label, item) => true}
-                    onChange={(e) => setTaskId(e)}
+                    onChange={(e) => {
+                      setTaskId(e);
+                      setSearch(false);
+                    }}
                     placeholder="ค้นหารหัสงาน (Task No.)"
                     onSearch={(val: any) => {
                       const uppercase = val.toUpperCase();
