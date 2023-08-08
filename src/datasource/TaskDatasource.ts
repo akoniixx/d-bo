@@ -234,7 +234,6 @@ export class TaskDatasource {
       remark: remark,
       updateBy: updateBy,
     };
-    console.log("p", param);
     return httpClient
       .post(BASE_URL + `/tasks/task-manage-area/save-change-area`, param)
       .then((response) => {
