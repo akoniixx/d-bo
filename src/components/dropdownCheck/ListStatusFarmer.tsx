@@ -16,9 +16,9 @@ const ListCheck: React.FC<listProps> = ({ onSearchType, list, title }) => {
   };
 
   const listApp = [
-    { title: "Back Office Website", icon: icon.bo, value: "BO" },
-    { title: "Droner Application", icon: icon.dronerApp, value: "DRONER" },
-    { title: "Farmer Application", icon: icon.farmerApp, value: "FARMER" },
+    { title: " Back Office Website", icon: icon.bo, value: "BO" },
+    { title: " Droner Application", icon: icon.dronerApp, value: "DRONER" },
+    { title: " Farmer Application", icon: icon.farmerApp, value: "FARMER" },
   ];
   const items: MenuProps["items"] = listApp.map((v, i) => {
     return {

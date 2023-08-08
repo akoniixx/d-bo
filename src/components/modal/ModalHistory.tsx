@@ -22,19 +22,20 @@ const ModalHistory: React.FC<ModalHistoryProps> = ({
   const [form] = Form.useForm();
   const [historyPlot, setHistoryPlot] = useState<AllHistoryFarmerPlotEntity>();
   const [current, setCurrent] = useState<number>(1);
-  const [row, setRow] = useState(5);
+  const row = 5;
 
-  const getHistoryPlot = async () => {
-    await FarmerPlotDatasource.getHistoryFarmerPlot(
-      data.farmerId!,
-      data.id!,
-      current,
-      row
-    ).then((res) => {
-      setHistoryPlot(res);
-    });
-  };
+  
   useEffect(() => {
+    const getHistoryPlot = async () => {
+      await FarmerPlotDatasource.getHistoryFarmerPlot(
+        data.farmerId!,
+        data.id!,
+        current,
+        row
+      ).then((res) => {
+        setHistoryPlot(res);
+      });
+    };
     getHistoryPlot();
   }, [current, data]);
 
@@ -147,12 +148,12 @@ const ModalHistory: React.FC<ModalHistoryProps> = ({
         <div className="d-flex justify-content-between pt-4 pb-3">
           <p>รายการทั้งหมด {historyPlot?.count} รายการ</p>
           <Pagination
-            current={current}
-            total={historyPlot?.count}
-            onChange={onChangePage}
-            pageSize={row}
-            showSizeChanger={false}
-          />
+          current={current}
+          total={historyPlot?.count}
+          onChange={onChangePage}
+          pageSize={row}
+          showSizeChanger={false}
+        />
         </div>
       </Modal>
     </>

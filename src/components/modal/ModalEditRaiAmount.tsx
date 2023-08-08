@@ -17,6 +17,7 @@ import {
 } from "../../entities/UploadImageEntities";
 import { FarmerPlotDatasource } from "../../datasource/FarmerPlotDatasource";
 import { useNavigate } from "react-router-dom";
+import { validateOnlyNumber } from "../../utilities/TextFormatter";
 
 interface ModalEditRaiAmountProps {
   show: boolean;
@@ -44,26 +45,7 @@ const ModalEditRaiAmount: React.FC<ModalEditRaiAmountProps> = ({
   const [createImgPlot, setCreateImgPlot] = useState<UploadImageEntity>(
     UploadImageEntity_INTI
   );
-  const onFieldsChange = () => {
-    const { file, raiAmount } = form.getFieldsValue();
-    let fieldInfo = false;
-    let fieldapp = false;
-    let fieldimg = false;
-    let fieldCateGory = false;
-
-    if (file) {
-      fieldInfo = false;
-    } else {
-      fieldInfo = true;
-    }
-
-    if (!file) {
-      fieldimg = true;
-    } else {
-      fieldimg = false;
-    }
-    setBtnSaveDisable(fieldInfo || fieldimg);
-  };
+  const [rai, setRai] = useState<any>();
 
   const onChangeImg = async (file: any) => {
     const source = file.target.files[0];
@@ -90,9 +72,11 @@ const ModalEditRaiAmount: React.FC<ModalEditRaiAmountProps> = ({
       "file",
       isFileMoreThan2MB ? newSource : source
     );
-    setBtnSaveDisable(false);
     setCreateImgPlot(d.toJS());
+    form.setFieldValue("file", d.toJS());
+    onFieldsChange();
   };
+
   const onPreviewImg = async () => {
     let src = imgPlot;
     if (!src) {
@@ -110,21 +94,49 @@ const ModalEditRaiAmount: React.FC<ModalEditRaiAmountProps> = ({
   const removeImg = () => {
     setImgPlot(undefined);
     setCreateImgPlot(UploadImageEntity_INTI);
+    form.setFieldValue("file", null);
+    onFieldsChange();
+  };
+
+  const onFieldsChange = () => {
+    const { file } = form.getFieldsValue();
+    let fieldInfo = false;
+    let fieldimg = false;
+
+    if (rai) {
+      fieldInfo = false;
+    } else {
+      fieldInfo = true;
+    }
+
+    if (!file) {
+      fieldimg = true;
+    } else {
+      fieldimg = false;
+    }
+    setBtnSaveDisable(fieldInfo || fieldimg);
+  };
+  const checkNumber = (
+    e: React.ChangeEvent<HTMLInputElement>,
+    name: string
+  ) => {
+    const { value: inputValue } = e.target;
+    const convertedNumber = validateOnlyNumber(inputValue);
+    form.setFieldsValue({ [name]: convertedNumber });
   };
   const handelCallBack = () => {
-    const { reason, raiAmount } = form.getFieldsValue();
+    const { reason } = form.getFieldsValue();
     const farmerId = data.farmerId;
     const farmerPlotId = data.id;
     const raiBefore = data.raiAmount;
-
     FarmerPlotDatasource.updateHistoryFarmerPlot({
       createBy: profile.firstname + " " + profile.lastname,
       farmerId: farmerId!,
       farmerPlotId: farmerPlotId!,
       file: createImgPlot.file,
       raiBefore: raiBefore!,
-      raiAfter: raiAmount,
-      reason: reason,
+      raiAfter: rai,
+      reason: reason != undefined ? reason : "",
     }).then((res) => {
       callBackEditRai(res);
     });
@@ -178,9 +190,14 @@ const ModalEditRaiAmount: React.FC<ModalEditRaiAmountProps> = ({
               ]}
             >
               <Input
+                type="number"
                 placeholder="กรอกจำนวนไร่"
                 autoComplete="off"
                 suffix="ไร่"
+                onChange={(e) => {
+                  checkNumber(e, "rai");
+                  setRai(e.target.value);
+                }}
               />
             </Form.Item>
           </div>
@@ -188,9 +205,7 @@ const ModalEditRaiAmount: React.FC<ModalEditRaiAmountProps> = ({
             <label>
               อัพโหลดหลักฐาน <span style={{ color: "red" }}>*</span>
             </label>
-            <Form.Item
-              name="file"
-            >
+            <Form.Item name="file">
               <div className="pb-2">
                 <div
                   className="hiddenFileInput"
