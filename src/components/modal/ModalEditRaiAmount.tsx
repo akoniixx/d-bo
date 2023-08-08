@@ -5,47 +5,141 @@ import FooterPage from "../footer/FooterPage";
 import TextArea from "antd/lib/input/TextArea";
 import { color } from "../../resource";
 import bth_img_empty from "../../resource/media/empties/upload_Img_btn.png";
-import { FarmerPlotEntity } from "../../entities/FarmerPlotEntities";
+import {
+  FarmerPlotEntity,
+  HistoryEditRaiEntity,
+  HistoryFarmerPlotEntity,
+} from "../../entities/FarmerPlotEntities";
+import { resizeFileImg } from "../../utilities/ResizeImage";
+import {
+  UploadImageEntity,
+  UploadImageEntity_INTI,
+} from "../../entities/UploadImageEntities";
+import { FarmerPlotDatasource } from "../../datasource/FarmerPlotDatasource";
+import { useNavigate } from "react-router-dom";
+import { validateOnlyNumber } from "../../utilities/TextFormatter";
 
 interface ModalEditRaiAmountProps {
   show: boolean;
   backButton: () => void;
   isEditModal?: boolean;
   data: FarmerPlotEntity;
-  callBackEditRai: (data: FarmerPlotEntity) => void;
+  callBackEditRai: (data?: any) => void;
+  callBackReturn: (data: boolean) => void;
 }
+const _ = require("lodash");
+const { Map } = require("immutable");
 const ModalEditRaiAmount: React.FC<ModalEditRaiAmountProps> = ({
   show,
   backButton,
   isEditModal,
   data,
   callBackEditRai,
+  callBackReturn,
 }) => {
+  const profile = JSON.parse(localStorage.getItem("profile") || "{  }");
   const [form] = Form.useForm();
-  const [saveBtnDisable, setBtnSaveDisable] = useState<boolean>(
-    isEditModal ? false : true
+  const [saveBtnDisable, setBtnSaveDisable] = useState<boolean>(true);
+
+  const [imgPlot, setImgPlot] = useState<any>();
+  const [createImgPlot, setCreateImgPlot] = useState<UploadImageEntity>(
+    UploadImageEntity_INTI
   );
-  const [imgEvidence, setImgEvidence] = useState<any>();
-  const checkValidate = (data: FarmerPlotEntity) => {
-    let checkEmpty = ![data.raiAmount].includes("");
-    let checkEmptyNumber = ![data.plotAreaId].includes(0);
-    if (checkEmpty && checkEmptyNumber) {
-      setBtnSaveDisable(false);
-    } else {
-      setBtnSaveDisable(true);
+  const [rai, setRai] = useState<any>();
+
+  const onChangeImg = async (file: any) => {
+    const source = file.target.files[0];
+    let newSource: any;
+
+    const isFileMoreThan2MB = source.size > 2 * 1024 * 1024;
+    if (isFileMoreThan2MB) {
+      newSource = await resizeFileImg({
+        file: source,
+        compressFormat: source?.type.split("/")[1],
+        quality: 70,
+        rotation: 0,
+        responseUriFunc: (res: any) => {},
+      });
     }
+    const img_base64 = await new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(isFileMoreThan2MB ? newSource : source);
+      reader.onload = () => resolve(reader.result);
+    });
+
+    setImgPlot(img_base64);
+    const d = Map(createImgPlot).set(
+      "file",
+      isFileMoreThan2MB ? newSource : source
+    );
+    setCreateImgPlot(d.toJS());
+    form.setFieldValue("file", d.toJS());
+    onFieldsChange();
   };
+
+  const onPreviewImg = async () => {
+    let src = imgPlot;
+    if (!src) {
+      src = await new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(imgPlot);
+        reader.onload = () => resolve(reader.result);
+      });
+    }
+    const image = new Image();
+    image.src = src;
+    const imgWindow = window.open(src);
+    imgWindow?.document.write(image.outerHTML);
+  };
+  const removeImg = () => {
+    setImgPlot(undefined);
+    setCreateImgPlot(UploadImageEntity_INTI);
+    form.setFieldValue("file", null);
+    onFieldsChange();
+  };
+
   const onFieldsChange = () => {
-    const valuesForm = form.getFieldsValue();
-    checkValidate(valuesForm);
+    const { file } = form.getFieldsValue();
+    let fieldInfo = false;
+    let fieldimg = false;
+
+    if (rai) {
+      fieldInfo = false;
+    } else {
+      fieldInfo = true;
+    }
+
+    if (!file) {
+      fieldimg = true;
+    } else {
+      fieldimg = false;
+    }
+    setBtnSaveDisable(fieldInfo || fieldimg);
   };
-  const handelCallBack = async (values: any) => {
-    const payload = {
-      ...values,
-      plotId: data.id,
-    };
-    callBackEditRai(payload);
-    console.log(payload);
+  const checkNumber = (
+    e: React.ChangeEvent<HTMLInputElement>,
+    name: string
+  ) => {
+    const { value: inputValue } = e.target;
+    const convertedNumber = validateOnlyNumber(inputValue);
+    form.setFieldsValue({ [name]: convertedNumber });
+  };
+  const handelCallBack = () => {
+    const { reason } = form.getFieldsValue();
+    const farmerId = data.farmerId;
+    const farmerPlotId = data.id;
+    const raiBefore = data.raiAmount;
+    FarmerPlotDatasource.updateHistoryFarmerPlot({
+      createBy: profile.firstname + " " + profile.lastname,
+      farmerId: farmerId!,
+      farmerPlotId: farmerPlotId!,
+      file: createImgPlot.file,
+      raiBefore: raiBefore!,
+      raiAfter: rai,
+      reason: reason != undefined ? reason : "",
+    }).then((res) => {
+      callBackEditRai(res);
+    });
   };
 
   return (
@@ -66,7 +160,7 @@ const ModalEditRaiAmount: React.FC<ModalEditRaiAmountProps> = ({
         onCancel={backButton}
         footer={[
           <FooterPage
-            onClickBack={backButton}
+            onClickBack={() => callBackReturn(true)}
             onClickSave={() => form.submit()}
             disableSaveBtn={saveBtnDisable}
           />,
@@ -89,12 +183,21 @@ const ModalEditRaiAmount: React.FC<ModalEditRaiAmountProps> = ({
                   required: true,
                   message: "กรุณากรอกจำนวนไร่!",
                 },
+                {
+                  pattern: new RegExp(/^[0-9\b]+$/),
+                  message: "กรุณากรอกเบอร์โทรให้ถูกต้อง!",
+                },
               ]}
             >
               <Input
+                type="number"
                 placeholder="กรอกจำนวนไร่"
                 autoComplete="off"
                 suffix="ไร่"
+                onChange={(e) => {
+                  checkNumber(e, "rai");
+                  setRai(e.target.value);
+                }}
               />
             </Form.Item>
           </div>
@@ -102,70 +205,61 @@ const ModalEditRaiAmount: React.FC<ModalEditRaiAmountProps> = ({
             <label>
               อัพโหลดหลักฐาน <span style={{ color: "red" }}>*</span>
             </label>
-            <br />
-            <div className="pb-2">
+            <Form.Item name="file">
+              <div className="pb-2">
+                <div
+                  className="hiddenFileInput"
+                  style={{
+                    backgroundImage: `url(${imgPlot})`,
+                    display: imgPlot != undefined ? "block" : "none",
+                  }}
+                />
+              </div>
+              <div className="text-left ps-4">
+                {imgPlot != undefined && (
+                  <>
+                    <Tag
+                      color={color.Success}
+                      onClick={onPreviewImg}
+                      style={{
+                        cursor: "pointer",
+                        borderRadius: "5px",
+                      }}
+                    >
+                      View
+                    </Tag>
+                    <Tag
+                      color={color.Error}
+                      onClick={removeImg}
+                      style={{
+                        cursor: "pointer",
+                        borderRadius: "5px",
+                      }}
+                    >
+                      Remove
+                    </Tag>
+                  </>
+                )}
+              </div>
               <div
-                className="hiddenFileInput"
+                className="hiddenFileBtn"
                 style={{
-                  backgroundImage: `url(${imgEvidence})`,
-                  display: imgEvidence != undefined ? "block" : "none",
+                  backgroundImage: `url(${bth_img_empty})`,
+                  display: imgPlot == undefined ? "block" : "none",
                 }}
-              />
-            </div>
-            <div className="text-left ps-4">
-              {imgEvidence != undefined && (
-                <>
-                  <Tag
-                    color={color.Success}
-                    // onClick={onPreviewIdCard}
-                    style={{
-                      cursor: "pointer",
-                      borderRadius: "5px",
-                    }}
-                  >
-                    View
-                  </Tag>
-                  <Tag
-                    color={color.Error}
-                    // onClick={removeImgIdCard}
-                    style={{
-                      cursor: "pointer",
-                      borderRadius: "5px",
-                    }}
-                  >
-                    Remove
-                  </Tag>
-                </>
-              )}
-            </div>
-            <div
-              className="hiddenFileBtn"
-              style={{
-                backgroundImage: `url(${bth_img_empty})`,
-                display: imgEvidence == undefined ? "block" : "none",
-              }}
-            >
-              <input
-                key={imgEvidence}
-                type="file"
-                // onChange={onChangeIdCard}
-                title="เลือกรูป"
-              />
-            </div>
+              >
+                <input
+                  key={imgPlot}
+                  type="file"
+                  onChange={onChangeImg}
+                  title="เลือกรูป"
+                />
+              </div>
+            </Form.Item>
           </div>
           <div className="form-group">
-            <label>
-              หมายเหตุ <span style={{ color: "red" }}>*</span>
-            </label>
-            <Form.Item
-              name="reason"
-              rules={[
-                {
-                  required: true,
-                  message: "กรอกหมายเหตุเพิ่มเติม!",
-                },
-              ]}
-            >
+            <label>หมายเหตุ</label>
+            <Form.Item name="reason">
               <TextArea
                 placeholder="กรอกหมายเหตุเพิ่มเติม"
                 autoComplete="off"

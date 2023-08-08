@@ -3,40 +3,69 @@ import { Form, Input, Modal, Pagination, Table, Tag } from "antd";
 import { color } from "../../resource";
 import bth_img_empty from "../../resource/media/empties/upload_Img_btn.png";
 import { numberWithCommas } from "../../utilities/TextFormatter";
+import {
+  AllHistoryFarmerPlotEntity,
+  FarmerPlotEntity,
+} from "../../entities/FarmerPlotEntities";
+import { FarmerPlotDatasource } from "../../datasource/FarmerPlotDatasource";
+import moment from "moment";
 interface ModalHistoryProps {
   show: boolean;
   backButton: () => void;
+  data: FarmerPlotEntity;
 }
 const ModalHistory: React.FC<ModalHistoryProps> = ({
   show,
   backButton,
+  data,
 }) => {
   const [form] = Form.useForm();
-  const data = [
-    {
-      date: "22/12/2023 18:00",
-      raiAmount: "2000",
-      evidence: "droner_capture.jpg",
-      updateBy: "สายไหม",
-      reason: "นักบินโทรแจ้ง call center และส่งรูปในไลน์",
-    },
-    {
-      date: "22/12/2023 18:00",
-      raiAmount: "70",
-      evidence: "droner_capture.jpg",
-      updateBy: "สายไหม",
-      reason: "-",
-    },
-  ];
+  const [historyPlot, setHistoryPlot] = useState<AllHistoryFarmerPlotEntity>();
+  const [current, setCurrent] = useState<number>(1);
+  const row = 5;
 
+  
+  useEffect(() => {
+    const getHistoryPlot = async () => {
+      await FarmerPlotDatasource.getHistoryFarmerPlot(
+        data.farmerId!,
+        data.id!,
+        current,
+        row
+      ).then((res) => {
+        setHistoryPlot(res);
+      });
+    };
+    getHistoryPlot();
+  }, [current, data]);
+
+  const onPreviewImg = async (e: any) => {
+    let src = e;
+    if (!src) {
+      src = await new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(e);
+        reader.onload = () => resolve(reader.result);
+      });
+    }
+    const image = new Image();
+    image.src = src;
+    const imgWindow = window.open(src);
+    imgWindow?.document.write(image.outerHTML);
+  };
+  const onChangePage = (page: number) => {
+    setCurrent(page);
+  };
   const columns = [
     {
       title: "วัน/เวลา",
-      dataIndex: "date",
-      key: "date",
+      dataIndex: "updatedAt",
+      key: "updatedAt",
       render: (value: any, row: any, index: number) => {
         return {
-          children: <>{row.date}</>,
+          children: (
+            <span>{moment(row.updatedAt).format("DD/MM/YYYY, HH:mm")}</span>
+          ),
         };
       },
     },
@@ -46,7 +75,7 @@ const ModalHistory: React.FC<ModalHistoryProps> = ({
       key: "raiAmount",
       render: (value: any, row: any, index: number) => {
         return {
-          children: <>{numberWithCommas(row.raiAmount) + " ไร่"}</>,
+          children: <>{numberWithCommas(row.raiAfter) + " ไร่"}</>,
         };
       },
     },
@@ -63,8 +92,9 @@ const ModalHistory: React.FC<ModalHistoryProps> = ({
                 textDecoration: "underline",
                 cursor: "pointer",
               }}
+              onClick={() => onPreviewImg(row.pathFile)}
             >
-              {row.evidence}
+              {row.fileName ? row.fileName : "-"}
             </span>
           ),
         };
@@ -72,11 +102,11 @@ const ModalHistory: React.FC<ModalHistoryProps> = ({
     },
     {
       title: "ผู้อัพเดต",
-      dataIndex: "updateBy",
-      key: "updateBy",
+      dataIndex: "createBy",
+      key: "createBy",
       render: (value: any, row: any, index: number) => {
         return {
-          children: <>{row.updateBy}</>,
+          children: <>{row.createBy}</>,
         };
       },
     },
@@ -86,7 +116,7 @@ const ModalHistory: React.FC<ModalHistoryProps> = ({
       key: "reason",
       render: (value: any, row: any, index: number) => {
         return {
-          children: <>{row.reason}</>,
+          children: <>{row.reason ? row.reason : "-"}</>,
         };
       },
     },
@@ -111,17 +141,19 @@ const ModalHistory: React.FC<ModalHistoryProps> = ({
       >
         <Table
           className="tableModal"
-          dataSource={data}
+          dataSource={historyPlot?.data}
           columns={columns}
           pagination={false}
         />
         <div className="d-flex justify-content-between pt-4 pb-3">
-          <p>รายการทั้งหมด {data.length} รายการ</p>
+          <p>รายการทั้งหมด {historyPlot?.count} รายการ</p>
           <Pagination
-            current={1}
-            //   onChange={onChangePage}
-            total={data.length}
-          />
+          current={current}
+          total={historyPlot?.count}
+          onChange={onChangePage}
+          pageSize={row}
+          showSizeChanger={false}
+        />
         </div>
       </Modal>
     </>

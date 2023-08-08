@@ -38,7 +38,7 @@ interface ModalFarmerPlotProps {
   show: boolean;
   backButton: () => void;
   callBack: (data: FarmerPlotEntity) => void;
-  callBackModal: (data: boolean) => void;
+  callBackModal: (data: boolean, raiAmount?: number) => void;
   data: FarmerPlotEntity;
   editIndex: number;
   title: string;
@@ -115,7 +115,8 @@ const ModalFarmerPlot: React.FC<ModalFarmerPlotProps> = ({
     setModalEdit(!modalEdit);
     callBackModal(!modalEdit!);
   };
-  const showHistory = () => {
+  const showHistory = (e: FarmerPlotEntity) => {
+    setEditFarmerPlot(e);
     setModalHistory(!modalHistory);
     callBackModal(!modalEdit!);
   };
@@ -176,12 +177,6 @@ const ModalFarmerPlot: React.FC<ModalFarmerPlotProps> = ({
       plantCharacteristics: checkedValues,
     });
   };
-  const updateRaiAmount = async (plot: FarmerPlotEntity) => {
-    const payload = {
-      ...plot,
-    };
-    console.log(payload);
-  };
 
   const handelCallBack = async (values: FarmerPlotEntity) => {
     let locationName = "";
@@ -205,13 +200,14 @@ const ModalFarmerPlot: React.FC<ModalFarmerPlotProps> = ({
           location[3].long_name;
       });
 
+    const plotId = data.id;
     const payload = {
       ...farmerPlot,
       ...values,
       locationName,
       plotId: editIndex,
+      id: plotId!,
     };
-    console.log(payload)
     callBack(payload);
   };
   const checkValidate = (data: FarmerPlotEntity) => {
@@ -345,7 +341,7 @@ const ModalFarmerPlot: React.FC<ModalFarmerPlotProps> = ({
                   ]}
                 >
                   <Input
-                    // disabled={!!data.raiAmount}
+                    disabled={!!data.raiAmount}
                     placeholder="กรอกจำนวนไร่"
                     autoComplete="off"
                     suffix="ไร่"
@@ -371,7 +367,7 @@ const ModalFarmerPlot: React.FC<ModalFarmerPlotProps> = ({
                 </Button>
               </div>
               <Button
-                onClick={showHistory}
+                onClick={() => showHistory(data)}
                 type="dashed"
                 className="col-lg-3"
                 style={{
@@ -588,15 +584,24 @@ const ModalFarmerPlot: React.FC<ModalFarmerPlotProps> = ({
           </div>
         </Form>
       </Modal>
-        <ModalEditRaiAmount
-          show={modalEdit}
-          backButton={() => setModalEdit((prev) => !prev)}
-          data={editFarmerPlot}
-          callBackEditRai={updateRaiAmount}
-        />
+      <ModalEditRaiAmount
+        show={modalEdit}
+        backButton={() => setModalEdit((prev) => !prev)}
+        callBackReturn={() => {
+          setModalEdit((prev) => !prev);
+          callBackModal(show);
+        }}
+        data={editFarmerPlot}
+        callBackEditRai={(data) => {
+          setModalEdit((prev) => !prev);
+          callBackModal(show, parseInt(data.responseData.raiAfter));
+          form.setFieldValue("raiAmount", parseInt(data.responseData.raiAfter));
+        }}
+      />
 
       <ModalHistory
         show={modalHistory}
+        data={editFarmerPlot}
         backButton={() => setModalHistory((prev) => !prev)}
       />
     </>

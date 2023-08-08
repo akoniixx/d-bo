@@ -1,6 +1,7 @@
 import { PlotAreaEntity, PlotAreaEntity_INIT } from "./PlotAreaEntities";
 import { LAT_LNG_BANGKOK } from "../definitions/Location";
 import { FarmerEntity } from "./FarmerEntities";
+import { UploadImageEntity } from "./UploadImageEntities";
 
 export interface FarmerPlotEntity {
   id?: string;
@@ -20,7 +21,7 @@ export interface FarmerPlotEntity {
   plotAreaId: number;
   comment?: string;
   status: string;
-  plantCharacteristics: string[]
+  plantCharacteristics: string[];
 }
 export const FarmerPlotEntity_INIT: FarmerPlotEntity = {
   id: "",
@@ -39,7 +40,7 @@ export const FarmerPlotEntity_INIT: FarmerPlotEntity = {
   farmerId: "",
   plotAreaId: 0,
   status: "PENDING",
-  plantCharacteristics: []
+  plantCharacteristics: [],
 };
 
 export interface PlotEntity {
@@ -77,4 +78,32 @@ export interface SumPlotEntity {
   data: PlotEntity[];
   count: number;
   summar: SummaryPlotEntity[];
+}
+
+export interface HistoryFarmerPlotEntity {
+  id: string;
+  farmerId: string;
+  raiBefore: string;
+  raiAfter: string;
+  pathFile: string;
+  fileName: string;
+  reason: string;
+  createBy: string;
+  createdAt: string;
+  updatedAt: string;
+  farmerPlotId: string;
+}
+export interface HistoryEditRaiEntity {
+  farmerId: string;
+  farmerPlotId: string;
+  raiBefore: string;
+  raiAfter: string;
+  reason: string;
+  createBy: string;
+  file : any;
+}
+
+export interface AllHistoryFarmerPlotEntity {
+  data: HistoryFarmerPlotEntity[];
+  count: number;
 }

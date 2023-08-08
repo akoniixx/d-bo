@@ -15,7 +15,7 @@ export const STATUS_FARMERPLOT_COLOR_MAPPING: any = {
 };
 
 export const STATUS_FARMER_MAPPING: any = {
-  PENDING: "รอยืนยันตัวตน",
+  PENDING: "รอตรวจสอบ",
   ACTIVE: "ใช้งาน",
   INACTIVE: "ปิดการใช้งาน",
   REJECTED: "ไม่อนุมัติ",
@@ -169,7 +169,7 @@ export const COLOR_QUOTA_REDEEM: any = {
   CANCEL: color.Error,
 };
 export const COLOR_QUOTA_REDEEM_DIG: any = {
-  REQUEST: color.secondary1,  
+  REQUEST: color.secondary1,
   CANCEL: color.Error,
   USED: color.Success,
   EXPIRED: color.Grey,
