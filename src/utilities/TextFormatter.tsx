@@ -8,8 +8,7 @@ export function numberWithCommas(x: number) {
 export const numberWithCommasToFixed = (x: number) => {
   if (!x) return 0;
 
-  return x
-    .toFixed(2)
+  return x.toFixed(2)
     .toString()
     .replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 };

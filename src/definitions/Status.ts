@@ -186,3 +186,33 @@ export const STATUS_QUOTA_REDEEM_DIG: any = {
   USED: "ใช้แล้ว",
   EXPIRED: "หมดอายุ",
 };
+export const ALL_TASK_COLOR_MAPPING: any = {
+  WAIT_RECEIVE: color.Warning,
+  REJECTED: color.Error,
+  CANCELED: color.Error,
+  RECEIVED: color.Success,
+  WAIT_START: "#FFCA37",
+  IN_PROGRESS: color.Success,
+  WAIT_REVIEW: color.blue,
+  DONE: color.Success,
+};
+export const ALL_TASK_MAPPING: any = {
+  WAIT_RECEIVE: "รอนักบินโดรนรับงาน",
+  REJECTED: "ไม่มีนักบินโดรนรับงาน",
+  CANCELED: "ยกเลิก",
+  RECEIVED: "นักบินโดรนรับงานแล้ว",
+  WAIT_START: "รอดำเนินงาน",
+  IN_PROGRESS: "กำลังดำเนินงาน",
+  WAIT_REVIEW: "รอรีวิว",
+  DONE: "งานเสร็จสิ้น",
+};
+export const HISTORY_TASK: any = {
+  FinishTask: "งานเสร็จสิ้น",
+  ChangeDroner: "มีการเปลี่ยนนักบินโดรน",
+  TaskProblem: "งานมีปัญหา",
+  ChangeStatus: "แก้ไข/เปลี่ยนสถานะ",
+  RequestExtend: "ขอขยายเวลางาน",
+  ChangeDateAppointment: "แก้ไข/เปลี่ยนวันที่นัดหมาย",
+  ChangeRai: "แก้ไข/เปลี่ยนจำนวนแปลง",
+  แก้ไขจำนวนแปลง: "แก้ไขจำนวนแปลง",
+};
