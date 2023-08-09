@@ -290,8 +290,7 @@ const EditFarmer = () => {
       ...plot,
       farmerId,
     };
-    console.log(payload);
-    if (payload.id !== "") {
+    if (payload.id) {
       await FarmerPlotDatasource.updateFarmerPlot(payload);
       setShowEditModal((prev) => !prev);
     } else {

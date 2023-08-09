@@ -28,6 +28,7 @@ import { CheckboxValueType } from "antd/lib/checkbox/Group";
 import { color } from "../../resource";
 import ModalEditRaiAmount from "./ModalEditRaiAmount";
 import ModalHistory from "./ModalHistory";
+import { validateOnlyNumWDecimal } from "../../utilities/TextFormatter";
 
 const { Option } = Select;
 
@@ -56,13 +57,8 @@ const ModalFarmerPlot: React.FC<ModalFarmerPlotProps> = ({
 }) => {
   const [form] = Form.useForm();
   const [farmerPlot, setFarmerPlot] = useState<FarmerPlotEntity>(data);
-  const [saveBtnDisable, setBtnSaveDisable] = useState<boolean>(
-    isEditModal ? false : true
-  );
   const [modalEdit, setModalEdit] = useState<boolean>(false);
   const [modalHistory, setModalHistory] = useState<boolean>(false);
-  const [comment, setComment] = useState(data.comment);
-  const [editRai, setEditRai] = useState<any>();
   const [mapPosition, setMapPosition] = useState<
     | {
         lat?: number;
@@ -171,20 +167,14 @@ const ModalFarmerPlot: React.FC<ModalFarmerPlotProps> = ({
       lng: parseFloat(value.target.value),
     }));
   };
-  const checkValue = (event: any) => {
-    setRai(handleDecimalsOnValue(event.target.value));
-    onFieldsChange();
-  };
-  const handleDecimalsOnValue = (value: any) => {
-    const regex = /([0-9]*[\.|\,]{0,1}[0-9]{0,2})/s;
-    return value.match(regex)[0];
-  };
 
-  const onChangePlantCharacter = (checkedValues: any[]) => {
-    setFarmerPlot({
-      ...farmerPlot,
-      plantCharacteristics: checkedValues,
-    });
+  const checkNumber = (
+    e: React.ChangeEvent<HTMLInputElement>,
+    name: string
+  ) => {
+    const { value: inputValue } = e.target;
+    const convertedNumber = validateOnlyNumWDecimal(inputValue);
+    form.setFieldsValue({ [name]: convertedNumber });
   };
 
   const handelCallBack = async (values: FarmerPlotEntity) => {
@@ -209,35 +199,21 @@ const ModalFarmerPlot: React.FC<ModalFarmerPlotProps> = ({
           location[3].long_name;
       });
 
-    const plotId = data.id;
-    const payload = {
-      ...farmerPlot,
-      ...values,
-      raiAmount: rai,
-      locationName,
-      plotId: editIndex,
-      id: plotId!,
-    };
+    let f = form.getFieldsValue();
+    let payload: any = {};
+    payload.id = data.id;
+    payload.plotName = f.plotName;
+    payload.plantName = f.plantName;
+    payload.raiAmount = f.raiAmount;
+    payload.plotAreaId = f.plotAreaId;
+    payload.mapUrl = f.mapUrl;
+    payload.lat = f.lat;
+    payload.long = f.long;
+    payload.landmark = f.landmark;
+    payload.status = f.status;
+    payload.comment = f.comment;
+    payload.reason = f.reason;
     callBack(payload);
-  };
-  const checkValidate = (data: FarmerPlotEntity) => {
-    let checkEmpty = ![
-      data.plantName,
-      data.plotName,
-      data.landmark,
-      data.raiAmount,
-    ].includes("");
-    let checkEmptyNumber = ![data.plotAreaId, data.lat, data.long].includes(0);
-
-    if (checkEmpty && checkEmptyNumber && rai) {
-      setBtnSaveDisable(false);
-    } else {
-      setBtnSaveDisable(true);
-    }
-  };
-  const onFieldsChange = () => {
-    const valuesForm = form.getFieldsValue();
-    checkValidate(valuesForm);
   };
 
   return (
@@ -259,16 +235,11 @@ const ModalFarmerPlot: React.FC<ModalFarmerPlotProps> = ({
           <FooterPage
             onClickBack={backButton}
             onClickSave={() => form.submit()}
-            disableSaveBtn={saveBtnDisable}
+            //disableSaveBtn={saveBtnDisable}
           />,
         ]}
       >
-        <Form
-          key={data.plotId}
-          form={form}
-          onFinish={handelCallBack}
-          onFieldsChange={onFieldsChange}
-        >
+        <Form key={data.plotId} form={form} onFinish={handelCallBack}>
           <div className="form-group">
             <label>
               ชื่อแปลง <span style={{ color: "red" }}>*</span>
@@ -289,7 +260,15 @@ const ModalFarmerPlot: React.FC<ModalFarmerPlotProps> = ({
             <label>
               พืชที่ปลูก <span style={{ color: "red" }}>*</span>
             </label>
-            <Form.Item name="plantName">
+            <Form.Item
+              name="plantName"
+              rules={[
+                {
+                  required: true,
+                  message: "กรุณาเลือกพืชที่ปลูก!",
+                },
+              ]}
+            >
               <Select
                 allowClear
                 showSearch
@@ -302,9 +281,6 @@ const ModalFarmerPlot: React.FC<ModalFarmerPlotProps> = ({
                 }
                 filterOption={(input: any, option: any) =>
                   option.children.includes(input)
-                }
-                defaultValue={
-                  data.plantName !== undefined ? data.plantName : undefined
                 }
               >
                 {cropsName.map((item) => (
@@ -336,64 +312,80 @@ const ModalFarmerPlot: React.FC<ModalFarmerPlotProps> = ({
               </Checkbox.Group>
             </Form.Item>
           </div> */}
-          <div className="form-group col-lg">
-            <label>
-              จำนวนไร่ <span style={{ color: "red" }}>*</span>
-            </label>
-            <div className="row pb-4">
-              <div className="col-lg-5">
-                <Input
-                  defaultValue={data.raiAmount}
-                  disabled={!!data.raiAmount}
-                  name="raiAmount"
-                  type="number"
-                  placeholder="กรอกจำนวนไร่"
-                  autoComplete="off"
-                  suffix="ไร่"
-                  value={rai}
-                  onChange={(e) => checkValue(e)}
-                />
-              </div>
-              <div className="col-lg-3">
-                <Button
-                  onClick={() => showEdit(data)}
-                  type="dashed"
-                  className="col-lg "
-                  style={{
-                    color: color.Success,
-                    borderBottomLeftRadius: 5,
-                    borderBottomRightRadius: 5,
-                    borderTopLeftRadius: 5,
-                    borderTopRightRadius: 5,
-                    borderColor: color.Success,
-                    background: color.bgSuccess,
-                  }}
-                >
-                  แก้ไขจำนวน
-                </Button>
-              </div>
-              <Button
-                onClick={() => showHistory(data)}
-                type="dashed"
-                className="col-lg-3"
-                style={{
-                  color: color.Success,
-                  borderBottomLeftRadius: 5,
-                  borderBottomRightRadius: 5,
-                  borderTopLeftRadius: 5,
-                  borderTopRightRadius: 5,
-                  borderColor: color.Success,
-                  background: color.bgSuccess,
-                }}
+          <Row justify={"space-between"} gutter={8}>
+            <Col span={isEditModal ? 12 : 24}>
+              <label>
+                จำนวนไร่ <span style={{ color: "red" }}>*</span>
+              </label>
+              <Form.Item
+                name="raiAmount"
+                rules={[
+                  {
+                    required: true,
+                    message: "กรุณากรอกจำนวนไร่!",
+                  },
+                ]}
               >
-                ประวัติการแก้ไข
-              </Button>
-            </div>
-          </div>
+                <Input
+                  placeholder="กรอกจำนวนไร่"
+                  onChange={(e) => checkNumber(e, "raiAmount")}
+                  disabled={isEditModal}
+                />
+              </Form.Item>
+            </Col>
+            {isEditModal && (
+              <>
+                <Col style={{ paddingTop: "22px" }}>
+                  <Button
+                    onClick={() => showEdit(data)}
+                    type="dashed"
+                    style={{
+                      color: color.Success,
+                      borderBottomLeftRadius: 5,
+                      borderBottomRightRadius: 5,
+                      borderTopLeftRadius: 5,
+                      borderTopRightRadius: 5,
+                      borderColor: color.Success,
+                      background: color.bgSuccess,
+                      width: "100%",
+                    }}
+                  >
+                    แก้ไขจำนวน
+                  </Button>
+                </Col>
+                <Col style={{ paddingTop: "22px" }}>
+                  <Button
+                    onClick={() => showHistory(data)}
+                    type="dashed"
+                    style={{
+                      color: color.Success,
+                      borderBottomLeftRadius: 5,
+                      borderBottomRightRadius: 5,
+                      borderTopLeftRadius: 5,
+                      borderTopRightRadius: 5,
+                      borderColor: color.Success,
+                      background: color.bgSuccess,
+                      width: "100%",
+                    }}
+                  >
+                    ประวัติการแก้ไข
+                  </Button>
+                </Col>
+              </>
+            )}
+          </Row>
           <div className="form-group">
             <label>พื้นที่แปลงเกษตร</label>
             <span style={{ color: "red" }}>*</span>
-            <Form.Item name="plotAreaId">
+            <Form.Item
+              name="plotAreaId"
+              rules={[
+                {
+                  required: true,
+                  message: "กรุณาเลือกพื้นที่แแปลงเกษตร!",
+                },
+              ]}
+            >
               <Select
                 allowClear
                 showSearch
@@ -408,7 +400,6 @@ const ModalFarmerPlot: React.FC<ModalFarmerPlotProps> = ({
                 filterOption={(input: any, option: any) =>
                   option.children.includes(input)
                 }
-                defaultValue={data.plotAreaId === 0 ? null : data.plotAreaId}
               >
                 {location.map((item) => (
                   <Option value={item.subdistrictId}>
@@ -492,7 +483,15 @@ const ModalFarmerPlot: React.FC<ModalFarmerPlotProps> = ({
               จุดสังเกตใกล้แปลง (เช่น รร.บ้านน้อย){" "}
               <span style={{ color: "red" }}>*</span>
             </label>
-            <Form.Item name="landmark">
+            <Form.Item
+              name="landmark"
+              rules={[
+                {
+                  required: true,
+                  message: "กรุณากรอกจุดสังเกต",
+                },
+              ]}
+            >
               <Input
                 placeholder="กรอกจุดสังเกต"
                 defaultValue={farmerPlot.landmark}
@@ -590,34 +589,37 @@ const ModalFarmerPlot: React.FC<ModalFarmerPlotProps> = ({
           </div>
         </Form>
       </Modal>
-      <ModalEditRaiAmount
-        show={modalEdit}
-        backButton={() => setModalEdit((prev) => !prev)}
-        callBackReturn={() => {
-          setModalEdit((prev) => !prev);
-          callBackModal(show);
-        }}
-        data={editFarmerPlot}
-        callBackEditRai={(data) => {
-          setModalEdit((prev) => !prev);
-          callBackModal(show, parseInt(data.responseData.raiAfter));
-          form.setFieldValue(
-            "raiAmount",
-            parseFloat(data.responseData.raiAfter).toFixed(2)
-          );
-          setRai(parseFloat(data.responseData.raiAfter).toFixed(2));
-        }}
-      />
-
-      <ModalHistory
-        show={modalHistory}
-        data={editFarmerPlot}
-        backButton={() => setModalHistory((prev) => !prev)}
-        callBackReturn={() => {
-          setModalHistory((prev) => !prev);
-          callBackModal(show);
-        }}
-      />
+      {modalEdit && (
+        <ModalEditRaiAmount
+          show={modalEdit}
+          backButton={() => setModalEdit((prev) => !prev)}
+          callBackReturn={() => {
+            setModalEdit((prev) => !prev);
+            callBackModal(show);
+          }}
+          data={editFarmerPlot}
+          callBackEditRai={(data) => {
+            setModalEdit((prev) => !prev);
+            callBackModal(show, parseInt(data.responseData.raiAfter));
+            form.setFieldValue(
+              "raiAmount",
+              parseFloat(data.responseData.raiAfter).toFixed(2)
+            );
+            setRai(parseFloat(data.responseData.raiAfter).toFixed(2));
+          }}
+        />
+      )}
+      {modalHistory && (
+        <ModalHistory
+          show={modalHistory}
+          data={editFarmerPlot}
+          backButton={() => setModalHistory((prev) => !prev)}
+          callBackReturn={() => {
+            setModalHistory((prev) => !prev);
+            callBackModal(show);
+          }}
+        />
+      )}
     </>
   );
 };
