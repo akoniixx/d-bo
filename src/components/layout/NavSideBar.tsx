@@ -30,7 +30,7 @@ const NavSidebar: React.FC<any> = ({ children }) => {
     "Khanittha.w",
     "oatchara.s@iconkaset",
     "nathapon.h@iconkaset.com",
-    "sawatdee.k"
+    "sawatdee.k",
   ];
   const checkBoolean = listAcc.find((x) => x === persistedProfile.username)
     ? true
