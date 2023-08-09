@@ -178,7 +178,7 @@ const IndexAdminTask = () => {
   );
   const cardCurrentTask = (
     <Col span={12}>
-      <Card style={{ backgroundColor: "#F2F5FC", height: '160px' }}>
+      <Card style={{ backgroundColor: "#F2F5FC", height: "140px" }}>
         <Row
           justify={"center"}
           gutter={8}
@@ -233,7 +233,7 @@ const IndexAdminTask = () => {
           </Col>
         </Row>
       </Card>
-      <Card style={{ height: '45%' }}>
+      <Card style={{ height: "45%" }}>
         <Row
           justify={"space-between"}
           gutter={8}
@@ -484,7 +484,9 @@ const IndexAdminTask = () => {
   );
   const cardEditTask = (
     <Col span={12}>
-      <Card style={{ backgroundColor: "rgba(33, 150, 83, 0.1)", height: '160px' }}>
+      <Card
+        style={{ backgroundColor: "rgba(33, 150, 83, 0.1)", height: "140px" }}
+      >
         <Row
           justify={"center"}
           gutter={8}
@@ -548,7 +550,7 @@ const IndexAdminTask = () => {
           </Col>
         </Row>
       </Card>
-      <Card style={{height: '45%'}}>
+      <Card style={{ height: "45%" }}>
         <Row
           justify={"space-between"}
           gutter={8}
@@ -889,7 +891,7 @@ const IndexAdminTask = () => {
       key: "action",
       render: (value: any, row: any, index: number) => {
         return {
-          children: <span>{HISTORY_TASK[value.replace(" ", "")]}</span>,
+          children: <span>{HISTORY_TASK[value?.replaceAll(" ", "")]}</span>,
         };
       },
     },
@@ -901,9 +903,9 @@ const IndexAdminTask = () => {
         return {
           children: (
             <span>
-              {row.action.replace(" ", "") === "ChangeStatus"
+              {row.action.replaceAll(" ", "") === "ChangeStatus"
                 ? ALL_TASK_MAPPING[value]
-                : value}
+                : DateTimeUtil.formatDate(value.toISOString) || value}
               {row.action === "แก้ไขจำนวนแปลง" && " ไร่"}
             </span>
           ),
@@ -918,9 +920,9 @@ const IndexAdminTask = () => {
         return {
           children: (
             <span>
-              {row.action.replace(" ", "") === "ChangeStatus"
+              {row.action.replaceAll(" ", "") === "ChangeStatus"
                 ? ALL_TASK_MAPPING[value]
-                : value}
+                : DateTimeUtil.formatDate(value.toISOString) || value}
               {row.action === "แก้ไขจำนวนแปลง" && " ไร่"}
             </span>
           ),
@@ -931,7 +933,7 @@ const IndexAdminTask = () => {
       title: "หมายเหตุ",
       dataIndex: "remark",
       key: "remark",
-      width: "30%",
+      width: "25%",
       render: (value: any, row: any, index: number) => {
         return {
           children: <span>{value}</span>,
