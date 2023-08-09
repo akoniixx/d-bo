@@ -1,5 +1,12 @@
 ## [Version - 0]
 
+## Fix [v0.36.2] 2023-08-09
+
+- fixed modal farmer plot
+- hide code plant character
+- remove filter list dropdown droner app
+- validate color row in table
+
 ## Fix [v0.36.1] 2023-08-09
 
 - fixed mapping status history task

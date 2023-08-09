@@ -120,7 +120,7 @@ const ModalEditRaiAmount: React.FC<ModalEditRaiAmountProps> = ({
     const convertedNumber = validateOnlyNumber(inputValue);
     form.setFieldsValue({ [name]: convertedNumber });
   };
-  const handelCallBack = () => {
+  const handleCallBack = () => {
     const { reason } = form.getFieldsValue();
     const farmerId = data.farmerId;
     const farmerPlotId = data.id;
@@ -165,7 +165,7 @@ const ModalEditRaiAmount: React.FC<ModalEditRaiAmountProps> = ({
         <Form
           key={data.plotId}
           form={form}
-          onFinish={handelCallBack}
+          onFinish={handleCallBack}
           onFieldsChange={onFieldsChange}
         >
           <div className="form-group">
