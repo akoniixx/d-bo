@@ -946,7 +946,6 @@ const AddFarmer = () => {
         onClickSave={insertFarmer}
         disableSaveBtn={saveBtnDisable}
       />
-      {showAddModal && (
         <ModalFarmerPlot
           show={showAddModal}
           backButton={() => setShowAddModal((prev) => !prev)}
@@ -954,9 +953,10 @@ const AddFarmer = () => {
           data={FarmerPlotEntity_INIT}
           editIndex={editIndex}
           title="เพิ่มแปลงเกษตร"
+          callBackModal={(val)=> setShowAddModal(!val)}
+
         />
-      )}
-      {showEditModal && (
+    
         <ModalFarmerPlot
           isEditModal
           show={showEditModal}
@@ -965,8 +965,9 @@ const AddFarmer = () => {
           data={editFarmerPlot}
           editIndex={editIndex}
           title="แก้ไขแปลงเกษตร"
+          callBackModal={(val)=> setShowEditModal(!val)}
+
         />
-      )}
     </>
   );
 };

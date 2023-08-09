@@ -1,9 +1,11 @@
 import { BASE_URL, httpClient } from "../config/config";
 import { FarmerEntity, FarmerPageEntity } from "../entities/FarmerEntities";
 import {
+  AllTaskListEntity,
   CreateNewTaskEntity,
   GetNewTaskEntity,
   NewTaskPageEntity,
+  TaskManageEntity,
   UpdateNewTask,
   UpdateTaskStatus,
 } from "../entities/NewTaskEntities";
@@ -49,7 +51,11 @@ export class TaskDatasource {
         console.log(err, "err getAdmin");
       });
   }
-  static getFarmerListTask(text?: string, page?: number, take?: number): Promise<FarmerPageEntity> {
+  static getFarmerListTask(
+    text?: string,
+    page?: number,
+    take?: number
+  ): Promise<FarmerPageEntity> {
     return httpClient
       .get(BASE_URL + `/tasks/farmer?search=${text}&page=${page}&take=${take}`)
       .then((response) => {
@@ -160,6 +166,81 @@ export class TaskDatasource {
       })
       .catch((error) => {
         console.log(error);
+      });
+  }
+  static getAllTaskList(
+    take: number,
+    page: number,
+    search?: string
+  ): Promise<AllTaskListEntity> {
+    const params = {
+      take: take,
+      page: page,
+      searchText: search,
+    };
+    return httpClient
+      .get(BASE_URL + "/tasks/task-manage-area", { params })
+      .then((response) => {
+        return response.data;
+      })
+      .catch((err) => {
+        console.log(err, "err getnewtask");
+      });
+  }
+  static getManageTaskByTaskId(taskId: string): Promise<TaskManageEntity> {
+    return httpClient
+      .get(BASE_URL + `/tasks/task-manage-area/${taskId}`)
+      .then((response) => {
+        return response.data;
+      })
+      .catch((err) => {
+        console.log(err, "err getnewtask");
+      });
+  }
+  static calculateManageTask(
+    taskId: string,
+    area?: number,
+    unitPrice?: number,
+    remark?: string,
+    updateBy?: string
+  ): Promise<any> {
+    const param = {
+      taskId: taskId,
+      area: area,
+      unitPrice: unitPrice,
+      remark: remark,
+      updateBy: updateBy,
+    };
+    return httpClient
+      .post(BASE_URL + `/tasks/task-manage-area/calculate-change-area`, param)
+      .then((response) => {
+        return response.data;
+      })
+      .catch((err) => {
+        console.log(err, "err getnewtask");
+      });
+  }
+  static insertManageTask(
+    taskId: string,
+    area?: number,
+    unitPrice?: number,
+    remark?: string,
+    updateBy?: string
+  ): Promise<any> {
+    const param = {
+      taskId: taskId,
+      area: area,
+      unitPrice: unitPrice,
+      remark: remark,
+      updateBy: updateBy,
+    };
+    return httpClient
+      .post(BASE_URL + `/tasks/task-manage-area/save-change-area`, param)
+      .then((response) => {
+        return response.data;
+      })
+      .catch((err) => {
+        console.log(err, "err getnewtask");
       });
   }
 }

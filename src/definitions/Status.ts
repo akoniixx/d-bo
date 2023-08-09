@@ -15,7 +15,7 @@ export const STATUS_FARMERPLOT_COLOR_MAPPING: any = {
 };
 
 export const STATUS_FARMER_MAPPING: any = {
-  PENDING: "รอยืนยันตัวตน",
+  PENDING: "รอตรวจสอบ",
   ACTIVE: "ใช้งาน",
   INACTIVE: "ปิดการใช้งาน",
   REJECTED: "ไม่อนุมัติ",
@@ -25,7 +25,7 @@ export const STATUS_FARMER_MAPPING: any = {
 export const STATUS_COLOR_MAPPING: any = {
   PENDING: "#EA973E",
   ACTIVE: color.Success,
-  REJECTED: color.Error,
+  REJECTED: color.Grey,
   INACTIVE: color.Error,
   OPEN: color.Grey,
   DRAFTING: color.Grey,
@@ -169,7 +169,7 @@ export const COLOR_QUOTA_REDEEM: any = {
   CANCEL: color.Error,
 };
 export const COLOR_QUOTA_REDEEM_DIG: any = {
-  REQUEST: color.secondary1,  
+  REQUEST: color.secondary1,
   CANCEL: color.Error,
   USED: color.Success,
   EXPIRED: color.Grey,
@@ -185,4 +185,34 @@ export const STATUS_QUOTA_REDEEM_DIG: any = {
   CANCEL: "ยกเลิก",
   USED: "ใช้แล้ว",
   EXPIRED: "หมดอายุ",
+};
+export const ALL_TASK_COLOR_MAPPING: any = {
+  WAIT_RECEIVE: color.Warning,
+  REJECTED: color.Error,
+  CANCELED: color.Error,
+  RECEIVED: color.Success,
+  WAIT_START: "#FFCA37",
+  IN_PROGRESS: color.Success,
+  WAIT_REVIEW: color.blue,
+  DONE: color.Success,
+};
+export const ALL_TASK_MAPPING: any = {
+  WAIT_RECEIVE: "รอนักบินโดรนรับงาน",
+  REJECTED: "ไม่มีนักบินโดรนรับงาน",
+  CANCELED: "ยกเลิก",
+  RECEIVED: "นักบินโดรนรับงานแล้ว",
+  WAIT_START: "รอดำเนินงาน",
+  IN_PROGRESS: "กำลังดำเนินงาน",
+  WAIT_REVIEW: "รอรีวิว",
+  DONE: "งานเสร็จสิ้น",
+};
+export const HISTORY_TASK: any = {
+  FinishTask: "งานเสร็จสิ้น",
+  ChangeDroner: "มีการเปลี่ยนนักบินโดรน",
+  TaskProblem: "งานมีปัญหา",
+  ChangeStatus: "แก้ไข/เปลี่ยนสถานะ",
+  RequestExtend: "ขอขยายเวลางาน",
+  ChangeDateAppointment: "แก้ไข/เปลี่ยนวันที่นัดหมาย",
+  ChangeRai: "แก้ไข/เปลี่ยนจำนวนแปลง",
+  แก้ไขจำนวนแปลง: "แก้ไขจำนวนแปลง",
 };

@@ -1,10 +1,42 @@
 ## [Version - 0]
 
+## Fix [v0.36.4] 2023-08-09
+
+- fixed mapping status history task
+- fixed can fill decimal
+- setting permission admin task
+
+## Fix [v0.36.3] 2023-08-09
+
+- fixed number decimal
+
+## Fix [v0.36.2] 2023-08-09
+
+- fixed modal farmer plot
+- hide code plant character
+- remove filter list dropdown droner app
+- validate color row in table
+
+## Fix [v0.36.1] 2023-08-09
+
+- fixed mapping status history task
+
+## Feature [v0.36.0] 2023-08-08
+
+- add task for admin menu
+
+## Feature [v0.35.0] 2023-08-08
+
+- manage plot menu
+
+## improve [v0.34.30] 2023-08-07
+
+- improve index farmer page
+
 ## Fix [v0.34.29] 2023-08-11
 
 - fixed search farmer for add or edit new task
 - fixed search droner gold quota
-
 
 ## Fix [v0.34.28] 2023-07-26
 

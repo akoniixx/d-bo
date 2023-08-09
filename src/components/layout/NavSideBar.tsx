@@ -26,10 +26,22 @@ const NavSidebar: React.FC<any> = ({ children }) => {
     "arisa.m@iconkaset",
     "nathapon",
   ];
+  const listAdminTask = [
+    "Khanittha.w",
+    "oatchara.s@iconkaset",
+    "nathapon.h@iconkaset.com",
+    "sawatdee.k"
+  ];
   const checkBoolean = listAcc.find((x) => x === persistedProfile.username)
     ? true
     : false;
+  const checkAdminTask = listAdminTask.find(
+    (x) => x === persistedProfile.username
+  )
+    ? true
+    : false;
   const isAccount = checkBoolean;
+  const isAdminTask = checkAdminTask;
   const navigate = useNavigate();
 
   return (
@@ -94,7 +106,7 @@ const NavSidebar: React.FC<any> = ({ children }) => {
             cursor: "pointer",
           }}
         >
-          <MenuSide lists={pathLists({ isAccounting: isAccount })} />
+          <MenuSide lists={pathLists(isAccount, isAdminTask)} />
         </Sider>
       </Layout>
     </Layout>
