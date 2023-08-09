@@ -804,7 +804,7 @@ function IndexFarmer() {
                     preview={false}
                     style={{ width: 24, height: 24 }}
                   />
-                  <span> แอดมิน ไอคอนเกษตร (Admin)</span>
+                  <span> {row.createBy ? row.createBy + ` (Admin)` : "-"}</span>
                 </>
               )}
               {row.applicationType === "FARMER" && (
@@ -816,20 +816,6 @@ function IndexFarmer() {
                   />
                   <span> {row.firstname + " " + row.lastname}</span>
                 </>
-              )}
-              {row.applicationType === "DRONER" && (
-                <Image
-                  src={icon.dronerApp}
-                  preview={false}
-                  style={{ width: 24, height: 24 }}
-                />
-              )}
-              {row.applicationType === "LINE" && (
-                <Image
-                  src={icon.lineApp}
-                  preview={false}
-                  style={{ width: 24, height: 24 }}
-                />
               )}
             </>
           ),
@@ -973,6 +959,7 @@ function IndexFarmer() {
               scroll={{ x: "max-content" }}
               rowClassName={(a) =>
                 a.status === "PENDING" &&
+                a.dateWaitPending != null &&
                 moment(Date.now()).diff(
                   moment(new Date(a.dateWaitPending)),
                   "day"

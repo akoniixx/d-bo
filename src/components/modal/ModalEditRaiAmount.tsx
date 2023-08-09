@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { Form, Input, Modal, Tag } from "antd";
 import FooterPage from "../footer/FooterPage";
 
@@ -7,8 +7,6 @@ import { color } from "../../resource";
 import bth_img_empty from "../../resource/media/empties/upload_Img_btn.png";
 import {
   FarmerPlotEntity,
-  HistoryEditRaiEntity,
-  HistoryFarmerPlotEntity,
 } from "../../entities/FarmerPlotEntities";
 import { resizeFileImg } from "../../utilities/ResizeImage";
 import {
@@ -16,7 +14,6 @@ import {
   UploadImageEntity_INTI,
 } from "../../entities/UploadImageEntities";
 import { FarmerPlotDatasource } from "../../datasource/FarmerPlotDatasource";
-import { useNavigate } from "react-router-dom";
 import { validateOnlyNumber } from "../../utilities/TextFormatter";
 
 interface ModalEditRaiAmountProps {
@@ -27,7 +24,6 @@ interface ModalEditRaiAmountProps {
   callBackEditRai: (data?: any) => void;
   callBackReturn: (data: boolean) => void;
 }
-const _ = require("lodash");
 const { Map } = require("immutable");
 const ModalEditRaiAmount: React.FC<ModalEditRaiAmountProps> = ({
   show,
@@ -136,7 +132,7 @@ const ModalEditRaiAmount: React.FC<ModalEditRaiAmountProps> = ({
       file: createImgPlot.file,
       raiBefore: raiBefore!,
       raiAfter: rai,
-      reason: reason != undefined ? reason : "",
+      reason: reason !== undefined ? reason : "",
     }).then((res) => {
       callBackEditRai(res);
     });
@@ -211,12 +207,12 @@ const ModalEditRaiAmount: React.FC<ModalEditRaiAmountProps> = ({
                   className="hiddenFileInput"
                   style={{
                     backgroundImage: `url(${imgPlot})`,
-                    display: imgPlot != undefined ? "block" : "none",
+                    display: imgPlot !== undefined ? "block" : "none",
                   }}
                 />
               </div>
               <div className="text-left ps-4">
-                {imgPlot != undefined && (
+                {imgPlot !== undefined && (
                   <>
                     <Tag
                       color={color.Success}
@@ -245,7 +241,7 @@ const ModalEditRaiAmount: React.FC<ModalEditRaiAmountProps> = ({
                 className="hiddenFileBtn"
                 style={{
                   backgroundImage: `url(${bth_img_empty})`,
-                  display: imgPlot == undefined ? "block" : "none",
+                  display: imgPlot === undefined ? "block" : "none",
                 }}
               >
                 <input

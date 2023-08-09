@@ -304,7 +304,7 @@ const ModalFarmerPlot: React.FC<ModalFarmerPlotProps> = ({
               </Select>
             </Form.Item>
           </div>
-          <div className="form-group">
+          {/* <div className="form-group">
             <label>
               ลักษณะเฉพาะของพืช (เลือกอย่างน้อย 1 อย่าง){" "}
               <span style={{ color: "red" }}>*</span>
@@ -324,7 +324,7 @@ const ModalFarmerPlot: React.FC<ModalFarmerPlotProps> = ({
                 </Row>
               </Checkbox.Group>
             </Form.Item>
-          </div>
+          </div> */}
           <div className="form-group col-lg">
             <label>
               จำนวนไร่ <span style={{ color: "red" }}>*</span>
@@ -603,6 +603,10 @@ const ModalFarmerPlot: React.FC<ModalFarmerPlotProps> = ({
         show={modalHistory}
         data={editFarmerPlot}
         backButton={() => setModalHistory((prev) => !prev)}
+        callBackReturn={() => {
+          setModalHistory((prev) => !prev);
+          callBackModal(show);
+        }}
       />
     </>
   );
