@@ -35,7 +35,7 @@ import {
 import {
   numberWithCommas,
   numberWithCommasToFixed,
-  validateOnlyNumber,
+  validateOnlyNumWDecimal,
 } from "../../../utilities/TextFormatter";
 
 const NewTable = styled(Table)`
@@ -134,7 +134,7 @@ const IndexAdminTask = () => {
     name: string
   ) => {
     const { value: inputValue } = e.target;
-    const convertedNumber = validateOnlyNumber(inputValue);
+    const convertedNumber = validateOnlyNumWDecimal(inputValue);
     form.setFieldsValue({ [name]: convertedNumber });
   };
   const checkRai = () => {
@@ -900,13 +900,16 @@ const IndexAdminTask = () => {
       dataIndex: "beforeValue",
       key: "beforeValue",
       render: (value: any, row: any, index: number) => {
+        const action = row.action.replaceAll(" ", "");
         return {
           children: (
             <span>
-              {row.action.replaceAll(" ", "") === "ChangeStatus"
+              {action === "ChangeStatus" || action === "FinishTask"
                 ? ALL_TASK_MAPPING[value]
-                : DateTimeUtil.formatDate(value.toISOString) || value}
-              {row.action === "แก้ไขจำนวนแปลง" && " ไร่"}
+                : action === "ChangeDateAppointment"
+                ? DateTimeUtil.formatDateTime(value)
+                : value}
+              {action === "แก้ไขจำนวนแปลง" && " ไร่"}
             </span>
           ),
         };
@@ -917,13 +920,16 @@ const IndexAdminTask = () => {
       dataIndex: "afterValue",
       key: "afterValue",
       render: (value: any, row: any, index: number) => {
+        const action = row.action.replaceAll(" ", "");
         return {
           children: (
             <span>
-              {row.action.replaceAll(" ", "") === "ChangeStatus"
+              {action === "ChangeStatus" || action === "FinishTask"
                 ? ALL_TASK_MAPPING[value]
-                : DateTimeUtil.formatDate(value.toISOString) || value}
-              {row.action === "แก้ไขจำนวนแปลง" && " ไร่"}
+                : action === "ChangeDateAppointment"
+                ? DateTimeUtil.formatDateTime(value)
+                : value}
+              {action === "แก้ไขจำนวนแปลง" && " ไร่"}
             </span>
           ),
         };
