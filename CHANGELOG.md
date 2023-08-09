@@ -1,5 +1,9 @@
 ## [Version - 0]
 
+## Fix [v0.36.6] 2023-08-09
+
+- fixed validate form farmer plot
+
 ## Fix [v0.36.5] 2023-08-09
 
 - fixed setting permission admin task
