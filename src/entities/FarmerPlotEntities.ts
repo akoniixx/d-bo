@@ -22,6 +22,7 @@ export interface FarmerPlotEntity {
   comment?: string;
   status: string;
   plantCharacteristics: string[];
+  reason?: string;
 }
 export const FarmerPlotEntity_INIT: FarmerPlotEntity = {
   id: "",
