@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Form, Input, Modal, Tag } from "antd";
 import FooterPage from "../footer/FooterPage";
 
@@ -7,6 +7,8 @@ import { color } from "../../resource";
 import bth_img_empty from "../../resource/media/empties/upload_Img_btn.png";
 import {
   FarmerPlotEntity,
+  HistoryEditRaiEntity,
+  HistoryFarmerPlotEntity,
 } from "../../entities/FarmerPlotEntities";
 import { resizeFileImg } from "../../utilities/ResizeImage";
 import {
@@ -14,6 +16,7 @@ import {
   UploadImageEntity_INTI,
 } from "../../entities/UploadImageEntities";
 import { FarmerPlotDatasource } from "../../datasource/FarmerPlotDatasource";
+import { useNavigate } from "react-router-dom";
 import { validateOnlyNumber } from "../../utilities/TextFormatter";
 
 interface ModalEditRaiAmountProps {
@@ -24,6 +27,7 @@ interface ModalEditRaiAmountProps {
   callBackEditRai: (data?: any) => void;
   callBackReturn: (data: boolean) => void;
 }
+const _ = require("lodash");
 const { Map } = require("immutable");
 const ModalEditRaiAmount: React.FC<ModalEditRaiAmountProps> = ({
   show,
@@ -98,8 +102,9 @@ const ModalEditRaiAmount: React.FC<ModalEditRaiAmountProps> = ({
     const { file } = form.getFieldsValue();
     let fieldInfo = false;
     let fieldimg = false;
+    console.log(rai);
 
-    if (rai) {
+    if (rai.length > 1) {
       fieldInfo = false;
     } else {
       fieldInfo = true;
@@ -112,15 +117,7 @@ const ModalEditRaiAmount: React.FC<ModalEditRaiAmountProps> = ({
     }
     setBtnSaveDisable(fieldInfo || fieldimg);
   };
-  const checkNumber = (
-    e: React.ChangeEvent<HTMLInputElement>,
-    name: string
-  ) => {
-    const { value: inputValue } = e.target;
-    const convertedNumber = validateOnlyNumber(inputValue);
-    form.setFieldsValue({ [name]: convertedNumber });
-  };
-  const handleCallBack = () => {
+  const handelCallBack = () => {
     const { reason } = form.getFieldsValue();
     const farmerId = data.farmerId;
     const farmerPlotId = data.id;
@@ -138,6 +135,14 @@ const ModalEditRaiAmount: React.FC<ModalEditRaiAmountProps> = ({
     });
   };
 
+  const checkValue = (event: any) => {
+    setRai(handleDecimalsOnValue(event.target.value));
+    onFieldsChange();
+  };
+  const handleDecimalsOnValue = (value: any) => {
+    const regex = /([0-9]*[\.|\,]{0,1}[0-9]{0,2})/s;
+    return value.match(regex)[0];
+  };
   return (
     <>
       <Modal
@@ -165,37 +170,22 @@ const ModalEditRaiAmount: React.FC<ModalEditRaiAmountProps> = ({
         <Form
           key={data.plotId}
           form={form}
-          onFinish={handleCallBack}
+          onFinish={handelCallBack}
           onFieldsChange={onFieldsChange}
         >
-          <div className="form-group">
+          <div className="form-group pb-4">
             <label>
               จำนวนไร่ <span style={{ color: "red" }}>*</span>
             </label>
-            <Form.Item
+            <Input
               name="raiAmount"
-              rules={[
-                {
-                  required: true,
-                  message: "กรุณากรอกจำนวนไร่!",
-                },
-                {
-                  pattern: new RegExp(/^[0-9\b]+$/),
-                  message: "กรุณากรอกเบอร์โทรให้ถูกต้อง!",
-                },
-              ]}
-            >
-              <Input
-                type="number"
-                placeholder="กรอกจำนวนไร่"
-                autoComplete="off"
-                suffix="ไร่"
-                onChange={(e) => {
-                  checkNumber(e, "rai");
-                  setRai(e.target.value);
-                }}
-              />
-            </Form.Item>
+              type="number"
+              placeholder="กรอกจำนวนไร่"
+              autoComplete="off"
+              suffix="ไร่"
+              value={rai}
+              onChange={(e) => checkValue(e)}
+            />
           </div>
           <div className="form-group col-lg-12 pb-5">
             <label>

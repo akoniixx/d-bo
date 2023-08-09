@@ -1,5 +1,9 @@
 ## [Version - 0]
 
+## Fix [v0.36.3] 2023-08-09
+
+- fixed number decimal
+
 ## Fix [v0.36.2] 2023-08-09
 
 - fixed modal farmer plot

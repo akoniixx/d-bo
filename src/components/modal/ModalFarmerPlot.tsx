@@ -83,6 +83,7 @@ const ModalFarmerPlot: React.FC<ModalFarmerPlotProps> = ({
   const [editFarmerPlot, setEditFarmerPlot] = useState<FarmerPlotEntity>(
     FarmerPlotEntity_INIT
   );
+  const [rai, setRai] = useState<any>();
 
   const fetchLocation = async (text?: string) => {
     await LocationDatasource.getSubdistrict(0, text).then((res) => {
@@ -170,6 +171,14 @@ const ModalFarmerPlot: React.FC<ModalFarmerPlotProps> = ({
       lng: parseFloat(value.target.value),
     }));
   };
+  const checkValue = (event: any) => {
+    setRai(handleDecimalsOnValue(event.target.value));
+    onFieldsChange();
+  };
+  const handleDecimalsOnValue = (value: any) => {
+    const regex = /([0-9]*[\.|\,]{0,1}[0-9]{0,2})/s;
+    return value.match(regex)[0];
+  };
 
   const onChangePlantCharacter = (checkedValues: any[]) => {
     setFarmerPlot({
@@ -204,6 +213,7 @@ const ModalFarmerPlot: React.FC<ModalFarmerPlotProps> = ({
     const payload = {
       ...farmerPlot,
       ...values,
+      raiAmount: rai,
       locationName,
       plotId: editIndex,
       id: plotId!,
@@ -218,7 +228,8 @@ const ModalFarmerPlot: React.FC<ModalFarmerPlotProps> = ({
       data.raiAmount,
     ].includes("");
     let checkEmptyNumber = ![data.plotAreaId, data.lat, data.long].includes(0);
-    if (checkEmpty && checkEmptyNumber) {
+
+    if (checkEmpty && checkEmptyNumber && rai) {
       setBtnSaveDisable(false);
     } else {
       setBtnSaveDisable(true);
@@ -293,7 +304,7 @@ const ModalFarmerPlot: React.FC<ModalFarmerPlotProps> = ({
                   option.children.includes(input)
                 }
                 defaultValue={
-                  data.plantName != undefined ? data.plantName : undefined
+                  data.plantName !== undefined ? data.plantName : undefined
                 }
               >
                 {cropsName.map((item) => (
@@ -329,24 +340,19 @@ const ModalFarmerPlot: React.FC<ModalFarmerPlotProps> = ({
             <label>
               จำนวนไร่ <span style={{ color: "red" }}>*</span>
             </label>
-            <div className="row">
+            <div className="row pb-4">
               <div className="col-lg-5">
-                <Form.Item
+                <Input
+                  defaultValue={data.raiAmount}
+                  disabled={!!data.raiAmount}
                   name="raiAmount"
-                  rules={[
-                    {
-                      required: true,
-                      message: "กรุณากรอกจำนวนไร่!",
-                    },
-                  ]}
-                >
-                  <Input
-                    disabled={!!data.raiAmount}
-                    placeholder="กรอกจำนวนไร่"
-                    autoComplete="off"
-                    suffix="ไร่"
-                  />
-                </Form.Item>
+                  type="number"
+                  placeholder="กรอกจำนวนไร่"
+                  autoComplete="off"
+                  suffix="ไร่"
+                  value={rai}
+                  onChange={(e) => checkValue(e)}
+                />
               </div>
               <div className="col-lg-3">
                 <Button
@@ -595,7 +601,11 @@ const ModalFarmerPlot: React.FC<ModalFarmerPlotProps> = ({
         callBackEditRai={(data) => {
           setModalEdit((prev) => !prev);
           callBackModal(show, parseInt(data.responseData.raiAfter));
-          form.setFieldValue("raiAmount", parseInt(data.responseData.raiAfter));
+          form.setFieldValue(
+            "raiAmount",
+            parseFloat(data.responseData.raiAfter).toFixed(2)
+          );
+          setRai(parseFloat(data.responseData.raiAfter).toFixed(2));
         }}
       />
 
