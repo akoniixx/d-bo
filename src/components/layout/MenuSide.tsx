@@ -38,6 +38,7 @@ const ListStyled = styled.div<{ isFocus?: boolean }>`
 `;
 export const MenuSide: React.FC<MenuSideProps> = ({ lists, isOpenSidebar }) => {
   const navigate = useNavigate();
+
   const [checkPath, setCheckPath] = useState<string | undefined>();
   const [current, setCurrent] = useState({
     path: "",
