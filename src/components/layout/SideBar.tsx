@@ -260,21 +260,28 @@ export const pathLists = (isAccounting: boolean, isAdminTask?: boolean) => {
       ],
     },
   ];
-  isAdminTask &&
-    menu.map((x: any) => {
-      const find = menu.findIndex((y) => y.name === "task");
+
+  if (isAdminTask) {
+    return menu.map((x: any) => {
+      const find = menu.findIndex((y) => x.name === "task");
       if (find === 0) {
-        return [
-          x.subMenu.push({
-            path: "/IndexAdminTask",
-            name: "IndexAdminTask",
-            title: "การแก้ไข/ประวัติงาน",
-            subMenu: [],
-          }),
-        ];
+        const newMenu = menu[find];
+        return {
+          ...newMenu,
+          subMenu: [
+            ...newMenu.subMenu,
+            {
+              path: "/IndexAdminTask",
+              name: "IndexAdminTask",
+              title: "การแก้ไข/ประวัติงาน",
+              subMenu: [],
+            },
+          ],
+        };
       } else {
         return { ...x };
       }
     });
+  }
   return menu;
 };

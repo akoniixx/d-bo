@@ -1,5 +1,9 @@
 ## [Version - 0]
 
+## Fix [v0.36.5] 2023-08-09
+
+- fixed setting permission admin task
+
 ## Fix [v0.36.4] 2023-08-09
 
 - fixed mapping status history task
