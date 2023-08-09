@@ -1,5 +1,9 @@
 ## [Version - 0]
 
+## Fix [v0.36.1] 2023-08-09
+
+- fixed mapping status history task
+
 ## Feature [v0.36.0] 2023-08-08
 
 - add task for admin menu

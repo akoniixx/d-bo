@@ -34,6 +34,10 @@ export class DateTimeUtil {
     return moment(date).format("DD/MM/yyyy HH:mm");
   };
 
+  static formatDate = (date: string) => {
+    return moment(date).format("DD/MM/yyyy");
+  };
+
   static calculateDay = (date: string) => {
     let now = new Date().getTime();
     let expired = new Date(date).getTime();
