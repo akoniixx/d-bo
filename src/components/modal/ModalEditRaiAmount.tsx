@@ -102,9 +102,8 @@ const ModalEditRaiAmount: React.FC<ModalEditRaiAmountProps> = ({
     const { file } = form.getFieldsValue();
     let fieldInfo = false;
     let fieldimg = false;
-    console.log(rai);
 
-    if (rai.length > 1) {
+    if (rai?.length > 1 || (rai && rai.length > 1)) {
       fieldInfo = false;
     } else {
       fieldInfo = true;
