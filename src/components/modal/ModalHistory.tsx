@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { Form, Input, Modal, Pagination, Table, Tag } from "antd";
+import { Modal, Pagination, Table } from "antd";
 import { color } from "../../resource";
-import bth_img_empty from "../../resource/media/empties/upload_Img_btn.png";
 import { numberWithCommas } from "../../utilities/TextFormatter";
 import {
   AllHistoryFarmerPlotEntity,
@@ -9,22 +8,42 @@ import {
 } from "../../entities/FarmerPlotEntities";
 import { FarmerPlotDatasource } from "../../datasource/FarmerPlotDatasource";
 import moment from "moment";
+import { LeftOutlined } from "@ant-design/icons";
+import styled from "styled-components";
+
+const NewTableStyle = styled(Table)`
+  .ant-table-container table thead tr th {
+    background-color: rgba(232, 236, 243, 1) !important;
+    font-weight: 500 !important;
+    color: #2b2b2b !important;
+    font-weight: bold !important;
+  }
+`;
+
+const ModalNewStyle = styled(Modal)`
+  .ant-modal-body {
+    padding: 0px;
+    font-size: 14px;
+    line-height: 1.5715;
+    word-wrap: break-word;
+  }
+`;
 interface ModalHistoryProps {
   show: boolean;
   backButton: () => void;
   data: FarmerPlotEntity;
+  callBackReturn: (data: boolean) => void;
 }
 const ModalHistory: React.FC<ModalHistoryProps> = ({
   show,
   backButton,
   data,
+  callBackReturn,
 }) => {
-  const [form] = Form.useForm();
   const [historyPlot, setHistoryPlot] = useState<AllHistoryFarmerPlotEntity>();
   const [current, setCurrent] = useState<number>(1);
   const row = 5;
 
-  
   useEffect(() => {
     const getHistoryPlot = async () => {
       await FarmerPlotDatasource.getHistoryFarmerPlot(
@@ -123,15 +142,18 @@ const ModalHistory: React.FC<ModalHistoryProps> = ({
   ];
   return (
     <>
-      <Modal
+      <ModalNewStyle
         title={
-          <div
-            style={{
-              width: "100%",
-              cursor: "move",
-            }}
-          >
-            ประวัติการแก้ไขจำนวนไร่
+          <div className="row">
+            <div className="col-lg-1">
+              <LeftOutlined
+                style={{ width: 15, height: 15, cursor: "pointer" }}
+                onClick={() => callBackReturn(true)}
+              />
+            </div>
+            <div className="col pt-1">
+              <span>ประวัติการแก้ไขจำนวนไร่</span>
+            </div>
           </div>
         }
         width={1000}
@@ -139,23 +161,23 @@ const ModalHistory: React.FC<ModalHistoryProps> = ({
         onCancel={backButton}
         footer={false}
       >
-        <Table
+        <NewTableStyle
           className="tableModal"
           dataSource={historyPlot?.data}
           columns={columns}
           pagination={false}
         />
-        <div className="d-flex justify-content-between pt-4 pb-3">
+        <div className="d-flex justify-content-between pt-4 pb-3 p-4">
           <p>รายการทั้งหมด {historyPlot?.count} รายการ</p>
           <Pagination
-          current={current}
-          total={historyPlot?.count}
-          onChange={onChangePage}
-          pageSize={row}
-          showSizeChanger={false}
-        />
+            current={current}
+            total={historyPlot?.count}
+            onChange={onChangePage}
+            pageSize={row}
+            showSizeChanger={false}
+          />
         </div>
-      </Modal>
+      </ModalNewStyle>
     </>
   );
 };
