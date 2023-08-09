@@ -1,5 +1,11 @@
 ## [Version - 0]
 
+## Fix [v0.36.4] 2023-08-09
+
+- fixed mapping status history task
+- fixed can fill decimal
+- setting permission admin task
+
 ## Fix [v0.36.3] 2023-08-09
 
 - fixed number decimal
