@@ -4,15 +4,13 @@ import {
   DronerDroneEntity,
   DronerDroneEntity_INIT,
 } from "./DronerDroneEntities";
-import { DroneEntity, DroneEntity_INIT } from "./DroneEntities";
 import {
-  AddressEntity,
   FullAddressEntiry_INIT,
   FullAddressEntity,
-  AddressEntity_INIT,
   CreateAddressEntity,
   CreateAddressEntity_INIT,
 } from "./AddressEntities";
+import { summaryFarmerEntity } from "./FarmerEntities";
 
 export interface DronerEntity {
   id: string;
@@ -42,6 +40,7 @@ export interface DronerEntity {
   birthDate: string;
   comment?: string;
   createBy?: string;
+  dateWaitPending: string,
 }
 export const DronerEntity_INIT: DronerEntity = {
   id: "",
@@ -69,6 +68,7 @@ export const DronerEntity_INIT: DronerEntity = {
   updatedAt: "",
   totalDroneCount: 0,
   birthDate: "",
+  dateWaitPending: ""
 };
 export interface CreateDronerEntity {
   id?: string;
@@ -121,6 +121,8 @@ export const CreateDronerEntity_INIT: CreateDronerEntity = {
 export interface DronerListEntity {
   data: DronerEntity[];
   count: number;
+  summary: summaryFarmerEntity[];
+
 }
 export interface DronerByAddressEntity {
   id: string;

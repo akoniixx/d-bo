@@ -8,11 +8,13 @@ export default {
   reward: require("./media/images/reward.png"),
   emptyImgReward: require("./media/empties/emptyImgReward.png"),
   progressBar: require("./media/images/progressBar.png"),
-  uploadImgQuota : require("./media/empties/upload_img_quota.png"),
-  condition : require("./media/images/condition.png"),
+  uploadImgQuota: require("./media/empties/upload_img_quota.png"),
+  condition: require("./media/images/condition.png"),
   tableLucky: require("./media/images/tableLucky.png"),
   announce: require("./media/images/announcement.png"),
   empty_cover: require("./media/empties/empty-cover.png"),
-  upload_Img_btn : require("./media/empties/upload_Img_btn.png"),
-  empty_table_farmer: require('./media/empties/empty_table_farmer.png')
+  upload_Img_btn: require("./media/empties/upload_Img_btn.png"),
+  empty_table_farmer: require("./media/empties/empty_table_farmer.png"),
+  empty_table_droner: require('./media/empties/empty_table_droner.png')
+
 };

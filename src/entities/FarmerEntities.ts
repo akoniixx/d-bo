@@ -7,13 +7,15 @@ import {
   AddressEntity,
   AddressEntity_INIT,
 } from "./AddressEntities";
-import {
-  FarmerPlotEntity,
-  FarmerPlotEntity_INIT,
-} from "./FarmerPlotEntities";
+import { FarmerPlotEntity, FarmerPlotEntity_INIT } from "./FarmerPlotEntities";
 import { ImageEntity, ImageEntity_INTI } from "./UploadImageEntities";
-import { summaryEntity, summaryEntity_INIT } from "./TaskInprogressEntities";
 
+export interface summaryFarmerEntity {
+  count_active: string;
+  count_inactive: string;
+  count_pending: string;
+  count_reject: string;
+}
 export interface FarmerEntity {
   id: string;
   firstname: string;
@@ -85,7 +87,7 @@ export const GetFarmerEntity_INIT: GetFarmerEntity = {
 export interface FarmerPageEntity {
   data: FarmerEntity[];
   count: number;
-  summary: summaryEntity[];
+  summary: summaryFarmerEntity[];
 }
 
 export interface CreateFarmerEntity {

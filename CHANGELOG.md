@@ -1,4 +1,7 @@
 ## [Version - 0]
+## improve [v0.36.7] 2023-08-11
+
+- improve index droner page
 
 ## Fix [v0.36.6] 2023-08-09
 
