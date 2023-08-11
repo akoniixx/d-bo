@@ -949,7 +949,6 @@ const AddFarmer = () => {
         disableSaveBtn={saveBtnDisable}
       />
 
-      {showAddModal && (
         <ModalFarmerPlot
           show={showAddModal}
           backButton={() => {
@@ -964,7 +963,6 @@ const AddFarmer = () => {
           isEditModal={editIndex > 0 ? true : false}
           action="create"
         />
-      )}
     </>
   );
 };

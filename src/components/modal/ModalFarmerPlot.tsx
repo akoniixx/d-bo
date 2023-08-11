@@ -45,6 +45,7 @@ interface ModalFarmerPlotProps {
   title: string;
   isEditModal?: boolean;
   action?: string;
+  showInPlotList?: string;
 }
 const ModalFarmerPlot: React.FC<ModalFarmerPlotProps> = ({
   show,
@@ -56,6 +57,7 @@ const ModalFarmerPlot: React.FC<ModalFarmerPlotProps> = ({
   title,
   isEditModal = false,
   action,
+  showInPlotList,
 }) => {
   const [form] = Form.useForm();
   const [farmerPlot, setFarmerPlot] = useState<FarmerPlotEntity>(data);
@@ -99,7 +101,7 @@ const ModalFarmerPlot: React.FC<ModalFarmerPlotProps> = ({
     setStatus(data.status);
     getCropJustName();
     fetchLocation(searchLocation);
-    if (action === "edit" && isEditModal) {
+    if (action && isEditModal) {
       form.setFieldsValue({
         plotAreaId: data.plotAreaId === 0 ? undefined : data.plotAreaId,
         lat: isEditModal ? parseFloat(data.lat) : undefined,
@@ -220,6 +222,7 @@ const ModalFarmerPlot: React.FC<ModalFarmerPlotProps> = ({
     payload.reason = f.reason;
     payload.plotId = editIndex;
     callBack(payload);
+    showInPlotList !== "indexPlot" && form.resetFields();
   };
 
   return (
@@ -238,13 +241,13 @@ const ModalFarmerPlot: React.FC<ModalFarmerPlotProps> = ({
         visible={show}
         onCancel={() => {
           backButton();
-          form.resetFields();
+          showInPlotList !== "indexPlot" && form.resetFields();
         }}
         footer={[
           <FooterPage
             onClickBack={() => {
               backButton();
-              form.resetFields();
+              showInPlotList !== "indexPlot" && form.resetFields();
             }}
             onClickSave={() => form.submit()}
             //disableSaveBtn={saveBtnDisable}
