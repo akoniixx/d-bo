@@ -900,6 +900,7 @@ function IndexPlotList() {
         editIndex={editIndex}
         title="แก้ไขแปลงเกษตร"
         callBackModal={(val) => setModalEdit(!val)}
+        action="edit"
       />
       <ModalDelete
         show={modalDelete}

@@ -44,6 +44,7 @@ interface ModalFarmerPlotProps {
   editIndex: number;
   title: string;
   isEditModal?: boolean;
+  action?: string;
 }
 const ModalFarmerPlot: React.FC<ModalFarmerPlotProps> = ({
   show,
@@ -54,6 +55,7 @@ const ModalFarmerPlot: React.FC<ModalFarmerPlotProps> = ({
   editIndex,
   title,
   isEditModal = false,
+  action,
 }) => {
   const [form] = Form.useForm();
   const [farmerPlot, setFarmerPlot] = useState<FarmerPlotEntity>(data);
@@ -80,32 +82,37 @@ const ModalFarmerPlot: React.FC<ModalFarmerPlotProps> = ({
     FarmerPlotEntity_INIT
   );
   const [rai, setRai] = useState<any>();
+  const [status, setStatus] = useState<any>(data.status);
 
   const fetchLocation = async (text?: string) => {
     await LocationDatasource.getSubdistrict(0, text).then((res) => {
       setLocation(res);
     });
   };
-  useEffect(() => {
-    const getCropJustName = () => {
-      CropDatasource.getCropJustName().then((res) => {
-        setCropsName(res);
-      });
-    };
-    getCropJustName();
-  }, []);
+  const getCropJustName = () => {
+    CropDatasource.getCropJustName().then((res) => {
+      setCropsName(res);
+    });
+  };
 
   useEffect(() => {
+    getCropJustName();
     fetchLocation(searchLocation);
-    if (data) {
+    if (action && isEditModal) {
       form.setFieldsValue({
-        ...data,
         plotAreaId: data.plotAreaId === 0 ? undefined : data.plotAreaId,
         lat: isEditModal ? parseFloat(data.lat) : undefined,
         long: isEditModal ? parseFloat(data.long) : undefined,
+        plotName: data.plotName,
+        plantName: data.plantName,
+        raiAmount: data.raiAmount,
+        mapUrl: data.mapUrl,
+        landmark: data.landmark,
+        comment: data.comment,
+        reason: data.reason,
       });
     }
-  }, [searchLocation, data, form, isEditModal]);
+  }, [searchLocation, data, isEditModal]);
 
   const showEdit = (e: FarmerPlotEntity) => {
     setEditFarmerPlot(e);
@@ -134,12 +141,9 @@ const ModalFarmerPlot: React.FC<ModalFarmerPlotProps> = ({
     }
   };
 
-  const handleShowComment = (e: RadioChangeEvent) => {
-    setFarmerPlot({
-      ...farmerPlot,
-      status: e.target.value,
-    });
-    if (e.target.value != "REJECTED") {
+  const handleShowComment = (e: any) => {
+    setStatus(e.target.value);
+    if (e.target.value !== "REJECTED") {
       form.setFieldsValue({
         reason: "",
       });
@@ -210,9 +214,10 @@ const ModalFarmerPlot: React.FC<ModalFarmerPlotProps> = ({
     payload.lat = f.lat;
     payload.long = f.long;
     payload.landmark = f.landmark;
-    payload.status = f.status;
+    payload.status = status;
     payload.comment = f.comment;
     payload.reason = f.reason;
+    payload.plotId = editIndex;
     callBack(payload);
   };
 
@@ -313,7 +318,7 @@ const ModalFarmerPlot: React.FC<ModalFarmerPlotProps> = ({
             </Form.Item>
           </div> */}
           <Row justify={"space-between"} gutter={8}>
-            <Col span={isEditModal ? 12 : 24}>
+            <Col span={isEditModal && action === "edit" ? 12 : 24}>
               <label>
                 จำนวนไร่ <span style={{ color: "red" }}>*</span>
               </label>
@@ -329,11 +334,11 @@ const ModalFarmerPlot: React.FC<ModalFarmerPlotProps> = ({
                 <Input
                   placeholder="กรอกจำนวนไร่"
                   onChange={(e) => checkNumber(e, "raiAmount")}
-                  disabled={isEditModal}
+                  disabled={isEditModal && action === "edit"}
                 />
               </Form.Item>
             </Col>
-            {isEditModal && (
+            {isEditModal && action === "edit" && (
               <>
                 <Col style={{ paddingTop: "22px" }}>
                   <Button
@@ -504,7 +509,7 @@ const ModalFarmerPlot: React.FC<ModalFarmerPlotProps> = ({
               สถานะ <span style={{ color: "red" }}>*</span>
             </label>
             <br />
-            <Form.Item
+            {/* <Form.Item
               name="status"
               rules={[
                 {
@@ -512,74 +517,71 @@ const ModalFarmerPlot: React.FC<ModalFarmerPlotProps> = ({
                   message: "กรุณาเลือกสถานะ!",
                 },
               ]}
-            >
-              {isEditModal ? (
-                <Radio.Group
-                  defaultValue={farmerPlot.status}
-                  onChange={handleShowComment}
-                >
-                  <Space direction="vertical">
-                    <Radio value={"ACTIVE"}>ใช้งาน</Radio>
-                    <Radio value={"PENDING"}>รอการตรวจสอบ</Radio>
-                    <Radio value={"REJECTED"}>
-                      ไม่อนุมัติ
-                      {farmerPlot.status == "REJECTED" && (
-                        <div className="form-group">
-                          <br />
-                          <Form.Item
-                            name="reason"
-                            rules={[
-                              {
-                                required: farmerPlot.status === "REJECTED",
-                                message: "กรุณากรอกเหตุผลที่ไม่อนุมัติ!",
-                              },
-                            ]}
-                          >
-                            <TextArea
-                              className="col-lg-12"
-                              rows={3}
-                              placeholder="กรอกเหตุผล/เหตุหมายเพิ่มเติม"
-                              autoComplete="off"
-                            />
-                          </Form.Item>
-                        </div>
-                      )}
-                    </Radio>
-                    <Radio value={"INACTIVE"}>
-                      ปิดการใช้งาน
-                      {farmerPlot.status === "INACTIVE" && (
-                        <div className="form-group">
-                          <br />
-                          <Form.Item
-                            name="reason"
-                            rules={[
-                              {
-                                required: farmerPlot.status === "INACTIVE",
-                                message: "กรุณากรอกเหตุผลที่ไม่อนุมัติ!",
-                              },
-                            ]}
-                          >
-                            <TextArea
-                              className="col-lg-12"
-                              rows={3}
-                              placeholder="กรอกเหตุผล/เหตุหมายเพิ่มเติม"
-                              autoComplete="off"
-                            />
-                          </Form.Item>
-                        </div>
-                      )}
-                    </Radio>
-                  </Space>
-                </Radio.Group>
-              ) : (
-                <Radio.Group defaultValue={farmerPlot.status}>
-                  <Space direction="vertical">
-                    <Radio value={"ACTIVE"}>ใช้งาน</Radio>
-                    <Radio value={"PENDING"}>รอการตรวจสอบ</Radio>
-                  </Space>
-                </Radio.Group>
-              )}
-            </Form.Item>
+            > */}
+            {isEditModal && action === "edit" ? (
+              <Radio.Group onChange={handleShowComment} value={status}>
+                <Space direction="vertical">
+                  <Radio value={"ACTIVE"}>ใช้งาน</Radio>
+                  <Radio value={"PENDING"}>รอการตรวจสอบ</Radio>
+                  <Radio value={"REJECTED"}>
+                    ไม่อนุมัติ
+                    {status === "REJECTED" && (
+                      <div className="form-group">
+                        <br />
+                        <Form.Item
+                          name="reason"
+                          rules={[
+                            {
+                              required: status === "REJECTED",
+                              message: "กรุณากรอกเหตุผลที่ไม่อนุมัติ!",
+                            },
+                          ]}
+                        >
+                          <TextArea
+                            className="col-lg-12"
+                            rows={3}
+                            placeholder="กรอกเหตุผล/เหตุหมายเพิ่มเติม"
+                            autoComplete="off"
+                          />
+                        </Form.Item>
+                      </div>
+                    )}
+                  </Radio>
+                  <Radio value={"INACTIVE"}>
+                    ปิดการใช้งาน
+                    {status === "INACTIVE" && (
+                      <div className="form-group">
+                        <br />
+                        <Form.Item
+                          name="reason"
+                          rules={[
+                            {
+                              required: status === "INACTIVE",
+                              message: "กรุณากรอกเหตุผลที่ไม่อนุมัติ!",
+                            },
+                          ]}
+                        >
+                          <TextArea
+                            className="col-lg-12"
+                            rows={3}
+                            placeholder="กรอกเหตุผล/เหตุหมายเพิ่มเติม"
+                            autoComplete="off"
+                          />
+                        </Form.Item>
+                      </div>
+                    )}
+                  </Radio>
+                </Space>
+              </Radio.Group>
+            ) : (
+              <Radio.Group>
+                <Space direction="vertical">
+                  <Radio value={"ACTIVE"}>ใช้งาน</Radio>
+                  <Radio value={"PENDING"}>รอการตรวจสอบ</Radio>
+                </Space>
+              </Radio.Group>
+            )}
+            {/* </Form.Item> */}
             <div className="form-group " style={{ marginTop: 16 }}>
               <label>หมายเหตุ</label>
               <Form.Item name="comment">
@@ -594,8 +596,8 @@ const ModalFarmerPlot: React.FC<ModalFarmerPlotProps> = ({
           show={modalEdit}
           backButton={() => setModalEdit((prev) => !prev)}
           callBackReturn={() => {
-            setModalEdit((prev) => !prev);
             callBackModal(show);
+            setModalEdit((prev) => !prev);
           }}
           data={editFarmerPlot}
           callBackEditRai={(data) => {
