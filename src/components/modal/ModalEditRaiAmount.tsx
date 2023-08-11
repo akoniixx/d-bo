@@ -119,7 +119,9 @@ const ModalEditRaiAmount: React.FC<ModalEditRaiAmountProps> = ({
 
   const checkValue = (event: any) => {
     setRai(validateOnlyNumWDecimal(event.target.value));
-    setBtnSaveDisable(event.target.value ? false : true);
+    setBtnSaveDisable(
+      validateOnlyNumWDecimal(event.target.value) ? false : true
+    );
   };
 
   return (
