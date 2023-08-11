@@ -97,19 +97,8 @@ const ModalEditRaiAmount: React.FC<ModalEditRaiAmountProps> = ({
     setImgPlot(undefined);
     setCreateImgPlot(UploadImageEntity_INTI);
     form.setFieldValue("file", null);
-    onFieldsChange();
   };
 
-  const onFieldsChange = () => {
-    let fieldInfo = false;
-    if (rai?.length > 1) {
-      fieldInfo = false;
-    } else {
-      fieldInfo = true;
-    }
-
-    setBtnSaveDisable(fieldInfo);
-  };
   const handelCallBack = () => {
     const { reason } = form.getFieldsValue();
     const farmerId = data.farmerId;
@@ -130,7 +119,7 @@ const ModalEditRaiAmount: React.FC<ModalEditRaiAmountProps> = ({
 
   const checkValue = (event: any) => {
     setRai(validateOnlyNumWDecimal(event.target.value));
-    onFieldsChange();
+    setBtnSaveDisable(event.target.value ? false : true);
   };
 
   return (
@@ -157,12 +146,7 @@ const ModalEditRaiAmount: React.FC<ModalEditRaiAmountProps> = ({
           />,
         ]}
       >
-        <Form
-          key={data.plotId}
-          form={form}
-          onFinish={handelCallBack}
-          onFieldsChange={onFieldsChange}
-        >
+        <Form key={data.plotId} form={form} onFinish={handelCallBack}>
           <div className="form-group pb-4">
             <label>
               จำนวนไร่ <span style={{ color: "red" }}>*</span>
