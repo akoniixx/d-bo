@@ -183,7 +183,9 @@ const AddFarmer = () => {
     checkValidateAddr(d.toJS());
   };
 
-  const handleOnChangeAddress2 = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+  const handleOnChangeAddress2 = (
+    e: React.ChangeEvent<HTMLTextAreaElement>
+  ) => {
     const d = Map(address).set("address2", e.target.value);
     setAddress(d.toJS());
     checkValidateAddr(d.toJS());
@@ -203,7 +205,7 @@ const AddFarmer = () => {
   };
 
   const editPlot = (data: FarmerPlotEntity, index: number) => {
-    setShowEditModal((prev) => !prev);
+    setShowAddModal((prev) => !prev);
     setEditIndex(index);
     setEditFarmerPlot(data);
   };
@@ -214,11 +216,11 @@ const AddFarmer = () => {
   };
 
   const insertFarmerPlot = (data: FarmerPlotEntity) => {
-    if (data.plotId == 0) {
+    if (data.plotId === 0) {
       const pushId = Map(data).set("plotId", farmerPlotList.length + 1);
       setFarmerPlotList([...farmerPlotList, pushId.toJS()]);
     } else {
-      const newData = farmerPlotList.filter((x) => x.plotId != data.plotId);
+      const newData = farmerPlotList.filter((x) => x.plotId !== data.plotId);
       setFarmerPlotList([...newData, data]);
     }
     setShowAddModal(false);
@@ -404,7 +406,7 @@ const AddFarmer = () => {
           timer: 1500,
           showConfirmButton: false,
         }).then((time) => {
-          navigate( "/IndexFarmer");
+          navigate("/IndexFarmer");
         });
       } else {
         Swal.fire({
@@ -946,28 +948,23 @@ const AddFarmer = () => {
         onClickSave={insertFarmer}
         disableSaveBtn={saveBtnDisable}
       />
+
+      {showAddModal && (
         <ModalFarmerPlot
           show={showAddModal}
-          backButton={() => setShowAddModal((prev) => !prev)}
+          backButton={() => {
+            setEditIndex(0);
+            setShowAddModal((prev) => !prev);
+          }}
           callBack={insertFarmerPlot}
-          data={FarmerPlotEntity_INIT}
+          data={editIndex > 0 ? editFarmerPlot : FarmerPlotEntity_INIT}
           editIndex={editIndex}
-          title="เพิ่มแปลงเกษตร"
-          callBackModal={(val)=> setShowAddModal(!val)}
-
+          title={editIndex > 0 ? "แก้ไขแปลงเกษตร" : "เพิ่มแปลงเกษตร"}
+          callBackModal={(val) => setShowAddModal(!val)}
+          isEditModal={editIndex > 0 ? true : false}
+          action="create"
         />
-    
-        <ModalFarmerPlot
-          isEditModal
-          show={showEditModal}
-          backButton={() => setShowEditModal((prev) => !prev)}
-          callBack={insertFarmerPlot}
-          data={editFarmerPlot}
-          editIndex={editIndex}
-          title="แก้ไขแปลงเกษตร"
-          callBackModal={(val)=> setShowEditModal(!val)}
-
-        />
+      )}
     </>
   );
 };

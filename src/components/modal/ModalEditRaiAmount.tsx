@@ -17,7 +17,10 @@ import {
 } from "../../entities/UploadImageEntities";
 import { FarmerPlotDatasource } from "../../datasource/FarmerPlotDatasource";
 import { useNavigate } from "react-router-dom";
-import { validateOnlyNumber } from "../../utilities/TextFormatter";
+import {
+  validateOnlyNumWDecimal,
+  validateOnlyNumber,
+} from "../../utilities/TextFormatter";
 
 interface ModalEditRaiAmountProps {
   show: boolean;
@@ -74,7 +77,6 @@ const ModalEditRaiAmount: React.FC<ModalEditRaiAmountProps> = ({
     );
     setCreateImgPlot(d.toJS());
     form.setFieldValue("file", d.toJS());
-    onFieldsChange();
   };
 
   const onPreviewImg = async () => {
@@ -99,22 +101,14 @@ const ModalEditRaiAmount: React.FC<ModalEditRaiAmountProps> = ({
   };
 
   const onFieldsChange = () => {
-    const { file } = form.getFieldsValue();
     let fieldInfo = false;
-    let fieldimg = false;
-
     if (rai?.length > 1) {
       fieldInfo = false;
     } else {
       fieldInfo = true;
     }
 
-    if (!file) {
-      fieldimg = true;
-    } else {
-      fieldimg = false;
-    }
-    setBtnSaveDisable(fieldInfo || fieldimg);
+    setBtnSaveDisable(fieldInfo);
   };
   const handelCallBack = () => {
     const { reason } = form.getFieldsValue();
@@ -135,13 +129,10 @@ const ModalEditRaiAmount: React.FC<ModalEditRaiAmountProps> = ({
   };
 
   const checkValue = (event: any) => {
-    setRai(handleDecimalsOnValue(event.target.value));
+    setRai(validateOnlyNumWDecimal(event.target.value));
     onFieldsChange();
   };
-  const handleDecimalsOnValue = (value: any) => {
-    const regex = /([0-9]*[\.|\,]{0,1}[0-9]{0,2})/s;
-    return value.match(regex)[0];
-  };
+
   return (
     <>
       <Modal
@@ -178,7 +169,6 @@ const ModalEditRaiAmount: React.FC<ModalEditRaiAmountProps> = ({
             </label>
             <Input
               name="raiAmount"
-              type="number"
               placeholder="กรอกจำนวนไร่"
               autoComplete="off"
               suffix="ไร่"
@@ -187,9 +177,7 @@ const ModalEditRaiAmount: React.FC<ModalEditRaiAmountProps> = ({
             />
           </div>
           <div className="form-group col-lg-12 pb-5">
-            <label>
-              อัพโหลดหลักฐาน <span style={{ color: "red" }}>*</span>
-            </label>
+            <label>อัพโหลดหลักฐาน</label>
             <Form.Item name="file">
               <div className="pb-2">
                 <div
