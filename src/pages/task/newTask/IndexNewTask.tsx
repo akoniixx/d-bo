@@ -1,14 +1,18 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import {
   DownOutlined,
   EditOutlined,
   UserOutlined,
   ExceptionOutlined,
+  SearchOutlined,
 } from "@ant-design/icons";
 import {
   Badge,
   Button,
   DatePicker,
   Dropdown,
+  Image,
+  Input,
   Menu,
   Pagination,
   Select,
@@ -34,12 +38,9 @@ import {
   UpdateTaskStatus,
   UpdateTaskStatus_INIT,
 } from "../../../entities/NewTaskEntities";
-import { color } from "../../../resource";
+import { color, icon } from "../../../resource";
 import { DateTimeUtil } from "../../../utilities/DateTimeUtil";
-import {
-  numberWithCommas,
-} from "../../../utilities/TextFormatter";
-import { DashboardLayout } from "../../../components/layout/Layout";
+import { numberWithCommas } from "../../../utilities/TextFormatter";
 import { useNavigate } from "react-router-dom";
 const { RangePicker } = DatePicker;
 const dateFormat = "DD-MM-YYYY";
@@ -76,13 +77,13 @@ const IndexNewTask = () => {
 
   useEffect(() => {
     fetchNewTaskList();
-  }, [searchStatus, searchText, searchStartDate, searchEndDate, current]);
+  }, [searchStartDate, searchEndDate, current]);
 
   const handleSearchStatus = (status: any) => {
-    setSearchStatus(status);
+    setSearchStatus(status.target.value);
     setCurrent(1);
   };
-  const handleSearchText = (e: string) => {
+  const handleSearchText = (e: any) => {
     setSearchText(e);
     setCurrent(1);
   };
@@ -153,65 +154,100 @@ const IndexNewTask = () => {
     />
   );
   const pageTitle = (
-    <div
-      className="container d-flex justify-content-between"
-      style={{ padding: "10px" }}
-    >
-      <div className="col-lg-2">
-        <span
-          className="card-label font-weight-bolder text-dark"
-          style={{
-            fontSize: 22,
-            fontWeight: "bold",
-            padding: "8px",
-          }}
-        >
-          <strong>งานใหม่ (รอนักบิน)</strong>
-        </span>
-      </div>
-      <div className="col-lg-3">
-        <Search
-          placeholder="ค้นหาชื่อเกษตรกร หรือเบอร์โทร"
-          className="col-lg-12 p-1"
-          onSearch={handleSearchText}
-        />
-      </div>
-      <div className="col-lg-2">
-        <Select
-          className="col-lg-12 p-1"
-          placeholder="สถานะทั้งหมด"
-          onChange={handleSearchStatus}
-          allowClear
-        >
-          {NEWTASK_STATUS_SEARCH.map((item) => (
-            <option value={item.name}>{item.name}</option>
-          ))}
-        </Select>
-      </div>
-      <div className="col-lg-3 p-1">
-        <RangePicker
-          allowClear
-          onCalendarChange={(val) => handleSearchDate(val)}
-          format={dateFormat}
-        />
-      </div>
-      <div className="col-lg-2 p-1">
-        <Dropdown overlay={menu}>
-          <Button
+    <>
+      <div
+        className="d-flex justify-content-between"
+        style={{ padding: "10px" }}
+      >
+        <div>
+          <span
+            className="card-label font-weight-bolder text-dark"
             style={{
-              padding: "8 0",
-              backgroundColor: color.primary1,
-              color: color.secondary2,
-              borderColor: color.Success,
-              borderRadius: "5px",
+              fontSize: 22,
+              fontWeight: "bold",
+              padding: "8px",
             }}
           >
-            เพิ่มงานบินโดรนใหม่
-            <DownOutlined />
-          </Button>
-        </Dropdown>
+            <strong>งานใหม่ (รอนักบิน)</strong>
+          </span>
+        </div>
+        <div style={{ color: color.Error, textAlign: "end" }}>
+          <RangePicker
+            style={{ right: "4px" }}
+            allowClear
+            onCalendarChange={(val) => handleSearchDate(val)}
+            format={dateFormat}
+          />
+          <Dropdown overlay={menu}>
+            <Button
+              style={{
+                padding: "8 0",
+                backgroundColor: color.primary1,
+                color: color.secondary2,
+                borderColor: color.Success,
+                borderRadius: "5px",
+              }}
+            >
+              เพิ่มงานบินโดรนใหม่
+              <DownOutlined />
+            </Button>
+          </Dropdown>
+        </div>
       </div>
-    </div>
+      <div
+        className=" d-flex justify-content-between"
+        style={{ padding: "8px" }}
+      >
+        <div className="col-lg-7" style={{ paddingRight: 5 }}>
+          <Input
+            allowClear
+            prefix={<SearchOutlined style={{ color: color.Disable }} />}
+            placeholder="ค้นหาชื่อเกษตรกร, คนบินโดรน หรือเบอร์โทร"
+            className="col-lg-12"
+            onChange={handleSearchText}
+          />
+        </div>
+        <div className="col-lg">
+          <Select
+            style={{ paddingRight: 5 }}
+            className="col-lg-12"
+            placeholder="เลือกรูปแบบการสร้าง"
+            onChange={handleSearchStatus}
+            allowClear
+          >
+            {NEWTASK_STATUS_SEARCH.map((item) => (
+              <option value={item.name}>{item.name}</option>
+            ))}
+          </Select>
+        </div>
+        <div className="col-lg">
+          <Select
+            style={{ paddingRight: 5 }}
+            className="col-lg-12"
+            placeholder="สถานะทั้งหมด"
+            onChange={handleSearchStatus}
+            allowClear
+          >
+            {NEWTASK_STATUS_SEARCH.map((item) => (
+              <option value={item.name}>{item.name}</option>
+            ))}
+          </Select>
+        </div>
+        <div>
+          <Button
+            style={{
+              borderColor: color.Success,
+              borderRadius: "5px",
+              color: color.secondary2,
+              backgroundColor: color.Success,
+            }}
+            onClick={fetchNewTaskList}
+          >
+            ค้นหาข้อมูล
+          </Button>
+        </div>
+      </div>
+    </>
   );
   const columns = [
     {
@@ -275,6 +311,27 @@ const IndexNewTask = () => {
       },
     },
     {
+      title: "นักบินโดรน",
+      dataIndex: "count_droner",
+      key: "count_droner",
+      render: (value: any, row: any, index: number) => {
+        return {
+          children: (
+            <>
+              <span>จำนวน {row.count_droner} ราย</span>
+              <br />
+              <span
+                onClick={() => handleModalDronerList(row.id)}
+                style={{ color: color.primary1, cursor: "pointer" }}
+              >
+                ดูรายชื่อนักบินโดรน
+              </span>
+            </>
+          ),
+        };
+      },
+    },
+    {
       title: "ค่าบริการ",
       dataIndex: "total_price",
       key: "total_price",
@@ -309,21 +366,39 @@ const IndexNewTask = () => {
       },
     },
     {
-      title: "นักบินโดรน",
-      dataIndex: "count_droner",
-      key: "count_droner",
+      title: "สร้างโดย",
+      dataIndex: "createByWho",
+      key: "createByWho",
       render: (value: any, row: any, index: number) => {
         return {
           children: (
             <>
-              <span>จำนวน {row.count_droner} ราย</span>
-              <br />
-              <a
-                onClick={() => handleModalDronerList(row.id)}
-                style={{ color: color.primary1 }}
-              >
-                ดูรายชื่อนักบินโดรน
-              </a>
+              {row.application_type === "BO" && (
+                <>
+                  <Image
+                    src={icon.bo}
+                    preview={false}
+                    style={{ width: 24, height: 24 }}
+                  />
+                  <span>
+                    {" "}
+                    {row.create_by ? row.create_by + ` (Admin)` : "-"}
+                  </span>
+                </>
+              )}
+              {row.application_type === "FARMER" && (
+                <>
+                  <Image
+                    src={icon.farmerApp}
+                    preview={false}
+                    style={{ width: 24, height: 24 }}
+                  />
+                  <span>
+                    {" "}
+                    {row.firstname + " " + row.lastname + " (FARMER)"}
+                  </span>
+                </>
+              )}
             </>
           ),
         };
@@ -370,9 +445,7 @@ const IndexNewTask = () => {
                 <ActionButton
                   icon={<EditOutlined />}
                   color={color.primary1}
-                  onClick={() =>
-                    navigate("/EditNewTask/id=" + row.id)
-                  }
+                  onClick={() => navigate("/EditNewTask/id=" + row.id)}
                 />
               </div>
               <div className="col-lg-6">
@@ -391,49 +464,48 @@ const IndexNewTask = () => {
 
   return (
     <>
-      <>
-        {pageTitle}
-        <CardContainer>
-          <Table
-            dataSource={data?.data}
-            columns={columns}
-            pagination={false}
-            size="large"
-            tableLayout="fixed"
-            rowClassName={(a) =>
-              a.task_status == "ไม่มีนักบินรับงาน"
-                ? "table-row-older"
-                : "table-row-lasted"
-            }
-          />
-        </CardContainer>
-        <div className="d-flex justify-content-between pt-4 pb-3">
-          <p>รายการทั้งหมด {data?.count} รายการ</p>
-          <Pagination
-            current={current}
-            total={data?.count}
-            onChange={onChangePage}
-            pageSize={row}
-            showSizeChanger={false}
-          />
-        </div>
-        {showModalMap && (
-          <ModalMapPlot
-            show={showModalMap}
-            backButton={() => setShowModalMap((prev) => !prev)}
-            title="แผนที่แปลงเกษตร"
-            plotId={plotId}
-          />
-        )}
-        {showModalDroner && (
-          <ModalDronerList
-            show={showModalDroner}
-            backButton={() => setShowModalDroner((prev) => !prev)}
-            title="รายชื่อนักโดรนบิน"
-            taskId={taskId}
-          />
-        )}
-      </>
+      {pageTitle}
+      <CardContainer>
+        <Table
+          scroll={{ x: "max-content" }}
+          dataSource={data?.data}
+          columns={columns}
+          pagination={false}
+          size="large"
+          tableLayout="fixed"
+          rowClassName={(a) =>
+            a.task_status === "ไม่มีนักบินรับงาน"
+              ? "table-row-older"
+              : "table-row-lasted"
+          }
+        />
+      </CardContainer>
+      <div className="d-flex justify-content-between pt-4 pb-3">
+        <p>รายการทั้งหมด {data?.count} รายการ</p>
+        <Pagination
+          current={current}
+          total={data?.count}
+          onChange={onChangePage}
+          pageSize={row}
+          showSizeChanger={false}
+        />
+      </div>
+      {showModalMap && (
+        <ModalMapPlot
+          show={showModalMap}
+          backButton={() => setShowModalMap((prev) => !prev)}
+          title="แผนที่แปลงเกษตร"
+          plotId={plotId}
+        />
+      )}
+      {showModalDroner && (
+        <ModalDronerList
+          show={showModalDroner}
+          backButton={() => setShowModalDroner((prev) => !prev)}
+          title="รายชื่อนักโดรนบิน"
+          taskId={taskId}
+        />
+      )}
     </>
   );
 };
