@@ -292,9 +292,11 @@ const EditFarmer = () => {
     };
     if (payload.id) {
       await FarmerPlotDatasource.updateFarmerPlot(payload);
+      setEditIndex(0);
       setShowAddModal((prev) => !prev);
     } else {
       await FarmerPlotDatasource.insertFarmerPlot(payload);
+      setEditIndex(0);
       setShowAddModal((prev) => !prev);
     }
     fecthFarmer();
