@@ -96,9 +96,10 @@ const ModalFarmerPlot: React.FC<ModalFarmerPlotProps> = ({
   };
 
   useEffect(() => {
+    setStatus(data.status);
     getCropJustName();
     fetchLocation(searchLocation);
-    if (action && isEditModal) {
+    if (action === "edit" && isEditModal) {
       form.setFieldsValue({
         plotAreaId: data.plotAreaId === 0 ? undefined : data.plotAreaId,
         lat: isEditModal ? parseFloat(data.lat) : undefined,
@@ -235,10 +236,16 @@ const ModalFarmerPlot: React.FC<ModalFarmerPlotProps> = ({
           </div>
         }
         visible={show}
-        onCancel={backButton}
+        onCancel={() => {
+          backButton();
+          form.resetFields();
+        }}
         footer={[
           <FooterPage
-            onClickBack={backButton}
+            onClickBack={() => {
+              backButton();
+              form.resetFields();
+            }}
             onClickSave={() => form.submit()}
             //disableSaveBtn={saveBtnDisable}
           />,
@@ -509,15 +516,6 @@ const ModalFarmerPlot: React.FC<ModalFarmerPlotProps> = ({
               สถานะ <span style={{ color: "red" }}>*</span>
             </label>
             <br />
-            {/* <Form.Item
-              name="status"
-              rules={[
-                {
-                  required: true,
-                  message: "กรุณาเลือกสถานะ!",
-                },
-              ]}
-            > */}
             {isEditModal && action === "edit" ? (
               <Radio.Group onChange={handleShowComment} value={status}>
                 <Space direction="vertical">
@@ -574,14 +572,13 @@ const ModalFarmerPlot: React.FC<ModalFarmerPlotProps> = ({
                 </Space>
               </Radio.Group>
             ) : (
-              <Radio.Group>
+              <Radio.Group onChange={handleShowComment} value={status}>
                 <Space direction="vertical">
                   <Radio value={"ACTIVE"}>ใช้งาน</Radio>
                   <Radio value={"PENDING"}>รอการตรวจสอบ</Radio>
                 </Space>
               </Radio.Group>
             )}
-            {/* </Form.Item> */}
             <div className="form-group " style={{ marginTop: 16 }}>
               <label>หมายเหตุ</label>
               <Form.Item name="comment">
