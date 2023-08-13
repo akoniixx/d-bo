@@ -262,10 +262,10 @@ const EditFarmer = () => {
   //#endregion
 
   //#region function farmer plot
-  const editPlot = (data: FarmerPlotEntity, index: number) => {
-    setShowEditModal((prev) => !prev);
+  const editPlot = (item: any, index: number) => {
+    setShowAddModal((prev) => !prev);
     setEditIndex(index);
-    setEditFarmerPlot(data);
+    setEditFarmerPlot(item);
   };
 
   const removePlot = (data: FarmerPlotEntity) => {
@@ -292,9 +292,11 @@ const EditFarmer = () => {
     };
     if (payload.id) {
       await FarmerPlotDatasource.updateFarmerPlot(payload);
-      setShowEditModal((prev) => !prev);
+      setEditIndex(0);
+      setShowAddModal((prev) => !prev);
     } else {
       await FarmerPlotDatasource.insertFarmerPlot(payload);
+      setEditIndex(0);
       setShowAddModal((prev) => !prev);
     }
     fecthFarmer();
@@ -993,7 +995,7 @@ const EditFarmer = () => {
           </Button>
         </div>
         <Form>
-          {farmerPlotList.length != 0 ? (
+          {farmerPlotList.length !== 0 ? (
             <div className="container">
               {farmerPlotList.map((item, index) => (
                 <div className="row pt-3 pb-3">
@@ -1032,7 +1034,7 @@ const EditFarmer = () => {
                       <ActionButton
                         icon={<EditOutlined />}
                         color={color.primary1}
-                        onClick={() => editPlot(item, index)}
+                        onClick={() => editPlot(item, index + 1)}
                       />
                     </div>
                     <div className="col-lg-6">
@@ -1088,23 +1090,17 @@ const EditFarmer = () => {
       />
       <ModalFarmerPlot
         show={showAddModal}
-        backButton={() => setShowAddModal((prev) => !prev)}
+        backButton={() => {
+          setEditIndex(0);
+          setShowAddModal((prev) => !prev);
+        }}
         callBack={updateFarmerPlot}
-        data={FarmerPlotEntity_INIT}
+        data={editIndex > 0 ? editFarmerPlot : FarmerPlotEntity_INIT}
         editIndex={editIndex}
-        title="เพิ่มแปลงเกษตร"
+        title={editIndex > 0 ? "แก้ไขแปลงเกษตร" : "เพิ่มแปลงเกษตร"}
         callBackModal={(val) => setShowAddModal(!val)}
-      />
-     
-      <ModalFarmerPlot
-        isEditModal
-        show={showEditModal}
-        backButton={() => setShowEditModal((prev) => !prev)}
-        callBack={updateFarmerPlot}
-        data={editFarmerPlot}
-        editIndex={editIndex}
-        title="แก้ไขแปลงเกษตร"
-        callBackModal={(val) => setShowEditModal(!val)}
+        isEditModal={editIndex > 0 ? true : false}
+        action="edit"
       />
     </>
   );
