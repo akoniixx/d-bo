@@ -589,19 +589,17 @@ function IndexDroner() {
               <span className="text-dark-75  d-block font-size-lg">
                 {moment(value.updatedAt).format("DD/MM/YYYY HH:mm")}
               </span>
-              {value.updateBy && (
-                <div>
-                  <span
-                    className=" d-block font-size-lg"
-                    style={{ color: color.Grey }}
-                  >
-                    <UserOutlined
-                      style={{ padding: "0 4px 0 0", verticalAlign: 0.5 }}
-                    />
-                    {value?.updateBy}
-                  </span>
-                </div>
-              )}
+              <div>
+                <span
+                  className=" d-block font-size-lg"
+                  style={{ color: color.Grey }}
+                >
+                  <UserOutlined
+                    style={{ padding: "0 4px 0 0", verticalAlign: 0.5 }}
+                  />
+                  {value?.updateBy ? value?.updateBy : "-"}
+                </span>
+              </div>
             </div>
           ),
         };
@@ -679,24 +677,28 @@ function IndexDroner() {
       title: "เบอร์โทร",
       dataIndex: "telephoneNo",
       key: "telephoneNo",
+      render: (value: any, row: any, index: number) => {
+        return {
+          children: <span>{row.telephoneNo ? row.telephoneNo : "-"}</span>,
+        };
+      },
     },
     {
       title: "ที่อยู่",
       dataIndex: "address",
       key: "address",
       render: (value: any, row: any, index: number) => {
-        const subdistrict = row.address.subdistrict;
-        const district = row.address.district;
-        const province = row.address.province;
+        const subdistrict =
+          row.address !== null ? row.address.subdistrict : null;
+        const district = row.address !== null ? row.address.district : null;
+        const province = row.address !== null ? row.address.province : null;
 
         return {
           children: (
             <span className="text-dark-75  d-block font-size-lg">
-              {subdistrict !== undefined
-                ? subdistrict.subdistrictName + "/"
-                : "-"}
-              {district !== undefined ? district.districtName + "/" : "-"}
-              {province !== undefined ? province.provinceName : "-"}
+              {subdistrict ? subdistrict.subdistrictName + "/" : "-/"}
+              {district ? district.districtName + "/" : "-/"}
+              {province ? province.provinceName : "-"}
             </span>
           ),
         };
