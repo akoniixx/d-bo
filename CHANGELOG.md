@@ -3,6 +3,10 @@
 
 - improve index droner page
 
+## Fix [v0.36.7] 2023-08-11
+
+- fixed validate form farmer plot
+
 ## Fix [v0.36.6] 2023-08-09
 
 - fixed validate form farmer plot
