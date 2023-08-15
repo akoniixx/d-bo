@@ -7,8 +7,14 @@ interface listProps {
   onSearchType: (e: any) => void;
   list: any;
   title: string;
+  menu: string;
 }
-const ListCheck: React.FC<listProps> = ({ onSearchType, list, title }) => {
+const ListCheck: React.FC<listProps> = ({
+  onSearchType,
+  list,
+  title,
+  menu,
+}) => {
   const [visibleCreateBy, setVisibleCreateBy] = useState(false);
 
   const handleVisibleCreateBy = (newVisible: any) => {
@@ -17,7 +23,9 @@ const ListCheck: React.FC<listProps> = ({ onSearchType, list, title }) => {
 
   const listApp = [
     { title: " Back Office Website", icon: icon.bo, value: "BO" },
-    { title: " Farmer Application", icon: icon.farmerApp, value: "FARMER" },
+    menu === "FARMER"
+      ? { title: " Farmer Application", icon: icon.farmerApp, value: "FARMER" }
+      : { title: " Droner Application", icon: icon.dronerApp, value: "DRONER" },
   ];
   const items: MenuProps["items"] = listApp.map((v, i) => {
     return {
@@ -51,7 +59,6 @@ const ListCheck: React.FC<listProps> = ({ onSearchType, list, title }) => {
           <Button
             style={{
               color: color.Disable,
-              width: "165px",
               textAlign: "start",
               backgroundColor: color.White,
               height: 32,
@@ -61,7 +68,6 @@ const ListCheck: React.FC<listProps> = ({ onSearchType, list, title }) => {
             {title}
             <DownOutlined
               style={{
-                paddingLeft: list != undefined ? "75%" : 0,
                 verticalAlign: 2,
               }}
             />

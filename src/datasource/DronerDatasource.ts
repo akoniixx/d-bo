@@ -7,28 +7,34 @@ import { BASE_URL, httpClient } from "../config/config";
 
 export class DronerDatasource {
   static async getDronerList(
+    mainStatus: string[],
+    waitPendingDate: string[],
+    applicationType: string[],
     page: number,
     row: number,
-    subdistrictId?: number,
-    districtId?: number,
-    provinceId?: number,
-    droneBrandId?: string,
-    status?: string,
+    status?: string[],
     search?: string,
-    sortField?: string,
-    sortDirection?: string
+    provinceId?: number,
+    districtId?: number,
+    subdistrictId?: number,
+    documentPersons?: string,
+    sortDirection?: string,
+    sortField?: string
   ): Promise<DronerListEntity> {
     const params = {
+      mainStatus: mainStatus,
+      waitPendingDate: waitPendingDate,
+      applicationType: applicationType,
       page: page,
       take: row,
-      subdistrictId: subdistrictId,
-      districtId: districtId,
-      provinceId: provinceId,
-      droneBrandId: droneBrandId,
       status: status,
       search: search,
-      sortField,
-      sortDirection,
+      provinceId: provinceId,
+      districtId: districtId,
+      subdistrictId: subdistrictId,
+      documentPersons: documentPersons,
+      sortDirection: sortDirection,
+      sortField: sortField,
     };
     return httpClient
       .get(BASE_URL + "/droner", { params })
