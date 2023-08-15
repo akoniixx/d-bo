@@ -509,7 +509,7 @@ const IndexNewTask = () => {
         return {
           children: (
             <>
-             {listAppType.map(
+              {listAppType.map(
                 (item) =>
                   row.application_type === item.value && (
                     <>
@@ -526,7 +526,8 @@ const IndexNewTask = () => {
                       </span>
                     </>
                   )
-              )}</>
+              )}
+            </>
           ),
         };
       },

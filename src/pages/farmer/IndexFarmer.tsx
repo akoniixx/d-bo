@@ -121,7 +121,6 @@ function IndexFarmer() {
       sortField
     )
       .then((res) => {
-        
         setData(res);
         setSummary(res.summary[0]);
       })
