@@ -50,8 +50,8 @@ import { DashboardLayout } from "../../../components/layout/Layout";
 import { useNavigate } from "react-router-dom";
 import InvoiceTask from "../../../components/popover/InvoiceTask";
 import { InvoiceTaskEntity } from "../../../entities/NewTaskEntities";
+import { ListCheckHaveLine } from "../../../components/dropdownCheck/ListStatusAppType";
 import { listAppType } from "../../../definitions/ApplicatoionTypes";
-import { ListCheckHaveLine } from "../../../components/dropdownCheck/ListStatusFarmer";
 export default function IndexFinishTask() {
   const navigate = useNavigate();
   const [row, setRow] = useState(10);

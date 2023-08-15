@@ -44,8 +44,8 @@ import {
 } from "../../../utilities/TextFormatter";
 import { DashboardLayout } from "../../../components/layout/Layout";
 import { useNavigate } from "react-router-dom";
-import { ListCheckHaveLine } from "../../../components/dropdownCheck/ListStatusFarmer";
 import { listAppType } from "../../../definitions/ApplicatoionTypes";
+import { ListCheckHaveLine } from "../../../components/dropdownCheck/ListStatusAppType";
 
 const { RangePicker } = DatePicker;
 const dateFormat = "DD/MM/YYYY";
@@ -306,8 +306,7 @@ const IndexInprogressTask = () => {
           <ListCheckHaveLine
             onSearchType={(e: any) => onSearchCreateBy(e)}
             list={applicationType}
-            title="เลือกรูปแบบการสร้าง"
-          />
+            title="เลือกรูปแบบการสร้าง" menu={""}          />
         </div>
         <div className="col-lg p-1">
           <Select

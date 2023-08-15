@@ -56,7 +56,7 @@ import { numberWithCommas } from "../../utilities/TextFormatter";
 import { image } from "../../resource";
 import { CheckboxValueType } from "antd/lib/checkbox/Group";
 import { STATUS_NORMAL_MAPPING } from "../../definitions/Status";
-import { ListCheck } from "../../components/dropdownCheck/ListStatusFarmer";
+import { ListCheck } from "../../components/dropdownCheck/ListStatusAppType";
 
 interface SearchSelectType {
   label: any;
@@ -222,7 +222,7 @@ function IndexFarmer() {
                     onChange={onChangeListPending}
                   >
                     <Checkbox style={{ marginLeft: "20px" }} value="FIRST">
-                      0-2 วัน
+                      1-2 วัน
                     </Checkbox>
                     <br />
                     <Checkbox style={{ marginLeft: "20px" }} value="SECOND">
@@ -480,6 +480,7 @@ function IndexFarmer() {
             onSearchType={(e) => onSearchCreateBy(e)}
             list={appType}
             title="เลือกรูปแบบการสร้าง"
+            menu="FARMER"
           />
         </div>
         <div className="col-lg pt-1 p-1">
@@ -828,12 +829,14 @@ function IndexFarmer() {
       key: "status",
       render: (value: any, row: any, index: number) => {
         const countDay = () => {
-          let dateToday: any = moment(Date.now());
-          let createDate: any = moment(new Date(row.dateWaitPending));
-          let dateDiff = dateToday.diff(createDate, "day");
-          let textDateDiff =
-            dateDiff === 0 ? null : "(รอไปแล้ว " + dateDiff + " วัน)";
-          return textDateDiff;
+          if (row.dateWaitPending != null) {
+            const nowDate = new Date(Date.now());
+            const rowDate = new Date(row.dateWaitPending);
+            const diffTime = nowDate.getTime() - rowDate.getTime();
+            let diffDay = Math.floor(diffTime / (1000 * 3600 * 24));
+            diffDay = diffDay === 0 ? 1 : diffDay;
+            return `รอไปแล้ว ${diffDay} วัน`;
+          }
         };
         let checkProfile = ![
           row.firstname,
