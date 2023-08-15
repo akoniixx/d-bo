@@ -43,13 +43,14 @@ import {
   UpdateInprogressTaskEntity_INIT,
 } from "../../../entities/TaskInprogress";
 import { TaskSearchDroner } from "../../../entities/TaskSearchDroner";
-import { color } from "../../../resource";
+import { color, icon } from "../../../resource";
 import {
   numberWithCommas,
   numberWithCommasToFixed,
 } from "../../../utilities/TextFormatter";
 import { DashboardLayout } from "../../../components/layout/Layout";
 import { useNavigate } from "react-router-dom";
+import { listAppType } from "../../../definitions/ApplicatoionTypes";
 const { Option } = Select;
 
 const dateFormat = "DD/MM/YYYY";
@@ -409,6 +410,24 @@ const EditInprogressTask = () => {
                   {numberWithCommas(parseFloat(data?.totalPrice))} บาท (จำนวน{" "}
                   {data?.farmAreaAmount} ไร่) ราคาไร่ละ {data.unitPrice} บาท
                 </p>
+              </div>
+              <div className="form-group col-lg-12 pb-3">
+                <label>สร้างโดย</label>
+                {listAppType.map(
+                  (item, index) =>
+                    data.applicationType === item.value && (
+                      <div>
+                        <img
+                          src={item.icon}
+                          style={{ width: 22, height: 22 }}
+                        />
+                        <span>
+                          {" "}
+                          {data.createBy ? data.createBy + ` ${item.create}` : "-"}
+                        </span>
+                      </div>
+                    )
+                )}
               </div>
               <div className="form-group col-lg-12">
                 <label>สถานะ</label>
@@ -821,7 +840,7 @@ const EditInprogressTask = () => {
       if (result.isConfirmed) {
         await TaskDatasource.updateInprogressTask(updateTask).then((res) => {
           if (res.userMessage == "success") {
-            navigate( "/IndexInprogressTask")
+            navigate("/IndexInprogressTask");
           }
         });
       }
@@ -832,9 +851,7 @@ const EditInprogressTask = () => {
     <>
       <div key={data?.id}>
         <Row>
-          <BackIconButton
-            onClick={() => navigate("/IndexInprogressTask")}
-          />
+          <BackIconButton onClick={() => navigate("/IndexInprogressTask")} />
           <span className="pt-3">
             <strong style={{ fontSize: "20px" }}>
               แก้ไขงาน #{data?.taskNo}

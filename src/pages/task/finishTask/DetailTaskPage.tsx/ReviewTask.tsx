@@ -53,6 +53,7 @@ import { useNavigate } from "react-router-dom";
 import ImagCards from "../../../../components/card/ImagCard";
 import icon from "../../../../resource/icon";
 import { image } from "../../../../resource";
+import { listAppType } from "../../../../definitions/ApplicatoionTypes";
 
 const { Map } = require("immutable");
 const _ = require("lodash");
@@ -306,6 +307,21 @@ function ReviewTask() {
               {data.data.unitPrice} บาท
             </span>
           </Form.Item>
+          <div className="form-group col-lg-12 pb-3">
+            <label>สร้างโดย</label>
+            {listAppType.map(
+              (item, index) =>
+                data.data.applicationType === item.value && (
+                  <div>
+                    <img src={item.icon} style={{ width: 22, height: 22 }} />
+                    <span>
+                      {" "}
+                      {data.data.createBy ? data.data.createBy + ` ${item.create}` : "-"}
+                    </span>
+                  </div>
+                )
+            )}
+          </div>
           <br />
           <Form.Item>
             <label style={{ marginRight: "30px" }}>คะแนนรีวิว </label>

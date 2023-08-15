@@ -56,7 +56,7 @@ import { numberWithCommas } from "../../utilities/TextFormatter";
 import { image } from "../../resource";
 import { CheckboxValueType } from "antd/lib/checkbox/Group";
 import { STATUS_NORMAL_MAPPING } from "../../definitions/Status";
-import ListCreateBy from "../../components/dropdownCheck/ListStatusFarmer";
+import { ListCheck } from "../../components/dropdownCheck/ListStatusFarmer";
 
 interface SearchSelectType {
   label: any;
@@ -121,6 +121,7 @@ function IndexFarmer() {
       sortField
     )
       .then((res) => {
+        
         setData(res);
         setSummary(res.summary[0]);
       })
@@ -476,7 +477,7 @@ function IndexFarmer() {
           </Select>
         </div>
         <div>
-          <ListCreateBy
+          <ListCheck
             onSearchType={(e) => onSearchCreateBy(e)}
             list={appType}
             title="เลือกรูปแบบการสร้าง"

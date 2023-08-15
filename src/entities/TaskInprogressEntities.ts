@@ -271,6 +271,7 @@ export interface TaskDetailEntity {
   revenuePromotion: string;
   discountCampaignPoint: string;
   usePoint: string;
+  applicationType: string;
 }
 export const TaskDetailEntity_INIT: TaskDetailEntity = {
   id: "",
@@ -321,6 +322,7 @@ export const TaskDetailEntity_INIT: TaskDetailEntity = {
   revenuePromotion: "",
   discountCampaignPoint: "",
   usePoint: "",
+  applicationType: ""
 };
 export interface UpdateTask {
   taskId: string;

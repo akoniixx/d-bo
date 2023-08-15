@@ -63,6 +63,7 @@ export interface GetTaskInprogressEntity {
   revenuePromotion: string;
   discountCampaignPoint: string;
   usePoint: string;
+  applicationType: string;
 }
 export interface TaskInprogressEntity {
   task_id: string;
@@ -214,6 +215,7 @@ export const GetTaskInprogressEntity_INIT: GetTaskInprogressEntity = {
   revenuePromotion: "",
   discountCampaignPoint: "",
   usePoint: "",
+  applicationType: ""
 };
 export interface UpdateInprogressTaskEntity {
   id: string;

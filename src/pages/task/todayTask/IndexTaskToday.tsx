@@ -1,4 +1,6 @@
 import {
+  CaretDownOutlined,
+  CaretUpOutlined,
   DownOutlined,
   EditOutlined,
   InfoCircleFilled,
@@ -11,11 +13,14 @@ import {
   Checkbox,
   Divider,
   Dropdown,
+  Image,
   Input,
   Menu,
   Pagination,
+  PaginationProps,
   Popover,
   Select,
+  Spin,
   Table,
   Tooltip,
 } from "antd";
@@ -47,10 +52,12 @@ import {
 } from "../../../utilities/TextFormatter";
 import { DashboardLayout } from "../../../components/layout/Layout";
 import { useNavigate } from "react-router-dom";
+import { listAppType } from "../../../definitions/ApplicatoionTypes";
+import { ListCheckHaveLine } from "../../../components/dropdownCheck/ListStatusFarmer";
 
 export default function IndexTodayTask() {
   const navigate = useNavigate();
-  const row = 10;
+  const [row, setRow] = useState(10);
   const [current, setCurrent] = useState(1);
   const [data, setData] = useState<TaskTodayListEntity>();
   const [searchText, setSearchText] = useState<string>();
@@ -70,12 +77,26 @@ export default function IndexTodayTask() {
   const [statusArr, setStatusArr] = useState<string[]>([]);
   const dateFormat = "DD/MM/YYYY";
   const timeFormat = "HH:mm";
+  const [appTypeArr, setAppTypeArr] = useState<string[]>([]);
+  const [applicationType, setApplicationType] = useState<any>();
+  const [loading, setLoading] = useState(false);
   const [problems, setProblems] = useState<any>([]);
-  useEffect(() => {
-    fetchAllTaskToday();
-    fetchProvince();
-  }, [current]);
+  const [sortDirection, setSortDirection] = useState<string | undefined>();
+  const [sortField, setSortField] = useState<string | undefined>();
+  const [sortDirection1, setSortDirection1] = useState<string | undefined>(
+    undefined
+  );
+  const [sortDirection2, setSortDirection2] = useState<string | undefined>(
+    undefined
+  );
+  const [sortDirection3, setSortDirection3] = useState<string | undefined>(
+    undefined
+  );
+  const [sortDirection4, setSortDirection4] = useState<string | undefined>(
+    undefined
+  );
   const fetchAllTaskToday = async () => {
+    setLoading(true);
     await TaskInprogressDatasource.getAllTaskToday(
       searchStatus,
       current,
@@ -86,11 +107,21 @@ export default function IndexTodayTask() {
       searchDistrict,
       searchProvince,
       isProblem,
-      isDelay
-    ).then((res: TaskTodayListEntity) => {
-      setData(res);
-    });
+      isDelay,
+      applicationType,
+      sortDirection,
+      sortField
+    )
+      .then((res: TaskTodayListEntity) => {
+        setData(res);
+      })
+      .catch((err) => console.log(err))
+      .finally(() => setLoading(false));
   };
+  useEffect(() => {
+    fetchAllTaskToday();
+    fetchProvince();
+  }, [current, row, sortDirection]);
 
   const fetchProvince = async () => {
     await LocationDatasource.getProvince().then((res) => {
@@ -192,19 +223,6 @@ export default function IndexTodayTask() {
       }
     }
   };
-
-  const sorter = (a: any, b: any) => {
-    if (a === b) return 0;
-    else if (a === null) return 1;
-    else if (b === null) return -1;
-    else return a.localeCompare(b);
-  };
-  const formatCurrency = (e: any) => {
-    e = parseFloat(e);
-    return e.toFixed(2).replace(/./g, function (c: any, i: any, a: any) {
-      return i > 0 && c !== "." && (a.length - i) % 3 === 0 ? "," + c : c;
-    });
-  };
   const handleModalMap = (plotId: string) => {
     setShowModalMap((prev) => !prev);
     setPlotId(plotId);
@@ -213,6 +231,31 @@ export default function IndexTodayTask() {
   const handleVisibleRating = (newVisible: any) => {
     setVisibleRating(newVisible);
   };
+  const onSearchCreateBy = (e: any) => {
+    let value = e.target.value;
+    let checked = e.target.checked;
+    let arr: any = 0;
+    if (checked === true) {
+      arr = [...appTypeArr, value];
+      setAppTypeArr([...appTypeArr, value]);
+      setApplicationType(value);
+    } else {
+      let d: string[] = appTypeArr.filter((x) => x != value);
+      arr = [...d];
+      setAppTypeArr(d);
+      if (d.length == 0) {
+        arr = undefined;
+      }
+    }
+    setApplicationType(arr);
+  };
+  const onShowSizeChange: PaginationProps["onShowSizeChange"] = (
+    current,
+    pageSize
+  ) => {
+    setCurrent(current);
+    setRow(pageSize);
+  };
   const status = (
     <Menu
       items={[
@@ -220,10 +263,7 @@ export default function IndexTodayTask() {
           label: "รอเริ่มงาน",
           key: "1",
           icon: (
-            <Checkbox
-              value="WAIT_START"
-              onClick={(e) => handleStatus(e)}
-            ></Checkbox>
+            <Checkbox value="WAIT_START" onClick={(e) => handleStatus(e)} />
           ),
         },
         {
@@ -234,7 +274,7 @@ export default function IndexTodayTask() {
               style={{ marginLeft: "20px" }}
               value="waitstartnormal"
               onClick={(e) => handleSubStatus(e)}
-            ></Checkbox>
+            />
           ),
         },
         {
@@ -245,17 +285,14 @@ export default function IndexTodayTask() {
               style={{ marginLeft: "20px" }}
               value="waitstartproblem"
               onClick={(e) => handleSubStatus(e)}
-            ></Checkbox>
+            />
           ),
         },
         {
           label: "กำลังดำเนินงาน",
           key: "4",
           icon: (
-            <Checkbox
-              value="IN_PROGRESS"
-              onClick={(e) => handleStatus(e)}
-            ></Checkbox>
+            <Checkbox value="IN_PROGRESS" onClick={(e) => handleStatus(e)} />
           ),
         },
         {
@@ -266,7 +303,7 @@ export default function IndexTodayTask() {
               style={{ marginLeft: "20px" }}
               value="inprogressnormal"
               onClick={(e) => handleSubStatus(e)}
-            ></Checkbox>
+            />
           ),
         },
         {
@@ -277,7 +314,7 @@ export default function IndexTodayTask() {
               style={{ marginLeft: "20px" }}
               value="waitapprovedelay"
               onClick={(e) => handleSubStatus(e)}
-            ></Checkbox>
+            />
           ),
         },
         {
@@ -288,7 +325,7 @@ export default function IndexTodayTask() {
               style={{ marginLeft: "20px" }}
               value="extended"
               onClick={(e) => handleSubStatus(e)}
-            ></Checkbox>
+            />
           ),
         },
         {
@@ -299,7 +336,7 @@ export default function IndexTodayTask() {
               style={{ marginLeft: "20px" }}
               value="inprogressproblem"
               onClick={(e) => handleSubStatus(e)}
-            ></Checkbox>
+            />
           ),
         },
       ]}
@@ -308,22 +345,22 @@ export default function IndexTodayTask() {
   const PageTitle = (
     <>
       <div
-        className="container d-flex justify-content-between"
-        style={{ padding: "8px" }}
+        className="d-flex justify-content-between"
+        style={{ padding: "0px" }}
       >
-        <div className="col-lg-4 p-1" style={{ maxWidth: "1200px" }}>
+        <div className="col-lg-3 p-1" style={{ maxWidth: "1200px" }}>
           <Input
             allowClear
             prefix={<SearchOutlined style={{ color: color.Disable }} />}
             placeholder="ค้นหาชื่อเกษตรกร, คนบินโดรน หรือเบอร์โทร"
-            className="col-lg-12 p-1"
+            className="col-lg-12"
             onChange={changeTextSearch}
           />
         </div>
-        <div className="col-lg">
+        <div className="col-lg p-1">
           <Select
             allowClear
-            className="col-lg-12 p-1"
+            className="col-lg-12"
             placeholder="เลือกจังหวัด"
             showSearch
             optionFilterProp="children"
@@ -342,10 +379,10 @@ export default function IndexTodayTask() {
             ))}
           </Select>
         </div>
-        <div className="col-lg">
+        <div className="col-lg p-1">
           <Select
             allowClear
-            className="col-lg-12 p-1"
+            className="col-lg-12"
             placeholder="เลือกอำเภอ"
             onChange={handleDistrict}
             showSearch
@@ -367,10 +404,10 @@ export default function IndexTodayTask() {
             ))}
           </Select>
         </div>
-        <div className="col-lg">
+        <div className="col-lg p-1">
           <Select
             allowClear
-            className="col-lg-12 p-1"
+            className="col-lg-12"
             placeholder="เลือกตำบล"
             onChange={handleSubDistrict}
             showSearch
@@ -391,6 +428,13 @@ export default function IndexTodayTask() {
               </option>
             ))}
           </Select>
+        </div>
+        <div className="col-lg p-1">
+          <ListCheckHaveLine
+            onSearchType={(e: any) => onSearchCreateBy(e)}
+            list={applicationType}
+            title="เลือกรูปแบบการสร้าง"
+          />
         </div>
         <div className="col-lg-2 p-1">
           <Dropdown
@@ -424,11 +468,58 @@ export default function IndexTodayTask() {
   );
   const columns = [
     {
-      title: "วัน/เวลา นัดหมาย",
+      title: () => {
+        return (
+          <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+            วัน/เวลานัดหมาย{" "}
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                cursor: "pointer",
+              }}
+              onClick={() => {
+                setSortField("task_date_appointment");
+                setSortDirection((prev) => {
+                  if (prev === "ASC") {
+                    return "DESC";
+                  } else if (prev === undefined) {
+                    return "ASC";
+                  } else {
+                    return undefined;
+                  }
+                });
+                setSortDirection1((prev) => {
+                  if (prev === "ASC") {
+                    return "DESC";
+                  } else if (prev === undefined) {
+                    return "ASC";
+                  } else {
+                    return undefined;
+                  }
+                });
+              }}
+            >
+              <CaretUpOutlined
+                style={{
+                  position: "relative",
+                  top: 2,
+                  color: sortDirection1 === "ASC" ? "#ffca37" : "white",
+                }}
+              />
+              <CaretDownOutlined
+                style={{
+                  position: "relative",
+                  bottom: 2,
+                  color: sortDirection1 === "DESC" ? "#ffca37" : "white",
+                }}
+              />
+            </div>
+          </div>
+        );
+      },
       dataIndex: "task_date_appointment",
       key: "task_date_appointment",
-      sorter: (a: any, b: any) =>
-        sorter(a.task_date_appointment, b.task_date_appointment),
       render: (value: any, row: any, index: number) => {
         const changeTime = row.count_change_appointment;
         return {
@@ -444,7 +535,11 @@ export default function IndexTodayTask() {
                   title="มีการเปลี่ยนแปลงวันและเวลานัดหมาย"
                   className="p-2"
                 >
-                  <img src={icon.iconChangeTime} alt="ic_change_time" />
+                  <img
+                    src={icon.iconChangeTime}
+                    alt="ic_change_time"
+                    style={{ width: 30, height: 30 }}
+                  />
                 </Tooltip>
               ) : null}
               <br />
@@ -457,11 +552,58 @@ export default function IndexTodayTask() {
       },
     },
     {
-      title: "ชื่อนักบินโดรน",
+      title: () => {
+        return (
+          <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+            ชื่อนักบินโดรน
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                cursor: "pointer",
+              }}
+              onClick={() => {
+                setSortField("droner_firstname");
+                setSortDirection((prev) => {
+                  if (prev === "ASC") {
+                    return "DESC";
+                  } else if (prev === undefined) {
+                    return "ASC";
+                  } else {
+                    return undefined;
+                  }
+                });
+                setSortDirection2((prev) => {
+                  if (prev === "ASC") {
+                    return "DESC";
+                  } else if (prev === undefined) {
+                    return "ASC";
+                  } else {
+                    return undefined;
+                  }
+                });
+              }}
+            >
+              <CaretUpOutlined
+                style={{
+                  position: "relative",
+                  top: 2,
+                  color: sortDirection2 === "ASC" ? "#ffca37" : "white",
+                }}
+              />
+              <CaretDownOutlined
+                style={{
+                  position: "relative",
+                  bottom: 2,
+                  color: sortDirection2 === "DESC" ? "#ffca37" : "white",
+                }}
+              />
+            </div>
+          </div>
+        );
+      },
       dataIndex: "droner",
       key: "droner",
-      sorter: (a: any, b: any) =>
-        sorter(a.droner_firstname, b.droner_firstname),
       render: (value: any, row: any, index: number) => {
         const changeDroner = row.count_change_droner;
         return {
@@ -474,7 +616,11 @@ export default function IndexTodayTask() {
                   title="มีการเปลี่ยนแปลงนักบินโดรนคนใหม่"
                   className="p-2"
                 >
-                  <img src={icon.iconChangeDroner} alt="ic_change_droner" />
+                  <img
+                    src={icon.iconChangeDroner}
+                    alt="ic_change_droner"
+                    style={{ width: 30, height: 30 }}
+                  />
                 </Tooltip>
               ) : null}
               <br />
@@ -488,11 +634,58 @@ export default function IndexTodayTask() {
     },
 
     {
-      title: "ชื่อเกษตรกร",
+      title: () => {
+        return (
+          <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+            ชื่อเกษตรกร
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                cursor: "pointer",
+              }}
+              onClick={() => {
+                setSortField("farmer_firstname");
+                setSortDirection((prev) => {
+                  if (prev === "ASC") {
+                    return "DESC";
+                  } else if (prev === undefined) {
+                    return "ASC";
+                  } else {
+                    return undefined;
+                  }
+                });
+                setSortDirection3((prev) => {
+                  if (prev === "ASC") {
+                    return "DESC";
+                  } else if (prev === undefined) {
+                    return "ASC";
+                  } else {
+                    return undefined;
+                  }
+                });
+              }}
+            >
+              <CaretUpOutlined
+                style={{
+                  position: "relative",
+                  top: 2,
+                  color: sortDirection3 === "ASC" ? "#ffca37" : "white",
+                }}
+              />
+              <CaretDownOutlined
+                style={{
+                  position: "relative",
+                  bottom: 2,
+                  color: sortDirection3 === "DESC" ? "#ffca37" : "white",
+                }}
+              />
+            </div>
+          </div>
+        );
+      },
       dataIndex: "farmer",
       key: "farmer",
-      sorter: (a: any, b: any) =>
-        sorter(a.farmer_firstname, b.farmer_firstname),
       render: (value: any, row: any, index: number) => {
         return {
           children: (
@@ -535,14 +728,59 @@ export default function IndexTodayTask() {
         };
       },
     },
-
     {
-      title: "ค่าบริการ",
+      title: () => {
+        return (
+          <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+            ค่าบริการ
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                cursor: "pointer",
+              }}
+              onClick={() => {
+                setSortField("task_total_price");
+                setSortDirection((prev) => {
+                  if (prev === "ASC") {
+                    return "DESC";
+                  } else if (prev === undefined) {
+                    return "ASC";
+                  } else {
+                    return undefined;
+                  }
+                });
+                setSortDirection4((prev) => {
+                  if (prev === "ASC") {
+                    return "DESC";
+                  } else if (prev === undefined) {
+                    return "ASC";
+                  } else {
+                    return undefined;
+                  }
+                });
+              }}
+            >
+              <CaretUpOutlined
+                style={{
+                  position: "relative",
+                  top: 2,
+                  color: sortDirection4 === "ASC" ? "#ffca37" : "white",
+                }}
+              />
+              <CaretDownOutlined
+                style={{
+                  position: "relative",
+                  bottom: 2,
+                  color: sortDirection4 === "DESC" ? "#ffca37" : "white",
+                }}
+              />
+            </div>
+          </div>
+        );
+      },
       dataIndex: "task_total_price",
       key: "task_total_price",
-      width: "12%",
-      sorter: (a: any, b: any) =>
-        sorter(a.task_total_price, b.task_total_price),
       render: (value: any, row: any, index: number) => {
         const inv: InvoiceTaskEntity = {
           raiAmount: row.task_farm_area_amount,
@@ -568,6 +806,37 @@ export default function IndexTodayTask() {
                 title="รายละเอียดค่าบริการ"
                 data={inv}
               />
+            </>
+          ),
+        };
+      },
+    },
+    {
+      title: "สร้างโดย",
+      dataIndex: "createByWho",
+      key: "createByWho",
+      render: (value: any, row: any, index: number) => {
+        return {
+          children: (
+            <>
+              {listAppType.map(
+                (item) =>
+                  row.task_application_type === item.value && (
+                    <>
+                      <Image
+                        src={item.icon}
+                        preview={false}
+                        style={{ width: 24, height: 24 }}
+                      />
+                      <span>
+                        {" "}
+                        {row.task_create_by
+                          ? row.task_create_by + ` ${item.create}`
+                          : "-"}
+                      </span>
+                    </>
+                  )
+              )}
             </>
           ),
         };
@@ -622,14 +891,13 @@ export default function IndexTodayTask() {
                     <img src={icon.iconExtend} alt="ic_change_droner" />
                   </Tooltip>
                 ) : null}
-                <br />
               </span>
-              <span style={{ color: color.Grey, fontSize: "12px" }}>
+              <div style={{ color: color.Grey, fontSize: "12px" }}>
                 <UserOutlined
                   style={{ padding: "0 4px 0 0", verticalAlign: 0.5 }}
                 />
                 {row.task_update_by}
-              </span>
+              </div>
             </>
           ),
         };
@@ -647,17 +915,13 @@ export default function IndexTodayTask() {
                 <ActionButton
                   icon={<EditOutlined />}
                   color={color.primary1}
-                  onClick={() =>
-                    navigate("/EditInProgress?=" + row.task_id)
-                  }
+                  onClick={() => navigate("/EditInProgress?=" + row.task_id)}
                 />
               ) : row.task_status == "WAIT_START" ? (
                 <ActionButton
                   icon={<EditOutlined />}
                   color={color.primary1}
-                  onClick={() =>
-                    navigate("/EditWaitStart?=" + row.task_id)
-                  }
+                  onClick={() => navigate("/EditWaitStart?=" + row.task_id)}
                 />
               ) : null}
             </div>
@@ -825,20 +1089,24 @@ export default function IndexTodayTask() {
       <br />
       {PageTitle}
       <br />
-      <Table
-        columns={columns}
-        dataSource={data?.data}
-        pagination={false}
-        rowClassName={(a) =>
-          a.task_is_problem == true
-            ? "table-row-older"
-            : a.task_status_delay == "WAIT_APPROVE"
-            ? "table-row-wait-approve"
-            : a.task_status_delay == "APPROVED"
-            ? "table-row-approve"
-            : "table-row-lasted"
-        }
-      />
+      <Spin tip="กำลังโหลดข้อมูล..." size="large" spinning={loading}>
+        <Table
+          scroll={{ x: "max-content" }}
+          columns={columns}
+          dataSource={data?.data}
+          pagination={false}
+          rowClassName={(a) =>
+            a.task_is_problem == true
+              ? "table-row-older"
+              : a.task_status_delay == "WAIT_APPROVE"
+              ? "table-row-wait-approve"
+              : a.task_status_delay == "APPROVED"
+              ? "table-row-approve"
+              : "table-row-lasted"
+          }
+        />
+      </Spin>
+
       <div className="d-flex justify-content-between pt-3 pb-3">
         <p>รายการทั้งหมด {data?.count} รายการ</p>
         <Pagination
@@ -846,7 +1114,8 @@ export default function IndexTodayTask() {
           total={data?.count}
           onChange={onChangePage}
           pageSize={row}
-          showSizeChanger={false}
+          showSizeChanger
+          onShowSizeChange={onShowSizeChange}
         />
       </div>
       {showModalMap && (

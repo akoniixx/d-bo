@@ -29,6 +29,7 @@ import {
   STATUS_NEWTASK_MAPPING,
 } from "../../../../definitions/Status";
 import { useNavigate } from "react-router-dom";
+import { listAppType } from "../../../../definitions/ApplicatoionTypes";
 const _ = require("lodash");
 const dateFormat = "DD/MM/YYYY";
 const timeFormat = "HH:mm";
@@ -165,6 +166,21 @@ function CancelTask() {
               {data.data.unitPrice} บาท
             </span>
           </Form.Item>
+          <div className="form-group col-lg-12 pb-3">
+            <label>สร้างโดย</label>
+            {listAppType.map(
+              (item, index) =>
+                data.data.applicationType === item.value && (
+                  <div>
+                    <img src={item.icon} style={{ width: 22, height: 22 }} />
+                    <span>
+                      {" "}
+                      {data.data.createBy ? data.data.createBy + ` ${item.create}` : "-"}
+                    </span>
+                  </div>
+                )
+            )}
+          </div>
           <br />
           <label>สถานะ</label>
           <Form.Item>

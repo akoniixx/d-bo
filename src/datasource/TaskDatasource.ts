@@ -22,7 +22,10 @@ export class TaskDatasource {
     status?: string,
     search?: string,
     startDate?: string,
-    endDate?: string
+    endDate?: string,
+    applicationType?: string[],
+    sortDirection?: string,
+    sortField?: string
   ): Promise<NewTaskPageEntity> {
     const params = {
       take: take,
@@ -31,6 +34,9 @@ export class TaskDatasource {
       search: search,
       startDate: startDate,
       endDate: endDate,
+      applicationType: applicationType,
+      sortDirection: sortDirection,
+      sortField: sortField,
     };
     return httpClient
       .get(BASE_URL + "/tasks/task", { params })
@@ -114,7 +120,10 @@ export class TaskDatasource {
     text?: string,
     dateAppointmentStart?: string,
     dateAppointmentEnd?: string,
-    problem?: boolean
+    problem?: boolean,
+    applicationType?: string[],
+    sortDirection?: string,
+    sortField?: string
   ): Promise<TaskInprogressPageEntity> {
     const params = {
       take: take,
@@ -126,6 +135,9 @@ export class TaskDatasource {
       dateAppointmentStart: dateAppointmentStart,
       dateAppointmentEnd: dateAppointmentEnd,
       isProblem: problem,
+      applicationType: applicationType,
+      sortDirection: sortDirection,
+      sortField: sortField,
     };
     return httpClient
       .get(BASE_URL + "/tasks/task-inprogress/get-all-task-wait-start", {

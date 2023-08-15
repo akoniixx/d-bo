@@ -11,7 +11,10 @@ export class TaskFinishedDatasource {
     dateAppointmentStart?: string,
     dateAppointmentEnd?: string,
     status?: string,
-    searchText?: string
+    searchText?: string,
+    applicationType?: string[],
+    sortDirection?: string,
+    sortField?: string
   ): Promise<TaskFinishListEntity> {
     const params = {
       page: page,
@@ -23,6 +26,9 @@ export class TaskFinishedDatasource {
       dateAppointmentEnd: dateAppointmentEnd,
       status: status,
       searchText: searchText,
+      applicationType: applicationType,
+      sortDirection: sortDirection,
+      sortField: sortField,
     };
     return httpClient
       .get(BASE_URL + "/tasks/task-finish/get-all-task-finish", { params })
