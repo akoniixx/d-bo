@@ -196,10 +196,10 @@ export default function IndexTodayTask() {
       setAppTypeArr([...appTypeArr, value]);
       setApplicationType(value);
     } else {
-      let d: string[] = appTypeArr.filter((x) => x != value);
+      let d: string[] = appTypeArr.filter((x) => x !== value);
       arr = [...d];
       setAppTypeArr(d);
-      if (d.length == 0) {
+      if (d.length === 0) {
         arr = undefined;
       }
     }
@@ -280,10 +280,10 @@ export default function IndexTodayTask() {
         setCheckAllInprogress(e.target.checked);
       }
     } else {
-      let d: string[] = statusArrMain.filter((x) => x != value);
+      let d: string[] = statusArrMain.filter((x) => x !== value);
       arr = [...d];
       setStatusArrMain(d);
-      if (d.length == 0) {
+      if (d.length === 0) {
         arr = undefined;
       }
       if (value === "WAIT_START") {
