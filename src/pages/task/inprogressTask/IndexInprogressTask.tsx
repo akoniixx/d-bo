@@ -768,7 +768,7 @@ const IndexInprogressTask = () => {
               dataSource={data?.data}
               pagination={false}
               rowClassName={(a) =>
-                a.task_is_problem == true ? "table-row-older" : "table-row"
+                a.task_is_problem ? "table-row-older" : "table-row"
               }
             />
           </Spin>

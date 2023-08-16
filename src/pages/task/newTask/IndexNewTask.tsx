@@ -168,7 +168,7 @@ const IndexNewTask = () => {
       setAppTypeArr([...appTypeArr, value]);
       setApplicationType(value);
     } else {
-      let d: string[] = appTypeArr.filter((x) => x != value);
+      let d: string[] = appTypeArr.filter((x) => x !== value);
       arr = [...d];
       setAppTypeArr(d);
       if (d.length == 0) {
