@@ -52,6 +52,8 @@ import InvoiceTask from "../../../components/popover/InvoiceTask";
 import { InvoiceTaskEntity } from "../../../entities/NewTaskEntities";
 import { ListCheckHaveLine } from "../../../components/dropdownCheck/ListStatusAppType";
 import { listAppType } from "../../../definitions/ApplicatoionTypes";
+import CheckDocument from "../../../components/dropdownCheck/CheckDocument";
+import { icon } from "../../../resource";
 export default function IndexFinishTask() {
   const navigate = useNavigate();
   const [row, setRow] = useState(10);
@@ -73,12 +75,14 @@ export default function IndexFinishTask() {
   const dateFormat = "DD/MM/YYYY";
   const timeFormat = "HH:mm";
   const dateSearchFormat = "YYYY-MM-DD";
+  const [checkDocArr, setCheckDocArr] = useState<string[]>([]);
   const [appTypeArr, setAppTypeArr] = useState<string[]>([]);
   const [applicationType, setApplicationType] = useState<any>();
   const [loading, setLoading] = useState(false);
   const [problems, setProblems] = useState<any>([]);
   const [sortDirection, setSortDirection] = useState<string | undefined>();
   const [sortField, setSortField] = useState<string | undefined>();
+  const [documentPersons, setDocumentPersons] = useState<any>();
   const [sortDirection1, setSortDirection1] = useState<string | undefined>(
     undefined
   );
@@ -89,6 +93,9 @@ export default function IndexFinishTask() {
     undefined
   );
   const [sortDirection4, setSortDirection4] = useState<string | undefined>(
+    undefined
+  );
+  const [sortDirection5, setSortDirection5] = useState<string | undefined>(
     undefined
   );
 
@@ -106,7 +113,8 @@ export default function IndexFinishTask() {
       searchText,
       applicationType,
       sortDirection,
-      sortField
+      sortField,
+      documentPersons
     )
       .then((res: TaskFinishListEntity) => {
         setData(res);
@@ -154,16 +162,7 @@ export default function IndexFinishTask() {
     setSearchStatus(status);
     setCurrent(1);
   };
-  const formatNumber = (e: any) => {
-    let formatNumber = Number(e)
-      .toFixed(1)
-      .replace(/\d(?=(\d{3})+\.)/g, "$&,");
-    let splitArray = formatNumber.split(".");
-    if (splitArray.length > 1) {
-      formatNumber = splitArray[0];
-    }
-    return formatNumber;
-  };
+
   const handleProvince = (provinceId: number) => {
     setSearchProvince(provinceId);
     fetchDistrict(provinceId);
@@ -207,6 +206,24 @@ export default function IndexFinishTask() {
     setCurrent(current);
     setRow(pageSize);
   };
+  const onSearchCheckDocument = (e: any) => {
+    let value = e.target.value;
+    let checked = e.target.checked;
+    let arr: any = 0;
+    if (checked === true) {
+      arr = [...checkDocArr, value];
+      setCheckDocArr([...checkDocArr, value]);
+      setDocumentPersons(value);
+    } else {
+      let d: string[] = checkDocArr.filter((x) => x != value);
+      arr = [...d];
+      setCheckDocArr(d);
+      if (d.length === 0) {
+        arr = undefined;
+      }
+    }
+    setDocumentPersons(arr);
+  };
   const PageTitle = (
     <>
       <div
@@ -237,7 +254,7 @@ export default function IndexFinishTask() {
         className="d-flex justify-content-between"
         style={{ padding: "0px" }}
       >
-        <div className="col-lg-3 p-1">
+        <div className="col-lg-2 p-1">
           <Input
             prefix={<SearchOutlined style={{ color: color.Disable }} />}
             placeholder="ค้นหาชื่อเกษตรกร, คนบินโดรน หรือเบอร์โทร"
@@ -324,6 +341,13 @@ export default function IndexFinishTask() {
             onSearchType={(e: any) => onSearchCreateBy(e)}
             list={applicationType}
             title="เลือกรูปแบบการสร้าง"
+          />
+        </div>
+        <div className="col-lg" style={{ paddingRight: 3 }}>
+          <CheckDocument
+            onSearchType={(e) => onSearchCheckDocument(e)}
+            list={documentPersons}
+            title="เลือกการตรวจเอกสาร"
           />
         </div>
         <div className="col-lg">
@@ -437,7 +461,7 @@ export default function IndexFinishTask() {
                 cursor: "pointer",
               }}
               onClick={() => {
-                setSortField("dateAppointment");
+                setSortField("dronerFirstname");
                 setSortDirection((prev) => {
                   if (prev === "ASC") {
                     return "DESC";
@@ -485,7 +509,7 @@ export default function IndexFinishTask() {
               <span className="text-dark-75  d-block font-size-lg">
                 {row.droner !== null
                   ? row.droner.firstname + " " + row.droner.lastname
-                  : null}
+                  : "-"}
               </span>
               <span style={{ color: color.Grey, fontSize: "12px" }}>
                 {row.droner !== null ? row.droner.telephoneNo : null}
@@ -496,58 +520,10 @@ export default function IndexFinishTask() {
       },
     },
     {
-      title: "ชื่อเกษตรกร",
-      dataIndex: "farmer",
-      key: "farmer",
-      render: (value: any, row: any, index: number) => {
-        return {
-          children: (
-            <>
-              <span className="text-dark-75  d-block font-size-lg">
-                {row.farmer.firstname + " " + row.farmer.lastname}
-              </span>
-              <span style={{ color: color.Grey, fontSize: "12px" }}>
-                {row.farmer.telephoneNo}
-              </span>
-            </>
-          ),
-        };
-      },
-    },
-    {
-      title: "พื้นที่แปลงเกษตร",
-      dataIndex: "plotArea",
-      key: "plotArea",
-      render: (value: any, row: any, index: number) => {
-        const subdistrict = row.farmerPlot.plotArea;
-        const district = row.farmerPlot.plotArea;
-        const province = row.farmerPlot.plotArea;
-        return {
-          children: (
-            <>
-              <span className="text-dark-75  d-block font-size-lg">
-                {subdistrict !== null
-                  ? subdistrict.subdistrictName + "/"
-                  : null}
-                {district !== null ? district.districtName + "/" : null}
-                {province !== null ? province.provinceName + "" : null}
-              </span>
-              <a
-                onClick={() => handleModalMap(row.farmerPlotId)}
-                style={{ color: color.primary1 }}
-              >
-                ดูแผนที่แปลง
-              </a>
-            </>
-          ),
-        };
-      },
-    },
-    {
       title: () => {
         return (
           <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-            Rating{" "}
+            ชื่อเกษตรกร
             <div
               style={{
                 display: "flex",
@@ -555,7 +531,7 @@ export default function IndexFinishTask() {
                 cursor: "pointer",
               }}
               onClick={() => {
-                setSortField("avg");
+                setSortField("farmerFirstname");
                 setSortDirection((prev) => {
                   if (prev === "ASC") {
                     return "DESC";
@@ -594,29 +570,47 @@ export default function IndexFinishTask() {
           </div>
         );
       },
-      dataIndex: "avgrating",
-      key: "avgrating",
+      dataIndex: "farmer",
+      key: "farmer",
       render: (value: any, row: any, index: number) => {
         return {
           children: (
             <>
               <span className="text-dark-75  d-block font-size-lg">
-                {row.reviewDronerAvg > "0" ? (
-                  <span>
-                    <StarFilled
-                      style={{
-                        color: "#FFCA37",
-                        fontSize: "20px",
-                        marginRight: "7px",
-                        verticalAlign: 0.5,
-                      }}
-                    />
-                    {parseFloat(row.reviewDronerAvg).toFixed(1)}
-                  </span>
-                ) : (
-                  "-"
-                )}
+                {row.farmer.firstname + " " + row.farmer.lastname}
               </span>
+              <span style={{ color: color.Grey, fontSize: "12px" }}>
+                {row.farmer.telephoneNo}
+              </span>
+            </>
+          ),
+        };
+      },
+    },
+    {
+      title: "พื้นที่แปลงเกษตร",
+      dataIndex: "plotArea",
+      key: "plotArea",
+      render: (value: any, row: any, index: number) => {
+        const subdistrict = row.farmerPlot.plotArea;
+        const district = row.farmerPlot.plotArea;
+        const province = row.farmerPlot.plotArea;
+        return {
+          children: (
+            <>
+              <span className="text-dark-75  d-block font-size-lg">
+                {subdistrict !== null
+                  ? subdistrict.subdistrictName + "/"
+                  : "-/"}
+                {district !== null ? district.districtName + "/" : "-/"}
+                {province !== null ? province.provinceName + "" : "-"}
+              </span>
+              <a
+                onClick={() => handleModalMap(row.farmerPlotId)}
+                style={{ color: color.primary1 }}
+              >
+                ดูแผนที่แปลง
+              </a>
             </>
           ),
         };
@@ -626,7 +620,7 @@ export default function IndexFinishTask() {
       title: () => {
         return (
           <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-            ค่าบริการ{" "}
+            Rating{" "}
             <div
               style={{
                 display: "flex",
@@ -634,7 +628,7 @@ export default function IndexFinishTask() {
                 cursor: "pointer",
               }}
               onClick={() => {
-                setSortField("totalPrice");
+                setSortField("reviewDronerAvg");
                 setSortDirection((prev) => {
                   if (prev === "ASC") {
                     return "DESC";
@@ -667,6 +661,115 @@ export default function IndexFinishTask() {
                   position: "relative",
                   bottom: 2,
                   color: sortDirection4 === "DESC" ? "#ffca37" : "white",
+                }}
+              />
+            </div>
+          </div>
+        );
+      },
+      dataIndex: "avgrating",
+      key: "avgrating",
+      render: (value: any, row: any, index: number) => {
+        return {
+          children: (
+            <>
+              <span className="text-dark-75  d-block font-size-lg">
+                {row.reviewDronerAvg > "0" ? (
+                  <span>
+                    <StarFilled
+                      style={{
+                        color: "#FFCA37",
+                        fontSize: "20px",
+                        marginRight: "7px",
+                        verticalAlign: 0.5,
+                      }}
+                    />
+                    {parseFloat(row.reviewDronerAvg).toFixed(1)}
+                  </span>
+                ) : (
+                  "-"
+                )}
+              </span>
+            </>
+          ),
+        };
+      },
+    },
+    {
+      title: "ตรวจเอกสาร",
+      dataIndex: "",
+      render: (value: any, row: any, index: number) => {
+        return {
+          children: (
+            <>
+              <div>
+                <Image
+                  src={row.droner?.file.length === 1 ? icon.check : icon.cancel}
+                  preview={false}
+                  style={{ width: 18, height: 18, marginRight: 6 }}
+                />
+                บัตรประชาชน
+              </div>
+              <div>
+                <Image
+                  src={
+                    row.droner?.isBookBank === true ? icon.check : icon.cancel
+                  }
+                  preview={false}
+                  style={{ width: 18, height: 18, marginRight: 6 }}
+                />
+                สมุดบัญชี
+              </div>
+            </>
+          ),
+        };
+      },
+    },
+    {
+      title: () => {
+        return (
+          <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+            ค่าบริการ{" "}
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                cursor: "pointer",
+              }}
+              onClick={() => {
+                setSortField("totalPrice");
+                setSortDirection((prev) => {
+                  if (prev === "ASC") {
+                    return "DESC";
+                  } else if (prev === undefined) {
+                    return "ASC";
+                  } else {
+                    return undefined;
+                  }
+                });
+                setSortDirection5((prev) => {
+                  if (prev === "ASC") {
+                    return "DESC";
+                  } else if (prev === undefined) {
+                    return "ASC";
+                  } else {
+                    return undefined;
+                  }
+                });
+              }}
+            >
+              <CaretUpOutlined
+                style={{
+                  position: "relative",
+                  top: 2,
+                  color: sortDirection5 === "ASC" ? "#ffca37" : "white",
+                }}
+              />
+              <CaretDownOutlined
+                style={{
+                  position: "relative",
+                  bottom: 2,
+                  color: sortDirection5 === "DESC" ? "#ffca37" : "white",
                 }}
               />
             </div>

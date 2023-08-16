@@ -423,7 +423,9 @@ const EditInprogressTask = () => {
                         />
                         <span>
                           {" "}
-                          {data.createBy ? data.createBy + ` ${item.create}` : "-"}
+                          {data.createBy
+                            ? data.createBy + ` ${item.create}`
+                            : "-"}
                         </span>
                       </div>
                     )
@@ -617,11 +619,13 @@ const EditInprogressTask = () => {
               <Avatar
                 size={25}
                 src={
+                  dronerSelected.dronerDrone[0] !== undefined &&
                   dronerSelected.dronerDrone[0].drone.droneBrand.logoImagePath
                 }
                 style={{ marginRight: "5px" }}
               />
-              {dronerSelected.dronerDrone[0].drone.droneBrand.name}
+              {dronerSelected.dronerDrone[0] !== undefined &&
+                dronerSelected.dronerDrone[0].drone.droneBrand.name}
               <br />
               <p style={{ fontSize: "12px", color: color.Grey }}>
                 {dronerSelected.totalDroneCount > 1 && "(มากกว่า 1 ยี่หัอ)"}

@@ -54,6 +54,7 @@ import { DashboardLayout } from "../../../components/layout/Layout";
 import { useNavigate } from "react-router-dom";
 import { listAppType } from "../../../definitions/ApplicatoionTypes";
 import { ListCheckHaveLine } from "../../../components/dropdownCheck/ListStatusAppType";
+import { CheckboxValueType } from "antd/lib/checkbox/Group";
 
 export default function IndexTodayTask() {
   const navigate = useNavigate();
@@ -81,6 +82,12 @@ export default function IndexTodayTask() {
   const [applicationType, setApplicationType] = useState<any>();
   const [loading, setLoading] = useState(false);
   const [problems, setProblems] = useState<any>([]);
+  const [indeterminateWaitStart, setIndeterminateWaitStart] = useState(false);
+  const [indeterminateInprogress, setIndeterminateInprogress] = useState(false);
+
+  const [checkAllWaitStart, setCheckAllWaitStart] = useState(false);
+  const [checkAllInprogress, setCheckAllInprogress] = useState(false);
+
   const [sortDirection, setSortDirection] = useState<string | undefined>();
   const [sortField, setSortField] = useState<string | undefined>();
   const [sortDirection1, setSortDirection1] = useState<string | undefined>(
@@ -95,6 +102,18 @@ export default function IndexTodayTask() {
   const [sortDirection4, setSortDirection4] = useState<string | undefined>(
     undefined
   );
+  const [subWaitStart, setSubWaitStart] = useState<any>();
+  const [subInprogress, setSubInprogress] = useState<any>();
+  const statusListWaitStart = ["waitStart_normal", "waitStart_problem"];
+  const statusListInprogress = [
+    "inprogress_normal",
+    "WAIT_APPROVE",
+    "EXTENDED",
+    "inprogress_problem",
+  ];
+
+  const [statusArrMain, setStatusArrMain] = useState<string[]>([]);
+
   const fetchAllTaskToday = async () => {
     setLoading(true);
     await TaskInprogressDatasource.getAllTaskToday(
@@ -159,70 +178,7 @@ export default function IndexTodayTask() {
     setSearchSubdistrict(subdistrictId);
     setCurrent(1);
   };
-  const handleStatus = (e: any) => {
-    let value = e.target.value;
-    let checked = e.target.checked;
-    let arr: any = 0;
-    if (checked) {
-      arr = [...statusArr, value];
-      setStatusArr([...statusArr, value]);
-    } else {
-      let d: string[] = statusArr.filter((x) => x != value);
-      arr = [...d];
-      setStatusArr(d);
-      if (d.length == 0) {
-        arr = undefined;
-      }
-    }
-    setSearchStatus(arr);
-    setCurrent(1);
-  };
-  const handleSubStatus = (e: any) => {
-    let value = e.target.value;
-    let checked = e.target.checked;
-    let statusProblem = ["waitstartproblem", "inprogressproblem"];
-    let statusNormal = ["waitstartnormal", "inprogressnormal"];
-    let m: any = [];
-    if (checked) {
-      m = [...problems, value];
-      setProblems(m);
-      if (m.length == 2) {
-        setIsProblem(undefined);
-        setIsDelay(undefined);
-      } else {
-        if (statusProblem.includes(m[0])) {
-          setIsProblem(true);
-        } else if (statusNormal.includes(m[0])) {
-          setIsProblem(false);
-          setStatusDelay(null);
-        } else if (value == "extended") {
-          setStatusDelay(value);
-          setIsDelay(true);
-        } else if (value == "waitapprovedelay") {
-          setStatusDelay(value);
-          setIsDelay(false);
-        }
-      }
-    } else {
-      m = problems.filter((x: any) => x != value);
-      setProblems(m);
-      if (m.length == 0) {
-        setIsProblem(undefined);
-        setIsDelay(undefined);
-        setStatusDelay(undefined);
-      } else {
-        if (m == "waitstartproblem" || m == "inprogressproblem") {
-          setIsProblem(true);
-        } else if (m == "waitstartnormal" || m == "inprogressnormal") {
-          setIsProblem(false);
-        } else if (m == "extended") {
-          setIsDelay(true);
-        } else if (m == "waitapprovedelay") {
-          setIsDelay(false);
-        }
-      }
-    }
-  };
+
   const handleModalMap = (plotId: string) => {
     setShowModalMap((prev) => !prev);
     setPlotId(plotId);
@@ -256,88 +212,172 @@ export default function IndexTodayTask() {
     setCurrent(current);
     setRow(pageSize);
   };
+  const onChangeListWaitStart = (list: CheckboxValueType[]) => {
+    let arr: any = [];
+    arr = [...list];
+    if (arr[0] === "waitStart_normal") {
+      setIsProblem(false);
+      setSearchStatus("WAIT_START");
+    } else if (arr[0] === "waitStart_problem") {
+      setIsProblem(true);
+      setSearchStatus("WAIT_START");
+    } else if (arr.length === 0) {
+      setIsProblem(undefined);
+      setIsDelay(undefined);
+      setStatusDelay(undefined);
+      setSearchStatus(undefined);
+    }
+    setSubWaitStart(list);
+    setIndeterminateWaitStart(
+      !!list.length && list.length < statusListWaitStart.length
+    );
+    setCheckAllWaitStart(list.length === statusListWaitStart.length);
+  };
+  const onChangeListInprogress = (list: CheckboxValueType[]) => {
+    let arr: any = 0;
+    arr = [...list];
+    if (arr[0] === "inprogress_normal") {
+      setIsProblem(false);
+      setSearchStatus("IN_PROGRESS");
+    } else if (arr[0] === "inprogress_problem") {
+      setIsProblem(true);
+      setSearchStatus("IN_PROGRESS");
+    } else if (arr[0] === "EXTENDED") {
+      setIsDelay(true);
+      setStatusDelay("EXTENDED");
+      setSearchStatus("IN_PROGRESS");
+    } else if (arr[0] === "WAIT_APPROVE") {
+      setIsDelay(false);
+      setStatusDelay("WAIT_APPROVE");
+      setSearchStatus("IN_PROGRESS");
+    } else if (arr.length === 0) {
+      setIsProblem(undefined);
+      setIsDelay(undefined);
+      setStatusDelay(undefined);
+      setSearchStatus(undefined);
+    }
+    setSubInprogress(list);
+    setIndeterminateInprogress(
+      !!list.length && list.length < statusListInprogress.length
+    );
+    setCheckAllInprogress(list.length === statusListInprogress.length);
+  };
+  const onSearchStatus = (e: any) => {
+    let value = e.target.value;
+    let checked = e.target.checked;
+    let arr: any = 0;
+    if (checked === true) {
+      arr = [...statusArrMain, value];
+      setStatusArrMain([...statusArrMain, value]);
+      setSearchStatus(value);
+      if (value === "WAIT_START") {
+        setSubWaitStart(e.target.checked ? statusListWaitStart : []);
+        setIndeterminateWaitStart(false);
+        setCheckAllWaitStart(e.target.checked);
+      } else {
+        setSubInprogress(e.target.checked ? statusListInprogress : []);
+        setIndeterminateInprogress(false);
+        setCheckAllInprogress(e.target.checked);
+      }
+    } else {
+      let d: string[] = statusArrMain.filter((x) => x != value);
+      arr = [...d];
+      setStatusArrMain(d);
+      if (d.length == 0) {
+        arr = undefined;
+      }
+      if (value === "WAIT_START") {
+        setSubWaitStart(e.target.checked ? statusListWaitStart : []);
+        setIndeterminateWaitStart(false);
+        setCheckAllWaitStart(e.target.checked);
+      } else {
+        setSubInprogress(e.target.checked ? statusListInprogress : []);
+        setIndeterminateInprogress(false);
+        setCheckAllInprogress(e.target.checked);
+      }
+    }
+    setSearchStatus(arr);
+  };
   const status = (
     <Menu
       items={[
         {
-          label: "รอเริ่มงาน",
+          label: (
+            <>
+              <Checkbox
+                indeterminate={indeterminateWaitStart}
+                onChange={onSearchStatus}
+                checked={checkAllWaitStart}
+                value="WAIT_START"
+              >
+                รอเริ่มงาน
+              </Checkbox>
+              <br />
+              <Checkbox.Group
+                value={subWaitStart}
+                style={{ width: "100%" }}
+                onChange={onChangeListWaitStart}
+              >
+                <Checkbox
+                  style={{ marginLeft: "20px" }}
+                  value="waitStart_normal"
+                >
+                  ปกติ
+                </Checkbox>
+                <br />
+                <Checkbox
+                  style={{ marginLeft: "20px" }}
+                  value="waitStart_problem"
+                >
+                  งานมีปัญหา
+                </Checkbox>
+              </Checkbox.Group>
+            </>
+          ),
           key: "1",
-          icon: (
-            <Checkbox value="WAIT_START" onClick={(e) => handleStatus(e)} />
-          ),
         },
         {
-          label: "งานปกติ",
+          label: (
+            <>
+              <Checkbox
+                indeterminate={indeterminateInprogress}
+                onChange={onSearchStatus}
+                checked={checkAllInprogress}
+                value="IN_PROGRESS"
+              >
+                กำลังดำเนินงาน
+              </Checkbox>
+              <br />
+              <Checkbox.Group
+                value={subInprogress}
+                style={{ width: "100%" }}
+                onChange={onChangeListInprogress}
+              >
+                <Checkbox
+                  style={{ marginLeft: "20px" }}
+                  value="inprogress_normal"
+                >
+                  ปกติ
+                </Checkbox>
+                <br />
+                <Checkbox style={{ marginLeft: "20px" }} value="WAIT_APPROVE">
+                  รออนุมัติขยายเวลา
+                </Checkbox>
+                <br />
+                <Checkbox style={{ marginLeft: "20px" }} value="EXTENDED">
+                  ขยายเวลา
+                </Checkbox>
+                <br />
+                <Checkbox
+                  style={{ marginLeft: "20px" }}
+                  value="inprogress_problem"
+                >
+                  งานมีปัญหา
+                </Checkbox>
+              </Checkbox.Group>
+            </>
+          ),
           key: "2",
-          icon: (
-            <Checkbox
-              style={{ marginLeft: "20px" }}
-              value="waitstartnormal"
-              onClick={(e) => handleSubStatus(e)}
-            />
-          ),
-        },
-        {
-          label: "งานมีปัญหา",
-          key: "3",
-          icon: (
-            <Checkbox
-              style={{ marginLeft: "20px" }}
-              value="waitstartproblem"
-              onClick={(e) => handleSubStatus(e)}
-            />
-          ),
-        },
-        {
-          label: "กำลังดำเนินงาน",
-          key: "4",
-          icon: (
-            <Checkbox value="IN_PROGRESS" onClick={(e) => handleStatus(e)} />
-          ),
-        },
-        {
-          label: "ปกติ",
-          key: "5",
-          icon: (
-            <Checkbox
-              style={{ marginLeft: "20px" }}
-              value="inprogressnormal"
-              onClick={(e) => handleSubStatus(e)}
-            />
-          ),
-        },
-        {
-          label: "รออนุมัติขยายเวลา",
-          key: "6",
-          icon: (
-            <Checkbox
-              style={{ marginLeft: "20px" }}
-              value="waitapprovedelay"
-              onClick={(e) => handleSubStatus(e)}
-            />
-          ),
-        },
-        {
-          label: "ขยายเวลา",
-          key: "7",
-          icon: (
-            <Checkbox
-              style={{ marginLeft: "20px" }}
-              value="extended"
-              onClick={(e) => handleSubStatus(e)}
-            />
-          ),
-        },
-        {
-          label: "งานมีปัญหา",
-          key: "8",
-          icon: (
-            <Checkbox
-              style={{ marginLeft: "20px" }}
-              value="inprogressproblem"
-              onClick={(e) => handleSubStatus(e)}
-            />
-          ),
         },
       ]}
     />

@@ -14,7 +14,8 @@ export class TaskFinishedDatasource {
     searchText?: string,
     applicationType?: string[],
     sortDirection?: string,
-    sortField?: string
+    sortField?: string,
+    documentPersons?: string[],
   ): Promise<TaskFinishListEntity> {
     const params = {
       page: page,
@@ -29,6 +30,7 @@ export class TaskFinishedDatasource {
       applicationType: applicationType,
       sortDirection: sortDirection,
       sortField: sortField,
+      documentPersons:documentPersons
     };
     return httpClient
       .get(BASE_URL + "/tasks/task-finish/get-all-task-finish", { params })

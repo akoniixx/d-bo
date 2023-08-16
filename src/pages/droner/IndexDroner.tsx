@@ -68,6 +68,7 @@ function IndexDroner() {
   const [sumPlotCard, setSumPlotCard] = useState<any>({
     card1: "รอตรวจสอบ",
     card2: "ไม่อนุมัติ",
+    card3: "ข้อมูลไม่ครบถ้วน",
   });
   const [loading, setLoading] = useState(false);
   const [appType, setAppType] = useState<any>();
@@ -168,6 +169,7 @@ function IndexDroner() {
       setSumPlotCard({
         card1: "รอตรวจสอบ",
         card2: "ไม่อนุมัติ",
+        card3: "ข้อมูลไม่ครบถ้วน",
       });
     } else {
       setSearchStatus(undefined);
@@ -299,6 +301,18 @@ function IndexDroner() {
               ),
               key: "4",
             },
+        mainStatus === "PENDING"
+          ? {
+              label: (
+                <>
+                  <Checkbox onClick={onSearchStatus} value="OPEN">
+                    ข้อมูลไม่ครบถ้วน
+                  </Checkbox>
+                </>
+              ),
+              key: "5",
+            }
+          : null,
       ]}
     />
   );
@@ -369,13 +383,19 @@ function IndexDroner() {
         </div>
       </div>
       <StatusPlots
+        checkPage="DronerPage"
         title1={sumPlotCard?.card1}
         title2={sumPlotCard?.card2}
+        title3={sumPlotCard?.card3}
+        status={mainStatus}
         bgColor1={
           sumPlotCard?.card1 === "รอตรวจสอบ" ? color.Warning : color.Success
         }
         bgColor2={
           sumPlotCard?.card2 === "ไม่อนุมัติ" ? color.Grey : color.Error
+        }
+        bgColor3={
+          sumPlotCard?.card3 === "ข้อมูลไม่ครบถ้วน" ? color.Disable : "none"
         }
         countPlot1={
           mainStatus === "PENDING"
@@ -386,6 +406,11 @@ function IndexDroner() {
           mainStatus === "ACTIVE"
             ? numberWithCommas(summary?.count_inactive) + " คน"
             : numberWithCommas(summary?.count_reject) + " คน"
+        }
+        countPlot3={
+          mainStatus === "PENDING"
+            ? numberWithCommas(summary?.count_inactive) + " คน"
+            : null
         }
       />
       <div

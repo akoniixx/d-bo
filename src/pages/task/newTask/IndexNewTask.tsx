@@ -341,7 +341,6 @@ const IndexNewTask = () => {
       },
       dataIndex: "date_appointment",
       key: "date_appointment",
-      width: "20%",
       render: (value: any, row: any, index: number) => {
         return {
           children: (
@@ -564,7 +563,6 @@ const IndexNewTask = () => {
       title: "",
       dataIndex: "Action",
       key: "Action",
-      width: "9%",
       render: (value: any, row: any, index: number) => {
         return {
           children: (

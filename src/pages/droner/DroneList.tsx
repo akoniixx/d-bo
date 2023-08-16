@@ -347,18 +347,7 @@ function DroneList() {
             ))}
           </Select>
         </div>
-        {/* <div className="col p-1">
-          <Select
-            className="col-lg-12"
-            placeholder="เลือกสถานะ"
-            onChange={handleStatus}
-          >
-            {DRONE_STATUS.map((item) => (
-              <option value={item.value}>{item.name}</option>
-            ))}
-          </Select>
-        </div> */}
-         <div className="col-lg pt-1 p-1">
+        <div className="col-lg pt-1 p-1">
           <Dropdown
             overlay={SubStatus}
             trigger={["click"]}
