@@ -409,7 +409,7 @@ function IndexDroner() {
         }
         countPlot3={
           mainStatus === "PENDING"
-            ? numberWithCommas(summary?.count_inactive) + " คน"
+            ? numberWithCommas(summary?.count_open) + " คน"
             : null
         }
       />
@@ -549,7 +549,6 @@ function IndexDroner() {
     current,
     pageSize
   ) => {
-    console.log(current, pageSize);
     setCurrent(current);
     setRow(pageSize);
   };
@@ -901,7 +900,7 @@ function IndexDroner() {
             const diffTime = nowDate.getTime() - rowDate.getTime();
             let diffDay = Math.floor(diffTime / (1000 * 3600 * 24));
             diffDay = diffDay === 0 ? 1 : diffDay;
-            return `รอไปแล้ว ${diffDay} วัน`;
+            return `(รอไปแล้ว ${diffDay} วัน)`;
           }
         };
         let checkProfile = ![

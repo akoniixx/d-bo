@@ -835,7 +835,7 @@ function IndexFarmer() {
             const diffTime = nowDate.getTime() - rowDate.getTime();
             let diffDay = Math.floor(diffTime / (1000 * 3600 * 24));
             diffDay = diffDay === 0 ? 1 : diffDay;
-            return `รอไปแล้ว ${diffDay} วัน`;
+            return `(รอไปแล้ว ${diffDay} วัน)`;
           }
         };
         let checkProfile = ![

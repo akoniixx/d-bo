@@ -7,6 +7,7 @@ import {
 import { DroneEntity, DroneEntity_INIT } from "./DroneEntities";
 import { FullAddressEntiry_INIT, FullAddressEntity } from "./AddressEntities";
 import { DronerAreaEntity, DronerAreaEntity_INIT } from "./DronerAreaEntities";
+import { summaryFarmerEntity } from "./FarmerEntities";
 
 export interface DronerDroneEntity {
   id?: string;
@@ -112,6 +113,7 @@ export interface GetDronerDroneEntity {
   createdAt: string;
   updatedAt: string;
   comment?: string;
+  dateWaitPending: string;
 }
 export const GetDronerDroneEntity_INIT: GetDronerDroneEntity = {
   id: "",
@@ -127,9 +129,11 @@ export const GetDronerDroneEntity_INIT: GetDronerDroneEntity = {
   file: [ImageEntity_INTI],
   createdAt: "",
   updatedAt: "",
+  dateWaitPending: ""
 };
 export interface DronerDroneListEntity {
   data: GetDronerDroneEntity[];
   count: number;
+  summary: summaryFarmerEntity[];
 }
 

@@ -7,20 +7,28 @@ import { BASE_URL, httpClient } from "../config/config";
 
 export class DronerDroneDatasource {
   static getDronerDrone(
+    mainStatus: string[],
+    waitPendingDate: string[],
     page: number,
     row: number,
-    status?: string,
+    status?: string[],
+    search?: string,
+    sortDirection?: string,
+    sortField?: string,
     droneId?: string,
-    droneBrandId?: string,
-    search?: string
+    droneBrandId?: string
   ): Promise<DronerDroneListEntity> {
     const params = {
+      mainStatus: mainStatus,
+      waitPendingDate: waitPendingDate,
       page: page,
       take: row,
       status: status,
+      search: search,
+      sortDirection: sortDirection,
+      sortField: sortField,
       droneId: droneId,
       droneBrandId: droneBrandId,
-      search: search,
     };
     return httpClient
       .get(BASE_URL + "/droner-drone", { params })
@@ -31,9 +39,7 @@ export class DronerDroneDatasource {
         console.log(error);
       });
   }
-  static async getDronerDroneById(
-    id: string
-  ): Promise<GetDronerDroneEntity> {
+  static async getDronerDroneById(id: string): Promise<GetDronerDroneEntity> {
     return httpClient
       .get(BASE_URL + "/droner-drone/" + id)
       .then((res) => {

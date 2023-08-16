@@ -7,6 +7,7 @@ import {
   Input,
   Menu,
   Pagination,
+  PaginationProps,
   Row,
   Select,
   Spin,
@@ -30,6 +31,8 @@ import { DronerDroneListEntity } from "../../entities/DronerDroneEntities";
 import color from "../../resource/color";
 import { formatDate, numberWithCommas } from "../../utilities/TextFormatter";
 import {
+  CaretDownOutlined,
+  CaretUpOutlined,
   DownOutlined,
   EditOutlined,
   FileTextFilled,
@@ -39,17 +42,18 @@ import { useNavigate } from "react-router-dom";
 import StatusButton from "../../components/button/StatusButton";
 import StatusPlots from "../../components/card/StatusPlots";
 import { CheckboxValueType } from "antd/lib/checkbox/Group";
+import { image } from "../../resource";
 
 function DroneList() {
   const navigate = useNavigate();
-  const row = 10;
+  const [row, setRow] = useState(10);
   const [current, setCurrent] = useState(1);
   const [droneList, setDroneList] = useState<DronerDroneListEntity>();
   const [droneBrand, setDroneBrand] = useState<DroneBrandEntity[]>();
   const [seriesDrone, setSeriesDrone] = useState<DroneEntity[]>();
   const [droneBrandId, setDroneBrandId] = useState<string>();
   const [searchSeriesDrone, setSearchSeriesDrone] = useState<any>();
-  const [searchStatus, setSearchStatus] = useState<string>();
+  const [searchStatus, setSearchStatus] = useState<any>();
   const [searchText, setSearchText] = useState<string>();
   const [mainStatus, setMainStatus] = useState<any>("PENDING");
   const [waitPendingDate, setWaitPendingDate] = useState<any>();
@@ -64,29 +68,51 @@ function DroneList() {
   const [statusArr, setStatusArr] = useState<string[]>([]);
   const statusListPend = ["FIRST", "SECOND", "THIRD"];
   const [statusArrMain, setStatusArrMain] = useState<string[]>([]);
+  const [sortDirection, setSortDirection] = useState<string | undefined>();
+  const [sortField, setSortField] = useState<string | undefined>();
+  const [summary, setSummary] = useState<any>();
+
+  const [sortDirection1, setSortDirection1] = useState<string | undefined>(
+    undefined
+  );
+  const [sortDirection2, setSortDirection2] = useState<string | undefined>(
+    undefined
+  );
+  const [sortDirection3, setSortDirection3] = useState<string | undefined>(
+    undefined
+  );
+  const [sortDirection4, setSortDirection4] = useState<string | undefined>(
+    undefined
+  );
+  const [sortDirection5, setSortDirection5] = useState<string | undefined>(
+    undefined
+  );
 
   const fetchDronerDroneList = async () => {
     setLoading(true);
     await DronerDroneDatasource.getDronerDrone(
+      mainStatus,
+      waitPendingDate,
       current,
       row,
       searchStatus,
+      searchText,
+      sortDirection,
+      sortField,
       searchSeriesDrone,
-      droneBrandId,
-      searchText
+      droneBrandId
     )
       .then((res) => {
         setDroneList(res);
+        setSummary(res.summary[0]);
       })
       .catch((err) => console.log(err))
       .finally(() => setLoading(false));
   };
   const fetchDroneList = async () => {
-    await DroneDatasource.getDroneList(current, row, droneBrandId).then(
-      (res) => {
-        setSeriesDrone(res.data);
-      }
-    );
+    await DroneDatasource.getDroneList(1, row, droneBrandId).then((res) => {
+      setSeriesDrone(res.data);
+    });
   };
   const fetchDroneBrand = async () => {
     await DroneDatasource.getDroneBrandList().then((res) => {
@@ -95,9 +121,11 @@ function DroneList() {
   };
   useEffect(() => {
     fetchDronerDroneList();
-    fetchDroneList();
     fetchDroneBrand();
-  }, [current, row]);
+  }, [current, row, mainStatus, sortDirection]);
+  useEffect(() => {
+    fetchDroneList();
+  }, [droneBrandId]);
 
   const onChangePage = (page: number) => {
     setCurrent(page);
@@ -112,10 +140,6 @@ function DroneList() {
   };
   const handleDroneSeries = (seriesDrone: string) => {
     setSearchSeriesDrone(seriesDrone);
-    setCurrent(1);
-  };
-  const handleStatus = (status: any) => {
-    setSearchStatus(status);
     setCurrent(1);
   };
   const CheckStatus = (e: any) => {
@@ -187,6 +211,13 @@ function DroneList() {
       }
     }
     setSearchStatus(arr);
+  };
+  const onShowSizeChange: PaginationProps["onShowSizeChange"] = (
+    current,
+    pageSize
+  ) => {
+    setCurrent(current);
+    setRow(pageSize);
   };
   const SubStatus = (
     <Menu
@@ -284,13 +315,13 @@ function DroneList() {
         }
         countPlot1={
           mainStatus === "PENDING"
-            ? numberWithCommas(100) + " คัน"
-            : numberWithCommas(100) + " คัน"
+            ? numberWithCommas(summary?.count_pending) + " คัน"
+            : numberWithCommas(summary?.count_active) + " คัน"
         }
         countPlot2={
           mainStatus === "ACTIVE"
-            ? numberWithCommas(100) + " คัน"
-            : numberWithCommas(100) + " คัน"
+            ? numberWithCommas(summary?.count_inactive) + " คัน"
+            : numberWithCommas(summary?.count_reject) + " คัน"
         }
       />
       <div className="d-flex justify-content-between pt-3">
@@ -341,6 +372,7 @@ function DroneList() {
             placeholder="เลือกรุ่นโดรน"
             allowClear
             onChange={handleDroneSeries}
+            disabled={!droneBrandId}
           >
             {seriesDrone?.map((item: any) => (
               <option value={item.id.toString()}>{item.series}</option>
@@ -379,7 +411,56 @@ function DroneList() {
   );
   const columns = [
     {
-      title: "วันที่ลงทะเบียน",
+      title: () => {
+        return (
+          <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+            วันที่ลงทะเบียน
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                cursor: "pointer",
+              }}
+              onClick={() => {
+                setSortField("createdAt");
+                setSortDirection((prev) => {
+                  if (prev === "ASC") {
+                    return "DESC";
+                  } else if (prev === undefined) {
+                    return "ASC";
+                  } else {
+                    return undefined;
+                  }
+                });
+                setSortDirection1((prev) => {
+                  if (prev === "ASC") {
+                    return "DESC";
+                  } else if (prev === undefined) {
+                    return "ASC";
+                  } else {
+                    return undefined;
+                  }
+                });
+              }}
+            >
+              <CaretUpOutlined
+                style={{
+                  position: "relative",
+                  top: 2,
+                  color: sortDirection1 === "ASC" ? "#ffca37" : "white",
+                }}
+              />
+              <CaretDownOutlined
+                style={{
+                  position: "relative",
+                  bottom: 2,
+                  color: sortDirection1 === "DESC" ? "#ffca37" : "white",
+                }}
+              />
+            </div>
+          </div>
+        );
+      },
       dataIndex: "createdAt",
       key: "createdAt",
       render: (value: any, row: any, index: number) => {
@@ -397,7 +478,56 @@ function DroneList() {
       },
     },
     {
-      title: "ยี่ห้อโดรน",
+      title: () => {
+        return (
+          <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+            ยี่ห้อโดรน
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                cursor: "pointer",
+              }}
+              onClick={() => {
+                setSortField("droneBrand");
+                setSortDirection((prev) => {
+                  if (prev === "ASC") {
+                    return "DESC";
+                  } else if (prev === undefined) {
+                    return "ASC";
+                  } else {
+                    return undefined;
+                  }
+                });
+                setSortDirection2((prev) => {
+                  if (prev === "ASC") {
+                    return "DESC";
+                  } else if (prev === undefined) {
+                    return "ASC";
+                  } else {
+                    return undefined;
+                  }
+                });
+              }}
+            >
+              <CaretUpOutlined
+                style={{
+                  position: "relative",
+                  top: 2,
+                  color: sortDirection2 === "ASC" ? "#ffca37" : "white",
+                }}
+              />
+              <CaretDownOutlined
+                style={{
+                  position: "relative",
+                  bottom: 2,
+                  color: sortDirection2 === "DESC" ? "#ffca37" : "white",
+                }}
+              />
+            </div>
+          </div>
+        );
+      },
       dataIndex: "droneBrand",
       key: "droneBrand",
       render: (value: any, row: any, index: number) => {
@@ -429,7 +559,56 @@ function DroneList() {
       },
     },
     {
-      title: "รุ่นโดรน",
+      title: () => {
+        return (
+          <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+            รุ่นโดรน
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                cursor: "pointer",
+              }}
+              onClick={() => {
+                setSortField("series");
+                setSortDirection((prev) => {
+                  if (prev === "ASC") {
+                    return "DESC";
+                  } else if (prev === undefined) {
+                    return "ASC";
+                  } else {
+                    return undefined;
+                  }
+                });
+                setSortDirection3((prev) => {
+                  if (prev === "ASC") {
+                    return "DESC";
+                  } else if (prev === undefined) {
+                    return "ASC";
+                  } else {
+                    return undefined;
+                  }
+                });
+              }}
+            >
+              <CaretUpOutlined
+                style={{
+                  position: "relative",
+                  top: 2,
+                  color: sortDirection3 === "ASC" ? "#ffca37" : "white",
+                }}
+              />
+              <CaretDownOutlined
+                style={{
+                  position: "relative",
+                  bottom: 2,
+                  color: sortDirection3 === "DESC" ? "#ffca37" : "white",
+                }}
+              />
+            </div>
+          </div>
+        );
+      },
       dataIndex: "series",
       key: "series",
       render: (value: any, row: any, index: number) => {
@@ -447,7 +626,56 @@ function DroneList() {
       },
     },
     {
-      title: "เลขตัวถัง",
+      title: () => {
+        return (
+          <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+            เลขตัวถัง
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                cursor: "pointer",
+              }}
+              onClick={() => {
+                setSortField("serialNo");
+                setSortDirection((prev) => {
+                  if (prev === "ASC") {
+                    return "DESC";
+                  } else if (prev === undefined) {
+                    return "ASC";
+                  } else {
+                    return undefined;
+                  }
+                });
+                setSortDirection4((prev) => {
+                  if (prev === "ASC") {
+                    return "DESC";
+                  } else if (prev === undefined) {
+                    return "ASC";
+                  } else {
+                    return undefined;
+                  }
+                });
+              }}
+            >
+              <CaretUpOutlined
+                style={{
+                  position: "relative",
+                  top: 2,
+                  color: sortDirection4 === "ASC" ? "#ffca37" : "white",
+                }}
+              />
+              <CaretDownOutlined
+                style={{
+                  position: "relative",
+                  bottom: 2,
+                  color: sortDirection4 === "DESC" ? "#ffca37" : "white",
+                }}
+              />
+            </div>
+          </div>
+        );
+      },
       dataIndex: "serialNo",
       key: "serialNo",
       render: (value: any, row: any, index: number) => {
@@ -463,9 +691,58 @@ function DroneList() {
       },
     },
     {
-      title: "ชื่อนักบินโดรน",
-      dataIndex: "named",
-      key: "named",
+      title: () => {
+        return (
+          <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+            ชื่อนักบินโดรน
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                cursor: "pointer",
+              }}
+              onClick={() => {
+                setSortField("firstname");
+                setSortDirection((prev) => {
+                  if (prev === "ASC") {
+                    return "DESC";
+                  } else if (prev === undefined) {
+                    return "ASC";
+                  } else {
+                    return undefined;
+                  }
+                });
+                setSortDirection5((prev) => {
+                  if (prev === "ASC") {
+                    return "DESC";
+                  } else if (prev === undefined) {
+                    return "ASC";
+                  } else {
+                    return undefined;
+                  }
+                });
+              }}
+            >
+              <CaretUpOutlined
+                style={{
+                  position: "relative",
+                  top: 2,
+                  color: sortDirection5 === "ASC" ? "#ffca37" : "white",
+                }}
+              />
+              <CaretDownOutlined
+                style={{
+                  position: "relative",
+                  bottom: 2,
+                  color: sortDirection5 === "DESC" ? "#ffca37" : "white",
+                }}
+              />
+            </div>
+          </div>
+        );
+      },
+      dataIndex: "firstname",
+      key: "firstname",
       render: (value: any, row: any, index: number) => {
         return {
           children: (
@@ -572,18 +849,20 @@ function DroneList() {
       key: "status",
       render: (value: any, row: any, index: number) => {
         const countDay = () => {
-          let dateToday: any = moment(Date.now());
-          let createDate: any = moment(new Date(row.createdAt));
-          let dateDiff = dateToday.diff(createDate, "day");
-          let textDateDiff =
-            dateDiff == 0 ? null : "(รอไปแล้ว " + dateDiff + " วัน)";
-          return textDateDiff;
+          if (row.dateWaitPending != null) {
+            const nowDate = new Date(Date.now());
+            const rowDate = new Date(row.dateWaitPending);
+            const diffTime = nowDate.getTime() - rowDate.getTime();
+            let diffDay = Math.floor(diffTime / (1000 * 3600 * 24));
+            diffDay = diffDay === 0 ? 1 : diffDay;
+            return `(รอไปแล้ว ${diffDay} วัน)`;
+          }
         };
         return {
           children: (
             <>
               <span style={{ color: STATUS_COLOR[row.status] }}>
-                <Badge color={STATUS_COLOR[row.status]} />
+                <Badge color={STATUS_COLOR[row.status]} />{" "}
                 {DRONER_DRONE_MAPPING[row.status]}
                 <br />
               </span>
@@ -614,23 +893,40 @@ function DroneList() {
       },
     },
   ];
-
+  let emptyState = {
+    emptyText: (
+      <div style={{ textAlign: "center", padding: "10%" }}>
+        <img
+          src={image.empty_table_drone}
+          style={{ width: 90, height: 90 }}
+        />
+        <p>ยังไม่มีข้อมูลโดรน</p>
+      </div>
+    ),
+  };
   return (
     <>
       {PageTitle}
       <br />
       <Spin tip="กำลังโหลดข้อมูล..." size="large" spinning={loading}>
         <Table
+          locale={emptyState}
           columns={columns}
           dataSource={droneList?.data}
           pagination={false}
           scroll={{ x: "max-content" }}
           rowClassName={(a) =>
-            a.status == "PENDING" &&
-            moment(Date.now()).diff(moment(new Date(a.createdAt)), "day") >= 3
+            a.status === "PENDING" &&
+            a.dateWaitPending != null &&
+            moment(Date.now()).diff(
+              moment(new Date(a.dateWaitPending)),
+              "day"
+            ) >= 3
               ? "PENDING" &&
-                moment(Date.now()).diff(moment(new Date(a.createdAt)), "day") >=
-                  7
+                moment(Date.now()).diff(
+                  moment(new Date(a.dateWaitPending)),
+                  "day"
+                ) >= 7
                 ? "table-row-older"
                 : "table-row-old"
               : "table-row-lasted"
@@ -645,7 +941,8 @@ function DroneList() {
           total={droneList?.count}
           onChange={onChangePage}
           pageSize={row}
-          showSizeChanger={false}
+          showSizeChanger
+          onShowSizeChange={onShowSizeChange}
         />
       </div>
     </>
