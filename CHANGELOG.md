@@ -1,5 +1,11 @@
 ## [Version - 0]
 
+## improve [v0.36.9] 2023-08-16
+
+- improve index drone page
+- improve index all task page
+- fixed render map in modal farmer plot
+
 ## improve [v0.36.8] 2023-08-15
 
 - improve index droner page

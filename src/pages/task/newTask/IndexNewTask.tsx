@@ -1,17 +1,25 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import {
   DownOutlined,
   EditOutlined,
   UserOutlined,
   ExceptionOutlined,
+  SearchOutlined,
+  CaretUpOutlined,
+  CaretDownOutlined,
 } from "@ant-design/icons";
 import {
   Badge,
   Button,
   DatePicker,
   Dropdown,
+  Image,
+  Input,
   Menu,
   Pagination,
+  PaginationProps,
   Select,
+  Spin,
   Table,
 } from "antd";
 import Search from "antd/lib/input/Search";
@@ -34,13 +42,13 @@ import {
   UpdateTaskStatus,
   UpdateTaskStatus_INIT,
 } from "../../../entities/NewTaskEntities";
-import { color } from "../../../resource";
+import { color, icon } from "../../../resource";
 import { DateTimeUtil } from "../../../utilities/DateTimeUtil";
-import {
-  numberWithCommas,
-} from "../../../utilities/TextFormatter";
-import { DashboardLayout } from "../../../components/layout/Layout";
+import { numberWithCommas } from "../../../utilities/TextFormatter";
 import { useNavigate } from "react-router-dom";
+import { listAppType } from "../../../definitions/ApplicatoionTypes";
+import { ListCheckHaveLine } from "../../../components/dropdownCheck/ListStatusAppType";
+
 const { RangePicker } = DatePicker;
 const dateFormat = "DD-MM-YYYY";
 const dateSearchFormat = "YYYY-MM-DD";
@@ -48,7 +56,7 @@ const dateSearchFormat = "YYYY-MM-DD";
 const IndexNewTask = () => {
   const profile = JSON.parse(localStorage.getItem("profile") || "{  }");
   const navigate = useNavigate();
-  const row = 10;
+  const [row, setRow] = useState(10);
   const [current, setCurrent] = useState(1);
   const [data, setData] = useState<NewTaskPageEntity>();
   const [searchStatus, setSearchStatus] = useState<string>("");
@@ -57,32 +65,48 @@ const IndexNewTask = () => {
   const [searchEndDate, setSearchEndDate] = useState<any>(null);
   const [showModalMap, setShowModalMap] = useState<boolean>(false);
   const [showModalDroner, setShowModalDroner] = useState<boolean>(false);
-
+  const [appTypeArr, setAppTypeArr] = useState<string[]>([]);
+  const [applicationType, setApplicationType] = useState<any>();
+  const [loading, setLoading] = useState(false);
+  const [sortDirection, setSortDirection] = useState<string | undefined>();
+  const [sortField, setSortField] = useState<string | undefined>();
   const [plotId, setPlotId] = useState<string>("");
   const [taskId, setTaskId] = useState<string>("");
-
+  const [sortDirection1, setSortDirection1] = useState<string | undefined>(
+    undefined
+  );
+  const [sortDirection2, setSortDirection2] = useState<string | undefined>(
+    undefined
+  );
   const fetchNewTaskList = async () => {
+    setLoading(true);
     await TaskDatasource.getNewTaskList(
       row,
       current,
       searchStatus,
       searchText,
       searchStartDate,
-      searchEndDate
-    ).then((res) => {
-      setData(res);
-    });
+      searchEndDate,
+      applicationType,
+      sortDirection,
+      sortField
+    )
+      .then((res) => {
+        setData(res);
+      })
+      .catch((err) => console.log(err))
+      .finally(() => setLoading(false));
   };
 
   useEffect(() => {
     fetchNewTaskList();
-  }, [searchStatus, searchText, searchStartDate, searchEndDate, current]);
+  }, [searchStartDate, searchEndDate, current, sortDirection, row]);
 
   const handleSearchStatus = (status: any) => {
-    setSearchStatus(status);
+    setSearchStatus(status.target.value);
     setCurrent(1);
   };
-  const handleSearchText = (e: string) => {
+  const handleSearchText = (e: any) => {
     setSearchText(e);
     setCurrent(1);
   };
@@ -135,7 +159,31 @@ const IndexNewTask = () => {
   const onChangePage = (page: number) => {
     setCurrent(page);
   };
-
+  const onSearchCreateBy = (e: any) => {
+    let value = e.target.value;
+    let checked = e.target.checked;
+    let arr: any = 0;
+    if (checked === true) {
+      arr = [...appTypeArr, value];
+      setAppTypeArr([...appTypeArr, value]);
+      setApplicationType(value);
+    } else {
+      let d: string[] = appTypeArr.filter((x) => x !== value);
+      arr = [...d];
+      setAppTypeArr(d);
+      if (d.length == 0) {
+        arr = undefined;
+      }
+    }
+    setApplicationType(arr);
+  };
+  const onShowSizeChange: PaginationProps["onShowSizeChange"] = (
+    current,
+    pageSize
+  ) => {
+    setCurrent(current);
+    setRow(pageSize);
+  };
   const menu = (
     <Menu
       items={[
@@ -153,72 +201,146 @@ const IndexNewTask = () => {
     />
   );
   const pageTitle = (
-    <div
-      className="container d-flex justify-content-between"
-      style={{ padding: "10px" }}
-    >
-      <div className="col-lg-2">
-        <span
-          className="card-label font-weight-bolder text-dark"
-          style={{
-            fontSize: 22,
-            fontWeight: "bold",
-            padding: "8px",
-          }}
-        >
-          <strong>งานใหม่ (รอนักบิน)</strong>
-        </span>
-      </div>
-      <div className="col-lg-3">
-        <Search
-          placeholder="ค้นหาชื่อเกษตรกร หรือเบอร์โทร"
-          className="col-lg-12 p-1"
-          onSearch={handleSearchText}
-        />
-      </div>
-      <div className="col-lg-2">
-        <Select
-          className="col-lg-12 p-1"
-          placeholder="สถานะทั้งหมด"
-          onChange={handleSearchStatus}
-          allowClear
-        >
-          {NEWTASK_STATUS_SEARCH.map((item) => (
-            <option value={item.name}>{item.name}</option>
-          ))}
-        </Select>
-      </div>
-      <div className="col-lg-3 p-1">
-        <RangePicker
-          allowClear
-          onCalendarChange={(val) => handleSearchDate(val)}
-          format={dateFormat}
-        />
-      </div>
-      <div className="col-lg-2 p-1">
-        <Dropdown overlay={menu}>
-          <Button
+    <>
+      <div
+        className="d-flex justify-content-between"
+        style={{ padding: "10px" }}
+      >
+        <div>
+          <span
+            className="card-label font-weight-bolder text-dark"
             style={{
-              padding: "8 0",
-              backgroundColor: color.primary1,
-              color: color.secondary2,
-              borderColor: color.Success,
-              borderRadius: "5px",
+              fontSize: 22,
+              fontWeight: "bold",
+              padding: "8px",
             }}
           >
-            เพิ่มงานบินโดรนใหม่
-            <DownOutlined />
-          </Button>
-        </Dropdown>
+            <strong>งานใหม่ (รอนักบิน)</strong>
+          </span>
+        </div>
+        <div style={{ color: color.Error, textAlign: "end" }}>
+          <RangePicker
+            style={{ right: "4px" }}
+            allowClear
+            onCalendarChange={(val) => handleSearchDate(val)}
+            format={dateFormat}
+          />
+          <Dropdown overlay={menu}>
+            <Button
+              style={{
+                padding: "8 0",
+                backgroundColor: color.primary1,
+                color: color.secondary2,
+                borderColor: color.Success,
+                borderRadius: "5px",
+              }}
+            >
+              เพิ่มงานบินโดรนใหม่
+              <DownOutlined />
+            </Button>
+          </Dropdown>
+        </div>
       </div>
-    </div>
+      <div className=" d-flex justify-content-between pb-3">
+        <div className="col-lg-7 pt-1" style={{ paddingRight: 5 }}>
+          <Input
+            allowClear
+            prefix={<SearchOutlined style={{ color: color.Disable }} />}
+            placeholder="ค้นหาชื่อเกษตรกร, คนบินโดรน หรือเบอร์โทร"
+            className="col-lg-12"
+            onChange={handleSearchText}
+          />
+        </div>
+        <div className="col-lg p-1">
+          <ListCheckHaveLine
+            onSearchType={(e: any) => onSearchCreateBy(e)}
+            list={applicationType}
+            title="เลือกรูปแบบการสร้าง"
+          />
+        </div>
+        <div className="col-lg pt-1">
+          <Select
+            style={{ paddingRight: 5 }}
+            className="col-lg-12"
+            placeholder="สถานะทั้งหมด"
+            onChange={handleSearchStatus}
+            allowClear
+          >
+            {NEWTASK_STATUS_SEARCH.map((item) => (
+              <option value={item.name}>{item.name}</option>
+            ))}
+          </Select>
+        </div>
+        <div className="pt-1">
+          <Button
+            style={{
+              borderColor: color.Success,
+              borderRadius: "5px",
+              color: color.secondary2,
+              backgroundColor: color.Success,
+            }}
+            onClick={fetchNewTaskList}
+          >
+            ค้นหาข้อมูล
+          </Button>
+        </div>
+      </div>
+    </>
   );
   const columns = [
     {
-      title: "วัน/เวลานัดหมาย",
+      title: () => {
+        return (
+          <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+            วัน/เวลานัดหมาย
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                cursor: "pointer",
+              }}
+              onClick={() => {
+                setSortField("date_appointment");
+                setSortDirection((prev) => {
+                  if (prev === "ASC") {
+                    return "DESC";
+                  } else if (prev === undefined) {
+                    return "ASC";
+                  } else {
+                    return undefined;
+                  }
+                });
+                setSortDirection1((prev) => {
+                  if (prev === "ASC") {
+                    return "DESC";
+                  } else if (prev === undefined) {
+                    return "ASC";
+                  } else {
+                    return undefined;
+                  }
+                });
+              }}
+            >
+              <CaretUpOutlined
+                style={{
+                  position: "relative",
+                  top: 2,
+                  color: sortDirection1 === "ASC" ? "#ffca37" : "white",
+                }}
+              />
+              <CaretDownOutlined
+                style={{
+                  position: "relative",
+                  bottom: 2,
+                  color: sortDirection1 === "DESC" ? "#ffca37" : "white",
+                }}
+              />
+            </div>
+          </div>
+        );
+      },
       dataIndex: "date_appointment",
       key: "date_appointment",
-      width: "20%",
       render: (value: any, row: any, index: number) => {
         return {
           children: (
@@ -275,7 +397,77 @@ const IndexNewTask = () => {
       },
     },
     {
-      title: "ค่าบริการ",
+      title: "นักบินโดรน",
+      dataIndex: "count_droner",
+      key: "count_droner",
+      render: (value: any, row: any, index: number) => {
+        return {
+          children: (
+            <>
+              <span>จำนวน {row.count_droner} ราย</span>
+              <br />
+              <span
+                onClick={() => handleModalDronerList(row.id)}
+                style={{ color: color.primary1, cursor: "pointer" }}
+              >
+                ดูรายชื่อนักบินโดรน
+              </span>
+            </>
+          ),
+        };
+      },
+    },
+    {
+      title: () => {
+        return (
+          <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+            ค่าบริการ{" "}
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                cursor: "pointer",
+              }}
+              onClick={() => {
+                setSortField("total_price");
+                setSortDirection((prev) => {
+                  if (prev === "ASC") {
+                    return "DESC";
+                  } else if (prev === undefined) {
+                    return "ASC";
+                  } else {
+                    return undefined;
+                  }
+                });
+                setSortDirection2((prev) => {
+                  if (prev === "ASC") {
+                    return "DESC";
+                  } else if (prev === undefined) {
+                    return "ASC";
+                  } else {
+                    return undefined;
+                  }
+                });
+              }}
+            >
+              <CaretUpOutlined
+                style={{
+                  position: "relative",
+                  top: 2,
+                  color: sortDirection2 === "ASC" ? "#ffca37" : "white",
+                }}
+              />
+              <CaretDownOutlined
+                style={{
+                  position: "relative",
+                  bottom: 2,
+                  color: sortDirection2 === "DESC" ? "#ffca37" : "white",
+                }}
+              />
+            </div>
+          </div>
+        );
+      },
       dataIndex: "total_price",
       key: "total_price",
       render: (value: any, row: any, index: number) => {
@@ -309,21 +501,31 @@ const IndexNewTask = () => {
       },
     },
     {
-      title: "นักบินโดรน",
-      dataIndex: "count_droner",
-      key: "count_droner",
+      title: "สร้างโดย",
+      dataIndex: "createByWho",
+      key: "createByWho",
       render: (value: any, row: any, index: number) => {
         return {
           children: (
             <>
-              <span>จำนวน {row.count_droner} ราย</span>
-              <br />
-              <a
-                onClick={() => handleModalDronerList(row.id)}
-                style={{ color: color.primary1 }}
-              >
-                ดูรายชื่อนักบินโดรน
-              </a>
+              {listAppType.map(
+                (item) =>
+                  row.application_type === item.value && (
+                    <>
+                      <Image
+                        src={item.icon}
+                        preview={false}
+                        style={{ width: 24, height: 24 }}
+                      />
+                      <span>
+                        {" "}
+                        {row.create_by
+                          ? row.create_by + ` ${item.create}`
+                          : "-"}
+                      </span>
+                    </>
+                  )
+              )}
             </>
           ),
         };
@@ -361,7 +563,6 @@ const IndexNewTask = () => {
       title: "",
       dataIndex: "Action",
       key: "Action",
-      width: "9%",
       render: (value: any, row: any, index: number) => {
         return {
           children: (
@@ -370,9 +571,7 @@ const IndexNewTask = () => {
                 <ActionButton
                   icon={<EditOutlined />}
                   color={color.primary1}
-                  onClick={() =>
-                    navigate("/EditNewTask/id=" + row.id)
-                  }
+                  onClick={() => navigate("/EditNewTask/id=" + row.id)}
                 />
               </div>
               <div className="col-lg-6">
@@ -391,49 +590,51 @@ const IndexNewTask = () => {
 
   return (
     <>
-      <>
-        {pageTitle}
-        <CardContainer>
+      {pageTitle}
+      <CardContainer>
+        <Spin tip="กำลังโหลดข้อมูล..." size="large" spinning={loading}>
           <Table
+            scroll={{ x: "max-content" }}
             dataSource={data?.data}
             columns={columns}
             pagination={false}
             size="large"
             tableLayout="fixed"
             rowClassName={(a) =>
-              a.task_status == "ไม่มีนักบินรับงาน"
+              a.task_status === "ไม่มีนักบินรับงาน"
                 ? "table-row-older"
                 : "table-row-lasted"
             }
           />
-        </CardContainer>
-        <div className="d-flex justify-content-between pt-4 pb-3">
-          <p>รายการทั้งหมด {data?.count} รายการ</p>
-          <Pagination
-            current={current}
-            total={data?.count}
-            onChange={onChangePage}
-            pageSize={row}
-            showSizeChanger={false}
-          />
-        </div>
-        {showModalMap && (
-          <ModalMapPlot
-            show={showModalMap}
-            backButton={() => setShowModalMap((prev) => !prev)}
-            title="แผนที่แปลงเกษตร"
-            plotId={plotId}
-          />
-        )}
-        {showModalDroner && (
-          <ModalDronerList
-            show={showModalDroner}
-            backButton={() => setShowModalDroner((prev) => !prev)}
-            title="รายชื่อนักโดรนบิน"
-            taskId={taskId}
-          />
-        )}
-      </>
+        </Spin>
+      </CardContainer>
+      <div className="d-flex justify-content-between pt-4 pb-3">
+        <p>รายการทั้งหมด {data?.count} รายการ</p>
+        <Pagination
+          current={current}
+          total={data?.count}
+          onChange={onChangePage}
+          pageSize={row}
+          showSizeChanger
+          onShowSizeChange={onShowSizeChange}
+        />
+      </div>
+      {showModalMap && (
+        <ModalMapPlot
+          show={showModalMap}
+          backButton={() => setShowModalMap((prev) => !prev)}
+          title="แผนที่แปลงเกษตร"
+          plotId={plotId}
+        />
+      )}
+      {showModalDroner && (
+        <ModalDronerList
+          show={showModalDroner}
+          backButton={() => setShowModalDroner((prev) => !prev)}
+          title="รายชื่อนักโดรนบิน"
+          taskId={taskId}
+        />
+      )}
     </>
   );
 };

@@ -44,7 +44,6 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import StatusButton from "../../components/button/StatusButton";
 import StatusPlots from "../../components/card/StatusPlots";
 import { numberWithCommas } from "../../utilities/TextFormatter";
-import ListCreateBy from "../../components/dropdownCheck/ListStatusAppType";
 import { CheckboxValueType } from "antd/lib/checkbox/Group";
 import { icon, image } from "../../resource";
 import {
@@ -52,6 +51,7 @@ import {
   STATUS_FARMER_MAPPING,
 } from "../../definitions/Status";
 import CheckDocument from "../../components/dropdownCheck/CheckDocument";
+import { ListCheck } from "../../components/dropdownCheck/ListStatusAppType";
 
 function IndexDroner() {
   const [row, setRow] = useState(10);
@@ -68,6 +68,7 @@ function IndexDroner() {
   const [sumPlotCard, setSumPlotCard] = useState<any>({
     card1: "รอตรวจสอบ",
     card2: "ไม่อนุมัติ",
+    card3: "ข้อมูลไม่ครบถ้วน",
   });
   const [loading, setLoading] = useState(false);
   const [appType, setAppType] = useState<any>();
@@ -168,6 +169,7 @@ function IndexDroner() {
       setSumPlotCard({
         card1: "รอตรวจสอบ",
         card2: "ไม่อนุมัติ",
+        card3: "ข้อมูลไม่ครบถ้วน",
       });
     } else {
       setSearchStatus(undefined);
@@ -299,6 +301,18 @@ function IndexDroner() {
               ),
               key: "4",
             },
+        mainStatus === "PENDING"
+          ? {
+              label: (
+                <>
+                  <Checkbox onClick={onSearchStatus} value="OPEN">
+                    ข้อมูลไม่ครบถ้วน
+                  </Checkbox>
+                </>
+              ),
+              key: "5",
+            }
+          : null,
       ]}
     />
   );
@@ -369,13 +383,19 @@ function IndexDroner() {
         </div>
       </div>
       <StatusPlots
+        checkPage="DronerPage"
         title1={sumPlotCard?.card1}
         title2={sumPlotCard?.card2}
+        title3={sumPlotCard?.card3}
+        status={mainStatus}
         bgColor1={
           sumPlotCard?.card1 === "รอตรวจสอบ" ? color.Warning : color.Success
         }
         bgColor2={
           sumPlotCard?.card2 === "ไม่อนุมัติ" ? color.Grey : color.Error
+        }
+        bgColor3={
+          sumPlotCard?.card3 === "ข้อมูลไม่ครบถ้วน" ? color.Disable : "none"
         }
         countPlot1={
           mainStatus === "PENDING"
@@ -386,6 +406,11 @@ function IndexDroner() {
           mainStatus === "ACTIVE"
             ? numberWithCommas(summary?.count_inactive) + " คน"
             : numberWithCommas(summary?.count_reject) + " คน"
+        }
+        countPlot3={
+          mainStatus === "PENDING"
+            ? numberWithCommas(summary?.count_open) + " คน"
+            : null
         }
       />
       <div
@@ -476,7 +501,7 @@ function IndexDroner() {
           </Select>
         </div>
         <div className="col-lg" style={{ paddingRight: 3 }}>
-          <ListCreateBy
+          <ListCheck
             onSearchType={(e) => onSearchCreateBy(e)}
             list={appType}
             title="เลือกรูปแบบการสร้าง"
@@ -524,7 +549,6 @@ function IndexDroner() {
     current,
     pageSize
   ) => {
-    console.log(current, pageSize);
     setCurrent(current);
     setRow(pageSize);
   };
@@ -876,7 +900,7 @@ function IndexDroner() {
             const diffTime = nowDate.getTime() - rowDate.getTime();
             let diffDay = Math.floor(diffTime / (1000 * 3600 * 24));
             diffDay = diffDay === 0 ? 1 : diffDay;
-            return `รอไปแล้ว ${diffDay} วัน`;
+            return `(รอไปแล้ว ${diffDay} วัน)`;
           }
         };
         let checkProfile = ![

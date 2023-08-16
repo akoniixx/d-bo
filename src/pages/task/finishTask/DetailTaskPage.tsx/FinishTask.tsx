@@ -42,6 +42,7 @@ import { DashboardLayout } from "../../../../components/layout/Layout";
 import { useNavigate } from "react-router-dom";
 import ImagCards from "../../../../components/card/ImagCard";
 import image from "../../../../resource/image";
+import { listAppType } from "../../../../definitions/ApplicatoionTypes";
 const _ = require("lodash");
 const dateFormat = "DD/MM/YYYY";
 const timeFormat = "HH:mm";
@@ -238,6 +239,23 @@ function FinishTasks() {
               ราคาไร่ละ {data.data.unitPrice} บาท
             </span>
           </Form.Item>
+          <div className="form-group col-lg-12 pb-3">
+            <label>สร้างโดย</label>
+            {listAppType.map(
+              (item, index) =>
+                data.data.applicationType === item.value && (
+                  <div>
+                    <img src={item.icon} style={{ width: 22, height: 22 }} />
+                    <span>
+                      {" "}
+                      {data.data.createBy
+                        ? data.data.createBy + ` ${item.create}`
+                        : "-"}
+                    </span>
+                  </div>
+                )
+            )}
+          </div>
           <br />
           <Form.Item>
             <div className="row">

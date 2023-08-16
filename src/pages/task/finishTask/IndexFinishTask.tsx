@@ -3,10 +3,13 @@ import {
   Button,
   DatePicker,
   Divider,
+  Image,
   Input,
   Pagination,
+  PaginationProps,
   Popover,
   Select,
+  Spin,
   Table,
 } from "antd";
 import moment from "moment";
@@ -20,6 +23,8 @@ import {
 } from "../../../entities/LocationEntities";
 import color from "../../../resource/color";
 import {
+  CaretDownOutlined,
+  CaretUpOutlined,
   EditOutlined,
   FileTextOutlined,
   InfoCircleFilled,
@@ -45,9 +50,13 @@ import { DashboardLayout } from "../../../components/layout/Layout";
 import { useNavigate } from "react-router-dom";
 import InvoiceTask from "../../../components/popover/InvoiceTask";
 import { InvoiceTaskEntity } from "../../../entities/NewTaskEntities";
+import { ListCheckHaveLine } from "../../../components/dropdownCheck/ListStatusAppType";
+import { listAppType } from "../../../definitions/ApplicatoionTypes";
+import CheckDocument from "../../../components/dropdownCheck/CheckDocument";
+import { icon } from "../../../resource";
 export default function IndexFinishTask() {
   const navigate = useNavigate();
-  const row = 10;
+  const [row, setRow] = useState(10);
   const [current, setCurrent] = useState(1);
   const [data, setData] = useState<TaskFinishListEntity>();
   const [searchText, setSearchText] = useState<string>();
@@ -66,11 +75,32 @@ export default function IndexFinishTask() {
   const dateFormat = "DD/MM/YYYY";
   const timeFormat = "HH:mm";
   const dateSearchFormat = "YYYY-MM-DD";
-  useEffect(() => {
-    fetchTaskFinish();
-    fetchProvince();
-  }, [current, row, startDate, endDate]);
+  const [checkDocArr, setCheckDocArr] = useState<string[]>([]);
+  const [appTypeArr, setAppTypeArr] = useState<string[]>([]);
+  const [applicationType, setApplicationType] = useState<any>();
+  const [loading, setLoading] = useState(false);
+  const [problems, setProblems] = useState<any>([]);
+  const [sortDirection, setSortDirection] = useState<string | undefined>();
+  const [sortField, setSortField] = useState<string | undefined>();
+  const [documentPersons, setDocumentPersons] = useState<any>();
+  const [sortDirection1, setSortDirection1] = useState<string | undefined>(
+    undefined
+  );
+  const [sortDirection2, setSortDirection2] = useState<string | undefined>(
+    undefined
+  );
+  const [sortDirection3, setSortDirection3] = useState<string | undefined>(
+    undefined
+  );
+  const [sortDirection4, setSortDirection4] = useState<string | undefined>(
+    undefined
+  );
+  const [sortDirection5, setSortDirection5] = useState<string | undefined>(
+    undefined
+  );
+
   const fetchTaskFinish = async () => {
+    setLoading(true);
     await TaskFinishedDatasource.getTaskFinishList(
       current,
       row,
@@ -80,11 +110,22 @@ export default function IndexFinishTask() {
       startDate,
       endDate,
       searchStatus,
-      searchText
-    ).then((res: TaskFinishListEntity) => {
-      setData(res);
-    });
+      searchText,
+      applicationType,
+      sortDirection,
+      sortField,
+      documentPersons
+    )
+      .then((res: TaskFinishListEntity) => {
+        setData(res);
+      })
+      .catch((err) => console.log(err))
+      .finally(() => setLoading(false));
   };
+  useEffect(() => {
+    fetchTaskFinish();
+    fetchProvince();
+  }, [current, row, startDate, endDate, sortDirection]);
   const SearchDate = (e: any) => {
     if (e != null) {
       setStartDate(moment(new Date(e[0])).format(dateSearchFormat));
@@ -121,16 +162,7 @@ export default function IndexFinishTask() {
     setSearchStatus(status);
     setCurrent(1);
   };
-  const formatNumber = (e: any) => {
-    let formatNumber = Number(e)
-      .toFixed(1)
-      .replace(/\d(?=(\d{3})+\.)/g, "$&,");
-    let splitArray = formatNumber.split(".");
-    if (splitArray.length > 1) {
-      formatNumber = splitArray[0];
-    }
-    return formatNumber;
-  };
+
   const handleProvince = (provinceId: number) => {
     setSearchProvince(provinceId);
     fetchDistrict(provinceId);
@@ -149,11 +181,53 @@ export default function IndexFinishTask() {
     setShowModalMap((prev) => !prev);
     setPlotId(plotId);
   };
-
+  const onSearchCreateBy = (e: any) => {
+    let value = e.target.value;
+    let checked = e.target.checked;
+    let arr: any = 0;
+    if (checked === true) {
+      arr = [...appTypeArr, value];
+      setAppTypeArr([...appTypeArr, value]);
+      setApplicationType(value);
+    } else {
+      let d: string[] = appTypeArr.filter((x) => x != value);
+      arr = [...d];
+      setAppTypeArr(d);
+      if (d.length == 0) {
+        arr = undefined;
+      }
+    }
+    setApplicationType(arr);
+  };
+  const onShowSizeChange: PaginationProps["onShowSizeChange"] = (
+    current,
+    pageSize
+  ) => {
+    setCurrent(current);
+    setRow(pageSize);
+  };
+  const onSearchCheckDocument = (e: any) => {
+    let value = e.target.value;
+    let checked = e.target.checked;
+    let arr: any = 0;
+    if (checked === true) {
+      arr = [...checkDocArr, value];
+      setCheckDocArr([...checkDocArr, value]);
+      setDocumentPersons(value);
+    } else {
+      let d: string[] = checkDocArr.filter((x) => x != value);
+      arr = [...d];
+      setCheckDocArr(d);
+      if (d.length === 0) {
+        arr = undefined;
+      }
+    }
+    setDocumentPersons(arr);
+  };
   const PageTitle = (
     <>
       <div
-        className="container d-flex justify-content-between"
+        className="d-flex justify-content-between"
         style={{ padding: "10px" }}
       >
         <div>
@@ -177,10 +251,10 @@ export default function IndexFinishTask() {
         </div>
       </div>
       <div
-        className="container d-flex justify-content-between"
-        style={{ padding: "8px" }}
+        className="d-flex justify-content-between"
+        style={{ padding: "0px" }}
       >
-        <div className="col-lg-4 p-1">
+        <div className="col-lg-2 p-1">
           <Input
             prefix={<SearchOutlined style={{ color: color.Disable }} />}
             placeholder="ค้นหาชื่อเกษตรกร, คนบินโดรน หรือเบอร์โทร"
@@ -262,6 +336,20 @@ export default function IndexFinishTask() {
             ))}
           </Select>
         </div>
+        <div className="col-lg p-1">
+          <ListCheckHaveLine
+            onSearchType={(e: any) => onSearchCreateBy(e)}
+            list={applicationType}
+            title="เลือกรูปแบบการสร้าง"
+          />
+        </div>
+        <div className="col-lg" style={{ paddingRight: 3 }}>
+          <CheckDocument
+            onSearchType={(e) => onSearchCheckDocument(e)}
+            list={documentPersons}
+            title="เลือกการตรวจเอกสาร"
+          />
+        </div>
         <div className="col-lg">
           <Select
             className="col-lg-12 p-1"
@@ -274,6 +362,7 @@ export default function IndexFinishTask() {
             ))}
           </Select>
         </div>
+
         <div className="pt-1">
           <Button
             style={{
@@ -292,7 +381,56 @@ export default function IndexFinishTask() {
   );
   const columns = [
     {
-      title: "วัน/เวลา นัดหมาย",
+      title: () => {
+        return (
+          <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+            วัน/เวลานัดหมาย
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                cursor: "pointer",
+              }}
+              onClick={() => {
+                setSortField("dateAppointment");
+                setSortDirection((prev) => {
+                  if (prev === "ASC") {
+                    return "DESC";
+                  } else if (prev === undefined) {
+                    return "ASC";
+                  } else {
+                    return undefined;
+                  }
+                });
+                setSortDirection1((prev) => {
+                  if (prev === "ASC") {
+                    return "DESC";
+                  } else if (prev === undefined) {
+                    return "ASC";
+                  } else {
+                    return undefined;
+                  }
+                });
+              }}
+            >
+              <CaretUpOutlined
+                style={{
+                  position: "relative",
+                  top: 2,
+                  color: sortDirection1 === "ASC" ? "#ffca37" : "white",
+                }}
+              />
+              <CaretDownOutlined
+                style={{
+                  position: "relative",
+                  bottom: 2,
+                  color: sortDirection1 === "DESC" ? "#ffca37" : "white",
+                }}
+              />
+            </div>
+          </div>
+        );
+      },
       dataIndex: "dateAppointment",
       key: "dateAppointment",
       render: (value: any, row: any, index: number) => {
@@ -303,7 +441,7 @@ export default function IndexFinishTask() {
                 {moment(new Date(row.dateAppointment)).format(dateFormat)},{" "}
                 {moment(new Date(row.dateAppointment)).format(timeFormat)}
               </span>
-              <span style={{ color: color.Disable, fontSize: "12px" }}>
+              <span style={{ color: color.Grey, fontSize: "12px" }}>
                 {row.taskNo}
               </span>
             </>
@@ -312,7 +450,56 @@ export default function IndexFinishTask() {
       },
     },
     {
-      title: "ชื่อนักบินโดรน",
+      title: () => {
+        return (
+          <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+            ชื่อนักบินโดรน{" "}
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                cursor: "pointer",
+              }}
+              onClick={() => {
+                setSortField("dronerFirstname");
+                setSortDirection((prev) => {
+                  if (prev === "ASC") {
+                    return "DESC";
+                  } else if (prev === undefined) {
+                    return "ASC";
+                  } else {
+                    return undefined;
+                  }
+                });
+                setSortDirection2((prev) => {
+                  if (prev === "ASC") {
+                    return "DESC";
+                  } else if (prev === undefined) {
+                    return "ASC";
+                  } else {
+                    return undefined;
+                  }
+                });
+              }}
+            >
+              <CaretUpOutlined
+                style={{
+                  position: "relative",
+                  top: 2,
+                  color: sortDirection2 === "ASC" ? "#ffca37" : "white",
+                }}
+              />
+              <CaretDownOutlined
+                style={{
+                  position: "relative",
+                  bottom: 2,
+                  color: sortDirection2 === "DESC" ? "#ffca37" : "white",
+                }}
+              />
+            </div>
+          </div>
+        );
+      },
       dataIndex: "droner",
       key: "droner",
       render: (value: any, row: any, index: number) => {
@@ -322,7 +509,7 @@ export default function IndexFinishTask() {
               <span className="text-dark-75  d-block font-size-lg">
                 {row.droner !== null
                   ? row.droner.firstname + " " + row.droner.lastname
-                  : null}
+                  : "-"}
               </span>
               <span style={{ color: color.Grey, fontSize: "12px" }}>
                 {row.droner !== null ? row.droner.telephoneNo : null}
@@ -333,7 +520,56 @@ export default function IndexFinishTask() {
       },
     },
     {
-      title: "ชื่อเกษตรกร",
+      title: () => {
+        return (
+          <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+            ชื่อเกษตรกร
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                cursor: "pointer",
+              }}
+              onClick={() => {
+                setSortField("farmerFirstname");
+                setSortDirection((prev) => {
+                  if (prev === "ASC") {
+                    return "DESC";
+                  } else if (prev === undefined) {
+                    return "ASC";
+                  } else {
+                    return undefined;
+                  }
+                });
+                setSortDirection3((prev) => {
+                  if (prev === "ASC") {
+                    return "DESC";
+                  } else if (prev === undefined) {
+                    return "ASC";
+                  } else {
+                    return undefined;
+                  }
+                });
+              }}
+            >
+              <CaretUpOutlined
+                style={{
+                  position: "relative",
+                  top: 2,
+                  color: sortDirection3 === "ASC" ? "#ffca37" : "white",
+                }}
+              />
+              <CaretDownOutlined
+                style={{
+                  position: "relative",
+                  bottom: 2,
+                  color: sortDirection3 === "DESC" ? "#ffca37" : "white",
+                }}
+              />
+            </div>
+          </div>
+        );
+      },
       dataIndex: "farmer",
       key: "farmer",
       render: (value: any, row: any, index: number) => {
@@ -365,9 +601,9 @@ export default function IndexFinishTask() {
               <span className="text-dark-75  d-block font-size-lg">
                 {subdistrict !== null
                   ? subdistrict.subdistrictName + "/"
-                  : null}
-                {district !== null ? district.districtName + "/" : null}
-                {province !== null ? province.provinceName + "" : null}
+                  : "-/"}
+                {district !== null ? district.districtName + "/" : "-/"}
+                {province !== null ? province.provinceName + "" : "-"}
               </span>
               <a
                 onClick={() => handleModalMap(row.farmerPlotId)}
@@ -381,7 +617,56 @@ export default function IndexFinishTask() {
       },
     },
     {
-      title: "Rating",
+      title: () => {
+        return (
+          <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+            Rating{" "}
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                cursor: "pointer",
+              }}
+              onClick={() => {
+                setSortField("reviewDronerAvg");
+                setSortDirection((prev) => {
+                  if (prev === "ASC") {
+                    return "DESC";
+                  } else if (prev === undefined) {
+                    return "ASC";
+                  } else {
+                    return undefined;
+                  }
+                });
+                setSortDirection4((prev) => {
+                  if (prev === "ASC") {
+                    return "DESC";
+                  } else if (prev === undefined) {
+                    return "ASC";
+                  } else {
+                    return undefined;
+                  }
+                });
+              }}
+            >
+              <CaretUpOutlined
+                style={{
+                  position: "relative",
+                  top: 2,
+                  color: sortDirection4 === "ASC" ? "#ffca37" : "white",
+                }}
+              />
+              <CaretDownOutlined
+                style={{
+                  position: "relative",
+                  bottom: 2,
+                  color: sortDirection4 === "DESC" ? "#ffca37" : "white",
+                }}
+              />
+            </div>
+          </div>
+        );
+      },
       dataIndex: "avgrating",
       key: "avgrating",
       render: (value: any, row: any, index: number) => {
@@ -396,6 +681,7 @@ export default function IndexFinishTask() {
                         color: "#FFCA37",
                         fontSize: "20px",
                         marginRight: "7px",
+                        verticalAlign: 0.5,
                       }}
                     />
                     {parseFloat(row.reviewDronerAvg).toFixed(1)}
@@ -410,10 +696,88 @@ export default function IndexFinishTask() {
       },
     },
     {
-      title: "ค่าบริการ",
+      title: "ตรวจเอกสาร",
+      dataIndex: "",
+      render: (value: any, row: any, index: number) => {
+        return {
+          children: (
+            <>
+              <div>
+                <Image
+                  src={row.droner?.file.length === 1 ? icon.check : icon.cancel}
+                  preview={false}
+                  style={{ width: 18, height: 18, marginRight: 6 }}
+                />
+                บัตรประชาชน
+              </div>
+              <div>
+                <Image
+                  src={
+                    row.droner?.isBookBank === true ? icon.check : icon.cancel
+                  }
+                  preview={false}
+                  style={{ width: 18, height: 18, marginRight: 6 }}
+                />
+                สมุดบัญชี
+              </div>
+            </>
+          ),
+        };
+      },
+    },
+    {
+      title: () => {
+        return (
+          <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+            ค่าบริการ{" "}
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                cursor: "pointer",
+              }}
+              onClick={() => {
+                setSortField("totalPrice");
+                setSortDirection((prev) => {
+                  if (prev === "ASC") {
+                    return "DESC";
+                  } else if (prev === undefined) {
+                    return "ASC";
+                  } else {
+                    return undefined;
+                  }
+                });
+                setSortDirection5((prev) => {
+                  if (prev === "ASC") {
+                    return "DESC";
+                  } else if (prev === undefined) {
+                    return "ASC";
+                  } else {
+                    return undefined;
+                  }
+                });
+              }}
+            >
+              <CaretUpOutlined
+                style={{
+                  position: "relative",
+                  top: 2,
+                  color: sortDirection5 === "ASC" ? "#ffca37" : "white",
+                }}
+              />
+              <CaretDownOutlined
+                style={{
+                  position: "relative",
+                  bottom: 2,
+                  color: sortDirection5 === "DESC" ? "#ffca37" : "white",
+                }}
+              />
+            </div>
+          </div>
+        );
+      },
       dataIndex: "subdistrict_subdistrict_name",
       key: "subdistrict_subdistrict_name",
-      width: "12%",
       render: (value: any, row: any, index: number) => {
         const inv: InvoiceTaskEntity = {
           raiAmount: row.farmAreaAmount,
@@ -439,6 +803,35 @@ export default function IndexFinishTask() {
                 title="รายละเอียดค่าบริการ"
                 data={inv}
               />
+            </>
+          ),
+        };
+      },
+    },
+    {
+      title: "สร้างโดย",
+      dataIndex: "createByWho",
+      key: "createByWho",
+      render: (value: any, row: any, index: number) => {
+        return {
+          children: (
+            <>
+              {listAppType.map(
+                (item) =>
+                  row.applicationType === item.value && (
+                    <>
+                      <Image
+                        src={item.icon}
+                        preview={false}
+                        style={{ width: 24, height: 24 }}
+                      />
+                      <span>
+                        {" "}
+                        {row.createBy ? row.createBy + ` ${item.create}` : "-"}
+                      </span>
+                    </>
+                  )
+              )}
             </>
           ),
         };
@@ -486,25 +879,19 @@ export default function IndexFinishTask() {
                 <ActionButton
                   icon={<EditOutlined />}
                   color={color.primary1}
-                  onClick={() =>
-                    navigate("/ReviewTask?=" + row.id)
-                  }
+                  onClick={() => navigate("/ReviewTask?=" + row.id)}
                 />
               ) : row.status == "CANCELED" ? (
                 <ActionButton
                   icon={<FileTextOutlined />}
                   color={color.primary1}
-                  onClick={() =>
-                    navigate("/CancelTask?=" + row.id)
-                  }
+                  onClick={() => navigate("/CancelTask?=" + row.id)}
                 />
               ) : row.status == "DONE" ? (
                 <ActionButton
                   icon={<FileTextOutlined />}
                   color={color.primary1}
-                  onClick={() =>
-                    navigate("/FinishTasks?=" + row.id)
-                  }
+                  onClick={() => navigate("/FinishTasks?=" + row.id)}
                 />
               ) : null}
             </div>
@@ -517,18 +904,22 @@ export default function IndexFinishTask() {
     <>
       {PageTitle}
       <br />
-      <Table
-        columns={columns}
-        dataSource={data?.data}
-        pagination={false}
-        rowClassName={(a) =>
-          a.status == "WAIT_REVIEW"
-            ? "table-row-wait-review"
-            : a.status === "CANCELED"
-            ? "table-row-older"
-            : "table-row-lasted"
-        }
-      />
+      <Spin tip="กำลังโหลดข้อมูล..." size="large" spinning={loading}>
+        <Table
+          columns={columns}
+          dataSource={data?.data}
+          pagination={false}
+          scroll={{ x: "max-content" }}
+          rowClassName={(a) =>
+            a.status == "WAIT_REVIEW"
+              ? "table-row-wait-review"
+              : a.status === "CANCELED"
+              ? "table-row-older"
+              : "table-row-lasted"
+          }
+        />
+      </Spin>
+
       <div className="d-flex justify-content-between pt-3 pb-3">
         <p>รายการทั้งหมด {data?.count} รายการ</p>
         <Pagination
@@ -536,7 +927,8 @@ export default function IndexFinishTask() {
           total={data?.count}
           onChange={onChangePage}
           pageSize={row}
-          showSizeChanger={false}
+          showSizeChanger
+          onShowSizeChange={onShowSizeChange}
         />
       </div>
       {showModalMap && (

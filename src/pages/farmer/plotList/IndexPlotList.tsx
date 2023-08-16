@@ -13,6 +13,7 @@ import {
   Menu,
   Pagination,
   PaginationProps,
+  Popover,
   Row,
   Select,
   Spin,
@@ -24,6 +25,7 @@ import {
   DeleteOutlined,
   DownOutlined,
   EditOutlined,
+  InfoCircleFilled,
   SearchOutlined,
 } from "@ant-design/icons";
 import { CardContainer } from "../../../components/card/CardContainer";
@@ -515,6 +517,26 @@ function IndexPlotList() {
               <span style={{ color: color.Grey, fontSize: 12 }}>
                 {row.farmer.farmerCode}
               </span>
+              <Popover
+                content={
+                  <span
+                    style={{ color: STATUS_COLOR_MAPPING[row.farmer?.status] }}
+                  >
+                    <span>สถานะ </span>
+                    <Badge color={STATUS_COLOR_MAPPING[row.farmer?.status]} />{" "}
+                    {STATUS_FARMER_MAPPING[row.farmer?.status]}
+                  </span>
+                }
+              >
+                <InfoCircleFilled
+                  style={{
+                    color: color.Success,
+                    fontSize: "15px",
+                    marginLeft: "7px",
+                    verticalAlign: 0.5,
+                  }}
+                />
+              </Popover>
             </>
           ),
         };

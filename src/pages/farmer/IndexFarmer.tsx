@@ -56,7 +56,7 @@ import { numberWithCommas } from "../../utilities/TextFormatter";
 import { image } from "../../resource";
 import { CheckboxValueType } from "antd/lib/checkbox/Group";
 import { STATUS_NORMAL_MAPPING } from "../../definitions/Status";
-import ListCreateBy from "../../components/dropdownCheck/ListStatusAppType";
+import { ListCheck } from "../../components/dropdownCheck/ListStatusAppType";
 
 interface SearchSelectType {
   label: any;
@@ -476,7 +476,7 @@ function IndexFarmer() {
           </Select>
         </div>
         <div>
-          <ListCreateBy
+          <ListCheck
             onSearchType={(e) => onSearchCreateBy(e)}
             list={appType}
             title="เลือกรูปแบบการสร้าง"
@@ -835,7 +835,7 @@ function IndexFarmer() {
             const diffTime = nowDate.getTime() - rowDate.getTime();
             let diffDay = Math.floor(diffTime / (1000 * 3600 * 24));
             diffDay = diffDay === 0 ? 1 : diffDay;
-            return `รอไปแล้ว ${diffDay} วัน`;
+            return `(รอไปแล้ว ${diffDay} วัน)`;
           }
         };
         let checkProfile = ![
