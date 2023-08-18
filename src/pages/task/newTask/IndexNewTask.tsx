@@ -44,7 +44,7 @@ import {
 } from "../../../entities/NewTaskEntities";
 import { color, icon } from "../../../resource";
 import { DateTimeUtil } from "../../../utilities/DateTimeUtil";
-import { numberWithCommas } from "../../../utilities/TextFormatter";
+import { numberWithCommas, numberWithCommasToFixed } from "../../../utilities/TextFormatter";
 import { useNavigate } from "react-router-dom";
 import { listAppType } from "../../../definitions/ApplicatoionTypes";
 import { ListCheckHaveLine } from "../../../components/dropdownCheck/ListStatusAppType";
@@ -488,7 +488,7 @@ const IndexNewTask = () => {
               <span>
                 {!row.total_price
                   ? 0.0 + " บาท"
-                  : numberWithCommas(parseFloat(row.total_price)) + " บาท"}
+                  : numberWithCommasToFixed(parseFloat(row.total_price)) + " บาท"}
               </span>
               <InvoiceTask
                 iconColor={color.Success}

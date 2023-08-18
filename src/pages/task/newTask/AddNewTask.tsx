@@ -64,7 +64,7 @@ import ModalSelectedDroner from "../../../components/modal/task/newTask/ModalSel
 import { CreateDronerTempEntity } from "../../../entities/TaskDronerTemp";
 import TextArea from "antd/lib/input/TextArea";
 import Swal from "sweetalert2";
-import { numberWithCommas } from "../../../utilities/TextFormatter";
+import { numberWithCommasToFixed, validateOnlyNumWDecimal, validateOnlyNumber } from "../../../utilities/TextFormatter";
 import icon from "../../../resource/icon";
 import { LocationPriceDatasource } from "../../../datasource/LocationPriceDatasource";
 import { CouponDataSource } from "../../../datasource/CouponDatasource";
@@ -387,15 +387,18 @@ const AddNewTask = () => {
   };
 
   const handleAmountRai = (e: React.ChangeEvent<HTMLInputElement>) => {
+    console.log(e.target.value)
+    const values = validateOnlyNumWDecimal(e.target.value);
+
     const payload = {
       ...createNewTask,
     };
     payload.priceStandard =
-      createNewTask.unitPriceStandard * parseFloat(e.target.value);
+      createNewTask.unitPriceStandard * parseFloat(values);
     payload.price =
-      createNewTask.unitPriceStandard * parseFloat(e.target.value);
+      createNewTask.unitPriceStandard * parseFloat(values);
     payload.unitPriceStandard = createNewTask.unitPrice;
-    payload.farmAreaAmount = e.target.value;
+    payload.farmAreaAmount = values;
     setCreateNewTask(payload);
     checkValidateStep(payload, current);
   };
@@ -458,16 +461,18 @@ const AddNewTask = () => {
     checkValidateStep(d.toJS(), current);
   };
   const handleCalServiceCharge = (e: any) => {
+    const values = validateOnlyNumber(e.target.value);
+
     if (e.target.id === "unitPrice") {
       let calUnitPrice =
-        parseFloat(createNewTask.farmAreaAmount) * e.target.value;
-      const d = Map(createNewTask).set("unitPrice", e.target.value);
+        parseFloat(createNewTask.farmAreaAmount) *parseFloat(values);
+      const d = Map(createNewTask).set("unitPrice", values);
       const pushCal = Map(d.toJS()).set("price", calUnitPrice);
       setCreateNewTask(pushCal.toJS());
       checkValidateStep(pushCal.toJS(), current);
     } else {
       let calUnitPrice =
-        e.target.value / parseFloat(createNewTask.farmAreaAmount);
+      parseFloat(values) / parseFloat(createNewTask.farmAreaAmount);
       const d = Map(createNewTask).set("price", e.target.value);
       const pushCal = Map(d.toJS()).set("unitPrice", calUnitPrice);
       setCreateNewTask(pushCal.toJS());
@@ -844,7 +849,7 @@ const AddNewTask = () => {
                         <span style={{ color: "red" }}>*</span>
                         <Input
                           suffix="บาท/ไร่"
-                          value={numberWithCommas(
+                          value={numberWithCommasToFixed(
                             createNewTask.unitPriceStandard
                           )}
                           disabled
@@ -859,7 +864,7 @@ const AddNewTask = () => {
                       <Form.Item>
                         <Input
                           suffix="บาท"
-                          value={createNewTask.priceStandard}
+                          value={numberWithCommasToFixed(createNewTask.priceStandard)}
                           disabled
                           autoComplete="off"
                           step="0.01"
@@ -893,7 +898,7 @@ const AddNewTask = () => {
                       <Form.Item>
                         <Input
                           suffix="บาท"
-                          value={numberWithCommas(createNewTask.price)}
+                          value={numberWithCommasToFixed(createNewTask.price)}
                           onChange={handleCalServiceCharge}
                           disabled={
                             current === 2 || checkSelectPlot === "error"
@@ -1735,7 +1740,7 @@ const AddNewTask = () => {
           <Form style={{ padding: "20px" }} form={form}>
             <label>ยอดรวมค่าบริการ</label>
             <h5 style={{ color: color.primary1 }} className="p-2">
-              {numberWithCommas(createNewTask.price - (discountResult ?? 0))}{" "}
+              {numberWithCommasToFixed(createNewTask.price - (discountResult ?? 0))}{" "}
               บาท
             </h5>
             <div className="row">
@@ -1744,7 +1749,7 @@ const AddNewTask = () => {
                 <Form.Item>
                   <Input
                     suffix="บาท"
-                    value={numberWithCommas(createNewTask.price)}
+                    value={numberWithCommasToFixed(createNewTask.price)}
                     disabled={current === 2 || checkSelectPlot === "error"}
                     autoComplete="off"
                     step="0.01"
@@ -1756,7 +1761,7 @@ const AddNewTask = () => {
                 <Form.Item>
                   <Input
                     suffix="บาท"
-                    value={createNewTask.fee}
+                    value={numberWithCommasToFixed(createNewTask.fee)}
                     disabled={current === 2 || checkSelectPlot === "error"}
                     autoComplete="off"
                     step="0.01"
@@ -1768,7 +1773,7 @@ const AddNewTask = () => {
                 <Form.Item>
                   <Input
                     suffix="บาท"
-                    value={createNewTask.discountFee}
+                    value={numberWithCommasToFixed(createNewTask.discountFee)}
                     disabled={current === 2 || checkSelectPlot === "error"}
                     autoComplete="off"
                     step="0.01"
@@ -1874,7 +1879,7 @@ const AddNewTask = () => {
                     suffix="บาท"
                     disabled
                     placeholder="ส่วนลดคูปอง"
-                    value={numberWithCommas(discountResult!)}
+                    value={numberWithCommasToFixed(discountResult!)}
                   />
                 </Form.Item>
               </div>
