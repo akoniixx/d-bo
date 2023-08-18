@@ -162,7 +162,7 @@ const BookBankDroner: React.FC<BookBankDronerProps> = ({
             />
           </div>
         </div>
-        <Form form={form} key={data.id} className="p-4">
+        <Form form={form} key={dronerId} className="p-4">
           <div className="form-group">
             <label>
               ธนาคาร
