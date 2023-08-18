@@ -83,7 +83,7 @@ interface DataType {
   telFarmer: string;
   taskNo: string;
   updateBy: string;
-  action: string;
+  id: string;
   discountFee: string;
   price: string;
   fee: string;
@@ -131,11 +131,8 @@ function IndexReport() {
   const dateFormat = "DD/MM/YYYY";
   const timeFormat = "HH:mm";
 
-  useEffect(() => {
-    fetchAllReport();
-    fetchProvince();
-  }, [current, row, startDate, endDate]);
   const fetchAllReport = async () => {
+    setLoading(true);
     await ReportDocDatasource.getAllReportDroner(
       current,
       row,
@@ -149,10 +146,17 @@ function IndexReport() {
       searchStatusCancel,
       searchText,
       documentPersons
-    ).then((res: TaskReportListEntity) => {
-      setGetData(res);
-    });
+    )
+      .then((res: TaskReportListEntity) => {
+        setGetData(res);
+      })
+      .catch((err) => console.log(err))
+      .finally(() => setLoading(false));
   };
+  useEffect(() => {
+    fetchAllReport();
+    fetchProvince();
+  }, [current, row, startDate, endDate]);
   const [persistedProfile, setPersistedProfile] = useLocalStorage(
     "profile",
     []
@@ -212,7 +216,6 @@ function IndexReport() {
       }
     }
     setSearchStatus(arr);
-    setCurrent(1);
   };
   const handleCheckDocument = (e: any) => {
     let value = e.target.value;
@@ -230,21 +233,17 @@ function IndexReport() {
       }
     }
     setDocumentPersons(arr);
-    setCurrent(1);
   };
   const handleProvince = (provinceId: number) => {
     setSearchProvince(provinceId);
     fetchDistrict(provinceId);
-    setCurrent(1);
   };
   const handleDistrict = (districtId: number) => {
     fetchSubdistrict(districtId);
     setSearchDistrict(districtId);
-    setCurrent(1);
   };
   const handleSubDistrict = (subdistrictId: any) => {
     setSearchSubdistrict(subdistrictId);
-    setCurrent(1);
   };
   const handleModalMap = (plotId: string) => {
     setShowModalMap((prev) => !prev);
@@ -470,7 +469,7 @@ function IndexReport() {
   const DownloadPDF = async () => {
     setLoading(true);
     if (clickPays.length > 1) {
-      const filterId = clickPays.map((x: any) => x.action);
+      const filterId = clickPays.map((x: any) => x.id);
       const downloadBy = `${persistedProfile.firstname} ${persistedProfile.lastname}`;
       await ReportDocDatasource.getFileName("ZIP_PDF", downloadBy).then(
         (res) => {
@@ -493,7 +492,7 @@ function IndexReport() {
         }
       );
     } else if (clickPays.length === 1) {
-      const filterId = clickPays.map((x: any) => x.action);
+      const filterId = clickPays.map((x: any) => x.id);
       const downloadBy = `${persistedProfile.firstname} ${persistedProfile.lastname}`;
       await ReportDocDatasource.getFileName("PDF", downloadBy, filterId).then(
         (res) => {
@@ -519,7 +518,7 @@ function IndexReport() {
   };
   const DownloadExcel = async () => {
     setLoading(true);
-    const filterId = clickPays.map((x: any) => x.action);
+    const filterId = clickPays.map((x: any) => x.id);
     const downloadBy = `${persistedProfile.firstname} ${persistedProfile.lastname}`;
     await ReportDocDatasource.getFileName("EXCEL", downloadBy, filterId).then(
       (res) => {
@@ -572,7 +571,7 @@ function IndexReport() {
         if (clickPays.map((x) => x.statusPay)[0] === "DONE_PAYMENT") {
           const updateBy = profile.firstname + " " + profile.lastname;
           const updateInfo = { ...statusPayment };
-          updateInfo.id = clickPays.map((x) => x.action);
+          updateInfo.id = clickPays.map((x) => x.id);
           updateInfo.statusPayment = "WAIT_PAYMENT";
           updateInfo.updateBy = updateBy;
           await UpdateStatusPaymentDatasource.UpdateStatusPayment(
@@ -583,7 +582,7 @@ function IndexReport() {
         } else if (clickPays.map((x) => x.statusPay)[0] === "WAIT_PAYMENT") {
           const updateBy = profile.firstname + " " + profile.lastname;
           const updateInfo = { ...statusPayment };
-          updateInfo.id = clickPays.map((x) => x.action);
+          updateInfo.id = clickPays.map((x) => x.id);
           updateInfo.statusPayment = "DONE_PAYMENT";
           updateInfo.updateBy = updateBy;
           await UpdateStatusPaymentDatasource.UpdateStatusPayment(
@@ -860,9 +859,8 @@ function IndexReport() {
     },
     {
       title: "",
-      dataIndex: "action",
+      dataIndex: "id",
       fixed: "right",
-      width: "5%",
       render: (value: any, row: any, index: number) => {
         return {
           children: (
@@ -1257,24 +1255,9 @@ function IndexReport() {
               color: color.secondary2,
               backgroundColor: color.Success,
             }}
-            onClick={async () => {
-              await ReportDocDatasource.getAllReportDroner(
-                current,
-                row,
-                searchSubdistrict,
-                searchDistrict,
-                searchProvince,
-                startDate,
-                endDate,
-                searchStatus,
-                searchStatusPayment,
-                searchStatusCancel,
-                searchText,
-                documentPersons
-              ).then((res: TaskReportListEntity) => {
-                setGetData(res);
-                setCurrent(1);
-              });
+            onClick={() => {
+              setCurrent(1);
+              fetchAllReport();
             }}
           >
             ค้นหาข้อมูล
@@ -1344,7 +1327,7 @@ function IndexReport() {
         price: `${getData?.data.map((x) => x.price)[i]}`,
         fee: `${getData?.data.map((x) => x.fee)[i]}`,
         discountCoupon: `${getData?.data.map((x) => x.discountCoupon)[i]}`,
-        action: `${getData?.data.map((x) => x.id)[i]}`,
+        id: `${getData?.data.map((x) => x.id)[i]}`,
         taskHistory: `${
           getData?.data.map((x) =>
             x.taskHistory.length > 0 ? x.taskHistory[0].beforeValue : []
@@ -1366,9 +1349,9 @@ function IndexReport() {
   return (
     <>
       <Space direction="vertical" style={{ width: "100%" }}>
-        <Spin tip="Loading..." size="large" spinning={loading}>
-          {PageTitle}
-          <br />
+        {PageTitle}
+        <br />
+        <Spin tip="กำลังโหลดข้อมูล..." size="large" spinning={loading}>
           <Table
             rowSelection={{
               ...rowSelection,

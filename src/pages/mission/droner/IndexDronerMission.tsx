@@ -15,6 +15,7 @@ import {
   Pagination,
   Row,
   Select,
+  Spin,
   Table,
 } from "antd";
 import moment from "moment";
@@ -45,8 +46,10 @@ const IndexDronerMission = () => {
   const [searchStatus, setSearchStatus] = useState("");
   const [showModal, setShowModal] = useState(false);
   const [deleteId, setDeleteId] = useState<string>("");
+  const [loading, setLoading] = useState(false);
 
   const fetchMission = () => {
+    setLoading(true);
     CampaignDatasource.getCampaignList(
       "DRONER",
       "MISSION_REWARD",
@@ -56,9 +59,12 @@ const IndexDronerMission = () => {
       searchEndDate,
       searchStatus,
       searchKeyword
-    ).then((res) => {
-      setData(res);
-    });
+    )
+      .then((res) => {
+        setData(res);
+      })
+      .catch((err) => console.log(err))
+      .finally(() => setLoading(false));
   };
 
   useEffect(() => {
@@ -281,7 +287,9 @@ const IndexDronerMission = () => {
     <>
       {pageTitle}
       <CardContainer>
-        <Table columns={columns} dataSource={data?.data} pagination={false} />
+        <Spin tip="กำลังโหลดข้อมูล..." size="large" spinning={loading}>
+          <Table columns={columns} dataSource={data?.data} pagination={false} />
+        </Spin>
       </CardContainer>
       <div className="d-flex justify-content-between pt-3 pb-3">
         <p>รายการทั้งหมด {data?.count} รายการ</p>

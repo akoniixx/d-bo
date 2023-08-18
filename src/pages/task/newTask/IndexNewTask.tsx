@@ -104,11 +104,9 @@ const IndexNewTask = () => {
 
   const handleSearchStatus = (status: any) => {
     setSearchStatus(status.target.value);
-    setCurrent(1);
   };
   const handleSearchText = (e: any) => {
     setSearchText(e);
-    setCurrent(1);
   };
   const handleSearchDate = (e: any) => {
     if (e != null) {
@@ -118,7 +116,6 @@ const IndexNewTask = () => {
       setSearchStartDate(e);
       setSearchEndDate(e);
     }
-    setCurrent(1);
   };
   const handleModalMap = (plotId: string) => {
     setShowModalMap((prev) => !prev);
@@ -279,7 +276,10 @@ const IndexNewTask = () => {
               color: color.secondary2,
               backgroundColor: color.Success,
             }}
-            onClick={fetchNewTaskList}
+            onClick={() => {
+              setCurrent(1);
+              fetchNewTaskList();
+            }}
           >
             ค้นหาข้อมูล
           </Button>

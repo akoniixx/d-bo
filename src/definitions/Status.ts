@@ -1,7 +1,7 @@
 import { color } from "../resource";
 
 export const STATUS_NORMAL_MAPPING: any = {
-  PENDING: "รอยืนยันตัวแปลง",
+  PENDING: "รอตรวจสอบ",
   ACTIVE: "ใช้งาน",
   INACTIVE: "ปิดการใช้งาน",
   REJECTED: "ไม่อนุมัติ",

@@ -151,7 +151,7 @@ function EditDroner() {
       ...UploadImageEntity_INTI,
     },
   ];
-  
+
   const fetchDronerById = useCallback(async () => {
     await DronerDatasource.getDronerByID(dronerId).then(async (res) => {
       await CropDatasource.getCropJustName().then((crops) => {
@@ -978,7 +978,8 @@ function EditDroner() {
                     message: "กรุณากรอกเบอร์โทร!",
                   },
                   {
-                    pattern: new RegExp(/^[0-9\b]+$/),
+                    pattern:
+                      new RegExp(/^[0-9\b]+$/) && new RegExp(/^0[689]\d{8}$/),
                     message: "กรุณากรอกเบอร์โทรให้ถูกต้อง!",
                   },
                   {
@@ -1002,7 +1003,8 @@ function EditDroner() {
                   locale={locale}
                   format={dateFormat}
                   disabledDate={(current) =>
-                    current && current > moment().endOf("day")
+                    (current && current > moment().endOf("day")) ||
+                    moment().diff(current, "years") < 18
                   }
                   defaultValue={
                     data.birthDate !== null ? moment(data.birthDate) : undefined
@@ -1475,10 +1477,7 @@ function EditDroner() {
           <div className="form-group">
             <label>หรือ</label>
             <Form.Item name="mapUrl">
-              <Input
-                placeholder="URL Link Google Maps"
-                autoComplete="off"
-              />
+              <Input placeholder="URL Link Google Maps" autoComplete="off" />
             </Form.Item>
           </div>
           <div className="row">
@@ -1838,7 +1837,7 @@ function EditDroner() {
       {bookBank ? (
         <BookBankDroner
           callBack={insertBookBank}
-          data={dataBookBank}
+          data={data}
           dronerId={dronerId}
         />
       ) : null}

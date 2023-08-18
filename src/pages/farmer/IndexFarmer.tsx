@@ -133,6 +133,7 @@ function IndexFarmer() {
       setProvince(res);
     });
   };
+
   const fetchDistrict = async (provinceId: number) => {
     await LocationDatasource.getDistrict(provinceId).then((res) => {
       setDistrict(res);
@@ -146,7 +147,7 @@ function IndexFarmer() {
   useEffect(() => {
     fetchFarmer();
     fetchProvince();
-  }, [sortDirection, current, mainStatus, row]);
+  }, [sortDirection, mainStatus, current]);
 
   const onChangePage = (page: number) => {
     setCurrent(page);
@@ -296,21 +297,26 @@ function IndexFarmer() {
 
   const handleSearchText = (e: any) => {
     setSearchText(e.target.value);
-    setCurrent(1);
   };
-  const handleSearchProvince = (provinceId: number) => {
+  const handleSearchProvince = (provinceId: any) => {
+    const filterId = district?.map((x) => x.provinceId)[0];
+    if (!provinceId || parseFloat(provinceId) !== filterId) {
+      setSearchDistrict(undefined);
+      setSearchSubdistrict(undefined);
+      setSearchProvince(undefined);
+    }
     setSearchProvince(provinceId);
     fetchDistrict(provinceId);
-    setCurrent(1);
   };
-  const handleSearchDistrict = (districtId: number) => {
+  const handleSearchDistrict = (districtId: any) => {
+    if (!districtId) {
+      setSearchSubdistrict(undefined);
+    }
     fetchSubdistrict(districtId);
     setSearchDistrict(districtId);
-    setCurrent(1);
   };
   const handleSearchSubdistrict = (subdistrictId: any) => {
     setSearchSubdistrict(subdistrictId);
-    setCurrent(1);
   };
 
   const onSearchCreateBy = (e: any) => {
@@ -441,7 +447,8 @@ function IndexFarmer() {
                 .toLowerCase()
                 .localeCompare(optionB.children.toLowerCase())
             }
-            disabled={searchProvince == undefined}
+            disabled={!searchProvince}
+            value={!searchProvince ? "เลือกอำเภอ" : undefined}
           >
             {district?.map((item) => (
               <option value={item.districtId.toString()}>
@@ -466,7 +473,8 @@ function IndexFarmer() {
                 .toLowerCase()
                 .localeCompare(optionB.children.toLowerCase())
             }
-            disabled={searchDistrict == undefined}
+            disabled={!searchDistrict}
+            value={!searchDistrict ? "เลือกตำบล" : undefined}
           >
             {subdistrict?.map((item) => (
               <option value={item.subdistrictId.toString()}>
@@ -505,7 +513,10 @@ function IndexFarmer() {
               color: color.secondary2,
               backgroundColor: color.Success,
             }}
-            onClick={fetchFarmer}
+            onClick={() => {
+              setCurrent(1);
+              fetchFarmer();
+            }}
           >
             ค้นหาข้อมูล
           </Button>
@@ -658,60 +669,21 @@ function IndexFarmer() {
       key: "telephoneNo",
     },
     {
-      title: "จังหวัด",
-      dataIndex: "province",
-      key: "province",
+      title: "ที่อยู่",
+      dataIndex: "address",
+      key: "address",
       render: (value: any, row: any, index: number) => {
+        const subdistrict =
+          row.address !== null ? row.address.subdistrict : null;
+        const district = row.address !== null ? row.address.district : null;
+        const province = row.address !== null ? row.address.province : null;
+
         return {
           children: (
-            <span>
-              {row?.address !== null
-                ? row?.address?.province !== null
-                  ? row.address.province.provinceName !== null
-                    ? row.address.province.provinceName
-                    : "-"
-                  : "-"
-                : "-"}
-            </span>
-          ),
-        };
-      },
-    },
-    {
-      title: "อำเภอ",
-      dataIndex: "district",
-      key: "district",
-      render: (value: any, row: any, index: number) => {
-        return {
-          children: (
-            <span>
-              {row?.address !== null
-                ? row?.address?.district !== null
-                  ? row.address.district.districtName !== null
-                    ? row.address.district.districtName
-                    : "-"
-                  : "-"
-                : "-"}
-            </span>
-          ),
-        };
-      },
-    },
-    {
-      title: "ตำบล",
-      dataIndex: "date",
-      key: "date",
-      render: (value: any, row: any, index: number) => {
-        return {
-          children: (
-            <span>
-              {row?.address !== null
-                ? row?.address?.subdistrict !== null
-                  ? row.address.subdistrict.subdistrictName !== null
-                    ? row.address.subdistrict.subdistrictName
-                    : "-"
-                  : "-"
-                : "-"}
+            <span className="text-dark-75  d-block font-size-lg">
+              {subdistrict ? subdistrict.subdistrictName + "/" : "-/"}
+              {district ? district.districtName + "/" : "-/"}
+              {province ? province.provinceName : "-"}
             </span>
           ),
         };

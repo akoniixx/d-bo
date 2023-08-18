@@ -26,7 +26,7 @@ import {
   STATUS_COLOR,
 } from "../../definitions/DronerStatus";
 import { DroneBrandEntity } from "../../entities/DroneBrandEntities";
-import { DroneEntity } from "../../entities/DroneEntities";
+import { DroneEntity, DroneEntity_INIT } from "../../entities/DroneEntities";
 import { DronerDroneListEntity } from "../../entities/DronerDroneEntities";
 import color from "../../resource/color";
 import { formatDate, numberWithCommas } from "../../utilities/TextFormatter";
@@ -109,39 +109,39 @@ function DroneList() {
       .catch((err) => console.log(err))
       .finally(() => setLoading(false));
   };
-  const fetchDroneList = async () => {
-    await DroneDatasource.getDroneList(1, row, droneBrandId).then((res) => {
-      setSeriesDrone(res.data);
-    });
-  };
+
   const fetchDroneBrand = async () => {
     await DroneDatasource.getDroneBrandList().then((res) => {
       setDroneBrand(res.data);
     });
   };
+
   useEffect(() => {
     fetchDronerDroneList();
     fetchDroneBrand();
   }, [current, row, mainStatus, sortDirection]);
-  useEffect(() => {
-    fetchDroneList();
-  }, [droneBrandId]);
 
   const onChangePage = (page: number) => {
     setCurrent(page);
   };
   const changeTextSearch = (value: any) => {
     setSearchText(value.target.value);
-    setCurrent(1);
   };
-  const handleDroneBrand = (droneBrand: string) => {
+  const handleDroneBrand = async (droneBrand: string) => {
+    if (droneBrand !== undefined) {
+      await DroneDatasource.getDroneList(1, row, droneBrand).then((res) => {
+        setSeriesDrone(res.data);
+      });
+    } else {
+      setSeriesDrone(undefined);
+      setSearchSeriesDrone(undefined);
+    }
     setDroneBrandId(droneBrand);
-    setCurrent(1);
   };
   const handleDroneSeries = (seriesDrone: string) => {
     setSearchSeriesDrone(seriesDrone);
-    setCurrent(1);
   };
+
   const CheckStatus = (e: any) => {
     if (e.target.value === "PENDING") {
       setSearchStatus(undefined);
@@ -373,9 +373,10 @@ function DroneList() {
             allowClear
             onChange={handleDroneSeries}
             disabled={!droneBrandId}
+            value={!droneBrandId ? "เลือกรุ่นโดรน" : undefined}
           >
             {seriesDrone?.map((item: any) => (
-              <option value={item.id.toString()}>{item.series}</option>
+              <option value={item.id}>{item.series}</option>
             ))}
           </Select>
         </div>
@@ -401,7 +402,10 @@ function DroneList() {
               color: color.secondary2,
               backgroundColor: color.Success,
             }}
-            onClick={fetchDronerDroneList}
+            onClick={()=> {
+              setCurrent(1);
+              fetchDronerDroneList();
+            }}
           >
             ค้นหาข้อมูล
           </Button>
@@ -896,10 +900,7 @@ function DroneList() {
   let emptyState = {
     emptyText: (
       <div style={{ textAlign: "center", padding: "10%" }}>
-        <img
-          src={image.empty_table_drone}
-          style={{ width: 90, height: 90 }}
-        />
+        <img src={image.empty_table_drone} style={{ width: 90, height: 90 }} />
         <p>ยังไม่มีข้อมูลโดรน</p>
       </div>
     ),

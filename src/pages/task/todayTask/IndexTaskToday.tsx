@@ -159,24 +159,29 @@ export default function IndexTodayTask() {
   };
   const changeTextSearch = (searchText: any) => {
     setSearchText(searchText.target.value);
-    setCurrent(1);
   };
   const onChangePage = (page: any) => {
     setCurrent(page);
   };
-  const handleProvince = (provinceId: number) => {
+  const handleProvince = (provinceId: any) => {
+    const filterId = district?.map((x) => x.provinceId)[0];
+    if (!provinceId || parseFloat(provinceId) !== filterId) {
+      setSearchDistrict(undefined);
+      setSearchSubdistrict(undefined);
+      setSearchProvince(undefined);
+    }
     setSearchProvince(provinceId);
     fetchDistrict(provinceId);
-    setCurrent(1);
   };
-  const handleDistrict = (districtId: number) => {
+  const handleDistrict = (districtId: any) => {
+    if (!districtId) {
+      setSearchSubdistrict(undefined);
+    }
     fetchSubdistrict(districtId);
     setSearchDistrict(districtId);
-    setCurrent(1);
   };
   const handleSubDistrict = (subdistrictId: any) => {
     setSearchSubdistrict(subdistrictId);
-    setCurrent(1);
   };
 
   const handleModalMap = (plotId: string) => {
@@ -435,7 +440,8 @@ export default function IndexTodayTask() {
                 .toLowerCase()
                 .localeCompare(optionB.children.toLowerCase())
             }
-            disabled={searchProvince == undefined}
+            disabled={!searchProvince}
+            value={!searchProvince ? "เลือกอำเภอ" : undefined}
           >
             {district?.map((item) => (
               <option value={item.districtId.toString()}>
@@ -460,7 +466,8 @@ export default function IndexTodayTask() {
                 .toLowerCase()
                 .localeCompare(optionB.children.toLowerCase())
             }
-            disabled={searchDistrict === undefined}
+            disabled={!searchDistrict}
+            value={!searchDistrict ? "เลือกตำบล" : undefined}
           >
             {subdistrict?.map((item) => (
               <option value={item.subdistrictId.toString()}>
@@ -498,7 +505,10 @@ export default function IndexTodayTask() {
               color: color.secondary2,
               backgroundColor: color.Success,
             }}
-            onClick={fetchAllTaskToday}
+            onClick={() => {
+              setCurrent(1);
+              fetchAllTaskToday();
+            }}
           >
             ค้นหาข้อมูล
           </Button>

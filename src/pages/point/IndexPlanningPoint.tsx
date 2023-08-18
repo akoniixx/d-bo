@@ -6,6 +6,7 @@ import {
   Input,
   Pagination,
   Row,
+  Spin,
   Table,
   Tooltip,
 } from "antd";
@@ -30,8 +31,10 @@ const IndexPlanningPoint = () => {
   const [searchTask, setSearchTask] = useState("");
   const [searchStartDate, setSearchStartDate] = useState<any>(null);
   const [searchEndDate, setSearchEndDate] = useState<any>(null);
+  const [loading, setLoading] = useState(false);
 
   const fetchPlanningPoint = () => {
+    setLoading(true);
     PointReceiveDatasource.getPlanningPoint(
       "PENDING",
       row,
@@ -40,13 +43,16 @@ const IndexPlanningPoint = () => {
       searchTask,
       searchStartDate,
       searchEndDate
-    ).then((res) => {
-      const mapKey = res.data.map((x, i) => ({
-        ...x,
-        key: i + 1,
-      }));
-      setData({ ...res, data: mapKey });
-    });
+    )
+      .then((res) => {
+        const mapKey = res.data.map((x, i) => ({
+          ...x,
+          key: i + 1,
+        }));
+        setData({ ...res, data: mapKey });
+      })
+      .catch((err) => console.log(err))
+      .finally(() => setLoading(false));
   };
 
   useEffect(() => {
@@ -298,18 +304,20 @@ const IndexPlanningPoint = () => {
     <>
       {pageTitle}
       <CardContainer>
-        <Table
-          dataSource={data?.data}
-          expandable={{
-            expandedRowRender: (record) => expandData(record),
-            showExpandColumn: false,
-            expandedRowKeys: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
-          }}
-          columns={columns}
-          pagination={false}
-          size="large"
-          tableLayout="fixed"
-        />
+        <Spin tip="กำลังโหลดข้อมูล..." size="large" spinning={loading}>
+          <Table
+            dataSource={data?.data}
+            expandable={{
+              expandedRowRender: (record) => expandData(record),
+              showExpandColumn: false,
+              expandedRowKeys: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+            }}
+            columns={columns}
+            pagination={false}
+            size="large"
+            tableLayout="fixed"
+          />
+        </Spin>
       </CardContainer>
       <div className="d-flex justify-content-between pt-3 pb-3">
         <p>รายการทั้งหมด {data?.count} รายการ</p>

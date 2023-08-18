@@ -1,5 +1,5 @@
 import { EditOutlined, SearchOutlined } from "@ant-design/icons";
-import { Button, Input, Pagination, Select, Table } from "antd";
+import { Button, Input, Pagination, Select, Spin, Table } from "antd";
 import { useEffect, useState } from "react";
 import ActionButton from "../../components/button/ActionButton";
 import ModalCropByProvince from "../../components/modal/ModalCropByProvince";
@@ -24,19 +24,20 @@ function PricePage() {
   const [showModalCrop, setShowModalCrop] = useState(false);
   const [searchText, setSearchText] = useState<string>();
   const [provinceId, setProvinceId] = useState();
+  const [loading, setLoading] = useState(false);
   const [editLocationPrice, setEditLocationPrice] =
     useState<UpdateLocationPrice>(UpdateLocationPrice_INIT);
   useEffect(() => {
     fetchLocationPrice();
   }, [current]);
   const fetchLocationPrice = async () => {
-    await LocationPriceDatasource.getAllLocationPrice(
-      row,
-      current,
-      searchText
-    ).then((res: LocationPricePageEntity) => {
-      setData(res);
-    });
+    setLoading(true);
+    await LocationPriceDatasource.getAllLocationPrice(row, current, searchText)
+      .then((res: LocationPricePageEntity) => {
+        setData(res);
+      })
+      .catch((err) => console.log(err))
+      .finally(() => setLoading(false));
   };
   const handleModalEdit = (plants: UpdateLocationPrice, index: any) => {
     setShowModalEdit((prev) => !prev);
@@ -48,7 +49,6 @@ function PricePage() {
   };
   const changeTextSearch = (searchText: any) => {
     setSearchText(searchText.target.value);
-    setCurrent(1);
   };
   const previewCrop = (province: any) => {
     setShowModalCrop((prev) => !prev);
@@ -203,7 +203,10 @@ function PricePage() {
             backgroundColor: color.Success,
           }}
           className="col-lg-12"
-          onClick={fetchLocationPrice}
+          onClick={() => {
+            setCurrent(1);
+            fetchLocationPrice();
+          }}
         >
           ค้นหาข้อมูล
         </Button>
@@ -226,7 +229,9 @@ function PricePage() {
   return (
     <>
       {pageTitle}
-      <Table columns={columns} dataSource={data?.data} pagination={false} />
+      <Spin tip="กำลังโหลดข้อมูล..." size="large" spinning={loading}>
+        <Table columns={columns} dataSource={data?.data} pagination={false} />
+      </Spin>
       <div className="d-flex justify-content-between pt-3 pb-3">
         <p>รายการทั้งหมด {data?.count} รายการ</p>
         <Pagination
