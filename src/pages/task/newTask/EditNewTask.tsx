@@ -1092,21 +1092,27 @@ const EditNewTask = () => {
       status,
       ratingMin,
       ratingMax
-    ).then((res) => {
-      res.map((item) =>
-        _.set(
-          item,
-          "isChecked",
-          dronerSelectedList
-            .map((x) => x)
-            .find((y) => y.dronerId === item.droner_id)
-            ? true
-            : false
-        )
-      );
-      setDataDronerList(res);
-      setLoading(false);
-    });
+    )
+      .then((res) => {
+        if (Array.isArray(res)) {
+          res.forEach((item) => {
+            _.set(
+              item,
+              "isChecked",
+              dronerSelectedList
+                .map((x) => x)
+                .find((y) => y.dronerId === item.droner_id)
+                ? true
+                : false
+            );
+          });
+          setDataDronerList(res);
+        } else {
+          setDataDronerList([]);
+        }
+      })
+      .catch((err) => console.log(err))
+      .finally(() => setLoading(false));
   };
   const ratingStar = (
     <Menu
@@ -1941,7 +1947,6 @@ const EditNewTask = () => {
         payload.priceStandard = 0;
         payload.unitPriceStandard = 0;
       }
-      console.log(payload);
       setData(payload);
     } else {
       const payload = { ...data };
