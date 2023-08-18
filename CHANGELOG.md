@@ -1,5 +1,10 @@
 ## [Version - 0]
 
+## improve [v0.36.10] 2023-08-18
+
+- set loading all page
+- fixed defect droner & task & drone list page
+
 ## improve [v0.36.9] 2023-08-16
 
 - improve index drone page
