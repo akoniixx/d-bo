@@ -1197,9 +1197,9 @@ function AddDroner() {
             </Form.Item>
           </div>
           <div className="form-group">
-            <label>หรือ</label>
+            <label>Link Google Map</label>
             <Form.Item name="mapUrl">
-              <Input placeholder="URL Link Google Maps" autoComplete="off" />
+              <Input placeholder="กรอกข้อมูล Url Google Map" autoComplete="off" />
             </Form.Item>
           </div>
           <div className="row">

@@ -1,5 +1,10 @@
 ## [Version - 0]
 
+## Fix [v0.36.11] 2023-08-21
+
+- fixed validate NumWDecimal new task
+- fixed wording google map
+
 ## improve [v0.36.10] 2023-08-18
 
 - set loading all page

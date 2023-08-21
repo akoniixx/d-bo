@@ -1475,7 +1475,7 @@ function EditDroner() {
             </div>
           </div>
           <div className="form-group">
-            <label>หรือ</label>
+            <label>Link Google Map</label>
             <Form.Item name="mapUrl">
               <Input placeholder="URL Link Google Maps" autoComplete="off" />
             </Form.Item>
