@@ -7,6 +7,7 @@ import {
   Menu,
   Pagination,
   Select,
+  Spin,
   Table,
 } from "antd";
 import Search from "antd/lib/input/Search";
@@ -21,7 +22,12 @@ import {
   SubdistrictEntity,
 } from "../../entities/LocationEntities";
 import color from "../../resource/color";
-import { DownOutlined, FileTextOutlined, SearchOutlined, StarFilled } from "@ant-design/icons";
+import {
+  DownOutlined,
+  FileTextOutlined,
+  SearchOutlined,
+  StarFilled,
+} from "@ant-design/icons";
 import { DronerRankDatasource } from "../../datasource/DronerRankDatasource";
 import { DronerRankListEntity } from "../../entities/DronerRankEntities";
 import { useNavigate } from "react-router-dom";
@@ -46,14 +52,15 @@ export default function IndexRankDroner() {
     ratingMin: any;
     ratingMax: any;
   }>();
+  const [loading, setLoading] = useState(false);
   const { RangePicker } = DatePicker;
   const dateSearchFormat = "YYYY-MM-DD";
   useEffect(() => {
     fetchDronerRank();
     fetchProvince();
   }, [current, startDate, endDate]);
-  const fetchDronerRank = async (
-  ) => {
+  const fetchDronerRank = async () => {
+    setLoading(true);
     await DronerRankDatasource.getDronerRank(
       current,
       row,
@@ -65,9 +72,12 @@ export default function IndexRankDroner() {
       startDate,
       endDate,
       searchText
-    ).then((res: DronerRankListEntity) => {
-      setData(res);
-    });
+    )
+      .then((res: DronerRankListEntity) => {
+        setData(res);
+      })
+      .catch((err) => console.log(err))
+      .finally(() => setLoading(false));
   };
   const fetchProvince = async () => {
     await LocationDatasource.getProvince().then((res) => {
@@ -86,24 +96,29 @@ export default function IndexRankDroner() {
   };
   const changeTextSearch = (searchText: any) => {
     setSearchText(searchText.target.value);
-    setCurrent(1);
   };
   const onChangePage = (page: number) => {
     setCurrent(page);
   };
-  const handleProvince = (provinceId: number) => {
+  const handleProvince = (provinceId: any) => {
+    const filterId = district?.map((x) => x.provinceId)[0];
+    if (!provinceId || parseFloat(provinceId) !== filterId) {
+      setSearchDistrict(undefined);
+      setSearchSubdistrict(undefined);
+      setSearchProvince(undefined);
+    }
     setSearchProvince(provinceId);
     fetchDistrict(provinceId);
-    setCurrent(1);
   };
-  const handleDistrict = (districtId: number) => {
+  const handleDistrict = (districtId: any) => {
+    if (!districtId) {
+      setSearchSubdistrict(undefined);
+    }
     fetchSubdistrict(districtId);
     setSearchDistrict(districtId);
-    setCurrent(1);
   };
   const handleSubDistrict = (subdistrictId: any) => {
     setSearchSubdistrict(subdistrictId);
-    setCurrent(1);
   };
   const handleSearchDate = (e: any) => {
     if (e != null) {
@@ -113,7 +128,6 @@ export default function IndexRankDroner() {
       setStartDate(e);
       setEndDate(e);
     }
-    setCurrent(1);
   };
   const sorter = (a: any, b: any) => {
     if (a === b) return 0;
@@ -276,7 +290,7 @@ export default function IndexRankDroner() {
       >
         <div className="col-lg-4 p-1" style={{ maxWidth: "1200px" }}>
           <Input
-            prefix={<SearchOutlined style={{color: color.Disable}}/>}
+            prefix={<SearchOutlined style={{ color: color.Disable }} />}
             placeholder="ค้นหาชื่อนักบินโดรน/เบอร์โทร/ID นักบินโดรน"
             className="col-lg-12 p-1"
             onChange={changeTextSearch}
@@ -322,7 +336,8 @@ export default function IndexRankDroner() {
                 .toLowerCase()
                 .localeCompare(optionB.children.toLowerCase())
             }
-            disabled={searchProvince == undefined}
+            disabled={!searchProvince}
+            value={!searchProvince ? "เลือกอำเภอ" : undefined}
           >
             {district?.map((item) => (
               <option value={item.districtId.toString()}>
@@ -347,7 +362,8 @@ export default function IndexRankDroner() {
                 .toLowerCase()
                 .localeCompare(optionB.children.toLowerCase())
             }
-            disabled={searchDistrict == undefined}
+            disabled={!searchDistrict}
+            value={!searchDistrict ? "เลือกตำบล" : undefined}
           >
             {subdistrict?.map((item) => (
               <option value={item.subdistrictId.toString()}>
@@ -378,9 +394,10 @@ export default function IndexRankDroner() {
               color: color.secondary2,
               backgroundColor: color.Success,
             }}
-            onClick={
-              fetchDronerRank
-            }
+            onClick={() => {
+              setCurrent(1);
+              fetchDronerRank();
+            }}
           >
             ค้นหาข้อมูล
           </Button>
@@ -412,6 +429,17 @@ export default function IndexRankDroner() {
       title: "เบอร์โทร",
       dataIndex: "droner_telephone_no",
       key: "droner_telephone_no",
+      render: (value: any, row: any, index: number) => {
+        return {
+          children: (
+            <>
+              <span className="text-dark-75  d-block font-size-lg">
+                {row.droner_telephone_no ? row.droner_telephone_no : '-' }
+              </span>
+            </>
+          ),
+        };
+      },
     },
     {
       title: "จำนวนให้บริการ",
@@ -520,7 +548,8 @@ export default function IndexRankDroner() {
       dataIndex: "province_province_name",
       key: "province_province_name",
       width: "10%",
-      sorter: (a: any, b: any) => sorter(a.province_province_name, b.province_province_name),
+      sorter: (a: any, b: any) =>
+        sorter(a.province_province_name, b.province_province_name),
       render: (value: any, row: any, index: number) => {
         const province = row.province_province_name;
         return {
@@ -545,9 +574,7 @@ export default function IndexRankDroner() {
               <ActionButton
                 icon={<FileTextOutlined />}
                 color={color.primary1}
-                onClick={() =>
-                  navigate("/DetailRankDroner?=" + row.droner_id)
-                }
+                onClick={() => navigate("/DetailRankDroner?=" + row.droner_id)}
               />
             </div>
           ),
@@ -559,7 +586,10 @@ export default function IndexRankDroner() {
     <>
       {PageTitle}
       <br />
-      <Table columns={columns} dataSource={data?.data} pagination={false} />
+      <Spin tip="กำลังโหลดข้อมูล..." size="large" spinning={loading}>
+        <Table columns={columns} dataSource={data?.data} pagination={false} />
+      </Spin>
+
       <div className="d-flex justify-content-between pt-3 pb-3">
         <p>รายการทั้งหมด {data?.count} รายการ</p>
         <Pagination

@@ -1,5 +1,5 @@
 import { EditOutlined } from "@ant-design/icons";
-import { Badge, Button, Pagination, Select, Table } from "antd";
+import { Badge, Button, Pagination, Select, Spin, Table } from "antd";
 import "antd/dist/antd.css";
 import React, { useEffect, useState } from "react";
 import ActionButton from "../../components/button/ActionButton";
@@ -27,16 +27,16 @@ const IndexAdmin = () => {
   const [searchStatus, setSearchStatus] = useState<boolean>();
   const [searchRole, setSearchRole] = useState<string>();
   const [roleNull, setRoleNull] = useState<string>();
+  const [loading, setLoading] = useState(false);
 
   const fecthAdmin = async () => {
-    await AdminDatasource.getAdminList(
-      current,
-      row,
-      searchStatus,
-      searchRole
-    ).then((res: UserStaffPageEntity) => {
-      setData(res);
-    });
+    setLoading(true);
+    await AdminDatasource.getAdminList(current, row, searchStatus, searchRole)
+      .then((res: UserStaffPageEntity) => {
+        setData(res);
+      })
+      .catch((err) => console.log(err))
+      .finally(() => setLoading(false));
   };
 
   useEffect(() => {
@@ -184,13 +184,15 @@ const IndexAdmin = () => {
     <>
       {pageTitle}
       <CardContainer>
-        <Table
-          dataSource={data.results}
-          columns={columns}
-          pagination={false}
-          size="large"
-          tableLayout="fixed"
-        />
+        <Spin tip="กำลังโหลดข้อมูล..." size="large" spinning={loading}>
+          <Table
+            dataSource={data.results}
+            columns={columns}
+            pagination={false}
+            size="large"
+            tableLayout="fixed"
+          />
+        </Spin>
       </CardContainer>
       <div className="d-flex justify-content-between pt-3 pb-3">
         <p>รายการทั้งหมด {data.total} รายการ</p>

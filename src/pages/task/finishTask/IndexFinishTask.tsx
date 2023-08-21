@@ -134,7 +134,6 @@ export default function IndexFinishTask() {
       setStartDate(e);
       setEndDate(e);
     }
-    setCurrent(1);
   };
   const fetchProvince = async () => {
     await LocationDatasource.getProvince().then((res) => {
@@ -153,29 +152,33 @@ export default function IndexFinishTask() {
   };
   const changeTextSearch = (searchText: any) => {
     setSearchText(searchText.target.value);
-    setCurrent(1);
   };
   const onChangePage = (page: number) => {
     setCurrent(page);
   };
   const handleStatus = (status: any) => {
     setSearchStatus(status);
-    setCurrent(1);
   };
 
-  const handleProvince = (provinceId: number) => {
+  const handleProvince = (provinceId: any) => {
+    const filterId = district?.map((x) => x.provinceId)[0];
+    if (!provinceId || parseFloat(provinceId) !== filterId) {
+      setSearchDistrict(undefined);
+      setSearchSubdistrict(undefined);
+      setSearchProvince(undefined);
+    }
     setSearchProvince(provinceId);
     fetchDistrict(provinceId);
-    setCurrent(1);
   };
-  const handleDistrict = (districtId: number) => {
+  const handleDistrict = (districtId: any) => {
+    if (!districtId) {
+      setSearchSubdistrict(undefined);
+    }
     fetchSubdistrict(districtId);
     setSearchDistrict(districtId);
-    setCurrent(1);
   };
   const handleSubDistrict = (subdistrictId: any) => {
     setSearchSubdistrict(subdistrictId);
-    setCurrent(1);
   };
   const handleModalMap = (plotId: string) => {
     setShowModalMap((prev) => !prev);
@@ -302,7 +305,8 @@ export default function IndexFinishTask() {
                 .toLowerCase()
                 .localeCompare(optionB.children.toLowerCase())
             }
-            disabled={searchProvince === undefined}
+            disabled={!searchProvince}
+            value={!searchProvince ? "เลือกอำเภอ" : undefined}
           >
             {district?.map((item) => (
               <option value={item.districtId.toString()}>
@@ -327,7 +331,8 @@ export default function IndexFinishTask() {
                 .toLowerCase()
                 .localeCompare(optionB.children.toLowerCase())
             }
-            disabled={searchDistrict == undefined}
+            disabled={!searchDistrict}
+            value={!searchDistrict ? "เลือกตำบล" : undefined}
           >
             {subdistrict?.map((item) => (
               <option value={item.subdistrictId.toString()}>
@@ -371,7 +376,10 @@ export default function IndexFinishTask() {
               color: color.secondary2,
               backgroundColor: color.Success,
             }}
-            onClick={fetchTaskFinish}
+            onClick={() => {
+              setCurrent(1);
+              fetchTaskFinish();
+            }}
           >
             ค้นหาข้อมูล
           </Button>

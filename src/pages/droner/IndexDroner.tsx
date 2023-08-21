@@ -142,26 +142,28 @@ function IndexDroner() {
 
   const handleSearchText = (e: any) => {
     setSearchText(e.target.value);
-    setCurrent(1);
   };
-  const handleSearchProvince = (provinceId: number) => {
+  const handleSearchProvince = (provinceId: any) => {
+    if (!provinceId) {
+      setSearchDistrict(undefined);
+      setSearchSubdistrict(undefined);
+    }
     setSearchProvince(provinceId);
     fetchDistrict(provinceId);
-    setCurrent(1);
   };
-  const handleSearchDistrict = (districtId: number) => {
+  const handleSearchDistrict = (districtId: any) => {
+    if (!districtId) {
+      setSearchSubdistrict(undefined);
+    }
     fetchSubdistrict(districtId);
     setSearchDistrict(districtId);
-    setCurrent(1);
   };
   const handleSearchSubdistrict = (subdistrictId: any) => {
     setSearchSubdistrict(subdistrictId);
-    setCurrent(1);
   };
   const onChangePage = (page: number) => {
     setCurrent(page);
   };
-
   const CheckStatus = (e: any) => {
     if (e.target.value === "PENDING") {
       setSearchStatus(undefined);
@@ -466,7 +468,8 @@ function IndexDroner() {
                 .toLowerCase()
                 .localeCompare(optionB.children.toLowerCase())
             }
-            disabled={searchProvince == undefined}
+            disabled={!searchProvince}
+            value={!searchProvince ? "เลือกอำเภอ" : undefined}
           >
             {district?.map((item) => (
               <option value={item.districtId.toString()}>
@@ -492,6 +495,7 @@ function IndexDroner() {
                 .localeCompare(optionB.children.toLowerCase())
             }
             disabled={searchDistrict == undefined}
+            value={!searchDistrict ? "เลือกตำบล" : undefined}
           >
             {subdistrict?.map((item) => (
               <option value={item.subdistrictId.toString()}>
@@ -537,7 +541,10 @@ function IndexDroner() {
               color: color.secondary2,
               backgroundColor: color.Success,
             }}
-            onClick={fetchDronerList}
+            onClick={() => {
+              setCurrent(1);
+              fetchDronerList();
+            }}
           >
             ค้นหาข้อมูล
           </Button>

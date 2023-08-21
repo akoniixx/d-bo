@@ -141,37 +141,38 @@ const IndexInprogressTask = () => {
       setStartDate(e);
       setEndDate(e);
     }
-    setCurrent(1);
   };
   const onChangePage = (page: number) => {
     setCurrent(page);
   };
   const changeTextSearch = (searchText: any) => {
     setSearchText(searchText.target.value);
-    setCurrent(1);
   };
   const handleModalMap = (plotId: string) => {
     setShowModalMap((prev) => !prev);
     setPlotId(plotId);
   };
-  const handleProvince = (provinceId: number) => {
+  const handleProvince = (provinceId: any) => {
+    if (!provinceId) {
+      setSearchDistrict(undefined);
+      setSearchSubdistrict(undefined);
+    }
     setSearchProvince(provinceId);
     fetchDistrict(provinceId);
-    setCurrent(1);
   };
-  const handleDistrict = (districtId: number) => {
+  const handleDistrict = (districtId: any) => {
+    if (!districtId) {
+      setSearchSubdistrict(undefined);
+    }
     fetchSubdistrict(districtId);
     setSearchDistrict(districtId);
-    setCurrent(1);
   };
   const handleSubDistrict = (subdistrictId: any) => {
     setSearchSubdistrict(subdistrictId);
-    setCurrent(1);
   };
 
   const handleStatus = (status: boolean) => {
     setSearchStatus(status);
-    setCurrent(1);
   };
   const onSearchCreateBy = (e: any) => {
     let value = e.target.value;
@@ -272,7 +273,8 @@ const IndexInprogressTask = () => {
                 .localeCompare(optionB.children.toLowerCase())
             }
             onChange={handleDistrict}
-            disabled={searchProvince == undefined}
+            disabled={!searchProvince}
+            value={!searchProvince ? "เลือกอำเภอ" : undefined}
           >
             {district?.map((item) => (
               <option value={item.districtId}>{item.districtName}</option>
@@ -295,7 +297,8 @@ const IndexInprogressTask = () => {
                 .localeCompare(optionB.children.toLowerCase())
             }
             onChange={handleSubDistrict}
-            disabled={searchDistrict == undefined}
+            disabled={!searchDistrict}
+            value={!searchDistrict ? "เลือกตำบล" : undefined}
           >
             {subdistrict?.map((item) => (
               <option value={item.subdistrictId}>{item.subdistrictName}</option>
@@ -328,7 +331,10 @@ const IndexInprogressTask = () => {
               color: color.secondary2,
               backgroundColor: color.Success,
             }}
-            onClick={fetchInprogressTask}
+            onClick={()=> {
+              setCurrent(1);
+              fetchInprogressTask();
+            }}
           >
             ค้นหาข้อมูล
           </Button>

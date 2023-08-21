@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Badge, Button, Input, Pagination, Table } from "antd";
+import { Badge, Button, Input, Pagination, Spin, Table } from "antd";
 import {
   DroneBrandEntity,
   DroneBrandListEntity,
@@ -21,14 +21,19 @@ import { useNavigate } from "react-router-dom";
 const IndexDroneBrand: React.FC = () => {
   const navigate = useNavigate();
   const [data, setData] = useState<DroneBrandListEntity>(
-    DroneBrandListEntity_INIT,
-);
+    DroneBrandListEntity_INIT
+  );
+  const [loading, setLoading] = useState(false);
   const [searchText, setSearchText] = useState<string>();
 
   const fetchDrone = async () => {
-    await DroneDatasource.getCountDroneBrandList(searchText).then((res) => {
-      setData(res);
-    });
+    setLoading(true);
+    await DroneDatasource.getCountDroneBrandList(searchText)
+      .then((res) => {
+        setData(res);
+      })
+      .catch((err) => console.log(err))
+      .finally(() => setLoading(false));
   };
   useEffect(() => {
     fetchDrone();
@@ -218,9 +223,7 @@ const IndexDroneBrand: React.FC = () => {
                 <ActionButton
                   icon={<EditOutlined />}
                   color={color.primary1}
-                  onClick={() =>
-                    navigate("/EditDroneBrand/id=" + row.id)
-                  }
+                  onClick={() => navigate("/EditDroneBrand/id=" + row.id)}
                 />
               </div>
               {row.drone === 0 ? (
@@ -250,7 +253,9 @@ const IndexDroneBrand: React.FC = () => {
   return (
     <>
       {pageTitle}
-      <Table columns={columns} dataSource={data.data} />
+      <Spin tip="กำลังโหลดข้อมูล..." size="large" spinning={loading}>
+        <Table columns={columns} dataSource={data.data} />
+      </Spin>
       <p>รายการทั้งหมด {data.count} รายการ</p>
     </>
   );

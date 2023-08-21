@@ -139,12 +139,10 @@ function IndexPlotList() {
 
   const onSearchText = (e: any) => {
     setSearchText(e.target.value);
-    setCurrentPage(1);
   };
 
   const searchPlants = (e: any) => {
     setPlantName(e);
-    setCurrentPage(1);
   };
 
   const CheckStatus = (e: any) => {
@@ -867,7 +865,10 @@ function IndexPlotList() {
               color: color.secondary2,
               backgroundColor: color.Success,
             }}
-            onClick={getPlotsData}
+            onClick={()=>{
+              setCurrentPage(1);
+              getPlotsData();
+            }}
           >
             ค้นหาข้อมูล
           </Button>

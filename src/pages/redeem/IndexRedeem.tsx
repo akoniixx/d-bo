@@ -13,6 +13,7 @@ import {
   Radio,
   Row,
   Select,
+  Spin,
   Table,
   Tooltip,
 } from "antd";
@@ -50,8 +51,10 @@ const IndexRedeem = () => {
   const [searchMission, setSearchMission] = useState("");
   const [searchType, setSearchType] = useState("PHYSICAL");
   const [searchRewardEx, setSearchRewardEx] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const fetchRedeemFarmer = () => {
+    setLoading(true);
     RedeemDatasource.getRedeemFarmer(
       10,
       current,
@@ -59,11 +62,15 @@ const IndexRedeem = () => {
       searchStartDate,
       searchEndDate,
       searchStatus
-    ).then((res) => {
-      setDataFarmer(res);
-    });
+    )
+      .then((res) => {
+        setDataFarmer(res);
+      })
+      .catch((err) => console.log(err))
+      .finally(() => setLoading(false));
   };
   const fetchRedeemDroner = () => {
+    setLoading(true);
     RedeemDatasource.getRedeemDroner(
       5,
       current,
@@ -74,13 +81,16 @@ const IndexRedeem = () => {
       searchMission,
       searchType,
       searchRewardEx
-    ).then((res) => {
-      const mapKey = res.data.map((x, i) => ({
-        ...x,
-        key: i + 1,
-      }));
-      setDataDroner({ ...res, data: mapKey });
-    });
+    )
+      .then((res) => {
+        const mapKey = res.data.map((x, i) => ({
+          ...x,
+          key: i + 1,
+        }));
+        setDataDroner({ ...res, data: mapKey });
+      })
+      .catch((err) => console.log(err))
+      .finally(() => setLoading(false));
   };
 
   useEffect(() => {
@@ -647,30 +657,34 @@ const IndexRedeem = () => {
       {pageTitle}
       <CardContainer>
         {source === "Farmer" && (
-          <Table
-            dataSource={dataFarmer?.data}
-            columns={columnsFarmer}
-            pagination={false}
-            size="large"
-            tableLayout="fixed"
-          />
+          <Spin tip="กำลังโหลดข้อมูล..." size="large" spinning={loading}>
+            <Table
+              dataSource={dataFarmer?.data}
+              columns={columnsFarmer}
+              pagination={false}
+              size="large"
+              tableLayout="fixed"
+            />
+          </Spin>
         )}
         {source === "Droner" && (
-          <Table
-            dataSource={dataDroner?.data}
-            expandable={{
-              expandedRowRender: (record) => expandable(record),
-              showExpandColumn: false,
-              defaultExpandedRowKeys: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
-            }}
-            columns={[...tableDronerFix]}
-            scroll={{
-              x: "auto",
-            }}
-            pagination={false}
-            size="large"
-            tableLayout="fixed"
-          />
+          <Spin tip="กำลังโหลดข้อมูล..." size="large" spinning={loading}>
+            <Table
+              dataSource={dataDroner?.data}
+              expandable={{
+                expandedRowRender: (record) => expandable(record),
+                showExpandColumn: false,
+                defaultExpandedRowKeys: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+              }}
+              columns={[...tableDronerFix]}
+              scroll={{
+                x: "auto",
+              }}
+              pagination={false}
+              size="large"
+              tableLayout="fixed"
+            />
+          </Spin>
         )}
       </CardContainer>
       <div className="d-flex justify-content-between pt-3 pb-3">

@@ -1,7 +1,4 @@
-import {
-  InfoCircleFilled,
-  SearchOutlined,
-} from "@ant-design/icons";
+import { InfoCircleFilled, SearchOutlined } from "@ant-design/icons";
 import {
   Button,
   Col,
@@ -10,6 +7,7 @@ import {
   Pagination,
   Row,
   Select,
+  Spin,
   Table,
   Tooltip,
 } from "antd";
@@ -27,6 +25,7 @@ const dateSearchFormat = "YYYY-MM-DD";
 const dateFormat = "DD/MM/YYYY";
 
 const IndexReceivePoint = () => {
+  const [loading, setLoading] = useState(false);
   const row = 5;
   const [current, setCurrent] = useState(1);
   const [data, setData] = useState<ReceivePointListEntity>();
@@ -37,6 +36,7 @@ const IndexReceivePoint = () => {
   const [searchType, setSearchType] = useState("");
 
   const fetchReceivePoint = () => {
+    setLoading(true);
     PointReceiveDatasource.getReceivePoint(
       row,
       current,
@@ -45,13 +45,16 @@ const IndexReceivePoint = () => {
       searchStartDate,
       searchEndDate,
       searchType
-    ).then((res) => {
-      const mapKey = res.history.map((x, i) => ({
-        ...x,
-        key: i + 1,
-      }));
-      setData({ ...res, history: mapKey });
-    });
+    )
+      .then((res) => {
+        const mapKey = res.history.map((x, i) => ({
+          ...x,
+          key: i + 1,
+        }));
+        setData({ ...res, history: mapKey });
+      })
+      .catch((err) => console.log(err))
+      .finally(() => setLoading(false));
   };
 
   useEffect(() => {
@@ -376,18 +379,20 @@ const IndexReceivePoint = () => {
     <>
       {pageTitle}
       <CardContainer>
-        <Table
-          dataSource={data?.history}
-          columns={columns}
-          expandable={{
-            expandedRowRender: (record) => expandData(record),
-            expandedRowKeys: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
-            showExpandColumn: false,
-          }}
-          pagination={false}
-          size="large"
-          tableLayout="fixed"
-        />
+        <Spin tip="กำลังโหลดข้อมูล..." size="large" spinning={loading}>
+          <Table
+            dataSource={data?.history}
+            columns={columns}
+            expandable={{
+              expandedRowRender: (record) => expandData(record),
+              expandedRowKeys: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+              showExpandColumn: false,
+            }}
+            pagination={false}
+            size="large"
+            tableLayout="fixed"
+          />
+        </Spin>
       </CardContainer>
       <div className="d-flex justify-content-between pt-3 pb-3">
         <p>รายการทั้งหมด {data?.count} รายการ</p>

@@ -636,7 +636,8 @@ const EditFarmer = () => {
                     message: "กรุณากรอกเบอร์โทร!",
                   },
                   {
-                    pattern: new RegExp(/^[0-9\b]+$/),
+                    pattern:
+                      new RegExp(/^[0-9\b]+$/) && new RegExp(/^0[689]\d{8}$/),
                     message: "กรุณากรอกเบอร์โทรให้ถูกต้อง!",
                   },
                   {
@@ -671,9 +672,10 @@ const EditFarmer = () => {
                   placeholder="กรอกวันเดือนปีเกิด"
                   format={dateFormat}
                   className="col-lg-12"
-                  disabledDate={(current) => {
-                    return current && current > moment().endOf("day");
-                  }}
+                  disabledDate={(current) =>
+                    (current && current > moment().endOf("day")) ||
+                    moment().diff(current, "years") < 18
+                  }
                   onChange={(e: any) => handleOnChangeBirthday(e)}
                   defaultValue={moment(data.birthDate)}
                 />
@@ -998,7 +1000,10 @@ const EditFarmer = () => {
           {farmerPlotList.length !== 0 ? (
             <div className="container">
               {farmerPlotList.map((item, index) => (
-                <div className="row pt-3 pb-3">
+                <div
+                  className="row pt-3 pb-3"
+                  style={{ justifyContent: "space-between" }}
+                >
                   <div className="col-lg-4">
                     <p
                       style={{
@@ -1025,7 +1030,7 @@ const EditFarmer = () => {
                     >
                       <Badge
                         color={STATUS_FARMERPLOT_COLOR_MAPPING[item.status]}
-                      />
+                      />{" "}
                       {STATUS_NORMAL_MAPPING[item.status]}
                     </span>
                   </div>
