@@ -64,7 +64,11 @@ import ModalSelectedDroner from "../../../components/modal/task/newTask/ModalSel
 import { CreateDronerTempEntity } from "../../../entities/TaskDronerTemp";
 import TextArea from "antd/lib/input/TextArea";
 import Swal from "sweetalert2";
-import { numberWithCommasToFixed, validateOnlyNumWDecimal, validateOnlyNumber } from "../../../utilities/TextFormatter";
+import {
+  numberWithCommas,
+  numberWithCommasToFixed,
+  validateOnlyNumWDecimal,
+} from "../../../utilities/TextFormatter";
 import icon from "../../../resource/icon";
 import { LocationPriceDatasource } from "../../../datasource/LocationPriceDatasource";
 import { CouponDataSource } from "../../../datasource/CouponDatasource";
@@ -84,8 +88,8 @@ import { FarmerDatasource } from "../../../datasource/FarmerDatasource";
 import { AsyncPaginate } from "react-select-async-paginate";
 import type { GroupBase, OptionsOrGroups } from "react-select";
 import { FarmerPageEntity } from "../../../entities/FarmerEntities";
-import { InputPicker, SelectPicker } from 'rsuite';
-import 'rsuite/dist/rsuite.min.css';
+import { InputPicker, SelectPicker } from "rsuite";
+import "rsuite/dist/rsuite.min.css";
 export type OptionType = {
   value: any;
   label: any;
@@ -157,47 +161,51 @@ const AddNewTask = () => {
   const [dataCouponKeep, setCouponKeep] = useState<CouponKeepByFarmer>();
   const options: OptionType[] = [];
   const [currenSearch, setCurrentSearch] = useState(1);
-  const [selectFarmer,setSelectFarmer] = useState<string>("")
-  const [searchFilterFarmer,setSearchFilterFarmer] = useState<string>("")
-  const [farmerListDropdown,setFarmerListDropdown] = useState<any>([])
-  const [count,setCount] = useState<number>(0)
-  const [showData,setShowData] = useState<boolean>(false)
+  const [selectFarmer, setSelectFarmer] = useState<string>("");
+  const [searchFilterFarmer, setSearchFilterFarmer] = useState<string>("");
+  const [farmerListDropdown, setFarmerListDropdown] = useState<any>([]);
+  const [count, setCount] = useState<number>(0);
+  const [showData, setShowData] = useState<boolean>(false);
 
   const twice = useRef<boolean>(true);
 
   const fetchFarmerList = () => {
-     TaskDatasource.getFarmerListTask(searchFilterFarmer, currenSearch, 10).then(
+    TaskDatasource.getFarmerListTask(searchFilterFarmer, currenSearch, 10).then(
       (res: FarmerPageEntity) => {
-       const data = res.data.map((item)=>{
-        return {
-          ...item,
-          label : item.firstname + " " + item.lastname + " | " + item.telephoneNo,
-          value : item.id
-        }
-       })
-       setCount(res.count)
-       setFarmerListDropdown(data)
+        const data = res.data.map((item) => {
+          return {
+            ...item,
+            label:
+              item.firstname + " " + item.lastname + " | " + item.telephoneNo,
+            value: item.id,
+          };
+        });
+        setCount(res.count);
+        setFarmerListDropdown(data);
       }
     );
   };
 
-  const onItemsRendered = (props : any)=> {
+  const onItemsRendered = (props: any) => {
     if (props.visibleStopIndex >= farmerListDropdown.length - 1) {
-       if(farmerListDropdown.length < count){
-        TaskDatasource.getFarmerListTask(searchFilterFarmer, currenSearch+1, 10).then(
-          (res: FarmerPageEntity) => {
-           const data = res.data.map((item)=>{
+      if (farmerListDropdown.length < count) {
+        TaskDatasource.getFarmerListTask(
+          searchFilterFarmer,
+          currenSearch + 1,
+          10
+        ).then((res: FarmerPageEntity) => {
+          const data = res.data.map((item) => {
             return {
               ...item,
-              label : item.firstname + " " + item.lastname + " | " + item.telephoneNo,
-              value : item.id
-            }
-           })
-           setCurrentSearch(currenSearch+1)
-           setFarmerListDropdown([...farmerListDropdown,...data])
-          }
-        );
-       }
+              label:
+                item.firstname + " " + item.lastname + " | " + item.telephoneNo,
+              value: item.id,
+            };
+          });
+          setCurrentSearch(currenSearch + 1);
+          setFarmerListDropdown([...farmerListDropdown, ...data]);
+        });
+      }
     }
   };
 
@@ -307,36 +315,37 @@ const AddNewTask = () => {
   const [showModalSelectedDroner, setShowModalSelectedDroner] =
     useState<boolean>(false);
 
-  useEffect(()=>{
-    fetchFarmerList()
-  },[])
+  useEffect(() => {
+    fetchFarmerList();
+  }, []);
 
   useEffect(() => {
     fetchPurposeSpray();
   }, [cropSelected]);
 
-  useEffect(()=>{
+  useEffect(() => {
     TaskDatasource.getFarmerListTask(searchFilterFarmer, currenSearch, 10).then(
       (res: FarmerPageEntity) => {
-       const data = res.data.map((item)=>{
-        return {
-          ...item,
-          label : item.firstname + " " + item.lastname + " | " + item.telephoneNo,
-          value : item.id
-        }
-       })
-       setCount(res.count)
-       setFarmerListDropdown(data)
+        const data = res.data.map((item) => {
+          return {
+            ...item,
+            label:
+              item.firstname + " " + item.lastname + " | " + item.telephoneNo,
+            value: item.id,
+          };
+        });
+        setCount(res.count);
+        setFarmerListDropdown(data);
       }
     );
-  },[searchFilterFarmer])
+  }, [searchFilterFarmer]);
 
   //#region Step1 & Step3
   const handleSearchFarmer = (id: any) => {
-    setSelectFarmer(id)
-    setFarmerSelected(farmerListDropdown.filter((x : any) => x.id === id)[0]);
-    setFarmerPlotId("")
-    setShowData(false)
+    setSelectFarmer(id);
+    setFarmerSelected(farmerListDropdown.filter((x: any) => x.id === id)[0]);
+    setFarmerPlotId("");
+    setShowData(false);
   };
   const fetchLocationPrice = async (
     proId?: number,
@@ -362,7 +371,7 @@ const AddNewTask = () => {
   const handleSelectFarmer = () => {
     const f = Map(createNewTask).set("farmerId", farmerSelected.id);
     console.log(f.toJS());
-    setShowData(true)
+    setShowData(true);
     setCheckSelectPlot("error");
     setDronerSelected([]);
     setCreateNewTask(f.toJS());
@@ -387,16 +396,13 @@ const AddNewTask = () => {
   };
 
   const handleAmountRai = (e: React.ChangeEvent<HTMLInputElement>) => {
-    console.log(e.target.value)
     const values = validateOnlyNumWDecimal(e.target.value);
-
     const payload = {
       ...createNewTask,
     };
     payload.priceStandard =
       createNewTask.unitPriceStandard * parseFloat(values);
-    payload.price =
-      createNewTask.unitPriceStandard * parseFloat(values);
+    payload.price = createNewTask.unitPriceStandard * parseFloat(values);
     payload.unitPriceStandard = createNewTask.unitPrice;
     payload.farmAreaAmount = values;
     setCreateNewTask(payload);
@@ -461,20 +467,19 @@ const AddNewTask = () => {
     checkValidateStep(d.toJS(), current);
   };
   const handleCalServiceCharge = (e: any) => {
-    const values = validateOnlyNumber(e.target.value);
-
+    const values = validateOnlyNumWDecimal(e.target.value);
     if (e.target.id === "unitPrice") {
       let calUnitPrice =
-        parseFloat(createNewTask.farmAreaAmount) *parseFloat(values);
+        parseFloat(createNewTask.farmAreaAmount) * parseFloat(values);
       const d = Map(createNewTask).set("unitPrice", values);
-      const pushCal = Map(d.toJS()).set("price", calUnitPrice);
+      const pushCal = Map(d.toJS()).set("price", calUnitPrice.toFixed(2));
       setCreateNewTask(pushCal.toJS());
       checkValidateStep(pushCal.toJS(), current);
     } else {
       let calUnitPrice =
-      parseFloat(values) / parseFloat(createNewTask.farmAreaAmount);
-      const d = Map(createNewTask).set("price", e.target.value);
-      const pushCal = Map(d.toJS()).set("unitPrice", calUnitPrice);
+        parseFloat(values) / parseFloat(createNewTask.farmAreaAmount);
+      const d = Map(createNewTask).set("price", values);
+      const pushCal = Map(d.toJS()).set("unitPrice", calUnitPrice.toFixed(2));
       setCreateNewTask(pushCal.toJS());
       checkValidateStep(pushCal.toJS(), current);
     }
@@ -603,29 +608,29 @@ const AddNewTask = () => {
             <div className="row">
               <div className="form-group col-lg-6">
                 <Form.Item name="searchAddress">
-                  <InputPicker 
+                  <InputPicker
                     virtualized
                     value={selectFarmer}
                     onChange={handleSearchFarmer}
                     listProps={{
-                      onItemsRendered
-                     }}
-                    searchBy={(keyword:string, label, item)=>true}
-                    onClean={()=>{
-                        setCurrentSearch(1)
-                        setSearchFilterFarmer("")
-                        setDataFarmer(FarmerEntity_INIT)
-                        setFarmerPlotId("")
-                        setShowData(false)
+                      onItemsRendered,
                     }}
-                    onSearch={(val)=>{
-                      if(!!val){
-                        setCurrentSearch(1)
-                        setSearchFilterFarmer(val)
+                    searchBy={(keyword: string, label, item) => true}
+                    onClean={() => {
+                      setCurrentSearch(1);
+                      setSearchFilterFarmer("");
+                      setDataFarmer(FarmerEntity_INIT);
+                      setFarmerPlotId("");
+                      setShowData(false);
+                    }}
+                    onSearch={(val) => {
+                      if (!!val) {
+                        setCurrentSearch(1);
+                        setSearchFilterFarmer(val);
                       }
                     }}
                     style={{
-                      width : '100%'
+                      width: "100%",
                     }}
                     placeholder="ค้นหาชื่อเกษตรกร/เบอร์โทร/เลขบัตรปชช."
                     data={farmerListDropdown}
@@ -864,7 +869,9 @@ const AddNewTask = () => {
                       <Form.Item>
                         <Input
                           suffix="บาท"
-                          value={numberWithCommasToFixed(createNewTask.priceStandard)}
+                          value={numberWithCommasToFixed(
+                            createNewTask.priceStandard
+                          )}
                           disabled
                           autoComplete="off"
                           step="0.01"
@@ -888,7 +895,6 @@ const AddNewTask = () => {
                             current === 2 || checkSelectPlot === "error"
                           }
                           autoComplete="off"
-                          step="0.01"
                         />
                       </Form.Item>
                     </div>
@@ -898,13 +904,12 @@ const AddNewTask = () => {
                       <Form.Item>
                         <Input
                           suffix="บาท"
-                          value={numberWithCommasToFixed(createNewTask.price)}
+                          value={numberWithCommas(createNewTask.price)}
                           onChange={handleCalServiceCharge}
                           disabled={
                             current === 2 || checkSelectPlot === "error"
                           }
                           autoComplete="off"
-                          //step="0.01"
                         />
                       </Form.Item>
                     </div>
@@ -1076,21 +1081,27 @@ const AddNewTask = () => {
       status,
       ratingMin,
       ratingMax
-    ).then((res) => {
-      res.map((item) =>
-        _.set(
-          item,
-          "isChecked",
-          dronerSelected
-            ?.map((x) => x)
-            .find((y) => y.droner_id === item.droner_id)
-            ? true
-            : false
-        )
-      );
-      setDataDronerList(res);
-      setLoading(false);
-    });
+    )
+      .then((res) => {
+        if (Array.isArray(res)) {
+          res.forEach((item) => {
+            _.set(
+              item,
+              "isChecked",
+              dronerSelected
+                .map((x) => x)
+                .find((y) => y.droner_id === item.droner_id)
+                ? true
+                : false
+            );
+          });
+          setDataDronerList(res);
+        } else {
+          setDataDronerList([]);
+        }
+      })
+      .catch((err) => console.log(err))
+      .finally(() => setLoading(false));
   };
   const ratingStar = (
     <Menu
@@ -1740,7 +1751,9 @@ const AddNewTask = () => {
           <Form style={{ padding: "20px" }} form={form}>
             <label>ยอดรวมค่าบริการ</label>
             <h5 style={{ color: color.primary1 }} className="p-2">
-              {numberWithCommasToFixed(createNewTask.price - (discountResult ?? 0))}{" "}
+              {numberWithCommasToFixed(
+                createNewTask.price - (discountResult ?? 0)
+              )}{" "}
               บาท
             </h5>
             <div className="row">
@@ -1749,7 +1762,9 @@ const AddNewTask = () => {
                 <Form.Item>
                   <Input
                     suffix="บาท"
-                    value={numberWithCommasToFixed(createNewTask.price)}
+                    value={numberWithCommasToFixed(
+                      parseFloat(createNewTask.price.toString())
+                    )}
                     disabled={current === 2 || checkSelectPlot === "error"}
                     autoComplete="off"
                     step="0.01"
@@ -1879,7 +1894,7 @@ const AddNewTask = () => {
                     suffix="บาท"
                     disabled
                     placeholder="ส่วนลดคูปอง"
-                    value={numberWithCommasToFixed(discountResult!)}
+                    value={numberWithCommas(discountResult!)}
                   />
                 </Form.Item>
               </div>

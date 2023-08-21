@@ -452,7 +452,6 @@ const EditNewTask = () => {
     payload.price = data.unitPriceStandard * parseFloat(values);
     payload.unitPriceStandard = data.unitPrice;
     payload.farmAreaAmount = values;
-    console.log(values);
     setData(payload);
   };
   const handlePeriodSpray = (e: any) => {
@@ -461,16 +460,16 @@ const EditNewTask = () => {
   };
 
   const handleCalServiceCharge = (e: any) => {
-    const values = validateOnlyNumber(e.target.value);
+    const values = validateOnlyNumWDecimal(e.target.value);
     if (e.target.id == "unitPrice") {
       let calUnitPrice = parseFloat(data.farmAreaAmount) * parseFloat(values);
       const d = Map(data).set("unitPrice", values);
-      const pushCal = Map(d.toJS()).set("price", calUnitPrice);
+      const pushCal = Map(d.toJS()).set("price", calUnitPrice.toFixed(2));
       setData(pushCal.toJS());
     } else {
       let calUnitPrice = parseFloat(values) / parseFloat(data.farmAreaAmount);
       const d = Map(data).set("price", values);
-      const pushCal = Map(d.toJS()).set("unitPrice", calUnitPrice);
+      const pushCal = Map(d.toJS()).set("unitPrice", calUnitPrice.toFixed(2));
       setData(pushCal.toJS());
     }
   };
