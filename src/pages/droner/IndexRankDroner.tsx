@@ -59,6 +59,19 @@ export default function IndexRankDroner() {
     fetchDronerRank();
     fetchProvince();
   }, [current, startDate, endDate]);
+  useEffect(() => {
+    LocationDatasource.getDistrict(searchProvince).then((res) => {
+      setDistrict(res);
+      setSearchDistrict(null);
+    });
+  }, [searchProvince]);
+  
+  useEffect(() => {
+    LocationDatasource.getSubdistrict(searchDistrict).then((res) => {
+      setSubdistrict(res);
+      setSearchSubdistrict(null);
+    });
+  }, [searchDistrict]);
   const fetchDronerRank = async () => {
     setLoading(true);
     await DronerRankDatasource.getDronerRank(
@@ -337,7 +350,7 @@ export default function IndexRankDroner() {
                 .localeCompare(optionB.children.toLowerCase())
             }
             disabled={!searchProvince}
-            value={!searchProvince ? "เลือกอำเภอ" : undefined}
+            value={searchDistrict}
           >
             {district?.map((item) => (
               <option value={item.districtId.toString()}>
@@ -363,7 +376,7 @@ export default function IndexRankDroner() {
                 .localeCompare(optionB.children.toLowerCase())
             }
             disabled={!searchDistrict}
-            value={!searchDistrict ? "เลือกตำบล" : undefined}
+            value={searchSubdistrict}
           >
             {subdistrict?.map((item) => (
               <option value={item.subdistrictId.toString()}>

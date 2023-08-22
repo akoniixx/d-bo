@@ -53,7 +53,7 @@ import {
 import { DashboardLayout } from "../../../components/layout/Layout";
 import { useNavigate } from "react-router-dom";
 import { listAppType } from "../../../definitions/ApplicatoionTypes";
-import { ListCheckHaveLine } from "../../../components/dropdownCheck/ListStatusAppType";
+import { ListCheck } from "../../../components/dropdownCheck/ListStatusAppType";
 import { CheckboxValueType } from "antd/lib/checkbox/Group";
 
 export default function IndexTodayTask() {
@@ -138,6 +138,19 @@ export default function IndexTodayTask() {
       .finally(() => setLoading(false));
   };
   useEffect(() => {
+    LocationDatasource.getDistrict(searchProvince).then((res) => {
+      setDistrict(res);
+      setSearchDistrict(null);
+    });
+  }, [searchProvince]);
+  
+  useEffect(() => {
+    LocationDatasource.getSubdistrict(searchDistrict).then((res) => {
+      setSubdistrict(res);
+      setSearchSubdistrict(null);
+    });
+  }, [searchDistrict]);
+  useEffect(() => {
     fetchAllTaskToday();
     fetchProvince();
   }, [current, row, sortDirection]);
@@ -192,9 +205,7 @@ export default function IndexTodayTask() {
   const handleVisibleRating = (newVisible: any) => {
     setVisibleRating(newVisible);
   };
-  const onSearchCreateBy = (e: any) => {
-    let value = e.target.value;
-    let checked = e.target.checked;
+  const onSearchCreateBy = (value: string, checked: boolean) => {
     let arr: any = 0;
     if (checked === true) {
       arr = [...appTypeArr, value];
@@ -441,7 +452,7 @@ export default function IndexTodayTask() {
                 .localeCompare(optionB.children.toLowerCase())
             }
             disabled={!searchProvince}
-            value={!searchProvince ? "เลือกอำเภอ" : undefined}
+            value={searchDistrict}
           >
             {district?.map((item) => (
               <option value={item.districtId.toString()}>
@@ -467,7 +478,7 @@ export default function IndexTodayTask() {
                 .localeCompare(optionB.children.toLowerCase())
             }
             disabled={!searchDistrict}
-            value={!searchDistrict ? "เลือกตำบล" : undefined}
+            value={searchSubdistrict}
           >
             {subdistrict?.map((item) => (
               <option value={item.subdistrictId.toString()}>
@@ -476,14 +487,17 @@ export default function IndexTodayTask() {
             ))}
           </Select>
         </div>
-        <div className="col-lg p-1">
-          <ListCheckHaveLine
-            onSearchType={(e: any) => onSearchCreateBy(e)}
+        <div className="col-lg-2">
+        <ListCheck
+            onSearchType={(value: any, checked: any) =>
+              onSearchCreateBy(value, checked)
+            }
             list={applicationType}
             title="เลือกรูปแบบการสร้าง"
+            menu="TASK"
           />
         </div>
-        <div className="col-lg-2 p-1">
+        <div className="col-lg p-1" >
           <Dropdown
             overlay={status}
             trigger={["click"]}

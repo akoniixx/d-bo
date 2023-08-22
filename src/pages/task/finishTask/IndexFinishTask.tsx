@@ -50,7 +50,7 @@ import { DashboardLayout } from "../../../components/layout/Layout";
 import { useNavigate } from "react-router-dom";
 import InvoiceTask from "../../../components/popover/InvoiceTask";
 import { InvoiceTaskEntity } from "../../../entities/NewTaskEntities";
-import { ListCheckHaveLine } from "../../../components/dropdownCheck/ListStatusAppType";
+import { ListCheck } from "../../../components/dropdownCheck/ListStatusAppType";
 import { listAppType } from "../../../definitions/ApplicatoionTypes";
 import CheckDocument from "../../../components/dropdownCheck/CheckDocument";
 import { icon } from "../../../resource";
@@ -123,6 +123,19 @@ export default function IndexFinishTask() {
       .finally(() => setLoading(false));
   };
   useEffect(() => {
+    LocationDatasource.getDistrict(searchProvince).then((res) => {
+      setDistrict(res);
+      setSearchDistrict(null);
+    });
+  }, [searchProvince]);
+  
+  useEffect(() => {
+    LocationDatasource.getSubdistrict(searchDistrict).then((res) => {
+      setSubdistrict(res);
+      setSearchSubdistrict(null);
+    });
+  }, [searchDistrict]);
+  useEffect(() => {
     fetchTaskFinish();
     fetchProvince();
   }, [current, row, startDate, endDate, sortDirection]);
@@ -184,9 +197,7 @@ export default function IndexFinishTask() {
     setShowModalMap((prev) => !prev);
     setPlotId(plotId);
   };
-  const onSearchCreateBy = (e: any) => {
-    let value = e.target.value;
-    let checked = e.target.checked;
+  const onSearchCreateBy = (value: string, checked: boolean) => {
     let arr: any = 0;
     if (checked === true) {
       arr = [...appTypeArr, value];
@@ -196,7 +207,7 @@ export default function IndexFinishTask() {
       let d: string[] = appTypeArr.filter((x) => x != value);
       arr = [...d];
       setAppTypeArr(d);
-      if (d.length == 0) {
+      if (d.length === 0) {
         arr = undefined;
       }
     }
@@ -209,9 +220,7 @@ export default function IndexFinishTask() {
     setCurrent(current);
     setRow(pageSize);
   };
-  const onSearchCheckDocument = (e: any) => {
-    let value = e.target.value;
-    let checked = e.target.checked;
+  const onSearchCheckDocument = (value: string, checked: boolean) => {
     let arr: any = 0;
     if (checked === true) {
       arr = [...checkDocArr, value];
@@ -306,7 +315,7 @@ export default function IndexFinishTask() {
                 .localeCompare(optionB.children.toLowerCase())
             }
             disabled={!searchProvince}
-            value={!searchProvince ? "เลือกอำเภอ" : undefined}
+            value={searchDistrict}
           >
             {district?.map((item) => (
               <option value={item.districtId.toString()}>
@@ -332,25 +341,30 @@ export default function IndexFinishTask() {
                 .localeCompare(optionB.children.toLowerCase())
             }
             disabled={!searchDistrict}
-            value={!searchDistrict ? "เลือกตำบล" : undefined}
+            value={searchSubdistrict}
           >
             {subdistrict?.map((item) => (
               <option value={item.subdistrictId.toString()}>
-                {item.subdistrictName}
+src/pages/task/newTask/IndexNewTask.tsx                {item.subdistrictName}
               </option>
             ))}
           </Select>
         </div>
-        <div className="col-lg p-1">
-          <ListCheckHaveLine
-            onSearchType={(e: any) => onSearchCreateBy(e)}
+        <div className="col-lg-2">
+        <ListCheck
+            onSearchType={(value: any, checked: any) =>
+              onSearchCreateBy(value, checked)
+            }
             list={applicationType}
             title="เลือกรูปแบบการสร้าง"
+            menu="TASK"
           />
         </div>
-        <div className="col-lg" style={{ paddingRight: 3 }}>
+        <div className="col-lg">
           <CheckDocument
-            onSearchType={(e) => onSearchCheckDocument(e)}
+          onSearchType={(value: any, checked: any) =>
+            onSearchCheckDocument(value, checked)
+          }
             list={documentPersons}
             title="เลือกการตรวจเอกสาร"
           />

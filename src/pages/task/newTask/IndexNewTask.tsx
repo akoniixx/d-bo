@@ -47,7 +47,7 @@ import { DateTimeUtil } from "../../../utilities/DateTimeUtil";
 import { numberWithCommas, numberWithCommasToFixed } from "../../../utilities/TextFormatter";
 import { useNavigate } from "react-router-dom";
 import { listAppType } from "../../../definitions/ApplicatoionTypes";
-import { ListCheckHaveLine } from "../../../components/dropdownCheck/ListStatusAppType";
+import { ListCheck } from "../../../components/dropdownCheck/ListStatusAppType";
 
 const { RangePicker } = DatePicker;
 const dateFormat = "DD-MM-YYYY";
@@ -156,19 +156,17 @@ const IndexNewTask = () => {
   const onChangePage = (page: number) => {
     setCurrent(page);
   };
-  const onSearchCreateBy = (e: any) => {
-    let value = e.target.value;
-    let checked = e.target.checked;
+  const onSearchCreateBy = (value: string, checked: boolean) => {
     let arr: any = 0;
     if (checked === true) {
       arr = [...appTypeArr, value];
       setAppTypeArr([...appTypeArr, value]);
       setApplicationType(value);
     } else {
-      let d: string[] = appTypeArr.filter((x) => x !== value);
+      let d: string[] = appTypeArr.filter((x) => x != value);
       arr = [...d];
       setAppTypeArr(d);
-      if (d.length == 0) {
+      if (d.length === 0) {
         arr = undefined;
       }
     }
@@ -248,14 +246,17 @@ const IndexNewTask = () => {
             onChange={handleSearchText}
           />
         </div>
-        <div className="col-lg p-1">
-          <ListCheckHaveLine
-            onSearchType={(e: any) => onSearchCreateBy(e)}
+        <div className="col-lg">
+        <ListCheck
+            onSearchType={(value: any, checked: any) =>
+              onSearchCreateBy(value, checked)
+            }
             list={applicationType}
             title="เลือกรูปแบบการสร้าง"
+            menu="TASK"
           />
         </div>
-        <div className="col-lg pt-1">
+        <div className="col-lg p-1">
           <Select
             style={{ paddingRight: 5 }}
             className="col-lg-12"

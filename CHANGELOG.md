@@ -1,5 +1,10 @@
 ## [Version - 0]
 
+## Fix [v0.36.12] 2023-08-22
+
+- fixed search address
+- fixed style ui status
+
 ## Fix [v0.36.11] 2023-08-21
 
 - fixed validate NumWDecimal new task

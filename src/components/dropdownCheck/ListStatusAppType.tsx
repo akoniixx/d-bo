@@ -4,9 +4,9 @@ import React, { useState } from "react";
 import { color, icon } from "../../resource";
 
 interface listProps {
-  onSearchType: (e: any) => void;
+  onSearchType: (value: string, checked: boolean) => void;
   list: any;
-  title: string;
+  title: any;
   menu?: string;
 }
 export const ListCheck: React.FC<listProps> = ({
@@ -15,25 +15,49 @@ export const ListCheck: React.FC<listProps> = ({
   title,
   menu,
 }) => {
-  const [visibleCreateBy, setVisibleCreateBy] = useState(false);
-
+  const [visibleCreateBy, setVisibleCreateBy] = useState<boolean>(false);
+  const [selectedOptions, setSelectedOptions] = useState<string[]>([]); 
   const handleVisibleCreateBy = (newVisible: any) => {
     setVisibleCreateBy(newVisible);
   };
 
+  const handleOptionSelect = (value: string) => {
+    const updatedSelectedOptions = [...selectedOptions];
+    const optionIndex = updatedSelectedOptions.indexOf(value);
+
+    if (optionIndex === -1) {
+      updatedSelectedOptions.push(value);
+    } else {
+      updatedSelectedOptions.splice(optionIndex, 1);
+    }
+    setSelectedOptions(updatedSelectedOptions);
+    const checked = optionIndex === -1;
+    onSearchType(value, checked);
+  };
+
   const listApp = [
     { title: " Back Office Website", icon: icon.bo, value: "BO" },
-    menu === "FARMER"
+    menu === "FARMER" || menu === "TASK"
       ? { title: " Farmer Application", icon: icon.farmerApp, value: "FARMER" }
       : { title: " Droner Application", icon: icon.dronerApp, value: "DRONER" },
   ];
-
+  if (menu === "TASK") {
+    listApp.push({
+      title: " Line Office Website",
+      icon: icon.lineApp,
+      value: "LINE",
+    });
+  }
   const items: MenuProps["items"] = listApp.map((v, i) => {
     return {
       key: i,
       label: (
         <>
-          <Checkbox onClick={onSearchType} value={v.value}>
+          <Checkbox
+            onClick={() => handleOptionSelect(v.value)}
+            value={v.value}
+            checked={selectedOptions.includes(v.value)}
+          >
             <div>
               <Image
                 src={v.icon}
@@ -47,9 +71,10 @@ export const ListCheck: React.FC<listProps> = ({
       ),
     };
   });
+
   return (
     <>
-      <div className="col-lg pt-1">
+      <div className="col-lg pt-1 p-1">
         <Dropdown
           menu={{ items }}
           trigger={["click"]}
@@ -66,85 +91,31 @@ export const ListCheck: React.FC<listProps> = ({
               cursor: "pointer",
             }}
           >
-            {title}
-            <DownOutlined
-              style={{
-                verticalAlign: 2,
-              }}
-            />
-          </Button>
-        </Dropdown>
-      </div>
-    </>
-  );
-};
-
-export const ListCheckHaveLine: React.FC<listProps> = ({
-  onSearchType,
-  list,
-  title,
-}) => {
-  const [visibleCreateBy, setVisibleCreateBy] = useState(false);
-
-  const handleVisibleCreateBy = (newVisible: any) => {
-    setVisibleCreateBy(newVisible);
-  };
-
-  const listApps = [
-    { title: " Back Office Website", icon: icon.bo, value: "BO" },
-    { title: " Farmer Application", icon: icon.farmerApp, value: "FARMER" },
-    { title: " Line Office Website", icon: icon.lineApp, value: "LINE" },
-  ];
-
-  const items: MenuProps["items"] = listApps.map((v, i) => {
-    return {
-      key: i,
-      label: (
-        <>
-          <Checkbox onClick={onSearchType} value={v.value}>
-            <div>
-              <Image
-                src={v.icon}
-                preview={false}
-                style={{ width: 20, height: 20 }}
-              />
-              <span>{v.title}</span>
+            <div className="row">
+              <div className="col-lg-8" style={{ textAlign: "start" }}>
+                {selectedOptions.length > 0
+                  ? selectedOptions.map((option) => (
+                      <Image
+                        key={option}
+                        src={listApp.find((app) => app.value === option)?.icon}
+                        preview={false}
+                        style={{ width: 20, height: 20, marginLeft: 8 }}
+                      />
+                    ))
+                  : title}
+              </div>
+              <div className="col-lg" style={{ textAlign: "end" }}>
+                <DownOutlined
+                  style={{
+                    verticalAlign: 0.5,
+                  }}
+                />
+              </div>
             </div>
-          </Checkbox>
-        </>
-      ),
-    };
-  });
-  return (
-    <>
-      <div className="col-lg">
-        <Dropdown
-          menu={{ items }}
-          trigger={["click"]}
-          className="col-lg-12"
-          onVisibleChange={handleVisibleCreateBy}
-          visible={visibleCreateBy}
-        >
-          <Button
-            style={{
-              color: color.Disable,
-              right: '2px',
-              textAlign: "start",
-              backgroundColor: color.White,
-              height: 32,
-              cursor: "pointer",
-            }}
-          >
-            {title}
-            <DownOutlined
-              style={{
-                paddingLeft: list != undefined ? "75%" : 0,
-                verticalAlign: 2,
-              }}
-            />
           </Button>
         </Dropdown>
       </div>
     </>
   );
 };
+

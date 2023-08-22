@@ -45,7 +45,7 @@ import {
 import { DashboardLayout } from "../../../components/layout/Layout";
 import { useNavigate } from "react-router-dom";
 import { listAppType } from "../../../definitions/ApplicatoionTypes";
-import { ListCheckHaveLine } from "../../../components/dropdownCheck/ListStatusAppType";
+import { ListCheck } from "../../../components/dropdownCheck/ListStatusAppType";
 
 const { RangePicker } = DatePicker;
 const dateFormat = "DD/MM/YYYY";
@@ -129,6 +129,19 @@ const IndexInprogressTask = () => {
     });
   };
   useEffect(() => {
+    LocationDatasource.getDistrict(searchProvince).then((res) => {
+      setDistrict(res);
+      setSearchDistrict(null);
+    });
+  }, [searchProvince]);
+  
+  useEffect(() => {
+    LocationDatasource.getSubdistrict(searchDistrict).then((res) => {
+      setSubdistrict(res);
+      setSearchSubdistrict(null);
+    });
+  }, [searchDistrict]);
+  useEffect(() => {
     fetchInprogressTask();
     fetchProvince();
   }, [current, startDate, endDate, row, sortDirection]);
@@ -174,9 +187,7 @@ const IndexInprogressTask = () => {
   const handleStatus = (status: boolean) => {
     setSearchStatus(status);
   };
-  const onSearchCreateBy = (e: any) => {
-    let value = e.target.value;
-    let checked = e.target.checked;
+  const onSearchCreateBy = (value: string, checked: boolean) => {
     let arr: any = 0;
     if (checked === true) {
       arr = [...appTypeArr, value];
@@ -186,7 +197,7 @@ const IndexInprogressTask = () => {
       let d: string[] = appTypeArr.filter((x) => x != value);
       arr = [...d];
       setAppTypeArr(d);
-      if (d.length == 0) {
+      if (d.length === 0) {
         arr = undefined;
       }
     }
@@ -226,7 +237,7 @@ const IndexInprogressTask = () => {
         </div>
       </div>
       <div className="d-flex justify-content-between pb-3">
-        <div className="col-lg-3 p-1">
+        <div className="col-lg-2 p-1">
           <Input
             allowClear
             prefix={<SearchOutlined style={{ color: color.Disable }} />}
@@ -274,7 +285,7 @@ const IndexInprogressTask = () => {
             }
             onChange={handleDistrict}
             disabled={!searchProvince}
-            value={!searchProvince ? "เลือกอำเภอ" : undefined}
+            value={searchDistrict}
           >
             {district?.map((item) => (
               <option value={item.districtId}>{item.districtName}</option>
@@ -298,18 +309,22 @@ const IndexInprogressTask = () => {
             }
             onChange={handleSubDistrict}
             disabled={!searchDistrict}
-            value={!searchDistrict ? "เลือกตำบล" : undefined}
+            value={searchSubdistrict}
           >
             {subdistrict?.map((item) => (
               <option value={item.subdistrictId}>{item.subdistrictName}</option>
             ))}
           </Select>
         </div>
-        <div className="col-lg p-1">
-          <ListCheckHaveLine
-            onSearchType={(e: any) => onSearchCreateBy(e)}
+        <div className="col-lg">
+        <ListCheck
+            onSearchType={(value: any, checked: any) =>
+              onSearchCreateBy(value, checked)
+            }
             list={applicationType}
-            title="เลือกรูปแบบการสร้าง" menu={""}          />
+            title="เลือกรูปแบบการสร้าง"
+            menu="TASK"
+          />
         </div>
         <div className="col-lg p-1">
           <Select
