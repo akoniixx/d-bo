@@ -543,7 +543,6 @@ const AddNewTask = () => {
         setCheckKeepCoupon(false);
       } else {
         CouponDataSource.getCoupon(couponCode).then((result) => {
-          console.log(result);
           if (!result.userMessage) {
             if (result.canUsed) {
               setCouponId(result.id);
