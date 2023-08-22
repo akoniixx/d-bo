@@ -1807,7 +1807,12 @@ const AddNewTask = () => {
                   <Input
                     disabled={couponUsedBtn[0]}
                     onChange={handleChangeCoupon}
-                    maxLength={7}
+                    onKeyPress={(e) => {
+                      const allowedCharacters = /^[a-zA-Z0-9]+$/;
+                      if (!allowedCharacters.test(e.key)) {
+                        e.preventDefault();
+                      }
+                    }}
                     style={{
                       paddingRight: 0,
                       paddingTop: 0,
