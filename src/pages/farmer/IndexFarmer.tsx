@@ -103,6 +103,7 @@ function IndexFarmer() {
   const [sortDirection3, setSortDirection3] = useState<string | undefined>(
     undefined
   );
+  const [fetchData, setFetchData] = useState<boolean>(false);
 
   const fetchFarmer = async () => {
     setLoading(true);
@@ -145,9 +146,21 @@ function IndexFarmer() {
     });
   };
   useEffect(() => {
+    LocationDatasource.getDistrict(searchProvince).then((res) => {
+      setDistrict(res);
+      setSearchDistrict(null);
+    });
+  }, [searchProvince]);
+  useEffect(() => {
+    LocationDatasource.getSubdistrict(searchDistrict).then((res) => {
+      setSubdistrict(res);
+      setSearchSubdistrict(null);
+    });
+  }, [searchDistrict]);
+  useEffect(() => {
     fetchFarmer();
     fetchProvince();
-  }, [sortDirection, mainStatus, current]);
+  }, [sortDirection, mainStatus, current, fetchData]);
 
   const onChangePage = (page: number) => {
     setCurrent(page);
@@ -319,9 +332,7 @@ function IndexFarmer() {
     setSearchSubdistrict(subdistrictId);
   };
 
-  const onSearchCreateBy = (e: any) => {
-    let value = e.target.value;
-    let checked = e.target.checked;
+  const onSearchCreateBy = (value: string, checked: boolean) => {
     let arr: any = 0;
     if (checked === true) {
       arr = [...appTypeArr, value];
@@ -331,7 +342,7 @@ function IndexFarmer() {
       let d: string[] = appTypeArr.filter((x) => x != value);
       arr = [...d];
       setAppTypeArr(d);
-      if (d.length == 0) {
+      if (d.length === 0) {
         arr = undefined;
       }
     }
@@ -448,7 +459,7 @@ function IndexFarmer() {
                 .localeCompare(optionB.children.toLowerCase())
             }
             disabled={!searchProvince}
-            value={!searchProvince ? "เลือกอำเภอ" : undefined}
+            value={searchDistrict}
           >
             {district?.map((item) => (
               <option value={item.districtId.toString()}>
@@ -474,7 +485,7 @@ function IndexFarmer() {
                 .localeCompare(optionB.children.toLowerCase())
             }
             disabled={!searchDistrict}
-            value={!searchDistrict ? "เลือกตำบล" : undefined}
+            value={searchSubdistrict}
           >
             {subdistrict?.map((item) => (
               <option value={item.subdistrictId.toString()}>
@@ -483,9 +494,11 @@ function IndexFarmer() {
             ))}
           </Select>
         </div>
-        <div>
+        <div className="col-lg-2">
           <ListCheck
-            onSearchType={(e) => onSearchCreateBy(e)}
+            onSearchType={(value: any, checked: any) =>
+              onSearchCreateBy(value, checked)
+            }
             list={appType}
             title="เลือกรูปแบบการสร้าง"
             menu="FARMER"
@@ -515,7 +528,7 @@ function IndexFarmer() {
             }}
             onClick={() => {
               setCurrent(1);
-              fetchFarmer();
+              setFetchData(!fetchData);
             }}
           >
             ค้นหาข้อมูล

@@ -543,6 +543,7 @@ const AddNewTask = () => {
         setCheckKeepCoupon(false);
       } else {
         CouponDataSource.getCoupon(couponCode).then((result) => {
+          console.log(result);
           if (!result.userMessage) {
             if (result.canUsed) {
               setCouponId(result.id);
@@ -1806,6 +1807,7 @@ const AddNewTask = () => {
                   <Input
                     disabled={couponUsedBtn[0]}
                     onChange={handleChangeCoupon}
+                    maxLength={7}
                     style={{
                       paddingRight: 0,
                       paddingTop: 0,

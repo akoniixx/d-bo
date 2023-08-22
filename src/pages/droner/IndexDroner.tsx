@@ -125,6 +125,21 @@ function IndexDroner() {
       setProvince(res);
     });
   };
+
+  useEffect(() => {
+    LocationDatasource.getDistrict(searchProvince).then((res) => {
+      setDistrict(res);
+      setSearchDistrict(null);
+    });
+  }, [searchProvince]);
+
+  useEffect(() => {
+    LocationDatasource.getSubdistrict(searchDistrict).then((res) => {
+      setSubdistrict(res);
+      setSearchSubdistrict(null);
+    });
+  }, [searchDistrict]);
+
   const fetchDistrict = async (provinceId: number) => {
     await LocationDatasource.getDistrict(provinceId).then((res) => {
       setDistrict(res);
@@ -135,6 +150,7 @@ function IndexDroner() {
       setSubdistrict(res);
     });
   };
+
   useEffect(() => {
     fetchDronerList();
     fetchProvince();
@@ -145,15 +161,16 @@ function IndexDroner() {
   };
   const handleSearchProvince = (provinceId: any) => {
     if (!provinceId) {
-      setSearchDistrict(undefined);
-      setSearchSubdistrict(undefined);
+      setSearchDistrict(null);
+      setSearchSubdistrict(null);
     }
     setSearchProvince(provinceId);
     fetchDistrict(provinceId);
   };
   const handleSearchDistrict = (districtId: any) => {
+    console.log(districtId);
     if (!districtId) {
-      setSearchSubdistrict(undefined);
+      setSearchSubdistrict(null);
     }
     fetchSubdistrict(districtId);
     setSearchDistrict(districtId);
@@ -318,9 +335,8 @@ function IndexDroner() {
       ]}
     />
   );
-  const onSearchCreateBy = (e: any) => {
-    let value = e.target.value;
-    let checked = e.target.checked;
+
+  const onSearchCreateBy = (value: string, checked: boolean) => {
     let arr: any = 0;
     if (checked === true) {
       arr = [...appTypeArr, value];
@@ -336,9 +352,7 @@ function IndexDroner() {
     }
     setAppType(arr);
   };
-  const onSearchCheckDocument = (e: any) => {
-    let value = e.target.value;
-    let checked = e.target.checked;
+  const onSearchCheckDocument = (value: string, checked: boolean) => {
     let arr: any = 0;
     if (checked === true) {
       arr = [...checkDocArr, value];
@@ -469,7 +483,7 @@ function IndexDroner() {
                 .localeCompare(optionB.children.toLowerCase())
             }
             disabled={!searchProvince}
-            value={!searchProvince ? "เลือกอำเภอ" : undefined}
+            value={searchDistrict}
           >
             {district?.map((item) => (
               <option value={item.districtId.toString()}>
@@ -494,8 +508,8 @@ function IndexDroner() {
                 .toLowerCase()
                 .localeCompare(optionB.children.toLowerCase())
             }
-            disabled={searchDistrict == undefined}
-            value={!searchDistrict ? "เลือกตำบล" : undefined}
+            disabled={!searchDistrict}
+            value={searchSubdistrict}
           >
             {subdistrict?.map((item) => (
               <option value={item.subdistrictId.toString()}>
@@ -504,22 +518,26 @@ function IndexDroner() {
             ))}
           </Select>
         </div>
-        <div className="col-lg" style={{ paddingRight: 3 }}>
+        <div className="col-lg-2">
           <ListCheck
-            onSearchType={(e) => onSearchCreateBy(e)}
+            onSearchType={(value: any, checked: any) =>
+              onSearchCreateBy(value, checked)
+            }
             list={appType}
             title="เลือกรูปแบบการสร้าง"
             menu="DRONER"
           />
         </div>
-        <div className="col-lg" style={{ paddingRight: 3 }}>
+        <div className="col-lg">
           <CheckDocument
-            onSearchType={(e) => onSearchCheckDocument(e)}
+            onSearchType={(value: any, checked: any) =>
+              onSearchCheckDocument(value, checked)
+            }
             list={documentPersons}
             title="เลือกการตรวจเอกสาร"
           />
         </div>
-        <div className="col-lg pt-1" style={{ paddingRight: 3 }}>
+        <div className="col-lg pt-1 p-1">
           <Dropdown
             overlay={SubStatus}
             trigger={["click"]}

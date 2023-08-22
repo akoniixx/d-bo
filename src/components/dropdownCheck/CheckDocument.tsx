@@ -4,17 +4,30 @@ import React, { useState } from "react";
 import { color, icon } from "../../resource";
 
 interface listProps {
-  onSearchType: (e: any) => void;
+  onSearchType: (value: string, checked: boolean) => void;
   list: any;
   title: string;
 }
 const CheckDocument: React.FC<listProps> = ({ onSearchType, list, title }) => {
   const [visibleCreateBy, setVisibleCreateBy] = useState(false);
+  const [selectedOptions, setSelectedOptions] = useState<string[]>([]);
 
   const handleVisibleCreateBy = (newVisible: any) => {
     setVisibleCreateBy(newVisible);
   };
+  const handleOptionSelect = (value: string) => {
+    const updatedSelectedOptions = [...selectedOptions];
+    const optionIndex = updatedSelectedOptions.indexOf(value);
 
+    if (optionIndex === -1) {
+      updatedSelectedOptions.push(value);
+    } else {
+      updatedSelectedOptions.splice(optionIndex, 1);
+    }
+    setSelectedOptions(updatedSelectedOptions);
+    const checked = optionIndex === -1;
+    onSearchType(value, checked);
+  };
   const listDoc = [
     { title: " บัตรประชาชน", value: "ID_CARD" },
     { title: " สมุดบัญชีธนาคาร", value: "BOOKBANK" },
@@ -24,7 +37,11 @@ const CheckDocument: React.FC<listProps> = ({ onSearchType, list, title }) => {
       key: i,
       label: (
         <>
-          <Checkbox onClick={onSearchType} value={v.value}>
+          <Checkbox
+            onClick={() => handleOptionSelect(v.value)}
+            value={v.value}
+            checked={selectedOptions.includes(v.value)}
+          >
             <span>{v.title}</span>
           </Checkbox>
         </>
@@ -50,7 +67,18 @@ const CheckDocument: React.FC<listProps> = ({ onSearchType, list, title }) => {
               cursor: "pointer",
             }}
           >
-            {title}
+            {selectedOptions.length > 0 ? (
+              <span style={{ color: color.font }}>
+                {[
+                  selectedOptions.map(
+                    (option) =>
+                      listDoc.find((doc) => doc.value === option)?.title
+                  ),
+                ].join(", ")}
+              </span>
+            ) : (
+              title
+            )}
             <DownOutlined
               style={{
                 verticalAlign: 2,

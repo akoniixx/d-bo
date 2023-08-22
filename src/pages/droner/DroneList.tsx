@@ -87,6 +87,7 @@ function DroneList() {
   const [sortDirection5, setSortDirection5] = useState<string | undefined>(
     undefined
   );
+  const [fetchData, setFetchData] = useState<boolean>(false);
 
   const fetchDronerDroneList = async () => {
     setLoading(true);
@@ -109,7 +110,6 @@ function DroneList() {
       .catch((err) => console.log(err))
       .finally(() => setLoading(false));
   };
-
   const fetchDroneBrand = async () => {
     await DroneDatasource.getDroneBrandList().then((res) => {
       setDroneBrand(res.data);
@@ -117,9 +117,16 @@ function DroneList() {
   };
 
   useEffect(() => {
+    DroneDatasource.getDroneList(1, row, droneBrandId).then((res) => {
+      setSeriesDrone(res.data);
+      setSearchSeriesDrone(null);
+    });
+  }, [droneBrandId]);
+
+  useEffect(() => {
     fetchDronerDroneList();
     fetchDroneBrand();
-  }, [current, row, mainStatus, sortDirection]);
+  }, [current, row, mainStatus, sortDirection, fetchData]);
 
   const onChangePage = (page: number) => {
     setCurrent(page);
@@ -373,7 +380,7 @@ function DroneList() {
             allowClear
             onChange={handleDroneSeries}
             disabled={!droneBrandId}
-            value={!droneBrandId ? "เลือกรุ่นโดรน" : undefined}
+            value={searchSeriesDrone}
           >
             {seriesDrone?.map((item: any) => (
               <option value={item.id}>{item.series}</option>
@@ -402,9 +409,9 @@ function DroneList() {
               color: color.secondary2,
               backgroundColor: color.Success,
             }}
-            onClick={()=> {
+            onClick={() => {
               setCurrent(1);
-              fetchDronerDroneList();
+              setFetchData(!fetchData);
             }}
           >
             ค้นหาข้อมูล

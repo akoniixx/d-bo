@@ -66,6 +66,7 @@ import InvoiceTask from "../../components/popover/InvoiceTask";
 import { InvoiceTaskEntity } from "../../entities/NewTaskEntities";
 import { icon } from "../../resource";
 import { DronerEntity } from "../../entities/DronerEntities";
+import CheckDocument from "../../components/dropdownCheck/CheckDocument";
 
 interface DataType {
   key: React.Key;
@@ -157,6 +158,19 @@ function IndexReport() {
     fetchAllReport();
     fetchProvince();
   }, [current, row, startDate, endDate]);
+  useEffect(() => {
+    LocationDatasource.getDistrict(searchProvince).then((res) => {
+      setDistrict(res);
+      setSearchDistrict(null);
+    });
+  }, [searchProvince]);
+
+  useEffect(() => {
+    LocationDatasource.getSubdistrict(searchDistrict).then((res) => {
+      setSubdistrict(res);
+      setSearchSubdistrict(null);
+    });
+  }, [searchDistrict]);
   const [persistedProfile, setPersistedProfile] = useLocalStorage(
     "profile",
     []
@@ -216,23 +230,6 @@ function IndexReport() {
       }
     }
     setSearchStatus(arr);
-  };
-  const handleCheckDocument = (e: any) => {
-    let value = e.target.value;
-    let checked = e.target.checked;
-    let arr: any = 0;
-    if (checked) {
-      arr = [...statusArrDoc, value];
-      setStatusArrDoc([...statusArrDoc, value]);
-    } else {
-      let d: string[] = statusArrDoc.filter((x) => x != value);
-      arr = [...d];
-      setStatusArrDoc(d);
-      if (d.length == 0) {
-        arr = undefined;
-      }
-    }
-    setDocumentPersons(arr);
   };
   const handleProvince = (provinceId: number) => {
     setSearchProvince(provinceId);
@@ -359,7 +356,21 @@ function IndexReport() {
     );
     setCheckAllDone(list.length === statusDoneOptions.length);
   };
-
+  const onSearchCheckDocument = (value: string, checked: boolean) => {
+    let arr: any = 0;
+    if (checked) {
+      arr = [...statusArrDoc, value];
+      setStatusArrDoc([...statusArrDoc, value]);
+    } else {
+      let d: string[] = statusArrDoc.filter((x) => x != value);
+      arr = [...d];
+      setStatusArrDoc(d);
+      if (d.length == 0) {
+        arr = undefined;
+      }
+    }
+    setDocumentPersons(arr);
+  };
   const SubStatus = (
     <Menu
       items={[
@@ -442,30 +453,6 @@ function IndexReport() {
       ]}
     />
   );
-  const SubCheckDoc = (
-    <Menu
-      items={[
-        {
-          label: "บัตรประชาชน",
-          key: "1",
-          icon: (
-            <Checkbox value="ID_CARD" onClick={(e) => handleCheckDocument(e)} />
-          ),
-        },
-        {
-          label: "สมุดบัญชีธนาคาร",
-          key: "2",
-          icon: (
-            <Checkbox
-              value="BOOKBANK"
-              onClick={(e) => handleCheckDocument(e)}
-            />
-          ),
-        },
-      ]}
-    />
-  );
-
   const DownloadPDF = async () => {
     setLoading(true);
     if (clickPays.length > 1) {
@@ -696,7 +683,7 @@ function IndexReport() {
       sorter: (a: any, b: any) => sorter(a.farmAreaAmount, b.farmAreaAmount),
       render: (value: any, row: any, index: number) => {
         return {
-          children: <>{`${value} ไร่`}</>,
+          children: <>{`${numberWithCommasToFixed(parseFloat(value))} ไร่`}</>,
         };
       },
     },
@@ -1185,7 +1172,8 @@ function IndexReport() {
                 .toLowerCase()
                 .localeCompare(optionB.children.toLowerCase())
             }
-            disabled={searchProvince === undefined}
+            disabled={!searchProvince}
+            value={searchDistrict}
           >
             {district?.map((item) => (
               <option value={item.districtId.toString()}>
@@ -1210,7 +1198,8 @@ function IndexReport() {
                 .toLowerCase()
                 .localeCompare(optionB.children.toLowerCase())
             }
-            disabled={searchDistrict == undefined}
+            disabled={!searchDistrict}
+            value={searchSubdistrict}
           >
             {subdistrict?.map((item) => (
               <option value={item.subdistrictId.toString()}>
@@ -1219,19 +1208,14 @@ function IndexReport() {
             ))}
           </Select>
         </div>
-        <div className="col-lg p-1">
-          <Dropdown
-            overlay={SubCheckDoc}
-            trigger={["click"]}
-            className="col-lg-12"
-            onVisibleChange={handleCheckDoc}
-            visible={visibleCheckDoc}
-          >
-            <Button style={{ color: color.Disable }}>
-              เลือกการตรวจเอกสาร
-              <DownOutlined />
-            </Button>
-          </Dropdown>
+        <div className="col-lg">
+          <CheckDocument
+            onSearchType={(value: any, checked: any) =>
+              onSearchCheckDocument(value, checked)
+            }
+            list={documentPersons}
+            title="เลือกการตรวจเอกสาร"
+          />
         </div>
         <div className="col-lg p-1">
           <Dropdown
