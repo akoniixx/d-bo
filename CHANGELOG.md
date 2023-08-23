@@ -1,5 +1,11 @@
 ## [Version - 0]
 
+## Fix [v0.36.13] 2023-08-23
+
+- fixed style search status
+- validate rating less than 0
+- modal check delete image
+
 ## Fix [v0.36.12] 2023-08-22
 
 - fixed search address

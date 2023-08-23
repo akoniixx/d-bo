@@ -128,7 +128,7 @@ export default function IndexFinishTask() {
       setSearchDistrict(null);
     });
   }, [searchProvince]);
-  
+
   useEffect(() => {
     LocationDatasource.getSubdistrict(searchDistrict).then((res) => {
       setSubdistrict(res);
@@ -345,13 +345,13 @@ export default function IndexFinishTask() {
           >
             {subdistrict?.map((item) => (
               <option value={item.subdistrictId.toString()}>
-src/pages/task/newTask/IndexNewTask.tsx                {item.subdistrictName}
+                {item.subdistrictName}
               </option>
             ))}
           </Select>
         </div>
         <div className="col-lg-2">
-        <ListCheck
+          <ListCheck
             onSearchType={(value: any, checked: any) =>
               onSearchCreateBy(value, checked)
             }
@@ -362,9 +362,9 @@ src/pages/task/newTask/IndexNewTask.tsx                {item.subdistrictName}
         </div>
         <div className="col-lg">
           <CheckDocument
-          onSearchType={(value: any, checked: any) =>
-            onSearchCheckDocument(value, checked)
-          }
+            onSearchType={(value: any, checked: any) =>
+              onSearchCheckDocument(value, checked)
+            }
             list={documentPersons}
             title="เลือกการตรวจเอกสาร"
           />

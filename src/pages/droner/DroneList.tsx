@@ -43,6 +43,7 @@ import StatusButton from "../../components/button/StatusButton";
 import StatusPlots from "../../components/card/StatusPlots";
 import { CheckboxValueType } from "antd/lib/checkbox/Group";
 import { image } from "../../resource";
+import { DropdownStatus } from "../../components/dropdownCheck/DropDownStatus";
 
 function DroneList() {
   const navigate = useNavigate();
@@ -62,9 +63,6 @@ function DroneList() {
     card2: "ไม่อนุมัติ",
   });
   const [loading, setLoading] = useState(false);
-  const [visibleStatus, setVisibleStatus] = useState(false);
-  const [indeterminatePending, setIndeterminatePending] = useState(false);
-  const [checkAllPending, setCheckAllPending] = useState(false);
   const [statusArr, setStatusArr] = useState<string[]>([]);
   const statusListPend = ["FIRST", "SECOND", "THIRD"];
   const [statusArrMain, setStatusArrMain] = useState<string[]>([]);
@@ -167,57 +165,39 @@ function DroneList() {
     }
     setMainStatus(e.target.value);
   };
-  const handleVisibleStatus = (newVisible: any) => {
-    setVisibleStatus(newVisible);
-  };
-  const onCheckAllPending = (e: any) => {
-    let value = e.target.value;
-    let checked = e.target.checked;
-    let arr: any = 0;
-    if (checked === true) {
-      arr = [...statusArr, value];
-      setStatusArr([...statusArr, value]);
-      setSearchStatus(value);
-    } else {
-      let d: string[] = statusArr.filter((x) => x != value);
-      arr = [...d];
-      setStatusArr(d);
-      if (d.length == 0) {
-        arr = undefined;
+
+  const onSearchStatus = (value: string, checked: boolean) => {
+    if (statusListPend.map((x) => x).find((c) => c === value)) {
+      let arr: any = 0;
+      if (checked === true) {
+        arr = [...statusArr, value];
+        setStatusArr([...statusArr, value]);
+        setWaitPendingDate(value);
+      } else {
+        let d: string[] = statusArr.filter((x) => x !== value);
+        arr = [...d];
+        setStatusArr(d);
+        if (d.length === 0) {
+          arr = undefined;
+        }
       }
-    }
-    setSearchStatus(arr);
-    setWaitPendingDate(e.target.checked ? statusListPend : []);
-    setIndeterminatePending(false);
-    setCheckAllPending(e.target.checked);
-  };
-  const onChangeListPending = (list: CheckboxValueType[]) => {
-    setSearchStatus(undefined);
-    let arr: any = 0;
-    arr = [...list];
-    setWaitPendingDate(list);
-    setIndeterminatePending(
-      !!list.length && list.length < statusListPend.length
-    );
-    setCheckAllPending(list.length === statusListPend.length);
-  };
-  const onSearchStatus = (e: any) => {
-    let value = e.target.value;
-    let checked = e.target.checked;
-    let arr: any = 0;
-    if (checked === true) {
-      arr = [...statusArrMain, value];
-      setStatusArrMain([...statusArrMain, value]);
-      setSearchStatus(value);
+      setWaitPendingDate(arr);
     } else {
-      let d: string[] = statusArrMain.filter((x) => x != value);
-      arr = [...d];
-      setStatusArrMain(d);
-      if (d.length == 0) {
-        arr = undefined;
+      let arr: any = 0;
+      if (checked === true) {
+        arr = [...statusArrMain, value];
+        setStatusArrMain([...statusArrMain, value]);
+        setSearchStatus(value);
+      } else {
+        let d: string[] = statusArrMain.filter((x) => x !== value);
+        arr = [...d];
+        setStatusArrMain(d);
+        if (d.length === 0) {
+          arr = undefined;
+        }
       }
+      setSearchStatus(arr);
     }
-    setSearchStatus(arr);
   };
   const onShowSizeChange: PaginationProps["onShowSizeChange"] = (
     current,
@@ -226,77 +206,7 @@ function DroneList() {
     setCurrent(current);
     setRow(pageSize);
   };
-  const SubStatus = (
-    <Menu
-      items={[
-        mainStatus === "PENDING"
-          ? {
-              label: (
-                <>
-                  <Checkbox
-                    indeterminate={indeterminatePending}
-                    onChange={onCheckAllPending}
-                    checked={checkAllPending}
-                    value="PENDING"
-                  >
-                    รอตรวจสอบ
-                  </Checkbox>
-                  <br />
-                  <Checkbox.Group
-                    value={waitPendingDate}
-                    style={{ width: "100%" }}
-                    onChange={onChangeListPending}
-                  >
-                    <Checkbox style={{ marginLeft: "20px" }} value="FIRST">
-                      0-2 วัน
-                    </Checkbox>
-                    <br />
-                    <Checkbox style={{ marginLeft: "20px" }} value="SECOND">
-                      3-6 วัน
-                    </Checkbox>
-                    <br />
-                    <Checkbox style={{ marginLeft: "20px" }} value="THIRD">
-                      7 วันขึ้นไป
-                    </Checkbox>
-                  </Checkbox.Group>
-                </>
-              ),
-              key: "1",
-            }
-          : {
-              label: (
-                <>
-                  <Checkbox onClick={onSearchStatus} value="ACTIVE">
-                    ใช้งาน
-                  </Checkbox>
-                </>
-              ),
-              key: "1",
-            },
-        mainStatus === "PENDING"
-          ? {
-              label: (
-                <>
-                  <Checkbox onClick={onSearchStatus} value="REJECTED">
-                    ไม่อนุมัติ
-                  </Checkbox>
-                </>
-              ),
-              key: "2",
-            }
-          : {
-              label: (
-                <>
-                  <Checkbox onClick={onSearchStatus} value="INACTIVE">
-                    ปิดการใช้งาน
-                  </Checkbox>
-                </>
-              ),
-              key: "2",
-            },
-      ]}
-    />
-  );
+
   const PageTitle = (
     <>
       <div className="d-flex" style={{ padding: "10px" }}>
@@ -387,19 +297,15 @@ function DroneList() {
             ))}
           </Select>
         </div>
-        <div className="col-lg pt-1 p-1">
-          <Dropdown
-            overlay={SubStatus}
-            trigger={["click"]}
-            className="col-lg-12 p-1"
-            onVisibleChange={handleVisibleStatus}
-            visible={visibleStatus}
-          >
-            <Button style={{ color: color.Disable }}>
-              เลือกสถานะ
-              <DownOutlined style={{ verticalAlign: 2 }} />
-            </Button>
-          </Dropdown>
+        <div className="col-lg">
+          <DropdownStatus
+            title="เลือกสถานะ"
+            mainStatus={mainStatus}
+            onSearchType={(value: any, checked: any) =>
+              onSearchStatus(value, checked)
+            }
+            list={searchStatus}
+          />
         </div>
         <div className="p-1">
           <Button

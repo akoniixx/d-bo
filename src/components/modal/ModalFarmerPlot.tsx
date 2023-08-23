@@ -433,9 +433,12 @@ const ModalFarmerPlot: React.FC<ModalFarmerPlotProps> = ({
             </Form.Item>
           </div>
           <div className="form-group">
-            <label>Link Google Map</label>
+            <label>Google Map Link</label>
             <Form.Item name="mapUrl">
-              <Input placeholder="URL Link Google Maps" autoComplete="off" />
+              <Input
+                placeholder="กรอก URL Google Maps Link"
+                autoComplete="off"
+              />
             </Form.Item>
           </div>
           <div className="row">

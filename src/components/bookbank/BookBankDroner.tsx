@@ -15,6 +15,7 @@ import {
   UploadImageEntity,
   UploadImageEntity_INTI,
 } from "../../entities/UploadImageEntities";
+import Swal from "sweetalert2";
 
 const _ = require("lodash");
 const { Map } = require("immutable");
@@ -30,16 +31,12 @@ const BookBankDroner: React.FC<BookBankDronerProps> = ({
   dronerId,
 }) => {
   const [form] = Form.useForm();
-  const [formTable] = Form.useForm();
   const [bankImg, setBankImg] = useState<any>();
   const [bank, setBank] = useState<any>();
-  // const [defaultData, setDefaultData] =
-  //   useState<DronerEntity>(data);
   const [bankImgCreate, setBankImgCreate] =
     useState<UploadImageEntity>(ImageEntity_INTI);
   const [dataBookBank, setDataBookBank] = useState<DronerEntity>(data);
   const [imgName, setImagName] = useState<any>();
-  const [accountNum, setAccountNum] = useState<any>();
 
   useEffect(() => {
     const getBank = async () => {
@@ -98,16 +95,24 @@ const BookBankDroner: React.FC<BookBankDronerProps> = ({
     imgWindow?.document.write(image.outerHTML);
   };
   const removeImg = () => {
-    const getImg =
-      data.file && data.file.filter((x) => x.category === "BOOK_BANK")[0];
-    if (getImg !== undefined) {
-      UploadImageDatasouce.deleteImage(getImg.id, getImg.path).then(
-        (res) => {}
-      );
-    }
-    setBankImgCreate(ImageEntity_INTI);
-    setBankImg(undefined);
-    setImagName(undefined);
+    Swal.fire({
+      title: "ยืนยันการลบ",
+      text: "โปรดตรวจสอบรูปภาพที่คุณต้องการลบ",
+      cancelButtonText: "ย้อนกลับ",
+      confirmButtonText: "ลบ",
+      confirmButtonColor: "#d33",
+      showCancelButton: true,
+      showCloseButton: true,
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        const getImg =
+          data.file && data.file.filter((x) => x.category === "BOOK_BANK")[0];
+        UploadImageDatasouce.deleteImage(getImg.id, getImg.path);
+        setBankImgCreate(ImageEntity_INTI);
+        setBankImg(undefined);
+        setImagName(undefined);
+      }
+    });
   };
   const onChangeBankName = (e: any) => {
     const value = Map(dataBookBank).set("bankName", e);
