@@ -589,14 +589,24 @@ function EditDroner() {
     imgWindow?.document.write(image.outerHTML);
   };
   const removeImg = () => {
-    const getImg = data.file.filter((x) => x.category === "PROFILE_IMAGE")[0];
-    if (getImg !== undefined) {
-      UploadImageDatasouce.deleteImage(getImg.id, getImg.path).then(
-        (res) => {}
-      );
-    }
-    setCreateImgProfile(ImageEntity_INTI);
-    setImgProfile(undefined);
+    Swal.fire({
+      title: "ยืนยันการลบ",
+      text: "โปรดตรวจสอบรูปภาพที่คุณต้องการลบ",
+      cancelButtonText: "ย้อนกลับ",
+      confirmButtonText: "ลบ",
+      confirmButtonColor: "#d33",
+      showCancelButton: true,
+      showCloseButton: true,
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        const getImg = data.file.filter(
+          (x) => x.category == "PROFILE_IMAGE"
+        )[0];
+        UploadImageDatasouce.deleteImage(getImg.id, getImg.path);
+        setCreateImgProfile(ImageEntity_INTI);
+        setImgProfile(undefined);
+      }
+    });
   };
 
   const onChangeIdCard = async (file: any) => {
@@ -643,14 +653,24 @@ function EditDroner() {
     imgWindow?.document.write(image.outerHTML);
   };
   const removeImgIdCard = () => {
-    const getImg = data.file.filter((x) => x.category === "ID_CARD_IMAGE")[0];
-    if (getImg !== undefined) {
-      UploadImageDatasouce.deleteImage(getImg.id, getImg.path).then(
-        (res) => {}
-      );
-    }
-    setCreateImgIdCrad(ImageEntity_INTI);
-    setImgIdCard(undefined);
+    Swal.fire({
+      title: "ยืนยันการลบ",
+      text: "โปรดตรวจสอบรูปภาพที่คุณต้องการลบ",
+      cancelButtonText: "ย้อนกลับ",
+      confirmButtonText: "ลบ",
+      confirmButtonColor: "#d33",
+      showCancelButton: true,
+      showCloseButton: true,
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        const getImg = data.file.filter(
+          (x) => x.category == "ID_CARD_IMAGE"
+        )[0];
+        UploadImageDatasouce.deleteImage(getImg.id, getImg.path);
+        setCreateImgIdCrad(ImageEntity_INTI);
+        setImgIdCard(undefined);
+      }
+    });
   };
   //#endregion
   const checkValidateComma = (data: string) => {
@@ -1475,9 +1495,12 @@ function EditDroner() {
             </div>
           </div>
           <div className="form-group">
-            <label>Link Google Map</label>
+            <label>Google Map Link</label>
             <Form.Item name="mapUrl">
-              <Input placeholder="URL Link Google Maps" autoComplete="off" />
+              <Input
+                placeholder="กรอกข้อมูล Url Google Map Link"
+                autoComplete="off"
+              />
             </Form.Item>
           </div>
           <div className="row">
