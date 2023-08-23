@@ -1529,7 +1529,7 @@ const EditNewTask = () => {
               <span>{row.firstname + " " + row.lastname}</span>
               {row.rating_avg != null && (
                 <Tooltip title={tooltipTitle} className="p-2">
-                  <img src={icon.iconReviewDroner} />
+                  <img src={icon.iconReviewDroner} style={{width: 32, height: 32}}/>
                 </Tooltip>
               )}
 
@@ -1990,6 +1990,7 @@ const EditNewTask = () => {
     updateTask.couponCode = data.couponCode;
     updateTask.couponId = couponData.couponId;
     updateTask.discountCoupon = couponData.priceCouponDiscount!;
+    console.log(updateTask)
     Swal.fire({
       title: "ยืนยันการแก้ไข",
       text: "โปรดตรวจสอบรายละเอียดที่คุณต้องการแก้ไขข้อมูลก่อนเสมอ เพราะอาจส่งผลต่อการจ้างงานในระบบ",
