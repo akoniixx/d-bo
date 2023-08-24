@@ -39,6 +39,8 @@ import { LocationDatasource } from "../../datasource/LocationDatasource";
 import Swal from "sweetalert2";
 import { UpdateStatusPaymentDatasource } from "../../datasource/UpdateStatusPaymentDatasource";
 import {
+  CaretDownOutlined,
+  CaretUpOutlined,
   DownOutlined,
   EditOutlined,
   InfoCircleFilled,
@@ -118,7 +120,6 @@ function IndexReport() {
   const [showModalMap, setShowModalMap] = useState<boolean>(false);
   const [plotId, setPlotId] = useState<string>("");
   const [visibleRating, setVisibleRating] = useState(false);
-  const [visibleCheckDoc, setVisibleCheckDoc] = useState(false);
   const [statusArrDoc, setStatusArrDoc] = useState<string[]>([]);
   const [statusArr, setStatusArr] = useState<string[]>([]);
   const [CheckEnum, setCheckEnum] = useState<string[]>([]);
@@ -131,7 +132,23 @@ function IndexReport() {
   const dateSearchFormat = "YYYY-MM-DD";
   const dateFormat = "DD/MM/YYYY";
   const timeFormat = "HH:mm";
-
+  const [sortDirection, setSortDirection] = useState<string | undefined>();
+  const [sortField, setSortField] = useState<string | undefined>();
+  const [sortDirection1, setSortDirection1] = useState<string | undefined>(
+    undefined
+  );
+  const [sortDirection2, setSortDirection2] = useState<string | undefined>(
+    undefined
+  );
+  const [sortDirection3, setSortDirection3] = useState<string | undefined>(
+    undefined
+  );
+  const [sortDirection4, setSortDirection4] = useState<string | undefined>(
+    undefined
+  );
+  const [sortDirection5, setSortDirection5] = useState<string | undefined>(
+    undefined
+  );
   const fetchAllReport = async () => {
     setLoading(true);
     await ReportDocDatasource.getAllReportDroner(
@@ -146,7 +163,9 @@ function IndexReport() {
       searchStatusPayment,
       searchStatusCancel,
       searchText,
-      documentPersons
+      documentPersons,
+      sortDirection,
+      sortField
     )
       .then((res: TaskReportListEntity) => {
         setGetData(res);
@@ -157,7 +176,7 @@ function IndexReport() {
   useEffect(() => {
     fetchAllReport();
     fetchProvince();
-  }, [current, row, startDate, endDate]);
+  }, [current, row, startDate, endDate, sortDirection]);
   useEffect(() => {
     LocationDatasource.getDistrict(searchProvince).then((res) => {
       setDistrict(res);
@@ -222,10 +241,10 @@ function IndexReport() {
       arr = [...statusArr, value];
       setStatusArr([...statusArr, value]);
     } else {
-      let d: string[] = statusArr.filter((x) => x != value);
+      let d: string[] = statusArr.filter((x) => x !== value);
       arr = [...d];
       setStatusArr(d);
-      if (d.length == 0) {
+      if (d.length === 0) {
         arr = undefined;
       }
     }
@@ -249,35 +268,9 @@ function IndexReport() {
   const isNumber = (n: any) => {
     return !isNaN(parseFloat(n)) && isFinite(n);
   };
-  const sorter = (a: any, b: any) => {
-    if (a === null) {
-      return 1;
-    }
-    if (b === null) {
-      return -1;
-    }
-    if (isNumber(a) && isNumber(b)) {
-      if (parseInt(a, 10) === parseInt(b, 10)) {
-        return 0;
-      }
-      return parseInt(a, 10) > parseInt(b, 10) ? 1 : -1;
-    }
-    if (isNumber(a)) {
-      return -1;
-    }
-    if (isNumber(b)) {
-      return 1;
-    }
-    if (a === b) {
-      return 0;
-    }
-    return a > b ? 1 : -1;
-  };
+
   const handleVisibleRating = (newVisible: any) => {
     setVisibleRating(newVisible);
-  };
-  const handleCheckDoc = (newVisible: any) => {
-    setVisibleCheckDoc(newVisible);
   };
 
   const statusOptions = ["WAIT_START", "IN_PROGRESS", "WAIT_RECEIVE"];
@@ -301,10 +294,10 @@ function IndexReport() {
       setStatusArr([...statusArr, value]);
       setSearchStatus(value);
     } else {
-      let d: string[] = statusArr.filter((x) => x != value);
+      let d: string[] = statusArr.filter((x) => x !== value);
       arr = [...d];
       setStatusArr(d);
-      if (d.length == 0) {
+      if (d.length === 0) {
         arr = undefined;
       }
       setSearchStatusCancel(undefined);
@@ -332,10 +325,10 @@ function IndexReport() {
       setStatusArr([...statusArr, value]);
       setSearchStatus(value);
     } else {
-      let d: string[] = statusArr.filter((x) => x != value);
+      let d: string[] = statusArr.filter((x) => x !== value);
       arr = [...d];
       setStatusArr(d);
-      if (d.length == 0) {
+      if (d.length === 0) {
         arr = undefined;
       }
       setSearchStatusPayment(undefined);
@@ -362,10 +355,10 @@ function IndexReport() {
       arr = [...statusArrDoc, value];
       setStatusArrDoc([...statusArrDoc, value]);
     } else {
-      let d: string[] = statusArrDoc.filter((x) => x != value);
+      let d: string[] = statusArrDoc.filter((x) => x !== value);
       arr = [...d];
       setStatusArrDoc(d);
-      if (d.length == 0) {
+      if (d.length === 0) {
         arr = undefined;
       }
     }
@@ -601,9 +594,57 @@ function IndexReport() {
   };
   const columns: ColumnsType<DataType> = [
     {
-      title: "วัน/เวลา นัดหมาย",
+      title: () => {
+        return (
+          <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+            วัน/เวลา นัดหมาย
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                cursor: "pointer",
+              }}
+              onClick={() => {
+                setSortField("dateAppointment");
+                setSortDirection((prev) => {
+                  if (prev === "ASC") {
+                    return "DESC";
+                  } else if (prev === undefined) {
+                    return "ASC";
+                  } else {
+                    return undefined;
+                  }
+                });
+                setSortDirection1((prev) => {
+                  if (prev === "ASC") {
+                    return "DESC";
+                  } else if (prev === undefined) {
+                    return "ASC";
+                  } else {
+                    return undefined;
+                  }
+                });
+              }}
+            >
+              <CaretUpOutlined
+                style={{
+                  position: "relative",
+                  top: 2,
+                  color: sortDirection1 === "ASC" ? "#ffca37" : "white",
+                }}
+              />
+              <CaretDownOutlined
+                style={{
+                  position: "relative",
+                  bottom: 2,
+                  color: sortDirection1 === "DESC" ? "#ffca37" : "white",
+                }}
+              />
+            </div>
+          </div>
+        );
+      },
       dataIndex: "date",
-      sorter: (a: any, b: any) => sorter(a.date, b.date),
       render: (value: any, row: any, index: number) => {
         return {
           children: (
@@ -678,9 +719,57 @@ function IndexReport() {
       },
     },
     {
-      title: "จำนวนไร่",
+      title: () => {
+        return (
+          <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+            จำนวนไร่
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                cursor: "pointer",
+              }}
+              onClick={() => {
+                setSortField("farmAreaAmount");
+                setSortDirection((prev) => {
+                  if (prev === "ASC") {
+                    return "DESC";
+                  } else if (prev === undefined) {
+                    return "ASC";
+                  } else {
+                    return undefined;
+                  }
+                });
+                setSortDirection2((prev) => {
+                  if (prev === "ASC") {
+                    return "DESC";
+                  } else if (prev === undefined) {
+                    return "ASC";
+                  } else {
+                    return undefined;
+                  }
+                });
+              }}
+            >
+              <CaretUpOutlined
+                style={{
+                  position: "relative",
+                  top: 2,
+                  color: sortDirection2 === "ASC" ? "#ffca37" : "white",
+                }}
+              />
+              <CaretDownOutlined
+                style={{
+                  position: "relative",
+                  bottom: 2,
+                  color: sortDirection2 === "DESC" ? "#ffca37" : "white",
+                }}
+              />
+            </div>
+          </div>
+        );
+      },
       dataIndex: "farmAreaAmount",
-      sorter: (a: any, b: any) => sorter(a.farmAreaAmount, b.farmAreaAmount),
       render: (value: any, row: any, index: number) => {
         return {
           children: <>{`${numberWithCommasToFixed(parseFloat(value))} ไร่`}</>,
@@ -688,25 +777,77 @@ function IndexReport() {
       },
     },
     {
-      title: "Rating",
+      title: () => {
+        return (
+          <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+            Rating
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                cursor: "pointer",
+              }}
+              onClick={() => {
+                setSortField("reviewDronerAvg");
+                setSortDirection((prev) => {
+                  if (prev === "ASC") {
+                    return "DESC";
+                  } else if (prev === undefined) {
+                    return "ASC";
+                  } else {
+                    return undefined;
+                  }
+                });
+                setSortDirection3((prev) => {
+                  if (prev === "ASC") {
+                    return "DESC";
+                  } else if (prev === undefined) {
+                    return "ASC";
+                  } else {
+                    return undefined;
+                  }
+                });
+              }}
+            >
+              <CaretUpOutlined
+                style={{
+                  position: "relative",
+                  top: 2,
+                  color: sortDirection3 === "ASC" ? "#ffca37" : "white",
+                }}
+              />
+              <CaretDownOutlined
+                style={{
+                  position: "relative",
+                  bottom: 2,
+                  color: sortDirection3 === "DESC" ? "#ffca37" : "white",
+                }}
+              />
+            </div>
+          </div>
+        );
+      },
       dataIndex: "rating",
-      sorter: (a: any, b: any) => sorter(a.rating, b.rating),
       render: (value: any, row: any, index: number) => {
         return {
           children: (
             <>
               <span className="text-dark-75  d-block font-size-lg">
-                <span>
-                  <StarFilled
-                    style={{
-                      color: "#FFCA37",
-                      fontSize: "20px",
-                      marginRight: "7px",
-                      verticalAlign: 0.5,
-                    }}
-                  />
-                  {parseFloat(value).toFixed(1)}
-                </span>
+                {value > "0" ? (
+                  <span>
+                    <StarFilled
+                      style={{
+                        color: "#FFCA37",
+                        fontSize: "20px",
+                        marginRight: "7px",
+                        verticalAlign: 0.5,
+                      }}
+                    />
+                    {parseFloat(value).toFixed(1)}
+                  </span>
+                ) : (
+                  "-"
+                )}
               </span>
             </>
           ),
@@ -716,7 +857,6 @@ function IndexReport() {
     {
       title: "ตรวจเอกสาร",
       dataIndex: "",
-      sorter: (a: any, b: any) => sorter(a.rating, b.rating),
       render: (value: any, row: any, index: number) => {
         return {
           children: (
@@ -743,10 +883,58 @@ function IndexReport() {
       },
     },
     {
-      title: "ยอดรวมค่าบริการ",
+      title: () => {
+        return (
+          <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+            ยอดรวมค่าบริการ{" "}
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                cursor: "pointer",
+              }}
+              onClick={() => {
+                setSortField("totalPrice");
+                setSortDirection((prev) => {
+                  if (prev === "ASC") {
+                    return "DESC";
+                  } else if (prev === undefined) {
+                    return "ASC";
+                  } else {
+                    return undefined;
+                  }
+                });
+                setSortDirection4((prev) => {
+                  if (prev === "ASC") {
+                    return "DESC";
+                  } else if (prev === undefined) {
+                    return "ASC";
+                  } else {
+                    return undefined;
+                  }
+                });
+              }}
+            >
+              <CaretUpOutlined
+                style={{
+                  position: "relative",
+                  top: 2,
+                  color: sortDirection4 === "ASC" ? "#ffca37" : "white",
+                }}
+              />
+              <CaretDownOutlined
+                style={{
+                  position: "relative",
+                  bottom: 2,
+                  color: sortDirection4 === "DESC" ? "#ffca37" : "white",
+                }}
+              />
+            </div>
+          </div>
+        );
+      },
       dataIndex: "totalPrice",
       fixed: "right",
-      sorter: (a: any, b: any) => sorter(a.totalPrice, b.totalPrice),
       render: (value: any, row: any, index: number) => {
         const inv: InvoiceTaskEntity = {
           raiAmount: row.farmAreaAmount,

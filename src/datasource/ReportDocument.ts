@@ -14,7 +14,9 @@ export class ReportDocDatasource {
     statusPayment?: string,
     statusCancel?: string,
     searchText?: string,
-    documentPersons?: string
+    documentPersons?: string,
+    sortDirection?: string,
+    sortField?: string,
   ): Promise<TaskReportListEntity> {
     const params = {
       page: page,
@@ -28,7 +30,9 @@ export class ReportDocDatasource {
       statusPayment: statusPayment,
       statusCancel: statusCancel,
       searchText: searchText,
-      documentPersons: documentPersons
+      documentPersons: documentPersons,
+      sortDirection: sortDirection,
+      sortField: sortField
     };
     return httpClient
       .get(BASE_URL + "/tasks/task-finish/get-all-task-finish-account", {

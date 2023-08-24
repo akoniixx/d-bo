@@ -353,15 +353,25 @@ const EditFarmer = () => {
   };
 
   const removeImg = () => {
-    const getImg = data.file.filter((x) => x.category == "PROFILE_IMAGE")[0];
-    if (getImg !== undefined) {
-      UploadImageDatasouce.deleteImage(getImg.id, getImg.path).then(
-        (res) => {}
-      );
-    }
-    setCreateImgProfile(ImageEntity_INTI);
-    setImgProfile(undefined);
-    checkValidate(data);
+    Swal.fire({
+      title: "ยืนยันการลบ",
+      text: "โปรดตรวจสอบรูปภาพที่คุณต้องการลบ",
+      cancelButtonText: "ย้อนกลับ",
+      confirmButtonText: "ลบ",
+      confirmButtonColor: "#d33",
+      showCancelButton: true,
+      showCloseButton: true,
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        const getImg = data.file.filter(
+          (x) => x.category == "PROFILE_IMAGE"
+        )[0];
+        UploadImageDatasouce.deleteImage(getImg.id, getImg.path);
+        setCreateImgProfile(ImageEntity_INTI);
+        setImgProfile(undefined);
+        checkValidate(data);
+      }
+    });
   };
   const onChangeIdCard = async (file: any) => {
     const source = file.target.files[0];
@@ -410,15 +420,25 @@ const EditFarmer = () => {
     imgWindow?.document.write(image.outerHTML);
   };
   const removeImgIdCard = () => {
-    const getImg = data.file.filter((x) => x.category == "ID_CARD_IMAGE")[0];
-    if (getImg != undefined) {
-      UploadImageDatasouce.deleteImage(getImg.id, getImg.path).then(
-        (res) => {}
-      );
-    }
-    setCreateImgIdCrad(ImageEntity_INTI);
-    setImgIdCard(undefined);
-    checkValidate(data);
+    Swal.fire({
+      title: "ยืนยันการลบ",
+      text: "โปรดตรวจสอบรูปภาพที่คุณต้องการลบ",
+      cancelButtonText: "ย้อนกลับ",
+      confirmButtonText: "ลบ",
+      confirmButtonColor: "#d33",
+      showCancelButton: true,
+      showCloseButton: true,
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        const getImg = data.file.filter(
+          (x) => x.category == "ID_CARD_IMAGE"
+        )[0];
+        UploadImageDatasouce.deleteImage(getImg.id, getImg.path);
+        setCreateImgIdCrad(ImageEntity_INTI);
+        setImgIdCard(undefined);
+        checkValidate(data);
+      }
+    });
   };
   //#endregion
 

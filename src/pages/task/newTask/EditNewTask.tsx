@@ -76,6 +76,8 @@ import {
 } from "../../../entities/TaskDronerTemp";
 import ModalSelectedEditDroner from "../../../components/modal/task/newTask/ModalSelectedEditDroner";
 import {
+  formatNumberWithCommas,
+  numberWithCommas,
   numberWithCommasToFixed,
   validateOnlyNumWDecimal,
   validateOnlyNumber,
@@ -463,16 +465,20 @@ const EditNewTask = () => {
 
   const handleCalServiceCharge = (e: any) => {
     const values = validateOnlyNumWDecimal(e.target.value);
-    if (e.target.id == "unitPrice") {
-      let calUnitPrice = parseFloat(data.farmAreaAmount) * parseFloat(values);
-      const d = Map(data).set("unitPrice", values);
-      const pushCal = Map(d.toJS()).set("price", calUnitPrice.toFixed(2));
-      setData(pushCal.toJS());
+    if (values.startsWith(".")) {
+      e.preventDefault();
     } else {
-      let calUnitPrice = parseFloat(values) / parseFloat(data.farmAreaAmount);
-      const d = Map(data).set("price", values);
-      const pushCal = Map(d.toJS()).set("unitPrice", calUnitPrice.toFixed(2));
-      setData(pushCal.toJS());
+      if (e.target.id == "unitPrice") {
+        let calUnitPrice = parseFloat(data.farmAreaAmount) * parseFloat(values);
+        const d = Map(data).set("unitPrice", values);
+        const pushCal = Map(d.toJS()).set("price", calUnitPrice.toFixed(2));
+        setData(pushCal.toJS());
+      } else {
+        let calUnitPrice = parseFloat(values) / parseFloat(data.farmAreaAmount);
+        const d = Map(data).set("price", values);
+        const pushCal = Map(d.toJS()).set("unitPrice", calUnitPrice.toFixed(2));
+        setData(pushCal.toJS());
+      }
     }
   };
   const handlePurposeSpray = (e: any) => {
@@ -878,7 +884,7 @@ const EditNewTask = () => {
                           <Input
                             suffix="บาท/ไร่"
                             id="unitPrice"
-                            value={data.unitPrice}
+                            value={formatNumberWithCommas(data.unitPrice)}
                             onChange={handleCalServiceCharge}
                             disabled={
                               current == 2 ||
@@ -898,7 +904,7 @@ const EditNewTask = () => {
                         <Form.Item>
                           <Input
                             suffix="บาท"
-                            value={data.price}
+                            value={formatNumberWithCommas(data.price)}
                             onChange={handleCalServiceCharge}
                             disabled={
                               current == 2 ||
@@ -935,6 +941,9 @@ const EditNewTask = () => {
                   format={dateFormat}
                   className="col-lg-12"
                   disabled={current == 2 || checkSelectPlot == "error"}
+                  disabledDate={(current) =>
+                    current && current < moment().startOf("day")
+                  }
                   onChange={(e: any) => handleDate(e)}
                   defaultValue={moment(dateAppointment)}
                 />

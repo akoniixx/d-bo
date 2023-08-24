@@ -174,18 +174,7 @@ function AddDroner() {
       setPlantsName(res);
     });
   };
-  useEffect(() => {
-    const handleBeforeUnload = (e: any) => {
-      e.preventDefault();
-      e.returnValue = "";
-    };
 
-    window.addEventListener("beforeunload", handleBeforeUnload);
-
-    return () => {
-      window.removeEventListener("beforeunload", handleBeforeUnload);
-    };
-  }, [showModal]);
   //#endregion
 
   //#region address
@@ -1197,9 +1186,12 @@ function AddDroner() {
             </Form.Item>
           </div>
           <div className="form-group">
-            <label>Link Google Map</label>
+            <label>Google Map Link</label>
             <Form.Item name="mapUrl">
-              <Input placeholder="กรอกข้อมูล Url Google Map" autoComplete="off" />
+              <Input
+                placeholder="กรอกข้อมูล Url Google Map Link"
+                autoComplete="off"
+              />
             </Form.Item>
           </div>
           <div className="row">

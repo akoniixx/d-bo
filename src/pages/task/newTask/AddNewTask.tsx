@@ -65,6 +65,7 @@ import { CreateDronerTempEntity } from "../../../entities/TaskDronerTemp";
 import TextArea from "antd/lib/input/TextArea";
 import Swal from "sweetalert2";
 import {
+  formatNumberWithCommas,
   numberWithCommas,
   numberWithCommasToFixed,
   validateOnlyNumWDecimal,
@@ -397,16 +398,20 @@ const AddNewTask = () => {
 
   const handleAmountRai = (e: React.ChangeEvent<HTMLInputElement>) => {
     const values = validateOnlyNumWDecimal(e.target.value);
-    const payload = {
-      ...createNewTask,
-    };
-    payload.priceStandard =
-      createNewTask.unitPriceStandard * parseFloat(values);
-    payload.price = createNewTask.unitPriceStandard * parseFloat(values);
-    payload.unitPriceStandard = createNewTask.unitPrice;
-    payload.farmAreaAmount = values;
-    setCreateNewTask(payload);
-    checkValidateStep(payload, current);
+    if (values.startsWith(".")) {
+      e.preventDefault();
+    } else {
+      const payload = {
+        ...createNewTask,
+      };
+      payload.priceStandard =
+        createNewTask.unitPriceStandard * parseFloat(values);
+      payload.price = createNewTask.unitPriceStandard * parseFloat(values);
+      payload.unitPriceStandard = createNewTask.unitPrice;
+      payload.farmAreaAmount = values;
+      setCreateNewTask(payload);
+      checkValidateStep(payload, current);
+    }
   };
   const handlePeriodSpray = (e: any) => {
     const mapData = periodSpray?.purposeSpray.find((x) => x.id === e);
@@ -468,20 +473,24 @@ const AddNewTask = () => {
   };
   const handleCalServiceCharge = (e: any) => {
     const values = validateOnlyNumWDecimal(e.target.value);
-    if (e.target.id === "unitPrice") {
-      let calUnitPrice =
-        parseFloat(createNewTask.farmAreaAmount) * parseFloat(values);
-      const d = Map(createNewTask).set("unitPrice", values);
-      const pushCal = Map(d.toJS()).set("price", calUnitPrice.toFixed(2));
-      setCreateNewTask(pushCal.toJS());
-      checkValidateStep(pushCal.toJS(), current);
+    if (values.startsWith(".")) {
+      e.preventDefault();
     } else {
-      let calUnitPrice =
-        parseFloat(values) / parseFloat(createNewTask.farmAreaAmount);
-      const d = Map(createNewTask).set("price", values);
-      const pushCal = Map(d.toJS()).set("unitPrice", calUnitPrice.toFixed(2));
-      setCreateNewTask(pushCal.toJS());
-      checkValidateStep(pushCal.toJS(), current);
+      if (e.target.id === "unitPrice") {
+        let calUnitPrice =
+          parseFloat(createNewTask.farmAreaAmount) * parseFloat(values);
+        const d = Map(createNewTask).set("unitPrice", values);
+        const pushCal = Map(d.toJS()).set("price", calUnitPrice.toFixed(2));
+        setCreateNewTask(pushCal.toJS());
+        checkValidateStep(pushCal.toJS(), current);
+      } else {
+        let calUnitPrice =
+          parseFloat(values) / parseFloat(createNewTask.farmAreaAmount);
+        const d = Map(createNewTask).set("price", values);
+        const pushCal = Map(d.toJS()).set("unitPrice", calUnitPrice.toFixed(2));
+        setCreateNewTask(pushCal.toJS());
+        checkValidateStep(pushCal.toJS(), current);
+      }
     }
   };
   const handleComment = (e: any) => {
@@ -889,7 +898,9 @@ const AddNewTask = () => {
                         <Input
                           suffix="บาท/ไร่"
                           id="unitPrice"
-                          value={createNewTask.unitPrice}
+                          value={formatNumberWithCommas(
+                            createNewTask.unitPrice
+                          )}
                           onChange={handleCalServiceCharge}
                           disabled={
                             current === 2 || checkSelectPlot === "error"
@@ -904,7 +915,7 @@ const AddNewTask = () => {
                       <Form.Item>
                         <Input
                           suffix="บาท"
-                          value={numberWithCommas(createNewTask.price)}
+                          value={formatNumberWithCommas(createNewTask.price)}
                           onChange={handleCalServiceCharge}
                           disabled={
                             current === 2 || checkSelectPlot === "error"
@@ -935,6 +946,9 @@ const AddNewTask = () => {
                   format={dateFormat}
                   className="col-lg-12"
                   disabled={current === 2 || checkSelectPlot === "error"}
+                  disabledDate={(current) =>
+                    current && current < moment().startOf("day")
+                  }
                   onChange={handleDateAppointment}
                   defaultValue={moment(dateAppointment)}
                 />
