@@ -95,7 +95,6 @@ const IndexNewTask = () => {
       sortField
     )
       .then((res) => {
-        console.log(res);
         setData(res);
       })
       .catch((err) => console.log(err))
