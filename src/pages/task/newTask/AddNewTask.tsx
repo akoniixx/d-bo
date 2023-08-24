@@ -1489,7 +1489,10 @@ const AddNewTask = () => {
               <span>{row.firstname + " " + row.lastname}</span>
               {row.rating_avg != null && (
                 <Tooltip title={tooltipTitle} className="p-2">
-                  <img src={icon.iconReviewDroner} />
+                  <img
+                    src={icon.iconReviewDroner}
+                    style={{ width: 32, height: 32 }}
+                  />
                 </Tooltip>
               )}
               <br />
@@ -1557,9 +1560,13 @@ const AddNewTask = () => {
         return {
           children: (
             <>
-              {row.subdistrict_name && <span>{row.subdistrict_name}/</span>}
-              {row.district_name && <span>{row.district_name}/</span>}
-              {row.province_name && <span>{row.province_name}</span>}
+              {row.subdistrict_name ? (
+                <span>{row.subdistrict_name}/ </span>
+              ) : (
+                "-/"
+              )}
+              {row.district_name ? <span>{row.district_name}/</span> : "-/"}
+              {row.province_name ? <span>{row.province_name}</span> : "-"}
             </>
           ),
         };
@@ -1585,7 +1592,7 @@ const AddNewTask = () => {
       key: "brand",
       render: (value: any, row: any, index: number) => {
         return {
-          children: (
+          children: row.drone_brand ? (
             <>
               <Avatar
                 size={25}
@@ -1600,6 +1607,8 @@ const AddNewTask = () => {
                 </p>
               )}
             </>
+          ) : (
+            "-"
           ),
         };
       },
@@ -1699,26 +1708,39 @@ const AddNewTask = () => {
                     </div>
                     <div className="col-lg-2">{JSON.parse(x).telephone_no}</div>
                     <div className="col-lg-3">
-                      {JSON.parse(x).subdistrict_name && (
+                      {JSON.parse(x).subdistrict_name ? (
                         <>{JSON.parse(x).subdistrict_name}/</>
+                      ) : (
+                        "-/"
                       )}
-                      {JSON.parse(x).district_name && (
+                      {JSON.parse(x).district_name ? (
                         <>{JSON.parse(x).district_name}/</>
+                      ) : (
+                        "-/"
                       )}
-                      {JSON.parse(x).province_name && (
+                      {JSON.parse(x).province_name ? (
                         <>{JSON.parse(x).province_name}</>
+                      ) : (
+                        "-"
                       )}
                     </div>
                     <div className="col-lg-1">
                       {JSON.parse(x).distance.toFixed(0)} km
                     </div>
                     <div className="col-lg-2">
-                      <Avatar
-                        size={25}
-                        src={JSON.parse(x).logo_drone_brand}
-                        style={{ marginRight: "5px" }}
-                      />
-                      {JSON.parse(x).drone_brand}
+                      {JSON.parse(x).drone_brand ? (
+                        <>
+                          <Avatar
+                            size={25}
+                            src={JSON.parse(x).logo_drone_brand}
+                            style={{ marginRight: "5px" }}
+                          />
+                          <span>{JSON.parse(x).drone_brand}</span>
+                        </>
+                      ) : (
+                        "-"
+                      )}
+
                       <br />
                       <p
                         style={{

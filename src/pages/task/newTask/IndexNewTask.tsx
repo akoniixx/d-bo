@@ -44,7 +44,10 @@ import {
 } from "../../../entities/NewTaskEntities";
 import { color, icon } from "../../../resource";
 import { DateTimeUtil } from "../../../utilities/DateTimeUtil";
-import { numberWithCommas, numberWithCommasToFixed } from "../../../utilities/TextFormatter";
+import {
+  numberWithCommas,
+  numberWithCommasToFixed,
+} from "../../../utilities/TextFormatter";
 import { useNavigate } from "react-router-dom";
 import { listAppType } from "../../../definitions/ApplicatoionTypes";
 import { ListCheck } from "../../../components/dropdownCheck/ListStatusAppType";
@@ -106,7 +109,7 @@ const IndexNewTask = () => {
     setSearchStatus(status.target.value);
   };
   const handleSearchText = (e: any) => {
-    setSearchText(e);
+    setSearchText(e.target.value);
   };
   const handleSearchDate = (e: any) => {
     if (e != null) {
@@ -247,7 +250,7 @@ const IndexNewTask = () => {
           />
         </div>
         <div className="col-lg">
-        <ListCheck
+          <ListCheck
             onSearchType={(value: any, checked: any) =>
               onSearchCreateBy(value, checked)
             }
@@ -489,7 +492,8 @@ const IndexNewTask = () => {
               <span>
                 {!row.total_price
                   ? 0.0 + " บาท"
-                  : numberWithCommasToFixed(parseFloat(row.total_price)) + " บาท"}
+                  : numberWithCommasToFixed(parseFloat(row.total_price)) +
+                    " บาท"}
               </span>
               <InvoiceTask
                 iconColor={color.Success}
