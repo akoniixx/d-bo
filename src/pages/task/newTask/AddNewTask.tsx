@@ -946,6 +946,9 @@ const AddNewTask = () => {
                   format={dateFormat}
                   className="col-lg-12"
                   disabled={current === 2 || checkSelectPlot === "error"}
+                  disabledDate={(current) =>
+                    current && current < moment().startOf("day")
+                  }
                   onChange={handleDateAppointment}
                   defaultValue={moment(dateAppointment)}
                 />

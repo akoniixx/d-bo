@@ -939,6 +939,9 @@ const EditNewTask = () => {
                   format={dateFormat}
                   className="col-lg-12"
                   disabled={current == 2 || checkSelectPlot == "error"}
+                  disabledDate={(current) =>
+                    current && current < moment().startOf("day")
+                  }
                   onChange={(e: any) => handleDate(e)}
                   defaultValue={moment(dateAppointment)}
                 />
