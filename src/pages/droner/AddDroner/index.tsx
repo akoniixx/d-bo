@@ -174,18 +174,7 @@ function AddDroner() {
       setPlantsName(res);
     });
   };
-  useEffect(() => {
-    const handleBeforeUnload = (e: any) => {
-      e.preventDefault();
-      e.returnValue = "";
-    };
 
-    window.addEventListener("beforeunload", handleBeforeUnload);
-
-    return () => {
-      window.removeEventListener("beforeunload", handleBeforeUnload);
-    };
-  }, [showModal]);
   //#endregion
 
   //#region address
