@@ -98,6 +98,7 @@ import { OptionType } from "./AddNewTask";
 import type { GroupBase, OptionsOrGroups } from "react-select";
 import { InputPicker } from "rsuite";
 import "rsuite/dist/rsuite.min.css";
+import { ModalAcceptedTask } from "../../../components/modal/ModalAcceptedTask";
 
 const dateFormat = "DD/MM/YYYY";
 const dateCreateFormat = "YYYY-MM-DD";
@@ -140,6 +141,7 @@ const EditNewTask = () => {
     status: "",
     message: "",
   });
+  const [modalCheckUpdate, setModalCheckUpdate] = useState<boolean>(false);
 
   const [couponData, setCouponData] = useState<TaskCoupon>(TaskCoupon_INIT);
   const [getCoupon, setGetCoupon] = useState<GetTaskCoupon>(GetTaskCoupon_INIT);
@@ -1529,7 +1531,10 @@ const EditNewTask = () => {
               <span>{row.firstname + " " + row.lastname}</span>
               {row.rating_avg != null && (
                 <Tooltip title={tooltipTitle} className="p-2">
-                  <img src={icon.iconReviewDroner} style={{width: 32, height: 32}}/>
+                  <img
+                    src={icon.iconReviewDroner}
+                    style={{ width: 32, height: 32 }}
+                  />
                 </Tooltip>
               )}
 
@@ -1990,22 +1995,23 @@ const EditNewTask = () => {
     updateTask.couponCode = data.couponCode;
     updateTask.couponId = couponData.couponId;
     updateTask.discountCoupon = couponData.priceCouponDiscount!;
-    console.log(updateTask)
-    Swal.fire({
-      title: "ยืนยันการแก้ไข",
-      text: "โปรดตรวจสอบรายละเอียดที่คุณต้องการแก้ไขข้อมูลก่อนเสมอ เพราะอาจส่งผลต่อการจ้างงานในระบบ",
-      cancelButtonText: "ยกเลิก",
-      confirmButtonText: "ยืนยัน",
-      confirmButtonColor: color.Success,
-      showCancelButton: true,
-      showCloseButton: true,
-    }).then(async (result) => {
-      if (result.isConfirmed) {
-        await TaskDatasource.updateNewTask(updateTask).then((res) => {
-          if (res.userMessage == "success") {
+    await TaskDatasource.updateNewTask(updateTask).then((res) => {
+      if (res.userMessage === "success") {
+        Swal.fire({
+          title: "ยืนยันการแก้ไข",
+          text: "โปรดตรวจสอบรายละเอียดที่คุณต้องการแก้ไขข้อมูลก่อนเสมอ เพราะอาจส่งผลต่อการจ้างงานในระบบ",
+          cancelButtonText: "ยกเลิก",
+          confirmButtonText: "ยืนยัน",
+          confirmButtonColor: color.Success,
+          showCancelButton: true,
+          showCloseButton: true,
+        }).then(async (result) => {
+          if (result.isConfirmed) {
             navigate("/IndexNewTask");
           }
         });
+      } else if (res.userMessage === "Droner has receive") {
+        setModalCheckUpdate(!modalCheckUpdate);
       }
     });
   };
@@ -2093,6 +2099,19 @@ const EditNewTask = () => {
           title="รายชื่อนักบินโดรน"
           backButton={() => setShowModalSelectedDroner((prev) => !prev)}
           callBack={callBackDronerSelected}
+        />
+      )}
+      {modalCheckUpdate && (
+        <ModalAcceptedTask
+          textHeader={"คุณไม่สามารถแก้ไขงานนี้ได้"}
+          textDetail={
+            "เนื่องจากในระหว่างการแก้ไข มีนักบินโดรนในระบบกดรับงานนี้แล้ว คุณสามารถตรวจสอบ/แก้ไขงานนี้ได้อีกครั้งในเมนูจัดการงานอื่นๆ"
+          }
+          visible={modalCheckUpdate}
+          backButton={() => {
+            setModalCheckUpdate(!modalCheckUpdate);
+            navigate("/IndexNewTask");
+          }}
         />
       )}
     </>
