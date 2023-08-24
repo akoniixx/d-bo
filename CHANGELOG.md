@@ -1,5 +1,9 @@
 ## [Version - 0]
 
+## improve [v0.36.15] 2023-08-24
+
+- added modal droner receive task
+
 ## Fix [v0.36.14] 2023-08-24
 
 - validate input number
