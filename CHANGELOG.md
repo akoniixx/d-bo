@@ -1,5 +1,10 @@
 ## [Version - 0]
 
+## Fix [v0.36.14] 2023-08-24
+
+- validate input number
+- fixed wording & fixed condition search status
+
 ## Fix [v0.36.13] 2023-08-23
 
 - fixed style search status

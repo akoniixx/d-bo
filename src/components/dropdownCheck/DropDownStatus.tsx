@@ -52,15 +52,26 @@ export const DropdownStatus: React.FC<listProps> = ({
         setSelectedOptionsSub([]);
       }
       setCheckAllPending(!checkAllPending);
+    } else {
+      if (optionIndex === -1) {
+        if (selectedOptionsSub.length > 0) {
+          setSelectedOptionsSub([]);
+          setSelectedOptions(value === "PENDING" ? [] : [value]);
+        }
+        setSelectedSubStatusOptions(listStatus.map((item) => item.value));
+        setSelectedOptionsSub([]);
+      } else {
+        setSelectedSubStatusOptions([]);
+        setSelectedOptionsSub([]);
+      }
     }
+
     const checked = optionIndex === -1;
     onSearchType(value, checked);
   };
-
   const handleOptionSelectSub = (value: string) => {
     const updatedSelectedOptions = [...selectedOptionsSub];
     const optionIndex = updatedSelectedOptions.indexOf(value);
-
     if (optionIndex === -1) {
       updatedSelectedOptions.push(value);
     } else {
@@ -81,6 +92,7 @@ export const DropdownStatus: React.FC<listProps> = ({
     const checked = optionIndex === -1;
     onSearchType(value, checked);
   };
+
   const handleSubStatusGroupChange = (
     newSelectedOptions: CheckboxValueType[]
   ) => {
@@ -103,6 +115,7 @@ export const DropdownStatus: React.FC<listProps> = ({
       setCheckAllPending(false);
     }
   }, [list, mainStatus]);
+
   const listStatus = [
     mainStatus === "PENDING"
       ? { title: " รอตรวจสอบ", value: "PENDING" }
@@ -122,7 +135,6 @@ export const DropdownStatus: React.FC<listProps> = ({
       value: "OPEN",
     });
   }
-
   const items: MenuProps["items"] = listStatus.map((v, i) => {
     return {
       key: i,
@@ -204,7 +216,14 @@ export const DropdownStatus: React.FC<listProps> = ({
                     </span>
                   ) : (
                     <span style={{ color: color.font, marginLeft: 8 }}>
-                      รอตรวจสอบ
+                      {selectedOptions.map((option) => STATUS_SEARCH[option])
+                        .length === 3
+                        ? "เลือกทั้งหมด"
+                        : [
+                            selectedOptions.map(
+                              (option) => STATUS_SEARCH[option]
+                            ),
+                          ].join(", ")}
                     </span>
                   )
                 ) : selectedOptions.length > 0 ? (
