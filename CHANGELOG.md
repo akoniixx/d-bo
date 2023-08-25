@@ -1,5 +1,9 @@
 ## [Version - 0]
 
+## improve [v0.36.16] 2023-08-25
+
+- click edit new task shows modal noti if dronerId is present.
+
 ## improve [v0.36.15] 2023-08-24
 
 - added modal droner receive task
