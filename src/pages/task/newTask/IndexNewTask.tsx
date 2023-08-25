@@ -51,6 +51,7 @@ import {
 import { useNavigate } from "react-router-dom";
 import { listAppType } from "../../../definitions/ApplicatoionTypes";
 import { ListCheck } from "../../../components/dropdownCheck/ListStatusAppType";
+import { ModalAcceptedTask } from "../../../components/modal/ModalAcceptedTask";
 
 const { RangePicker } = DatePicker;
 const dateFormat = "DD-MM-YYYY";
@@ -81,6 +82,8 @@ const IndexNewTask = () => {
   const [sortDirection2, setSortDirection2] = useState<string | undefined>(
     undefined
   );
+  const [modalCheckUpdate, setModalCheckUpdate] = useState<boolean>(false);
+
   const fetchNewTaskList = async () => {
     setLoading(true);
     await TaskDatasource.getNewTaskList(
@@ -174,6 +177,15 @@ const IndexNewTask = () => {
       }
     }
     setApplicationType(arr);
+  };
+  const checkDronerReceive = async (id: string) => {
+    await TaskDatasource.getNewTaskById(id).then((res) => {
+      if (!res.dronerId) {
+        navigate("/EditNewTask/id=" + id);
+      } else {
+        setModalCheckUpdate(!modalCheckUpdate);
+      }
+    });
   };
   const onShowSizeChange: PaginationProps["onShowSizeChange"] = (
     current,
@@ -576,7 +588,7 @@ const IndexNewTask = () => {
                 <ActionButton
                   icon={<EditOutlined />}
                   color={color.primary1}
-                  onClick={() => navigate("/EditNewTask/id=" + row.id)}
+                  onClick={() => checkDronerReceive(row.id)}
                 />
               </div>
               <div className="col-lg-6">
@@ -638,6 +650,20 @@ const IndexNewTask = () => {
           backButton={() => setShowModalDroner((prev) => !prev)}
           title="รายชื่อนักโดรนบิน"
           taskId={taskId}
+        />
+      )}
+      {modalCheckUpdate && (
+        <ModalAcceptedTask
+          titleButton={"ตกลง"}
+          textHeader={"คุณไม่สามารถแก้ไขงานนี้ได้"}
+          textDetail={
+            "เนื่องจากมีนักบินโดรนในระบบกดรับงานนี้แล้ว คุณสามารถตรวจสอบ/แก้ไขงานนี้ได้อีกครั้งในเมนูจัดการงานอื่นๆ"
+          }
+          visible={modalCheckUpdate}
+          backButton={() => {
+            setModalCheckUpdate(!modalCheckUpdate);
+            fetchNewTaskList();
+          }}
         />
       )}
     </>

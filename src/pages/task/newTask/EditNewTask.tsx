@@ -1612,9 +1612,13 @@ const EditNewTask = () => {
         return {
           children: (
             <>
-              {row.subdistrict_name && <span>{row.subdistrict_name}/</span>}
-              {row.district_name && <span>{row.district_name}/</span>}
-              {row.province_name && <span>{row.province_name}</span>}
+              {row.subdistrict_name ? (
+                <span>{row.subdistrict_name}/</span>
+              ) : (
+                "-/"
+              )}
+              {row.district_name ? <span>{row.district_name}/</span> : "-/"}
+              {row.province_name ? <span>{row.province_name}</span> : "-"}
             </>
           ),
         };
@@ -1642,17 +1646,23 @@ const EditNewTask = () => {
         return {
           children: (
             <>
-              <Avatar
-                size={25}
-                src={row.logo_drone_brand}
-                style={{ marginRight: "5px" }}
-              />
-              <span>{row.drone_brand}</span>
-              <br />
-              {row.count_drone > 1 && (
-                <p style={{ fontSize: "12px", color: color.Grey }}>
-                  (มากกว่า 1 ยี่ห้อ)
-                </p>
+              {row.drone_brand ? (
+                <>
+                  <Avatar
+                    size={25}
+                    src={row.logo_drone_brand}
+                    style={{ marginRight: "5px" }}
+                  />
+                  <span>{row.drone_brand}</span>
+                  <br />
+                  {row.count_drone > 1 && (
+                    <p style={{ fontSize: "12px", color: color.Grey }}>
+                      (มากกว่า 1 ยี่ห้อ)
+                    </p>
+                  )}
+                </>
+              ) : (
+                "-"
               )}
             </>
           ),
@@ -1738,36 +1748,48 @@ const EditNewTask = () => {
                       {JSON.parse(item?.dronerDetail).telephone_no}
                     </div>
                     <div className="col-lg-3">
-                      {JSON.parse(item?.dronerDetail).subdistrict_name && (
+                      {JSON.parse(item?.dronerDetail).subdistrict_name ? (
                         <>{JSON.parse(item?.dronerDetail).subdistrict_name}/</>
+                      ) : (
+                        "-/"
                       )}
-                      {JSON.parse(item?.dronerDetail).district_name && (
+                      {JSON.parse(item?.dronerDetail).district_name ? (
                         <>{JSON.parse(item?.dronerDetail).district_name}/</>
+                      ) : (
+                        "-/"
                       )}
-                      {JSON.parse(item?.dronerDetail).province_name && (
+                      {JSON.parse(item?.dronerDetail).province_name ? (
                         <>{JSON.parse(item?.dronerDetail).province_name}</>
+                      ) : (
+                        "-"
                       )}
                     </div>
                     <div className="col-lg-1">
                       {JSON.parse(item.distance).toFixed(0)} km
                     </div>
                     <div className="col-lg-2">
-                      <Avatar
-                        size={25}
-                        src={JSON.parse(item.dronerDetail).logo_drone_brand}
-                        style={{ marginRight: "5px" }}
-                      />
-                      {JSON.parse(item?.dronerDetail).drone_brand}
-                      <br />
-                      <p
-                        style={{
-                          fontSize: "12px",
-                          color: color.Grey,
-                        }}
-                      >
-                        {JSON.parse(item.dronerDetail).count_drone > 1 &&
-                          "(มากกว่า 1 ยี่หัอ)"}
-                      </p>
+                      {JSON.parse(item?.dronerDetail).drone_brand ? (
+                        <>
+                          <Avatar
+                            size={25}
+                            src={JSON.parse(item.dronerDetail).logo_drone_brand}
+                            style={{ marginRight: "5px" }}
+                          />
+                          {JSON.parse(item?.dronerDetail).drone_brand}
+                          <br />
+                          <p
+                            style={{
+                              fontSize: "12px",
+                              color: color.Grey,
+                            }}
+                          >
+                            {JSON.parse(item.dronerDetail).count_drone > 1 &&
+                              "(มากกว่า 1 ยี่หัอ)"}
+                          </p>
+                        </>
+                      ) : (
+                        "-"
+                      )}
                     </div>
                     <div className="col-lg-1">
                       <span
@@ -2112,6 +2134,7 @@ const EditNewTask = () => {
       )}
       {modalCheckUpdate && (
         <ModalAcceptedTask
+        titleButton={"ย้อนไปหน้าหลัก"}
           textHeader={"คุณไม่สามารถแก้ไขงานนี้ได้"}
           textDetail={
             "เนื่องจากในระหว่างการแก้ไข มีนักบินโดรนในระบบกดรับงานนี้แล้ว คุณสามารถตรวจสอบ/แก้ไขงานนี้ได้อีกครั้งในเมนูจัดการงานอื่นๆ"

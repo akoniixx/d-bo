@@ -10,12 +10,14 @@ interface ModalProps {
   textDetail: string;
   visible: boolean;
   backButton: () => void;
+  titleButton: string;
 }
 export const ModalAcceptedTask: React.FC<ModalProps> = ({
   textHeader,
   textDetail,
   visible,
   backButton,
+  titleButton
 }) => (
   <Modal
     title={
@@ -44,7 +46,7 @@ export const ModalAcceptedTask: React.FC<ModalProps> = ({
           }}
           onClick={backButton}
         >
-          กลับไปหน้าหลัก
+          {titleButton}
         </Button>
       </div>,
     ]}
