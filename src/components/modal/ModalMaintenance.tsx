@@ -16,12 +16,8 @@ export const ModalMaintence: React.FC<ModalMaintenceProp> = ({
   onClose,
   data,
 }) => {
-  const sameDay =
-    convertBuddhistYear.toBuddhistYear(
-      moment(data.dateStart),
-      "DD MMMM YYYY"
-    ) ===
-    convertBuddhistYear.toBuddhistYear(moment(data.dateEnd), "DD MMMM YYYY");
+  const sameDay = moment(data.dateStart).isSame(data.dateEnd);
+
   const footerClose = () => {
     return (
       <div className="text-center">

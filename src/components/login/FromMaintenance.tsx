@@ -10,15 +10,7 @@ interface FromMaintenanceProp {
   data: MaintenanceSystem;
 }
 export const FromMaintenance: React.FC<FromMaintenanceProp> = (data) => {
-  const sameDay =
-    convertBuddhistYear.toBuddhistYear(
-      moment(data.data.dateStart),
-      "DD MMMM YYYY"
-    ) ===
-    convertBuddhistYear.toBuddhistYear(
-      moment(data.data.dateEnd),
-      "DD MMMM YYYY"
-    );
+  const sameDay = moment(data.data.dateStart).isSame(data.data.dateEnd)
   return (
     <div className="col-lg-12">
       <div style={{ width: "100%" }}>
