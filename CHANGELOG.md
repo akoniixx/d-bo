@@ -1,5 +1,9 @@
 ## [Version - 0]
 
+## Fix [v0.36.18] 2023-08-28
+
+- case maintenance 2 day
+
 ## improve [v0.36.17] 2023-08-28
 
 - maintenance time to bounce to the login page
