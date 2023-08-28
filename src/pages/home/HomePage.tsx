@@ -23,24 +23,45 @@ export function HomePage() {
     MaintenanceSystem_INIT
   );
   const [showModalMaintance, setShowModalMaintance] = useState<boolean>(true);
-
-  const checkMaintence = () => {
-    MaintenanceDataSource.getMaintenceSystem("BO").then((res) => {
-      setShowModalMaintance(res.id ? true : false);
-      res.textDate =
-        "วันที่ " +
-        convertBuddhistYear.toBuddhistYear(
-          moment(res.dateStart),
-          "DD MMMM YYYY ช่วงเวลา HH:mm - "
-        ) +
-        moment(res.dateEnd).format("HH:mm น.");
-      setDataMaintance(res);
-    });
-  };
+  const dateNow = moment(Date.now());
+  const [checkTime, setCheckTime] = useState(false);
 
   useEffect(() => {
-    checkMaintence();
+    const getMaintenance = async () => {
+      const value = await localStorage.getItem("Maintenance");
+      await MaintenanceDataSource.getMaintenceSystem("BO")
+        .then((res) => {
+          if (res.responseData !== null) {
+            setCheckTime(
+              checkTimeMaintance(
+                moment(res.responseData.dateNotiStart),
+                moment(res.responseData.dateNotiEnd)
+              )
+            );
+            if (value === "read") {
+              setDataMaintance(res.responseData);
+              setShowModalMaintance(false);
+            } else {
+              setDataMaintance(res.responseData);
+              setShowModalMaintance(res.responseData.id ? true : false);
+              res.responseData.textDate =
+                "วันที่ " +
+                convertBuddhistYear.toBuddhistYear(
+                  moment(res.responseData.dateStart),
+                  "DD MMMM YYYY ช่วงเวลา HH:mm - "
+                ) +
+                moment(res.responseData.dateEnd).format("HH:mm น.");
+            }
+          }
+        })
+        .catch((err) => console.log(err));
+    };
+    getMaintenance();
   }, []);
+
+  const checkTimeMaintance = (startDate: any, endDate: any) => {
+    return dateNow.isBetween(startDate, endDate, "milliseconds");
+  };
 
   return (
     <div>
@@ -50,23 +71,23 @@ export function HomePage() {
           คุณ {persistedProfile.firstname + " " + persistedProfile.lastname}
         </h2>
         <footer
-        style={{
-          position: "fixed",
-          bottom: 0,
-          // width: "100%",
-          textAlign: "center",
-          // backgroundColor: color.BG,
-        }}
-      >
-        <span>version {version}</span>
-      </footer>
+          style={{
+            position: "fixed",
+            bottom: 0,
+            textAlign: "center",
+          }}
+        >
+          <span>version {version}</span>
+        </footer>
       </div>
-      
 
-      {dataMaintance.id && (
+      {checkTime === true && (
         <ModalMaintence
           show={showModalMaintance}
-          onClose={() => setShowModalMaintance(!showModalMaintance)}
+          onClose={async () => {
+            await localStorage.setItem("Maintenance", "read");
+            setShowModalMaintance(!showModalMaintance);
+          }}
           data={dataMaintance}
         />
       )}

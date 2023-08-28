@@ -1,5 +1,9 @@
 ## [Version - 0]
 
+## improve [v0.36.17] 2023-08-28
+
+- maintenance time to bounce to the login page
+
 ## improve [v0.36.16] 2023-08-25
 
 - click edit new task shows modal noti if dronerId is present.

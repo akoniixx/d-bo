@@ -1,9 +1,12 @@
 import { Button, Divider, Form, Input, message, Space } from "antd";
-import React, { SyntheticEvent, useRef, useState } from "react";
+import React, { SyntheticEvent, useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { AuthDatasource } from "../../datasource/AuthDatasource";
 import { useLocalStorage } from "../../hook/useLocalStorage";
 import color from "../../resource/color";
+import { MaintenanceDataSource } from "../../datasource/MaintenanceDataSource";
+import moment from "moment";
+import { convertBuddhistYear } from "../../utilities/ConvertToBuddhistYear";
 
 const FromLogin: React.FC = () => {
   const style: React.CSSProperties = {
@@ -15,12 +18,41 @@ const FromLogin: React.FC = () => {
     "profile",
     []
   );
+  const [start, setStart] = useState<any>();
+  const [end, setEnd] = useState<any>();
+
   const navigate = useNavigate();
   const [token, setToken] = useLocalStorage("token", []);
+  useEffect(() => {
+    const getMaintenance = async () => {
+      await MaintenanceDataSource.getMaintenceSystem("BO")
+        .then((res) => {
+          if (res.responseData !== null) {
+            setStart(
+              convertBuddhistYear.toBuddhistYear(
+                moment(res.responseData.dateStart),
+                "DD MMMM YYYY ช่วงเวลา HH:mm "
+              )
+            );
+            setEnd(
+              convertBuddhistYear.toBuddhistYear(
+                moment(res.responseData.dateEnd),
+                "DD MMMM YYYY ช่วงเวลา HH:mm  "
+              )
+            );
+          }
+        })
+        .catch((err) => console.log(err));
+    };
+    getMaintenance();
+  }, []);
+
   const handlerSubmitFrom = (data: any) => {
     AuthDatasource.login(data.username, data.password)
       .then((res: any) => {
         if (res.accessToken) {
+          localStorage.setItem("MA1", start);
+          localStorage.setItem("MA2", end);
           message.success("Login Successful");
           setPersistedProfile(res.data);
           setToken(res.accessToken);
