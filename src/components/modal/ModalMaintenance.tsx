@@ -68,7 +68,7 @@ export const ModalMaintence: React.FC<ModalMaintenceProp> = ({
                     วันที่{" "}
                     {convertBuddhistYear.toBuddhistYear(
                       moment(data.dateStart),
-                      "DD MMMM YYYY ช่วงเวลา HH:mm - 00:59 น."
+                      "DD MMMM YYYY ช่วงเวลา HH:mm - 23:59 น."
                     )}{" "}
                   </label>
                   <label style={{ fontSize: "17px" }}>

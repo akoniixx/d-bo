@@ -26,7 +26,7 @@ export const FromMaintenance: React.FC<FromMaintenanceProp> = (data) => {
                 วันที่{" "}
                 {convertBuddhistYear.toBuddhistYear(
                   moment(data.data.dateStart),
-                  "DD MMMM YYYY ช่วงเวลา HH:mm - 00:59 น."
+                  "DD MMMM YYYY ช่วงเวลา HH:mm - 23:59 น."
                 )}{" "}
               </h5>
               <h5 style={{ fontSize: "17px" }}>
