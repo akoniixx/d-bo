@@ -16,7 +16,7 @@ export const ModalMaintence: React.FC<ModalMaintenceProp> = ({
   onClose,
   data,
 }) => {
-  const sameDay = moment(data.dateStart).isSame(data.dateEnd);
+  const sameDay = moment(data.dateStart).isSame(data.dateEnd, "day");
 
   const footerClose = () => {
     return (

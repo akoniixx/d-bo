@@ -10,7 +10,7 @@ interface FromMaintenanceProp {
   data: MaintenanceSystem;
 }
 export const FromMaintenance: React.FC<FromMaintenanceProp> = (data) => {
-  const sameDay = moment(data.data.dateStart).isSame(data.data.dateEnd)
+  const sameDay = moment(data.data.dateStart).isSame(data.data.dateEnd, "day");
   return (
     <div className="col-lg-12">
       <div style={{ width: "100%" }}>
