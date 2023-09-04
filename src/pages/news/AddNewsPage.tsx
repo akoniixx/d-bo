@@ -568,7 +568,7 @@ function AddNewsPage() {
                         onChange={handleCampName}
                       >
                         {cName && cName.map((item) => (
-                          <option value={item.id}>{item.campaignName}</option>
+                          <option key={item.id} value={item.id}>{item.campaignName}</option>
                         ))}
                       </Select>
                     </Form.Item>
