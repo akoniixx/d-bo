@@ -567,8 +567,8 @@ function AddNewsPage() {
                         placeholder="เลือกชื่อชาเลนจ์"
                         onChange={handleCampName}
                       >
-                        {cName.map((item) => (
-                          <option value={item.id}>{item.campaignName}</option>
+                        {cName && cName.map((item) => (
+                          <option key={item.id} value={item.id}>{item.campaignName}</option>
                         ))}
                       </Select>
                     </Form.Item>

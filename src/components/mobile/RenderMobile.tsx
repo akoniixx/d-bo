@@ -81,9 +81,9 @@ const RenderMobile: React.FC<RenderMobile> = ({
   }
 
   const generateRaiText = () => {
-    if (!raiConditionMin  && !raiConditionMax) {
+    if (!raiConditionMin && !raiConditionMax) {
       return "จำนวนไร่ขั้นต่ำที่ฉีดพ่น XX ไร่";
-    } else if (raiConditionMin  && !raiConditionMax) {
+    } else if (raiConditionMin && !raiConditionMax) {
       return `จำนวนไร่ขั้นต่ำที่ฉีดพ่น ${raiConditionMin} ไร่`;
     } else if (!raiConditionMin && raiConditionMax) {
       return `จำนวนไร่ที่ฉีดพ่นต้องไม่เกิน ${raiConditionMax} ไร่`;
@@ -106,7 +106,10 @@ const RenderMobile: React.FC<RenderMobile> = ({
   return (
     <div className="col-4">
       <div ref={div}>
-        <CardHeaderPromotion textHeader="ตัวอย่างในแอปพลิเคชั่น" center={true} />
+        <CardHeaderPromotion
+          textHeader="ตัวอย่างในแอปพลิเคชั่น"
+          center={true}
+        />
         <div
           style={{
             width: "100%",
@@ -150,15 +153,15 @@ const RenderMobile: React.FC<RenderMobile> = ({
                     alignItems: "center",
                   }}
                 >
-                  {
-                    !couponType?
-                    <></>:
+                  {!couponType ? (
+                    <></>
+                  ) : (
                     <img
-                    src={
-                      couponType === "INJECTION" ? icon.injection : icon.drug
-                    }
-                  />
-                  }
+                      src={
+                        couponType === "INJECTION" ? icon.injection : icon.drug
+                      }
+                    />
+                  )}
                 </div>
                 <div>
                   <p
@@ -242,7 +245,7 @@ const RenderMobile: React.FC<RenderMobile> = ({
                 style={{
                   width: "100%",
                   height: "10px",
-                  
+
                   borderRadius: "5px",
                   backgroundImage:
                     "linear-gradient(67.07deg, #FB8705 14.86%, #FFCF75 85.14%)",
@@ -252,8 +255,8 @@ const RenderMobile: React.FC<RenderMobile> = ({
             <div
               style={{
                 width: "100%",
-                maxHeight : '450px',
-                overflow : 'scroll',
+                maxHeight: "450px",
+                overflow: "scroll",
                 padding: "10px 20px",
               }}
             >
