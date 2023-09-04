@@ -1,5 +1,10 @@
 ## [Version - 0]
 
+## Fix [v0.36.19] 2023-09-04
+
+- fixed setting coupon
+- fixed show modal ma
+
 ## Fix [v0.36.18] 2023-08-28
 
 - case maintenance 2 day

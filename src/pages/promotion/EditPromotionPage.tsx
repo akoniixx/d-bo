@@ -4,7 +4,6 @@ import { CardHeaderPromotion } from "../../components/header/CardHeaderPromotion
 import {
   Form,
   Input,
-  Select,
   Radio,
   DatePicker,
   Divider,
@@ -15,6 +14,7 @@ import {
   Modal,
   Button,
 } from "antd";
+import { Select as AntdSelect } from "antd";
 import parse from "html-react-parser";
 import { Option } from "antd/lib/mentions";
 import ReactQuill, { Quill } from "react-quill";
@@ -42,6 +42,14 @@ import { ProviceEntity } from "../../entities/LocationEntities";
 import { TaskDatasource } from "../../datasource/TaskDatasource";
 import { FarmerDatasource } from "../../datasource/FarmerDatasource";
 import { DashboardLayout } from "../../components/layout/Layout";
+import {
+  validateOnlyNumWDecimal,
+  validateOnlyNumber,
+} from "../../utilities/TextFormatter";
+import dayjs from "dayjs";
+import Select, { Props as SelectProps } from "react-select";
+import { FarmerPageEntity } from "../../entities/FarmerEntities";
+
 const _ = require("lodash");
 
 function EditPromotion() {
@@ -83,6 +91,8 @@ function EditPromotion() {
   const fetchTwice = useRef<boolean>(true);
   const [provinceListId, setProvinceListId] = useState<ProviceEntity[]>([]);
   const [searchFarmer, setSearchFarmer] = useState<string>("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [row, setRow] = useState(10);
   const [couponConditionFarmerList, setCouponConditionFarmerList] = useState<
     any[]
   >([]);
@@ -117,32 +127,57 @@ function EditPromotion() {
 
   useEffect(() => {
     fetchFarmerList(searchFarmer, provinceListId);
-  }, [searchFarmer, provinceListId]);
+  }, [searchFarmer, provinceListId, row]);
 
-  const fetchFarmerList = async (text?: string, dataProvice?: any) => {
-    const data = await (
-      await TaskDatasource.getFarmerListTask(text, 0, 0).then((res) => {
-        return res.data;
-      })
-    ).map((x: any) => {
-      const res = { ...x, provinceName: "" };
-      return res;
-    });
-    const mapData = data.map((x) => {
-      const matching = dataProvice.find(
-        (i: any) => `${i.provinceId}` === `${x.address.provinceId}`
-      );
-      if (matching) {
-        return { ...x, provinceName: matching.provinceName };
+  const fetchFarmerList = (text?: string, dataProvice?: any) => {
+    TaskDatasource.getFarmerListTask(text, currentPage, text ? 0 : row).then(
+      (res: FarmerPageEntity) => {
+        const data = res.data.map((x: any) => {
+          const res = { ...x, provinceName: "" };
+          return res;
+        });
+        const mapData = data.map((x) => {
+          const matching = dataProvice.find(
+            (i: any) => `${i.provinceId}` === `${x.address.provinceId}`
+          );
+          if (matching) {
+            return { ...x, provinceName: matching.provinceName };
+          }
+          return {
+            ...x,
+            provinceName: x.provinceName,
+          };
+        });
+
+        const result = mapData.map((item) => {
+          return {
+            ...item,
+            label:
+              item.firstname +
+              " " +
+              item.lastname +
+              " | " +
+              (item.provinceName ? item.provinceName : "-"),
+            value: item.id,
+          };
+        });
+        setFarmerList(result);
       }
-      return {
-        ...x,
-        provinceName: x.provinceName,
-      };
-    });
-    setFarmerList(mapData);
+    );
+  };
+  const handleInputChange = (inputValue: any) => {
+    if (currentPage === 1) {
+      setSearchFarmer(inputValue);
+    }
+    return inputValue;
   };
 
+  const handleMenuScrollToBottom = () => {
+    if (row === farmerList.length) {
+      setCurrentPage(currentPage);
+      setRow(row + 10);
+    }
+  };
   const getPromotion = (id: string) => {
     CouponDataSource.queryCoupon(id)
       .then(async (res) => {
@@ -360,7 +395,7 @@ function EditPromotion() {
                 },
               ]}
             >
-              <Select
+              <AntdSelect
                 disabled={!couponPlant}
                 className="col-lg-12 p-1"
                 placeholder="เลือกพืช"
@@ -384,7 +419,7 @@ function EditPromotion() {
                     {item.cropName}
                   </Option>
                 ))}
-              </Select>
+              </AntdSelect>
             </Form.Item>
           ),
         };
@@ -409,7 +444,7 @@ function EditPromotion() {
                 },
               ]}
             >
-              <Select
+              <AntdSelect
                 key={index}
                 disabled={!crop[index].cropName || !couponPlant}
                 mode="multiple"
@@ -436,7 +471,7 @@ function EditPromotion() {
                     {item.purposeSprayName}
                   </Option>
                 ))}
-              </Select>
+              </AntdSelect>
             </Form.Item>
           ),
         };
@@ -573,7 +608,20 @@ function EditPromotion() {
       ];
     });
   };
+  const checkNumber = (
+    e: React.ChangeEvent<HTMLInputElement>,
+    name: string
+  ) => {
+    const { value: inputValue } = e.target;
+    const convertedNumber = validateOnlyNumWDecimal(inputValue);
+    const convertedNumberNotDecimal = validateOnlyNumber(inputValue);
 
+    if (name === "count") {
+      form.setFieldsValue({ [name]: convertedNumberNotDecimal });
+    } else {
+      form.setFieldsValue({ [name]: convertedNumber });
+    }
+  };
   const deleteCrop = (index: number, cropDelete: any) => {
     crop.forEach((item: any) => {
       if (item.id === cropDelete.id) {
@@ -585,7 +633,19 @@ function EditPromotion() {
     setEditTable(!editTable);
     setCrop(mapCrop);
   };
+  const disabledDate = (current: any) => {
+    const getValueDate = form.getFieldsValue();
+    const startDate = moment(getValueDate.DateStart).format("YYYY-MM-DD");
+    return current && current < dayjs(startDate);
+  };
 
+  const disabledStartDate = (current: any) => {
+    if (renderMobile.expiredDate) {
+      const getValueDate = form.getFieldsValue();
+      const endDate = moment(getValueDate.DateExpired).format("YYYY-MM-DD");
+      return current && current > dayjs(endDate);
+    }
+  };
   const handleDescriptionEditor = (
     content: any,
     delta: any,
@@ -605,15 +665,23 @@ function EditPromotion() {
   };
 
   const handleCouponConditionFarmerList = (value: any[]) => {
+    const filterId = value.map((item) => item.id);
     const oldState = couponConditionFarmerList;
-    const newState = {
-      farmerId: value[value.length - 1],
-      keep: false,
-    };
-    oldState.push(newState);
-    setCouponConditionFarmerList(oldState);
+    const filterOldState = couponConditionFarmerList.map((x) => x.id);
+    if (filterOldState.find((x) => x === filterId[filterId.length - 1])) {
+      const newData = oldState.filter(
+        (x) => x.id !== filterId[filterId.length - 1]
+      );
+      setCouponConditionFarmerList(newData);
+    } else {
+      const newState = {
+        farmerId: filterId[filterId.length - 1],
+        keep: false,
+      };
+      oldState.push(newState);
+      setCouponConditionFarmerList(oldState);
+    }
   };
-
   function checkRai(min: number | null, max: number | null): string {
     let result;
     if (!min && !max) {
@@ -1009,7 +1077,7 @@ function EditPromotion() {
                       },
                     ]}
                   >
-                    <Select
+                    <AntdSelect
                       className="col-lg-12 p-1"
                       placeholder="เลือกประเภทคูปอง"
                       onChange={handleCouponType}
@@ -1028,7 +1096,7 @@ function EditPromotion() {
                     >
                       <Option value={"INJECTION"}>ส่วนลดการฉีดพ่น</Option>
                       <Option value={"DRUG"}>ส่วนลดปุ๋ยและยา</Option>
-                    </Select>
+                    </AntdSelect>
                   </Form.Item>
                 </div>
                 <div className="form-group col-lg-6">
@@ -1063,10 +1131,10 @@ function EditPromotion() {
                         ]}
                       >
                         <Input
-                          type="number"
                           disabled={coupon !== "DISCOUNT"}
                           placeholder="กรอกจำนวนเงิน"
                           autoComplete="off"
+                          onChange={(e) => checkNumber(e, "discount")}
                         />
                       </Form.Item>
                     </div>
@@ -1087,7 +1155,7 @@ function EditPromotion() {
                       },
                     ]}
                   >
-                    <Select
+                    <AntdSelect
                       disabled
                       className="col-lg-12 p-1"
                       placeholder="เลือกการรับคูปอง"
@@ -1107,7 +1175,7 @@ function EditPromotion() {
                     >
                       <Option value={"ONLINE"}>ออนไลน์(Online)</Option>
                       <Option value={"OFFLINE"}>ออฟไลน์(Offline)</Option>
-                    </Select>
+                    </AntdSelect>
                   </Form.Item>
                 </div>
                 <div className="form-group col-lg-6">
@@ -1125,10 +1193,10 @@ function EditPromotion() {
                       ]}
                     >
                       <Input
-                        type="number"
                         placeholder="กรอกจำนวนสิทธ์"
                         autoComplete="off"
                         onChange={(e) => {
+                          checkNumber(e, "count");
                           setRenderMobile({
                             ...renderMobile,
                             count: e.target.value,
@@ -1168,6 +1236,7 @@ function EditPromotion() {
                           }
                         }}
                         format={dateFormat}
+                        disabledDate={disabledStartDate}
                       />
                     </Form.Item>
                     <Form.Item
@@ -1224,6 +1293,7 @@ function EditPromotion() {
                           }
                         }}
                         format={dateFormat}
+                        disabledDate={disabledDate}
                       />
                     </Form.Item>
                     <Form.Item
@@ -1342,38 +1412,26 @@ function EditPromotion() {
                       rules={[
                         {
                           required: couponProvince,
-                          message: "กรุณากรอกเลือกจังหวัด",
+                          message: "กรุณากรอกเลือกเกษตรกร",
                         },
                       ]}
                     >
                       <Select
-                        disabled={!specificFarmer}
-                        mode="multiple"
-                        placeholder="เลือกเกษตรกร"
-                        onChange={handleCouponConditionFarmerList}
-                        showSearch
-                        value={province}
-                        allowClear
-                        optionFilterProp="children"
-                        filterOption={(input: any, option: any) =>
-                          option.children.includes(input)
-                        }
-                        filterSort={(optionA, optionB) =>
-                          optionA.children
-                            .toLowerCase()
-                            .localeCompare(optionB.children.toLowerCase())
-                        }
-                      >
-                        {farmerList?.map((item: any) => (
-                          <Option value={item.id}>
-                            {item.firstname +
-                              " " +
-                              item.lastname +
-                              " | จังหวัด" +
-                              item.provinceName}
-                          </Option>
-                        ))}
-                      </Select>
+                        placeholder="กรุณาเลือกเกษตรกร"
+                        isDisabled={!specificFarmer}
+                        isSearchable
+                        isClearable
+                        onInputChange={handleInputChange}
+                        onChange={(selectedOptions: any) => {
+                          setCurrentPage(1);
+                          handleCouponConditionFarmerList(selectedOptions);
+                        }}
+                        options={farmerList}
+                        defaultValue={couponConditionFarmerList}
+                        isMulti
+                        onMenuScrollToBottom={handleMenuScrollToBottom}
+                        closeMenuOnSelect={false}
+                      />
                     </Form.Item>
                   </div>
                 </div>
@@ -1396,10 +1454,10 @@ function EditPromotion() {
                             <label>จำนวนไร่ขั้นต่ำ</label>
                             <Form.Item name="couponConditionRaiMin">
                               <Input
-                                type="number"
                                 disabled={!raiCondition}
                                 placeholder="กรอกจำนวนไร่"
                                 onChange={(e) => {
+                                  checkNumber(e, "couponConditionRaiMin");
                                   setRenderMobile({
                                     ...renderMobile,
                                     raiConditionMin: e.target.value,
@@ -1412,10 +1470,10 @@ function EditPromotion() {
                             <label>จำนวนไร่สูงสุด</label>
                             <Form.Item name="couponConditionRaiMax">
                               <Input
-                                type="number"
                                 disabled={!raiCondition}
                                 placeholder="กรอกจำนวนไร่"
                                 onChange={(e) => {
+                                  checkNumber(e, "couponConditionRaiMax");
                                   setRenderMobile({
                                     ...renderMobile,
                                     raiConditionMax: e.target.value,
@@ -1440,10 +1498,10 @@ function EditPromotion() {
                             <label>จำนวนค่าบริการขั้นต่ำ</label>
                             <Form.Item name="couponConditionServiceMin">
                               <Input
-                                type="number"
                                 disabled={!serviceCondition}
                                 placeholder="กรอกค่าบริการ"
                                 onChange={(e) => {
+                                  checkNumber(e, "couponConditionServiceMin");
                                   setRenderMobile({
                                     ...renderMobile,
                                     serviceConditionMin: e.target.value,
@@ -1456,10 +1514,10 @@ function EditPromotion() {
                             <label>จำนวนค่าบริการสูงสุด</label>
                             <Form.Item name="couponConditionServiceMax">
                               <Input
-                                type="number"
                                 disabled={!serviceCondition}
                                 placeholder="กรอกค่าบริการ"
                                 onChange={(e) => {
+                                  checkNumber(e, "couponConditionServiceMax");
                                   setRenderMobile({
                                     ...renderMobile,
                                     serviceConditionMax: e.target.value,
@@ -1529,7 +1587,7 @@ function EditPromotion() {
                       },
                     ]}
                   >
-                    <Select
+                    <AntdSelect
                       disabled={!couponProvince}
                       mode="multiple"
                       placeholder="เลือกจังหวัด"
@@ -1552,7 +1610,7 @@ function EditPromotion() {
                           {item}
                         </Option>
                       ))}
-                    </Select>
+                    </AntdSelect>
                   </Form.Item>
                 </div>
               </div>
