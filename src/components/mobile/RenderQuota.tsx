@@ -5,6 +5,7 @@ import color from "../../resource/color";
 import { image } from "../../resource";
 import styled from "styled-components";
 import { DateTimeUtil } from "./../../utilities/DateTimeUtil";
+import { validateNumber } from "../../utilities/TextFormatter";
 
 const TextCard = styled.div<{ isFocus?: boolean }>`
   color: #523a19;
@@ -192,7 +193,7 @@ const RenderQuota: React.FC<RenderQuota> = ({
                   </div>
                   <div className="col" style={{ fontWeight: "600" }}>
                     <span style={{ color: "#FB8705" }}>XX</span>/
-                    <span>{raiAmount ? raiAmount : "XX"}</span>
+                    <span>{raiAmount ? validateNumber(raiAmount) : "XX"}</span>
                   </div>
                 </div>
               </div>

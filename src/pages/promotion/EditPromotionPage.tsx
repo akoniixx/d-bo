@@ -47,7 +47,7 @@ import {
   validateOnlyNumber,
 } from "../../utilities/TextFormatter";
 import dayjs from "dayjs";
-import Select, { Props as SelectProps } from "react-select";
+import Select, { ActionMeta, OnChangeValue, StylesConfig } from "react-select";
 import { FarmerPageEntity } from "../../entities/FarmerEntities";
 
 const _ = require("lodash");
@@ -69,6 +69,7 @@ function EditPromotion() {
   const [descriptionEditor, setDescriptionEditor] = useState<string | null>(
     null
   );
+  const [checkDelete, setCheckDelete] = useState<any>();
   const [conditionEditor, setConditionEditor] = useState<string | null>(null);
   const [editTable, setEditTable] = useState(true);
   const [province, setProvince] = useState<string[]>([]);
@@ -178,6 +179,7 @@ function EditPromotion() {
       setRow(row + 10);
     }
   };
+
   const getPromotion = (id: string) => {
     CouponDataSource.queryCoupon(id)
       .then(async (res) => {
@@ -682,6 +684,14 @@ function EditPromotion() {
       setCouponConditionFarmerList(oldState);
     }
   };
+
+  const styles: StylesConfig<true> = {
+    multiValueRemove: (base) => {
+      const checkId = couponConditionFarmerList.map((x)=>x.id)
+      return checkId ? { ...base, display: "none" } : base;
+    },
+  };
+
   function checkRai(min: number | null, max: number | null): string {
     let result;
     if (!min && !max) {
@@ -1420,7 +1430,8 @@ function EditPromotion() {
                         placeholder="กรุณาเลือกเกษตรกร"
                         isDisabled={!specificFarmer}
                         isSearchable
-                        isClearable
+                        styles={styles}
+                        isClearable={false}
                         onInputChange={handleInputChange}
                         onChange={(selectedOptions: any) => {
                           setCurrentPage(1);
