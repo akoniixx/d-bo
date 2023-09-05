@@ -475,7 +475,7 @@ function EditQuota() {
     const reward: any = {};
 
     const roundDate: any = [];
-    if (count > 1) {
+    if (count >= 1) {
       for (let i = 0; count > i; i++) {
         roundDate.push(moment(f[`${i + 1}_roundDate`]).format("YYYY-MM-DD"));
       }

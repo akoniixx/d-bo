@@ -288,6 +288,7 @@ function AddQuota() {
     ]);
     setRewardRound(addList);
   };
+
   const deleteRound = async (index: number) => {
     const mapData = await mapRound(rewardRound);
     const filter = mapData.filter((x: any) => x.index !== index);
@@ -400,7 +401,7 @@ function AddQuota() {
     const create: any = {};
     const reward: any = {};
     const roundDate: any = [];
-    if (count > 1) {
+    if (count >= 1) {
       for (let i = 0; count > i; i++) {
         roundDate.push(moment(f[`${i + 1}_roundDate`]).format("YYYY-MM-DD"));
       }
