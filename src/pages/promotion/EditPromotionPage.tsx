@@ -691,8 +691,6 @@ function EditPromotion() {
       return checkId ? { ...base, display: "none" } : base;
     },
   };
-  console.log(couponConditionFarmerList)
-
 
   function checkRai(min: number | null, max: number | null): string {
     let result;
