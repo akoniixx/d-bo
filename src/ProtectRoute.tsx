@@ -27,6 +27,8 @@ const ProtectRoute = () => {
   const [showModalMaintance, setShowModalMaintance] = useState<boolean>(true);
   const dateNow = moment(Date.now());
   const [checkTime, setCheckTime] = useState(false);
+  const [start, setStart] = useState<any>();
+  const [end, setEnd] = useState<any>();
 
   const location = useLocation();
   useEffect(() => {
@@ -35,6 +37,18 @@ const ProtectRoute = () => {
       await MaintenanceDataSource.getMaintenceSystem("BO")
         .then((res) => {
           if (res.responseData !== null) {
+            setStart(
+              convertBuddhistYear.toBuddhistYear(
+                moment(res.responseData.dateStart),
+                "DD MMMM YYYY ช่วงเวลา HH:mm "
+              )
+            );
+            setEnd(
+              convertBuddhistYear.toBuddhistYear(
+                moment(res.responseData.dateEnd),
+                "DD MMMM YYYY ช่วงเวลา HH:mm  "
+              )
+            );
             setCheckTime(
               checkTimeMaintance(
                 moment(res.responseData.dateNotiStart),
@@ -74,6 +88,8 @@ const ProtectRoute = () => {
           show={showModalMaintance}
           onClose={async () => {
             await localStorage.setItem("Maintenance", "read");
+            await localStorage.setItem("MA1", start);
+            await localStorage.setItem("MA2", end);
             setShowModalMaintance(!showModalMaintance);
           }}
           data={dataMaintance}
