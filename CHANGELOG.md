@@ -1,5 +1,9 @@
 ## [Version - 0]
 
+## Fix [v0.36.20] 2023-09-05
+
+- fixed bug reward round in add/edit quota page
+
 ## Fix [v0.36.19] 2023-09-04
 
 - fixed setting coupon
