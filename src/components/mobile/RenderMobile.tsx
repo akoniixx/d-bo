@@ -3,6 +3,7 @@ import { icon } from "../../resource";
 import { CardHeaderPromotion } from "../header/CardHeaderPromotion";
 import { Image } from "antd";
 import parse from "html-react-parser";
+import { validateNumber } from "../../utilities/TextFormatter";
 
 interface RenderMobile {
   couponName: string;
@@ -103,6 +104,8 @@ const RenderMobile: React.FC<RenderMobile> = ({
       return `ค่าบริการขั้นต่ำ ${serviceConditionMin} บาทและไม่เกิน ${serviceConditionMax} บาท`;
     }
   };
+  const renderNumCount = validateNumber(count.toString());
+ 
   return (
     <div className="col-4">
       <div ref={div}>
@@ -231,13 +234,13 @@ const RenderMobile: React.FC<RenderMobile> = ({
                     color: "#FB8705",
                   }}
                 >
-                  {count === "" ? "XX" : count}
+                  {renderNumCount === "" ? "XX" : renderNumCount}
                   <span
                     style={{
                       color: "#000",
                     }}
                   >
-                    /{count === "" ? "XX" : count} สิทธิ์
+                    /{renderNumCount === "" ? "XX" :renderNumCount} สิทธิ์
                   </span>
                 </p>
               </div>

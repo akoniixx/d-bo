@@ -1,5 +1,10 @@
 ## [Version - 0]
 
+## improve [v0.36.21] 2023-09-07
+
+- split and rearrange menu tabs
+- fixed the display of the number of coupon rights
+
 ## Fix [v0.36.20] 2023-09-05
 
 - fixed bug reward round in add/edit quota page
