@@ -29,7 +29,7 @@ export const IconMenu = {
   ),
   news: (
     <Image
-      src={icon.news_inactive}
+      src={icon.icon_news}
       preview={false}
       style={{ width: 18, height: 22, color: color.BK, paddingBottom: 4 }}
     />
@@ -70,8 +70,29 @@ export const IconMenu = {
       style={{ width: 18, height: 18, color: color.BK }}
     />
   ),
+  promotion: (
+    <Image
+      src={icon.news_inactive}
+      preview={false}
+      style={{ width: 18, height: 18, color: color.BK }}
+    />
+  ),
+  rewards: (
+    <Image
+      src={icon.icon_reward}
+      preview={false}
+      style={{ width: 18, height: 18, color: color.BK }}
+    />
+  ),
+  challenge: (
+    <Image
+      src={icon.icon_challenge}
+      preview={false}
+      style={{ width: 18, height: 18, color: color.BK }}
+    />
+  ),
 };
-export const IconMenuInActive = {
+export const IconMenuActive = {
   task: (
     <Image
       src={icon.task_active}
@@ -88,7 +109,7 @@ export const IconMenuInActive = {
   ),
   news: (
     <Image
-      src={icon.news_active}
+      src={icon.icon_news_active}
       preview={false}
       style={{ width: 18, height: 22, color: color.BK, paddingBottom: 4 }}
     />
@@ -127,6 +148,27 @@ export const IconMenuInActive = {
       src={icon.targetActive}
       preview={false}
       style={{ width: 18, height: 18 }}
+    />
+  ),
+  promotion: (
+    <Image
+      src={icon.news_active}
+      preview={false}
+      style={{ width: 18, height: 18, color: color.BK }}
+    />
+  ),
+  rewards: (
+    <Image
+      src={icon.icon_reward_active}
+      preview={false}
+      style={{ width: 18, height: 18, color: color.BK }}
+    />
+  ),
+  challenge: (
+    <Image
+      src={icon.icon_challenge_active}
+      preview={false}
+      style={{ width: 18, height: 18, color: color.BK }}
     />
   ),
 };

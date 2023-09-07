@@ -4,7 +4,7 @@ import styled from "styled-components";
 import { useNavigate } from "react-router-dom";
 import { useEffectOnce } from "../../hook/useEffectOnce";
 import { CollapseMenu } from "./CollapseMenu";
-import { IconMenu, IconMenuInActive } from "./IconMenu";
+import { IconMenu, IconMenuActive } from "./IconMenu";
 
 interface SubMenu {
   path: string;
@@ -91,7 +91,7 @@ export const MenuSide: React.FC<MenuSideProps> = ({ lists, isOpenSidebar }) => {
                       paddingLeft: "16px",
                     }}
                   >
-                    {IconMenuInActive[list.name as keyof typeof IconMenu]}
+                    {IconMenuActive[list.name as keyof typeof IconMenu]}
                     {list.title}
                   </ListStyled>
                 ) : (

@@ -47,5 +47,12 @@ export default {
   farmerApp: require("./media/images/farmerApp.png"),
   lineApp: require("./media/images/line.png"),
   bo: require("./media/images/bo.png"),
-  folder_icon: require("./media/images/folder_icon.png")
+  folder_icon: require("./media/images/folder_icon.png"),
+  icon_news_active: require("./media/images/icon_news_active.png"),
+  icon_reward_active: require("./media/images/icon_reward_active.png"),
+  icon_challenge_active: require("./media/images/icon_challenge_active.png"),
+  icon_news: require("./media/images/icon_news.png"),
+  icon_reward: require("./media/images/icon_reward.png"),
+  icon_challenge: require("./media/images/icon_challenge.png")
+
 };
