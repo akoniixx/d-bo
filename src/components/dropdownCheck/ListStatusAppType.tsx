@@ -3,13 +3,13 @@ import { Button, Checkbox, Dropdown, Image, MenuProps } from "antd";
 import React, { useState } from "react";
 import { color, icon } from "../../resource";
 
-interface listProps {
+interface ListProps {
   onSearchType: (value: string, checked: boolean) => void;
   list: any;
   title: any;
   menu?: string;
 }
-export const ListCheck: React.FC<listProps> = ({
+export const ListCheck: React.FC<ListProps> = ({
   onSearchType,
   list,
   title,

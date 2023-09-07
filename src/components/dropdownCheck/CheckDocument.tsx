@@ -3,12 +3,12 @@ import { Button, Checkbox, Dropdown, Image, MenuProps } from "antd";
 import React, { useState } from "react";
 import { color, icon } from "../../resource";
 
-interface listProps {
+interface ListProps {
   onSearchType: (value: string, checked: boolean) => void;
   list: any;
   title: string;
 }
-const CheckDocument: React.FC<listProps> = ({ onSearchType, list, title }) => {
+const CheckDocument: React.FC<ListProps> = ({ onSearchType, list, title }) => {
   const [visibleCreateBy, setVisibleCreateBy] = useState(false);
   const [selectedOptions, setSelectedOptions] = useState<string[]>([]);
 

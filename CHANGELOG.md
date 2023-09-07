@@ -1,5 +1,10 @@
 ## [Version - 0]
 
+## improve [v0.36.22] 2023-09-08
+
+- index rank droner page sorts data from the API.
+- improved drone ranking details with task details.
+
 ## improve [v0.36.21] 2023-09-07
 
 - split and rearrange menu tabs

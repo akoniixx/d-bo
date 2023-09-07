@@ -5,14 +5,14 @@ import { color, icon } from "../../resource";
 import { CheckboxValueType } from "antd/lib/checkbox/Group";
 import { STATUS_SEARCH } from "../../definitions/Status";
 
-interface listProps {
+interface ListProps {
   onSearchType: (value: string, checked: boolean) => void;
   list: any;
   title: any;
   menu?: string;
   mainStatus?: string;
 }
-export const DropdownStatus: React.FC<listProps> = ({
+export const DropdownStatus: React.FC<ListProps> = ({
   onSearchType,
   list,
   title,
