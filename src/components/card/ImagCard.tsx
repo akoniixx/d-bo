@@ -9,6 +9,9 @@ interface ImagCardsProps {
   onClick: () => void;
 }
 const ImagCards: React.FC<ImagCardsProps> = ({ imageName, image, onClick }) => {
+  const pathnameParts = imageName.split("/");
+  const shortImageName = pathnameParts[pathnameParts.length - 1].split("?")[0];
+
   return (
     <div className="form-group col-lg-12">
       <Row
@@ -23,7 +26,7 @@ const ImagCards: React.FC<ImagCardsProps> = ({ imageName, image, onClick }) => {
         }}
         gutter={8}
       >
-        <Col span={10} className="align-self-center">
+        <Col span={8} className="align-self-center">
           <span
             style={{
               backgroundImage: `url(${image})`,
@@ -38,16 +41,10 @@ const ImagCards: React.FC<ImagCardsProps> = ({ imageName, image, onClick }) => {
             }}
           />
         </Col>
-        <Col span={10} className="align-self-center">
-          <span>
-            {imageName.split("/").pop()?.slice(0, 8) +
-              imageName.charAt(imageName.length - 4) +
-              imageName.charAt(imageName.length - 3) +
-              imageName.charAt(imageName.length - 2) +
-              imageName.charAt(imageName.length - 1)}
-          </span>
+        <Col span={16} className="align-self-center">
+          <span>{shortImageName}</span>
         </Col>
-      </Row>
+      </Row>  
     </div>
   );
 };

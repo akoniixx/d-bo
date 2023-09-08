@@ -4,6 +4,7 @@ import { FarmerPlotEntity, FarmerPlotEntity_INIT } from "./FarmerPlotEntities";
 import { FarmerEntity, FarmerEntity_INIT } from "./FarmerEntities";
 import { FullAddressEntiry_INIT, FullAddressEntity } from "./AddressEntities";
 import { PurposeSprayEntity, PurposeSprayEntity_INIT } from "./CropEntities";
+import { TaskDetailEntity, TaskDetailEntity_INIT } from "./TaskInprogressEntities";
 
 export interface AllDronerRankEntity {
   droner_id: null;
@@ -181,51 +182,67 @@ export const taskByDronerEntity_INIT: taskByDronerEntity = {
 };
 export interface DronerRankDetailEntity {
   id: string;
-  dronerCode: null;
+  dronerCode: string;
   firstname: string;
   lastname: string;
   idNo: string;
   telephoneNo: string;
   status: string;
-  reason: null;
-  expYear: number;
-  expMonth: number;
+  reason: string[];
+  birthDate: string;
+  isOpenReceiveTask: boolean;
   expPlant: string[];
   addressId: string;
   dronerAreaId: string;
-  createdAt: string;
+  createdAt:string;
   updatedAt: string;
-  address: FullAddressEntity;
-  task: taskByDronerEntity[];
-  farmer: FarmerEntity;
+  isDelete: boolean;
+  deleteDate: string;
+  comment: string;
+  updateBy: string;
+  createBy: string;
+  otherAddressId: string;
+  ratingAvg: string;
+  countRating: number;
+  address: FullAddressEntity
+  task: TaskDetailEntity[]
   file: ImageEntity[];
   avgrating: string;
   totalTaskCount: string;
   totalRaiCount: string;
+  countTask: string;
 }
 export const DronerRankDetailEntity_INIT: DronerRankDetailEntity = {
   id: "",
-  dronerCode: null,
+  dronerCode: "",
   firstname: "",
   lastname: "",
   idNo: "",
   telephoneNo: "",
   status: "",
-  reason: null,
-  expYear: 0,
-  expMonth: 0,
-  expPlant: [],
+  reason: [""],
+  birthDate: "",
+  isOpenReceiveTask: false,
+  expPlant: [""],
   addressId: "",
   dronerAreaId: "",
-  createdAt: "",
+  createdAt:"",
   updatedAt: "",
+  isDelete: false,
+  deleteDate: "",
+  comment: "",
+  updateBy: "",
+  createBy: "",
+  otherAddressId: "",
+  ratingAvg: "",
+  countRating: 0,
   address: FullAddressEntiry_INIT,
-  task: [taskByDronerEntity_INIT],
+  task: [TaskDetailEntity_INIT],
   file: [ImageEntity_INTI],
-  farmer: FarmerEntity_INIT,
   avgrating: "",
   totalTaskCount: "",
   totalRaiCount: "",
+  countTask: "",
 };
 export interface DronerRankListEntity {
   data: AllDronerRankEntity[];
@@ -233,8 +250,8 @@ export interface DronerRankListEntity {
 }
 export interface taskDetailEntity {
   id: string;
-  couponId : string;
-  discount : string;
+  couponId: string;
+  discount: string;
   taskNo: string;
   farmerId: string;
   farmerPlotId: string;
@@ -279,8 +296,8 @@ export interface taskDetailEntity {
 }
 export const taskDetailEntity_INIT: taskDetailEntity = {
   id: "",
-  couponId : "",
-  discount : "",
+  couponId: "",
+  discount: "",
   taskNo: "",
   farmerId: "",
   farmerPlotId: "",
