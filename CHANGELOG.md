@@ -1,5 +1,10 @@
 ## [Version - 0]
 
+## Fix [v0.36.23] 2023-09-11
+
+- fix condition search status
+- check null in detail rank droner page
+
 ## improve [v0.36.22] 2023-09-08
 
 - index rank droner page sorts data from the API.

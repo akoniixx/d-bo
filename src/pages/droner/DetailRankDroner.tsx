@@ -101,7 +101,6 @@ function DetailRankDroner() {
       .catch((err) => console.log(err))
       .finally(() => setLoading(false));
   };
-
   const previewImg = async () => {
     let src = imgProfile;
     if (!src) {
@@ -376,7 +375,7 @@ function DetailRankDroner() {
         return {
           children: (
             <>
-              <span>{row.farmer.address.province.provinceName}</span>
+              <span>{row.farmer.address.provinceId ? row.farmer.address.province.provinceName : '-'}</span>
             </>
           ),
         };
