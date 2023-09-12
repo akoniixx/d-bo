@@ -42,7 +42,6 @@ export const DropdownStatus: React.FC<ListProps> = ({
       updatedSelectedOptions.splice(optionIndex, 1);
     }
     setSelectedOptions(updatedSelectedOptions);
-
     if (value === "PENDING") {
       if (optionIndex === -1) {
         setSelectedSubStatusOptions(listSubStatus.map((item) => item.value));
@@ -54,21 +53,23 @@ export const DropdownStatus: React.FC<ListProps> = ({
       setCheckAllPending(!checkAllPending);
     } else {
       if (optionIndex === -1) {
-        if (selectedOptionsSub.length > 0) {
+        if (
+          updatedSelectedOptions.includes("PENDING") &&
+          selectedOptionsSub.length < 3
+        ) {
           setSelectedOptionsSub([]);
+          setSelectedSubStatusOptions([]);
           setSelectedOptions(value === "PENDING" ? [] : [value]);
         }
-        setSelectedSubStatusOptions(listStatus.map((item) => item.value));
-        setSelectedOptionsSub([]);
       } else {
-        setSelectedSubStatusOptions([]);
         setSelectedOptionsSub([]);
+        setSelectedSubStatusOptions([]);
       }
     }
-
     const checked = optionIndex === -1;
     onSearchType(value, checked);
   };
+
   const handleOptionSelectSub = (value: string) => {
     const updatedSelectedOptions = [...selectedOptionsSub];
     const optionIndex = updatedSelectedOptions.indexOf(value);
@@ -78,14 +79,18 @@ export const DropdownStatus: React.FC<ListProps> = ({
       updatedSelectedOptions.splice(optionIndex, 1);
     }
     setSelectedOptionsSub(updatedSelectedOptions);
-
     if (listSubStatus.map((item) => item.value)) {
       if (optionIndex === -1) {
         setSelectedOptions(["PENDING"]);
         setIndeterminatePending(true);
       } else {
-        setSelectedOptions([]);
-        setIndeterminatePending(false);
+        if (updatedSelectedOptions.length > 0) {
+          setSelectedOptions(["PENDING"]);
+          setIndeterminatePending(true);
+        } else {
+          setSelectedOptions([]);
+          setIndeterminatePending(false);
+        }
       }
       setCheckAllPending(!checkAllPending);
     }
@@ -105,7 +110,6 @@ export const DropdownStatus: React.FC<ListProps> = ({
     );
     setCheckAllPending(selectedSubStatusCount === 3);
   };
-
   useEffect(() => {
     if (list === undefined) {
       setSelectedOptions([]);
