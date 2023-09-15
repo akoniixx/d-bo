@@ -1,5 +1,8 @@
 ## [Version - 0]
 
+## Fix [v0.36.24] 2023-09-15
+- fixed news
+
 ## Fix [v0.36.23] 2023-09-11
 
 - fix condition search status
