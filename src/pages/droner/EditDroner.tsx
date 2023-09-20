@@ -203,6 +203,11 @@ function EditDroner() {
           });
         }
       });
+      await OtherAddressDatasource.getDronerAddressByID(res.id).then((res) => {
+        if (res.otherAddress) {
+          setOtherAddress(res.otherAddress);
+        }
+      });
 
       setMapPosition({
         lat: parseFloat(res.dronerArea?.lat),
@@ -240,11 +245,6 @@ function EditDroner() {
       }
       if (listPromise.length > 0) {
         await Promise.all([...listPromise]);
-      }
-    });
-    await OtherAddressDatasource.getDronerAddressByID(dronerId).then((res) => {
-      if (res.otherAddress) {
-        setOtherAddress(res.otherAddress);
       }
     });
   }, [dronerId, form]);
@@ -772,7 +772,7 @@ function EditDroner() {
       payload.isOpenReceiveTask = true;
     }
     if (
-      !otherAdd.id &&
+      otherAdd.id === "" &&
       otherAdd.provinceId !== 0 &&
       otherAdd.districtId !== 0 &&
       otherAdd.subdistrictId !== 0
@@ -787,42 +787,48 @@ function EditDroner() {
       otherAdd.subdistrictId > 0
     ) {
       OtherAddressDatasource.updateOtherAddress(otherAdd).then((res) => {});
-    } else {
+    } else if (
+      otherAdd.id &&
+      !otherAdd.provinceId &&
+      !otherAdd.districtId &&
+      !otherAdd.subdistrictId
+    ) {
       OtherAddressDatasource.deleteOtherAddress(dronerId, otherAddress.id).then(
         (res) => {}
       );
     }
-
     if (imgBB) {
       UploadImageDatasouce.uploadImage(imgBB).then((res) => {});
     }
-    await DronerDatasource.updateDroner(payload).then((res) => {
-      if (res !== undefined) {
-        var i = 0;
-        for (i; 2 > i; i++) {
-          i === 0 &&
-            createImgProfile.file !== "" &&
-            UploadImageDatasouce.uploadImage(createImgProfile).then(res);
-          i === 1 &&
-            createImgIdCard.file !== "" &&
-            UploadImageDatasouce.uploadImage(createImgIdCard).then(res);
+    if (payload) {
+      await DronerDatasource.updateDroner(payload).then((res) => {
+        if (res !== undefined) {
+          var i = 0;
+          for (i; 2 > i; i++) {
+            i === 0 &&
+              createImgProfile.file !== "" &&
+              UploadImageDatasouce.uploadImage(createImgProfile).then(res);
+            i === 1 &&
+              createImgIdCard.file !== "" &&
+              UploadImageDatasouce.uploadImage(createImgIdCard).then(res);
+          }
+          Swal.fire({
+            title: "บันทึกสำเร็จ",
+            icon: "success",
+            timer: 1500,
+            showConfirmButton: false,
+          }).then((time) => {
+            navigate("/IndexDroner");
+          });
+        } else {
+          Swal.fire({
+            title: "เบอร์โทร หรือ รหัสบัตรประชาชน <br/> ซ้ำในระบบ",
+            icon: "error",
+            showConfirmButton: true,
+          });
         }
-        Swal.fire({
-          title: "บันทึกสำเร็จ",
-          icon: "success",
-          timer: 1500,
-          showConfirmButton: false,
-        }).then((time) => {
-          navigate("/IndexDroner");
-        });
-      } else {
-        Swal.fire({
-          title: "เบอร์โทร หรือ รหัสบัตรประชาชน <br/> ซ้ำในระบบ",
-          icon: "error",
-          showConfirmButton: true,
-        });
-      }
-    });
+      });
+    }
   };
   const onFieldsChange = (field: any) => {
     const isHasError = form.getFieldsError().some(({ errors }) => {

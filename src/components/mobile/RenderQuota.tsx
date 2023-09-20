@@ -27,7 +27,7 @@ interface RenderQuota {
   imgButton: any;
   nameReward: any;
   imgReward: any;
-  raiAmount: any;
+  raiAmount: string;
   startDate?: any;
   endDate?: any;
 }
@@ -43,6 +43,7 @@ const RenderQuota: React.FC<RenderQuota> = ({
   startDate,
   endDate,
 }) => {
+
   const div = useRef<any>();
   useLayoutEffect(() => {
     const divAnimate = div.current.getBoundingClientRect().top;
@@ -57,6 +58,8 @@ const RenderQuota: React.FC<RenderQuota> = ({
     window.addEventListener("scroll", onScroll);
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
+  const renderRaiAmount = validateNumber(raiAmount.toString());
+
   return (
     <div className="col-lg-12">
       <div ref={div}>
@@ -193,7 +196,7 @@ const RenderQuota: React.FC<RenderQuota> = ({
                   </div>
                   <div className="col" style={{ fontWeight: "600" }}>
                     <span style={{ color: "#FB8705" }}>XX</span>/
-                    <span>{raiAmount ? validateNumber(raiAmount) : "XX"}</span>
+                    <span>{renderRaiAmount !== '' ? renderRaiAmount : "XX"}</span>
                   </div>
                 </div>
               </div>
