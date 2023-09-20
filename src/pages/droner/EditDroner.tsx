@@ -802,7 +802,7 @@ function EditDroner() {
     }
     if (payload) {
       await DronerDatasource.updateDroner(payload).then((res) => {
-        if (res !== undefined) {
+        if (res !== undefined && res.status !== 409) {
           var i = 0;
           for (i; 2 > i; i++) {
             i === 0 &&
