@@ -1,10 +1,17 @@
 ## [Version - 0]
 
+## Fix [v0.36.26] 2023-09-20
+
+- fixed challenge & mission
+- changed text color when farmer & drone are deleted.
+
 ## Fix [v0.36.25] 2023-09-20
+
 - fixed task icon
 - fixed pagination coupon offline
 
 ## Fix [v0.36.24] 2023-09-15
+
 - fixed news
 
 ## Fix [v0.36.23] 2023-09-11
