@@ -1487,7 +1487,7 @@ const AddNewTask = () => {
           children: (
             <>
               <span>{row.firstname + " " + row.lastname}</span>
-              {row.rating_avg != null && (
+              {!!row.last_review_avg && (
                 <Tooltip title={tooltipTitle} className="p-2">
                   <img
                     src={icon.iconReviewDroner}

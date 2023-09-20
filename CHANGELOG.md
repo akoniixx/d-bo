@@ -1,5 +1,9 @@
 ## [Version - 0]
 
+## Fix [v0.36.25] 2023-09-20
+- fixed task icon
+- fixed pagination coupon offline
+
 ## Fix [v0.36.24] 2023-09-15
 - fixed news
 
