@@ -26,6 +26,7 @@ export interface MissionDetailEntity {
     lastname: string;
     telephoneNo: string;
     updateAt: string;
+    isDelete: boolean;
   }[];
 }
 export interface ConditionMission {

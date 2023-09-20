@@ -252,7 +252,13 @@ function QuotaReport() {
         return {
           children: (
             <>
-              <span>{row.firstname + " " + row.lastname}</span>
+              <span
+                style={{
+                  color: row.isDelete === true ? color.Error : color.font,
+                }}
+              >
+                {row.firstname + " " + row.lastname}
+              </span>
             </>
           ),
         };
@@ -264,7 +270,15 @@ function QuotaReport() {
       key: "phoneNo",
       render: (value: any, row: any, index: number) => {
         return {
-          children: <span>{row.telephoneNo}</span>,
+          children: (
+            <span
+              style={{
+                color: row.isDelete === true ? color.Error : color.font,
+              }}
+            >
+              {row.telephoneNo}
+            </span>
+          ),
         };
       },
     },
@@ -392,7 +406,7 @@ function QuotaReport() {
           children: (
             <div>
               <Button
-                disabled={row.quotaAmount === 0}
+                disabled={row.isDelete === true || row.quotaAmount === 0}
                 onClick={() => {
                   setShowModal((prev) => !prev);
                   setGetRow(row);
@@ -400,14 +414,16 @@ function QuotaReport() {
                 style={{
                   padding: 5,
                   borderColor:
-                    row.quotaAmount === 0 ? color.Grey : color.Success,
+                    row.isDelete === true || row.quotaAmount === 0
+                      ? color.Grey
+                      : color.Success,
                   borderRadius: 5,
                   paddingTop: 2,
                 }}
               >
                 <Image
                   src={
-                    row.quotaAmount === 0
+                    row.isDelete === true || row.quotaAmount === 0
                       ? icon.quotaReport
                       : icon.iconQuotaReport
                   }

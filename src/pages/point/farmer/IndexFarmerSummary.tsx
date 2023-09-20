@@ -138,7 +138,15 @@ function IndexFarmerSummary() {
       width: "30%",
       render: (value: any, row: any, index: number) => {
         return {
-          children: <span>{row.firstname + " " + row.lastname}</span>,
+          children: (
+            <span
+              style={{
+                color: row.isDelete === true ? color.Error : color.font,
+              }}
+            >
+              {row.firstname + " " + row.lastname}
+            </span>
+          ),
         };
       },
     },
@@ -149,7 +157,15 @@ function IndexFarmerSummary() {
       width: "45%",
       render: (value: any, row: any, index: number) => {
         return {
-          children: <span>{row.telephoneNo}</span>,
+          children: (
+            <span
+              style={{
+                color: row.isDelete === true ? color.Error : color.font,
+              }}
+            >
+              {row.telephoneNo}
+            </span>
+          ),
         };
       },
     },
