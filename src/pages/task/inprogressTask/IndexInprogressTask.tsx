@@ -1,4 +1,6 @@
 import {
+  CaretDownOutlined,
+  CaretUpOutlined,
   EditOutlined,
   InfoCircleFilled,
   SearchOutlined,
@@ -9,10 +11,13 @@ import {
   Button,
   DatePicker,
   Divider,
+  Image,
   Input,
   Pagination,
+  PaginationProps,
   Popover,
   Select,
+  Spin,
   Table,
   Tooltip,
 } from "antd";
@@ -39,6 +44,8 @@ import {
 } from "../../../utilities/TextFormatter";
 import { DashboardLayout } from "../../../components/layout/Layout";
 import { useNavigate } from "react-router-dom";
+import { listAppType } from "../../../definitions/ApplicatoionTypes";
+import { ListCheck } from "../../../components/dropdownCheck/ListStatusAppType";
 
 const { RangePicker } = DatePicker;
 const dateFormat = "DD/MM/YYYY";
@@ -47,7 +54,7 @@ const dateSearchFormat = "YYYY-MM-DD";
 
 const IndexInprogressTask = () => {
   const navigate = useNavigate();
-  const row = 10;
+  const [row, setRow] = useState(10);
   const [current, setCurrent] = useState(1);
   const [data, setData] = useState<TaskInprogressPageEntity>();
   const [showModalMap, setShowModalMap] = useState<boolean>(false);
@@ -60,16 +67,32 @@ const IndexInprogressTask = () => {
   const [province, setProvince] = useState<ProviceEntity[]>();
   const [district, setDistrict] = useState<DistrictEntity[]>();
   const [subdistrict, setSubdistrict] = useState<SubdistrictEntity[]>();
-
+  const [appTypeArr, setAppTypeArr] = useState<string[]>([]);
+  const [applicationType, setApplicationType] = useState<any>();
+  const [loading, setLoading] = useState(false);
   const [startDate, setStartDate] = useState<any>(null);
   const [endDate, setEndDate] = useState<any>(null);
-
+  const [sortDirection, setSortDirection] = useState<string | undefined>();
+  const [sortField, setSortField] = useState<string | undefined>();
+  const [sortDirection1, setSortDirection1] = useState<string | undefined>(
+    undefined
+  );
+  const [sortDirection2, setSortDirection2] = useState<string | undefined>(
+    undefined
+  );
+  const [sortDirection3, setSortDirection3] = useState<string | undefined>(
+    undefined
+  );
+  const [sortDirection4, setSortDirection4] = useState<string | undefined>(
+    undefined
+  );
   const statusSearch = [
     { value: "false", name: "รอดำเนินงาน" },
     { value: "true", name: "งานมีปัญหา" },
   ];
 
   const fetchInprogressTask = async () => {
+    setLoading(true);
     await TaskDatasource.getInprogressTaskList(
       row,
       current,
@@ -79,10 +102,16 @@ const IndexInprogressTask = () => {
       searchText,
       startDate,
       endDate,
-      searchStatus
-    ).then((res) => {
-      setData(res);
-    });
+      searchStatus,
+      applicationType,
+      sortDirection,
+      sortField
+    )
+      .then((res) => {
+        setData(res);
+      })
+      .catch((err) => console.log(err))
+      .finally(() => setLoading(false));
   };
   const fetchProvince = async () => {
     await LocationDatasource.getProvince().then((res) => {
@@ -100,9 +129,22 @@ const IndexInprogressTask = () => {
     });
   };
   useEffect(() => {
+    LocationDatasource.getDistrict(searchProvince).then((res) => {
+      setDistrict(res);
+      setSearchDistrict(null);
+    });
+  }, [searchProvince]);
+  
+  useEffect(() => {
+    LocationDatasource.getSubdistrict(searchDistrict).then((res) => {
+      setSubdistrict(res);
+      setSearchSubdistrict(null);
+    });
+  }, [searchDistrict]);
+  useEffect(() => {
     fetchInprogressTask();
     fetchProvince();
-  }, [current, startDate, endDate]);
+  }, [current, startDate, endDate, row, sortDirection]);
 
   const SearchDate = (e: any) => {
     if (e != null) {
@@ -112,43 +154,66 @@ const IndexInprogressTask = () => {
       setStartDate(e);
       setEndDate(e);
     }
-    setCurrent(1);
   };
   const onChangePage = (page: number) => {
     setCurrent(page);
   };
   const changeTextSearch = (searchText: any) => {
     setSearchText(searchText.target.value);
-    setCurrent(1);
   };
   const handleModalMap = (plotId: string) => {
     setShowModalMap((prev) => !prev);
     setPlotId(plotId);
   };
-  const handleProvince = (provinceId: number) => {
+  const handleProvince = (provinceId: any) => {
+    if (!provinceId) {
+      setSearchDistrict(undefined);
+      setSearchSubdistrict(undefined);
+    }
     setSearchProvince(provinceId);
     fetchDistrict(provinceId);
-    setCurrent(1);
   };
-  const handleDistrict = (districtId: number) => {
+  const handleDistrict = (districtId: any) => {
+    if (!districtId) {
+      setSearchSubdistrict(undefined);
+    }
     fetchSubdistrict(districtId);
     setSearchDistrict(districtId);
-    setCurrent(1);
   };
   const handleSubDistrict = (subdistrictId: any) => {
     setSearchSubdistrict(subdistrictId);
-    setCurrent(1);
   };
 
   const handleStatus = (status: boolean) => {
     setSearchStatus(status);
-    setCurrent(1);
   };
-
+  const onSearchCreateBy = (value: string, checked: boolean) => {
+    let arr: any = 0;
+    if (checked === true) {
+      arr = [...appTypeArr, value];
+      setAppTypeArr([...appTypeArr, value]);
+      setApplicationType(value);
+    } else {
+      let d: string[] = appTypeArr.filter((x) => x != value);
+      arr = [...d];
+      setAppTypeArr(d);
+      if (d.length === 0) {
+        arr = undefined;
+      }
+    }
+    setApplicationType(arr);
+  };
+  const onShowSizeChange: PaginationProps["onShowSizeChange"] = (
+    current,
+    pageSize
+  ) => {
+    setCurrent(current);
+    setRow(pageSize);
+  };
   const PageTitle = (
     <>
       <div
-        className="container d-flex justify-content-between"
+        className="d-flex justify-content-between"
         style={{ padding: "10px" }}
       >
         <div>
@@ -171,23 +236,20 @@ const IndexInprogressTask = () => {
           />
         </div>
       </div>
-      <div
-        className="container d-flex justify-content-between"
-        style={{ padding: "8px" }}
-      >
-        <div className="col-lg-4 p-1">
+      <div className="d-flex justify-content-between pb-3">
+        <div className="col-lg-2 p-1">
           <Input
             allowClear
             prefix={<SearchOutlined style={{ color: color.Disable }} />}
             placeholder="ค้นหาชื่อเกษตรกร, คนบินโดรน หรือเบอร์โทร"
-            className="col-lg-12 p-1"
+            className="col-lg-12"
             onChange={changeTextSearch}
           />
         </div>
-        <div className="col-lg">
+        <div className="col-lg p-1">
           <Select
             allowClear
-            className="col-lg-12 p-1"
+            className="col-lg-12"
             placeholder="เลือกจังหวัด"
             showSearch
             optionFilterProp="children"
@@ -206,10 +268,10 @@ const IndexInprogressTask = () => {
             ))}
           </Select>
         </div>
-        <div className="col-lg">
+        <div className="col-lg p-1">
           <Select
             allowClear
-            className="col-lg-12 p-1"
+            className="col-lg-12"
             placeholder="เลือกอำเภอ"
             showSearch
             optionFilterProp="children"
@@ -222,17 +284,18 @@ const IndexInprogressTask = () => {
                 .localeCompare(optionB.children.toLowerCase())
             }
             onChange={handleDistrict}
-            disabled={searchProvince == undefined}
+            disabled={!searchProvince}
+            value={searchDistrict}
           >
             {district?.map((item) => (
               <option value={item.districtId}>{item.districtName}</option>
             ))}
           </Select>
         </div>
-        <div className="col-lg">
+        <div className="col-lg p-1">
           <Select
             allowClear
-            className="col-lg-12 p-1"
+            className="col-lg-12"
             placeholder="เลือกตำบล"
             showSearch
             optionFilterProp="children"
@@ -245,7 +308,8 @@ const IndexInprogressTask = () => {
                 .localeCompare(optionB.children.toLowerCase())
             }
             onChange={handleSubDistrict}
-            disabled={searchDistrict == undefined}
+            disabled={!searchDistrict}
+            value={searchSubdistrict}
           >
             {subdistrict?.map((item) => (
               <option value={item.subdistrictId}>{item.subdistrictName}</option>
@@ -253,8 +317,18 @@ const IndexInprogressTask = () => {
           </Select>
         </div>
         <div className="col-lg">
+        <ListCheck
+            onSearchType={(value: any, checked: any) =>
+              onSearchCreateBy(value, checked)
+            }
+            list={applicationType}
+            title="เลือกรูปแบบการสร้าง"
+            menu="TASK"
+          />
+        </div>
+        <div className="col-lg p-1">
           <Select
-            className="col-lg-12 p-1"
+            className="col-lg-12"
             placeholder="เลือกสถานะ"
             onChange={handleStatus}
             allowClear
@@ -272,7 +346,10 @@ const IndexInprogressTask = () => {
               color: color.secondary2,
               backgroundColor: color.Success,
             }}
-            onClick={fetchInprogressTask}
+            onClick={()=> {
+              setCurrent(1);
+              fetchInprogressTask();
+            }}
           >
             ค้นหาข้อมูล
           </Button>
@@ -282,7 +359,56 @@ const IndexInprogressTask = () => {
   );
   const columns = [
     {
-      title: "วัน/เวลา นัดหมาย",
+      title: () => {
+        return (
+          <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+            วัน/เวลานัดหมาย{" "}
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                cursor: "pointer",
+              }}
+              onClick={() => {
+                setSortField("task_date_appointment");
+                setSortDirection((prev) => {
+                  if (prev === "ASC") {
+                    return "DESC";
+                  } else if (prev === undefined) {
+                    return "ASC";
+                  } else {
+                    return undefined;
+                  }
+                });
+                setSortDirection1((prev) => {
+                  if (prev === "ASC") {
+                    return "DESC";
+                  } else if (prev === undefined) {
+                    return "ASC";
+                  } else {
+                    return undefined;
+                  }
+                });
+              }}
+            >
+              <CaretUpOutlined
+                style={{
+                  position: "relative",
+                  top: 2,
+                  color: sortDirection1 === "ASC" ? "#ffca37" : "white",
+                }}
+              />
+              <CaretDownOutlined
+                style={{
+                  position: "relative",
+                  bottom: 2,
+                  color: sortDirection1 === "DESC" ? "#ffca37" : "white",
+                }}
+              />
+            </div>
+          </div>
+        );
+      },
       dataIndex: "dateAppointment",
       key: "dateAppointment",
       render: (value: any, row: any, index: number) => {
@@ -298,7 +424,10 @@ const IndexInprogressTask = () => {
                     title="มีการเปลี่ยนแปลงวันและเวลานัดหมาย"
                     className="p-2"
                   >
-                    <img src={icon.iconChangeTime} />
+                    <img
+                      src={icon.iconChangeTime}
+                      style={{ width: 30, height: 30 }}
+                    />
                   </Tooltip>
                 )}
               </span>
@@ -312,7 +441,56 @@ const IndexInprogressTask = () => {
       },
     },
     {
-      title: "ชื่อนักบินโดรน",
+      title: () => {
+        return (
+          <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+            ชื่อนักบินโดรน
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                cursor: "pointer",
+              }}
+              onClick={() => {
+                setSortField("droner_firstname");
+                setSortDirection((prev) => {
+                  if (prev === "ASC") {
+                    return "DESC";
+                  } else if (prev === undefined) {
+                    return "ASC";
+                  } else {
+                    return undefined;
+                  }
+                });
+                setSortDirection2((prev) => {
+                  if (prev === "ASC") {
+                    return "DESC";
+                  } else if (prev === undefined) {
+                    return "ASC";
+                  } else {
+                    return undefined;
+                  }
+                });
+              }}
+            >
+              <CaretUpOutlined
+                style={{
+                  position: "relative",
+                  top: 2,
+                  color: sortDirection2 === "ASC" ? "#ffca37" : "white",
+                }}
+              />
+              <CaretDownOutlined
+                style={{
+                  position: "relative",
+                  bottom: 2,
+                  color: sortDirection2 === "DESC" ? "#ffca37" : "white",
+                }}
+              />
+            </div>
+          </div>
+        );
+      },
       dataIndex: "droner",
       key: "droner",
       render: (value: any, row: any, index: number) => {
@@ -328,7 +506,10 @@ const IndexInprogressTask = () => {
                     title="มีการเปลี่ยนแปลงนักบินโดรนคนใหม่"
                     className="p-2"
                   >
-                    <img src={icon.iconChangeDroner} />
+                    <img
+                      src={icon.iconChangeDroner}
+                      style={{ width: 30, height: 30 }}
+                    />
                   </Tooltip>
                 )}
               </span>
@@ -341,7 +522,56 @@ const IndexInprogressTask = () => {
       },
     },
     {
-      title: "ชื่อเกษตรกร",
+      title: () => {
+        return (
+          <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+            ชื่อเกษตรกร
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                cursor: "pointer",
+              }}
+              onClick={() => {
+                setSortField("farmer_firstname");
+                setSortDirection((prev) => {
+                  if (prev === "ASC") {
+                    return "DESC";
+                  } else if (prev === undefined) {
+                    return "ASC";
+                  } else {
+                    return undefined;
+                  }
+                });
+                setSortDirection3((prev) => {
+                  if (prev === "ASC") {
+                    return "DESC";
+                  } else if (prev === undefined) {
+                    return "ASC";
+                  } else {
+                    return undefined;
+                  }
+                });
+              }}
+            >
+              <CaretUpOutlined
+                style={{
+                  position: "relative",
+                  top: 2,
+                  color: sortDirection3 === "ASC" ? "#ffca37" : "white",
+                }}
+              />
+              <CaretDownOutlined
+                style={{
+                  position: "relative",
+                  bottom: 2,
+                  color: sortDirection3 === "DESC" ? "#ffca37" : "white",
+                }}
+              />
+            </div>
+          </div>
+        );
+      },
       dataIndex: "farmer",
       key: "farmer",
       render: (value: any, row: any, index: number) => {
@@ -386,9 +616,58 @@ const IndexInprogressTask = () => {
       },
     },
     {
-      title: "ค่าบริการ",
-      dataIndex: "subdistrict_name",
-      key: "subdistrict_name",
+      title: () => {
+        return (
+          <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+            ค่าบริการ
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                cursor: "pointer",
+              }}
+              onClick={() => {
+                setSortField("task_total_price");
+                setSortDirection((prev) => {
+                  if (prev === "ASC") {
+                    return "DESC";
+                  } else if (prev === undefined) {
+                    return "ASC";
+                  } else {
+                    return undefined;
+                  }
+                });
+                setSortDirection4((prev) => {
+                  if (prev === "ASC") {
+                    return "DESC";
+                  } else if (prev === undefined) {
+                    return "ASC";
+                  } else {
+                    return undefined;
+                  }
+                });
+              }}
+            >
+              <CaretUpOutlined
+                style={{
+                  position: "relative",
+                  top: 2,
+                  color: sortDirection4 === "ASC" ? "#ffca37" : "white",
+                }}
+              />
+              <CaretDownOutlined
+                style={{
+                  position: "relative",
+                  bottom: 2,
+                  color: sortDirection4 === "DESC" ? "#ffca37" : "white",
+                }}
+              />
+            </div>
+          </div>
+        );
+      },
+      dataIndex: "task_total_price",
+      key: "task_total_price",
       render: (value: any, row: any, index: number) => {
         const inv: InvoiceTaskEntity = {
           raiAmount: row.task_farm_area_amount,
@@ -414,6 +693,37 @@ const IndexInprogressTask = () => {
                 title="รายละเอียดค่าบริการ"
                 data={inv}
               />
+            </>
+          ),
+        };
+      },
+    },
+    {
+      title: "สร้างโดย",
+      dataIndex: "createByWho",
+      key: "createByWho",
+      render: (value: any, row: any, index: number) => {
+        return {
+          children: (
+            <>
+              {listAppType.map(
+                (item) =>
+                  row.task_application_type === item.value && (
+                    <>
+                      <Image
+                        src={item.icon}
+                        preview={false}
+                        style={{ width: 24, height: 24 }}
+                      />
+                      <span>
+                        {" "}
+                        {row.task_create_by
+                          ? row.task_create_by + ` ${item.create}`
+                          : "-"}
+                      </span>
+                    </>
+                  )
+              )}
             </>
           ),
         };
@@ -472,14 +782,17 @@ const IndexInprogressTask = () => {
       <>
         {PageTitle}
         <CardContainer>
-          <Table
-            columns={columns}
-            dataSource={data?.data}
-            pagination={false}
-            rowClassName={(a) =>
-              a.task_is_problem == true ? "table-row-older" : "table-row"
-            }
-          />
+          <Spin tip="กำลังโหลดข้อมูล..." size="large" spinning={loading}>
+            <Table
+              scroll={{ x: "max-content" }}
+              columns={columns}
+              dataSource={data?.data}
+              pagination={false}
+              rowClassName={(a) =>
+                a.task_is_problem ? "table-row-older" : "table-row"
+              }
+            />
+          </Spin>
         </CardContainer>
         <div className="d-flex justify-content-between pt-3 pb-3">
           <p>รายการทั้งหมด {data?.count} รายการ</p>
@@ -488,7 +801,8 @@ const IndexInprogressTask = () => {
             total={data?.count}
             onChange={onChangePage}
             pageSize={row}
-            showSizeChanger={false}
+            showSizeChanger
+            onShowSizeChange={onShowSizeChange}
           />
         </div>
       </>

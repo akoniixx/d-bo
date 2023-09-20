@@ -88,6 +88,7 @@ function MissionReport() {
           name: res.data[i].firstname + " " + res.data[i].lastname,
           telephone: res.data[i].telephoneNo,
           allraiAmount: res.data[i].allraiAmount,
+          isDelete: res.data[i].isDelete,
         };
         tableList.push(table);
       }
@@ -191,7 +192,7 @@ function MissionReport() {
           children: (
             <u
               style={{
-                color: color.Success,
+                color: row.isDelete === true ? color.Error : color.Success,
               }}
             >
               {row.name}
@@ -206,7 +207,15 @@ function MissionReport() {
       key: "telephone",
       render: (value: any, row: any, index: number) => {
         return {
-          children: <span>{row.telephone}</span>,
+          children: (
+            <span
+              style={{
+                color: row.isDelete === true ? color.Error : color.font,
+              }}
+            >
+              {row.telephone}
+            </span>
+          ),
         };
       },
     },

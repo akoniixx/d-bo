@@ -14,7 +14,7 @@ import {
   CouponQueryEntities,
 } from "../../entities/CouponEntites";
 import { DateTimeUtil } from "../../utilities/DateTimeUtil";
-import { Badge, Button, Image } from "antd";
+import { Badge, Button, Image, Spin } from "antd";
 import icon from "../../resource/icon";
 import ActionButton from "../../components/button/ActionButton";
 import {
@@ -52,8 +52,10 @@ function PromotionPage() {
   const [sortCoupon, setSortCoupon] = useState<string>();
 
   const [sortType, setSortType] = useState<string>();
+  const [loading, setLoading] = useState(false);
 
   const fetchCouponList = () => {
+    setLoading(true)
     CouponDataSource.getCoupons(
       current,
       row,
@@ -67,7 +69,8 @@ function PromotionPage() {
       .then((res) => {
         setData(res);
       })
-      .catch((err) => console.log(err));
+      .catch((err) => console.log(err))
+      .finally(() => setLoading(false));
   };
 
   useEffect(() => {
@@ -76,15 +79,12 @@ function PromotionPage() {
 
   const handleChangeStatus = (status: any) => {
     setSortStatus(status);
-    setCurrent(1);
   };
   const handleChangeCoupon = (type: any) => {
     setSortCoupon(type);
-    setCurrent(1);
   };
   const handleChangePromotionType = (type: any) => {
     setSortType(type);
-    setCurrent(1);
   };
   const handleChangeDateRange = (date: any) => {
     if (date != null) {
@@ -98,7 +98,6 @@ function PromotionPage() {
   };
   const handleSearchText = (text: any) => {
     setSearchText(text.target.value);
-    setCurrent(1);
   };
   const onChangePage = (page: number) => {
     setCurrent(page);
@@ -309,7 +308,10 @@ function PromotionPage() {
               color: color.secondary2,
               backgroundColor: color.Success,
             }}
-            onClick={fetchCouponList}
+            onClick={() => {
+              setCurrent(1);
+              fetchCouponList();
+            }}
           >
             ค้นหาข้อมูล
           </Button>
@@ -579,12 +581,15 @@ function PromotionPage() {
       />
       {PageTitle}
       <br />
-      <Table
-        columns={columns}
-        dataSource={data.promotions}
-        pagination={false}
-        scroll={{ x: "max-content" }}
-      />
+      <Spin tip="กำลังโหลดข้อมูล..." size="large" spinning={loading}>
+        <Table
+          columns={columns}
+          dataSource={data.promotions}
+          pagination={false}
+          scroll={{ x: "max-content" }}
+        />
+      </Spin>
+
       <div className="d-flex justify-content-between pt-3 pb-3">
         <p>รายการทั้งหมด {data.count} รายการ</p>
         <Pagination

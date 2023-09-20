@@ -64,7 +64,12 @@ import ModalSelectedDroner from "../../../components/modal/task/newTask/ModalSel
 import { CreateDronerTempEntity } from "../../../entities/TaskDronerTemp";
 import TextArea from "antd/lib/input/TextArea";
 import Swal from "sweetalert2";
-import { numberWithCommas } from "../../../utilities/TextFormatter";
+import {
+  formatNumberWithCommas,
+  numberWithCommas,
+  numberWithCommasToFixed,
+  validateOnlyNumWDecimal,
+} from "../../../utilities/TextFormatter";
 import icon from "../../../resource/icon";
 import { LocationPriceDatasource } from "../../../datasource/LocationPriceDatasource";
 import { CouponDataSource } from "../../../datasource/CouponDatasource";
@@ -84,8 +89,8 @@ import { FarmerDatasource } from "../../../datasource/FarmerDatasource";
 import { AsyncPaginate } from "react-select-async-paginate";
 import type { GroupBase, OptionsOrGroups } from "react-select";
 import { FarmerPageEntity } from "../../../entities/FarmerEntities";
-import { InputPicker, SelectPicker } from 'rsuite';
-import 'rsuite/dist/rsuite.min.css';
+import { InputPicker, SelectPicker } from "rsuite";
+import "rsuite/dist/rsuite.min.css";
 export type OptionType = {
   value: any;
   label: any;
@@ -157,47 +162,51 @@ const AddNewTask = () => {
   const [dataCouponKeep, setCouponKeep] = useState<CouponKeepByFarmer>();
   const options: OptionType[] = [];
   const [currenSearch, setCurrentSearch] = useState(1);
-  const [selectFarmer,setSelectFarmer] = useState<string>("")
-  const [searchFilterFarmer,setSearchFilterFarmer] = useState<string>("")
-  const [farmerListDropdown,setFarmerListDropdown] = useState<any>([])
-  const [count,setCount] = useState<number>(0)
-  const [showData,setShowData] = useState<boolean>(false)
+  const [selectFarmer, setSelectFarmer] = useState<string>("");
+  const [searchFilterFarmer, setSearchFilterFarmer] = useState<string>("");
+  const [farmerListDropdown, setFarmerListDropdown] = useState<any>([]);
+  const [count, setCount] = useState<number>(0);
+  const [showData, setShowData] = useState<boolean>(false);
 
   const twice = useRef<boolean>(true);
 
   const fetchFarmerList = () => {
-     TaskDatasource.getFarmerListTask(searchFilterFarmer, currenSearch, 10).then(
+    TaskDatasource.getFarmerListTask(searchFilterFarmer, currenSearch, 10).then(
       (res: FarmerPageEntity) => {
-       const data = res.data.map((item)=>{
-        return {
-          ...item,
-          label : item.firstname + " " + item.lastname + " | " + item.telephoneNo,
-          value : item.id
-        }
-       })
-       setCount(res.count)
-       setFarmerListDropdown(data)
+        const data = res.data.map((item) => {
+          return {
+            ...item,
+            label:
+              item.firstname + " " + item.lastname + " | " + item.telephoneNo,
+            value: item.id,
+          };
+        });
+        setCount(res.count);
+        setFarmerListDropdown(data);
       }
     );
   };
 
-  const onItemsRendered = (props : any)=> {
+  const onItemsRendered = (props: any) => {
     if (props.visibleStopIndex >= farmerListDropdown.length - 1) {
-       if(farmerListDropdown.length < count){
-        TaskDatasource.getFarmerListTask(searchFilterFarmer, currenSearch+1, 10).then(
-          (res: FarmerPageEntity) => {
-           const data = res.data.map((item)=>{
+      if (farmerListDropdown.length < count) {
+        TaskDatasource.getFarmerListTask(
+          searchFilterFarmer,
+          currenSearch + 1,
+          10
+        ).then((res: FarmerPageEntity) => {
+          const data = res.data.map((item) => {
             return {
               ...item,
-              label : item.firstname + " " + item.lastname + " | " + item.telephoneNo,
-              value : item.id
-            }
-           })
-           setCurrentSearch(currenSearch+1)
-           setFarmerListDropdown([...farmerListDropdown,...data])
-          }
-        );
-       }
+              label:
+                item.firstname + " " + item.lastname + " | " + item.telephoneNo,
+              value: item.id,
+            };
+          });
+          setCurrentSearch(currenSearch + 1);
+          setFarmerListDropdown([...farmerListDropdown, ...data]);
+        });
+      }
     }
   };
 
@@ -307,36 +316,37 @@ const AddNewTask = () => {
   const [showModalSelectedDroner, setShowModalSelectedDroner] =
     useState<boolean>(false);
 
-  useEffect(()=>{
-    fetchFarmerList()
-  },[])
+  useEffect(() => {
+    fetchFarmerList();
+  }, []);
 
   useEffect(() => {
     fetchPurposeSpray();
   }, [cropSelected]);
 
-  useEffect(()=>{
+  useEffect(() => {
     TaskDatasource.getFarmerListTask(searchFilterFarmer, currenSearch, 10).then(
       (res: FarmerPageEntity) => {
-       const data = res.data.map((item)=>{
-        return {
-          ...item,
-          label : item.firstname + " " + item.lastname + " | " + item.telephoneNo,
-          value : item.id
-        }
-       })
-       setCount(res.count)
-       setFarmerListDropdown(data)
+        const data = res.data.map((item) => {
+          return {
+            ...item,
+            label:
+              item.firstname + " " + item.lastname + " | " + item.telephoneNo,
+            value: item.id,
+          };
+        });
+        setCount(res.count);
+        setFarmerListDropdown(data);
       }
     );
-  },[searchFilterFarmer])
+  }, [searchFilterFarmer]);
 
   //#region Step1 & Step3
   const handleSearchFarmer = (id: any) => {
-    setSelectFarmer(id)
-    setFarmerSelected(farmerListDropdown.filter((x : any) => x.id === id)[0]);
-    setFarmerPlotId("")
-    setShowData(false)
+    setSelectFarmer(id);
+    setFarmerSelected(farmerListDropdown.filter((x: any) => x.id === id)[0]);
+    setFarmerPlotId("");
+    setShowData(false);
   };
   const fetchLocationPrice = async (
     proId?: number,
@@ -362,7 +372,7 @@ const AddNewTask = () => {
   const handleSelectFarmer = () => {
     const f = Map(createNewTask).set("farmerId", farmerSelected.id);
     console.log(f.toJS());
-    setShowData(true)
+    setShowData(true);
     setCheckSelectPlot("error");
     setDronerSelected([]);
     setCreateNewTask(f.toJS());
@@ -387,17 +397,21 @@ const AddNewTask = () => {
   };
 
   const handleAmountRai = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const payload = {
-      ...createNewTask,
-    };
-    payload.priceStandard =
-      createNewTask.unitPriceStandard * parseFloat(e.target.value);
-    payload.price =
-      createNewTask.unitPriceStandard * parseFloat(e.target.value);
-    payload.unitPriceStandard = createNewTask.unitPrice;
-    payload.farmAreaAmount = e.target.value;
-    setCreateNewTask(payload);
-    checkValidateStep(payload, current);
+    const values = validateOnlyNumWDecimal(e.target.value);
+    if (values.startsWith(".")) {
+      e.preventDefault();
+    } else {
+      const payload = {
+        ...createNewTask,
+      };
+      payload.priceStandard =
+        createNewTask.unitPriceStandard * parseFloat(values);
+      payload.price = createNewTask.unitPriceStandard * parseFloat(values);
+      payload.unitPriceStandard = createNewTask.unitPrice;
+      payload.farmAreaAmount = values;
+      setCreateNewTask(payload);
+      checkValidateStep(payload, current);
+    }
   };
   const handlePeriodSpray = (e: any) => {
     const mapData = periodSpray?.purposeSpray.find((x) => x.id === e);
@@ -458,20 +472,25 @@ const AddNewTask = () => {
     checkValidateStep(d.toJS(), current);
   };
   const handleCalServiceCharge = (e: any) => {
-    if (e.target.id === "unitPrice") {
-      let calUnitPrice =
-        parseFloat(createNewTask.farmAreaAmount) * e.target.value;
-      const d = Map(createNewTask).set("unitPrice", e.target.value);
-      const pushCal = Map(d.toJS()).set("price", calUnitPrice);
-      setCreateNewTask(pushCal.toJS());
-      checkValidateStep(pushCal.toJS(), current);
+    const values = validateOnlyNumWDecimal(e.target.value);
+    if (values.startsWith(".")) {
+      e.preventDefault();
     } else {
-      let calUnitPrice =
-        e.target.value / parseFloat(createNewTask.farmAreaAmount);
-      const d = Map(createNewTask).set("price", e.target.value);
-      const pushCal = Map(d.toJS()).set("unitPrice", calUnitPrice);
-      setCreateNewTask(pushCal.toJS());
-      checkValidateStep(pushCal.toJS(), current);
+      if (e.target.id === "unitPrice") {
+        let calUnitPrice =
+          parseFloat(createNewTask.farmAreaAmount) * parseFloat(values);
+        const d = Map(createNewTask).set("unitPrice", values);
+        const pushCal = Map(d.toJS()).set("price", calUnitPrice.toFixed(2));
+        setCreateNewTask(pushCal.toJS());
+        checkValidateStep(pushCal.toJS(), current);
+      } else {
+        let calUnitPrice =
+          parseFloat(values) / parseFloat(createNewTask.farmAreaAmount);
+        const d = Map(createNewTask).set("price", values);
+        const pushCal = Map(d.toJS()).set("unitPrice", calUnitPrice.toFixed(2));
+        setCreateNewTask(pushCal.toJS());
+        checkValidateStep(pushCal.toJS(), current);
+      }
     }
   };
   const handleComment = (e: any) => {
@@ -598,29 +617,29 @@ const AddNewTask = () => {
             <div className="row">
               <div className="form-group col-lg-6">
                 <Form.Item name="searchAddress">
-                  <InputPicker 
+                  <InputPicker
                     virtualized
                     value={selectFarmer}
                     onChange={handleSearchFarmer}
                     listProps={{
-                      onItemsRendered
-                     }}
-                    searchBy={(keyword:string, label, item)=>true}
-                    onClean={()=>{
-                        setCurrentSearch(1)
-                        setSearchFilterFarmer("")
-                        setDataFarmer(FarmerEntity_INIT)
-                        setFarmerPlotId("")
-                        setShowData(false)
+                      onItemsRendered,
                     }}
-                    onSearch={(val)=>{
-                      if(!!val){
-                        setCurrentSearch(1)
-                        setSearchFilterFarmer(val)
+                    searchBy={(keyword: string, label, item) => true}
+                    onClean={() => {
+                      setCurrentSearch(1);
+                      setSearchFilterFarmer("");
+                      setDataFarmer(FarmerEntity_INIT);
+                      setFarmerPlotId("");
+                      setShowData(false);
+                    }}
+                    onSearch={(val) => {
+                      if (!!val) {
+                        setCurrentSearch(1);
+                        setSearchFilterFarmer(val);
                       }
                     }}
                     style={{
-                      width : '100%'
+                      width: "100%",
                     }}
                     placeholder="ค้นหาชื่อเกษตรกร/เบอร์โทร/เลขบัตรปชช."
                     data={farmerListDropdown}
@@ -844,7 +863,7 @@ const AddNewTask = () => {
                         <span style={{ color: "red" }}>*</span>
                         <Input
                           suffix="บาท/ไร่"
-                          value={numberWithCommas(
+                          value={numberWithCommasToFixed(
                             createNewTask.unitPriceStandard
                           )}
                           disabled
@@ -859,7 +878,9 @@ const AddNewTask = () => {
                       <Form.Item>
                         <Input
                           suffix="บาท"
-                          value={createNewTask.priceStandard}
+                          value={numberWithCommasToFixed(
+                            createNewTask.priceStandard
+                          )}
                           disabled
                           autoComplete="off"
                           step="0.01"
@@ -877,13 +898,14 @@ const AddNewTask = () => {
                         <Input
                           suffix="บาท/ไร่"
                           id="unitPrice"
-                          value={createNewTask.unitPrice}
+                          value={formatNumberWithCommas(
+                            createNewTask.unitPrice
+                          )}
                           onChange={handleCalServiceCharge}
                           disabled={
                             current === 2 || checkSelectPlot === "error"
                           }
                           autoComplete="off"
-                          step="0.01"
                         />
                       </Form.Item>
                     </div>
@@ -893,13 +915,12 @@ const AddNewTask = () => {
                       <Form.Item>
                         <Input
                           suffix="บาท"
-                          value={numberWithCommas(createNewTask.price)}
+                          value={formatNumberWithCommas(createNewTask.price)}
                           onChange={handleCalServiceCharge}
                           disabled={
                             current === 2 || checkSelectPlot === "error"
                           }
                           autoComplete="off"
-                          //step="0.01"
                         />
                       </Form.Item>
                     </div>
@@ -925,6 +946,9 @@ const AddNewTask = () => {
                   format={dateFormat}
                   className="col-lg-12"
                   disabled={current === 2 || checkSelectPlot === "error"}
+                  disabledDate={(current) =>
+                    current && current < moment().startOf("day")
+                  }
                   onChange={handleDateAppointment}
                   defaultValue={moment(dateAppointment)}
                 />
@@ -1071,21 +1095,27 @@ const AddNewTask = () => {
       status,
       ratingMin,
       ratingMax
-    ).then((res) => {
-      res.map((item) =>
-        _.set(
-          item,
-          "isChecked",
-          dronerSelected
-            ?.map((x) => x)
-            .find((y) => y.droner_id === item.droner_id)
-            ? true
-            : false
-        )
-      );
-      setDataDronerList(res);
-      setLoading(false);
-    });
+    )
+      .then((res) => {
+        if (Array.isArray(res)) {
+          res.forEach((item) => {
+            _.set(
+              item,
+              "isChecked",
+              dronerSelected
+                .map((x) => x)
+                .find((y) => y.droner_id === item.droner_id)
+                ? true
+                : false
+            );
+          });
+          setDataDronerList(res);
+        } else {
+          setDataDronerList([]);
+        }
+      })
+      .catch((err) => console.log(err))
+      .finally(() => setLoading(false));
   };
   const ratingStar = (
     <Menu
@@ -1457,9 +1487,12 @@ const AddNewTask = () => {
           children: (
             <>
               <span>{row.firstname + " " + row.lastname}</span>
-              {row.rating_avg != null && (
+              {!!row.last_review_avg && (
                 <Tooltip title={tooltipTitle} className="p-2">
-                  <img src={icon.iconReviewDroner} />
+                  <img
+                    src={icon.iconReviewDroner}
+                    style={{ width: 32, height: 32 }}
+                  />
                 </Tooltip>
               )}
               <br />
@@ -1527,9 +1560,13 @@ const AddNewTask = () => {
         return {
           children: (
             <>
-              {row.subdistrict_name && <span>{row.subdistrict_name}/</span>}
-              {row.district_name && <span>{row.district_name}/</span>}
-              {row.province_name && <span>{row.province_name}</span>}
+              {row.subdistrict_name ? (
+                <span>{row.subdistrict_name}/ </span>
+              ) : (
+                "-/"
+              )}
+              {row.district_name ? <span>{row.district_name}/</span> : "-/"}
+              {row.province_name ? <span>{row.province_name}</span> : "-"}
             </>
           ),
         };
@@ -1555,7 +1592,7 @@ const AddNewTask = () => {
       key: "brand",
       render: (value: any, row: any, index: number) => {
         return {
-          children: (
+          children: row.drone_brand ? (
             <>
               <Avatar
                 size={25}
@@ -1570,6 +1607,8 @@ const AddNewTask = () => {
                 </p>
               )}
             </>
+          ) : (
+            "-"
           ),
         };
       },
@@ -1669,26 +1708,39 @@ const AddNewTask = () => {
                     </div>
                     <div className="col-lg-2">{JSON.parse(x).telephone_no}</div>
                     <div className="col-lg-3">
-                      {JSON.parse(x).subdistrict_name && (
+                      {JSON.parse(x).subdistrict_name ? (
                         <>{JSON.parse(x).subdistrict_name}/</>
+                      ) : (
+                        "-/"
                       )}
-                      {JSON.parse(x).district_name && (
+                      {JSON.parse(x).district_name ? (
                         <>{JSON.parse(x).district_name}/</>
+                      ) : (
+                        "-/"
                       )}
-                      {JSON.parse(x).province_name && (
+                      {JSON.parse(x).province_name ? (
                         <>{JSON.parse(x).province_name}</>
+                      ) : (
+                        "-"
                       )}
                     </div>
                     <div className="col-lg-1">
                       {JSON.parse(x).distance.toFixed(0)} km
                     </div>
                     <div className="col-lg-2">
-                      <Avatar
-                        size={25}
-                        src={JSON.parse(x).logo_drone_brand}
-                        style={{ marginRight: "5px" }}
-                      />
-                      {JSON.parse(x).drone_brand}
+                      {JSON.parse(x).drone_brand ? (
+                        <>
+                          <Avatar
+                            size={25}
+                            src={JSON.parse(x).logo_drone_brand}
+                            style={{ marginRight: "5px" }}
+                          />
+                          <span>{JSON.parse(x).drone_brand}</span>
+                        </>
+                      ) : (
+                        "-"
+                      )}
+
                       <br />
                       <p
                         style={{
@@ -1735,7 +1787,9 @@ const AddNewTask = () => {
           <Form style={{ padding: "20px" }} form={form}>
             <label>ยอดรวมค่าบริการ</label>
             <h5 style={{ color: color.primary1 }} className="p-2">
-              {numberWithCommas(createNewTask.price - (discountResult ?? 0))}{" "}
+              {numberWithCommasToFixed(
+                createNewTask.price - (discountResult ?? 0)
+              )}{" "}
               บาท
             </h5>
             <div className="row">
@@ -1744,7 +1798,9 @@ const AddNewTask = () => {
                 <Form.Item>
                   <Input
                     suffix="บาท"
-                    value={numberWithCommas(createNewTask.price)}
+                    value={numberWithCommasToFixed(
+                      parseFloat(createNewTask.price.toString())
+                    )}
                     disabled={current === 2 || checkSelectPlot === "error"}
                     autoComplete="off"
                     step="0.01"
@@ -1756,7 +1812,7 @@ const AddNewTask = () => {
                 <Form.Item>
                   <Input
                     suffix="บาท"
-                    value={createNewTask.fee}
+                    value={numberWithCommasToFixed(createNewTask.fee)}
                     disabled={current === 2 || checkSelectPlot === "error"}
                     autoComplete="off"
                     step="0.01"
@@ -1768,7 +1824,7 @@ const AddNewTask = () => {
                 <Form.Item>
                   <Input
                     suffix="บาท"
-                    value={createNewTask.discountFee}
+                    value={numberWithCommasToFixed(createNewTask.discountFee)}
                     disabled={current === 2 || checkSelectPlot === "error"}
                     autoComplete="off"
                     step="0.01"
@@ -1786,6 +1842,12 @@ const AddNewTask = () => {
                   <Input
                     disabled={couponUsedBtn[0]}
                     onChange={handleChangeCoupon}
+                    onKeyPress={(e) => {
+                      const allowedCharacters = /^[a-zA-Z0-9]+$/;
+                      if (!allowedCharacters.test(e.key)) {
+                        e.preventDefault();
+                      }
+                    }}
                     style={{
                       paddingRight: 0,
                       paddingTop: 0,

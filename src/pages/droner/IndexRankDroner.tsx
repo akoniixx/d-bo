@@ -1,19 +1,15 @@
 import {
   Button,
-  Checkbox,
   DatePicker,
-  Dropdown,
   Input,
-  Menu,
   Pagination,
   Select,
+  Spin,
   Table,
 } from "antd";
-import Search from "antd/lib/input/Search";
 import moment, { min } from "moment";
 import React, { useEffect, useState } from "react";
 import ActionButton from "../../components/button/ActionButton";
-import { DashboardLayout } from "../../components/layout/Layout";
 import { LocationDatasource } from "../../datasource/LocationDatasource";
 import {
   DistrictEntity,
@@ -21,10 +17,21 @@ import {
   SubdistrictEntity,
 } from "../../entities/LocationEntities";
 import color from "../../resource/color";
-import { DownOutlined, FileTextOutlined, SearchOutlined, StarFilled } from "@ant-design/icons";
+import {
+  CaretDownOutlined,
+  CaretUpOutlined,
+  FileTextOutlined,
+  SearchOutlined,
+  StarFilled,
+} from "@ant-design/icons";
 import { DronerRankDatasource } from "../../datasource/DronerRankDatasource";
 import { DronerRankListEntity } from "../../entities/DronerRankEntities";
 import { useNavigate } from "react-router-dom";
+import CheckRatingDroner from "../../components/dropdownCheck/CheckRatingDroner";
+import {
+  formatNumberWithCommas,
+  validateOnlyNumWDecimal,
+} from "../../utilities/TextFormatter";
 
 export default function IndexRankDroner() {
   const navigate = useNavigate();
@@ -40,20 +47,53 @@ export default function IndexRankDroner() {
   const [province, setProvince] = useState<ProviceEntity[]>();
   const [district, setDistrict] = useState<DistrictEntity[]>();
   const [subdistrict, setSubdistrict] = useState<SubdistrictEntity[]>();
-  const [visibleRating, setVisibleRating] = useState(false);
   const [accuNumber, setAccuNumber] = useState<number[]>([]);
   const [rating, setRating] = useState<{
     ratingMin: any;
     ratingMax: any;
   }>();
+  const [loading, setLoading] = useState(false);
   const { RangePicker } = DatePicker;
+  const [sortDirection, setSortDirection] = useState<string | undefined>();
+  const [sortField, setSortField] = useState<string | undefined>();
+  const [sortDirection1, setSortDirection1] = useState<string | undefined>(
+    undefined
+  );
+  const [sortDirection2, setSortDirection2] = useState<string | undefined>(
+    undefined
+  );
+  const [sortDirection3, setSortDirection3] = useState<string | undefined>(
+    undefined
+  );
+  const [sortDirection4, setSortDirection4] = useState<string | undefined>(
+    undefined
+  );
+  const [sortDirection5, setSortDirection5] = useState<string | undefined>(
+    undefined
+  );
+  const [sortDirection6, setSortDirection6] = useState<string | undefined>(
+    undefined
+  );
   const dateSearchFormat = "YYYY-MM-DD";
   useEffect(() => {
     fetchDronerRank();
     fetchProvince();
-  }, [current, startDate, endDate]);
-  const fetchDronerRank = async (
-  ) => {
+  }, [current, startDate, endDate, sortDirection]);
+  useEffect(() => {
+    LocationDatasource.getDistrict(searchProvince).then((res) => {
+      setDistrict(res);
+      setSearchDistrict(null);
+    });
+  }, [searchProvince]);
+
+  useEffect(() => {
+    LocationDatasource.getSubdistrict(searchDistrict).then((res) => {
+      setSubdistrict(res);
+      setSearchSubdistrict(null);
+    });
+  }, [searchDistrict]);
+  const fetchDronerRank = async () => {
+    setLoading(true);
     await DronerRankDatasource.getDronerRank(
       current,
       row,
@@ -64,10 +104,15 @@ export default function IndexRankDroner() {
       rating?.ratingMax,
       startDate,
       endDate,
-      searchText
-    ).then((res: DronerRankListEntity) => {
-      setData(res);
-    });
+      searchText,
+      sortDirection,
+      sortField
+    )
+      .then((res: DronerRankListEntity) => {
+        setData(res);
+      })
+      .catch((err) => console.log(err))
+      .finally(() => setLoading(false));
   };
   const fetchProvince = async () => {
     await LocationDatasource.getProvince().then((res) => {
@@ -86,24 +131,29 @@ export default function IndexRankDroner() {
   };
   const changeTextSearch = (searchText: any) => {
     setSearchText(searchText.target.value);
-    setCurrent(1);
   };
   const onChangePage = (page: number) => {
     setCurrent(page);
   };
-  const handleProvince = (provinceId: number) => {
+  const handleProvince = (provinceId: any) => {
+    const filterId = district?.map((x) => x.provinceId)[0];
+    if (!provinceId || parseFloat(provinceId) !== filterId) {
+      setSearchDistrict(undefined);
+      setSearchSubdistrict(undefined);
+      setSearchProvince(undefined);
+    }
     setSearchProvince(provinceId);
     fetchDistrict(provinceId);
-    setCurrent(1);
   };
-  const handleDistrict = (districtId: number) => {
+  const handleDistrict = (districtId: any) => {
+    if (!districtId) {
+      setSearchSubdistrict(undefined);
+    }
     fetchSubdistrict(districtId);
     setSearchDistrict(districtId);
-    setCurrent(1);
   };
   const handleSubDistrict = (subdistrictId: any) => {
     setSearchSubdistrict(subdistrictId);
-    setCurrent(1);
   };
   const handleSearchDate = (e: any) => {
     if (e != null) {
@@ -113,17 +163,8 @@ export default function IndexRankDroner() {
       setStartDate(e);
       setEndDate(e);
     }
-    setCurrent(1);
   };
-  const sorter = (a: any, b: any) => {
-    if (a === b) return 0;
-    else if (a === null) return 1;
-    else if (b === null) return -1;
-    else return a.localeCompare(b);
-  };
-  const handlerRating = (e: any) => {
-    let value = e.target.value;
-    let checked = e.target.checked;
+  const onSearchStatus = (value: number, checked: boolean) => {
     let min: any = 0;
     let max: any = 0;
     if (checked) {
@@ -143,111 +184,6 @@ export default function IndexRankDroner() {
     setRating({ ratingMin: min, ratingMax: max });
   };
 
-  const handleVisibleRating = (newVisible: any) => {
-    setVisibleRating(newVisible);
-  };
-
-  const ratingStar = (
-    <Menu
-      items={[
-        {
-          label: (
-            <div
-              style={{
-                color: "#FFCA37",
-                fontSize: "16px",
-                marginBottom: "10px",
-              }}
-            >
-              <StarFilled />
-              <StarFilled />
-              <StarFilled />
-              <StarFilled />
-              <StarFilled />
-            </div>
-          ),
-          key: "1",
-          icon: (
-            <Checkbox value={5} onClick={(e) => handlerRating(e)}></Checkbox>
-          ),
-        },
-        {
-          label: (
-            <div
-              style={{
-                color: "#FFCA37",
-                fontSize: "16px",
-                marginBottom: "10px",
-              }}
-            >
-              <StarFilled />
-              <StarFilled />
-              <StarFilled />
-              <StarFilled />
-            </div>
-          ),
-          key: "2",
-          icon: (
-            <Checkbox value={4} onClick={(e) => handlerRating(e)}></Checkbox>
-          ),
-        },
-        {
-          label: (
-            <div
-              style={{
-                color: "#FFCA37",
-                fontSize: "16px",
-                marginBottom: "10px",
-              }}
-            >
-              <StarFilled />
-              <StarFilled />
-              <StarFilled />
-            </div>
-          ),
-          key: "3",
-          icon: (
-            <Checkbox value={3} onClick={(e) => handlerRating(e)}></Checkbox>
-          ),
-        },
-        {
-          label: (
-            <div
-              style={{
-                color: "#FFCA37",
-                fontSize: "16px",
-                marginBottom: "10px",
-              }}
-            >
-              <StarFilled />
-              <StarFilled />
-            </div>
-          ),
-          key: "4",
-          icon: (
-            <Checkbox value={2} onClick={(e) => handlerRating(e)}></Checkbox>
-          ),
-        },
-        {
-          label: (
-            <div
-              style={{
-                color: "#FFCA37",
-                fontSize: "16px",
-                marginBottom: "10px",
-              }}
-            >
-              <StarFilled />
-            </div>
-          ),
-          key: "5",
-          icon: (
-            <Checkbox value={1} onClick={(e) => handlerRating(e)}></Checkbox>
-          ),
-        },
-      ]}
-    />
-  );
   const PageTitle = (
     <>
       <div
@@ -276,7 +212,7 @@ export default function IndexRankDroner() {
       >
         <div className="col-lg-4 p-1" style={{ maxWidth: "1200px" }}>
           <Input
-            prefix={<SearchOutlined style={{color: color.Disable}}/>}
+            prefix={<SearchOutlined style={{ color: color.Disable }} />}
             placeholder="ค้นหาชื่อนักบินโดรน/เบอร์โทร/ID นักบินโดรน"
             className="col-lg-12 p-1"
             onChange={changeTextSearch}
@@ -322,7 +258,8 @@ export default function IndexRankDroner() {
                 .toLowerCase()
                 .localeCompare(optionB.children.toLowerCase())
             }
-            disabled={searchProvince == undefined}
+            disabled={!searchProvince}
+            value={searchDistrict}
           >
             {district?.map((item) => (
               <option value={item.districtId.toString()}>
@@ -347,7 +284,8 @@ export default function IndexRankDroner() {
                 .toLowerCase()
                 .localeCompare(optionB.children.toLowerCase())
             }
-            disabled={searchDistrict == undefined}
+            disabled={!searchDistrict}
+            value={searchSubdistrict}
           >
             {subdistrict?.map((item) => (
               <option value={item.subdistrictId.toString()}>
@@ -356,19 +294,13 @@ export default function IndexRankDroner() {
             ))}
           </Select>
         </div>
-        <div className="col-lg-2 p-1">
-          <Dropdown
-            overlay={ratingStar}
-            trigger={["click"]}
-            className="col-lg-12"
-            onVisibleChange={handleVisibleRating}
-            visible={visibleRating}
-          >
-            <Button style={{ color: color.Disable }}>
-              เลือก Rating
-              <DownOutlined />
-            </Button>
-          </Dropdown>
+        <div className="col-lg-2">
+          <CheckRatingDroner
+            onSearchType={(value: any, checked: any) =>
+              onSearchStatus(value, checked)
+            }
+            title="เลือกแต้ม Rating"
+          />
         </div>
         <div className="pt-1">
           <Button
@@ -378,9 +310,10 @@ export default function IndexRankDroner() {
               color: color.secondary2,
               backgroundColor: color.Success,
             }}
-            onClick={
-              fetchDronerRank
-            }
+            onClick={() => {
+              setCurrent(1);
+              fetchDronerRank();
+            }}
           >
             ค้นหาข้อมูล
           </Button>
@@ -412,12 +345,71 @@ export default function IndexRankDroner() {
       title: "เบอร์โทร",
       dataIndex: "droner_telephone_no",
       key: "droner_telephone_no",
+      render: (value: any, row: any, index: number) => {
+        return {
+          children: (
+            <>
+              <span className="text-dark-75  d-block font-size-lg">
+                {row.droner_telephone_no ? row.droner_telephone_no : "-"}
+              </span>
+            </>
+          ),
+        };
+      },
     },
     {
-      title: "จำนวนให้บริการ",
+      title: () => {
+        return (
+          <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+            จำนวนให้บริการ
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                cursor: "pointer",
+              }}
+              onClick={() => {
+                setSortField("totalTaskCount");
+                setSortDirection((prev) => {
+                  if (prev === "ASC") {
+                    return "DESC";
+                  } else if (prev === undefined) {
+                    return "ASC";
+                  } else {
+                    return undefined;
+                  }
+                });
+                setSortDirection1((prev) => {
+                  if (prev === "ASC") {
+                    return "DESC";
+                  } else if (prev === undefined) {
+                    return "ASC";
+                  } else {
+                    return undefined;
+                  }
+                });
+              }}
+            >
+              <CaretUpOutlined
+                style={{
+                  position: "relative",
+                  top: 2,
+                  color: sortDirection1 === "ASC" ? "#ffca37" : "white",
+                }}
+              />
+              <CaretDownOutlined
+                style={{
+                  position: "relative",
+                  bottom: 2,
+                  color: sortDirection1 === "DESC" ? "#ffca37" : "white",
+                }}
+              />
+            </div>
+          </div>
+        );
+      },
       dataIndex: "totalTaskCount",
       key: "totalTaskCount",
-      sorter: (a: any, b: any) => sorter(a.totalTaskCount, b.totalTaskCount),
       render: (value: any, row: any, index: number) => {
         return {
           children: (
@@ -431,16 +423,67 @@ export default function IndexRankDroner() {
       },
     },
     {
-      title: "จำนวนไร่",
+      title: () => {
+        return (
+          <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+            จำนวนไร่
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                cursor: "pointer",
+              }}
+              onClick={() => {
+                setSortField("totalRaiCount");
+                setSortDirection((prev) => {
+                  if (prev === "ASC") {
+                    return "DESC";
+                  } else if (prev === undefined) {
+                    return "ASC";
+                  } else {
+                    return undefined;
+                  }
+                });
+                setSortDirection2((prev) => {
+                  if (prev === "ASC") {
+                    return "DESC";
+                  } else if (prev === undefined) {
+                    return "ASC";
+                  } else {
+                    return undefined;
+                  }
+                });
+              }}
+            >
+              <CaretUpOutlined
+                style={{
+                  position: "relative",
+                  top: 2,
+                  color: sortDirection2 === "ASC" ? "#ffca37" : "white",
+                }}
+              />
+              <CaretDownOutlined
+                style={{
+                  position: "relative",
+                  bottom: 2,
+                  color: sortDirection2 === "DESC" ? "#ffca37" : "white",
+                }}
+              />
+            </div>
+          </div>
+        );
+      },
       dataIndex: "totalRaiCount",
       key: "totalRaiCount",
-      sorter: (a: any, b: any) => sorter(a.totalRaiCount, b.totalRaiCount),
       render: (value: any, row: any, index: number) => {
         return {
           children: (
             <>
               <span className="text-dark-75  d-block font-size-lg">
-                {row.totalRaiCount + " " + "ไร่"}
+                {row.totalRaiCount
+                  ? formatNumberWithCommas(row.totalRaiCount)
+                  : 0}{" "}
+                ไร่
               </span>
             </>
           ),
@@ -448,10 +491,58 @@ export default function IndexRankDroner() {
       },
     },
     {
-      title: "คะแนน Rating",
+      title: () => {
+        return (
+          <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+            คะแนน Rating
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                cursor: "pointer",
+              }}
+              onClick={() => {
+                setSortField("avgrating");
+                setSortDirection((prev) => {
+                  if (prev === "ASC") {
+                    return "DESC";
+                  } else if (prev === undefined) {
+                    return "ASC";
+                  } else {
+                    return undefined;
+                  }
+                });
+                setSortDirection3((prev) => {
+                  if (prev === "ASC") {
+                    return "DESC";
+                  } else if (prev === undefined) {
+                    return "ASC";
+                  } else {
+                    return undefined;
+                  }
+                });
+              }}
+            >
+              <CaretUpOutlined
+                style={{
+                  position: "relative",
+                  top: 2,
+                  color: sortDirection3 === "ASC" ? "#ffca37" : "white",
+                }}
+              />
+              <CaretDownOutlined
+                style={{
+                  position: "relative",
+                  bottom: 2,
+                  color: sortDirection3 === "DESC" ? "#ffca37" : "white",
+                }}
+              />
+            </div>
+          </div>
+        );
+      },
       dataIndex: "avgrating",
       key: "avgrating",
-      sorter: (a: any, b: any) => sorter(a.avgrating, b.avgrating),
       render: (value: any, row: any, index: number) => {
         return {
           children: (
@@ -464,6 +555,7 @@ export default function IndexRankDroner() {
                         color: "#FFCA37",
                         fontSize: "20px",
                         marginRight: "7px",
+                        verticalAlign: 0.5,
                       }}
                     />
                     {parseFloat(row.avgrating).toFixed(1)}
@@ -478,12 +570,58 @@ export default function IndexRankDroner() {
       },
     },
     {
-      title: "ตำบล",
+      title: () => {
+        return (
+          <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+            ตำบล
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                cursor: "pointer",
+              }}
+              onClick={() => {
+                setSortField("subdistrict_subdistrict_name");
+                setSortDirection((prev) => {
+                  if (prev === "ASC") {
+                    return "DESC";
+                  } else if (prev === undefined) {
+                    return "ASC";
+                  } else {
+                    return undefined;
+                  }
+                });
+                setSortDirection4((prev) => {
+                  if (prev === "ASC") {
+                    return "DESC";
+                  } else if (prev === undefined) {
+                    return "ASC";
+                  } else {
+                    return undefined;
+                  }
+                });
+              }}
+            >
+              <CaretUpOutlined
+                style={{
+                  position: "relative",
+                  top: 2,
+                  color: sortDirection4 === "ASC" ? "#ffca37" : "white",
+                }}
+              />
+              <CaretDownOutlined
+                style={{
+                  position: "relative",
+                  bottom: 2,
+                  color: sortDirection4 === "DESC" ? "#ffca37" : "white",
+                }}
+              />
+            </div>
+          </div>
+        );
+      },
       dataIndex: "subdistrict_subdistrict_name",
       key: "subdistrict_subdistrict_name",
-      width: "10%",
-      sorter: (a: any, b: any) =>
-        sorter(a.subdistrict_subdistrict_name, b.subdistrict_subdistrict_name),
       render: (value: any, row: any, index: number) => {
         const subdistrict = row.subdistrict_subdistrict_name;
         return {
@@ -496,12 +634,58 @@ export default function IndexRankDroner() {
       },
     },
     {
-      title: "อำเภอ",
+      title: () => {
+        return (
+          <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+            อำเภอ
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                cursor: "pointer",
+              }}
+              onClick={() => {
+                setSortField("district_district_name");
+                setSortDirection((prev) => {
+                  if (prev === "ASC") {
+                    return "DESC";
+                  } else if (prev === undefined) {
+                    return "ASC";
+                  } else {
+                    return undefined;
+                  }
+                });
+                setSortDirection5((prev) => {
+                  if (prev === "ASC") {
+                    return "DESC";
+                  } else if (prev === undefined) {
+                    return "ASC";
+                  } else {
+                    return undefined;
+                  }
+                });
+              }}
+            >
+              <CaretUpOutlined
+                style={{
+                  position: "relative",
+                  top: 2,
+                  color: sortDirection5 === "ASC" ? "#ffca37" : "white",
+                }}
+              />
+              <CaretDownOutlined
+                style={{
+                  position: "relative",
+                  bottom: 2,
+                  color: sortDirection5 === "DESC" ? "#ffca37" : "white",
+                }}
+              />
+            </div>
+          </div>
+        );
+      },
       dataIndex: "district_district_name",
       key: "district_district_name",
-      width: "10%",
-      sorter: (a: any, b: any) =>
-        sorter(a.district_district_name, b.district_district_name),
       render: (value: any, row: any, index: number) => {
         const district = row.district_district_name;
         return {
@@ -516,11 +700,58 @@ export default function IndexRankDroner() {
       },
     },
     {
-      title: "จังหวัด",
+      title: () => {
+        return (
+          <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+            จังหวัด
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                cursor: "pointer",
+              }}
+              onClick={() => {
+                setSortField("province_province_name");
+                setSortDirection((prev) => {
+                  if (prev === "ASC") {
+                    return "DESC";
+                  } else if (prev === undefined) {
+                    return "ASC";
+                  } else {
+                    return undefined;
+                  }
+                });
+                setSortDirection6((prev) => {
+                  if (prev === "ASC") {
+                    return "DESC";
+                  } else if (prev === undefined) {
+                    return "ASC";
+                  } else {
+                    return undefined;
+                  }
+                });
+              }}
+            >
+              <CaretUpOutlined
+                style={{
+                  position: "relative",
+                  top: 2,
+                  color: sortDirection6 === "ASC" ? "#ffca37" : "white",
+                }}
+              />
+              <CaretDownOutlined
+                style={{
+                  position: "relative",
+                  bottom: 2,
+                  color: sortDirection6 === "DESC" ? "#ffca37" : "white",
+                }}
+              />
+            </div>
+          </div>
+        );
+      },
       dataIndex: "province_province_name",
       key: "province_province_name",
-      width: "10%",
-      sorter: (a: any, b: any) => sorter(a.province_province_name, b.province_province_name),
       render: (value: any, row: any, index: number) => {
         const province = row.province_province_name;
         return {
@@ -545,9 +776,7 @@ export default function IndexRankDroner() {
               <ActionButton
                 icon={<FileTextOutlined />}
                 color={color.primary1}
-                onClick={() =>
-                  navigate("/DetailRankDroner?=" + row.droner_id)
-                }
+                onClick={() => navigate("/DetailRankDroner?=" + row.droner_id)}
               />
             </div>
           ),
@@ -559,7 +788,10 @@ export default function IndexRankDroner() {
     <>
       {PageTitle}
       <br />
-      <Table columns={columns} dataSource={data?.data} pagination={false} />
+      <Spin tip="กำลังโหลดข้อมูล..." size="large" spinning={loading}>
+        <Table columns={columns} dataSource={data?.data} pagination={false} />
+      </Spin>
+
       <div className="d-flex justify-content-between pt-3 pb-3">
         <p>รายการทั้งหมด {data?.count} รายการ</p>
         <Pagination

@@ -14,31 +14,16 @@ import {
 } from "../../entities/DronerRankEntities";
 import { DronerRankDatasource } from "../../datasource/DronerRankDatasource";
 import {
-  AddressEntity,
-  AddressEntity_INIT,
-  FullAddressEntiry_INIT,
-  FullAddressEntity,
-} from "../../entities/AddressEntities";
-import {
   StarFilled,
   CalendarOutlined,
   ClockCircleOutlined,
 } from "@ant-design/icons";
 import { UploadImageDatasouce } from "../../datasource/UploadImageDatasource";
-import {
-  DistrictEntity,
-  DistrictEntity_INIT,
-  ProviceEntity,
-  ProvinceEntity_INIT,
-  SubdistrictEntity,
-  SubdistrictEntity_INIT,
-} from "../../entities/LocationEntities";
-import { LocationDatasource } from "../../datasource/LocationDatasource";
-import { CropPurposeSprayEntity } from "../../entities/CropEntities";
-import { PURPOSE_SPRAY } from "../../definitions/PurposeSpray";
 import { CouponDataSource } from "../../datasource/CouponDatasource";
-import { DashboardLayout } from "../../components/layout/Layout";
 import { useNavigate } from "react-router-dom";
+import { formatNumberWithCommas } from "../../utilities/TextFormatter";
+import ImagCards from "../../components/card/ImagCard";
+import { image } from "../../resource";
 const _ = require("lodash");
 const dateFormat = "DD/MM/YYYY";
 const timeFormat = "HH:mm";
@@ -54,24 +39,26 @@ function DetailWorkDroner() {
     lng: LAT_LNG_BANGKOK.lng,
   });
   const [imgFinish, setImgFinish] = useState<any>();
-  const [couponData,setCouponData] = useState<{
-    couponCode : string,
-    couponName : string,
-    couponDiscount : number | null
+  const [couponData, setCouponData] = useState<{
+    couponCode: string;
+    couponName: string;
+    couponDiscount: number | null;
   }>({
-    couponCode : "",
-    couponName : "",
-    couponDiscount : null
-  })
+    couponCode: "",
+    couponName: "",
+    couponDiscount: null,
+  });
 
   const fetchTask = async () => {
     await DronerRankDatasource.getTaskDetail(taskId).then((res) => {
-      if(res.couponId !== null){
-        CouponDataSource.getPromotionCode(res.couponId).then(result => setCouponData({
-          couponCode : result.couponCode??"",
-          couponDiscount : (!res.discount)?null:parseInt(res.discount),
-          couponName : result.couponName??""
-        }))
+      if (res.couponId !== null) {
+        CouponDataSource.getPromotionCode(res.couponId).then((result) =>
+          setCouponData({
+            couponCode: result.couponCode ? result.couponCode : "-",
+            couponDiscount: !res.discount ? 0 : parseInt(res.discount),
+            couponName: result.couponName ? result.couponName : "-",
+          })
+        );
       }
       setData(res);
       setMapPosition({
@@ -95,20 +82,11 @@ function DetailWorkDroner() {
   useEffect(() => {
     fetchTask();
   }, []);
-
-  const formatCurrency = (e: any) => {
-    e = parseFloat(e);
-    return e.toFixed(2).replace(/./g, function (c: any, i: any, a: any) {
-      return i > 0 && c !== "." && (a.length - i) % 3 === 0 ? "," + c : c;
-    });
-  };
-  const onPreviewImg = async () => {
-    let src = imgFinish;
+  const onPreviewImg = async (e: any) => {
+    let src = e;
     if (!src) {
       src = await new Promise((resolve) => {
         const reader = new FileReader();
-        reader.readAsDataURL(imgFinish);
-        reader.onload = () => resolve(reader.result);
       });
     }
     const image = new Image();
@@ -180,31 +158,12 @@ function DetailWorkDroner() {
               {data.preparationBy !== null ? data.preparationBy : "-"}
             </span>
           </Form.Item>
-          <label>ภาพงานจากนักบินโดรน</label>
-          <br />
-          <div className="pb-2">
-            <div
-              className="hiddenFileInput"
-              style={{
-                backgroundImage: `url(${imgFinish})`,
-                display: imgFinish != null ? `url(${imgFinish})` : undefined,
-              }}
-            ></div>
-            <div className="ps-5">
-              {imgFinish != undefined && (
-                <>
-                  <Tag
-                    color={color.Success}
-                    onClick={onPreviewImg}
-                    style={{ cursor: "pointer", borderRadius: "5px" }}
-                  >
-                    View
-                  </Tag>
-                </>
-              )}
-            </div>
-          </div>
-
+          <p>ภาพงานจากนักบินโดรน</p>
+          <ImagCards
+            imageName={imgFinish ? imgFinish : ""}
+            image={imgFinish ? imgFinish : image.empty_cover}
+            onClick={() => onPreviewImg(imgFinish)}
+          />
           <br />
           <label>หมายเหตุ</label>
           <Form.Item>
@@ -218,14 +177,17 @@ function DetailWorkDroner() {
           <label>ค่าบริการ</label>
           <Form.Item style={{ color: color.Grey }}>
             <span>
-              {" "}
               {data.price !== null
-                ? formatCurrency(data.price) + " " + "บาท"
+                ? formatNumberWithCommas(data.price) + " " + "บาท"
                 : "0.00" + " " + "บาท"}
             </span>{" "}
             <span>
               {data.farmAreaAmount !== null
-                ? "(จำนวน" + " " + data.farmAreaAmount + " " + "ไร่)"
+                ? "(จำนวน" +
+                  " " +
+                  formatNumberWithCommas(parseFloat(data.farmAreaAmount)) +
+                  " " +
+                  "ไร่)"
                 : "0"}
             </span>
           </Form.Item>
@@ -308,9 +270,9 @@ function DetailWorkDroner() {
               rows={3}
               disabled
               value={
-                data.reviewDronerDetail != null
+                data.reviewDronerDetail && data.reviewDronerDetail.comment
                   ? data.reviewDronerDetail.comment
-                  : undefined
+                  : "-"
               }
             />
           </Form.Item>
@@ -318,7 +280,7 @@ function DetailWorkDroner() {
           <Form.Item>
             <span style={{ color: color.Success }}>
               <Badge color={color.Success} />
-              {data.status == "DONE" ? "เสร็จสิ้น" : null}
+              {data.status == "DONE" ? " เสร็จสิ้น" : null}
               <br />
             </span>
           </Form.Item>
@@ -366,7 +328,13 @@ function DetailWorkDroner() {
             <Form.Item>
               <Input
                 disabled
-                defaultValue={data.farmerPlot.raiAmount}
+                defaultValue={
+                  data.farmerPlot.raiAmount
+                    ? formatNumberWithCommas(
+                        parseFloat(data.farmerPlot.raiAmount)
+                      )
+                    : 0
+                }
                 suffix="ไร่"
               />
             </Form.Item>
@@ -439,26 +407,30 @@ function DetailWorkDroner() {
           <span>{data.droner.telephoneNo}</span>
         </div>
         <div className="col-lg-4">
-          {data.droner.address.subdistrict.subdistrictName +
-            "," +
-            " " +
-            data.droner.address.district.districtName +
-            "," +
-            " " +
-            data.droner.address.province.provinceName}
+          {data.droner.address.subdistrict.subdistrictName
+            ? data.droner.address.subdistrict.subdistrictName + ","
+            : "-/"}
+
+          {data.droner.address.district.districtName
+            ? data.droner.address.district.districtName + ","
+            : "-/"}
+
+          {data.droner.address.province.provinceName
+            ? data.droner.address.province.provinceName
+            : "-"}
         </div>
         <div className="col-lg">
           <span>
             <Avatar
               size={25}
               src={
-                data.droner.dronerDrone && data.droner.dronerDrone[0] != null
+                data.droner.dronerDrone && data.droner.dronerDrone[0] !== null
                   ? data.droner.dronerDrone[0].drone.droneBrand.logoImagePath
                   : null
               }
               style={{ marginRight: "5px" }}
             />
-            {data.droner.dronerDrone && data.droner.dronerDrone[0] != null
+            {data.droner.dronerDrone && data.droner.dronerDrone[0] !== null
               ? data.droner.dronerDrone[0].drone.droneBrand.name
               : "-"}
           </span>
@@ -483,7 +455,7 @@ function DetailWorkDroner() {
                 <br />
                 <b style={{ fontSize: "20px", color: color.Success }}>
                   {data.totalPrice !== null
-                    ? formatCurrency(data.totalPrice) + " " + "บาท"
+                    ? formatNumberWithCommas(data.totalPrice) + " " + "บาท"
                     : "0.00" + " " + "บาท"}
                 </b>
               </span>
@@ -497,7 +469,9 @@ function DetailWorkDroner() {
               <Input
                 disabled
                 value={
-                  data.price !== null ? formatCurrency(data.price) : "0.00"
+                  data.price !== null
+                    ? formatNumberWithCommas(data.price)
+                    : "0.00"
                 }
                 suffix="บาท"
               />
@@ -509,7 +483,9 @@ function DetailWorkDroner() {
               <Input
                 disabled
                 placeholder="0.0"
-                value={data.fee !== null ? formatCurrency(data.fee) : "0.00"}
+                value={
+                  data.fee !== null ? formatNumberWithCommas(data.fee) : "0.00"
+                }
                 suffix="บาท"
               />
             </Form.Item>
@@ -521,7 +497,7 @@ function DetailWorkDroner() {
                 disabled
                 value={
                   data.discountFee !== null
-                    ? formatCurrency(data.discountFee)
+                    ? formatNumberWithCommas(data.discountFee)
                     : "0.00"
                 }
                 suffix="บาท"
@@ -530,27 +506,19 @@ function DetailWorkDroner() {
           </div>
           <div className="form-group col-lg-4">
             <label>รหัสคูปอง</label>
-            <Input
-                // value={couponData.couponCode}
-                disabled
-                autoComplete="off"
-             />
+            <Input value={couponData.couponCode} disabled autoComplete="off" />
           </div>
           <div className="form-group col-lg-4">
             <label>ชื่อคูปอง</label>
-            <Input
-                // value={couponData.couponName}
-                disabled
-                autoComplete="off"
-             />
+            <Input value={couponData.couponName} disabled autoComplete="off" />
           </div>
           <div className="form-group col-lg-4">
             <label>ส่วนลดคูปอง</label>
             <Input
-                // value={couponData.couponDiscount!}
-                disabled
-                autoComplete="off"
-             />
+              value={couponData.couponDiscount!}
+              disabled
+              autoComplete="off"
+            />
           </div>
         </div>
       </Form>
@@ -561,11 +529,9 @@ function DetailWorkDroner() {
     <>
       <Row>
         <BackIconButton
-          onClick={() =>
-            navigate("/DetailRankDroner?=" + data.dronerId)
-          }
+          onClick={() => navigate("/DetailRankDroner?=" + data.dronerId)}
         />
-        <span className="pt-4">
+        <span className="pt-3">
           <strong style={{ fontSize: "20px" }}>
             รายละเอียดงาน #{data.taskNo}
           </strong>

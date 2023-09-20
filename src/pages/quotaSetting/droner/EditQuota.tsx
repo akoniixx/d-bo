@@ -51,7 +51,7 @@ function EditQuota() {
   const [nameChallenge, setNameChallenge] = useState<string | null>(null);
   const [detail, setDetail] = useState<string | null>(null);
   const [nameReward, setNameReward] = useState<string | null>(null);
-  const [raiAmount, setRaiAmount] = useState<string | null>(null);
+  const [raiAmount, setRaiAmount] = useState<string>('');
   const [startDate, setStartDate] = useState<any>(null);
   const [endDate, setEndDate] = useState<any>(null);
   const [createImgReward, setCreateImgReward] = useState<UploadImageEntity>(
@@ -475,7 +475,7 @@ function EditQuota() {
     const reward: any = {};
 
     const roundDate: any = [];
-    if (count > 1) {
+    if (count >= 1) {
       for (let i = 0; count > i; i++) {
         roundDate.push(moment(f[`${i + 1}_roundDate`]).format("YYYY-MM-DD"));
       }

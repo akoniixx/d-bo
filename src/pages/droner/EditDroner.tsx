@@ -151,7 +151,7 @@ function EditDroner() {
       ...UploadImageEntity_INTI,
     },
   ];
-  
+
   const fetchDronerById = useCallback(async () => {
     await DronerDatasource.getDronerByID(dronerId).then(async (res) => {
       await CropDatasource.getCropJustName().then((crops) => {
@@ -203,6 +203,11 @@ function EditDroner() {
           });
         }
       });
+      await OtherAddressDatasource.getDronerAddressByID(res.id).then((res) => {
+        if (res.otherAddress) {
+          setOtherAddress(res.otherAddress);
+        }
+      });
 
       setMapPosition({
         lat: parseFloat(res.dronerArea?.lat),
@@ -240,11 +245,6 @@ function EditDroner() {
       }
       if (listPromise.length > 0) {
         await Promise.all([...listPromise]);
-      }
-    });
-    await OtherAddressDatasource.getDronerAddressByID(dronerId).then((res) => {
-      if (res.otherAddress) {
-        setOtherAddress(res.otherAddress);
       }
     });
   }, [dronerId, form]);
@@ -589,14 +589,24 @@ function EditDroner() {
     imgWindow?.document.write(image.outerHTML);
   };
   const removeImg = () => {
-    const getImg = data.file.filter((x) => x.category === "PROFILE_IMAGE")[0];
-    if (getImg !== undefined) {
-      UploadImageDatasouce.deleteImage(getImg.id, getImg.path).then(
-        (res) => {}
-      );
-    }
-    setCreateImgProfile(ImageEntity_INTI);
-    setImgProfile(undefined);
+    Swal.fire({
+      title: "ยืนยันการลบ",
+      text: "โปรดตรวจสอบรูปภาพที่คุณต้องการลบ",
+      cancelButtonText: "ย้อนกลับ",
+      confirmButtonText: "ลบ",
+      confirmButtonColor: "#d33",
+      showCancelButton: true,
+      showCloseButton: true,
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        const getImg = data.file.filter(
+          (x) => x.category == "PROFILE_IMAGE"
+        )[0];
+        UploadImageDatasouce.deleteImage(getImg.id, getImg.path);
+        setCreateImgProfile(ImageEntity_INTI);
+        setImgProfile(undefined);
+      }
+    });
   };
 
   const onChangeIdCard = async (file: any) => {
@@ -643,14 +653,24 @@ function EditDroner() {
     imgWindow?.document.write(image.outerHTML);
   };
   const removeImgIdCard = () => {
-    const getImg = data.file.filter((x) => x.category === "ID_CARD_IMAGE")[0];
-    if (getImg !== undefined) {
-      UploadImageDatasouce.deleteImage(getImg.id, getImg.path).then(
-        (res) => {}
-      );
-    }
-    setCreateImgIdCrad(ImageEntity_INTI);
-    setImgIdCard(undefined);
+    Swal.fire({
+      title: "ยืนยันการลบ",
+      text: "โปรดตรวจสอบรูปภาพที่คุณต้องการลบ",
+      cancelButtonText: "ย้อนกลับ",
+      confirmButtonText: "ลบ",
+      confirmButtonColor: "#d33",
+      showCancelButton: true,
+      showCloseButton: true,
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        const getImg = data.file.filter(
+          (x) => x.category == "ID_CARD_IMAGE"
+        )[0];
+        UploadImageDatasouce.deleteImage(getImg.id, getImg.path);
+        setCreateImgIdCrad(ImageEntity_INTI);
+        setImgIdCard(undefined);
+      }
+    });
   };
   //#endregion
   const checkValidateComma = (data: string) => {
@@ -752,7 +772,7 @@ function EditDroner() {
       payload.isOpenReceiveTask = true;
     }
     if (
-      !otherAdd.id &&
+      otherAdd.id === "" &&
       otherAdd.provinceId !== 0 &&
       otherAdd.districtId !== 0 &&
       otherAdd.subdistrictId !== 0
@@ -767,42 +787,48 @@ function EditDroner() {
       otherAdd.subdistrictId > 0
     ) {
       OtherAddressDatasource.updateOtherAddress(otherAdd).then((res) => {});
-    } else {
+    } else if (
+      otherAdd.id &&
+      !otherAdd.provinceId &&
+      !otherAdd.districtId &&
+      !otherAdd.subdistrictId
+    ) {
       OtherAddressDatasource.deleteOtherAddress(dronerId, otherAddress.id).then(
         (res) => {}
       );
     }
-
     if (imgBB) {
       UploadImageDatasouce.uploadImage(imgBB).then((res) => {});
     }
-    await DronerDatasource.updateDroner(payload).then((res) => {
-      if (res !== undefined) {
-        var i = 0;
-        for (i; 2 > i; i++) {
-          i === 0 &&
-            createImgProfile.file !== "" &&
-            UploadImageDatasouce.uploadImage(createImgProfile).then(res);
-          i === 1 &&
-            createImgIdCard.file !== "" &&
-            UploadImageDatasouce.uploadImage(createImgIdCard).then(res);
+    if (payload) {
+      await DronerDatasource.updateDroner(payload).then((res) => {
+        if (res !== undefined && res.status !== 409) {
+          var i = 0;
+          for (i; 2 > i; i++) {
+            i === 0 &&
+              createImgProfile.file !== "" &&
+              UploadImageDatasouce.uploadImage(createImgProfile).then(res);
+            i === 1 &&
+              createImgIdCard.file !== "" &&
+              UploadImageDatasouce.uploadImage(createImgIdCard).then(res);
+          }
+          Swal.fire({
+            title: "บันทึกสำเร็จ",
+            icon: "success",
+            timer: 1500,
+            showConfirmButton: false,
+          }).then((time) => {
+            navigate("/IndexDroner");
+          });
+        } else {
+          Swal.fire({
+            title: "เบอร์โทร หรือ รหัสบัตรประชาชน <br/> ซ้ำในระบบ",
+            icon: "error",
+            showConfirmButton: true,
+          });
         }
-        Swal.fire({
-          title: "บันทึกสำเร็จ",
-          icon: "success",
-          timer: 1500,
-          showConfirmButton: false,
-        }).then((time) => {
-          navigate("/IndexDroner");
-        });
-      } else {
-        Swal.fire({
-          title: "เบอร์โทร หรือ รหัสบัตรประชาชน <br/> ซ้ำในระบบ",
-          icon: "error",
-          showConfirmButton: true,
-        });
-      }
-    });
+      });
+    }
   };
   const onFieldsChange = (field: any) => {
     const isHasError = form.getFieldsError().some(({ errors }) => {
@@ -978,7 +1004,8 @@ function EditDroner() {
                     message: "กรุณากรอกเบอร์โทร!",
                   },
                   {
-                    pattern: new RegExp(/^[0-9\b]+$/),
+                    pattern:
+                      new RegExp(/^[0-9\b]+$/) && new RegExp(/^0[689]\d{8}$/),
                     message: "กรุณากรอกเบอร์โทรให้ถูกต้อง!",
                   },
                   {
@@ -1002,7 +1029,8 @@ function EditDroner() {
                   locale={locale}
                   format={dateFormat}
                   disabledDate={(current) =>
-                    current && current > moment().endOf("day")
+                    (current && current > moment().endOf("day")) ||
+                    moment().diff(current, "years") < 18
                   }
                   defaultValue={
                     data.birthDate !== null ? moment(data.birthDate) : undefined
@@ -1473,10 +1501,10 @@ function EditDroner() {
             </div>
           </div>
           <div className="form-group">
-            <label>หรือ</label>
+            <label>Google Map Link</label>
             <Form.Item name="mapUrl">
               <Input
-                placeholder="กรอกข้อมูล Url Google Map"
+                placeholder="กรอกข้อมูล Url Google Map Link"
                 autoComplete="off"
               />
             </Form.Item>
@@ -1838,7 +1866,7 @@ function EditDroner() {
       {bookBank ? (
         <BookBankDroner
           callBack={insertBookBank}
-          data={dataBookBank}
+          data={data}
           dronerId={dronerId}
         />
       ) : null}

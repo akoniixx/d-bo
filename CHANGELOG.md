@@ -1,5 +1,95 @@
 ## [Version - 0]
 
+## Fix [v0.36.26] 2023-09-20
+
+- fixed challenge & mission
+- changed text color when farmer & drone are deleted.
+
+## Fix [v0.36.25] 2023-09-20
+
+- fixed task icon
+- fixed pagination coupon offline
+
+## Fix [v0.36.24] 2023-09-15
+
+- fixed news
+
+## Fix [v0.36.23] 2023-09-11
+
+- fix condition search status
+- check null in detail rank droner page
+
+## improve [v0.36.22] 2023-09-08
+
+- index rank droner page sorts data from the API.
+- improved drone ranking details with task details.
+
+## improve [v0.36.21] 2023-09-07
+
+- split and rearrange menu tabs
+- fixed the display of the number of coupon rights
+
+## Fix [v0.36.20] 2023-09-05
+
+- fixed bug reward round in add/edit quota page
+
+## Fix [v0.36.19] 2023-09-04
+
+- fixed setting coupon
+- fixed show modal ma
+
+## Fix [v0.36.18] 2023-08-28
+
+- case maintenance 2 day
+
+## improve [v0.36.17] 2023-08-28
+
+- maintenance time to bounce to the login page
+
+## improve [v0.36.16] 2023-08-25
+
+- click edit new task shows modal noti if dronerId is present.
+
+## improve [v0.36.15] 2023-08-24
+
+- added modal droner receive task
+
+## Fix [v0.36.14] 2023-08-24
+
+- validate input number
+- fixed wording & fixed condition search status
+
+## Fix [v0.36.13] 2023-08-23
+
+- fixed style search status
+- validate rating less than 0
+- modal check delete image
+
+## Fix [v0.36.12] 2023-08-22
+
+- fixed search address
+- fixed style ui status
+
+## Fix [v0.36.11] 2023-08-21
+
+- fixed validate NumWDecimal new task
+- fixed wording google map
+
+## improve [v0.36.10] 2023-08-18
+
+- set loading all page
+- fixed defect droner & task & drone list page
+
+## improve [v0.36.9] 2023-08-16
+
+- improve index drone page
+- improve index all task page
+- fixed render map in modal farmer plot
+
+## improve [v0.36.8] 2023-08-15
+
+- improve index droner page
+
 ## Fix [v0.36.7] 2023-08-11
 
 - fixed validate form farmer plot

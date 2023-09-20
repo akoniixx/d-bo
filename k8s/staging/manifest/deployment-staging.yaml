@@ -37,9 +37,9 @@ spec:
             periodSeconds: 30
             timeoutSeconds: 60
           envFrom:
-          # - secretRef:
-          #     name: dnds-bo-staging
+            # - secretRef:
+            #     name: dnds-bo-staging
             - configMapRef:
                 name: dnds-bo-staging
       imagePullSecrets:
-      - name: gcr-image-pull-secret
+        - name: gcr-image-pull-secret

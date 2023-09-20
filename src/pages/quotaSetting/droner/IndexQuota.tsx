@@ -16,6 +16,7 @@ import {
   Pagination,
   Row,
   Select,
+  Spin,
   Table,
 } from "antd";
 import moment from "moment";
@@ -48,8 +49,10 @@ function IndexQuota() {
   const [searchText, setSearchText] = useState<any>();
   const [showModal, setShowModal] = useState(false);
   const [quotaId, setQuotaId] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const getAllQuota = () => {
+    setLoading(true);
     CampaignDatasource.getCampaignQuota(
       "DRONER",
       row,
@@ -58,9 +61,12 @@ function IndexQuota() {
       endDate,
       status,
       searchText
-    ).then((res) => {
-      setData(res);
-    });
+    )
+      .then((res) => {
+        setData(res);
+      })
+      .catch((err) => console.log(err))
+      .finally(() => setLoading(false));
   };
 
   useEffect(() => {
@@ -320,7 +326,9 @@ function IndexQuota() {
     <>
       {pageTitle}
       <CardContainer>
-        <Table columns={columns} dataSource={data?.data} pagination={false} />
+        <Spin tip="กำลังโหลดข้อมูล..." size="large" spinning={loading}>
+          <Table columns={columns} dataSource={data?.data} pagination={false} />
+        </Spin>
       </CardContainer>
       <div className="d-flex justify-content-between pt-3 pb-3">
         <p>รายการทั้งหมด {data?.count} รายการ</p>

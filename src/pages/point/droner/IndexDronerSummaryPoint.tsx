@@ -4,7 +4,7 @@ import {
   FileTextOutlined,
   SearchOutlined,
 } from "@ant-design/icons";
-import { Button, Col, Input, Pagination, Row, Table, Image } from "antd";
+import { Button, Col, Input, Pagination, Row, Table, Image, Spin } from "antd";
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import ActionButton from "../../../components/button/ActionButton";
@@ -23,16 +23,21 @@ const IndexDronerSummaryPoint = () => {
   const [sortDirection, setSortDirection] = useState<string | undefined>(
     undefined
   );
+  const [loading, setLoading] = useState(false);
 
   const fetchDronerSum = () => {
+    setLoading(true);
     PointReceiveDatasource.getDronerSumPoint(
       row,
       current,
       searchKeyword,
       sortDirection
-    ).then((res) => {
-      setData(res);
-    });
+    )
+      .then((res) => {
+        setData(res);
+      })
+      .catch((err) => console.log(err))
+      .finally(() => setLoading(false));
   };
 
   useEffect(() => {
@@ -97,7 +102,15 @@ const IndexDronerSummaryPoint = () => {
       width: "30%",
       render: (value: any, row: any, index: number) => {
         return {
-          children: <span>{row.firstname + " " + row.lastname}</span>,
+          children: (
+            <span
+              style={{
+                color: row.isDelete === true ? color.Error : color.font,
+              }}
+            >
+              {row.firstname + " " + row.lastname}
+            </span>
+          ),
         };
       },
     },
@@ -107,7 +120,15 @@ const IndexDronerSummaryPoint = () => {
       width: "45%",
       render: (value: any, row: any, index: number) => {
         return {
-          children: <span>{row.telephoneNo}</span>,
+          children: (
+            <span
+              style={{
+                color: row.isDelete === true ? color.Error : color.font,
+              }}
+            >
+              {row.telephoneNo}
+            </span>
+          ),
         };
       },
     },
@@ -196,13 +217,15 @@ const IndexDronerSummaryPoint = () => {
     <>
       {pageTitle}
       <CardContainer>
-        <Table
-          dataSource={data?.data}
-          columns={columns}
-          pagination={false}
-          size="large"
-          tableLayout="fixed"
-        />
+        <Spin tip="กำลังโหลดข้อมูล..." size="large" spinning={loading}>
+          <Table
+            dataSource={data?.data}
+            columns={columns}
+            pagination={false}
+            size="large"
+            tableLayout="fixed"
+          />
+        </Spin>
       </CardContainer>
       <div className="d-flex justify-content-between pt-3 pb-3">
         <p>รายการทั้งหมด {data?.count} รายการ</p>

@@ -4,7 +4,7 @@ import {
   FileTextOutlined,
   SearchOutlined,
 } from "@ant-design/icons";
-import { Button, Col, Image, Input, Pagination, Row, Table } from "antd";
+import { Button, Col, Image, Input, Pagination, Row, Spin, Table } from "antd";
 import React, { useEffect, useState } from "react";
 import ActionButton from "../../../components/button/ActionButton";
 import { CardContainer } from "../../../components/card/CardContainer";
@@ -24,16 +24,21 @@ function IndexFarmerSummary() {
   const [sortDirection, setSortDirection] = useState<string | undefined>(
     undefined
   );
+  const [loading, setLoading] = useState(false);
 
   const fetchFarmerSum = () => {
+    setLoading(true);
     PointReceiveDatasource.getFarmerSumPoint(
       row,
       current,
       searchKeyword,
       sortDirection
-    ).then((res) => {
-      setData(res);
-    });
+    )
+      .then((res) => {
+        setData(res);
+      })
+      .catch((err) => console.log(err))
+      .finally(() => setLoading(false));
   };
 
   useEffect(() => {
@@ -133,7 +138,15 @@ function IndexFarmerSummary() {
       width: "30%",
       render: (value: any, row: any, index: number) => {
         return {
-          children: <span>{row.firstname + " " + row.lastname}</span>,
+          children: (
+            <span
+              style={{
+                color: row.isDelete === true ? color.Error : color.font,
+              }}
+            >
+              {row.firstname + " " + row.lastname}
+            </span>
+          ),
         };
       },
     },
@@ -144,7 +157,15 @@ function IndexFarmerSummary() {
       width: "45%",
       render: (value: any, row: any, index: number) => {
         return {
-          children: <span>{row.telephoneNo}</span>,
+          children: (
+            <span
+              style={{
+                color: row.isDelete === true ? color.Error : color.font,
+              }}
+            >
+              {row.telephoneNo}
+            </span>
+          ),
         };
       },
     },
@@ -199,13 +220,15 @@ function IndexFarmerSummary() {
     <>
       {pageTitle}
       <CardContainer>
-        <Table
-          dataSource={data?.data}
-          columns={columns}
-          pagination={false}
-          size="large"
-          tableLayout="fixed"
-        />
+        <Spin tip="กำลังโหลดข้อมูล..." size="large" spinning={loading}>
+          <Table
+            dataSource={data?.data}
+            columns={columns}
+            pagination={false}
+            size="large"
+            tableLayout="fixed"
+          />
+        </Spin>
       </CardContainer>
       <div className="d-flex justify-content-between pt-4">
         <p>รายการทั้งหมด {data?.count} รายการ</p>

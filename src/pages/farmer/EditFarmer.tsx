@@ -353,15 +353,25 @@ const EditFarmer = () => {
   };
 
   const removeImg = () => {
-    const getImg = data.file.filter((x) => x.category == "PROFILE_IMAGE")[0];
-    if (getImg !== undefined) {
-      UploadImageDatasouce.deleteImage(getImg.id, getImg.path).then(
-        (res) => {}
-      );
-    }
-    setCreateImgProfile(ImageEntity_INTI);
-    setImgProfile(undefined);
-    checkValidate(data);
+    Swal.fire({
+      title: "ยืนยันการลบ",
+      text: "โปรดตรวจสอบรูปภาพที่คุณต้องการลบ",
+      cancelButtonText: "ย้อนกลับ",
+      confirmButtonText: "ลบ",
+      confirmButtonColor: "#d33",
+      showCancelButton: true,
+      showCloseButton: true,
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        const getImg = data.file.filter(
+          (x) => x.category == "PROFILE_IMAGE"
+        )[0];
+        UploadImageDatasouce.deleteImage(getImg.id, getImg.path);
+        setCreateImgProfile(ImageEntity_INTI);
+        setImgProfile(undefined);
+        checkValidate(data);
+      }
+    });
   };
   const onChangeIdCard = async (file: any) => {
     const source = file.target.files[0];
@@ -410,15 +420,25 @@ const EditFarmer = () => {
     imgWindow?.document.write(image.outerHTML);
   };
   const removeImgIdCard = () => {
-    const getImg = data.file.filter((x) => x.category == "ID_CARD_IMAGE")[0];
-    if (getImg != undefined) {
-      UploadImageDatasouce.deleteImage(getImg.id, getImg.path).then(
-        (res) => {}
-      );
-    }
-    setCreateImgIdCrad(ImageEntity_INTI);
-    setImgIdCard(undefined);
-    checkValidate(data);
+    Swal.fire({
+      title: "ยืนยันการลบ",
+      text: "โปรดตรวจสอบรูปภาพที่คุณต้องการลบ",
+      cancelButtonText: "ย้อนกลับ",
+      confirmButtonText: "ลบ",
+      confirmButtonColor: "#d33",
+      showCancelButton: true,
+      showCloseButton: true,
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        const getImg = data.file.filter(
+          (x) => x.category == "ID_CARD_IMAGE"
+        )[0];
+        UploadImageDatasouce.deleteImage(getImg.id, getImg.path);
+        setCreateImgIdCrad(ImageEntity_INTI);
+        setImgIdCard(undefined);
+        checkValidate(data);
+      }
+    });
   };
   //#endregion
 
@@ -636,7 +656,8 @@ const EditFarmer = () => {
                     message: "กรุณากรอกเบอร์โทร!",
                   },
                   {
-                    pattern: new RegExp(/^[0-9\b]+$/),
+                    pattern:
+                      new RegExp(/^[0-9\b]+$/) && new RegExp(/^0[689]\d{8}$/),
                     message: "กรุณากรอกเบอร์โทรให้ถูกต้อง!",
                   },
                   {
@@ -671,9 +692,10 @@ const EditFarmer = () => {
                   placeholder="กรอกวันเดือนปีเกิด"
                   format={dateFormat}
                   className="col-lg-12"
-                  disabledDate={(current) => {
-                    return current && current > moment().endOf("day");
-                  }}
+                  disabledDate={(current) =>
+                    (current && current > moment().endOf("day")) ||
+                    moment().diff(current, "years") < 18
+                  }
                   onChange={(e: any) => handleOnChangeBirthday(e)}
                   defaultValue={moment(data.birthDate)}
                 />
@@ -998,7 +1020,10 @@ const EditFarmer = () => {
           {farmerPlotList.length !== 0 ? (
             <div className="container">
               {farmerPlotList.map((item, index) => (
-                <div className="row pt-3 pb-3">
+                <div
+                  className="row pt-3 pb-3"
+                  style={{ justifyContent: "space-between" }}
+                >
                   <div className="col-lg-4">
                     <p
                       style={{
@@ -1025,7 +1050,7 @@ const EditFarmer = () => {
                     >
                       <Badge
                         color={STATUS_FARMERPLOT_COLOR_MAPPING[item.status]}
-                      />
+                      />{" "}
                       {STATUS_NORMAL_MAPPING[item.status]}
                     </span>
                   </div>

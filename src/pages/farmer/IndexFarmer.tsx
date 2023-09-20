@@ -56,7 +56,8 @@ import { numberWithCommas } from "../../utilities/TextFormatter";
 import { image } from "../../resource";
 import { CheckboxValueType } from "antd/lib/checkbox/Group";
 import { STATUS_NORMAL_MAPPING } from "../../definitions/Status";
-import ListCreateBy from "../../components/dropdownCheck/ListStatusFarmer";
+import { ListCheck } from "../../components/dropdownCheck/ListStatusAppType";
+import { DropdownStatus } from "../../components/dropdownCheck/DropDownStatus";
 
 interface SearchSelectType {
   label: any;
@@ -84,14 +85,12 @@ function IndexFarmer() {
   const [sumPlotCard, setSumPlotCard] = useState<any>({
     card1: "รอตรวจสอบ",
     card2: "ไม่อนุมัติ",
+    card3: "ข้อมูลไม่ครบถ้วน",
   });
   const [mainStatus, setMainStatus] = useState<any>("PENDING");
   const [waitPendingDate, setWaitPendingDate] = useState<any>();
   const [appType, setAppType] = useState<any>();
   const [summary, setSummary] = useState<any>();
-  const [visibleStatus, setVisibleStatus] = useState(false);
-  const [indeterminatePending, setIndeterminatePending] = useState(false);
-  const [checkAllPending, setCheckAllPending] = useState(false);
   const [statusArr, setStatusArr] = useState<string[]>([]);
   const [statusArrMain, setStatusArrMain] = useState<string[]>([]);
   const [sortDirection1, setSortDirection1] = useState<string | undefined>(
@@ -103,6 +102,7 @@ function IndexFarmer() {
   const [sortDirection3, setSortDirection3] = useState<string | undefined>(
     undefined
   );
+  const [fetchData, setFetchData] = useState<boolean>(false);
 
   const fetchFarmer = async () => {
     setLoading(true);
@@ -133,6 +133,7 @@ function IndexFarmer() {
       setProvince(res);
     });
   };
+
   const fetchDistrict = async (provinceId: number) => {
     await LocationDatasource.getDistrict(provinceId).then((res) => {
       setDistrict(res);
@@ -144,135 +145,58 @@ function IndexFarmer() {
     });
   };
   useEffect(() => {
+    LocationDatasource.getDistrict(searchProvince).then((res) => {
+      setDistrict(res);
+      setSearchDistrict(null);
+    });
+  }, [searchProvince]);
+  useEffect(() => {
+    LocationDatasource.getSubdistrict(searchDistrict).then((res) => {
+      setSubdistrict(res);
+      setSearchSubdistrict(null);
+    });
+  }, [searchDistrict]);
+  useEffect(() => {
     fetchFarmer();
     fetchProvince();
-  }, [sortDirection, current, mainStatus, row]);
+  }, [sortDirection, mainStatus, current, fetchData]);
 
   const onChangePage = (page: number) => {
     setCurrent(page);
   };
-  const onCheckAllPending = (e: any) => {
-    let value = e.target.value;
-    let checked = e.target.checked;
-    let arr: any = 0;
-    if (checked === true) {
-      arr = [...statusArr, value];
-      setStatusArr([...statusArr, value]);
-      setSearchStatus(value);
-    } else {
-      let d: string[] = statusArr.filter((x) => x != value);
-      arr = [...d];
-      setStatusArr(d);
-      if (d.length == 0) {
-        arr = undefined;
+
+  const onSearchStatus = (value: string, checked: boolean) => {
+    if (statusListPend.map((x) => x).find((c) => c === value)) {
+      let arr: any = 0;
+      if (checked === true) {
+        arr = [...statusArr, value];
+        setStatusArr([...statusArr, value]);
+        setWaitPendingDate(value);
+      } else {
+        let d: string[] = statusArr.filter((x) => x !== value);
+        arr = [...d];
+        setStatusArr(d);
+        if (d.length === 0) {
+          arr = undefined;
+        }
       }
-    }
-    setSearchStatus(arr);
-    setWaitPendingDate(e.target.checked ? statusListPend : []);
-    setIndeterminatePending(false);
-    setCheckAllPending(e.target.checked);
-  };
-  const onChangeListPending = (list: CheckboxValueType[]) => {
-    setSearchStatus(undefined);
-    let arr: any = 0;
-    arr = [...list];
-    setWaitPendingDate(list);
-    setIndeterminatePending(
-      !!list.length && list.length < statusListPend.length
-    );
-    setCheckAllPending(list.length === statusListPend.length);
-  };
-  const onSearchStatus = (e: any) => {
-    let value = e.target.value;
-    let checked = e.target.checked;
-    let arr: any = 0;
-    if (checked === true) {
-      arr = [...statusArrMain, value];
-      setStatusArrMain([...statusArrMain, value]);
-      setSearchStatus(value);
+      setWaitPendingDate(arr);
     } else {
-      let d: string[] = statusArrMain.filter((x) => x != value);
-      arr = [...d];
-      setStatusArrMain(d);
-      if (d.length == 0) {
-        arr = undefined;
+      let arr: any = 0;
+      if (checked === true) {
+        arr = [...statusArrMain, value];
+        setStatusArrMain([...statusArrMain, value]);
+        setSearchStatus(value);
+      } else {
+        let d: string[] = statusArrMain.filter((x) => x !== value);
+        arr = [...d];
+        setStatusArrMain(d);
+        if (d.length === 0) {
+          arr = undefined;
+        }
       }
+      setSearchStatus(arr);
     }
-    setSearchStatus(arr);
-  };
-  const SubStatus = (
-    <Menu
-      items={[
-        mainStatus === "PENDING"
-          ? {
-              label: (
-                <>
-                  <Checkbox
-                    indeterminate={indeterminatePending}
-                    onChange={onCheckAllPending}
-                    checked={checkAllPending}
-                    value="PENDING"
-                  >
-                    รอตรวจสอบ
-                  </Checkbox>
-                  <br />
-                  <Checkbox.Group
-                    value={waitPendingDate}
-                    style={{ width: "100%" }}
-                    onChange={onChangeListPending}
-                  >
-                    <Checkbox style={{ marginLeft: "20px" }} value="FIRST">
-                      0-2 วัน
-                    </Checkbox>
-                    <br />
-                    <Checkbox style={{ marginLeft: "20px" }} value="SECOND">
-                      3-6 วัน
-                    </Checkbox>
-                    <br />
-                    <Checkbox style={{ marginLeft: "20px" }} value="THIRD">
-                      7 วันขึ้นไป
-                    </Checkbox>
-                  </Checkbox.Group>
-                </>
-              ),
-              key: "1",
-            }
-          : {
-              label: (
-                <>
-                  <Checkbox onClick={onSearchStatus} value="ACTIVE">
-                    ใช้งาน
-                  </Checkbox>
-                </>
-              ),
-              key: "1",
-            },
-        mainStatus === "PENDING"
-          ? {
-              label: (
-                <>
-                  <Checkbox onClick={onSearchStatus} value="REJECTED">
-                    ไม่อนุมัติ
-                  </Checkbox>
-                </>
-              ),
-              key: "2",
-            }
-          : {
-              label: (
-                <>
-                  <Checkbox onClick={onSearchStatus} value="INACTIVE">
-                    ปิดการใช้งาน
-                  </Checkbox>
-                </>
-              ),
-              key: "2",
-            },
-      ]}
-    />
-  );
-  const handleVisibleStatus = (newVisible: any) => {
-    setVisibleStatus(newVisible);
   };
 
   const CheckStatus = (e: any) => {
@@ -282,6 +206,7 @@ function IndexFarmer() {
       setSumPlotCard({
         card1: "รอตรวจสอบ",
         card2: "ไม่อนุมัติ",
+        card3: "ข้อมูลไม่ครบถ้วน",
       });
     } else {
       setSearchStatus(undefined);
@@ -296,36 +221,39 @@ function IndexFarmer() {
 
   const handleSearchText = (e: any) => {
     setSearchText(e.target.value);
-    setCurrent(1);
   };
-  const handleSearchProvince = (provinceId: number) => {
+  const handleSearchProvince = (provinceId: any) => {
+    const filterId = district?.map((x) => x.provinceId)[0];
+    if (!provinceId || parseFloat(provinceId) !== filterId) {
+      setSearchDistrict(undefined);
+      setSearchSubdistrict(undefined);
+      setSearchProvince(undefined);
+    }
     setSearchProvince(provinceId);
     fetchDistrict(provinceId);
-    setCurrent(1);
   };
-  const handleSearchDistrict = (districtId: number) => {
+  const handleSearchDistrict = (districtId: any) => {
+    if (!districtId) {
+      setSearchSubdistrict(undefined);
+    }
     fetchSubdistrict(districtId);
     setSearchDistrict(districtId);
-    setCurrent(1);
   };
   const handleSearchSubdistrict = (subdistrictId: any) => {
     setSearchSubdistrict(subdistrictId);
-    setCurrent(1);
   };
 
-  const onSearchCreateBy = (e: any) => {
-    let value = e.target.value;
-    let checked = e.target.checked;
+  const onSearchCreateBy = (value: string, checked: boolean) => {
     let arr: any = 0;
     if (checked === true) {
       arr = [...appTypeArr, value];
       setAppTypeArr([...appTypeArr, value]);
       setAppType(value);
     } else {
-      let d: string[] = appTypeArr.filter((x) => x != value);
+      let d: string[] = appTypeArr.filter((x) => x !== value);
       arr = [...d];
       setAppTypeArr(d);
-      if (d.length == 0) {
+      if (d.length === 0) {
         arr = undefined;
       }
     }
@@ -369,13 +297,19 @@ function IndexFarmer() {
         </div>
       </div>
       <StatusPlots
+        checkPage="DronerPage"
         title1={sumPlotCard?.card1}
         title2={sumPlotCard?.card2}
+        title3={sumPlotCard?.card3}
+        status={mainStatus}
         bgColor1={
           sumPlotCard?.card1 === "รอตรวจสอบ" ? color.Warning : color.Success
         }
         bgColor2={
           sumPlotCard?.card2 === "ไม่อนุมัติ" ? color.Grey : color.Error
+        }
+        bgColor3={
+          sumPlotCard?.card3 === "ข้อมูลไม่ครบถ้วน" ? color.Disable : "none"
         }
         countPlot1={
           mainStatus === "PENDING"
@@ -386,6 +320,11 @@ function IndexFarmer() {
           mainStatus === "ACTIVE"
             ? numberWithCommas(summary?.count_inactive) + " คน"
             : numberWithCommas(summary?.count_reject) + " คน"
+        }
+        countPlot3={
+          mainStatus === "PENDING"
+            ? numberWithCommas(summary?.count_open) + " คน"
+            : null
         }
       />
       <div
@@ -441,7 +380,8 @@ function IndexFarmer() {
                 .toLowerCase()
                 .localeCompare(optionB.children.toLowerCase())
             }
-            disabled={searchProvince == undefined}
+            disabled={!searchProvince}
+            value={searchDistrict}
           >
             {district?.map((item) => (
               <option value={item.districtId.toString()}>
@@ -466,7 +406,8 @@ function IndexFarmer() {
                 .toLowerCase()
                 .localeCompare(optionB.children.toLowerCase())
             }
-            disabled={searchDistrict == undefined}
+            disabled={!searchDistrict}
+            value={searchSubdistrict}
           >
             {subdistrict?.map((item) => (
               <option value={item.subdistrictId.toString()}>
@@ -475,26 +416,26 @@ function IndexFarmer() {
             ))}
           </Select>
         </div>
-        <div>
-          <ListCreateBy
-            onSearchType={(e) => onSearchCreateBy(e)}
+        <div className="col-lg-2">
+          <ListCheck
+            onSearchType={(value: any, checked: any) =>
+              onSearchCreateBy(value, checked)
+            }
             list={appType}
             title="เลือกรูปแบบการสร้าง"
+            menu="FARMER"
           />
         </div>
-        <div className="col-lg pt-1 p-1">
-          <Dropdown
-            overlay={SubStatus}
-            trigger={["click"]}
-            className="col-lg-12 p-1"
-            onVisibleChange={handleVisibleStatus}
-            visible={visibleStatus}
-          >
-            <Button style={{ color: color.Disable }}>
-              เลือกสถานะ
-              <DownOutlined style={{ verticalAlign: 2 }} />
-            </Button>
-          </Dropdown>
+        <div className="col-lg">
+          <DropdownStatus
+            title="เลือกสถานะ"
+            mainStatus={mainStatus}
+            onSearchType={(value: any, checked: any) =>
+              onSearchStatus(value, checked)
+            }
+            list={searchStatus}
+            menu="DRONER"
+          />
         </div>
         <div className="pt-1">
           <Button
@@ -504,7 +445,10 @@ function IndexFarmer() {
               color: color.secondary2,
               backgroundColor: color.Success,
             }}
-            onClick={fetchFarmer}
+            onClick={() => {
+              setCurrent(1);
+              setFetchData(!fetchData);
+            }}
           >
             ค้นหาข้อมูล
           </Button>
@@ -657,60 +601,21 @@ function IndexFarmer() {
       key: "telephoneNo",
     },
     {
-      title: "จังหวัด",
-      dataIndex: "province",
-      key: "province",
+      title: "ที่อยู่",
+      dataIndex: "address",
+      key: "address",
       render: (value: any, row: any, index: number) => {
+        const subdistrict =
+          row.address !== null ? row.address.subdistrict : null;
+        const district = row.address !== null ? row.address.district : null;
+        const province = row.address !== null ? row.address.province : null;
+
         return {
           children: (
-            <span>
-              {row?.address !== null
-                ? row?.address?.province !== null
-                  ? row.address.province.provinceName !== null
-                    ? row.address.province.provinceName
-                    : "-"
-                  : "-"
-                : "-"}
-            </span>
-          ),
-        };
-      },
-    },
-    {
-      title: "อำเภอ",
-      dataIndex: "district",
-      key: "district",
-      render: (value: any, row: any, index: number) => {
-        return {
-          children: (
-            <span>
-              {row?.address !== null
-                ? row?.address?.district !== null
-                  ? row.address.district.districtName !== null
-                    ? row.address.district.districtName
-                    : "-"
-                  : "-"
-                : "-"}
-            </span>
-          ),
-        };
-      },
-    },
-    {
-      title: "ตำบล",
-      dataIndex: "date",
-      key: "date",
-      render: (value: any, row: any, index: number) => {
-        return {
-          children: (
-            <span>
-              {row?.address !== null
-                ? row?.address?.subdistrict !== null
-                  ? row.address.subdistrict.subdistrictName !== null
-                    ? row.address.subdistrict.subdistrictName
-                    : "-"
-                  : "-"
-                : "-"}
+            <span className="text-dark-75  d-block font-size-lg">
+              {subdistrict ? subdistrict.subdistrictName + "/" : "-/"}
+              {district ? district.districtName + "/" : "-/"}
+              {province ? province.provinceName : "-"}
             </span>
           ),
         };
@@ -828,12 +733,14 @@ function IndexFarmer() {
       key: "status",
       render: (value: any, row: any, index: number) => {
         const countDay = () => {
-          let dateToday: any = moment(Date.now());
-          let createDate: any = moment(new Date(row.dateWaitPending));
-          let dateDiff = dateToday.diff(createDate, "day");
-          let textDateDiff =
-            dateDiff === 0 ? null : "(รอไปแล้ว " + dateDiff + " วัน)";
-          return textDateDiff;
+          if (row.dateWaitPending != null) {
+            const nowDate = new Date(Date.now());
+            const rowDate = new Date(row.dateWaitPending);
+            const diffTime = nowDate.getTime() - rowDate.getTime();
+            let diffDay = Math.floor(diffTime / (1000 * 3600 * 24));
+            diffDay = diffDay === 0 ? 1 : diffDay;
+            return `(รอไปแล้ว ${diffDay} วัน)`;
+          }
         };
         let checkProfile = ![
           row.firstname,

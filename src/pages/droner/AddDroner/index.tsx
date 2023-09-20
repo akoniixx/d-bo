@@ -99,6 +99,7 @@ function AddDroner() {
   const [dronerDroneList, setDronerDroneList] = useState<DronerDroneEntity[]>(
     []
   );
+  const [showModal, setShowModal] = useState(false);
   const [imgBB, setImgBB] = useState<any>();
   const [bookBank, setBookBank] = useState<BookBankEntities>(
     BookBankEntities_INIT
@@ -713,7 +714,8 @@ function AddDroner() {
                     message: "กรุณากรอกเบอร์โทร!",
                   },
                   {
-                    pattern: new RegExp(/^[0-9\b]+$/),
+                    pattern:
+                      new RegExp(/^[0-9\b]+$/) && new RegExp(/^0[689]\d{8}$/),
                     message: "กรุณากรอกเบอร์โทรให้ถูกต้อง!",
                   },
                   {
@@ -737,7 +739,8 @@ function AddDroner() {
                   format={dateFormat}
                   locale={locale}
                   disabledDate={(current) =>
-                    current && current > moment().endOf("day")
+                    (current && current > moment().endOf("day")) ||
+                    moment().diff(current, "years") < 18
                   }
                   onChange={(e) => {
                     setBirthDay(moment(e).toISOString());
@@ -1183,10 +1186,10 @@ function AddDroner() {
             </Form.Item>
           </div>
           <div className="form-group">
-            <label>หรือ</label>
+            <label>Google Map Link</label>
             <Form.Item name="mapUrl">
               <Input
-                placeholder="กรอกข้อมูล Url Google Map"
+                placeholder="กรอกข้อมูล Url Google Map Link"
                 autoComplete="off"
               />
             </Form.Item>
@@ -1297,13 +1300,14 @@ function AddDroner() {
             </Form.Item>
           </div>
           <div className="form-group col-lg-12">
-            <label></label>
             <Form.Item
               name="plantsOther"
               dependencies={["checkPlantsOther"]}
               rules={[
                 {
                   validator(rule, value) {
+                    const lastChar = value[value.length - 1];
+                    console.log(lastChar);
                     const splitValue = (value && value.split(",")) || [];
                     const valueCheckbox =
                       form.getFieldValue("checkPlantsOther");
@@ -1482,6 +1486,15 @@ function AddDroner() {
           editIndex={editIndex}
           title="แก้ไขข้อมูลโดรนเกษตร"
         />
+      )}
+      {showModal && (
+        <div className="modal">
+          <div className="modal-content">
+            <p>Are you sure you want to leave?</p>
+            <button onClick={() => setShowModal(false)}>Stay</button>
+            <button onClick={() => setShowModal(false)}>Leave</button>
+          </div>
+        </div>
       )}
     </>
   );

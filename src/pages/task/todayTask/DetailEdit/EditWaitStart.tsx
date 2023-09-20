@@ -49,6 +49,7 @@ import { CouponDataSource } from "../../../../datasource/CouponDatasource";
 import { numberWithCommas } from "../../../../utilities/TextFormatter";
 import { DashboardLayout } from "../../../../components/layout/Layout";
 import { useNavigate } from "react-router-dom";
+import { listAppType } from "../../../../definitions/ApplicatoionTypes";
 const { Map } = require("immutable");
 const _ = require("lodash");
 const dateFormat = "DD/MM/YYYY";
@@ -404,6 +405,24 @@ function EditWaitStart() {
               {data?.farmAreaAmount} ไร่) ราคาไร่ละ {data.unitPrice} บาท
             </p>
           </div>
+          <div className="form-group col-lg-12 pb-3">
+                <label>สร้างโดย</label>
+                {listAppType.map(
+                  (item, index) =>
+                    data.applicationType === item.value && (
+                      <div>
+                        <img
+                          src={item.icon}
+                          style={{ width: 22, height: 22 }}
+                        />
+                        <span>
+                          {" "}
+                          {data.createBy ? data.createBy + ` ${item.create}` : "-"}
+                        </span>
+                      </div>
+                    )
+                )}
+              </div>
           <label style={{ marginBottom: "10px" }}>
             สถานะ <span style={{ color: "red" }}>*</span>
           </label>

@@ -76,8 +76,11 @@ import {
 } from "../../../entities/TaskDronerTemp";
 import ModalSelectedEditDroner from "../../../components/modal/task/newTask/ModalSelectedEditDroner";
 import {
+  formatNumberWithCommas,
   numberWithCommas,
   numberWithCommasToFixed,
+  validateOnlyNumWDecimal,
+  validateOnlyNumber,
 } from "../../../utilities/TextFormatter";
 import { TaskDronerTempDataSource } from "../../../datasource/TaskDronerTempDatasource";
 import Swal from "sweetalert2";
@@ -95,8 +98,9 @@ import { useNavigate } from "react-router-dom";
 import { AsyncPaginate } from "react-select-async-paginate";
 import { OptionType } from "./AddNewTask";
 import type { GroupBase, OptionsOrGroups } from "react-select";
-import { InputPicker } from 'rsuite';
-import 'rsuite/dist/rsuite.min.css';
+import { InputPicker } from "rsuite";
+import "rsuite/dist/rsuite.min.css";
+import { ModalAcceptedTask } from "../../../components/modal/ModalAcceptedTask";
 
 const dateFormat = "DD/MM/YYYY";
 const dateCreateFormat = "YYYY-MM-DD";
@@ -139,6 +143,7 @@ const EditNewTask = () => {
     status: "",
     message: "",
   });
+  const [modalCheckUpdate, setModalCheckUpdate] = useState<boolean>(false);
 
   const [couponData, setCouponData] = useState<TaskCoupon>(TaskCoupon_INIT);
   const [getCoupon, setGetCoupon] = useState<GetTaskCoupon>(GetTaskCoupon_INIT);
@@ -168,11 +173,11 @@ const EditNewTask = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const options: OptionType[] = [];
   const [currenSearch, setCurrentSearch] = useState(1);
-  const [selectFarmer,setSelectFarmer] = useState<string>("")
-  const [searchFilterFarmer,setSearchFilterFarmer] = useState<string>("")
-  const [farmerListDropdown,setFarmerListDropdown] = useState<any>([])
-  const [count,setCount] = useState<number>(0)
-  const [showData,setShowData] = useState<boolean>(true)
+  const [selectFarmer, setSelectFarmer] = useState<string>("");
+  const [searchFilterFarmer, setSearchFilterFarmer] = useState<string>("");
+  const [farmerListDropdown, setFarmerListDropdown] = useState<any>([]);
+  const [count, setCount] = useState<number>(0);
+  const [showData, setShowData] = useState<boolean>(true);
   const [farmerPlotId, setFarmerPlotId] = useState<string>("");
 
   const twice = useRef<boolean>(true);
@@ -224,21 +229,22 @@ const EditNewTask = () => {
     fetchFarmerList();
   }, []);
 
-  useEffect(()=>{
+  useEffect(() => {
     TaskDatasource.getFarmerListTask(searchFilterFarmer, currenSearch, 10).then(
       (res: FarmerPageEntity) => {
-       const data = res.data.map((item)=>{
-        return {
-          ...item,
-          label : item.firstname + " " + item.lastname + " | " + item.telephoneNo,
-          value : item.id
-        }
-       })
-       setCount(res.count)
-       setFarmerListDropdown(data)
+        const data = res.data.map((item) => {
+          return {
+            ...item,
+            label:
+              item.firstname + " " + item.lastname + " | " + item.telephoneNo,
+            value: item.id,
+          };
+        });
+        setCount(res.count);
+        setFarmerListDropdown(data);
       }
     );
-  },[searchFilterFarmer])
+  }, [searchFilterFarmer]);
 
   // #region step 1
   // const fetchFarmerList = async () => {
@@ -264,39 +270,43 @@ const EditNewTask = () => {
   // };
   const fetchFarmerList = () => {
     TaskDatasource.getFarmerListTask(searchFilterFarmer, currenSearch, 10).then(
-     (res: FarmerPageEntity) => {
-      const data = res.data.map((item)=>{
-       return {
-         ...item,
-         label : item.firstname + " " + item.lastname + " | " + item.telephoneNo,
-         value : item.id
-       }
-      })
-      setCount(res.count)
-      setFarmerListDropdown(data)
-     }
-   );
- };
-
- const onItemsRendered = (props : any)=> {
-  if (props.visibleStopIndex >= farmerListDropdown.length - 1) {
-     if(farmerListDropdown.length < count){
-      TaskDatasource.getFarmerListTask(searchFilterFarmer, currenSearch+1, 10).then(
-        (res: FarmerPageEntity) => {
-         const data = res.data.map((item)=>{
+      (res: FarmerPageEntity) => {
+        const data = res.data.map((item) => {
           return {
             ...item,
-            label : item.firstname + " " + item.lastname + " | " + item.telephoneNo,
-            value : item.id
-          }
-         })
-         setCurrentSearch(currenSearch+1)
-         setFarmerListDropdown([...farmerListDropdown,...data])
-        }
-      );
-     }
-  }
-};
+            label:
+              item.firstname + " " + item.lastname + " | " + item.telephoneNo,
+            value: item.id,
+          };
+        });
+        setCount(res.count);
+        setFarmerListDropdown(data);
+      }
+    );
+  };
+
+  const onItemsRendered = (props: any) => {
+    if (props.visibleStopIndex >= farmerListDropdown.length - 1) {
+      if (farmerListDropdown.length < count) {
+        TaskDatasource.getFarmerListTask(
+          searchFilterFarmer,
+          currenSearch + 1,
+          10
+        ).then((res: FarmerPageEntity) => {
+          const data = res.data.map((item) => {
+            return {
+              ...item,
+              label:
+                item.firstname + " " + item.lastname + " | " + item.telephoneNo,
+              value: item.id,
+            };
+          });
+          setCurrentSearch(currenSearch + 1);
+          setFarmerListDropdown([...farmerListDropdown, ...data]);
+        });
+      }
+    }
+  };
 
   const sleep = (ms: number) =>
     new Promise((resolve) => {
@@ -345,9 +355,9 @@ const EditNewTask = () => {
   }, []);
 
   const handleSearchFarmer = (id: any) => {
-    setSelectFarmer(id)
-    setFarmerSelected(farmerListDropdown.filter((x : any) => x.id === id)[0]);
-    setShowData(false)
+    setSelectFarmer(id);
+    setFarmerSelected(farmerListDropdown.filter((x: any) => x.id === id)[0]);
+    setShowData(false);
   };
 
   const fetchLocationPrice = async (
@@ -411,7 +421,7 @@ const EditNewTask = () => {
     newData.droner = "";
     newData.farmerPlot = FarmerPlotEntity_INIT;
     setData(newData);
-    setShowData(true)
+    setShowData(true);
     setCheckSelectPlot("error");
     setDronerSelected([]);
     setDataFarmer(farmerSelected);
@@ -438,30 +448,37 @@ const EditNewTask = () => {
     );
   };
   const handleAmountRai = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const values = validateOnlyNumber(e.target.value);
     const payload = {
       ...data,
     };
-    payload.priceStandard = data.unitPriceStandard * parseFloat(e.target.value);
-    payload.price = String(data.unitPriceStandard * parseFloat(e.target.value));
+    payload.priceStandard = data.unitPriceStandard * parseFloat(values);
+    payload.price = data.unitPriceStandard * parseFloat(values);
     payload.unitPriceStandard = data.unitPrice;
-    payload.farmAreaAmount = e.target.value;
+    payload.farmAreaAmount = values;
     setData(payload);
   };
   const handlePeriodSpray = (e: any) => {
     const d = Map(data).set("purposeSprayId", e);
     setData(d.toJS());
   };
+
   const handleCalServiceCharge = (e: any) => {
-    if (e.target.id == "unitPrice") {
-      let calUnitPrice = parseFloat(data.farmAreaAmount) * e.target.value;
-      const d = Map(data).set("unitPrice", e.target.value);
-      const pushCal = Map(d.toJS()).set("price", calUnitPrice);
-      setData(pushCal.toJS());
+    const values = validateOnlyNumWDecimal(e.target.value);
+    if (values.startsWith(".")) {
+      e.preventDefault();
     } else {
-      let calUnitPrice = e.target.value / parseFloat(data.farmAreaAmount);
-      const d = Map(data).set("price", e.target.value);
-      const pushCal = Map(d.toJS()).set("unitPrice", calUnitPrice);
-      setData(pushCal.toJS());
+      if (e.target.id == "unitPrice") {
+        let calUnitPrice = parseFloat(data.farmAreaAmount) * parseFloat(values);
+        const d = Map(data).set("unitPrice", values);
+        const pushCal = Map(d.toJS()).set("price", calUnitPrice.toFixed(2));
+        setData(pushCal.toJS());
+      } else {
+        let calUnitPrice = parseFloat(values) / parseFloat(data.farmAreaAmount);
+        const d = Map(data).set("price", values);
+        const pushCal = Map(d.toJS()).set("unitPrice", calUnitPrice.toFixed(2));
+        setData(pushCal.toJS());
+      }
     }
   };
   const handlePurposeSpray = (e: any) => {
@@ -540,7 +557,7 @@ const EditNewTask = () => {
   };
   const selectPrice = (e: any) => {
     setPriceMethod(e.target.outerText);
-    if (e.target.outerText == "กรอกข้อมูลเอง") {
+    if (e.target.outerText === "กรอกข้อมูลเอง") {
       const d = Map(data).set("price", 0);
       const pushCal = Map(d.toJS()).set("unitPrice", 0);
       setData(pushCal.toJS());
@@ -564,33 +581,33 @@ const EditNewTask = () => {
               <div className="row">
                 <div className="form-group col-lg-6">
                   <Form.Item name="searchAddress">
-                  <InputPicker 
-                    virtualized
-                    value={selectFarmer}
-                    onChange={handleSearchFarmer}
-                    listProps={{
-                      onItemsRendered
-                     }}
-                    searchBy={(keyword:string, label, item)=>true}
-                    onClean={()=>{
-                        setCurrentSearch(1)
-                        setSearchFilterFarmer("")
-                        setDataFarmer(FarmerEntity_INIT)
-                        setFarmerPlotId("")
-                        setShowData(false)
-                    }}
-                    onSearch={(val)=>{
-                      if(!!val){
-                        setCurrentSearch(1)
-                        setSearchFilterFarmer(val)
-                      }
-                    }}
-                    style={{
-                      width : '100%'
-                    }}
-                    placeholder="ค้นหาชื่อเกษตรกร/เบอร์โทร/เลขบัตรปชช."
-                    data={farmerListDropdown}
-                  />
+                    <InputPicker
+                      virtualized
+                      value={selectFarmer}
+                      onChange={handleSearchFarmer}
+                      listProps={{
+                        onItemsRendered,
+                      }}
+                      searchBy={(keyword: string, label, item) => true}
+                      onClean={() => {
+                        setCurrentSearch(1);
+                        setSearchFilterFarmer("");
+                        setDataFarmer(FarmerEntity_INIT);
+                        setFarmerPlotId("");
+                        setShowData(false);
+                      }}
+                      onSearch={(val) => {
+                        if (!!val) {
+                          setCurrentSearch(1);
+                          setSearchFilterFarmer(val);
+                        }
+                      }}
+                      style={{
+                        width: "100%",
+                      }}
+                      placeholder="ค้นหาชื่อเกษตรกร/เบอร์โทร/เลขบัตรปชช."
+                      data={farmerListDropdown}
+                    />
                     {/* <AsyncPaginate
                       isClearable
                       debounceTimeout={300}
@@ -676,7 +693,9 @@ const EditNewTask = () => {
                             ? "error"
                             : ""
                         }
-                        value={data?.farmAreaAmount}
+                        value={numberWithCommasToFixed(
+                          parseFloat(data?.farmAreaAmount)
+                        )}
                         onChange={handleAmountRai}
                         disabled={
                           current === 2 ||
@@ -845,7 +864,9 @@ const EditNewTask = () => {
                         <Form.Item>
                           <Input
                             suffix="บาท"
-                            value={data.priceStandard}
+                            value={numberWithCommasToFixed(
+                              parseFloat(data.priceStandard.toString())
+                            )}
                             disabled
                             autoComplete="off"
                             step="0.01"
@@ -863,7 +884,7 @@ const EditNewTask = () => {
                           <Input
                             suffix="บาท/ไร่"
                             id="unitPrice"
-                            value={data.unitPrice}
+                            value={formatNumberWithCommas(data.unitPrice)}
                             onChange={handleCalServiceCharge}
                             disabled={
                               current == 2 ||
@@ -883,7 +904,7 @@ const EditNewTask = () => {
                         <Form.Item>
                           <Input
                             suffix="บาท"
-                            value={data.price}
+                            value={formatNumberWithCommas(data.price)}
                             onChange={handleCalServiceCharge}
                             disabled={
                               current == 2 ||
@@ -920,6 +941,9 @@ const EditNewTask = () => {
                   format={dateFormat}
                   className="col-lg-12"
                   disabled={current == 2 || checkSelectPlot == "error"}
+                  disabledDate={(current) =>
+                    current && current < moment().startOf("day")
+                  }
                   onChange={(e: any) => handleDate(e)}
                   defaultValue={moment(dateAppointment)}
                 />
@@ -1078,21 +1102,27 @@ const EditNewTask = () => {
       status,
       ratingMin,
       ratingMax
-    ).then((res) => {
-      res.map((item) =>
-        _.set(
-          item,
-          "isChecked",
-          dronerSelectedList
-            .map((x) => x)
-            .find((y) => y.dronerId === item.droner_id)
-            ? true
-            : false
-        )
-      );
-      setDataDronerList(res);
-      setLoading(false);
-    });
+    )
+      .then((res) => {
+        if (Array.isArray(res)) {
+          res.forEach((item) => {
+            _.set(
+              item,
+              "isChecked",
+              dronerSelectedList
+                .map((x) => x)
+                .find((y) => y.dronerId === item.droner_id)
+                ? true
+                : false
+            );
+          });
+          setDataDronerList(res);
+        } else {
+          setDataDronerList([]);
+        }
+      })
+      .catch((err) => console.log(err))
+      .finally(() => setLoading(false));
   };
   const ratingStar = (
     <Menu
@@ -1510,7 +1540,10 @@ const EditNewTask = () => {
               <span>{row.firstname + " " + row.lastname}</span>
               {row.rating_avg != null && (
                 <Tooltip title={tooltipTitle} className="p-2">
-                  <img src={icon.iconReviewDroner} />
+                  <img
+                    src={icon.iconReviewDroner}
+                    style={{ width: 32, height: 32 }}
+                  />
                 </Tooltip>
               )}
 
@@ -1579,9 +1612,13 @@ const EditNewTask = () => {
         return {
           children: (
             <>
-              {row.subdistrict_name && <span>{row.subdistrict_name}/</span>}
-              {row.district_name && <span>{row.district_name}/</span>}
-              {row.province_name && <span>{row.province_name}</span>}
+              {row.subdistrict_name ? (
+                <span>{row.subdistrict_name}/</span>
+              ) : (
+                "-/"
+              )}
+              {row.district_name ? <span>{row.district_name}/</span> : "-/"}
+              {row.province_name ? <span>{row.province_name}</span> : "-"}
             </>
           ),
         };
@@ -1609,17 +1646,23 @@ const EditNewTask = () => {
         return {
           children: (
             <>
-              <Avatar
-                size={25}
-                src={row.logo_drone_brand}
-                style={{ marginRight: "5px" }}
-              />
-              <span>{row.drone_brand}</span>
-              <br />
-              {row.count_drone > 1 && (
-                <p style={{ fontSize: "12px", color: color.Grey }}>
-                  (มากกว่า 1 ยี่ห้อ)
-                </p>
+              {row.drone_brand ? (
+                <>
+                  <Avatar
+                    size={25}
+                    src={row.logo_drone_brand}
+                    style={{ marginRight: "5px" }}
+                  />
+                  <span>{row.drone_brand}</span>
+                  <br />
+                  {row.count_drone > 1 && (
+                    <p style={{ fontSize: "12px", color: color.Grey }}>
+                      (มากกว่า 1 ยี่ห้อ)
+                    </p>
+                  )}
+                </>
+              ) : (
+                "-"
               )}
             </>
           ),
@@ -1705,36 +1748,48 @@ const EditNewTask = () => {
                       {JSON.parse(item?.dronerDetail).telephone_no}
                     </div>
                     <div className="col-lg-3">
-                      {JSON.parse(item?.dronerDetail).subdistrict_name && (
+                      {JSON.parse(item?.dronerDetail).subdistrict_name ? (
                         <>{JSON.parse(item?.dronerDetail).subdistrict_name}/</>
+                      ) : (
+                        "-/"
                       )}
-                      {JSON.parse(item?.dronerDetail).district_name && (
+                      {JSON.parse(item?.dronerDetail).district_name ? (
                         <>{JSON.parse(item?.dronerDetail).district_name}/</>
+                      ) : (
+                        "-/"
                       )}
-                      {JSON.parse(item?.dronerDetail).province_name && (
+                      {JSON.parse(item?.dronerDetail).province_name ? (
                         <>{JSON.parse(item?.dronerDetail).province_name}</>
+                      ) : (
+                        "-"
                       )}
                     </div>
                     <div className="col-lg-1">
                       {JSON.parse(item.distance).toFixed(0)} km
                     </div>
                     <div className="col-lg-2">
-                      <Avatar
-                        size={25}
-                        src={JSON.parse(item.dronerDetail).logo_drone_brand}
-                        style={{ marginRight: "5px" }}
-                      />
-                      {JSON.parse(item?.dronerDetail).drone_brand}
-                      <br />
-                      <p
-                        style={{
-                          fontSize: "12px",
-                          color: color.Grey,
-                        }}
-                      >
-                        {JSON.parse(item.dronerDetail).count_drone > 1 &&
-                          "(มากกว่า 1 ยี่หัอ)"}
-                      </p>
+                      {JSON.parse(item?.dronerDetail).drone_brand ? (
+                        <>
+                          <Avatar
+                            size={25}
+                            src={JSON.parse(item.dronerDetail).logo_drone_brand}
+                            style={{ marginRight: "5px" }}
+                          />
+                          {JSON.parse(item?.dronerDetail).drone_brand}
+                          <br />
+                          <p
+                            style={{
+                              fontSize: "12px",
+                              color: color.Grey,
+                            }}
+                          >
+                            {JSON.parse(item.dronerDetail).count_drone > 1 &&
+                              "(มากกว่า 1 ยี่หัอ)"}
+                          </p>
+                        </>
+                      ) : (
+                        "-"
+                      )}
                     </div>
                     <div className="col-lg-1">
                       <span
@@ -1800,7 +1855,7 @@ const EditNewTask = () => {
                 <Form.Item>
                   <Input
                     suffix="บาท"
-                    value={numberWithCommas(couponData?.priceBefore)}
+                    value={numberWithCommasToFixed(couponData?.priceBefore)}
                     disabled={current == 2}
                     autoComplete="off"
                     step="0.01"
@@ -1812,7 +1867,7 @@ const EditNewTask = () => {
                 <Form.Item>
                   <Input
                     suffix="บาท"
-                    value={numberWithCommas(couponData?.fee)}
+                    value={numberWithCommasToFixed(couponData?.fee)}
                     disabled={current == 2}
                     autoComplete="off"
                     step="0.01"
@@ -1824,7 +1879,7 @@ const EditNewTask = () => {
                 <Form.Item>
                   <Input
                     suffix="บาท"
-                    value={numberWithCommas(couponData?.discountFee)}
+                    value={numberWithCommasToFixed(couponData?.discountFee)}
                     disabled={current == 2}
                     autoComplete="off"
                     step="0.01"
@@ -1847,7 +1902,9 @@ const EditNewTask = () => {
                 <label>ส่วนลดคูปอง</label>
                 <Input
                   suffix="บาท"
-                  value={numberWithCommas(couponData.priceCouponDiscount!)}
+                  value={numberWithCommasToFixed(
+                    couponData.priceCouponDiscount!
+                  )}
                   disabled
                   autoComplete="off"
                 />
@@ -1925,7 +1982,6 @@ const EditNewTask = () => {
         payload.priceStandard = 0;
         payload.unitPriceStandard = 0;
       }
-      console.log(payload)
       setData(payload);
     } else {
       const payload = { ...data };
@@ -1970,21 +2026,23 @@ const EditNewTask = () => {
     updateTask.couponCode = data.couponCode;
     updateTask.couponId = couponData.couponId;
     updateTask.discountCoupon = couponData.priceCouponDiscount!;
-    Swal.fire({
-      title: "ยืนยันการแก้ไข",
-      text: "โปรดตรวจสอบรายละเอียดที่คุณต้องการแก้ไขข้อมูลก่อนเสมอ เพราะอาจส่งผลต่อการจ้างงานในระบบ",
-      cancelButtonText: "ยกเลิก",
-      confirmButtonText: "ยืนยัน",
-      confirmButtonColor: color.Success,
-      showCancelButton: true,
-      showCloseButton: true,
-    }).then(async (result) => {
-      if (result.isConfirmed) {
-        await TaskDatasource.updateNewTask(updateTask).then((res) => {
-          if (res.userMessage == "success") {
+    await TaskDatasource.updateNewTask(updateTask).then((res) => {
+      if (res.userMessage === "success") {
+        Swal.fire({
+          title: "ยืนยันการแก้ไข",
+          text: "โปรดตรวจสอบรายละเอียดที่คุณต้องการแก้ไขข้อมูลก่อนเสมอ เพราะอาจส่งผลต่อการจ้างงานในระบบ",
+          cancelButtonText: "ยกเลิก",
+          confirmButtonText: "ยืนยัน",
+          confirmButtonColor: color.Success,
+          showCancelButton: true,
+          showCloseButton: true,
+        }).then(async (result) => {
+          if (result.isConfirmed) {
             navigate("/IndexNewTask");
           }
         });
+      } else if (res.userMessage === "Droner has receive") {
+        setModalCheckUpdate(!modalCheckUpdate);
       }
     });
   };
@@ -2072,6 +2130,20 @@ const EditNewTask = () => {
           title="รายชื่อนักบินโดรน"
           backButton={() => setShowModalSelectedDroner((prev) => !prev)}
           callBack={callBackDronerSelected}
+        />
+      )}
+      {modalCheckUpdate && (
+        <ModalAcceptedTask
+        titleButton={"ย้อนไปหน้าหลัก"}
+          textHeader={"คุณไม่สามารถแก้ไขงานนี้ได้"}
+          textDetail={
+            "เนื่องจากในระหว่างการแก้ไข มีนักบินโดรนในระบบกดรับงานนี้แล้ว คุณสามารถตรวจสอบ/แก้ไขงานนี้ได้อีกครั้งในเมนูจัดการงานอื่นๆ"
+          }
+          visible={modalCheckUpdate}
+          backButton={() => {
+            setModalCheckUpdate(!modalCheckUpdate);
+            navigate("/IndexNewTask");
+          }}
         />
       )}
     </>

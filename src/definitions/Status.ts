@@ -1,7 +1,7 @@
 import { color } from "../resource";
 
 export const STATUS_NORMAL_MAPPING: any = {
-  PENDING: "รอยืนยันตัวแปลง",
+  PENDING: "รอตรวจสอบ",
   ACTIVE: "ใช้งาน",
   INACTIVE: "ปิดการใช้งาน",
   REJECTED: "ไม่อนุมัติ",
@@ -216,3 +216,14 @@ export const HISTORY_TASK: any = {
   ChangeRai: "แก้ไข/เปลี่ยนจำนวนแปลง",
   แก้ไขจำนวนแปลง: "แก้ไขจำนวนแปลง",
 };
+export const STATUS_SEARCH: any = {
+  PENDING: "รอตรวจสอบ",
+  ACTIVE: "ใช้งาน",
+  INACTIVE: "ปิดการใช้งาน",
+  REJECTED: "ไม่อนุมัติ",
+  OPEN: "ข้อมูลไม่ครบถ้วน",
+  FIRST: "1-2 วัน",
+  SECOND: "3-6 วัน",
+  THIRD: "7 วันขึ้นไป"
+};
+

@@ -523,7 +523,8 @@ const AddFarmer = () => {
                     message: "กรุณากรอกเบอร์โทร!",
                   },
                   {
-                    pattern: new RegExp(/^[0-9\b]+$/),
+                    pattern:
+                      new RegExp(/^[0-9\b]+$/) && new RegExp(/^0[689]\d{8}$/),
                     message: "กรุณากรอกเบอร์โทรให้ถูกต้อง!",
                   },
                   {
@@ -558,7 +559,8 @@ const AddFarmer = () => {
                   format={dateFormat}
                   className="col-lg-12"
                   disabledDate={(current) =>
-                    current && current > moment().endOf("day")
+                    (current && current > moment().endOf("day")) ||
+                    moment().diff(current, "years") < 18
                   }
                   onChange={(e: any) => handleOnChangeBirthday(e)}
                 />
@@ -949,20 +951,20 @@ const AddFarmer = () => {
         disableSaveBtn={saveBtnDisable}
       />
 
-        <ModalFarmerPlot
-          show={showAddModal}
-          backButton={() => {
-            setEditIndex(0);
-            setShowAddModal((prev) => !prev);
-          }}
-          callBack={insertFarmerPlot}
-          data={editIndex > 0 ? editFarmerPlot : FarmerPlotEntity_INIT}
-          editIndex={editIndex}
-          title={editIndex > 0 ? "แก้ไขแปลงเกษตร" : "เพิ่มแปลงเกษตร"}
-          callBackModal={(val) => setShowAddModal(!val)}
-          isEditModal={editIndex > 0 ? true : false}
-          action="create"
-        />
+      <ModalFarmerPlot
+        show={showAddModal}
+        backButton={() => {
+          setEditIndex(0);
+          setShowAddModal((prev) => !prev);
+        }}
+        callBack={insertFarmerPlot}
+        data={editIndex > 0 ? editFarmerPlot : FarmerPlotEntity_INIT}
+        editIndex={editIndex}
+        title={editIndex > 0 ? "แก้ไขแปลงเกษตร" : "เพิ่มแปลงเกษตร"}
+        callBackModal={(val) => setShowAddModal(!val)}
+        isEditModal={editIndex > 0 ? true : false}
+        action="create"
+      />
     </>
   );
 };

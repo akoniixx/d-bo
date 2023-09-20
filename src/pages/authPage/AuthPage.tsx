@@ -14,7 +14,6 @@ import { convertBuddhistYear } from "../../utilities/ConvertToBuddhistYear";
 
 export const AuthPage: React.FC = () => {
   const dateNow = moment(Date.now());
-
   const [dataMaintance, setDataMaintance] = useState<MaintenanceSystem>(
     MaintenanceSystem_INIT
   );
@@ -22,16 +21,19 @@ export const AuthPage: React.FC = () => {
   const checkMaintance = () => {
     MaintenanceDataSource.getMaintenceSystem("BO").then((res) => {
       setCheckTime(
-        checkTimeMaintance(moment(res.dateStart), moment(res.dateEnd))
+        checkTimeMaintance(
+          moment(res.responseData.dateStart),
+          moment(res.responseData.dateEnd)
+        )
       );
-      res.textDate =
+      res.responseData.textDate =
         "วันที่ " +
         convertBuddhistYear.toBuddhistYear(
-          moment(res.dateStart),
+          moment(res.responseData.dateStart),
           "DD MMMM YYYY ช่วงเวลา HH:mm - "
         ) +
-        moment(res.dateEnd).format("HH:mm น.");
-      setDataMaintance(res);
+        moment(res.responseData.dateEnd).format("HH:mm น.");
+      setDataMaintance(res.responseData);
     });
   };
 

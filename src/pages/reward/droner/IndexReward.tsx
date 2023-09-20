@@ -22,6 +22,7 @@ import {
   Pagination,
   Row,
   Select,
+  Spin,
   Table,
 } from "antd";
 import moment from "moment";
@@ -68,8 +69,10 @@ function IndexReward() {
   const [checkAllPhy, setCheckAllPhy] = useState(false);
   const [statusArr, setStatusArr] = useState<string[]>([]);
   const statusOptions = ["SCORE", "MISSION"];
+  const [loading, setLoading] = useState(false);
 
   const getAllReward = () => {
+    setLoading(true);
     RewardDatasource.getAllReward(
       row,
       current,
@@ -79,9 +82,12 @@ function IndexReward() {
       rewardType,
       rewardExchange,
       searchText
-    ).then((res) => {
-      setData(res);
-    });
+    )
+      .then((res) => {
+        setData(res);
+      })
+      .catch((err) => console.log(err))
+      .finally(() => setLoading(false));
   };
   useEffect(() => {
     getAllReward();
@@ -101,7 +107,6 @@ function IndexReward() {
   };
   const changeTextSearch = (searchText: any) => {
     setSearchText(searchText.target.value);
-    setCurrent(1);
   };
 
   const onChangeStatus = (checkedValues: any) => {
@@ -378,7 +383,10 @@ function IndexReward() {
               color: color.secondary2,
               backgroundColor: color.Success,
             }}
-            onClick={getAllReward}
+            onClick={() => {
+              setCurrent(1);
+              getAllReward();
+            }}
           >
             ค้นหาข้อมูล
           </Button>
@@ -684,12 +692,14 @@ function IndexReward() {
     <>
       {PageTitle}
       <br />
-      <Table
-        columns={columns}
-        dataSource={data?.data}
-        pagination={false}
-        scroll={{ x: 1800 }}
-      />
+      <Spin tip="กำลังโหลดข้อมูล..." size="large" spinning={loading}>
+        <Table
+          columns={columns}
+          dataSource={data?.data}
+          pagination={false}
+          scroll={{ x: 1800 }}
+        />
+      </Spin>
 
       <div className="d-flex justify-content-between pt-3 pb-3">
         <p>รายการทั้งหมด {data?.count} รายการ</p>

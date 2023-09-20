@@ -5,14 +5,12 @@ import StatusPlots from "../../../components/card/StatusPlots";
 import {
   Badge,
   Button,
-  Checkbox,
   ConfigProvider,
-  Dropdown,
   Image,
   Input,
-  Menu,
   Pagination,
   PaginationProps,
+  Popover,
   Row,
   Select,
   Spin,
@@ -22,8 +20,8 @@ import {
   CaretDownOutlined,
   CaretUpOutlined,
   DeleteOutlined,
-  DownOutlined,
   EditOutlined,
+  InfoCircleFilled,
   SearchOutlined,
 } from "@ant-design/icons";
 import { CardContainer } from "../../../components/card/CardContainer";
@@ -47,6 +45,7 @@ import { FarmerPlotDatasource } from "../../../datasource/FarmerPlotDatasource";
 import { numberWithCommas } from "../../../utilities/TextFormatter";
 import { Option } from "antd/lib/mentions";
 import emptyPlot from "../../../resource/media/empties/iconoir_farm.png";
+import { DropdownStatus } from "../../../components/dropdownCheck/DropDownStatus";
 
 const _ = require("lodash");
 const { Map } = require("immutable");
@@ -57,9 +56,6 @@ function IndexPlotList() {
     card2: "ไม่อนุมัติ",
   });
   const [cropName, setCropName] = useState<any[]>([]);
-  const [visibleStatus, setVisibleStatus] = useState(false);
-  const [indeterminatePending, setIndeterminatePending] = useState(false);
-  const [checkAllPending, setCheckAllPending] = useState(false);
   const [statusArr, setStatusArr] = useState<string[]>([]);
   const [statusArrMain, setStatusArrMain] = useState<string[]>([]);
   const [status, setStatus] = useState<any>();
@@ -137,12 +133,10 @@ function IndexPlotList() {
 
   const onSearchText = (e: any) => {
     setSearchText(e.target.value);
-    setCurrentPage(1);
   };
 
   const searchPlants = (e: any) => {
     setPlantName(e);
-    setCurrentPage(1);
   };
 
   const CheckStatus = (e: any) => {
@@ -163,10 +157,6 @@ function IndexPlotList() {
     }
     setMainStatus(e.target.value);
   };
-
-  const handleVisibleStatus = (newVisible: any) => {
-    setVisibleStatus(newVisible);
-  };
   const handleModalMap = (plotId: string) => {
     setShowModalMap((prev) => !prev);
     setPlotId(plotId);
@@ -182,127 +172,40 @@ function IndexPlotList() {
   const onChangePage = (page: number) => {
     setCurrentPage(page);
   };
-  const onCheckAllPending = (e: any) => {
-    let value = e.target.value;
-    let checked = e.target.checked;
-    let arr: any = 0;
-    if (checked === true) {
-      arr = [...statusArr, value];
-      setStatusArr([...statusArr, value]);
-      setStatus(value);
-    } else {
-      let d: string[] = statusArr.filter((x) => x != value);
-      arr = [...d];
-      setStatusArr(d);
-      if (d.length == 0) {
-        arr = undefined;
-      }
-    }
-    setStatus(arr);
-    setWaitPendingDate(e.target.checked ? statusListPend : []);
-    setIndeterminatePending(false);
-    setCheckAllPending(e.target.checked);
-  };
-  const onChangeListPending = (list: CheckboxValueType[]) => {
-    setStatus([]);
-    let arr: any = 0;
-    arr = [...list];
-    setWaitPendingDate(list);
-    setIndeterminatePending(
-      !!list.length && list.length < statusListPend.length
-    );
-    setCheckAllPending(list.length === statusListPend.length);
-  };
-  const onSearchStatus = (e: any) => {
-    let value = e.target.value;
-    let checked = e.target.checked;
-    let arr: any = 0;
-    if (checked === true) {
-      arr = [...statusArrMain, value];
-      setStatusArrMain([...statusArrMain, value]);
-      setStatus(value);
-    } else {
-      let d: string[] = statusArrMain.filter((x) => x != value);
-      arr = [...d];
-      setStatusArrMain(d);
-      if (d.length == 0) {
-        arr = undefined;
-      }
-    }
-    setStatus(arr);
-  };
 
-  const SubStatus = (
-    <Menu
-      items={[
-        mainStatus === "PENDING"
-          ? {
-              label: (
-                <>
-                  <Checkbox
-                    indeterminate={indeterminatePending}
-                    onChange={onCheckAllPending}
-                    checked={checkAllPending}
-                    value="PENDING"
-                  >
-                    รอตรวจสอบ
-                  </Checkbox>
-                  <br />
-                  <Checkbox.Group
-                    value={waitPendingDate}
-                    style={{ width: "100%" }}
-                    onChange={onChangeListPending}
-                  >
-                    <Checkbox style={{ marginLeft: "20px" }} value="FIRST">
-                      0-2 วัน
-                    </Checkbox>
-                    <br />
-                    <Checkbox style={{ marginLeft: "20px" }} value="SECOND">
-                      3-6 วัน
-                    </Checkbox>
-                    <br />
-                    <Checkbox style={{ marginLeft: "20px" }} value="THIRD">
-                      7 วันขึ้นไป
-                    </Checkbox>
-                  </Checkbox.Group>
-                </>
-              ),
-              key: "1",
-            }
-          : {
-              label: (
-                <>
-                  <Checkbox onClick={onSearchStatus} value="ACTIVE">
-                    ใช้งาน
-                  </Checkbox>
-                </>
-              ),
-              key: "2",
-            },
-        mainStatus === "PENDING"
-          ? {
-              label: (
-                <>
-                  <Checkbox onClick={onSearchStatus} value="REJECTED">
-                    ไม่อนุมัติ
-                  </Checkbox>
-                </>
-              ),
-              key: "3",
-            }
-          : {
-              label: (
-                <>
-                  <Checkbox onClick={onSearchStatus} value="INACTIVE">
-                    ปิดการใช้งาน
-                  </Checkbox>
-                </>
-              ),
-              key: "4",
-            },
-      ]}
-    />
-  );
+  const onSearchStatus = (value: string, checked: boolean) => {
+    if (statusListPend.map((x) => x).find((c) => c === value)) {
+      let arr: any = 0;
+      if (checked === true) {
+        arr = [...statusArr, value];
+        setStatusArr([...statusArr, value]);
+        setWaitPendingDate(value);
+      } else {
+        let d: string[] = statusArr.filter((x) => x !== value);
+        arr = [...d];
+        setStatusArr(d);
+        if (d.length === 0) {
+          arr = undefined;
+        }
+      }
+      setWaitPendingDate(arr);
+    } else {
+      let arr: any = 0;
+      if (checked === true) {
+        arr = [...statusArrMain, value];
+        setStatusArrMain([...statusArrMain, value]);
+        setStatus(value);
+      } else {
+        let d: string[] = statusArrMain.filter((x) => x !== value);
+        arr = [...d];
+        setStatusArrMain(d);
+        if (d.length === 0) {
+          arr = undefined;
+        }
+      }
+      setStatus(arr);
+    }
+  };
   const showEdit = (item: FarmerPlotEntity, index: any) => {
     setEditFarmerPlot(item);
     setEditIndex(index);
@@ -515,6 +418,28 @@ function IndexPlotList() {
               <span style={{ color: color.Grey, fontSize: 12 }}>
                 {row.farmer.farmerCode}
               </span>
+              <Popover
+                content={
+                  <span
+                    style={{ color: STATUS_COLOR_MAPPING[row.farmer?.status] }}
+                  >
+                    <span>สถานะ </span>
+                    <Badge
+                      color={STATUS_COLOR_MAPPING[row.farmer?.status]}
+                    />{" "}
+                    {STATUS_FARMER_MAPPING[row.farmer?.status]}
+                  </span>
+                }
+              >
+                <InfoCircleFilled
+                  style={{
+                    color: color.Success,
+                    fontSize: "15px",
+                    marginLeft: "7px",
+                    verticalAlign: 0.5,
+                  }}
+                />
+              </Popover>
             </>
           ),
         };
@@ -822,19 +747,15 @@ function IndexPlotList() {
             ))}
           </Select>
         </div>
-        <div className="col-lg p-1">
-          <Dropdown
-            overlay={SubStatus}
-            trigger={["click"]}
-            className="col-lg-12"
-            onVisibleChange={handleVisibleStatus}
-            visible={visibleStatus}
-          >
-            <Button style={{ color: color.Disable }}>
-              เลือกสถานะ
-              <DownOutlined />
-            </Button>
-          </Dropdown>
+        <div className="col-lg">
+          <DropdownStatus
+            title="เลือกสถานะ"
+            mainStatus={mainStatus}
+            onSearchType={(value: any, checked: any) =>
+              onSearchStatus(value, checked)
+            }
+            list={status}
+          />
         </div>
         <div className="col-lg-1 p-1" style={{ textAlign: "end" }}>
           <Button
@@ -845,7 +766,10 @@ function IndexPlotList() {
               color: color.secondary2,
               backgroundColor: color.Success,
             }}
-            onClick={getPlotsData}
+            onClick={() => {
+              setCurrentPage(1);
+              getPlotsData();
+            }}
           >
             ค้นหาข้อมูล
           </Button>

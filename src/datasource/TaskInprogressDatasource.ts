@@ -13,6 +13,9 @@ export class TaskInprogressDatasource {
     provinceId?: number,
     isProblem?: boolean,
     isDelay?: boolean,
+    applicationType?: string[],
+    sortDirection?: string,
+    sortField?: string
    
   ): Promise<TaskTodayListEntity> {
     const params = {
@@ -26,6 +29,9 @@ export class TaskInprogressDatasource {
       provinceId: provinceId,
       isProblem: isProblem,
       isDelay: isDelay,
+      applicationType: applicationType,
+      sortDirection: sortDirection,
+      sortField: sortField,
     };
     return httpClient
       .get(BASE_URL + "/tasks/task-inprogress/get-all-task-today", { params })

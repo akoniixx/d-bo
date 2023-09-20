@@ -50,6 +50,7 @@ import { CouponDataSource } from "../../../../datasource/CouponDatasource";
 import { numberWithCommas } from "../../../../utilities/TextFormatter";
 import { DashboardLayout } from "../../../../components/layout/Layout";
 import { useNavigate } from "react-router-dom";
+import { listAppType } from "../../../../definitions/ApplicatoionTypes";
 const { Map } = require("immutable");
 const _ = require("lodash");
 const dateFormat = "DD/MM/YYYY";
@@ -266,6 +267,21 @@ function EditInProgress() {
               {numberWithCommas(parseFloat(data?.totalPrice))} บาท (จำนวน{" "}
               {data?.farmAreaAmount} ไร่) ราคาไร่ละ {data.unitPrice} บาท
             </p>
+          </div>
+          <div className="form-group col-lg-12 pb-3">
+            <label>สร้างโดย</label>
+            {listAppType.map(
+              (item, index) =>
+                data.applicationType === item.value && (
+                  <div>
+                    <img src={item.icon} style={{ width: 22, height: 22 }} />
+                    <span>
+                      {" "}
+                      {data.createBy ? data.createBy + ` ${item.create}` : "-"}
+                    </span>
+                  </div>
+                )
+            )}
           </div>
           <label style={{ marginBottom: "10px" }}>
             สถานะ <span style={{ color: "red" }}>*</span>
@@ -605,7 +621,7 @@ function EditInProgress() {
           <div className="col-lg-4 text-start">
             <label>จำนวนไร่</label>
             <Form.Item>
-              <Input defaultValue={data.farmAreaAmount} suffix="ไร่" disabled/>
+              <Input defaultValue={data.farmAreaAmount} suffix="ไร่" disabled />
             </Form.Item>
           </div>
         </div>
@@ -874,7 +890,7 @@ function EditInProgress() {
         ).set("updateBy", profile.firstname + " " + profile.lastname);
         await TaskInprogressDatasource.UpdateTask(pushUpdateBy.toJS()).then(
           (time) => {
-            navigate("/IndexTodayTask")
+            navigate("/IndexTodayTask");
           }
         );
       }
@@ -885,9 +901,7 @@ function EditInProgress() {
   return (
     <>
       <Row>
-        <BackIconButton
-          onClick={() => navigate("/IndexTodayTask")}
-        />
+        <BackIconButton onClick={() => navigate("/IndexTodayTask")} />
         <span className="pt-4">
           <strong style={{ fontSize: "20px" }}>
             รายละเอียดงาน #{data.taskNo}

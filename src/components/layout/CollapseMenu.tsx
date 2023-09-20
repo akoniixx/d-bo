@@ -3,7 +3,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import { color, icon } from "../../resource";
 import { CollapseSubMenu } from "./CollapseSubMenu";
-import { IconMenu, IconMenuInActive } from "./IconMenu";
+import { IconMenu, IconMenuActive } from "./IconMenu";
 import { DownOutlined, UpOutlined } from "@ant-design/icons";
 import { Image } from "antd";
 import { useLocalStorage } from "../../hook/useLocalStorage";
@@ -174,7 +174,7 @@ export const CollapseMenu: React.FC<CollapseMenuProps> = ({
                 paddingLeft: "16px",
               }}
             >
-              {IconMenuInActive[name as keyof typeof IconMenu]}
+              {IconMenuActive[name as keyof typeof IconMenu]}
               {title}
               {/* {path === "task" && (
                 <div

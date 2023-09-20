@@ -101,6 +101,10 @@ const ModalFarmerPlot: React.FC<ModalFarmerPlotProps> = ({
     setStatus(data.status);
     getCropJustName();
     fetchLocation(searchLocation);
+    setMapPosition({
+      lat: parseFloat(data.lat),
+      lng: parseFloat(data.long),
+    });
     if (action && isEditModal) {
       form.setFieldsValue({
         plotAreaId: data.plotAreaId === 0 ? undefined : data.plotAreaId,
@@ -429,10 +433,10 @@ const ModalFarmerPlot: React.FC<ModalFarmerPlotProps> = ({
             </Form.Item>
           </div>
           <div className="form-group">
-            <label>Link Google Map</label>
+            <label>Google Map Link</label>
             <Form.Item name="mapUrl">
               <Input
-                placeholder="กรอกข้อมูล Url Google Map"
+                placeholder="กรอก URL Google Maps Link"
                 autoComplete="off"
               />
             </Form.Item>

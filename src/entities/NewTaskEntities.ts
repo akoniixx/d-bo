@@ -107,7 +107,7 @@ export interface GetNewTaskEntity {
   taskNo: string;
   farmerId: string;
   farmerPlotId: string;
-  farmAreaAmount: string;
+  farmAreaAmount: any;
   dronerId: string;
   purposeSprayId: string;
   dateAppointment: string;
@@ -123,7 +123,7 @@ export interface GetNewTaskEntity {
   unitPriceStandard: number;
   priceStandard: number;
   unitPrice: number;
-  price: string;
+  price: any;
   totalPrice: string;
   fee: number;
   discountFee: number;

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import Search from "antd/lib/input/Search";
 import Select from "antd/lib/select";
 import { Option } from "antd/lib/mentions";
-import { Badge, Button, Image, Pagination, Table, Tooltip } from "antd";
+import { Badge, Button, Image, Pagination, Spin, Table, Tooltip } from "antd";
 import { color, icon } from "../../resource";
 import ActionButton from "../../components/button/ActionButton";
 import {
@@ -27,6 +27,7 @@ function NewsPage() {
     newsId: "",
     newsPath: "",
   });
+  const [loading, setLoading] = useState(false);
   const [status, setStatus] = useState<string | undefined>(undefined);
   const [application, setApplication] = useState<string | undefined>(undefined);
   const [sortDirection, setSortDirection] = useState<string | undefined>(
@@ -58,6 +59,7 @@ function NewsPage() {
     news: [],
   });
   const fetchNews = () => {
+    setLoading(true);
     NewsDatasource.getNews(
       row,
       current,
@@ -67,12 +69,15 @@ function NewsPage() {
       sortDirection,
       search,
       "BO"
-    ).then((res) => {
-      setData({
-        count: res.count,
-        news: res.data,
-      });
-    });
+    )
+      .then((res) => {
+        setData({
+          count: res.count,
+          news: res.data,
+        });
+      })
+      .catch((err) => console.log(err))
+      .finally(() => setLoading(false));
   };
   const onChangeSearch = (e: any) => {
     setSearch(e.target.value);
@@ -768,12 +773,15 @@ function NewsPage() {
       />
       {PageTitle}
       <br />
-      <Table
-        columns={columns}
-        dataSource={data.news}
-        pagination={false}
-        scroll={{ x: "max-content" }}
-      />
+      <Spin tip="กำลังโหลดข้อมูล..." size="large" spinning={loading}>
+        <Table
+          columns={columns}
+          dataSource={data.news}
+          pagination={false}
+          scroll={{ x: "max-content" }}
+        />
+      </Spin>
+
       <div className="d-flex justify-content-between pt-3 pb-3">
         <p>รายการทั้งหมด {data.count} รายการ</p>
         <Pagination

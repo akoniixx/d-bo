@@ -86,7 +86,7 @@ export const pathLists = (isAccounting: boolean, isAdminTask?: boolean) => {
     {
       path: "news",
       name: "news",
-      title: "ข่าวสารและโปรโมชั่น",
+      title: "ข่าวสาร/กูรูเกษตร",
       subMenu: [
         {
           path: "/NewsPage",
@@ -94,9 +94,16 @@ export const pathLists = (isAccounting: boolean, isAdminTask?: boolean) => {
           title: "ข่าวสาร",
           subMenu: [],
         },
+      ],
+    },
+    {
+      path: "promotion",
+      name: "promotion",
+      title: "โปรโมชั่น/คูปอง",
+      subMenu: [
         {
           path: "/PromotionPage",
-          name: "/PromotionPage",
+          name: "PromotionPage",
           title: "คูปอง",
           subMenu: [],
         },
@@ -155,27 +162,6 @@ export const pathLists = (isAccounting: boolean, isAdminTask?: boolean) => {
           ],
         },
         {
-          path: "rewards",
-          name: "rewards",
-          title: "ของรางวัล",
-          permission: null,
-          subMenu: [
-            {
-              path: "/IndexReward",
-              name: "IndexReward",
-              title: "นักบินโดรน",
-              permission: null,
-              subMenu: [],
-            },
-            // {
-            //   path: "/IndexReward",
-            //   name: "IndexReward",
-            //   title: "เกษตรกร",
-            //   permission: null,
-            // }
-          ],
-        },
-        {
           path: "/IndexCampaignPoint",
           name: "IndexCampaignPoint",
           title: "แคมเปญแต้ม",
@@ -184,33 +170,43 @@ export const pathLists = (isAccounting: boolean, isAdminTask?: boolean) => {
       ],
     },
     {
-      path: "mission",
-      name: "mission",
-      title: "ภารกิจและชาเลนจ์",
+      path: "rewards",
+      name: "rewards",
+      title: "ของรางวัล",
+      permission: null,
       subMenu: [
         {
-          path: "listmission",
-          name: "listmission",
-          title: "ภารกิจ",
-          subMenu: [
-            {
-              path: "/IndexDronerMission",
-              name: "IndexDronerMission",
-              title: "นักบินโดรน",
-            },
-          ],
+          path: "/IndexReward",
+          name: "IndexReward",
+          title: "นักบินโดรน",
+          permission: null,
+          subMenu: [],
         },
+      ],
+    },
+    {
+      path: "mission",
+      name: "mission",
+      title: "ภารกิจ",
+      subMenu: [
         {
-          path: "listquota",
-          name: "listquota",
-          title: "ชาเลนจ์",
-          subMenu: [
-            {
-              path: "/IndexQuota",
-              name: "IndexQuota",
-              title: "นักบินโดรน",
-            },
-          ],
+          path: "/IndexDronerMission",
+          name: "IndexDronerMission",
+          title: "นักบินโดรน",
+          subMenu: [],
+        },
+      ],
+    },
+    {
+      path: "challenge",
+      name: "challenge",
+      title: "ชาเลนจ์",
+      subMenu: [
+        {
+          path: "/IndexQuota",
+          name: "IndexQuota",
+          title: "นักบินโดรน",
+          subMenu: [],
         },
       ],
     },

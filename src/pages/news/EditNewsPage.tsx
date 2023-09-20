@@ -39,13 +39,12 @@ function EditNewsPage() {
   const [newsName, setNewsName] = useState<string>("");
   const [farmCountPoint, setFarmCountPoint] = useState<any>();
   const [droneCountPoint, setDroneCountPoint] = useState<any>();
-  const [farmPinMain, setFarmPinMain] = useState<boolean>(false);
-  const [farmPinAll, setFarmPinAll] = useState<boolean>(false);
-  const [dronePinMain, setDronePinMain] = useState<boolean>(false);
-  const [dronePinAll, setDronePinAll] = useState<boolean>(false);
+  const [appPinMain, setAppPinMain] = useState<boolean>(false);
+  const [appPinAll, setAppPinAll] = useState<boolean>(false);
   const [descriptionEditor, setDescriptionEditor] = useState<string | null>(
     null
   );
+
   const [createImgProfile, setCreateImgProfile] = useState<UploadImageEntity>(
     UploadImageEntity_INTI
   );
@@ -115,27 +114,10 @@ function EditNewsPage() {
   ) => {
     setDescriptionEditor(editor.getHTML());
   };
-
-  const handleChooseFarmer = (e: any) => {
-    setChooseFarmer(e.target.checked);
-    handleChooseApplication(e.target.checked, chooseDroner);
-  };
-
-  const handleChooseDroner = (e: any) => {
-    setChooseDroner(e.target.checked);
-    handleChooseApplication(chooseFarmer, e.target.checked);
-  };
-
-  const handleChooseApplication = (farmer: boolean, droner: boolean) => {
-    if (farmer === false && droner === false) {
-      setApplication("");
-    } else if (farmer === true && droner === false) {
-      setApplication("FARMER");
-    } else if (farmer === false && droner === true) {
-      setApplication("DRONER");
-    } else {
-      setApplication("ALL");
-    }
+  const handleChooseAppType = (e: any) => {
+    setAppPinAll(false);
+    setAppPinMain(false);
+    setApplication(e);
   };
 
   const handleChooseChallenge = (e: any) => {
@@ -146,6 +128,19 @@ function EditNewsPage() {
     setChooseNews(e.target.checked);
     handleChooseCategoryNews(chooseChallenge, e.target.checked);
   };
+  const disableCheckPinMain =
+    status === "DRAFTING"  &&
+    (application === "FARMER"
+      ? farmCountPoint?.disablePinMain === true && false
+      : droneCountPoint?.disablePinMain === true && false) ||
+    !application;
+
+  const disableCheckPinAll =
+    status === "DRAFTING" &&
+    (application === "FARMER"
+      ? farmCountPoint?.disablePinAll === true && false
+      : droneCountPoint?.disablePinAll === true && false) ||
+    !application;
   const handleChooseCategoryNews = (challenge: boolean, news: boolean) => {
     if (challenge === false && news === false) {
       setCategoryNews("");
@@ -161,29 +156,15 @@ function EditNewsPage() {
     setCampId(e);
   };
   const handlePinAll = (e: any) => {
-    if (application === "FARMER") {
-      setFarmPinAll(e.target.checked);
-    } else if (application === "DRONER") {
-      setDronePinAll(e.target.checked);
-    } else if (application === "ALL") {
-      setFarmPinAll(e.target.checked);
-      setDronePinAll(e.target.checked);
-    }
+    setAppPinAll(e.target.checked);
   };
 
   const handlePinMain = (e: any) => {
-    if (application === "FARMER") {
-      setFarmPinMain(e.target.checked);
-    } else if (application === "DRONER") {
-      setDronePinMain(e.target.checked);
-    } else if (application === "ALL") {
-      setFarmPinMain(e.target.checked);
-      setDronePinMain(e.target.checked);
-    }
+    setAppPinMain(e.target.checked);
   };
 
   const onFieldsChange = () => {
-    const { newsName, newsDescription, newsStatus, FarmerApp, DronerApp, img } =
+    const { newsName, newsDescription, newsStatus, applicationType, img } =
       form.getFieldsValue();
     let fieldInfo = false;
     let fieldapp = false;
@@ -193,7 +174,7 @@ function EditNewsPage() {
     } else {
       fieldInfo = true;
     }
-    if (FarmerApp || DronerApp) {
+    if (applicationType) {
       fieldapp = false;
     } else {
       fieldapp = true;
@@ -219,8 +200,8 @@ function EditNewsPage() {
         categoryNews: categoryNews,
         campaignId: campId,
         createBy: profile.firstname + " " + profile.lastname,
-        pinAll: (farmPinAll && farmPinAll) || (dronePinAll && dronePinAll),
-        pinMain: (farmPinMain && farmPinMain) || (dronePinMain && dronePinMain),
+        pinAll: appPinAll,
+        pinMain: appPinMain,
       })
         .then((res) => {
           Swal.fire({
@@ -251,8 +232,8 @@ function EditNewsPage() {
         campaignId: campId,
         file: createImgProfile.file,
         createBy: profile.firstname + " " + profile.lastname,
-        pinAll: (farmPinAll && farmPinAll) || (dronePinAll && dronePinAll),
-        pinMain: (farmPinMain && farmPinMain) || (dronePinMain && dronePinMain),
+        pinAll: appPinAll,
+        pinMain: appPinMain,
       })
         .then((res) => {
           Swal.fire({
@@ -301,8 +282,8 @@ function EditNewsPage() {
                   categoryNews: categoryNews,
                   campaignId: campId,
                   createBy: profile.firstname + " " + profile.lastname,
-                  pinAll: res.responseData.remainPinAll === 0 && false,
-                  pinMain: res.responseData.remainPinMain === 0 && false,
+                  pinAll: res.pinAll,
+                  pinMain: res.pinMain,
                 }).then((res) => {});
               }
             }
@@ -330,40 +311,23 @@ function EditNewsPage() {
                   categoryNews: categoryNews,
                   campaignId: campId,
                   createBy: profile.firstname + " " + profile.lastname,
-                  pinAll: false,
-                  pinMain: false,
+                  pinAll: res.pinAll,
+                  pinMain: res.pinMain,
                 }).then((res) => {});
               }
             }
           }
         });
-        if (res.application === "FARMER") {
-          setFarmPinMain(res.pinMain);
-          setFarmPinAll(res.pinAll);
-        } else if (res.application === "DRONER") {
-          setDronePinMain(res.pinMain);
-          setDronePinAll(res.pinAll);
-        }
       }
-
       form.setFieldsValue({
         img: res.imagePath,
         newsName: res.title,
         newsStatus: res.status,
         campName: res.campaign ? res.campaign.campaignName : null,
         newsDescription: res.details,
-        FarmerApp:
-          res.application === "ALL"
-            ? true
-            : res.application === "FARMER"
-            ? true
-            : false,
-        DronerApp:
-          res.application === "ALL"
-            ? true
-            : res.application === "DRONER"
-            ? true
-            : false,
+        applicationType: res.application,
+        pinAll: res.pinAll,
+        pinMain: res.pinMain,
         challenge:
           res.categoryNews === "ALL"
             ? true
@@ -383,21 +347,9 @@ function EditNewsPage() {
       setDescriptionEditor(res.details);
       setImgProfile(res.imagePath);
       setApplication(res.application);
+      setAppPinMain(res.pinMain);
+      setAppPinAll(res.pinAll);
       setCategoryNews(res.categoryNews);
-      setChooseFarmer(
-        res.application === "ALL"
-          ? true
-          : res.application === "FARMER"
-          ? true
-          : false
-      );
-      setChooseDroner(
-        res.application === "ALL"
-          ? true
-          : res.application === "DRONER"
-          ? true
-          : false
-      );
       setChooseChallenge(
         res.categoryNews === "ALL"
           ? true
@@ -545,196 +497,92 @@ function EditNewsPage() {
                   <Input autoComplete="off" disabled />
                 </Form.Item>
               </div>
-              <div className="form-group col-lg-12">
+              <div className="form-group col-lg-4">
                 <label>
                   แอปพลิเคชั่น <span style={{ color: "red" }}>*</span>
                 </label>
                 <Form.Item
                   initialValue={false}
-                  name="FarmerApp"
-                  valuePropName="checked"
+                  name="applicationType"
                   className="my-0"
                 >
-                  <Checkbox
-                    onChange={handleChooseFarmer}
-                    checked={chooseFarmer}
-                    className="pt-2"
-                    disabled={chooseDroner}
+                  <Select
+                    allowClear
+                    placeholder="เลือกแอปพลิเคชั่น"
+                    onChange={handleChooseAppType}
                   >
-                    Farmer Application
-                  </Checkbox>
+                    <option key={1} value="FARMER">
+                      Farmer Application
+                    </option>
+                    <option key={2} value="DRONER">
+                      Droner Application
+                    </option>
+                  </Select>
                 </Form.Item>
-                <div
-                  className="form-group col-lg "
-                  style={{ paddingLeft: "3%" }}
-                >
-                  <Form.Item
-                    initialValue={false}
-                    valuePropName="checked"
-                    className="my-0"
-                  >
-                    <Checkbox
-                      onChange={handlePinMain}
-                      checked={
-                        status === "DRAFTING" &&
-                        farmCountPoint?.remainPinMain === 0
-                          ? false
-                          : farmPinMain
-                      }
-                      className="pt-2"
-                      disabled={
-                        (status === "DRAFTING" &&
-                          farmCountPoint?.remainPinMain === 0) ||
-                        !chooseFarmer ||
-                        (farmCountPoint?.disablePinMain && !farmPinMain)
-                      }
-                    >
-                      ปักหมุดในหน้าหลัก
-                      <span
-                        style={{
-                          color:
-                            (status === "DRAFTING" &&
-                              farmCountPoint?.remainPinMain === 0) ||
-                            !chooseFarmer ||
-                            (farmCountPoint?.disablePinMain && !farmPinMain)
-                              ? color.Disable
-                              : color.Grey,
-                        }}
-                      >
-                        {` (เหลือปักหมุด ${farmCountPoint?.remainPinMain} อัน)`}
-                      </span>
-                    </Checkbox>
-                  </Form.Item>
-                  <Form.Item
-                    initialValue={false}
-                    valuePropName="checked"
-                    className="my-0"
-                  >
-                    <Checkbox
-                      onChange={handlePinAll}
-                      checked={
-                        status === "DRAFTING" &&
-                        farmCountPoint?.remainPinAll === 0
-                          ? false
-                          : farmPinAll
-                      }
-                      disabled={
-                        (status === "DRAFTING" &&
-                          farmCountPoint?.remainPinAll === 0) ||
-                        !chooseFarmer ||
-                        (farmCountPoint?.disablePinAll && !farmPinAll)
-                      }
-                    >
-                      ปักหมุดในหน้าข่าวสารทั้งหมด
-                      <span
-                        style={{
-                          color:
-                            (status === "DRAFTING" &&
-                              farmCountPoint?.remainPinAll === 0) ||
-                            !chooseFarmer ||
-                            (farmCountPoint?.disablePinAll && !farmPinAll)
-                              ? color.Disable
-                              : color.Grey,
-                        }}
-                      >
-                        {` (เหลือปักหมุด ${farmCountPoint?.remainPinAll} อัน)`}
-                      </span>
-                    </Checkbox>
-                  </Form.Item>
-                </div>
+              </div>
+              <div className="form-group col-lg " style={{ paddingLeft: "3%" }}>
                 <Form.Item
                   initialValue={false}
-                  name="DronerApp"
                   valuePropName="checked"
                   className="my-0"
                 >
                   <Checkbox
-                    onChange={handleChooseDroner}
-                    checked={chooseDroner}
-                    className="mt-0"
-                    disabled={chooseFarmer}
+                    onChange={handlePinMain}
+                    checked={
+                      (status === "DRAFTING" && application === "FARMER"
+                        ? farmCountPoint?.remainPinMain === 0
+                        : droneCountPoint?.remainPinMain === 0) || !application
+                        ? false
+                        : appPinMain
+                    }
+                    className="pt-2"
+                    disabled={disableCheckPinMain}
                   >
-                    Droner Application
+                    ปักหมุดในหน้าหลัก
+                    <span
+                      style={{
+                        color: disableCheckPinMain ? color.Disable : color.Grey,
+                      }}
+                    >
+                      {application === "FARMER"
+                        ? ` (เหลือปักหมุด ${farmCountPoint?.remainPinMain} อัน)`
+                        : application === "DRONER"
+                        ? ` (เหลือปักหมุด ${droneCountPoint?.remainPinMain} อัน)`
+                        : null}
+                    </span>
                   </Checkbox>
                 </Form.Item>
-                <div
-                  className="form-group col-lg "
-                  style={{ paddingLeft: "3%" }}
+                <Form.Item
+                  initialValue={false}
+                  valuePropName="checked"
+                  className="my-0"
                 >
-                  <Form.Item
-                    initialValue={false}
-                    valuePropName="checked"
-                    className="my-0"
+                  <Checkbox
+                    onChange={handlePinAll}
+                    checked={
+                      (status === "DRAFTING" 
+                      && application === "FARMER"
+                        ? farmCountPoint?.remainPinAll === 0
+                        : droneCountPoint?.remainPinAll === 0) || !application
+                        ? false
+                        : appPinAll
+                    }
+                    disabled={disableCheckPinAll}
                   >
-                    <Checkbox
-                      onChange={handlePinMain}
-                      checked={
-                        status === "DRAFTING" &&
-                        droneCountPoint?.remainPinMain === 0
-                          ? false
-                          : dronePinMain
-                      }
-                      className="pt-2"
-                      disabled={
-                        (status === "DRAFTING" &&
-                          droneCountPoint?.remainPinMain === 0) ||
-                        !chooseDroner ||
-                        (droneCountPoint?.disablePinMain && !dronePinMain)
-                      }
+                    ปักหมุดในหน้าข่าวสารทั้งหมด
+                    <span
+                      style={{
+                        color: disableCheckPinAll ? color.Disable : color.Grey,
+                      }}
                     >
-                      ปักหมุดในหน้าหลัก
-                      <span
-                        style={{
-                          color:
-                            (status === "DRAFTING" &&
-                              droneCountPoint?.remainPinMain === 0) ||
-                            !chooseDroner ||
-                            (droneCountPoint?.disablePinMain && !dronePinMain)
-                              ? color.Disable
-                              : color.Grey,
-                        }}
-                      >
-                        {` (เหลือปักหมุด ${droneCountPoint?.remainPinMain} อัน)`}
-                      </span>
-                    </Checkbox>
-                  </Form.Item>
-                  <Form.Item
-                    initialValue={false}
-                    valuePropName="checked"
-                    className="my-0"
-                  >
-                    <Checkbox
-                      onChange={handlePinAll}
-                      checked={
-                        status === "DRAFTING" &&
-                        droneCountPoint?.remainPinAll === 0
-                          ? false
-                          : dronePinAll
-                      }
-                      disabled={
-                        (status === "DRAFTING" &&
-                          droneCountPoint?.remainPinAll === 0) ||
-                        !chooseDroner ||
-                        (droneCountPoint?.disablePinAll && !dronePinAll)
-                      }
-                    >
-                      ปักหมุดในหน้าข่าวสารทั้งหมด
-                      <span
-                        style={{
-                          color:
-                            (status === "DRAFTING" &&
-                              droneCountPoint?.remainPinAll === 0) ||
-                            !chooseDroner ||
-                            (droneCountPoint?.disablePinAll && !dronePinAll)
-                              ? color.Disable
-                              : color.Grey,
-                        }}
-                      >
-                        {` (เหลือปักหมุด ${droneCountPoint?.remainPinAll} อัน)`}
-                      </span>
-                    </Checkbox>
-                  </Form.Item>
-                </div>
+                      {application === "FARMER"
+                        ? ` (เหลือปักหมุด ${farmCountPoint?.remainPinAll} อัน)`
+                        : application === "DRONER"
+                        ? ` (เหลือปักหมุด ${droneCountPoint?.remainPinAll} อัน)`
+                        : null}
+                    </span>
+                  </Checkbox>
+                </Form.Item>
               </div>
               <div className="form-group col-lg-12 pt-4">
                 <label>
@@ -777,9 +625,12 @@ function EditNewsPage() {
                         placeholder="เลือกชื่อชาเลนจ์"
                         onChange={handleCampName}
                       >
-                        {cName.map((item) => (
-                          <option value={item.id}>{item.campaignName}</option>
-                        ))}
+                        {cName &&
+                          cName.map((item) => (
+                            <option key={item.id} value={item.id}>
+                              {item.campaignName}
+                            </option>
+                          ))}
                       </Select>
                     </Form.Item>
                   </div>

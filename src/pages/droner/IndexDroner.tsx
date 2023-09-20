@@ -1,22 +1,36 @@
-import { Avatar, Badge, Col, Pagination, Row, Select, Table } from "antd";
+import {
+  Avatar,
+  Badge,
+  Button,
+  Checkbox,
+  Col,
+  Dropdown,
+  Image,
+  Input,
+  Menu,
+  Pagination,
+  PaginationProps,
+  Popover,
+  Row,
+  Select,
+  Spin,
+  Table,
+} from "antd";
 import React, { useEffect, useState } from "react";
-import { Option } from "antd/lib/mentions";
 import color from "../../resource/color";
 import {
   CaretDownOutlined,
   CaretUpOutlined,
+  DownOutlined,
   EditOutlined,
-  FolderViewOutlined,
+  InfoCircleFilled,
+  SearchOutlined,
+  StarOutlined,
   UserOutlined,
 } from "@ant-design/icons";
 import ActionButton from "../../components/button/ActionButton";
 import { DronerListEntity } from "../../entities/DronerEntities";
 import { DronerDatasource } from "../../datasource/DronerDatasource";
-import {
-  DRONER_STATUS,
-  DRONER_STATUS_MAPPING,
-  STATUS_COLOR,
-} from "../../definitions/DronerStatus";
 import { LocationDatasource } from "../../datasource/LocationDatasource";
 import {
   DistrictEntity,
@@ -27,321 +41,229 @@ import moment from "moment";
 import AddButtton from "../../components/button/AddButton";
 import { DroneDatasource } from "../../datasource/DroneDatasource";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { useEffectOnce } from "../../hook/useEffectOnce";
-import SearchDebounce from "../../components/searchDebounce/SearchDebounce";
-import { DashboardLayout } from "../../components/layout/Layout";
+import StatusButton from "../../components/button/StatusButton";
+import StatusPlots from "../../components/card/StatusPlots";
+import { numberWithCommas } from "../../utilities/TextFormatter";
+import { CheckboxValueType } from "antd/lib/checkbox/Group";
+import { icon, image } from "../../resource";
+import {
+  STATUS_COLOR_MAPPING,
+  STATUS_FARMER_MAPPING,
+} from "../../definitions/Status";
+import CheckDocument from "../../components/dropdownCheck/CheckDocument";
+import { ListCheck } from "../../components/dropdownCheck/ListStatusAppType";
+import { DropdownStatus } from "../../components/dropdownCheck/DropDownStatus";
 
-interface SearchSelectType {
-  label: any;
-  value: any;
-}
 function IndexDroner() {
-  const row = 10;
+  const [row, setRow] = useState(10);
   const [current, setCurrent] = useState(1);
   const [data, setData] = useState<DronerListEntity>();
   const [searchText, setSearchText] = useState<string>();
-  const [searchStatus, setSearchStatus] = useState<SearchSelectType>({
-    label: "ทั้งหมด",
-    value: "ALL",
-  });
-  const [searchProvince, setSearchProvince] = useState<
-    SearchSelectType | undefined
-  >(undefined);
-  const [searchDistrict, setSearchDistrict] = useState<
-    SearchSelectType | undefined
-  >(undefined);
-  const [searchSubdistrict, setSearchSubdistrict] = useState<
-    SearchSelectType | undefined
-  >(undefined);
-  const [searchDroneBrand, setSearchDroneBrand] = useState<
-    SearchSelectType | undefined
-  >(undefined);
+  const [searchProvince, setSearchProvince] = useState<any>();
+  const [searchDistrict, setSearchDistrict] = useState<any>();
+  const [searchSubdistrict, setSearchSubdistrict] = useState<any>();
   const [province, setProvince] = useState<ProviceEntity[]>([]);
   const [district, setDistrict] = useState<DistrictEntity[]>([]);
   const [subdistrict, setSubdistrict] = useState<SubdistrictEntity[]>([]);
-  const genQuery = ({
-    searchDistrict,
-    searchDroneBrand,
-    searchProvince,
-    searchStatus,
-    searchSubdistrict,
-    searchText,
-  }: {
-    searchStatus?: string;
-    searchText?: string;
-    searchProvince?: string;
-    searchDistrict?: string;
-    searchSubdistrict?: string;
-    searchDroneBrand?: string;
-  }) => {
-    const query: any = {};
-    if (searchStatus) {
-      query.status = searchStatus;
-    }
-    if (searchText) {
-      query.searchText = searchText;
-    }
-    if (searchProvince) {
-      query.province = searchProvince;
-    }
-    if (searchDistrict) {
-      query.district = searchDistrict;
-    }
-    if (searchSubdistrict) {
-      query.subdistrict = searchSubdistrict;
-    }
-    if (searchDroneBrand) {
-      query.droneBrand = searchDroneBrand;
-    }
-    const queryString = Object.keys(query);
-    if (queryString.length > 0) {
-      return "?" + queryString.map((key) => key + "=" + query[key]).join("&");
-    }
-    return "";
-  };
+  const [mainStatus, setMainStatus] = useState<any>("PENDING");
+  const [sumPlotCard, setSumPlotCard] = useState<any>({
+    card1: "รอตรวจสอบ",
+    card2: "ไม่อนุมัติ",
+    card3: "ข้อมูลไม่ครบถ้วน",
+  });
+  const [loading, setLoading] = useState(false);
+  const [appType, setAppType] = useState<any>();
+  const [appTypeArr, setAppTypeArr] = useState<string[]>([]);
+  const [checkDocArr, setCheckDocArr] = useState<string[]>([]);
 
+  const [statusArr, setStatusArr] = useState<string[]>([]);
+  const [statusArrMain, setStatusArrMain] = useState<string[]>([]);
+  const [waitPendingDate, setWaitPendingDate] = useState<any>();
+  const statusListPend = ["FIRST", "SECOND", "THIRD"];
+  const [searchStatus, setSearchStatus] = useState<any>();
+  const [documentPersons, setDocumentPersons] = useState<any>();
+  const [summary, setSummary] = useState<any>();
+  const [sortDirection, setSortDirection] = useState<string | undefined>();
+  const [sortField, setSortField] = useState<string | undefined>();
   const navigate = useNavigate();
-  const [searchQuery] = useSearchParams();
-
-  const [sortStatus, setSortStatus] = useState<string | undefined>(undefined);
-  const [droneBrandId, setDroneBrandId] = useState<any>();
-  useEffect(() => {
-    fetchDronerList({
-      sortField: sortStatus ? "updatedAt" : undefined,
-      sortDirection: sortStatus,
-    });
-    if (searchProvince) {
-      fetchDistrict();
-    }
-    if (searchDistrict) {
-      fetchSubdistrict();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [
-    current,
-    sortStatus,
-
-    searchText,
-    searchStatus,
-    searchProvince,
-    searchDistrict,
-    searchDroneBrand,
-    searchSubdistrict,
-  ]);
-
-  const fetchDronerList = async ({
-    sortField,
-    sortDirection,
-  }: {
-    sortField?: string;
-    sortDirection?: string;
-  }) => {
+  const [sortDirection1, setSortDirection1] = useState<string | undefined>(
+    undefined
+  );
+  const [sortDirection2, setSortDirection2] = useState<string | undefined>(
+    undefined
+  );
+  const [sortDirection3, setSortDirection3] = useState<string | undefined>(
+    undefined
+  );
+  const fetchDronerList = async () => {
+    setLoading(true);
     await DronerDatasource.getDronerList(
+      mainStatus,
+      waitPendingDate,
+      appType,
       current,
       row,
-      searchSubdistrict?.value,
-      searchDistrict?.value,
-      searchProvince?.value,
-      searchDroneBrand?.value,
-      searchStatus?.value === "ALL" ? undefined : searchStatus?.value,
+      searchStatus,
       searchText,
-      sortField,
-      sortDirection
-    ).then((res: DronerListEntity) => {
-      setData(res);
-    });
+      searchProvince,
+      searchDistrict,
+      searchSubdistrict,
+      documentPersons,
+      sortDirection,
+      sortField
+    )
+      .then((res) => {
+        setData(res);
+        setSummary(res.summary[0]);
+      })
+      .catch((err) => console.log(err))
+      .finally(() => setLoading(false));
   };
-  useEffectOnce(() => {
-    const getInitialSearch = async () => {
-      const provinceData = await fetchProvince();
-      const droneBrandData = await fetchDroneBrand();
-      let findProvince: any;
-      let findDistrict: any;
-      if (searchQuery) {
-        const status = searchQuery.get("status");
-        const searchText = searchQuery.get("searchText");
-        const provinceQuery = searchQuery.get("province");
-        const districtQuery = searchQuery.get("district");
-        const subdistrictQuery = searchQuery.get("subdistrict");
-        const droneBrand = searchQuery.get("droneBrand");
-
-        if (droneBrand) {
-          const find = droneBrandData.find(
-            (item: any) => item.name === droneBrand
-          );
-          setSearchDroneBrand({
-            label: find?.name,
-            value: find?.id,
-          });
-        }
-        if (status) {
-          const find = DRONER_STATUS.find((item) => item.name === status);
-          setSearchStatus({
-            label: find?.name || "ทั้งหมด",
-            value: find?.value || "ALL",
-          });
-        }
-        if (searchText) {
-          setSearchText(searchText);
-        }
-        if (provinceQuery && provinceData) {
-          findProvince = provinceData.find((el: any) => {
-            return el.provinceName === provinceQuery;
-          });
-          setSearchProvince({
-            label: findProvince?.provinceName || "",
-            value: findProvince?.provinceId || "",
-          });
-        }
-
-        if (districtQuery && findProvince) {
-          const districtData = await LocationDatasource.getDistrict(
-            findProvince?.provinceId
-          );
-          findDistrict = districtData.find((el: any) => {
-            return el.districtName === districtQuery;
-          });
-          setSearchDistrict({
-            label: findDistrict?.districtName || "",
-            value: findDistrict?.districtId || "",
-          });
-        }
-        if (subdistrictQuery && findDistrict) {
-          const subdistrictData = await LocationDatasource.getSubdistrict(
-            findDistrict?.districtId
-          );
-          const findSubdistrict = subdistrictData.find((el: any) => {
-            return el.subdistrictName === subdistrictQuery;
-          });
-          setSearchSubdistrict({
-            label: findSubdistrict?.subdistrictName || "",
-            value: findSubdistrict?.subdistrictId || "",
-          });
-        }
-      }
-    };
-    getInitialSearch();
-  });
   const fetchProvince = async () => {
-    return await LocationDatasource.getProvince().then((res) => {
+    await LocationDatasource.getProvince().then((res) => {
       setProvince(res);
-      return res;
     });
   };
-  const fetchDistrict = async () => {
-    await LocationDatasource.getDistrict(searchProvince?.value).then((res) => {
+
+  useEffect(() => {
+    LocationDatasource.getDistrict(searchProvince).then((res) => {
+      setDistrict(res);
+      setSearchDistrict(null);
+    });
+  }, [searchProvince]);
+
+  useEffect(() => {
+    LocationDatasource.getSubdistrict(searchDistrict).then((res) => {
+      setSubdistrict(res);
+      setSearchSubdistrict(null);
+    });
+  }, [searchDistrict]);
+
+  const fetchDistrict = async (provinceId: number) => {
+    await LocationDatasource.getDistrict(provinceId).then((res) => {
       setDistrict(res);
     });
   };
-  const fetchSubdistrict = async () => {
-    await LocationDatasource.getSubdistrict(searchDistrict?.value).then(
-      (res) => {
-        setSubdistrict(res);
-      }
-    );
-  };
-  const fetchDroneBrand = async () => {
-    return await DroneDatasource.getDroneBrandList().then((res) => {
-      setDroneBrandId(res.data);
-      return res.data;
+  const fetchSubdistrict = async (districtId: number) => {
+    await LocationDatasource.getSubdistrict(districtId).then((res) => {
+      setSubdistrict(res);
     });
+  };
+
+  useEffect(() => {
+    fetchDronerList();
+    fetchProvince();
+  }, [sortDirection, current, mainStatus, row]);
+
+  const handleSearchText = (e: any) => {
+    setSearchText(e.target.value);
+  };
+  const handleSearchProvince = (provinceId: any) => {
+    if (!provinceId) {
+      setSearchDistrict(null);
+      setSearchSubdistrict(null);
+    }
+    setSearchProvince(provinceId);
+    fetchDistrict(provinceId);
+  };
+  const handleSearchDistrict = (districtId: any) => {
+    console.log(districtId);
+    if (!districtId) {
+      setSearchSubdistrict(null);
+    }
+    fetchSubdistrict(districtId);
+    setSearchDistrict(districtId);
+  };
+  const handleSearchSubdistrict = (subdistrictId: any) => {
+    setSearchSubdistrict(subdistrictId);
   };
   const onChangePage = (page: number) => {
     setCurrent(page);
   };
-  const handleProvince = (provinceId: number, data: any) => {
-    setSearchProvince({ value: provinceId, label: data.children });
-    navigate(
-      `/IndexDroner${genQuery({
-        searchProvince: data.children,
-        searchDistrict: searchDistrict?.label,
-        searchSubdistrict: searchSubdistrict?.label,
-        searchDroneBrand: searchDroneBrand?.label,
-        searchStatus: searchStatus?.label,
-        searchText,
-      })}`
-    );
+  const CheckStatus = (e: any) => {
+    if (e.target.value === "PENDING") {
+      setSearchStatus(undefined);
+      setWaitPendingDate(undefined);
+      setSumPlotCard({
+        card1: "รอตรวจสอบ",
+        card2: "ไม่อนุมัติ",
+        card3: "ข้อมูลไม่ครบถ้วน",
+      });
+    } else {
+      setSearchStatus(undefined);
+      setWaitPendingDate(undefined);
+      setSumPlotCard({
+        card1: "ใช้งาน",
+        card2: "ปิดการใช้งาน",
+      });
+    }
+    setMainStatus(e.target.value);
+  };
+  const onSearchStatus = (value: string, checked: boolean) => {
+    if (statusListPend.map((x) => x).find((c) => c === value)) {
+      let arr: any = 0;
+      if (checked === true) {
+        arr = [...statusArr, value];
+        setStatusArr([...statusArr, value]);
+        setWaitPendingDate(value);
+      } else {
+        let d: string[] = statusArr.filter((x) => x !== value);
+        arr = [...d];
+        setStatusArr(d);
+        if (d.length == 0) {
+          arr = undefined;
+        }
+      }
+      setWaitPendingDate(arr);
+    } else {
+      let arr: any = 0;
+      if (checked === true) {
+        arr = [...statusArrMain, value];
+        setStatusArrMain([...statusArrMain, value]);
+        setSearchStatus(value);
+      } else {
+        let d: string[] = statusArrMain.filter((x) => x !== value);
+        arr = [...d];
+        setStatusArrMain(d);
+        if (d.length === 0) {
+          arr = undefined;
+        }
+      }
+      setSearchStatus(arr);
+    }
+  };
 
-    setCurrent(1);
+  const onSearchCreateBy = (value: string, checked: boolean) => {
+    let arr: any = 0;
+    if (checked === true) {
+      arr = [...appTypeArr, value];
+      setAppTypeArr([...appTypeArr, value]);
+      setAppType(value);
+    } else {
+      let d: string[] = appTypeArr.filter((x) => x !== value);
+      arr = [...d];
+      setAppTypeArr(d);
+      if (d.length === 0) {
+        arr = undefined;
+      }
+    }
+    setAppType(arr);
   };
-  const handleDistrict = (districtId: number, data: any) => {
-    setSearchDistrict({ value: districtId, label: data.children });
-    navigate(
-      `/IndexDroner${genQuery({
-        searchProvince: searchProvince?.label,
-        searchDistrict: data.children,
-        searchSubdistrict: searchSubdistrict?.label,
-        searchDroneBrand: searchDroneBrand?.label,
-        searchStatus: searchStatus?.label,
-        searchText,
-      })}`
-    );
-    setCurrent(1);
-  };
-  const handleSubDistrict = (subdistrictId: any, data: any) => {
-    setSearchSubdistrict({
-      value: subdistrictId,
-      label: data.children,
-    });
-    navigate(
-      `/IndexDroner${genQuery({
-        searchProvince: searchProvince?.label,
-        searchDistrict: searchDistrict?.label,
-        searchSubdistrict: data.children,
-        searchDroneBrand: searchDroneBrand?.label,
-        searchStatus: searchStatus?.label,
-        searchText,
-      })}`
-    );
-    setCurrent(1);
-  };
-  const handleDroneBrand = (droneBrandId: string, data: any) => {
-    setSearchDroneBrand({
-      value: droneBrandId,
-      label: data.children,
-    });
-    navigate(
-      `/IndexDroner${genQuery({
-        searchProvince: searchProvince?.label,
-        searchDistrict: searchDistrict?.label,
-        searchSubdistrict: searchSubdistrict?.label,
-        searchDroneBrand: data.children,
-        searchStatus: searchStatus?.label,
-        searchText,
-      })}`
-    );
-    setCurrent(1);
-  };
-  const changeTextSearch = (value: string) => {
-    setSearchText(value);
-    navigate(
-      `/IndexDroner${genQuery({
-        searchProvince: searchProvince?.label,
-        searchDistrict: searchDistrict?.label,
-        searchSubdistrict: searchSubdistrict?.label,
-        searchDroneBrand: searchDroneBrand?.label,
-        searchStatus: searchStatus?.label,
-        searchText: value,
-      })}`
-    );
-    setCurrent(1);
-  };
-  const handleStatus = (status: any, data: any) => {
-    setSearchStatus({
-      value: status,
-      label: data.children,
-    });
-    navigate(
-      `/IndexDroner${genQuery({
-        searchProvince: searchProvince?.label,
-        searchDistrict: searchDistrict?.label,
-        searchSubdistrict: searchSubdistrict?.label,
-        searchDroneBrand: searchDroneBrand?.label,
-        searchStatus: data.children,
-        searchText,
-      })}`
-    );
-    setCurrent(1);
+  const onSearchCheckDocument = (value: string, checked: boolean) => {
+    let arr: any = 0;
+    if (checked === true) {
+      arr = [...checkDocArr, value];
+      setCheckDocArr([...checkDocArr, value]);
+      setDocumentPersons(value);
+    } else {
+      let d: string[] = checkDocArr.filter((x) => x !== value);
+      arr = [...d];
+      setCheckDocArr(d);
+      if (d.length === 0) {
+        arr = undefined;
+      }
+    }
+    setDocumentPersons(arr);
   };
   const PageTitle = (
     <>
@@ -361,6 +283,11 @@ function IndexDroner() {
             <strong>รายชื่อนักบินโดรน (Droner)</strong>
           </span>
         </div>
+        <StatusButton
+          label1={mainStatus}
+          label2={mainStatus}
+          onClick={(e: any) => CheckStatus(e)}
+        />
         <div>
           <AddButtton
             text="เพิ่มนักบินโดรน"
@@ -368,39 +295,57 @@ function IndexDroner() {
           />
         </div>
       </div>
+      <StatusPlots
+        checkPage="DronerPage"
+        title1={sumPlotCard?.card1}
+        title2={sumPlotCard?.card2}
+        title3={sumPlotCard?.card3}
+        status={mainStatus}
+        bgColor1={
+          sumPlotCard?.card1 === "รอตรวจสอบ" ? color.Warning : color.Success
+        }
+        bgColor2={
+          sumPlotCard?.card2 === "ไม่อนุมัติ" ? color.Grey : color.Error
+        }
+        bgColor3={
+          sumPlotCard?.card3 === "ข้อมูลไม่ครบถ้วน" ? color.Disable : "none"
+        }
+        countPlot1={
+          mainStatus === "PENDING"
+            ? numberWithCommas(summary?.count_pending) + " คน"
+            : numberWithCommas(summary?.count_active) + " คน"
+        }
+        countPlot2={
+          mainStatus === "ACTIVE"
+            ? numberWithCommas(summary?.count_inactive) + " คน"
+            : numberWithCommas(summary?.count_reject) + " คน"
+        }
+        countPlot3={
+          mainStatus === "PENDING"
+            ? numberWithCommas(summary?.count_open) + " คน"
+            : null
+        }
+      />
       <div
-        className="container d-flex justify-content-between"
-        style={{ padding: "8px" }}
+        className="d-flex justify-content-between"
+        style={{ padding: "8px", textAlign: "center" }}
       >
-        <div className="col-lg-3">
-          <SearchDebounce
-            onSearch={changeTextSearch}
-            placeholder="ค้นหาชื่อนักบินโดรน หรือเบอร์โทร"
+        <div className="col-lg-2 pt-1">
+          <Input
+            allowClear
+            prefix={<SearchOutlined style={{ color: color.Disable }} />}
+            placeholder="ค้นหาชื่อนักบิน/เบอร์โทร/ID นักบินโดรน"
             className="col-lg-12 p-1"
-            searchDefault={searchText}
+            onChange={handleSearchText}
           />
         </div>
-        <div className="col">
+        <div className="col-lg">
           <Select
+            allowClear
             className="col-lg-12 p-1"
             placeholder="เลือกจังหวัด"
-            onChange={handleProvince}
+            onChange={handleSearchProvince}
             showSearch
-            value={searchProvince?.label}
-            allowClear
-            onClear={() => {
-              setSearchProvince(undefined);
-              navigate(
-                `/IndexDroner${genQuery({
-                  searchProvince: undefined,
-                  searchDistrict: searchDistrict?.label,
-                  searchSubdistrict: searchSubdistrict?.label,
-                  searchDroneBrand: searchDroneBrand?.label,
-                  searchStatus: searchStatus?.label,
-                  searchText,
-                })}`
-              );
-            }}
             optionFilterProp="children"
             filterOption={(input: any, option: any) =>
               option.children.includes(input)
@@ -412,33 +357,19 @@ function IndexDroner() {
             }
           >
             {province?.map((item) => (
-              <Option value={item.provinceId.toString()}>
+              <option value={item.provinceId.toString()}>
                 {item.provinceName}
-              </Option>
+              </option>
             ))}
           </Select>
         </div>
-        <div className="col">
+        <div className="col-lg">
           <Select
-            className="col-lg-12 p-1"
-            onClear={() => {
-              setSearchDistrict(undefined);
-              navigate(
-                `/IndexDroner${genQuery({
-                  searchProvince: searchProvince?.label,
-                  searchDistrict: undefined,
-                  searchSubdistrict: searchSubdistrict?.label,
-                  searchDroneBrand: searchDroneBrand?.label,
-                  searchStatus: searchStatus?.label,
-                  searchText,
-                })}`
-              );
-            }}
-            placeholder="เลือกอำเภอ"
-            onChange={handleDistrict}
-            showSearch
-            value={searchDistrict?.label}
             allowClear
+            className="col-lg-12 p-1"
+            placeholder="เลือกอำเภอ"
+            onChange={handleSearchDistrict}
+            showSearch
             optionFilterProp="children"
             filterOption={(input: any, option: any) =>
               option.children.includes(input)
@@ -448,36 +379,23 @@ function IndexDroner() {
                 .toLowerCase()
                 .localeCompare(optionB.children.toLowerCase())
             }
-            disabled={searchProvince === undefined}
+            disabled={!searchProvince}
+            value={searchDistrict}
           >
             {district?.map((item) => (
-              <Option value={item.districtId.toString()}>
+              <option value={item.districtId.toString()}>
                 {item.districtName}
-              </Option>
+              </option>
             ))}
           </Select>
         </div>
-        <div className="col">
+        <div className="col-lg">
           <Select
+            allowClear
             className="col-lg-12 p-1"
             placeholder="เลือกตำบล"
-            onChange={handleSubDistrict}
-            onClear={() => {
-              setSearchSubdistrict(undefined);
-              navigate(
-                `/IndexDroner${genQuery({
-                  searchProvince: searchProvince?.label,
-                  searchDistrict: searchDistrict?.label,
-                  searchSubdistrict: undefined,
-                  searchDroneBrand: searchDroneBrand?.label,
-                  searchStatus: searchStatus?.label,
-                  searchText,
-                })}`
-              );
-            }}
+            onChange={handleSearchSubdistrict}
             showSearch
-            allowClear
-            value={searchSubdistrict?.label}
             optionFilterProp="children"
             filterOption={(input: any, option: any) =>
               option.children.includes(input)
@@ -487,74 +405,78 @@ function IndexDroner() {
                 .toLowerCase()
                 .localeCompare(optionB.children.toLowerCase())
             }
-            disabled={searchDistrict == undefined}
+            disabled={!searchDistrict}
+            value={searchSubdistrict}
           >
             {subdistrict?.map((item) => (
-              <Option value={item.subdistrictId.toString()}>
+              <option value={item.subdistrictId.toString()}>
                 {item.subdistrictName}
-              </Option>
+              </option>
             ))}
           </Select>
         </div>
-        <div className="col">
-          <Select
-            showSearch
-            value={searchDroneBrand?.label}
-            onClear={() => {
-              setSearchDroneBrand(undefined);
-              navigate(
-                `/IndexDroner${genQuery({
-                  searchProvince: searchProvince?.label,
-                  searchDistrict: searchDistrict?.label,
-                  searchSubdistrict: searchSubdistrict?.label,
-                  searchDroneBrand: undefined,
-                  searchStatus: searchStatus?.label,
-                  searchText,
-                })}`
-              );
+        <div className="col-lg-2">
+          <ListCheck
+            onSearchType={(value: any, checked: any) =>
+              onSearchCreateBy(value, checked)
+            }
+            list={appType}
+            title="เลือกรูปแบบการสร้าง"
+            menu="DRONER"
+          />
+        </div>
+        <div className="col-lg">
+          <CheckDocument
+            onSearchType={(value: any, checked: any) =>
+              onSearchCheckDocument(value, checked)
+            }
+            list={documentPersons}
+            title="เลือกการตรวจเอกสาร"
+          />
+        </div>
+        <div className="col-lg">
+          <DropdownStatus
+            title="เลือกสถานะ"
+            mainStatus={mainStatus}
+            onSearchType={(value: any, checked: any) =>
+              onSearchStatus(value, checked)
+            }
+            list={searchStatus}
+            menu="DRONER"
+          />
+        </div>
+        <div className="pt-1">
+          <Button
+            style={{
+              borderColor: color.Success,
+              borderRadius: "5px",
+              color: color.secondary2,
+              backgroundColor: color.Success,
             }}
-            optionFilterProp="children"
-            filterOption={(input: any, option: any) =>
-              option.children.includes(input)
-            }
-            filterSort={(optionA, optionB) =>
-              optionA.children
-                .toLowerCase()
-                .localeCompare(optionB.children.toLowerCase())
-            }
-            className="col-lg-12 p-1"
-            placeholder="เลือกยี่ห้อ"
-            allowClear
-            onChange={handleDroneBrand}
+            onClick={() => {
+              setCurrent(1);
+              fetchDronerList();
+            }}
           >
-            {droneBrandId?.map((item: any) => (
-              <Option value={item.id.toString()}>{item.name}</Option>
-            ))}
-          </Select>
-        </div>
-
-        <div className="col">
-          <Select
-            className="col-lg-12 p-1"
-            placeholder="เลือกสถานะ"
-            value={searchStatus?.label}
-            onChange={handleStatus}
-          >
-            {DRONER_STATUS.map((item) => (
-              <Option value={item.value}>{item.name}</Option>
-            ))}
-          </Select>
+            ค้นหาข้อมูล
+          </Button>
         </div>
       </div>
     </>
   );
-
+  const onShowSizeChange: PaginationProps["onShowSizeChange"] = (
+    current,
+    pageSize
+  ) => {
+    setCurrent(current);
+    setRow(pageSize);
+  };
   const columns = [
     {
       title: () => {
         return (
           <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-            อัพเดทล่าสุด
+            อัพเดตล่าสุด
             <div
               style={{
                 display: "flex",
@@ -562,7 +484,17 @@ function IndexDroner() {
                 cursor: "pointer",
               }}
               onClick={() => {
-                setSortStatus((prev) => {
+                setSortField("updatedAt");
+                setSortDirection((prev) => {
+                  if (prev === "ASC") {
+                    return "DESC";
+                  } else if (prev === undefined) {
+                    return "ASC";
+                  } else {
+                    return undefined;
+                  }
+                });
+                setSortDirection1((prev) => {
                   if (prev === "ASC") {
                     return "DESC";
                   } else if (prev === undefined) {
@@ -577,14 +509,14 @@ function IndexDroner() {
                 style={{
                   position: "relative",
                   top: 2,
-                  color: sortStatus === "ASC" ? "#ffca37" : "white",
+                  color: sortDirection1 === "ASC" ? "#ffca37" : "white",
                 }}
               />
               <CaretDownOutlined
                 style={{
                   position: "relative",
                   bottom: 2,
-                  color: sortStatus === "DESC" ? "#ffca37" : "white",
+                  color: sortDirection1 === "DESC" ? "#ffca37" : "white",
                 }}
               />
             </div>
@@ -600,25 +532,73 @@ function IndexDroner() {
               <span className="text-dark-75  d-block font-size-lg">
                 {moment(value.updatedAt).format("DD/MM/YYYY HH:mm")}
               </span>
-              {value.updateBy && (
-                <div>
-                  <span
-                    className=" d-block font-size-lg"
-                    style={{ color: color.Grey }}
-                  >
-                    <UserOutlined style={{ padding: "0 4px 0 0" }} />
-
-                    {value?.updateBy}
-                  </span>
-                </div>
-              )}
+              <div>
+                <span
+                  className=" d-block font-size-lg"
+                  style={{ color: color.Grey }}
+                >
+                  <UserOutlined
+                    style={{ padding: "0 4px 0 0", verticalAlign: 0.5 }}
+                  />
+                  {value?.updateBy ? value?.updateBy : "-"}
+                </span>
+              </div>
             </div>
           ),
         };
       },
     },
     {
-      title: "ชื่อนักบินโดรน",
+      title: () => {
+        return (
+          <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+            ชื่อนักบินโดรน
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                cursor: "pointer",
+              }}
+              onClick={() => {
+                setSortField("firstname");
+                setSortDirection((prev) => {
+                  if (prev === "ASC") {
+                    return "DESC";
+                  } else if (prev === undefined) {
+                    return "ASC";
+                  } else {
+                    return undefined;
+                  }
+                });
+                setSortDirection2((prev) => {
+                  if (prev === "ASC") {
+                    return "DESC";
+                  } else if (prev === undefined) {
+                    return "ASC";
+                  } else {
+                    return undefined;
+                  }
+                });
+              }}
+            >
+              <CaretUpOutlined
+                style={{
+                  position: "relative",
+                  top: 2,
+                  color: sortDirection2 === "ASC" ? "#ffca37" : "white",
+                }}
+              />
+              <CaretDownOutlined
+                style={{
+                  position: "relative",
+                  bottom: 2,
+                  color: sortDirection2 === "DESC" ? "#ffca37" : "white",
+                }}
+              />
+            </div>
+          </div>
+        );
+      },
       dataIndex: "firstname",
       key: "firstname",
       render: (value: any, row: any, index: number) => {
@@ -628,55 +608,8 @@ function IndexDroner() {
               <span className="text-dark-75  d-block font-size-lg">
                 {row.firstname + " " + row.lastname}
               </span>
-              <span style={{ color: color.Disable }}>{row.pin}</span>
-            </div>
-          ),
-        };
-      },
-    },
-    {
-      title: "ตำบล",
-      dataIndex: "subdistrict",
-      key: "subdistrict",
-      render: (value: any, row: any, index: number) => {
-        const subdistrict = row.address.subdistrict;
-        return {
-          children: (
-            <span className="text-dark-75  d-block font-size-lg">
-              {subdistrict !== undefined ? subdistrict.subdistrictName : null}
-            </span>
-          ),
-        };
-      },
-    },
-    {
-      title: "อำเภอ",
-      dataIndex: "district",
-      key: "district",
-      render: (value: any, row: any, index: number) => {
-        const district = row.address.district;
-        return {
-          children: (
-            <div className="container">
-              <span className="text-dark-75  d-block font-size-lg">
-                {district !== undefined ? district.districtName : null}
-              </span>
-            </div>
-          ),
-        };
-      },
-    },
-    {
-      title: "จังหวัด",
-      dataIndex: "province",
-      key: "province",
-      render: (value: any, row: any, index: number) => {
-        const province = row.address.province;
-        return {
-          children: (
-            <div className="container">
-              <span className="text-dark-75  d-block font-size-lg">
-                {province !== undefined ? province.provinceName : null}
+              <span style={{ color: color.Grey, fontSize: 12 }}>
+                {row.dronerCode}
               </span>
             </div>
           ),
@@ -687,9 +620,145 @@ function IndexDroner() {
       title: "เบอร์โทร",
       dataIndex: "telephoneNo",
       key: "telephoneNo",
+      render: (value: any, row: any, index: number) => {
+        return {
+          children: <span>{row.telephoneNo ? row.telephoneNo : "-"}</span>,
+        };
+      },
     },
     {
-      title: "จำนวนโดรน",
+      title: "ที่อยู่",
+      dataIndex: "address",
+      key: "address",
+      render: (value: any, row: any, index: number) => {
+        const subdistrict =
+          row.address !== null ? row.address.subdistrict : null;
+        const district = row.address !== null ? row.address.district : null;
+        const province = row.address !== null ? row.address.province : null;
+
+        return {
+          children: (
+            <span className="text-dark-75  d-block font-size-lg">
+              {subdistrict ? subdistrict.subdistrictName + "/" : "-/"}
+              {district ? district.districtName + "/" : "-/"}
+              {province ? province.provinceName : "-"}
+            </span>
+          ),
+        };
+      },
+    },
+    {
+      title: "ตรวจเอกสาร",
+      dataIndex: "",
+      render: (value: any, row: any, index: number) => {
+        return {
+          children: (
+            <>
+              <div>
+                <Image
+                  src={row.file.length > 0 ? icon.check : icon.cancel}
+                  preview={false}
+                  style={{ width: 18, height: 18, marginRight: 6 }}
+                />
+                บัตรประชาชน
+              </div>
+              <div>
+                <Image
+                  src={row.isBookBank === true ? icon.check : icon.cancel}
+                  preview={false}
+                  style={{ width: 18, height: 18, marginRight: 6 }}
+                />
+                สมุดบัญชี
+              </div>
+            </>
+          ),
+        };
+      },
+    },
+    {
+      title: "สร้างโดย",
+      dataIndex: "createByWho",
+      key: "createByWho",
+      render: (value: any, row: any, index: number) => {
+        return {
+          children: (
+            <>
+              {row.applicationType === "BO" && (
+                <>
+                  <Image
+                    src={icon.bo}
+                    preview={false}
+                    style={{ width: 24, height: 24 }}
+                  />
+                  <span> {row.createBy ? row.createBy + ` (Admin)` : "-"}</span>
+                </>
+              )}
+              {row.applicationType === "DRONER" && (
+                <>
+                  <Image
+                    src={icon.dronerApp}
+                    preview={false}
+                    style={{ width: 24, height: 24 }}
+                  />
+                  <span> {row.firstname + " " + row.lastname}</span>
+                </>
+              )}
+            </>
+          ),
+        };
+      },
+    },
+    {
+      title: () => {
+        return (
+          <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+            จำนวนโดรน
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                cursor: "pointer",
+              }}
+              onClick={() => {
+                setSortField("totalDroneCount");
+                setSortDirection((prev) => {
+                  if (prev === "ASC") {
+                    return "DESC";
+                  } else if (prev === undefined) {
+                    return "ASC";
+                  } else {
+                    return undefined;
+                  }
+                });
+                setSortDirection3((prev) => {
+                  if (prev === "ASC") {
+                    return "DESC";
+                  } else if (prev === undefined) {
+                    return "ASC";
+                  } else {
+                    return undefined;
+                  }
+                });
+              }}
+            >
+              <CaretUpOutlined
+                style={{
+                  position: "relative",
+                  top: 2,
+                  color: sortDirection3 === "ASC" ? "#ffca37" : "white",
+                }}
+              />
+              <CaretDownOutlined
+                style={{
+                  position: "relative",
+                  bottom: 2,
+                  color: sortDirection3 === "DESC" ? "#ffca37" : "white",
+                }}
+              />
+            </div>
+          </div>
+        );
+      },
       dataIndex: "totalDroneCount",
       key: "totalDroneCount",
       render: (value: any, row: any, index: number) => {
@@ -697,7 +766,7 @@ function IndexDroner() {
           children: (
             <div className="container">
               <span className="text-dark-75  d-block font-size-lg">
-                {row.totalDroneCount + " " + "เครื่อง"}
+                {row.totalDroneCount + " เครื่อง"}
               </span>
             </div>
           ),
@@ -715,21 +784,15 @@ function IndexDroner() {
             <div className="container">
               <span className="text-dark-75  d-block font-size-lg">
                 {droneLatest ? (
-                  <Avatar
-                    size={25}
-                    src={droneLatest.drone.droneBrand.logoImagePath}
-                    style={{ marginRight: "5px" }}
-                  />
+                  <div style={{ borderColor: "yellow" }}>
+                    <Avatar
+                      size={25}
+                      src={droneLatest.drone.droneBrand.logoImagePath}
+                      style={{ marginRight: "5px" }}
+                    />
+                  </div>
                 ) : (
-                  <Avatar
-                    size={25}
-                    style={{
-                      color: "#0068F4",
-                      backgroundColor: "#EFF2F9",
-                    }}
-                  >
-                    {/* {droneLatest.charAt(0)} */}
-                  </Avatar>
+                  "-"
                 )}
                 {droneLatest !== undefined
                   ? droneLatest.drone.droneBrand.name
@@ -750,23 +813,98 @@ function IndexDroner() {
       key: "status",
       render: (value: any, row: any, index: number) => {
         const countDay = () => {
-          let dateToday: any = moment(Date.now());
-          let createDate: any = moment(new Date(row.createdAt));
-          let dateDiff = dateToday.diff(createDate, "day");
-          let textDateDiff =
-            dateDiff == 0 ? null : "(รอไปแล้ว " + dateDiff + " วัน)";
-          return textDateDiff;
+          if (row.dateWaitPending != null) {
+            const nowDate = new Date(Date.now());
+            const rowDate = new Date(row.dateWaitPending);
+            const diffTime = nowDate.getTime() - rowDate.getTime();
+            let diffDay = Math.floor(diffTime / (1000 * 3600 * 24));
+            diffDay = diffDay === 0 ? 1 : diffDay;
+            return `(รอไปแล้ว ${diffDay} วัน)`;
+          }
         };
+        let checkProfile = ![
+          row.firstname,
+          row.lastname,
+          row.telephoneNo,
+        ].includes("");
         return {
           children: (
             <>
-              <span style={{ color: STATUS_COLOR[row.status] }}>
-                <Badge color={STATUS_COLOR[row.status]} />{" "}
-                {DRONER_STATUS_MAPPING[row.status]}
+              <span style={{ color: STATUS_COLOR_MAPPING[row.status] }}>
+                <Badge color={STATUS_COLOR_MAPPING[row.status]} />{" "}
+                {STATUS_FARMER_MAPPING[row.status]}
+                {row.status === "PENDING" && (
+                  <Popover
+                    title={
+                      <span
+                        style={{
+                          color: color.White,
+                        }}
+                      >
+                        ตรวจสอบข้อมูลนักบินโดรน
+                      </span>
+                    }
+                    content={
+                      <>
+                        <div>
+                          <Image
+                            src={
+                              checkProfile === true && row.birthDate
+                                ? icon.check
+                                : icon.cancel
+                            }
+                            preview={false}
+                            style={{ width: 20, height: 20 }}
+                          />
+                          <span> ข้อมูลส่วนตัว</span>
+                        </div>
+                        <div>
+                          <Image
+                            src={row.dronerArea?.id ? icon.check : icon.cancel}
+                            preview={false}
+                            style={{ width: 20, height: 20 }}
+                          />
+                          <span> พื้นที่ให้บริการ</span>
+                        </div>
+                        <div>
+                          <Image
+                            src={
+                              row.dronerDrone.length > 0
+                                ? icon.check
+                                : icon.cancel
+                            }
+                            preview={false}
+                            style={{ width: 20, height: 20 }}
+                          />
+                          <span> ข้อมูลโดรน</span>
+                        </div>
+                        <div>
+                          <Image
+                            src={row.expPlant ? icon.check : icon.cancel}
+                            preview={false}
+                            style={{ width: 20, height: 20 }}
+                          />
+                          <span> พืชที่ฉีดพ่น</span>
+                        </div>
+                      </>
+                    }
+                  >
+                    <InfoCircleFilled
+                      style={{
+                        color: color.Warning,
+                        fontSize: "15px",
+                        marginLeft: "7px",
+                        verticalAlign: 0.5,
+                      }}
+                    />
+                  </Popover>
+                )}
                 <br />
               </span>
               <span style={{ color: color.Grey }}>
-                {row.status == "PENDING" ? countDay() : null}
+                {row.status === "PENDING" && row.dateWaitPending != null
+                  ? countDay()
+                  : null}
               </span>
             </>
           ),
@@ -783,7 +921,7 @@ function IndexDroner() {
             <Row justify={"space-between"} gutter={8}>
               <Col span={12}>
                 <ActionButton
-                  icon={<FolderViewOutlined />}
+                  icon={<StarOutlined />}
                   color={color.primary1}
                   onClick={() =>
                     navigate("/DetailDronerHistorySum/id=" + row.id)
@@ -806,32 +944,55 @@ function IndexDroner() {
     },
   ];
 
+  let emptyState = {
+    emptyText: (
+      <div style={{ textAlign: "center", padding: "10%" }}>
+        <Image
+          src={image.empty_table_droner}
+          preview={false}
+          style={{ width: 90, height: 90 }}
+        />
+        <p>ยังไม่มีข้อมูลนักบินโดรน</p>
+      </div>
+    ),
+  };
   return (
     <>
       {PageTitle}
-      <Table
-        columns={columns}
-        dataSource={data?.data}
-        pagination={false}
-        scroll={{ x: "max-content" }}
-        rowClassName={(a) =>
-          a.status == "PENDING" &&
-          moment(Date.now()).diff(moment(new Date(a.createdAt)), "day") >= 3
-            ? "PENDING" &&
-              moment(Date.now()).diff(moment(new Date(a.createdAt)), "day") >= 7
-              ? "table-row-older"
-              : "table-row-old"
-            : "table-row-lasted"
-        }
-      />
+      <Spin tip="กำลังโหลดข้อมูล..." size="large" spinning={loading}>
+        <Table
+          locale={emptyState}
+          columns={columns}
+          dataSource={data?.data}
+          pagination={false}
+          scroll={{ x: "max-content" }}
+          rowClassName={(a) =>
+            a.status === "PENDING" &&
+            a.dateWaitPending != null &&
+            moment(Date.now()).diff(
+              moment(new Date(a.dateWaitPending)),
+              "day"
+            ) >= 3
+              ? "PENDING" &&
+                moment(Date.now()).diff(
+                  moment(new Date(a.dateWaitPending)),
+                  "day"
+                ) >= 7
+                ? "table-row-older"
+                : "table-row-old"
+              : "table-row-lasted"
+          }
+        />
+      </Spin>
+
       <div className="d-flex justify-content-between pt-3 pb-3">
         <p>รายการทั้งหมด {data?.count} รายการ</p>
         <Pagination
           current={current}
-          total={data?.count}
+          showSizeChanger
           onChange={onChangePage}
-          pageSize={row}
-          showSizeChanger={false}
+          onShowSizeChange={onShowSizeChange}
+          total={data?.count}
         />
       </div>
     </>

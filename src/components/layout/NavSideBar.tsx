@@ -9,6 +9,7 @@ import icon from "../../resource/icon";
 import { useLocalStorage } from "../../hook/useLocalStorage";
 import { MenuSide } from "./MenuSide";
 import { pathLists } from "./SideBar";
+
 const logout = () => {
   localStorage.clear();
   sessionStorage.clear();
@@ -20,11 +21,12 @@ const NavSidebar: React.FC<any> = ({ children }) => {
     "profile",
     []
   );
-  const listAcc = [
+  const listReportAcc = [
     "ick_accounting",
     "minkact",
     "arisa.m@iconkaset",
     "nathapon",
+    "issariya",
   ];
   const listAdminTask = [
     "Khanittha.w",
@@ -32,15 +34,9 @@ const NavSidebar: React.FC<any> = ({ children }) => {
     "nathapon.h@iconkaset.com",
     "sawatdee.k",
   ];
-  const checkBoolean = listAcc.find((x) => x === persistedProfile.username)
-    ? true
-    : false;
-  const checkAdminTask = listAdminTask.find(
-    (x) => x === persistedProfile.username
-  )
-    ? true
-    : false;
-  const isAccount = checkBoolean;
+  const checkReportAcc = listReportAcc.includes(persistedProfile.username);
+  const checkAdminTask = listAdminTask.includes(persistedProfile.username);
+  const isReportAccount = checkReportAcc;
   const isAdminTask = checkAdminTask;
   const navigate = useNavigate();
 
@@ -98,15 +94,15 @@ const NavSidebar: React.FC<any> = ({ children }) => {
         <Sider
           width={200}
           style={{
-            overflow: "auto",
-            height: "100%",
+            overflowX: "auto",
+            height: "90%",
             position: "fixed",
             marginTop: 65,
             backgroundColor: color.White,
             cursor: "pointer",
           }}
         >
-          <MenuSide lists={pathLists(isAccount, isAdminTask)} />
+          <MenuSide lists={pathLists(isReportAccount, isAdminTask)} />
         </Sider>
       </Layout>
     </Layout>
