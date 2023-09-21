@@ -686,25 +686,6 @@ function EditPromotion() {
     setConditionEditor(editor.getHTML());
   };
 
-  const handleCouponConditionFarmerList = (value: any[]) => {
-    const filterId = value.map((item) => item.id);
-    const oldState = couponConditionFarmerList;
-    const filterOldState = couponConditionFarmerList.map((x) => x.id);
-    if (filterOldState.find((x) => x === filterId[filterId.length - 1])) {
-      const newData = oldState.filter(
-        (x) => x.id !== filterId[filterId.length - 1]
-      );
-      setCouponConditionFarmerList(newData);
-    } else {
-      const newState = {
-        farmerId: filterId[filterId.length - 1],
-        keep: false,
-      };
-      oldState.push(newState);
-      setCouponConditionFarmerList(oldState);
-    }
-  };
-
   function checkRai(min: number | null, max: number | null): string {
     let result;
     if (!min && !max) {
@@ -1445,9 +1426,19 @@ function EditPromotion() {
                         styles={styles}
                         isClearable={false}
                         onInputChange={handleInputChange}
-                        onChange={(selectedOptions: any) => {
-                          setCurrentPage(1);
-                          handleCouponConditionFarmerList(selectedOptions);
+                        onChange={(value: any, option) => {
+                          if (option.removedValue) {
+                            setCouponConditionFarmerList(value);
+                          } else {
+                            const filterId = value.map((item: any) => item.id);
+                            const oldState = couponConditionFarmerList;
+                            const newState = {
+                              farmerId: filterId[filterId.length - 1],
+                              keep: false,
+                            };
+                            oldState.push(newState);
+                            setCouponConditionFarmerList(oldState);
+                          }
                         }}
                         options={farmerList || []}
                         isMulti

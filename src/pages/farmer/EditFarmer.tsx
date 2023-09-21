@@ -660,7 +660,7 @@ const EditFarmer = () => {
               <Form.Item name="nickname">
                 <Input
                   placeholder="กรอกชื่อเล่น"
-                  // defaultValue={data.lastname}
+                  defaultValue={data.nickname}
                   autoComplete="off"
                   onChange={handleOnChange}
                 />

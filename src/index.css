@@ -93,3 +93,13 @@ table tr td :hover {
 .ant-spin-text {
   color: #219653;
 }
+.ant-checkbox-checked .ant-checkbox-inner {
+  background-color: #219653 !important;
+  border-color: #219653 !important;
+}
+.ant-radio-checked .ant-radio-inner {
+  border-color: #219653 !important ;
+}
+.ant-radio-checked .ant-radio-inner:after {
+  background-color: #219653 !important;
+}
