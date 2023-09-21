@@ -25,7 +25,13 @@ import color from "../../resource/color";
 import AddButtton from "../../components/button/AddButton";
 import ActionButton from "../../components/button/ActionButton";
 import { DeleteOutlined } from "@ant-design/icons";
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import {
+  ReactEventHandler,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from "react";
 import { CropDatasource } from "../../datasource/CropDatasource";
 import { LocationDatasource } from "../../datasource/LocationDatasource";
 import FooterPage from "../../components/footer/FooterPage";
@@ -52,9 +58,9 @@ import { FarmerPageEntity } from "../../entities/FarmerEntities";
 
 const _ = require("lodash");
 interface ColourOption {
-  value: string; 
+  value: string;
   label: string;
-  isFixed: boolean; 
+  isFixed: boolean;
 }
 function EditPromotion() {
   let queryString = _.split(window.location.pathname, "=");
@@ -120,8 +126,8 @@ function EditPromotion() {
   });
 
   const styles: StylesConfig<ColourOption, true> = {
-    multiValueRemove: (base,state) => {
-      return  state.data.isFixed ? { ...base, display: "none" } : base;
+    multiValueRemove: (base, state) => {
+      return state.data.isFixed ? { ...base, display: "none" } : base;
     },
   };
   const [form] = Form.useForm();
@@ -159,7 +165,6 @@ function EditPromotion() {
             provinceName: x.provinceName,
           };
         });
-        const defaultResult = couponConditionFarmerList.map((i)=> i.farmerId)
         const result = mapData.map((item) => {
           return {
             ...item,
@@ -169,6 +174,7 @@ function EditPromotion() {
               item.lastname +
               " | " +
               (item.provinceName ? item.provinceName : "-"),
+
             value: item.id,
           };
         });
@@ -176,12 +182,14 @@ function EditPromotion() {
       }
     );
   };
-  const handleInputChange = (e:any, option:any) => {
-    console.log()
-    if (option.action === 'remove-value' || option.action === 'pop-value') return;
-
-    // setCurrentPage(1);
-    // setSearchFarmer(inputValue);
+  const handleInputChange = (inputValue: string) => {
+    setCurrentPage(1);
+    setSearchFarmer(inputValue);
+  };
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
+    if (!searchFarmer && event.key === "Backspace") {
+      event.preventDefault();
+    }
   };
 
   const handleMenuScrollToBottom = () => {
@@ -337,8 +345,7 @@ function EditPromotion() {
             item.provinceName,
           id: item.id,
           keep: item.keep,
-          isFixed: true
-
+          isFixed: true,
         };
       })
     );
@@ -697,13 +704,6 @@ function EditPromotion() {
       setCouponConditionFarmerList(oldState);
     }
   };
-
-  // const styles: StylesConfig<true> = {
-  //   multiValueRemove: (base) => {
-  //     const checkId = couponConditionFarmerList.map((x) => x.id);
-  //     return checkId ? { ...base, display: "none" } : base;
-  //   },
-  // };
 
   function checkRai(min: number | null, max: number | null): string {
     let result;
@@ -1439,34 +1439,21 @@ function EditPromotion() {
                         },
                       ]}
                     >
-                      {/* <Select
-                        name="clients"
-                        isMulti
-                        // value={clients}
-                        onChange={handleInputChange}
-                        isClearable={
-                          !clients.some((client) => client.visited)
-                        }
-                        options={listOfClients || []}
-                        className="basic-multi-select"
-                        classNamePrefix="select"
-                        styles={styles}
-                      /> */}
                       <Select
                         placeholder="กรุณาเลือกเกษตรกร"
                         isDisabled={!specificFarmer}
-                        isSearchable
                         styles={styles}
                         isClearable={false}
-                        onChange={handleInputChange}
-                        // onChange={(selectedOptions: any) => {
-                        //   setCurrentPage(1);
-                        //   handleCouponConditionFarmerList(selectedOptions);
-                        // }}
-                        options={farmerList}
+                        onInputChange={handleInputChange}
+                        onChange={(selectedOptions: any) => {
+                          setCurrentPage(1);
+                          handleCouponConditionFarmerList(selectedOptions);
+                        }}
+                        options={farmerList || []}
                         isMulti
                         onMenuScrollToBottom={handleMenuScrollToBottom}
                         closeMenuOnSelect={false}
+                        onKeyDown={handleKeyDown}
                       />
                     </Form.Item>
                   </div>
