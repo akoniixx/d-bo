@@ -1,5 +1,9 @@
 ## [Version - 0]
 
+## improve [v0.36.27] 2023-09-21
+
+- select farmer in create coupon page.
+
 ## Fix [v0.36.26] 2023-09-20
 
 - fixed challenge & mission
