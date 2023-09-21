@@ -582,6 +582,19 @@ const EditFarmer = () => {
           </div>
           <div className="row">
             <div className="form-group col-lg-6">
+              <label>Farmer ID</label>
+
+              <div style={{ marginBottom: 24 }}>
+                <Input
+                  style={{
+                    padding: "4px 12px",
+                  }}
+                  disabled
+                  value={data.farmerCode}
+                />
+              </div>
+            </div>
+            <div className="form-group col-lg-6">
               <label>วันที่ลงทะเบียน</label>
 
               <div style={{ marginBottom: 24 }}>
@@ -600,7 +613,7 @@ const EditFarmer = () => {
             </div>
           </div>
           <div className="row">
-            <div className="form-group col-lg-6">
+            <div className="form-group col-lg-4">
               <label>
                 ชื่อ <span style={{ color: "red" }}>*</span>
               </label>
@@ -621,7 +634,7 @@ const EditFarmer = () => {
                 />
               </Form.Item>
             </div>
-            <div className="form-group col-lg-6">
+            <div className="form-group col-lg-4">
               <label>
                 นามสกุล <span style={{ color: "red" }}>*</span>
               </label>
@@ -637,6 +650,17 @@ const EditFarmer = () => {
                 <Input
                   placeholder="กรอกนามสกุล"
                   defaultValue={data.lastname}
+                  autoComplete="off"
+                  onChange={handleOnChange}
+                />
+              </Form.Item>
+            </div>
+            <div className="form-group col-lg-4">
+              <label>ชื่อเล่น</label>
+              <Form.Item name="nickname">
+                <Input
+                  placeholder="กรอกชื่อเล่น"
+                  // defaultValue={data.lastname}
                   autoComplete="off"
                   onChange={handleOnChange}
                 />
@@ -1098,7 +1122,7 @@ const EditFarmer = () => {
             navigate(-1);
           }}
         />
-        <span className="pt-4">
+        <span className="pt-3">
           <strong style={{ fontSize: "20px" }}>
             แก้ไขข้อมูลเกษตรกร (Farmer)
           </strong>

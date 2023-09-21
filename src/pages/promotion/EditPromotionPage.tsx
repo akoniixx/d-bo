@@ -25,7 +25,13 @@ import color from "../../resource/color";
 import AddButtton from "../../components/button/AddButton";
 import ActionButton from "../../components/button/ActionButton";
 import { DeleteOutlined } from "@ant-design/icons";
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import {
+  ReactEventHandler,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from "react";
 import { CropDatasource } from "../../datasource/CropDatasource";
 import { LocationDatasource } from "../../datasource/LocationDatasource";
 import FooterPage from "../../components/footer/FooterPage";
@@ -51,7 +57,11 @@ import Select, { ActionMeta, OnChangeValue, StylesConfig } from "react-select";
 import { FarmerPageEntity } from "../../entities/FarmerEntities";
 
 const _ = require("lodash");
-
+interface ColourOption {
+  value: string;
+  label: string;
+  isFixed: boolean;
+}
 function EditPromotion() {
   let queryString = _.split(window.location.pathname, "=");
   const profile = JSON.parse(localStorage.getItem("profile") || "{  }");
@@ -114,6 +124,12 @@ function EditPromotion() {
     plantName: "",
     province: "",
   });
+
+  const styles: StylesConfig<ColourOption, true> = {
+    multiValueRemove: (base, state) => {
+      return state.data.isFixed ? { ...base, display: "none" } : base;
+    },
+  };
   const [form] = Form.useForm();
   useEffect(() => {
     getPromotion(queryString[1]);
@@ -149,7 +165,6 @@ function EditPromotion() {
             provinceName: x.provinceName,
           };
         });
-
         const result = mapData.map((item) => {
           return {
             ...item,
@@ -159,6 +174,7 @@ function EditPromotion() {
               item.lastname +
               " | " +
               (item.provinceName ? item.provinceName : "-"),
+
             value: item.id,
           };
         });
@@ -166,11 +182,14 @@ function EditPromotion() {
       }
     );
   };
-  const handleInputChange = (inputValue: any) => {
-    if (currentPage === 1) {
-      setSearchFarmer(inputValue);
+  const handleInputChange = (inputValue: string) => {
+    setCurrentPage(1);
+    setSearchFarmer(inputValue);
+  };
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
+    if (!searchFarmer && event.key === "Backspace") {
+      event.preventDefault();
     }
-    return inputValue;
   };
 
   const handleMenuScrollToBottom = () => {
@@ -326,6 +345,7 @@ function EditPromotion() {
             item.provinceName,
           id: item.id,
           keep: item.keep,
+          isFixed: true,
         };
       })
     );
@@ -683,13 +703,6 @@ function EditPromotion() {
       oldState.push(newState);
       setCouponConditionFarmerList(oldState);
     }
-  };
-
-  const styles: StylesConfig<true> = {
-    multiValueRemove: (base) => {
-      const checkId = couponConditionFarmerList.map((x)=>x.id)
-      return checkId ? { ...base, display: "none" } : base;
-    },
   };
 
   function checkRai(min: number | null, max: number | null): string {
@@ -1429,7 +1442,6 @@ function EditPromotion() {
                       <Select
                         placeholder="กรุณาเลือกเกษตรกร"
                         isDisabled={!specificFarmer}
-                        isSearchable
                         styles={styles}
                         isClearable={false}
                         onInputChange={handleInputChange}
@@ -1437,11 +1449,11 @@ function EditPromotion() {
                           setCurrentPage(1);
                           handleCouponConditionFarmerList(selectedOptions);
                         }}
-                        options={farmerList}
-                        defaultValue={couponConditionFarmerList}
+                        options={farmerList || []}
                         isMulti
                         onMenuScrollToBottom={handleMenuScrollToBottom}
                         closeMenuOnSelect={false}
+                        onKeyDown={handleKeyDown}
                       />
                     </Form.Item>
                   </div>
