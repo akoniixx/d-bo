@@ -200,14 +200,8 @@ const ModalFarmerPlot: React.FC<ModalFarmerPlotProps> = ({
         location: latlng,
         region: "th",
       })
-      .then((res) => {
-        let location = res.results[0].address_components;
-        locationName =
-          location[1].short_name +
-          " " +
-          location[2].short_name +
-          " " +
-          location[3].long_name;
+      .then((res) => {       
+        locationName = res.results[0].formatted_address
       });
 
     let f = form.getFieldsValue();
@@ -220,6 +214,7 @@ const ModalFarmerPlot: React.FC<ModalFarmerPlotProps> = ({
     payload.mapUrl = f.mapUrl;
     payload.lat = f.lat;
     payload.long = f.long;
+    payload.locationName = locationName;
     payload.landmark = f.landmark;
     payload.status = status;
     payload.comment = f.comment;
