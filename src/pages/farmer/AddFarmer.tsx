@@ -469,7 +469,7 @@ const AddFarmer = () => {
             </div>
           </div>
           <div className="row">
-            <div className="form-group col-lg-6">
+            <div className="form-group col-lg-4">
               <label>
                 ชื่อ <span style={{ color: "red" }}>*</span>
               </label>
@@ -489,7 +489,7 @@ const AddFarmer = () => {
                 />
               </Form.Item>
             </div>
-            <div className="form-group col-lg-6">
+            <div className="form-group col-lg-4">
               <label>
                 นามสกุล <span style={{ color: "red" }}>*</span>
               </label>
@@ -504,6 +504,18 @@ const AddFarmer = () => {
               >
                 <Input
                   placeholder="กรอกนามสกุล"
+                  onChange={handleOnChange}
+                  autoComplete="off"
+                />
+              </Form.Item>
+            </div>
+            <div className="form-group col-lg-4">
+              <label>
+                ชื่อเล่น
+              </label>
+              <Form.Item name="nickname">
+                <Input
+                  placeholder="กรอกชื่อเล่น"
                   onChange={handleOnChange}
                   autoComplete="off"
                 />
@@ -935,7 +947,7 @@ const AddFarmer = () => {
     <>
       <Row>
         <BackIconButton onClick={() => navigate(-1)} />
-        <span className="pt-4">
+        <span className="pt-3">
           <strong style={{ fontSize: "20px" }}>
             เพิ่มข้อมูลเกษตรกร (Farmer)
           </strong>

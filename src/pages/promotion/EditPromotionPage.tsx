@@ -51,7 +51,11 @@ import Select, { ActionMeta, OnChangeValue, StylesConfig } from "react-select";
 import { FarmerPageEntity } from "../../entities/FarmerEntities";
 
 const _ = require("lodash");
-
+interface ColourOption {
+  value: string; 
+  label: string;
+  isFixed: boolean; 
+}
 function EditPromotion() {
   let queryString = _.split(window.location.pathname, "=");
   const profile = JSON.parse(localStorage.getItem("profile") || "{  }");
@@ -114,6 +118,12 @@ function EditPromotion() {
     plantName: "",
     province: "",
   });
+
+  const styles: StylesConfig<ColourOption, true> = {
+    multiValueRemove: (base,state) => {
+      return  state.data.isFixed ? { ...base, display: "none" } : base;
+    },
+  };
   const [form] = Form.useForm();
   useEffect(() => {
     getPromotion(queryString[1]);
@@ -149,7 +159,7 @@ function EditPromotion() {
             provinceName: x.provinceName,
           };
         });
-
+        const defaultResult = couponConditionFarmerList.map((i)=> i.farmerId)
         const result = mapData.map((item) => {
           return {
             ...item,
@@ -166,11 +176,12 @@ function EditPromotion() {
       }
     );
   };
-  const handleInputChange = (inputValue: any) => {
-    if (currentPage === 1) {
-      setSearchFarmer(inputValue);
-    }
-    return inputValue;
+  const handleInputChange = (e:any, option:any) => {
+    console.log()
+    if (option.action === 'remove-value' || option.action === 'pop-value') return;
+
+    // setCurrentPage(1);
+    // setSearchFarmer(inputValue);
   };
 
   const handleMenuScrollToBottom = () => {
@@ -326,6 +337,8 @@ function EditPromotion() {
             item.provinceName,
           id: item.id,
           keep: item.keep,
+          isFixed: true
+
         };
       })
     );
@@ -685,12 +698,12 @@ function EditPromotion() {
     }
   };
 
-  const styles: StylesConfig<true> = {
-    multiValueRemove: (base) => {
-      const checkId = couponConditionFarmerList.map((x)=>x.id)
-      return checkId ? { ...base, display: "none" } : base;
-    },
-  };
+  // const styles: StylesConfig<true> = {
+  //   multiValueRemove: (base) => {
+  //     const checkId = couponConditionFarmerList.map((x) => x.id);
+  //     return checkId ? { ...base, display: "none" } : base;
+  //   },
+  // };
 
   function checkRai(min: number | null, max: number | null): string {
     let result;
@@ -1426,19 +1439,31 @@ function EditPromotion() {
                         },
                       ]}
                     >
+                      {/* <Select
+                        name="clients"
+                        isMulti
+                        // value={clients}
+                        onChange={handleInputChange}
+                        isClearable={
+                          !clients.some((client) => client.visited)
+                        }
+                        options={listOfClients || []}
+                        className="basic-multi-select"
+                        classNamePrefix="select"
+                        styles={styles}
+                      /> */}
                       <Select
                         placeholder="กรุณาเลือกเกษตรกร"
                         isDisabled={!specificFarmer}
                         isSearchable
                         styles={styles}
                         isClearable={false}
-                        onInputChange={handleInputChange}
-                        onChange={(selectedOptions: any) => {
-                          setCurrentPage(1);
-                          handleCouponConditionFarmerList(selectedOptions);
-                        }}
+                        onChange={handleInputChange}
+                        // onChange={(selectedOptions: any) => {
+                        //   setCurrentPage(1);
+                        //   handleCouponConditionFarmerList(selectedOptions);
+                        // }}
                         options={farmerList}
-                        defaultValue={couponConditionFarmerList}
                         isMulti
                         onMenuScrollToBottom={handleMenuScrollToBottom}
                         closeMenuOnSelect={false}
