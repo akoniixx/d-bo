@@ -1,5 +1,11 @@
 ## [Version - 0]
 
+## Feature [v0.37.0] 2023-09-22
+
+- ui permission menu
+- get nickname farmer from api
+- fixed bugs select farmer in edit coupon page
+
 ## improve [v0.36.27] 2023-09-21
 
 - select farmer in create coupon page.
