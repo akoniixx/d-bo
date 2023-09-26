@@ -46,6 +46,7 @@ import { numberWithCommas } from "../../../utilities/TextFormatter";
 import { Option } from "antd/lib/mentions";
 import emptyPlot from "../../../resource/media/empties/iconoir_farm.png";
 import { DropdownStatus } from "../../../components/dropdownCheck/DropDownStatus";
+import Swal from "sweetalert2";
 
 const _ = require("lodash");
 const { Map } = require("immutable");
@@ -229,10 +230,20 @@ function IndexPlotList() {
       farmerId,
     };
     if (payload.id) {
-      await FarmerPlotDatasource.updateFarmerPlot(payload);
-      setModalEdit((prev) => !prev);
+      await FarmerPlotDatasource.updateFarmerPlot(payload).then((res) => {
+        if (res) {
+          Swal.fire({
+            title: "แก้ไขแปลงสำเร็จ",
+            icon: "success",
+            timer: 1500,
+            showConfirmButton: false,
+          }).then((time) => {
+            getPlotsData();
+            setModalEdit((prev) => !prev);
+          });
+        }
+      });
     }
-    getPlotsData();
   };
 
   const columns = [

@@ -291,13 +291,33 @@ const EditFarmer = () => {
       farmerId,
     };
     if (payload.id) {
-      await FarmerPlotDatasource.updateFarmerPlot(payload);
-      setEditIndex(0);
-      setShowAddModal((prev) => !prev);
+      await FarmerPlotDatasource.updateFarmerPlot(payload).then((res) => {
+        if (res) {
+          Swal.fire({
+            title: "แก้ไขแปลงสำเร็จ",
+            icon: "success",
+            timer: 1500,
+            showConfirmButton: false,
+          }).then((time) => {
+            setEditIndex(0);
+            setShowAddModal((prev) => !prev);
+          });
+        }
+      });
     } else {
-      await FarmerPlotDatasource.insertFarmerPlot(payload);
-      setEditIndex(0);
-      setShowAddModal((prev) => !prev);
+      await FarmerPlotDatasource.insertFarmerPlot(payload).then((res) => {
+        if (res) {
+          Swal.fire({
+            title: "บันทึกแปลงสำเร็จ",
+            icon: "success",
+            timer: 1500,
+            showConfirmButton: false,
+          }).then((time) => {
+            setEditIndex(0);
+            setShowAddModal((prev) => !prev);
+          });
+        }
+      });
     }
     fecthFarmer();
     checkValidate(data);
