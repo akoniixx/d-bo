@@ -1,5 +1,9 @@
 ## [Version - 0]
 
+## Fix [v0.37.1] 2023-09-26
+
+- prevent user passing save farmer plot again
+
 ## Feature [v0.37.0] 2023-09-22
 
 - ui permission menu
