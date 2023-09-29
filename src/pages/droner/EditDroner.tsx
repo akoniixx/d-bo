@@ -825,7 +825,7 @@ function EditDroner() {
             timer: 1500,
             showConfirmButton: false,
           }).then((time) => {
-            // navigate("/IndexDroner");
+            navigate("/IndexDroner");
           });
         } else {
           Swal.fire({
