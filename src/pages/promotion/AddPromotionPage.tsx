@@ -38,9 +38,7 @@ import { image } from "../../resource";
 import RenderMobile from "../../components/mobile/RenderMobile";
 import dayjs from "dayjs";
 import { CropPurposeSprayEntity } from "../../entities/CropEntities";
-import {
-  FarmerPageEntity,
-} from "../../entities/FarmerEntities";
+import { FarmerPageEntity } from "../../entities/FarmerEntities";
 import { TaskDatasource } from "../../datasource/TaskDatasource";
 import { ProviceEntity } from "../../entities/LocationEntities";
 import {
@@ -76,6 +74,7 @@ export default function AddPromotion() {
   const [couponConditionFarmerList, setCouponConditionFarmerList] = useState<
     any[]
   >([]);
+  const [countSelectFarmer, setCountSelectFarmer] = useState<number>(0);
   const [farmer, setFarmer] = useState<string[]>([]);
   const [coupon, setCoupon] = useState<string | null>(null);
   const [couponType, setCouponType] = useState<string | null>(null);
@@ -413,6 +412,20 @@ export default function AddPromotion() {
     form.setFieldsValue({
       specificFarmer: !specificFarmer,
     });
+    if (!specificFarmer !== false) {
+      checkNumber(
+        {
+          target: {
+            value: countSelectFarmer.toString(),
+          },
+        } as React.ChangeEvent<HTMLInputElement>,
+        "count"
+      );
+      setRenderMobile({
+        ...renderMobile,
+        count: countSelectFarmer.toString(),
+      });
+    }
   };
 
   function checkRai(min: number | null, max: number | null): string {
@@ -458,6 +471,7 @@ export default function AddPromotion() {
       };
     });
     setCouponConditionFarmerList(result);
+    setCountSelectFarmer(result.length);
   };
 
   const handleNotiCouponMany = () => {
@@ -554,6 +568,7 @@ export default function AddPromotion() {
     let plantErr: boolean = true;
     let provinceError: boolean = true;
     let specificError: boolean = true;
+    const counts = specificFarmer ? countSelectFarmer : count;
 
     if (
       couponName &&
@@ -561,7 +576,7 @@ export default function AddPromotion() {
       promotionStatus &&
       promotionType &&
       discountType &&
-      count &&
+      counts &&
       DateStart &&
       TimeStart &&
       DateExpired &&
@@ -675,7 +690,6 @@ export default function AddPromotion() {
     const { value: inputValue } = e.target;
     const convertedNumber = validateOnlyNumWDecimal(inputValue);
     const convertedNumberNotDecimal = validateOnlyNumber(inputValue);
-
     if (name === "count") {
       form.setFieldsValue({ [name]: convertedNumberNotDecimal });
     } else {
@@ -739,8 +753,8 @@ export default function AddPromotion() {
       promotionType: promotionType,
       discountType: discountType,
       discount: parseInt(discount),
-      count: count,
-      keep: count,
+      count: specificFarmer ? countSelectFarmer : count,
+      keep: specificFarmer ? countSelectFarmer : 0,
       used: 0,
       createBy: profile.firstname + " " + profile.lastname,
       startDate: new Date(startDate),
@@ -1058,7 +1072,12 @@ export default function AddPromotion() {
                       ]}
                     >
                       <Input
-                        placeholder="กรอกจำนวนสิทธิ์"
+                        disabled={specificFarmer}
+                        placeholder={
+                          specificFarmer
+                            ? countSelectFarmer.toString()
+                            : "กรอกจำนวนสิทธิ์"
+                        }
                         autoComplete="off"
                         onChange={(e) => {
                           checkNumber(e, "count");
@@ -1244,66 +1263,71 @@ export default function AddPromotion() {
                 </div>
               </div>
               <br />
-              <Divider />
-              <div className="row">
-                <div className="form-group col-lg-12 d-flex flex-column">
-                  <label>เงื่อนไขการได้รับพิเศษ</label>
-                  <Form.Item
-                    name="conditionSpecialFirsttime"
-                    valuePropName="checked"
-                  >
-                    <Checkbox
-                      onChange={handleSpecialCoupon}
-                      checked={conditionSpecialFirsttime}
-                      className="pt-3"
-                    >
-                      ลงทะเบียนใช้งานครั้งแรก
-                    </Checkbox>
-                  </Form.Item>
-                  <Form.Item name="specificFarmer" valuePropName="checked">
-                    <Checkbox
-                      onChange={handleSpecificFarmer}
-                      checked={specificFarmer}
-                      className="pt-3"
-                    >
-                      ให้เฉพาะเกษตรกรบางคน
-                    </Checkbox>
-                  </Form.Item>
-                  <div
-                    style={{
-                      width: "100%",
-                      paddingLeft: "16px",
-                    }}
-                  >
-                    <Form.Item
-                      name="couponConditionFarmerList"
-                      rules={[
-                        {
-                          required: couponProvince,
-                          message: "กรุณาเลือกเกษตรกร",
-                        },
-                      ]}
-                    >
-                      <Select
-                        placeholder="กรุณาเลือกเกษตรกร"
-                        isDisabled={!specificFarmer}
-                        isSearchable
-                        isClearable
-                        onInputChange={handleInputChange}
-                        onChange={(selectedOptions: any) => {
-                          setCurrentPage(1);
-                          handleCouponConditionFarmerList(selectedOptions);
+              {couponInfo !== "OFFLINE" ? (
+                <>
+                  <Divider />
+                  <div className="row">
+                    <div className="form-group col-lg-12 d-flex flex-column">
+                      <label>เงื่อนไขการได้รับพิเศษ</label>
+                      <Form.Item
+                        name="conditionSpecialFirsttime"
+                        valuePropName="checked"
+                      >
+                        <Checkbox
+                          onChange={handleSpecialCoupon}
+                          checked={conditionSpecialFirsttime}
+                          className="pt-3"
+                        >
+                          ลงทะเบียนใช้งานครั้งแรก
+                        </Checkbox>
+                      </Form.Item>
+                      <Form.Item name="specificFarmer" valuePropName="checked">
+                        <Checkbox
+                          onChange={handleSpecificFarmer}
+                          checked={specificFarmer}
+                          className="pt-3"
+                        >
+                          ให้เฉพาะเกษตรกรบางคน
+                        </Checkbox>
+                      </Form.Item>
+                      <div
+                        style={{
+                          width: "100%",
+                          paddingLeft: "16px",
                         }}
-                        options={farmerList}
-                        isMulti
-                        value={farmerList}
-                        onMenuScrollToBottom={handleMenuScrollToBottom}
-                        closeMenuOnSelect={false}
-                      />
-                    </Form.Item>
+                      >
+                        <Form.Item
+                          name="couponConditionFarmerList"
+                          rules={[
+                            {
+                              required: couponProvince,
+                              message: "กรุณาเลือกเกษตรกร",
+                            },
+                          ]}
+                        >
+                          <Select
+                            placeholder="กรุณาเลือกเกษตรกร"
+                            isDisabled={!specificFarmer}
+                            isSearchable
+                            isClearable
+                            onInputChange={handleInputChange}
+                            onChange={(selectedOptions: any) => {
+                              setCurrentPage(1);
+                              handleCouponConditionFarmerList(selectedOptions);
+                            }}
+                            options={farmerList}
+                            isMulti
+                            value={farmerList}
+                            onMenuScrollToBottom={handleMenuScrollToBottom}
+                            closeMenuOnSelect={false}
+                          />
+                        </Form.Item>
+                      </div>
+                    </div>
                   </div>
-                </div>
-              </div>
+                </>
+              ) : null}
+
               <Divider />
               <div className="row">
                 <div className="form-group col-lg-12 d-flex flex-column">

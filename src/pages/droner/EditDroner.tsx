@@ -754,7 +754,7 @@ function EditDroner() {
         !data.bankAccountName
           ? false
           : true,
-      file: imgBB,
+      file: imgBB !== undefined ? imgBB : [],
     };
     const otherAdd = {
       id: otherAddress.id,
@@ -766,63 +766,70 @@ function EditDroner() {
       provinceId: otherAddress.provinceId,
       postcode: otherAddress.postcode,
     };
+    const addOtherAddress =
+      otherAdd.id === "" &&
+      otherAdd.provinceId !== 0 &&
+      otherAdd.districtId !== 0 &&
+      otherAdd.subdistrictId !== 0;
+    const updateOtherAddress =
+      otherAdd.id &&
+      otherAdd.provinceId > 0 &&
+      otherAdd.districtId > 0 &&
+      otherAdd.subdistrictId > 0;
+    const deleteOtherAddress =
+      otherAdd.id &&
+      !otherAdd.provinceId &&
+      !otherAdd.districtId &&
+      !otherAdd.subdistrictId;
+
     delete payload.dronerDrone;
     if (values.status === "ACTIVE") {
       payload.isDelete = false;
       payload.isOpenReceiveTask = true;
-    }
-    if (
-      otherAdd.id === "" &&
-      otherAdd.provinceId !== 0 &&
-      otherAdd.districtId !== 0 &&
-      otherAdd.subdistrictId !== 0
-    ) {
-      OtherAddressDatasource.addOtherAddress(dronerId, otherAdd).then(
-        (res) => {}
-      );
-    } else if (
-      otherAdd.id &&
-      otherAdd.provinceId > 0 &&
-      otherAdd.districtId > 0 &&
-      otherAdd.subdistrictId > 0
-    ) {
-      OtherAddressDatasource.updateOtherAddress(otherAdd).then((res) => {});
-    } else if (
-      otherAdd.id &&
-      !otherAdd.provinceId &&
-      !otherAdd.districtId &&
-      !otherAdd.subdistrictId
-    ) {
-      OtherAddressDatasource.deleteOtherAddress(dronerId, otherAddress.id).then(
-        (res) => {}
-      );
     }
     if (imgBB) {
       UploadImageDatasouce.uploadImage(imgBB).then((res) => {});
     }
     if (payload) {
       await DronerDatasource.updateDroner(payload).then((res) => {
-        if (res !== undefined && res.status !== 409) {
+        if (res !== undefined) {
+          console.log(res)
+
           var i = 0;
-          for (i; 2 > i; i++) {
+          for (i; 5 > i; i++) {
             i === 0 &&
               createImgProfile.file !== "" &&
               UploadImageDatasouce.uploadImage(createImgProfile).then(res);
             i === 1 &&
               createImgIdCard.file !== "" &&
               UploadImageDatasouce.uploadImage(createImgIdCard).then(res);
+            i === 2 &&
+              addOtherAddress === true &&
+              OtherAddressDatasource.addOtherAddress(dronerId, otherAdd).then(
+                res
+              );
+            i === 3 &&
+              updateOtherAddress === true &&
+              OtherAddressDatasource.updateOtherAddress(otherAdd).then(res);
+            i === 4 &&
+              deleteOtherAddress === true &&
+              OtherAddressDatasource.deleteOtherAddress(
+                dronerId,
+                otherAddress.id
+              ).then(res);
           }
+
           Swal.fire({
             title: "บันทึกสำเร็จ",
             icon: "success",
             timer: 1500,
             showConfirmButton: false,
           }).then((time) => {
-            navigate("/IndexDroner");
+            // navigate("/IndexDroner");
           });
         } else {
           Swal.fire({
-            title: "เบอร์โทร หรือ รหัสบัตรประชาชน <br/> ซ้ำในระบบ",
+            title: "เบอร์โทร หรือ รหัส บัตรประชาชน <br/> ซ้ำในระบบ",
             icon: "error",
             showConfirmButton: true,
           });
