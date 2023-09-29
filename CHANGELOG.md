@@ -1,5 +1,11 @@
 ## [Version - 0]
 
+## improve [v0.37.2] 2023-09-29
+
+- sort filter index promotion page
+- fixed ui add/edit promotion page
+- fixed call api otherAddress in update droner page
+
 ## Fix [v0.37.1] 2023-09-26
 
 - prevent user passing save farmer plot again
