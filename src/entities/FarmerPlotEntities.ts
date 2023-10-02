@@ -6,7 +6,7 @@ import { UploadImageEntity } from "./UploadImageEntities";
 export interface FarmerPlotEntity {
   id?: string;
   plotName: string;
-  raiAmount?: string;
+  raiAmount: string;
   landmark: string;
   plantName: string;
   plantNature: string;

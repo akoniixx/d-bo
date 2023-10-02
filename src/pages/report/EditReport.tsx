@@ -121,7 +121,7 @@ function EditReport() {
   useEffect(() => {
     fetchDetailTask();
   }, []);
-  const onPreviewImg = async (e:any) => {
+  const onPreviewImg = async (e: any) => {
     let src = e;
     if (!src) {
       src = await new Promise((resolve) => {
@@ -254,7 +254,7 @@ function EditReport() {
                     : ""
                 }
                 image={imgControl ? imgControl : image.empty_cover}
-                onClick={()=>onPreviewImg(imgControl)}
+                onClick={() => onPreviewImg(imgControl)}
               />
             </div>
             <div className="col-lg">
@@ -524,158 +524,172 @@ function EditReport() {
   );
   const renderDroner = (
     <Form key={data.data.dronerId} style={{ padding: "32px" }}>
-      <div className="row">
-        <div className="col-lg">
-          <p>Droner ID</p>
+      {data.data.droner !== null && data.data.isDelete === true ? (
+        <>
+          <div className="row">
+            <div className="col-lg">
+              <p>Droner ID</p>
 
-          <Input disabled defaultValue={data.data.droner.dronerCode} />
-        </div>
-        <div className="col-lg">
-          <p>ชื่อ</p>
-          <Input disabled defaultValue={data.data.droner.firstname} />
-        </div>
-        <div className="col-lg">
-          <p>นามสกุล</p>
-          <Input disabled defaultValue={data.data.droner.lastname} />
-        </div>
-      </div>
-      <div className="row pt-4">
-        <div className="col-lg-4">
-          <p>เบอร์โทร</p>
-          <Input disabled defaultValue={data.data.droner.telephoneNo} />
-        </div>
-        <div className="col-lg-4">
-          <p>โดรน</p>
-          <Input
-            disabled
-            prefix={
-              <Avatar
-                size={25}
-                src={
-                  data.data.droner.dronerDrone[0] != null
-                    ? data.data.droner.dronerDrone[0].drone.droneBrand
-                        .logoImagePath
-                    : null
+              <Input disabled defaultValue={data.data.droner.dronerCode} />
+            </div>
+            <div className="col-lg">
+              <p>ชื่อ</p>
+              <Input disabled defaultValue={data.data.droner.firstname} />
+            </div>
+            <div className="col-lg">
+              <p>นามสกุล</p>
+              <Input disabled defaultValue={data.data.droner.lastname} />
+            </div>
+          </div>
+          <div className="row pt-4">
+            <div className="col-lg-4">
+              <p>เบอร์โทร</p>
+              <Input disabled defaultValue={data.data.droner.telephoneNo} />
+            </div>
+            <div className="col-lg-4">
+              <p>โดรน</p>
+              <Input
+                disabled
+                prefix={
+                  <Avatar
+                    size={25}
+                    src={
+                      data.data.droner.dronerDrone[0] != null
+                        ? data.data.droner.dronerDrone[0].drone.droneBrand
+                            .logoImagePath
+                        : null
+                    }
+                    style={{ marginRight: "5px" }}
+                  />
                 }
-                style={{ marginRight: "5px" }}
+                defaultValue="DJI (AGRAS T20)"
               />
-            }
-            defaultValue="DJI (AGRAS T20)"
-          />
+            </div>
+          </div>
+          <div className="row pt-4 d-flex justify-content-between">
+            {data.imageIdCard.path != "" ? (
+              <div className="col-lg-6">
+                <Form
+                  style={{
+                    padding: "20px",
+                    backgroundColor: "#2196531A",
+                    borderRadius: 5,
+                  }}
+                >
+                  <span style={{ color: color.primary1 }}>บัตรประชาชน</span>{" "}
+                  <br />
+                  <span>รูปถ่ายผู้สมัครคู่กับบัตรประชาชน </span>
+                  <Upload
+                    listType="picture"
+                    defaultFileList={[...IdCard]}
+                    disabled
+                  />
+                </Form>
+              </div>
+            ) : (
+              <div className="col-lg-6">
+                <Form
+                  style={{
+                    padding: "20px",
+                    backgroundColor: "#FCE3E3",
+                    borderRadius: 5,
+                  }}
+                >
+                  <span style={{ color: color.primary1 }}>บัตรประชาชน</span>{" "}
+                  <br />
+                  <span>รูปถ่ายผู้สมัครคู่กับบัตรประชาชน </span>
+                  <div
+                    style={{
+                      backgroundColor: color.White,
+                      width: "100%",
+                      height: "70px",
+                      borderRadius: 3,
+                    }}
+                  >
+                    <div>
+                      <CloseCircleFilled
+                        className="col-lg-3"
+                        style={{
+                          color: color.Error,
+                          width: "42px",
+                          fontSize: "42px",
+                          padding: 15,
+                        }}
+                      />
+                      <span style={{ color: color.Error, margin: 50 }}>
+                        ยังไม่มีรูปถ่ายผู้สมัครคู่กับบัตรประชาชน
+                      </span>
+                    </div>
+                  </div>
+                </Form>
+              </div>
+            )}
+            {data.imageBookBank.path != "" ? (
+              <div className="col-lg-6">
+                <Form
+                  style={{
+                    padding: "20px",
+                    backgroundColor: "#2196531A",
+                    borderRadius: 5,
+                  }}
+                >
+                  <span style={{ color: color.primary1 }}>สมุดธนาคาร</span>{" "}
+                  <br />
+                  <span>รูปภาพหน้าสมุดธนาคาร </span>
+                  <Upload
+                    listType="picture"
+                    defaultFileList={[...BookBank]}
+                    disabled
+                  />
+                </Form>
+              </div>
+            ) : (
+              <div className="col-lg-6">
+                <Form
+                  style={{
+                    padding: "20px",
+                    backgroundColor: "#FCE3E3",
+                    borderRadius: 5,
+                  }}
+                >
+                  <span style={{ color: color.primary1 }}>สมุดธนาคาร</span>{" "}
+                  <br />
+                  <span>รูปภาพหน้าสมุดธนาคาร </span>
+                  <div
+                    style={{
+                      backgroundColor: color.White,
+                      width: "100%",
+                      height: "70px",
+                      borderRadius: 3,
+                    }}
+                  >
+                    <div>
+                      <CloseCircleFilled
+                        className="col-lg-3"
+                        style={{
+                          color: color.Error,
+                          width: "42px",
+                          fontSize: "42px",
+                          padding: 15,
+                        }}
+                      />
+                      <span style={{ color: color.Error, margin: 50 }}>
+                        ยังไม่มีเอกสารหน้าสมุดธนาคาร
+                      </span>
+                    </div>
+                  </div>
+                </Form>
+              </div>
+            )}
+          </div>
+        </>
+      ) : (
+        <div style={{ textAlign: "center" }}>
+          <strong style={{ color: color.Error, alignItems: "center" }}>
+            ผู้ใช้งานนี้ถูกลบแล้ว
+          </strong>
         </div>
-      </div>
-      <div className="row pt-4 d-flex justify-content-between">
-        {data.imageIdCard.path != "" ? (
-          <div className="col-lg-6">
-            <Form
-              style={{
-                padding: "20px",
-                backgroundColor: "#2196531A",
-                borderRadius: 5,
-              }}
-            >
-              <span style={{ color: color.primary1 }}>บัตรประชาชน</span> <br />
-              <span>รูปถ่ายผู้สมัครคู่กับบัตรประชาชน </span>
-              <Upload
-                listType="picture"
-                defaultFileList={[...IdCard]}
-                disabled
-              />
-            </Form>
-          </div>
-        ) : (
-          <div className="col-lg-6">
-            <Form
-              style={{
-                padding: "20px",
-                backgroundColor: "#FCE3E3",
-                borderRadius: 5,
-              }}
-            >
-              <span style={{ color: color.primary1 }}>บัตรประชาชน</span> <br />
-              <span>รูปถ่ายผู้สมัครคู่กับบัตรประชาชน </span>
-              <div
-                style={{
-                  backgroundColor: color.White,
-                  width: "100%",
-                  height: "70px",
-                  borderRadius: 3,
-                }}
-              >
-                <div>
-                  <CloseCircleFilled
-                    className="col-lg-3"
-                    style={{
-                      color: color.Error,
-                      width: "42px",
-                      fontSize: "42px",
-                      padding: 15,
-                    }}
-                  />
-                  <span style={{ color: color.Error, margin: 50 }}>
-                    ยังไม่มีรูปถ่ายผู้สมัครคู่กับบัตรประชาชน
-                  </span>
-                </div>
-              </div>
-            </Form>
-          </div>
-        )}
-        {data.imageBookBank.path != "" ? (
-          <div className="col-lg-6">
-            <Form
-              style={{
-                padding: "20px",
-                backgroundColor: "#2196531A",
-                borderRadius: 5,
-              }}
-            >
-              <span style={{ color: color.primary1 }}>สมุดธนาคาร</span> <br />
-              <span>รูปภาพหน้าสมุดธนาคาร </span>
-              <Upload
-                listType="picture"
-                defaultFileList={[...BookBank]}
-                disabled
-              />
-            </Form>
-          </div>
-        ) : (
-          <div className="col-lg-6">
-            <Form
-              style={{
-                padding: "20px",
-                backgroundColor: "#FCE3E3",
-                borderRadius: 5,
-              }}
-            >
-              <span style={{ color: color.primary1 }}>สมุดธนาคาร</span> <br />
-              <span>รูปภาพหน้าสมุดธนาคาร </span>
-              <div
-                style={{
-                  backgroundColor: color.White,
-                  width: "100%",
-                  height: "70px",
-                  borderRadius: 3,
-                }}
-              >
-                <div>
-                  <CloseCircleFilled
-                    className="col-lg-3"
-                    style={{
-                      color: color.Error,
-                      width: "42px",
-                      fontSize: "42px",
-                      padding: 15,
-                    }}
-                  />
-                  <span style={{ color: color.Error, margin: 50 }}>
-                    ยังไม่มีเอกสารหน้าสมุดธนาคาร
-                  </span>
-                </div>
-              </div>
-            </Form>
-          </div>
-        )}
-      </div>
+      )}
     </Form>
   );
   const renderPrice = (
