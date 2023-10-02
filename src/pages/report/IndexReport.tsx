@@ -69,6 +69,8 @@ import { InvoiceTaskEntity } from "../../entities/NewTaskEntities";
 import { icon } from "../../resource";
 import { DronerEntity } from "../../entities/DronerEntities";
 import CheckDocument from "../../components/dropdownCheck/CheckDocument";
+import { listAppType } from "../../definitions/ApplicatoionTypes";
+import { ListCheck } from "../../components/dropdownCheck/ListStatusAppType";
 
 interface DataType {
   key: React.Key;
@@ -97,6 +99,8 @@ interface DataType {
   file: any;
   isBookBank: boolean;
   dateWaitPayment: any;
+  applicationType: string;
+  createBy : string;
 }
 function IndexReport() {
   const navigate = useNavigate();
@@ -127,6 +131,8 @@ function IndexReport() {
   const [statusPayment, setStatusPayment] = useState<updateStatusPays>(
     updateStatusPays_INIT
   );
+  const [appTypeArr, setAppTypeArr] = useState<string[]>([]);
+  const [applicationType, setApplicationType] = useState<any>();
   const [loading, setLoading] = useState(false);
   const { RangePicker } = DatePicker;
   const dateSearchFormat = "YYYY-MM-DD";
@@ -165,7 +171,8 @@ function IndexReport() {
       searchText,
       documentPersons,
       sortDirection,
-      sortField
+      sortField,
+      applicationType
     )
       .then((res: TaskReportListEntity) => {
         setGetData(res);
@@ -537,6 +544,22 @@ function IndexReport() {
       ]}
     />
   );
+  const onSearchCreateBy = (value: string, checked: boolean) => {
+    let arr: any = 0;
+    if (checked === true) {
+      arr = [...appTypeArr, value];
+      setAppTypeArr([...appTypeArr, value]);
+      setApplicationType(value);
+    } else {
+      let d: string[] = appTypeArr.filter((x) => x != value);
+      arr = [...d];
+      setAppTypeArr(d);
+      if (d.length === 0) {
+        arr = undefined;
+      }
+    }
+    setApplicationType(arr);
+  };
   const updateStatusPayment = async () => {
     Swal.fire({
       title: "ยืนยันการเปลี่ยนสถานะ",
@@ -645,6 +668,7 @@ function IndexReport() {
         );
       },
       dataIndex: "date",
+      fixed: "left",
       render: (value: any, row: any, index: number) => {
         return {
           children: (
@@ -664,6 +688,7 @@ function IndexReport() {
     {
       title: "ชื่อนักบินโดรน",
       dataIndex: "droner",
+      fixed: "left",
       render: (value: any, row: any, index: number) => {
         return {
           children: (
@@ -682,6 +707,7 @@ function IndexReport() {
     {
       title: "ชื่อเกษตรกร",
       dataIndex: "farmer",
+      fixed: "left",
       render: (value: any, row: any, index: number) => {
         return {
           children: (
@@ -934,7 +960,6 @@ function IndexReport() {
         );
       },
       dataIndex: "totalPrice",
-      fixed: "right",
       render: (value: any, row: any, index: number) => {
         const inv: InvoiceTaskEntity = {
           raiAmount: row.farmAreaAmount,
@@ -960,6 +985,35 @@ function IndexReport() {
                   data={inv}
                 />
               </span>
+            </>
+          ),
+        };
+      },
+    },
+    {
+      title: "สร้างโดย",
+      dataIndex: "createByWho",
+      key: "createByWho",
+      render: (value: any, row: any, index: number) => {
+        return {
+          children: (
+            <>
+              {listAppType.map(
+                (item) =>
+                  row.applicationType === item.value && (
+                    <>
+                      <Image
+                        src={item.icon}
+                        preview={false}
+                        style={{ width: 24, height: 24 }}
+                      />
+                      <span>
+                        {" "}
+                        {row.createBy ? row.createBy + ` ${item.create}` : "-"}
+                      </span>
+                    </>
+                  )
+              )}
             </>
           ),
         };
@@ -1311,7 +1365,7 @@ function IndexReport() {
         </CardContainer>
       </div>
       <div className=" d-flex justify-content-between pt-3">
-        <div className="col-lg-3 p-1">
+        <div className="col-lg-2 p-1">
           <Input
             allowClear
             prefix={<SearchOutlined style={{ color: color.Disable }} />}
@@ -1403,6 +1457,16 @@ function IndexReport() {
             }
             list={documentPersons}
             title="เลือกการตรวจเอกสาร"
+          />
+        </div>
+        <div className="col-lg-2">
+          <ListCheck
+            onSearchType={(value: any, checked: any) =>
+              onSearchCreateBy(value, checked)
+            }
+            list={applicationType}
+            title="เลือกรูปแบบการสร้าง"
+            menu="TASK"
           />
         </div>
         <div className="col-lg p-1">
@@ -1514,6 +1578,8 @@ function IndexReport() {
         )[i],
         isBookBank: getData.data.map((x) => x.droner && x.droner.isBookBank)[i],
         dateWaitPayment: getData.data.map((x) => x.dateWaitPayment)[i],
+        applicationType: getData.data.map((x) => x.applicationType)[i],
+        createBy: getData.data.map((x) => x.createBy)[i],
       });
     }
   }

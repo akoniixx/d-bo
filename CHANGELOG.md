@@ -1,5 +1,9 @@
 ## [Version - 0]
 
+## improve [v0.37.4] 2023-10-2
+
+- checkbox dropdown applicationType in index report page
+
 ## Fix [v0.37.3] 2023-10-2
 
 - fixed bug in add new task page

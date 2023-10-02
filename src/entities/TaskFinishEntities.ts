@@ -304,6 +304,7 @@ export interface TaskReportEntity {
   droner: DronerEntity;
   taskDronerTemp: TaskDronerTempEntity[];
   discountCampaignPoint: string;
+  applicationType: string;
 }
 export const TaskReportEntity_INIT: TaskReportEntity = {
   key: "",
@@ -357,6 +358,7 @@ export const TaskReportEntity_INIT: TaskReportEntity = {
   droner: DronerEntity_INIT,
   taskDronerTemp: [TaskDronerTempEntity_INIT],
   discountCampaignPoint: "",
+  applicationType: ""
 };
 export interface summaryReportEntity {
   waitpayment: string;
