@@ -33,6 +33,7 @@ export interface TaskFinish {
     cropId: string;
     purposeSprayName: string;
   };
+  isDelete: boolean;
   purposeSprayId: string;
   dateAppointment: string;
   targetSpray: string[];
@@ -82,6 +83,7 @@ export const TaskFinish_INIT: TaskFinish = {
   farmerPlotId: "",
   farmAreaAmount: "",
   dronerId: "",
+  isDelete: false,
   purposeSpray: {
     id: "",
     cropId: "",

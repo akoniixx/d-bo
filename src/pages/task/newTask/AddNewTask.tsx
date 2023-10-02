@@ -398,7 +398,11 @@ const AddNewTask = () => {
 
   const handleAmountRai = (e: React.ChangeEvent<HTMLInputElement>) => {
     const values = validateOnlyNumWDecimal(e.target.value);
-    if (values.startsWith(".")) {
+    if (
+      values.startsWith(".") ||
+      (values.match(/\./g) || []).length > 1 ||
+      /\.\d{3,}/.test(values)
+    ) {
       e.preventDefault();
     } else {
       const payload = {
@@ -473,7 +477,11 @@ const AddNewTask = () => {
   };
   const handleCalServiceCharge = (e: any) => {
     const values = validateOnlyNumWDecimal(e.target.value);
-    if (values.startsWith(".")) {
+    if (
+      values.startsWith(".") ||
+      (values.match(/\./g) || []).length > 1 ||
+      /\.\d{3,}/.test(values)
+    ) {
       e.preventDefault();
     } else {
       if (e.target.id === "unitPrice") {
@@ -1006,12 +1014,11 @@ const AddNewTask = () => {
               )
             ).map((x, index) => (
               <div className="form-group">
-                <input
-                  type="checkbox"
-                  defaultValue={x.crop}
+                <Checkbox
+                  value={x.crop}
                   disabled={current === 2 || checkSelectPlot === "error"}
                   onChange={handlePurposeSpray}
-                  checked={x.isChecked}
+                  defaultChecked={x.isChecked}
                 />{" "}
                 <label style={{ padding: "0 8px 0 0" }}>{x.crop}</label>
                 {index === 4 && (
@@ -1953,6 +1960,7 @@ const AddNewTask = () => {
     currentStep?: number,
     dataDroner?: TaskSearchDroner[]
   ) => {
+    const defaultRai: any = farmerPlotSeleced.raiAmount >= data.farmAreaAmount;
     if (currentStep === 0) {
       let checkEmptySting = ![
         data?.farmerId,
@@ -1973,12 +1981,16 @@ const AddNewTask = () => {
           data?.targetSpray.length !== 0 &&
           data?.targetSpray !== undefined;
       }
+      let checkOtherSpray = otherSpray && otherSpray.trim().length !== 1;
       let checkDateTime = ![dateAppointment, timeAppointment].includes("");
       if (
-        checkEmptySting &&
-        checkEmptyArray &&
-        checkDateTime &&
-        checkEmptyNumber
+        checkEmptyArray && [data?.targetSpray][0]?.includes("อื่นๆ")
+          ? checkOtherSpray
+          : checkEmptyArray &&
+            checkDateTime &&
+            checkEmptyNumber &&
+            defaultRai &&
+            checkEmptySting
       ) {
         setDisableBtn(false);
       } else {

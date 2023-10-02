@@ -467,12 +467,41 @@ function AddDroner() {
       data.includes("+");
     return data.trim().length !== 0 ? (checkSyntax ? true : false) : true;
   };
+  const validatePlants = (_: any, value: any) => {
+    const plantsOther = form.getFieldValue("plantsOther");
+
+    if ((!value || value.length === 0) && !plantsOther) {
+      return Promise.reject("กรุณาเลือกพืชที่เคยฉีดพ่นอย่างน้อย 1 อย่าง");
+    } else {
+      return Promise.resolve();
+    }
+  };
+  const validatePlantsOther = (rule: any, value: any) => {
+    const splitValue = (value && value.split(",")) || [];
+    const valueCheckbox = form.getFieldValue("checkPlantsOther");
+    const isDuplicate =
+      splitValue &&
+      splitValue.some((el: string) => valueCheckbox?.includes(el));
+    const isDupTyping = new Set(splitValue).size !== splitValue.length;
+    if (!!value && checkValidateComma(value)) {
+      return Promise.reject("กรุณาใช้ (,) ให้กับการเพิ่มพืชมากกว่า 1 อย่าง");
+    } else if (isDuplicate || isDupTyping) {
+      return Promise.reject(
+        "กรุณากรอกพืชที่เคยฉีดพ่นให้ถูกต้อง ไม่ควรมีพืชที่ซ้ำกัน"
+      );
+    } else if (!value && valueCheckbox?.length === 0) {
+      return Promise.reject(
+        "กรุณาเลือกพืชที่เคยฉีดพ่น/กรอกพืชที่เคยฉีดพ่นอย่างน้อย 1 อย่าง"
+      );
+    } else {
+      return Promise.resolve();
+    }
+  };
 
   const onFieldsChange = () => {
     const isHasError = form.getFieldsError().some(({ errors }) => {
       return errors.length > 0;
     });
-
     const {
       mapUrl,
       plantsOther,
@@ -1272,21 +1301,7 @@ function AddDroner() {
                 marginBottom: "0px",
               }}
               dependencies={["plantsOther"]}
-              rules={[
-                {
-                  validator: (_, value) => {
-                    const plantsOther = form.getFieldValue("plantsOther");
-
-                    if ((!value || value.length === 0) && !plantsOther) {
-                      return Promise.reject(
-                        "กรุณาเลือกพืชที่เคยฉีดพ่นอย่างน้อย 1 อย่าง"
-                      );
-                    } else {
-                      return Promise.resolve();
-                    }
-                  },
-                },
-              ]}
+              rules={[{ validator: validatePlants }]}
             >
               <Checkbox.Group>
                 <Space direction="vertical">
@@ -1303,39 +1318,7 @@ function AddDroner() {
             <Form.Item
               name="plantsOther"
               dependencies={["checkPlantsOther"]}
-              rules={[
-                {
-                  validator(rule, value) {
-                    const lastChar = value[value.length - 1];
-                    console.log(lastChar);
-                    const splitValue = (value && value.split(",")) || [];
-                    const valueCheckbox =
-                      form.getFieldValue("checkPlantsOther");
-                    const isDuplicate =
-                      splitValue &&
-                      splitValue.some((el: string) =>
-                        valueCheckbox?.includes(el)
-                      );
-                    const isDupTyping =
-                      new Set(splitValue).size !== splitValue.length;
-                    if (!!value && checkValidateComma(value)) {
-                      return Promise.reject(
-                        "กรุณาใช้ (,) ให้กับการเพิ่มพืชมากกว่า 1 อย่าง"
-                      );
-                    } else if (isDuplicate || isDupTyping) {
-                      return Promise.reject(
-                        "กรุณากรอกพืชที่เคยฉีดพ่นให้ถูกต้อง ไม่ควรมีพืชที่ซ้ำกัน"
-                      );
-                    } else if (!value && valueCheckbox?.length === 0) {
-                      return Promise.reject(
-                        "กรุณาเลือกพืชที่เคยฉีดพ่น/กรอกพืชที่เคยฉีดพ่นอย่างน้อย 1 อย่าง"
-                      );
-                    } else {
-                      return Promise.resolve();
-                    }
-                  },
-                },
-              ]}
+              rules={[{ validator: validatePlantsOther }]}
             >
               <Input
                 placeholder="กรอกข้อมูลพืชอื่นๆ เช่น ส้ม,มะขาม (กรุณาใช้ (,) ให้กับการเพิ่มพืชมากกว่า 1 อย่าง)"

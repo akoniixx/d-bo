@@ -1,5 +1,11 @@
 ## [Version - 0]
 
+## Fix [v0.37.3] 2023-10-2
+
+- fixed bug in add new task page
+- fixed other plant in add droner page
+- fixed ui in finish task page when account was deleted
+
 ## improve [v0.37.2] 2023-09-29
 
 - sort filter index promotion page
