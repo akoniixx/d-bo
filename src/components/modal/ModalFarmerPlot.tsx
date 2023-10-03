@@ -495,16 +495,9 @@ const ModalFarmerPlot: React.FC<ModalFarmerPlotProps> = ({
           <div className="form-group">
             <label>
               จุดสังเกตใกล้แปลง (เช่น รร.บ้านน้อย){" "}
-              <span style={{ color: "red" }}>*</span>
             </label>
             <Form.Item
               name="landmark"
-              rules={[
-                {
-                  required: true,
-                  message: "กรุณากรอกจุดสังเกต",
-                },
-              ]}
             >
               <Input
                 placeholder="กรอกจุดสังเกต"

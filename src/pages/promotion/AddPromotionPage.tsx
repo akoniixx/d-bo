@@ -168,12 +168,15 @@ export default function AddPromotion() {
           return res;
         });
         const mapData = data.map((x) => {
-          const matching = dataProvice.find(
-            (i: any) => `${i.provinceId}` === `${x.address.provinceId}`
-          );
-          if (matching) {
-            return { ...x, provinceName: matching.provinceName };
+          if (x.address && x.address.provinceId) {
+            const matching = dataProvice.find(
+              (i: any) => `${i.provinceId}` === `${x.address.provinceId}`
+            );
+            if (matching) {
+              return { ...x, provinceName: matching.provinceName };
+            }
           }
+
           return {
             ...x,
             provinceName: x.provinceName,
@@ -196,6 +199,7 @@ export default function AddPromotion() {
       }
     );
   };
+
   const handleInputChange = (inputValue: any) => {
     if (currentPage === 1) {
       setSearchFarmer(inputValue);
