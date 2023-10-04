@@ -51,6 +51,7 @@ export interface DronerEntity {
   dronerCode: string;
   firstname: string;
   lastname: string;
+  nickname: string;
   idNo: string;
   telephoneNo: string;
   status: string;
@@ -71,12 +72,14 @@ export interface DronerEntity {
   updatedAt: string;
   totalDroneCount: number;
   distance?: number;
+  isDelete: boolean;
 }
 export const DronerEntity_INIT: DronerEntity = {
   id: "",
   dronerCode: "",
   firstname: "",
   lastname: "",
+  nickname: "",
   idNo: "",
   telephoneNo: "",
   status: "",
@@ -97,6 +100,7 @@ export const DronerEntity_INIT: DronerEntity = {
   updatedAt: "",
   totalDroneCount: 0,
   distance: 0,
+  isDelete: false
 };
 export interface GetDronerDroneEntity {
   id: string;

@@ -32,6 +32,7 @@ import {
   formatNumberWithCommas,
   validateOnlyNumWDecimal,
 } from "../../utilities/TextFormatter";
+import ShowNickName from "../../components/popover/ShowNickName";
 
 export default function IndexRankDroner() {
   const navigate = useNavigate();
@@ -335,6 +336,13 @@ export default function IndexRankDroner() {
               </span>
               <span style={{ color: color.Grey, fontSize: "13px" }}>
                 {row.droner_droner_code}
+                {row.droner_nickname && (
+                  <ShowNickName
+                    data={row.droner_nickname}
+                    menu="drone"
+                    status={row.droner_status}
+                  />
+                )}
               </span>
             </>
           ),

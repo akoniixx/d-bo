@@ -44,6 +44,7 @@ import StatusPlots from "../../components/card/StatusPlots";
 import { CheckboxValueType } from "antd/lib/checkbox/Group";
 import { image } from "../../resource";
 import { DropdownStatus } from "../../components/dropdownCheck/DropDownStatus";
+import ShowNickName from "../../components/popover/ShowNickName";
 
 function DroneList() {
   const navigate = useNavigate();
@@ -663,13 +664,22 @@ function DroneList() {
       render: (value: any, row: any, index: number) => {
         return {
           children: (
-            <>
-              <Row>
-                <span className="text-dark-75  text-hover-primary mb-1 font-size-lg">
-                  {row.droner.firstname + " " + row.droner.lastname}
-                </span>
-              </Row>
-            </>
+            <div className="container">
+              <span className="text-dark-75  d-block font-size-lg">
+                {row.droner.firstname + " " + row.droner.lastname}
+              </span>
+
+              <span style={{ color: color.Grey, fontSize: 12 }}>
+                {row.droner.dronerCode}
+                {row.droner.nickname && (
+                  <ShowNickName
+                    data={row.droner.nickname}
+                    menu="drone"
+                    status={row.droner.status}
+                  />
+                )}
+              </span>
+            </div>
           ),
         };
       },

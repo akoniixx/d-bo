@@ -11,6 +11,7 @@ import {
   Space,
   Tag,
   DatePicker,
+  PaginationProps,
 } from "antd";
 import { CardContainer } from "../../components/card/CardContainer";
 import { BackIconButton } from "../../components/button/BackButton";
@@ -76,7 +77,8 @@ const EditFarmer = () => {
   let queryString = _.split(window.location.pathname, "=");
   const [profile] = useLocalStorage("profile", []);
   const navigate = useNavigate();
-
+  const itemsPerPage = 10;
+  const [currentPage, setCurrentPage] = useState(1);
   const farmerId = queryString[1];
   const [data, setData] = useState<GetFarmerEntity>(GetFarmerEntity_INIT);
   const [address, setAddress] = useState<AddressEntity>(AddressEntity_INIT);
@@ -152,7 +154,13 @@ const EditFarmer = () => {
       }
     });
   };
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = farmerPlotList.slice(indexOfFirstItem, indexOfLastItem);
 
+  const handlePageChange = (pageNumber: number) => {
+    setCurrentPage(pageNumber);
+  };
   useEffect(() => {
     fecthFarmer();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -356,7 +364,6 @@ const EditFarmer = () => {
     const g = Map(f.toJS()).set("resourceId", farmerId);
     setCreateImgProfile(g.toJS());
   };
-
   const onPreviewProfile = async () => {
     let src = imgProfile;
     if (!src) {
@@ -1063,7 +1070,7 @@ const EditFarmer = () => {
         <Form>
           {farmerPlotList.length !== 0 ? (
             <div className="container">
-              {farmerPlotList.map((item, index) => (
+              {currentItems.map((item, index) => (
                 <div
                   className="row pt-3 pb-3"
                   style={{ justifyContent: "space-between" }}
@@ -1127,9 +1134,13 @@ const EditFarmer = () => {
       </CardContainer>
       <div className="d-flex justify-content-between pt-5">
         <p>รายการทั้งหมด {farmerPlotList.length} รายการ</p>
-        {farmerPlotList.length < 10 ? null : (
-          <Pagination defaultCurrent={1} total={1} />
-        )}
+        <Pagination
+          simple
+          current={currentPage}
+          total={farmerPlotList.length}
+          pageSize={10}
+          onChange={handlePageChange}
+        />
       </div>
     </div>
   );

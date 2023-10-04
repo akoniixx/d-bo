@@ -69,6 +69,7 @@ function EditPromotion() {
   const [plantName, setPlantName] = useState<CropPurposeSprayEntity[]>();
   const [provinceList, setProvinceList] = useState<string[]>([]);
   const [countSelectFarmer, setCountSelectFarmer] = useState<any>();
+  const [editPromo , setEditPromo] = useState<boolean>(false);
   const [crop, setCrop] = useState<any>([
     {
       id: null,
@@ -80,7 +81,7 @@ function EditPromotion() {
   const [descriptionEditor, setDescriptionEditor] = useState<string | null>(
     null
   );
-  const [checkDelete, setCheckDelete] = useState<any>();
+  const [defaultCount, setDefaultCount] = useState<any>();
   const [conditionEditor, setConditionEditor] = useState<string | null>(null);
   const [editTable, setEditTable] = useState(true);
   const [province, setProvince] = useState<string[]>([]);
@@ -197,7 +198,6 @@ function EditPromotion() {
       setRow(row + 10);
     }
   };
-
   const getPromotion = (id: string) => {
     CouponDataSource.queryCoupon(id)
       .then(async (res) => {
@@ -235,6 +235,8 @@ function EditPromotion() {
           provinceCheckbox: res.couponConditionProvince,
           couponConditionProvinceList: res.couponConditionProvinceList,
         });
+        setDefaultCount(res.count);
+        setEditPromo(res.keep > 0);
         setConditionSpecialFirsttime(res.conditionSpecialFirsttime ?? false);
         setRaiCondition(res.couponConditionRai ?? false);
         setServiceCondition(res.couponConditionService ?? false);
@@ -678,7 +680,7 @@ function EditPromotion() {
     if (renderMobile.expiredDate) {
       const getValueDate = form.getFieldsValue();
       const endDate = moment(getValueDate.DateExpired).format("YYYY-MM-DD");
-      return current && current > dayjs(endDate);
+      return current && current < dayjs(endDate);
     }
   };
   const handleDescriptionEditor = (
@@ -1097,6 +1099,7 @@ function EditPromotion() {
                     ]}
                   >
                     <AntdSelect
+                      disabled={editPromo}
                       className="col-lg-12 p-1"
                       placeholder="เลือกประเภทคูปอง"
                       onChange={handleCouponType}
@@ -1133,7 +1136,7 @@ function EditPromotion() {
                           },
                         ]}
                       >
-                        <Radio.Group className="d-flex" onChange={handleCoupon}>
+                        <Radio.Group className="d-flex" onChange={handleCoupon} disabled={editPromo}>
                           <Radio value={"FREE"}>ฟรีค่าบริการ</Radio>
                           <Radio value={"DISCOUNT"}>ส่วนลด</Radio>
                         </Radio.Group>
@@ -1150,7 +1153,7 @@ function EditPromotion() {
                         ]}
                       >
                         <Input
-                          disabled={coupon !== "DISCOUNT"}
+                          disabled={coupon !== "DISCOUNT" || editPromo}
                           placeholder="กรอกจำนวนเงิน"
                           autoComplete="off"
                           onChange={(e) => checkNumber(e, "discount")}
@@ -1199,7 +1202,7 @@ function EditPromotion() {
                 </div>
                 <div className="form-group col-lg-6">
                   <label>
-                    จำนวนสิทธิ์ <span style={{ color: "red" }}>*</span>
+                    จำนวนสิทธิ์ <span style={{ color: "red" }}>* (สามารถปรับเพิ่มได้เท่านั้น)</span>
                   </label>
                   <div className="mt-1">
                     {couponConditionFarmerList.length > 0 ? (
@@ -1261,6 +1264,7 @@ function EditPromotion() {
                         }}
                         format={dateFormat}
                         disabledDate={disabledStartDate}
+                        disabled={editPromo}
                       />
                     </Form.Item>
                     <Form.Item
@@ -1273,6 +1277,7 @@ function EditPromotion() {
                       ]}
                     >
                       <TimePicker
+                      disabled={editPromo}
                         format={"HH:mm"}
                         className="ms-3"
                         placeholder="เลือกเวลา"
@@ -1291,7 +1296,7 @@ function EditPromotion() {
                 </div>
                 <div className="form-group col-lg-6">
                   <label>
-                    วันสิ้นสุด <span style={{ color: "red" }}>*</span>
+                    วันสิ้นสุด <span style={{ color: "red" }}>* (สามารถขยายเวลาเพิ่มได้เท่านั้น)</span>
                   </label>
                   <div className="d-flex">
                     <Form.Item
@@ -1409,6 +1414,7 @@ function EditPromotion() {
                     valuePropName="checked"
                   >
                     <Checkbox
+                    disabled={editPromo}
                       onChange={handleConditionSpecialFirsttime}
                       checked={conditionSpecialFirsttime}
                       className="pt-3"
@@ -1423,7 +1429,7 @@ function EditPromotion() {
                           onChange={handleSpecificFarmer}
                           checked={specificFarmer}
                           className="pt-3"
-                          disabled={couponConditionFarmerList.length > 0}
+                          disabled={couponConditionFarmerList.length > 0 || editPromo}
                         >
                           ให้เฉพาะเกษตรกรบางคน
                         </Checkbox>
@@ -1488,6 +1494,7 @@ function EditPromotion() {
                   <div>
                     <Form.Item name="raiCheckbox" valuePropName="checked">
                       <Checkbox
+                      disabled={editPromo}
                         onChange={handleRaiCondition}
                         checked={raiCondition}
                         className="pt-3"
@@ -1497,7 +1504,7 @@ function EditPromotion() {
                             <label>จำนวนไร่ขั้นต่ำ</label>
                             <Form.Item name="couponConditionRaiMin">
                               <Input
-                                disabled={!raiCondition}
+                                disabled={!raiCondition || editPromo}
                                 placeholder="กรอกจำนวนไร่"
                                 onChange={(e) => {
                                   checkNumber(e, "couponConditionRaiMin");
@@ -1513,7 +1520,7 @@ function EditPromotion() {
                             <label>จำนวนไร่สูงสุด</label>
                             <Form.Item name="couponConditionRaiMax">
                               <Input
-                                disabled={!raiCondition}
+                                disabled={!raiCondition || editPromo}
                                 placeholder="กรอกจำนวนไร่"
                                 onChange={(e) => {
                                   checkNumber(e, "couponConditionRaiMax");
@@ -1532,6 +1539,7 @@ function EditPromotion() {
                   <div>
                     <Form.Item name="serviceCheckbox" valuePropName="checked">
                       <Checkbox
+                      disabled={editPromo}
                         onChange={handleServiceCondition}
                         checked={serviceCondition}
                         className="pt-3"
@@ -1541,7 +1549,7 @@ function EditPromotion() {
                             <label>จำนวนค่าบริการขั้นต่ำ</label>
                             <Form.Item name="couponConditionServiceMin">
                               <Input
-                                disabled={!serviceCondition}
+                                disabled={!serviceCondition || editPromo}
                                 placeholder="กรอกค่าบริการ"
                                 onChange={(e) => {
                                   checkNumber(e, "couponConditionServiceMin");
@@ -1557,7 +1565,7 @@ function EditPromotion() {
                             <label>จำนวนค่าบริการสูงสุด</label>
                             <Form.Item name="couponConditionServiceMax">
                               <Input
-                                disabled={!serviceCondition}
+                                disabled={!serviceCondition || editPromo}
                                 placeholder="กรอกค่าบริการ"
                                 onChange={(e) => {
                                   checkNumber(e, "couponConditionServiceMax");
@@ -1579,6 +1587,7 @@ function EditPromotion() {
                 <div className="form-group col-lg-12 d-flex justify-content-between align-items-center pb-4">
                   <Form.Item name="plantCheckbox" valuePropName="checked">
                     <Checkbox
+                    disabled={editPromo}
                       className="pt-3"
                       checked={couponPlant}
                       onChange={handlePlantCoupon}
@@ -1603,6 +1612,7 @@ function EditPromotion() {
                 <div className="form-group col-lg-12 d-flex justify-content-between align-items-center pt-2 pb-3">
                   <Form.Item name="provinceCheckbox" valuePropName="checked">
                     <Checkbox
+                    disabled={editPromo}
                       checked={couponProvince}
                       onChange={handleCouponProvince}
                       className="pt-3"
@@ -1631,7 +1641,7 @@ function EditPromotion() {
                     ]}
                   >
                     <AntdSelect
-                      disabled={!couponProvince}
+                      disabled={!couponProvince|| editPromo}
                       mode="multiple"
                       placeholder="เลือกจังหวัด"
                       onChange={handleChangeProvince}

@@ -697,7 +697,7 @@ function AddDroner() {
             </div>
           </div>
           <div className="row">
-            <div className="form-group col-lg-6">
+            <div className="form-group col-lg-4">
               <label>
                 ชื่อ <span style={{ color: "red" }}>*</span>
               </label>
@@ -713,7 +713,7 @@ function AddDroner() {
                 <Input placeholder="กรอกชื่อ" autoComplete="off" />
               </Form.Item>
             </div>
-            <div className="form-group col-lg-6">
+            <div className="form-group col-lg-4">
               <label>
                 นามสกุล <span style={{ color: "red" }}>*</span>
               </label>
@@ -727,6 +727,16 @@ function AddDroner() {
                 ]}
               >
                 <Input placeholder="กรอกนามสกุล" autoComplete="off" />
+              </Form.Item>
+            </div>
+            <div className="form-group col-lg-4">
+              <label>
+                ชื่อเล่น 
+              </label>
+              <Form.Item
+                name="nickname"
+              >
+                <Input placeholder="กรอกชื่อเล่น" autoComplete="off" />
               </Form.Item>
             </div>
           </div>

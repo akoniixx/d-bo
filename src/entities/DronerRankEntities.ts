@@ -211,6 +211,7 @@ export interface DronerRankDetailEntity {
   totalTaskCount: string;
   totalRaiCount: string;
   countTask: string;
+  nickname: string;
 }
 export const DronerRankDetailEntity_INIT: DronerRankDetailEntity = {
   id: "",
@@ -243,6 +244,7 @@ export const DronerRankDetailEntity_INIT: DronerRankDetailEntity = {
   totalTaskCount: "",
   totalRaiCount: "",
   countTask: "",
+  nickname: ""
 };
 export interface DronerRankListEntity {
   data: AllDronerRankEntity[];

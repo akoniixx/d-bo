@@ -456,7 +456,7 @@ function FinishTasks() {
   );
   const renderDroner = (
     <Form style={{ padding: "32px" }}>
-      {data.data.droner !== null && data.data.isDelete === true ? (
+      {data.data.droner !== null && data.data.droner.isDelete !== true ? (
         <div className="row">
           <div className="col-lg-3">
             <span>
