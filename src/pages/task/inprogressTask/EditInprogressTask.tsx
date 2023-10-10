@@ -51,6 +51,7 @@ import {
 import { DashboardLayout } from "../../../components/layout/Layout";
 import { useNavigate } from "react-router-dom";
 import { listAppType } from "../../../definitions/ApplicatoionTypes";
+import ShowNickName from "../../../components/popover/ShowNickName";
 const { Option } = Select;
 
 const dateFormat = "DD/MM/YYYY";
@@ -598,6 +599,9 @@ const EditInprogressTask = () => {
               <br />
               <p style={{ fontSize: "12px", color: color.Grey }}>
                 {dronerSelected.dronerCode}
+                {dronerSelected.nickname && (
+                  <ShowNickName data={dronerSelected.nickname} menu="INFO" />
+                )}
               </p>
             </div>
             <div className="col-lg-2">{dronerSelected.telephoneNo}</div>

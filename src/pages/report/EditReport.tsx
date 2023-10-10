@@ -524,7 +524,7 @@ function EditReport() {
   );
   const renderDroner = (
     <Form key={data.data.dronerId} style={{ padding: "32px" }}>
-      {data.data.droner !== null && data.data.isDelete === true ? (
+      {data.data.droner !== null && data.data.isDelete !== true ? (
         <>
           <div className="row">
             <div className="col-lg">

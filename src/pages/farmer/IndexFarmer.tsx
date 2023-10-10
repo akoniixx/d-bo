@@ -58,6 +58,7 @@ import { CheckboxValueType } from "antd/lib/checkbox/Group";
 import { STATUS_NORMAL_MAPPING } from "../../definitions/Status";
 import { ListCheck } from "../../components/dropdownCheck/ListStatusAppType";
 import { DropdownStatus } from "../../components/dropdownCheck/DropDownStatus";
+import ShowNickName from "../../components/popover/ShowNickName";
 
 interface SearchSelectType {
   label: any;
@@ -589,6 +590,9 @@ function IndexFarmer() {
               <br />
               <span style={{ color: color.Grey, fontSize: 12 }}>
                 {row.farmerCode}
+                {row.nickname && (
+                  <ShowNickName data={row.nickname} menu="INFO" />
+                )}
               </span>
             </>
           ),

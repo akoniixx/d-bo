@@ -54,6 +54,7 @@ import { ListCheck } from "../../../components/dropdownCheck/ListStatusAppType";
 import { listAppType } from "../../../definitions/ApplicatoionTypes";
 import CheckDocument from "../../../components/dropdownCheck/CheckDocument";
 import { icon } from "../../../resource";
+import ShowNickName from "../../../components/popover/ShowNickName";
 export default function IndexFinishTask() {
   const navigate = useNavigate();
   const [row, setRow] = useState(10);
@@ -534,7 +535,10 @@ export default function IndexFinishTask() {
                   : "-"}
               </span>
               <span style={{ color: color.Grey, fontSize: "12px" }}>
-                {row.droner !== null ? row.droner.telephoneNo : null}
+                {row.farmer.telephoneNo || "-"}
+                {row.droner && row.droner.nickname && (
+                  <ShowNickName data={row.droner.nickname} menu="INFO" />
+                )}
               </span>
             </>
           ),
@@ -602,7 +606,10 @@ export default function IndexFinishTask() {
                 {row.farmer.firstname + " " + row.farmer.lastname}
               </span>
               <span style={{ color: color.Grey, fontSize: "12px" }}>
-                {row.farmer.telephoneNo}
+                {row.farmer.telephoneNo || "-"}
+                {row.farmer && row.farmer.nickname && (
+                  <ShowNickName data={row.farmer.nickname} menu="INFO" />
+                )}
               </span>
             </>
           ),

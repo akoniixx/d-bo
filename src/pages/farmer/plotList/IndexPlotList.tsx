@@ -47,6 +47,7 @@ import { Option } from "antd/lib/mentions";
 import emptyPlot from "../../../resource/media/empties/iconoir_farm.png";
 import { DropdownStatus } from "../../../components/dropdownCheck/DropDownStatus";
 import Swal from "sweetalert2";
+import ShowNickName from "../../../components/popover/ShowNickName";
 
 const _ = require("lodash");
 const { Map } = require("immutable");
@@ -428,29 +429,8 @@ function IndexPlotList() {
               <br />
               <span style={{ color: color.Grey, fontSize: 12 }}>
                 {row.farmer.farmerCode}
+                {row.farmer.nickname && <ShowNickName data={row.farmer.nickname} menu="plot" status={row.farmer.status}/>}
               </span>
-              <Popover
-                content={
-                  <span
-                    style={{ color: STATUS_COLOR_MAPPING[row.farmer?.status] }}
-                  >
-                    <span>สถานะ </span>
-                    <Badge
-                      color={STATUS_COLOR_MAPPING[row.farmer?.status]}
-                    />{" "}
-                    {STATUS_FARMER_MAPPING[row.farmer?.status]}
-                  </span>
-                }
-              >
-                <InfoCircleFilled
-                  style={{
-                    color: color.Success,
-                    fontSize: "15px",
-                    marginLeft: "7px",
-                    verticalAlign: 0.5,
-                  }}
-                />
-              </Popover>
             </>
           ),
         };

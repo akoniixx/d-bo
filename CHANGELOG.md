@@ -1,5 +1,9 @@
 ## [Version - 0]
 
+## improve [v0.37.5] 2023-10-10
+
+- display nickname droner & farmer
+
 ## improve [v0.37.4] 2023-10-2
 
 - checkbox dropdown applicationType in index report page
