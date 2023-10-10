@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import {
   Row,
   Form,
@@ -85,8 +85,8 @@ const EditFarmer = () => {
   const [farmerPlotList, setFarmerPlotList] = useState<FarmerPlotEntity[]>([
     FarmerPlotEntity_INIT,
   ]);
+  const [locateNull, setLocateNull] = useState<any>();
   const [showAddModal, setShowAddModal] = useState(false);
-  const [showEditModal, setShowEditModal] = useState(false);
   const [editIndex, setEditIndex] = useState(0);
 
   const [province, setProvince] = useState<ProviceEntity[]>([
@@ -111,6 +111,15 @@ const EditFarmer = () => {
   const [createImgIdCard, setCreateImgIdCrad] =
     useState<ImageEntity>(ImageEntity_INTI);
 
+  const fetchLocation = useCallback(async (text?: string) => {
+    await LocationDatasource.getSubdistrict(0, text).then((res) => {
+      if (res) {
+        const findId = res.find((x) => x.provinceId === 0);
+        setLocateNull(findId);
+        console.log(findId);
+      }
+    });
+  }, []);
   const fecthFarmer = async () => {
     await FarmerDatasource.getFarmerById(farmerId).then((res) => {
       setData({
@@ -157,14 +166,16 @@ const EditFarmer = () => {
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentItems = farmerPlotList.slice(indexOfFirstItem, indexOfLastItem);
+  const [searchLocation] = useState("");
 
   const handlePageChange = (pageNumber: number) => {
     setCurrentPage(pageNumber);
   };
   useEffect(() => {
     fecthFarmer();
+    fetchLocation(searchLocation);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [searchLocation]);
 
   useEffect(() => {
     LocationDatasource.getProvince().then((res) => {
@@ -843,7 +854,11 @@ const EditFarmer = () => {
                 <Select
                   allowClear
                   placeholder="เลือกจังหวัด"
-                  defaultValue={address !== null ? address.provinceId : 0}
+                  defaultValue={
+                    address && address.provinceId !== 0
+                      ? address.provinceId
+                      : locateNull?.provinceName
+                  }
                   showSearch
                   optionFilterProp="children"
                   filterOption={(input: any, option: any) =>
@@ -856,8 +871,10 @@ const EditFarmer = () => {
                   }
                   onChange={handleOnChangeProvince}
                 >
-                  {province?.map((item) => (
-                    <Option value={item.provinceId}>{item.provinceName}</Option>
+                  {province.map((item: any, index: any) => (
+                    <Select.Option key={index} value={item.provinceId}>
+                      {item.provinceName}
+                    </Select.Option>
                   ))}
                 </Select>
               </Form.Item>
@@ -870,7 +887,11 @@ const EditFarmer = () => {
                 <Select
                   allowClear
                   placeholder="เลือกอำเภอ"
-                  defaultValue={address !== null ? address.districtId : 0}
+                  defaultValue={
+                    address && address.districtId !== 0
+                      ? address.districtId
+                      : locateNull?.districtName
+                  }
                   showSearch
                   optionFilterProp="children"
                   filterOption={(input: any, option: any) =>
@@ -881,10 +902,13 @@ const EditFarmer = () => {
                       .toLowerCase()
                       .localeCompare(optionB.children.toLowerCase())
                   }
+                  disabled={!address || !address.provinceId}
                   onChange={handleOnChangeDistrict}
                 >
-                  {district?.map((item) => (
-                    <Option value={item.districtId}>{item.districtName}</Option>
+                  {district.map((item: any, index: any) => (
+                    <Select.Option key={index} value={item.districtId}>
+                      {item.districtName}
+                    </Select.Option>
                   ))}
                 </Select>
               </Form.Item>
@@ -899,7 +923,11 @@ const EditFarmer = () => {
                 <Select
                   allowClear
                   placeholder="เลือกตำบล"
-                  defaultValue={address !== null ? address.subdistrictId : 0}
+                  defaultValue={
+                    address && address.subdistrictId !== 0
+                      ? address.subdistrictId
+                      : locateNull?.subdistrictName
+                  }
                   showSearch
                   optionFilterProp="children"
                   filterOption={(input: any, option: any) =>
@@ -911,11 +939,12 @@ const EditFarmer = () => {
                       .localeCompare(optionB.children.toLowerCase())
                   }
                   onChange={handleOnChangeSubdistrict}
+                  disabled={!address || !address.districtId}
                 >
-                  {subdistrict?.map((item) => (
-                    <Option value={item.subdistrictId}>
+                  {subdistrict?.map((item: any, index: any) => (
+                    <Select.Option key={index} value={item.subdistrictId}>
                       {item.subdistrictName}
-                    </Option>
+                    </Select.Option>
                   ))}
                 </Select>
               </Form.Item>
@@ -927,8 +956,12 @@ const EditFarmer = () => {
               <Form.Item name="postcode">
                 <Input
                   placeholder="เลือกรหัสไปรษณีย์"
-                  defaultValue={address !== null ? address.postcode : "-"}
-                  key={address !== null ? address.subdistrictId : 0}
+                  defaultValue={
+                    address && address.postcode
+                      ? address.postcode
+                      : locateNull?.postcode
+                  }
+                  key={address ? address.postcode : 0}
                   disabled
                 />
               </Form.Item>

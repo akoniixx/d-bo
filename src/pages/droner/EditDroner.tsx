@@ -855,6 +855,7 @@ function EditDroner() {
       provinceId,
       districtId,
       subdistrictId,
+      nickname,
       ...rest
     } = form.getFieldsValue();
     const reasonList = [];
@@ -884,7 +885,8 @@ function EditDroner() {
       (!isHasError && isHasValues) ||
       (address.districtId === 0 &&
         address.districtId === 0 &&
-        address.subdistrictId === 0)
+        address.subdistrictId === 0) ||
+        nickname
     ) {
       setDisableSaveBtn(false);
     } else {

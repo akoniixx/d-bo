@@ -52,6 +52,7 @@ import { useNavigate } from "react-router-dom";
 import { listAppType } from "../../../definitions/ApplicatoionTypes";
 import { ListCheck } from "../../../components/dropdownCheck/ListStatusAppType";
 import { ModalAcceptedTask } from "../../../components/modal/ModalAcceptedTask";
+import ShowNickName from "../../../components/popover/ShowNickName";
 
 const { RangePicker } = DatePicker;
 const dateFormat = "DD-MM-YYYY";
@@ -379,7 +380,10 @@ const IndexNewTask = () => {
             <>
               <span>{row.firstname + " " + row.lastname}</span>
               <br />
-              <span style={{ color: color.Grey }}>{row.telephone_no}</span>
+              <span style={{ color: color.Grey }}>{row.telephone_no}
+              {row.nickname && (
+                  <ShowNickName data={row.nickname} menu="INFO" />
+                )}</span>
             </>
           ),
         };

@@ -101,6 +101,7 @@ import type { GroupBase, OptionsOrGroups } from "react-select";
 import { InputPicker } from "rsuite";
 import "rsuite/dist/rsuite.min.css";
 import { ModalAcceptedTask } from "../../../components/modal/ModalAcceptedTask";
+import ShowNickName from "../../../components/popover/ShowNickName";
 
 const dateFormat = "DD/MM/YYYY";
 const dateCreateFormat = "YYYY-MM-DD";
@@ -605,7 +606,7 @@ const EditNewTask = () => {
                       style={{
                         width: "100%",
                       }}
-                      placeholder="ค้นหาชื่อเกษตรกร/เบอร์โทร/เลขบัตรปชช."
+                      placeholder="ค้นหาชื่อนักบินโดรน/เบอร์โทร/เลขบัตรปชช."
                       data={farmerListDropdown}
                     />
                     {/* <AsyncPaginate
@@ -1548,7 +1549,12 @@ const EditNewTask = () => {
               )}
 
               <br />
-              <span style={{ color: color.Grey }}>{row.droner_code}</span>
+              <span style={{ color: color.Grey }}>
+                {row.droner_code}
+                {row.nickname && (
+                  <ShowNickName data={row.nickname} menu="INFO" />
+                )}
+              </span>
             </>
           ),
         };
@@ -1742,6 +1748,12 @@ const EditNewTask = () => {
                         }}
                       >
                         {JSON.parse(item?.dronerDetail).droner_code}
+                        {JSON.parse(item?.dronerDetail).nickname && (
+                          <ShowNickName
+                            data={JSON.parse(item?.dronerDetail).nickname}
+                            menu="INFO"
+                          />
+                        )}
                       </p>
                     </div>
                     <div className="col-lg-2">
@@ -2134,7 +2146,7 @@ const EditNewTask = () => {
       )}
       {modalCheckUpdate && (
         <ModalAcceptedTask
-        titleButton={"ย้อนไปหน้าหลัก"}
+          titleButton={"ย้อนไปหน้าหลัก"}
           textHeader={"คุณไม่สามารถแก้ไขงานนี้ได้"}
           textDetail={
             "เนื่องจากในระหว่างการแก้ไข มีนักบินโดรนในระบบกดรับงานนี้แล้ว คุณสามารถตรวจสอบ/แก้ไขงานนี้ได้อีกครั้งในเมนูจัดการงานอื่นๆ"

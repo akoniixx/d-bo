@@ -46,6 +46,7 @@ import { DashboardLayout } from "../../../components/layout/Layout";
 import { useNavigate } from "react-router-dom";
 import { listAppType } from "../../../definitions/ApplicatoionTypes";
 import { ListCheck } from "../../../components/dropdownCheck/ListStatusAppType";
+import ShowNickName from "../../../components/popover/ShowNickName";
 
 const { RangePicker } = DatePicker;
 const dateFormat = "DD/MM/YYYY";
@@ -515,6 +516,9 @@ const IndexInprogressTask = () => {
               </span>
               <span style={{ color: color.Grey, fontSize: "12px" }}>
                 {row.droner !== null ? row.droner_telephone_no : null}
+                {row.droner_nickname && (
+                  <ShowNickName data={row.droner_nickname} menu="INFO" />
+                )}
               </span>
             </>
           ),
@@ -583,6 +587,9 @@ const IndexInprogressTask = () => {
               </span>
               <span style={{ color: color.Grey, fontSize: "12px" }}>
                 {row.farmer_telephone_no}
+                {row.farmer_nickname && (
+                  <ShowNickName data={row.farmer_nickname} menu="INFO" />
+                )}
               </span>
             </>
           ),

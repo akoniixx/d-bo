@@ -5,6 +5,7 @@ import { TaskDronerTempDataSource } from "../../../../datasource/TaskDronerTempD
 import { TaskDronerTempEntity } from "../../../../entities/TaskDronerTemp";
 import { color } from "../../../../resource";
 import { CardContainer } from "../../../card/CardContainer";
+import ShowNickName from "../../../popover/ShowNickName";
 
 interface ModalDronerListProps {
   show: boolean;
@@ -43,7 +44,11 @@ const ModalDronerList: React.FC<ModalDronerListProps> = ({
             <>
               <span>{data?.firstname + " " + data?.lastname}</span>
               <br />
-              <span style={{ color: color.Grey }}>{data.droner_code}</span>
+              <span style={{ color: color.Grey }}>{data.droner_code}
+              {data?.nickname && (
+                  <ShowNickName data={data?.nickname} menu="INFO" />
+                )}
+                </span>
             </>
           ),
         };

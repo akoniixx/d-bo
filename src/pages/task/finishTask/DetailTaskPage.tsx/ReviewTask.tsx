@@ -54,6 +54,7 @@ import ImagCards from "../../../../components/card/ImagCard";
 import icon from "../../../../resource/icon";
 import { image } from "../../../../resource";
 import { listAppType } from "../../../../definitions/ApplicatoionTypes";
+import ShowNickName from "../../../../components/popover/ShowNickName";
 
 const { Map } = require("immutable");
 const _ = require("lodash");
@@ -505,6 +506,9 @@ function ReviewTask() {
               <br />
               <p style={{ fontSize: "12px", color: color.Grey }}>
                 {data.data.droner !== null ? data.data.droner.dronerCode : null}
+                {data.data.droner?.nickname && (
+                  <ShowNickName data={data.data.droner?.nickname} menu="INFO" />
+                )}
               </p>
             </span>
           </div>
