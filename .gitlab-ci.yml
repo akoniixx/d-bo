@@ -9,7 +9,7 @@ image: docker:stable
 # Define variables and environment-specific configuration
 variables:
   PROJECT_ID: iconkaset-app
-  REGISTRY_HOSTNAME: asia.gcr.io/${PROJECT_ID}
+  REGISTRY_HOSTNAME: asia-southeast1-docker.pkg.dev/${PROJECT_ID}
   IMAGE_NAME: dnds/dnds-bo
   IMAGE_TAG: $CI_COMMIT_SHORT_SHA
   SECRET_NAME: gcr-image-pull-secret
