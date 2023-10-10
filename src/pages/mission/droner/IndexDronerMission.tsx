@@ -1,4 +1,6 @@
 import {
+  CaretDownOutlined,
+  CaretUpOutlined,
   DeleteOutlined,
   EditOutlined,
   FileTextOutlined,
@@ -25,6 +27,7 @@ import ActionButton from "../../../components/button/ActionButton";
 import { CardContainer } from "../../../components/card/CardContainer";
 import { CampaignDatasource } from "../../../datasource/CampaignDatasource";
 import {
+  CAMPAINGTYPE,
   STATUS_COLOR_MAPPING,
   STATUS_COUPON,
 } from "../../../definitions/Status";
@@ -47,12 +50,23 @@ const IndexDronerMission = () => {
   const [showModal, setShowModal] = useState(false);
   const [deleteId, setDeleteId] = useState<string>("");
   const [loading, setLoading] = useState(false);
-
+  const [campaignType, setCampaignType] = useState<string>();
+  const [sortField, setSortField] = useState<string | undefined>();
+  const [sortDirection, setSortDirection] = useState<string | undefined>();
+  const [sortDirection1, setSortDirection1] = useState<string | undefined>(
+    undefined
+  );
+  const [sortDirection2, setSortDirection2] = useState<string | undefined>(
+    undefined
+  );
+  const [sortDirection3, setSortDirection3] = useState<string | undefined>(
+    undefined
+  );
   const fetchMission = () => {
     setLoading(true);
     CampaignDatasource.getCampaignList(
       "DRONER",
-      "MISSION_REWARD",
+      campaignType,
       row,
       current,
       searchStartDate,
@@ -132,7 +146,7 @@ const IndexDronerMission = () => {
         className="container d-flex justify-content-between"
         style={{ padding: "8px" }}
       >
-        <div className="col-lg-8 p-1">
+        <div className="col-lg-6 p-1">
           <Input
             allowClear
             prefix={<SearchOutlined style={{ color: color.Disable }} />}
@@ -140,6 +154,17 @@ const IndexDronerMission = () => {
             className="col-lg-12 p-1"
             onChange={(e) => setSearchKeyword(e.target.value)}
           />
+        </div>
+        <div className="col-lg">
+          <Select
+            className="col-lg-12 p-1"
+            placeholder="เลือกประเภทสิ่งที่ได้รับ"
+            allowClear
+            onChange={(e) => setCampaignType(e)}
+          >
+            <option value="MISSION_REWARD">ของรางวัล</option>
+            <option value="MISSION_POINT">แต้ม</option>
+          </Select>
         </div>
         <div className="col-lg">
           <Select
@@ -180,10 +205,58 @@ const IndexDronerMission = () => {
 
   const columns = [
     {
-      title: "ชื่อภารกิจ",
+      title: () => {
+        return (
+          <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+            ชื่อภารกิจ
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                cursor: "pointer",
+              }}
+              onClick={() => {
+                setSortField("campaignName");
+                setSortDirection((prev) => {
+                  if (prev === "ASC") {
+                    return "DESC";
+                  } else if (prev === undefined) {
+                    return "ASC";
+                  } else {
+                    return undefined;
+                  }
+                });
+                setSortDirection1((prev) => {
+                  if (prev === "ASC") {
+                    return "DESC";
+                  } else if (prev === undefined) {
+                    return "ASC";
+                  } else {
+                    return undefined;
+                  }
+                });
+              }}
+            >
+              <CaretUpOutlined
+                style={{
+                  position: "relative",
+                  top: 2,
+                  color: sortDirection1 === "ASC" ? "#ffca37" : "white",
+                }}
+              />
+              <CaretDownOutlined
+                style={{
+                  position: "relative",
+                  bottom: 2,
+                  color: sortDirection1 === "DESC" ? "#ffca37" : "white",
+                }}
+              />
+            </div>
+          </div>
+        );
+      },
       dataIndex: "campaignName",
       key: "campaignName",
-      width: "35%",
       render: (value: any, row: any, index: number) => {
         return {
           children: (
@@ -197,7 +270,56 @@ const IndexDronerMission = () => {
       },
     },
     {
-      title: "วันที่เริ่ม-วันที่สิ้นสุด",
+      title: () => {
+        return (
+          <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+            วันที่เริ่ม-วันที่สิ้นสุด
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                cursor: "pointer",
+              }}
+              onClick={() => {
+                setSortField("campaignName");
+                setSortDirection((prev) => {
+                  if (prev === "ASC") {
+                    return "DESC";
+                  } else if (prev === undefined) {
+                    return "ASC";
+                  } else {
+                    return undefined;
+                  }
+                });
+                setSortDirection2((prev) => {
+                  if (prev === "ASC") {
+                    return "DESC";
+                  } else if (prev === undefined) {
+                    return "ASC";
+                  } else {
+                    return undefined;
+                  }
+                });
+              }}
+            >
+              <CaretUpOutlined
+                style={{
+                  position: "relative",
+                  top: 2,
+                  color: sortDirection2 === "ASC" ? "#ffca37" : "white",
+                }}
+              />
+              <CaretDownOutlined
+                style={{
+                  position: "relative",
+                  bottom: 2,
+                  color: sortDirection2 === "DESC" ? "#ffca37" : "white",
+                }}
+              />
+            </div>
+          </div>
+        );
+      },
       render: (value: any, row: any, index: number) => {
         return {
           children: (
@@ -214,8 +336,64 @@ const IndexDronerMission = () => {
       },
     },
     {
-      title: "ภารกิจย่อย",
+      title: "ประเภทสิ่งที่ได้รับ",
       render: (value: any, row: any, index: number) => {
+        return {
+          children: <span>{CAMPAINGTYPE[row.campaignType]}</span>,
+        };
+      },
+    },
+    {
+      title: () => {
+        return (
+          <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+            ภารกิจย่อย
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                cursor: "pointer",
+              }}
+              onClick={() => {
+                setSortField("campaignName");
+                setSortDirection((prev) => {
+                  if (prev === "ASC") {
+                    return "DESC";
+                  } else if (prev === undefined) {
+                    return "ASC";
+                  } else {
+                    return undefined;
+                  }
+                });
+                setSortDirection3((prev) => {
+                  if (prev === "ASC") {
+                    return "DESC";
+                  } else if (prev === undefined) {
+                    return "ASC";
+                  } else {
+                    return undefined;
+                  }
+                });
+              }}
+            >
+              <CaretUpOutlined
+                style={{
+                  position: "relative",
+                  top: 2,
+                  color: sortDirection3 === "ASC" ? "#ffca37" : "white",
+                }}
+              />
+              <CaretDownOutlined
+                style={{
+                  position: "relative",
+                  bottom: 2,
+                  color: sortDirection3 === "DESC" ? "#ffca37" : "white",
+                }}
+              />
+            </div>
+          </div>
+        );
+      },      render: (value: any, row: any, index: number) => {
         return {
           children: <span>{row.condition.length} ภารกิจ</span>,
         };
@@ -224,7 +402,6 @@ const IndexDronerMission = () => {
     {
       title: "สถานะ",
       dataIndex: "status",
-      width: "12%",
       render: (value: any, row: any, index: number) => {
         return {
           children: (
@@ -246,7 +423,6 @@ const IndexDronerMission = () => {
       title: "",
       dataIndex: "Action",
       key: "Action",
-      width: "12%",
       render: (value: any, row: any, index: number) => {
         return {
           children: (

@@ -44,10 +44,12 @@ const AddDronerMission = () => {
   const [form] = Form.useForm();
   const [formTable] = Form.useForm();
   const [rewardList, setRewardList] = useState<GetAllRewardEntities>();
+  const [saveBtnDisable, setBtnSaveDisable] = useState<boolean>(true);
   const [dataSubMission, setDataSubMission] = useState<
     CampaignConditionEntity[]
   >([CampaignConditionEntity_INIT]);
   const [count, setCount] = useState(1);
+  const [campaignType, setCampaignType] = useState<string>();
 
   const fetchRewardList = () => {
     RewardDatasource.getAllReward(
@@ -57,8 +59,9 @@ const AddDronerMission = () => {
       "",
       "ACTIVE",
       ["PHYSICAL", "DIGITAL"],
-      "MISSION"
+      ""
     ).then((res) => {
+      console.log(res);
       setRewardList(res);
     });
   };
@@ -245,55 +248,72 @@ const AddDronerMission = () => {
       },
     },
     {
-      title: "ชื่อของรางวัล",
+      title: campaignType === "MISSION_POINT" ? "แต้ม" : "ชื่อของรางวัล",
       render: (value: any, row: any, index: number) => {
         return {
           children: (
-            <Form.Item
-              style={{ margin: 0 }}
-              name={`${row.num}_rewardId`}
-              rules={[
-                {
-                  required: true,
-                  message: "กรุณาเลือกชื่อของรางวัล",
-                },
-              ]}
-            >
-              <Select placeholder="เลือกชื่อของรางวัล" allowClear>
-                {rewardList?.data.map((item) => (
-                  <option value={item.id}>
-                    <Row
-                      justify={"start"}
-                      gutter={8}
-                      style={{ fontSize: "13px" }}
-                    >
-                      <Col>
-                        <img src={item.imagePath} width={20} height={20} />
-                      </Col>
-                      <Col>{item.rewardName} |</Col>
-                      <Col>{item.rewardNo} |</Col>
-                      <Col>
-                        {item.rewardType === "PHYSICAL"
-                          ? "Physical"
-                          : "Digital"}
-                        <span
-                          style={{
-                            color:
-                              item.rewardExchange === "MISSION"
-                                ? "#A9CB62"
-                                : "#EA973E",
-                          }}
+            <>
+              {campaignType === "MISSION_POINT" ? (
+                <Form.Item
+                  style={{ margin: 0 }}
+                  name="point"
+                  rules={[
+                    {
+                      required: true,
+                      message: "กรุณาเลือกกรอกจำนวนแต้ม",
+                    },
+                  ]}
+                >
+                  <Input placeholder="กรอกจำนวนแต้ม" suffix="แต้ม" />
+                </Form.Item>
+              ) : (
+                <Form.Item
+                  style={{ margin: 0 }}
+                  name={`${row.num}_rewardId`}
+                  rules={[
+                    {
+                      required: true,
+                      message: "กรุณาเลือกชื่อของรางวัล",
+                    },
+                  ]}
+                >
+                  <Select placeholder="เลือกชื่อของรางวัล" allowClear>
+                    {rewardList?.data.map((item) => (
+                      <option value={item.id}>
+                        <Row
+                          justify={"start"}
+                          gutter={8}
+                          style={{ fontSize: "13px" }}
                         >
-                          {item.rewardExchange === "MISSION"
-                            ? " (ภารกิจ)"
-                            : " (ใช้แต้ม)"}
-                        </span>
-                      </Col>
-                    </Row>
-                  </option>
-                ))}
-              </Select>
-            </Form.Item>
+                          <Col>
+                            <img src={item.imagePath} width={20} height={20} />
+                          </Col>
+                          <Col>{item.rewardName} |</Col>
+                          <Col>{item.rewardNo} |</Col>
+                          <Col>
+                            {item.rewardType === "PHYSICAL"
+                              ? "Physical"
+                              : "Digital"}
+                            <span
+                              style={{
+                                color:
+                                  item.rewardExchange === "MISSION"
+                                    ? "#A9CB62"
+                                    : "#EA973E",
+                              }}
+                            >
+                              {item.rewardExchange === "MISSION"
+                                ? " (ภารกิจ)"
+                                : " (ใช้แต้ม)"}
+                            </span>
+                          </Col>
+                        </Row>
+                      </option>
+                    ))}
+                  </Select>
+                </Form.Item>
+              )}
+            </>
           ),
         };
       },
@@ -392,7 +412,58 @@ const AddDronerMission = () => {
       </Form>
     </>
   );
+  const onFieldsChange = () => {
+    const { missionName, campaignType, startDate, endDate, status } =
+      form.getFieldsValue();
+    const dataSub = newDataSubMission;
+    const fs = formTable.getFieldsValue();
+    const condition: any = dataSub?.map((y: any, i: number) => {
+      // if({
+      //   num: i + 1,
+      //   missionName: fs[`${y.num}_missionName`],
+      //   rai: parseFloat(fs[`${y.num}_rai`]).toFixed(2),
+      //   rewardId: fs[`${y.num}_rewardId`],
+      //   descriptionReward: fs[`${y.num}_description`],
+      //   conditionReward: fs[`${y.num}_condition`],
+      // }
+      // ){
+      //   return true;
+      // }else{
+      //   return false;
+      // }
+      return {
+        num: i + 1,
+        missionName: fs[`${y.num}_missionName`],
+        rai: parseFloat(fs[`${y.num}_rai`]).toFixed(2),
+        rewardId: fs[`${y.num}_rewardId`],
+        point: fs[`${y.num}_point`],
+        descriptionReward: fs[`${y.num}_description`],
+        conditionReward: fs[`${y.num}_condition`],
 
+      };
+    });
+    let fieldErr: boolean = true;
+    let fieldNull: boolean = true;
+
+    const checkMission =
+      condition[0].conditionReward &&
+      condition[0].descriptionReward &&
+      condition[0].missionName &&
+      condition[0].num &&
+      condition[0].rai &&
+      condition[0].rewardId;
+    if (checkMission) {
+      fieldNull = false;
+    } else {
+      fieldNull = true;
+    }
+    if (missionName && campaignType && startDate && endDate && status) {
+      fieldErr = false;
+    } else {
+      fieldErr = true;
+    }
+    setBtnSaveDisable(fieldErr || checkMission);
+  };
   const submit = async () => {
     const dataSub = newDataSubMission;
     await form.validateFields();
@@ -407,12 +478,13 @@ const AddDronerMission = () => {
         missionName: fs[`${y.num}_missionName`],
         rai: parseFloat(fs[`${y.num}_rai`]).toFixed(2),
         rewardId: fs[`${y.num}_rewardId`],
+        point: fs[`${y.num}_point`],
         descriptionReward: fs[`${y.num}_description`],
         conditionReward: fs[`${y.num}_condition`],
       };
     });
     create.campaignName = f.missionName;
-    create.campaignType = "MISSION_REWARD";
+    create.campaignType = f.campaignType;
     create.application = "DRONER";
     create.status = f.status;
     create.condition = condition;
@@ -428,22 +500,24 @@ const AddDronerMission = () => {
         " " +
         moment(f.endTime).format("HH:mm:ss")
     ).toISOString();
-    CampaignDatasource.createCampaign(create).then((res) => {
-      if (res.success) {
-        Swal.fire({
-          title: "บันทึกสำเร็จ",
-          icon: "success",
-          timer: 1500,
-          showConfirmButton: false,
-        }).then((time) => {
-          navigate("/IndexDronerMission");
-        });
-      } else {
-        if (res.userMessage === "dupplicate") {
-        } else {
-        }
-      }
-    });
+    console.log(create);
+
+    // CampaignDatasource.createCampaign(create).then((res) => {
+    //   if (res.success) {
+    //     Swal.fire({
+    //       title: "บันทึกสำเร็จ",
+    //       icon: "success",
+    //       timer: 1500,
+    //       showConfirmButton: false,
+    //     }).then((time) => {
+    //       navigate("/IndexDronerMission");
+    //     });
+    //   } else {
+    //     if (res.userMessage === "dupplicate") {
+    //     } else {
+    //     }
+    //   }
+    // });
   };
 
   return (
@@ -456,7 +530,11 @@ const AddDronerMission = () => {
       </Row>
       <CardContainer>
         <CardHeader textHeader="รายละเอียดภารกิจ" />
-        <Form style={{ padding: "32px" }} form={form}>
+        <Form
+          style={{ padding: "32px" }}
+          form={form}
+          onFieldsChange={onFieldsChange}
+        >
           <Col span={24}>
             <label>
               ชื่อภารกิจ <span style={{ color: color.Error }}>*</span>
@@ -474,11 +552,35 @@ const AddDronerMission = () => {
             </Form.Item>
           </Col>
           <Row>
+            <Col span={10}>
+              <label>
+                ประเภทสิ่งที่ได้รับ<span style={{ color: color.Error }}>*</span>
+              </label>
+              <Form.Item
+                name="campaignType"
+                rules={[
+                  {
+                    required: true,
+                    message: "กรุณาเลือกประเภทสิ่งที่ได้รับ",
+                  },
+                ]}
+              >
+                <Select
+                  className="col-lg-11 p-1"
+                  placeholder="เลือกประเภทสิ่งที่ได้รับ"
+                  allowClear
+                  onChange={(e) => setCampaignType(e)}
+                >
+                  <option value="MISSION_REWARD">ของรางวัล</option>
+                  <option value="MISSION_POINT">แต้ม</option>
+                </Select>
+              </Form.Item>
+            </Col>
             <Col span={7}>
               <label>
                 วันเริ่มต้น<span style={{ color: color.Error }}>*</span>
               </label>
-              <div className="d-flex">
+              <div className="d-flex p-1">
                 <Form.Item
                   name="startDate"
                   rules={[
@@ -508,11 +610,11 @@ const AddDronerMission = () => {
                 </Form.Item>
               </div>
             </Col>
-            <Col span={12}>
+            <Col span={7}>
               <label>
                 วันสิ้นสุด<span style={{ color: color.Error }}>*</span>
               </label>
-              <Col className="d-flex">
+              <Col className="d-flex p-1">
                 <Form.Item
                   name="endDate"
                   rules={[
@@ -569,6 +671,7 @@ const AddDronerMission = () => {
           onClickBack={() => navigate("/IndexDronerMission/")}
           styleFooter={{ padding: "6px" }}
           onClickSave={() => submit()}
+          disableSaveBtn={saveBtnDisable}
         />
       </CardContainer>
     </>

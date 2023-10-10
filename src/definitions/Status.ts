@@ -149,6 +149,10 @@ export const STATUS_COUPON: any = {
   DRAFTING: "รอเปิดการใช้งาน",
   INACTIVE: "ปิดการใช้งาน",
 };
+export const CAMPAINGTYPE: any = {
+  MISSION_REWARD: "ของรางวัล",
+  MISSION_POINT: "แต้ม"
+};
 export const REWARD_STATUS = [
   //{ value: "", name: "ทั้งหมด" },
   { value: "ACTIVE", name: "ใช้งาน" },
