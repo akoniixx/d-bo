@@ -18,7 +18,7 @@ spec:
     spec:
       containers:
         - name: dnds-bo
-          image: asia.gcr.io/iconkaset-app/dnds/dnds-bo:<VERSION>
+          image: asia-southeast1-docker.pkg.dev/iconkaset-app/dnds/dnds-bo:<VERSION>
           imagePullPolicy: Always
           ports:
             - containerPort: 80
