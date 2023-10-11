@@ -23,6 +23,7 @@ import { CampaignDatasource } from "../../../datasource/CampaignDatasource";
 import { DateTimeUtil } from "../../../utilities/DateTimeUtil";
 import { numberWithCommas } from "../../../utilities/TextFormatter";
 import styled from "styled-components";
+import ShowNickName from "../../../components/popover/ShowNickName";
 const _ = require("lodash");
 
 const NewTable = styled(Table)<{
@@ -57,10 +58,12 @@ function MissionReport() {
   const [statusMission, setStatusMission] = useState("INPROGRESS");
   const [isLoading, setIsLoading] = useState(false);
   const [search, setSearch] = useState("");
+  const [campaignType, setCampaignType] = useState<string>();
 
   interface DataTable {
     updateAt: string;
     name: string;
+    nickname: string;
     telephone: string;
     allraiAmount: string;
     redeemNo: string;
@@ -80,12 +83,14 @@ function MissionReport() {
       statusMission,
       search
     ).then((res) => {
+      setCampaignType(res.campaignType);
       setCountInpro(res.count);
       const tableList = [];
       for (let i = 0; res.data.length > i; i++) {
         const table: any = {
           updateAt: res.data[i].updateAt,
           name: res.data[i].firstname + " " + res.data[i].lastname,
+          nickname: res.data[i].nickname,
           telephone: res.data[i].telephoneNo,
           allraiAmount: res.data[i].allraiAmount,
           isDelete: res.data[i].isDelete,
@@ -96,8 +101,8 @@ function MissionReport() {
         rowCard * (current - 1),
         rowCard * current
       );
-      setDataInpro(tableList);
       setDataCondition(mapPage);
+      setDataInpro(tableList);
       setDataMission(res);
       fetchMissionSuccess(res.missionNo);
       setIsLoading(false);
@@ -190,13 +195,16 @@ function MissionReport() {
       render: (value: any, row: any, index: number) => {
         return {
           children: (
-            <u
-              style={{
-                color: row.isDelete === true ? color.Error : color.Success,
-              }}
-            >
-              {row.name}
-            </u>
+            <>
+              <u
+                style={{
+                  color: row.isDelete === true ? color.Error : color.Success,
+                }}
+              >
+                {row.name}
+              </u>
+              {row.nickname && <ShowNickName data={row.nickname} menu="INFO" />}
+            </>
           ),
         };
       },
@@ -250,6 +258,7 @@ function MissionReport() {
         };
       },
     },
+    campaignType === "MISSION_REWARD" ?
     {
       title: "Redeem No.",
       dataIndex: "redeemNo",
@@ -269,9 +278,12 @@ function MissionReport() {
           ),
         };
       },
-    },
+    }: 
+    {
+      title: "",
+      key: "",
+    }
   ];
-
   const renderSubmission = (
     <Col span={12}>
       <div
@@ -287,37 +299,70 @@ function MissionReport() {
           ผู้เข้าร่วมภารกิจ : {dataMission?.amountPeople} คน
         </h5>
       </div>
-      {dataCondition?.map((item: any, index: any) => {
-        const detailReward: any = {
-          rewardId: item.reward.id,
-          rewardName: item.reward.rewardName,
-          rewardNo: item.reward.rewardNo,
-          rewardExchange: item.reward.rewardExchange,
-          remain: item.reward.remain,
-          imagePath: item.reward.imagePath,
-          rewardType: item.reward.rewardType,
-        };
-        return (
-          <div
-            className="pt-3"
-            key={item.num}
-            onClick={() => {
-              setNum(item.num);
-            }}
-            style={{ cursor: "pointer" }}
-          >
-            <MissionReportCard
-              checkCard={checkSubmission(item.num)}
-              title={`ภารกิจ ${item.num}  ${item.missionName}`}
-              raiAmount={item.rai}
-              successMission={item.reward.amountSuccessCount}
-              unsuccessMission={item.reward.amountInprogressCount}
-              unconfirmMission={item.reward.amountRequestCount}
-              detailReward={detailReward}
-            />
-          </div>
-        );
-      })}
+      {campaignType === "MISSION_REWARD"
+        ? dataCondition?.map((item: any, index: any) => {
+            const detailReward: any = {
+              rewardId: item.reward.id,
+              rewardName: item.reward.rewardName,
+              rewardNo: item.reward.rewardNo,
+              rewardExchange: item.reward.rewardExchange,
+              remain: item.reward.remain,
+              imagePath: item.reward.imagePath,
+              rewardType: item.reward.rewardType,
+            };
+            return (
+              <div
+                className="pt-3"
+                key={item.num}
+                onClick={() => {
+                  setNum(item.num);
+                }}
+                style={{ cursor: "pointer" }}
+              >
+                <MissionReportCard
+                  checkCard={checkSubmission(item.num)}
+                  title={`ภารกิจ ${item.num}  ${item.missionName}`}
+                  raiAmount={item.rai}
+                  successMission={item.reward.amountSuccessCount}
+                  unsuccessMission={item.reward.amountInprogressCount}
+                  unconfirmMission={item.reward.amountRequestCount}
+                  detailReward={detailReward}
+                />
+              </div>
+            );
+          })
+        : dataCondition?.map((item: any, index: any) => {
+            const detailPoint: any = {
+              num: item.num,
+              rai: item.rai,
+              point: item.point,
+              conditionReward: item.conditionReward,
+              descriptionReward: item.descriptionReward,
+              amountInprogressCount: item.amountInprogressCount,
+              amountSuccessCount: item.amountSuccessCount,
+            };
+            return (
+              <div
+                className="pt-3"
+                key={item.num}
+                onClick={() => {
+                  setNum(item.num);
+                }}
+                style={{ cursor: "pointer" }}
+              >
+                <MissionReportCard
+                  type="MISSION_POINT"
+                  checkCard={checkSubmission(item.num)}
+                  title={`ภารกิจ ${item.num}  ${item.missionName}`}
+                  raiAmount={item.rai}
+                  successMission={item.amountSuccessCount}
+                  unsuccessMission={item.amountInprogressCount}
+                  unconfirmMission={item.amountRequestCount}
+                  detailReward={detailPoint}
+                />
+              </div>
+            );
+          })}
       <div className="d-flex justify-content-between pt-3 pb-3">
         <p>รายการทั้งหมด {dataMission?.condition.length} รายการ</p>
         <Pagination
@@ -361,31 +406,39 @@ function MissionReport() {
           onClick={() => setStatusMission("INPROGRESS")}
         >
           ผู้เข้าร่วมที่ยังไม่สำเร็จ{" "}
-          {`(${
-            dataCondition?.find((x) => x.num === num)?.reward
-              .amountInprogressCount
-          })` || 0}
+          {campaignType === "MISSION_REWARD"
+            ? `(${
+                dataCondition?.find((x) => x.num === num)?.reward
+                  .amountInprogressCount
+              })`
+            : `(${
+                dataCondition?.find((x) => x.num === num)?.amountInprogressCount
+              })` || 0}
         </Radio.Button>
-        <Radio.Button
-          className="col"
-          style={{
-            textAlign: "center",
-            padding: 4,
-            height: "40px",
-            backgroundColor:
-              type === "unconfirmMission" ? mapColor[type] : color.White,
-            color: type === "unconfirmMission" ? "#FFCA37" : color.BK,
-            borderColor: type === "unconfirmMission" ? "#FFCA37" : color.BK,
-            borderWidth: type === "unconfirmMission" ? 1 : 0,
-          }}
-          value="unconfirmMission"
-          onClick={() => setStatusMission("REQUEST")}
-        >
-          ผู้เข้าร่วมที่รอกดแลก{" "}
-          {`(${
-            dataCondition?.find((x) => x.num === num)?.reward.amountRequestCount
-          })` || 0}
-        </Radio.Button>
+        {campaignType === "MISSION_REWARD" && (
+          <Radio.Button
+            className="col"
+            style={{
+              textAlign: "center",
+              padding: 4,
+              height: "40px",
+              backgroundColor:
+                type === "unconfirmMission" ? mapColor[type] : color.White,
+              color: type === "unconfirmMission" ? "#FFCA37" : color.BK,
+              borderColor: type === "unconfirmMission" ? "#FFCA37" : color.BK,
+              borderWidth: type === "unconfirmMission" ? 1 : 0,
+            }}
+            value="unconfirmMission"
+            onClick={() => setStatusMission("REQUEST")}
+          >
+            ผู้เข้าร่วมที่รอกดแลก{" "}
+            {`(${
+              dataCondition?.find((x) => x.num === num)?.reward
+                .amountRequestCount
+            })` || 0}
+          </Radio.Button>
+        )}
+
         <Radio.Button
           className="col"
           style={{
@@ -401,11 +454,17 @@ function MissionReport() {
             borderWidth: type === "successMission" ? 1 : 0,
           }}
           value="successMission"
+          onClick={() => setStatusMission("COMPLETE")}
         >
           ผู้เข้าร่วมที่สำเร็จ{" "}
-          {`(${
-            dataCondition?.find((x) => x.num === num)?.reward.amountSuccessCount
-          })` || 0}
+          {campaignType === "MISSION_REWARD"
+            ? `(${
+                dataCondition?.find((x) => x.num === num)?.reward
+                  .amountSuccessCount
+              })`
+            : `(${
+                dataCondition?.find((x) => x.num === num)?.amountSuccessCount
+              })` || 0}
         </Radio.Button>
       </Radio.Group>
       {(type === "unsuccessMission" || type === "unconfirmMission") && (
@@ -481,7 +540,13 @@ function MissionReport() {
             ? columns.slice(0, -2)
             : columns.slice(0, -1)
         }
-        dataSource={type === "successMission" ? dataSuccess : dataInpro}
+        dataSource={  
+          campaignType === "MISSION_POINT"
+            ? dataInpro
+            : type === "successMission"
+            ? dataSuccess
+            : dataInpro
+        }
         pagination={false}
         loading={isLoading}
         colors={mapTableColor[type]}

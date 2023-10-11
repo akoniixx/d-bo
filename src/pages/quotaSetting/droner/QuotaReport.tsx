@@ -30,6 +30,7 @@ import ModalQuotaRedeem from "../../../components/modal/ModalQuotaRedeem";
 import Swal from "sweetalert2";
 import { CampaignDatasource } from "../../../datasource/CampaignDatasource";
 import { useLocalStorage } from "../../../hook/useLocalStorage";
+import ShowNickName from "../../../components/popover/ShowNickName";
 
 const _ = require("lodash");
 const { Map } = require("immutable");
@@ -79,6 +80,7 @@ function QuotaReport() {
       searchText
     )
       .then((res) => {
+        console.log(res)
         setData(res);
       })
       .catch((err) => console.log(err))
@@ -175,12 +177,7 @@ function QuotaReport() {
           </span>
         </Col>
         <Col span={4} className="p-3">
-          <Dropdown
-            overlay={downloadListName}
-            // trigger={["click"]}
-            // onVisibleChange={handleVisible}
-            // visible={visible}
-          >
+          <Dropdown overlay={downloadListName}>
             <Button
               style={{
                 borderColor: color.Success,
@@ -258,6 +255,12 @@ function QuotaReport() {
                 }}
               >
                 {row.firstname + " " + row.lastname}
+                {row.nickname && (
+                  <ShowNickName
+                    data={row.nickname}
+                    menu="INFO"
+                  />
+                )}
               </span>
             </>
           ),

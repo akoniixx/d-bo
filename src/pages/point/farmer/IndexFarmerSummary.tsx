@@ -14,6 +14,7 @@ import { FarmerSummaryPointListEntity } from "../../../entities/PointReceiveEnti
 import { PointReceiveDatasource } from "../../../datasource/PointReceiveDatasource";
 import { numberWithCommas } from "../../../utilities/TextFormatter";
 import { sorter } from "../../../utilities/Sorting";
+import ShowNickName from "../../../components/popover/ShowNickName";
 
 function IndexFarmerSummary() {
   const navigate = useNavigate();
@@ -129,7 +130,7 @@ function IndexFarmerSummary() {
           ค้นหาข้อมูล
         </Button>
       </Col>
-    </Row>
+    </Row>  
   );
 
   const columns = [
@@ -145,6 +146,9 @@ function IndexFarmerSummary() {
               }}
             >
               {row.firstname + " " + row.lastname}
+              {row.nickname && (
+                  <ShowNickName data={row.nickname} menu="INFO" />
+                )}
             </span>
           ),
         };
