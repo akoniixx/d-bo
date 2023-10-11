@@ -13,7 +13,11 @@ import {
   Table,
 } from "antd";
 import MissionReportCard from "../../../components/card/MissionReportCard";
-import { SearchOutlined } from "@ant-design/icons";
+import {
+  CaretDownOutlined,
+  CaretUpOutlined,
+  SearchOutlined,
+} from "@ant-design/icons";
 import moment from "moment";
 import {
   ConditionMission,
@@ -49,7 +53,8 @@ function MissionReport() {
   const { RangePicker } = DatePicker;
   const dateFormat = "DD/MM/YYYY";
   const dateSearchFormat = "YYYY-MM-DD";
-
+  const [sortDirection, setSortDirection] = useState<string | undefined>();
+  const [sortField, setSortField] = useState<string | undefined>();
   const navigate = useNavigate();
   const [dataMission, setDataMission] = useState<MissionDetailEntity>();
   const [dataCondition, setDataCondition] = useState<ConditionMission[]>();
@@ -59,7 +64,12 @@ function MissionReport() {
   const [isLoading, setIsLoading] = useState(false);
   const [search, setSearch] = useState("");
   const [campaignType, setCampaignType] = useState<string>();
-
+  const [sortDirection1, setSortDirection1] = useState<string | undefined>(
+    undefined
+  );
+  const [sortDirection2, setSortDirection2] = useState<string | undefined>(
+    undefined
+  );
   interface DataTable {
     updateAt: string;
     name: string;
@@ -81,7 +91,9 @@ function MissionReport() {
       row,
       currentTable,
       statusMission,
-      search
+      search,
+      sortField,
+      sortDirection
     ).then((res) => {
       setCampaignType(res.campaignType);
       setCountInpro(res.count);
@@ -144,7 +156,7 @@ function MissionReport() {
 
   useEffect(() => {
     fetchMissionInprogress();
-  }, [currentTable, num, statusMission, current]);
+  }, [currentTable, num, statusMission, current, sortDirection]);
 
   const onChangePage = (page: number) => {
     setCurrentTable(page);
@@ -179,7 +191,56 @@ function MissionReport() {
 
   const columns: any = [
     {
-      title: "วันที่อัพเดต",
+      title: () => {
+        return (
+          <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+            วันที่อัพเดต
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                cursor: "pointer",
+              }}
+              onClick={() => {
+                setSortField("updateAt");
+                setSortDirection((prev) => {
+                  if (prev === "ASC") {
+                    return "DESC";
+                  } else if (prev === undefined) {
+                    return "ASC";
+                  } else {
+                    return undefined;
+                  }
+                });
+                setSortDirection1((prev) => {
+                  if (prev === "ASC") {
+                    return "DESC";
+                  } else if (prev === undefined) {
+                    return "ASC";
+                  } else {
+                    return undefined;
+                  }
+                });
+              }}
+            >
+              <CaretUpOutlined
+                style={{
+                  position: "relative",
+                  top: 2,
+                  color: sortDirection1 === "ASC" ? "#ffca37" : "white",
+                }}
+              />
+              <CaretDownOutlined
+                style={{
+                  position: "relative",
+                  bottom: 2,
+                  color: sortDirection1 === "DESC" ? "#ffca37" : "white",
+                }}
+              />
+            </div>
+          </div>
+        );
+      },
       dataIndex: "updatedAt",
       key: "updatedAt",
       render: (value: any, row: any, index: number) => {
@@ -228,7 +289,56 @@ function MissionReport() {
       },
     },
     {
-      title: "จำนวนไร่สะสม",
+      title: () => {
+        return (
+          <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+            จำนวนไร่สะสม
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                cursor: "pointer",
+              }}
+              onClick={() => {
+                setSortField("allraiAmount");
+                setSortDirection((prev) => {
+                  if (prev === "ASC") {
+                    return "DESC";
+                  } else if (prev === undefined) {
+                    return "ASC";
+                  } else {
+                    return undefined;
+                  }
+                });
+                setSortDirection2((prev) => {
+                  if (prev === "ASC") {
+                    return "DESC";
+                  } else if (prev === undefined) {
+                    return "ASC";
+                  } else {
+                    return undefined;
+                  }
+                });
+              }}
+            >
+              <CaretUpOutlined
+                style={{
+                  position: "relative",
+                  top: 2,
+                  color: sortDirection2 === "ASC" ? "#ffca37" : "white",
+                }}
+              />
+              <CaretDownOutlined
+                style={{
+                  position: "relative",
+                  bottom: 2,
+                  color: sortDirection2 === "DESC" ? "#ffca37" : "white",
+                }}
+              />
+            </div>
+          </div>
+        );
+      },
       dataIndex: "allraiAmount",
       key: "allraiAmount",
       render: (value: any, row: any, index: number) => {
@@ -258,32 +368,33 @@ function MissionReport() {
         };
       },
     },
-    campaignType === "MISSION_REWARD" ?
-    {
-      title: "Redeem No.",
-      dataIndex: "redeemNo",
-      key: "redeemNo",
-      render: (value: any, row: any, index: number) => {
-        return {
-          children: (
-            <div>
-              <span
-                style={{
-                  color: color.Success,
-                }}
-              >
-                {row.redeemNo}
-              </span>
-            </div>
-          ),
-        };
-      },
-    }: 
-    {
-      title: "",
-      key: "",
-    }
+    campaignType === "MISSION_REWARD"
+      ? {
+          title: "Redeem No.",
+          dataIndex: "redeemNo",
+          key: "redeemNo",
+          render: (value: any, row: any, index: number) => {
+            return {
+              children: (
+                <div>
+                  <span
+                    style={{
+                      color: color.Success,
+                    }}
+                  >
+                    {row.redeemNo}
+                  </span>
+                </div>
+              ),
+            };
+          },
+        }
+      : {
+          title: "",
+          key: "",
+        },
   ];
+
   const renderSubmission = (
     <Col span={12}>
       <div
@@ -540,7 +651,7 @@ function MissionReport() {
             ? columns.slice(0, -2)
             : columns.slice(0, -1)
         }
-        dataSource={  
+        dataSource={
           campaignType === "MISSION_POINT"
             ? dataInpro
             : type === "successMission"

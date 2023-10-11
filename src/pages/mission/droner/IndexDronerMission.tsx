@@ -72,7 +72,9 @@ const IndexDronerMission = () => {
       searchStartDate,
       searchEndDate,
       searchStatus,
-      searchKeyword
+      searchKeyword,
+      sortDirection,
+      sortField
     )
       .then((res) => {
         setData(res);
@@ -83,7 +85,7 @@ const IndexDronerMission = () => {
 
   useEffect(() => {
     fetchMission();
-  }, [current, searchStartDate, searchEndDate]);
+  }, [current, searchStartDate, searchEndDate, sortDirection]);
 
   const onChangePage = (page: number) => {
     setCurrent(page);
@@ -161,10 +163,10 @@ const IndexDronerMission = () => {
             placeholder="เลือกประเภทสิ่งที่ได้รับ"
             allowClear
             onChange={(e) => {
-              if(e === undefined){
+              if (e === undefined) {
                 setCampaignType("MISSION");
-              }else{
-                setCampaignType(e)
+              } else {
+                setCampaignType(e);
               }
             }}
           >
@@ -287,7 +289,7 @@ const IndexDronerMission = () => {
                 cursor: "pointer",
               }}
               onClick={() => {
-                setSortField("campaignName");
+                setSortField("startDate");
                 setSortDirection((prev) => {
                   if (prev === "ASC") {
                     return "DESC";
@@ -361,7 +363,7 @@ const IndexDronerMission = () => {
                 cursor: "pointer",
               }}
               onClick={() => {
-                setSortField("campaignName");
+                setSortField("countSubMission");
                 setSortDirection((prev) => {
                   if (prev === "ASC") {
                     return "DESC";
@@ -399,7 +401,8 @@ const IndexDronerMission = () => {
             </div>
           </div>
         );
-      },      render: (value: any, row: any, index: number) => {
+      },
+      render: (value: any, row: any, index: number) => {
         return {
           children: <span>{row.condition.length} ภารกิจ</span>,
         };
