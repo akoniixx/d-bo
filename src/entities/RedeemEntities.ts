@@ -41,7 +41,9 @@ export interface DetailRedeemFermerEntity {
     id: string;
     firstname: string;
     lastname: string;
+    nickname: string;
     telephoneNo: string;
+    isDelete: boolean;
     address: {
       address1: string;
       address2: string;
@@ -63,6 +65,8 @@ export interface DetailRedeemFermerEntity {
     id: string;
     firstname: string;
     lastname: string;
+    nickname: string;
+    isDelete: boolean
   };
   farmerPlot: {
     plotName: string;
@@ -148,6 +152,7 @@ export interface DetailRedeemDronerEntity {
   receiverDetail: {
     firstname: string;
     lastname: string;
+    nickname: string;
     tel: string;
     address: string;
   };

@@ -13,6 +13,7 @@ import { PointReceiveDatasource } from "../../../datasource/PointReceiveDatasour
 import { DronerSummaryPointListEntity } from "../../../entities/PointReceiveEntities";
 import { color, icon } from "../../../resource";
 import { numberWithCommas } from "../../../utilities/TextFormatter";
+import ShowNickName from "../../../components/popover/ShowNickName";
 
 const IndexDronerSummaryPoint = () => {
   const navigate = useNavigate();
@@ -101,6 +102,7 @@ const IndexDronerSummaryPoint = () => {
       title: "ชื่อนักบินโดรน",
       width: "30%",
       render: (value: any, row: any, index: number) => {
+        console.log(row)
         return {
           children: (
             <span
@@ -109,6 +111,9 @@ const IndexDronerSummaryPoint = () => {
               }}
             >
               {row.firstname + " " + row.lastname}
+              {row.nickname && (
+                  <ShowNickName data={row.nickname} menu="INFO" />
+                )}
             </span>
           ),
         };
