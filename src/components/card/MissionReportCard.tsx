@@ -1,7 +1,7 @@
 import { Col, Image, Row } from "antd";
 import React, { useState } from "react";
 import { color } from "../../resource";
-import { numberWithCommas } from "../../utilities/TextFormatter";
+import { formatNumberWithCommas, numberWithCommas } from "../../utilities/TextFormatter";
 
 export interface detailReward {
   rewardId: string;
@@ -11,8 +11,10 @@ export interface detailReward {
   remain: number;
   imagePath: string;
   rewardType: string;
+  point: string;
 }
 interface MissionReportProps {
+  type?: string;
   title?: string;
   raiAmount?: number;
   successMission: string;
@@ -22,6 +24,7 @@ interface MissionReportProps {
   checkCard?: boolean;
 }
 const MissionReportCard: React.FC<MissionReportProps> = ({
+  type,
   title,
   raiAmount,
   successMission,
@@ -30,6 +33,7 @@ const MissionReportCard: React.FC<MissionReportProps> = ({
   detailReward,
   checkCard,
 }) => {
+
   return (
     <div
       style={{
@@ -72,7 +76,7 @@ const MissionReportCard: React.FC<MissionReportProps> = ({
               }}
             >
               <span style={{ color: '#FFCA37', fontWeight: "bold" }}>
-                {unconfirmMission}{" "}
+                {unconfirmMission || 0}{" "}
               </span>
               <br />
               <span style={{ color: color.BK }}>รอกดแลก</span>
@@ -104,7 +108,11 @@ const MissionReportCard: React.FC<MissionReportProps> = ({
           borderBottomRightRadius: "8px",
         }}
       >
-        <Col span={2}>
+        {type === "MISSION_POINT" ? 
+        <span>จำนวนแต็มที่ได้รับ : {formatNumberWithCommas(parseFloat(detailReward?.point!))} แต้ม</span>
+        :
+        <>
+         <Col span={2}>
           <Image
             src={detailReward?.imagePath}
             style={{ width: 48, height: 48, padding: "6px", borderRadius: 5 }}
@@ -129,7 +137,9 @@ const MissionReportCard: React.FC<MissionReportProps> = ({
             </span>
             | คงเหลือ {detailReward?.remain} ชิ้น
           </span>
-        </Col>
+        </Col></>
+        }
+       
       </Row>
     </div>
   );

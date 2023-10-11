@@ -31,6 +31,7 @@ import {
 import { color } from "../../resource";
 import { DateTimeUtil } from "../../utilities/DateTimeUtil";
 import { numberWithCommas } from "../../utilities/TextFormatter";
+import ShowNickName from "../../components/popover/ShowNickName";
 const _ = require("lodash");
 
 const NewTable = styled(Table)`
@@ -506,6 +507,9 @@ const DetailDronerRedeem = () => {
                   " " +
                   data?.receiverDetail.lastname}
               </u>
+              {data?.receiverDetail.nickname && (
+                  <ShowNickName data={data?.receiverDetail.nickname} menu="INFO" />
+                )}
             </div>
           </Col>
           <Col span={4}>

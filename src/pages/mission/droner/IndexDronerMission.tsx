@@ -50,7 +50,7 @@ const IndexDronerMission = () => {
   const [showModal, setShowModal] = useState(false);
   const [deleteId, setDeleteId] = useState<string>("");
   const [loading, setLoading] = useState(false);
-  const [campaignType, setCampaignType] = useState<string>();
+  const [campaignType, setCampaignType] = useState<string>("MISSION");
   const [sortField, setSortField] = useState<string | undefined>();
   const [sortDirection, setSortDirection] = useState<string | undefined>();
   const [sortDirection1, setSortDirection1] = useState<string | undefined>(
@@ -160,7 +160,13 @@ const IndexDronerMission = () => {
             className="col-lg-12 p-1"
             placeholder="เลือกประเภทสิ่งที่ได้รับ"
             allowClear
-            onChange={(e) => setCampaignType(e)}
+            onChange={(e) => {
+              if(e === undefined){
+                setCampaignType("MISSION");
+              }else{
+                setCampaignType(e)
+              }
+            }}
           >
             <option value="MISSION_REWARD">ของรางวัล</option>
             <option value="MISSION_POINT">แต้ม</option>

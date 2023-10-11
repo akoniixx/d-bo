@@ -61,7 +61,6 @@ const AddDronerMission = () => {
       ["PHYSICAL", "DIGITAL"],
       ""
     ).then((res) => {
-      console.log(res);
       setRewardList(res);
     });
   };
@@ -87,6 +86,7 @@ const AddDronerMission = () => {
         num: i + 1,
         missionName: sTable[`${y.num}_missionName`],
         rai: sTable[`${y.num}_rai`],
+        point: sTable[`${y.num}_point`],
         rewardId: sTable[`${y.num}_rewardId`],
         descriptionReward: sTable[`${y.num}_description`],
         conditionReward: sTable[`${y.num}_condition`],
@@ -102,6 +102,7 @@ const AddDronerMission = () => {
       formTable.setFieldValue(`${y.num}_condition`, y.conditionReward);
       formTable.setFieldValue(`${y.num}_missionName`, y.missionName);
       formTable.setFieldValue(`${y.num}_rai`, y.rai);
+      formTable.setFieldValue(`${y.num}_point`, y.point);
       formTable.setFieldValue(`${y.num}_rewardId`, y.rewardId);
     });
   };
@@ -148,6 +149,7 @@ const AddDronerMission = () => {
     formTable.setFieldValue(`${e.length + 1}_condition`, "");
     formTable.setFieldValue(`${e.length + 1}_missionName`, "");
     formTable.setFieldValue(`${e.length + 1}_rai`, "");
+    formTable.setFieldValue(`${e.length + 1}_point`, "");
     formTable.setFieldValue(`${e.length + 1}_rewardId`, "");
   };
 
@@ -171,9 +173,16 @@ const AddDronerMission = () => {
     e: React.ChangeEvent<HTMLInputElement>,
     name: string
   ) => {
+    const checkName = name.split("_")[1];
     const { value: inputValue } = e.target;
-    const convertedNumber = validateOnlyNumWDecimal(inputValue);
-    formTable.setFieldsValue({ [name]: convertedNumber });
+    const justNumber = inputValue.replace(/[^0-9.]/g, "");
+    const convertedNumber = justNumber.replace(/^(\d*\.\d{0,2}).*$/, "$1");
+    if(checkName === 'rai'){
+      formTable.setFieldsValue({ [name]: convertedNumber });
+    }else{
+      const withoutDecimal = justNumber.replace(/\./g, "");
+      formTable.setFieldsValue({ [name]: withoutDecimal });
+    }
   };
 
   const columns = [
@@ -256,7 +265,7 @@ const AddDronerMission = () => {
               {campaignType === "MISSION_POINT" ? (
                 <Form.Item
                   style={{ margin: 0 }}
-                  name="point"
+                  name={`${row.num}_point`}
                   rules={[
                     {
                       required: true,
@@ -264,7 +273,11 @@ const AddDronerMission = () => {
                     },
                   ]}
                 >
-                  <Input placeholder="กรอกจำนวนแต้ม" suffix="แต้ม" />
+                  <Input
+                    placeholder="กรอกจำนวนแต้ม"
+                    suffix="แต้ม"
+                     onChange={(e) => checkNumber(e, `${row.num}_point`)}
+                  />
                 </Form.Item>
               ) : (
                 <Form.Item
@@ -339,7 +352,48 @@ const AddDronerMission = () => {
       },
     },
   ];
+  const onFieldsChange = () => {
+    const { missionName, campaignType, startDate, endDate, status } =
+      form.getFieldsValue();
+    const dataSub = newDataSubMission;
+    const fs = formTable.getFieldsValue();
+    const condition: any = dataSub?.map((y: any, i: number) => {
+      return {
+        num: i + 1,
+        missionName: fs[`${y.num}_missionName`],
+        rai: parseFloat(fs[`${y.num}_rai`]).toFixed(2),
+        rewardId: fs[`${y.num}_rewardId`],
+        point: fs[`${y.num}_point`],
+        descriptionReward: fs[`${y.num}_description`],
+        conditionReward: fs[`${y.num}_condition`],
+      };
+    });
+    let fieldErr: boolean = true;
+    let fieldNull: boolean = true;
+    let campaign =
+      campaignType === "MISSION_REWARD"
+        ? condition[0].rewardId
+        : condition[0].point;
 
+    if (
+      condition[0].conditionReward &&
+      condition[0].descriptionReward &&
+      condition[0].missionName &&
+      condition[0].num &&
+      condition[0].rai &&
+      campaign
+    ) {
+      fieldNull = false;
+    } else {
+      fieldNull = true;
+    }
+    if (missionName && campaignType && startDate && endDate && status) {
+      fieldErr = false;
+    } else {
+      fieldErr = true;
+    }
+    setBtnSaveDisable(fieldErr || fieldNull);
+  };
   const subMissionTextArea = (recode: any) => {
     return (
       <Row justify={"space-between"} gutter={16}>
@@ -384,7 +438,7 @@ const AddDronerMission = () => {
           </Button>
         </Col>
       </Row>
-      <Form form={formTable}>
+      <Form form={formTable} onFieldsChange={onFieldsChange}>
         <Table
           columns={columns}
           dataSource={newDataSubMission}
@@ -412,58 +466,7 @@ const AddDronerMission = () => {
       </Form>
     </>
   );
-  const onFieldsChange = () => {
-    const { missionName, campaignType, startDate, endDate, status } =
-      form.getFieldsValue();
-    const dataSub = newDataSubMission;
-    const fs = formTable.getFieldsValue();
-    const condition: any = dataSub?.map((y: any, i: number) => {
-      // if({
-      //   num: i + 1,
-      //   missionName: fs[`${y.num}_missionName`],
-      //   rai: parseFloat(fs[`${y.num}_rai`]).toFixed(2),
-      //   rewardId: fs[`${y.num}_rewardId`],
-      //   descriptionReward: fs[`${y.num}_description`],
-      //   conditionReward: fs[`${y.num}_condition`],
-      // }
-      // ){
-      //   return true;
-      // }else{
-      //   return false;
-      // }
-      return {
-        num: i + 1,
-        missionName: fs[`${y.num}_missionName`],
-        rai: parseFloat(fs[`${y.num}_rai`]).toFixed(2),
-        rewardId: fs[`${y.num}_rewardId`],
-        point: fs[`${y.num}_point`],
-        descriptionReward: fs[`${y.num}_description`],
-        conditionReward: fs[`${y.num}_condition`],
 
-      };
-    });
-    let fieldErr: boolean = true;
-    let fieldNull: boolean = true;
-
-    const checkMission =
-      condition[0].conditionReward &&
-      condition[0].descriptionReward &&
-      condition[0].missionName &&
-      condition[0].num &&
-      condition[0].rai &&
-      condition[0].rewardId;
-    if (checkMission) {
-      fieldNull = false;
-    } else {
-      fieldNull = true;
-    }
-    if (missionName && campaignType && startDate && endDate && status) {
-      fieldErr = false;
-    } else {
-      fieldErr = true;
-    }
-    setBtnSaveDisable(fieldErr || checkMission);
-  };
   const submit = async () => {
     const dataSub = newDataSubMission;
     await form.validateFields();
@@ -500,24 +503,23 @@ const AddDronerMission = () => {
         " " +
         moment(f.endTime).format("HH:mm:ss")
     ).toISOString();
-    console.log(create);
-
-    // CampaignDatasource.createCampaign(create).then((res) => {
-    //   if (res.success) {
-    //     Swal.fire({
-    //       title: "บันทึกสำเร็จ",
-    //       icon: "success",
-    //       timer: 1500,
-    //       showConfirmButton: false,
-    //     }).then((time) => {
-    //       navigate("/IndexDronerMission");
-    //     });
-    //   } else {
-    //     if (res.userMessage === "dupplicate") {
-    //     } else {
-    //     }
-    //   }
-    // });
+    CampaignDatasource.createCampaign(create).then((res) => {
+      if (res.success) {
+        Swal.fire({
+          title: "บันทึกสำเร็จ",
+          icon: "success",
+          timer: 1500,
+          showConfirmButton: false,
+        }).then((time) => {
+          navigate("/IndexDronerMission");
+        });
+      } else {
+        
+        if (res.userMessage === "dupplicate") {
+        } else {
+        }
+      }
+    });
   };
 
   return (
