@@ -1,5 +1,9 @@
 ## [Version - 0]
 
+## improve [v0.37.6] 2023-10-11
+
+- mission point setting
+
 ## improve [v0.37.5] 2023-10-10
 
 - display nickname droner & farmer

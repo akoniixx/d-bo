@@ -12,7 +12,9 @@ export class CampaignDatasource {
     startDate?: string,
     endStart?: string,
     status?: string,
-    search?: string
+    search?: string,
+    sortDirection?: string,
+    sortField?: string
   ) {
     const params = {
       campaignType: campaignType,
@@ -23,6 +25,8 @@ export class CampaignDatasource {
       status: status,
       search: search,
       application: app,
+      sortDirection: sortDirection,
+      sortField: sortField,
     };
     return httpClient
       .get(BASE_URL + `/promotion/campaign/find-all-campaign`, { params })
@@ -90,7 +94,9 @@ export class CampaignDatasource {
     take: number,
     page: number,
     status: string,
-    search?: string
+    search?: string,
+    sortField?: string,
+    sortDirection? : string
   ): Promise<MissionDetailEntity> {
     const params = {
       campaignId: campaignId,
@@ -99,6 +105,9 @@ export class CampaignDatasource {
       page: page,
       status: status,
       search: search,
+      sortField: sortField,
+      sortDirection: sortDirection
+
     };
     return httpClient
       .get(BASE_URL + `/promotion/mission-campaign/query`, { params })

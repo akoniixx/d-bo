@@ -55,7 +55,6 @@ const EditDronerMission = () => {
   const [count, setCount] = useState(1);
   const [isActive, setIsActive] = useState(false);
   const [isEdit, setIsEdit] = useState(false);
-  const [campaignType, setCampaignType] = useState<string>();
 
   const fetchMissionById = () => {
     CampaignDatasource.getCampaignById(queryString[1]).then((res) => {
@@ -241,7 +240,6 @@ const EditDronerMission = () => {
   const disabledDateChangeEnd = (current: any) => {
     return current && current < dayjs().endOf("day");
   };
-
   const columns = [
     {
       title: "",
@@ -418,7 +416,7 @@ const EditDronerMission = () => {
                       : color.Grey
                   }
                   actionDisable={
-                    form.getFieldValue("status") !== "ACTIVE" && count >1
+                    form.getFieldValue("status") !== "ACTIVE" && count > 1
                       ? row.isDelete
                       : true
                   }
@@ -530,7 +528,7 @@ const EditDronerMission = () => {
       };
     });
     create.campaignName = f.missionName;
-    create.campaignType = "MISSION_REWARD";
+    create.campaignType = f.campaignType;
     create.application = "DRONER";
     create.status = f.status;
     create.condition = condition;
@@ -601,11 +599,10 @@ const EditDronerMission = () => {
                 ]}
               >
                 <Select
-                  disabled={isEdit}
+                  disabled
                   className="col-lg-11 p-1"
                   placeholder="เลือกประเภทสิ่งที่ได้รับ"
                   allowClear
-                  onChange={(e) => setCampaignType(e)}
                 >
                   <option value="MISSION_REWARD">ของรางวัล</option>
                   <option value="MISSION_POINT">แต้ม</option>
