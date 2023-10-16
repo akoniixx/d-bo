@@ -52,7 +52,7 @@ function AddQuota() {
   const [nameChallenge, setNameChallenge] = useState<string | null>(null);
   const [detail, setDetail] = useState<string | null>(null);
   const [nameReward, setNameReward] = useState<string | null>(null);
-  const [raiAmount, setRaiAmount] = useState<string>('');
+  const [raiAmount, setRaiAmount] = useState<string>("");
   const [startDate, setStartDate] = useState<any>(null);
   const [endDate, setEndDate] = useState<any>(null);
   const [createImgReward, setCreateImgReward] = useState<UploadImageEntity>(
@@ -510,7 +510,7 @@ function AddQuota() {
               )}
             </div>
           </div>
-          <p className="text-center text-danger pt-3">
+          <p className="text-center text-muted	 pt-3">
             *รูปภาพจะต้องมีสัดส่วน 1:1 หรือ 375px * 375px เท่านั้น
             เพื่อความสวยงามของภาพในแอปพลิเคชัน*
           </p>
@@ -565,6 +565,10 @@ function AddQuota() {
           <label>
             รูปภาพปุ่มชาเลนจ์ <span style={{ color: "red" }}>*</span>
           </label>
+          <p className="text-muted pt-1">
+            *รูปภาพจะต้องขนาด 490px * 294px เท่านั้น
+            เพื่อความสวยงามของภาพในแอปพลิเคชัน*
+          </p>
           <div className="form-group col-lg-12">
             <div className="p-2">
               <Row
@@ -650,6 +654,10 @@ function AddQuota() {
           <label>
             รูปภาพของรางวัล <span style={{ color: "red" }}>*</span>
           </label>
+          <p className="text-muted pt-1">
+            *รูปภาพจะต้องมีสัดส่วน 1:1 ขนาด 500px * 500px เท่านั้น
+            เพื่อความสวยงามของภาพในแอปพลิเคชัน*
+          </p>
           <div className="form-group col-lg-12">
             <div className="p-2">
               <Row
@@ -866,6 +874,10 @@ function AddQuota() {
           <label>
             ตารางจับรางวัล <span style={{ color: "red" }}>*</span>
           </label>
+          <p className="text-muted pt-1">
+            *รูปภาพจะต้องมีสัดส่วน 1:1 ขนาด 1200px * 1200px เท่านั้น
+            เพื่อความสวยงามของภาพในแอปพลิเคชัน*{" "}
+          </p>
           <div className="form-group col-lg-12">
             <div className="p-2">
               <Row
@@ -999,12 +1011,15 @@ function AddQuota() {
           />
         </Col>
       </Row>
+      <div className="pt-3 pb-3">
       <FooterPage
         //disableSaveBtn={saveBtnDisable}
         styleFooter={{ padding: "6px" }}
         onClickBack={() => navigate(-1)}
         onClickSave={onSubmit}
       />
+      </div>
+  
     </>
   );
 }

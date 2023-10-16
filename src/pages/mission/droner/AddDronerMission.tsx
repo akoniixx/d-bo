@@ -120,15 +120,24 @@ const AddDronerMission = () => {
     }
   }, [dataSubMission]);
 
-  const disabledDateStart = (current: any) => {
-    return current && current < dayjs();
-  };
   const disabledDateEnd = (current: any) => {
     const f = form.getFieldsValue();
     const startDate = moment(f.startDate).format("YYYY-MM-DD");
     return current && current < dayjs(startDate);
   };
 
+  const disabledDateStart = (current: any) => {
+    const f = form.getFieldsValue();
+    if (f.endDate) {
+      const f = form.getFieldsValue();
+      const endDate = moment(f.endDate).format("YYYY-MM-DD");
+      const startDate = moment(f.startDate).format("YYYY-MM-DD");
+      return (
+        current && (current < dayjs(startDate) || current > dayjs(endDate))
+      );
+    }
+    return current && current.isBefore(dayjs());
+  };
   const addRow = () => {
     setCount(count + 1);
     const addList = mapCondition([
@@ -177,9 +186,9 @@ const AddDronerMission = () => {
     const { value: inputValue } = e.target;
     const justNumber = inputValue.replace(/[^0-9.]/g, "");
     const convertedNumber = justNumber.replace(/^(\d*\.\d{0,2}).*$/, "$1");
-    if(checkName === 'rai'){
+    if (checkName === "rai") {
       formTable.setFieldsValue({ [name]: convertedNumber });
-    }else{
+    } else {
       const withoutDecimal = justNumber.replace(/\./g, "");
       formTable.setFieldsValue({ [name]: withoutDecimal });
     }
@@ -276,7 +285,7 @@ const AddDronerMission = () => {
                   <Input
                     placeholder="กรอกจำนวนแต้ม"
                     suffix="แต้ม"
-                     onChange={(e) => checkNumber(e, `${row.num}_point`)}
+                    onChange={(e) => checkNumber(e, `${row.num}_point`)}
                   />
                 </Form.Item>
               ) : (
@@ -355,13 +364,13 @@ const AddDronerMission = () => {
   const onFieldsChange = () => {
     const { missionName, campaignType, startDate, endDate, status } =
       form.getFieldsValue();
-    const dataSub = newDataSubMission;
+    const dataSub: any = newDataSubMission;
     const fs = formTable.getFieldsValue();
     const condition: any = dataSub?.map((y: any, i: number) => {
       return {
         num: i + 1,
         missionName: fs[`${y.num}_missionName`],
-        rai: parseFloat(fs[`${y.num}_rai`]).toFixed(2),
+        rai: fs[`${y.num}_rai`],
         rewardId: fs[`${y.num}_rewardId`],
         point: fs[`${y.num}_point`],
         descriptionReward: fs[`${y.num}_description`],
@@ -370,23 +379,22 @@ const AddDronerMission = () => {
     });
     let fieldErr: boolean = true;
     let fieldNull: boolean = true;
-    let campaign =
-      campaignType === "MISSION_REWARD"
-        ? condition[0].rewardId
-        : condition[0].point;
+    const isMissionReward = campaignType === "MISSION_REWARD";
+    condition.length > 0 &&
+    condition.every(
+      (item: any) =>
+        item &&
+        item.conditionReward &&
+        item.descriptionReward &&
+        item.missionName &&
+        item.num &&
+        item.rai &&
+        (isMissionReward ? item.rewardId : item.point) &&
+        !checkLimit()
+    )
+      ? (fieldNull = false)
+      : (fieldNull = true);
 
-    if (
-      condition[0].conditionReward &&
-      condition[0].descriptionReward &&
-      condition[0].missionName &&
-      condition[0].num &&
-      condition[0].rai &&
-      campaign
-    ) {
-      fieldNull = false;
-    } else {
-      fieldNull = true;
-    }
     if (missionName && campaignType && startDate && endDate && status) {
       fieldErr = false;
     } else {
@@ -514,7 +522,6 @@ const AddDronerMission = () => {
           navigate("/IndexDronerMission");
         });
       } else {
-        
         if (res.userMessage === "dupplicate") {
         } else {
         }

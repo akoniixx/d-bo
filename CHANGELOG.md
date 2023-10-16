@@ -1,5 +1,11 @@
 ## [Version - 0]
 
+## Fix [v0.37.7] 2023-10-16
+
+- fixed startDate in mission
+- fixed validate rai in mission
+- display text image size
+
 ## improve [v0.37.6] 2023-10-11
 
 - mission point setting
