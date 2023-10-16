@@ -51,7 +51,7 @@ function EditQuota() {
   const [nameChallenge, setNameChallenge] = useState<string | null>(null);
   const [detail, setDetail] = useState<string | null>(null);
   const [nameReward, setNameReward] = useState<string | null>(null);
-  const [raiAmount, setRaiAmount] = useState<string>('');
+  const [raiAmount, setRaiAmount] = useState<string>("");
   const [startDate, setStartDate] = useState<any>(null);
   const [endDate, setEndDate] = useState<any>(null);
   const [createImgReward, setCreateImgReward] = useState<UploadImageEntity>(
@@ -575,7 +575,7 @@ function EditQuota() {
               )}
             </div>
           </div>
-          <p className="text-center text-danger pt-3">
+          <p className="text-center text-muted	pt-3">
             *รูปภาพจะต้องมีสัดส่วน 1:1 หรือ 375px * 375px เท่านั้น
             เพื่อความสวยงามของภาพในแอปพลิเคชัน*
           </p>
@@ -630,6 +630,10 @@ function EditQuota() {
           <label>
             รูปภาพปุ่มชาเลนจ์ <span style={{ color: "red" }}>*</span>
           </label>
+          <p className="text-muted pt-1">
+            *รูปภาพจะต้องขนาด 490px * 294px เท่านั้น
+            เพื่อความสวยงามของภาพในแอปพลิเคชัน*
+          </p>
           <div className="form-group col-lg-12">
             <div className="p-2">
               <Row
@@ -715,6 +719,10 @@ function EditQuota() {
           <label>
             รูปภาพของรางวัล <span style={{ color: "red" }}>*</span>
           </label>
+          <p className="text-muted pt-1">
+            *รูปภาพจะต้องมีสัดส่วน 1:1 ขนาด 500px * 500px เท่านั้น
+            เพื่อความสวยงามของภาพในแอปพลิเคชัน*
+          </p>
           <div className="form-group col-lg-12">
             <div className="p-2">
               <Row
@@ -929,6 +937,10 @@ function EditQuota() {
           <label>
             ตารางจับรางวัล <span style={{ color: "red" }}>*</span>
           </label>
+          <p className="text-muted pt-1">
+            *รูปภาพจะต้องมีสัดส่วน 1:1 ขนาด 1200px * 1200px เท่านั้น
+            เพื่อความสวยงามของภาพในแอปพลิเคชัน*{" "}
+          </p>
           <div className="form-group col-lg-12">
             <div className="p-2">
               <Row
@@ -1062,11 +1074,13 @@ function EditQuota() {
           />
         </Col>
       </Row>
-      <FooterPage
-        styleFooter={{ padding: "6px" }}
-        onClickBack={() => navigate(-1)}
-        onClickSave={onSubmit}
-      />
+      <div className="pt-3 pb-3">
+        <FooterPage
+          styleFooter={{ padding: "6px" }}
+          onClickBack={() => navigate(-1)}
+          onClickSave={onSubmit}
+        />
+      </div>
     </>
   );
 }

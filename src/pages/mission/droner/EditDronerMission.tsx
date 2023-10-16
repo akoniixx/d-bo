@@ -48,6 +48,7 @@ const EditDronerMission = () => {
   const [form] = Form.useForm();
   const [formTable] = Form.useForm();
   const [data, setData] = useState<CampaignEntiry>();
+  const [saveBtnDisable, setBtnSaveDisable] = useState<boolean>(true);
   const [dataSubMission, setDataSubMission] = useState<
     CampaignConditionEntity[]
   >([CampaignConditionEntity_INIT]);
@@ -233,12 +234,23 @@ const EditDronerMission = () => {
     formTable.setFieldsValue({ [name]: convertedNumber });
   };
 
+  const disabledDateChangeEnd = (current: any) => {
+    const f = form.getFieldsValue();
+    const startDate = moment(f.startDate).format("YYYY-MM-DD");
+    return current && current < dayjs(startDate);
+  };
+
   const disabledDateChangeStart = (current: any) => {
     const f = form.getFieldsValue();
-    return current && current < f.startDate;
-  };
-  const disabledDateChangeEnd = (current: any) => {
-    return current && current < dayjs().endOf("day");
+    if (f.endDate) {
+      const f = form.getFieldsValue();
+      const endDate = moment(f.endDate).format("YYYY-MM-DD");
+      const startDate = moment(f.startDate).format("YYYY-MM-DD");
+      return (
+        current && (current < dayjs(startDate) || current > dayjs(endDate))
+      );
+    }
+    return current && current.isBefore(dayjs());
   };
   const columns = [
     {
@@ -429,7 +441,47 @@ const EditDronerMission = () => {
       },
     },
   ];
+  const onFieldsChange = () => {
+    const { missionName, campaignType, startDate, endDate, status } =
+      form.getFieldsValue();
+    const dataSub: any = newDataSubMission;
+    const fs = formTable.getFieldsValue();
+    const condition: any = dataSub?.map((y: any, i: number) => {
+      return {
+        num: i + 1,
+        missionName: fs[`${y.num}_missionName`],
+        rai: fs[`${y.num}_rai`],
+        rewardId: fs[`${y.num}_rewardId`],
+        point: fs[`${y.num}_point`],
+        descriptionReward: fs[`${y.num}_description`],
+        conditionReward: fs[`${y.num}_condition`],
+      };
+    });
+    let fieldErr: boolean = true;
+    let fieldNull: boolean = true;
+    const isMissionReward = campaignType === "MISSION_REWARD";
+    condition.length > 0 &&
+    condition.every(
+      (item: any) =>
+        item &&
+        item.conditionReward &&
+        item.descriptionReward &&
+        item.missionName &&
+        item.num &&
+        item.rai &&
+        (isMissionReward ? item.rewardId : item.point) &&
+        !checkLimit()
+    )
+      ? (fieldNull = false)
+      : (fieldNull = true);
 
+    if (missionName && campaignType && startDate && endDate && status) {
+      fieldErr = false;
+    } else {
+      fieldErr = true;
+    }
+    setBtnSaveDisable(fieldErr || fieldNull);
+  };
   const subMissionTextArea = (recode: any) => {
     return (
       <Row justify={"space-between"} gutter={16}>
@@ -476,7 +528,7 @@ const EditDronerMission = () => {
           </Col>
         )}
       </Row>
-      <Form form={formTable}>
+      <Form form={formTable} onFieldsChange={onFieldsChange}>
         <Table
           columns={columns}
           dataSource={newDataSubMission}
@@ -567,7 +619,11 @@ const EditDronerMission = () => {
       </Row>
       <CardContainer>
         <CardHeader textHeader="รายละเอียดภารกิจ" />
-        <Form style={{ padding: "32px" }} form={form}>
+        <Form
+          style={{ padding: "32px" }}
+          form={form}
+          onFieldsChange={onFieldsChange}
+        >
           <Col span={24}>
             <label>
               ชื่อภารกิจ <span style={{ color: color.Error }}>*</span>
@@ -717,6 +773,7 @@ const EditDronerMission = () => {
           onClickBack={() => navigate("/IndexDronerMission/")}
           styleFooter={{ padding: "6px" }}
           onClickSave={() => submit()}
+          disableSaveBtn={saveBtnDisable}
         />
       </CardContainer>
     </>
