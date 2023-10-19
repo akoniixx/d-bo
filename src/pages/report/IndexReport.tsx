@@ -1016,7 +1016,7 @@ function IndexReport() {
                         preview={false}
                         style={{ width: 24, height: 24 }}
                       />
-                      <span>
+                      <span style={{ paddingLeft: "8px" }}>
                         {row.createBy ? row.createBy + ` ${item.create}` : "-"}
                       </span>
                     </>
