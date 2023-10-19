@@ -580,7 +580,7 @@ function IndexReward() {
           children: (
             <>
               <span className="text-dark-75  d-block font-size-lg">
-                {row.score ? numberWithCommas(row.score) + ` แต้ม` : "-"}
+                {numberWithCommas(row.score) || 0} แต้ม
               </span>
             </>
           ),
