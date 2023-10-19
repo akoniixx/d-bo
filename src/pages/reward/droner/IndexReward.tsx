@@ -873,7 +873,7 @@ function IndexReward() {
                 cursor: "pointer",
               }}
               onClick={() => {
-                setSortField("updatedAt");
+                setSortField("remain");
                 setSortDirection((prev) => {
                   if (prev === "ASC") {
                     return "DESC";
