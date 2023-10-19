@@ -141,6 +141,19 @@ function AddReward() {
     const startDate = moment(getValueDate.startUsedDate).format("YYYY-MM-DD");
     return current && current < dayjs(startDate);
   };
+  const checkNumber = (
+    e: React.ChangeEvent<HTMLInputElement>,
+    name: string
+  ) => {
+    const { value: inputValue } = e.target;
+     const convertedNumber = validateOnlyNumber(inputValue);
+     const convertedNumberScore = inputValue === '' || isNaN(Number(inputValue)) ? '' : Number(inputValue);
+    if (name === "score") {
+      form.setFieldsValue({ [name]: convertedNumberScore });
+    } else {
+      form.setFieldsValue({ [name]: convertedNumber });
+    }
+  };
   const onFieldsChange = () => {
     const {
       rewardName,
@@ -180,7 +193,7 @@ function AddReward() {
 
     if (rewardType === "DIGITAL" && rewardExchange === "SCORE") {
       if (
-        score > 0 &&
+        score >= 0 &&
         amount > 0 &&
         startUsedDate &&
         endUsedDate &&
@@ -198,7 +211,7 @@ function AddReward() {
         rwTypeErr = true;
       }
     } else if (rewardType === "PHYSICAL" && rewardExchange === "SCORE") {
-      if (score > 0 && amount > 0 && startExchangeDate && expiredExchangeDate) {
+      if (score >= 0 && amount > 0 && startExchangeDate && expiredExchangeDate) {
         rwTypeErr = false;
       } else {
         rwTypeErr = true;
@@ -218,14 +231,6 @@ function AddReward() {
       imgErr = false;
     }
     setBtnSaveDisable(fieldErr || imgErr || rwTypeErr);
-  };
-  const checkNumber = (
-    e: React.ChangeEvent<HTMLInputElement>,
-    name: string
-  ) => {
-    const { value: inputValue } = e.target;
-    const convertedNumber = validateOnlyNumber(inputValue);
-    form.setFieldsValue({ [name]: convertedNumber });
   };
   const renderDataReward = (
     <div className="col-lg-7">
@@ -380,7 +385,6 @@ function AddReward() {
                     ]}
                   >
                     <Input
-                      type="number"
                       placeholder="กรอกจำนวน"
                       autoComplete="off"
                       onChange={(e) => {
@@ -407,7 +411,6 @@ function AddReward() {
                     ]}
                   >
                     <Input
-                      type="number"
                       placeholder="กรอกแต้มที่ต้องใช้แลก"
                       autoComplete="off"
                       suffix="แต้ม"
@@ -432,7 +435,6 @@ function AddReward() {
                     ]}
                   >
                     <Input
-                      type="number"
                       placeholder="กรอกจำนวน"
                       autoComplete="off"
                       onChange={(e) => checkNumber(e, "amount")}
@@ -712,6 +714,7 @@ function AddReward() {
       />
     </div>
   );
+
   const onSubmit = () => {
     const {
       rewardName,

@@ -224,7 +224,7 @@ function EditReward() {
 
     if (rewardType === "DIGITAL" && rewardExchange === "SCORE") {
       if (
-        score > 0 &&
+        score >= 0 &&
         amount > 0 &&
         startUsedDate &&
         endUsedDate &&
@@ -242,7 +242,12 @@ function EditReward() {
         rwTypeErr = true;
       }
     } else if (rewardType === "PHYSICAL" && rewardExchange === "SCORE") {
-      if (score > 0 && amount > 0 && startExchangeDate && expiredExchangeDate) {
+      if (
+        score >= 0 &&
+        amount > 0 &&
+        startExchangeDate &&
+        expiredExchangeDate
+      ) {
         rwTypeErr = false;
       } else {
         rwTypeErr = true;
@@ -269,7 +274,13 @@ function EditReward() {
   ) => {
     const { value: inputValue } = e.target;
     const convertedNumber = validateOnlyNumber(inputValue);
-    form.setFieldsValue({ [name]: convertedNumber });
+    const convertedNumberScore =
+      inputValue === "" || isNaN(Number(inputValue)) ? "" : Number(inputValue);
+    if (name === "score") {
+      form.setFieldsValue({ [name]: convertedNumberScore });
+    } else {
+      form.setFieldsValue({ [name]: convertedNumber });
+    }
   };
   const renderDataReward = (
     <div className="col-lg-7">
@@ -441,7 +452,6 @@ function EditReward() {
                     ]}
                   >
                     <Input
-                      type="number"
                       placeholder="กรอกจำนวน"
                       autoComplete="off"
                       onChange={(e) => checkNumber(e, "amount")}
@@ -499,7 +509,6 @@ function EditReward() {
                     ]}
                   >
                     <Input
-                      type="number"
                       placeholder="กรอกจำนวน"
                       autoComplete="off"
                       onChange={(e) => checkNumber(e, "amount")}
