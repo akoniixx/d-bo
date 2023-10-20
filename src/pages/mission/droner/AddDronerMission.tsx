@@ -59,7 +59,7 @@ const AddDronerMission = () => {
       "",
       "ACTIVE",
       ["PHYSICAL", "DIGITAL"],
-      ""
+      "MISSION"
     ).then((res) => {
       setRewardList(res);
     });

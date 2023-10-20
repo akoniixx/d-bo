@@ -122,7 +122,7 @@ const EditDronerMission = () => {
       "",
       "ACTIVE",
       ["PHYSICAL", "DIGITAL"],
-      ""
+      "MISSION"
     ).then((res) => {
       setRewardList(res);
     });
