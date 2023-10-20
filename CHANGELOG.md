@@ -1,5 +1,9 @@
 ## [Version - 0]
 
+## Fix [v0.37.8] 2023-10-16
+
+- fixed reward mission filter
+
 ## Fix [v0.37.7] 2023-10-16
 
 - fixed startDate in mission
