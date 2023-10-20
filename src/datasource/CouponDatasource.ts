@@ -56,7 +56,9 @@ export class CouponDataSource {
     sortType?: string,
     startDate?: string,
     expiredDate?: string,
-    search?: string
+    search?: string,
+    sortDirection?: string,
+    sortField?: string
   ) {
     const params = {
       page: page,
@@ -67,6 +69,8 @@ export class CouponDataSource {
       startDate: startDate,
       expiredDate: expiredDate,
       search: search,
+      sortDirection: sortDirection,
+      sortField: sortField,
     };
     return httpClient
       .get(BASE_URL + "/promotion/promotions", { params })

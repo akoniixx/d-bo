@@ -25,7 +25,13 @@ import color from "../../resource/color";
 import AddButtton from "../../components/button/AddButton";
 import ActionButton from "../../components/button/ActionButton";
 import { DeleteOutlined } from "@ant-design/icons";
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import {
+  ReactEventHandler,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from "react";
 import { CropDatasource } from "../../datasource/CropDatasource";
 import { LocationDatasource } from "../../datasource/LocationDatasource";
 import FooterPage from "../../components/footer/FooterPage";
@@ -51,13 +57,19 @@ import Select, { ActionMeta, OnChangeValue, StylesConfig } from "react-select";
 import { FarmerPageEntity } from "../../entities/FarmerEntities";
 
 const _ = require("lodash");
-
+interface ColourOption {
+  value: string;
+  label: string;
+  isFixed: boolean;
+}
 function EditPromotion() {
   let queryString = _.split(window.location.pathname, "=");
   const profile = JSON.parse(localStorage.getItem("profile") || "{  }");
   const dateFormat = "DD/MM/YYYY";
   const [plantName, setPlantName] = useState<CropPurposeSprayEntity[]>();
   const [provinceList, setProvinceList] = useState<string[]>([]);
+  const [countSelectFarmer, setCountSelectFarmer] = useState<any>();
+  const [editPromo , setEditPromo] = useState<boolean>(false);
   const [crop, setCrop] = useState<any>([
     {
       id: null,
@@ -69,7 +81,7 @@ function EditPromotion() {
   const [descriptionEditor, setDescriptionEditor] = useState<string | null>(
     null
   );
-  const [checkDelete, setCheckDelete] = useState<any>();
+  const [defaultCount, setDefaultCount] = useState<any>();
   const [conditionEditor, setConditionEditor] = useState<string | null>(null);
   const [editTable, setEditTable] = useState(true);
   const [province, setProvince] = useState<string[]>([]);
@@ -114,6 +126,11 @@ function EditPromotion() {
     plantName: "",
     province: "",
   });
+  const styles: StylesConfig<ColourOption, true> = {
+    multiValueRemove: (base, state) => {
+      return state.data.isFixed ? { ...base, display: "none" } : base;
+    },
+  };
   const [form] = Form.useForm();
   useEffect(() => {
     getPromotion(queryString[1]);
@@ -129,7 +146,6 @@ function EditPromotion() {
   useEffect(() => {
     fetchFarmerList(searchFarmer, provinceListId);
   }, [searchFarmer, provinceListId, row]);
-
   const fetchFarmerList = (text?: string, dataProvice?: any) => {
     TaskDatasource.getFarmerListTask(text, currentPage, text ? 0 : row).then(
       (res: FarmerPageEntity) => {
@@ -138,18 +154,20 @@ function EditPromotion() {
           return res;
         });
         const mapData = data.map((x) => {
-          const matching = dataProvice.find(
-            (i: any) => `${i.provinceId}` === `${x.address.provinceId}`
-          );
-          if (matching) {
-            return { ...x, provinceName: matching.provinceName };
+          if (x.address && x.address.provinceId) {
+            const matching = dataProvice.find(
+              (i: any) => `${i.provinceId}` === `${x.address.provinceId}`
+            );
+            if (matching) {
+              return { ...x, provinceName: matching.provinceName };
+            }
           }
+
           return {
             ...x,
             provinceName: x.provinceName,
           };
         });
-
         const result = mapData.map((item) => {
           return {
             ...item,
@@ -159,6 +177,7 @@ function EditPromotion() {
               item.lastname +
               " | " +
               (item.provinceName ? item.provinceName : "-"),
+
             value: item.id,
           };
         });
@@ -166,11 +185,14 @@ function EditPromotion() {
       }
     );
   };
-  const handleInputChange = (inputValue: any) => {
-    if (currentPage === 1) {
-      setSearchFarmer(inputValue);
+  const handleInputChange = (inputValue: string) => {
+    setCurrentPage(1);
+    setSearchFarmer(inputValue);
+  };
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
+    if (!searchFarmer && event.key === "Backspace") {
+      event.preventDefault();
     }
-    return inputValue;
   };
 
   const handleMenuScrollToBottom = () => {
@@ -179,7 +201,6 @@ function EditPromotion() {
       setRow(row + 10);
     }
   };
-
   const getPromotion = (id: string) => {
     CouponDataSource.queryCoupon(id)
       .then(async (res) => {
@@ -217,6 +238,8 @@ function EditPromotion() {
           provinceCheckbox: res.couponConditionProvince,
           couponConditionProvinceList: res.couponConditionProvinceList,
         });
+        setDefaultCount(res.count);
+        setEditPromo(res.keep > 0);
         setConditionSpecialFirsttime(res.conditionSpecialFirsttime ?? false);
         setRaiCondition(res.couponConditionRai ?? false);
         setServiceCondition(res.couponConditionService ?? false);
@@ -231,6 +254,7 @@ function EditPromotion() {
         setSpecificFarmer(res.conditionSpecificFarmer);
         getCropinjectionTimingInit(res.couponConditionPlantList);
         getInfoFarmerManual(res.specificFarmerList);
+        setCountSelectFarmer(res.specificFarmerList.length);
         setRenderMobile({
           couponName: res.couponName,
           couponType: res.couponType,
@@ -267,6 +291,7 @@ function EditPromotion() {
       })
       .catch((err) => console.log(err));
   };
+
   const getCropPlantName = () => {
     CropDatasource.getAllCropPlantName()
       .then((res) => {
@@ -326,6 +351,7 @@ function EditPromotion() {
             item.provinceName,
           id: item.id,
           keep: item.keep,
+          isFixed: true,
         };
       })
     );
@@ -339,7 +365,6 @@ function EditPromotion() {
       })
     );
   };
-
   const renderMobilePlant = () => {
     const plantName = crop.map((item: any) => {
       let injname = "";
@@ -580,6 +605,20 @@ function EditPromotion() {
     form.setFieldsValue({
       specificFarmer: !specificFarmer,
     });
+    if (!specificFarmer !== false) {
+      checkNumber(
+        {
+          target: {
+            value: countSelectFarmer.toString(),
+          },
+        } as React.ChangeEvent<HTMLInputElement>,
+        "count"
+      );
+      setRenderMobile({
+        ...renderMobile,
+        count: countSelectFarmer.toString(),
+      });
+    }
   };
 
   const handleNotiCouponMany = () => {
@@ -617,7 +656,6 @@ function EditPromotion() {
     const { value: inputValue } = e.target;
     const convertedNumber = validateOnlyNumWDecimal(inputValue);
     const convertedNumberNotDecimal = validateOnlyNumber(inputValue);
-
     if (name === "count") {
       form.setFieldsValue({ [name]: convertedNumberNotDecimal });
     } else {
@@ -645,7 +683,7 @@ function EditPromotion() {
     if (renderMobile.expiredDate) {
       const getValueDate = form.getFieldsValue();
       const endDate = moment(getValueDate.DateExpired).format("YYYY-MM-DD");
-      return current && current > dayjs(endDate);
+      return current && current < dayjs(endDate);
     }
   };
   const handleDescriptionEditor = (
@@ -664,32 +702,6 @@ function EditPromotion() {
     editor: any
   ) => {
     setConditionEditor(editor.getHTML());
-  };
-
-  const handleCouponConditionFarmerList = (value: any[]) => {
-    const filterId = value.map((item) => item.id);
-    const oldState = couponConditionFarmerList;
-    const filterOldState = couponConditionFarmerList.map((x) => x.id);
-    if (filterOldState.find((x) => x === filterId[filterId.length - 1])) {
-      const newData = oldState.filter(
-        (x) => x.id !== filterId[filterId.length - 1]
-      );
-      setCouponConditionFarmerList(newData);
-    } else {
-      const newState = {
-        farmerId: filterId[filterId.length - 1],
-        keep: false,
-      };
-      oldState.push(newState);
-      setCouponConditionFarmerList(oldState);
-    }
-  };
-
-  const styles: StylesConfig<true> = {
-    multiValueRemove: (base) => {
-      const checkId = couponConditionFarmerList.map((x)=>x.id)
-      return checkId ? { ...base, display: "none" } : base;
-    },
   };
 
   function checkRai(min: number | null, max: number | null): string {
@@ -737,6 +749,8 @@ function EditPromotion() {
     let serviceError: boolean = true;
     let plantErr: boolean = true;
     let provinceError: boolean = true;
+    const counts =
+      couponConditionFarmerList.length > 0 ? countSelectFarmer : count;
 
     if (
       couponName &&
@@ -744,7 +758,7 @@ function EditPromotion() {
       promotionStatus &&
       promotionType &&
       discountType &&
-      count &&
+      counts &&
       DateStart &&
       TimeStart &&
       DateExpired &&
@@ -898,7 +912,8 @@ function EditPromotion() {
       promotionType: promotionType,
       discountType: discountType,
       discount: parseInt(discount),
-      count: count,
+      count: couponConditionFarmerList.length > 0 ? countSelectFarmer : count,
+      keep: couponConditionFarmerList.length > 0 ? countSelectFarmer : 0,
       createBy: profile.username + " " + profile.lastname,
       startDate: new Date(startDate),
       expiredDate: new Date(expiredDate),
@@ -938,7 +953,6 @@ function EditPromotion() {
         });
       });
   };
-
   return (
     <>
       <Modal
@@ -1088,6 +1102,7 @@ function EditPromotion() {
                     ]}
                   >
                     <AntdSelect
+                      disabled={editPromo}
                       className="col-lg-12 p-1"
                       placeholder="เลือกประเภทคูปอง"
                       onChange={handleCouponType}
@@ -1124,7 +1139,7 @@ function EditPromotion() {
                           },
                         ]}
                       >
-                        <Radio.Group className="d-flex" onChange={handleCoupon}>
+                        <Radio.Group className="d-flex" onChange={handleCoupon} disabled={editPromo}>
                           <Radio value={"FREE"}>ฟรีค่าบริการ</Radio>
                           <Radio value={"DISCOUNT"}>ส่วนลด</Radio>
                         </Radio.Group>
@@ -1141,7 +1156,7 @@ function EditPromotion() {
                         ]}
                       >
                         <Input
-                          disabled={coupon !== "DISCOUNT"}
+                          disabled={coupon !== "DISCOUNT" || editPromo}
                           placeholder="กรอกจำนวนเงิน"
                           autoComplete="off"
                           onChange={(e) => checkNumber(e, "discount")}
@@ -1190,30 +1205,35 @@ function EditPromotion() {
                 </div>
                 <div className="form-group col-lg-6">
                   <label>
-                    จำนวนสิทธิ์ <span style={{ color: "red" }}>*</span>
+                    จำนวนสิทธิ์ <span style={{ color: "red" }}>* (สามารถปรับเพิ่มได้เท่านั้น)</span>
                   </label>
                   <div className="mt-1">
-                    <Form.Item
-                      name="count"
-                      rules={[
-                        {
-                          required: true,
-                          message: "กรุณากรอกจำนวนสิทธิ์!",
-                        },
-                      ]}
-                    >
-                      <Input
-                        placeholder="กรอกจำนวนสิทธ์"
-                        autoComplete="off"
-                        onChange={(e) => {
-                          checkNumber(e, "count");
-                          setRenderMobile({
-                            ...renderMobile,
-                            count: e.target.value,
-                          });
-                        }}
-                      />
-                    </Form.Item>
+                    {couponConditionFarmerList.length > 0 ? (
+                      <Input disabled placeholder={countSelectFarmer} />
+                    ) : (
+                      <Form.Item
+                        name="count"
+                        rules={[
+                          {
+                            required: true,
+                            message: "กรุณากรอกจำนวนสิทธิ์!",
+                          },
+                        ]}
+                      >
+                        <Input
+                          disabled={specificFarmer}
+                          placeholder={"กรอกจำนวนสิทธิ์"}
+                          autoComplete="off"
+                          onChange={(e) => {
+                            checkNumber(e, "count");
+                            setRenderMobile({
+                              ...renderMobile,
+                              count: e.target.value,
+                            });
+                          }}
+                        />
+                      </Form.Item>
+                    )}
                   </div>
                 </div>
               </div>
@@ -1247,6 +1267,7 @@ function EditPromotion() {
                         }}
                         format={dateFormat}
                         disabledDate={disabledStartDate}
+                        disabled={editPromo}
                       />
                     </Form.Item>
                     <Form.Item
@@ -1259,6 +1280,7 @@ function EditPromotion() {
                       ]}
                     >
                       <TimePicker
+                      disabled={editPromo}
                         format={"HH:mm"}
                         className="ms-3"
                         placeholder="เลือกเวลา"
@@ -1277,7 +1299,7 @@ function EditPromotion() {
                 </div>
                 <div className="form-group col-lg-6">
                   <label>
-                    วันสิ้นสุด <span style={{ color: "red" }}>*</span>
+                    วันสิ้นสุด <span style={{ color: "red" }}>* (สามารถขยายเวลาเพิ่มได้เท่านั้น)</span>
                   </label>
                   <div className="d-flex">
                     <Form.Item
@@ -1395,6 +1417,7 @@ function EditPromotion() {
                     valuePropName="checked"
                   >
                     <Checkbox
+                    disabled={editPromo}
                       onChange={handleConditionSpecialFirsttime}
                       checked={conditionSpecialFirsttime}
                       className="pt-3"
@@ -1402,49 +1425,67 @@ function EditPromotion() {
                       ลงทะเบียนใช้งานครั้งแรก
                     </Checkbox>
                   </Form.Item>
-                  <Form.Item name="specificFarmer" valuePropName="checked">
-                    <Checkbox
-                      onChange={handleSpecificFarmer}
-                      checked={specificFarmer}
-                      className="pt-3"
-                    >
-                      ให้เฉพาะเกษตรกรบางคน
-                    </Checkbox>
-                  </Form.Item>
-                  <div
-                    style={{
-                      width: "100%",
-                      paddingLeft: "16px",
-                    }}
-                  >
-                    <Form.Item
-                      name="couponConditionFarmerList"
-                      rules={[
-                        {
-                          required: couponProvince,
-                          message: "กรุณากรอกเลือกเกษตรกร",
-                        },
-                      ]}
-                    >
-                      <Select
-                        placeholder="กรุณาเลือกเกษตรกร"
-                        isDisabled={!specificFarmer}
-                        isSearchable
-                        styles={styles}
-                        isClearable={false}
-                        onInputChange={handleInputChange}
-                        onChange={(selectedOptions: any) => {
-                          setCurrentPage(1);
-                          handleCouponConditionFarmerList(selectedOptions);
+                  {couponConditionFarmerList.length !== 0 ? (
+                    <>
+                      <Form.Item name="specificFarmer" valuePropName="checked">
+                        <Checkbox
+                          onChange={handleSpecificFarmer}
+                          checked={specificFarmer}
+                          className="pt-3"
+                          disabled={couponConditionFarmerList.length > 0 || editPromo}
+                        >
+                          ให้เฉพาะเกษตรกรบางคน
+                        </Checkbox>
+                      </Form.Item>
+                      <div
+                        style={{
+                          width: "100%",
+                          paddingLeft: "16px",
                         }}
-                        options={farmerList}
-                        defaultValue={couponConditionFarmerList}
-                        isMulti
-                        onMenuScrollToBottom={handleMenuScrollToBottom}
-                        closeMenuOnSelect={false}
-                      />
-                    </Form.Item>
-                  </div>
+                      >
+                        <Form.Item
+                          name="couponConditionFarmerList"
+                          rules={[
+                            {
+                              required: couponProvince,
+                              message: "กรุณากรอกเลือกเกษตรกร",
+                            },
+                          ]}
+                        >
+                          <Select
+                            placeholder="กรุณาเลือกเกษตรกร"
+                            isDisabled={!specificFarmer}
+                            styles={styles}
+                            isClearable={false}
+                            onInputChange={handleInputChange}
+                            onChange={(value: any, option) => {
+                              if (option.removedValue) {
+                                setCountSelectFarmer(value.length);
+                                setCouponConditionFarmerList(value);
+                              } else {
+                                const filterId = value.map(
+                                  (item: any) => item.id
+                                );
+                                const oldState = couponConditionFarmerList;
+                                const newState = {
+                                  farmerId: filterId[filterId.length - 1],
+                                  keep: false,
+                                };
+                                oldState.push(newState);
+                                setCountSelectFarmer(oldState.length);
+                                setCouponConditionFarmerList(oldState);
+                              }
+                            }}
+                            options={farmerList || []}
+                            isMulti
+                            onMenuScrollToBottom={handleMenuScrollToBottom}
+                            closeMenuOnSelect={false}
+                            onKeyDown={handleKeyDown}
+                          />
+                        </Form.Item>
+                      </div>
+                    </>
+                  ) : null}
                 </div>
               </div>
               <Divider />
@@ -1456,6 +1497,7 @@ function EditPromotion() {
                   <div>
                     <Form.Item name="raiCheckbox" valuePropName="checked">
                       <Checkbox
+                      disabled={editPromo}
                         onChange={handleRaiCondition}
                         checked={raiCondition}
                         className="pt-3"
@@ -1465,7 +1507,7 @@ function EditPromotion() {
                             <label>จำนวนไร่ขั้นต่ำ</label>
                             <Form.Item name="couponConditionRaiMin">
                               <Input
-                                disabled={!raiCondition}
+                                disabled={!raiCondition || editPromo}
                                 placeholder="กรอกจำนวนไร่"
                                 onChange={(e) => {
                                   checkNumber(e, "couponConditionRaiMin");
@@ -1481,7 +1523,7 @@ function EditPromotion() {
                             <label>จำนวนไร่สูงสุด</label>
                             <Form.Item name="couponConditionRaiMax">
                               <Input
-                                disabled={!raiCondition}
+                                disabled={!raiCondition || editPromo}
                                 placeholder="กรอกจำนวนไร่"
                                 onChange={(e) => {
                                   checkNumber(e, "couponConditionRaiMax");
@@ -1500,6 +1542,7 @@ function EditPromotion() {
                   <div>
                     <Form.Item name="serviceCheckbox" valuePropName="checked">
                       <Checkbox
+                      disabled={editPromo}
                         onChange={handleServiceCondition}
                         checked={serviceCondition}
                         className="pt-3"
@@ -1509,7 +1552,7 @@ function EditPromotion() {
                             <label>จำนวนค่าบริการขั้นต่ำ</label>
                             <Form.Item name="couponConditionServiceMin">
                               <Input
-                                disabled={!serviceCondition}
+                                disabled={!serviceCondition || editPromo}
                                 placeholder="กรอกค่าบริการ"
                                 onChange={(e) => {
                                   checkNumber(e, "couponConditionServiceMin");
@@ -1525,7 +1568,7 @@ function EditPromotion() {
                             <label>จำนวนค่าบริการสูงสุด</label>
                             <Form.Item name="couponConditionServiceMax">
                               <Input
-                                disabled={!serviceCondition}
+                                disabled={!serviceCondition || editPromo}
                                 placeholder="กรอกค่าบริการ"
                                 onChange={(e) => {
                                   checkNumber(e, "couponConditionServiceMax");
@@ -1547,6 +1590,7 @@ function EditPromotion() {
                 <div className="form-group col-lg-12 d-flex justify-content-between align-items-center pb-4">
                   <Form.Item name="plantCheckbox" valuePropName="checked">
                     <Checkbox
+                    disabled={editPromo}
                       className="pt-3"
                       checked={couponPlant}
                       onChange={handlePlantCoupon}
@@ -1571,6 +1615,7 @@ function EditPromotion() {
                 <div className="form-group col-lg-12 d-flex justify-content-between align-items-center pt-2 pb-3">
                   <Form.Item name="provinceCheckbox" valuePropName="checked">
                     <Checkbox
+                    disabled={editPromo}
                       checked={couponProvince}
                       onChange={handleCouponProvince}
                       className="pt-3"
@@ -1599,7 +1644,7 @@ function EditPromotion() {
                     ]}
                   >
                     <AntdSelect
-                      disabled={!couponProvince}
+                      disabled={!couponProvince|| editPromo}
                       mode="multiple"
                       placeholder="เลือกจังหวัด"
                       onChange={handleChangeProvince}

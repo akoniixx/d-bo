@@ -33,6 +33,7 @@ export interface TaskFinish {
     cropId: string;
     purposeSprayName: string;
   };
+  isDelete: boolean;
   purposeSprayId: string;
   dateAppointment: string;
   targetSpray: string[];
@@ -82,6 +83,7 @@ export const TaskFinish_INIT: TaskFinish = {
   farmerPlotId: "",
   farmAreaAmount: "",
   dronerId: "",
+  isDelete: false,
   purposeSpray: {
     id: "",
     cropId: "",
@@ -302,6 +304,7 @@ export interface TaskReportEntity {
   droner: DronerEntity;
   taskDronerTemp: TaskDronerTempEntity[];
   discountCampaignPoint: string;
+  applicationType: string;
 }
 export const TaskReportEntity_INIT: TaskReportEntity = {
   key: "",
@@ -355,6 +358,7 @@ export const TaskReportEntity_INIT: TaskReportEntity = {
   droner: DronerEntity_INIT,
   taskDronerTemp: [TaskDronerTempEntity_INIT],
   discountCampaignPoint: "",
+  applicationType: ""
 };
 export interface summaryReportEntity {
   waitpayment: string;

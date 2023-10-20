@@ -43,6 +43,7 @@ import { useNavigate } from "react-router-dom";
 import ImagCards from "../../../../components/card/ImagCard";
 import image from "../../../../resource/image";
 import { listAppType } from "../../../../definitions/ApplicatoionTypes";
+import ShowNickName from "../../../../components/popover/ShowNickName";
 const _ = require("lodash");
 const dateFormat = "DD/MM/YYYY";
 const timeFormat = "HH:mm";
@@ -456,57 +457,72 @@ function FinishTasks() {
   );
   const renderDroner = (
     <Form style={{ padding: "32px" }}>
-      <div className="row">
-        <div className="col-lg-3">
-          <span>
-            {data.data.droner.firstname + " " + data.data.droner.lastname}
+      {data.data.droner !== null && data.data.droner.isDelete !== true ? (
+        <div className="row">
+          <div className="col-lg-3">
+            <span>
+              {data.data.droner.firstname + " " + data.data.droner.lastname}
+              <br />
+              <p style={{ fontSize: "12px", color: color.Grey }}>
+                {data.data.droner.dronerCode}
+                {data.data.droner?.nickname && (
+                  <ShowNickName data={data.data.droner?.nickname} menu="INFO" />
+                )}
+              </p>
+            </span>
+          </div>
+          <div className="col-lg-3">
+            <span>{data.data.droner.telephoneNo}</span>
+          </div>
+          <div className="col-lg-3">
+            {
+              <span>
+                {data.data.droner.address !== null
+                  ? data.data.droner.address.subdistrict.subdistrictName +
+                    "/" +
+                    data.data.droner.address.district.districtName +
+                    "/" +
+                    data.data.droner.address.province.provinceName
+                  : null}
+              </span>
+            }
+          </div>
+          <div className="col-lg-1">
+            {data.data.droner.address !== null
+              ? parseFloat(data.data.distance).toFixed(0) || 0 + "km"
+              : "-"}
+          </div>
+          <div className="col-lg">
+            <span>
+              <Avatar
+                size={25}
+                src={
+                  data.data.droner.dronerDrone[0] != null
+                    ? data.data.droner.dronerDrone[0].drone.droneBrand
+                        .logoImagePath
+                    : null
+                }
+                style={{ marginRight: "5px" }}
+              />
+              {data.data.droner.dronerDrone[0] != null
+                ? data.data.droner.dronerDrone[0].drone.droneBrand.name
+                : null}
+            </span>
             <br />
             <p style={{ fontSize: "12px", color: color.Grey }}>
-              {data.data.droner.dronerCode}
+              {data.data.droner.dronerDrone.length > 1
+                ? "(มากกว่า 1 ยี่ห้อ)"
+                : null}
             </p>
-          </span>
+          </div>
         </div>
-        <div className="col-lg-3">
-          <span>{data.data.droner.telephoneNo}</span>
+      ) : (
+        <div style={{ textAlign: "center" }}>
+          <strong style={{ color: color.Error, alignItems: "center" }}>
+            ผู้ใช้งานนี้ถูกลบแล้ว
+          </strong>
         </div>
-        <div className="col-lg-3">
-          <span>
-            {data.data.droner.address !== null
-              ? data.data.droner.address.subdistrict.subdistrictName +
-                "/" +
-                data.data.droner.address.district.districtName +
-                "/" +
-                data.data.droner.address.province.provinceName
-              : null}
-          </span>
-        </div>
-        <div className="col-lg-1">
-          {parseFloat(data.data.distance).toFixed(0) || 0} km
-        </div>
-        <div className="col-lg">
-          <span>
-            <Avatar
-              size={25}
-              src={
-                data.data.droner.dronerDrone[0] != null
-                  ? data.data.droner.dronerDrone[0].drone.droneBrand
-                      .logoImagePath
-                  : null
-              }
-              style={{ marginRight: "5px" }}
-            />
-            {data.data.droner.dronerDrone[0] != null
-              ? data.data.droner.dronerDrone[0].drone.droneBrand.name
-              : null}
-          </span>
-          <br />
-          <p style={{ fontSize: "12px", color: color.Grey }}>
-            {data.data.droner.dronerDrone.length > 1
-              ? "(มากกว่า 1 ยี่ห้อ)"
-              : null}
-          </p>
-        </div>
-      </div>
+      )}
     </Form>
   );
   const renderPrice = (
@@ -617,25 +633,25 @@ function FinishTasks() {
           </div>
         </div>
         {/* <div className="row pt-3">
-          <div className="form-group col-lg-6 p-2">
-            <label>โปรโมชั่นนักบินโดรน</label>
-            <Input
-              suffix="บาท"
-              value={data.data.discountPromotion || 0}
-              disabled
-              autoComplete="off"
-            />
-          </div>
-          <div className="form-group col-lg-6 p-2">
-            <label>โปรโมชั่นเกษตรกร</label>
-            <Input
-              suffix="บาท"
-              value={data.data.revenuePromotion || 0}
-              disabled
-              autoComplete="off"
-            />
-          </div>
-        </div> */}
+            <div className="form-group col-lg-6 p-2">
+              <label>โปรโมชั่นนักบินโดรน</label>
+              <Input
+                suffix="บาท"
+                value={data.data.discountPromotion || 0}
+                disabled
+                autoComplete="off"
+              />
+            </div>
+            <div className="form-group col-lg-6 p-2">
+              <label>โปรโมชั่นเกษตรกร</label>
+              <Input
+                suffix="บาท"
+                value={data.data.revenuePromotion || 0}
+                disabled
+                autoComplete="off"
+              />
+            </div>
+          </div> */}
       </Form>
     </Form>
   );

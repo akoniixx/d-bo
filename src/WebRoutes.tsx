@@ -78,6 +78,9 @@ import QuotaReport from "./pages/quotaSetting/droner/QuotaReport";
 import RewardReceived from "./pages/quotaSetting/droner/RewardReceived";
 import IndexAdminTask from "./pages/task/AdminTask/IndexAdminTask";
 import IndexPlotList from "./pages/farmer/plotList/IndexPlotList";
+import IndexPermission from "./pages/permission/IndexPermission";
+import EditPermission from "./pages/permission/EditPermission";
+import AddPermission from "./pages/permission/AddPermission";
 
 const WebRoutes: React.FC<any> = () => {
   return (
@@ -196,8 +199,11 @@ const WebRoutes: React.FC<any> = () => {
             path="/EditDronerMission/:id"
             element={<EditDronerMission />}
           />
-           <Route path="/IndexAdminTask" element={<IndexAdminTask />} />
+          <Route path="/IndexAdminTask" element={<IndexAdminTask />} />
           <Route path="/IndexPlotList" element={<IndexPlotList />} />
+          <Route path="/IndexPermission" element={<IndexPermission />} />
+          <Route path="/EditPermission" element={<EditPermission />} />
+          <Route path="/AddPermission" element={<AddPermission />} />
         </Route>
         <Route element={<PublicRoute />}>
           <Route index element={<AuthPage />} />

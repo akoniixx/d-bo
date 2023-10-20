@@ -91,6 +91,7 @@ import type { GroupBase, OptionsOrGroups } from "react-select";
 import { FarmerPageEntity } from "../../../entities/FarmerEntities";
 import { InputPicker, SelectPicker } from "rsuite";
 import "rsuite/dist/rsuite.min.css";
+import ShowNickName from "../../../components/popover/ShowNickName";
 export type OptionType = {
   value: any;
   label: any;
@@ -398,7 +399,11 @@ const AddNewTask = () => {
 
   const handleAmountRai = (e: React.ChangeEvent<HTMLInputElement>) => {
     const values = validateOnlyNumWDecimal(e.target.value);
-    if (values.startsWith(".")) {
+    if (
+      values.startsWith(".") ||
+      (values.match(/\./g) || []).length > 1 ||
+      /\.\d{3,}/.test(values)
+    ) {
       e.preventDefault();
     } else {
       const payload = {
@@ -473,7 +478,11 @@ const AddNewTask = () => {
   };
   const handleCalServiceCharge = (e: any) => {
     const values = validateOnlyNumWDecimal(e.target.value);
-    if (values.startsWith(".")) {
+    if (
+      values.startsWith(".") ||
+      (values.match(/\./g) || []).length > 1 ||
+      /\.\d{3,}/.test(values)
+    ) {
       e.preventDefault();
     } else {
       if (e.target.id === "unitPrice") {
@@ -1006,12 +1015,11 @@ const AddNewTask = () => {
               )
             ).map((x, index) => (
               <div className="form-group">
-                <input
-                  type="checkbox"
-                  defaultValue={x.crop}
+                <Checkbox
+                  value={x.crop}
                   disabled={current === 2 || checkSelectPlot === "error"}
                   onChange={handlePurposeSpray}
-                  checked={x.isChecked}
+                  defaultChecked={x.isChecked}
                 />{" "}
                 <label style={{ padding: "0 8px 0 0" }}>{x.crop}</label>
                 {index === 4 && (
@@ -1318,13 +1326,12 @@ const AddNewTask = () => {
   const handleVisibleRating = (newVisible: any) => {
     setVisibleRating(newVisible);
   };
-
   const searchSection = (
     <div className="d-flex justify-content-between" style={{ padding: "10px" }}>
       <div className="col-lg-3 p-1">
         <Input
           prefix={<SearchOutlined style={{ color: color.Disable }} />}
-          placeholder="ค้นหาชื่อเกษตรกร หรือเบอร์โทร"
+          placeholder="ค้นหาชื่อนักบินโดรน หรือเบอร์โทร"
           className="col-lg-12"
           onChange={(e: any) => setSearchTextDroner(e.target.value)}
         />
@@ -1496,7 +1503,12 @@ const AddNewTask = () => {
                 </Tooltip>
               )}
               <br />
-              <span style={{ color: color.Grey }}>{row.droner_code}</span>
+              <span style={{ color: color.Grey }}>
+                {row.droner_code}
+                {row.nickname && (
+                  <ShowNickName data={row.nickname} menu="INFO" />
+                )}
+              </span>
             </>
           ),
         };
@@ -1704,6 +1716,12 @@ const AddNewTask = () => {
                         }}
                       >
                         {JSON.parse(x).droner_code}
+                        {JSON.parse(x).nickname && (
+                          <ShowNickName
+                            data={JSON.parse(x).nickname}
+                            menu="INFO"
+                          />
+                        )}
                       </p>
                     </div>
                     <div className="col-lg-2">{JSON.parse(x).telephone_no}</div>
@@ -1953,6 +1971,7 @@ const AddNewTask = () => {
     currentStep?: number,
     dataDroner?: TaskSearchDroner[]
   ) => {
+    const defaultRai: any = farmerPlotSeleced.raiAmount >= data.farmAreaAmount;
     if (currentStep === 0) {
       let checkEmptySting = ![
         data?.farmerId,
@@ -1973,12 +1992,16 @@ const AddNewTask = () => {
           data?.targetSpray.length !== 0 &&
           data?.targetSpray !== undefined;
       }
+      let checkOtherSpray = otherSpray && otherSpray.trim().length !== 1;
       let checkDateTime = ![dateAppointment, timeAppointment].includes("");
       if (
-        checkEmptySting &&
-        checkEmptyArray &&
-        checkDateTime &&
-        checkEmptyNumber
+        checkEmptyArray && [data?.targetSpray][0]?.includes("อื่นๆ")
+          ? checkOtherSpray
+          : checkEmptyArray &&
+            checkDateTime &&
+            checkEmptyNumber &&
+            defaultRai &&
+            checkEmptySting
       ) {
         setDisableBtn(false);
       } else {

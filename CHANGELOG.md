@@ -1,5 +1,53 @@
 ## [Version - 0]
 
+## Fix [v0.37.8] 2023-10-20
+
+- fixed reward mission filter
+
+## Fix [v0.37.7] 2023-10-16
+
+- fixed startDate in mission
+- fixed validate rai in mission
+- display text image size
+
+## improve [v0.37.6] 2023-10-11
+
+- mission point setting
+
+## improve [v0.37.5] 2023-10-10
+
+- display nickname droner & farmer
+
+## improve [v0.37.4] 2023-10-2
+
+- checkbox dropdown applicationType in index report page
+
+## Fix [v0.37.3] 2023-10-2
+
+- fixed bug in add new task page
+- fixed other plant in add droner page
+- fixed ui in finish task page when account was deleted
+
+## improve [v0.37.2] 2023-09-29
+
+- sort filter index promotion page
+- fixed ui add/edit promotion page
+- fixed call api otherAddress in update droner page
+
+## Fix [v0.37.1] 2023-09-26
+
+- prevent user passing save farmer plot again
+
+## Feature [v0.37.0] 2023-09-22
+
+- ui permission menu
+- get nickname farmer from api
+- fixed bugs select farmer in edit coupon page
+
+## improve [v0.36.27] 2023-09-21
+
+- select farmer in create coupon page.
+
 ## Fix [v0.36.26] 2023-09-20
 
 - fixed challenge & mission

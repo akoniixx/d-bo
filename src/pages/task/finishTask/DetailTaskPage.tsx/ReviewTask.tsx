@@ -54,6 +54,7 @@ import ImagCards from "../../../../components/card/ImagCard";
 import icon from "../../../../resource/icon";
 import { image } from "../../../../resource";
 import { listAppType } from "../../../../definitions/ApplicatoionTypes";
+import ShowNickName from "../../../../components/popover/ShowNickName";
 
 const { Map } = require("immutable");
 const _ = require("lodash");
@@ -316,7 +317,9 @@ function ReviewTask() {
                     <img src={item.icon} style={{ width: 22, height: 22 }} />
                     <span>
                       {" "}
-                      {data.data.createBy ? data.data.createBy + ` ${item.create}` : "-"}
+                      {data.data.createBy
+                        ? data.data.createBy + ` ${item.create}`
+                        : "-"}
                     </span>
                   </div>
                 )
@@ -493,61 +496,72 @@ function ReviewTask() {
   );
   const renderDroner = (
     <Form style={{ padding: "32px" }}>
-      <div className="row">
-        <div className="col-lg-3">
-          <span>
-            {data.data.droner !== null
-              ? data.data.droner.firstname + " " + data.data.droner.lastname
-              : null}
+      {data.data.droner !== null && data.data.droner.isDelete !== true ? (
+        <div className="row">
+          <div className="col-lg-3">
+            <span>
+              {data.data.droner !== null
+                ? data.data.droner.firstname + " " + data.data.droner.lastname
+                : null}
+              <br />
+              <p style={{ fontSize: "12px", color: color.Grey }}>
+                {data.data.droner !== null ? data.data.droner.dronerCode : null}
+                {data.data.droner?.nickname && (
+                  <ShowNickName data={data.data.droner?.nickname} menu="INFO" />
+                )}
+              </p>
+            </span>
+          </div>
+          <div className="col-lg-3">
+            <span>
+              {data.data.droner !== null ? data.data.droner.telephoneNo : null}
+            </span>
+          </div>
+          <div className="col-lg-3">
+            <span>
+              {data.data.droner.address !== null
+                ? data.data.droner.address.subdistrict.subdistrictName +
+                  "/" +
+                  data.data.droner.address.district.districtName +
+                  "/" +
+                  data.data.droner.address.province.provinceName
+                : null}
+            </span>
+          </div>
+          <div className="col-lg-1">
+            {parseFloat(data.data.distance).toFixed(0) || 0} km
+          </div>
+          <div className="col-lg">
+            <span>
+              <Avatar
+                size={25}
+                src={
+                  data.data.droner.dronerDrone[0] != null
+                    ? data.data.droner.dronerDrone[0].drone.droneBrand
+                        .logoImagePath
+                    : null
+                }
+                style={{ marginRight: "5px" }}
+              />
+              {data.data.droner.dronerDrone[0] != null
+                ? data.data.droner.dronerDrone[0].drone.droneBrand.name
+                : "-"}
+            </span>
             <br />
             <p style={{ fontSize: "12px", color: color.Grey }}>
-              {data.data.droner !== null ? data.data.droner.dronerCode : null}
+              {data.data.droner.dronerDrone.length > 1
+                ? "(มากกว่า 1 ยี่ห้อ)"
+                : null}
             </p>
-          </span>
+          </div>
         </div>
-        <div className="col-lg-3">
-          <span>
-            {data.data.droner !== null ? data.data.droner.telephoneNo : null}
-          </span>
+      ) : (
+        <div style={{ textAlign: "center" }}>
+          <strong style={{ color: color.Error, alignItems: "center" }}>
+            ผู้ใช้งานนี้ถูกลบแล้ว
+          </strong>
         </div>
-        <div className="col-lg-3">
-          <span>
-            {data.data.droner.address !== null
-              ? data.data.droner.address.subdistrict.subdistrictName +
-                "/" +
-                data.data.droner.address.district.districtName +
-                "/" +
-                data.data.droner.address.province.provinceName
-              : null}
-          </span>
-        </div>
-        <div className="col-lg-1">
-          {parseFloat(data.data.distance).toFixed(0) || 0} km
-        </div>
-        <div className="col-lg">
-          <span>
-            <Avatar
-              size={25}
-              src={
-                data.data.droner.dronerDrone[0] != null
-                  ? data.data.droner.dronerDrone[0].drone.droneBrand
-                      .logoImagePath
-                  : null
-              }
-              style={{ marginRight: "5px" }}
-            />
-            {data.data.droner.dronerDrone[0] != null
-              ? data.data.droner.dronerDrone[0].drone.droneBrand.name
-              : "-"}
-          </span>
-          <br />
-          <p style={{ fontSize: "12px", color: color.Grey }}>
-            {data.data.droner.dronerDrone.length > 1
-              ? "(มากกว่า 1 ยี่ห้อ)"
-              : null}
-          </p>
-        </div>
-      </div>
+      )}
     </Form>
   );
   const renderPrice = (

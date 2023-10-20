@@ -1,4 +1,6 @@
 import {
+  CaretDownOutlined,
+  CaretUpOutlined,
   DeleteOutlined,
   DownOutlined,
   EditOutlined,
@@ -59,10 +61,8 @@ function IndexReward() {
   };
   const [showModal, setShowModal] = useState(false);
   const [rewardId, setRewardId] = useState("");
-
   const [checkedListDigi, setCheckedListDigi] = useState<CheckboxValueType[]>();
   const [checkedListPhy, setCheckedListPhy] = useState<CheckboxValueType[]>();
-
   const [inDigi, setInDigi] = useState(false);
   const [inPhy, setInPhy] = useState(false);
   const [checkAllDigi, setCheckAllDigi] = useState(false);
@@ -70,6 +70,29 @@ function IndexReward() {
   const [statusArr, setStatusArr] = useState<string[]>([]);
   const statusOptions = ["SCORE", "MISSION"];
   const [loading, setLoading] = useState(false);
+  const [sortDirection, setSortDirection] = useState<string | undefined>();
+  const [sortField, setSortField] = useState<string | undefined>();
+  const [sortDirection1, setSortDirection1] = useState<string | undefined>(
+    undefined
+  );
+  const [sortDirection2, setSortDirection2] = useState<string | undefined>(
+    undefined
+  );
+  const [sortDirection3, setSortDirection3] = useState<string | undefined>(
+    undefined
+  );
+  const [sortDirection4, setSortDirection4] = useState<string | undefined>(
+    undefined
+  );
+  const [sortDirection5, setSortDirection5] = useState<string | undefined>(
+    undefined
+  );
+  const [sortDirection6, setSortDirection6] = useState<string | undefined>(
+    undefined
+  );
+  const [sortDirection7, setSortDirection7] = useState<string | undefined>(
+    undefined
+  );
 
   const getAllReward = () => {
     setLoading(true);
@@ -81,7 +104,9 @@ function IndexReward() {
       status,
       rewardType,
       rewardExchange,
-      searchText
+      searchText,
+      sortDirection,
+      sortField
     )
       .then((res) => {
         setData(res);
@@ -91,7 +116,7 @@ function IndexReward() {
   };
   useEffect(() => {
     getAllReward();
-  }, [current, startExchangeDate, expiredExchangeDate]);
+  }, [current, startExchangeDate, expiredExchangeDate, sortDirection]);
   const onChangePage = (page: number) => {
     setCurrent(page);
   };
@@ -269,33 +294,6 @@ function IndexReward() {
       .catch((err) => console.log(err));
   };
 
-  const isNumber = (n: any) => {
-    return !isNaN(parseFloat(n)) && isFinite(n);
-  };
-  const sorter = (a: any, b: any) => {
-    if (a === null) {
-      return 1;
-    }
-    if (b === null) {
-      return -1;
-    }
-    if (isNumber(a) && isNumber(b)) {
-      if (parseInt(a, 10) === parseInt(b, 10)) {
-        return 0;
-      }
-      return parseInt(a, 10) > parseInt(b, 10) ? 1 : -1;
-    }
-    if (isNumber(a)) {
-      return -1;
-    }
-    if (isNumber(b)) {
-      return 1;
-    }
-    if (a === b) {
-      return 0;
-    }
-    return a > b ? 1 : -1;
-  };
   const PageTitle = (
     <>
       <div
@@ -396,12 +394,59 @@ function IndexReward() {
   );
   const columns: ColumnsType<any> = [
     {
-      title: "วันที่อัพเดต",
+      title: () => {
+        return (
+          <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+            วันที่อัพเดต
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                cursor: "pointer",
+              }}
+              onClick={() => {
+                setSortField("updateAt");
+                setSortDirection((prev) => {
+                  if (prev === "ASC") {
+                    return "DESC";
+                  } else if (prev === undefined) {
+                    return "ASC";
+                  } else {
+                    return undefined;
+                  }
+                });
+                setSortDirection1((prev) => {
+                  if (prev === "ASC") {
+                    return "DESC";
+                  } else if (prev === undefined) {
+                    return "ASC";
+                  } else {
+                    return undefined;
+                  }
+                });
+              }}
+            >
+              <CaretUpOutlined
+                style={{
+                  position: "relative",
+                  top: 2,
+                  color: sortDirection1 === "ASC" ? "#ffca37" : "white",
+                }}
+              />
+              <CaretDownOutlined
+                style={{
+                  position: "relative",
+                  bottom: 2,
+                  color: sortDirection1 === "DESC" ? "#ffca37" : "white",
+                }}
+              />
+            </div>
+          </div>
+        );
+      },
       dataIndex: "updateAt",
       key: "updateAt",
-      width: "15%",
       fixed: "left",
-      sorter: (a: any, b: any) => sorter(a.updateAt, b.updateAt),
       render: (value: any, row: any, index: number) => {
         return {
           children: (
@@ -425,9 +470,7 @@ function IndexReward() {
       title: "ชื่อของรางวัล",
       dataIndex: "rewardName",
       key: "rewardName",
-      width: "28%",
       fixed: "left",
-      sorter: (a: any, b: any) => sorter(a.rewardName, b.rewardName),
       render: (value: any, row: any, index: number) => {
         return {
           children: (
@@ -458,8 +501,6 @@ function IndexReward() {
       title: "ประเภทของรางวัล",
       dataIndex: "rewardType",
       key: "rewardType",
-      width: "12%",
-      sorter: (a: any, b: any) => sorter(a.rewardType, b.rewardType),
       render: (value: any, row: any, index: number) => {
         return {
           children: (
@@ -482,17 +523,64 @@ function IndexReward() {
       },
     },
     {
-      title: "แต้มที่ใช้แลก",
+      title: () => {
+        return (
+          <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+            แต้มที่ใช้แลก
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                cursor: "pointer",
+              }}
+              onClick={() => {
+                setSortField("score");
+                setSortDirection((prev) => {
+                  if (prev === "ASC") {
+                    return "DESC";
+                  } else if (prev === undefined) {
+                    return "ASC";
+                  } else {
+                    return undefined;
+                  }
+                });
+                setSortDirection2((prev) => {
+                  if (prev === "ASC") {
+                    return "DESC";
+                  } else if (prev === undefined) {
+                    return "ASC";
+                  } else {
+                    return undefined;
+                  }
+                });
+              }}
+            >
+              <CaretUpOutlined
+                style={{
+                  position: "relative",
+                  top: 2,
+                  color: sortDirection2 === "ASC" ? "#ffca37" : "white",
+                }}
+              />
+              <CaretDownOutlined
+                style={{
+                  position: "relative",
+                  bottom: 2,
+                  color: sortDirection2 === "DESC" ? "#ffca37" : "white",
+                }}
+              />
+            </div>
+          </div>
+        );
+      },
       dataIndex: "score",
       key: "score",
-      width: "10%",
-      sorter: (a: any, b: any) => sorter(a.score, b.score),
       render: (value: any, row: any, index: number) => {
         return {
           children: (
             <>
               <span className="text-dark-75  d-block font-size-lg">
-                {row.score ? numberWithCommas(row.score) + ` แต้ม` : "-"}
+                {numberWithCommas(row.score) || 0} แต้ม
               </span>
             </>
           ),
@@ -500,21 +588,70 @@ function IndexReward() {
       },
     },
     {
-      title: "ช่วงเวลาที่แลก",
+      title: () => {
+        return (
+          <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+            ช่วงเวลาที่แลก
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                cursor: "pointer",
+              }}
+              onClick={() => {
+                setSortField("startExchangeDate");
+                setSortDirection((prev) => {
+                  if (prev === "ASC") {
+                    return "DESC";
+                  } else if (prev === undefined) {
+                    return "ASC";
+                  } else {
+                    return undefined;
+                  }
+                });
+                setSortDirection3((prev) => {
+                  if (prev === "ASC") {
+                    return "DESC";
+                  } else if (prev === undefined) {
+                    return "ASC";
+                  } else {
+                    return undefined;
+                  }
+                });
+              }}
+            >
+              <CaretUpOutlined
+                style={{
+                  position: "relative",
+                  top: 2,
+                  color: sortDirection3 === "ASC" ? "#ffca37" : "white",
+                }}
+              />
+              <CaretDownOutlined
+                style={{
+                  position: "relative",
+                  bottom: 2,
+                  color: sortDirection3 === "DESC" ? "#ffca37" : "white",
+                }}
+              />
+            </div>
+          </div>
+        );
+      },
       dataIndex: "startExchangeDate",
       key: "startExchangeDate",
-      width: "15%",
-      sorter: (a: any, b: any) =>
-        sorter(a.startExchangeDate, b.startExchangeDate),
       render: (value: any, row: any, index: number) => {
         return {
           children: (
             <>
               <div style={{ paddingLeft: "3px" }}>
                 {row.startExchangeDate
-                  ? DateTimeUtil.formatDateTime(row.startExchangeDate) +
-                    " - " +
-                    DateTimeUtil.formatDateTime(row.expiredExchangeDate)
+                  ? DateTimeUtil.formatDateTime(row.startExchangeDate) + " - "
+                  : "-"}
+              </div>
+              <div style={{ paddingLeft: "3px" }}>
+                {row.expiredExchangeDate
+                  ? DateTimeUtil.formatDateTime(row.expiredExchangeDate)
                   : "-"}
               </div>
             </>
@@ -523,20 +660,70 @@ function IndexReward() {
       },
     },
     {
-      title: "ช่วงเวลาที่ใช้ได้",
+      title: () => {
+        return (
+          <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+            ช่วงเวลาที่ใช้ได้
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                cursor: "pointer",
+              }}
+              onClick={() => {
+                setSortField("startUsedDate");
+                setSortDirection((prev) => {
+                  if (prev === "ASC") {
+                    return "DESC";
+                  } else if (prev === undefined) {
+                    return "ASC";
+                  } else {
+                    return undefined;
+                  }
+                });
+                setSortDirection4((prev) => {
+                  if (prev === "ASC") {
+                    return "DESC";
+                  } else if (prev === undefined) {
+                    return "ASC";
+                  } else {
+                    return undefined;
+                  }
+                });
+              }}
+            >
+              <CaretUpOutlined
+                style={{
+                  position: "relative",
+                  top: 2,
+                  color: sortDirection4 === "ASC" ? "#ffca37" : "white",
+                }}
+              />
+              <CaretDownOutlined
+                style={{
+                  position: "relative",
+                  bottom: 2,
+                  color: sortDirection4 === "DESC" ? "#ffca37" : "white",
+                }}
+              />
+            </div>
+          </div>
+        );
+      },
       dataIndex: "startUsedDate",
       key: "startUsedDate",
-      width: "15%",
-      sorter: (a: any, b: any) => sorter(a.startUsedDate, b.startUsedDate),
       render: (value: any, row: any, index: number) => {
         return {
           children: (
             <>
               <div style={{ paddingLeft: "3px" }}>
                 {row.startUsedDate
-                  ? DateTimeUtil.formatDateTime(row.startUsedDate) +
-                    " - " +
-                    DateTimeUtil.formatDateTime(row.expiredUsedDate)
+                  ? DateTimeUtil.formatDateTime(row.startUsedDate) + " - "
+                  : "-"}
+              </div>
+              <div style={{ paddingLeft: "3px" }}>
+                {row.expiredUsedDate
+                  ? DateTimeUtil.formatDateTime(row.expiredUsedDate)
                   : "-"}
               </div>
             </>
@@ -545,11 +732,58 @@ function IndexReward() {
       },
     },
     {
-      title: "ทั้งหมด",
+      title: () => {
+        return (
+          <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+            ทั้งหมด
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                cursor: "pointer",
+              }}
+              onClick={() => {
+                setSortField("amount");
+                setSortDirection((prev) => {
+                  if (prev === "ASC") {
+                    return "DESC";
+                  } else if (prev === undefined) {
+                    return "ASC";
+                  } else {
+                    return undefined;
+                  }
+                });
+                setSortDirection5((prev) => {
+                  if (prev === "ASC") {
+                    return "DESC";
+                  } else if (prev === undefined) {
+                    return "ASC";
+                  } else {
+                    return undefined;
+                  }
+                });
+              }}
+            >
+              <CaretUpOutlined
+                style={{
+                  position: "relative",
+                  top: 2,
+                  color: sortDirection5 === "ASC" ? "#ffca37" : "white",
+                }}
+              />
+              <CaretDownOutlined
+                style={{
+                  position: "relative",
+                  bottom: 2,
+                  color: sortDirection5 === "DESC" ? "#ffca37" : "white",
+                }}
+              />
+            </div>
+          </div>
+        );
+      },
       dataIndex: "amount",
       key: "amount",
-      width: "8%",
-      sorter: (a: any, b: any) => sorter(a.amount, b.amount),
       render: (value: any, row: any, index: number) => {
         return {
           children: (
@@ -563,11 +797,58 @@ function IndexReward() {
       },
     },
     {
-      title: "แลกแล้ว",
+      title: () => {
+        return (
+          <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+            แลกแล้ว
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                cursor: "pointer",
+              }}
+              onClick={() => {
+                setSortField("used");
+                setSortDirection((prev) => {
+                  if (prev === "ASC") {
+                    return "DESC";
+                  } else if (prev === undefined) {
+                    return "ASC";
+                  } else {
+                    return undefined;
+                  }
+                });
+                setSortDirection6((prev) => {
+                  if (prev === "ASC") {
+                    return "DESC";
+                  } else if (prev === undefined) {
+                    return "ASC";
+                  } else {
+                    return undefined;
+                  }
+                });
+              }}
+            >
+              <CaretUpOutlined
+                style={{
+                  position: "relative",
+                  top: 2,
+                  color: sortDirection6 === "ASC" ? "#ffca37" : "white",
+                }}
+              />
+              <CaretDownOutlined
+                style={{
+                  position: "relative",
+                  bottom: 2,
+                  color: sortDirection6 === "DESC" ? "#ffca37" : "white",
+                }}
+              />
+            </div>
+          </div>
+        );
+      },
       dataIndex: "used",
       key: "used",
-      width: "8%",
-      sorter: (a: any, b: any) => sorter(a.used, b.used),
       render: (value: any, row: any, index: number) => {
         return {
           children: (
@@ -581,11 +862,58 @@ function IndexReward() {
       },
     },
     {
-      title: "คงเหลือ",
+      title: () => {
+        return (
+          <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+            คงเหลือ
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                cursor: "pointer",
+              }}
+              onClick={() => {
+                setSortField("remain");
+                setSortDirection((prev) => {
+                  if (prev === "ASC") {
+                    return "DESC";
+                  } else if (prev === undefined) {
+                    return "ASC";
+                  } else {
+                    return undefined;
+                  }
+                });
+                setSortDirection7((prev) => {
+                  if (prev === "ASC") {
+                    return "DESC";
+                  } else if (prev === undefined) {
+                    return "ASC";
+                  } else {
+                    return undefined;
+                  }
+                });
+              }}
+            >
+              <CaretUpOutlined
+                style={{
+                  position: "relative",
+                  top: 2,
+                  color: sortDirection7 === "ASC" ? "#ffca37" : "white",
+                }}
+              />
+              <CaretDownOutlined
+                style={{
+                  position: "relative",
+                  bottom: 2,
+                  color: sortDirection7 === "DESC" ? "#ffca37" : "white",
+                }}
+              />
+            </div>
+          </div>
+        );
+      },
       dataIndex: "remain",
       key: "remain",
-      width: "8%",
-      sorter: (a: any, b: any) => sorter(a.remain, b.remain),
       render: (value: any, row: any, index: number) => {
         return {
           children: (
@@ -603,8 +931,6 @@ function IndexReward() {
       dataIndex: "status",
       key: "status",
       fixed: "right",
-      width: "8%",
-      sorter: (a: any, b: any) => sorter(a.status, b.status),
       render: (value: any, row: any, index: number) => {
         return {
           children: (
@@ -636,7 +962,6 @@ function IndexReward() {
       title: "",
       dataIndex: "Action",
       key: "Action",
-      width: "10%",
       fixed: "right",
       render: (value: any, row: any, index: number) => {
         const checkDelete = row.status === "INACTIVE" && row.used === 0;
@@ -697,7 +1022,7 @@ function IndexReward() {
           columns={columns}
           dataSource={data?.data}
           pagination={false}
-          scroll={{ x: 1800 }}
+          scroll={{ x: "max-content" }}
         />
       </Spin>
 

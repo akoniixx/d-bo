@@ -20,6 +20,7 @@ export interface FarmerEntity {
   id: string;
   firstname: string;
   lastname: string;
+  nickname: string;
   idNo: string;
   telephoneNo: string;
   status: string;
@@ -37,6 +38,7 @@ export const FarmerEntity_INIT: FarmerEntity = {
   id: "",
   firstname: "",
   lastname: "",
+  nickname: "",
   idNo: "",
   telephoneNo: "",
   status: "",
@@ -56,6 +58,7 @@ export interface GetFarmerEntity {
   farmerCode: string;
   firstname: string;
   lastname: string;
+  nickname: string;
   idNo: string;
   telephoneNo: string;
   status: string;
@@ -73,6 +76,7 @@ export const GetFarmerEntity_INIT: GetFarmerEntity = {
   farmerCode: "",
   firstname: "",
   lastname: "",
+  nickname: "",
   idNo: "",
   telephoneNo: "",
   status: "",

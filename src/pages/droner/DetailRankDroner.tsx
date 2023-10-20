@@ -24,6 +24,7 @@ import image from "../../resource/image";
 import { useNavigate } from "react-router-dom";
 import { formatNumberWithCommas } from "../../utilities/TextFormatter";
 import styled from "styled-components";
+import ShowNickName from "../../components/popover/ShowNickName";
 const _ = require("lodash");
 const dateFormat = "DD/MM/YYYY";
 const timeFormat = "HH:mm";
@@ -198,7 +199,7 @@ function DetailRankDroner() {
               <Form.Item name="firstname">
                 <Input
                   disabled
-                  defaultValue={data.firstname !== null ? data.firstname : "-"}
+                  defaultValue={data.firstname  ? data.firstname : "-"}
                 />
               </Form.Item>
             </div>
@@ -207,7 +208,7 @@ function DetailRankDroner() {
               <Form.Item name="lastname">
                 <Input
                   disabled
-                  defaultValue={data.lastname !== null ? data.lastname : "-"}
+                  defaultValue={data.lastname  ? data.lastname : "-"}
                 />
               </Form.Item>
             </div>
@@ -219,11 +220,22 @@ function DetailRankDroner() {
                 <Input
                   disabled
                   defaultValue={
-                    data.telephoneNo !== null ? data.telephoneNo : "-"
+                    data.telephoneNo  ? data.telephoneNo : "-"
                   }
                 />
               </Form.Item>
             </div>
+            <div className="col-lg-6">
+              <label>ชื่อเล่น</label>
+              <Form.Item name="nickname">
+                <Input
+                  disabled
+                  defaultValue={data.nickname !== null ? data.nickname : "-"}
+                />
+              </Form.Item>
+            </div>
+          </div>
+          <div className="row">
             <div className="col-lg-6">
               <label>ตำบล</label>
               <Form.Item name="subdistrictName">
@@ -237,8 +249,6 @@ function DetailRankDroner() {
                 />
               </Form.Item>
             </div>
-          </div>
-          <div className="row">
             <div className="col-lg-6">
               <label>อำเภอ</label>
               <Form.Item name="districtName">
@@ -333,7 +343,7 @@ function DetailRankDroner() {
                 {moment(new Date(row.dateAppointment)).format(timeFormat)}
               </span>
               <br />
-              <span style={{ color: color.Disable, fontSize: "12px" }}>
+              <span style={{ color: color.Grey, fontSize: "12px" }}>
                 {row.taskNo}
               </span>
             </>
@@ -347,7 +357,22 @@ function DetailRankDroner() {
       key: "farmer",
       render: (value: any, row: any, index: number) => {
         return {
-          children: <>{row.farmer.firstname + " " + row.farmer.lastname}</>,
+          children: (
+            <>
+              <span>{row.farmer.firstname + " " + row.farmer.lastname}</span>
+              <br />
+              <span style={{ color: color.Grey, fontSize: 12 }}>
+                <span>{row.farmer.farmerCode}</span>
+                {row.farmer.nickname && (
+                  <ShowNickName
+                    data={row.farmer.nickname}
+                    menu="detailRank"
+                    status={row.farmer.status}
+                  />
+                )}
+              </span>
+            </>
+          ),
         };
       },
     },
@@ -375,7 +400,11 @@ function DetailRankDroner() {
         return {
           children: (
             <>
-              <span>{row.farmer.address.provinceId ? row.farmer.address.province.provinceName : '-'}</span>
+              <span>
+                {row.farmer.address.provinceId
+                  ? row.farmer.address.province.provinceName
+                  : "-"}
+              </span>
             </>
           ),
         };

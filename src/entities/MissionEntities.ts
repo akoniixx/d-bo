@@ -24,6 +24,7 @@ export interface MissionDetailEntity {
     allraiAmount: number;
     firstname: string;
     lastname: string;
+    nickname: string;
     telephoneNo: string;
     updateAt: string;
     isDelete: boolean;
@@ -35,6 +36,9 @@ export interface ConditionMission {
   rewardId: string;
   missionName: string;
   conditionReward: string;
+  descriptionReward: string;
+  amountInprogressCount: number;
+  amountSuccessCount: number;
   reward: {
     id: string;
     rewardName: string;

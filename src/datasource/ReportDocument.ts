@@ -17,6 +17,7 @@ export class ReportDocDatasource {
     documentPersons?: string,
     sortDirection?: string,
     sortField?: string,
+    applicationType?: string
   ): Promise<TaskReportListEntity> {
     const params = {
       page: page,
@@ -32,7 +33,8 @@ export class ReportDocDatasource {
       searchText: searchText,
       documentPersons: documentPersons,
       sortDirection: sortDirection,
-      sortField: sortField
+      sortField: sortField,
+      applicationType: applicationType
     };
     return httpClient
       .get(BASE_URL + "/tasks/task-finish/get-all-task-finish-account", {

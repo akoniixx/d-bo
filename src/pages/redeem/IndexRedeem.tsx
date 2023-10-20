@@ -31,7 +31,17 @@ import { color } from "../../resource";
 import { DateTimeUtil } from "../../utilities/DateTimeUtil";
 import { useNavigate } from "react-router-dom";
 import { numberWithCommas } from "../../utilities/TextFormatter";
-
+import ShowNickName from "../../components/popover/ShowNickName";
+import styled from "styled-components";
+const NewTableDroner = styled(Table)`
+  .ant-table-container table thead tr th {
+    background-color: #EA973E !important;
+    font-family: "Prompt" !important;
+    font-weight: 500 !important;
+    color: 'white' !important;
+    font-weight: bold !important;
+  }
+`;
 const { RangePicker } = DatePicker;
 const dateSearchFormat = "YYYY-MM-DD";
 
@@ -356,7 +366,11 @@ const IndexRedeem = () => {
       render: (value: any, row: any, index: number) => {
         return {
           children: (
-            <span>{row.farmer.firstname + " " + row.farmer.lastname}</span>
+            <span>{row.farmer.firstname + " " + row.farmer.lastname}
+                {row.farmer.nickname && (
+                  <ShowNickName data={row.farmer.nickname} menu="INFO" />
+                )}</span>
+            
           ),
         };
       },
@@ -366,7 +380,7 @@ const IndexRedeem = () => {
       dataIndex: "telephone",
       render: (value: any, row: any, index: number) => {
         return {
-          children: <span>{row.farmer.telephoneNo}</span>,
+          children: <span>{row.farmer.telephoneNo || '-'}</span>,
         };
       },
     },
@@ -500,6 +514,9 @@ const IndexRedeem = () => {
           children: (
             <u style={{ color: color.Success }}>
               {row.receiverDetail.firstname + " " + row.receiverDetail.lastname}
+              {row.receiverDetail.nickname && (
+                  <ShowNickName data={row.receiverDetail.nickname} menu="INFO" />
+                )}
             </u>
           ),
         };
@@ -615,7 +632,7 @@ const IndexRedeem = () => {
     return (
       <Container
         style={{
-          backgroundColor: "rgba(86, 167, 104, 0.1)",
+          backgroundColor: "rgba(234, 151, 62, 0.10)",
         }}
         className="p-3"
       >
@@ -669,7 +686,7 @@ const IndexRedeem = () => {
         )}
         {source === "Droner" && (
           <Spin tip="กำลังโหลดข้อมูล..." size="large" spinning={loading}>
-            <Table
+            <NewTableDroner
               dataSource={dataDroner?.data}
               expandable={{
                 expandedRowRender: (record) => expandable(record),

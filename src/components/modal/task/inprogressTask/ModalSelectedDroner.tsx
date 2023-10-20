@@ -31,6 +31,7 @@ import {
 import color from "../../../../resource/color";
 import { CardContainer } from "../../../card/CardContainer";
 import FooterPage from "../../../footer/FooterPage";
+import ShowNickName from "../../../popover/ShowNickName";
 
 const _ = require("lodash");
 const { Map } = require("immutable");
@@ -236,7 +237,7 @@ const ModalSelectedDroner: React.FC<ModalSelectedDronerProps> = ({
       <div className="col-lg-3 p-1">
         <Input
           prefix={<SearchOutlined style={{ color: color.Disable }} />}
-          placeholder="ค้นหาชื่อเกษตรกร หรือเบอร์โทร"
+          placeholder="ค้นหาชื่อนักบินโดรน หรือเบอร์โทร"
           className="col-lg-12"
           onChange={(e: any) => setSearchTextDroner(e.target.value)}
         />
@@ -370,6 +371,9 @@ const ModalSelectedDroner: React.FC<ModalSelectedDronerProps> = ({
               <br />
               <span style={{ color: color.Grey }}>
                 {row.droner_code}
+                {row.nickname && (
+                  <ShowNickName data={row.nickname} menu="INFO" />
+                )}
               </span>
             </>
           ),
@@ -437,9 +441,9 @@ const ModalSelectedDroner: React.FC<ModalSelectedDronerProps> = ({
         return {
           children: (
             <>
-              {row.subdistrict_name && <span>{row.subdistrict_name}/</span>}
-              {row.district_name && <span>{row.district_name}/</span>}
-              {row.province_name && <span>{row.province_name}</span>}
+              {row.subdistrict_name ? <span>{row.subdistrict_name}/</span>: '-/'}
+              {row.district_name ? <span>{row.district_name}/</span>: '-/'}
+              {row.province_name ? <span>{row.province_name}</span>: '-'}
             </>
           ),
         };
@@ -546,12 +550,9 @@ const ModalSelectedDroner: React.FC<ModalSelectedDronerProps> = ({
               dataSource={dataDronerList}
               columns={columns}
               pagination={false}
-              size="large"
               tableLayout="fixed"
+              scroll={{ x: "max-content",  y: 300, }}
               rowKey={(data) => data.droner_id}
-              scroll={{
-                y: 300,
-              }}
             />
           </CardContainer>
         </Form>

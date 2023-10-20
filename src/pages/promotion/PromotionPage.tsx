@@ -18,6 +18,8 @@ import { Badge, Button, Image, Spin } from "antd";
 import icon from "../../resource/icon";
 import ActionButton from "../../components/button/ActionButton";
 import {
+  CaretDownOutlined,
+  CaretUpOutlined,
   ClockCircleOutlined,
   DeleteOutlined,
   EditOutlined,
@@ -48,14 +50,30 @@ function PromotionPage() {
   });
   const profile = JSON.parse(localStorage.getItem("profile") || "{  }");
   const [sortStatus, setSortStatus] = useState<string>();
-
   const [sortCoupon, setSortCoupon] = useState<string>();
-
   const [sortType, setSortType] = useState<string>();
   const [loading, setLoading] = useState(false);
+  const [sortField, setSortField] = useState<string | undefined>();
+  const [sortDirection, setSortDirection] = useState<string | undefined>();
+
+  const [sortDirection1, setSortDirection1] = useState<string | undefined>(
+    undefined
+  );
+  const [sortDirection2, setSortDirection2] = useState<string | undefined>(
+    undefined
+  );
+  const [sortDirection3, setSortDirection3] = useState<string | undefined>(
+    undefined
+  );
+  const [sortDirection4, setSortDirection4] = useState<string | undefined>(
+    undefined
+  );
+  const [sortDirection5, setSortDirection5] = useState<string | undefined>(
+    undefined
+  );
 
   const fetchCouponList = () => {
-    setLoading(true)
+    setLoading(true);
     CouponDataSource.getCoupons(
       current,
       row,
@@ -64,7 +82,9 @@ function PromotionPage() {
       sortType,
       startDate,
       expiredDate,
-      searchText
+      searchText,
+      sortDirection,
+      sortField
     )
       .then((res) => {
         setData(res);
@@ -75,7 +95,7 @@ function PromotionPage() {
 
   useEffect(() => {
     fetchCouponList();
-  }, [current, startDate, expiredDate]);
+  }, [current, startDate, expiredDate, sortDirection]);
 
   const handleChangeStatus = (status: any) => {
     setSortStatus(status);
@@ -326,6 +346,49 @@ function PromotionPage() {
         return (
           <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
             ชื่อคูปอง
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                cursor: "pointer",
+              }}
+              onClick={() => {
+                setSortField("couponName");
+                setSortDirection((prev) => {
+                  if (prev === "ASC") {
+                    return "DESC";
+                  } else if (prev === undefined) {
+                    return "ASC";
+                  } else {
+                    return undefined;
+                  }
+                });
+                setSortDirection1((prev) => {
+                  if (prev === "ASC") {
+                    return "DESC";
+                  } else if (prev === undefined) {
+                    return "ASC";
+                  } else {
+                    return undefined;
+                  }
+                });
+              }}
+            >
+              <CaretUpOutlined
+                style={{
+                  position: "relative",
+                  top: 2,
+                  color: sortDirection1 === "ASC" ? "#ffca37" : "white",
+                }}
+              />
+              <CaretDownOutlined
+                style={{
+                  position: "relative",
+                  bottom: 2,
+                  color: sortDirection1 === "DESC" ? "#ffca37" : "white",
+                }}
+              />
+            </div>
           </div>
         );
       },
@@ -394,7 +457,56 @@ function PromotionPage() {
       },
     },
     {
-      title: "ช่วงเวลาเริ่มต้น - สิ้นสุด",
+      title: () => {
+        return (
+          <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+            ช่วงเวลาเริ่มต้น - สิ้นสุด
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                cursor: "pointer",
+              }}
+              onClick={() => {
+                setSortField("expiredDate");
+                setSortDirection((prev) => {
+                  if (prev === "ASC") {
+                    return "DESC";
+                  } else if (prev === undefined) {
+                    return "ASC";
+                  } else {
+                    return undefined;
+                  }
+                });
+                setSortDirection2((prev) => {
+                  if (prev === "ASC") {
+                    return "DESC";
+                  } else if (prev === undefined) {
+                    return "ASC";
+                  } else {
+                    return undefined;
+                  }
+                });
+              }}
+            >
+              <CaretUpOutlined
+                style={{
+                  position: "relative",
+                  top: 2,
+                  color: sortDirection2 === "ASC" ? "#ffca37" : "white",
+                }}
+              />
+              <CaretDownOutlined
+                style={{
+                  position: "relative",
+                  bottom: 2,
+                  color: sortDirection2 === "DESC" ? "#ffca37" : "white",
+                }}
+              />
+            </div>
+          </div>
+        );
+      },
       dataIndex: "startDate",
       key: "startDate",
       render: (value: any, row: any, index: number) => {
@@ -440,7 +552,56 @@ function PromotionPage() {
       },
     },
     {
-      title: "ทั้งหมด",
+      title: () => {
+        return (
+          <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+            ทั้งหมด{" "}
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                cursor: "pointer",
+              }}
+              onClick={() => {
+                setSortField("count");
+                setSortDirection((prev) => {
+                  if (prev === "ASC") {
+                    return "DESC";
+                  } else if (prev === undefined) {
+                    return "ASC";
+                  } else {
+                    return undefined;
+                  }
+                });
+                setSortDirection3((prev) => {
+                  if (prev === "ASC") {
+                    return "DESC";
+                  } else if (prev === undefined) {
+                    return "ASC";
+                  } else {
+                    return undefined;
+                  }
+                });
+              }}
+            >
+              <CaretUpOutlined
+                style={{
+                  position: "relative",
+                  top: 2,
+                  color: sortDirection3 === "ASC" ? "#ffca37" : "white",
+                }}
+              />
+              <CaretDownOutlined
+                style={{
+                  position: "relative",
+                  bottom: 2,
+                  color: sortDirection3 === "DESC" ? "#ffca37" : "white",
+                }}
+              />
+            </div>
+          </div>
+        );
+      },
       dataIndex: "count",
       key: "count",
       render: (value: any, row: any, index: number) => {
@@ -456,7 +617,56 @@ function PromotionPage() {
       },
     },
     {
-      title: "เก็บแล้ว",
+      title: () => {
+        return (
+          <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+            เก็บแล้ว{" "}
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                cursor: "pointer",
+              }}
+              onClick={() => {
+                setSortField("keep");
+                setSortDirection((prev) => {
+                  if (prev === "ASC") {
+                    return "DESC";
+                  } else if (prev === undefined) {
+                    return "ASC";
+                  } else {
+                    return undefined;
+                  }
+                });
+                setSortDirection4((prev) => {
+                  if (prev === "ASC") {
+                    return "DESC";
+                  } else if (prev === undefined) {
+                    return "ASC";
+                  } else {
+                    return undefined;
+                  }
+                });
+              }}
+            >
+              <CaretUpOutlined
+                style={{
+                  position: "relative",
+                  top: 2,
+                  color: sortDirection4 === "ASC" ? "#ffca37" : "white",
+                }}
+              />
+              <CaretDownOutlined
+                style={{
+                  position: "relative",
+                  bottom: 2,
+                  color: sortDirection4 === "DESC" ? "#ffca37" : "white",
+                }}
+              />
+            </div>
+          </div>
+        );
+      },
       dataIndex: "keep",
       key: "keep",
       render: (value: any, row: any, index: number) => {
@@ -464,7 +674,7 @@ function PromotionPage() {
           children: (
             <div className="container">
               <span className="text-dark-75  d-block font-size-lg">
-                {(row.count - row.keep) | 0} สิทธิ์
+                {row.keep} สิทธิ์
               </span>
             </div>
           ),
@@ -472,7 +682,56 @@ function PromotionPage() {
       },
     },
     {
-      title: "ถูกใช้แล้ว",
+      title: () => {
+        return (
+          <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+            ถูกใช้แล้ว{" "}
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                cursor: "pointer",
+              }}
+              onClick={() => {
+                setSortField("used");
+                setSortDirection((prev) => {
+                  if (prev === "ASC") {
+                    return "DESC";
+                  } else if (prev === undefined) {
+                    return "ASC";
+                  } else {
+                    return undefined;
+                  }
+                });
+                setSortDirection5((prev) => {
+                  if (prev === "ASC") {
+                    return "DESC";
+                  } else if (prev === undefined) {
+                    return "ASC";
+                  } else {
+                    return undefined;
+                  }
+                });
+              }}
+            >
+              <CaretUpOutlined
+                style={{
+                  position: "relative",
+                  top: 2,
+                  color: sortDirection5 === "ASC" ? "#ffca37" : "white",
+                }}
+              />
+              <CaretDownOutlined
+                style={{
+                  position: "relative",
+                  bottom: 2,
+                  color: sortDirection5 === "DESC" ? "#ffca37" : "white",
+                }}
+              />
+            </div>
+          </div>
+        );
+      },
       dataIndex: "used",
       key: "used",
       render: (value: any, row: any, index: number) => {
