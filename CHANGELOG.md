@@ -1,6 +1,6 @@
 ## [Version - 0]
 
-## Fix [v0.37.8] 2023-10-16
+## Fix [v0.37.8] 2023-10-20
 
 - fixed reward mission filter
 
