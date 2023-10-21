@@ -3,6 +3,7 @@ import moment from "moment";
 import { convertBuddhistYear } from "../utilities/ConvertToBuddhistYear";
 
 const DEV_URL = "https://api-dnds-dev.iconkaset.com";
+// const PROD_URL = "https://api-dnds.iconkaset.com";
 export const BASE_URL =
   process.env.NODE_ENV === "development"
     ? DEV_URL
