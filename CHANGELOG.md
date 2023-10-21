@@ -1,4 +1,6 @@
 ## [Version - 0]
+## Fix [v0.37.9] 2023-10-21
+- fixed  validate rai in addNewTask
 
 ## Fix [v0.37.8] 2023-10-20
 
