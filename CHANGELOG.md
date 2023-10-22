@@ -1,4 +1,6 @@
 ## [Version - 0]
+## Fix [v0.37.10] 2023-10-22
+- fixed  show tel droner
 ## Fix [v0.37.9] 2023-10-21
 - fixed  validate rai in addNewTask
 
