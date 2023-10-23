@@ -6,6 +6,7 @@ import {
   Input,
   Pagination,
   Row,
+  Select,
   Spin,
   Table,
   Tooltip,
@@ -32,6 +33,7 @@ const IndexPlanningPoint = () => {
   const [searchStartDate, setSearchStartDate] = useState<any>(null);
   const [searchEndDate, setSearchEndDate] = useState<any>(null);
   const [loading, setLoading] = useState(false);
+  const [searchType, setSearchType] = useState("");
 
   const fetchPlanningPoint = () => {
     setLoading(true);
@@ -127,6 +129,17 @@ const IndexPlanningPoint = () => {
             onChange={(e) => setSearchTask(e.target.value)}
           />
         </div>
+        <div className="col-lg-2">
+          <Select
+            className="col-lg-12 p-1"
+            placeholder="ประเภทการได้รับแต้ม"
+            allowClear
+            onChange={(e) => setSearchType(e)}
+          >
+            <option value="JOB">การจ้างงาน</option>
+            <option value="MISSION">ภารกิจ</option>
+          </Select>
+        </div>
         <div className="pt-1">
           <Button
             style={{
@@ -143,7 +156,6 @@ const IndexPlanningPoint = () => {
       </div>
     </>
   );
-
   const expandData = (record: any) => {
     let checkFarmer = record.farmer;
     let checkDroner = record.droner;
@@ -282,10 +294,19 @@ const IndexPlanningPoint = () => {
     {
       title: "Task No",
       dataIndex: "task_no",
-      width: "40%",
+      width: "25%",
       render: (value: any, row: any, index: number) => {
         return {
           children: <u style={{ color: color.Success }}>{row.task_no}</u>,
+        };
+      },
+    },
+    {
+      title: "ชื่อรายการแต้มพิเศษ",
+      dataIndex: "",
+      render: (value: any, row: any, index: number) => {
+        return {
+          children: <span>-</span>,
         };
       },
     },

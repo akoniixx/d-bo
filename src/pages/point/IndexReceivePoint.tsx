@@ -314,7 +314,6 @@ const IndexReceivePoint = () => {
     {
       title: "Point No",
       dataIndex: "pointNo",
-      width: "20%",
       render: (value: any, row: any, index: number) => {
         return {
           children: <span>{row.pointNo}</span>,
@@ -324,7 +323,6 @@ const IndexReceivePoint = () => {
     {
       title: "Task No",
       dataIndex: "taskNo",
-      width: "20%",
       render: (value: any, row: any, index: number) => {
         return {
           children: <u style={{ color: color.Success }}>{row.taskNo}</u>,
@@ -334,7 +332,6 @@ const IndexReceivePoint = () => {
     {
       title: "Mission No",
       dataIndex: "missionId",
-      width: "20%",
       render: (value: any, row: any, index: number) => {
         return {
           children:
@@ -365,8 +362,16 @@ const IndexReceivePoint = () => {
       },
     },
     {
+      title: "ชื่อรายการแต้มพิเศษ",
+      dataIndex: "",
+      render: (value: any, row: any, index: number) => {
+        return {
+          children: <span>-</span>,
+        };
+      },
+    },
+    {
       title: "ประเภทการได้รับแต้ม",
-      width: "20%",
       render: (value: any, row: any, index: number) => {
         return {
           children: (

@@ -53,6 +53,9 @@ export default {
   icon_challenge_active: require("./media/images/icon_challenge_active.png"),
   icon_news: require("./media/images/icon_news.png"),
   icon_reward: require("./media/images/icon_reward.png"),
-  icon_challenge: require("./media/images/icon_challenge.png")
-
+  icon_challenge: require("./media/images/icon_challenge.png"),
+  returnPoint: require("./media/images/return_point.png"),
+  arrowDownMenu: require("./media/images/arrowDownMenu.png"),
+  arrowUpMenu: require("./media/images/arrowUpMenu.png"),
+  arrowUpYellowMenu: require("./media/images/arrowUpMenuYellow.png"),
 };

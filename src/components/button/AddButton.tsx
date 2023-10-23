@@ -9,7 +9,7 @@ interface AddButtonProps {
 export const AddButtton: React.FC<AddButtonProps> = ({ onClick, text }) => (
   <Button
     style={{
-      width: "130px",
+      width: "max-content",
       padding: "8 0",
       backgroundColor: color.primary1,
       color: color.secondary2,

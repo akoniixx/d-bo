@@ -64,7 +64,7 @@ export const CollapseSubMenu: React.FC<CollapseSubMenuProps> = ({
   checkPathSubList,
 }) => {
   const navigate = useNavigate();
- 
+
   return (
     <>
       <div
@@ -107,9 +107,17 @@ export const CollapseSubMenu: React.FC<CollapseSubMenuProps> = ({
             </div>
             <div style={{ paddingRight: "8px" }}>
               {checkPathSub !== path || checkPathSubList !== path ? (
-                <DownOutlined style={{ fontSize: "14px" }} />
+                <Image
+                  src={icon.arrowDownMenu}
+                  preview={false}
+                  style={{ width: 14, height: 8 }}
+                />
               ) : (
-                <UpOutlined style={{ fontSize: "14px" }} />
+                <Image
+                  src={icon.arrowUpMenu}
+                  preview={false}
+                  style={{ width: 14, height: 8 }}
+                />
               )}
             </div>
           </>
@@ -130,10 +138,16 @@ export const CollapseSubMenu: React.FC<CollapseSubMenuProps> = ({
               }}
             >
               {checkPathSub === path && checkPathSubList !== path ? (
-                <DownOutlined style={{ fontSize: "14px" }} />
+                <Image
+                  src={icon.arrowDownMenu}
+                  preview={false}
+                  style={{ width: 14, height: 8 }}
+                />
               ) : (
-                <UpOutlined
-                  style={{ fontSize: "14px", color: color.Success }}
+                <Image
+                  src={icon.arrowUpMenu}
+                  preview={false}
+                  style={{ width: 14, height: 8 }}
                 />
               )}
             </div>

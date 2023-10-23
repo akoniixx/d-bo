@@ -81,6 +81,10 @@ import IndexPlotList from "./pages/farmer/plotList/IndexPlotList";
 import IndexPermission from "./pages/permission/IndexPermission";
 import EditPermission from "./pages/permission/EditPermission";
 import AddPermission from "./pages/permission/AddPermission";
+import IndexPointManual from "./pages/pointManual/IndexPointManual";
+import DetailPointManual from "./pages/pointManual/DetailPointManaul/DetailPointManual";
+import AddDetailPointManual from "./pages/pointManual/DetailPointManaul/AddDetailPointManual";
+import EditDetailPointManual from "./pages/pointManual/DetailPointManaul/EditDetailPointManual";
 
 const WebRoutes: React.FC<any> = () => {
   return (
@@ -204,6 +208,16 @@ const WebRoutes: React.FC<any> = () => {
           <Route path="/IndexPermission" element={<IndexPermission />} />
           <Route path="/EditPermission" element={<EditPermission />} />
           <Route path="/AddPermission" element={<AddPermission />} />
+          <Route path="/IndexPointManual" element={<IndexPointManual />} />
+          <Route path="/DetailPointManual" element={<DetailPointManual />} />
+          <Route
+            path="/AddDetailPointManual"
+            element={<AddDetailPointManual />}
+          />
+          <Route
+            path="/EditDetailPointManual"
+            element={<EditDetailPointManual />}
+          />
         </Route>
         <Route element={<PublicRoute />}>
           <Route index element={<AuthPage />} />
