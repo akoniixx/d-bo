@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Form, Input, Modal } from "antd";
 import FooterPage from "../footer/FooterPage";
 import TextArea from "antd/lib/input/TextArea";
@@ -23,6 +23,20 @@ const ModalPointManual: React.FC<ModalPointManualProps> = ({
   isEditModal,
 }) => {
   const [form] = Form.useForm();
+  const [saveBtnDisable, setBtnSaveDisable] = useState<boolean>(true);
+
+  useEffect(() => {
+    if (!show) {
+      form.resetFields();
+      setBtnSaveDisable(true);
+    }
+  }, [show]);
+  const onFieldsChange = () => {
+    const namePoint = form.getFieldValue("name");
+    const fieldErr = namePoint === undefined || namePoint === "";
+
+    setBtnSaveDisable(fieldErr);
+  };
 
   const handelCallBack = async (values: any) => {
     callBack(values);
@@ -46,6 +60,7 @@ const ModalPointManual: React.FC<ModalPointManualProps> = ({
           backButton();
           form.resetFields();
         }}
+        width={600}
         footer={[
           <FooterPage
             onClickBack={() => {
@@ -53,11 +68,16 @@ const ModalPointManual: React.FC<ModalPointManualProps> = ({
               form.resetFields();
             }}
             onClickSave={() => form.submit()}
-            //disableSaveBtn={saveBtnDisable}
+            disableSaveBtn={saveBtnDisable}
           />,
         ]}
       >
-        <Form key={1} form={form} onFinish={handelCallBack}>
+        <Form
+          key={1}
+          form={form}
+          onFinish={handelCallBack}
+          onFieldsChange={onFieldsChange}
+        >
           <div className="form-group">
             <label>
               ชื่อรายการแต้มพิเศษ <span style={{ color: "red" }}>*</span>

@@ -12,10 +12,10 @@ import {
   Input,
   Radio,
   Row,
-  Select,
   Table,
   TimePicker,
 } from "antd";
+import Select, { Props as SelectProps } from "react-select";
 import TextArea from "antd/lib/input/TextArea";
 import moment from "moment";
 import React, { useEffect, useMemo, useState } from "react";
@@ -36,6 +36,10 @@ import { color } from "../../../resource";
 import dayjs from "dayjs";
 import Swal from "sweetalert2";
 import { validateOnlyNumWDecimal } from "../../../utilities/TextFormatter";
+import { FarmerPageEntity } from "../../../entities/FarmerEntities";
+import { TaskDatasource } from "../../../datasource/TaskDatasource";
+import { ProviceEntity } from "../../../entities/LocationEntities";
+import { LocationDatasource } from "../../../datasource/LocationDatasource";
 
 const AddDetailPointManual = () => {
   const profile = JSON.parse(localStorage.getItem("profile") || "{  }");
@@ -50,6 +54,13 @@ const AddDetailPointManual = () => {
   >([CampaignConditionEntity_INIT]);
   const [count, setCount] = useState(1);
   const [campaignType, setCampaignType] = useState<string>();
+  const [currentPage, setCurrentPage] = useState(1);
+  const [row, setRow] = useState(10);
+  const [farmerList, setFarmerList] = useState<any>();
+  const [dronerList, setDronerList] = useState<any>();
+  const [searchFarmer, setSearchFarmer] = useState<string>("");
+  const [provinceListId, setProvinceListId] = useState<ProviceEntity[]>([]);
+  const [provinceList, setProvinceList] = useState<string[]>([]);
 
   const fetchRewardList = () => {
     RewardDatasource.getAllReward(
@@ -65,6 +76,78 @@ const AddDetailPointManual = () => {
     });
   };
 
+  useEffect(() => {
+    fetchTypeUserList(searchFarmer, provinceListId);
+  }, [searchFarmer, provinceListId, currentPage, row]);
+  useEffect(() => {
+    getProvince();
+  }, []);
+
+  const getProvince = async () => {
+    await LocationDatasource.getProvince()
+      .then((res) => {
+        setProvinceList(
+          res.map((item: any) => (item.provinceName ? item.provinceName : "-"))
+        );
+        setProvinceListId(res);
+      })
+      .catch((err) => console.log(err));
+  };
+  const fetchTypeUserList = (text?: string, dataProvice?: any) => {
+    // const typeUser = form.getFieldsValue();
+    //   console.log(typeUser)
+    TaskDatasource.getFarmerListTask(text, currentPage, text ? 0 : row).then(
+      (res: FarmerPageEntity) => {
+        const data = res.data.map((x: any) => {
+          const res = { ...x, provinceName: "" };
+          return res;
+        });
+        const mapData = data.map((x) => {
+          if (x.address && x.address.provinceId) {
+            const matching = dataProvice.find(
+              (i: any) => `${i.provinceId}` === `${x.address.provinceId}`
+            );
+            if (matching) {
+              return { ...x, provinceName: matching.provinceName };
+            }
+          }
+
+          return {
+            ...x,
+            provinceName: x.provinceName,
+          };
+        });
+
+        const result = mapData.map((item) => {
+          return {
+            ...item,
+            label:
+              item.firstname +
+              " " +
+              item.lastname +
+              " | " +
+              item.telephoneNo +
+              " | " +
+              (item.provinceName ? item.provinceName : "-"),
+            value: item.id,
+          };
+        });
+        setFarmerList(result);
+      }
+    );
+  };
+  const handleInputChange = (inputValue: any) => {
+    if (currentPage === 1) {
+      setSearchFarmer(inputValue);
+    }
+    return inputValue;
+  };
+  const handleMenuScrollToBottom = () => {
+    if (row === farmerList.length) {
+      setCurrentPage(currentPage);
+      setRow(row + 10);
+    }
+  };
   const countExpand = () => {
     const allCount = [];
     for (let i = 0; 50 > i; i++) {
@@ -188,13 +271,13 @@ const AddDetailPointManual = () => {
     Table.EXPAND_COLUMN,
     {
       title: "ชื่อผู้ใช้",
-      width: "35%",
+      width: "30%",
       render: (value: any, row: any, index: number) => {
         return {
           children: (
             <Form.Item
               style={{ margin: 0 }}
-              name={`${row.num}_missionName`}
+              name={`${row.num}_nameUser`}
               rules={[
                 {
                   required: true,
@@ -202,7 +285,21 @@ const AddDetailPointManual = () => {
                 },
               ]}
             >
-              <Input placeholder="กรอกชื่อผู้ใช้" autoComplete="off" />
+              <Select
+                placeholder="กรุณาเลือกเกษตรกร"
+                isSearchable
+                isClearable
+                onInputChange={handleInputChange}
+                onChange={(selectedOptions: any) => {
+                  setCurrentPage(1);
+                  console.log(selectedOptions);
+                  // handleCouponConditionFarmerList(selectedOptions);
+                }}
+                options={farmerList}
+                value={farmerList}
+                onMenuScrollToBottom={handleMenuScrollToBottom}
+                closeMenuOnSelect={false}
+              />
             </Form.Item>
           ),
         };
@@ -210,14 +307,14 @@ const AddDetailPointManual = () => {
     },
     {
       title: "จำนวนแต้ม",
-      dataIndex: "rai",
+      dataIndex: "point",
       width: "20%",
       render: (value: any, row: any, index: number) => {
         return {
           children: (
             <Form.Item
               style={{ margin: 0 }}
-              name={`${row.num}_rai`}
+              name={`${row.num}_point`}
               rules={[
                 {
                   required: true,
@@ -229,7 +326,7 @@ const AddDetailPointManual = () => {
                 placeholder="กรอกจำนวนแต้ม"
                 suffix="แต้ม"
                 autoComplete="off"
-                onChange={(e) => checkNumber(e, `${row.num}_rai`)}
+                onChange={(e) => checkNumber(e, `${row.num}_point`)}
               />
             </Form.Item>
           ),
@@ -274,7 +371,7 @@ const AddDetailPointManual = () => {
         return {
           children: (
             <div className="d-flex flex-row justify-content-center">
-              <div className="col-lg-4">
+              <div className="col-lg-3">
                 <ActionButton
                   icon={<DeleteOutlined />}
                   color={count > 1 ? color.Error : color.Grey}
@@ -289,45 +386,46 @@ const AddDetailPointManual = () => {
     },
   ];
   const onFieldsChange = () => {
-    const { missionName, campaignType, startDate, endDate, status } =
-      form.getFieldsValue();
+    const  typeUser = form.getFieldsValue();
+    console.log(typeUser)
     const dataSub: any = newDataSubMission;
     const fs = formTable.getFieldsValue();
     const condition: any = dataSub?.map((y: any, i: number) => {
       return {
         num: i + 1,
-        missionName: fs[`${y.num}_missionName`],
-        rai: fs[`${y.num}_rai`],
+        nameUser: fs[`${y.num}_nameUser`],
+        _point: fs[`${y.num}__point`],
         rewardId: fs[`${y.num}_rewardId`],
         point: fs[`${y.num}_point`],
         descriptionReward: fs[`${y.num}_description`],
         conditionReward: fs[`${y.num}_condition`],
       };
     });
-    let fieldErr: boolean = true;
-    let fieldNull: boolean = true;
-    const isMissionReward = campaignType === "MISSION_REWARD";
-    condition.length > 0 &&
-    condition.every(
-      (item: any) =>
-        item &&
-        item.conditionReward &&
-        item.descriptionReward &&
-        item.missionName &&
-        item.num &&
-        item.rai &&
-        (isMissionReward ? item.rewardId : item.point) &&
-        !checkLimit()
-    )
-      ? (fieldNull = false)
-      : (fieldNull = true);
+    console.log(condition)
+    // let fieldErr: boolean = true;
+    // let fieldNull: boolean = true;
+    // const isMissionReward = campaignType === "MISSION_REWARD";
+    // condition.length > 0 &&
+    // condition.every(
+    //   (item: any) =>
+    //     item &&
+    //     item.conditionReward &&
+    //     item.descriptionReward &&
+    //     item.missionName &&
+    //     item.num &&
+    //     item.rai &&
+    //     (isMissionReward ? item.rewardId : item.point) &&
+    //     !checkLimit()
+    // )
+    //   ? (fieldNull = false)
+    //   : (fieldNull = true);
 
-    if (missionName && campaignType && startDate && endDate && status) {
-      fieldErr = false;
-    } else {
-      fieldErr = true;
-    }
-    setBtnSaveDisable(fieldErr || fieldNull);
+    // if (missionName && campaignType && startDate && endDate && status) {
+    //   fieldErr = false;
+    // } else {
+    //   fieldErr = true;
+    // }
+    // setBtnSaveDisable(fieldErr || fieldNull);
   };
   const subMissionTextArea = (recode: any) => {
     return (

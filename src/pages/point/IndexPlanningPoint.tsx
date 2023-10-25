@@ -20,6 +20,7 @@ import { PlanningPointListEntity } from "../../entities/PointReceiveEntities";
 import { color } from "../../resource";
 import { DateTimeUtil } from "../../utilities/DateTimeUtil";
 import { numberWithCommas } from "../../utilities/TextFormatter";
+import ShowNickName from "../../components/popover/ShowNickName";
 const { RangePicker } = DatePicker;
 const dateSearchFormat = "YYYY-MM-DD";
 
@@ -180,6 +181,9 @@ const IndexPlanningPoint = () => {
                         checkFarmer[0].last_name}
                     </u>
                   </span>
+                  {checkFarmer[0].nickname && (
+                  <ShowNickName data={checkFarmer[0].nickname} menu="INFO" />
+                )}
                 </Col>
                 <Col span={7}>
                   <label>เบอร์ : </label>{" "}
@@ -234,6 +238,9 @@ const IndexPlanningPoint = () => {
                         checkDroner[0].last_name}
                     </u>
                   </span>
+                  {checkDroner[0].nickname && (
+                  <ShowNickName data={checkDroner[0].nickname} menu="INFO" colorTooltip={color.Warning}/>
+                )}
                 </Col>
                 <Col span={7}>
                   <label>เบอร์ :</label>{" "}

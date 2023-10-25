@@ -48,7 +48,6 @@ const IndexReceivePoint = () => {
       searchType
     )
       .then((res) => {
-        console.log(res)
         const mapKey = res.history.map((x, i) => ({
           ...x,
           key: i + 1,
@@ -177,7 +176,7 @@ const IndexReceivePoint = () => {
               <Row>
                 <Col span={11}>
                   <label>ชื่อเกษตรกร : </label>{" "}
-                  <span>
+                  <u style={{ color: color.Success }}>
                     {checkFarmer.mission !== null
                       ? (checkFarmer.firstname + " " + checkFarmer.lastname)
                           .length > 20 && checkFarmer.mission === null
@@ -188,10 +187,10 @@ const IndexReceivePoint = () => {
                           ).substring(0, 20)
                         : checkFarmer.firstname + " " + checkFarmer.lastname
                       : checkFarmer.firstname + " " + checkFarmer.lastname}
-                       {checkFarmer.nickname && (
-                  <ShowNickName data={checkFarmer.nickname} menu="INFO" />
-                )}
-                  </span>
+                  </u>
+                  {checkFarmer.nickname && (
+                    <ShowNickName data={checkFarmer.nickname} menu="INFO" />
+                  )}
                 </Col>
                 <Col span={8}>
                   <label>เบอร์โทร : </label>{" "}
@@ -239,7 +238,7 @@ const IndexReceivePoint = () => {
               <Row>
                 <Col span={11}>
                   <label>ชื่อนักบินโดรน :</label>{" "}
-                  <span>
+                  <u style={{ color: color.Warning }}>
                     {(checkDroner.firstname + " " + checkDroner.lastname)
                       .length > 20 && checkDroner.mission === null
                       ? (
@@ -248,10 +247,14 @@ const IndexReceivePoint = () => {
                           checkDroner.lastname
                         ).substring(0, 20) + "..."
                       : checkDroner.firstname + " " + checkDroner.lastname}
-                       {checkDroner.nickname && (
-                  <ShowNickName data={checkDroner.nickname} menu="INFO" />
-                )}
-                  </span>
+                  </u>
+                  {checkDroner.nickname && (
+                    <ShowNickName
+                      data={checkDroner.nickname}
+                      menu="INFO"
+                      colorTooltip={color.Warning}
+                    />
+                  )}
                 </Col>
                 <Col span={8}>
                   <label>เบอร์โทร :</label>{" "}
