@@ -12,11 +12,10 @@ import icon from "../../resource/icon";
 import image from "../../resource/image";
 import { convertBuddhistYear } from "../../utilities/ConvertToBuddhistYear";
 
-export const AuthPage: React.FC = () => {
+const AuthPage: React.FC = () => {
   const dateNow = moment(Date.now());
-  const [dataMaintance, setDataMaintance] = useState<MaintenanceSystem>(
-    MaintenanceSystem_INIT
-  );
+  const [dataMaintance, setDataMaintance] =
+    useState<MaintenanceSystem>(MaintenanceSystem_INIT);
   const [checkTime, setCheckTime] = useState(false);
   const checkMaintance = () => {
     MaintenanceDataSource.getMaintenceSystem("BO").then((res) => {
@@ -46,11 +45,17 @@ export const AuthPage: React.FC = () => {
   };
 
   return (
-    <div className=" overflow-hidden " style={{ backgroundColor: color.BG }}>
+    <div
+      className=" overflow-hidden "
+      style={{ backgroundColor: color.BG }}>
       <div className="row">
         <div className="col-lg-6">
           <div className="d-flex justify-content-start">
-            <img alt="imageLogin" src={image.login} className="w-100 vh-100" />
+            <img
+              alt="imageLogin"
+              src={image.login}
+              className="w-100 vh-100"
+            />
           </div>
         </div>
         <div className="col-lg-6">
@@ -59,12 +64,13 @@ export const AuthPage: React.FC = () => {
               marginTop: "35%",
               paddingLeft: "20%",
               paddingRight: "20%",
-            }}
-          >
+            }}>
             <div className="text-center">
               <img
                 alt="logo"
-                src={checkTime ? dataMaintance.imagePath : icon.iconLogin}
+                src={
+                  checkTime ? dataMaintance.imagePath : icon.iconLogin
+                }
                 width={"40%"}
               />
             </div>
@@ -81,3 +87,4 @@ export const AuthPage: React.FC = () => {
     </div>
   );
 };
+export default AuthPage;

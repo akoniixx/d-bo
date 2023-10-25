@@ -6,7 +6,6 @@ import {
   Radio,
   Row,
   Select,
-  Space,
   Tag,
   TimePicker,
 } from "antd";
@@ -22,7 +21,10 @@ import { resizeFileImg } from "../../../utilities/ResizeImage";
 import { CardContainer } from "../../../components/card/CardContainer";
 import { CardHeader } from "../../../components/header/CardHearder";
 import { color, image } from "../../../resource";
-import { formats, modules } from "../../../components/editor/EditorToolbar";
+import {
+  formats,
+  modules,
+} from "../../../components/editor/EditorToolbar";
 import { BackIconButton } from "../../../components/button/BackButton";
 import { FooterPage } from "../../../components/footer/FooterPage";
 import RenderReward from "../../../components/mobile/RenderReward";
@@ -35,18 +37,21 @@ import { validateOnlyNumber } from "../../../utilities/TextFormatter";
 const { Map } = require("immutable");
 
 function AddReward() {
-  const profile = JSON.parse(localStorage.getItem("profile") || "{  }");
+  const profile = JSON.parse(
+    localStorage.getItem("profile") || "{  }"
+  );
   const dateFormat = "DD/MM/YYYY";
   const navigate = useNavigate();
   const [form] = Form.useForm();
   const [imgReward, setImgReward] = useState<any>();
-  const [createImgReward, setCreateImgReward] = useState<UploadImageEntity>(
-    UploadImageEntity_INTI
-  );
+  const [createImgReward, setCreateImgReward] =
+    useState<UploadImageEntity>(UploadImageEntity_INTI);
 
   const [rewardType, setRewardType] = useState<string | null>(null);
   const [rewardName, setRewardName] = useState<string | null>(null);
-  const [rewardExchange, setRewardExchange] = useState<string | null>(null);
+  const [rewardExchange, setRewardExchange] = useState<string | null>(
+    null
+  );
   const [description, setDescription] = useState<string | null>(null);
   const [condition, setCondition] = useState<string | null>(null);
   const [amount, setAmount] = useState<any>();
@@ -138,7 +143,9 @@ function AddReward() {
   };
   const disabledDateUsed = (current: any) => {
     const getValueDate = form.getFieldsValue();
-    const startDate = moment(getValueDate.startUsedDate).format("YYYY-MM-DD");
+    const startDate = moment(getValueDate.startUsedDate).format(
+      "YYYY-MM-DD"
+    );
     return current && current < dayjs(startDate);
   };
   const checkNumber = (
@@ -146,8 +153,11 @@ function AddReward() {
     name: string
   ) => {
     const { value: inputValue } = e.target;
-     const convertedNumber = validateOnlyNumber(inputValue);
-     const convertedNumberScore = inputValue === '' || isNaN(Number(inputValue)) ? '' : Number(inputValue);
+    const convertedNumber = validateOnlyNumber(inputValue);
+    const convertedNumberScore =
+      inputValue === "" || isNaN(Number(inputValue))
+        ? ""
+        : Number(inputValue);
     if (name === "score") {
       form.setFieldsValue({ [name]: convertedNumberScore });
     } else {
@@ -204,19 +214,33 @@ function AddReward() {
       } else {
         rwTypeErr = true;
       }
-    } else if (rewardType === "DIGITAL" && rewardExchange === "MISSION") {
+    } else if (
+      rewardType === "DIGITAL" &&
+      rewardExchange === "MISSION"
+    ) {
       if (amount > 0 && startUsedDate && endUsedDate) {
         rwTypeErr = false;
       } else {
         rwTypeErr = true;
       }
-    } else if (rewardType === "PHYSICAL" && rewardExchange === "SCORE") {
-      if (score >= 0 && amount > 0 && startExchangeDate && expiredExchangeDate) {
+    } else if (
+      rewardType === "PHYSICAL" &&
+      rewardExchange === "SCORE"
+    ) {
+      if (
+        score >= 0 &&
+        amount > 0 &&
+        startExchangeDate &&
+        expiredExchangeDate
+      ) {
         rwTypeErr = false;
       } else {
         rwTypeErr = true;
       }
-    } else if (rewardType === "PHYSICAL" && rewardExchange === "MISSION") {
+    } else if (
+      rewardType === "PHYSICAL" &&
+      rewardExchange === "MISSION"
+    ) {
       if (amount > 0) {
         rwTypeErr = false;
       } else {
@@ -237,7 +261,9 @@ function AddReward() {
       <CardContainer>
         <CardHeader textHeader="ข้อมูลของรางวัล" />
         <Form form={form} onFieldsChange={onFieldsChange}>
-          <div className="form-group text-center" style={{ marginTop: "5%" }}>
+          <div
+            className="form-group text-center"
+            style={{ marginTop: "5%" }}>
             <Form.Item
               name="file"
               rules={[
@@ -245,16 +271,16 @@ function AddReward() {
                   required: true,
                   message: "กรุณาใส่รูปภาพ!",
                 },
-              ]}
-            >
+              ]}>
               <div
                 className="hiddenFileInput"
                 style={{
                   backgroundImage: `url(${
-                    imgReward == undefined ? image.emptyUpload : imgReward
+                    imgReward == undefined
+                      ? image.emptyUpload
+                      : imgReward
                   })`,
-                }}
-              >
+                }}>
                 <input
                   key={imgReward}
                   type="file"
@@ -272,8 +298,7 @@ function AddReward() {
                     style={{
                       cursor: "pointer",
                       borderRadius: "5px",
-                    }}
-                  >
+                    }}>
                     View
                   </Tag>
                   <Tag
@@ -282,8 +307,7 @@ function AddReward() {
                     style={{
                       cursor: "pointer",
                       borderRadius: "5px",
-                    }}
-                  >
+                    }}>
                     Remove
                   </Tag>
                 </>
@@ -306,8 +330,7 @@ function AddReward() {
                     required: true,
                     message: "กรุณากรอกชื่อของรางวัล!",
                   },
-                ]}
-              >
+                ]}>
                 <Input
                   placeholder="กรอกชื่อของรางวัล"
                   autoComplete="off"
@@ -320,7 +343,8 @@ function AddReward() {
             <div className="row">
               <div className="form-group col-lg-6">
                 <label>
-                  ประเภทของรางวัล <span style={{ color: "red" }}>*</span>
+                  ประเภทของรางวัล{" "}
+                  <span style={{ color: "red" }}>*</span>
                 </label>
                 <Form.Item
                   name="rewardType"
@@ -329,8 +353,7 @@ function AddReward() {
                       required: true,
                       message: "กรุณาเลือกประเภทของรางวัล!",
                     },
-                  ]}
-                >
+                  ]}>
                   <Select
                     className="col-lg-12 p-1"
                     placeholder="เลือกประเภทของรางวัล"
@@ -346,8 +369,7 @@ function AddReward() {
                       optionA.children
                         .toLowerCase()
                         .localeCompare(optionB.children.toLowerCase())
-                    }
-                  >
+                    }>
                     <Option value={"PHYSICAL"}>Physical</Option>
                     <Option value={"DIGITAL"}>Digital</Option>
                   </Select>
@@ -355,7 +377,8 @@ function AddReward() {
               </div>
               <div className="form-group col-lg-6">
                 <label>
-                  การแลกเปลี่ยน <span style={{ color: "red" }}>*</span>
+                  การแลกเปลี่ยน{" "}
+                  <span style={{ color: "red" }}>*</span>
                 </label>
                 <div className="row">
                   <div className="col-12">
@@ -382,8 +405,7 @@ function AddReward() {
                         required: true,
                         message: "กรุณากรอกจำนวน!",
                       },
-                    ]}
-                  >
+                    ]}>
                     <Input
                       placeholder="กรอกจำนวน"
                       autoComplete="off"
@@ -399,7 +421,8 @@ function AddReward() {
               <div className="row">
                 <div className="form-group col-lg-6">
                   <label>
-                    แต้มที่ต้องใช้แลก <span style={{ color: "red" }}>*</span>
+                    แต้มที่ต้องใช้แลก{" "}
+                    <span style={{ color: "red" }}>*</span>
                   </label>
                   <Form.Item
                     name="score"
@@ -408,8 +431,7 @@ function AddReward() {
                         required: true,
                         message: "กรุณากรอกแต้มที่ต้องการใช้แลก!",
                       },
-                    ]}
-                  >
+                    ]}>
                     <Input
                       placeholder="กรอกแต้มที่ต้องใช้แลก"
                       autoComplete="off"
@@ -432,8 +454,7 @@ function AddReward() {
                         required: true,
                         message: "กรุณากรอกจำนวน!",
                       },
-                    ]}
-                  >
+                    ]}>
                     <Input
                       placeholder="กรอกจำนวน"
                       autoComplete="off"
@@ -446,11 +467,14 @@ function AddReward() {
             {rewardExchange === "SCORE" && (
               <>
                 <Divider />
-                <p style={{ color: color.Error }}>ช่วงเวลาที่สามารถแลกได้</p>
+                <p style={{ color: color.Error }}>
+                  ช่วงเวลาที่สามารถแลกได้
+                </p>
                 <div className="row">
                   <div className="col-lg-6">
                     <label>
-                      วันเริ่มต้น<span style={{ color: color.Error }}>*</span>
+                      วันเริ่มต้น
+                      <span style={{ color: color.Error }}>*</span>
                     </label>
                     <div className="d-flex">
                       <Form.Item
@@ -460,8 +484,7 @@ function AddReward() {
                             required: true,
                             message: "กรุณากรอกวันที่!",
                           },
-                        ]}
-                      >
+                        ]}>
                         <DatePicker
                           placeholder="เลือกวันที่"
                           onChange={(val) => {
@@ -472,8 +495,7 @@ function AddReward() {
                       </Form.Item>
                       <Form.Item
                         name="startExchangeTime"
-                        initialValue={moment("00:00", "HH:mm")}
-                      >
+                        initialValue={moment("00:00", "HH:mm")}>
                         <TimePicker
                           format={"HH:mm"}
                           className="ms-3"
@@ -489,7 +511,8 @@ function AddReward() {
                   </div>
                   <div className="col-lg-6">
                     <label>
-                      วันสิ้นสุด<span style={{ color: color.Error }}>*</span>
+                      วันสิ้นสุด
+                      <span style={{ color: color.Error }}>*</span>
                     </label>
                     <div className="d-flex">
                       <Form.Item
@@ -499,8 +522,7 @@ function AddReward() {
                             required: true,
                             message: "กรุณากรอกวันที่!",
                           },
-                        ]}
-                      >
+                        ]}>
                         <DatePicker
                           placeholder="เลือกวันที่"
                           onChange={(val) => {
@@ -512,8 +534,7 @@ function AddReward() {
                       </Form.Item>
                       <Form.Item
                         name="expiredExchangeTime"
-                        initialValue={moment("23:59", "HH:mm")}
-                      >
+                        initialValue={moment("23:59", "HH:mm")}>
                         <TimePicker
                           format={"HH:mm"}
                           className="ms-3"
@@ -533,11 +554,14 @@ function AddReward() {
             )}
             {rewardType === "DIGITAL" && (
               <>
-                <p style={{ color: color.Success }}>ช่วงเวลาที่ใช้ได้</p>
+                <p style={{ color: color.Success }}>
+                  ช่วงเวลาที่ใช้ได้
+                </p>
                 <div className="row">
                   <div className="col-lg-6">
                     <label>
-                      วันเริ่มต้น<span style={{ color: color.Error }}>*</span>
+                      วันเริ่มต้น
+                      <span style={{ color: color.Error }}>*</span>
                     </label>
                     <div className="d-flex">
                       <Form.Item
@@ -547,8 +571,7 @@ function AddReward() {
                             required: true,
                             message: "กรุณากรอกวันที่!",
                           },
-                        ]}
-                      >
+                        ]}>
                         <DatePicker
                           placeholder="เลือกวันที่"
                           format={dateFormat}
@@ -559,8 +582,7 @@ function AddReward() {
                       </Form.Item>
                       <Form.Item
                         name="startUsedTime"
-                        initialValue={moment("00:00", "HH:mm")}
-                      >
+                        initialValue={moment("00:00", "HH:mm")}>
                         <TimePicker
                           format={"HH:mm"}
                           className="ms-3"
@@ -576,7 +598,8 @@ function AddReward() {
                   </div>
                   <div className="col-lg-6">
                     <label>
-                      วันสิ้นสุด<span style={{ color: color.Error }}>*</span>
+                      วันสิ้นสุด
+                      <span style={{ color: color.Error }}>*</span>
                     </label>
                     <div className="d-flex">
                       <Form.Item
@@ -586,8 +609,7 @@ function AddReward() {
                             required: true,
                             message: "กรุณากรอกวันที่!",
                           },
-                        ]}
-                      >
+                        ]}>
                         <DatePicker
                           placeholder="เลือกวันที่"
                           format={dateFormat}
@@ -599,8 +621,7 @@ function AddReward() {
                       </Form.Item>
                       <Form.Item
                         name="expiredUsedTime"
-                        initialValue={moment("23:59", "HH:mm")}
-                      >
+                        initialValue={moment("23:59", "HH:mm")}>
                         <TimePicker
                           format={"HH:mm"}
                           className="ms-3"
@@ -631,13 +652,14 @@ function AddReward() {
                       required: true,
                       message: "กรุณากรอกรายละเอียด",
                     },
-                  ]}
-                >
+                  ]}>
                   <ReactQuill
                     className="react-editor"
                     theme="snow"
                     onChange={handleDescription}
-                    placeholder={"กรอกรายละเอียด (จะแสดงใน Application)"}
+                    placeholder={
+                      "กรอกรายละเอียด (จะแสดงใน Application)"
+                    }
                     modules={modules}
                     formats={formats}
                   />
@@ -657,13 +679,14 @@ function AddReward() {
                       required: true,
                       message: "กรุณากรอกเงื่อนไข",
                     },
-                  ]}
-                >
+                  ]}>
                   <ReactQuill
                     className="react-editor"
                     theme="snow"
                     onChange={handleCondition}
-                    placeholder={"กรอกเงื่อนไข (จะแสดงใน Application)"}
+                    placeholder={
+                      "กรอกเงื่อนไข (จะแสดงใน Application)"
+                    }
                     modules={modules}
                     formats={formats}
                   />
@@ -682,12 +705,10 @@ function AddReward() {
                       required: true,
                       message: "กรุณาเลือกสถานะ",
                     },
-                  ]}
-                >
+                  ]}>
                   <Radio.Group
                     className="d-flex flex-column"
-                    onChange={(e) => setRewardStatus(e.target.value)}
-                  >
+                    onChange={(e) => setRewardStatus(e.target.value)}>
                     <Radio value={"DRAFTING"}>รอเปิดใช้งาน</Radio>
                     <Radio value={"ACTIVE"}>ใช้งาน</Radio>
                   </Radio.Group>

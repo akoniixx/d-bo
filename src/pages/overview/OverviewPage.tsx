@@ -1,12 +1,11 @@
-import React from 'react'
-import { DashboardLayout } from '../../components/layout/Layout'
+import React from "react";
+import { DashboardLayout } from "../../components/layout/Layout";
 
-export function OverviewPage() {
+function OverviewPage() {
   return (
     <>
-    <div>OverviewPage</div>
+      <div>OverviewPage</div>
     </>
-  )
+  );
 }
-
- 
+export default OverviewPage;

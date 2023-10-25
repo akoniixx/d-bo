@@ -1,12 +1,11 @@
-import React, { useEffect, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import React, {  useState } from "react";
+import {  useNavigate } from "react-router-dom";
 import styled from "styled-components";
-import { color, icon } from "../../resource";
+import { color,  } from "../../resource";
 import { CollapseSubMenu } from "./CollapseSubMenu";
 import { IconMenu, IconMenuActive } from "./IconMenu";
 import { DownOutlined, UpOutlined } from "@ant-design/icons";
-import { Image } from "antd";
-import { useLocalStorage } from "../../hook/useLocalStorage";
+ 
 import { useEffectOnce } from "../../hook/useEffectOnce";
 
 interface CollapseMenuProps {
