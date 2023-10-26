@@ -406,13 +406,19 @@ const AddDronerMission = () => {
     return (
       <Row justify={"space-between"} gutter={16}>
         <Col span={12}>
-          <label>รายละเอียด</label>
+          <label>
+            รายละเอียด
+            <span style={{ color: color.Error }}>*</span>
+          </label>
           <Form.Item style={{ margin: 0 }} name={`${recode.num}_description`}>
             <TextArea placeholder="กรอกรายละเอียด" rows={4} />
           </Form.Item>
         </Col>
         <Col span={12}>
-          <label>เงื่อนไข</label>
+          <label>
+            เงื่อนไข
+            <span style={{ color: color.Error }}>*</span>
+          </label>
           <Form.Item style={{ margin: 0 }} name={`${recode.num}_condition`}>
             <TextArea placeholder="กรอกเงื่อนไข" rows={4} />
           </Form.Item>
