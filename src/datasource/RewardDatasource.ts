@@ -52,6 +52,9 @@ export class RewardDatasource {
       rewardExchange: rewardExchange,
       search: search,
     };
+    console.log(BASE_URL + "/promotion/reward/queryall", {
+      params,
+    })
     return httpClient
       .get(BASE_URL + "/promotion/reward/queryall", {
         params,
