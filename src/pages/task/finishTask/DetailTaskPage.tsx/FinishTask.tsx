@@ -43,6 +43,7 @@ import { useNavigate } from "react-router-dom";
 import ImagCards from "../../../../components/card/ImagCard";
 import image from "../../../../resource/image";
 import { listAppType } from "../../../../definitions/ApplicatoionTypes";
+import ShowNickName from "../../../../components/popover/ShowNickName";
 const _ = require("lodash");
 const dateFormat = "DD/MM/YYYY";
 const timeFormat = "HH:mm";
@@ -456,7 +457,7 @@ function FinishTasks() {
   );
   const renderDroner = (
     <Form style={{ padding: "32px" }}>
-      {data.data.droner !== null && data.data.isDelete === true ? (
+      {data.data.droner !== null && data.data.droner.isDelete !== true ? (
         <div className="row">
           <div className="col-lg-3">
             <span>
@@ -464,6 +465,9 @@ function FinishTasks() {
               <br />
               <p style={{ fontSize: "12px", color: color.Grey }}>
                 {data.data.droner.dronerCode}
+                {data.data.droner?.nickname && (
+                  <ShowNickName data={data.data.droner?.nickname} menu="INFO" />
+                )}
               </p>
             </span>
           </div>

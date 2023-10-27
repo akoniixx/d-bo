@@ -24,6 +24,7 @@ import { useNavigate } from "react-router-dom";
 import { formatNumberWithCommas } from "../../utilities/TextFormatter";
 import ImagCards from "../../components/card/ImagCard";
 import { image } from "../../resource";
+import ShowNickName from "../../components/popover/ShowNickName";
 const _ = require("lodash");
 const dateFormat = "DD/MM/YYYY";
 const timeFormat = "HH:mm";
@@ -393,55 +394,66 @@ function DetailWorkDroner() {
   );
   const renderDroner = (
     <Form style={{ padding: "32px" }}>
-      <div className="row">
-        <div className="col-lg-3">
-          <span>
-            {data.droner.firstname + " " + data.droner.lastname}
-            <br />
-            <p style={{ fontSize: "12px", color: color.Grey }}>
-              {data.droner.dronerCode}
-            </p>
-          </span>
-        </div>
-        <div className="col-lg-3">
-          <span>{data.droner.telephoneNo}</span>
-        </div>
-        <div className="col-lg-4">
-          {data.droner.address.subdistrict.subdistrictName
-            ? data.droner.address.subdistrict.subdistrictName + ","
-            : "-/"}
+      {data.droner !== null && data.droner.isDelete !== true ?
+       <div className="row">
+       <div className="col-lg-3">
+         <span>
+           {data.droner.firstname + " " + data.droner.lastname}
+           <br />
+           <p style={{ fontSize: "12px", color: color.Grey }}>
+             {data.droner.dronerCode}
+             {data.droner.nickname && (
+                 <ShowNickName data={data.droner.nickname} menu="Detail" status={data.droner.status} />
+               )}
+           </p>
+         </span>
+       </div>
+       <div className="col-lg-3">
+         <span>{data.droner.telephoneNo ? data.droner.telephoneNo : '-'}</span>
+       </div>
+       <div className="col-lg-4">
+         {data.droner.address.subdistrict.subdistrictName
+           ? data.droner.address.subdistrict.subdistrictName + ","
+           : "-/"}
 
-          {data.droner.address.district.districtName
-            ? data.droner.address.district.districtName + ","
-            : "-/"}
+         {data.droner.address.district.districtName
+           ? data.droner.address.district.districtName + ","
+           : "-/"}
 
-          {data.droner.address.province.provinceName
-            ? data.droner.address.province.provinceName
-            : "-"}
-        </div>
-        <div className="col-lg">
-          <span>
-            <Avatar
-              size={25}
-              src={
-                data.droner.dronerDrone && data.droner.dronerDrone[0] !== null
-                  ? data.droner.dronerDrone[0].drone.droneBrand.logoImagePath
-                  : null
-              }
-              style={{ marginRight: "5px" }}
-            />
-            {data.droner.dronerDrone && data.droner.dronerDrone[0] !== null
-              ? data.droner.dronerDrone[0].drone.droneBrand.name
-              : "-"}
-          </span>
-          <br />
-          <span style={{ color: color.Grey, fontSize: "12px" }}>
-            {data.droner.dronerDrone && data.droner.dronerDrone.length! > 1
-              ? "(มากกว่า 1 ยี่ห้อ)"
-              : null}
-          </span>
-        </div>
-      </div>
+         {data.droner.address.province.provinceName
+           ? data.droner.address.province.provinceName
+           : "-"}
+       </div>
+       <div className="col-lg">
+         <span>
+           <Avatar
+             size={25}
+             src={
+               data.droner.dronerDrone && data.droner.dronerDrone[0] !== null
+                 ? data.droner.dronerDrone[0].drone.droneBrand.logoImagePath
+                 : null
+             }
+             style={{ marginRight: "5px" }}
+           />
+           {data.droner.dronerDrone && data.droner.dronerDrone[0] !== null
+             ? data.droner.dronerDrone[0].drone.droneBrand.name
+             : "-"}
+         </span>
+         <br />
+         <span style={{ color: color.Grey, fontSize: "12px" }}>
+           {data.droner.dronerDrone && data.droner.dronerDrone.length! > 1
+             ? "(มากกว่า 1 ยี่ห้อ)"
+             : null}
+         </span>
+       </div>
+     </div> : (
+      <div style={{ textAlign: "center" }}>
+      <strong style={{ color: color.Error, alignItems: "center" }}>
+        ผู้ใช้งานนี้ถูกลบแล้ว
+      </strong>
+    </div>
+     )}
+     
     </Form>
   );
   const renderPrice = (

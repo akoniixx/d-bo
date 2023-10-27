@@ -50,6 +50,7 @@ import { numberWithCommas } from "../../../../utilities/TextFormatter";
 import { DashboardLayout } from "../../../../components/layout/Layout";
 import { useNavigate } from "react-router-dom";
 import { listAppType } from "../../../../definitions/ApplicatoionTypes";
+import ShowNickName from "../../../../components/popover/ShowNickName";
 const { Map } = require("immutable");
 const _ = require("lodash");
 const dateFormat = "DD/MM/YYYY";
@@ -637,6 +638,9 @@ function EditWaitStart() {
             <br />
             <p style={{ fontSize: "12px", color: color.Grey }}>
               {data.droner.dronerCode}
+              {data.droner.nickname && (
+                  <ShowNickName data={data.droner.nickname} menu="INFO" />
+                )}
             </p>
           </span>
         </div>

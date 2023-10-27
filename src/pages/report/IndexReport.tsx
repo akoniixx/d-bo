@@ -71,6 +71,7 @@ import { DronerEntity } from "../../entities/DronerEntities";
 import CheckDocument from "../../components/dropdownCheck/CheckDocument";
 import { listAppType } from "../../definitions/ApplicatoionTypes";
 import { ListCheck } from "../../components/dropdownCheck/ListStatusAppType";
+import ShowNickName from "../../components/popover/ShowNickName";
 
 interface DataType {
   key: React.Key;
@@ -100,7 +101,9 @@ interface DataType {
   isBookBank: boolean;
   dateWaitPayment: any;
   applicationType: string;
-  createBy : string;
+  createBy: string;
+  nickname_farmer: string;
+  nickname_droner: string;
 }
 function IndexReport() {
   const navigate = useNavigate();
@@ -698,6 +701,9 @@ function IndexReport() {
               </span>
               <span style={{ color: color.Grey, fontSize: "12px" }}>
                 {row.telDroner}
+                {row.nickname_droner && (
+                  <ShowNickName data={row.nickname_droner} menu="INFO" />
+                )}
               </span>
             </>
           ),
@@ -717,6 +723,9 @@ function IndexReport() {
               </span>
               <span style={{ color: color.Grey, fontSize: "12px" }}>
                 {row.telFarmer}
+                {row.nickname_farmer && row.nickname_farmer !== "null" && (
+                  <ShowNickName data={row.nickname_farmer} menu="INFO" />
+                )}
               </span>
             </>
           ),
@@ -1007,8 +1016,7 @@ function IndexReport() {
                         preview={false}
                         style={{ width: 24, height: 24 }}
                       />
-                      <span>
-                        {" "}
+                      <span style={{ paddingLeft: "8px" }}>
                         {row.createBy ? row.createBy + ` ${item.create}` : "-"}
                       </span>
                     </>
@@ -1580,6 +1588,12 @@ function IndexReport() {
         dateWaitPayment: getData.data.map((x) => x.dateWaitPayment)[i],
         applicationType: getData.data.map((x) => x.applicationType)[i],
         createBy: getData.data.map((x) => x.createBy)[i],
+        nickname_droner: `${
+          getData?.data.map((x) => (x.droner ? x.droner?.nickname : ""))[i]
+        }`,
+        nickname_farmer: `${
+          getData?.data.map((x) => (x.farmer ? x.farmer?.nickname : ""))[i]
+        }`,
       });
     }
   }

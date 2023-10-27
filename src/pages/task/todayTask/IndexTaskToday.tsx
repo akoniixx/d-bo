@@ -55,6 +55,7 @@ import { useNavigate } from "react-router-dom";
 import { listAppType } from "../../../definitions/ApplicatoionTypes";
 import { ListCheck } from "../../../components/dropdownCheck/ListStatusAppType";
 import { CheckboxValueType } from "antd/lib/checkbox/Group";
+import ShowNickName from "../../../components/popover/ShowNickName";
 
 export default function IndexTodayTask() {
   const navigate = useNavigate();
@@ -690,6 +691,9 @@ export default function IndexTodayTask() {
               <br />
               <span style={{ color: color.Grey, fontSize: "12px" }}>
                 {row.droner_telephone_no}
+                {row.droner_nickname && (
+                  <ShowNickName data={row.droner_nickname} menu="INFO" />
+                )}
               </span>
             </>
           ),
@@ -758,6 +762,9 @@ export default function IndexTodayTask() {
               <br />
               <span style={{ color: color.Grey, fontSize: "12px" }}>
                 {row.farmer_telephone_no}
+                {row.farmer_nickname && (
+                  <ShowNickName data={row.farmer_nickname} menu="INFO" />
+                )}
               </span>
             </>
           ),

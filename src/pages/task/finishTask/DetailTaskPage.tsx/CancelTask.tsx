@@ -30,6 +30,7 @@ import {
 } from "../../../../definitions/Status";
 import { useNavigate } from "react-router-dom";
 import { listAppType } from "../../../../definitions/ApplicatoionTypes";
+import ShowNickName from "../../../../components/popover/ShowNickName";
 const _ = require("lodash");
 const dateFormat = "DD/MM/YYYY";
 const timeFormat = "HH:mm";
@@ -306,7 +307,7 @@ function CancelTask() {
   );
   const renderDroner = (
     <>
-      {data.data.droner ? (
+      {data.data.droner  && data.data.droner.isDelete !== true ? (
         <Form style={{ padding: "32px" }}>
           <div className="row">
             <div className="col-lg-3">
@@ -317,6 +318,9 @@ function CancelTask() {
                 <br />
                 <p style={{ fontSize: "12px", color: color.Grey }}>
                   {data.data.droner?.dronerCode ?? ""}
+                  {data.data.droner?.nickname && (
+                  <ShowNickName data={data.data.droner?.nickname} menu="INFO" />
+                )}
                 </p>
               </span>
             </div>
@@ -366,16 +370,19 @@ function CancelTask() {
         <Form style={{ padding: "32px" }}>
           {data.data.taskDronerTemp.map((item) => (
             <div className="row">
-              {JSON.parse(item.dronerDetail[0]) !== null && (
+              {item.dronerDetail[0] && JSON.parse(item.dronerDetail[0]) !== null && (
                 <>
                   <div className="col-lg-2">
                     <span>
-                      {JSON.parse(item.dronerDetail[0]).firstname +
+                      {JSON.parse(item.dronerDetail[0]).firstname  +
                         " " +
                         JSON.parse(item.dronerDetail[0]).lastname}
                       <br />
                       <p style={{ fontSize: "12px", color: color.Grey }}>
                         {JSON.parse(item.dronerDetail[0]).droner_code ?? ""}
+                        {JSON.parse(item.dronerDetail[0]).droner_code.nickname && (
+                  <ShowNickName data={JSON.parse(item.dronerDetail[0]).droner_code.nickname} menu="INFO" />
+                )}
                       </p>
                     </span>
                   </div>
@@ -414,7 +421,7 @@ function CancelTask() {
                         }
                         style={{ marginRight: "5px" }}
                       />
-                      {JSON.parse(item.dronerDetail[0]).drone_brand != undefined
+                      {JSON.parse(item.dronerDetail[0]).drone_brand !== undefined
                         ? JSON.parse(item.dronerDetail[0]).drone_brand
                         : "-"}
                     </span>

@@ -20,6 +20,7 @@ import { ReceivePointListEntity } from "../../entities/PointReceiveEntities";
 import { color } from "../../resource";
 import { DateTimeUtil } from "../../utilities/DateTimeUtil";
 import { numberWithCommas } from "../../utilities/TextFormatter";
+import ShowNickName from "../../components/popover/ShowNickName";
 const { RangePicker } = DatePicker;
 const dateSearchFormat = "YYYY-MM-DD";
 const dateFormat = "DD/MM/YYYY";
@@ -47,6 +48,7 @@ const IndexReceivePoint = () => {
       searchType
     )
       .then((res) => {
+        console.log(res)
         const mapKey = res.history.map((x, i) => ({
           ...x,
           key: i + 1,
@@ -186,6 +188,9 @@ const IndexReceivePoint = () => {
                           ).substring(0, 20)
                         : checkFarmer.firstname + " " + checkFarmer.lastname
                       : checkFarmer.firstname + " " + checkFarmer.lastname}
+                       {checkFarmer.nickname && (
+                  <ShowNickName data={checkFarmer.nickname} menu="INFO" />
+                )}
                   </span>
                 </Col>
                 <Col span={8}>
@@ -243,6 +248,9 @@ const IndexReceivePoint = () => {
                           checkDroner.lastname
                         ).substring(0, 20) + "..."
                       : checkDroner.firstname + " " + checkDroner.lastname}
+                       {checkDroner.nickname && (
+                  <ShowNickName data={checkDroner.nickname} menu="INFO" />
+                )}
                   </span>
                 </Col>
                 <Col span={8}>

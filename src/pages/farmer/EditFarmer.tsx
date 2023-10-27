@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import {
   Row,
   Form,
@@ -11,6 +11,7 @@ import {
   Space,
   Tag,
   DatePicker,
+  PaginationProps,
 } from "antd";
 import { CardContainer } from "../../components/card/CardContainer";
 import { BackIconButton } from "../../components/button/BackButton";
@@ -76,15 +77,16 @@ const EditFarmer = () => {
   let queryString = _.split(window.location.pathname, "=");
   const [profile] = useLocalStorage("profile", []);
   const navigate = useNavigate();
-
+  const itemsPerPage = 10;
+  const [currentPage, setCurrentPage] = useState(1);
   const farmerId = queryString[1];
   const [data, setData] = useState<GetFarmerEntity>(GetFarmerEntity_INIT);
   const [address, setAddress] = useState<AddressEntity>(AddressEntity_INIT);
   const [farmerPlotList, setFarmerPlotList] = useState<FarmerPlotEntity[]>([
     FarmerPlotEntity_INIT,
   ]);
+  const [locateNull, setLocateNull] = useState<any>();
   const [showAddModal, setShowAddModal] = useState(false);
-  const [showEditModal, setShowEditModal] = useState(false);
   const [editIndex, setEditIndex] = useState(0);
 
   const [province, setProvince] = useState<ProviceEntity[]>([
@@ -109,6 +111,15 @@ const EditFarmer = () => {
   const [createImgIdCard, setCreateImgIdCrad] =
     useState<ImageEntity>(ImageEntity_INTI);
 
+  const fetchLocation = useCallback(async (text?: string) => {
+    await LocationDatasource.getSubdistrict(0, text).then((res) => {
+      if (res) {
+        const findId = res.find((x) => x.provinceId === 0);
+        setLocateNull(findId);
+        console.log(findId);
+      }
+    });
+  }, []);
   const fecthFarmer = async () => {
     await FarmerDatasource.getFarmerById(farmerId).then((res) => {
       setData({
@@ -152,11 +163,19 @@ const EditFarmer = () => {
       }
     });
   };
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = farmerPlotList.slice(indexOfFirstItem, indexOfLastItem);
+  const [searchLocation] = useState("");
 
+  const handlePageChange = (pageNumber: number) => {
+    setCurrentPage(pageNumber);
+  };
   useEffect(() => {
     fecthFarmer();
+    fetchLocation(searchLocation);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [searchLocation]);
 
   useEffect(() => {
     LocationDatasource.getProvince().then((res) => {
@@ -356,7 +375,6 @@ const EditFarmer = () => {
     const g = Map(f.toJS()).set("resourceId", farmerId);
     setCreateImgProfile(g.toJS());
   };
-
   const onPreviewProfile = async () => {
     let src = imgProfile;
     if (!src) {
@@ -836,7 +854,11 @@ const EditFarmer = () => {
                 <Select
                   allowClear
                   placeholder="เลือกจังหวัด"
-                  defaultValue={address !== null ? address.provinceId : 0}
+                  defaultValue={
+                    address && address.provinceId !== 0
+                      ? address.provinceId
+                      : locateNull?.provinceName
+                  }
                   showSearch
                   optionFilterProp="children"
                   filterOption={(input: any, option: any) =>
@@ -849,8 +871,10 @@ const EditFarmer = () => {
                   }
                   onChange={handleOnChangeProvince}
                 >
-                  {province?.map((item) => (
-                    <Option value={item.provinceId}>{item.provinceName}</Option>
+                  {province.map((item: any, index: any) => (
+                    <Select.Option key={index} value={item.provinceId}>
+                      {item.provinceName}
+                    </Select.Option>
                   ))}
                 </Select>
               </Form.Item>
@@ -863,7 +887,11 @@ const EditFarmer = () => {
                 <Select
                   allowClear
                   placeholder="เลือกอำเภอ"
-                  defaultValue={address !== null ? address.districtId : 0}
+                  defaultValue={
+                    address && address.districtId !== 0
+                      ? address.districtId
+                      : locateNull?.districtName
+                  }
                   showSearch
                   optionFilterProp="children"
                   filterOption={(input: any, option: any) =>
@@ -874,10 +902,13 @@ const EditFarmer = () => {
                       .toLowerCase()
                       .localeCompare(optionB.children.toLowerCase())
                   }
+                  disabled={!address || !address.provinceId}
                   onChange={handleOnChangeDistrict}
                 >
-                  {district?.map((item) => (
-                    <Option value={item.districtId}>{item.districtName}</Option>
+                  {district.map((item: any, index: any) => (
+                    <Select.Option key={index} value={item.districtId}>
+                      {item.districtName}
+                    </Select.Option>
                   ))}
                 </Select>
               </Form.Item>
@@ -892,7 +923,11 @@ const EditFarmer = () => {
                 <Select
                   allowClear
                   placeholder="เลือกตำบล"
-                  defaultValue={address !== null ? address.subdistrictId : 0}
+                  defaultValue={
+                    address && address.subdistrictId !== 0
+                      ? address.subdistrictId
+                      : locateNull?.subdistrictName
+                  }
                   showSearch
                   optionFilterProp="children"
                   filterOption={(input: any, option: any) =>
@@ -904,11 +939,12 @@ const EditFarmer = () => {
                       .localeCompare(optionB.children.toLowerCase())
                   }
                   onChange={handleOnChangeSubdistrict}
+                  disabled={!address || !address.districtId}
                 >
-                  {subdistrict?.map((item) => (
-                    <Option value={item.subdistrictId}>
+                  {subdistrict?.map((item: any, index: any) => (
+                    <Select.Option key={index} value={item.subdistrictId}>
                       {item.subdistrictName}
-                    </Option>
+                    </Select.Option>
                   ))}
                 </Select>
               </Form.Item>
@@ -920,8 +956,12 @@ const EditFarmer = () => {
               <Form.Item name="postcode">
                 <Input
                   placeholder="เลือกรหัสไปรษณีย์"
-                  defaultValue={address !== null ? address.postcode : "-"}
-                  key={address !== null ? address.subdistrictId : 0}
+                  defaultValue={
+                    address && address.postcode
+                      ? address.postcode
+                      : locateNull?.postcode
+                  }
+                  key={address ? address.postcode : 0}
                   disabled
                 />
               </Form.Item>
@@ -1063,7 +1103,7 @@ const EditFarmer = () => {
         <Form>
           {farmerPlotList.length !== 0 ? (
             <div className="container">
-              {farmerPlotList.map((item, index) => (
+              {currentItems.map((item, index) => (
                 <div
                   className="row pt-3 pb-3"
                   style={{ justifyContent: "space-between" }}
@@ -1127,9 +1167,13 @@ const EditFarmer = () => {
       </CardContainer>
       <div className="d-flex justify-content-between pt-5">
         <p>รายการทั้งหมด {farmerPlotList.length} รายการ</p>
-        {farmerPlotList.length < 10 ? null : (
-          <Pagination defaultCurrent={1} total={1} />
-        )}
+        <Pagination
+          simple
+          current={currentPage}
+          total={farmerPlotList.length}
+          pageSize={10}
+          onChange={handlePageChange}
+        />
       </div>
     </div>
   );

@@ -51,7 +51,7 @@ function EditQuota() {
   const [nameChallenge, setNameChallenge] = useState<string | null>(null);
   const [detail, setDetail] = useState<string | null>(null);
   const [nameReward, setNameReward] = useState<string | null>(null);
-  const [raiAmount, setRaiAmount] = useState<string>('');
+  const [raiAmount, setRaiAmount] = useState<string>("");
   const [startDate, setStartDate] = useState<any>(null);
   const [endDate, setEndDate] = useState<any>(null);
   const [createImgReward, setCreateImgReward] = useState<UploadImageEntity>(
@@ -63,6 +63,7 @@ function EditQuota() {
   const [createImgButton, setCreateImgButton] = useState<UploadImageEntity>(
     UploadImageEntity_INTI
   );
+  const [saveBtnDisable, setBtnSaveDisable] = useState<boolean>(true);
   const [createImgTableLucky, setCreateImgTableLucky] =
     useState<UploadImageEntity>(UploadImageEntity_INTI);
   const [checkDup, setCheckDup] = useState(false);
@@ -110,6 +111,10 @@ function EditQuota() {
       };
       checkIsEdit();
       form.setFieldsValue({
+        imgCover: res.pathImageBanner,
+        imgButton: res.pathImageReward,
+        imgReward: res.pathImageFloating,
+        imgTableLucky: res.pathImageRewardRound,
         campaignName: res.campaignName,
         description: res.description,
         rulesCampaign: res.rulesCampaign,
@@ -194,7 +199,7 @@ function EditQuota() {
   const onRemoveImg = () => {
     setImgCover(undefined);
     setCreateImgReward(UploadImageEntity_INTI);
-    form.setFieldValue("imgCover", null);
+    setBtnSaveDisable(true);
   };
   const onChangeImgButton = async (e: any) => {
     const source = e.target.files[0];
@@ -279,12 +284,15 @@ function EditQuota() {
   };
   const onRemoveImgReward = () => {
     setImgReward(undefined);
+    setBtnSaveDisable(true);
   };
   const onRemoveImgButton = () => {
     setImgButton(undefined);
+    setBtnSaveDisable(true);
   };
   const onRemoveImgTableLucky = () => {
     setImgTableLucky(undefined);
+    setBtnSaveDisable(true);
   };
   const disabledDateChange = (current: any) => {
     const getValueDate = form.getFieldsValue();
@@ -467,6 +475,71 @@ function EditQuota() {
       },
     },
   ];
+  const onFieldsChange = () => {
+    const {
+      imgCover,
+      imgButton,
+      imgReward,
+      imgTableLucky,
+      campaignName,
+      description,
+      rewardName,
+      startDate,
+      endDate,
+      rai,
+      rulesCampaign,
+      status,
+    } = form.getFieldsValue();
+    let fieldErr: boolean = true;
+    const sTable = form.getFieldsValue();
+    const value = rewardRound.map((y: any, i: number) => {
+      return {
+        ...y,
+        index: i + 1,
+        dateRound: sTable[`${y.index}_roundDate`],
+      };
+    });
+    if (
+      imgCover &&
+      imgButton &&
+      imgReward &&
+      imgTableLucky &&
+      campaignName &&
+      description &&
+      rewardName &&
+      startDate &&
+      endDate &&
+      !checkDup &&
+      rai &&
+      rulesCampaign &&
+      status &&
+      value.length > 0 &&
+      value.map((i) => i.dateRound)[0]
+    ) {
+      fieldErr = false;
+    } else {
+      fieldErr = true;
+    }
+    console.log(
+      imgCover,
+      imgButton,
+      imgReward,
+      imgTableLucky,
+      campaignName,
+      description,
+      rewardName,
+      startDate,
+      endDate,
+      !checkDup,
+      rai,
+      rulesCampaign,
+      status,
+      value.length > 0,
+      value.map((i) => i.dateRound)[0]
+    );
+
+    setBtnSaveDisable(fieldErr);
+  };
 
   const onSubmit = async () => {
     await form.validateFields();
@@ -530,52 +603,55 @@ function EditQuota() {
   const renderData = (
     <CardContainer>
       <CardHeader textHeader="ข้อมูลชาเลนจ์" />
-      <Form form={form} className="p-5">
+      <Form form={form} className="p-5" onFieldsChange={onFieldsChange}>
         <div className="row">
-          <div className="form-group text-center pt-2">
-            <div
-              className="hiddenFileInputQuota"
-              style={{
-                backgroundImage: `url(${
-                  imgCover == undefined ? uploadImgQuota : imgCover
-                })`,
-              }}
-            >
-              <input
-                key={imgCover}
-                type="file"
-                onChange={onChangeImg}
-                title="เลือกรูป"
-              />
+          <Form.Item name="imgCover">
+            <div className="form-group text-center pt-2">
+              <div
+                className="hiddenFileInputQuota"
+                style={{
+                  backgroundImage: `url(${
+                    imgCover == undefined ? uploadImgQuota : imgCover
+                  })`,
+                }}
+              >
+                <input
+                  key={imgCover}
+                  type="file"
+                  onChange={onChangeImg}
+                  title="เลือกรูป"
+                />
+              </div>
+              <div>
+                {imgCover != undefined && (
+                  <>
+                    <Tag
+                      color={color.Success}
+                      onClick={onPreviewImg}
+                      style={{
+                        cursor: "pointer",
+                        borderRadius: "5px",
+                      }}
+                    >
+                      View
+                    </Tag>
+                    <Tag
+                      color={color.Error}
+                      onClick={onRemoveImg}
+                      style={{
+                        cursor: "pointer",
+                        borderRadius: "5px",
+                      }}
+                    >
+                      Remove
+                    </Tag>
+                  </>
+                )}
+              </div>
             </div>
-            <div>
-              {imgCover != undefined && (
-                <>
-                  <Tag
-                    color={color.Success}
-                    onClick={onPreviewImg}
-                    style={{
-                      cursor: "pointer",
-                      borderRadius: "5px",
-                    }}
-                  >
-                    View
-                  </Tag>
-                  <Tag
-                    color={color.Error}
-                    onClick={onRemoveImg}
-                    style={{
-                      cursor: "pointer",
-                      borderRadius: "5px",
-                    }}
-                  >
-                    Remove
-                  </Tag>
-                </>
-              )}
-            </div>
-          </div>
-          <p className="text-center text-danger pt-3">
+          </Form.Item>
+
+          <p className="text-center text-muted	pt-3">
             *รูปภาพจะต้องมีสัดส่วน 1:1 หรือ 375px * 375px เท่านั้น
             เพื่อความสวยงามของภาพในแอปพลิเคชัน*
           </p>
@@ -630,78 +706,84 @@ function EditQuota() {
           <label>
             รูปภาพปุ่มชาเลนจ์ <span style={{ color: "red" }}>*</span>
           </label>
-          <div className="form-group col-lg-12">
-            <div className="p-2">
-              <Row
+          <p className="text-muted pt-1">
+            *รูปภาพจะต้องขนาด 490px * 294px เท่านั้น
+            เพื่อความสวยงามของภาพในแอปพลิเคชัน*
+          </p>
+          <Form.Item
+            name="imgButton"
+            rules={[
+              {
+                required: true,
+                message: "กรุณาใส่รูปภาพ!",
+              },
+            ]}
+          >
+            <div className="form-group col-lg-12">
+              <div className="p-2">
+                <Row
+                  style={{
+                    border: imgButton && "dotted",
+                    borderWidth: imgButton && 0.5,
+                    borderRadius: imgButton && "8px",
+                    width: imgButton && "100%",
+                    height: imgButton && 90,
+                    paddingLeft: imgButton && 5,
+                  }}
+                  gutter={8}
+                >
+                  <Col span={4} className="align-self-center">
+                    <span
+                      style={{
+                        backgroundImage: `url(${imgButton})`,
+                        display: imgButton != undefined ? "block" : "none",
+                        width: "65px",
+                        height: "65px",
+                        overflow: "hidden",
+                        backgroundRepeat: "no-repeat",
+                        backgroundPosition: "center",
+                        backgroundSize: "100%",
+                      }}
+                    />
+                  </Col>
+                  <Col span={18} className="align-self-center">
+                    <span>{imgButton && createImgButton.file.name}</span>
+                  </Col>
+                  <Col span={2} className="align-self-center">
+                    <span>
+                      {imgButton && (
+                        <DeleteOutlined
+                          style={{ fontSize: 20, color: color.Error }}
+                          onClick={onRemoveImgButton}
+                        />
+                      )}
+                    </span>
+                  </Col>
+                </Row>
+              </div>
+              <div
+                className="hiddenFileBtn"
                 style={{
-                  border: imgButton && "dotted",
-                  borderWidth: imgButton && 0.5,
-                  borderRadius: imgButton && "8px",
-                  width: imgButton && "100%",
-                  height: imgButton && 90,
-                  paddingLeft: imgButton && 5,
+                  backgroundImage: `url(${image.upload_Img_btn})`,
+                  display: imgButton == undefined ? "block" : "none",
                 }}
-                gutter={8}
               >
-                <Col span={4} className="align-self-center">
-                  <span
-                    style={{
-                      backgroundImage: `url(${imgButton})`,
-                      display: imgButton != undefined ? "block" : "none",
-                      width: "65px",
-                      height: "65px",
-                      overflow: "hidden",
-                      backgroundRepeat: "no-repeat",
-                      backgroundPosition: "center",
-                      backgroundSize: "100%",
-                    }}
-                  />
-                </Col>
-                <Col span={18} className="align-self-center">
-                  <span>{imgButton && createImgButton.file.name}</span>
-                </Col>
-                <Col span={2} className="align-self-center">
-                  <span>
-                    {imgButton && (
-                      <DeleteOutlined
-                        style={{ fontSize: 20, color: color.Error }}
-                        onClick={onRemoveImgButton}
-                      />
-                    )}
-                  </span>
-                </Col>
-              </Row>
+                <input
+                  key={imgButton}
+                  type="file"
+                  onChange={onChangeImgButton}
+                  title="เลือกรูป"
+                />
+              </div>
             </div>
-            <div
-              className="hiddenFileBtn"
-              style={{
-                backgroundImage: `url(${image.upload_Img_btn})`,
-                display: imgButton == undefined ? "block" : "none",
-              }}
-            >
-              <input
-                key={imgButton}
-                type="file"
-                onChange={onChangeImgButton}
-                title="เลือกรูป"
-              />
-            </div>
-          </div>
+          </Form.Item>
         </div>
         <Divider />
         <div className="form-group col-lg-12">
           <label>
             ชื่อของรางวัล <span style={{ color: "red" }}>*</span>
           </label>
-          <Form.Item
-            name="rewardName"
-            rules={[
-              {
-                required: true,
-                message: "กรุณากรอกชื่อของรางวัล!",
-              },
-            ]}
-          >
+          <Form.Item name="rewardName">
             <Input
               placeholder="กรอกชื่อของรางวัล"
               autoComplete="off"
@@ -715,63 +797,70 @@ function EditQuota() {
           <label>
             รูปภาพของรางวัล <span style={{ color: "red" }}>*</span>
           </label>
-          <div className="form-group col-lg-12">
-            <div className="p-2">
-              <Row
+          <p className="text-muted pt-1">
+            *รูปภาพจะต้องมีสัดส่วน 1:1 ขนาด 500px * 500px เท่านั้น
+            เพื่อความสวยงามของภาพในแอปพลิเคชัน*
+          </p>
+          <Form.Item name="imgReward">
+            {" "}
+            <div className="form-group col-lg-12">
+              <div className="p-2">
+                <Row
+                  style={{
+                    border: imgReward && "dotted",
+                    borderWidth: imgReward && 0.5,
+                    borderRadius: imgReward && "8px",
+                    width: imgReward && "100%",
+                    height: imgReward && 90,
+                    paddingLeft: imgReward && 5,
+                  }}
+                  gutter={8}
+                >
+                  <Col span={4} className="align-self-center">
+                    <span
+                      style={{
+                        backgroundImage: `url(${imgReward})`,
+                        display: imgReward != undefined ? "block" : "none",
+                        width: "65px",
+                        height: "65px",
+                        overflow: "hidden",
+                        backgroundRepeat: "no-repeat",
+                        backgroundPosition: "center",
+                        backgroundSize: "100%",
+                      }}
+                    />
+                  </Col>
+                  <Col span={18} className="align-self-center">
+                    <span>{imgReward && createImgReward.file.name}</span>
+                  </Col>
+                  <Col span={2} className="align-self-center">
+                    <span>
+                      {imgReward && (
+                        <DeleteOutlined
+                          style={{ fontSize: 20, color: color.Error }}
+                          onClick={onRemoveImgReward}
+                        />
+                      )}
+                    </span>
+                  </Col>
+                </Row>
+              </div>
+              <div
+                className="hiddenFileBtn"
                 style={{
-                  border: imgReward && "dotted",
-                  borderWidth: imgReward && 0.5,
-                  borderRadius: imgReward && "8px",
-                  width: imgReward && "100%",
-                  height: imgReward && 90,
-                  paddingLeft: imgReward && 5,
+                  backgroundImage: `url(${image.upload_Img_btn})`,
+                  display: imgReward == undefined ? "block" : "none",
                 }}
-                gutter={8}
               >
-                <Col span={4} className="align-self-center">
-                  <span
-                    style={{
-                      backgroundImage: `url(${imgReward})`,
-                      display: imgReward != undefined ? "block" : "none",
-                      width: "65px",
-                      height: "65px",
-                      overflow: "hidden",
-                      backgroundRepeat: "no-repeat",
-                      backgroundPosition: "center",
-                      backgroundSize: "100%",
-                    }}
-                  />
-                </Col>
-                <Col span={18} className="align-self-center">
-                  <span>{imgReward && createImgReward.file.name}</span>
-                </Col>
-                <Col span={2} className="align-self-center">
-                  <span>
-                    {imgReward && (
-                      <DeleteOutlined
-                        style={{ fontSize: 20, color: color.Error }}
-                        onClick={onRemoveImgReward}
-                      />
-                    )}
-                  </span>
-                </Col>
-              </Row>
+                <input
+                  key={imgReward}
+                  type="file"
+                  onChange={onChangeImgReward}
+                  title="เลือกรูป"
+                />
+              </div>
             </div>
-            <div
-              className="hiddenFileBtn"
-              style={{
-                backgroundImage: `url(${image.upload_Img_btn})`,
-                display: imgReward == undefined ? "block" : "none",
-              }}
-            >
-              <input
-                key={imgReward}
-                type="file"
-                onChange={onChangeImgReward}
-                title="เลือกรูป"
-              />
-            </div>
-          </div>
+          </Form.Item>
         </div>
         <Divider />
         <div className="row">
@@ -929,63 +1018,71 @@ function EditQuota() {
           <label>
             ตารางจับรางวัล <span style={{ color: "red" }}>*</span>
           </label>
-          <div className="form-group col-lg-12">
-            <div className="p-2">
-              <Row
+          <p className="text-muted pt-1">
+            *รูปภาพจะต้องมีสัดส่วน 1:1 ขนาด 1200px * 1200px เท่านั้น
+            เพื่อความสวยงามของภาพในแอปพลิเคชัน*{" "}
+          </p>
+          <Form.Item name="imgTableLucky">
+            <div className="form-group col-lg-12">
+              <div className="p-2">
+                <Row
+                  style={{
+                    border: imgTableLucky && "dotted",
+                    borderWidth: imgTableLucky && 0.5,
+                    borderRadius: imgTableLucky && "8px",
+                    width: imgTableLucky && "100%",
+                    height: imgTableLucky && 90,
+                    paddingLeft: imgTableLucky && 5,
+                  }}
+                  gutter={8}
+                >
+                  <Col span={4} className="align-self-center">
+                    <span
+                      style={{
+                        backgroundImage: `url(${imgTableLucky})`,
+                        display: imgTableLucky != undefined ? "block" : "none",
+                        width: "65px",
+                        height: "65px",
+                        overflow: "hidden",
+                        backgroundRepeat: "no-repeat",
+                        backgroundPosition: "center",
+                        backgroundSize: "100%",
+                      }}
+                    />
+                  </Col>
+                  <Col span={18} className="align-self-center">
+                    <span>
+                      {imgTableLucky && createImgTableLucky.file.name}
+                    </span>
+                  </Col>
+                  <Col span={2} className="align-self-center">
+                    <span>
+                      {imgTableLucky && (
+                        <DeleteOutlined
+                          style={{ fontSize: 20, color: color.Error }}
+                          onClick={onRemoveImgTableLucky}
+                        />
+                      )}
+                    </span>
+                  </Col>
+                </Row>
+              </div>
+              <div
+                className="hiddenFileBtn"
                 style={{
-                  border: imgTableLucky && "dotted",
-                  borderWidth: imgTableLucky && 0.5,
-                  borderRadius: imgTableLucky && "8px",
-                  width: imgTableLucky && "100%",
-                  height: imgTableLucky && 90,
-                  paddingLeft: imgTableLucky && 5,
+                  backgroundImage: `url(${image.upload_Img_btn})`,
+                  display: imgTableLucky == undefined ? "block" : "none",
                 }}
-                gutter={8}
               >
-                <Col span={4} className="align-self-center">
-                  <span
-                    style={{
-                      backgroundImage: `url(${imgTableLucky})`,
-                      display: imgTableLucky != undefined ? "block" : "none",
-                      width: "65px",
-                      height: "65px",
-                      overflow: "hidden",
-                      backgroundRepeat: "no-repeat",
-                      backgroundPosition: "center",
-                      backgroundSize: "100%",
-                    }}
-                  />
-                </Col>
-                <Col span={18} className="align-self-center">
-                  <span>{imgTableLucky && createImgTableLucky.file.name}</span>
-                </Col>
-                <Col span={2} className="align-self-center">
-                  <span>
-                    {imgTableLucky && (
-                      <DeleteOutlined
-                        style={{ fontSize: 20, color: color.Error }}
-                        onClick={onRemoveImgTableLucky}
-                      />
-                    )}
-                  </span>
-                </Col>
-              </Row>
+                <input
+                  key={imgTableLucky}
+                  type="file"
+                  onChange={onChangeImgTableLucky}
+                  title="เลือกรูป"
+                />
+              </div>
             </div>
-            <div
-              className="hiddenFileBtn"
-              style={{
-                backgroundImage: `url(${image.upload_Img_btn})`,
-                display: imgTableLucky == undefined ? "block" : "none",
-              }}
-            >
-              <input
-                key={imgTableLucky}
-                type="file"
-                onChange={onChangeImgTableLucky}
-                title="เลือกรูป"
-              />
-            </div>
-          </div>
+          </Form.Item>
         </div>
         <br />
         <div className="form-group col-lg-12">
@@ -1062,11 +1159,14 @@ function EditQuota() {
           />
         </Col>
       </Row>
-      <FooterPage
-        styleFooter={{ padding: "6px" }}
-        onClickBack={() => navigate(-1)}
-        onClickSave={onSubmit}
-      />
+      <div className="pt-3 pb-3">
+        <FooterPage
+          styleFooter={{ padding: "6px" }}
+          onClickBack={() => navigate(-1)}
+          onClickSave={onSubmit}
+          disableSaveBtn={saveBtnDisable}
+        />
+      </div>
     </>
   );
 }

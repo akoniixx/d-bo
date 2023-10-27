@@ -13,6 +13,7 @@ import { color } from "../../resource";
 import { DateTimeUtil } from "../../utilities/DateTimeUtil";
 import { numberWithCommas } from "../../utilities/TextFormatter";
 import { useNavigate } from "react-router-dom";
+import ShowNickName from "../../components/popover/ShowNickName";
 const _ = require("lodash");
 
 const NewTable = styled(Table)`
@@ -249,42 +250,52 @@ const DetailFarmerRedeem = () => {
     <CardContainer>
       <CardHeader textHeader="ข้อมูลเกษตรกร" />
       <Container className="p-3">
-        <Row>
-          <Col span={4}>
-            <div>ชื่อเกษตรกร</div>
-            <div style={{ color: color.Success }}>
-              <u>{data?.farmer.firstname + " " + data?.farmer.lastname}</u>
-            </div>
-          </Col>
-          <Col span={4}>
-            <div>เบอร์โทร</div>
-            <div>{data?.farmer.telephoneNo}</div>
-          </Col>
-          <Col span={12}>
-            <div>ที่อยู่</div>
-            <div>
-              {data?.farmer.address.address1 +
-                " " +
-                data?.farmer.address.address2 +
-                " " +
-                data?.farmer.address.subdistrict.subdistrictName +
-                " " +
-                data?.farmer.address.district.districtName +
-                " " +
-                data?.farmer.address.province.provinceName +
-                " " +
-                data?.farmer.address.postcode}
-            </div>
-          </Col>
-          <Col span={4}>
-            <div>แต้มที่แลก</div>
-            <div style={{ color: color.Error }}>
-              {"- " +
-                numberWithCommas(parseFloat(data?.usePoint!) || 0) +
-                " แต้ม"}
-            </div>
-          </Col>
-        </Row>
+        {data?.farmer !== null && data?.farmer.isDelete !== true ?
+         <Row>
+         <Col span={4}>
+           <div>ชื่อเกษตรกร</div>
+           <div style={{ color: color.Success }}>
+             <u>{data?.farmer.firstname + " " + data?.farmer.lastname}</u>
+             {data?.farmer.nickname && (
+                  <ShowNickName data={data?.farmer.nickname} menu="INFO" />
+                )}
+           </div>
+         </Col>
+         <Col span={4}>
+           <div>เบอร์โทร</div>
+           <div>{data?.farmer.telephoneNo}</div>
+         </Col>
+         <Col span={12}>
+           <div>ที่อยู่</div>
+           <div>
+             {data?.farmer.address.address1 +
+               " " +
+               data?.farmer.address.address2 +
+               " " +
+               data?.farmer.address.subdistrict.subdistrictName +
+               " " +
+               data?.farmer.address.district.districtName +
+               " " +
+               data?.farmer.address.province.provinceName +
+               " " +
+               data?.farmer.address.postcode}
+           </div>
+         </Col>
+         <Col span={4}>
+           <div>แต้มที่แลก</div>
+           <div style={{ color: color.Error }}>
+             {"- " +
+               numberWithCommas(parseFloat(data?.usePoint!) || 0) +
+               " แต้ม"}
+           </div>
+         </Col>
+       </Row> :
+       <div style={{ textAlign: "center" }}>
+       <strong style={{ color: color.Error, alignItems: "center" }}>
+         ผู้ใช้งานนี้ถูกลบแล้ว
+       </strong>
+     </div>}
+       
       </Container>
       <NewTable columns={columeHis} dataSource={dataHis} pagination={false} />
     </CardContainer>

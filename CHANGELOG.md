@@ -1,4 +1,26 @@
 ## [Version - 0]
+## Fix [v0.37.10] 2023-10-22
+- fixed  show tel droner
+## Fix [v0.37.9] 2023-10-21
+- fixed  validate rai in addNewTask
+
+## Fix [v0.37.8] 2023-10-20
+
+- fixed reward mission filter
+
+## Fix [v0.37.7] 2023-10-16
+
+- fixed startDate in mission
+- fixed validate rai in mission
+- display text image size
+
+## improve [v0.37.6] 2023-10-11
+
+- mission point setting
+
+## improve [v0.37.5] 2023-10-10
+
+- display nickname droner & farmer
 
 ## improve [v0.37.4] 2023-10-2
 

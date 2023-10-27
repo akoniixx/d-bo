@@ -54,6 +54,7 @@ import { ListCheck } from "../../../components/dropdownCheck/ListStatusAppType";
 import { listAppType } from "../../../definitions/ApplicatoionTypes";
 import CheckDocument from "../../../components/dropdownCheck/CheckDocument";
 import { icon } from "../../../resource";
+import ShowNickName from "../../../components/popover/ShowNickName";
 export default function IndexFinishTask() {
   const navigate = useNavigate();
   const [row, setRow] = useState(10);
@@ -68,7 +69,8 @@ export default function IndexFinishTask() {
   const [searchSubdistrict, setSearchSubdistrict] = useState<any>();
   const [province, setProvince] = useState<ProviceEntity[]>();
   const [district, setDistrict] = useState<DistrictEntity[]>();
-  const [subdistrict, setSubdistrict] = useState<SubdistrictEntity[]>();
+  const [subdistrict, setSubdistrict] =
+    useState<SubdistrictEntity[]>();
   const [showModalMap, setShowModalMap] = useState<boolean>(false);
   const [plotId, setPlotId] = useState<string>("");
   const { RangePicker } = DatePicker;
@@ -80,24 +82,26 @@ export default function IndexFinishTask() {
   const [applicationType, setApplicationType] = useState<any>();
   const [loading, setLoading] = useState(false);
   const [problems, setProblems] = useState<any>([]);
-  const [sortDirection, setSortDirection] = useState<string | undefined>();
+  const [sortDirection, setSortDirection] = useState<
+    string | undefined
+  >();
   const [sortField, setSortField] = useState<string | undefined>();
   const [documentPersons, setDocumentPersons] = useState<any>();
-  const [sortDirection1, setSortDirection1] = useState<string | undefined>(
-    undefined
-  );
-  const [sortDirection2, setSortDirection2] = useState<string | undefined>(
-    undefined
-  );
-  const [sortDirection3, setSortDirection3] = useState<string | undefined>(
-    undefined
-  );
-  const [sortDirection4, setSortDirection4] = useState<string | undefined>(
-    undefined
-  );
-  const [sortDirection5, setSortDirection5] = useState<string | undefined>(
-    undefined
-  );
+  const [sortDirection1, setSortDirection1] = useState<
+    string | undefined
+  >(undefined);
+  const [sortDirection2, setSortDirection2] = useState<
+    string | undefined
+  >(undefined);
+  const [sortDirection3, setSortDirection3] = useState<
+    string | undefined
+  >(undefined);
+  const [sortDirection4, setSortDirection4] = useState<
+    string | undefined
+  >(undefined);
+  const [sortDirection5, setSortDirection5] = useState<
+    string | undefined
+  >(undefined);
 
   const fetchTaskFinish = async () => {
     setLoading(true);
@@ -159,9 +163,11 @@ export default function IndexFinishTask() {
     });
   };
   const fetchSubdistrict = async (districtId: number) => {
-    await LocationDatasource.getSubdistrict(districtId).then((res) => {
-      setSubdistrict(res);
-    });
+    await LocationDatasource.getSubdistrict(districtId).then(
+      (res) => {
+        setSubdistrict(res);
+      }
+    );
   };
   const changeTextSearch = (searchText: any) => {
     setSearchText(searchText.target.value);
@@ -240,8 +246,7 @@ export default function IndexFinishTask() {
     <>
       <div
         className="d-flex justify-content-between"
-        style={{ padding: "10px" }}
-      >
+        style={{ padding: "10px" }}>
         <div>
           <span
             className="card-label font-weight-bolder text-dark"
@@ -249,8 +254,7 @@ export default function IndexFinishTask() {
               fontSize: 22,
               fontWeight: "bold",
               padding: "8px",
-            }}
-          >
+            }}>
             <strong>งานที่เสร็จแล้ว</strong>
           </span>
         </div>
@@ -264,11 +268,12 @@ export default function IndexFinishTask() {
       </div>
       <div
         className="d-flex justify-content-between"
-        style={{ padding: "0px" }}
-      >
+        style={{ padding: "0px" }}>
         <div className="col-lg-2 p-1">
           <Input
-            prefix={<SearchOutlined style={{ color: color.Disable }} />}
+            prefix={
+              <SearchOutlined style={{ color: color.Disable }} />
+            }
             placeholder="ค้นหาชื่อเกษตรกร, คนบินโดรน หรือเบอร์โทร"
             className="col-lg-12 p-1"
             onChange={changeTextSearch}
@@ -289,8 +294,7 @@ export default function IndexFinishTask() {
               optionA.children
                 .toLowerCase()
                 .localeCompare(optionB.children.toLowerCase())
-            }
-          >
+            }>
             {province?.map((item) => (
               <option value={item.provinceId.toString()}>
                 {item.provinceName}
@@ -315,8 +319,7 @@ export default function IndexFinishTask() {
                 .localeCompare(optionB.children.toLowerCase())
             }
             disabled={!searchProvince}
-            value={searchDistrict}
-          >
+            value={searchDistrict}>
             {district?.map((item) => (
               <option value={item.districtId.toString()}>
                 {item.districtName}
@@ -341,8 +344,7 @@ export default function IndexFinishTask() {
                 .localeCompare(optionB.children.toLowerCase())
             }
             disabled={!searchDistrict}
-            value={searchSubdistrict}
-          >
+            value={searchSubdistrict}>
             {subdistrict?.map((item) => (
               <option value={item.subdistrictId.toString()}>
                 {item.subdistrictName}
@@ -374,8 +376,7 @@ export default function IndexFinishTask() {
             className="col-lg-12 p-1"
             placeholder="เลือกสถานะ"
             onChange={handleStatus}
-            allowClear
-          >
+            allowClear>
             {FINISH_TASK_SEARCH.map((item) => (
               <option value={item.value}>{item.name}</option>
             ))}
@@ -393,8 +394,7 @@ export default function IndexFinishTask() {
             onClick={() => {
               setCurrent(1);
               fetchTaskFinish();
-            }}
-          >
+            }}>
             ค้นหาข้อมูล
           </Button>
         </div>
@@ -405,7 +405,8 @@ export default function IndexFinishTask() {
     {
       title: () => {
         return (
-          <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+          <div
+            style={{ display: "flex", gap: 8, alignItems: "center" }}>
             วัน/เวลานัดหมาย
             <div
               style={{
@@ -433,20 +434,21 @@ export default function IndexFinishTask() {
                     return undefined;
                   }
                 });
-              }}
-            >
+              }}>
               <CaretUpOutlined
                 style={{
                   position: "relative",
                   top: 2,
-                  color: sortDirection1 === "ASC" ? "#ffca37" : "white",
+                  color:
+                    sortDirection1 === "ASC" ? "#ffca37" : "white",
                 }}
               />
               <CaretDownOutlined
                 style={{
                   position: "relative",
                   bottom: 2,
-                  color: sortDirection1 === "DESC" ? "#ffca37" : "white",
+                  color:
+                    sortDirection1 === "DESC" ? "#ffca37" : "white",
                 }}
               />
             </div>
@@ -460,8 +462,13 @@ export default function IndexFinishTask() {
           children: (
             <>
               <span className="text-dark-75  d-block font-size-lg">
-                {moment(new Date(row.dateAppointment)).format(dateFormat)},{" "}
-                {moment(new Date(row.dateAppointment)).format(timeFormat)}
+                {moment(new Date(row.dateAppointment)).format(
+                  dateFormat
+                )}
+                ,{" "}
+                {moment(new Date(row.dateAppointment)).format(
+                  timeFormat
+                )}
               </span>
               <span style={{ color: color.Grey, fontSize: "12px" }}>
                 {row.taskNo}
@@ -474,7 +481,8 @@ export default function IndexFinishTask() {
     {
       title: () => {
         return (
-          <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+          <div
+            style={{ display: "flex", gap: 8, alignItems: "center" }}>
             ชื่อนักบินโดรน{" "}
             <div
               style={{
@@ -502,20 +510,21 @@ export default function IndexFinishTask() {
                     return undefined;
                   }
                 });
-              }}
-            >
+              }}>
               <CaretUpOutlined
                 style={{
                   position: "relative",
                   top: 2,
-                  color: sortDirection2 === "ASC" ? "#ffca37" : "white",
+                  color:
+                    sortDirection2 === "ASC" ? "#ffca37" : "white",
                 }}
               />
               <CaretDownOutlined
                 style={{
                   position: "relative",
                   bottom: 2,
-                  color: sortDirection2 === "DESC" ? "#ffca37" : "white",
+                  color:
+                    sortDirection2 === "DESC" ? "#ffca37" : "white",
                 }}
               />
             </div>
@@ -534,7 +543,13 @@ export default function IndexFinishTask() {
                   : "-"}
               </span>
               <span style={{ color: color.Grey, fontSize: "12px" }}>
-                {row.droner !== null ? row.droner.telephoneNo : null}
+                {row?.droner?.telephoneNo || "-"}
+                {row.droner && row.droner.nickname && (
+                  <ShowNickName
+                    data={row.droner.nickname}
+                    menu="INFO"
+                  />
+                )}
               </span>
             </>
           ),
@@ -544,7 +559,8 @@ export default function IndexFinishTask() {
     {
       title: () => {
         return (
-          <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+          <div
+            style={{ display: "flex", gap: 8, alignItems: "center" }}>
             ชื่อเกษตรกร
             <div
               style={{
@@ -572,20 +588,21 @@ export default function IndexFinishTask() {
                     return undefined;
                   }
                 });
-              }}
-            >
+              }}>
               <CaretUpOutlined
                 style={{
                   position: "relative",
                   top: 2,
-                  color: sortDirection3 === "ASC" ? "#ffca37" : "white",
+                  color:
+                    sortDirection3 === "ASC" ? "#ffca37" : "white",
                 }}
               />
               <CaretDownOutlined
                 style={{
                   position: "relative",
                   bottom: 2,
-                  color: sortDirection3 === "DESC" ? "#ffca37" : "white",
+                  color:
+                    sortDirection3 === "DESC" ? "#ffca37" : "white",
                 }}
               />
             </div>
@@ -602,7 +619,13 @@ export default function IndexFinishTask() {
                 {row.farmer.firstname + " " + row.farmer.lastname}
               </span>
               <span style={{ color: color.Grey, fontSize: "12px" }}>
-                {row.farmer.telephoneNo}
+                {row.farmer.telephoneNo || "-"}
+                {row.farmer && row.farmer.nickname && (
+                  <ShowNickName
+                    data={row.farmer.nickname}
+                    menu="INFO"
+                  />
+                )}
               </span>
             </>
           ),
@@ -624,13 +647,14 @@ export default function IndexFinishTask() {
                 {subdistrict !== null
                   ? subdistrict.subdistrictName + "/"
                   : "-/"}
-                {district !== null ? district.districtName + "/" : "-/"}
+                {district !== null
+                  ? district.districtName + "/"
+                  : "-/"}
                 {province !== null ? province.provinceName + "" : "-"}
               </span>
               <a
                 onClick={() => handleModalMap(row.farmerPlotId)}
-                style={{ color: color.primary1 }}
-              >
+                style={{ color: color.primary1 }}>
                 ดูแผนที่แปลง
               </a>
             </>
@@ -641,7 +665,8 @@ export default function IndexFinishTask() {
     {
       title: () => {
         return (
-          <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+          <div
+            style={{ display: "flex", gap: 8, alignItems: "center" }}>
             Rating{" "}
             <div
               style={{
@@ -669,20 +694,21 @@ export default function IndexFinishTask() {
                     return undefined;
                   }
                 });
-              }}
-            >
+              }}>
               <CaretUpOutlined
                 style={{
                   position: "relative",
                   top: 2,
-                  color: sortDirection4 === "ASC" ? "#ffca37" : "white",
+                  color:
+                    sortDirection4 === "ASC" ? "#ffca37" : "white",
                 }}
               />
               <CaretDownOutlined
                 style={{
                   position: "relative",
                   bottom: 2,
-                  color: sortDirection4 === "DESC" ? "#ffca37" : "white",
+                  color:
+                    sortDirection4 === "DESC" ? "#ffca37" : "white",
                 }}
               />
             </div>
@@ -726,7 +752,11 @@ export default function IndexFinishTask() {
             <>
               <div>
                 <Image
-                  src={row.droner?.file.length === 1 ? icon.check : icon.cancel}
+                  src={
+                    row.droner?.file.length === 1
+                      ? icon.check
+                      : icon.cancel
+                  }
                   preview={false}
                   style={{ width: 18, height: 18, marginRight: 6 }}
                 />
@@ -735,7 +765,9 @@ export default function IndexFinishTask() {
               <div>
                 <Image
                   src={
-                    row.droner?.isBookBank === true ? icon.check : icon.cancel
+                    row.droner?.isBookBank === true
+                      ? icon.check
+                      : icon.cancel
                   }
                   preview={false}
                   style={{ width: 18, height: 18, marginRight: 6 }}
@@ -750,7 +782,8 @@ export default function IndexFinishTask() {
     {
       title: () => {
         return (
-          <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+          <div
+            style={{ display: "flex", gap: 8, alignItems: "center" }}>
             ค่าบริการ{" "}
             <div
               style={{
@@ -778,20 +811,21 @@ export default function IndexFinishTask() {
                     return undefined;
                   }
                 });
-              }}
-            >
+              }}>
               <CaretUpOutlined
                 style={{
                   position: "relative",
                   top: 2,
-                  color: sortDirection5 === "ASC" ? "#ffca37" : "white",
+                  color:
+                    sortDirection5 === "ASC" ? "#ffca37" : "white",
                 }}
               />
               <CaretDownOutlined
                 style={{
                   position: "relative",
                   bottom: 2,
-                  color: sortDirection5 === "DESC" ? "#ffca37" : "white",
+                  color:
+                    sortDirection5 === "DESC" ? "#ffca37" : "white",
                 }}
               />
             </div>
@@ -849,7 +883,9 @@ export default function IndexFinishTask() {
                       />
                       <span>
                         {" "}
-                        {row.createBy ? row.createBy + ` ${item.create}` : "-"}
+                        {row.createBy
+                          ? row.createBy + ` ${item.create}`
+                          : "-"}
                       </span>
                     </>
                   )
@@ -873,7 +909,10 @@ export default function IndexFinishTask() {
                 {FINISH_TASK[row.status]}
                 {beforeValue != undefined
                   ? row.status == "CANCELED"
-                    ? " " + "(" + TASK_HISTORY[beforeValue.beforeValue] + ")"
+                    ? " " +
+                      "(" +
+                      TASK_HISTORY[beforeValue.beforeValue] +
+                      ")"
                     : null
                   : null}
                 <br />

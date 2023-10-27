@@ -13,7 +13,11 @@ import {
   Table,
 } from "antd";
 import MissionReportCard from "../../../components/card/MissionReportCard";
-import { SearchOutlined } from "@ant-design/icons";
+import {
+  CaretDownOutlined,
+  CaretUpOutlined,
+  SearchOutlined,
+} from "@ant-design/icons";
 import moment from "moment";
 import {
   ConditionMission,
@@ -23,6 +27,7 @@ import { CampaignDatasource } from "../../../datasource/CampaignDatasource";
 import { DateTimeUtil } from "../../../utilities/DateTimeUtil";
 import { numberWithCommas } from "../../../utilities/TextFormatter";
 import styled from "styled-components";
+import ShowNickName from "../../../components/popover/ShowNickName";
 const _ = require("lodash");
 
 const NewTable = styled(Table)<{
@@ -48,7 +53,8 @@ function MissionReport() {
   const { RangePicker } = DatePicker;
   const dateFormat = "DD/MM/YYYY";
   const dateSearchFormat = "YYYY-MM-DD";
-
+  const [sortDirection, setSortDirection] = useState<string | undefined>();
+  const [sortField, setSortField] = useState<string | undefined>();
   const navigate = useNavigate();
   const [dataMission, setDataMission] = useState<MissionDetailEntity>();
   const [dataCondition, setDataCondition] = useState<ConditionMission[]>();
@@ -57,10 +63,17 @@ function MissionReport() {
   const [statusMission, setStatusMission] = useState("INPROGRESS");
   const [isLoading, setIsLoading] = useState(false);
   const [search, setSearch] = useState("");
-
+  const [campaignType, setCampaignType] = useState<string>();
+  const [sortDirection1, setSortDirection1] = useState<string | undefined>(
+    undefined
+  );
+  const [sortDirection2, setSortDirection2] = useState<string | undefined>(
+    undefined
+  );
   interface DataTable {
     updateAt: string;
     name: string;
+    nickname: string;
     telephone: string;
     allraiAmount: string;
     redeemNo: string;
@@ -78,14 +91,18 @@ function MissionReport() {
       row,
       currentTable,
       statusMission,
-      search
+      search,
+      sortField,
+      sortDirection
     ).then((res) => {
+      setCampaignType(res.campaignType);
       setCountInpro(res.count);
       const tableList = [];
       for (let i = 0; res.data.length > i; i++) {
         const table: any = {
           updateAt: res.data[i].updateAt,
           name: res.data[i].firstname + " " + res.data[i].lastname,
+          nickname: res.data[i].nickname,
           telephone: res.data[i].telephoneNo,
           allraiAmount: res.data[i].allraiAmount,
           isDelete: res.data[i].isDelete,
@@ -96,8 +113,8 @@ function MissionReport() {
         rowCard * (current - 1),
         rowCard * current
       );
-      setDataInpro(tableList);
       setDataCondition(mapPage);
+      setDataInpro(tableList);
       setDataMission(res);
       fetchMissionSuccess(res.missionNo);
       setIsLoading(false);
@@ -139,7 +156,7 @@ function MissionReport() {
 
   useEffect(() => {
     fetchMissionInprogress();
-  }, [currentTable, num, statusMission, current]);
+  }, [currentTable, num, statusMission, current, sortDirection]);
 
   const onChangePage = (page: number) => {
     setCurrentTable(page);
@@ -174,7 +191,56 @@ function MissionReport() {
 
   const columns: any = [
     {
-      title: "วันที่อัพเดต",
+      title: () => {
+        return (
+          <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+            วันที่อัพเดต
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                cursor: "pointer",
+              }}
+              onClick={() => {
+                setSortField("updateAt");
+                setSortDirection((prev) => {
+                  if (prev === "ASC") {
+                    return "DESC";
+                  } else if (prev === undefined) {
+                    return "ASC";
+                  } else {
+                    return undefined;
+                  }
+                });
+                setSortDirection1((prev) => {
+                  if (prev === "ASC") {
+                    return "DESC";
+                  } else if (prev === undefined) {
+                    return "ASC";
+                  } else {
+                    return undefined;
+                  }
+                });
+              }}
+            >
+              <CaretUpOutlined
+                style={{
+                  position: "relative",
+                  top: 2,
+                  color: sortDirection1 === "ASC" ? "#ffca37" : "white",
+                }}
+              />
+              <CaretDownOutlined
+                style={{
+                  position: "relative",
+                  bottom: 2,
+                  color: sortDirection1 === "DESC" ? "#ffca37" : "white",
+                }}
+              />
+            </div>
+          </div>
+        );
+      },
       dataIndex: "updatedAt",
       key: "updatedAt",
       render: (value: any, row: any, index: number) => {
@@ -190,13 +256,16 @@ function MissionReport() {
       render: (value: any, row: any, index: number) => {
         return {
           children: (
-            <u
-              style={{
-                color: row.isDelete === true ? color.Error : color.Success,
-              }}
-            >
-              {row.name}
-            </u>
+            <>
+              <u
+                style={{
+                  color: row.isDelete === true ? color.Error : color.Success,
+                }}
+              >
+                {row.name}
+              </u>
+              {row.nickname && <ShowNickName data={row.nickname} menu="INFO" />}
+            </>
           ),
         };
       },
@@ -220,7 +289,56 @@ function MissionReport() {
       },
     },
     {
-      title: "จำนวนไร่สะสม",
+      title: () => {
+        return (
+          <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+            จำนวนไร่สะสม
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                cursor: "pointer",
+              }}
+              onClick={() => {
+                setSortField("allraiAmount");
+                setSortDirection((prev) => {
+                  if (prev === "ASC") {
+                    return "DESC";
+                  } else if (prev === undefined) {
+                    return "ASC";
+                  } else {
+                    return undefined;
+                  }
+                });
+                setSortDirection2((prev) => {
+                  if (prev === "ASC") {
+                    return "DESC";
+                  } else if (prev === undefined) {
+                    return "ASC";
+                  } else {
+                    return undefined;
+                  }
+                });
+              }}
+            >
+              <CaretUpOutlined
+                style={{
+                  position: "relative",
+                  top: 2,
+                  color: sortDirection2 === "ASC" ? "#ffca37" : "white",
+                }}
+              />
+              <CaretDownOutlined
+                style={{
+                  position: "relative",
+                  bottom: 2,
+                  color: sortDirection2 === "DESC" ? "#ffca37" : "white",
+                }}
+              />
+            </div>
+          </div>
+        );
+      },
       dataIndex: "allraiAmount",
       key: "allraiAmount",
       render: (value: any, row: any, index: number) => {
@@ -250,26 +368,31 @@ function MissionReport() {
         };
       },
     },
-    {
-      title: "Redeem No.",
-      dataIndex: "redeemNo",
-      key: "redeemNo",
-      render: (value: any, row: any, index: number) => {
-        return {
-          children: (
-            <div>
-              <span
-                style={{
-                  color: color.Success,
-                }}
-              >
-                {row.redeemNo}
-              </span>
-            </div>
-          ),
-        };
-      },
-    },
+    campaignType === "MISSION_REWARD"
+      ? {
+          title: "Redeem No.",
+          dataIndex: "redeemNo",
+          key: "redeemNo",
+          render: (value: any, row: any, index: number) => {
+            return {
+              children: (
+                <div>
+                  <span
+                    style={{
+                      color: color.Success,
+                    }}
+                  >
+                    {row.redeemNo}
+                  </span>
+                </div>
+              ),
+            };
+          },
+        }
+      : {
+          title: "",
+          key: "",
+        },
   ];
 
   const renderSubmission = (
@@ -287,37 +410,70 @@ function MissionReport() {
           ผู้เข้าร่วมภารกิจ : {dataMission?.amountPeople} คน
         </h5>
       </div>
-      {dataCondition?.map((item: any, index: any) => {
-        const detailReward: any = {
-          rewardId: item.reward.id,
-          rewardName: item.reward.rewardName,
-          rewardNo: item.reward.rewardNo,
-          rewardExchange: item.reward.rewardExchange,
-          remain: item.reward.remain,
-          imagePath: item.reward.imagePath,
-          rewardType: item.reward.rewardType,
-        };
-        return (
-          <div
-            className="pt-3"
-            key={item.num}
-            onClick={() => {
-              setNum(item.num);
-            }}
-            style={{ cursor: "pointer" }}
-          >
-            <MissionReportCard
-              checkCard={checkSubmission(item.num)}
-              title={`ภารกิจ ${item.num}  ${item.missionName}`}
-              raiAmount={item.rai}
-              successMission={item.reward.amountSuccessCount}
-              unsuccessMission={item.reward.amountInprogressCount}
-              unconfirmMission={item.reward.amountRequestCount}
-              detailReward={detailReward}
-            />
-          </div>
-        );
-      })}
+      {campaignType === "MISSION_REWARD"
+        ? dataCondition?.map((item: any, index: any) => {
+            const detailReward: any = {
+              rewardId: item.reward.id,
+              rewardName: item.reward.rewardName,
+              rewardNo: item.reward.rewardNo,
+              rewardExchange: item.reward.rewardExchange,
+              remain: item.reward.remain,
+              imagePath: item.reward.imagePath,
+              rewardType: item.reward.rewardType,
+            };
+            return (
+              <div
+                className="pt-3"
+                key={item.num}
+                onClick={() => {
+                  setNum(item.num);
+                }}
+                style={{ cursor: "pointer" }}
+              >
+                <MissionReportCard
+                  checkCard={checkSubmission(item.num)}
+                  title={`ภารกิจ ${item.num}  ${item.missionName}`}
+                  raiAmount={item.rai}
+                  successMission={item.reward.amountSuccessCount}
+                  unsuccessMission={item.reward.amountInprogressCount}
+                  unconfirmMission={item.reward.amountRequestCount}
+                  detailReward={detailReward}
+                />
+              </div>
+            );
+          })
+        : dataCondition?.map((item: any, index: any) => {
+            const detailPoint: any = {
+              num: item.num,
+              rai: item.rai,
+              point: item.point,
+              conditionReward: item.conditionReward,
+              descriptionReward: item.descriptionReward,
+              amountInprogressCount: item.amountInprogressCount,
+              amountSuccessCount: item.amountSuccessCount,
+            };
+            return (
+              <div
+                className="pt-3"
+                key={item.num}
+                onClick={() => {
+                  setNum(item.num);
+                }}
+                style={{ cursor: "pointer" }}
+              >
+                <MissionReportCard
+                  type="MISSION_POINT"
+                  checkCard={checkSubmission(item.num)}
+                  title={`ภารกิจ ${item.num}  ${item.missionName}`}
+                  raiAmount={item.rai}
+                  successMission={item.amountSuccessCount}
+                  unsuccessMission={item.amountInprogressCount}
+                  unconfirmMission={item.amountRequestCount}
+                  detailReward={detailPoint}
+                />
+              </div>
+            );
+          })}
       <div className="d-flex justify-content-between pt-3 pb-3">
         <p>รายการทั้งหมด {dataMission?.condition.length} รายการ</p>
         <Pagination
@@ -361,31 +517,39 @@ function MissionReport() {
           onClick={() => setStatusMission("INPROGRESS")}
         >
           ผู้เข้าร่วมที่ยังไม่สำเร็จ{" "}
-          {`(${
-            dataCondition?.find((x) => x.num === num)?.reward
-              .amountInprogressCount
-          })` || 0}
+          {campaignType === "MISSION_REWARD"
+            ? `(${
+                dataCondition?.find((x) => x.num === num)?.reward
+                  .amountInprogressCount
+              })`
+            : `(${
+                dataCondition?.find((x) => x.num === num)?.amountInprogressCount
+              })` || 0}
         </Radio.Button>
-        <Radio.Button
-          className="col"
-          style={{
-            textAlign: "center",
-            padding: 4,
-            height: "40px",
-            backgroundColor:
-              type === "unconfirmMission" ? mapColor[type] : color.White,
-            color: type === "unconfirmMission" ? "#FFCA37" : color.BK,
-            borderColor: type === "unconfirmMission" ? "#FFCA37" : color.BK,
-            borderWidth: type === "unconfirmMission" ? 1 : 0,
-          }}
-          value="unconfirmMission"
-          onClick={() => setStatusMission("REQUEST")}
-        >
-          ผู้เข้าร่วมที่รอกดแลก{" "}
-          {`(${
-            dataCondition?.find((x) => x.num === num)?.reward.amountRequestCount
-          })` || 0}
-        </Radio.Button>
+        {campaignType === "MISSION_REWARD" && (
+          <Radio.Button
+            className="col"
+            style={{
+              textAlign: "center",
+              padding: 4,
+              height: "40px",
+              backgroundColor:
+                type === "unconfirmMission" ? mapColor[type] : color.White,
+              color: type === "unconfirmMission" ? "#FFCA37" : color.BK,
+              borderColor: type === "unconfirmMission" ? "#FFCA37" : color.BK,
+              borderWidth: type === "unconfirmMission" ? 1 : 0,
+            }}
+            value="unconfirmMission"
+            onClick={() => setStatusMission("REQUEST")}
+          >
+            ผู้เข้าร่วมที่รอกดแลก{" "}
+            {`(${
+              dataCondition?.find((x) => x.num === num)?.reward
+                .amountRequestCount
+            })` || 0}
+          </Radio.Button>
+        )}
+
         <Radio.Button
           className="col"
           style={{
@@ -401,11 +565,17 @@ function MissionReport() {
             borderWidth: type === "successMission" ? 1 : 0,
           }}
           value="successMission"
+          onClick={() => setStatusMission("COMPLETE")}
         >
           ผู้เข้าร่วมที่สำเร็จ{" "}
-          {`(${
-            dataCondition?.find((x) => x.num === num)?.reward.amountSuccessCount
-          })` || 0}
+          {campaignType === "MISSION_REWARD"
+            ? `(${
+                dataCondition?.find((x) => x.num === num)?.reward
+                  .amountSuccessCount
+              })`
+            : `(${
+                dataCondition?.find((x) => x.num === num)?.amountSuccessCount
+              })` || 0}
         </Radio.Button>
       </Radio.Group>
       {(type === "unsuccessMission" || type === "unconfirmMission") && (
@@ -481,7 +651,13 @@ function MissionReport() {
             ? columns.slice(0, -2)
             : columns.slice(0, -1)
         }
-        dataSource={type === "successMission" ? dataSuccess : dataInpro}
+        dataSource={
+          campaignType === "MISSION_POINT"
+            ? dataInpro
+            : type === "successMission"
+            ? dataSuccess
+            : dataInpro
+        }
         pagination={false}
         loading={isLoading}
         colors={mapTableColor[type]}

@@ -40,7 +40,9 @@ export class RewardDatasource {
     status?: string,
     rewardType?: string[],
     rewardExchange?: string,
-    search?: string
+    search?: string,
+    sortDirection?: string,
+    sortField?: string
   ): Promise<GetAllRewardEntities> {
     const params = {
       take: take,
@@ -51,6 +53,8 @@ export class RewardDatasource {
       status: status,
       rewardExchange: rewardExchange,
       search: search,
+      sortDirection: sortDirection,
+      sortField: sortField
     };
     console.log(BASE_URL + "/promotion/reward/queryall", {
       params,
