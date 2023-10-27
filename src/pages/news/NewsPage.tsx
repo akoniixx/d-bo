@@ -163,6 +163,7 @@ function NewsPage() {
               }
             >
               <Option value={"ACTIVE"}>ใช้งาน</Option>
+              <Option value={"PENDING"}>รอการเผยแพร่</Option>
               <Option value={"DRAFTING"}>รอเปิดใช้งาน</Option>
               <Option value={"INACTIVE"}>ปิดการใช้งาน</Option>
             </Select>
