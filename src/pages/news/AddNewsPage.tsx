@@ -454,6 +454,9 @@ function AddNewsPage() {
                       modules={modulesNews}
                       formats={formats}
                       ref={quillRef}
+                      style={{
+                        height : '600px'
+                      }}
                     />
                   </Form.Item>
                 </div>
