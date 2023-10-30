@@ -319,7 +319,9 @@ function IndexDroner() {
             }
           >
             {province?.map((item, index) => (
-              <option key={index} value={item.provinceId.toString()}>{item.provinceName}</option>
+              <option key={index} value={item.provinceId.toString()}>
+                {item.provinceName}
+              </option>
             ))}
           </Select>
         </div>
@@ -339,7 +341,9 @@ function IndexDroner() {
             value={searchDistrict}
           >
             {district?.map((item, index) => (
-              <option key={index} value={item.districtId.toString()}>{item.districtName}</option>
+              <option key={index} value={item.districtId.toString()}>
+                {item.districtName}
+              </option>
             ))}
           </Select>
         </div>
@@ -359,7 +363,9 @@ function IndexDroner() {
             value={searchSubdistrict}
           >
             {subdistrict?.map((item, index) => (
-              <option key={index} value={item.subdistrictId.toString()}>{item.subdistrictName}</option>
+              <option key={index} value={item.subdistrictId.toString()}>
+                {item.subdistrictName}
+              </option>
             ))}
           </Select>
         </div>

@@ -291,7 +291,9 @@ function EditWaitStart() {
               >
                 {periodSpray?.purposeSpray?.length ? (
                   periodSpray?.purposeSpray?.map((item) => (
-                    <Option key={item.id} value={item.id}>{item.purposeSprayName}</Option>
+                    <Option key={item.id} value={item.id}>
+                      {item.purposeSprayName}
+                    </Option>
                   ))
                 ) : (
                   <Option>-</Option>
@@ -315,37 +317,38 @@ function EditWaitStart() {
                   ),
                 ).map((x, index) => (
                   <>
-                   <div className='form-group'>
-                    <Checkbox
-                      key={x.key}
-                      value={x.crop}
-                      onClick={handlerTargetSpray}
-                      checked={x.isChecked}
-                    />{' '}
-                    <label>{x.crop}</label>
-                    <br />
-                    {PURPOSE_SPRAY_CHECKBOX[4] && index == 4 && (
-                      <>
-                        <Input
-                          key={data?.targetSpray[0]}
-                          disabled={checkCrop}
-                          onChange={handleOtherSpray}
-                          placeholder='โปรดระบุ เช่น เพลี้ย,หอย'
-                          autoComplete='off'
-                          defaultValue={Array.from(
-                            new Set(
-                              data?.targetSpray.filter((a) => !PURPOSE_SPRAY.some((x) => x === a)),
-                            ),
+                    <div className='form-group'>
+                      <Checkbox
+                        key={x.key}
+                        value={x.crop}
+                        onClick={handlerTargetSpray}
+                        checked={x.isChecked}
+                      />{' '}
+                      <label>{x.crop}</label>
+                      <br />
+                      {PURPOSE_SPRAY_CHECKBOX[4] && index == 4 && (
+                        <>
+                          <Input
+                            key={data?.targetSpray[0]}
+                            disabled={checkCrop}
+                            onChange={handleOtherSpray}
+                            placeholder='โปรดระบุ เช่น เพลี้ย,หอย'
+                            autoComplete='off'
+                            defaultValue={Array.from(
+                              new Set(
+                                data?.targetSpray.filter(
+                                  (a) => !PURPOSE_SPRAY.some((x) => x === a),
+                                ),
+                              ),
+                            )}
+                          />
+                          {validateComma.status == 'error' && (
+                            <p style={{ color: color.Error }}>{validateComma.message}</p>
                           )}
-                        />
-                        {validateComma.status == 'error' && (
-                          <p style={{ color: color.Error }}>{validateComma.message}</p>
-                        )}
-                      </>
-                    )}
-                  </div>
+                        </>
+                      )}
+                    </div>
                   </>
-                 
                 ))
               : null}
           </div>
@@ -382,9 +385,9 @@ function EditWaitStart() {
           <div className='form-group col-lg-12 pb-3'>
             <label>สร้างโดย</label>
             {listAppType.map(
-              (item) =>
+              (item, index) =>
                 data.applicationType === item.value && (
-                  <div>
+                  <div key={index}>
                     <img src={item.icon} style={{ width: 22, height: 22 }} />
                     <span> {data.createBy ? data.createBy + ` ${item.create}` : '-'}</span>
                   </div>
@@ -401,82 +404,87 @@ function EditWaitStart() {
                   <Space direction='vertical'>
                     {TASKTODAY_STATUS.map((item: any, index: any) => (
                       <>
-                       <Radio value={item.value}>
-                        <b> {item.name}</b>
+                        <Radio value={item.value}>
+                          <b> {item.name}</b>
 
-                        {data.status == 'WAIT_START' && index == 0 ? (
-                          <div style={{ marginLeft: '20px' }} className='col-lg-10'>
-                            <Form.Item style={{ width: '530px' }}>
-                              <Radio.Group value={data.isProblem} onChange={handleChangeIsProblem}>
-                                <Space direction='vertical'>
-                                  <Radio value={false}>งานปกติ</Radio>
-                                  <Radio value={true}>งานมีปัญหา</Radio>
-                                </Space>
-                              </Radio.Group>
-                            </Form.Item>
-                            {data.isProblem == true ? (
-                              <Form.Item>
+                          {data.status == 'WAIT_START' && index == 0 ? (
+                            <div style={{ marginLeft: '20px' }} className='col-lg-10'>
+                              <Form.Item style={{ width: '530px' }}>
+                                <Radio.Group
+                                  value={data.isProblem}
+                                  onChange={handleChangeIsProblem}
+                                >
+                                  <Space direction='vertical'>
+                                    <Radio value={false}>งานปกติ</Radio>
+                                    <Radio value={true}>งานมีปัญหา</Radio>
+                                  </Space>
+                                </Radio.Group>
+                              </Form.Item>
+                              {data.isProblem == true ? (
+                                <Form.Item>
+                                  <TextArea
+                                    rows={3}
+                                    onChange={onChangeProblemText}
+                                    placeholder='รายละเอียดปัญหา'
+                                    autoComplete='off'
+                                    defaultValue={
+                                      data.problemRemark != null ? data.problemRemark : undefined
+                                    }
+                                  />
+                                </Form.Item>
+                              ) : null}
+                            </div>
+                          ) : data.status == 'IN_PROGRESS' && index == 1 ? (
+                            <div style={{ marginLeft: '20px' }}>
+                              <Form.Item style={{ width: '500px' }}>
+                                <Radio.Group
+                                  value={data.isProblem}
+                                  onChange={handleChangeIsProblem}
+                                >
+                                  <Space direction='vertical'>
+                                    <Radio value={false}>งานปกติ</Radio>
+                                    <Radio disabled>รออนุมัติขยายเวลา</Radio>
+                                    <Radio disabled>
+                                      อนุมัติขยายเวลา{' '}
+                                      <span style={{ color: color.Error }}>
+                                        *ต้องโทรหาเกษตกรเพื่อคอนเฟิร์มการอนุมัติ/ปฏิเสธ*
+                                      </span>
+                                    </Radio>
+                                    <Radio value={true}>งานมีปัญหา</Radio>
+                                  </Space>
+                                </Radio.Group>
+                              </Form.Item>
+                              {data.isProblem == true ? (
+                                <Form.Item>
+                                  <TextArea
+                                    rows={3}
+                                    onChange={onChangeProblemText}
+                                    placeholder='รายละเอียดปัญหา'
+                                    autoComplete='off'
+                                    defaultValue={
+                                      data.problemRemark != null ? data.problemRemark : undefined
+                                    }
+                                  />
+                                </Form.Item>
+                              ) : null}
+                            </div>
+                          ) : data.status == 'CANCELED' && index == 2 ? (
+                            <div style={{ marginLeft: '20px' }}>
+                              <Form.Item style={{ width: '500px' }}>
                                 <TextArea
                                   rows={3}
-                                  onChange={onChangeProblemText}
-                                  placeholder='รายละเอียดปัญหา'
+                                  onChange={onChangeCanCelText}
+                                  placeholder='รายละเอียดการยกเลิก'
                                   autoComplete='off'
                                   defaultValue={
-                                    data.problemRemark != null ? data.problemRemark : undefined
+                                    data.statusRemark != null ? data.statusRemark : undefined
                                   }
                                 />
                               </Form.Item>
-                            ) : null}
-                          </div>
-                        ) : data.status == 'IN_PROGRESS' && index == 1 ? (
-                          <div style={{ marginLeft: '20px' }}>
-                            <Form.Item style={{ width: '500px' }}>
-                              <Radio.Group value={data.isProblem} onChange={handleChangeIsProblem}>
-                                <Space direction='vertical'>
-                                  <Radio value={false}>งานปกติ</Radio>
-                                  <Radio disabled>รออนุมัติขยายเวลา</Radio>
-                                  <Radio disabled>
-                                    อนุมัติขยายเวลา{' '}
-                                    <span style={{ color: color.Error }}>
-                                      *ต้องโทรหาเกษตกรเพื่อคอนเฟิร์มการอนุมัติ/ปฏิเสธ*
-                                    </span>
-                                  </Radio>
-                                  <Radio value={true}>งานมีปัญหา</Radio>
-                                </Space>
-                              </Radio.Group>
-                            </Form.Item>
-                            {data.isProblem == true ? (
-                              <Form.Item>
-                                <TextArea
-                                  rows={3}
-                                  onChange={onChangeProblemText}
-                                  placeholder='รายละเอียดปัญหา'
-                                  autoComplete='off'
-                                  defaultValue={
-                                    data.problemRemark != null ? data.problemRemark : undefined
-                                  }
-                                />
-                              </Form.Item>
-                            ) : null}
-                          </div>
-                        ) : data.status == 'CANCELED' && index == 2 ? (
-                          <div style={{ marginLeft: '20px' }}>
-                            <Form.Item style={{ width: '500px' }}>
-                              <TextArea
-                                rows={3}
-                                onChange={onChangeCanCelText}
-                                placeholder='รายละเอียดการยกเลิก'
-                                autoComplete='off'
-                                defaultValue={
-                                  data.statusRemark != null ? data.statusRemark : undefined
-                                }
-                              />
-                            </Form.Item>
-                          </div>
-                        ) : null}
-                      </Radio>
+                            </div>
+                          ) : null}
+                        </Radio>
                       </>
-                     
                     ))}
                   </Space>
                 </Radio.Group>

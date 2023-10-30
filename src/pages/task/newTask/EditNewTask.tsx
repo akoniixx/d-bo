@@ -821,46 +821,47 @@ const EditNewTask = () => {
                   : item.isChecked,
               ),
             ).map((x, index) => (
-              <div className='form-group'>
-                <input
-                  key={data.targetSpray[0]}
-                  type='checkbox'
-                  value={x.crop}
-                  disabled={
-                    current == 2 || checkSelectPlot == 'error' || data.couponId ? true : false
-                  }
-                  checked={x.isChecked}
-                  onChange={handlePurposeSpray}
-                />{' '}
-                <label style={{ padding: '0 8px 0 0' }}>{x.crop}</label>
-                {index == 4 && (
-                  <>
-                    <Input
-                      status={validateComma.status}
-                      key={data.targetSpray[0]}
-                      className='col-lg-5'
-                      disabled={current == 2 || checkCrop}
-                      placeholder='โปรดระบุ เช่น เพลี้ย,หอย'
-                      defaultValue={Array.from(
-                        new Set(
-                          data?.targetSpray.filter((a) => !PURPOSE_SPRAY.some((x) => x === a)),
-                        ),
-                      ).join(',')}
-                      onChange={handleOtherSpray}
-                    />
-                    {validateComma.status == 'error' && (
-                      <p
-                        style={{
-                          color: color.Error,
-                          padding: '0 0 0 55px',
-                        }}
-                      >
-                        {validateComma.message}
-                      </p>
-                    )}
-                  </>
-                )}
-              </div>
+              <>
+                <div className='form-group'>
+                  <Checkbox
+                    key={data.targetSpray[0]}
+                    checked={x.isChecked}
+                    value={x.crop}
+                    disabled={
+                      current == 2 || checkSelectPlot == 'error' || data.couponId ? true : false
+                    }
+                    onChange={handlePurposeSpray}
+                  />{' '}
+                  <label style={{ padding: '0 8px 0 0' }}>{x.crop}</label>
+                  {index == 4 && (
+                    <>
+                      <Input
+                        status={validateComma.status}
+                        key={data.targetSpray[0]}
+                        className='col-lg-5'
+                        disabled={current == 2 || checkCrop}
+                        placeholder='โปรดระบุ เช่น เพลี้ย,หอย'
+                        defaultValue={Array.from(
+                          new Set(
+                            data?.targetSpray.filter((a) => !PURPOSE_SPRAY.some((x) => x === a)),
+                          ),
+                        ).join(',')}
+                        onChange={handleOtherSpray}
+                      />
+                      {validateComma.status == 'error' && (
+                        <p
+                          style={{
+                            color: color.Error,
+                            padding: '0 0 0 55px',
+                          }}
+                        >
+                          {validateComma.message}
+                        </p>
+                      )}
+                    </>
+                  )}
+                </div>
+              </>
             ))}
           </div>
           <div className='row form-group col-lg-6 p-2'>
@@ -1094,7 +1095,7 @@ const EditNewTask = () => {
       const compareData = dataDronerList.filter(
         (x) => !dronerSelectedList.map((y) => y.dronerId).includes(x.droner_id),
       )
-      for (let i: number = 0; compareData.length > i; i++) {
+      for (let i = 0; compareData.length > i; i++) {
         dronerSelected.taskId = queryString[1]
         dronerSelected.dronerId = compareData[i].droner_id
         dronerSelected.status = 'WAIT_RECEIVE'
@@ -1115,7 +1116,7 @@ const EditNewTask = () => {
         })
       }
     } else {
-      for (let i: number = 0; dataDronerList.length > i; i++) {
+      for (let i = 0; dataDronerList.length > i; i++) {
         deleteDroner.taskId = queryString[1]
         deleteDroner.dronerId = dataDronerList[i].droner_id
         await TaskDronerTempDataSource.deleteDronerTemp(deleteDroner).then((res) => {
@@ -1136,7 +1137,7 @@ const EditNewTask = () => {
   }
   const callBackDronerSelected = async (data: TaskDronerTempEntity[]) => {
     const compareData = dronerSelectedList.filter((x) => !data.map((y) => y.id).includes(x.id))
-    for (let i: number = 0; compareData.length > i; i++) {
+    for (let i = 0; compareData.length > i; i++) {
       const deleteDroner: DeletedDronerTemp = DeletedDronerTemp_INIT
       deleteDroner.taskId = queryString[1]
       deleteDroner.dronerId = compareData[i].dronerId
@@ -1853,7 +1854,7 @@ const EditNewTask = () => {
             ถัดไป
           </Button>
         )}
-        {current === titleStep.length - 1 && <SaveButton onClick={() => updateNewTask} />}
+        {current === titleStep.length - 1 && <SaveButton onClick={updateNewTask} />}
       </Row>
     </>
   )

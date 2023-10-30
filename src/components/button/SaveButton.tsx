@@ -1,10 +1,9 @@
 import React from 'react'
-import { LeftOutlined } from '@ant-design/icons'
-import { Button, Empty } from 'antd'
+import { Button } from 'antd'
 import { color } from '../../resource'
 
 interface SaveButtonProps {
-  onClick: () => void
+  onClick?: () => void
   disableBtn?: boolean
 }
 export const SaveButtton: React.FC<SaveButtonProps> = ({ onClick, disableBtn }) => (

@@ -382,7 +382,11 @@ export default function IndexTodayTask() {
             }
             onChange={handleProvince}
           >
-            {province?.map((item, index) => <option key={index} value={item.provinceId}>{item.provinceName}</option>)}
+            {province?.map((item, index) => (
+              <option key={index} value={item.provinceId}>
+                {item.provinceName}
+              </option>
+            ))}
           </Select>
         </div>
         <div className='col-lg p-1'>
@@ -401,7 +405,9 @@ export default function IndexTodayTask() {
             value={searchDistrict}
           >
             {district?.map((item, index) => (
-              <option key={index} value={item.districtId.toString()}>{item.districtName}</option>
+              <option key={index} value={item.districtId.toString()}>
+                {item.districtName}
+              </option>
             ))}
           </Select>
         </div>
@@ -420,8 +426,10 @@ export default function IndexTodayTask() {
             disabled={!searchDistrict}
             value={searchSubdistrict}
           >
-            {subdistrict?.map((item,index) => (
-              <option key={index} value={item.subdistrictId.toString()}>{item.subdistrictName}</option>
+            {subdistrict?.map((item, index) => (
+              <option key={index} value={item.subdistrictId.toString()}>
+                {item.subdistrictName}
+              </option>
             ))}
           </Select>
         </div>
