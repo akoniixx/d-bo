@@ -1,4 +1,7 @@
 ## [Version - 0]
+## Fix [v0.39.1] 2022-10-30
+- import css for news guru
+
 ## Feature [v0.39.0] 2022-10-30
 - eslint & prettier setup
 - lazy load
