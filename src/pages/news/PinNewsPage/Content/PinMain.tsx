@@ -204,6 +204,7 @@ function PinMain({ currentApp, form }: Props) {
                                 return (
                                   <ItemPin
                                     form={form}
+                                    nameHead='pinMain'
                                     currentApp={currentApp}
                                     key={item.key}
                                     disabled={item.disabled}
@@ -227,6 +228,7 @@ function PinMain({ currentApp, form }: Props) {
                                         style={getItemStyle(s.isDragging, p.draggableProps.style)}
                                       >
                                         <ItemPin
+                                          nameHead='pinMain'
                                           form={form}
                                           name={i.name}
                                           newsData={item}
