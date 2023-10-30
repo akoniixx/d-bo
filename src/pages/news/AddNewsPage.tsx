@@ -1,8 +1,7 @@
-import React, { useEffect, useState } from "react";
-import { DashboardLayout } from "../../components/layout/Layout";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { BackIconButton } from "../../components/button/BackButton";
 import { useNavigate } from "react-router-dom";
-import { Checkbox, Form, Input, Radio, Select, Tag } from "antd";
+import { Checkbox, DatePicker, Form, Input, Radio, Select, Tag, TimePicker } from "antd";
 import { CardHeaderPromotion } from "../../components/header/CardHeaderPromotion";
 import uploadImg from "../../resource/media/empties/upload_img_news.png";
 import { color } from "../../resource";
@@ -11,13 +10,14 @@ import {
   UploadImageEntity,
   UploadImageEntity_INTI,
 } from "../../entities/UploadImageEntities";
-import { formats, modules } from "../../components/editor/EditorToolbar";
+import { formats, } from "../../components/editor/EditorToolbar";
 import ReactQuill from "react-quill";
 import FooterPage from "../../components/footer/FooterPage";
 import RenderNews from "../../components/mobile/RenderNews";
 import { NewsDatasource } from "../../datasource/NewsDatasource";
 import Swal from "sweetalert2";
 import { CampaignDatasource } from "../../datasource/CampaignDatasource";
+import moment from "moment";
 const { Map } = require("immutable");
 
 function AddNewsPage() {
@@ -44,6 +44,11 @@ function AddNewsPage() {
   const [allCountPoint, setAllCountPoint] = useState<any>();
   const [pinMain, setPinMain] = useState<boolean>(false);
   const [pinAll, setPinAll] = useState<boolean>(false);
+  const [timerNews,setTimerNews] = useState<string>('')
+  const [showTimer,setShowTimer] = useState<boolean>(false)
+  const [typeLaunch,setTypeLaunch] = useState<string>("NON_ENDDATE")
+  const dateFormat = "DD/MM/YYYY";
+  const quillRef = useRef<any>(null);
   const onChangeProfile = async (file: any) => {
     const source = file.target.files[0];
     let newSource: any;
@@ -142,6 +147,54 @@ function AddNewsPage() {
   const handlePinMain = (e: any) => {
     setPinMain(e.target.checked);
   };
+
+  const handleTimer = (e: any)=>{
+    setTimerNews(e.target.value)
+  }
+
+  const handleShowTimer = (e:any)=>{
+    setShowTimer(e.target.value === "PENDING")
+  }
+
+  const handleTypeLaunch = (e:any)=>{
+    setTypeLaunch(e.target.value)
+  }
+  
+  const disabledDateStart = (current: any) => {
+    let customDate = moment().format("YYYY-MM-DD");
+    return current && current < moment(customDate, "YYYY-MM-DD");
+  };
+
+  const imageHandler = () => {
+    const input = document.createElement("input");
+    input.setAttribute("type", "file");
+    input.setAttribute("accept", "image/png");
+    input.click();
+
+    input.onchange = async () => {
+      const file = input?.files![0];
+      NewsDatasource.uploadNewsImageDescription(file).then(resImg => {
+        setTimeout(()=>{
+          const range = quillRef.current.getEditor().getSelection(true);
+          let quill = quillRef.current.getEditor();
+          quill.insertEmbed(range.index, "image", resImg.url);
+          quill.formatText(range.index, 1, { width: `100%`, height: `200px` });
+        },2000)
+      })
+    };
+  };
+
+  const modulesNews = useMemo(()=> ({
+    toolbar: {
+      handlers: {
+        image: imageHandler,
+      },
+      container: [["bold", "italic", "link", "image","video"],    
+      [{ align: '' }, { align: 'center' }, { align: 'right' }],
+      [{list : "ordered"},{list : "bullet"}],],
+    },
+  }),[])
+
   useEffect(() => {
     CampaignDatasource.getCampaignList(undefined, "QUATA").then((res) => {
       setCname(res.data);
@@ -155,6 +208,14 @@ function AddNewsPage() {
     NewsDatasource.checkCountPoint("ALL").then((res) => {
       setAllCountPoint(res.responseData);
     });
+    if (quillRef.current) {
+      const quill = quillRef.current.getEditor();
+      
+      quill.on('text-change', async() => {
+        const imgs = quill.container.querySelectorAll('img');
+        imgs.forEach((img : any) => img.classList.add('editor-img'));
+      });
+    }
   }, []);
   const disableCheckPinMain =
     !application ||
@@ -165,6 +226,9 @@ function AddNewsPage() {
     (application === "FARMER" && farmCountPoint?.disablePinAll === true) ||
     (application === "DRONER" && droneCountPoint?.disablePinAll === true);
   const onFieldsChange = () => {
+    const quill = quillRef.current.getEditor();
+    const imgs = quill.container.querySelectorAll('img');
+    imgs.forEach((img : any) => img.classList.add('editor-img'));
     const {
       newsName,
       newsDescription,
@@ -174,6 +238,11 @@ function AddNewsPage() {
       challenge,
       news,
       campName,
+      startDate,
+      startTime,
+      typeLaunch,
+      endDate,
+      endTime
     } = form.getFieldsValue();
     let fieldInfo = false;
     let fieldapp = false;
@@ -181,7 +250,27 @@ function AddNewsPage() {
     let fieldCateGory = false;
 
     if (newsName && newsDescription != "<p><br></p>" && newsStatus) {
-      fieldInfo = false;
+      if(newsStatus === "PENDING"){
+        if(typeLaunch === "IS_ENDDATE"){
+          if(!!startDate && !!startTime && !!endDate && !!endTime){
+            fieldInfo = false;
+          }
+          else{
+            fieldInfo = true;
+          }
+        }
+        else{
+          if(!!startDate && !!startTime){
+            fieldInfo = false;
+          }
+          else{
+            fieldInfo = true;
+          }
+        }
+      }
+      else{
+        fieldInfo = false;
+      }
     } else {
       fieldInfo = true;
     }
@@ -204,7 +293,15 @@ function AddNewsPage() {
     setBtnSaveDisable(fieldInfo || fieldapp || fieldimg || fieldCateGory);
   };
   const onSubmit = () => {
-    const { newsName, newsDescription, newsStatus } = form.getFieldsValue();
+    const { newsName, newsDescription, newsStatus,startDate,startTime,typeLaunch,endDate,endTime } = form.getFieldsValue();
+    const dateStart =
+    newsStatus === "PENDING" ? moment(startDate).format("YYYY-MM-DD") +
+    " " +
+    moment(startTime).format("HH:mm:ss") : null;
+    const dateEnd =
+    newsStatus === "PENDING" ? typeLaunch === "IS_ENDDATE" ? moment(endDate).format("YYYY-MM-DD") +
+    " " +
+    moment(endTime).format("HH:mm:ss") : null : null;
     setBtnSaveDisable(true);
     NewsDatasource.addNews({
       title: newsName,
@@ -217,6 +314,9 @@ function AddNewsPage() {
       createBy: profile.firstname + " " + profile.lastname,
       pinAll: pinAll,
       pinMain: pinMain,
+      startDate : dateStart,
+      typeLaunch : typeLaunch,
+      endDate : dateEnd
     })
       .then((res) => {
         setBtnSaveDisable(false);
@@ -351,8 +451,9 @@ function AddNewsPage() {
                       theme="snow"
                       onChange={handleDescriptionEditor}
                       placeholder={"กรอกรายละเอียด"}
-                      modules={modules}
+                      modules={modulesNews}
                       formats={formats}
+                      ref={quillRef}
                     />
                   </Form.Item>
                 </div>
@@ -361,6 +462,7 @@ function AddNewsPage() {
                 <label>
                   แอปพลิเคชั่น <span style={{ color: "red" }}>*</span>
                 </label>
+                {/* <img src={"https://storage.googleapis.com/dnds/news-image/dollar.png?GoogleAccessId=dnds-storage%40iconkaset-app.iam.gserviceaccount.com&Expires=1697429940&Signature=D69Jy%2BoF16bqk8GZ%2BuwfGgo2sNq8uH9k%2F5Oxi%2F%2FirFok2OzI%2FY9b2KO1P7Om2Z7wWAfBZJ%2FEobsSLh%2BQq%2FU7tNk3rJR12VaBtYF0PUwI2DITDyY%2FvGwI5twB06m%2BYsJAhaHvVSUFbWSRptkPBvCpFGqGLnh1A7chI%2BHcZ%2Bk%2BQqmCqXAOr7TPiTODSZ0v%2BE9DUo3Pxu%2FVprLLl1xtXa55OfDB166PLuzakZRiQo7NIdJ3Cfcit0uKdHOLIzcXr0MUZM%2F5lV43PDBbNw6v2lxTie7LHwikCCOxINwb5z25h%2Fd1pJ3rvFA7%2Fu%2BXgUUo2rO%2BPtzczPyMZ4LrDhTF6bGpTw%3D%3D"}/> */}
                 <Form.Item
                   initialValue={false}
                   name="applicationType"
@@ -506,10 +608,95 @@ function AddNewsPage() {
                       },
                     ]}
                   >
-                    <Radio.Group className="d-flex flex-column">
-                      <Radio value={"ACTIVE"}>ใช้งาน</Radio>
+                    <Radio.Group className="d-flex flex-column" onChange={handleShowTimer}>
+                      <Radio value={"ACTIVE"}>
+                        ใช้งาน (เผยแพร่ทันที)
+                      </Radio>
+                      <Radio value={"PENDING"}>รอเผยแพร่ (ตั้งวันและเวลา) 
+                          <div className="d-flex flex-column" style={{display : showTimer? "block" : "none"}}>
+                            <div className="d-flex flex-row align-items-center">
+                            <Form.Item  name="typeLaunch" rules={[
+                              {
+                                required: true,
+                                message: "กรุณาเลือกสถานะ",
+                              },
+                            ]} style={{display : showTimer ? "block" : "none"}}>
+                              <Radio.Group style={{
+                                display : 'flex',
+                                flexFlow : 'row'
+                              }} defaultValue={"NON_ENDDATE"} onChange={handleTypeLaunch}>
+                                <Radio value={"NON_ENDDATE"}>
+                                  ไม่มีวันเวลาสิ้นสุด
+                                </Radio>
+                                <Radio value={"IS_ENDDATE"}>
+                                  มีกำหนดวันเวลาสิ้นสุด
+                                </Radio>
+                              </Radio.Group>
+                            </Form.Item>
+                            </div>
+                            <div className="d-flex">
+                            <div >
+                              <label style={{display : showTimer ? "block" : "none" }}>
+                                วันเริ่มต้น <span style={{ color: "red" }}>*</span>
+                              </label>
+                              <div className="d-flex flex-row">
+                              <Form.Item
+                                name="startDate"
+                                style={{display : showTimer ? "block" : "none" }}
+                              >
+                                <DatePicker
+                                  placeholder="เลือกวันที่"
+                                  format={dateFormat}
+                                  disabledDate={disabledDateStart}
+                                  onChange={()=>{}}
+                                />
+                              </Form.Item>
+                              <Form.Item
+                                name="startTime"
+                                style={{display : showTimer ? "block" : "none",}}
+                              >
+                                <TimePicker
+                                  format={"HH:mm"}
+                                  className="ms-3"
+                                  placeholder="เลือกเวลา"
+                                  allowClear={false}
+                                />
+                              </Form.Item>
+                              </div>
+                            </div>
+                            <div className="mx-4">
+                              <label style={{display : showTimer ? typeLaunch === "IS_ENDDATE" ?"block" : "none" : "none" }}>
+                                วันสิ้นสุด <span style={{ color: "red" }}>*</span>
+                              </label>
+                              <div className="d-flex flex-row">
+                              <Form.Item
+                                name="endDate"
+                                style={{display : showTimer ? typeLaunch === "IS_ENDDATE" ?"block" : "none" : "none" }}
+                              >
+                                <DatePicker
+                                  placeholder="เลือกวันที่"
+                                  format={dateFormat}
+                                  disabledDate={disabledDateStart}
+                                  onChange={()=>{}}
+                                />
+                              </Form.Item>
+                              <Form.Item
+                                name="endTime"
+                                style={{display : showTimer ? typeLaunch === "IS_ENDDATE" ?"block" : "none" : "none" }}
+                              >
+                                <TimePicker
+                                  format={"HH:mm"}
+                                  className="ms-3"
+                                  placeholder="เลือกเวลา"
+                                  allowClear={false}
+                                />
+                              </Form.Item>
+                              </div>
+                            </div>
+                            </div>
+                          </div>
+                      </Radio>
                       <Radio value={"DRAFTING"}>รอเปิดใช้งาน</Radio>
-                      <Radio value={"INACTIVE"}>ปิดการใช้งาน</Radio>
                     </Radio.Group>
                   </Form.Item>
                 </div>

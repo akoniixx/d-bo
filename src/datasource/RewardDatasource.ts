@@ -56,6 +56,9 @@ export class RewardDatasource {
       sortDirection: sortDirection,
       sortField: sortField
     };
+    console.log(BASE_URL + "/promotion/reward/queryall", {
+      params,
+    })
     return httpClient
       .get(BASE_URL + "/promotion/reward/queryall", {
         params,

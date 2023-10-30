@@ -1,4 +1,8 @@
 ## [Version - 0]
+## Feature [v0.37.11] 2023-10-27
+- add image to news guru
+- add video link to news guru
+
 ## Fix [v0.37.10] 2023-10-22
 - fixed  show tel droner
 ## Fix [v0.37.9] 2023-10-21

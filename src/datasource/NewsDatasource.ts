@@ -14,6 +14,9 @@ export class NewsDatasource{
         formData.append("campaignId",data.campaignId)
         formData.append("pinAll",new Boolean(data.pinAll).toString())
         formData.append("pinMain",new Boolean(data.pinMain).toString())
+        if(!!data.startDate)formData.append("startDate",data.startDate)
+        if(!!data.endDate)formData.append("endDate",data.endDate)
+        if(!!data.typeLaunch)formData.append("typeLaunch",data.typeLaunch)
         return httpClient
         .post(BASE_URL + "/promotion/news/upload",formData)
         .then(res => {return res.data})
@@ -92,6 +95,14 @@ export class NewsDatasource{
     static checkCountPoint(app : string){
         return httpClient.
         get(BASE_URL + `/promotion/news/check-count-pin?application=${app}`)
+        .then(res => {return res.data})
+        .catch(err => console.log(err))
+    }
+    static uploadNewsImageDescription(file : any){
+        const formData = new FormData();
+        formData.append("file",file)
+        return httpClient
+        .post(BASE_URL + "/promotion/news/upload-news-image-description",formData)
         .then(res => {return res.data})
         .catch(err => console.log(err))
     }

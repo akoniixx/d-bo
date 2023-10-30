@@ -3,6 +3,7 @@ import { CardHeaderPromotion } from '../header/CardHeaderPromotion';
 import uploadImg from "../../resource/media/empties/upload_img_news.png";
 import { Image } from 'antd';
 import parse from "html-react-parser";
+import "../../news.css"
 
 interface RenderNews{
     img : string;
