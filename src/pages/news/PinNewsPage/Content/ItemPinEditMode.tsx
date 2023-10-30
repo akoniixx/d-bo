@@ -45,6 +45,7 @@ interface Props {
     app: 'DRONER' | 'FARMER'
   }
   form: FormInstance<FormValues>
+  nameHead: string
 }
 function ItemPinEditMode({
   onSelectNews,
@@ -54,9 +55,11 @@ function ItemPinEditMode({
   editMode,
   currentApp,
   form,
+  nameHead,
 }: Props) {
   const [searchValue, setSearchValue] = React.useState('')
   const debounceSearch = useDebounce(searchValue, 500)
+  const [fetching, setFetching] = React.useState(false)
 
   const [optionFetch, setOptionFetch] = React.useState<
     {
@@ -74,6 +77,7 @@ function ItemPinEditMode({
   useEffect(() => {
     const getNewsBySearch = async (searchKeyword: string) => {
       try {
+        setFetching(true)
         const res = await NewsDatasource.searchNews({
           application: currentApp.app,
           search: searchKeyword,
@@ -90,8 +94,11 @@ function ItemPinEditMode({
         })
 
         setOptionFetch(formatData)
+        setFetching(false)
       } catch (error) {
         console.log('error', error)
+      } finally {
+        setFetching(false)
       }
     }
 
@@ -128,6 +135,19 @@ function ItemPinEditMode({
                     required: true,
                     message: 'กรุณาเลือกข่าวสารที่ปักหมุด',
                   },
+                  {
+                    validator: async (_, value) => {
+                      const list = form.getFieldValue(nameHead) || []
+                      const findIndex = list.findIndex(
+                        (item: any) => item.newsId === value && item.key !== newsData.key,
+                      )
+                      if (findIndex !== -1) {
+                        return Promise.reject(new Error('ข่าวสารนี้ถูกปักหมุดแล้ว'))
+                      } else {
+                        return Promise.resolve()
+                      }
+                    },
+                  },
                 ]
               : []
           }
@@ -135,6 +155,7 @@ function ItemPinEditMode({
           <DebounceSelect
             focusBackgroundColor={currentApp.backgroundColor}
             setSearchValue={setSearchValue}
+            fetching={fetching}
             customOptionRender={(option) => {
               return (
                 <div

@@ -1,5 +1,5 @@
 import React from 'react'
-import { Select, Spin } from 'antd'
+import { Empty, Select, Spin } from 'antd'
 // import debounce from 'lodash/debounce'
 import { CloseCircleFilled } from '@ant-design/icons'
 
@@ -69,7 +69,7 @@ const DebounceSelect: React.FC<DebounceSelectProps> = ({
       // onPopupScroll={(e) => {
       //   console.log('e', e)
       // }}
-      notFoundContent={!fetching ? <Spin size='small' /> : null}
+      notFoundContent={fetching ? <Spin size='small' /> : <Empty description='ไม่พบข่าวสาร' />}
       onSelect={(v, option) => {
         handleSelect?.(v, option)
         setSearchValue?.('')

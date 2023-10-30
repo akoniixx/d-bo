@@ -53,6 +53,8 @@ interface NewsType {
   typeLaunch: string | null
   updateAt: string
   updateBy: string | null
+  create_at: string
+  category_news: string
 }
 
 interface NewsResponse {
@@ -104,75 +106,76 @@ function Content({ application }: Props) {
     }
   }, [application])
 
-  useEffect(() => {
-    const getInitialListDnd = async () => {
-      try {
-        const result: NewsResponse = await NewsDatasource.getPinNews(currentApp.app)
-        const formatDataPinMain = initialListDnd.map((item, index) => {
-          const currentArray = result.pinMain[index]
-          if (!currentArray) {
-            return {
-              ...item,
-              disabled: true,
-              order: index + 1,
-            }
-          } else {
-            return {
-              ...item,
-              disabled: false,
-              newsId: currentArray.id,
-              label: currentArray.title,
-              value: currentArray.id,
-              endDate: currentArray.endDate,
-              order: index + 1,
-              currentOptions: [
-                {
-                  label: currentArray.title,
-                  value: currentArray.id,
-                  id: currentArray.id,
-                  startDate: currentArray.createAt,
-                  categoryNews: currentArray.categoryNews,
-                },
-              ],
-            }
+  const getInitialListDnd = async () => {
+    try {
+      const result: NewsResponse = await NewsDatasource.getPinNews(currentApp.app)
+      const formatDataPinMain = initialListDnd.map((item, index) => {
+        const currentArray = result.pinMain[index]
+        if (!currentArray) {
+          return {
+            ...item,
+            disabled: true,
+            order: index + 1,
           }
-        })
-        const formatDataPinAll = initialListDnd.map((item, index) => {
-          const currentArray = result.pinAll[index]
-          if (!currentArray) {
-            return {
-              ...item,
-              disabled: true,
-              order: index + 1,
-            }
-          } else {
-            return {
-              ...item,
-              disabled: false,
-              newsId: currentArray.id,
-              label: currentArray.title,
-              value: currentArray.id,
-              endDate: currentArray.endDate,
-              order: index + 1,
-              currentOptions: [
-                {
-                  label: currentArray.title,
-                  value: currentArray.id,
-                  id: currentArray.id,
-                  startDate: currentArray.createAt,
-                },
-              ],
-            }
+        } else {
+          return {
+            ...item,
+            disabled: false,
+            newsId: currentArray.id,
+            label: currentArray.title,
+            value: currentArray.id,
+            endDate: currentArray.endDate,
+            order: index + 1,
+            currentOptions: [
+              {
+                label: currentArray.title,
+                value: currentArray.id,
+                id: currentArray.id,
+                startDate: currentArray.createAt,
+                categoryNews: currentArray.categoryNews,
+              },
+            ],
           }
-        })
-        form.setFieldsValue({
-          pinMain: formatDataPinMain as any,
-          pinAll: formatDataPinAll as any,
-        })
-      } catch (error) {
-        console.log('error', error)
-      }
+        }
+      })
+      const formatDataPinAll = initialListDnd.map((item, index) => {
+        const currentArray = result.pinAll[index]
+        if (!currentArray) {
+          return {
+            ...item,
+            disabled: true,
+            order: index + 1,
+          }
+        } else {
+          return {
+            ...item,
+            disabled: false,
+            newsId: currentArray.id,
+            label: currentArray.title,
+            value: currentArray.id,
+            endDate: currentArray.endDate,
+            order: index + 1,
+            currentOptions: [
+              {
+                label: currentArray.title,
+                value: currentArray.id,
+                id: currentArray.id,
+                startDate: currentArray.createAt,
+                categoryNews: currentArray.categoryNews,
+              },
+            ],
+          }
+        }
+      })
+      form.setFieldsValue({
+        pinMain: formatDataPinMain as any,
+        pinAll: formatDataPinAll as any,
+      })
+    } catch (error) {
+      console.log('error', error)
     }
+  }
+  useEffect(() => {
     getInitialListDnd()
   }, [form, currentApp])
 
@@ -214,6 +217,7 @@ function Content({ application }: Props) {
           showConfirmButton: false,
           timer: 1500,
         })
+        await getInitialListDnd()
       }
     } catch (e) {
       console.log('e', e)
@@ -227,10 +231,6 @@ function Content({ application }: Props) {
       }}
     >
       <Form
-        onFieldsChange={(changedFields, allFields) => {
-          console.log('changedFields', changedFields)
-          console.log('allFields', allFields)
-        }}
         onFinish={onFinish}
         form={form}
         style={{

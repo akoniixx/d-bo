@@ -54,6 +54,7 @@ interface Props {
   newsData: any
   name: string | number
   form: FormInstance<FormValues>
+  nameHead: string
 }
 const textButtonAdd = '+ เพิ่มปักหมุดข่าวสาร'
 const titleNews = 'ข่าวสารที่ปักหมุด'
@@ -67,6 +68,7 @@ function ItemPin({
   onDelPinNews,
   name,
   form,
+  nameHead,
 }: Props) {
   const [editMode, setEditMode] = useState(false)
   const onClickDel = async () => {
@@ -82,6 +84,7 @@ function ItemPin({
       currentApp={currentApp}
       editMode={editMode || !disabled}
       form={form}
+      nameHead={nameHead}
     />
   ) : (
     <RowContainer
