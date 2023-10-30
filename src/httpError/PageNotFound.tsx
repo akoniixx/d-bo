@@ -1,10 +1,10 @@
-import React from "react";
-import { useLocation } from "react-router-dom";
-import { image } from "../resource";
+import React from 'react'
+import { useLocation } from 'react-router-dom'
+import { image } from '../resource'
 
 const PageNotFound: React.FC = () => {
   const NoMatch = () => {
-    let location = useLocation();
+    const location = useLocation()
 
     return (
       <div>
@@ -12,25 +12,25 @@ const PageNotFound: React.FC = () => {
           No match for <code>{location.pathname}</code>
         </h3>
       </div>
-    );
-  };
+    )
+  }
 
   return (
-    <div className="container">
-      <div className="d-flex justify-content-center align-items-center">
-        <img src={image.error404} width="264px" height="164px" />
-        <h3 className="card-title  mt-5 ">
-          <span className="card-label font-weight-bolder text-dark">
+    <div className='container'>
+      <div className='d-flex justify-content-center align-items-center'>
+        <img src={image.error404} width='264px' height='164px' />
+        <h3 className='card-title  mt-5 '>
+          <span className='card-label font-weight-bolder text-dark'>
             ขออภัย ไม่พบหน้าที่ท่านต้องการ
           </span>
           {NoMatch()}
           <br />
-          <span className="text-muted mt-5 font-weight-bold font-size-sm">
+          <span className='text-muted mt-5 font-weight-bold font-size-sm'>
             ไม่พบ URL ที่คุณเรียกโปรดตรวจสอบ URL ให้ถูกต้อง
           </span>
         </h3>
       </div>
     </div>
-  );
-};
-export default PageNotFound;
+  )
+}
+export default PageNotFound

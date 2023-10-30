@@ -7,10 +7,10 @@ import {
   SettingFilled,
   StarFilled,
   UserOutlined,
-} from "@ant-design/icons";
-import { Image } from "antd";
-import React from "react";
-import { color, icon } from "../../resource";
+} from '@ant-design/icons'
+import { Image } from 'antd'
+import React from 'react'
+import { color, icon } from '../../resource'
 
 export const IconMenu = {
   task: (
@@ -58,8 +58,8 @@ export const IconMenu = {
   setting: (
     <SettingFilled
       style={{
-        fontSize: "16px",
-        color: "#231F20",
+        fontSize: '16px',
+        color: '#231F20',
       }}
     />
   ),
@@ -91,7 +91,7 @@ export const IconMenu = {
       style={{ width: 18, height: 18, color: color.BK }}
     />
   ),
-};
+}
 export const IconMenuActive = {
   task: (
     <Image
@@ -138,18 +138,12 @@ export const IconMenuActive = {
   setting: (
     <SettingFilled
       style={{
-        fontSize: "16px",
-        color: "#FFCA37",
+        fontSize: '16px',
+        color: '#FFCA37',
       }}
     />
   ),
-  mission: (
-    <Image
-      src={icon.targetActive}
-      preview={false}
-      style={{ width: 18, height: 18 }}
-    />
-  ),
+  mission: <Image src={icon.targetActive} preview={false} style={{ width: 18, height: 18 }} />,
   promotion: (
     <Image
       src={icon.news_active}
@@ -171,4 +165,4 @@ export const IconMenuActive = {
       style={{ width: 18, height: 18, color: color.BK }}
     />
   ),
-};
+}

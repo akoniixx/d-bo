@@ -1,4 +1,4 @@
-import { BASE_URL, httpClient } from "../config/config";
+import { BASE_URL, httpClient } from '../config/config'
 import {
   DetailRedeemDronerEntity,
   DetailRedeemFermerEntity,
@@ -6,7 +6,7 @@ import {
   RedeemDronerListEntity,
   RedeemFarmerListEntity,
   UpdateRedeemDronerEntity,
-} from "../entities/RedeemEntities";
+} from '../entities/RedeemEntities'
 
 export class RedeemDatasource {
   static getRedeemFarmer(
@@ -15,7 +15,7 @@ export class RedeemDatasource {
     search?: string,
     startDate?: string,
     endDate?: string,
-    status?: string
+    status?: string,
   ): Promise<RedeemFarmerListEntity> {
     const params = {
       page: page,
@@ -24,25 +24,25 @@ export class RedeemDatasource {
       startDate: startDate,
       endDate: endDate,
       status: status,
-    };
+    }
     return httpClient
-      .post(BASE_URL + "/tasks/task/get-task-redeem-point", params)
+      .post(BASE_URL + '/tasks/task/get-task-redeem-point', params)
       .then((response) => {
-        return response.data;
+        return response.data
       })
       .catch((err) => {
-        console.log(err, "err getnewtask");
-      });
+        console.log(err, 'err getnewtask')
+      })
   }
   static getRedeemFarmerById(id: string): Promise<DetailRedeemFermerEntity> {
     return httpClient
       .get(BASE_URL + `/tasks/task/get-task-redeem-point-detail/${id}`)
       .then((response) => {
-        return response.data;
+        return response.data
       })
       .catch((err) => {
-        console.log(err, "err getnewtask");
-      });
+        console.log(err, 'err getnewtask')
+      })
   }
   static getRedeemDroner(
     take: number,
@@ -53,7 +53,7 @@ export class RedeemDatasource {
     status?: string,
     secondSearch?: string,
     rewardType?: string,
-    rewardExchange?: string
+    rewardExchange?: string,
   ): Promise<RedeemDronerListEntity> {
     const params = {
       take: take,
@@ -65,44 +65,34 @@ export class RedeemDatasource {
       secondSearch: secondSearch,
       rewardType: rewardType,
       rewardExchange: rewardExchange,
-    };
+    }
     return httpClient
-      .get(
-        BASE_URL +
-          "/promotion/droner-transactions/get-all-droner-reward-history",
-        { params }
-      )
+      .get(BASE_URL + '/promotion/droner-transactions/get-all-droner-reward-history', { params })
       .then((response) => {
-        return response.data;
+        return response.data
       })
       .catch((err) => {
-        console.log(err, "err getnewtask");
-      });
+        console.log(err, 'err getnewtask')
+      })
   }
   static getRedeemDronerById(id: string): Promise<DetailRedeemDronerEntity> {
     return httpClient
-      .get(
-        BASE_URL +
-          `/promotion/droner-transactions/get-droner-reward-history/${id}`
-      )
+      .get(BASE_URL + `/promotion/droner-transactions/get-droner-reward-history/${id}`)
       .then((response) => {
-        return response.data;
+        return response.data
       })
       .catch((err) => {
-        console.log(err, "err getnewtask");
-      });
+        console.log(err, 'err getnewtask')
+      })
   }
   static updateStatusRedeem(data: UpdateRedeemDronerEntity) {
     return httpClient
-      .post(
-        BASE_URL + "/promotion/droner-transactions/update-redeem-status",
-        data
-      )
+      .post(BASE_URL + '/promotion/droner-transactions/update-redeem-status', data)
       .then((response) => {
-        return response.data;
+        return response.data
       })
       .catch((error) => {
-        console.log(error);
-      });
+        console.log(error)
+      })
   }
 }

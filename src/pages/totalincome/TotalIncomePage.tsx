@@ -4,7 +4,7 @@ import { DashboardLayout } from '../../components/layout/Layout'
 function TotalIncomePage() {
   return (
     <>
-    <div>TotalIncomePage</div>
+      <div>TotalIncomePage</div>
     </>
   )
 }

@@ -1,9 +1,5 @@
-import { httpClient, BASE_URL } from "../config/config";
-import {
-  CreateFarmerEntity,
-  FarmerPageEntity,
-  GetFarmerEntity,
-} from "../entities/FarmerEntities";
+import { httpClient, BASE_URL } from '../config/config'
+import { CreateFarmerEntity, FarmerPageEntity, GetFarmerEntity } from '../entities/FarmerEntities'
 
 export class FarmerDatasource {
   static getFarmerList(
@@ -18,7 +14,7 @@ export class FarmerDatasource {
     districtId?: number,
     subdistrictId?: number,
     sortDirection?: string,
-    sortField?: string
+    sortField?: string,
   ): Promise<FarmerPageEntity> {
     const params = {
       mainStatus: mainStatus,
@@ -33,51 +29,51 @@ export class FarmerDatasource {
       subdistrictId: subdistrictId,
       sortDirection: sortDirection,
       sortField: sortField,
-    };
+    }
     return httpClient
-      .get(BASE_URL + "/farmer", { params })
+      .get(BASE_URL + '/farmer', { params })
       .then((response) => {
-        return response.data;
+        return response.data
       })
       .catch((err) => {
-        console.log(err, "err getFarmer");
-      });
+        console.log(err, 'err getFarmer')
+      })
   }
 
   static insertFarmer(data: CreateFarmerEntity): Promise<any> {
-    var id: any = "id";
-    var farmerId: any = "farmerId";
-    delete data.farmerPlot[id];
-    delete data.farmerPlot[farmerId];
+    const id: any = 'id'
+    const farmerId: any = 'farmerId'
+    delete data.farmerPlot[id]
+    delete data.farmerPlot[farmerId]
     return httpClient
-      .post(BASE_URL + "/farmer", data)
+      .post(BASE_URL + '/farmer', data)
       .then((response) => {
-        return response.data;
+        return response.data
       })
       .catch((err) => {
-        console.log(err, "err insertFarmer");
-      });
+        console.log(err, 'err insertFarmer')
+      })
   }
 
   static getFarmerById(id: string): Promise<GetFarmerEntity> {
     return httpClient
-      .get(BASE_URL + "/farmer/" + id)
+      .get(BASE_URL + '/farmer/' + id)
       .then((response) => {
-        return response.data;
+        return response.data
       })
       .catch((err) => {
-        console.log(err, "err getFarmerid");
-      });
+        console.log(err, 'err getFarmerid')
+      })
   }
 
   static updateFarmer(data: GetFarmerEntity): Promise<any> {
     return httpClient
-      .patch(BASE_URL + "/farmer/" + data.id, data)
+      .patch(BASE_URL + '/farmer/' + data.id, data)
       .then((response) => {
-        return response.data;
+        return response.data
       })
       .catch((err) => {
-        console.log(err, "err getFarmerid");
-      });
+        console.log(err, 'err getFarmerid')
+      })
   }
 }

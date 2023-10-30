@@ -3,105 +3,98 @@ import {
   CaretUpOutlined,
   FileTextOutlined,
   SearchOutlined,
-} from "@ant-design/icons";
-import { Button, Col, Image, Input, Pagination, Row, Spin, Table } from "antd";
-import React, { useEffect, useState } from "react";
-import ActionButton from "../../../components/button/ActionButton";
-import { CardContainer } from "../../../components/card/CardContainer";
-import { color, icon } from "../../../resource";
-import { useNavigate } from "react-router-dom";
-import { FarmerSummaryPointListEntity } from "../../../entities/PointReceiveEntities";
-import { PointReceiveDatasource } from "../../../datasource/PointReceiveDatasource";
-import { numberWithCommas } from "../../../utilities/TextFormatter";
-import { sorter } from "../../../utilities/Sorting";
-import ShowNickName from "../../../components/popover/ShowNickName";
+} from '@ant-design/icons'
+import { Button, Col, Image, Input, Pagination, Row, Spin, Table } from 'antd'
+import React, { useEffect, useState } from 'react'
+import ActionButton from '../../../components/button/ActionButton'
+import { CardContainer } from '../../../components/card/CardContainer'
+import { color, icon } from '../../../resource'
+import { useNavigate } from 'react-router-dom'
+import { FarmerSummaryPointListEntity } from '../../../entities/PointReceiveEntities'
+import { PointReceiveDatasource } from '../../../datasource/PointReceiveDatasource'
+import { numberWithCommas } from '../../../utilities/TextFormatter'
+import { sorter } from '../../../utilities/Sorting'
+import ShowNickName from '../../../components/popover/ShowNickName'
 
 function IndexFarmerSummary() {
-  const navigate = useNavigate();
-  const row = 10;
-  const [current, setCurrent] = useState(1);
-  const [data, setData] = useState<FarmerSummaryPointListEntity>();
-  const [searchKeyword, setSearchKeyword] = useState("");
-  const [sortDirection, setSortDirection] = useState<string | undefined>(
-    undefined
-  );
-  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate()
+  const row = 10
+  const [current, setCurrent] = useState(1)
+  const [data, setData] = useState<FarmerSummaryPointListEntity>()
+  const [searchKeyword, setSearchKeyword] = useState('')
+  const [sortDirection, setSortDirection] = useState<string | undefined>(undefined)
+  const [loading, setLoading] = useState(false)
 
   const fetchFarmerSum = () => {
-    setLoading(true);
-    PointReceiveDatasource.getFarmerSumPoint(
-      row,
-      current,
-      searchKeyword,
-      sortDirection
-    )
+    setLoading(true)
+    PointReceiveDatasource.getFarmerSumPoint(row, current, searchKeyword, sortDirection)
       .then((res) => {
-        setData(res);
+        setData(res)
       })
       .catch((err) => console.log(err))
-      .finally(() => setLoading(false));
-  };
+      .finally(() => setLoading(false))
+  }
 
   useEffect(() => {
-    fetchFarmerSum();
-  }, [current, sortDirection]);
+    fetchFarmerSum()
+  }, [current, sortDirection])
 
   const onChangePage = (page: number) => {
-    setCurrent(page);
-  };
+    setCurrent(page)
+  }
   const onSearch = () => {
-    setCurrent(1);
-    fetchFarmerSum();
-  };
+    setCurrent(1)
+    fetchFarmerSum()
+  }
 
   const sortTitle = (title: string, field?: string) => {
     return (
       <>
-        <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+        <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
           {title}
           <div
             style={{
-              display: "flex",
-              flexDirection: "column",
-              cursor: "pointer",
+              display: 'flex',
+              flexDirection: 'column',
+              cursor: 'pointer',
             }}
             onClick={() => {
               setSortDirection((prev: any) => {
-                if (prev === "ASC") {
-                  return "DESC";
+                if (prev === 'ASC') {
+                  return 'DESC'
                 } else if (prev === undefined) {
-                  return "ASC";
+                  return 'ASC'
                 } else {
-                  return undefined;
+                  return undefined
                 }
-              });
+              })
             }}
           >
             <CaretUpOutlined
               style={{
-                position: "relative",
+                position: 'relative',
                 top: 2,
-                color: sortDirection === "ASC" ? "#ffca37" : "white",
+                color: sortDirection === 'ASC' ? '#ffca37' : 'white',
               }}
             />
             <CaretDownOutlined
               style={{
-                position: "relative",
+                position: 'relative',
                 bottom: 2,
-                color: sortDirection === "DESC" ? "#ffca37" : "white",
+                color: sortDirection === 'DESC' ? '#ffca37' : 'white',
               }}
             />
           </div>
         </div>
       </>
-    );
-  };
+    )
+  }
 
   const pageTitle = (
-    <Row gutter={8} className="p-3">
+    <Row gutter={8} className='p-3'>
       <Col span={16}>
         <span
-          className="card-label font-weight-bolder text-dark"
+          className='card-label font-weight-bolder text-dark'
           style={{
             fontSize: 22,
           }}
@@ -113,7 +106,7 @@ function IndexFarmerSummary() {
         <Input
           allowClear
           prefix={<SearchOutlined style={{ color: color.Disable }} />}
-          placeholder="ค้นหาชื่อเกษตรกร/เบอร์โทร"
+          placeholder='ค้นหาชื่อเกษตรกร/เบอร์โทร'
           onChange={(e) => setSearchKeyword(e.target.value)}
         />
       </Col>
@@ -121,7 +114,7 @@ function IndexFarmerSummary() {
         <Button
           style={{
             borderColor: color.Success,
-            borderRadius: "5px",
+            borderRadius: '5px',
             color: color.secondary2,
             backgroundColor: color.Success,
           }}
@@ -130,13 +123,13 @@ function IndexFarmerSummary() {
           ค้นหาข้อมูล
         </Button>
       </Col>
-    </Row>  
-  );
+    </Row>
+  )
 
   const columns = [
     {
-      title: "ชื่อเกษตรกร",
-      width: "30%",
+      title: 'ชื่อเกษตรกร',
+      width: '30%',
       render: (value: any, row: any, index: number) => {
         return {
           children: (
@@ -145,20 +138,18 @@ function IndexFarmerSummary() {
                 color: row.isDelete === true ? color.Error : color.font,
               }}
             >
-              {row.firstname + " " + row.lastname}
-              {row.nickname && (
-                  <ShowNickName data={row.nickname} menu="INFO" />
-                )}
+              {row.firstname + ' ' + row.lastname}
+              {row.nickname && <ShowNickName data={row.nickname} menu='INFO' />}
             </span>
           ),
-        };
+        }
       },
     },
     {
-      title: "เบอร์โทร",
-      dataIndex: "telephoneNo",
-      key: "telephoneNo",
-      width: "45%",
+      title: 'เบอร์โทร',
+      dataIndex: 'telephoneNo',
+      key: 'telephoneNo',
+      width: '45%',
       render: (value: any, row: any, index: number) => {
         return {
           children: (
@@ -170,13 +161,13 @@ function IndexFarmerSummary() {
               {row.telephoneNo}
             </span>
           ),
-        };
+        }
       },
     },
     {
-      title: () => sortTitle("แต้มคงเหลือ"),
-      dataIndex: "balance",
-      key: "balance",
+      title: () => sortTitle('แต้มคงเหลือ'),
+      dataIndex: 'balance',
+      key: 'balance',
       render: (value: any, row: any, index: number) => {
         return {
           children: (
@@ -184,57 +175,55 @@ function IndexFarmerSummary() {
               <img
                 src={icon.coinFarmer}
                 style={{
-                  width: "26px",
-                  height: "26px",
-                  alignContent: "center",
+                  width: '26px',
+                  height: '26px',
+                  alignContent: 'center',
                 }}
-              />{" "}
+              />{' '}
               <span>{numberWithCommas(row.balance) + ` แต้ม`}</span>
             </>
           ),
-        };
+        }
       },
     },
     {
-      title: "",
-      dataIndex: "Action",
-      key: "Action",
-      width: "8%",
+      title: '',
+      dataIndex: 'Action',
+      key: 'Action',
+      width: '8%',
       render: (value: any, row: any, index: number) => {
         return {
           children: (
-            <div className="d-flex flex-row justify-content-center">
-              <div className="col-lg-6">
+            <div className='d-flex flex-row justify-content-center'>
+              <div className='col-lg-6'>
                 <ActionButton
                   icon={<FileTextOutlined />}
                   color={color.primary1}
-                  onClick={() =>
-                    navigate("/IndexFarmerHistorySum/id=" + row.farmerId)
-                  }
+                  onClick={() => navigate('/IndexFarmerHistorySum/id=' + row.farmerId)}
                 />
               </div>
             </div>
           ),
-        };
+        }
       },
     },
-  ];
+  ]
 
   return (
     <>
       {pageTitle}
       <CardContainer>
-        <Spin tip="กำลังโหลดข้อมูล..." size="large" spinning={loading}>
+        <Spin tip='กำลังโหลดข้อมูล...' size='large' spinning={loading}>
           <Table
             dataSource={data?.data}
             columns={columns}
             pagination={false}
-            size="large"
-            tableLayout="fixed"
+            size='large'
+            tableLayout='fixed'
           />
         </Spin>
       </CardContainer>
-      <div className="d-flex justify-content-between pt-4">
+      <div className='d-flex justify-content-between pt-4'>
         <p>รายการทั้งหมด {data?.count} รายการ</p>
         <Pagination
           current={current}
@@ -245,7 +234,7 @@ function IndexFarmerSummary() {
         />
       </div>
     </>
-  );
+  )
 }
 
-export default IndexFarmerSummary;
+export default IndexFarmerSummary
