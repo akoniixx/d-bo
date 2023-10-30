@@ -80,6 +80,7 @@ const _ = require('lodash')
 const { Map } = require('immutable')
 
 const AddNewTask = () => {
+  // eslint-disable-next-line prefer-const
   let queryString = _.split(window.location.pathname, '=')
   const navigate = useNavigate()
   const [form] = Form.useForm()
@@ -246,7 +247,7 @@ const AddNewTask = () => {
     plot?: string,
   ) => {
     await LocationPriceDatasource.getLocationPrice(proId, plant).then((res) => {
-      let calUnitPrice = rai && parseFloat(res.price) * parseFloat(rai)
+      const calUnitPrice = rai && parseFloat(res.price) * parseFloat(rai)
       const d = Map(createNewTask).set('priceStandard', calUnitPrice)
       const e = Map(d.toJS()).set('farmAreaAmount', rai)
       const pushCal = Map(e.toJS()).set('unitPriceStandard', parseFloat(res.price))

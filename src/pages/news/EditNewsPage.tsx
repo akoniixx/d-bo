@@ -166,7 +166,7 @@ function EditNewsPage() {
   }
 
   const disabledDateStart = (current: any) => {
-    let customDate = moment().format('YYYY-MM-DD')
+    const customDate = moment().format('YYYY-MM-DD')
     return current && current < moment(customDate, 'YYYY-MM-DD')
   }
 
@@ -181,6 +181,7 @@ function EditNewsPage() {
       NewsDatasource.uploadNewsImageDescription(file).then((resImg) => {
         setTimeout(() => {
           const range = quillRef.current.getEditor().getSelection(true)
+          // eslint-disable-next-line prefer-const
           let quill = quillRef.current.getEditor()
           quill.insertEmbed(range.index, 'image', resImg.url)
           quill.formatText(range.index, 1, { width: `100%`, height: `200px` })
