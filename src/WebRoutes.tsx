@@ -19,7 +19,6 @@ const IndexFarmer = lazy(() => import('./pages/farmer/IndexFarmer'))
 const HomePage = lazy(() => import('./pages/home/HomePage'))
 const OverviewPage = lazy(() => import('./pages/overview/OverviewPage'))
 const PromotionPage = lazy(() => import('./pages/promotion/PromotionPage'))
-const TotalIncomePage = lazy(() => import('./pages/totalincome/TotalIncomePage'))
 const IndexAdmin = lazy(() => import('./pages/admin/IndexAdmin'))
 const AddAdmin = lazy(() => import('./pages/admin/AddAdmin'))
 const EditAdmin = lazy(() => import('./pages/admin/EditAdmin'))
@@ -129,13 +128,9 @@ const WebRoutes: React.FC<any> = () => {
             <Route path='/IndexFarmer/*' element={<IndexFarmer />} />
             <Route path='AddFarmer' element={<AddFarmer />} />
             <Route path='/EditFarmer/:id' element={<EditFarmer />} />
-            <Route path='/TotalIncomePage' element={<TotalIncomePage />} />
             <Route path='/PromotionPage' element={<PromotionPage />} />
-
             <Route path='/NewsPage' element={<NewsPage />} />
             <Route path='/PinNewsPage' element={<PinNewsPage />} />
-
-            <Route path='/TotalIncomePage' element={<TotalIncomePage />} />
             <Route path='/AddDroner' element={<AddDroner />} />
             <Route path='/DroneList' element={<DroneList />} />
             <Route path='/PricePage' element={<PricePage />} />

@@ -6,7 +6,6 @@ import { BackIconButton } from '../../../components/button/BackButton'
 import { CardContainer } from '../../../components/card/CardContainer'
 import FooterPage from '../../../components/footer/FooterPage'
 import { CardHeader } from '../../../components/header/CardHearder'
-import { DashboardLayout } from '../../../components/layout/Layout'
 import { CampaignDatasource } from '../../../datasource/CampaignDatasource'
 import { CreateCampaignEntiry } from '../../../entities/CampaignPointEntites'
 import { color } from '../../../resource'
@@ -24,6 +23,7 @@ const AddCampaignPoint = () => {
   const [create, setCreate] = useState<CreateCampaignEntiry>()
   const [checkDup, setCheckDup] = useState(false)
 
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
   useEffect(() => {}, [checkDup])
 
   const checkDupCampiagn = async () => {

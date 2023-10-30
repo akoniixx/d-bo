@@ -1,6 +1,6 @@
 import { DeleteOutlined, DownCircleFilled, UpCircleFilled } from '@ant-design/icons'
 import { Button, Col, Divider, Form, Input, Radio, Row, Table } from 'antd'
-import Select, { Props as SelectProps } from 'react-select'
+import Select from 'react-select'
 import TextArea from 'antd/lib/input/TextArea'
 import React, { useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
@@ -13,7 +13,6 @@ import {
   CampaignConditionEntity,
   CampaignConditionEntity_INIT,
 } from '../../../entities/CampaignPointEntites'
-import { GetAllRewardEntities } from '../../../entities/RewardEntites'
 import { color } from '../../../resource'
 import { ProviceEntity } from '../../../entities/LocationEntities'
 import { LocationDatasource } from '../../../datasource/LocationDatasource'
@@ -133,7 +132,7 @@ const EditDetailPointManual = () => {
 
   const mapForm = (e: any) => {
     const mapList = e
-    mapList.map((y: any, i: number) => {
+    mapList.map((y: any) => {
       formTable.setFieldValue(`${y.num}_nameUser`, y.nameUser)
       formTable.setFieldValue(`${y.num}_point`, y.point)
       formTable.setFieldValue(`${y.num}_task`, y.task)
@@ -225,6 +224,7 @@ const EditDetailPointManual = () => {
         return {
           children: (
             <Form.Item
+              key={index}
               style={{ margin: 0 }}
               name={`${row.num}_nameUser`}
               rules={[
@@ -257,6 +257,7 @@ const EditDetailPointManual = () => {
         return {
           children: (
             <Form.Item
+              key={index}
               style={{ margin: 0 }}
               name={`${row.num}_point`}
               rules={[
@@ -283,7 +284,7 @@ const EditDetailPointManual = () => {
         return {
           children: (
             <div className='d-flex'>
-              <Form.Item name={`${row.num}_task`} style={{ margin: 0 }}>
+              <Form.Item key={index} name={`${row.num}_task`} style={{ margin: 0 }}>
                 <Radio.Group>
                   <Radio value='YES'>ไม่มี</Radio>
                   <Radio value='NO'>มี</Radio>
@@ -311,7 +312,7 @@ const EditDetailPointManual = () => {
     },
     {
       title: '',
-      render: (value: any, row: any, index: number) => {
+      render: (value: any, row: any) => {
         return {
           children: (
             <div className='d-flex flex-row justify-content-center'>
@@ -344,8 +345,8 @@ const EditDetailPointManual = () => {
         description: fs[`${y.num}_description`],
       }
     })
-    let fieldErr: boolean = true
-    let fieldNull: boolean = true
+    let fieldErr = true
+    let fieldNull = true
     condition.length > 0 &&
     condition.every(
       (item: any) =>
@@ -429,6 +430,7 @@ const EditDetailPointManual = () => {
     </>
   )
 
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
   const submit = async () => {}
 
   return (
@@ -436,7 +438,7 @@ const EditDetailPointManual = () => {
       <Row>
         <BackIconButton onClick={() => navigate(-1)} />
         <span className='pt-3'>
-          <strong style={{ fontSize: '20px' }}>เพิ่มแต้มพิเศษ</strong>
+          <strong style={{ fontSize: '20px' }}>แก้ไขแต้มพิเศษ</strong>
         </span>
       </Row>
       <CardContainer>

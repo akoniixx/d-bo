@@ -2,12 +2,9 @@ import {
   Avatar,
   Badge,
   Button,
-  Checkbox,
   Col,
-  Dropdown,
   Image,
   Input,
-  Menu,
   Pagination,
   PaginationProps,
   Popover,
@@ -21,7 +18,6 @@ import color from '../../resource/color'
 import {
   CaretDownOutlined,
   CaretUpOutlined,
-  DownOutlined,
   EditOutlined,
   InfoCircleFilled,
   SearchOutlined,
@@ -35,12 +31,10 @@ import { LocationDatasource } from '../../datasource/LocationDatasource'
 import { DistrictEntity, ProviceEntity, SubdistrictEntity } from '../../entities/LocationEntities'
 import moment from 'moment'
 import AddButtton from '../../components/button/AddButton'
-import { DroneDatasource } from '../../datasource/DroneDatasource'
-import { useNavigate, useSearchParams } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import StatusButton from '../../components/button/StatusButton'
 import StatusPlots from '../../components/card/StatusPlots'
 import { numberWithCommas } from '../../utilities/TextFormatter'
-import { CheckboxValueType } from 'antd/lib/checkbox/Group'
 import { icon, image } from '../../resource'
 import { STATUS_COLOR_MAPPING, STATUS_FARMER_MAPPING } from '../../definitions/Status'
 import CheckDocument from '../../components/dropdownCheck/CheckDocument'
@@ -324,8 +318,8 @@ function IndexDroner() {
               optionA.children.toLowerCase().localeCompare(optionB.children.toLowerCase())
             }
           >
-            {province?.map((item) => (
-              <option value={item.provinceId.toString()}>{item.provinceName}</option>
+            {province?.map((item, index) => (
+              <option key={index} value={item.provinceId.toString()}>{item.provinceName}</option>
             ))}
           </Select>
         </div>
@@ -344,8 +338,8 @@ function IndexDroner() {
             disabled={!searchProvince}
             value={searchDistrict}
           >
-            {district?.map((item) => (
-              <option value={item.districtId.toString()}>{item.districtName}</option>
+            {district?.map((item, index) => (
+              <option key={index} value={item.districtId.toString()}>{item.districtName}</option>
             ))}
           </Select>
         </div>
@@ -364,8 +358,8 @@ function IndexDroner() {
             disabled={!searchDistrict}
             value={searchSubdistrict}
           >
-            {subdistrict?.map((item) => (
-              <option value={item.subdistrictId.toString()}>{item.subdistrictName}</option>
+            {subdistrict?.map((item, index) => (
+              <option key={index} value={item.subdistrictId.toString()}>{item.subdistrictName}</option>
             ))}
           </Select>
         </div>
@@ -541,7 +535,7 @@ function IndexDroner() {
       },
       dataIndex: 'firstname',
       key: 'firstname',
-      render: (value: any, row: any, index: number) => {
+      render: (value: any, row: any) => {
         return {
           children: (
             <div className='container'>
@@ -561,7 +555,7 @@ function IndexDroner() {
       title: 'เบอร์โทร',
       dataIndex: 'telephoneNo',
       key: 'telephoneNo',
-      render: (value: any, row: any, index: number) => {
+      render: (value: any, row: any) => {
         return {
           children: <span>{row.telephoneNo ? row.telephoneNo : '-'}</span>,
         }
@@ -571,7 +565,7 @@ function IndexDroner() {
       title: 'ที่อยู่',
       dataIndex: 'address',
       key: 'address',
-      render: (value: any, row: any, index: number) => {
+      render: (value: any, row: any) => {
         const subdistrict = row.address !== null ? row.address.subdistrict : null
         const district = row.address !== null ? row.address.district : null
         const province = row.address !== null ? row.address.province : null
@@ -590,7 +584,7 @@ function IndexDroner() {
     {
       title: 'ตรวจเอกสาร',
       dataIndex: '',
-      render: (value: any, row: any, index: number) => {
+      render: (value: any, row: any) => {
         return {
           children: (
             <>
@@ -619,7 +613,7 @@ function IndexDroner() {
       title: 'สร้างโดย',
       dataIndex: 'createByWho',
       key: 'createByWho',
-      render: (value: any, row: any, index: number) => {
+      render: (value: any, row: any) => {
         return {
           children: (
             <>
@@ -693,7 +687,7 @@ function IndexDroner() {
       },
       dataIndex: 'totalDroneCount',
       key: 'totalDroneCount',
-      render: (value: any, row: any, index: number) => {
+      render: (value: any, row: any) => {
         return {
           children: (
             <div className='container'>
@@ -709,7 +703,7 @@ function IndexDroner() {
       title: 'ยี่ห้อ',
       dataIndex: 'brand',
       key: 'brand',
-      render: (value: any, row: any, index: number) => {
+      render: (value: any, row: any) => {
         const droneLatest = row.dronerDrone[0]
         return {
           children: (
@@ -741,7 +735,7 @@ function IndexDroner() {
       title: 'สถานะ',
       dataIndex: 'status',
       key: 'status',
-      render: (value: any, row: any, index: number) => {
+      render: (value: any, row: any) => {
         const countDay = () => {
           if (row.dateWaitPending != null) {
             const nowDate = new Date(Date.now())
@@ -831,7 +825,7 @@ function IndexDroner() {
       title: '',
       dataIndex: 'Action',
       key: 'Action',
-      render: (value: any, row: any, index: number) => {
+      render: (value: any, row: any) => {
         return {
           children: (
             <Row justify={'space-between'} gutter={8}>
