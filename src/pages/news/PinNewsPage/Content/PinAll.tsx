@@ -202,6 +202,7 @@ function PinAll({ currentApp, form }: Props) {
                                 return (
                                   <ItemPin
                                     form={form}
+                                    nameHead='pinAll'
                                     currentApp={currentApp}
                                     key={item.key}
                                     disabled={item.disabled}
@@ -225,6 +226,7 @@ function PinAll({ currentApp, form }: Props) {
                                         style={getItemStyle(s.isDragging, p.draggableProps.style)}
                                       >
                                         <ItemPin
+                                          nameHead='pinAll'
                                           form={form}
                                           name={i.name}
                                           newsData={item}
