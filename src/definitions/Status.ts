@@ -232,3 +232,13 @@ export const STATUS_SEARCH: any = {
   THIRD: "7 วันขึ้นไป"
 };
 
+export const STATUS_COLOR_POINT_MANUAL: any = {
+  "คืน": color.Error,
+  "ได้": color.Success,
+  "รอ": color.Grey,
+};
+export const STATUS_POINT_MANUAL: any = {
+  "คืน": "คืนแต้ม",
+  "ได้": "ได้รับแต้ม",
+  "รอ": "รอรับแต้ม",
+};

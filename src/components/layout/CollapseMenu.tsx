@@ -158,9 +158,17 @@ export const CollapseMenu: React.FC<CollapseMenuProps> = ({
             </div>
             <div style={{ paddingRight: "8px" }}>
               {checkPath !== path ? (
-                <DownOutlined style={{ fontSize: "14px" }} />
+                <Image
+                  src={icon.arrowDownMenu}
+                  preview={false}
+                  style={{ width: 14, height: 8 }}
+                />
               ) : (
-                <UpOutlined style={{ fontSize: "14px" }} />
+                <Image
+                  src={icon.arrowUpYellowMenu}
+                  preview={false}
+                  style={{ width: 14, height: 8 }}
+                />
               )}
             </div>
           </>
@@ -207,9 +215,17 @@ export const CollapseMenu: React.FC<CollapseMenuProps> = ({
               }}
             >
               {checkPath !== path ? (
-                <DownOutlined style={{ fontSize: "14px" }} />
+                <Image
+                  src={icon.arrowDownMenu}
+                  preview={false}
+                  style={{ width: 14, height: 8 }}
+                />
               ) : (
-                <UpOutlined style={{ fontSize: "14px", color: color.White }} />
+                <Image
+                  src={icon.arrowUpYellowMenu}
+                  preview={false}
+                  style={{ width: 14, height: 8 }}
+                />
               )}
             </div>
           </>

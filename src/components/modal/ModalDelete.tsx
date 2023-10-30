@@ -8,6 +8,7 @@ interface ModalDelete {
   title2: string;
   backButton: () => void;
   callBack: () => void;
+  title?: string;
 }
 
 const ModalDelete: React.FC<ModalDelete> = ({
@@ -16,10 +17,11 @@ const ModalDelete: React.FC<ModalDelete> = ({
   title2,
   backButton,
   callBack,
+  title,
 }) => {
   return (
     <Modal
-      title="ยืนยันการลบ"
+      title={title ? title : "ยืนยันการลบ"}
       onCancel={backButton}
       open={show}
       footer={null}
@@ -28,12 +30,8 @@ const ModalDelete: React.FC<ModalDelete> = ({
       }}
     >
       <div className="px-4 pt-4">
-        <span className="text-secondary">
-       {title1}
-        </span>
-        <p className="text-secondary">
-       {title2}
-        </p>
+        <span className="text-secondary">{title1}</span>
+        <p className="text-secondary">{title2}</p>
       </div>
       <Divider
         style={{
@@ -58,7 +56,7 @@ const ModalDelete: React.FC<ModalDelete> = ({
           }}
           onClick={callBack}
         >
-          ลบ
+          {title === "ยืนยันการคืนแต้ม" ? "คืนแต้ม" : "ลบ"}
         </Button>
       </div>
     </Modal>

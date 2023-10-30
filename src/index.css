@@ -103,3 +103,24 @@ table tr td :hover {
 .ant-radio-checked .ant-radio-inner:after {
   background-color: #219653 !important;
 }
+.ant-tabs-tab-active {
+  border-color: #219653 !important;
+  border-radius: 4px 4px 0px 0px !important;
+}
+.ant-tabs-tab {
+  border-radius: 4px 4px 0px 0px !important;
+}
+.ant-tabs-tab-btn {
+  color: #404040 !important;
+}
+.ant-tabs-tab.ant-tabs-tab-active .ant-tabs-tab-btn {
+  color: #219653 !important;
+}
+.ant-tabs-nav-wrap {
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: 50%; /* Position the line in the center of the screen vertically */
+  border-bottom: 0.5px solid #ccc; /* You can adjust the width, color, and style of the line here */
+  z-index: 999;
+}

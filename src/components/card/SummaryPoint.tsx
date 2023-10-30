@@ -11,6 +11,8 @@ interface SummaryProps {
   label: string;
   point: number;
   icon?: string;
+  time?: number;
+  pointManual?: boolean;
 }
 const SummaryPoint: React.FC<SummaryProps> = ({
   title,
@@ -18,6 +20,8 @@ const SummaryPoint: React.FC<SummaryProps> = ({
   label,
   point,
   icon,
+  time,
+  pointManual,
 }) => {
   return (
     <>
@@ -28,7 +32,7 @@ const SummaryPoint: React.FC<SummaryProps> = ({
           borderRadius: "5px",
         }}
       >
-        <p>{title}</p>
+        <p style={{ fontSize: "16px", fontWeight: "600" }}>{title}</p>
         <div className="d-flex justify-content-between">
           <CardContainer
             style={{
@@ -43,20 +47,34 @@ const SummaryPoint: React.FC<SummaryProps> = ({
               style={{ color: color.White, fontWeight: "bold" }}
             >
               <div className="d-flex justify-content-between">
-                <div>
-                  <Image
-                    preview={false}
-                    src={icon}
-                    style={{ width: "36px", height: "24px", paddingRight: 10 }}
-                  />
-                </div>
+                {!pointManual && icon && (
+                  <div>
+                    <Image
+                      preview={false}
+                      src={icon}
+                      style={{
+                        width: "36px",
+                        height: "24px",
+                        paddingRight: 10,
+                      }}
+                    />
+                  </div>
+                )}
                 <div>
                   <span>{label}</span>
                 </div>
               </div>
-              <div style={{ fontSize: "16px" }}>
-                {numberWithCommas(point) + " แต้ม"}
-              </div>
+              {!pointManual ? (
+                <div style={{ fontSize: "16px" }}>
+                  {numberWithCommas(point) + " แต้ม"}
+                </div>
+              ) : (
+                <div style={{ fontSize: "16px" }}>
+                  {numberWithCommas(point) +
+                    " ครั้ง" +
+                    ` ( ${numberWithCommas(time!)}  คน)`}
+                </div>
+              )}
             </div>
           </CardContainer>
         </div>
