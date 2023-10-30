@@ -1,17 +1,17 @@
-import { Navigate, Outlet } from "react-router-dom";
+import { Navigate, Outlet } from 'react-router-dom'
 
 const useAuth = () => {
-  const token = localStorage.getItem("token");
+  const token = localStorage.getItem('token')
   if (token) {
-    return true;
+    return true
   } else {
-    return false;
+    return false
   }
-};
+}
 
 const PublicRoute = (props: any) => {
-  const auth = useAuth();
-  return auth ? <Navigate to="/AuthPage" /> : <Outlet />;
-};
+  const auth = useAuth()
+  return auth ? <Navigate to='/AuthPage' /> : <Outlet />
+}
 
-export default PublicRoute;
+export default PublicRoute

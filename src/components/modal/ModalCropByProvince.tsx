@@ -1,60 +1,52 @@
-import { SearchOutlined } from "@ant-design/icons";
-import { Button, Input, Modal, Select, Table } from "antd";
-import React, { useEffect, useState } from "react";
-import { LocationPriceDatasource } from "../../datasource/LocationPriceDatasource";
-import {
-  AllLocatePriceEntity
-} from "../../entities/LocationPrice";
-import { color } from "../../resource";
+import { SearchOutlined } from '@ant-design/icons'
+import { Button, Input, Modal, Select, Table } from 'antd'
+import React, { useEffect, useState } from 'react'
+import { LocationPriceDatasource } from '../../datasource/LocationPriceDatasource'
+import { AllLocatePriceEntity } from '../../entities/LocationPrice'
+import { color } from '../../resource'
 
 interface ModalCropProps {
-  show: boolean;
-  backButton: () => void;
-  data: any;
+  show: boolean
+  backButton: () => void
+  data: any
 }
-const ModalCropByProvince: React.FC<ModalCropProps> = ({
-  show,
-  backButton,
-  data,
-}) => {
-  const [searchCops, setSearchCrop] = useState<AllLocatePriceEntity[]>();
-  const [searchText, setSearchText] = useState<string>("");
+const ModalCropByProvince: React.FC<ModalCropProps> = ({ show, backButton, data }) => {
+  const [searchCops, setSearchCrop] = useState<AllLocatePriceEntity[]>()
+  const [searchText, setSearchText] = useState<string>('')
 
   const searchPlants = async () => {
-    await LocationPriceDatasource.getPrice(data.province_name, searchText).then(
-      (res) => {
-        setSearchCrop(res.data);
-      }
-    );
-  };
+    await LocationPriceDatasource.getPrice(data.province_name, searchText).then((res) => {
+      setSearchCrop(res.data)
+    })
+  }
 
   const changeTextSearch = (search: any) => {
-    setSearchText(search.target.value);
-  };
+    setSearchText(search.target.value)
+  }
   const columns = [
     {
-      title: "ชื่อพืช",
-      dataIndex: "plants",
-      key: "plants",
-      width: "50%",
+      title: 'ชื่อพืช',
+      dataIndex: 'plants',
+      key: 'plants',
+      width: '50%',
       render: (value: any, row: any, index: any) => {
         return {
           children: <>{row.plant_name}</>,
-        };
+        }
       },
     },
     {
-      title: "ราคา",
-      dataIndex: "price",
-      key: "price",
-      width: "50%",
+      title: 'ราคา',
+      dataIndex: 'price',
+      key: 'price',
+      width: '50%',
       render: (value: any, row: any, index: number) => {
         return {
-          children: <>{`${row.price.toFixed(2)}  ` + "บาท"}</>,
-        };
+          children: <>{`${row.price.toFixed(2)}  ` + 'บาท'}</>,
+        }
       },
     },
-  ];
+  ]
   return (
     <>
       <Modal
@@ -63,7 +55,7 @@ const ModalCropByProvince: React.FC<ModalCropProps> = ({
         title={
           <div
             style={{
-              cursor: "move",
+              cursor: 'move',
             }}
           >
             {`รายการพืช : จังหวัด${data.province_name}`}
@@ -73,20 +65,20 @@ const ModalCropByProvince: React.FC<ModalCropProps> = ({
         visible={show}
         onCancel={backButton}
       >
-        <div className="row col-lg-12 pb-3 pt-2">
-          <div className="col-lg-10">
+        <div className='row col-lg-12 pb-3 pt-2'>
+          <div className='col-lg-10'>
             <Input
               allowClear
               prefix={<SearchOutlined style={{ color: color.Disable }} />}
-              placeholder="ค้นหาชื่อพืช"
+              placeholder='ค้นหาชื่อพืช'
               onChange={changeTextSearch}
             />
           </div>
-          <div className="col-lg-2">
+          <div className='col-lg-2'>
             <Button
               style={{
                 borderColor: color.Success,
-                borderRadius: "5px",
+                borderRadius: '5px',
                 color: color.secondary2,
                 backgroundColor: color.Success,
                 padding: 6,
@@ -117,7 +109,7 @@ const ModalCropByProvince: React.FC<ModalCropProps> = ({
         )}
       </Modal>
     </>
-  );
-};
+  )
+}
 
-export default ModalCropByProvince;
+export default ModalCropByProvince

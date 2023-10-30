@@ -1,67 +1,67 @@
-import { Button, Radio } from "antd";
-import React, { useEffect, useState } from "react";
-import { color } from "../../resource";
+import { Button, Radio } from 'antd'
+import React, { useEffect, useState } from 'react'
+import { color } from '../../resource'
 
 interface StatusProps {
-  label1: string;
-  label2: string;
-  onClick?: (e: any) => void;
+  label1: string
+  label2: string
+  onClick?: (e: any) => void
 }
 const StatusButton: React.FC<StatusProps> = ({ label1, label2, onClick }) => {
   return (
     <>
-      <Radio.Group buttonStyle="outline">
+      <Radio.Group buttonStyle='outline'>
         <Radio.Button
-          value="PENDING"
+          value='PENDING'
           style={
-            label1 === "PENDING"
+            label1 === 'PENDING'
               ? {
-                  width: "130px",
+                  width: '130px',
                   backgroundColor: color.bgWarning,
                   color: color.Warning,
                   borderColor: color.Warning,
-                  borderTopLeftRadius: "5px",
-                  borderBottomLeftRadius: "5px",
-                  fontWeight: "bold",
+                  borderTopLeftRadius: '5px',
+                  borderBottomLeftRadius: '5px',
+                  fontWeight: 'bold',
                 }
               : {
-                  width: "130px",
-                  padding: "8 0",
-                  borderTopLeftRadius: "5px",
-                  borderBottomLeftRadius: "5px",
+                  width: '130px',
+                  padding: '8 0',
+                  borderTopLeftRadius: '5px',
+                  borderBottomLeftRadius: '5px',
                 }
           }
           onClick={onClick}
         >
-          <div style={{ textAlign: "center" }}>รอตรวจสอบ</div>
+          <div style={{ textAlign: 'center' }}>รอตรวจสอบ</div>
         </Radio.Button>
         <Radio.Button
-          value="ACTIVE"
+          value='ACTIVE'
           style={
-            label1 === "ACTIVE"
+            label1 === 'ACTIVE'
               ? {
-                  width: "130px",
+                  width: '130px',
                   backgroundColor: color.bgSuccess,
                   color: color.Success,
                   borderColor: color.Success,
-                  borderTopRightRadius: "5px",
-                  borderBottomRightRadius: "5px",
-                  fontWeight: "bold",
+                  borderTopRightRadius: '5px',
+                  borderBottomRightRadius: '5px',
+                  fontWeight: 'bold',
                 }
               : {
-                  width: "130px",
-                  padding: "8 0",
-                  borderTopRightRadius: "5px",
-                  borderBottomRightRadius: "5px",
+                  width: '130px',
+                  padding: '8 0',
+                  borderTopRightRadius: '5px',
+                  borderBottomRightRadius: '5px',
                 }
           }
           onClick={onClick}
         >
-          <div style={{ textAlign: "center" }}>ใช้งาน</div>
+          <div style={{ textAlign: 'center' }}>ใช้งาน</div>
         </Radio.Button>
       </Radio.Group>
     </>
-  );
-};
+  )
+}
 
-export default StatusButton;
+export default StatusButton

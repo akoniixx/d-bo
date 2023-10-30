@@ -1,11 +1,7 @@
 import React from 'react'
 
 function ConditionDroner() {
-  return (
-    <div>
-      
-    </div>
-  )
+  return <div></div>
 }
 
 export default ConditionDroner

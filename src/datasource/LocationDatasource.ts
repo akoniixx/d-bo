@@ -1,40 +1,37 @@
-import { BASE_URL, httpClient } from "../config/config";
-import { SubdistrictEntity } from "../entities/LocationEntities";
+import { BASE_URL, httpClient } from '../config/config'
+import { SubdistrictEntity } from '../entities/LocationEntities'
 
 export class LocationDatasource {
   static getProvince(): Promise<any> {
     return httpClient
-      .get(BASE_URL + "/location/province")
+      .get(BASE_URL + '/location/province')
       .then((response) => {
-        return response.data;
+        return response.data
       })
       .catch((error) => {
-        console.log(error);
-      });
+        console.log(error)
+      })
   }
   static getDistrict(id: number): Promise<any> {
     return httpClient
-      .get(BASE_URL + "/location/district/?provinceId=" + id)
+      .get(BASE_URL + '/location/district/?provinceId=' + id)
       .then((response) => {
-        return response.data;
+        return response.data
       })
       .catch((error) => {
-        console.log(error);
-      });
+        console.log(error)
+      })
   }
-  static getSubdistrict(
-    id?: number,
-    text?: string
-  ): Promise<SubdistrictEntity[]> {
-    let script = null;
-    script = id != 0 ? "?districtId=" + id : text == '' ? "?search=" + text : null;
+  static getSubdistrict(id?: number, text?: string): Promise<SubdistrictEntity[]> {
+    let script = null
+    script = id != 0 ? '?districtId=' + id : text == '' ? '?search=' + text : null
     return httpClient
-      .get(BASE_URL + "/location/sub-district/" + script)
+      .get(BASE_URL + '/location/sub-district/' + script)
       .then((response) => {
-        return response.data;
+        return response.data
       })
       .catch((error) => {
-        console.log(error);
-      });
+        console.log(error)
+      })
   }
 }

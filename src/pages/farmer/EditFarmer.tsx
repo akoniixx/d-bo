@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from 'react'
 import {
   Row,
   Form,
@@ -12,20 +12,17 @@ import {
   Tag,
   DatePicker,
   PaginationProps,
-} from "antd";
-import { CardContainer } from "../../components/card/CardContainer";
-import { BackIconButton } from "../../components/button/BackButton";
-import TextArea from "antd/lib/input/TextArea";
-import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
-import emptyData from "../../resource/media/empties/iconoir_farm.png";
-import color from "../../resource/color";
-import FooterPage from "../../components/footer/FooterPage";
-import ActionButton from "../../components/button/ActionButton";
-import { CardHeader } from "../../components/header/CardHearder";
-import {
-  GetFarmerEntity,
-  GetFarmerEntity_INIT,
-} from "../../entities/FarmerEntities";
+} from 'antd'
+import { CardContainer } from '../../components/card/CardContainer'
+import { BackIconButton } from '../../components/button/BackButton'
+import TextArea from 'antd/lib/input/TextArea'
+import { DeleteOutlined, EditOutlined } from '@ant-design/icons'
+import emptyData from '../../resource/media/empties/iconoir_farm.png'
+import color from '../../resource/color'
+import FooterPage from '../../components/footer/FooterPage'
+import ActionButton from '../../components/button/ActionButton'
+import { CardHeader } from '../../components/header/CardHearder'
+import { GetFarmerEntity, GetFarmerEntity_INIT } from '../../entities/FarmerEntities'
 import {
   DistrictEntity,
   DistrictEntity_INIT,
@@ -33,562 +30,497 @@ import {
   ProvinceEntity_INIT,
   SubdistrictEntity,
   SubdistrictEntity_INIT,
-} from "../../entities/LocationEntities";
-import { FarmerDatasource } from "../../datasource/FarmerDatasource";
-import {
-  FarmerPlotEntity,
-  FarmerPlotEntity_INIT,
-} from "../../entities/FarmerPlotEntities";
+} from '../../entities/LocationEntities'
+import { FarmerDatasource } from '../../datasource/FarmerDatasource'
+import { FarmerPlotEntity, FarmerPlotEntity_INIT } from '../../entities/FarmerPlotEntities'
 import {
   FARMER_STATUS_SEARCH,
   STATUS_FARMERPLOT_COLOR_MAPPING,
   STATUS_NORMAL_MAPPING,
-} from "../../definitions/Status";
-import {
-  AddressEntity,
-  AddressEntity_INIT,
-} from "../../entities/AddressEntities";
-import { LocationDatasource } from "../../datasource/LocationDatasource";
-import ModalFarmerPlot from "../../components/modal/ModalFarmerPlot";
-import { FarmerPlotDatasource } from "../../datasource/FarmerPlotDatasource";
-import Swal from "sweetalert2";
-import { UploadImageDatasouce } from "../../datasource/UploadImageDatasource";
-import {
-  ImageEntity,
-  ImageEntity_INTI,
-} from "../../entities/UploadImageEntities";
-import "../farmer/Style.css";
-import img_empty from "../../resource/media/empties/uploadImg.png";
-import bth_img_empty from "../../resource/media/empties/upload_Img_btn.png";
-import moment from "moment";
-import { useLocalStorage } from "../../hook/useLocalStorage";
-import { resizeFileImg } from "../../utilities/ResizeImage";
-import { Navigate, useNavigate } from "react-router-dom";
-import { DashboardLayout } from "../../components/layout/Layout";
-const { Option } = Select;
+} from '../../definitions/Status'
+import { AddressEntity, AddressEntity_INIT } from '../../entities/AddressEntities'
+import { LocationDatasource } from '../../datasource/LocationDatasource'
+import ModalFarmerPlot from '../../components/modal/ModalFarmerPlot'
+import { FarmerPlotDatasource } from '../../datasource/FarmerPlotDatasource'
+import Swal from 'sweetalert2'
+import { UploadImageDatasouce } from '../../datasource/UploadImageDatasource'
+import { ImageEntity, ImageEntity_INTI } from '../../entities/UploadImageEntities'
+import '../farmer/Style.css'
+import img_empty from '../../resource/media/empties/uploadImg.png'
+import bth_img_empty from '../../resource/media/empties/upload_Img_btn.png'
+import moment from 'moment'
+import { useLocalStorage } from '../../hook/useLocalStorage'
+import { resizeFileImg } from '../../utilities/ResizeImage'
+import { Navigate, useNavigate } from 'react-router-dom'
+import { DashboardLayout } from '../../components/layout/Layout'
+const { Option } = Select
 
-const dateFormat = "DD/MM/YYYY";
-const dateCreateFormat = "YYYY-MM-DD";
+const dateFormat = 'DD/MM/YYYY'
+const dateCreateFormat = 'YYYY-MM-DD'
 
-const _ = require("lodash");
-const { Map } = require("immutable");
+const _ = require('lodash')
+const { Map } = require('immutable')
 
 const EditFarmer = () => {
-  let queryString = _.split(window.location.pathname, "=");
-  const [profile] = useLocalStorage("profile", []);
-  const navigate = useNavigate();
-  const itemsPerPage = 10;
-  const [currentPage, setCurrentPage] = useState(1);
-  const farmerId = queryString[1];
-  const [data, setData] = useState<GetFarmerEntity>(GetFarmerEntity_INIT);
-  const [address, setAddress] = useState<AddressEntity>(AddressEntity_INIT);
-  const [farmerPlotList, setFarmerPlotList] = useState<FarmerPlotEntity[]>([
-    FarmerPlotEntity_INIT,
-  ]);
-  const [locateNull, setLocateNull] = useState<any>();
-  const [showAddModal, setShowAddModal] = useState(false);
-  const [editIndex, setEditIndex] = useState(0);
+  const queryString = _.split(window.location.pathname, '=')
+  const [profile] = useLocalStorage('profile', [])
+  const navigate = useNavigate()
+  const itemsPerPage = 10
+  const [currentPage, setCurrentPage] = useState(1)
+  const farmerId = queryString[1]
+  const [data, setData] = useState<GetFarmerEntity>(GetFarmerEntity_INIT)
+  const [address, setAddress] = useState<AddressEntity>(AddressEntity_INIT)
+  const [farmerPlotList, setFarmerPlotList] = useState<FarmerPlotEntity[]>([FarmerPlotEntity_INIT])
+  const [locateNull, setLocateNull] = useState<any>()
+  const [showAddModal, setShowAddModal] = useState(false)
+  const [editIndex, setEditIndex] = useState(0)
 
-  const [province, setProvince] = useState<ProviceEntity[]>([
-    ProvinceEntity_INIT,
-  ]);
-  const [district, setDistrict] = useState<DistrictEntity[]>([
-    DistrictEntity_INIT,
-  ]);
-  const [subdistrict, setSubdistrict] = useState<SubdistrictEntity[]>([
-    SubdistrictEntity_INIT,
-  ]);
-  const [saveBtnDisable, setBtnSaveDisable] = useState<boolean>(false);
-  const [editFarmerPlot, setEditFarmerPlot] = useState<FarmerPlotEntity>(
-    FarmerPlotEntity_INIT
-  );
+  const [province, setProvince] = useState<ProviceEntity[]>([ProvinceEntity_INIT])
+  const [district, setDistrict] = useState<DistrictEntity[]>([DistrictEntity_INIT])
+  const [subdistrict, setSubdistrict] = useState<SubdistrictEntity[]>([SubdistrictEntity_INIT])
+  const [saveBtnDisable, setBtnSaveDisable] = useState<boolean>(false)
+  const [editFarmerPlot, setEditFarmerPlot] = useState<FarmerPlotEntity>(FarmerPlotEntity_INIT)
 
-  const [imgProfile, setImgProfile] = useState<any>();
-  const [imgIdCard, setImgIdCard] = useState<any>();
+  const [imgProfile, setImgProfile] = useState<any>()
+  const [imgIdCard, setImgIdCard] = useState<any>()
 
-  const [createImgProfile, setCreateImgProfile] =
-    useState<ImageEntity>(ImageEntity_INTI);
-  const [createImgIdCard, setCreateImgIdCrad] =
-    useState<ImageEntity>(ImageEntity_INTI);
+  const [createImgProfile, setCreateImgProfile] = useState<ImageEntity>(ImageEntity_INTI)
+  const [createImgIdCard, setCreateImgIdCrad] = useState<ImageEntity>(ImageEntity_INTI)
 
   const fetchLocation = useCallback(async (text?: string) => {
     await LocationDatasource.getSubdistrict(0, text).then((res) => {
       if (res) {
-        const findId = res.find((x) => x.provinceId === 0);
-        setLocateNull(findId);
-        console.log(findId);
+        const findId = res.find((x) => x.provinceId === 0)
+        setLocateNull(findId)
+        console.log(findId)
       }
-    });
-  }, []);
+    })
+  }, [])
   const fecthFarmer = async () => {
     await FarmerDatasource.getFarmerById(farmerId).then((res) => {
       setData({
         ...res,
         birthDate: res.birthDate ? moment(res.birthDate) : moment(),
-      });
+      })
 
-      setAddress(res.address);
-      setFarmerPlotList(res.farmerPlot);
-      let getPathPro = res.file.filter((x) => x.category === "PROFILE_IMAGE");
-      let getPathCard = res.file.filter((x) => x.category === "ID_CARD_IMAGE");
-      let imgList: {
-        path: string;
-        category: string;
-      }[] = [];
+      setAddress(res.address)
+      setFarmerPlotList(res.farmerPlot)
+      const getPathPro = res.file.filter((x) => x.category === 'PROFILE_IMAGE')
+      const getPathCard = res.file.filter((x) => x.category === 'ID_CARD_IMAGE')
+      const imgList: {
+        path: string
+        category: string
+      }[] = []
       if (getPathPro.length > 0) {
-        imgList.push(getPathPro[0]);
+        imgList.push(getPathPro[0])
       }
       if (getPathCard.length > 0) {
-        imgList.push(getPathCard[0]);
+        imgList.push(getPathCard[0])
       }
 
-      let i = 0;
+      let i = 0
       for (i; imgList.length > i; i++) {
         i === 0 &&
-          UploadImageDatasouce.getImage(imgList[i].path.toString()).then(
-            (resImg) => {
-              if (resImg.url) {
-                imgList[0].category === "PROFILE_IMAGE"
-                  ? setImgProfile(resImg.url)
-                  : setImgIdCard(resImg.url);
-              }
+          UploadImageDatasouce.getImage(imgList[i].path.toString()).then((resImg) => {
+            if (resImg.url) {
+              imgList[0].category === 'PROFILE_IMAGE'
+                ? setImgProfile(resImg.url)
+                : setImgIdCard(resImg.url)
             }
-          );
+          })
         i === 1 &&
-          UploadImageDatasouce.getImage(imgList[i].path.toString()).then(
-            (resImg) => {
-              resImg?.url && setImgIdCard(resImg.url);
-            }
-          );
+          UploadImageDatasouce.getImage(imgList[i].path.toString()).then((resImg) => {
+            resImg?.url && setImgIdCard(resImg.url)
+          })
       }
-    });
-  };
-  const indexOfLastItem = currentPage * itemsPerPage;
-  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = farmerPlotList.slice(indexOfFirstItem, indexOfLastItem);
-  const [searchLocation] = useState("");
+    })
+  }
+  const indexOfLastItem = currentPage * itemsPerPage
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage
+  const currentItems = farmerPlotList.slice(indexOfFirstItem, indexOfLastItem)
+  const [searchLocation] = useState('')
 
   const handlePageChange = (pageNumber: number) => {
-    setCurrentPage(pageNumber);
-  };
+    setCurrentPage(pageNumber)
+  }
   useEffect(() => {
-    fecthFarmer();
-    fetchLocation(searchLocation);
+    fecthFarmer()
+    fetchLocation(searchLocation)
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchLocation]);
+  }, [searchLocation])
 
   useEffect(() => {
     LocationDatasource.getProvince().then((res) => {
-      setProvince(res);
-    });
+      setProvince(res)
+    })
     if (address !== null) {
       if (address.provinceId) {
         LocationDatasource.getDistrict(address.provinceId).then((res) => {
-          setDistrict(res);
-        });
+          setDistrict(res)
+        })
       }
       if (address.districtId) {
         LocationDatasource.getSubdistrict(address.districtId).then((res) => {
-          setSubdistrict(res);
-        });
+          setSubdistrict(res)
+        })
       }
     }
-  }, [
-    address !== null && address.provinceId,
-    address !== null && address.districtId,
-  ]);
+  }, [address !== null && address.provinceId, address !== null && address.districtId])
 
   //#region function farmer
   const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const m = Map(data).set(e.target.id, e.target.value);
-    setData(m.toJS());
-    checkValidate(m.toJS());
-  };
+    const m = Map(data).set(e.target.id, e.target.value)
+    setData(m.toJS())
+    checkValidate(m.toJS())
+  }
   const handleOnChangeBirthday = (e: any) => {
     const d = Map(data)
-      .set("birthDate", moment(new Date(e)).format(dateCreateFormat))
-      .toJS();
-    setData(d);
-    checkValidate(d);
-  };
+      .set('birthDate', moment(new Date(e)).format(dateCreateFormat))
+      .toJS()
+    setData(d)
+    checkValidate(d)
+  }
   const handleOnChangeProvince = async (provinceId: number) => {
-    const d = Map(address).set(
-      "provinceId",
-      provinceId == undefined ? 0 : provinceId
-    );
-    setAddress(d.toJS());
-    checkValidateAddr(d.toJS());
-  };
+    const d = Map(address).set('provinceId', provinceId == undefined ? 0 : provinceId)
+    setAddress(d.toJS())
+    checkValidateAddr(d.toJS())
+  }
 
   const handleOnChangeDistrict = async (districtId: number) => {
-    const d = Map(address).set(
-      "districtId",
-      districtId == undefined ? 0 : districtId
-    );
-    setAddress(d.toJS());
-    checkValidateAddr(d.toJS());
-  };
+    const d = Map(address).set('districtId', districtId == undefined ? 0 : districtId)
+    setAddress(d.toJS())
+    checkValidateAddr(d.toJS())
+  }
 
   const handleOnChangeSubdistrict = async (subdistrictId: number) => {
-    const d = Map(address).set(
-      "subdistrictId",
-      subdistrictId == undefined ? 0 : subdistrictId
-    );
-    setAddress(d.toJS());
-    checkValidateAddr(d.toJS());
-    await handleOnChangePostcode(d.toJS());
-  };
+    const d = Map(address).set('subdistrictId', subdistrictId == undefined ? 0 : subdistrictId)
+    setAddress(d.toJS())
+    checkValidateAddr(d.toJS())
+    await handleOnChangePostcode(d.toJS())
+  }
 
   const handleOnChangePostcode = (addr: AddressEntity) => {
-    let getPostcode = subdistrict.filter(
-      (x) => x.subdistrictId == addr.subdistrictId
-    )[0].postcode;
-    const c = Map(addr).set("postcode", getPostcode);
-    setAddress(c.toJS());
-    checkValidateAddr(c.toJS());
-  };
+    const getPostcode = subdistrict.filter((x) => x.subdistrictId == addr.subdistrictId)[0].postcode
+    const c = Map(addr).set('postcode', getPostcode)
+    setAddress(c.toJS())
+    checkValidateAddr(c.toJS())
+  }
 
   const handleOnChangeAddress1 = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const d = Map(address).set("address1", e.target.value);
-    setAddress(d.toJS());
-    checkValidateAddr(d.toJS());
-  };
+    const d = Map(address).set('address1', e.target.value)
+    setAddress(d.toJS())
+    checkValidateAddr(d.toJS())
+  }
 
-  const handleOnChangeAddress2 = (
-    e: React.ChangeEvent<HTMLTextAreaElement>
-  ) => {
-    const d = Map(address).set("address2", e.target.value);
-    setAddress(d.toJS());
-    checkValidateAddr(d.toJS());
-  };
+  const handleOnChangeAddress2 = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const d = Map(address).set('address2', e.target.value)
+    setAddress(d.toJS())
+    checkValidateAddr(d.toJS())
+  }
 
   const handleChangeFarmerstatus = (e: any) => {
-    if (e.target.value != "INATIVE" || e.target.value != "REJECTED") {
-      data.reason = "";
+    if (e.target.value != 'INATIVE' || e.target.value != 'REJECTED') {
+      data.reason = ''
     }
-    const m = Map(data).set("status", e.target.value);
-    setData(m.toJS());
-    checkValidate(m.toJS());
-    checkValidateReason(m.toJS());
-  };
+    const m = Map(data).set('status', e.target.value)
+    setData(m.toJS())
+    checkValidate(m.toJS())
+    checkValidateReason(m.toJS())
+  }
 
   const handleOnChangeReason = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    const d = Map(data).set("reason", e.target.value);
-    setData(d.toJS());
-    checkValidateAddr(d.toJS());
-    checkValidateReason(d.toJS());
-  };
+    const d = Map(data).set('reason', e.target.value)
+    setData(d.toJS())
+    checkValidateAddr(d.toJS())
+    checkValidateReason(d.toJS())
+  }
   //#endregion
 
   //#region function farmer plot
   const editPlot = (item: any, index: number) => {
-    setShowAddModal((prev) => !prev);
-    setEditIndex(index);
-    setEditFarmerPlot(item);
-  };
+    setShowAddModal((prev) => !prev)
+    setEditIndex(index)
+    setEditFarmerPlot(item)
+  }
 
   const removePlot = (data: FarmerPlotEntity) => {
     Swal.fire({
-      title: "ยืนยันการลบ",
-      text: "โปรดตรวจสอบแปลงเกษตรที่คุณต้องการลบ เพราะอาจจะส่งผลต่อการจ้างงานในแอปพลิเคชัน",
-      cancelButtonText: "ย้อนกลับ",
-      confirmButtonText: "ลบ",
-      confirmButtonColor: "#d33",
+      title: 'ยืนยันการลบ',
+      text: 'โปรดตรวจสอบแปลงเกษตรที่คุณต้องการลบ เพราะอาจจะส่งผลต่อการจ้างงานในแอปพลิเคชัน',
+      cancelButtonText: 'ย้อนกลับ',
+      confirmButtonText: 'ลบ',
+      confirmButtonColor: '#d33',
       showCancelButton: true,
       showCloseButton: true,
     }).then(async (result) => {
       if (result.isConfirmed) {
-        await FarmerPlotDatasource.deleteFarmerPlot(data.id);
+        await FarmerPlotDatasource.deleteFarmerPlot(data.id)
       }
-      fecthFarmer();
-    });
-  };
+      fecthFarmer()
+    })
+  }
 
   const updateFarmerPlot = async (plot: FarmerPlotEntity) => {
     const payload = {
       ...plot,
       farmerId,
-    };
+    }
     if (payload.id) {
       await FarmerPlotDatasource.updateFarmerPlot(payload).then((res) => {
         if (res) {
           Swal.fire({
-            title: "แก้ไขแปลงสำเร็จ",
-            icon: "success",
+            title: 'แก้ไขแปลงสำเร็จ',
+            icon: 'success',
             timer: 1500,
             showConfirmButton: false,
           }).then((time) => {
-            setEditIndex(0);
-            setShowAddModal((prev) => !prev);
-          });
+            setEditIndex(0)
+            setShowAddModal((prev) => !prev)
+          })
         }
-      });
+      })
     } else {
       await FarmerPlotDatasource.insertFarmerPlot(payload).then((res) => {
         if (res) {
           Swal.fire({
-            title: "บันทึกแปลงสำเร็จ",
-            icon: "success",
+            title: 'บันทึกแปลงสำเร็จ',
+            icon: 'success',
             timer: 1500,
             showConfirmButton: false,
           }).then((time) => {
-            setEditIndex(0);
-            setShowAddModal((prev) => !prev);
-          });
+            setEditIndex(0)
+            setShowAddModal((prev) => !prev)
+          })
         }
-      });
+      })
     }
-    fecthFarmer();
-    checkValidate(data);
-  };
+    fecthFarmer()
+    checkValidate(data)
+  }
   //#endregion
 
   //#region image
   const onChangeProfile = async (file: any) => {
-    const source = file.target.files[0];
-    let newSource: any;
+    const source = file.target.files[0]
+    let newSource: any
 
-    const isFileMoreThan2MB = source.size > 2 * 1024 * 1024;
+    const isFileMoreThan2MB = source.size > 2 * 1024 * 1024
     if (isFileMoreThan2MB) {
       newSource = await resizeFileImg({
         file: source,
-        compressFormat: source?.type.split("/")[1],
+        compressFormat: source?.type.split('/')[1],
         quality: 70,
         rotation: 0,
         responseUriFunc: (res: any) => {},
-      });
+      })
     }
     const img_base64 = await new Promise((resolve) => {
-      const reader = new FileReader();
-      reader.readAsDataURL(isFileMoreThan2MB ? newSource : source);
-      reader.onload = () => resolve(reader.result);
-    });
+      const reader = new FileReader()
+      reader.readAsDataURL(isFileMoreThan2MB ? newSource : source)
+      reader.onload = () => resolve(reader.result)
+    })
 
-    setImgProfile(img_base64);
-    checkValidate(data);
-    const d = Map(createImgProfile).set(
-      "file",
-      isFileMoreThan2MB ? newSource : source
-    );
-    const e = Map(d.toJS()).set("resource", "FARMER");
-    const f = Map(e.toJS()).set("category", "PROFILE_IMAGE");
-    const g = Map(f.toJS()).set("resourceId", farmerId);
-    setCreateImgProfile(g.toJS());
-  };
+    setImgProfile(img_base64)
+    checkValidate(data)
+    const d = Map(createImgProfile).set('file', isFileMoreThan2MB ? newSource : source)
+    const e = Map(d.toJS()).set('resource', 'FARMER')
+    const f = Map(e.toJS()).set('category', 'PROFILE_IMAGE')
+    const g = Map(f.toJS()).set('resourceId', farmerId)
+    setCreateImgProfile(g.toJS())
+  }
   const onPreviewProfile = async () => {
-    let src = imgProfile;
+    let src = imgProfile
     if (!src) {
       src = await new Promise((resolve) => {
-        const reader = new FileReader();
-        reader.readAsDataURL(imgProfile);
-        reader.onload = () => resolve(reader.result);
-      });
+        const reader = new FileReader()
+        reader.readAsDataURL(imgProfile)
+        reader.onload = () => resolve(reader.result)
+      })
     }
-    const image = new Image();
-    image.src = src;
-    const imgWindow = window.open(src);
-    imgWindow?.document.write(image.outerHTML);
-  };
+    const image = new Image()
+    image.src = src
+    const imgWindow = window.open(src)
+    imgWindow?.document.write(image.outerHTML)
+  }
 
   const removeImg = () => {
     Swal.fire({
-      title: "ยืนยันการลบ",
-      text: "โปรดตรวจสอบรูปภาพที่คุณต้องการลบ",
-      cancelButtonText: "ย้อนกลับ",
-      confirmButtonText: "ลบ",
-      confirmButtonColor: "#d33",
+      title: 'ยืนยันการลบ',
+      text: 'โปรดตรวจสอบรูปภาพที่คุณต้องการลบ',
+      cancelButtonText: 'ย้อนกลับ',
+      confirmButtonText: 'ลบ',
+      confirmButtonColor: '#d33',
       showCancelButton: true,
       showCloseButton: true,
     }).then(async (result) => {
       if (result.isConfirmed) {
-        const getImg = data.file.filter(
-          (x) => x.category == "PROFILE_IMAGE"
-        )[0];
-        UploadImageDatasouce.deleteImage(getImg.id, getImg.path);
-        setCreateImgProfile(ImageEntity_INTI);
-        setImgProfile(undefined);
-        checkValidate(data);
+        const getImg = data.file.filter((x) => x.category == 'PROFILE_IMAGE')[0]
+        UploadImageDatasouce.deleteImage(getImg.id, getImg.path)
+        setCreateImgProfile(ImageEntity_INTI)
+        setImgProfile(undefined)
+        checkValidate(data)
       }
-    });
-  };
+    })
+  }
   const onChangeIdCard = async (file: any) => {
-    const source = file.target.files[0];
-    let newSource: any;
+    const source = file.target.files[0]
+    let newSource: any
 
-    const isFileMoreThan2MB = source.size > 2 * 1024 * 1024;
+    const isFileMoreThan2MB = source.size > 2 * 1024 * 1024
     if (isFileMoreThan2MB) {
       newSource = await resizeFileImg({
         file: source,
-        compressFormat: source?.type.split("/")[1],
+        compressFormat: source?.type.split('/')[1],
         quality: 70,
         rotation: 0,
         responseUriFunc: (res: any) => {},
-      });
+      })
     }
     const img_base64 = await new Promise((resolve) => {
-      const reader = new FileReader();
-      reader.readAsDataURL(isFileMoreThan2MB ? newSource : source);
-      reader.onload = () => resolve(reader.result);
-    });
+      const reader = new FileReader()
+      reader.readAsDataURL(isFileMoreThan2MB ? newSource : source)
+      reader.onload = () => resolve(reader.result)
+    })
 
-    setImgIdCard(img_base64);
-    checkValidate(data);
-    const d = Map(createImgProfile).set(
-      "file",
-      isFileMoreThan2MB ? newSource : source
-    );
-    const e = Map(d.toJS()).set("resource", "FARMER");
-    const f = Map(e.toJS()).set("category", "ID_CARD_IMAGE");
-    const g = Map(f.toJS()).set("resourceId", farmerId);
-    setCreateImgIdCrad(g.toJS());
-  };
+    setImgIdCard(img_base64)
+    checkValidate(data)
+    const d = Map(createImgProfile).set('file', isFileMoreThan2MB ? newSource : source)
+    const e = Map(d.toJS()).set('resource', 'FARMER')
+    const f = Map(e.toJS()).set('category', 'ID_CARD_IMAGE')
+    const g = Map(f.toJS()).set('resourceId', farmerId)
+    setCreateImgIdCrad(g.toJS())
+  }
 
   const onPreviewIdCard = async () => {
-    let src = imgIdCard;
+    let src = imgIdCard
     if (!src) {
       src = await new Promise((resolve) => {
-        const reader = new FileReader();
-        reader.readAsDataURL(imgIdCard);
-        reader.onload = () => resolve(reader.result);
-      });
+        const reader = new FileReader()
+        reader.readAsDataURL(imgIdCard)
+        reader.onload = () => resolve(reader.result)
+      })
     }
-    const image = new Image();
-    image.src = src;
-    const imgWindow = window.open(src);
-    imgWindow?.document.write(image.outerHTML);
-  };
+    const image = new Image()
+    image.src = src
+    const imgWindow = window.open(src)
+    imgWindow?.document.write(image.outerHTML)
+  }
   const removeImgIdCard = () => {
     Swal.fire({
-      title: "ยืนยันการลบ",
-      text: "โปรดตรวจสอบรูปภาพที่คุณต้องการลบ",
-      cancelButtonText: "ย้อนกลับ",
-      confirmButtonText: "ลบ",
-      confirmButtonColor: "#d33",
+      title: 'ยืนยันการลบ',
+      text: 'โปรดตรวจสอบรูปภาพที่คุณต้องการลบ',
+      cancelButtonText: 'ย้อนกลับ',
+      confirmButtonText: 'ลบ',
+      confirmButtonColor: '#d33',
       showCancelButton: true,
       showCloseButton: true,
     }).then(async (result) => {
       if (result.isConfirmed) {
-        const getImg = data.file.filter(
-          (x) => x.category == "ID_CARD_IMAGE"
-        )[0];
-        UploadImageDatasouce.deleteImage(getImg.id, getImg.path);
-        setCreateImgIdCrad(ImageEntity_INTI);
-        setImgIdCard(undefined);
-        checkValidate(data);
+        const getImg = data.file.filter((x) => x.category == 'ID_CARD_IMAGE')[0]
+        UploadImageDatasouce.deleteImage(getImg.id, getImg.path)
+        setCreateImgIdCrad(ImageEntity_INTI)
+        setImgIdCard(undefined)
+        checkValidate(data)
       }
-    });
-  };
+    })
+  }
   //#endregion
 
   const checkValidate = (data: GetFarmerEntity) => {
-    let checkEmptySting = ![
+    const checkEmptySting = ![
       data.firstname,
       data.lastname,
       data.telephoneNo,
       address.address1,
-    ].includes("");
-    let checkEmptyNumber = ![
+    ].includes('')
+    const checkEmptyNumber = ![
       address.provinceId,
       address.districtId,
       address.subdistrictId,
-    ].includes(0);
-    let checkEmptyDate = ![data.birthDate].includes("1970-01-01");
+    ].includes(0)
+    const checkEmptyDate = ![data.birthDate].includes('1970-01-01')
     if (checkEmptySting && checkEmptyNumber && checkEmptyDate) {
-      setBtnSaveDisable(false);
+      setBtnSaveDisable(false)
     } else {
-      setBtnSaveDisable(true);
+      setBtnSaveDisable(true)
     }
-  };
+  }
 
   const checkValidateAddr = (addr: AddressEntity) => {
-    let checkEmptySting = ![
+    const checkEmptySting = ![
       data.firstname,
       data.lastname,
       data.telephoneNo,
       address.address1,
       address.address2,
-    ].includes("");
-    let checkEmptyNumber = ![
-      addr.provinceId,
-      addr.districtId,
-      addr.subdistrictId,
-    ].includes(0);
-    let checkEmptyDate = ![data.birthDate].includes("1970-01-01");
+    ].includes('')
+    const checkEmptyNumber = ![addr.provinceId, addr.districtId, addr.subdistrictId].includes(0)
+    const checkEmptyDate = ![data.birthDate].includes('1970-01-01')
     if (checkEmptySting && checkEmptyNumber && checkEmptyDate) {
-      setBtnSaveDisable(false);
+      setBtnSaveDisable(false)
     } else {
-      setBtnSaveDisable(true);
+      setBtnSaveDisable(true)
     }
-  };
+  }
 
   const checkValidateReason = (data: GetFarmerEntity) => {
-    if (
-      data.status == "INACTIVE" &&
-      (data.reason == null || data.reason == "")
-    ) {
-      setBtnSaveDisable(true);
+    if (data.status == 'INACTIVE' && (data.reason == null || data.reason == '')) {
+      setBtnSaveDisable(true)
     } else {
-      setBtnSaveDisable(false);
+      setBtnSaveDisable(false)
     }
-  };
+  }
   const updateFarmer = async () => {
-    const pushAddr = Map(data).set("address", address);
-    const pushPin = Map(pushAddr.toJS()).set("pin", "");
+    const pushAddr = Map(data).set('address', address)
+    const pushPin = Map(pushAddr.toJS()).set('pin', '')
     const payload = {
       ...pushPin.toJS(),
       updateBy: `${profile.firstname} ${profile.lastname}`,
-    };
-    delete payload.farmerPlot;
+    }
+    delete payload.farmerPlot
     await FarmerDatasource.updateFarmer(payload).then((res) => {
       if (res !== undefined) {
-        let i = 0;
+        let i = 0
         for (i; 2 > i; i++) {
           i === 0 &&
-            createImgProfile.file !== "" &&
-            UploadImageDatasouce.uploadImage(createImgProfile).then(res);
+            createImgProfile.file !== '' &&
+            UploadImageDatasouce.uploadImage(createImgProfile).then(res)
           i === 1 &&
-            createImgIdCard.file !== "" &&
-            UploadImageDatasouce.uploadImage(createImgIdCard).then(res);
+            createImgIdCard.file !== '' &&
+            UploadImageDatasouce.uploadImage(createImgIdCard).then(res)
         }
         Swal.fire({
-          title: "บันทึกสำเร็จ",
-          icon: "success",
+          title: 'บันทึกสำเร็จ',
+          icon: 'success',
           timer: 1500,
           showConfirmButton: false,
         }).then((time) => {
-          navigate("/IndexFarmer");
-        });
+          navigate('/IndexFarmer')
+        })
       } else {
         Swal.fire({
-          title: "เบอร์โทร หรือ รหัสบัตรประชาชน <br/> ซ้ำในระบบ",
-          icon: "error",
+          title: 'เบอร์โทร หรือ รหัสบัตรประชาชน <br/> ซ้ำในระบบ',
+          icon: 'error',
           showConfirmButton: true,
-        });
+        })
       }
-    });
-  };
+    })
+  }
 
   const renderFromData = (
-    <div className="col-lg-7">
+    <div className='col-lg-7'>
       <CardContainer>
-        <CardHeader textHeader="ข้อมูลเกษตรกร" />
-        <Form style={{ padding: "32px" }}>
-          <div className="row">
-            <div className="form-group text-center pb-4">
+        <CardHeader textHeader='ข้อมูลเกษตรกร' />
+        <Form style={{ padding: '32px' }}>
+          <div className='row'>
+            <div className='form-group text-center pb-4'>
               <div
-                className="hiddenFileInput zoom"
+                className='hiddenFileInput zoom'
                 style={{
-                  backgroundImage: `url(${
-                    imgProfile === undefined ? img_empty : imgProfile
-                  })`,
+                  backgroundImage: `url(${imgProfile === undefined ? img_empty : imgProfile})`,
                 }}
               >
-                <input
-                  key={imgProfile}
-                  type="file"
-                  onChange={onChangeProfile}
-                  title="เลือกรูป"
-                />
+                <input key={imgProfile} type='file' onChange={onChangeProfile} title='เลือกรูป' />
               </div>
               <div>
                 {imgProfile !== undefined && (
@@ -597,8 +529,8 @@ const EditFarmer = () => {
                       color={color.Success}
                       onClick={onPreviewProfile}
                       style={{
-                        cursor: "pointer",
-                        borderRadius: "5px",
+                        cursor: 'pointer',
+                        borderRadius: '5px',
                       }}
                     >
                       View
@@ -607,8 +539,8 @@ const EditFarmer = () => {
                       color={color.Error}
                       onClick={removeImg}
                       style={{
-                        cursor: "pointer",
-                        borderRadius: "5px",
+                        cursor: 'pointer',
+                        borderRadius: '5px',
                       }}
                     >
                       Remove
@@ -618,145 +550,144 @@ const EditFarmer = () => {
               </div>
             </div>
           </div>
-          <div className="row">
-            <div className="form-group col-lg-6">
+          <div className='row'>
+            <div className='form-group col-lg-6'>
               <label>Farmer ID</label>
 
               <div style={{ marginBottom: 24 }}>
                 <Input
                   style={{
-                    padding: "4px 12px",
+                    padding: '4px 12px',
                   }}
                   disabled
                   value={data.farmerCode}
                 />
               </div>
             </div>
-            <div className="form-group col-lg-6">
+            <div className='form-group col-lg-6'>
               <label>วันที่ลงทะเบียน</label>
 
               <div style={{ marginBottom: 24 }}>
                 <Input
                   style={{
-                    padding: "4px 12px",
+                    padding: '4px 12px',
                   }}
                   disabled
-                  value={`${moment(data.createdAt).format("DD/MM/YYYY")} ${
+                  value={`${moment(data.createdAt).format('DD/MM/YYYY')} ${
                     data.createBy === null || data.createBy === undefined
-                      ? "ลงทะเบียนโดยเกษตรกร"
+                      ? 'ลงทะเบียนโดยเกษตรกร'
                       : `(${data.createBy})`
                   }`}
                 />
               </div>
             </div>
           </div>
-          <div className="row">
-            <div className="form-group col-lg-4">
+          <div className='row'>
+            <div className='form-group col-lg-4'>
               <label>
-                ชื่อ <span style={{ color: "red" }}>*</span>
+                ชื่อ <span style={{ color: 'red' }}>*</span>
               </label>
               <Form.Item
-                name="firstname"
+                name='firstname'
                 rules={[
                   {
                     required: true,
-                    message: "กรุณากรอกชื่อ!",
+                    message: 'กรุณากรอกชื่อ!',
                   },
                 ]}
               >
                 <Input
-                  placeholder="กรอกชื่อ"
+                  placeholder='กรอกชื่อ'
                   defaultValue={data.firstname}
-                  autoComplete="off"
+                  autoComplete='off'
                   onChange={handleOnChange}
                 />
               </Form.Item>
             </div>
-            <div className="form-group col-lg-4">
+            <div className='form-group col-lg-4'>
               <label>
-                นามสกุล <span style={{ color: "red" }}>*</span>
+                นามสกุล <span style={{ color: 'red' }}>*</span>
               </label>
               <Form.Item
-                name="lastname"
+                name='lastname'
                 rules={[
                   {
                     required: true,
-                    message: "กรุณากรอกนามสกุล!",
+                    message: 'กรุณากรอกนามสกุล!',
                   },
                 ]}
               >
                 <Input
-                  placeholder="กรอกนามสกุล"
+                  placeholder='กรอกนามสกุล'
                   defaultValue={data.lastname}
-                  autoComplete="off"
+                  autoComplete='off'
                   onChange={handleOnChange}
                 />
               </Form.Item>
             </div>
-            <div className="form-group col-lg-4">
+            <div className='form-group col-lg-4'>
               <label>ชื่อเล่น</label>
-              <Form.Item name="nickname">
+              <Form.Item name='nickname'>
                 <Input
-                  placeholder="กรอกชื่อเล่น"
+                  placeholder='กรอกชื่อเล่น'
                   defaultValue={data.nickname}
-                  autoComplete="off"
+                  autoComplete='off'
                   onChange={handleOnChange}
                 />
               </Form.Item>
             </div>
           </div>
-          <div className="row">
-            <div className="form-group col-lg-6">
+          <div className='row'>
+            <div className='form-group col-lg-6'>
               <label>
-                เบอร์โทร <span style={{ color: "red" }}>*</span>
+                เบอร์โทร <span style={{ color: 'red' }}>*</span>
               </label>
               <Form.Item
-                name="telephoneNo"
+                name='telephoneNo'
                 rules={[
                   {
                     required: true,
-                    message: "กรุณากรอกเบอร์โทร!",
+                    message: 'กรุณากรอกเบอร์โทร!',
                   },
                   {
-                    pattern:
-                      new RegExp(/^[0-9\b]+$/) && new RegExp(/^0[689]\d{8}$/),
-                    message: "กรุณากรอกเบอร์โทรให้ถูกต้อง!",
+                    pattern: new RegExp(/^[0-9\b]+$/) && new RegExp(/^0[689]\d{8}$/),
+                    message: 'กรุณากรอกเบอร์โทรให้ถูกต้อง!',
                   },
                   {
                     min: 10,
-                    message: "กรุณากรอกเบอร์โทรให้ครบ 10 หลัก!",
+                    message: 'กรุณากรอกเบอร์โทรให้ครบ 10 หลัก!',
                   },
                 ]}
               >
                 <Input
-                  placeholder="กรอกเบอร์โทร"
+                  placeholder='กรอกเบอร์โทร'
                   defaultValue={data.telephoneNo}
-                  autoComplete="off"
+                  autoComplete='off'
                   maxLength={10}
                   onChange={handleOnChange}
                 />
               </Form.Item>
             </div>
-            <div className="form-group col-lg-6">
+            <div className='form-group col-lg-6'>
               <label>
-                วันเดือนปีเกิด <span style={{ color: "red" }}>*</span>
+                วันเดือนปีเกิด <span style={{ color: 'red' }}>*</span>
               </label>
               <Form.Item
-                name="birthDate"
+                name='birthDate'
                 rules={[
                   {
                     required: true,
-                    message: "กรุณากรอกวันเดือนปีเกิด",
+                    message: 'กรุณากรอกวันเดือนปีเกิด',
                   },
                 ]}
               >
                 <DatePicker
-                  placeholder="กรอกวันเดือนปีเกิด"
+                  placeholder='กรอกวันเดือนปีเกิด'
                   format={dateFormat}
-                  className="col-lg-12"
+                  className='col-lg-12'
                   disabledDate={(current) =>
-                    (current && current > moment().endOf("day")) ||
-                    moment().diff(current, "years") < 18
+                    (current && current > moment().endOf('day')) ||
+                    moment().diff(current, 'years') < 18
                   }
                   onChange={(e: any) => handleOnChangeBirthday(e)}
                   defaultValue={moment(data.birthDate)}
@@ -764,54 +695,54 @@ const EditFarmer = () => {
               </Form.Item>
             </div>
           </div>
-          <div className="row">
-            <div className="form-group col-lg-6">
+          <div className='row'>
+            <div className='form-group col-lg-6'>
               <label>รหัสบัตรประชาชน</label>
               <Form.Item
-                name="idNo"
+                name='idNo'
                 rules={[
                   {
                     min: 13,
-                    message: "กรุณากรอกรหัสบัตรประชาชนให้ครบ 13 หลัก!",
+                    message: 'กรุณากรอกรหัสบัตรประชาชนให้ครบ 13 หลัก!',
                   },
                   {
                     pattern: new RegExp(/^[0-9\b]+$/),
-                    message: "กรุณากรอกรหัสบัตรประชาชนให้ถูกต้อง!",
+                    message: 'กรุณากรอกรหัสบัตรประชาชนให้ถูกต้อง!',
                   },
                 ]}
               >
                 <Input
-                  placeholder="กรอกรหัสบัตรประชาชน"
+                  placeholder='กรอกรหัสบัตรประชาชน'
                   defaultValue={data.idNo}
-                  autoComplete="off"
+                  autoComplete='off'
                   maxLength={13}
                   onChange={handleOnChange}
                 />
               </Form.Item>
             </div>
           </div>
-          <div className="row">
-            <div className="form-group col-lg-12 pb-5">
+          <div className='row'>
+            <div className='form-group col-lg-12 pb-5'>
               <label>รูปถ่ายผู้สมัครคู่กับบัตรประชาชน </label>
               <br />
-              <div className="pb-2">
+              <div className='pb-2'>
                 <div
-                  className="hiddenFileInput"
+                  className='hiddenFileInput'
                   style={{
                     backgroundImage: `url(${imgIdCard})`,
-                    display: imgIdCard != undefined ? "block" : "none",
+                    display: imgIdCard != undefined ? 'block' : 'none',
                   }}
                 ></div>
               </div>
-              <div className="text-left ps-4">
+              <div className='text-left ps-4'>
                 {imgIdCard != undefined && (
                   <>
                     <Tag
                       color={color.Success}
                       onClick={onPreviewIdCard}
                       style={{
-                        cursor: "pointer",
-                        borderRadius: "5px",
+                        cursor: 'pointer',
+                        borderRadius: '5px',
                       }}
                     >
                       View
@@ -820,8 +751,8 @@ const EditFarmer = () => {
                       color={color.Error}
                       onClick={removeImgIdCard}
                       style={{
-                        cursor: "pointer",
-                        borderRadius: "5px",
+                        cursor: 'pointer',
+                        borderRadius: '5px',
                       }}
                     >
                       Remove
@@ -830,44 +761,35 @@ const EditFarmer = () => {
                 )}
               </div>
               <div
-                className="hiddenFileBtn"
+                className='hiddenFileBtn'
                 style={{
                   backgroundImage: `url(${bth_img_empty})`,
-                  display: imgIdCard == undefined ? "block" : "none",
+                  display: imgIdCard == undefined ? 'block' : 'none',
                 }}
               >
-                <input
-                  key={imgIdCard}
-                  type="file"
-                  onChange={onChangeIdCard}
-                  title="เลือกรูป"
-                />
+                <input key={imgIdCard} type='file' onChange={onChangeIdCard} title='เลือกรูป' />
               </div>
             </div>
           </div>
-          <div className="row">
-            <div className="form-group col-lg-6">
+          <div className='row'>
+            <div className='form-group col-lg-6'>
               <label>
-                จังหวัด <span style={{ color: "red" }}>*</span>
+                จังหวัด <span style={{ color: 'red' }}>*</span>
               </label>
-              <Form.Item name="province">
+              <Form.Item name='province'>
                 <Select
                   allowClear
-                  placeholder="เลือกจังหวัด"
+                  placeholder='เลือกจังหวัด'
                   defaultValue={
                     address && address.provinceId !== 0
                       ? address.provinceId
                       : locateNull?.provinceName
                   }
                   showSearch
-                  optionFilterProp="children"
-                  filterOption={(input: any, option: any) =>
-                    option.children.includes(input)
-                  }
+                  optionFilterProp='children'
+                  filterOption={(input: any, option: any) => option.children.includes(input)}
                   filterSort={(optionA, optionB) =>
-                    optionA.children
-                      .toLowerCase()
-                      .localeCompare(optionB.children.toLowerCase())
+                    optionA.children.toLowerCase().localeCompare(optionB.children.toLowerCase())
                   }
                   onChange={handleOnChangeProvince}
                 >
@@ -879,28 +801,24 @@ const EditFarmer = () => {
                 </Select>
               </Form.Item>
             </div>
-            <div className="form-group col-lg-6">
+            <div className='form-group col-lg-6'>
               <label>
-                อำเภอ <span style={{ color: "red" }}>*</span>
+                อำเภอ <span style={{ color: 'red' }}>*</span>
               </label>
-              <Form.Item name="district">
+              <Form.Item name='district'>
                 <Select
                   allowClear
-                  placeholder="เลือกอำเภอ"
+                  placeholder='เลือกอำเภอ'
                   defaultValue={
                     address && address.districtId !== 0
                       ? address.districtId
                       : locateNull?.districtName
                   }
                   showSearch
-                  optionFilterProp="children"
-                  filterOption={(input: any, option: any) =>
-                    option.children.includes(input)
-                  }
+                  optionFilterProp='children'
+                  filterOption={(input: any, option: any) => option.children.includes(input)}
                   filterSort={(optionA: any, optionB: any) =>
-                    optionA.children
-                      .toLowerCase()
-                      .localeCompare(optionB.children.toLowerCase())
+                    optionA.children.toLowerCase().localeCompare(optionB.children.toLowerCase())
                   }
                   disabled={!address || !address.provinceId}
                   onChange={handleOnChangeDistrict}
@@ -914,29 +832,25 @@ const EditFarmer = () => {
               </Form.Item>
             </div>
           </div>
-          <div className="row">
-            <div className="form-group col-lg-6">
+          <div className='row'>
+            <div className='form-group col-lg-6'>
               <label>
-                ตำบล <span style={{ color: "red" }}>*</span>
+                ตำบล <span style={{ color: 'red' }}>*</span>
               </label>
-              <Form.Item name="subdistrict">
+              <Form.Item name='subdistrict'>
                 <Select
                   allowClear
-                  placeholder="เลือกตำบล"
+                  placeholder='เลือกตำบล'
                   defaultValue={
                     address && address.subdistrictId !== 0
                       ? address.subdistrictId
                       : locateNull?.subdistrictName
                   }
                   showSearch
-                  optionFilterProp="children"
-                  filterOption={(input: any, option: any) =>
-                    option.children.includes(input)
-                  }
+                  optionFilterProp='children'
+                  filterOption={(input: any, option: any) => option.children.includes(input)}
                   filterSort={(optionA, optionB) =>
-                    optionA.children
-                      .toLowerCase()
-                      .localeCompare(optionB.children.toLowerCase())
+                    optionA.children.toLowerCase().localeCompare(optionB.children.toLowerCase())
                   }
                   onChange={handleOnChangeSubdistrict}
                   disabled={!address || !address.districtId}
@@ -949,17 +863,15 @@ const EditFarmer = () => {
                 </Select>
               </Form.Item>
             </div>
-            <div className="form-group col-lg-6">
+            <div className='form-group col-lg-6'>
               <label>
-                รหัสไปรษณีย์ <span style={{ color: "red" }}>*</span>
+                รหัสไปรษณีย์ <span style={{ color: 'red' }}>*</span>
               </label>
-              <Form.Item name="postcode">
+              <Form.Item name='postcode'>
                 <Input
-                  placeholder="เลือกรหัสไปรษณีย์"
+                  placeholder='เลือกรหัสไปรษณีย์'
                   defaultValue={
-                    address && address.postcode
-                      ? address.postcode
-                      : locateNull?.postcode
+                    address && address.postcode ? address.postcode : locateNull?.postcode
                   }
                   key={address ? address.postcode : 0}
                   disabled
@@ -967,80 +879,77 @@ const EditFarmer = () => {
               </Form.Item>
             </div>
           </div>
-          <div className="row">
-            <div className="form-group col-lg-12">
+          <div className='row'>
+            <div className='form-group col-lg-12'>
               <label>
-                บ้านเลขที่ <span style={{ color: "red" }}>*</span>
+                บ้านเลขที่ <span style={{ color: 'red' }}>*</span>
               </label>
               <Form.Item
-                name="address1"
+                name='address1'
                 rules={[
                   {
                     required: true,
-                    message: "กรุณากรอกบ้านเลขที่",
+                    message: 'กรุณากรอกบ้านเลขที่',
                   },
                 ]}
               >
                 <Input
-                  placeholder="กรอกบ้านเลขที่"
+                  placeholder='กรอกบ้านเลขที่'
                   onChange={handleOnChangeAddress1}
-                  defaultValue={address !== null ? address.address1 : "-"}
-                  autoComplete="off"
+                  defaultValue={address !== null ? address.address1 : '-'}
+                  autoComplete='off'
                 />
               </Form.Item>
             </div>
           </div>
-          <div className="row">
-            <div className="form-group">
+          <div className='row'>
+            <div className='form-group'>
               <label>
-                ที่อยู่บ้าน <span style={{ color: "red" }}>*</span>
+                ที่อยู่บ้าน <span style={{ color: 'red' }}>*</span>
               </label>
               <Form.Item
-                name="Address"
+                name='Address'
                 rules={[
                   {
                     required: true,
-                    message: "กรุณากรอกที่อยู่บ้าน!",
+                    message: 'กรุณากรอกที่อยู่บ้าน!',
                   },
                 ]}
               >
                 <TextArea
-                  className="col-lg-12"
+                  className='col-lg-12'
                   rows={5}
-                  placeholder="กรอกที่อยู่บ้าน (เลขที่บ้าน, หมู่บ้าน, ชื่ออาคาร/ตึก, ซอย)"
-                  defaultValue={address !== null ? address.address2 : "-"}
-                  autoComplete="off"
+                  placeholder='กรอกที่อยู่บ้าน (เลขที่บ้าน, หมู่บ้าน, ชื่ออาคาร/ตึก, ซอย)'
+                  defaultValue={address !== null ? address.address2 : '-'}
+                  autoComplete='off'
                   onChange={handleOnChangeAddress2}
                 />
               </Form.Item>
             </div>
           </div>
           <div>
-            <div className="form-group">
+            <div className='form-group'>
               <label>
-                สถานะ <span style={{ color: "red" }}>*</span>
+                สถานะ <span style={{ color: 'red' }}>*</span>
               </label>
               <br />
-              <Radio.Group
-                defaultValue={data.status}
-                onChange={handleChangeFarmerstatus}
-              >
-                <Space direction="vertical">
+              <Radio.Group defaultValue={data.status} onChange={handleChangeFarmerstatus}>
+                <Space direction='vertical'>
                   {FARMER_STATUS_SEARCH.map((item, index) => (
                     <Radio value={item.value}>
                       {item.name}
-                      {(data.status == "REJECTED" && index == 3) ||
-                      (data.status == "INACTIVE" && index == 4) ? (
+                      {(data.status == 'REJECTED' && index == 3) ||
+                      (data.status == 'INACTIVE' && index == 4) ? (
                         <div>
-                          <div className="form-group">
+                          <div className='form-group'>
                             <label></label>
                             <br />
                             <Form.Item>
                               <TextArea
-                                className="col-lg-12"
+                                className='col-lg-12'
                                 rows={3}
-                                placeholder="กรอกเหตุผล/เหตุหมายเพิ่มเติม"
-                                autoComplete="off"
+                                placeholder='กรอกเหตุผล/เหตุหมายเพิ่มเติม'
+                                autoComplete='off'
                                 onChange={handleOnChangeReason}
                                 defaultValue={data.reason}
                               />
@@ -1054,7 +963,7 @@ const EditFarmer = () => {
               </Radio.Group>
             </div>
           </div>
-          <div className="form-group col-lg-12" style={{ marginTop: 16 }}>
+          <div className='form-group col-lg-12' style={{ marginTop: 16 }}>
             <label>หมายเหตุ</label>
             <Form.Item>
               <TextArea
@@ -1063,7 +972,7 @@ const EditFarmer = () => {
                   setData((prev) => ({
                     ...prev,
                     comment: e.target.value,
-                  }));
+                  }))
                 }}
               />
             </Form.Item>
@@ -1071,29 +980,29 @@ const EditFarmer = () => {
         </Form>
       </CardContainer>
     </div>
-  );
+  )
 
   const renderLand = (
-    <div className="col-lg-4">
+    <div className='col-lg-4'>
       <CardContainer>
         <div
           style={{
             backgroundColor: color.Success,
-            borderRadius: "12px 12px 0px 0px",
-            padding: "10px 10px 10px 10px",
+            borderRadius: '12px 12px 0px 0px',
+            padding: '10px 10px 10px 10px',
           }}
-          className="d-flex justify-content-between"
+          className='d-flex justify-content-between'
         >
-          <h4 className="pt-2 ps-3" style={{ color: "white" }}>
+          <h4 className='pt-2 ps-3' style={{ color: 'white' }}>
             แปลงเกษตร
           </h4>
           <Button
-            className="pt-2"
+            className='pt-2'
             style={{
               backgroundColor: color.secondary1,
-              color: "white",
-              border: "none",
-              borderRadius: "5px",
+              color: 'white',
+              border: 'none',
+              borderRadius: '5px',
             }}
             onClick={() => setShowAddModal((prev) => !prev)}
           >
@@ -1102,51 +1011,44 @@ const EditFarmer = () => {
         </div>
         <Form>
           {farmerPlotList.length !== 0 ? (
-            <div className="container">
+            <div className='container'>
               {currentItems.map((item, index) => (
-                <div
-                  className="row pt-3 pb-3"
-                  style={{ justifyContent: "space-between" }}
-                >
-                  <div className="col-lg-4">
+                <div className='row pt-3 pb-3' style={{ justifyContent: 'space-between' }}>
+                  <div className='col-lg-4'>
                     <p
                       style={{
-                        textOverflow: "ellipsis",
-                        overflow: "hidden",
-                        whiteSpace: "nowrap",
+                        textOverflow: 'ellipsis',
+                        overflow: 'hidden',
+                        whiteSpace: 'nowrap',
                         marginBottom: 0,
                       }}
                     >
                       {item.plotName}
                     </p>
-                    <p style={{ fontSize: "12px", color: color.Grey }}>
-                      {item.plantName}
-                    </p>
+                    <p style={{ fontSize: '12px', color: color.Grey }}>{item.plantName}</p>
                   </div>
-                  <div className="col-lg-2">
+                  <div className='col-lg-2'>
                     <span>{item.raiAmount} ไร่</span>
                   </div>
-                  <div className="col-lg-3">
+                  <div className='col-lg-3'>
                     <span
                       style={{
                         color: STATUS_FARMERPLOT_COLOR_MAPPING[item.status],
                       }}
                     >
-                      <Badge
-                        color={STATUS_FARMERPLOT_COLOR_MAPPING[item.status]}
-                      />{" "}
+                      <Badge color={STATUS_FARMERPLOT_COLOR_MAPPING[item.status]} />{' '}
                       {STATUS_NORMAL_MAPPING[item.status]}
                     </span>
                   </div>
-                  <div className="col-lg-3 d-flex justify-content-between">
-                    <div className="col-lg-6">
+                  <div className='col-lg-3 d-flex justify-content-between'>
+                    <div className='col-lg-6'>
                       <ActionButton
                         icon={<EditOutlined />}
                         color={color.primary1}
                         onClick={() => editPlot(item, index + 1)}
                       />
                     </div>
-                    <div className="col-lg-6">
+                    <div className='col-lg-6'>
                       <ActionButton
                         icon={<DeleteOutlined />}
                         color={color.Error}
@@ -1158,14 +1060,14 @@ const EditFarmer = () => {
               ))}
             </div>
           ) : (
-            <div className="container text-center" style={{ padding: "80px" }}>
-              <img src={emptyData} alt="" />
+            <div className='container text-center' style={{ padding: '80px' }}>
+              <img src={emptyData} alt='' />
               <h5>ยังไม่มีแปลงเกษตร</h5>
             </div>
           )}
         </Form>
       </CardContainer>
-      <div className="d-flex justify-content-between pt-5">
+      <div className='d-flex justify-content-between pt-5'>
         <p>รายการทั้งหมด {farmerPlotList.length} รายการ</p>
         <Pagination
           simple
@@ -1176,23 +1078,21 @@ const EditFarmer = () => {
         />
       </div>
     </div>
-  );
+  )
 
   return (
     <>
       <Row>
         <BackIconButton
           onClick={() => {
-            navigate(-1);
+            navigate(-1)
           }}
         />
-        <span className="pt-3">
-          <strong style={{ fontSize: "20px" }}>
-            แก้ไขข้อมูลเกษตรกร (Farmer)
-          </strong>
+        <span className='pt-3'>
+          <strong style={{ fontSize: '20px' }}>แก้ไขข้อมูลเกษตรกร (Farmer)</strong>
         </span>
       </Row>
-      <Row className="d-flex justify-content-around" key={data.id}>
+      <Row className='d-flex justify-content-around' key={data.id}>
         {renderFromData}
         {renderLand}
       </Row>
@@ -1204,19 +1104,19 @@ const EditFarmer = () => {
       <ModalFarmerPlot
         show={showAddModal}
         backButton={() => {
-          setEditIndex(0);
-          setShowAddModal((prev) => !prev);
+          setEditIndex(0)
+          setShowAddModal((prev) => !prev)
         }}
         callBack={updateFarmerPlot}
         data={editIndex > 0 ? editFarmerPlot : FarmerPlotEntity_INIT}
         editIndex={editIndex}
-        title={editIndex > 0 ? "แก้ไขแปลงเกษตร" : "เพิ่มแปลงเกษตร"}
+        title={editIndex > 0 ? 'แก้ไขแปลงเกษตร' : 'เพิ่มแปลงเกษตร'}
         callBackModal={(val) => setShowAddModal(!val)}
         isEditModal={editIndex > 0 ? true : false}
-        action="edit"
+        action='edit'
       />
     </>
-  );
-};
+  )
+}
 
-export default EditFarmer;
+export default EditFarmer

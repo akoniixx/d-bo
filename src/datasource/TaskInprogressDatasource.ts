@@ -1,5 +1,9 @@
-import { BASE_URL, httpClient } from "../config/config";
-import { TaskDetailEntity, TaskTodayListEntity, UpdateTask } from "../entities/TaskInprogressEntities";
+import { BASE_URL, httpClient } from '../config/config'
+import {
+  TaskDetailEntity,
+  TaskTodayListEntity,
+  UpdateTask,
+} from '../entities/TaskInprogressEntities'
 
 export class TaskInprogressDatasource {
   static getAllTaskToday(
@@ -15,8 +19,7 @@ export class TaskInprogressDatasource {
     isDelay?: boolean,
     applicationType?: string[],
     sortDirection?: string,
-    sortField?: string
-   
+    sortField?: string,
   ): Promise<TaskTodayListEntity> {
     const params = {
       taskStatus: taskStatus,
@@ -32,25 +35,25 @@ export class TaskInprogressDatasource {
       applicationType: applicationType,
       sortDirection: sortDirection,
       sortField: sortField,
-    };
+    }
     return httpClient
-      .get(BASE_URL + "/tasks/task-inprogress/get-all-task-today", { params })
+      .get(BASE_URL + '/tasks/task-inprogress/get-all-task-today', { params })
       .then((response) => {
-        return response.data;
+        return response.data
       })
       .catch((error) => {
-        console.log(error);
-      });
+        console.log(error)
+      })
   }
   static getTaskDetailById(id: string): Promise<TaskDetailEntity> {
     return httpClient
-      .get(BASE_URL + "/tasks/task-inprogress/get-task-detail/" + id)
+      .get(BASE_URL + '/tasks/task-inprogress/get-task-detail/' + id)
       .then((response) => {
-        return response.data;
+        return response.data
       })
       .catch((error) => {
-        console.log(error);
-      });
+        console.log(error)
+      })
   }
   static UpdateTask(data: TaskDetailEntity): Promise<any> {
     const params = {
@@ -70,15 +73,14 @@ export class TaskInprogressDatasource {
       isDelay: data.isDelay,
       delayRemark: data.delayRemark,
       dateDelay: data.dateDelay,
-    };
+    }
     return httpClient
-      .patch(BASE_URL + "/tasks/task/" + data.id, params)
-      .then((response) => { 
+      .patch(BASE_URL + '/tasks/task/' + data.id, params)
+      .then((response) => {
         return response.data
       })
       .catch((error) => {
-        console.log(error);
-      });
-      
+        console.log(error)
+      })
   }
 }

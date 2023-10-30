@@ -1,12 +1,27 @@
 ## [Version - 0]
+## Feature [v0.39.0] 2022-10-30
+- eslint & prettier setup
+- lazy load
+- Pin News Screen
+
+## Feature [v0.38.0] 2022-10-30
+
+- added ui point manual menu
+- fixed search farmer in new task menu
+- fixed style tabs menu
+
 ## Feature [v0.37.11] 2023-10-27
+
 - add image to news guru
 - add video link to news guru
 
 ## Fix [v0.37.10] 2023-10-22
-- fixed  show tel droner
+
+- fixed show tel droner
+
 ## Fix [v0.37.9] 2023-10-21
-- fixed  validate rai in addNewTask
+
+- fixed validate rai in addNewTask
 
 ## Fix [v0.37.8] 2023-10-20
 

@@ -1,41 +1,38 @@
-import { BASE_URL, httpClient } from "../config/config";
-import axios from "axios";
+import { BASE_URL, httpClient } from '../config/config'
+import axios from 'axios'
 import {
   LocationPriceEntity,
   LocationPricePageEntity,
   UpdateLocationPrice,
-} from "../entities/LocationPrice";
+} from '../entities/LocationPrice'
 
 export class LocationPriceDatasource {
-  static getLocationPrice(
-    proId?: number,
-    plant?: string
-  ): Promise<LocationPriceEntity> {
+  static getLocationPrice(proId?: number, plant?: string): Promise<LocationPriceEntity> {
     const params = {
       provinceId: proId,
       cropName: plant,
-    };
+    }
     return httpClient
-      .get(BASE_URL + "/tasks/location-price/get-location-price", { params })
+      .get(BASE_URL + '/tasks/location-price/get-location-price', { params })
       .then((response) => {
-        return response.data;
+        return response.data
       })
       .catch((error) => {
-        console.log(error);
-      });
+        console.log(error)
+      })
   }
   static async getAllLocationPrice(
     take: number,
     page: number,
-    search?: string
+    search?: string,
   ): Promise<LocationPricePageEntity> {
     return httpClient
       .post(BASE_URL + `/tasks/location-price/get-all-location-price?page=${page}&take=${take}`, {
         search,
       })
       .then((res) => {
-        return res.data;
-      });
+        return res.data
+      })
   }
   static async getPrice(search?: string, searchPlant?: string): Promise<any> {
     return axios
@@ -44,17 +41,17 @@ export class LocationPriceDatasource {
         searchPlant: searchPlant,
       })
       .then((res) => {
-        return res.data;
-      });
+        return res.data
+      })
   }
   static updateLocationPrice(data: any): Promise<any> {
     return httpClient
-      .post(BASE_URL + "/tasks/location-price/update-multiple-price", data)
+      .post(BASE_URL + '/tasks/location-price/update-multiple-price', data)
       .then((response) => {
-        return response.data;
+        return response.data
       })
       .catch((err) => {
-        console.log(err);
-      });
+        console.log(err)
+      })
   }
 }
