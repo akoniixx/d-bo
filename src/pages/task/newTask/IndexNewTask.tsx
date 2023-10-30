@@ -7,7 +7,7 @@ import {
   SearchOutlined,
   CaretUpOutlined,
   CaretDownOutlined,
-} from "@ant-design/icons";
+} from '@ant-design/icons'
 import {
   Badge,
   Button,
@@ -21,72 +21,62 @@ import {
   Select,
   Spin,
   Table,
-} from "antd";
-import Search from "antd/lib/input/Search";
-import moment from "moment";
-import { useEffect, useState } from "react";
-import Swal from "sweetalert2";
-import ActionButton from "../../../components/button/ActionButton";
-import { CardContainer } from "../../../components/card/CardContainer";
-import ModalDronerList from "../../../components/modal/task/newTask/ModalDronerList";
-import ModalMapPlot from "../../../components/modal/task/newTask/ModalMapPlot";
-import InvoiceTask from "../../../components/popover/InvoiceTask";
-import { TaskDatasource } from "../../../datasource/TaskDatasource";
-import {
-  NEWTASK_STATUS_SEARCH,
-  STATUS_NEWTASK_COLOR_MAPPING,
-} from "../../../definitions/Status";
+} from 'antd'
+import Search from 'antd/lib/input/Search'
+import moment from 'moment'
+import { useEffect, useState } from 'react'
+import Swal from 'sweetalert2'
+import ActionButton from '../../../components/button/ActionButton'
+import { CardContainer } from '../../../components/card/CardContainer'
+import ModalDronerList from '../../../components/modal/task/newTask/ModalDronerList'
+import ModalMapPlot from '../../../components/modal/task/newTask/ModalMapPlot'
+import InvoiceTask from '../../../components/popover/InvoiceTask'
+import { TaskDatasource } from '../../../datasource/TaskDatasource'
+import { NEWTASK_STATUS_SEARCH, STATUS_NEWTASK_COLOR_MAPPING } from '../../../definitions/Status'
 import {
   InvoiceTaskEntity,
   NewTaskPageEntity,
   UpdateTaskStatus,
   UpdateTaskStatus_INIT,
-} from "../../../entities/NewTaskEntities";
-import { color, icon } from "../../../resource";
-import { DateTimeUtil } from "../../../utilities/DateTimeUtil";
-import {
-  numberWithCommas,
-  numberWithCommasToFixed,
-} from "../../../utilities/TextFormatter";
-import { useNavigate } from "react-router-dom";
-import { listAppType } from "../../../definitions/ApplicatoionTypes";
-import { ListCheck } from "../../../components/dropdownCheck/ListStatusAppType";
-import { ModalAcceptedTask } from "../../../components/modal/ModalAcceptedTask";
-import ShowNickName from "../../../components/popover/ShowNickName";
+} from '../../../entities/NewTaskEntities'
+import { color, icon } from '../../../resource'
+import { DateTimeUtil } from '../../../utilities/DateTimeUtil'
+import { numberWithCommas, numberWithCommasToFixed } from '../../../utilities/TextFormatter'
+import { useNavigate } from 'react-router-dom'
+import { listAppType } from '../../../definitions/ApplicatoionTypes'
+import { ListCheck } from '../../../components/dropdownCheck/ListStatusAppType'
+import { ModalAcceptedTask } from '../../../components/modal/ModalAcceptedTask'
+import ShowNickName from '../../../components/popover/ShowNickName'
 
-const { RangePicker } = DatePicker;
-const dateFormat = "DD-MM-YYYY";
-const dateSearchFormat = "YYYY-MM-DD";
+const { RangePicker } = DatePicker
+const dateFormat = 'DD-MM-YYYY'
+const dateSearchFormat = 'YYYY-MM-DD'
 
 const IndexNewTask = () => {
-  const profile = JSON.parse(localStorage.getItem("profile") || "{  }");
-  const navigate = useNavigate();
-  const [row, setRow] = useState(10);
-  const [current, setCurrent] = useState(1);
-  const [data, setData] = useState<NewTaskPageEntity>();
-  const [searchStatus, setSearchStatus] = useState<string>("");
-  const [searchText, setSearchText] = useState<string>("");
-  const [searchStartDate, setSearchStartDate] = useState<any>(null);
-  const [searchEndDate, setSearchEndDate] = useState<any>(null);
-  const [showModalMap, setShowModalMap] = useState<boolean>(false);
-  const [showModalDroner, setShowModalDroner] = useState<boolean>(false);
-  const [appTypeArr, setAppTypeArr] = useState<string[]>([]);
-  const [applicationType, setApplicationType] = useState<any>();
-  const [loading, setLoading] = useState(false);
-  const [sortDirection, setSortDirection] = useState<string | undefined>();
-  const [sortField, setSortField] = useState<string | undefined>();
-  const [plotId, setPlotId] = useState<string>("");
-  const [taskId, setTaskId] = useState<string>("");
-  const [sortDirection1, setSortDirection1] = useState<string | undefined>(
-    undefined
-  );
-  const [sortDirection2, setSortDirection2] = useState<string | undefined>(
-    undefined
-  );
-  const [modalCheckUpdate, setModalCheckUpdate] = useState<boolean>(false);
+  const profile = JSON.parse(localStorage.getItem('profile') || '{  }')
+  const navigate = useNavigate()
+  const [row, setRow] = useState(10)
+  const [current, setCurrent] = useState(1)
+  const [data, setData] = useState<NewTaskPageEntity>()
+  const [searchStatus, setSearchStatus] = useState<string>('')
+  const [searchText, setSearchText] = useState<string>('')
+  const [searchStartDate, setSearchStartDate] = useState<any>(null)
+  const [searchEndDate, setSearchEndDate] = useState<any>(null)
+  const [showModalMap, setShowModalMap] = useState<boolean>(false)
+  const [showModalDroner, setShowModalDroner] = useState<boolean>(false)
+  const [appTypeArr, setAppTypeArr] = useState<string[]>([])
+  const [applicationType, setApplicationType] = useState<any>()
+  const [loading, setLoading] = useState(false)
+  const [sortDirection, setSortDirection] = useState<string | undefined>()
+  const [sortField, setSortField] = useState<string | undefined>()
+  const [plotId, setPlotId] = useState<string>('')
+  const [taskId, setTaskId] = useState<string>('')
+  const [sortDirection1, setSortDirection1] = useState<string | undefined>(undefined)
+  const [sortDirection2, setSortDirection2] = useState<string | undefined>(undefined)
+  const [modalCheckUpdate, setModalCheckUpdate] = useState<boolean>(false)
 
   const fetchNewTaskList = async () => {
-    setLoading(true);
+    setLoading(true)
     await TaskDatasource.getNewTaskList(
       row,
       current,
@@ -96,142 +86,136 @@ const IndexNewTask = () => {
       searchEndDate,
       applicationType,
       sortDirection,
-      sortField
+      sortField,
     )
       .then((res) => {
-        setData(res);
+        setData(res)
       })
       .catch((err) => console.log(err))
-      .finally(() => setLoading(false));
-  };
+      .finally(() => setLoading(false))
+  }
 
   useEffect(() => {
-    fetchNewTaskList();
-  }, [searchStartDate, searchEndDate, current, sortDirection, row]);
+    fetchNewTaskList()
+  }, [searchStartDate, searchEndDate, current, sortDirection, row])
 
   const handleSearchStatus = (status: any) => {
-    setSearchStatus(status.target.value);
-  };
+    setSearchStatus(status.target.value)
+  }
   const handleSearchText = (e: any) => {
-    setSearchText(e.target.value);
-  };
+    setSearchText(e.target.value)
+  }
   const handleSearchDate = (e: any) => {
     if (e != null) {
-      setSearchStartDate(moment(new Date(e[0])).format(dateSearchFormat));
-      setSearchEndDate(moment(new Date(e[1])).format(dateSearchFormat));
+      setSearchStartDate(moment(new Date(e[0])).format(dateSearchFormat))
+      setSearchEndDate(moment(new Date(e[1])).format(dateSearchFormat))
     } else {
-      setSearchStartDate(e);
-      setSearchEndDate(e);
+      setSearchStartDate(e)
+      setSearchEndDate(e)
     }
-  };
+  }
   const handleModalMap = (plotId: string) => {
-    setShowModalMap((prev) => !prev);
-    setPlotId(plotId);
-  };
+    setShowModalMap((prev) => !prev)
+    setPlotId(plotId)
+  }
   const handleModalDronerList = (taskId: string) => {
-    setShowModalDroner((prev) => !prev);
-    setTaskId(taskId);
-  };
+    setShowModalDroner((prev) => !prev)
+    setTaskId(taskId)
+  }
   const removeNewTask = async (id: string) => {
     Swal.fire({
-      title: "ยืนยันการยกเลิก",
-      cancelButtonText: "ยกเลิก",
-      confirmButtonText: "ยืนยัน",
-      confirmButtonColor: "#d33",
+      title: 'ยืนยันการยกเลิก',
+      cancelButtonText: 'ยกเลิก',
+      confirmButtonText: 'ยืนยัน',
+      confirmButtonColor: '#d33',
       showCancelButton: true,
       showCloseButton: true,
-      input: "textarea",
-      inputPlaceholder: "กรอกเหตุผลการยกเลิก",
-      inputAttributes: { input: "text", required: "true" },
+      input: 'textarea',
+      inputPlaceholder: 'กรอกเหตุผลการยกเลิก',
+      inputAttributes: { input: 'text', required: 'true' },
       html:
         "<p class='text-left'>โปรดตรวจสอบงานใหม่ที่คุณต้องการลบ ก่อนที่จะกดยืนยันการลบ เพราะอาจส่งผลต่อการจ้างงานในระบบ</p>" +
         "<p class='text-left'>เหตุผล</p>",
     }).then(async (result) => {
       if (result.isConfirmed) {
-        const data: UpdateTaskStatus = UpdateTaskStatus_INIT;
-        data.id = id;
-        data.status = "CANCELED";
-        data.statusRemark = result.value;
-        data.updateBy = profile.firstname + " " + profile.lastname;
+        const data: UpdateTaskStatus = UpdateTaskStatus_INIT
+        data.id = id
+        data.status = 'CANCELED'
+        data.statusRemark = result.value
+        data.updateBy = profile.firstname + ' ' + profile.lastname
         await TaskDatasource.cancelNewTask(data).then((res) => {
           //navigate("/IndexNewTask");
-        });
+        })
       }
-      fetchNewTaskList();
-    });
-  };
+      fetchNewTaskList()
+    })
+  }
   const onChangePage = (page: number) => {
-    setCurrent(page);
-  };
+    setCurrent(page)
+  }
   const onSearchCreateBy = (value: string, checked: boolean) => {
-    let arr: any = 0;
+    let arr: any = 0
     if (checked === true) {
-      arr = [...appTypeArr, value];
-      setAppTypeArr([...appTypeArr, value]);
-      setApplicationType(value);
+      arr = [...appTypeArr, value]
+      setAppTypeArr([...appTypeArr, value])
+      setApplicationType(value)
     } else {
-      let d: string[] = appTypeArr.filter((x) => x != value);
-      arr = [...d];
-      setAppTypeArr(d);
+      const d: string[] = appTypeArr.filter((x) => x != value)
+      arr = [...d]
+      setAppTypeArr(d)
       if (d.length === 0) {
-        arr = undefined;
+        arr = undefined
       }
     }
-    setApplicationType(arr);
-  };
+    setApplicationType(arr)
+  }
   const checkDronerReceive = async (id: string) => {
     await TaskDatasource.getNewTaskById(id).then((res) => {
       if (!res.dronerId) {
-        navigate("/EditNewTask/id=" + id);
+        navigate('/EditNewTask/id=' + id)
       } else {
-        setModalCheckUpdate(!modalCheckUpdate);
+        setModalCheckUpdate(!modalCheckUpdate)
       }
-    });
-  };
-  const onShowSizeChange: PaginationProps["onShowSizeChange"] = (
-    current,
-    pageSize
-  ) => {
-    setCurrent(current);
-    setRow(pageSize);
-  };
+    })
+  }
+  const onShowSizeChange: PaginationProps['onShowSizeChange'] = (current, pageSize) => {
+    setCurrent(current)
+    setRow(pageSize)
+  }
   const menu = (
     <Menu
       items={[
         {
-          label: "เลือกนักบินหลายคน (แบบปกติ)",
-          key: "1",
-          onClick: () => navigate("/AddNewTask=checkbox"),
+          label: 'เลือกนักบินหลายคน (แบบปกติ)',
+          key: '1',
+          onClick: () => navigate('/AddNewTask=checkbox'),
         },
         {
-          label: "บังคับเลือกนักบิน (ติดต่อแล้ว)",
-          key: "2",
-          onClick: () => navigate("/AddNewTask=radio"),
+          label: 'บังคับเลือกนักบิน (ติดต่อแล้ว)',
+          key: '2',
+          onClick: () => navigate('/AddNewTask=radio'),
         },
       ]}
     />
-  );
+  )
   const pageTitle = (
     <>
-      <div
-        className="d-flex justify-content-between"
-        style={{ padding: "10px" }}
-      >
+      <div className='d-flex justify-content-between' style={{ padding: '10px' }}>
         <div>
           <span
-            className="card-label font-weight-bolder text-dark"
+            className='card-label font-weight-bolder text-dark'
             style={{
               fontSize: 22,
-              fontWeight: "bold",
-              padding: "8px",
+              fontWeight: 'bold',
+              padding: '8px',
             }}
           >
             <strong>งานใหม่ (รอนักบิน)</strong>
           </span>
         </div>
-        <div style={{ color: color.Error, textAlign: "end" }}>
+        <div style={{ color: color.Error, textAlign: 'end' }}>
           <RangePicker
-            style={{ right: "4px" }}
+            style={{ right: '4px' }}
             allowClear
             onCalendarChange={(val) => handleSearchDate(val)}
             format={dateFormat}
@@ -239,11 +223,11 @@ const IndexNewTask = () => {
           <Dropdown overlay={menu}>
             <Button
               style={{
-                padding: "8 0",
+                padding: '8 0',
                 backgroundColor: color.primary1,
                 color: color.secondary2,
                 borderColor: color.Success,
-                borderRadius: "5px",
+                borderRadius: '5px',
               }}
             >
               เพิ่มงานบินโดรนใหม่
@@ -252,31 +236,29 @@ const IndexNewTask = () => {
           </Dropdown>
         </div>
       </div>
-      <div className=" d-flex justify-content-between pb-3">
-        <div className="col-lg-7 pt-1" style={{ paddingRight: 5 }}>
+      <div className=' d-flex justify-content-between pb-3'>
+        <div className='col-lg-7 pt-1' style={{ paddingRight: 5 }}>
           <Input
             allowClear
             prefix={<SearchOutlined style={{ color: color.Disable }} />}
-            placeholder="ค้นหาชื่อเกษตรกร, คนบินโดรน หรือเบอร์โทร"
-            className="col-lg-12"
+            placeholder='ค้นหาชื่อเกษตรกร, คนบินโดรน หรือเบอร์โทร'
+            className='col-lg-12'
             onChange={handleSearchText}
           />
         </div>
-        <div className="col-lg">
+        <div className='col-lg'>
           <ListCheck
-            onSearchType={(value: any, checked: any) =>
-              onSearchCreateBy(value, checked)
-            }
+            onSearchType={(value: any, checked: any) => onSearchCreateBy(value, checked)}
             list={applicationType}
-            title="เลือกรูปแบบการสร้าง"
-            menu="TASK"
+            title='เลือกรูปแบบการสร้าง'
+            menu='TASK'
           />
         </div>
-        <div className="col-lg p-1">
+        <div className='col-lg p-1'>
           <Select
             style={{ paddingRight: 5 }}
-            className="col-lg-12"
-            placeholder="สถานะทั้งหมด"
+            className='col-lg-12'
+            placeholder='สถานะทั้งหมด'
             onChange={handleSearchStatus}
             allowClear
           >
@@ -285,17 +267,17 @@ const IndexNewTask = () => {
             ))}
           </Select>
         </div>
-        <div className="pt-1">
+        <div className='pt-1'>
           <Button
             style={{
               borderColor: color.Success,
-              borderRadius: "5px",
+              borderRadius: '5px',
               color: color.secondary2,
               backgroundColor: color.Success,
             }}
             onClick={() => {
-              setCurrent(1);
-              fetchNewTaskList();
+              setCurrent(1)
+              fetchNewTaskList()
             }}
           >
             ค้นหาข้อมูล
@@ -303,61 +285,61 @@ const IndexNewTask = () => {
         </div>
       </div>
     </>
-  );
+  )
   const columns = [
     {
       title: () => {
         return (
-          <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+          <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
             วัน/เวลานัดหมาย
             <div
               style={{
-                display: "flex",
-                flexDirection: "column",
-                cursor: "pointer",
+                display: 'flex',
+                flexDirection: 'column',
+                cursor: 'pointer',
               }}
               onClick={() => {
-                setSortField("date_appointment");
+                setSortField('date_appointment')
                 setSortDirection((prev) => {
-                  if (prev === "ASC") {
-                    return "DESC";
+                  if (prev === 'ASC') {
+                    return 'DESC'
                   } else if (prev === undefined) {
-                    return "ASC";
+                    return 'ASC'
                   } else {
-                    return undefined;
+                    return undefined
                   }
-                });
+                })
                 setSortDirection1((prev) => {
-                  if (prev === "ASC") {
-                    return "DESC";
+                  if (prev === 'ASC') {
+                    return 'DESC'
                   } else if (prev === undefined) {
-                    return "ASC";
+                    return 'ASC'
                   } else {
-                    return undefined;
+                    return undefined
                   }
-                });
+                })
               }}
             >
               <CaretUpOutlined
                 style={{
-                  position: "relative",
+                  position: 'relative',
                   top: 2,
-                  color: sortDirection1 === "ASC" ? "#ffca37" : "white",
+                  color: sortDirection1 === 'ASC' ? '#ffca37' : 'white',
                 }}
               />
               <CaretDownOutlined
                 style={{
-                  position: "relative",
+                  position: 'relative',
                   bottom: 2,
-                  color: sortDirection1 === "DESC" ? "#ffca37" : "white",
+                  color: sortDirection1 === 'DESC' ? '#ffca37' : 'white',
                 }}
               />
             </div>
           </div>
-        );
+        )
       },
-      dataIndex: "date_appointment",
-      key: "date_appointment",
+      dataIndex: 'date_appointment',
+      key: 'date_appointment',
       render: (value: any, row: any, index: number) => {
         return {
           children: (
@@ -367,39 +349,37 @@ const IndexNewTask = () => {
               <span style={{ color: color.Grey }}>{row.task_no}</span>
             </>
           ),
-        };
+        }
       },
     },
     {
-      title: "ชื่อเกษตรกร",
-      dataIndex: "fullname",
-      key: "fullname",
+      title: 'ชื่อเกษตรกร',
+      dataIndex: 'fullname',
+      key: 'fullname',
       render: (value: any, row: any, index: number) => {
         return {
           children: (
             <>
-              <span>{row.firstname + " " + row.lastname}</span>
+              <span>{row.firstname + ' ' + row.lastname}</span>
               <br />
-              <span style={{ color: color.Grey }}>{row.telephone_no}
-              {row.nickname && (
-                  <ShowNickName data={row.nickname} menu="INFO" />
-                )}</span>
+              <span style={{ color: color.Grey }}>
+                {row.telephone_no}
+                {row.nickname && <ShowNickName data={row.nickname} menu='INFO' />}
+              </span>
             </>
           ),
-        };
+        }
       },
     },
     {
-      title: "พื้นที่แปลงเกษตร",
+      title: 'พื้นที่แปลงเกษตร',
       render: (value: any, row: any, index: number) => {
         const checkAddress = () => {
-          let province = row.province_name + "";
-          let district =
-            row.district_name == null ? "" : row.district_name + "/";
-          let subdistrict =
-            row.subdistrict_name == null ? "" : row.subdistrict_name + "/";
-          return subdistrict + district + province;
-        };
+          const province = row.province_name + ''
+          const district = row.district_name == null ? '' : row.district_name + '/'
+          const subdistrict = row.subdistrict_name == null ? '' : row.subdistrict_name + '/'
+          return subdistrict + district + province
+        }
         return {
           children: (
             <>
@@ -407,19 +387,19 @@ const IndexNewTask = () => {
               <br />
               <div
                 onClick={() => handleModalMap(row.farmer_plot_id)}
-                style={{ color: color.primary1, cursor: "pointer" }}
+                style={{ color: color.primary1, cursor: 'pointer' }}
               >
                 ดูแผนที่แปลง
               </div>
             </>
           ),
-        };
+        }
       },
     },
     {
-      title: "นักบินโดรน",
-      dataIndex: "count_droner",
-      key: "count_droner",
+      title: 'นักบินโดรน',
+      dataIndex: 'count_droner',
+      key: 'count_droner',
       render: (value: any, row: any, index: number) => {
         return {
           children: (
@@ -428,68 +408,68 @@ const IndexNewTask = () => {
               <br />
               <span
                 onClick={() => handleModalDronerList(row.id)}
-                style={{ color: color.primary1, cursor: "pointer" }}
+                style={{ color: color.primary1, cursor: 'pointer' }}
               >
                 ดูรายชื่อนักบินโดรน
               </span>
             </>
           ),
-        };
+        }
       },
     },
     {
       title: () => {
         return (
-          <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-            ค่าบริการ{" "}
+          <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+            ค่าบริการ{' '}
             <div
               style={{
-                display: "flex",
-                flexDirection: "column",
-                cursor: "pointer",
+                display: 'flex',
+                flexDirection: 'column',
+                cursor: 'pointer',
               }}
               onClick={() => {
-                setSortField("total_price");
+                setSortField('total_price')
                 setSortDirection((prev) => {
-                  if (prev === "ASC") {
-                    return "DESC";
+                  if (prev === 'ASC') {
+                    return 'DESC'
                   } else if (prev === undefined) {
-                    return "ASC";
+                    return 'ASC'
                   } else {
-                    return undefined;
+                    return undefined
                   }
-                });
+                })
                 setSortDirection2((prev) => {
-                  if (prev === "ASC") {
-                    return "DESC";
+                  if (prev === 'ASC') {
+                    return 'DESC'
                   } else if (prev === undefined) {
-                    return "ASC";
+                    return 'ASC'
                   } else {
-                    return undefined;
+                    return undefined
                   }
-                });
+                })
               }}
             >
               <CaretUpOutlined
                 style={{
-                  position: "relative",
+                  position: 'relative',
                   top: 2,
-                  color: sortDirection2 === "ASC" ? "#ffca37" : "white",
+                  color: sortDirection2 === 'ASC' ? '#ffca37' : 'white',
                 }}
               />
               <CaretDownOutlined
                 style={{
-                  position: "relative",
+                  position: 'relative',
                   bottom: 2,
-                  color: sortDirection2 === "DESC" ? "#ffca37" : "white",
+                  color: sortDirection2 === 'DESC' ? '#ffca37' : 'white',
                 }}
               />
             </div>
           </div>
-        );
+        )
       },
-      dataIndex: "total_price",
-      key: "total_price",
+      dataIndex: 'total_price',
+      key: 'total_price',
       render: (value: any, row: any, index: number) => {
         const inv: InvoiceTaskEntity = {
           raiAmount: row.farm_area_amount,
@@ -501,30 +481,25 @@ const IndexNewTask = () => {
           discountPromotion: row.discount_promotion,
           discountPoint: row.discount_campaign_point,
           totalPrice: row.total_price,
-        };
+        }
         return {
           children: (
             <>
               <span>
                 {!row.total_price
-                  ? 0.0 + " บาท"
-                  : numberWithCommasToFixed(parseFloat(row.total_price)) +
-                    " บาท"}
+                  ? 0.0 + ' บาท'
+                  : numberWithCommasToFixed(parseFloat(row.total_price)) + ' บาท'}
               </span>
-              <InvoiceTask
-                iconColor={color.Success}
-                title="รายละเอียดค่าบริการ"
-                data={inv}
-              />
+              <InvoiceTask iconColor={color.Success} title='รายละเอียดค่าบริการ' data={inv} />
             </>
           ),
-        };
+        }
       },
     },
     {
-      title: "สร้างโดย",
-      dataIndex: "createByWho",
-      key: "createByWho",
+      title: 'สร้างโดย',
+      dataIndex: 'createByWho',
+      key: 'createByWho',
       render: (value: any, row: any, index: number) => {
         return {
           children: (
@@ -533,29 +508,20 @@ const IndexNewTask = () => {
                 (item) =>
                   row.application_type === item.value && (
                     <>
-                      <Image
-                        src={item.icon}
-                        preview={false}
-                        style={{ width: 24, height: 24 }}
-                      />
-                      <span>
-                        {" "}
-                        {row.create_by
-                          ? row.create_by + ` ${item.create}`
-                          : "-"}
-                      </span>
+                      <Image src={item.icon} preview={false} style={{ width: 24, height: 24 }} />
+                      <span> {row.create_by ? row.create_by + ` ${item.create}` : '-'}</span>
                     </>
-                  )
+                  ),
               )}
             </>
           ),
-        };
+        }
       },
     },
     {
-      title: "สถานะ",
-      dataIndex: "task_status",
-      key: "task_status",
+      title: 'สถานะ',
+      dataIndex: 'task_status',
+      key: 'task_status',
       render: (value: any, row: any, index: number) => {
         return {
           children: (
@@ -565,37 +531,34 @@ const IndexNewTask = () => {
                   color: STATUS_NEWTASK_COLOR_MAPPING[row.task_status],
                 }}
               >
-                <Badge color={STATUS_NEWTASK_COLOR_MAPPING[row.task_status]} />{" "}
-                {row.task_status}
+                <Badge color={STATUS_NEWTASK_COLOR_MAPPING[row.task_status]} /> {row.task_status}
               </span>
               <br />
               <span style={{ color: color.Grey }}>
-                <UserOutlined
-                  style={{ padding: "0 4px 0 0", verticalAlign: 0.5 }}
-                />
+                <UserOutlined style={{ padding: '0 4px 0 0', verticalAlign: 0.5 }} />
                 {row.create_by}
               </span>
             </>
           ),
-        };
+        }
       },
     },
     {
-      title: "",
-      dataIndex: "Action",
-      key: "Action",
+      title: '',
+      dataIndex: 'Action',
+      key: 'Action',
       render: (value: any, row: any, index: number) => {
         return {
           children: (
-            <div className="d-flex flex-row justify-content-center">
-              <div className="col-lg-6">
+            <div className='d-flex flex-row justify-content-center'>
+              <div className='col-lg-6'>
                 <ActionButton
                   icon={<EditOutlined />}
                   color={color.primary1}
                   onClick={() => checkDronerReceive(row.id)}
                 />
               </div>
-              <div className="col-lg-6">
+              <div className='col-lg-6'>
                 <ActionButton
                   icon={<ExceptionOutlined />}
                   color={color.Error}
@@ -604,32 +567,30 @@ const IndexNewTask = () => {
               </div>
             </div>
           ),
-        };
+        }
       },
     },
-  ];
+  ]
 
   return (
     <>
       {pageTitle}
       <CardContainer>
-        <Spin tip="กำลังโหลดข้อมูล..." size="large" spinning={loading}>
+        <Spin tip='กำลังโหลดข้อมูล...' size='large' spinning={loading}>
           <Table
-            scroll={{ x: "max-content" }}
+            scroll={{ x: 'max-content' }}
             dataSource={data?.data}
             columns={columns}
             pagination={false}
-            size="large"
-            tableLayout="fixed"
+            size='large'
+            tableLayout='fixed'
             rowClassName={(a) =>
-              a.task_status === "ไม่มีนักบินรับงาน"
-                ? "table-row-older"
-                : "table-row-lasted"
+              a.task_status === 'ไม่มีนักบินรับงาน' ? 'table-row-older' : 'table-row-lasted'
             }
           />
         </Spin>
       </CardContainer>
-      <div className="d-flex justify-content-between pt-4 pb-3">
+      <div className='d-flex justify-content-between pt-4 pb-3'>
         <p>รายการทั้งหมด {data?.count} รายการ</p>
         <Pagination
           current={current}
@@ -644,7 +605,7 @@ const IndexNewTask = () => {
         <ModalMapPlot
           show={showModalMap}
           backButton={() => setShowModalMap((prev) => !prev)}
-          title="แผนที่แปลงเกษตร"
+          title='แผนที่แปลงเกษตร'
           plotId={plotId}
         />
       )}
@@ -652,26 +613,26 @@ const IndexNewTask = () => {
         <ModalDronerList
           show={showModalDroner}
           backButton={() => setShowModalDroner((prev) => !prev)}
-          title="รายชื่อนักโดรนบิน"
+          title='รายชื่อนักโดรนบิน'
           taskId={taskId}
         />
       )}
       {modalCheckUpdate && (
         <ModalAcceptedTask
-          titleButton={"ตกลง"}
-          textHeader={"คุณไม่สามารถแก้ไขงานนี้ได้"}
+          titleButton={'ตกลง'}
+          textHeader={'คุณไม่สามารถแก้ไขงานนี้ได้'}
           textDetail={
-            "เนื่องจากมีนักบินโดรนในระบบกดรับงานนี้แล้ว คุณสามารถตรวจสอบ/แก้ไขงานนี้ได้อีกครั้งในเมนูจัดการงานอื่นๆ"
+            'เนื่องจากมีนักบินโดรนในระบบกดรับงานนี้แล้ว คุณสามารถตรวจสอบ/แก้ไขงานนี้ได้อีกครั้งในเมนูจัดการงานอื่นๆ'
           }
           visible={modalCheckUpdate}
           backButton={() => {
-            setModalCheckUpdate(!modalCheckUpdate);
-            fetchNewTaskList();
+            setModalCheckUpdate(!modalCheckUpdate)
+            fetchNewTaskList()
           }}
         />
       )}
     </>
-  );
-};
+  )
+}
 
-export default IndexNewTask;
+export default IndexNewTask

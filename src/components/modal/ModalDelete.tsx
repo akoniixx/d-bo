@@ -1,25 +1,19 @@
-import { Button, Divider, Modal } from "antd";
-import React from "react";
-import { color } from "../../resource";
+import { Button, Divider, Modal } from 'antd'
+import React from 'react'
+import { color } from '../../resource'
 
 interface ModalDelete {
-  show: boolean;
-  title1: string;
-  title2: string;
-  backButton: () => void;
-  callBack: () => void;
+  show: boolean
+  title1: string
+  title2: string
+  backButton: () => void
+  callBack: () => void
 }
 
-const ModalDelete: React.FC<ModalDelete> = ({
-  show,
-  title1,
-  title2,
-  backButton,
-  callBack,
-}) => {
+const ModalDelete: React.FC<ModalDelete> = ({ show, title1, title2, backButton, callBack }) => {
   return (
     <Modal
-      title="ยืนยันการลบ"
+      title='ยืนยันการลบ'
       onCancel={backButton}
       open={show}
       footer={null}
@@ -27,20 +21,16 @@ const ModalDelete: React.FC<ModalDelete> = ({
         padding: 0,
       }}
     >
-      <div className="px-4 pt-4">
-        <span className="text-secondary">
-       {title1}
-        </span>
-        <p className="text-secondary">
-       {title2}
-        </p>
+      <div className='px-4 pt-4'>
+        <span className='text-secondary'>{title1}</span>
+        <p className='text-secondary'>{title2}</p>
       </div>
       <Divider
         style={{
-          marginBottom: "20px",
+          marginBottom: '20px',
         }}
       />
-      <div className="d-flex justify-content-between px-4 pb-4">
+      <div className='d-flex justify-content-between px-4 pb-4'>
         <Button
           style={{
             borderColor: color.Error,
@@ -62,7 +52,7 @@ const ModalDelete: React.FC<ModalDelete> = ({
         </Button>
       </div>
     </Modal>
-  );
-};
+  )
+}
 
-export default ModalDelete;
+export default ModalDelete

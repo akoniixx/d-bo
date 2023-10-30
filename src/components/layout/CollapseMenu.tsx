@@ -1,38 +1,38 @@
-import React, {  useState } from "react";
-import {  useNavigate } from "react-router-dom";
-import styled from "styled-components";
-import { color,  } from "../../resource";
-import { CollapseSubMenu } from "./CollapseSubMenu";
-import { IconMenu, IconMenuActive } from "./IconMenu";
-import { DownOutlined, UpOutlined } from "@ant-design/icons";
- 
-import { useEffectOnce } from "../../hook/useEffectOnce";
+import React, { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+import styled from 'styled-components'
+import { color } from '../../resource'
+import { CollapseSubMenu } from './CollapseSubMenu'
+import { IconMenu, IconMenuActive } from './IconMenu'
+import { DownOutlined, UpOutlined } from '@ant-design/icons'
+
+import { useEffectOnce } from '../../hook/useEffectOnce'
 
 interface CollapseMenuProps {
   subLists: {
-    path: string;
-    name: string;
-    title: string;
+    path: string
+    name: string
+    title: string
     subMenu: {
-      path: string;
-      name: string;
-      title: string;
-    }[];
-  }[];
-  name: string;
-  path: string;
-  title: string;
+      path: string
+      name: string
+      title: string
+    }[]
+  }[]
+  name: string
+  path: string
+  title: string
   setCurrent: React.Dispatch<
     React.SetStateAction<{
-      path: string;
+      path: string
     }>
-  >;
+  >
   current: {
-    path: string;
-  };
-  count: number;
-  checkPath: string | undefined;
-  setCheckPath: React.Dispatch<React.SetStateAction<string | undefined>>;
+    path: string
+  }
+  count: number
+  checkPath: string | undefined
+  setCheckPath: React.Dispatch<React.SetStateAction<string | undefined>>
 }
 
 const ListStyled = styled.div<{}>`
@@ -44,18 +44,18 @@ const ListStyled = styled.div<{}>`
   align-items: center;
   height: 50px;
   background-color: ${color.Success};
-`;
+`
 const SubListItem = styled.div<{ isFocus?: boolean }>`
   padding: 14px;
   padding-left: 52px;
   cursor: pointer;
-  background-color: ${"#ceeed5"};
+  background-color: ${'#ceeed5'};
   color: ${color.Success};
   width: 100%;
   font-size: 14px;
   height: 50px;
   justify-content: space-between;
-`;
+`
 export const CollapseMenu: React.FC<CollapseMenuProps> = ({
   title,
   subLists,
@@ -67,53 +67,49 @@ export const CollapseMenu: React.FC<CollapseMenuProps> = ({
   checkPath,
   setCheckPath,
 }) => {
-  const navigate = useNavigate();
-  const [checkPathSub, setCheckPathSub] = useState<string | undefined>();
+  const navigate = useNavigate()
+  const [checkPathSub, setCheckPathSub] = useState<string | undefined>()
   const [currentSub, setCurrentSub] = useState({
-    path: "",
-  });
-  const [checkPathSubList, setCheckPathSubList] = useState<
-    string | undefined
-  >();
+    path: '',
+  })
+  const [checkPathSubList, setCheckPathSubList] = useState<string | undefined>()
   useEffectOnce(() => {
-    const pathName = window.location.pathname;
-    const pathNameSplit = pathName.split("/").filter((item) => item !== "");
+    const pathName = window.location.pathname
+    const pathNameSplit = pathName.split('/').filter((item) => item !== '')
 
     const currentPath = subLists.find((item) => {
       if (item.subMenu && item.subMenu.length < 1) {
-        return item.path === `/${pathNameSplit[0]}`;
+        return item.path === `/${pathNameSplit[0]}`
       }
-      const isHaveSubPath = item.subMenu.find(
-        (el) => el.path === `/${pathNameSplit[0]}`
-      );
-      return !!isHaveSubPath;
-    });
+      const isHaveSubPath = item.subMenu.find((el) => el.path === `/${pathNameSplit[0]}`)
+      return !!isHaveSubPath
+    })
 
     setCurrentSub({
       path: `/${pathNameSplit}`,
-    });
-    setCheckPathSub(currentPath?.path);
-    setCheckPathSubList(currentPath?.path);
-  });
+    })
+    setCheckPathSub(currentPath?.path)
+    setCheckPathSubList(currentPath?.path)
+  })
 
   return (
     <>
       <div
         style={{
-          cursor: "pointer",
-          width: "100%",
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          height: "50px",
+          cursor: 'pointer',
+          width: '100%',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          height: '50px',
         }}
         onClick={() => {
-          setCheckPathSub(path);
-          setCurrent({ path });
+          setCheckPathSub(path)
+          setCurrent({ path })
           if (path === checkPath) {
-            setCheckPath(undefined);
+            setCheckPath(undefined)
           } else {
-            setCheckPath(path);
+            setCheckPath(path)
           }
         }}
       >
@@ -121,15 +117,15 @@ export const CollapseMenu: React.FC<CollapseMenuProps> = ({
           <>
             <div
               style={{
-                color: "#231F20",
-                display: "flex",
+                color: '#231F20',
+                display: 'flex',
                 gap: 18,
-                padding: "8px",
-                cursor: "pointer",
-                width: "100%",
-                alignItems: "center",
-                height: "50px",
-                paddingLeft: "16px",
+                padding: '8px',
+                cursor: 'pointer',
+                width: '100%',
+                alignItems: 'center',
+                height: '50px',
+                paddingLeft: '16px',
               }}
             >
               {IconMenu[name as keyof typeof IconMenu]}
@@ -155,11 +151,11 @@ export const CollapseMenu: React.FC<CollapseMenuProps> = ({
                 </div>
               )} */}
             </div>
-            <div style={{ paddingRight: "8px" }}>
+            <div style={{ paddingRight: '8px' }}>
               {checkPath !== path ? (
-                <DownOutlined style={{ fontSize: "14px" }} />
+                <DownOutlined style={{ fontSize: '14px' }} />
               ) : (
-                <UpOutlined style={{ fontSize: "14px" }} />
+                <UpOutlined style={{ fontSize: '14px' }} />
               )}
             </div>
           </>
@@ -167,10 +163,10 @@ export const CollapseMenu: React.FC<CollapseMenuProps> = ({
           <>
             <ListStyled
               style={{
-                color: "#FFCA37",
-                display: "flex",
+                color: '#FFCA37',
+                display: 'flex',
                 gap: 18,
-                paddingLeft: "16px",
+                paddingLeft: '16px',
               }}
             >
               {IconMenuActive[name as keyof typeof IconMenu]}
@@ -198,17 +194,17 @@ export const CollapseMenu: React.FC<CollapseMenuProps> = ({
             </ListStyled>
             <div
               style={{
-                paddingRight: "8px",
+                paddingRight: '8px',
                 backgroundColor: color.Success,
-                height: "50px",
-                alignItems: "center",
-                display: "flex",
+                height: '50px',
+                alignItems: 'center',
+                display: 'flex',
               }}
             >
               {checkPath !== path ? (
-                <DownOutlined style={{ fontSize: "14px" }} />
+                <DownOutlined style={{ fontSize: '14px' }} />
               ) : (
-                <UpOutlined style={{ fontSize: "14px", color: color.White }} />
+                <UpOutlined style={{ fontSize: '14px', color: color.White }} />
               )}
             </div>
           </>
@@ -217,7 +213,7 @@ export const CollapseMenu: React.FC<CollapseMenuProps> = ({
       {checkPath === path && (
         <div
           style={{
-            width: "100%",
+            width: '100%',
           }}
         >
           {subLists.map((subList, idx) => {
@@ -235,41 +231,37 @@ export const CollapseMenu: React.FC<CollapseMenuProps> = ({
                   checkPathSubList={checkPathSubList}
                   setCheckPathSubList={setCheckPathSubList}
                 />
-              );
+              )
             }
             return (
               <div
                 key={idx}
                 onClick={() => {
-                  setCurrent({ path: subList.path });
-                  if (
-                    subList.path !== checkPathSub &&
-                    subList.path === checkPathSubList
-                  ) {
-                    setCheckPathSub(undefined);
-                    setCheckPathSubList(undefined);
+                  setCurrent({ path: subList.path })
+                  if (subList.path !== checkPathSub && subList.path === checkPathSubList) {
+                    setCheckPathSub(undefined)
+                    setCheckPathSubList(undefined)
                   } else {
-                    setCheckPathSub(subList.path);
-                    setCheckPathSubList(subList.path);
+                    setCheckPathSub(subList.path)
+                    setCheckPathSubList(subList.path)
                   }
-                  navigate(subList.path);
+                  navigate(subList.path)
                 }}
               >
-                {checkPathSub === subList.path &&
-                checkPathSubList === subList.path ? (
+                {checkPathSub === subList.path && checkPathSubList === subList.path ? (
                   <SubListItem>{subList.title}</SubListItem>
                 ) : (
                   <div
                     style={{
-                      padding: "14px",
-                      paddingLeft: "52px",
-                      cursor: "pointer",
-                      width: "100%",
-                      display: "flex",
-                      justifyContent: "space-between",
-                      alignItems: "center",
-                      height: "50px",
-                      fontSize: "14px",
+                      padding: '14px',
+                      paddingLeft: '52px',
+                      cursor: 'pointer',
+                      width: '100%',
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                      height: '50px',
+                      fontSize: '14px',
                     }}
                   >
                     {subList.title}
@@ -297,10 +289,10 @@ export const CollapseMenu: React.FC<CollapseMenuProps> = ({
                     </div>
                   )} */}
               </div>
-            );
+            )
           })}
         </div>
       )}
     </>
-  );
-};
+  )
+}

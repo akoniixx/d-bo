@@ -1,30 +1,30 @@
-import React, { useState } from "react";
-import { color } from "../../resource";
-import styled from "styled-components";
-import { useNavigate } from "react-router-dom";
-import { useEffectOnce } from "../../hook/useEffectOnce";
-import { CollapseMenu } from "./CollapseMenu";
-import { IconMenu, IconMenuActive } from "./IconMenu";
+import React, { useState } from 'react'
+import { color } from '../../resource'
+import styled from 'styled-components'
+import { useNavigate } from 'react-router-dom'
+import { useEffectOnce } from '../../hook/useEffectOnce'
+import { CollapseMenu } from './CollapseMenu'
+import { IconMenu, IconMenuActive } from './IconMenu'
 
 interface SubMenu {
-  path: string;
-  name: string;
-  title: string;
-  permission?: null;
-  subMenu?: SubMenu[];
+  path: string
+  name: string
+  title: string
+  permission?: null
+  subMenu?: SubMenu[]
 }
 
 interface PathList {
-  path: string;
-  name: string;
-  title: string;
-  permission?: null;
-  subMenu?: SubMenu[];
+  path: string
+  name: string
+  title: string
+  permission?: null
+  subMenu?: SubMenu[]
 }
 
 interface MenuSideProps {
-  lists: PathList[];
-  isOpenSidebar?: boolean;
+  lists: PathList[]
+  isOpenSidebar?: boolean
 }
 
 const ListStyled = styled.div<{ isFocus?: boolean }>`
@@ -35,40 +35,38 @@ const ListStyled = styled.div<{ isFocus?: boolean }>`
   align-items: center;
   height: 50px;
   background-color: ${color.Success};
-`;
+`
 export const MenuSide: React.FC<MenuSideProps> = ({ lists, isOpenSidebar }) => {
-  const navigate = useNavigate();
+  const navigate = useNavigate()
 
-  const [checkPath, setCheckPath] = useState<string | undefined>();
+  const [checkPath, setCheckPath] = useState<string | undefined>()
   const [current, setCurrent] = useState({
-    path: "",
-  });
+    path: '',
+  })
 
   useEffectOnce(() => {
-    const pathName = window.location.pathname;
-    const pathNameSplit = pathName.split("/").filter((item) => item !== "");
+    const pathName = window.location.pathname
+    const pathNameSplit = pathName.split('/').filter((item) => item !== '')
 
     const currentPath = lists.find((item) => {
       if (item.subMenu && item.subMenu?.length < 1) {
-        return item.path === `/${pathNameSplit[0]}`;
+        return item.path === `/${pathNameSplit[0]}`
       }
-      const isHaveSubPath = item.subMenu?.find(
-        (el) => el.path === `/${pathNameSplit[0]}`
-      );
-      return !!isHaveSubPath;
-    });
-    setCheckPath(currentPath?.path);
+      const isHaveSubPath = item.subMenu?.find((el) => el.path === `/${pathNameSplit[0]}`)
+      return !!isHaveSubPath
+    })
+    setCheckPath(currentPath?.path)
     setCurrent({
       path: `/${pathNameSplit[0]}`,
-    });
-  });
+    })
+  })
   return (
     <div>
       <div
         style={{
-          cursor: "pointer",
-          width: "100%",
-          height: "50px",
+          cursor: 'pointer',
+          width: '100%',
+          height: '50px',
         }}
       >
         {lists.map((list: any, idx: any) => {
@@ -77,18 +75,18 @@ export const MenuSide: React.FC<MenuSideProps> = ({ lists, isOpenSidebar }) => {
               <div
                 key={idx}
                 onClick={() => {
-                  setCheckPath(list.path);
-                  setCurrent(list.path);
-                  navigate(list.path);
+                  setCheckPath(list.path)
+                  setCurrent(list.path)
+                  navigate(list.path)
                 }}
               >
                 {checkPath === list.path ? (
                   <ListStyled
                     style={{
-                      display: "flex",
+                      display: 'flex',
                       gap: 18,
-                      color: "#FFCA37",
-                      paddingLeft: "16px",
+                      color: '#FFCA37',
+                      paddingLeft: '16px',
                     }}
                   >
                     {IconMenuActive[list.name as keyof typeof IconMenu]}
@@ -97,15 +95,15 @@ export const MenuSide: React.FC<MenuSideProps> = ({ lists, isOpenSidebar }) => {
                 ) : (
                   <div
                     style={{
-                      color: "#231F20",
-                      display: "flex",
+                      color: '#231F20',
+                      display: 'flex',
                       gap: 18,
-                      padding: "8px",
-                      cursor: "pointer",
-                      width: "100%",
-                      height: "50px",
-                      alignItems: "center",
-                      paddingLeft: "16px",
+                      padding: '8px',
+                      cursor: 'pointer',
+                      width: '100%',
+                      height: '50px',
+                      alignItems: 'center',
+                      paddingLeft: '16px',
                     }}
                   >
                     {IconMenu[list.name as keyof typeof IconMenu]}
@@ -113,7 +111,7 @@ export const MenuSide: React.FC<MenuSideProps> = ({ lists, isOpenSidebar }) => {
                   </div>
                 )}
               </div>
-            );
+            )
           } else {
             return (
               <CollapseMenu
@@ -128,10 +126,10 @@ export const MenuSide: React.FC<MenuSideProps> = ({ lists, isOpenSidebar }) => {
                 checkPath={checkPath}
                 setCheckPath={setCheckPath}
               />
-            );
+            )
           }
         })}
       </div>
     </div>
-  );
-};
+  )
+}

@@ -1,21 +1,18 @@
-import React from "react";
-import { LeftOutlined } from "@ant-design/icons";
-import { Button, Empty } from "antd";
-import { color } from "../../resource";
+import React from 'react'
+import { LeftOutlined } from '@ant-design/icons'
+import { Button, Empty } from 'antd'
+import { color } from '../../resource'
 
 interface SaveButtonProps {
-  onClick: Function;
-  disableBtn?: boolean;
+  onClick: Function
+  disableBtn?: boolean
 }
-export const SaveButtton: React.FC<SaveButtonProps> = ({
-  onClick,
-  disableBtn,
-}) => (
+export const SaveButtton: React.FC<SaveButtonProps> = ({ onClick, disableBtn }) => (
   <Button
     style={{
       backgroundColor: disableBtn ? color.Grey : color.Success,
       borderColor: disableBtn ? color.Grey : color.Success,
-      borderRadius: "5px",
+      borderRadius: '5px',
       color: color.BG,
     }}
     onClick={onClick()}
@@ -23,6 +20,6 @@ export const SaveButtton: React.FC<SaveButtonProps> = ({
   >
     บันทึก
   </Button>
-);
+)
 
-export default SaveButtton;
+export default SaveButtton
