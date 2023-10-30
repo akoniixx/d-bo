@@ -31,6 +31,7 @@ export const ModalPage: React.FC<ModalProps> = ({
     }
     visible={visible}
     onCancel={closeModal}
+    // eslint-disable-next-line react/jsx-key
     footer={[<FooterPage onClickBack={backButton} onClickSave={saveButton} />]}
   >
     {data}

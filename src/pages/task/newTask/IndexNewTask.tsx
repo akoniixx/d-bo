@@ -22,7 +22,6 @@ import {
   Spin,
   Table,
 } from 'antd'
-import Search from 'antd/lib/input/Search'
 import moment from 'moment'
 import { useEffect, useState } from 'react'
 import Swal from 'sweetalert2'
@@ -39,9 +38,9 @@ import {
   UpdateTaskStatus,
   UpdateTaskStatus_INIT,
 } from '../../../entities/NewTaskEntities'
-import { color, icon } from '../../../resource'
+import { color } from '../../../resource'
 import { DateTimeUtil } from '../../../utilities/DateTimeUtil'
-import { numberWithCommas, numberWithCommasToFixed } from '../../../utilities/TextFormatter'
+import { numberWithCommasToFixed } from '../../../utilities/TextFormatter'
 import { useNavigate } from 'react-router-dom'
 import { listAppType } from '../../../definitions/ApplicatoionTypes'
 import { ListCheck } from '../../../components/dropdownCheck/ListStatusAppType'
@@ -143,7 +142,7 @@ const IndexNewTask = () => {
         data.status = 'CANCELED'
         data.statusRemark = result.value
         data.updateBy = profile.firstname + ' ' + profile.lastname
-        await TaskDatasource.cancelNewTask(data).then((res) => {
+        await TaskDatasource.cancelNewTask(data).then(() => {
           //navigate("/IndexNewTask");
         })
       }
@@ -262,8 +261,10 @@ const IndexNewTask = () => {
             onChange={handleSearchStatus}
             allowClear
           >
-            {NEWTASK_STATUS_SEARCH.map((item) => (
-              <option value={item.name}>{item.name}</option>
+            {NEWTASK_STATUS_SEARCH.map((item, index) => (
+              <option key={index} value={item.name}>
+                {item.name}
+              </option>
             ))}
           </Select>
         </div>
@@ -340,7 +341,7 @@ const IndexNewTask = () => {
       },
       dataIndex: 'date_appointment',
       key: 'date_appointment',
-      render: (value: any, row: any, index: number) => {
+      render: (value: any, row: any) => {
         return {
           children: (
             <>
@@ -356,7 +357,7 @@ const IndexNewTask = () => {
       title: 'ชื่อเกษตรกร',
       dataIndex: 'fullname',
       key: 'fullname',
-      render: (value: any, row: any, index: number) => {
+      render: (value: any, row: any) => {
         return {
           children: (
             <>
@@ -373,7 +374,7 @@ const IndexNewTask = () => {
     },
     {
       title: 'พื้นที่แปลงเกษตร',
-      render: (value: any, row: any, index: number) => {
+      render: (value: any, row: any) => {
         const checkAddress = () => {
           const province = row.province_name + ''
           const district = row.district_name == null ? '' : row.district_name + '/'
@@ -400,7 +401,7 @@ const IndexNewTask = () => {
       title: 'นักบินโดรน',
       dataIndex: 'count_droner',
       key: 'count_droner',
-      render: (value: any, row: any, index: number) => {
+      render: (value: any, row: any) => {
         return {
           children: (
             <>
@@ -470,7 +471,7 @@ const IndexNewTask = () => {
       },
       dataIndex: 'total_price',
       key: 'total_price',
-      render: (value: any, row: any, index: number) => {
+      render: (value: any, row: any) => {
         const inv: InvoiceTaskEntity = {
           raiAmount: row.farm_area_amount,
           unitPrice: row.unit_price,
@@ -500,7 +501,7 @@ const IndexNewTask = () => {
       title: 'สร้างโดย',
       dataIndex: 'createByWho',
       key: 'createByWho',
-      render: (value: any, row: any, index: number) => {
+      render: (value: any, row: any) => {
         return {
           children: (
             <>
@@ -522,7 +523,7 @@ const IndexNewTask = () => {
       title: 'สถานะ',
       dataIndex: 'task_status',
       key: 'task_status',
-      render: (value: any, row: any, index: number) => {
+      render: (value: any, row: any) => {
         return {
           children: (
             <>
@@ -547,7 +548,7 @@ const IndexNewTask = () => {
       title: '',
       dataIndex: 'Action',
       key: 'Action',
-      render: (value: any, row: any, index: number) => {
+      render: (value: any, row: any) => {
         return {
           children: (
             <div className='d-flex flex-row justify-content-center'>

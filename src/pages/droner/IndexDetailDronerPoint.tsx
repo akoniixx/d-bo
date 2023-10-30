@@ -6,7 +6,6 @@ import { useNavigate } from 'react-router-dom'
 import ActionButton from '../../components/button/ActionButton'
 import { BackIconButton } from '../../components/button/BackButton'
 import { CardContainer } from '../../components/card/CardContainer'
-import { DashboardLayout } from '../../components/layout/Layout'
 import { color } from '../../resource'
 import { DateTimeUtil } from '../../utilities/DateTimeUtil'
 const { RangePicker } = DatePicker
