@@ -144,7 +144,11 @@ function PinAll({ currentApp, form }: Props) {
     const reOrderList = reOrder(newList, findIndex, newList.length - 1)
     form.setFieldsValue({
       pinAll: reOrderList,
-      deletePinMain: alreadyDeleted ? deletePinAll : [...deletePinAll, v],
+      deletePinAll: alreadyDeleted
+        ? deletePinAll
+        : [...deletePinAll, v].filter((el) => {
+            return el.newsId
+          }),
     })
 
     setReMemo(!reMemo)

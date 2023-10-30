@@ -4,6 +4,7 @@ import { Button, Form } from 'antd'
 import { useForm } from 'antd/lib/form/Form'
 import { NewsDatasource } from '../../../../datasource/NewsDatasource'
 import PinAll from './PinAll'
+import Swal from 'sweetalert2'
 
 interface Props {
   application: 'DRONER' | 'FARMER'
@@ -194,23 +195,26 @@ function Content({ application }: Props) {
           }
         })
       const deletePinAll = (values.deletePinAll || []).map((el) => {
-        return {
-          newsId: el.newsId,
-        }
+        return el.newsId
       })
       const deletePinMain = (values.deletePinMain || []).map((el) => {
-        return {
-          newsId: el.newsId,
-        }
+        return el.newsId
       })
       const payload = {
         pinAll,
         pinMain,
         deletePinAll,
         deletePinMain,
+      } as any
+      const result = await NewsDatasource.postPinNews(payload)
+      if (result.success) {
+        Swal.fire({
+          icon: 'success',
+          title: 'บันทึกข้อมูลสำเร็จ',
+          showConfirmButton: false,
+          timer: 1500,
+        })
       }
-      console.log('payload', payload)
-      // const result = await NewsDatasource.postPinNews(payload)
     } catch (e) {
       console.log('e', e)
     }
@@ -223,6 +227,10 @@ function Content({ application }: Props) {
       }}
     >
       <Form
+        onFieldsChange={(changedFields, allFields) => {
+          console.log('changedFields', changedFields)
+          console.log('allFields', allFields)
+        }}
         onFinish={onFinish}
         form={form}
         style={{
@@ -240,6 +248,12 @@ function Content({ application }: Props) {
       >
         <PinMain form={form} currentApp={currentApp} />
         <PinAll form={form} currentApp={currentApp} />
+        <Form.Item name='deletePinAll' hidden>
+          <input type='hidden' />
+        </Form.Item>
+        <Form.Item name='deletePinMain' hidden>
+          <input type='hidden' />
+        </Form.Item>
         <Button
           type='primary'
           htmlType='submit'
