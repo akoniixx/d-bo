@@ -144,10 +144,13 @@ function PinMain({ currentApp, form }: Props) {
       currentOptions: [],
     }
     const reOrderList = reOrder(newList, findIndex, newList.length - 1)
-
     form.setFieldsValue({
       pinMain: reOrderList,
-      deletePinMain: alreadyDeleted ? deletePinMain : [...deletePinMain, v],
+      deletePinMain: alreadyDeleted
+        ? deletePinMain
+        : [...deletePinMain, v].filter((el) => {
+            return el.newsId
+          }),
     })
 
     setReMemo(!reMemo)
