@@ -1,3 +1,5 @@
+import "react-quill/dist/quill.snow.css";
+import "../farmer/Style.css"
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { BackIconButton } from '../../components/button/BackButton'
 import { useNavigate } from 'react-router-dom'
@@ -451,6 +453,9 @@ function AddNewsPage() {
                       modules={modulesNews}
                       formats={formats}
                       ref={quillRef}
+                      style={{
+                        height : '600px'
+                      }}
                     />
                   </Form.Item>
                 </div>
