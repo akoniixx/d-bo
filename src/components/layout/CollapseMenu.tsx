@@ -35,7 +35,7 @@ interface CollapseMenuProps {
   setCheckPath: React.Dispatch<React.SetStateAction<string | undefined>>
 }
 
-const ListStyled = styled.div<{}>`
+const ListStyled = styled.div`
   padding: 8px;
   cursor: pointer;
   border-radius: 0px;
