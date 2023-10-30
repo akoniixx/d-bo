@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import image from '../resource/image'
-export default class ErrorLoginPage extends Component<{}> {
+export default class ErrorLoginPage extends Component {
   logout = () => {
     localStorage.clear()
     const url = window.location.href

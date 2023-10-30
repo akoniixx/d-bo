@@ -103,7 +103,8 @@ const MissionReportCard: React.FC<MissionReportProps> = ({
       >
         {type === 'MISSION_POINT' ? (
           <span>
-            จำนวนแต็มที่ได้รับ : {formatNumberWithCommas(parseFloat(detailReward?.point!))} แต้ม
+            จำนวนแต็มที่ได้รับ :{' '}
+            {detailReward?.point ? formatNumberWithCommas(parseFloat(detailReward?.point)) : 0} แต้ม
           </span>
         ) : (
           <>

@@ -162,7 +162,8 @@ function AddDroner() {
     await handleOnChangePostcode(d.toJS())
   }
   const handleOnChangePostcode = (addr: CreateAddressEntity) => {
-    const getPostcode = subdistrict.filter((x) => x.subdistrictId === addr.subdistrictId)[0].postcode
+    const getPostcode = subdistrict.filter((x) => x.subdistrictId === addr.subdistrictId)[0]
+      .postcode
     const c = Map(addr).set('postcode', getPostcode)
     setAddress(c.toJS())
     form.setFieldsValue({

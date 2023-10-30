@@ -673,9 +673,12 @@ function IndexFarmer() {
             return `(รอไปแล้ว ${diffDay} วัน)`
           }
         }
-        const checkProfile = ![row.firstname, row.lastname, row.telephoneNo, row.birthDate].includes(
-          '',
-        )
+        const checkProfile = ![
+          row.firstname,
+          row.lastname,
+          row.telephoneNo,
+          row.birthDate,
+        ].includes('')
 
         return {
           children: (

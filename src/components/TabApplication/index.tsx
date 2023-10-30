@@ -5,7 +5,7 @@ const Container = styled.div`
   display: flex;
   align-items: center;
 `
-const ListStyled = styled.div<{}>`
+const ListStyled = styled.div`
   cursor: pointer;
   width: fit-content;
   display: flex;

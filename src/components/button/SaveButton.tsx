@@ -4,7 +4,7 @@ import { Button, Empty } from 'antd'
 import { color } from '../../resource'
 
 interface SaveButtonProps {
-  onClick: Function
+  onClick: () => void
   disableBtn?: boolean
 }
 export const SaveButtton: React.FC<SaveButtonProps> = ({ onClick, disableBtn }) => (
@@ -15,7 +15,7 @@ export const SaveButtton: React.FC<SaveButtonProps> = ({ onClick, disableBtn }) 
       borderRadius: '5px',
       color: color.BG,
     }}
-    onClick={onClick()}
+    onClick={onClick}
     disabled={disableBtn}
   >
     บันทึก

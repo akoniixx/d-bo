@@ -79,7 +79,9 @@ const AddCampaignPoint = () => {
         navigate('/IndexCampaignPoint')
       } else {
         if (res.userMessage === 'dupplicate') {
+          console.log('dupplicate')
         } else {
+          console.log('error')
         }
       }
     })

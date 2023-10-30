@@ -31,11 +31,11 @@ const InvoiceTask: React.FC<InvoiceTaskProp> = ({ iconColor, title, data }) => (
             <div style={{ fontSize: '12px' }}>
               จำนวนไร่{' '}
               <span style={{ color: color.Success }}>
-                {numberWithCommasToFixed(parseFloat(data?.raiAmount!))} ไร่
+                {data && numberWithCommasToFixed(parseFloat(data.raiAmount || '0'))} ไร่
               </span>{' '}
               x ค่าบริการ{' '}
               <span style={{ color: color.Success }}>
-                {numberWithCommasToFixed(parseFloat(data?.unitPrice!))} ไร่
+                {data && numberWithCommasToFixed(parseFloat(data?.unitPrice || '0'))} ไร่
               </span>
             </div>
           </td>
