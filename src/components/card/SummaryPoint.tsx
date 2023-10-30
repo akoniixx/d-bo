@@ -1,18 +1,18 @@
-import { SearchOutlined } from "@ant-design/icons";
-import { Image } from "antd";
-import React, { useEffect, useState } from "react";
-import { color } from "../../resource";
-import { CardContainer } from "./CardContainer";
-import { numberWithCommas } from "./../../utilities/TextFormatter";
+import { SearchOutlined } from '@ant-design/icons'
+import { Image } from 'antd'
+import React, { useEffect, useState } from 'react'
+import { color } from '../../resource'
+import { CardContainer } from './CardContainer'
+import { numberWithCommas } from './../../utilities/TextFormatter'
 
 interface SummaryProps {
-  title: string;
-  bgColor: string;
-  label: string;
-  point: number;
-  icon?: string;
-  time?: number;
-  pointManual?: boolean;
+  title: string
+  bgColor: string
+  label: string
+  point: number
+  icon?: string
+  time?: number
+  pointManual?: boolean
 }
 const SummaryPoint: React.FC<SummaryProps> = ({
   title,
@@ -27,34 +27,34 @@ const SummaryPoint: React.FC<SummaryProps> = ({
     <>
       <CardContainer
         style={{
-          padding: "12px",
-          marginRight: "12px",
-          borderRadius: "5px",
+          padding: '12px',
+          marginRight: '12px',
+          borderRadius: '5px',
         }}
       >
-        <p style={{ fontSize: "16px", fontWeight: "600" }}>{title}</p>
-        <div className="d-flex justify-content-between">
+        <p style={{ fontSize: '16px', fontWeight: '600' }}>{title}</p>
+        <div className='d-flex justify-content-between'>
           <CardContainer
             style={{
               backgroundColor: bgColor,
-              borderRadius: "5px",
-              padding: "10px",
-              width: "100%",
+              borderRadius: '5px',
+              padding: '10px',
+              width: '100%',
             }}
           >
             <div
-              className="d-flex justify-content-between"
-              style={{ color: color.White, fontWeight: "bold" }}
+              className='d-flex justify-content-between'
+              style={{ color: color.White, fontWeight: 'bold' }}
             >
-              <div className="d-flex justify-content-between">
+              <div className='d-flex justify-content-between'>
                 {!pointManual && icon && (
                   <div>
                     <Image
                       preview={false}
                       src={icon}
                       style={{
-                        width: "36px",
-                        height: "24px",
+                        width: '36px',
+                        height: '24px',
                         paddingRight: 10,
                       }}
                     />
@@ -65,14 +65,10 @@ const SummaryPoint: React.FC<SummaryProps> = ({
                 </div>
               </div>
               {!pointManual ? (
-                <div style={{ fontSize: "16px" }}>
-                  {numberWithCommas(point) + " แต้ม"}
-                </div>
+                <div style={{ fontSize: '16px' }}>{numberWithCommas(point) + ' แต้ม'}</div>
               ) : (
-                <div style={{ fontSize: "16px" }}>
-                  {numberWithCommas(point) +
-                    " ครั้ง" +
-                    ` ( ${numberWithCommas(time!)}  คน)`}
+                <div style={{ fontSize: '16px' }}>
+                  {numberWithCommas(point) + ' ครั้ง' + ` ( ${numberWithCommas(time!)}  คน)`}
                 </div>
               )}
             </div>
@@ -80,7 +76,7 @@ const SummaryPoint: React.FC<SummaryProps> = ({
         </div>
       </CardContainer>
     </>
-  );
-};
+  )
+}
 
-export default SummaryPoint;
+export default SummaryPoint

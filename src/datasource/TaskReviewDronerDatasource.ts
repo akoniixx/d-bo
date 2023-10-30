@@ -1,4 +1,4 @@
-import { BASE_URL, httpClient } from "../config/config";
+import { BASE_URL, httpClient } from '../config/config'
 
 export class TaskReviewDronerDatasource {
   static async UpdateReviewDroner(
@@ -18,14 +18,14 @@ export class TaskReviewDronerDatasource {
       sprayExpertise: sprayExpertise,
       comment: comment,
       updateBy: updateBy,
-    };
+    }
     return httpClient
       .post(BASE_URL + '/tasks/task/review-droner', params)
-      .then(response => {
-        return response.data;
+      .then((response) => {
+        return response.data
       })
-      .catch(err => {
-        throw err;
-      });
+      .catch((err) => {
+        throw err
+      })
   }
 }

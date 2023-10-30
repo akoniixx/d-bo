@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Prompt:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&display=swap");
+@import url('https://fonts.googleapis.com/css2?family=Prompt:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&display=swap');
 
 html {
   font-size: 14px;
@@ -7,8 +7,9 @@ html {
   -webkit-text-size-adjust: 100%;
   -ms-text-size-adjust: 100%;
 }
+
 body {
-  font-family: "Prompt" !important;
+  font-family: 'Prompt' !important;
   font-weight: 400 !important;
   color: #000;
   margin: 0;
@@ -21,51 +22,60 @@ body {
 table tr td :hover {
   font-weight: normal !important;
 }
+
 .table-row-old td {
   background-color: rgba(244, 132, 26, 0.2) !important;
 }
+
 .table-row-older td {
   background-color: rgba(235, 87, 87, 0.3) !important;
 }
+
 .table-row-lasted td {
   background-color: rgb(255, 255, 255) !important;
 }
+
 .table-row-wait-review td {
   background-color: #2f80ed1a !important;
 }
+
 .table-row-wait-approve td {
   background-color: #2f80ed33 !important;
 }
+
 .table-row-approve td {
   background-color: #56ccf21a !important;
 }
 
 .ant-layout-sider-light {
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24) !important;
+  box-shadow:
+    0 1px 3px rgba(0, 0, 0, 0.12),
+    0 1px 2px rgba(0, 0, 0, 0.24) !important;
 }
+
 .ant-table-container table thead tr th {
   background-color: #219653 !important;
-  font-family: "Prompt" !important;
+  font-family: 'Prompt' !important;
   font-weight: 500 !important;
   color: rgb(255, 255, 255) !important;
   font-weight: bold !important;
 }
 
-.custom-steps
-  .ant-steps-item-process
-  > .ant-steps-item-container
-  > .ant-steps-item-icon {
+.custom-steps .ant-steps-item-process > .ant-steps-item-container > .ant-steps-item-icon {
   background-color: #219653;
   border-color: #219653;
 }
+
 .custom-steps .ant-steps-item-finish .ant-steps-item-icon {
   background-color: #fff;
   border-color: #219653;
 }
+
 .custom-steps .ant-steps-item-finish .ant-steps-item-icon > .ant-steps-icon {
   color: #219653;
   top: -4.5px;
 }
+
 .custom-steps
   .ant-steps-item-process
   > .ant-steps-item-container
@@ -73,6 +83,7 @@ table tr td :hover {
   > .ant-steps-item-title:after {
   background-color: #c6c6c6;
 }
+
 .custom-steps
   .ant-steps-item-finish
   > .ant-steps-item-container
@@ -80,47 +91,65 @@ table tr td :hover {
   > .ant-steps-item-title:after {
   background-color: #219653;
 }
+
 .text-left {
   text-align: left;
   margin: 0;
 }
+
 .ant-popover-title {
   background-color: #219653;
 }
+
 .ant-spin-dot-item {
   background-color: #219653 !important;
 }
+
 .ant-spin-text {
   color: #219653;
 }
+
 .ant-checkbox-checked .ant-checkbox-inner {
   background-color: #219653 !important;
   border-color: #219653 !important;
 }
+
 .ant-radio-checked .ant-radio-inner {
-  border-color: #219653 !important ;
+  border-color: #219653 !important;
 }
+
+.ant-select-item-option-content {
+  width: 100% !important;
+}
+
 .ant-radio-checked .ant-radio-inner:after {
   background-color: #219653 !important;
 }
+
 .ant-tabs-tab-active {
   border-color: #219653 !important;
   border-radius: 4px 4px 0px 0px !important;
 }
+
 .ant-tabs-tab {
   border-radius: 4px 4px 0px 0px !important;
 }
+
 .ant-tabs-tab-btn {
   color: #404040 !important;
 }
+
 .ant-tabs-tab.ant-tabs-tab-active .ant-tabs-tab-btn {
   color: #219653 !important;
 }
+
 .ant-tabs-nav-wrap {
   position: fixed;
   left: 0;
   right: 0;
-  top: 50%; /* Position the line in the center of the screen vertically */
-  border-bottom: 0.5px solid #ccc; /* You can adjust the width, color, and style of the line here */
+  top: 50%;
+  /* Position the line in the center of the screen vertically */
+  border-bottom: 0.5px solid #ccc;
+  /* You can adjust the width, color, and style of the line here */
   z-index: 999;
 }

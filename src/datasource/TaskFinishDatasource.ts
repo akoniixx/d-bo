@@ -1,5 +1,5 @@
-import { TaskFinishListEntity, TaskReportListEntity } from "./../entities/TaskFinishEntities";
-import { BASE_URL, httpClient } from "../config/config";
+import { TaskFinishListEntity, TaskReportListEntity } from './../entities/TaskFinishEntities'
+import { BASE_URL, httpClient } from '../config/config'
 
 export class TaskFinishedDatasource {
   static getTaskFinishList(
@@ -30,25 +30,25 @@ export class TaskFinishedDatasource {
       applicationType: applicationType,
       sortDirection: sortDirection,
       sortField: sortField,
-      documentPersons:documentPersons
-    };
+      documentPersons: documentPersons,
+    }
     return httpClient
-      .get(BASE_URL + "/tasks/task-finish/get-all-task-finish", { params })
+      .get(BASE_URL + '/tasks/task-finish/get-all-task-finish', { params })
       .then((response) => {
-        return response.data;
+        return response.data
       })
       .catch((error) => {
-        console.log(error);
-      });
+        console.log(error)
+      })
   }
   static getDetailFinishTaskById(id: string): Promise<any> {
     return httpClient
       .get(`${BASE_URL}/tasks/task-finish/get-task-detail/${id}`)
       .then((res) => {
-        return res.data;
+        return res.data
       })
       .catch((err) => {
-        console.log(err);
-      });
+        console.log(err)
+      })
   }
 }

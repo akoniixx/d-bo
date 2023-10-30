@@ -1,21 +1,17 @@
-import { Button, Divider, Modal } from "antd";
-import React from "react";
-import { color } from "../../resource";
+import { Button, Divider, Modal } from 'antd'
+import React from 'react'
+import { color } from '../../resource'
 
 interface ModalDeleteCouponProps {
-  show: boolean;
-  backButton: () => void;
-  callBack: () => void;
+  show: boolean
+  backButton: () => void
+  callBack: () => void
 }
 
-const ModalDeleteCoupon: React.FC<ModalDeleteCouponProps> = ({
-  show,
-  backButton,
-  callBack,
-}) => {
+const ModalDeleteCoupon: React.FC<ModalDeleteCouponProps> = ({ show, backButton, callBack }) => {
   return (
     <Modal
-      title="ยืนยันการลบ"
+      title='ยืนยันการลบ'
       onCancel={backButton}
       open={show}
       footer={null}
@@ -23,20 +19,18 @@ const ModalDeleteCoupon: React.FC<ModalDeleteCouponProps> = ({
         padding: 0,
       }}
     >
-      <div className="px-4 pt-4">
-        <span className="text-secondary">
+      <div className='px-4 pt-4'>
+        <span className='text-secondary'>
           โปรดตรวจสอบคูปองที่คุณต้องการลบ ก่อนที่จะกดยืนยันการลบ
         </span>
-        <p className="text-secondary">
-          เพราะอาจส่งผลต่อการจ้างงานและโปรโมชั่นในระบบ
-        </p>
+        <p className='text-secondary'>เพราะอาจส่งผลต่อการจ้างงานและโปรโมชั่นในระบบ</p>
       </div>
       <Divider
         style={{
-          marginBottom: "20px",
+          marginBottom: '20px',
         }}
       />
-      <div className="d-flex justify-content-between px-4 pb-4">
+      <div className='d-flex justify-content-between px-4 pb-4'>
         <Button
           style={{
             borderColor: color.Error,
@@ -58,7 +52,7 @@ const ModalDeleteCoupon: React.FC<ModalDeleteCouponProps> = ({
         </Button>
       </div>
     </Modal>
-  );
-};
+  )
+}
 
-export default ModalDeleteCoupon;
+export default ModalDeleteCoupon

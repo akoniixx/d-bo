@@ -1,48 +1,49 @@
-import { BASE_URL, httpClient } from "../config/config";
-import { AddressEntity, CreateAddressEntity } from "../entities/AddressEntities";
-import { DronerByAddressEntity } from "../entities/DronerEntities";
+import { BASE_URL, httpClient } from '../config/config'
+import { AddressEntity, CreateAddressEntity } from '../entities/AddressEntities'
+import { DronerByAddressEntity } from '../entities/DronerEntities'
 
 export class OtherAddressDatasource {
-  static async getDronerAddressByID(
-    id: string
-  ): Promise<DronerByAddressEntity> {
+  static async getDronerAddressByID(id: string): Promise<DronerByAddressEntity> {
     return httpClient
-      .get(BASE_URL + "/droner/droner-address/" + id)
+      .get(BASE_URL + '/droner/droner-address/' + id)
       .then((res) => {
-        return res.data;
+        return res.data
       })
       .catch((err) => {
-        console.log(err, "err getDronerAddressById");
-      });
+        console.log(err, 'err getDronerAddressById')
+      })
   }
   static async addOtherAddress(id: string, data: CreateAddressEntity): Promise<any> {
     return httpClient
-      .post(BASE_URL + "/droner/add-other-address/" + id, data)
+      .post(BASE_URL + '/droner/add-other-address/' + id, data)
       .then((res) => {
-        return res.data;
+        return res.data
       })
       .catch((err) => {
-        console.log(err, "err addDronerAddressById");
-      });
+        console.log(err, 'err addDronerAddressById')
+      })
   }
   static async updateOtherAddress(data: AddressEntity): Promise<any> {
     return httpClient
-      .patch(BASE_URL + "/droner/update-other-address/" + data.id, data)
+      .patch(BASE_URL + '/droner/update-other-address/' + data.id, data)
       .then((res) => {
-        return res.data;
+        return res.data
       })
       .catch((err) => {
-        console.log(err, "err addDronerAddressById");
-      });
+        console.log(err, 'err addDronerAddressById')
+      })
   }
   static async deleteOtherAddress(dronerId: string, otherAddressId: string): Promise<any> {
     return httpClient
-      .delete(BASE_URL + `/droner/delete-other-address?dronerId=${dronerId}&otherAddressId=${otherAddressId}`)
+      .delete(
+        BASE_URL +
+          `/droner/delete-other-address?dronerId=${dronerId}&otherAddressId=${otherAddressId}`,
+      )
       .then((res) => {
-        return res.data;
+        return res.data
       })
       .catch((err) => {
-        console.log(err, "err deleteOtherAddress");
-      });
+        console.log(err, 'err deleteOtherAddress')
+      })
   }
 }

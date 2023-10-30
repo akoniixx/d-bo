@@ -50,7 +50,7 @@
 }
 .zoom {
   padding: 50px;
-  transition: transform .2s;
+  transition: transform 0.2s;
   margin: 0 auto;
 }
 

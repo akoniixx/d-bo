@@ -1,17 +1,17 @@
-import { DeleteOutlined, StarFilled } from "@ant-design/icons";
-import { Avatar, Badge, Form, Modal, Row, Table } from "antd";
-import React, { useEffect, useState } from "react";
-import { TaskSearchDroner } from "../../../../entities/TaskSearchDroner";
-import { color } from "../../../../resource";
-import ActionButton from "../../../button/ActionButton";
-import { CardContainer } from "../../../card/CardContainer";
-import FooterPage from "../../../footer/FooterPage";
+import { DeleteOutlined, StarFilled } from '@ant-design/icons'
+import { Avatar, Badge, Form, Modal, Row, Table } from 'antd'
+import React, { useEffect, useState } from 'react'
+import { TaskSearchDroner } from '../../../../entities/TaskSearchDroner'
+import { color } from '../../../../resource'
+import ActionButton from '../../../button/ActionButton'
+import { CardContainer } from '../../../card/CardContainer'
+import FooterPage from '../../../footer/FooterPage'
 interface ModalSelectedDronerProps {
-  show: boolean;
-  backButton: () => void;
-  dataDroner: TaskSearchDroner[];
-  title: string;
-  callBack: (data: TaskSearchDroner[]) => void;
+  show: boolean
+  backButton: () => void
+  dataDroner: TaskSearchDroner[]
+  title: string
+  callBack: (data: TaskSearchDroner[]) => void
 }
 const ModalSelectedDroner: React.FC<ModalSelectedDronerProps> = ({
   show,
@@ -20,70 +20,66 @@ const ModalSelectedDroner: React.FC<ModalSelectedDronerProps> = ({
   title,
   callBack,
 }) => {
-  let checkDup = Array.from(new Set(dataDroner)).filter(
-    (x) => x.droner_id != ""
-  );
-  const [data, setData] = useState<TaskSearchDroner[]>(checkDup);
+  const checkDup = Array.from(new Set(dataDroner)).filter((x) => x.droner_id != '')
+  const [data, setData] = useState<TaskSearchDroner[]>(checkDup)
   const removeDroner = (e: any) => {
-    let d = data.filter((x) => x.droner_id != e.droner_id);
-    setData(d);
-  };
+    const d = data.filter((x) => x.droner_id != e.droner_id)
+    setData(d)
+  }
   const handelCallBack = () => {
-    callBack(data);
-  };
+    callBack(data)
+  }
 
   const columns = [
     {
-      title: "ชื่อนักบินโดรน",
-      width: "15%",
-      dataIndex: "fullname",
-      key: "fullname",
+      title: 'ชื่อนักบินโดรน',
+      width: '15%',
+      dataIndex: 'fullname',
+      key: 'fullname',
       render: (value: any, row: any, index: number) => {
         return {
           children: (
             <>
-              <span>{row.firstname + " " + row.lastname}</span>
+              <span>{row.firstname + ' ' + row.lastname}</span>
               <br />
               <span style={{ color: color.Grey }}></span>
             </>
           ),
-        };
+        }
       },
     },
     {
-      title: "เบอร์โทร",
-      dataIndex: "telephone_no",
-      key: "telephone_no",
+      title: 'เบอร์โทร',
+      dataIndex: 'telephone_no',
+      key: 'telephone_no',
     },
     {
-      title: "Rating",
-      dataIndex: "rating_avg",
-      key: "rating_avg",
+      title: 'Rating',
+      dataIndex: 'rating_avg',
+      key: 'rating_avg',
       render: (value: any, row: any, index: number) => {
         const checkRating = () => {
-          return row.rating_avg > 0 ? true : false;
-        };
+          return row.rating_avg > 0 ? true : false
+        }
         return {
           children: (
             <>
               {checkRating() && (
                 <Row>
-                  <div style={{ color: "#FFCA37", fontSize: "16px" }}>
+                  <div style={{ color: '#FFCA37', fontSize: '16px' }}>
                     <StarFilled />
                   </div>
-                  <span className="pt-2 ps-1">
-                    {parseFloat(row.rating_avg).toFixed(2)}
-                  </span>
+                  <span className='pt-2 ps-1'>{parseFloat(row.rating_avg).toFixed(2)}</span>
                 </Row>
               )}
             </>
           ),
-        };
+        }
       },
     },
     {
-      title: "ตำบล/อำเภอ/จังหวัด",
-      dataIndex: "subdistrict_name",
+      title: 'ตำบล/อำเภอ/จังหวัด',
+      dataIndex: 'subdistrict_name',
       render: (value: any, row: any, index: number) => {
         return {
           children: (
@@ -93,13 +89,13 @@ const ModalSelectedDroner: React.FC<ModalSelectedDronerProps> = ({
               {row.province_name && <span>{row.province_name}</span>}
             </>
           ),
-        };
+        }
       },
     },
     {
-      title: "ระยะทาง",
-      dataIndex: "distance",
-      key: "distance",
+      title: 'ระยะทาง',
+      dataIndex: 'distance',
+      key: 'distance',
       render: (value: any, row: any, index: number) => {
         return {
           children: (
@@ -107,66 +103,57 @@ const ModalSelectedDroner: React.FC<ModalSelectedDronerProps> = ({
               <span>{row.distance.toFixed(0)} km</span>
             </>
           ),
-        };
+        }
       },
     },
     {
-      title: "ยี่หัอ",
-      dataIndex: "role",
-      key: "role",
+      title: 'ยี่หัอ',
+      dataIndex: 'role',
+      key: 'role',
       render: (value: any, row: any, index: number) => {
         return {
           children: (
             <>
-              <Avatar
-                size={25}
-                src={row.logo_drone_brand}
-                style={{ marginRight: "5px" }}
-              />
+              <Avatar size={25} src={row.logo_drone_brand} style={{ marginRight: '5px' }} />
               {row.drone_brand}
               <br />
-              <p style={{ fontSize: "12px", color: color.Grey }}>
-                {row.count_drone > 1 && "(มากกว่า 1 ยี่หัอ)"}
+              <p style={{ fontSize: '12px', color: color.Grey }}>
+                {row.count_drone > 1 && '(มากกว่า 1 ยี่หัอ)'}
               </p>
             </>
           ),
-        };
+        }
       },
     },
     {
-      title: "สถานะ",
-      dataIndex: "droner_status",
-      key: "droner_status",
+      title: 'สถานะ',
+      dataIndex: 'droner_status',
+      key: 'droner_status',
       render: (value: any, row: any, index: number) => {
         return {
           children: (
             <>
               <span
                 style={{
-                  color:
-                    row.droner_status == "สะดวก" ? color.Success : color.Error,
+                  color: row.droner_status == 'สะดวก' ? color.Success : color.Error,
                 }}
               >
-                <Badge
-                  color={
-                    row.droner_status == "สะดวก" ? color.Success : color.Error
-                  }
-                />{" "}
+                <Badge color={row.droner_status == 'สะดวก' ? color.Success : color.Error} />{' '}
                 {row.droner_status}
                 <br />
               </span>
             </>
           ),
-        };
+        }
       },
     },
     {
-      title: "",
-      width: "7%",
+      title: '',
+      width: '7%',
       render: (value: any, row: any, index: number) => {
         return {
           children: (
-            <div className="d-flex flex-row justify-content-between">
+            <div className='d-flex flex-row justify-content-between'>
               <ActionButton
                 icon={<DeleteOutlined />}
                 color={color.Error}
@@ -174,10 +161,10 @@ const ModalSelectedDroner: React.FC<ModalSelectedDronerProps> = ({
               />
             </div>
           ),
-        };
+        }
       },
     },
-  ];
+  ]
 
   return (
     <>
@@ -185,8 +172,8 @@ const ModalSelectedDroner: React.FC<ModalSelectedDronerProps> = ({
         title={
           <div
             style={{
-              width: "100%",
-              cursor: "move",
+              width: '100%',
+              cursor: 'move',
             }}
           >
             {title}
@@ -209,14 +196,14 @@ const ModalSelectedDroner: React.FC<ModalSelectedDronerProps> = ({
               dataSource={data}
               columns={columns}
               pagination={false}
-              size="large"
-              tableLayout="fixed"
+              size='large'
+              tableLayout='fixed'
               rowKey={(data) => data.droner_id}
             />
           </CardContainer>
         </Form>
       </Modal>
     </>
-  );
-};
-export default ModalSelectedDroner;
+  )
+}
+export default ModalSelectedDroner
