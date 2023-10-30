@@ -10,4 +10,7 @@ export interface NewsEntities {
   pinAll: boolean
   pinMain: boolean
   file?: any
+  startDate?: string | null
+  endDate?: string | null
+  typeLaunch?: string | null
 }

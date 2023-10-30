@@ -148,6 +148,7 @@ export const STATUS_COUPON: any = {
   ACTIVE: 'ใช้งาน',
   DRAFTING: 'รอเปิดการใช้งาน',
   INACTIVE: 'ปิดการใช้งาน',
+  PENDING: 'รอเผยแพร่',
 }
 export const CAMPAINGTYPE: any = {
   MISSION_REWARD: 'ของรางวัล',
@@ -229,4 +230,15 @@ export const STATUS_SEARCH: any = {
   FIRST: '1-2 วัน',
   SECOND: '3-6 วัน',
   THIRD: '7 วันขึ้นไป',
+}
+
+export const STATUS_COLOR_POINT_MANUAL: any = {
+  คืน: color.Error,
+  ได้: color.Success,
+  รอ: color.Grey,
+}
+export const STATUS_POINT_MANUAL: any = {
+  คืน: 'คืนแต้ม',
+  ได้: 'ได้รับแต้ม',
+  รอ: 'รอรับแต้ม',
 }

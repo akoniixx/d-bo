@@ -85,6 +85,16 @@ const IndexPermission = lazy(() => import('./pages/permission/IndexPermission'))
 const EditPermission = lazy(() => import('./pages/permission/EditPermission'))
 const AddPermission = lazy(() => import('./pages/permission/AddPermission'))
 const PinNewsPage = lazy(() => import('./pages/news/PinNewsPage'))
+const IndexPointManual = lazy(() => import('./pages/pointManual/IndexPointManual'))
+const DetailPointManual = lazy(
+  () => import('./pages/pointManual/DetailPointManaul/DetailPointManual'),
+)
+const AddDetailPointManual = lazy(
+  () => import('./pages/pointManual/DetailPointManaul/AddDetailPointManual'),
+)
+const EditDetailPointManual = lazy(
+  () => import('./pages/pointManual/DetailPointManaul/EditDetailPointManual'),
+)
 
 const FallBack = () => {
   return (
@@ -191,6 +201,10 @@ const WebRoutes: React.FC<any> = () => {
             <Route path='/IndexPermission' element={<IndexPermission />} />
             <Route path='/EditPermission' element={<EditPermission />} />
             <Route path='/AddPermission' element={<AddPermission />} />
+            <Route path='/IndexPointManual' element={<IndexPointManual />} />
+            <Route path='/DetailPointManual' element={<DetailPointManual />} />
+            <Route path='/AddDetailPointManual' element={<AddDetailPointManual />} />
+            <Route path='/EditDetailPointManual' element={<EditDetailPointManual />} />
           </Route>
           <Route element={<PublicRoute />}>
             <Route index element={<AuthPage />} />

@@ -7,6 +7,8 @@ import { IconMenu, IconMenuActive } from './IconMenu'
 import { DownOutlined, UpOutlined } from '@ant-design/icons'
 
 import { useEffectOnce } from '../../hook/useEffectOnce'
+import { Image } from 'antd'
+import icon from '../../resource/icon'
 
 interface CollapseMenuProps {
   subLists: {
@@ -153,9 +155,13 @@ export const CollapseMenu: React.FC<CollapseMenuProps> = ({
             </div>
             <div style={{ paddingRight: '8px' }}>
               {checkPath !== path ? (
-                <DownOutlined style={{ fontSize: '14px' }} />
+                <Image src={icon.arrowDownMenu} preview={false} style={{ width: 14, height: 8 }} />
               ) : (
-                <UpOutlined style={{ fontSize: '14px' }} />
+                <Image
+                  src={icon.arrowUpYellowMenu}
+                  preview={false}
+                  style={{ width: 14, height: 8 }}
+                />
               )}
             </div>
           </>
@@ -202,9 +208,13 @@ export const CollapseMenu: React.FC<CollapseMenuProps> = ({
               }}
             >
               {checkPath !== path ? (
-                <DownOutlined style={{ fontSize: '14px' }} />
+                <Image src={icon.arrowDownMenu} preview={false} style={{ width: 14, height: 8 }} />
               ) : (
-                <UpOutlined style={{ fontSize: '14px', color: color.White }} />
+                <Image
+                  src={icon.arrowUpYellowMenu}
+                  preview={false}
+                  style={{ width: 14, height: 8 }}
+                />
               )}
             </div>
           </>
@@ -220,6 +230,7 @@ export const CollapseMenu: React.FC<CollapseMenuProps> = ({
             if (subList?.subMenu?.length > 0) {
               return (
                 <CollapseSubMenu
+                  key={idx}
                   subLists={subList.subMenu}
                   name={subList.name}
                   title={subList.title}

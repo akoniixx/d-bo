@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { BackIconButton } from '../../components/button/BackButton'
 import { useNavigate } from 'react-router-dom'
-import { Checkbox, Form, Input, Radio, Select, Tag } from 'antd'
+import { Checkbox, DatePicker, Form, Input, Radio, Select, Tag, TimePicker } from 'antd'
 import { CardHeaderPromotion } from '../../components/header/CardHeaderPromotion'
 import uploadImg from '../../resource/media/empties/upload_img_news.png'
 import { color } from '../../resource'
@@ -13,15 +13,15 @@ import FooterPage from '../../components/footer/FooterPage'
 import RenderNews from '../../components/mobile/RenderNews'
 import { NewsDatasource } from '../../datasource/NewsDatasource'
 import Swal from 'sweetalert2'
-import parse from 'html-react-parser'
-import { UploadImageDatasouce } from '../../datasource/UploadImageDatasource'
-import { DashboardLayout } from '../../components/layout/Layout'
 import { CampaignDatasource } from '../../datasource/CampaignDatasource'
+import moment from 'moment'
 const { Map } = require('immutable')
 const _ = require('lodash')
 
 function EditNewsPage() {
   const queryString = _.split(window.location.pathname, '=')
+  const quillRef = useRef<any>(null)
+  const dateFormat = 'DD/MM/YYYY'
   const profile = JSON.parse(localStorage.getItem('profile') || '{  }')
   const [imgProfile, setImgProfile] = useState<any>()
   const [status, setStatus] = useState<any>()
@@ -36,12 +36,16 @@ function EditNewsPage() {
   const [newsName, setNewsName] = useState<string>('')
   const [farmCountPoint, setFarmCountPoint] = useState<any>()
   const [droneCountPoint, setDroneCountPoint] = useState<any>()
+  const [typeLaunch, setTypeLaunch] = useState<string>('NON_ENDDATE')
   const [appPinMain, setAppPinMain] = useState<boolean>(false)
   const [appPinAll, setAppPinAll] = useState<boolean>(false)
   const [descriptionEditor, setDescriptionEditor] = useState<string | null>(null)
 
   const [createImgProfile, setCreateImgProfile] =
     useState<UploadImageEntity>(UploadImageEntity_INTI)
+
+  const [timerNews, setTimerNews] = useState<string>('')
+  const [showTimer, setShowTimer] = useState<boolean>(true)
   const [saveBtnDisable, setBtnSaveDisable] = useState<boolean>(false)
   const navigate = useNavigate()
   const [form] = Form.useForm()
@@ -149,8 +153,64 @@ function EditNewsPage() {
     setAppPinMain(e.target.checked)
   }
 
+  const handleTimer = (e: any) => {
+    setTimerNews(e.target.value)
+  }
+
+  const handleShowTimer = (e: any) => {
+    setShowTimer(e.target.value === 'ACTIVE')
+  }
+
+  const handleTypeLaunch = (e: any) => {
+    setTypeLaunch(e.target.value)
+  }
+
+  const disabledDateStart = (current: any) => {
+    let customDate = moment().format('YYYY-MM-DD')
+    return current && current < moment(customDate, 'YYYY-MM-DD')
+  }
+
+  const imageHandler = () => {
+    const input = document.createElement('input')
+    input.setAttribute('type', 'file')
+    input.setAttribute('accept', 'image/png')
+    input.click()
+
+    input.onchange = async () => {
+      const file = input?.files![0]
+      NewsDatasource.uploadNewsImageDescription(file).then((resImg) => {
+        setTimeout(() => {
+          const range = quillRef.current.getEditor().getSelection(true)
+          let quill = quillRef.current.getEditor()
+          quill.insertEmbed(range.index, 'image', resImg.url)
+          quill.formatText(range.index, 1, { width: `100%`, height: `200px` })
+        }, 2000)
+      })
+    }
+  }
+
+  const modulesNews = useMemo(
+    () => ({
+      toolbar: {
+        handlers: {
+          image: imageHandler,
+        },
+        container: [
+          ['bold', 'italic', 'link', 'image', 'video'],
+          [{ align: '' }, { align: 'center' }, { align: 'right' }],
+          [{ list: 'ordered' }, { list: 'bullet' }],
+        ],
+      },
+    }),
+    [],
+  )
+
   const onFieldsChange = () => {
-    const { newsName, newsDescription, newsStatus, applicationType, img } = form.getFieldsValue()
+    const quill = quillRef.current.getEditor()
+    const imgs = quill.container.querySelectorAll('img')
+    imgs.forEach((img: any) => img.classList.add('editor-img'))
+    const { newsName, newsDescription, newsStatus, applicationType, img, newsTimer } =
+      form.getFieldsValue()
     let fieldInfo = false
     let fieldapp = false
     let fieldimg = false
@@ -299,10 +359,24 @@ function EditNewsPage() {
         applicationType: res.application,
         pinAll: res.pinAll,
         pinMain: res.pinMain,
+        status: res.status,
         challenge:
           res.categoryNews === 'ALL' ? true : res.categoryNews === 'CHALLENGE' ? true : false,
         news: res.categoryNews === 'ALL' ? true : res.categoryNews === 'NEWS' ? true : false,
         createBy: res.createBy,
+        typeLaunch: res.typeLaunch,
+        startDate: !res.startDate
+          ? moment(new Date().toUTCString())
+          : moment(new Date(res.startDate).toUTCString()),
+        startTime: !res.startDate
+          ? moment(new Date().toUTCString())
+          : moment(new Date(res.startDate).toUTCString()),
+        endDate: !res.endDate
+          ? moment(new Date().toUTCString())
+          : moment(new Date(res.endDate).toUTCString()),
+        endTime: !res.endTime
+          ? moment(new Date().toUTCString())
+          : moment(new Date(res.endTime).toUTCString()),
       })
       setStatus(res.status)
       setNewsName(res.title)
@@ -312,11 +386,21 @@ function EditNewsPage() {
       setAppPinMain(res.pinMain)
       setAppPinAll(res.pinAll)
       setCategoryNews(res.categoryNews)
+      setTypeLaunch(res.typeLaunch)
       setChooseChallenge(
         res.categoryNews === 'ALL' ? true : res.categoryNews === 'CHALLENGE' ? true : false,
       )
       setChooseNews(res.categoryNews === 'ALL' ? true : res.categoryNews === 'NEWS' ? true : false)
+      setShowTimer(res.status === 'PENDING')
     })
+    if (quillRef.current) {
+      const quill = quillRef.current.getEditor()
+
+      quill.on('text-change', async () => {
+        const imgs = quill.container.querySelectorAll('img')
+        imgs.forEach((img: any) => img.classList.add('editor-img'))
+      })
+    }
   }, [])
   useEffect(() => {
     CampaignDatasource.getCampaignList(undefined, 'QUATA').then((res) => {
@@ -433,8 +517,9 @@ function EditNewsPage() {
                       theme='snow'
                       onChange={handleDescriptionEditor}
                       placeholder={'กรอกรายละเอียด'}
-                      modules={modules}
+                      modules={modulesNews}
                       formats={formats}
+                      ref={quillRef}
                     />
                   </Form.Item>
                 </div>
@@ -576,10 +661,121 @@ function EditNewsPage() {
                       },
                     ]}
                   >
-                    <Radio.Group className='d-flex flex-column'>
-                      <Radio value={'ACTIVE'}>ใช้งาน</Radio>
+                    <Radio.Group className='d-flex flex-column' onChange={handleShowTimer}>
+                      <Radio value={'ACTIVE'}>ใช้งาน (เผยแพร่ทันที)</Radio>
+                      <Radio value={'PENDING'}>
+                        รอเผยแพร่ (ตั้งวันและเวลา)
+                        <div
+                          className='d-flex flex-column'
+                          style={{ display: showTimer ? 'block' : 'none' }}
+                        >
+                          <div className='d-flex flex-row align-items-center'>
+                            <Form.Item
+                              name='typeLaunch'
+                              rules={[
+                                {
+                                  required: true,
+                                  message: 'กรุณาเลือกสถานะ',
+                                },
+                              ]}
+                              style={{ display: showTimer ? 'block' : 'none' }}
+                            >
+                              <Radio.Group
+                                style={{
+                                  display: 'flex',
+                                  flexFlow: 'row',
+                                }}
+                                defaultValue={'NON_ENDDATE'}
+                                onChange={handleTypeLaunch}
+                              >
+                                <Radio value={'NON_ENDDATE'}>ไม่มีวันเวลาสิ้นสุด</Radio>
+                                <Radio value={'IS_ENDDATE'}>มีกำหนดวันเวลาสิ้นสุด</Radio>
+                              </Radio.Group>
+                            </Form.Item>
+                          </div>
+                          <div className='d-flex'>
+                            <div>
+                              <label style={{ display: showTimer ? 'block' : 'none' }}>
+                                วันเริ่มต้น <span style={{ color: 'red' }}>*</span>
+                              </label>
+                              <div className='d-flex flex-row'>
+                                <Form.Item
+                                  name='startDate'
+                                  style={{ display: showTimer ? 'block' : 'none' }}
+                                >
+                                  <DatePicker
+                                    placeholder='เลือกวันที่'
+                                    format={dateFormat}
+                                    disabledDate={disabledDateStart}
+                                    onChange={() => {}}
+                                  />
+                                </Form.Item>
+                                <Form.Item
+                                  name='startTime'
+                                  style={{ display: showTimer ? 'block' : 'none' }}
+                                >
+                                  <TimePicker
+                                    format={'HH:mm'}
+                                    className='ms-3'
+                                    placeholder='เลือกเวลา'
+                                    allowClear={false}
+                                  />
+                                </Form.Item>
+                              </div>
+                            </div>
+                            <div className='mx-4'>
+                              <label
+                                style={{
+                                  display: showTimer
+                                    ? typeLaunch === 'IS_ENDDATE'
+                                      ? 'block'
+                                      : 'none'
+                                    : 'none',
+                                }}
+                              >
+                                วันสิ้นสุด <span style={{ color: 'red' }}>*</span>
+                              </label>
+                              <div className='d-flex flex-row'>
+                                <Form.Item
+                                  name='endDate'
+                                  style={{
+                                    display: showTimer
+                                      ? typeLaunch === 'IS_ENDDATE'
+                                        ? 'block'
+                                        : 'none'
+                                      : 'none',
+                                  }}
+                                >
+                                  <DatePicker
+                                    placeholder='เลือกวันที่'
+                                    format={dateFormat}
+                                    disabledDate={disabledDateStart}
+                                    onChange={() => {}}
+                                  />
+                                </Form.Item>
+                                <Form.Item
+                                  name='endTime'
+                                  style={{
+                                    display: showTimer
+                                      ? typeLaunch === 'IS_ENDDATE'
+                                        ? 'block'
+                                        : 'none'
+                                      : 'none',
+                                  }}
+                                >
+                                  <TimePicker
+                                    format={'HH:mm'}
+                                    className='ms-3'
+                                    placeholder='เลือกเวลา'
+                                    allowClear={false}
+                                  />
+                                </Form.Item>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </Radio>
                       <Radio value={'DRAFTING'}>รอเปิดใช้งาน</Radio>
-                      <Radio value={'INACTIVE'}>ปิดการใช้งาน</Radio>
                     </Radio.Group>
                   </Form.Item>
                 </div>

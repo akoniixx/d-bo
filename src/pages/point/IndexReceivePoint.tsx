@@ -37,7 +37,6 @@ const IndexReceivePoint = () => {
       searchType,
     )
       .then((res) => {
-        console.log(res)
         const mapKey = res.history.map((x, i) => ({
           ...x,
           key: i + 1,
@@ -160,17 +159,15 @@ const IndexReceivePoint = () => {
               <Row>
                 <Col span={11}>
                   <label>ชื่อเกษตรกร : </label>{' '}
-                  <span>
+                  <u style={{ color: color.Success }}>
                     {checkFarmer.mission !== null
                       ? (checkFarmer.firstname + ' ' + checkFarmer.lastname).length > 20 &&
                         checkFarmer.mission === null
                         ? (checkFarmer.firstname + ' ' + checkFarmer.lastname).substring(0, 20)
                         : checkFarmer.firstname + ' ' + checkFarmer.lastname
                       : checkFarmer.firstname + ' ' + checkFarmer.lastname}
-                    {checkFarmer.nickname && (
-                      <ShowNickName data={checkFarmer.nickname} menu='INFO' />
-                    )}
-                  </span>
+                  </u>
+                  {checkFarmer.nickname && <ShowNickName data={checkFarmer.nickname} menu='INFO' />}
                 </Col>
                 <Col span={8}>
                   <label>เบอร์โทร : </label> <span>{checkFarmer.telephoneNo}</span>
@@ -216,16 +213,20 @@ const IndexReceivePoint = () => {
               <Row>
                 <Col span={11}>
                   <label>ชื่อนักบินโดรน :</label>{' '}
-                  <span>
+                  <u style={{ color: color.Warning }}>
                     {(checkDroner.firstname + ' ' + checkDroner.lastname).length > 20 &&
                     checkDroner.mission === null
                       ? (checkDroner.firstname + ' ' + checkDroner.lastname).substring(0, 20) +
                         '...'
                       : checkDroner.firstname + ' ' + checkDroner.lastname}
-                    {checkDroner.nickname && (
-                      <ShowNickName data={checkDroner.nickname} menu='INFO' />
-                    )}
-                  </span>
+                  </u>
+                  {checkDroner.nickname && (
+                    <ShowNickName
+                      data={checkDroner.nickname}
+                      menu='INFO'
+                      colorTooltip={color.Warning}
+                    />
+                  )}
                 </Col>
                 <Col span={8}>
                   <label>เบอร์โทร :</label> <span>{checkDroner.telephoneNo}</span>
@@ -284,7 +285,6 @@ const IndexReceivePoint = () => {
     {
       title: 'Point No',
       dataIndex: 'pointNo',
-      width: '20%',
       render: (value: any, row: any, index: number) => {
         return {
           children: <span>{row.pointNo}</span>,
@@ -294,7 +294,6 @@ const IndexReceivePoint = () => {
     {
       title: 'Task No',
       dataIndex: 'taskNo',
-      width: '20%',
       render: (value: any, row: any, index: number) => {
         return {
           children: <u style={{ color: color.Success }}>{row.taskNo}</u>,
@@ -304,7 +303,6 @@ const IndexReceivePoint = () => {
     {
       title: 'Mission No',
       dataIndex: 'missionId',
-      width: '20%',
       render: (value: any, row: any, index: number) => {
         return {
           children:
@@ -333,8 +331,16 @@ const IndexReceivePoint = () => {
       },
     },
     {
+      title: 'ชื่อรายการแต้มพิเศษ',
+      dataIndex: '',
+      render: (value: any, row: any, index: number) => {
+        return {
+          children: <span>-</span>,
+        }
+      },
+    },
+    {
       title: 'ประเภทการได้รับแต้ม',
-      width: '20%',
       render: (value: any, row: any, index: number) => {
         return {
           children: (

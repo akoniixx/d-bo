@@ -111,6 +111,12 @@ export const pathLists = (isAccounting: boolean, isAdminTask?: boolean) => {
               title: 'ข่าวสารไฮไลท์',
               subMenu: [],
             },
+            {
+              path: "/IndexPointManual",
+              name: "IndexPointManual",
+              title: "รายการแต้มพิเศษ",
+              subMenu: [],
+            },
           ],
         },
         {

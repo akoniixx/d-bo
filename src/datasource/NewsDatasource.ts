@@ -46,7 +46,6 @@ export class NewsDatasource {
       })
       .catch((err) => console.log(err))
   }
-
   static getNews(
     limit: number,
     offset: number,
@@ -109,6 +108,38 @@ export class NewsDatasource {
       .catch((err) => console.log(err))
   }
 
+  static deleteNews(id: string, path: string) {
+    return httpClient
+      .delete(BASE_URL + `/promotion/news/delete?id=${id}&path=${path}`)
+      .then((res) => {
+        return res.data
+      })
+      .catch((err) => console.log(err))
+  }
+  static checkCountPoint(app: string) {
+    return httpClient
+      .get(BASE_URL + `/promotion/news/check-count-pin?application=${app}`)
+      .then((res) => {
+        return res.data
+      })
+      .catch((err) => console.log(err))
+  }
+  static async getPinNews(app: 'DRONER' | 'FARMER' | 'ALL') {
+    return httpClient
+      .get(BASE_URL + `/promotion/news/find-all-pin?application=${app}`)
+      .then((res) => {
+        return res.data
+      })
+      .catch((err) => console.log(err))
+  }
+  static async postPinNews(payload: PayloadPinNews) {
+    return httpClient
+      .post(BASE_URL + `/promotion/news/pin-news`, payload)
+      .then((res) => {
+        return res.data
+      })
+      .catch((err) => console.log(err))
+  }
   static editNews(data: NewsEntities) {
     const formData = new FormData()
     if (!data.file) {
@@ -141,33 +172,11 @@ export class NewsDatasource {
       .catch((err) => console.log(err))
   }
 
-  static deleteNews(id: string, path: string) {
+  static uploadNewsImageDescription(file: any) {
+    const formData = new FormData()
+    formData.append('file', file)
     return httpClient
-      .delete(BASE_URL + `/promotion/news/delete?id=${id}&path=${path}`)
-      .then((res) => {
-        return res.data
-      })
-      .catch((err) => console.log(err))
-  }
-  static checkCountPoint(app: string) {
-    return httpClient
-      .get(BASE_URL + `/promotion/news/check-count-pin?application=${app}`)
-      .then((res) => {
-        return res.data
-      })
-      .catch((err) => console.log(err))
-  }
-  static async getPinNews(app: 'DRONER' | 'FARMER' | 'ALL') {
-    return httpClient
-      .get(BASE_URL + `/promotion/news/find-all-pin?application=${app}`)
-      .then((res) => {
-        return res.data
-      })
-      .catch((err) => console.log(err))
-  }
-  static async postPinNews(payload: PayloadPinNews) {
-    return httpClient
-      .post(BASE_URL + `/promotion/news/pin-news`, payload)
+      .post(BASE_URL + '/promotion/news/upload-news-image-description', formData)
       .then((res) => {
         return res.data
       })

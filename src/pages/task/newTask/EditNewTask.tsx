@@ -13,7 +13,6 @@ import {
   Popover,
   Radio,
   Row,
-  Select,
   Slider,
   Space,
   Steps,
@@ -21,6 +20,8 @@ import {
   TimePicker,
   Tooltip,
 } from 'antd'
+import { Select as AntdSelect } from 'antd'
+import Select, { Props as SelectProps } from 'react-select'
 import TextArea from 'antd/lib/input/TextArea'
 import { RowSelectionType } from 'antd/lib/table/interface'
 import moment, { utc } from 'moment'
@@ -88,7 +89,7 @@ const dateCreateFormat = 'YYYY-MM-DD'
 const timeFormat = 'HH:mm'
 const timeCreateFormat = 'HH:mm:ss'
 
-const { Option } = Select
+const { Option } = AntdSelect
 const { Step } = Steps
 
 const _ = require('lodash')
@@ -129,7 +130,7 @@ const EditNewTask = () => {
 
   const [periodSpray, setPeriodSpray] = useState<CropPurposeSprayEntity>()
   const [selectionType] = useState<RowSelectionType>('checkbox')
-
+  const [rowFarmer, setRowFarmer] = useState(10)
   const [dataDronerList, setDataDronerList] = useState<TaskSearchDroner[]>([TaskSearchDroner_INIT])
   const [dronerSelectedList, setDronerSelectedList] = useState<TaskDronerTempEntity[]>([
     TaskDronerTempEntity_INIT,
@@ -193,7 +194,7 @@ const EditNewTask = () => {
   useEffect(() => {
     fetchNewTask()
     fetchFarmerList()
-  }, [])
+  }, [currenSearch, rowFarmer])
 
   useEffect(() => {
     TaskDatasource.getFarmerListTask(searchFilterFarmer, currenSearch, 10).then(
@@ -212,29 +213,8 @@ const EditNewTask = () => {
   }, [searchFilterFarmer])
 
   // #region step 1
-  // const fetchFarmerList = async () => {
-  //   await TaskDatasource.getFarmerListTask("", currenSearch, 0).then((res) => {
-  //     if (res) {
-  //       setFarmerList(res.data);
-  //       if (twice.current) {
-  //         for (let i = 0; i < res.count; ++i) {
-  //           options.push({
-  //             value: res.data.map((item) => item.id)[i],
-  //             label: res.data.map((item) => item.firstname + " " + item.lastname)[i],
-  //             tel: res.data.map((item) => item.telephoneNo)[i],
-  //             idNo: res.data.map((item) => item.idNo)[i],
-  //           });
-  //         }
-  //         twice.current = false;
-  //         setCurrentSearch(currenSearch + 1);
-  //       } else {
-  //         twice.current = true;
-  //       }
-  //     }
-  //   });
-  // };
   const fetchFarmerList = () => {
-    TaskDatasource.getFarmerListTask(searchFilterFarmer, currenSearch, 10).then(
+    TaskDatasource.getFarmerListTask(searchFilterFarmer, currenSearch, rowFarmer).then(
       (res: FarmerPageEntity) => {
         const data = res.data.map((item) => {
           return {
@@ -249,72 +229,22 @@ const EditNewTask = () => {
     )
   }
 
-  const onItemsRendered = (props: any) => {
-    if (props.visibleStopIndex >= farmerListDropdown.length - 1) {
-      if (farmerListDropdown.length < count) {
-        TaskDatasource.getFarmerListTask(searchFilterFarmer, currenSearch + 1, 10).then(
-          (res: FarmerPageEntity) => {
-            const data = res.data.map((item) => {
-              return {
-                ...item,
-                label: item.firstname + ' ' + item.lastname + ' | ' + item.telephoneNo,
-                value: item.id,
-              }
-            })
-            setCurrentSearch(currenSearch + 1)
-            setFarmerListDropdown([...farmerListDropdown, ...data])
-          },
-        )
-      }
+  const handleInputChange = (inputValue: any) => {
+    if (currenSearch === 1) {
+      setSearchFilterFarmer(inputValue)
+    }
+    return inputValue
+  }
+  const handleMenuScrollToBottom = () => {
+    if (rowFarmer === farmerListDropdown.length) {
+      setCurrentSearch(currenSearch)
+      setRowFarmer(rowFarmer + 10)
     }
   }
-
-  const sleep = (ms: number) =>
-    new Promise((resolve) => {
-      setTimeout(() => {
-        resolve(undefined)
-      }, ms)
-    })
-
-  const loadOptions = async (
-    search: string,
-    prevOptions: OptionsOrGroups<OptionType, GroupBase<OptionType>>,
-  ) => {
-    await sleep(1000)
-    let filteredName: OptionType[]
-
-    if (!search) {
-      filteredName = options
-    } else {
-      const searchLower = search.toLowerCase()
-      filteredName = options.filter(({ label, tel, idNo }: OptionType) => {
-        const lowerLabel = label.toLowerCase()
-        const lowerTel = tel ? tel.toLowerCase() : ''
-        const lowerIdNo = idNo ? idNo.toLowerCase() : ''
-        return (
-          lowerLabel.includes(searchLower) ||
-          lowerTel.includes(searchLower) ||
-          lowerIdNo.includes(searchLower)
-        )
-      })
-    }
-
-    const hasMore = filteredName.length > prevOptions.length + 10
-    const slicedOptions = filteredName.slice(prevOptions.length, prevOptions.length + 10)
-
-    return {
-      options: slicedOptions,
-      hasMore,
-    }
-  }
-
-  const wrappedLoadOptions = useCallback<typeof loadOptions>((...args) => {
-    return loadOptions(...args)
-  }, [])
 
   const handleSearchFarmer = (id: any) => {
     setSelectFarmer(id)
-    setFarmerSelected(farmerListDropdown.filter((x: any) => x.id === id)[0])
+    setFarmerSelected(id)
     setShowData(false)
   }
 
@@ -530,41 +460,19 @@ const EditNewTask = () => {
               <div className='row'>
                 <div className='form-group col-lg-6'>
                   <Form.Item name='searchAddress'>
-                    <InputPicker
-                      virtualized
-                      value={selectFarmer}
-                      onChange={handleSearchFarmer}
-                      listProps={{
-                        onItemsRendered,
-                      }}
-                      searchBy={(keyword: string, label, item) => true}
-                      onClean={() => {
-                        setCurrentSearch(1)
-                        setSearchFilterFarmer('')
-                        setDataFarmer(FarmerEntity_INIT)
-                        setFarmerPlotId('')
-                        setShowData(false)
-                      }}
-                      onSearch={(val) => {
-                        if (val) {
-                          setCurrentSearch(1)
-                          setSearchFilterFarmer(val)
-                        }
-                      }}
-                      style={{
-                        width: '100%',
-                      }}
-                      placeholder='ค้นหาชื่อนักบินโดรน/เบอร์โทร/เลขบัตรปชช.'
-                      data={farmerListDropdown}
-                    />
-                    {/* <AsyncPaginate
+                    <Select
+                      placeholder='ค้นหาชื่อเกษตรกร/เบอร์โทร.'
+                      isSearchable
                       isClearable
-                      debounceTimeout={300}
-                      loadOptions={wrappedLoadOptions}
-                      onChange={(e) => handleSearchFarmer(e)}
-                      placeholder="ค้นหาชื่อเกษตรกร/เบอร์โทร/เลขบัตรปชช."
-                      defaultOptions
-                    /> */}
+                      onInputChange={handleInputChange}
+                      onChange={(selectedOptions: any) => {
+                        setCurrentSearch(1)
+                        handleSearchFarmer(selectedOptions)
+                      }}
+                      options={farmerListDropdown}
+                      value={selectFarmer}
+                      onMenuScrollToBottom={handleMenuScrollToBottom}
+                    />
                   </Form.Item>
                 </div>
                 <div className='form-group col-lg-6'>
@@ -603,7 +511,7 @@ const EditNewTask = () => {
                   <div className='form-group col-lg-4'>
                     <label>แปลง</label>
                     <Form.Item>
-                      <Select
+                      <AntdSelect
                         status={checkSelectPlot}
                         placeholder='เลือกแปลง'
                         disabled={current == 2 || data.couponId ? true : false}
@@ -613,7 +521,7 @@ const EditNewTask = () => {
                         {dataFarmer?.farmerPlot.map((item) => (
                           <option value={item.id}>{item.plotName}</option>
                         ))}
-                      </Select>
+                      </AntdSelect>
                       {checkSelectPlot == 'error' && (
                         <span style={{ color: color.Error }}>กรุณาเลือกแปลง</span>
                       )}
@@ -881,7 +789,7 @@ const EditNewTask = () => {
               ช่วงเวลาการพ่น <span style={{ color: 'red' }}>*</span>
             </label>
             <Form.Item>
-              <Select
+              <AntdSelect
                 key={data?.purposeSprayId}
                 placeholder='-'
                 disabled={
@@ -897,7 +805,7 @@ const EditNewTask = () => {
                 ) : (
                   <Option>-</Option>
                 )}
-              </Select>
+              </AntdSelect>
             </Form.Item>
           </div>
           <div className='row form-group col-lg-6 p-2'>
@@ -1319,7 +1227,7 @@ const EditNewTask = () => {
         </Dropdown>
       </div>
       <div className='col-lg-2'>
-        <Select
+        <AntdSelect
           allowClear
           className='col-lg-12 p-1'
           placeholder='เลือกสถานะ'
@@ -1327,7 +1235,7 @@ const EditNewTask = () => {
         >
           <option value='สะดวก'>สะดวก</option>
           <option value='ไม่สะดวก'>ไม่สะดวก</option>
-        </Select>
+        </AntdSelect>
       </div>
       <div className='col-lg-1 pt-1'>
         <Button

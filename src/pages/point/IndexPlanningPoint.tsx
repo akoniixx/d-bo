@@ -1,5 +1,5 @@
 import { InfoCircleFilled, SearchOutlined } from '@ant-design/icons'
-import { Button, Col, DatePicker, Input, Pagination, Row, Spin, Table, Tooltip } from 'antd'
+import { Button, Col, DatePicker, Input, Pagination, Row, Select, Spin, Table, Tooltip } from 'antd'
 import moment from 'moment'
 import React, { useEffect, useState } from 'react'
 import { Container } from 'react-bootstrap'
@@ -9,6 +9,7 @@ import { PlanningPointListEntity } from '../../entities/PointReceiveEntities'
 import { color } from '../../resource'
 import { DateTimeUtil } from '../../utilities/DateTimeUtil'
 import { numberWithCommas } from '../../utilities/TextFormatter'
+import ShowNickName from '../../components/popover/ShowNickName'
 const { RangePicker } = DatePicker
 const dateSearchFormat = 'YYYY-MM-DD'
 
@@ -22,6 +23,7 @@ const IndexPlanningPoint = () => {
   const [searchStartDate, setSearchStartDate] = useState<any>(null)
   const [searchEndDate, setSearchEndDate] = useState<any>(null)
   const [loading, setLoading] = useState(false)
+  const [searchType, setSearchType] = useState('')
 
   const fetchPlanningPoint = () => {
     setLoading(true)
@@ -111,6 +113,17 @@ const IndexPlanningPoint = () => {
             onChange={(e) => setSearchTask(e.target.value)}
           />
         </div>
+        <div className='col-lg-2'>
+          <Select
+            className='col-lg-12 p-1'
+            placeholder='ประเภทการได้รับแต้ม'
+            allowClear
+            onChange={(e) => setSearchType(e)}
+          >
+            <option value='JOB'>การจ้างงาน</option>
+            <option value='MISSION'>ภารกิจ</option>
+          </Select>
+        </div>
         <div className='pt-1'>
           <Button
             style={{
@@ -127,7 +140,6 @@ const IndexPlanningPoint = () => {
       </div>
     </>
   )
-
   const expandData = (record: any) => {
     const checkFarmer = record.farmer
     const checkDroner = record.droner
@@ -148,6 +160,9 @@ const IndexPlanningPoint = () => {
                   <span style={{ color: color.Success }}>
                     <u>{checkFarmer[0].first_name + ' ' + checkFarmer[0].last_name}</u>
                   </span>
+                  {checkFarmer[0].nickname && (
+                    <ShowNickName data={checkFarmer[0].nickname} menu='INFO' />
+                  )}
                 </Col>
                 <Col span={7}>
                   <label>เบอร์ : </label> <span>{checkFarmer[0].telephone_no}</span>
@@ -197,6 +212,13 @@ const IndexPlanningPoint = () => {
                       {checkDroner[0].first_name + ' ' + checkDroner[0].last_name}
                     </u>
                   </span>
+                  {checkDroner[0].nickname && (
+                    <ShowNickName
+                      data={checkDroner[0].nickname}
+                      menu='INFO'
+                      colorTooltip={color.Warning}
+                    />
+                  )}
                 </Col>
                 <Col span={7}>
                   <label>เบอร์ :</label> <span>{checkDroner[0].telephone_no}</span>
@@ -252,10 +274,19 @@ const IndexPlanningPoint = () => {
     {
       title: 'Task No',
       dataIndex: 'task_no',
-      width: '40%',
+      width: '25%',
       render: (value: any, row: any, index: number) => {
         return {
           children: <u style={{ color: color.Success }}>{row.task_no}</u>,
+        }
+      },
+    },
+    {
+      title: 'ชื่อรายการแต้มพิเศษ',
+      dataIndex: '',
+      render: (value: any, row: any, index: number) => {
+        return {
+          children: <span>-</span>,
         }
       },
     },

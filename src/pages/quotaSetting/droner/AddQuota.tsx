@@ -54,6 +54,7 @@ function AddQuota() {
   const [createImgButton, setCreateImgButton] = useState<UploadImageEntity>(UploadImageEntity_INTI)
   const [createImgTableLucky, setCreateImgTableLucky] =
     useState<UploadImageEntity>(UploadImageEntity_INTI)
+  const [saveBtnDisable, setBtnSaveDisable] = useState<boolean>(true)
 
   const [checkDup, setCheckDup] = useState(false)
   const [rewardRound, setRewardRound] = useState<{ index: number; dateRound: string }[]>([
@@ -103,6 +104,7 @@ function AddQuota() {
   }
   const onRemoveImg = () => {
     setImgCover(undefined)
+    setBtnSaveDisable(true)
     setCreateImgCover(UploadImageEntity_INTI)
   }
   const onChangeImgButton = async (e: any) => {
@@ -179,12 +181,15 @@ function AddQuota() {
   }
   const onRemoveImgReward = () => {
     setImgReward(undefined)
+    setBtnSaveDisable(true)
   }
   const onRemoveImgButton = () => {
     setImgButton(undefined)
+    setBtnSaveDisable(true)
   }
   const onRemoveImgTableLucky = () => {
     setImgTableLucky(undefined)
+    setBtnSaveDisable(true)
   }
   const disabledDateChange = (current: any) => {
     const getValueDate = form.getFieldsValue()
@@ -360,7 +365,54 @@ function AddQuota() {
       },
     },
   ]
+  const onFieldsChange = () => {
+    const {
+      imgCover,
+      imgButton,
+      imgReward,
+      imgTableLucky,
+      campaignName,
+      description,
+      rewardName,
+      startDate,
+      endDate,
+      rai,
+      rulesCampaign,
+      status,
+    } = form.getFieldsValue()
+    let fieldErr: boolean = true
+    const sTable = form.getFieldsValue()
+    const value = rewardRound.map((y: any, i: number) => {
+      return {
+        ...y,
+        index: i + 1,
+        dateRound: sTable[`${y.index}_roundDate`],
+      }
+    })
+    if (
+      imgCover &&
+      imgButton &&
+      imgReward &&
+      imgTableLucky &&
+      campaignName &&
+      description &&
+      rewardName &&
+      startDate &&
+      endDate &&
+      !checkDup &&
+      rai &&
+      rulesCampaign &&
+      status &&
+      value.length > 0 &&
+      value.map((i) => i.dateRound)[0]
+    ) {
+      fieldErr = false
+    } else {
+      fieldErr = true
+    }
 
+    setBtnSaveDisable(fieldErr)
+  }
   const onSubmit = async () => {
     await form.validateFields()
     const f = form.getFieldsValue()
@@ -417,18 +469,10 @@ function AddQuota() {
   const renderData = (
     <CardContainer>
       <CardHeader textHeader='ข้อมูลชาเลนจ์' />
-      <Form form={form} className='p-5'>
+      <Form form={form} className='p-5' onFieldsChange={onFieldsChange}>
         <div className='row'>
           <div className='form-group text-center pt-2'>
-            <Form.Item
-              name='imgCover'
-              rules={[
-                {
-                  required: true,
-                  message: 'กรุณาใส่รูปภาพ!',
-                },
-              ]}
-            >
+            <Form.Item name='imgCover'>
               <div
                 className='hiddenFileInputQuota'
                 style={{
@@ -523,58 +567,60 @@ function AddQuota() {
           <p className='text-muted pt-1'>
             *รูปภาพจะต้องขนาด 490px * 294px เท่านั้น เพื่อความสวยงามของภาพในแอปพลิเคชัน*
           </p>
-          <div className='form-group col-lg-12'>
-            <div className='p-2'>
-              <Row
+          <Form.Item name='imgButton'>
+            <div className='form-group col-lg-12'>
+              <div className='p-2'>
+                <Row
+                  style={{
+                    border: imgButton && 'dotted',
+                    borderWidth: imgButton && 0.5,
+                    borderRadius: imgButton && '8px',
+                    width: imgButton && '100%',
+                    height: imgButton && 90,
+                    paddingLeft: imgButton && 5,
+                  }}
+                  gutter={8}
+                >
+                  <Col span={4} className='align-self-center'>
+                    <span
+                      style={{
+                        backgroundImage: `url(${imgButton})`,
+                        display: imgButton != undefined ? 'block' : 'none',
+                        width: '65px',
+                        height: '65px',
+                        overflow: 'hidden',
+                        backgroundRepeat: 'no-repeat',
+                        backgroundPosition: 'center',
+                        backgroundSize: '100%',
+                      }}
+                    />
+                  </Col>
+                  <Col span={18} className='align-self-center'>
+                    <span>{imgButton && createImgButton.file.name}</span>
+                  </Col>
+                  <Col span={2} className='align-self-center'>
+                    <span>
+                      {imgButton && (
+                        <DeleteOutlined
+                          style={{ fontSize: 20, color: color.Error }}
+                          onClick={onRemoveImgButton}
+                        />
+                      )}
+                    </span>
+                  </Col>
+                </Row>
+              </div>
+              <div
+                className='hiddenFileBtn'
                 style={{
-                  border: imgButton && 'dotted',
-                  borderWidth: imgButton && 0.5,
-                  borderRadius: imgButton && '8px',
-                  width: imgButton && '100%',
-                  height: imgButton && 90,
-                  paddingLeft: imgButton && 5,
+                  backgroundImage: `url(${image.upload_Img_btn})`,
+                  display: imgButton == undefined ? 'block' : 'none',
                 }}
-                gutter={8}
               >
-                <Col span={4} className='align-self-center'>
-                  <span
-                    style={{
-                      backgroundImage: `url(${imgButton})`,
-                      display: imgButton != undefined ? 'block' : 'none',
-                      width: '65px',
-                      height: '65px',
-                      overflow: 'hidden',
-                      backgroundRepeat: 'no-repeat',
-                      backgroundPosition: 'center',
-                      backgroundSize: '100%',
-                    }}
-                  />
-                </Col>
-                <Col span={18} className='align-self-center'>
-                  <span>{imgButton && createImgButton.file.name}</span>
-                </Col>
-                <Col span={2} className='align-self-center'>
-                  <span>
-                    {imgButton && (
-                      <DeleteOutlined
-                        style={{ fontSize: 20, color: color.Error }}
-                        onClick={onRemoveImgButton}
-                      />
-                    )}
-                  </span>
-                </Col>
-              </Row>
+                <input key={imgButton} type='file' onChange={onChangeImgButton} title='เลือกรูป' />
+              </div>
             </div>
-            <div
-              className='hiddenFileBtn'
-              style={{
-                backgroundImage: `url(${image.upload_Img_btn})`,
-                display: imgButton == undefined ? 'block' : 'none',
-              }}
-            >
-              <input key={imgButton} type='file' onChange={onChangeImgButton} title='เลือกรูป' />
-            </div>
-          </div>
+          </Form.Item>
         </div>
         <Divider />
         <div className='form-group col-lg-12'>
@@ -607,58 +653,60 @@ function AddQuota() {
             *รูปภาพจะต้องมีสัดส่วน 1:1 ขนาด 500px * 500px เท่านั้น
             เพื่อความสวยงามของภาพในแอปพลิเคชัน*
           </p>
-          <div className='form-group col-lg-12'>
-            <div className='p-2'>
-              <Row
+          <Form.Item name='imgReward'>
+            <div className='form-group col-lg-12'>
+              <div className='p-2'>
+                <Row
+                  style={{
+                    border: imgReward && 'dotted',
+                    borderWidth: imgReward && 0.5,
+                    borderRadius: imgReward && '8px',
+                    width: imgReward && '100%',
+                    height: imgReward && 90,
+                    paddingLeft: imgReward && 5,
+                  }}
+                  gutter={8}
+                >
+                  <Col span={4} className='align-self-center'>
+                    <span
+                      style={{
+                        backgroundImage: `url(${imgReward})`,
+                        display: imgReward != undefined ? 'block' : 'none',
+                        width: '65px',
+                        height: '65px',
+                        overflow: 'hidden',
+                        backgroundRepeat: 'no-repeat',
+                        backgroundPosition: 'center',
+                        backgroundSize: '100%',
+                      }}
+                    />
+                  </Col>
+                  <Col span={18} className='align-self-center'>
+                    <span>{imgReward && createImgReward.file.name}</span>
+                  </Col>
+                  <Col span={2} className='align-self-center'>
+                    <span>
+                      {imgReward && (
+                        <DeleteOutlined
+                          style={{ fontSize: 20, color: color.Error }}
+                          onClick={onRemoveImgReward}
+                        />
+                      )}
+                    </span>
+                  </Col>
+                </Row>
+              </div>
+              <div
+                className='hiddenFileBtn'
                 style={{
-                  border: imgReward && 'dotted',
-                  borderWidth: imgReward && 0.5,
-                  borderRadius: imgReward && '8px',
-                  width: imgReward && '100%',
-                  height: imgReward && 90,
-                  paddingLeft: imgReward && 5,
+                  backgroundImage: `url(${image.upload_Img_btn})`,
+                  display: imgReward == undefined ? 'block' : 'none',
                 }}
-                gutter={8}
               >
-                <Col span={4} className='align-self-center'>
-                  <span
-                    style={{
-                      backgroundImage: `url(${imgReward})`,
-                      display: imgReward != undefined ? 'block' : 'none',
-                      width: '65px',
-                      height: '65px',
-                      overflow: 'hidden',
-                      backgroundRepeat: 'no-repeat',
-                      backgroundPosition: 'center',
-                      backgroundSize: '100%',
-                    }}
-                  />
-                </Col>
-                <Col span={18} className='align-self-center'>
-                  <span>{imgReward && createImgReward.file.name}</span>
-                </Col>
-                <Col span={2} className='align-self-center'>
-                  <span>
-                    {imgReward && (
-                      <DeleteOutlined
-                        style={{ fontSize: 20, color: color.Error }}
-                        onClick={onRemoveImgReward}
-                      />
-                    )}
-                  </span>
-                </Col>
-              </Row>
+                <input key={imgReward} type='file' onChange={onChangeImgReward} title='เลือกรูป' />
+              </div>
             </div>
-            <div
-              className='hiddenFileBtn'
-              style={{
-                backgroundImage: `url(${image.upload_Img_btn})`,
-                display: imgReward == undefined ? 'block' : 'none',
-              }}
-            >
-              <input key={imgReward} type='file' onChange={onChangeImgReward} title='เลือกรูป' />
-            </div>
-          </div>
+          </Form.Item>
         </div>
         <Divider />
         <div className='row'>
@@ -820,63 +868,65 @@ function AddQuota() {
             *รูปภาพจะต้องมีสัดส่วน 1:1 ขนาด 1200px * 1200px เท่านั้น
             เพื่อความสวยงามของภาพในแอปพลิเคชัน*{' '}
           </p>
-          <div className='form-group col-lg-12'>
-            <div className='p-2'>
-              <Row
+          <Form.Item name='imgTableLucky'>
+            <div className='form-group col-lg-12'>
+              <div className='p-2'>
+                <Row
+                  style={{
+                    border: imgTableLucky && 'dotted',
+                    borderWidth: imgTableLucky && 0.5,
+                    borderRadius: imgTableLucky && '8px',
+                    width: imgTableLucky && '100%',
+                    height: imgTableLucky && 90,
+                    paddingLeft: imgTableLucky && 5,
+                  }}
+                  gutter={8}
+                >
+                  <Col span={4} className='align-self-center'>
+                    <span
+                      style={{
+                        backgroundImage: `url(${imgTableLucky})`,
+                        display: imgTableLucky != undefined ? 'block' : 'none',
+                        width: '65px',
+                        height: '65px',
+                        overflow: 'hidden',
+                        backgroundRepeat: 'no-repeat',
+                        backgroundPosition: 'center',
+                        backgroundSize: '100%',
+                      }}
+                    />
+                  </Col>
+                  <Col span={18} className='align-self-center'>
+                    <span>{imgTableLucky && createImgTableLucky.file.name}</span>
+                  </Col>
+                  <Col span={2} className='align-self-center'>
+                    <span>
+                      {imgTableLucky && (
+                        <DeleteOutlined
+                          style={{ fontSize: 20, color: color.Error }}
+                          onClick={onRemoveImgTableLucky}
+                        />
+                      )}
+                    </span>
+                  </Col>
+                </Row>
+              </div>
+              <div
+                className='hiddenFileBtn'
                 style={{
-                  border: imgTableLucky && 'dotted',
-                  borderWidth: imgTableLucky && 0.5,
-                  borderRadius: imgTableLucky && '8px',
-                  width: imgTableLucky && '100%',
-                  height: imgTableLucky && 90,
-                  paddingLeft: imgTableLucky && 5,
+                  backgroundImage: `url(${image.upload_Img_btn})`,
+                  display: imgTableLucky == undefined ? 'block' : 'none',
                 }}
-                gutter={8}
               >
-                <Col span={4} className='align-self-center'>
-                  <span
-                    style={{
-                      backgroundImage: `url(${imgTableLucky})`,
-                      display: imgTableLucky != undefined ? 'block' : 'none',
-                      width: '65px',
-                      height: '65px',
-                      overflow: 'hidden',
-                      backgroundRepeat: 'no-repeat',
-                      backgroundPosition: 'center',
-                      backgroundSize: '100%',
-                    }}
-                  />
-                </Col>
-                <Col span={18} className='align-self-center'>
-                  <span>{imgTableLucky && createImgTableLucky.file.name}</span>
-                </Col>
-                <Col span={2} className='align-self-center'>
-                  <span>
-                    {imgTableLucky && (
-                      <DeleteOutlined
-                        style={{ fontSize: 20, color: color.Error }}
-                        onClick={onRemoveImgTableLucky}
-                      />
-                    )}
-                  </span>
-                </Col>
-              </Row>
+                <input
+                  key={imgTableLucky}
+                  type='file'
+                  onChange={onChangeImgTableLucky}
+                  title='เลือกรูป'
+                />
+              </div>
             </div>
-            <div
-              className='hiddenFileBtn'
-              style={{
-                backgroundImage: `url(${image.upload_Img_btn})`,
-                display: imgTableLucky == undefined ? 'block' : 'none',
-              }}
-            >
-              <input
-                key={imgTableLucky}
-                type='file'
-                onChange={onChangeImgTableLucky}
-                title='เลือกรูป'
-              />
-            </div>
-          </div>
+          </Form.Item>
         </div>
         <br />
         <div className='form-group col-lg-12'>
@@ -951,7 +1001,7 @@ function AddQuota() {
       </Row>
       <div className='pt-3 pb-3'>
         <FooterPage
-          //disableSaveBtn={saveBtnDisable}
+          disableSaveBtn={saveBtnDisable}
           styleFooter={{ padding: '6px' }}
           onClickBack={() => navigate(-1)}
           onClickSave={onSubmit}

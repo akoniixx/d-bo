@@ -8,9 +8,10 @@ interface ShowNickNameProps {
   data?: string
   menu?: string
   status?: string
+  colorTooltip?: any
 }
 
-const ShowNickName: React.FC<ShowNickNameProps> = ({ menu, status, data }) => (
+const ShowNickName: React.FC<ShowNickNameProps> = ({ menu, status, data, colorTooltip }) => (
   <Popover
     content={
       <div>
@@ -28,7 +29,7 @@ const ShowNickName: React.FC<ShowNickNameProps> = ({ menu, status, data }) => (
   >
     <InfoCircleFilled
       style={{
-        color: color.Success,
+        color: colorTooltip || color.Success,
         fontSize: '15px',
         marginLeft: '7px',
         verticalAlign: 0.5,

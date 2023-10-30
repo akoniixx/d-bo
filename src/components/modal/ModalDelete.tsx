@@ -8,12 +8,20 @@ interface ModalDelete {
   title2: string
   backButton: () => void
   callBack: () => void
+  title?: string
 }
 
-const ModalDelete: React.FC<ModalDelete> = ({ show, title1, title2, backButton, callBack }) => {
+const ModalDelete: React.FC<ModalDelete> = ({
+  show,
+  title1,
+  title2,
+  backButton,
+  callBack,
+  title,
+}) => {
   return (
     <Modal
-      title='ยืนยันการลบ'
+      title={title ? title : 'ยืนยันการลบ'}
       onCancel={backButton}
       open={show}
       footer={null}
@@ -48,7 +56,7 @@ const ModalDelete: React.FC<ModalDelete> = ({ show, title1, title2, backButton, 
           }}
           onClick={callBack}
         >
-          ลบ
+          {title === 'ยืนยันการคืนแต้ม' ? 'คืนแต้ม' : 'ลบ'}
         </Button>
       </div>
     </Modal>
