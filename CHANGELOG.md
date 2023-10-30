@@ -1,4 +1,8 @@
 ## [Version - 0]
+## Feature [v0.39.0] 2022-10-30
+- eslint & prettier setup
+- lazy load
+- Pin News Screen
 
 ## Feature [v0.38.0] 2022-10-30
 

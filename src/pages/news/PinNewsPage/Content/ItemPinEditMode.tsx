@@ -53,6 +53,7 @@ function ItemPinEditMode({
   name,
   editMode,
   currentApp,
+  form,
 }: Props) {
   const [searchValue, setSearchValue] = React.useState('')
   const debounceSearch = useDebounce(searchValue, 500)
@@ -228,6 +229,13 @@ function ItemPinEditMode({
         <MinusCircleOutlined
           onClick={() => {
             onDelPinNews(newsData)
+            form.setFields([
+              {
+                name: [name, 'newsId'],
+                errors: [],
+                touched: false,
+              },
+            ])
           }}
           style={{
             fontSize: 18,
