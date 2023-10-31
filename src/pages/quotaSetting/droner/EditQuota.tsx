@@ -31,7 +31,7 @@ import { CampaignDatasource } from '../../../datasource/CampaignDatasource'
 import { validateOnlyNumber } from '../../../utilities/TextFormatter'
 import Swal from 'sweetalert2'
 import ActionButton from '../../../components/button/ActionButton'
-
+import '../../farmer/Style.css'
 const { Map } = require('immutable')
 const _ = require('lodash')
 function EditQuota() {

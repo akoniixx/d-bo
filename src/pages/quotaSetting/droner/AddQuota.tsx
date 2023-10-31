@@ -31,7 +31,7 @@ import { validateOnlyNumber, validateOnlyNumWDecimal } from '../../../utilities/
 import { CampaignDatasource } from '../../../datasource/CampaignDatasource'
 import Swal from 'sweetalert2'
 import ActionButton from '../../../components/button/ActionButton'
-
+import '../../farmer/Style.css'
 const { Map } = require('immutable')
 
 function AddQuota() {
