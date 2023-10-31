@@ -12,7 +12,7 @@ import {
   DronerRankDetailEntity,
   DronerRankDetailEntity_INIT,
 } from '../../entities/DronerRankEntities'
-
+import '../farmer/Style.css'
 import { StarFilled, FileTextOutlined, CaretUpOutlined, CaretDownOutlined } from '@ant-design/icons'
 import moment from 'moment'
 import image from '../../resource/image'

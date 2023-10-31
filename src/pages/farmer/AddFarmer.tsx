@@ -38,6 +38,7 @@ import { useLocalStorage } from '../../hook/useLocalStorage'
 import { resizeFileImg } from '../../utilities/ResizeImage'
 import { useNavigate } from 'react-router-dom'
 import { DashboardLayout } from '../../components/layout/Layout'
+import '../farmer/Style.css'
 
 const dateFormat = 'DD/MM/YYYY'
 const dateCreateFormat = 'YYYY-MM-DD'

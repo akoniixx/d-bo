@@ -24,6 +24,7 @@ import { DroneDatasource } from '../../../datasource/DroneDatasource'
 import Swal from 'sweetalert2'
 import { UploadImageDatasouce } from '../../../datasource/UploadImageDatasource'
 import { DashboardLayout } from '../../../components/layout/Layout'
+import '../../farmer/Style.css'
 
 const _ = require('lodash')
 const { Map } = require('immutable')

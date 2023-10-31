@@ -1,7 +1,8 @@
 ## [Version - 0]
+## Fix [v0.39.3] 2022-10-31
+- fixed field time news
 ## Fix [v0.39.2] 2022-10-31
-- fix time news guru
-
+- fixed style
 ## Fix [v0.39.1] 2022-10-30
 - import css for news guru
 

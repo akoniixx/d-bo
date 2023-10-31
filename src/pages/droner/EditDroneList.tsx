@@ -26,6 +26,8 @@ import image from '../../resource/image'
 import { DashboardLayout } from '../../components/layout/Layout'
 import { useNavigate } from 'react-router-dom'
 import { LocationDatasource } from '../../datasource/LocationDatasource'
+import '../farmer/Style.css'
+
 const { Option } = Select
 const _ = require('lodash')
 const { Map } = require('immutable')

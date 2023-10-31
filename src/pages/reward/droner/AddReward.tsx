@@ -17,7 +17,8 @@ import { RewardDatasource } from '../../../datasource/RewardDatasource'
 import Swal from 'sweetalert2'
 import dayjs from 'dayjs'
 import { validateOnlyNumber } from '../../../utilities/TextFormatter'
-
+import 'react-quill/dist/quill.snow.css'
+import '../../farmer/Style.css'
 const { Map } = require('immutable')
 
 function AddReward() {
