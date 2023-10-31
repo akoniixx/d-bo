@@ -466,8 +466,8 @@ const EditDetailPointManual = () => {
                 ]}
               >
                 <Radio.Group className='d-flex flex-row'>
-                  <Radio value='FARMER'>เกษตรกร</Radio>
-                  <Radio value='DRONER'>นักบินโดรน</Radio>
+                  <Radio value='1'>รอรับแต้ม</Radio>
+                  <Radio value='2'>ได้รับแต้ม</Radio>
                 </Radio.Group>
               </Form.Item>
             </div>
