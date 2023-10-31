@@ -31,6 +31,7 @@ import { UploadImageDatasouce } from '../../../datasource/UploadImageDatasource'
 import ModalDroneBrand from '../../../components/modal/ModalDroneBrand'
 import Swal from 'sweetalert2'
 import { DashboardLayout } from '../../../components/layout/Layout'
+import '../../farmer/Style.css'
 
 const _ = require('lodash')
 const { Map } = require('immutable')
