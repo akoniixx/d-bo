@@ -1,6 +1,5 @@
 import React from 'react'
-import { Button, Row } from 'antd'
-import { color } from '../../resource'
+import { Row } from 'antd'
 import { Footer } from 'antd/lib/layout/layout'
 import { BackButton } from '../button/BackButton'
 import SaveButton from '../button/SaveButton'
@@ -22,7 +21,7 @@ export const FooterPage: React.FC<FoolterPageProps> = ({
   <Footer style={styleFooter}>
     <Row className='d-flex justify-content-between'>
       <BackButton onClick={onClickBack} disableBtn={disableBackBtn} />
-      <SaveButton onClick={() => onClickSave} disableBtn={disableSaveBtn} />
+      <SaveButton onClick={onClickSave} disableBtn={disableSaveBtn} />
     </Row>
   </Footer>
 )

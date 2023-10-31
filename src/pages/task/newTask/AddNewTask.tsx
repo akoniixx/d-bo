@@ -1,6 +1,5 @@
 import { DownOutlined, SearchOutlined, StarFilled } from '@ant-design/icons'
 import {
-  AutoComplete,
   Avatar,
   Badge,
   Button,
@@ -23,9 +22,9 @@ import {
   Tooltip,
 } from 'antd'
 import { Select as AntdSelect } from 'antd'
-import Select, { Props as SelectProps } from 'react-select'
+import Select from 'react-select'
 import moment from 'moment'
-import React, { useCallback, useEffect, useRef, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { BackButton, BackIconButton } from '../../../components/button/BackButton'
 import SaveButton from '../../../components/button/SaveButton'
 import { CardContainer } from '../../../components/card/CardContainer'
@@ -76,7 +75,9 @@ const dateCreateFormat = 'YYYY-MM-DD'
 const timeFormat = 'HH:mm'
 const timeCreateFormat = 'HH:mm:ss'
 
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const _ = require('lodash')
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const { Map } = require('immutable')
 
 const AddNewTask = () => {
@@ -88,7 +89,6 @@ const AddNewTask = () => {
   const [current, setCurrent] = useState(0)
   const [createNewTask, setCreateNewTask] = useState<CreateNewTaskEntity>(CreateNewTaskEntity_INIT)
   const [dataFarmer, setDataFarmer] = useState<FarmerEntity>()
-  const [farmerList, setFarmerList] = useState<FarmerEntity[]>([FarmerEntity_INIT])
   const [farmerSelected, setFarmerSelected] = useState<any>()
   const [farmerPlotSeleced, setFarmerPlotSelected] =
     useState<FarmerPlotEntity>(FarmerPlotEntity_INIT)
@@ -113,7 +113,7 @@ const AddNewTask = () => {
   const [disableBtn, setDisableBtn] = useState<boolean>(true)
   const [searchTextDroner, setSearchTextDroner] = useState<string>('')
   const [priceMethod, setPriceMethod] = useState<string>('อัตโนมัติ')
-  const [getCoupon, setGetCoupon] = useState<GetTaskCoupon>(GetTaskCoupon_INIT)
+  const [getCoupon] = useState<GetTaskCoupon>(GetTaskCoupon_INIT)
 
   const [couponCode, setCouponCode] = useState<string>('')
   const [couponId, setCouponId] = useState<string>('')
@@ -126,12 +126,10 @@ const AddNewTask = () => {
   const [couponKeepList, setCouponKeepList] = useState<CouponKeepByFarmer[]>()
   const [checkKeepCoupon, setCheckKeepCoupon] = useState<boolean>(false)
   const [dataCouponKeep, setCouponKeep] = useState<CouponKeepByFarmer>()
-  const options: OptionType[] = []
   const [currenSearch, setCurrentSearch] = useState(1)
   const [selectFarmer, setSelectFarmer] = useState<string>('')
   const [searchFilterFarmer, setSearchFilterFarmer] = useState<string>('')
   const [farmerListDropdown, setFarmerListDropdown] = useState<any>([])
-  const [count, setCount] = useState<number>(0)
   const [showData, setShowData] = useState<boolean>(false)
   const [rowFarmer, setRowFarmer] = useState(10)
 
@@ -145,7 +143,6 @@ const AddNewTask = () => {
             value: item.id,
           }
         })
-        setCount(res.count)
         setFarmerListDropdown(data)
       },
     )
@@ -227,7 +224,6 @@ const AddNewTask = () => {
             value: item.id,
           }
         })
-        setCount(res.count)
         setFarmerListDropdown(data)
       },
     )
@@ -390,9 +386,6 @@ const AddNewTask = () => {
   const handleDateAppointment = (e: any) => {
     setDateAppointment(moment(new Date(e)).format(dateCreateFormat))
   }
-  const handleTimeAppiontment = (e: any) => {
-    setTimeAppointment(moment(new Date(e).getTime()))
-  }
   const checkValidateComma = (data: string) => {
     const checkSyntax =
       data.includes('*') ||
@@ -484,7 +477,7 @@ const AddNewTask = () => {
     couponInfo.cropName = farmerPlotSeleced?.plantName
     couponInfo.couponCode = coupon //couponCode;
     couponInfo.raiAmount =
-      (farmerPlotSeleced.raiAmount && parseInt(farmerPlotSeleced.raiAmount!)) || 0
+      (farmerPlotSeleced.raiAmount && parseInt(farmerPlotSeleced.raiAmount)) || 0
     couponInfo.priceCustom =
       createNewTask.unitPriceStandard === 0 ? createNewTask.unitPrice.toString() : '0'
     CouponDataSource.calculateCoupon(couponInfo).then((res) => {
@@ -564,7 +557,9 @@ const AddNewTask = () => {
                       value={farmerPlotId}
                     >
                       {dataFarmer.farmerPlot.map((item) => (
-                        <option value={item.id}>{item.plotName}</option>
+                        <option key={item.id} value={item.id}>
+                          {item.plotName}
+                        </option>
                       ))}
                     </AntdSelect>
                     {checkSelectPlot === 'error' && (
@@ -818,7 +813,9 @@ const AddNewTask = () => {
               >
                 {periodSpray?.purposeSpray?.length ? (
                   periodSpray?.purposeSpray?.map((item) => (
-                    <Option value={item.id}>{item.purposeSprayName}</Option>
+                    <Option key={item.id} value={item.id}>
+                      {item.purposeSprayName}
+                    </Option>
                   ))
                 ) : (
                   <Option>-</Option>
@@ -839,43 +836,45 @@ const AddNewTask = () => {
                   : false,
               ),
             ).map((x, index) => (
-              <div className='form-group'>
-                <Checkbox
-                  value={x.crop}
-                  disabled={current === 2 || checkSelectPlot === 'error'}
-                  onChange={handlePurposeSpray}
-                  defaultChecked={x.isChecked}
-                />{' '}
-                <label style={{ padding: '0 8px 0 0' }}>{x.crop}</label>
-                {index === 4 && (
-                  <>
-                    <Input
-                      status={validateComma.status}
-                      className='col-lg-5'
-                      disabled={current === 2 || checkCrop}
-                      placeholder='โปรดระบุ เช่น เพลี้ย,หอย'
-                      onChange={handleOtherSpray}
-                      defaultValue={Array.from(
-                        new Set(
-                          createNewTask.targetSpray.filter(
-                            (a) => !PURPOSE_SPRAY.some((x) => x === a),
+              <>
+                <div className='form-group'>
+                  <Checkbox
+                    value={x.crop}
+                    disabled={current === 2 || checkSelectPlot === 'error'}
+                    onChange={handlePurposeSpray}
+                    defaultChecked={x.isChecked}
+                  />{' '}
+                  <label style={{ padding: '0 8px 0 0' }}>{x.crop}</label>
+                  {index === 4 && (
+                    <>
+                      <Input
+                        status={validateComma.status}
+                        className='col-lg-5'
+                        disabled={current === 2 || checkCrop}
+                        placeholder='โปรดระบุ เช่น เพลี้ย,หอย'
+                        onChange={handleOtherSpray}
+                        defaultValue={Array.from(
+                          new Set(
+                            createNewTask.targetSpray.filter(
+                              (a) => !PURPOSE_SPRAY.some((x) => x === a),
+                            ),
                           ),
-                        ),
+                        )}
+                      />
+                      {validateComma.status === 'error' && (
+                        <p
+                          style={{
+                            color: color.Error,
+                            padding: '0 0 0 55px',
+                          }}
+                        >
+                          {validateComma.message}
+                        </p>
                       )}
-                    />
-                    {validateComma.status === 'error' && (
-                      <p
-                        style={{
-                          color: color.Error,
-                          padding: '0 0 0 55px',
-                        }}
-                      >
-                        {validateComma.message}
-                      </p>
-                    )}
-                  </>
-                )}
-              </div>
+                    </>
+                  )}
+                </div>
+              </>
             ))}
           </div>
           <div className='row form-group col-lg-6 p-2'>
@@ -1804,7 +1803,7 @@ const AddNewTask = () => {
       )
     } else {
       const pushDronerList: CreateDronerTempEntity[] = []
-      for (let i: number = 0; dronerSelected.length > i; i++) {
+      for (let i = 0; dronerSelected.length > i; i++) {
         pushDronerList.push({
           dronerId: dronerSelected[i].droner_id,
           status: 'WAIT_RECEIVE',
@@ -1877,6 +1876,7 @@ const AddNewTask = () => {
               ? null
               : dataCouponKeep?.offlineCode
             : couponCode
+          // eslint-disable-next-line @typescript-eslint/no-empty-function
           CouponDataSource.updateCouponFarmerUsed(used).then((res) => {})
         }
 
@@ -1957,7 +1957,7 @@ const AddNewTask = () => {
             ถัดไป
           </Button>
         )}
-        {current === titleStep.length - 1 && <SaveButton onClick={() => insertNewTask} />}
+        {current === titleStep.length - 1 && <SaveButton onClick={insertNewTask} />}
       </Row>
     </>
   )

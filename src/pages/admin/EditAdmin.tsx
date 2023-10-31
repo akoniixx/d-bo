@@ -9,7 +9,6 @@ import { UserStaffEntity, UserStaffEntity_INIT } from '../../entities/UserStaffE
 import { AdminDatasource } from '../../datasource/AdminDatasource'
 import Swal from 'sweetalert2'
 import { ExclamationCircleOutlined } from '@ant-design/icons'
-import { DashboardLayout } from '../../components/layout/Layout'
 import { useNavigate } from 'react-router-dom'
 
 const _ = require('lodash')

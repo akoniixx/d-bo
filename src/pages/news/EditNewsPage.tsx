@@ -1,3 +1,5 @@
+import "react-quill/dist/quill.snow.css";
+import "../farmer/Style.css"
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { BackIconButton } from '../../components/button/BackButton'
 import { useNavigate } from 'react-router-dom'

@@ -1,5 +1,5 @@
 import React from 'react'
-import { Button, Empty } from 'antd'
+import { Button } from 'antd'
 import { color } from '../../resource'
 import { LeftOutlined } from '@ant-design/icons'
 

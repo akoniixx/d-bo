@@ -1,24 +1,23 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
-import { BackIconButton } from "../../components/button/BackButton";
-import { useNavigate } from "react-router-dom";
-import { Checkbox, DatePicker, Form, Input, Radio, Select, Tag, TimePicker } from "antd";
-import { CardHeaderPromotion } from "../../components/header/CardHeaderPromotion";
-import uploadImg from "../../resource/media/empties/upload_img_news.png";
-import { color } from "../../resource";
-import { resizeFileImg } from "../../utilities/ResizeImage";
-import {
-  UploadImageEntity,
-  UploadImageEntity_INTI,
-} from "../../entities/UploadImageEntities";
-import { formats, } from "../../components/editor/EditorToolbar";
-import ReactQuill from "react-quill";
-import FooterPage from "../../components/footer/FooterPage";
-import RenderNews from "../../components/mobile/RenderNews";
-import { NewsDatasource } from "../../datasource/NewsDatasource";
-import Swal from "sweetalert2";
-import { CampaignDatasource } from "../../datasource/CampaignDatasource";
-import moment from "moment";
-const { Map } = require("immutable");
+import "react-quill/dist/quill.snow.css";
+import "../farmer/Style.css"
+import React, { useEffect, useMemo, useRef, useState } from 'react'
+import { BackIconButton } from '../../components/button/BackButton'
+import { useNavigate } from 'react-router-dom'
+import { Checkbox, DatePicker, Form, Input, Radio, Select, Tag, TimePicker } from 'antd'
+import { CardHeaderPromotion } from '../../components/header/CardHeaderPromotion'
+import uploadImg from '../../resource/media/empties/upload_img_news.png'
+import { color } from '../../resource'
+import { resizeFileImg } from '../../utilities/ResizeImage'
+import { UploadImageEntity, UploadImageEntity_INTI } from '../../entities/UploadImageEntities'
+import { formats } from '../../components/editor/EditorToolbar'
+import ReactQuill from 'react-quill'
+import FooterPage from '../../components/footer/FooterPage'
+import RenderNews from '../../components/mobile/RenderNews'
+import { NewsDatasource } from '../../datasource/NewsDatasource'
+import Swal from 'sweetalert2'
+import { CampaignDatasource } from '../../datasource/CampaignDatasource'
+import moment from 'moment'
+const { Map } = require('immutable')
 
 function AddNewsPage() {
   const profile = JSON.parse(localStorage.getItem("profile") || "{  }");

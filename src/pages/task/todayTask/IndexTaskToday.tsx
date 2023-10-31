@@ -3,7 +3,6 @@ import {
   CaretUpOutlined,
   DownOutlined,
   EditOutlined,
-  InfoCircleFilled,
   SearchOutlined,
   UserOutlined,
 } from '@ant-design/icons'
@@ -11,14 +10,12 @@ import {
   Badge,
   Button,
   Checkbox,
-  Divider,
   Dropdown,
   Image,
   Input,
   Menu,
   Pagination,
   PaginationProps,
-  Popover,
   Select,
   Spin,
   Table,
@@ -28,7 +25,6 @@ import moment from 'moment'
 import { useEffect, useState } from 'react'
 import ActionButton from '../../../components/button/ActionButton'
 import { CardContainer } from '../../../components/card/CardContainer'
-import { CardHeader } from '../../../components/header/CardHearder'
 import ModalMapPlot from '../../../components/modal/task/finishTask/ModalMapPlot'
 import InvoiceTask from '../../../components/popover/InvoiceTask'
 import { LocationDatasource } from '../../../datasource/LocationDatasource'
@@ -43,8 +39,7 @@ import { InvoiceTaskEntity } from '../../../entities/NewTaskEntities'
 import { TaskTodayListEntity } from '../../../entities/TaskInprogressEntities'
 import color from '../../../resource/color'
 import icon from '../../../resource/icon'
-import { numberWithCommas, numberWithCommasToFixed } from '../../../utilities/TextFormatter'
-import { DashboardLayout } from '../../../components/layout/Layout'
+import { numberWithCommas } from '../../../utilities/TextFormatter'
 import { useNavigate } from 'react-router-dom'
 import { listAppType } from '../../../definitions/ApplicatoionTypes'
 import { ListCheck } from '../../../components/dropdownCheck/ListStatusAppType'
@@ -70,19 +65,15 @@ export default function IndexTodayTask() {
   const [visibleRating, setVisibleRating] = useState(false)
   const [showModalMap, setShowModalMap] = useState<boolean>(false)
   const [plotId, setPlotId] = useState<string>('')
-  const [statusArr, setStatusArr] = useState<string[]>([])
   const dateFormat = 'DD/MM/YYYY'
   const timeFormat = 'HH:mm'
   const [appTypeArr, setAppTypeArr] = useState<string[]>([])
   const [applicationType, setApplicationType] = useState<any>()
   const [loading, setLoading] = useState(false)
-  const [problems, setProblems] = useState<any>([])
   const [indeterminateWaitStart, setIndeterminateWaitStart] = useState(false)
   const [indeterminateInprogress, setIndeterminateInprogress] = useState(false)
-
   const [checkAllWaitStart, setCheckAllWaitStart] = useState(false)
   const [checkAllInprogress, setCheckAllInprogress] = useState(false)
-
   const [sortDirection, setSortDirection] = useState<string | undefined>()
   const [sortField, setSortField] = useState<string | undefined>()
   const [sortDirection1, setSortDirection1] = useState<string | undefined>(undefined)
@@ -391,7 +382,11 @@ export default function IndexTodayTask() {
             }
             onChange={handleProvince}
           >
-            {province?.map((item) => <option value={item.provinceId}>{item.provinceName}</option>)}
+            {province?.map((item, index) => (
+              <option key={index} value={item.provinceId}>
+                {item.provinceName}
+              </option>
+            ))}
           </Select>
         </div>
         <div className='col-lg p-1'>
@@ -409,8 +404,10 @@ export default function IndexTodayTask() {
             disabled={!searchProvince}
             value={searchDistrict}
           >
-            {district?.map((item) => (
-              <option value={item.districtId.toString()}>{item.districtName}</option>
+            {district?.map((item, index) => (
+              <option key={index} value={item.districtId.toString()}>
+                {item.districtName}
+              </option>
             ))}
           </Select>
         </div>
@@ -429,8 +426,10 @@ export default function IndexTodayTask() {
             disabled={!searchDistrict}
             value={searchSubdistrict}
           >
-            {subdistrict?.map((item) => (
-              <option value={item.subdistrictId.toString()}>{item.subdistrictName}</option>
+            {subdistrict?.map((item, index) => (
+              <option key={index} value={item.subdistrictId.toString()}>
+                {item.subdistrictName}
+              </option>
             ))}
           </Select>
         </div>
@@ -529,7 +528,7 @@ export default function IndexTodayTask() {
       },
       dataIndex: 'task_date_appointment',
       key: 'task_date_appointment',
-      render: (value: any, row: any, index: number) => {
+      render: (value: any, row: any) => {
         const changeTime = row.count_change_appointment
         return {
           children: (
@@ -607,7 +606,7 @@ export default function IndexTodayTask() {
       },
       dataIndex: 'droner',
       key: 'droner',
-      render: (value: any, row: any, index: number) => {
+      render: (value: any, row: any) => {
         const changeDroner = row.count_change_droner
         return {
           children: (
@@ -690,7 +689,7 @@ export default function IndexTodayTask() {
       },
       dataIndex: 'farmer',
       key: 'farmer',
-      render: (value: any, row: any, index: number) => {
+      render: (value: any, row: any) => {
         return {
           children: (
             <>
@@ -709,7 +708,7 @@ export default function IndexTodayTask() {
       title: 'พื้นที่แปลงเกษตร',
       dataIndex: 'plotArea',
       key: 'plotArea',
-      render: (value: any, row: any, index: number) => {
+      render: (value: any, row: any) => {
         const subdistrict = row.plotArea_subdistrict_name
         const district = row.plotArea_district_name
         const province = row.plotArea_province_name
@@ -786,7 +785,7 @@ export default function IndexTodayTask() {
       },
       dataIndex: 'task_total_price',
       key: 'task_total_price',
-      render: (value: any, row: any, index: number) => {
+      render: (value: any, row: any) => {
         const inv: InvoiceTaskEntity = {
           raiAmount: row.task_farm_area_amount,
           unitPrice: row.task_unit_price,
@@ -816,7 +815,7 @@ export default function IndexTodayTask() {
       title: 'สร้างโดย',
       dataIndex: 'createByWho',
       key: 'createByWho',
-      render: (value: any, row: any, index: number) => {
+      render: (value: any, row: any) => {
         return {
           children: (
             <>
@@ -841,7 +840,7 @@ export default function IndexTodayTask() {
       title: 'สถานะ ',
       dataIndex: 'task_status',
       key: 'task_status',
-      render: (value: any, row: any, index: number) => {
+      render: (value: any, row: any) => {
         const extend = row.task_status_delay
         return {
           children: (
@@ -897,7 +896,7 @@ export default function IndexTodayTask() {
       title: '',
       dataIndex: 'Action',
       key: 'Action',
-      render: (value: any, row: any, index: number) => {
+      render: (value: any, row: any) => {
         return {
           children: (
             <div className='d-flex flex-row justify-content-between'>
