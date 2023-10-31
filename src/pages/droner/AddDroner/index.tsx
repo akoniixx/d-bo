@@ -63,6 +63,8 @@ import { DashboardLayout } from '../../../components/layout/Layout'
 import BookBankDroner from '../../../components/bookbank/BookBankDroner'
 import { OtherAddressDatasource } from '../../../datasource/OtherAddress'
 import { CropDatasource } from '../../../datasource/CropDatasource'
+import "../../farmer/Style.css"
+
 const dateFormat = 'DD/MM/YYYY'
 const dateCreateFormat = 'YYYY-MM-DD'
 
