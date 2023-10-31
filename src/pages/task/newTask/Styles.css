@@ -1,0 +1,7 @@
+.ant-picker-input > input[disabled],
+.ant-input[disabled],
+.ant-input-affix-wrapper-disabled,
+.ant-select-disabled.ant-select:not(.ant-select-customize-input) .ant-select-selector,
+.ant-radio-disabled + span {
+  color: #2b2b2b;
+}
