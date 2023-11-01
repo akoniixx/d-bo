@@ -37,9 +37,6 @@ function AddNewsPage() {
   const [form] = Form.useForm()
   const [farmCountPoint, setFarmCountPoint] = useState<any>()
   const [droneCountPoint, setDroneCountPoint] = useState<any>()
-  const [allCountPoint, setAllCountPoint] = useState<any>()
-  const [pinMain, setPinMain] = useState<boolean>(false)
-  const [pinAll, setPinAll] = useState<boolean>(false)
   const [timerNews, setTimerNews] = useState<string>('')
   const [showTimer, setShowTimer] = useState<boolean>(false)
   const [typeLaunch, setTypeLaunch] = useState<string>('NON_ENDDATE')
@@ -101,8 +98,6 @@ function AddNewsPage() {
   }
 
   const handleChooseAppType = (e: any) => {
-    setPinAll(false)
-    setPinMain(false)
     setApplication(e)
   }
 
@@ -127,17 +122,6 @@ function AddNewsPage() {
   }
   const handleCampName = (e: any) => {
     setCampId(e)
-  }
-  const handlePinAll = (e: any) => {
-    setPinAll(e.target.checked)
-  }
-
-  const handlePinMain = (e: any) => {
-    setPinMain(e.target.checked)
-  }
-
-  const handleTimer = (e: any) => {
-    setTimerNews(e.target.value)
   }
 
   const handleShowTimer = (e: any) => {
@@ -199,9 +183,6 @@ function AddNewsPage() {
     NewsDatasource.checkCountPoint('FARMER').then((res) => {
       setFarmCountPoint(res.responseData)
     })
-    NewsDatasource.checkCountPoint('ALL').then((res) => {
-      setAllCountPoint(res.responseData)
-    })
     if (quillRef.current) {
       const quill = quillRef.current.getEditor()
 
@@ -211,14 +192,7 @@ function AddNewsPage() {
       })
     }
   }, [])
-  const disableCheckPinMain =
-    !application ||
-    (application === 'FARMER' && farmCountPoint?.disablePinMain === true) ||
-    (application === 'DRONER' && droneCountPoint?.disablePinMain === true)
-  const disableCheckPinAll =
-    !application ||
-    (application === 'FARMER' && farmCountPoint?.disablePinAll === true) ||
-    (application === 'DRONER' && droneCountPoint?.disablePinAll === true)
+
   const onFieldsChange = () => {
     const quill = quillRef.current.getEditor()
     const imgs = quill.container.querySelectorAll('img')
@@ -313,8 +287,8 @@ function AddNewsPage() {
       campaignId: campId,
       file: createImgProfile.file,
       createBy: profile.firstname + ' ' + profile.lastname,
-      pinAll: pinAll,
-      pinMain: pinMain,
+      pinAll: false,
+      pinMain: false,
       startDate: dateStart,
       typeLaunch: typeLaunch,
       endDate: dateEnd,
@@ -326,7 +300,7 @@ function AddNewsPage() {
           icon: 'success',
           timer: 1500,
           showConfirmButton: false,
-        }).then((time) => {
+        }).then(() => {
           navigate('/NewsPage')
         })
       })
@@ -479,49 +453,6 @@ function AddNewsPage() {
                       Droner Application
                     </option>
                   </Select>
-                </Form.Item>
-              </div>
-              <div className='form-group col-lg ' style={{ paddingLeft: '3%' }}>
-                <Form.Item initialValue={false} valuePropName='checked' className='my-0'>
-                  <Checkbox
-                    onChange={handlePinMain}
-                    checked={pinMain}
-                    className='pt-2'
-                    disabled={disableCheckPinMain}
-                  >
-                    ปักหมุดในหน้าหลัก
-                    <span
-                      style={{
-                        color: !application || disableCheckPinMain ? color.Disable : color.Grey,
-                      }}
-                    >
-                      {application === 'FARMER'
-                        ? ` (เหลือปักหมุด ${farmCountPoint?.remainPinMain} อัน)`
-                        : application === 'DRONER'
-                        ? ` (เหลือปักหมุด ${droneCountPoint?.remainPinMain} อัน)`
-                        : null}
-                    </span>
-                  </Checkbox>
-                </Form.Item>
-                <Form.Item initialValue={false} valuePropName='checked' className='my-0'>
-                  <Checkbox
-                    onChange={handlePinAll}
-                    checked={pinAll}
-                    disabled={!application || disableCheckPinAll}
-                  >
-                    ปักหมุดในหน้าข่าวสารทั้งหมด
-                    <span
-                      style={{
-                        color: !application || disableCheckPinAll ? color.Disable : color.Grey,
-                      }}
-                    >
-                      {application === 'FARMER'
-                        ? ` (เหลือปักหมุด ${farmCountPoint?.remainPinAll} อัน)`
-                        : application === 'DRONER'
-                        ? ` (เหลือปักหมุด ${droneCountPoint?.remainPinAll} อัน)`
-                        : null}{' '}
-                    </span>
-                  </Checkbox>
                 </Form.Item>
               </div>
               <div className='form-group col-lg-12 pt-4'>
