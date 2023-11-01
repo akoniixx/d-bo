@@ -1,8 +1,8 @@
-import { Form, Input, Modal, Radio, Space } from 'antd'
+import { Checkbox, Form, Input, Modal, Radio, Space } from 'antd'
 import React, { useEffect, useState } from 'react'
 import { CreateDroneEntity } from '../../entities/DroneBrandEntities'
 import FooterPage from '../footer/FooterPage'
-const _ = require('lodash')
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const { Map } = require('immutable')
 
 interface ModalDroneProps {
@@ -32,6 +32,7 @@ const ModalDroneBrand: React.FC<ModalDroneProps> = ({
         ...data,
         series: isEditModal ? dataDrone.series : undefined,
         isActive: isEditModal ? dataDrone.isActive : undefined,
+        droneAbility: isEditModal ? dataDrone.droneAbility : undefined,
       })
     }
   }, [dataDrone, form, isEditModal])
@@ -77,6 +78,7 @@ const ModalDroneBrand: React.FC<ModalDroneProps> = ({
         visible={show}
         onCancel={backButton}
         footer={[
+          // eslint-disable-next-line react/jsx-key
           <FooterPage
             onClickBack={backButton}
             onClickSave={() => form.submit()}
@@ -104,6 +106,14 @@ const ModalDroneBrand: React.FC<ModalDroneProps> = ({
               ]}
             >
               <Input placeholder='กรอกชื่อรุ่นโดรน' autoComplete='off' />
+            </Form.Item>
+            <label>ความสามารถ</label>
+            <Form.Item name='droneAbility'>
+              <Checkbox.Group style={{ width: '100%' }}>
+                <Checkbox value='SPRAY'>ฉีดพ่น</Checkbox>
+
+                <Checkbox value='SOW'>หว่าน</Checkbox>
+              </Checkbox.Group>
             </Form.Item>
           </div>
           {isEditModal && (
