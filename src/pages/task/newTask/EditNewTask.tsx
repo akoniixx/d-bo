@@ -21,11 +21,11 @@ import {
   Tooltip,
 } from 'antd'
 import { Select as AntdSelect } from 'antd'
-import Select, { Props as SelectProps } from 'react-select'
+import Select from 'react-select'
 import TextArea from 'antd/lib/input/TextArea'
 import { RowSelectionType } from 'antd/lib/table/interface'
 import moment, { utc } from 'moment'
-import React, { useCallback, useEffect, useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { BackButton, BackIconButton } from '../../../components/button/BackButton'
 import SaveButton from '../../../components/button/SaveButton'
 import { CardContainer } from '../../../components/card/CardContainer'
@@ -35,7 +35,6 @@ import { CropDatasource } from '../../../datasource/CropDatasource'
 import { TaskDatasource } from '../../../datasource/TaskDatasource'
 import { TaskSearchDronerDatasource } from '../../../datasource/TaskSearchDronerDatasource'
 import { LAT_LNG_BANGKOK } from '../../../definitions/Location'
-import { PURPOSE_SPRAY, PURPOSE_SPRAY_CHECKBOX } from '../../../definitions/PurposeSpray'
 import { CropPurposeSprayEntity, CropPurposeSprayEntity_INT } from '../../../entities/CropEntities'
 import { FarmerEntity, FarmerEntity_INIT, FarmerPageEntity } from '../../../entities/FarmerEntities'
 import { FarmerPlotEntity, FarmerPlotEntity_INIT } from '../../../entities/FarmerPlotEntities'
@@ -58,7 +57,6 @@ import {
 import ModalSelectedEditDroner from '../../../components/modal/task/newTask/ModalSelectedEditDroner'
 import {
   formatNumberWithCommas,
-  numberWithCommas,
   numberWithCommasToFixed,
   validateOnlyNumWDecimal,
   validateOnlyNumber,
@@ -74,16 +72,14 @@ import {
   TaskCoupon,
   TaskCoupon_INIT,
 } from '../../../entities/CalculateTask'
-import { DashboardLayout } from '../../../components/layout/Layout'
 import { useNavigate } from 'react-router-dom'
-import { AsyncPaginate } from 'react-select-async-paginate'
 import { OptionType } from './AddNewTask'
-import type { GroupBase, OptionsOrGroups } from 'react-select'
-import { InputPicker } from 'rsuite'
 import 'rsuite/dist/rsuite.min.css'
 import { ModalAcceptedTask } from '../../../components/modal/ModalAcceptedTask'
 import ShowNickName from '../../../components/popover/ShowNickName'
 import '../newTask/Styles.css'
+import { TargetSpray } from '../../../datasource/TargetSprayDatarource'
+import { AllTargetSpayEntities } from '../../../entities/TargetSprayEntities'
 
 const dateFormat = 'DD/MM/YYYY'
 const dateCreateFormat = 'YYYY-MM-DD'
@@ -104,11 +100,9 @@ const EditNewTask = () => {
   const [current, setCurrent] = useState(0)
   const [data, setData] = useState<GetNewTaskEntity>(GetNewTaskEntity_INIT)
   const [dataFarmer, setDataFarmer] = useState<FarmerEntity>(FarmerEntity_INIT)
-  const [farmerList, setFarmerList] = useState<FarmerEntity[]>([FarmerEntity_INIT])
   const [farmerSelected, setFarmerSelected] = useState<FarmerEntity>(FarmerEntity_INIT)
   const [farmerPlotSeleced, setFarmerPlotSelected] =
     useState<FarmerPlotEntity>(FarmerPlotEntity_INIT)
-  const [searchFarmer, setSearchFarmer] = useState<string>('')
   const [checkSelectPlot, setCheckSelectPlot] = useState<any>('')
   const [dronerSelected, setDronerSelected] = useState<TaskSearchDroner[]>([TaskSearchDroner_INIT])
   const [checkCrop, setCheckCrop] = useState<boolean>(true)
@@ -121,6 +115,7 @@ const EditNewTask = () => {
     message: '',
   })
   const [modalCheckUpdate, setModalCheckUpdate] = useState<boolean>(false)
+  const [targetSpray, setTargetSpray] = useState<AllTargetSpayEntities[]>([])
 
   const [couponData, setCouponData] = useState<TaskCoupon>(TaskCoupon_INIT)
   const [getCoupon, setGetCoupon] = useState<GetTaskCoupon>(GetTaskCoupon_INIT)
@@ -141,16 +136,14 @@ const EditNewTask = () => {
   const [disableBtn, setDisableBtn] = useState<boolean>(false)
   const [priceMethod, setPriceMethod] = useState<string>('อัตโนมัติ')
   const [loading, setLoading] = useState<boolean>(true)
-  const options: OptionType[] = []
   const [currenSearch, setCurrentSearch] = useState(1)
   const [selectFarmer, setSelectFarmer] = useState<string>('')
   const [searchFilterFarmer, setSearchFilterFarmer] = useState<string>('')
   const [farmerListDropdown, setFarmerListDropdown] = useState<any>([])
   const [count, setCount] = useState<number>(0)
   const [showData, setShowData] = useState<boolean>(true)
-  const [farmerPlotId, setFarmerPlotId] = useState<string>('')
+  const [someTargetSpray, setSomeTargetSpray] = useState<any>()
 
-  const twice = useRef<boolean>(true)
   const fetchNewTask = async () => {
     await TaskDatasource.getNewTaskById(queryString[1]).then(async (res) => {
       delete res['updatedAt']
@@ -176,6 +169,7 @@ const EditNewTask = () => {
       })
     })
   }
+
   const calculatePrice = () => {
     const couponInfo = { ...getCoupon }
     couponInfo.farmerPlotId = data.farmerPlotId
@@ -192,9 +186,11 @@ const EditNewTask = () => {
       setPeriodSpray(res)
     })
   }
+
   useEffect(() => {
     fetchNewTask()
     fetchFarmerList()
+    getAllTargetSpray()
   }, [currenSearch, rowFarmer])
 
   useEffect(() => {
@@ -213,6 +209,12 @@ const EditNewTask = () => {
     )
   }, [searchFilterFarmer])
 
+  const getAllTargetSpray = async () => {
+    await TargetSpray.getAllTargetSpray().then((res) => {
+      setTargetSpray(res.data)
+      setSomeTargetSpray(res.data.map((item: any) => item.name))
+    })
+  }
   // #region step 1
   const fetchFarmerList = () => {
     TaskDatasource.getFarmerListTask(searchFilterFarmer, currenSearch, rowFarmer).then(
@@ -315,7 +317,7 @@ const EditNewTask = () => {
     setTimeAppointment(moment(undefined))
   }
   const handleSelectFarmerPlot = (value: any) => {
-    PURPOSE_SPRAY_CHECKBOX.map((item) => _.set(item, 'isChecked', false))
+    targetSpray.map((item) => _.set(item, 'isChecked', false))
     const plotSelected = farmerSelected?.farmerPlot.filter((x) => x.id == value)[0]
     setPriceMethod('อัตโนมัติ')
     const f = Map(data).set('farmerPlotId', plotSelected?.id)
@@ -369,8 +371,8 @@ const EditNewTask = () => {
     const checked = e.target.checked
     const value = e.target.value
     setCheckCrop(value == 'อื่นๆ' ? !checked : otherSpray != null ? false : true)
-    PURPOSE_SPRAY_CHECKBOX.map((item) =>
-      _.set(item, 'isChecked', item.crop === value ? checked : item.isChecked),
+    targetSpray.map((item: any) =>
+      _.set(item, 'isChecked', item.name === value ? checked : item.isChecked),
     )
     let p: any = ''
 
@@ -801,7 +803,9 @@ const EditNewTask = () => {
               >
                 {periodSpray?.purposeSpray?.length ? (
                   periodSpray?.purposeSpray?.map((item) => (
-                    <Option value={item.id}>{item.purposeSprayName}</Option>
+                    <Option key={item.id} value={item.id}>
+                      {item.purposeSprayName}
+                    </Option>
                   ))
                 ) : (
                   <Option>-</Option>
@@ -813,57 +817,61 @@ const EditNewTask = () => {
             <label>
               เป้าหมายการฉีดพ่น <span style={{ color: 'red' }}>*</span>
             </label>
-            {PURPOSE_SPRAY_CHECKBOX.map((item) =>
-              _.set(
-                item,
-                'isChecked',
-                data?.targetSpray.map((x) => x).find((y) => y === item.crop)
-                  ? true
-                  : item.isChecked,
-              ),
-            ).map((x, index) => (
-              <>
-                <div className='form-group'>
-                  <Checkbox
-                    key={data.targetSpray[0]}
-                    checked={x.isChecked}
-                    value={x.crop}
-                    disabled={
-                      current == 2 || checkSelectPlot == 'error' || data.couponId ? true : false
-                    }
-                    onChange={handlePurposeSpray}
-                  />{' '}
-                  <label style={{ padding: '0 8px 0 0' }}>{x.crop}</label>
-                  {index == 4 && (
-                    <>
-                      <Input
-                        status={validateComma.status}
-                        key={data.targetSpray[0]}
-                        className='col-lg-5'
-                        disabled={current == 2 || checkCrop}
-                        placeholder='โปรดระบุ เช่น เพลี้ย,หอย'
-                        defaultValue={Array.from(
-                          new Set(
-                            data?.targetSpray.filter((a) => !PURPOSE_SPRAY.some((x) => x === a)),
-                          ),
-                        ).join(',')}
-                        onChange={handleOtherSpray}
-                      />
-                      {validateComma.status == 'error' && (
-                        <p
-                          style={{
-                            color: color.Error,
-                            padding: '0 0 0 55px',
-                          }}
-                        >
-                          {validateComma.message}
-                        </p>
-                      )}
-                    </>
-                  )}
-                </div>
-              </>
-            ))}
+            {targetSpray
+              .map((item: any) =>
+                _.set(
+                  item,
+                  'isChecked',
+                  data?.targetSpray.map((x) => x).find((y) => y === item.name)
+                    ? true
+                    : item.isChecked,
+                ),
+              )
+              .map((x, index) => (
+                <>
+                  <div className='form-group'>
+                    <Checkbox
+                      key={data.targetSpray[0]}
+                      defaultChecked={x.isChecked}
+                      value={x.name}
+                      disabled={
+                        current == 2 || checkSelectPlot == 'error' || data.couponId ? true : false
+                      }
+                      onChange={handlePurposeSpray}
+                    />{' '}
+                    <label style={{ padding: '0 8px 0 0' }}>{x.name}</label>
+                    {index == 4 && (
+                      <>
+                        <Input
+                          status={validateComma.status}
+                          key={data.targetSpray[0]}
+                          className='col-lg-5'
+                          disabled={current == 2 || checkCrop}
+                          placeholder='โปรดระบุ เช่น เพลี้ย,หอย'
+                          defaultValue={Array.from(
+                            new Set(
+                              data?.targetSpray.filter(
+                                (a) => !someTargetSpray.some((x: any) => x === a),
+                              ),
+                            ),
+                          ).join(',')}
+                          onChange={handleOtherSpray}
+                        />
+                        {validateComma.status == 'error' && (
+                          <p
+                            style={{
+                              color: color.Error,
+                              padding: '0 0 0 55px',
+                            }}
+                          >
+                            {validateComma.message}
+                          </p>
+                        )}
+                      </>
+                    )}
+                  </div>
+                </>
+              ))}
           </div>
           <div className='row form-group col-lg-6 p-2'>
             <label>
@@ -1505,93 +1513,96 @@ const EditNewTask = () => {
         <div className='container'>
           {current == 2 &&
             dronerSelectedList?.map((item) => (
-              <div className='row pt-3'>
-                {item?.dronerDetail[0] != '' && (
-                  <>
-                    <div className='col-lg-3'>
-                      {JSON.parse(item?.dronerDetail).firstname}{' '}
-                      {JSON.parse(item?.dronerDetail).lastname}
-                      <br />
-                      <p
-                        style={{
-                          fontSize: '12px',
-                          color: color.Grey,
-                        }}
-                      >
-                        {JSON.parse(item?.dronerDetail).droner_code}
-                        {JSON.parse(item?.dronerDetail).nickname && (
-                          <ShowNickName
-                            data={JSON.parse(item?.dronerDetail).nickname}
-                            menu='INFO'
-                          />
-                        )}
-                      </p>
-                    </div>
-                    <div className='col-lg-2'>{JSON.parse(item?.dronerDetail).telephone_no}</div>
-                    <div className='col-lg-3'>
-                      {JSON.parse(item?.dronerDetail).subdistrict_name ? (
-                        <>{JSON.parse(item?.dronerDetail).subdistrict_name}/</>
-                      ) : (
-                        '-/'
-                      )}
-                      {JSON.parse(item?.dronerDetail).district_name ? (
-                        <>{JSON.parse(item?.dronerDetail).district_name}/</>
-                      ) : (
-                        '-/'
-                      )}
-                      {JSON.parse(item?.dronerDetail).province_name ? (
-                        <>{JSON.parse(item?.dronerDetail).province_name}</>
-                      ) : (
-                        '-'
-                      )}
-                    </div>
-                    <div className='col-lg-1'>{JSON.parse(item.distance).toFixed(0)} km</div>
-                    <div className='col-lg-2'>
-                      {JSON.parse(item?.dronerDetail).drone_brand ? (
-                        <>
-                          <Avatar
-                            size={25}
-                            src={JSON.parse(item.dronerDetail).logo_drone_brand}
-                            style={{ marginRight: '5px' }}
-                          />
-                          {JSON.parse(item?.dronerDetail).drone_brand}
-                          <br />
-                          <p
-                            style={{
-                              fontSize: '12px',
-                              color: color.Grey,
-                            }}
-                          >
-                            {JSON.parse(item.dronerDetail).count_drone > 1 && '(มากกว่า 1 ยี่หัอ)'}
-                          </p>
-                        </>
-                      ) : (
-                        '-'
-                      )}
-                    </div>
-                    <div className='col-lg-1'>
-                      <span
-                        style={{
-                          color:
-                            JSON.parse(item?.dronerDetail).droner_status == 'สะดวก'
-                              ? color.Success
-                              : color.Error,
-                        }}
-                      >
-                        <Badge
-                          color={
-                            JSON.parse(item?.dronerDetail).droner_status == 'สะดวก'
-                              ? color.Success
-                              : color.Error
-                          }
-                        />{' '}
-                        {JSON.parse(item?.dronerDetail).droner_status}
+              <>
+                <div className='row pt-3'>
+                  {item?.dronerDetail[0] != '' && (
+                    <>
+                      <div className='col-lg-3'>
+                        {JSON.parse(item?.dronerDetail).firstname}{' '}
+                        {JSON.parse(item?.dronerDetail).lastname}
                         <br />
-                      </span>
-                    </div>
-                  </>
-                )}
-              </div>
+                        <p
+                          style={{
+                            fontSize: '12px',
+                            color: color.Grey,
+                          }}
+                        >
+                          {JSON.parse(item?.dronerDetail).droner_code}
+                          {JSON.parse(item?.dronerDetail).nickname && (
+                            <ShowNickName
+                              data={JSON.parse(item?.dronerDetail).nickname}
+                              menu='INFO'
+                            />
+                          )}
+                        </p>
+                      </div>
+                      <div className='col-lg-2'>{JSON.parse(item?.dronerDetail).telephone_no}</div>
+                      <div className='col-lg-3'>
+                        {JSON.parse(item?.dronerDetail).subdistrict_name ? (
+                          <>{JSON.parse(item?.dronerDetail).subdistrict_name}/</>
+                        ) : (
+                          '-/'
+                        )}
+                        {JSON.parse(item?.dronerDetail).district_name ? (
+                          <>{JSON.parse(item?.dronerDetail).district_name}/</>
+                        ) : (
+                          '-/'
+                        )}
+                        {JSON.parse(item?.dronerDetail).province_name ? (
+                          <>{JSON.parse(item?.dronerDetail).province_name}</>
+                        ) : (
+                          '-'
+                        )}
+                      </div>
+                      <div className='col-lg-1'>{JSON.parse(item.distance).toFixed(0)} km</div>
+                      <div className='col-lg-2'>
+                        {JSON.parse(item?.dronerDetail).drone_brand ? (
+                          <>
+                            <Avatar
+                              size={25}
+                              src={JSON.parse(item.dronerDetail).logo_drone_brand}
+                              style={{ marginRight: '5px' }}
+                            />
+                            {JSON.parse(item?.dronerDetail).drone_brand}
+                            <br />
+                            <p
+                              style={{
+                                fontSize: '12px',
+                                color: color.Grey,
+                              }}
+                            >
+                              {JSON.parse(item.dronerDetail).count_drone > 1 &&
+                                '(มากกว่า 1 ยี่หัอ)'}
+                            </p>
+                          </>
+                        ) : (
+                          '-'
+                        )}
+                      </div>
+                      <div className='col-lg-1'>
+                        <span
+                          style={{
+                            color:
+                              JSON.parse(item?.dronerDetail).droner_status == 'สะดวก'
+                                ? color.Success
+                                : color.Error,
+                          }}
+                        >
+                          <Badge
+                            color={
+                              JSON.parse(item?.dronerDetail).droner_status == 'สะดวก'
+                                ? color.Success
+                                : color.Error
+                            }
+                          />{' '}
+                          {JSON.parse(item?.dronerDetail).droner_status}
+                          <br />
+                        </span>
+                      </div>
+                    </>
+                  )}
+                </div>
+              </>
             ))}
         </div>
       </Form>

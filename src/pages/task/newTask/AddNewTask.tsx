@@ -69,6 +69,8 @@ export type OptionType = {
   idNo: any
 }
 import '../newTask/Styles.css'
+import { TargetSpray } from '../../../datasource/TargetSprayDatarource'
+import { AllTargetSpayEntities } from '../../../entities/TargetSprayEntities'
 const { Step } = Steps
 const { Option } = AntdSelect
 const dateFormat = 'DD/MM/YYYY'
@@ -115,7 +117,7 @@ const AddNewTask = () => {
   const [searchTextDroner, setSearchTextDroner] = useState<string>('')
   const [priceMethod, setPriceMethod] = useState<string>('อัตโนมัติ')
   const [getCoupon] = useState<GetTaskCoupon>(GetTaskCoupon_INIT)
-
+  const [someTargetSpray, setSomeTargetSpray] = useState<any>()
   const [couponCode, setCouponCode] = useState<string>('')
   const [couponId, setCouponId] = useState<string>('')
   const [couponUsedBtn, setCouponUsedBtn] = useState<boolean[]>([false, true])
@@ -133,6 +135,7 @@ const AddNewTask = () => {
   const [farmerListDropdown, setFarmerListDropdown] = useState<any>([])
   const [showData, setShowData] = useState<boolean>(false)
   const [rowFarmer, setRowFarmer] = useState(10)
+  const [targetSpray, setTargetSpray] = useState<AllTargetSpayEntities[]>([])
 
   const fetchFarmerList = () => {
     TaskDatasource.getFarmerListTask(searchFilterFarmer, currenSearch, rowFarmer).then(
@@ -147,6 +150,12 @@ const AddNewTask = () => {
         setFarmerListDropdown(data)
       },
     )
+  }
+  const getAllTargetSpray = async () => {
+    await TargetSpray.getAllTargetSpray().then((res) => {
+      setTargetSpray(res.data)
+      setSomeTargetSpray(res.data.map((item: any) => item.name))
+    })
   }
 
   const handleInputChange = (inputValue: any) => {
@@ -209,6 +218,7 @@ const AddNewTask = () => {
 
   useEffect(() => {
     fetchFarmerList()
+    getAllTargetSpray()
   }, [currenSearch, rowFarmer])
 
   useEffect(() => {
@@ -311,8 +321,8 @@ const AddNewTask = () => {
     const checked = e.target.checked
     const value = e.target.value
     setCheckCrop(value === 'อื่นๆ' ? !checked : otherSpray != null ? false : true)
-    PURPOSE_SPRAY_CHECKBOX.map((item) =>
-      _.set(item, 'isChecked', item.crop === value ? checked : item.isChecked),
+    targetSpray.map((item: any) =>
+      _.set(item, 'isChecked', item.name === value ? checked : item.isChecked),
     )
     let p: any = ''
 
@@ -828,55 +838,57 @@ const AddNewTask = () => {
             <label>
               เป้าหมายการฉีดพ่น <span style={{ color: 'red' }}>*</span>
             </label>
-            {PURPOSE_SPRAY_CHECKBOX.map((item) =>
-              _.set(
-                item,
-                'isChecked',
-                createNewTask?.targetSpray.map((x) => x).find((y) => y === item.crop)
-                  ? true
-                  : false,
-              ),
-            ).map((x, index) => (
-              <>
-                <div className='form-group'>
-                  <Checkbox
-                    value={x.crop}
-                    disabled={current === 2 || checkSelectPlot === 'error'}
-                    onChange={handlePurposeSpray}
-                    defaultChecked={x.isChecked}
-                  />{' '}
-                  <label style={{ padding: '0 8px 0 0' }}>{x.crop}</label>
-                  {index === 4 && (
-                    <>
-                      <Input
-                        status={validateComma.status}
-                        className='col-lg-5'
-                        disabled={current === 2 || checkCrop}
-                        placeholder='โปรดระบุ เช่น เพลี้ย,หอย'
-                        onChange={handleOtherSpray}
-                        defaultValue={Array.from(
-                          new Set(
-                            createNewTask.targetSpray.filter(
-                              (a) => !PURPOSE_SPRAY.some((x) => x === a),
+            {targetSpray
+              .map((item: any) =>
+                _.set(
+                  item,
+                  'isChecked',
+                  createNewTask?.targetSpray.map((x) => x).find((y) => y === item.name)
+                    ? true
+                    : false,
+                ),
+              )
+              .map((x, index) => (
+                <>
+                  <div className='form-group'>
+                    <Checkbox
+                      value={x.name}
+                      disabled={current === 2 || checkSelectPlot === 'error'}
+                      onChange={handlePurposeSpray}
+                      defaultChecked={x.isChecked}
+                    />{' '}
+                    <label style={{ padding: '0 8px 0 0' }}>{x.name}</label>
+                    {index === 4 && (
+                      <>
+                        <Input
+                          status={validateComma.status}
+                          className='col-lg-5'
+                          disabled={current === 2 || checkCrop}
+                          placeholder='โปรดระบุ เช่น เพลี้ย,หอย'
+                          onChange={handleOtherSpray}
+                          defaultValue={Array.from(
+                            new Set(
+                              createNewTask.targetSpray.filter(
+                                (a) => !someTargetSpray.some((x: any) => x === a),
+                              ),
                             ),
-                          ),
+                          )}
+                        />
+                        {validateComma.status === 'error' && (
+                          <p
+                            style={{
+                              color: color.Error,
+                              padding: '0 0 0 55px',
+                            }}
+                          >
+                            {validateComma.message}
+                          </p>
                         )}
-                      />
-                      {validateComma.status === 'error' && (
-                        <p
-                          style={{
-                            color: color.Error,
-                            padding: '0 0 0 55px',
-                          }}
-                        >
-                          {validateComma.message}
-                        </p>
-                      )}
-                    </>
-                  )}
-                </div>
-              </>
-            ))}
+                      </>
+                    )}
+                  </div>
+                </>
+              ))}
           </div>
           <div className='row form-group col-lg-6 p-2'>
             <label>

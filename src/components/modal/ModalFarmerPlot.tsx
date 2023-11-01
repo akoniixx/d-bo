@@ -1,27 +1,13 @@
 import React, { useEffect, useState } from 'react'
-import {
-  Button,
-  Checkbox,
-  Col,
-  Form,
-  Input,
-  Modal,
-  Radio,
-  RadioChangeEvent,
-  Row,
-  Select,
-  Space,
-} from 'antd'
+import { Button, Col, Form, Input, Modal, Radio, Row, Select, Space } from 'antd'
 import FooterPage from '../footer/FooterPage'
 import { FarmerPlotEntity, FarmerPlotEntity_INIT } from '../../entities/FarmerPlotEntities'
-import { EXP_PLANT } from '../../definitions/ExpPlant'
 import GoogleMap from '../map/GoogleMap'
 import { SubdistrictEntity } from '../../entities/LocationEntities'
 import { LocationDatasource } from '../../datasource/LocationDatasource'
 import { LAT_LNG_BANGKOK } from '../../definitions/Location'
 import TextArea from 'antd/lib/input/TextArea'
 import { CropDatasource } from '../../datasource/CropDatasource'
-import { CheckboxValueType } from 'antd/lib/checkbox/Group'
 import { color } from '../../resource'
 import ModalEditRaiAmount from './ModalEditRaiAmount'
 import ModalHistory from './ModalHistory'
@@ -29,7 +15,9 @@ import { validateOnlyNumWDecimal } from '../../utilities/TextFormatter'
 
 const { Option } = Select
 
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const _ = require('lodash')
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const { Map } = require('immutable')
 
 interface ModalFarmerPlotProps {
@@ -80,6 +68,7 @@ const ModalFarmerPlot: React.FC<ModalFarmerPlotProps> = ({
   const [editFarmerPlot, setEditFarmerPlot] = useState<FarmerPlotEntity>(FarmerPlotEntity_INIT)
   const [rai, setRai] = useState<any>()
   const [status, setStatus] = useState<any>(data.status)
+  const [keepAddressPlot, setKeepAddressPlot] = useState<any>({})
 
   const fetchLocation = async (text?: string) => {
     await LocationDatasource.getSubdistrict(0, text).then((res) => {
@@ -129,6 +118,12 @@ const ModalFarmerPlot: React.FC<ModalFarmerPlotProps> = ({
   const handleSearchLocation = async (value: any) => {
     if (value !== undefined) {
       const a = location.filter((x) => x.subdistrictId === value)[0]
+      setKeepAddressPlot({
+        provinceId: a.provinceId,
+        districtId: a.districtId,
+        subdistrictId: a.subdistrictId,
+        postcode: a.postcode,
+      })
       form.setFieldsValue({
         lat: a.lat,
         long: a.long,
@@ -203,6 +198,10 @@ const ModalFarmerPlot: React.FC<ModalFarmerPlotProps> = ({
     payload.plantName = f.plantName
     payload.raiAmount = f.raiAmount
     payload.plotAreaId = f.plotAreaId
+    payload.provinceId = keepAddressPlot.provinceId
+    payload.districtId = keepAddressPlot.districtId
+    payload.subdistrictId = keepAddressPlot.subdistrictId
+    payload.postcode = keepAddressPlot.postcode
     payload.mapUrl = f.mapUrl
     payload.lat = f.lat
     payload.long = f.long
@@ -235,6 +234,7 @@ const ModalFarmerPlot: React.FC<ModalFarmerPlotProps> = ({
           showInPlotList !== 'indexPlot' && form.resetFields()
         }}
         footer={[
+          // eslint-disable-next-line react/jsx-key
           <FooterPage
             onClickBack={() => {
               backButton()
@@ -399,10 +399,12 @@ const ModalFarmerPlot: React.FC<ModalFarmerPlotProps> = ({
                 }
                 filterOption={(input: any, option: any) => option.children.includes(input)}
               >
-                {location.map((item) => (
-                  <Option value={item.subdistrictId}>
-                    {item.districtName + '/' + item.subdistrictName + '/' + item.provinceName}
-                  </Option>
+                {location.map((item, index) => (
+                  <>
+                    <Option key={index} value={item.subdistrictId}>
+                      {item.districtName + '/' + item.subdistrictName + '/' + item.provinceName}
+                    </Option>
+                  </>
                 ))}
               </Select>
             </Form.Item>

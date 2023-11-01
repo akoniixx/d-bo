@@ -37,7 +37,6 @@ import moment from 'moment'
 import { useLocalStorage } from '../../hook/useLocalStorage'
 import { resizeFileImg } from '../../utilities/ResizeImage'
 import { useNavigate } from 'react-router-dom'
-import { DashboardLayout } from '../../components/layout/Layout'
 import '../farmer/Style.css'
 
 const dateFormat = 'DD/MM/YYYY'
@@ -45,27 +44,29 @@ const dateCreateFormat = 'YYYY-MM-DD'
 
 const { Option } = Select
 
-const _ = require('lodash')
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const { Map } = require('immutable')
 
 const AddFarmer = () => {
   const [profile] = useLocalStorage('profile', [])
   const navigate = useNavigate()
-
+  const [form] = Form.useForm()
   const [data, setData] = useState<CreateFarmerEntity>(CreateFarmerEntity_INIT)
   const [address, setAddress] = useState<CreateAddressEntity>(CreateAddressEntity_INIT)
   const [saveBtnDisable, setBtnSaveDisable] = useState<boolean>(true)
   const [showAddModal, setShowAddModal] = useState(false)
-  const [showEditModal, setShowEditModal] = useState(false)
   const [editIndex, setEditIndex] = useState(0)
   const [province, setProvince] = useState<ProviceEntity[]>([ProvinceEntity_INIT])
   const [district, setDistrict] = useState<DistrictEntity[]>([DistrictEntity_INIT])
   const [subdistrict, setSubdistrict] = useState<SubdistrictEntity[]>([SubdistrictEntity_INIT])
   const [editFarmerPlot, setEditFarmerPlot] = useState<FarmerPlotEntity>(FarmerPlotEntity_INIT)
   const [farmerPlotList, setFarmerPlotList] = useState<FarmerPlotEntity[]>([])
-
   const [imgProfile, setImgProfile] = useState<any>()
   const [imgIdCard, setImgIdCard] = useState<any>()
+
+  const [autoProvince, setAutoProvince] = useState<any>()
+  const [autoDistrict, setAutoDistrict] = useState<any>()
+  const [autoSubdistrict, setAutoSubdistrict] = useState<any>()
 
   const [createImgProfile, setCreateImgProfile] =
     useState<UploadImageEntity>(UploadImageEntity_INTI)
@@ -76,7 +77,6 @@ const AddFarmer = () => {
       setProvince(res)
     })
   }
-
   useEffect(() => {
     fetchProvince()
   }, [])
@@ -177,6 +177,11 @@ const AddFarmer = () => {
           timer: 1500,
           showConfirmButton: false,
         })
+
+        setAutoProvince(data.provinceId)
+        setAutoDistrict(data.districtId)
+        setAutoSubdistrict(data.subdistrictId)
+
         setFarmerPlotList([...farmerPlotList, pushId.toJS()])
       }
     } else {
@@ -192,7 +197,6 @@ const AddFarmer = () => {
       setFarmerPlotList([...newData, data])
     }
     setShowAddModal(false)
-    setShowEditModal(false)
     setEditIndex(0)
   }
   //#endregion
@@ -209,7 +213,8 @@ const AddFarmer = () => {
         compressFormat: source?.type.split('/')[1],
         quality: 70,
         rotation: 0,
-        responseUriFunc: (res: any) => {},
+        // eslint-disable-next-line @typescript-eslint/no-empty-function
+        responseUriFunc: () => {},
       })
     }
     const img_base64 = await new Promise((resolve) => {
@@ -256,7 +261,8 @@ const AddFarmer = () => {
         compressFormat: source?.type.split('/')[1],
         quality: 70,
         rotation: 0,
-        responseUriFunc: (res: any) => {},
+        // eslint-disable-next-line @typescript-eslint/no-empty-function
+        responseUriFunc: () => {},
       })
     }
     const img_base64 = await new Promise((resolve) => {
@@ -292,14 +298,8 @@ const AddFarmer = () => {
     checkValidate(data)
   }
   //#endregion
-
   const checkValidate = (data: CreateFarmerEntity) => {
-    const checkEmptySting = ![
-      data.firstname,
-      data.lastname,
-      data.telephoneNo,
-      address.address1,
-    ].includes('')
+    const checkEmptySting = ![data.firstname, data.lastname, data.telephoneNo].includes('')
     const checkEmptyNumber = ![
       address.provinceId,
       address.districtId,
@@ -319,8 +319,6 @@ const AddFarmer = () => {
       data.lastname,
       data.telephoneNo,
       data.birthDate,
-      addr.address1,
-      addr.address2,
     ].includes('')
     const checkEmptyNumber = ![addr.provinceId, addr.districtId, addr.subdistrictId].includes(0)
     const checkEmptyDate = ![data.birthDate].includes('1970-01-01')
@@ -344,41 +342,42 @@ const AddFarmer = () => {
       ...prev,
       farmerPlot: farmerPlotList,
     }))
+    console.log(payload)
 
-    await FarmerDatasource.insertFarmer(payload).then(async (res) => {
-      if (res != undefined) {
-        const fileList = [createImgProfile, createImgIdCard]
-          .filter((el) => {
-            return el.file !== '' && el.file !== undefined
-          })
-          .map((el) => {
-            return UploadImageDatasouce.uploadImage(Map(el).set('resourceId', res.id).toJS())
-          })
+    // await FarmerDatasource.insertFarmer(payload).then(async (res) => {
+    //   if (res != undefined) {
+    //     const fileList = [createImgProfile, createImgIdCard]
+    //       .filter((el) => {
+    //         return el.file !== '' && el.file !== undefined
+    //       })
+    //       .map((el) => {
+    //         return UploadImageDatasouce.uploadImage(Map(el).set('resourceId', res.id).toJS())
+    //       })
 
-        await Promise.all(fileList)
-        Swal.fire({
-          title: 'บันทึกสำเร็จ',
-          icon: 'success',
-          timer: 1500,
-          showConfirmButton: false,
-        }).then((time) => {
-          navigate('/IndexFarmer')
-        })
-      } else {
-        Swal.fire({
-          title: 'เบอร์โทร หรือ รหัสบัตรประชาชน <br/> ซ้ำในระบบ',
-          icon: 'error',
-          showConfirmButton: true,
-        })
-      }
-    })
+    //     await Promise.all(fileList)
+    //     Swal.fire({
+    //       title: 'บันทึกสำเร็จ',
+    //       icon: 'success',
+    //       timer: 1500,
+    //       showConfirmButton: false,
+    //     }).then(() => {
+    //       navigate('/IndexFarmer')
+    //     })
+    //   } else {
+    //     Swal.fire({
+    //       title: 'เบอร์โทร หรือ รหัสบัตรประชาชน <br/> ซ้ำในระบบ',
+    //       icon: 'error',
+    //       showConfirmButton: true,
+    //     })
+    //   }
+    // })
   }
 
   const renderFromData = (
     <div className='col-lg-7'>
       <CardContainer>
         <CardHeader textHeader='ข้อมูลเกษตรกร' />
-        <Form style={{ padding: '32px' }}>
+        <Form style={{ padding: '32px' }} form={form}>
           <div className='row'>
             <div className='form-group text-center pb-5'>
               <div
@@ -604,10 +603,11 @@ const AddFarmer = () => {
                     optionA.children.toLowerCase().localeCompare(optionB.children.toLowerCase())
                   }
                   onChange={handleOnChangeProvince}
-                  key={address.provinceId}
                 >
-                  {province?.map((item) => (
-                    <Option value={item.provinceId}>{item.provinceName}</Option>
+                  {province?.map((item, index) => (
+                    <Option key={index} value={item.provinceId}>
+                      {item.provinceName}
+                    </Option>
                   ))}
                 </Select>
               </Form.Item>
@@ -628,8 +628,10 @@ const AddFarmer = () => {
                   }
                   onChange={handleOnChangeDistrict}
                 >
-                  {district?.map((item) => (
-                    <Option value={item.districtId}>{item.districtName}</Option>
+                  {district?.map((item, index) => (
+                    <Option key={index} value={item.districtId}>
+                      {item.districtName}
+                    </Option>
                   ))}
                 </Select>
               </Form.Item>
@@ -652,8 +654,10 @@ const AddFarmer = () => {
                   }
                   onChange={handleOnChangeSubdistrict}
                 >
-                  {subdistrict?.map((item) => (
-                    <Option value={item.subdistrictId}>{item.subdistrictName}</Option>
+                  {subdistrict?.map((item, index) => (
+                    <Option key={index} value={item.subdistrictId}>
+                      {item.subdistrictName}
+                    </Option>
                   ))}
                 </Select>
               </Form.Item>
@@ -674,36 +678,16 @@ const AddFarmer = () => {
           </div>
           <div className='row'>
             <div className='form-group col-lg-12'>
-              <label>
-                บ้านเลขที่ <span style={{ color: 'red' }}>*</span>
-              </label>
-              <Form.Item
-                name='address1'
-                rules={[
-                  {
-                    required: true,
-                    message: 'กรุณากรอกบ้านเลขที่',
-                  },
-                ]}
-              >
+              <label>บ้านเลขที่</label>
+              <Form.Item name='address1'>
                 <Input placeholder='กรอกบ้านเลขที่' onChange={handleOnChangeAddress1} />
               </Form.Item>
             </div>
           </div>
           <div className='row'>
             <div className='form-group'>
-              <label>
-                รายละเอียดที่อยู่ <span style={{ color: 'red' }}>*</span>
-              </label>
-              <Form.Item
-                name='address2'
-                rules={[
-                  {
-                    required: true,
-                    message: 'กรุณากรอกรายละเอียด',
-                  },
-                ]}
-              >
+              <label>รายละเอียดที่อยู่</label>
+              <Form.Item name='address2'>
                 <TextArea
                   className='col-lg-12'
                   rows={5}
@@ -724,8 +708,10 @@ const AddFarmer = () => {
                 <Space direction='vertical'>
                   {FARMER_STATUS_SEARCH.filter(
                     (x) => x.value != 'INACTIVE' && x.value != 'REJECTED',
-                  ).map((item) => (
-                    <Radio value={item.value}>{item.name}</Radio>
+                  ).map((item, index) => (
+                    <Radio key={index} value={item.value}>
+                      {item.name}
+                    </Radio>
                   ))}
                 </Space>
               </Radio.Group>
@@ -782,58 +768,60 @@ const AddFarmer = () => {
             {farmerPlotList
               .sort((x, y) => x.plotId - y.plotId)
               .map((item, index) => (
-                <div className='container'>
-                  <div className='row pt-3 pb-3'>
-                    <div className='col-lg-4'>
-                      <p
-                        style={{
-                          textOverflow: 'ellipsis',
-                          overflow: 'hidden',
-                          whiteSpace: 'nowrap',
-                          marginBottom: 0,
-                        }}
-                      >
-                        {item.plotName}
-                      </p>
-                      <br />
-                      <p
-                        style={{
-                          fontSize: '12px',
-                          color: color.Grey,
-                        }}
-                      >
-                        {item.plantName}
-                      </p>
-                    </div>
-                    <div className='col-lg-2'>{item.raiAmount} ไร่</div>
-                    <div className='col-lg-3'>
-                      <span
-                        style={{
-                          color: colorStatus(item.status),
-                        }}
-                      >
-                        <Badge color={colorStatus(item.status)} />
-                        {STATUS_NORMAL_MAPPING[item.status]}
-                      </span>
-                    </div>
-                    <div className='col-lg-3 d-flex justify-content-between'>
-                      <div className='col-lg-6'>
-                        <ActionButton
-                          icon={<EditOutlined />}
-                          color={color.primary1}
-                          onClick={() => editPlot(item, index + 1)}
-                        />
+                <>
+                  <div className='container'>
+                    <div className='row pt-3 pb-3'>
+                      <div className='col-lg-4'>
+                        <p
+                          style={{
+                            textOverflow: 'ellipsis',
+                            overflow: 'hidden',
+                            whiteSpace: 'nowrap',
+                            marginBottom: 0,
+                          }}
+                        >
+                          {item.plotName}
+                        </p>
+                        <br />
+                        <p
+                          style={{
+                            fontSize: '12px',
+                            color: color.Grey,
+                          }}
+                        >
+                          {item.plantName}
+                        </p>
                       </div>
-                      <div className='col-lg-6'>
-                        <ActionButton
-                          icon={<DeleteOutlined />}
-                          color={color.Error}
-                          onClick={() => removePlot(index + 1)}
-                        />
+                      <div className='col-lg-2'>{item.raiAmount} ไร่</div>
+                      <div className='col-lg-3'>
+                        <span
+                          style={{
+                            color: colorStatus(item.status),
+                          }}
+                        >
+                          <Badge color={colorStatus(item.status)} />
+                          {STATUS_NORMAL_MAPPING[item.status]}
+                        </span>
+                      </div>
+                      <div className='col-lg-3 d-flex justify-content-between'>
+                        <div className='col-lg-6'>
+                          <ActionButton
+                            icon={<EditOutlined />}
+                            color={color.primary1}
+                            onClick={() => editPlot(item, index + 1)}
+                          />
+                        </div>
+                        <div className='col-lg-6'>
+                          <ActionButton
+                            icon={<DeleteOutlined />}
+                            color={color.Error}
+                            onClick={() => removePlot(index + 1)}
+                          />
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
+                </>
               ))}
           </Form>
         ) : (
@@ -867,7 +855,7 @@ const AddFarmer = () => {
       <FooterPage
         onClickBack={() => navigate(-1)}
         onClickSave={insertFarmer}
-        disableSaveBtn={saveBtnDisable}
+        // disableSaveBtn={saveBtnDisable}
       />
 
       <ModalFarmerPlot
