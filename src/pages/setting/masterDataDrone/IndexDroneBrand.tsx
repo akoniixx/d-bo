@@ -9,9 +9,14 @@ import { DroneDatasource } from '../../../datasource/DroneDatasource'
 import { color } from '../../../resource'
 import moment from 'moment'
 import ActionButton from '../../../components/button/ActionButton'
-import { DeleteOutlined, EditOutlined, SearchOutlined } from '@ant-design/icons'
+import {
+  CaretDownOutlined,
+  CaretUpOutlined,
+  DeleteOutlined,
+  EditOutlined,
+  SearchOutlined,
+} from '@ant-design/icons'
 import Swal from 'sweetalert2'
-import { DashboardLayout } from '../../../components/layout/Layout'
 import { useNavigate } from 'react-router-dom'
 
 const IndexDroneBrand: React.FC = () => {
@@ -19,10 +24,15 @@ const IndexDroneBrand: React.FC = () => {
   const [data, setData] = useState<DroneBrandListEntity>(DroneBrandListEntity_INIT)
   const [loading, setLoading] = useState(false)
   const [searchText, setSearchText] = useState<string>()
-
+  const [current, setCurrent] = useState(1)
+  const [sortDirection, setSortDirection] = useState<string | undefined>()
+  const [sortField, setSortField] = useState<string | undefined>()
+  const [sortDirection1, setSortDirection1] = useState<string | undefined>(undefined)
+  const [sortDirection2, setSortDirection2] = useState<string | undefined>(undefined)
+  const [sortDirection3, setSortDirection3] = useState<string | undefined>(undefined)
   const fetchDrone = async () => {
     setLoading(true)
-    await DroneDatasource.getCountDroneBrandList(searchText)
+    await DroneDatasource.getCountDroneBrandList(10, current, searchText, sortField, sortDirection)
       .then((res) => {
         setData(res)
       })
@@ -31,37 +41,14 @@ const IndexDroneBrand: React.FC = () => {
   }
   useEffect(() => {
     fetchDrone()
-  }, [])
+  }, [current, sortDirection])
   const changeTextSearch = (searchText: any) => {
     setSearchText(searchText.target.value)
   }
-  const isNumber = (n: any) => {
-    return !isNaN(parseFloat(n)) && isFinite(n)
+  const onChangePage = (page: number) => {
+    setCurrent(page)
   }
-  const sorter = (a: any, b: any) => {
-    if (a === null) {
-      return 1
-    }
-    if (b === null) {
-      return -1
-    }
-    if (isNumber(a) && isNumber(b)) {
-      if (parseInt(a, 10) === parseInt(b, 10)) {
-        return 0
-      }
-      return parseInt(a, 10) > parseInt(b, 10) ? 1 : -1
-    }
-    if (isNumber(a)) {
-      return -1
-    }
-    if (isNumber(b)) {
-      return 1
-    }
-    if (a === b) {
-      return 0
-    }
-    return a > b ? 1 : -1
-  }
+
   const removeDroneBrand = (data: DroneBrandEntity) => {
     Swal.fire({
       title: 'ยืนยันการลบ',
@@ -135,13 +122,60 @@ const IndexDroneBrand: React.FC = () => {
       dataIndex: 'name',
       key: 'name',
       width: '25%',
-      sorter: (a: any, b: any) => sorter(a.name, b.name),
     },
     {
-      title: 'จำนวนรุ่นโดรน',
+      title: () => {
+        return (
+          <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+            จำนวนรุ่นโดรน
+            <div
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                cursor: 'pointer',
+              }}
+              onClick={() => {
+                setSortField('drone')
+                setSortDirection((prev) => {
+                  if (prev === 'ASC') {
+                    return 'DESC'
+                  } else if (prev === undefined) {
+                    return 'ASC'
+                  } else {
+                    return undefined
+                  }
+                })
+                setSortDirection1((prev) => {
+                  if (prev === 'ASC') {
+                    return 'DESC'
+                  } else if (prev === undefined) {
+                    return 'ASC'
+                  } else {
+                    return undefined
+                  }
+                })
+              }}
+            >
+              <CaretUpOutlined
+                style={{
+                  position: 'relative',
+                  top: 2,
+                  color: sortDirection1 === 'ASC' ? '#ffca37' : 'white',
+                }}
+              />
+              <CaretDownOutlined
+                style={{
+                  position: 'relative',
+                  bottom: 2,
+                  color: sortDirection1 === 'DESC' ? '#ffca37' : 'white',
+                }}
+              />
+            </div>
+          </div>
+        )
+      },
       dataIndex: 'drone',
       key: 'drone',
-      sorter: (a: any, b: any) => sorter(a.drone, b.drone),
       render: (value: any, row: any, index: number) => {
         return {
           children: (
@@ -151,10 +185,58 @@ const IndexDroneBrand: React.FC = () => {
       },
     },
     {
-      title: 'จำนวนเครื่องโดรน',
+      title: () => {
+        return (
+          <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+            จำนวนเครื่องโดรน
+            <div
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                cursor: 'pointer',
+              }}
+              onClick={() => {
+                setSortField('droneCount')
+                setSortDirection((prev) => {
+                  if (prev === 'ASC') {
+                    return 'DESC'
+                  } else if (prev === undefined) {
+                    return 'ASC'
+                  } else {
+                    return undefined
+                  }
+                })
+                setSortDirection2((prev) => {
+                  if (prev === 'ASC') {
+                    return 'DESC'
+                  } else if (prev === undefined) {
+                    return 'ASC'
+                  } else {
+                    return undefined
+                  }
+                })
+              }}
+            >
+              <CaretUpOutlined
+                style={{
+                  position: 'relative',
+                  top: 2,
+                  color: sortDirection2 === 'ASC' ? '#ffca37' : 'white',
+                }}
+              />
+              <CaretDownOutlined
+                style={{
+                  position: 'relative',
+                  bottom: 2,
+                  color: sortDirection2 === 'DESC' ? '#ffca37' : 'white',
+                }}
+              />
+            </div>
+          </div>
+        )
+      },
       dataIndex: 'droneCount',
       key: 'droneCount',
-      sorter: (a: any, b: any) => sorter(a.droneCount, b.droneCount),
       render: (value: any, row: any, index: number) => {
         return {
           children: (
@@ -168,7 +250,6 @@ const IndexDroneBrand: React.FC = () => {
       dataIndex: 'isActive',
       key: 'isActive',
       width: '10%',
-      sorter: (a: any, b: any) => sorter(a.isActive, b.isActive),
       render: (value: any, row: any, index: number) => {
         return {
           children: (
@@ -180,10 +261,58 @@ const IndexDroneBrand: React.FC = () => {
       },
     },
     {
-      title: 'อัพเดตล่าสุด',
+      title: () => {
+        return (
+          <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+            อัพเดตล่าสุด
+            <div
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                cursor: 'pointer',
+              }}
+              onClick={() => {
+                setSortField('updatedAt')
+                setSortDirection((prev) => {
+                  if (prev === 'ASC') {
+                    return 'DESC'
+                  } else if (prev === undefined) {
+                    return 'ASC'
+                  } else {
+                    return undefined
+                  }
+                })
+                setSortDirection3((prev) => {
+                  if (prev === 'ASC') {
+                    return 'DESC'
+                  } else if (prev === undefined) {
+                    return 'ASC'
+                  } else {
+                    return undefined
+                  }
+                })
+              }}
+            >
+              <CaretUpOutlined
+                style={{
+                  position: 'relative',
+                  top: 2,
+                  color: sortDirection3 === 'ASC' ? '#ffca37' : 'white',
+                }}
+              />
+              <CaretDownOutlined
+                style={{
+                  position: 'relative',
+                  bottom: 2,
+                  color: sortDirection3 === 'DESC' ? '#ffca37' : 'white',
+                }}
+              />
+            </div>
+          </div>
+        )
+      },
       dataIndex: 'updatedAt',
       key: 'updatedAt',
-      sorter: (a: any, b: any) => sorter(a.updatedAt, b.updatedAt),
       render: (value: any, row: any, index: number) => {
         return {
           children: <span> {moment(row.updatedAt).format('DD/MM/YYYY, HH:mm')}</span>,
@@ -234,9 +363,12 @@ const IndexDroneBrand: React.FC = () => {
     <>
       {pageTitle}
       <Spin tip='กำลังโหลดข้อมูล...' size='large' spinning={loading}>
-        <Table columns={columns} dataSource={data.data} />
+        <Table columns={columns} dataSource={data.data} pagination={false} />
       </Spin>
-      <p>รายการทั้งหมด {data.count} รายการ</p>
+      <div className='d-flex justify-content-between pt-4 pb-3'>
+        <p>รายการทั้งหมด {data?.count} รายการ</p>
+        <Pagination current={current} onChange={onChangePage} total={data?.count} />
+      </div>
     </>
   )
 }

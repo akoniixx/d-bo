@@ -12,6 +12,7 @@ export interface DroneEntity {
   createdAt: string
   updatedAt: string
   droneId: number
+  droneAbility: string[]
 }
 
 export const DroneEntity_INIT: DroneEntity = {
@@ -25,6 +26,7 @@ export const DroneEntity_INIT: DroneEntity = {
   createdAt: '',
   updatedAt: '',
   droneId: 0,
+  droneAbility: [''],
 }
 
 export interface DroneListEntity {

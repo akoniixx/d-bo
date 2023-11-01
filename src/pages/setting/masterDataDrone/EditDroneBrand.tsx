@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
 import { Badge, Button, Form, Input, Pagination, Radio, Row, Space, Tag } from 'antd'
 import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
@@ -21,16 +22,9 @@ import { DroneListEntity } from '../../../entities/DroneEntities'
 
 import uploadImg from '../../../resource/media/empties/uploadImg.png'
 import { resizeFileImg } from '../../../utilities/ResizeImage'
-import {
-  ImageEntity,
-  ImageEntity_INTI,
-  UploadImageEntity,
-  UploadImageEntity_INTI,
-} from '../../../entities/UploadImageEntities'
 import { UploadImageDatasouce } from '../../../datasource/UploadImageDatasource'
 import ModalDroneBrand from '../../../components/modal/ModalDroneBrand'
 import Swal from 'sweetalert2'
-import { DashboardLayout } from '../../../components/layout/Layout'
 import '../../farmer/Style.css'
 
 const _ = require('lodash')
@@ -48,6 +42,7 @@ const EditDroneBrand = () => {
   const [data, setData] = useState<DroneBrandEntity>(DroneBrandEntity_INIT)
   const [dataDrone, setDataDrone] = useState<DroneListEntity>()
   const [imgDroneBrand, setImgDroneBrand] = useState<any>()
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [getDroneBarnd, setGetDroneBrand] = useState<DroneBrandListEntity>()
 
   const [saveBtnDisable, setBtnSaveDisable] = useState<boolean>(false)
@@ -89,7 +84,7 @@ const EditDroneBrand = () => {
         compressFormat: source?.type.split('/')[1],
         quality: 70,
         rotation: 0,
-        responseUriFunc: (res: any) => {},
+        responseUriFunc: () => {},
       })
     }
     const img_base64 = await new Promise((resolve) => {
@@ -275,6 +270,7 @@ const EditDroneBrand = () => {
           {dataDrone?.data.length != 0 ? (
             <div className='container'>
               {dataDrone?.data.map((item, index) => (
+              <>
                 <div className='row pt-3 pb-3'>
                   <div className='col-lg-5'>
                     <p
@@ -338,7 +334,7 @@ const EditDroneBrand = () => {
                       </div>
                     )}
                   </div>
-                </div>
+                </div></>
               ))}
             </div>
           ) : (
@@ -405,7 +401,7 @@ const EditDroneBrand = () => {
       icon: 'success',
       timer: 1500,
       showConfirmButton: false,
-    }).then((time) => {
+    }).then(() => {
       navigate('/IndexDroneBrand')
     })
   }
@@ -417,7 +413,7 @@ const EditDroneBrand = () => {
             navigate(-1)
           }}
         />
-        <span className='pt-4'>
+        <span className='pt-3'>
           <strong style={{ fontSize: '20px' }}>แก้ไขยี่ห้อโดรน</strong>
         </span>
       </Row>
