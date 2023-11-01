@@ -37,6 +37,9 @@ function AddNewsPage() {
   const [form] = Form.useForm()
   const [farmCountPoint, setFarmCountPoint] = useState<any>()
   const [droneCountPoint, setDroneCountPoint] = useState<any>()
+  const [allCountPoint, setAllCountPoint] = useState<any>()
+  const [pinMain, setPinMain] = useState<boolean>(false)
+  const [pinAll, setPinAll] = useState<boolean>(false)
   const [timerNews, setTimerNews] = useState<string>('')
   const [showTimer, setShowTimer] = useState<boolean>(false)
   const [typeLaunch, setTypeLaunch] = useState<string>('NON_ENDDATE')
@@ -98,6 +101,8 @@ function AddNewsPage() {
   }
 
   const handleChooseAppType = (e: any) => {
+    setPinAll(false)
+    setPinMain(false)
     setApplication(e)
   }
 
@@ -122,6 +127,17 @@ function AddNewsPage() {
   }
   const handleCampName = (e: any) => {
     setCampId(e)
+  }
+  const handlePinAll = (e: any) => {
+    setPinAll(e.target.checked)
+  }
+
+  const handlePinMain = (e: any) => {
+    setPinMain(e.target.checked)
+  }
+
+  const handleTimer = (e: any) => {
+    setTimerNews(e.target.value)
   }
 
   const handleShowTimer = (e: any) => {
@@ -183,6 +199,9 @@ function AddNewsPage() {
     NewsDatasource.checkCountPoint('FARMER').then((res) => {
       setFarmCountPoint(res.responseData)
     })
+    NewsDatasource.checkCountPoint('ALL').then((res) => {
+      setAllCountPoint(res.responseData)
+    })
     if (quillRef.current) {
       const quill = quillRef.current.getEditor()
 
@@ -192,7 +211,14 @@ function AddNewsPage() {
       })
     }
   }, [])
-
+  const disableCheckPinMain =
+    !application ||
+    (application === 'FARMER' && farmCountPoint?.disablePinMain === true) ||
+    (application === 'DRONER' && droneCountPoint?.disablePinMain === true)
+  const disableCheckPinAll =
+    !application ||
+    (application === 'FARMER' && farmCountPoint?.disablePinAll === true) ||
+    (application === 'DRONER' && droneCountPoint?.disablePinAll === true)
   const onFieldsChange = () => {
     const quill = quillRef.current.getEditor()
     const imgs = quill.container.querySelectorAll('img')
@@ -300,7 +326,7 @@ function AddNewsPage() {
           icon: 'success',
           timer: 1500,
           showConfirmButton: false,
-        }).then(() => {
+        }).then((time) => {
           navigate('/NewsPage')
         })
       })
