@@ -1,4 +1,3 @@
-import { DroneEntity, DroneEntity_INIT } from './DroneEntities'
 export interface fileEntity {
   id: string
   fileName: string
@@ -56,6 +55,7 @@ export interface CreateDroneEntity {
   droneId: number
   series: string
   isActive: boolean
+  droneAbility: string[]
 }
 export const CreateDroneEntity_INIT: CreateDroneEntity = {
   id: '',
@@ -63,6 +63,7 @@ export const CreateDroneEntity_INIT: CreateDroneEntity = {
   droneId: 0,
   series: '',
   isActive: true,
+  droneAbility: ['']
 }
 export interface CreateDroneBrandEntity {
   id?: string

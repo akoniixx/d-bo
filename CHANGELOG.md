@@ -1,5 +1,10 @@
 ## [Version - 0]
 
+## improve [v0.39.5] 2023-11-1
+
+- added droneAbility
+- fixed sort filter index master data drone page
+
 ## Fix [v0.39.4] 2022-11-1
 
 - fixed text color in new task menu

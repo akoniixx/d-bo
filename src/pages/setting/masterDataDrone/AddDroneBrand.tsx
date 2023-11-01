@@ -1,5 +1,5 @@
 import { DeleteOutlined, EditOutlined } from '@ant-design/icons'
-import { Avatar, Badge, Button, Form, Input, Pagination, Row, Tag } from 'antd'
+import { Badge, Button, Form, Input, Row, Tag } from 'antd'
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import ActionButton from '../../../components/button/ActionButton'
@@ -10,10 +10,9 @@ import { CardHeader } from '../../../components/header/CardHearder'
 import { color } from '../../../resource'
 import uploadImg from '../../../resource/media/empties/uploadImg.png'
 import emptyData from '../../../resource/media/empties/tabler_drone.png'
-import { DronerDroneEntity } from '../../../entities/DronerDroneEntities'
 import ModalDroneBrand from '../../../components/modal/ModalDroneBrand'
 import { resizeFileImg } from '../../../utilities/ResizeImage'
-import { UploadImageEntity, UploadImageEntity_INTI } from '../../../entities/UploadImageEntities'
+import { UploadImageEntity_INTI } from '../../../entities/UploadImageEntities'
 import {
   CreateDroneBrandEntity,
   CreateDroneBrandEntity_INIT,
@@ -22,11 +21,9 @@ import {
 } from '../../../entities/DroneBrandEntities'
 import { DroneDatasource } from '../../../datasource/DroneDatasource'
 import Swal from 'sweetalert2'
-import { UploadImageDatasouce } from '../../../datasource/UploadImageDatasource'
-import { DashboardLayout } from '../../../components/layout/Layout'
 import '../../farmer/Style.css'
 
-const _ = require('lodash')
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const { Map } = require('immutable')
 function AddDroneBrand() {
   const navigate = useNavigate()
@@ -38,7 +35,7 @@ function AddDroneBrand() {
   const [showAddModal, setShowAddModal] = useState(false)
   const [showEditModal, setShowEditModal] = useState(false)
   const [editIndex, setEditIndex] = useState(0)
-  const [createImgDroneBrand, setCreateImgDroneBrand] = useState<any>()
+  const [setCreateImgDroneBrand] = useState<any>()
   const [editDrone, setEditDrone] = useState<CreateDroneEntity>(CreateDroneEntity_INIT)
   const onChangeImgDrone = async (file: any) => {
     const source = file.target.files[0]
@@ -51,7 +48,7 @@ function AddDroneBrand() {
         compressFormat: source?.type.split('/')[1],
         quality: 70,
         rotation: 0,
-        responseUriFunc: (res: any) => {},
+        responseUriFunc: () => {},
       })
     }
     const img_base64 = await new Promise((resolve) => {
@@ -127,7 +124,7 @@ function AddDroneBrand() {
           icon: 'success',
           timer: 1500,
           showConfirmButton: false,
-        }).then((time) => {
+        }).then(() => {
           navigate('/IndexDroneBrand')
         })
       }
@@ -240,46 +237,48 @@ function AddDroneBrand() {
           {droneList.length != 0 ? (
             <div className='container'>
               {droneList.map((item, index) => (
-                <div className='row pt-3 pb-3'>
-                  <div className='col-lg-6'>
-                    <p
-                      style={{
-                        textOverflow: 'ellipsis',
-                        overflow: 'hidden',
-                        whiteSpace: 'nowrap',
-                        marginBottom: 0,
-                      }}
-                    >
-                      {item.series}
-                    </p>
-                  </div>
-                  <div className='col-lg-3'>
-                    <span
-                      style={{
-                        color: item.isActive ? color.Success : color.Error,
-                      }}
-                    >
-                      <Badge color={item.isActive ? color.Success : color.Error} />{' '}
-                      {item.isActive ? 'ใช้งาน' : 'ไม่ใช้งาน'}
-                    </span>
-                  </div>
-                  <div className='col-lg-3 d-flex justify-content-between'>
+                <>
+                  <div className='row pt-3 pb-3'>
                     <div className='col-lg-6'>
-                      <ActionButton
-                        icon={<EditOutlined />}
-                        color={color.primary1}
-                        onClick={() => editDroneBrand(item, index + 1)}
-                      />
+                      <p
+                        style={{
+                          textOverflow: 'ellipsis',
+                          overflow: 'hidden',
+                          whiteSpace: 'nowrap',
+                          marginBottom: 0,
+                        }}
+                      >
+                        {item.series}
+                      </p>
                     </div>
-                    <div className='col-lg-6'>
-                      <ActionButton
-                        icon={<DeleteOutlined />}
-                        color={color.Error}
-                        onClick={() => removeDrone(index + 1)}
-                      />
+                    <div className='col-lg-3'>
+                      <span
+                        style={{
+                          color: item.isActive ? color.Success : color.Error,
+                        }}
+                      >
+                        <Badge color={item.isActive ? color.Success : color.Error} />{' '}
+                        {item.isActive ? 'ใช้งาน' : 'ไม่ใช้งาน'}
+                      </span>
+                    </div>
+                    <div className='col-lg-3 d-flex justify-content-between'>
+                      <div className='col-lg-6'>
+                        <ActionButton
+                          icon={<EditOutlined />}
+                          color={color.primary1}
+                          onClick={() => editDroneBrand(item, index + 1)}
+                        />
+                      </div>
+                      <div className='col-lg-6'>
+                        <ActionButton
+                          icon={<DeleteOutlined />}
+                          color={color.Error}
+                          onClick={() => removeDrone(index + 1)}
+                        />
+                      </div>
                     </div>
                   </div>
-                </div>
+                </>
               ))}
             </div>
           ) : (

@@ -94,11 +94,15 @@ export class DroneDatasource {
     take?: any,
     page?: any,
     search?: string,
+    sortField?: string,
+    sortDirection?: string
   ): Promise<DroneBrandListEntity> {
     const params = {
       take: take,
       page: page,
       search: search,
+      sortField: sortField,
+      sortDirection: sortDirection
     }
     return httpClient
       .get(BASE_URL + '/drone-brand/droner-brand-all', { params })
