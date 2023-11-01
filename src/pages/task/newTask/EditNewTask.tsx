@@ -83,6 +83,7 @@ import { InputPicker } from 'rsuite'
 import 'rsuite/dist/rsuite.min.css'
 import { ModalAcceptedTask } from '../../../components/modal/ModalAcceptedTask'
 import ShowNickName from '../../../components/popover/ShowNickName'
+import '../newTask/Styles.css'
 
 const dateFormat = 'DD/MM/YYYY'
 const dateCreateFormat = 'YYYY-MM-DD'

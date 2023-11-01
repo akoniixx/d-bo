@@ -27,12 +27,12 @@ import { RewardDatasource } from '../../../datasource/RewardDatasource'
 import {
   CampaignConditionEntity,
   CampaignConditionEntity_INIT,
-  CampaignEntiry,
 } from '../../../entities/CampaignPointEntites'
 import { GetAllRewardEntities } from '../../../entities/RewardEntites'
 import { color } from '../../../resource'
 import { validateOnlyNumWDecimal } from '../../../utilities/TextFormatter'
 import dayjs from 'dayjs'
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const _ = require('lodash')
 
 const EditDronerMission = () => {
@@ -43,7 +43,6 @@ const EditDronerMission = () => {
   const dateFormat = 'DD/MM/YYYY'
   const [form] = Form.useForm()
   const [formTable] = Form.useForm()
-  const [data, setData] = useState<CampaignEntiry>()
   const [saveBtnDisable, setBtnSaveDisable] = useState<boolean>(true)
   const [dataSubMission, setDataSubMission] = useState<CampaignConditionEntity[]>([
     CampaignConditionEntity_INIT,
@@ -52,9 +51,11 @@ const EditDronerMission = () => {
   const [count, setCount] = useState(1)
   const [isActive, setIsActive] = useState(false)
   const [isEdit, setIsEdit] = useState(false)
+  const [statusMission, setStatusMission] = useState<any>()
 
   const fetchMissionById = () => {
     CampaignDatasource.getCampaignById(queryString[1]).then((res) => {
+      setStatusMission(res.status)
       const mapKey = res.condition
       const checkIsEdit = () => {
         if (res.status === 'ACTIVE') {
@@ -80,7 +81,6 @@ const EditDronerMission = () => {
       checkIsEdit()
       setDataSubMission(mapKey)
       setCount(mapKey.length)
-      setData({ ...res, condition: mapKey })
       form.setFieldsValue({
         missionName: res.campaignName,
         campaignType: res.campaignType,
@@ -162,7 +162,7 @@ const EditDronerMission = () => {
 
   const mapForm = (e: any) => {
     const mapList = e
-    mapList.map((y: any, i: number) => {
+    mapList.map((y: any) => {
       formTable.setFieldValue(`${y.num}_description`, y.descriptionReward)
       formTable.setFieldValue(`${y.num}_condition`, y.conditionReward)
       formTable.setFieldValue(`${y.num}_missionName`, y.missionName)
@@ -248,7 +248,7 @@ const EditDronerMission = () => {
     Table.EXPAND_COLUMN,
     {
       title: 'ชื่อภารกิจย่อย',
-      render: (value: any, row: any, index: number) => {
+      render: (value: any, row: any) => {
         return {
           children: (
             <Form.Item
@@ -271,7 +271,7 @@ const EditDronerMission = () => {
       title: 'จำนวนไร่สะสม',
       dataIndex: 'rai',
       width: '18%',
-      render: (value: any, row: any, index: number) => {
+      render: (value: any, row: any) => {
         return {
           children: (
             <Form.Item
@@ -283,8 +283,8 @@ const EditDronerMission = () => {
                   message: 'กรุณากรอกจำนวนไร่',
                 },
                 {
-                  validator: (rules, value) => {
-                    return new Promise(async (resolve, reject) => {
+                  validator: () => {
+                    return new Promise((resolve, reject) => {
                       if (checkLimit()) {
                         reject('จำนวนไร่ต้องไม่น้อยกว่าภารกิจย่อยก่อนหน้า')
                       } else {
@@ -309,7 +309,7 @@ const EditDronerMission = () => {
     },
     {
       title: form.getFieldValue('campaignType') === 'MISSION_POINT' ? 'แต้ม' : 'ชื่อของรางวัล',
-      render: (value: any, row: any, index: number) => {
+      render: (value: any, row: any) => {
         return {
           children: (
             <>
@@ -342,26 +342,28 @@ const EditDronerMission = () => {
                   ]}
                 >
                   <Select placeholder='เลือกชื่อของรางวัล' allowClear disabled={isEdit}>
-                    {rewardList?.data.map((item) => (
-                      <option value={item.id}>
-                        <Row justify={'start'} gutter={8} style={{ fontSize: '13px' }}>
-                          <Col>
-                            <img src={item.imagePath} width={20} height={20} />
-                          </Col>
-                          <Col>{item.rewardName} |</Col>
-                          <Col>{item.rewardNo} |</Col>
-                          <Col>
-                            {item.rewardType === 'PHYSICAL' ? 'Physical' : 'Digital'}
-                            <span
-                              style={{
-                                color: item.rewardExchange === 'MISSION' ? '#A9CB62' : '#EA973E',
-                              }}
-                            >
-                              {item.rewardExchange === 'MISSION' ? ' (ภารกิจ)' : ' (ใช้แต้ม)'}
-                            </span>
-                          </Col>
-                        </Row>
-                      </option>
+                    {rewardList?.data.map((item, index) => (
+                      <>
+                        <option value={item.id} key={index}>
+                          <Row justify={'start'} gutter={8} style={{ fontSize: '13px' }}>
+                            <Col>
+                              <img src={item.imagePath} width={20} height={20} />
+                            </Col>
+                            <Col>{item.rewardName} |</Col>
+                            <Col>{item.rewardNo} |</Col>
+                            <Col>
+                              {item.rewardType === 'PHYSICAL' ? 'Physical' : 'Digital'}
+                              <span
+                                style={{
+                                  color: item.rewardExchange === 'MISSION' ? '#A9CB62' : '#EA973E',
+                                }}
+                              >
+                                {item.rewardExchange === 'MISSION' ? ' (ภารกิจ)' : ' (ใช้แต้ม)'}
+                              </span>
+                            </Col>
+                          </Row>
+                        </option>
+                      </>
                     ))}
                   </Select>
                 </Form.Item>
@@ -374,7 +376,7 @@ const EditDronerMission = () => {
     {
       title: '',
       width: '3%',
-      render: (value: any, row: any, index: number) => {
+      render: (value: any, row: any) => {
         return {
           children: (
             <div className='d-flex flex-row justify-content-center'>
@@ -415,8 +417,8 @@ const EditDronerMission = () => {
         conditionReward: fs[`${y.num}_condition`],
       }
     })
-    let fieldErr: boolean = true
-    let fieldNull: boolean = true
+    let fieldErr = true
+    let fieldNull = true
     const isMissionReward = campaignType === 'MISSION_REWARD'
     condition.length > 0 &&
     condition.every(
@@ -525,7 +527,6 @@ const EditDronerMission = () => {
     const dataSub = newDataSubMission
     await form.validateFields()
     await formTable.validateFields()
-
     const create: any = {}
     const f = form.getFieldsValue()
     const fs = formTable.getFieldsValue()
@@ -560,7 +561,7 @@ const EditDronerMission = () => {
           icon: 'success',
           timer: 1500,
           showConfirmButton: false,
-        }).then((time) => {
+        }).then(() => {
           navigate('/IndexDronerMission')
         })
       }
@@ -700,15 +701,17 @@ const EditDronerMission = () => {
               ]}
             >
               <Radio.Group className='d-flex flex-column'>
-                {form.getFieldValue('status') === 'INACTIVE' ? (
+                {statusMission === 'DRAFTING' ? (
+                  <>
+                    <Radio value={'ACTIVE'}>ใช้งาน</Radio>
+                    <Radio value={'DRAFTING'}>รอเปิดการใช้งาน</Radio>
+                  </>
+                ) : statusMission === 'INACTIVE' ? (
                   <Radio value={'INACTIVE'}>ปิดการใช้งาน</Radio>
                 ) : (
                   <>
                     <Radio value={'ACTIVE'}>ใช้งาน</Radio>
-                    <Radio value={'DRAFTING'}>รอเปิดใช้งาน</Radio>
-                    {form.getFieldValue('status') !== 'ACTIVE' ? (
-                      <Radio value={'INACTIVE'}>ปิดการใช้งาน</Radio>
-                    ) : null}
+                    <Radio value={'INACTIVE'}>ปิดการใช้งาน</Radio>
                   </>
                 )}
               </Radio.Group>

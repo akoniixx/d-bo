@@ -27,8 +27,6 @@ function EditNewsPage() {
   const profile = JSON.parse(localStorage.getItem('profile') || '{  }')
   const [imgProfile, setImgProfile] = useState<any>()
   const [status, setStatus] = useState<any>()
-  const [chooseFarmer, setChooseFarmer] = useState<boolean>(false)
-  const [chooseDroner, setChooseDroner] = useState<boolean>(false)
   const [chooseChallenge, setChooseChallenge] = useState<boolean>(false)
   const [chooseNews, setChooseNews] = useState<boolean>(false)
   const [application, setApplication] = useState<string>('')
@@ -107,8 +105,6 @@ function EditNewsPage() {
     setDescriptionEditor(editor.getHTML())
   }
   const handleChooseAppType = (e: any) => {
-    setAppPinAll(false)
-    setAppPinMain(false)
     setApplication(e)
   }
 
@@ -146,13 +142,6 @@ function EditNewsPage() {
   }
   const handleCampName = (e: any) => {
     setCampId(e)
-  }
-  const handlePinAll = (e: any) => {
-    setAppPinAll(e.target.checked)
-  }
-
-  const handlePinMain = (e: any) => {
-    setAppPinMain(e.target.checked)
   }
 
   const handleTimer = (e: any) => {
@@ -551,61 +540,6 @@ function EditNewsPage() {
                       Droner Application
                     </option>
                   </Select>
-                </Form.Item>
-              </div>
-              <div className='form-group col-lg ' style={{ paddingLeft: '3%' }}>
-                <Form.Item initialValue={false} valuePropName='checked' className='my-0'>
-                  <Checkbox
-                    onChange={handlePinMain}
-                    checked={
-                      (status === 'DRAFTING' && application === 'FARMER'
-                        ? farmCountPoint?.remainPinMain === 0
-                        : droneCountPoint?.remainPinMain === 0) || !application
-                        ? false
-                        : appPinMain
-                    }
-                    className='pt-2'
-                    disabled={disableCheckPinMain}
-                  >
-                    ปักหมุดในหน้าหลัก
-                    <span
-                      style={{
-                        color: disableCheckPinMain ? color.Disable : color.Grey,
-                      }}
-                    >
-                      {application === 'FARMER'
-                        ? ` (เหลือปักหมุด ${farmCountPoint?.remainPinMain} อัน)`
-                        : application === 'DRONER'
-                        ? ` (เหลือปักหมุด ${droneCountPoint?.remainPinMain} อัน)`
-                        : null}
-                    </span>
-                  </Checkbox>
-                </Form.Item>
-                <Form.Item initialValue={false} valuePropName='checked' className='my-0'>
-                  <Checkbox
-                    onChange={handlePinAll}
-                    checked={
-                      (status === 'DRAFTING' && application === 'FARMER'
-                        ? farmCountPoint?.remainPinAll === 0
-                        : droneCountPoint?.remainPinAll === 0) || !application
-                        ? false
-                        : appPinAll
-                    }
-                    disabled={disableCheckPinAll}
-                  >
-                    ปักหมุดในหน้าข่าวสารทั้งหมด
-                    <span
-                      style={{
-                        color: disableCheckPinAll ? color.Disable : color.Grey,
-                      }}
-                    >
-                      {application === 'FARMER'
-                        ? ` (เหลือปักหมุด ${farmCountPoint?.remainPinAll} อัน)`
-                        : application === 'DRONER'
-                        ? ` (เหลือปักหมุด ${droneCountPoint?.remainPinAll} อัน)`
-                        : null}
-                    </span>
-                  </Checkbox>
                 </Form.Item>
               </div>
               <div className='form-group col-lg-12 pt-4'>

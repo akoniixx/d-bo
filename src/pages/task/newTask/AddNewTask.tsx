@@ -68,6 +68,7 @@ export type OptionType = {
   tel: any
   idNo: any
 }
+import '../newTask/Styles.css'
 const { Step } = Steps
 const { Option } = AntdSelect
 const dateFormat = 'DD/MM/YYYY'
