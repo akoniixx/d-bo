@@ -1,5 +1,11 @@
 ## [Version - 0]
 
+## improve [v0.39.8] 2023-11-2
+
+- auto address add/edit farmer menu
+- change search input in admin task menu
+- get data the target spray from api
+
 ## Fix [v0.39.7] 2023-11-1
 
 - fixed status for news
