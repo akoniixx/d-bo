@@ -226,14 +226,16 @@ function EditNewsPage() {
   }
 
   const onSubmit = () => {
-    const { newsName,
+    const {
+      newsName,
       newsDescription,
       newsStatus,
       startDate,
       startTime,
       typeLaunch,
       endDate,
-      endTime, } = form.getFieldsValue()
+      endTime,
+    } = form.getFieldsValue()
     const dateStart =
       newsStatus === 'PENDING'
         ? moment(startDate).format('YYYY-MM-DD') + ' ' + moment(startTime).format('HH:mm:ss')
@@ -257,7 +259,11 @@ function EditNewsPage() {
         pinAll: false,
         pinMain: false,
         startDate: dateStart,
-        typeLaunch: (!typeLaunch) ? (newsStatus === "PENDING") ? 'NON_ENDDATE' : undefined : typeLaunch,
+        typeLaunch: !typeLaunch
+          ? newsStatus === 'PENDING'
+            ? 'NON_ENDDATE'
+            : undefined
+          : typeLaunch,
         endDate: dateEnd,
       })
         .then((res) => {
@@ -292,7 +298,11 @@ function EditNewsPage() {
         pinAll: false,
         pinMain: false,
         startDate: dateStart,
-        typeLaunch: (!typeLaunch) ? (newsStatus === "PENDING") ? 'NON_ENDDATE' : undefined : typeLaunch,
+        typeLaunch: !typeLaunch
+          ? newsStatus === 'PENDING'
+            ? 'NON_ENDDATE'
+            : undefined
+          : typeLaunch,
         endDate: dateEnd,
       })
         .then((res) => {
