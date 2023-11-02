@@ -39,9 +39,13 @@ export class NewsDatasource {
     formData.append('campaignId', data.campaignId)
     formData.append('pinAll', new Boolean(data.pinAll).toString())
     formData.append('pinMain', new Boolean(data.pinMain).toString())
-    formData.append('startDate', data.startDate!)
-    formData.append('endDate', data.endDate!)
-    formData.append('typeLaunch', data.typeLaunch!)
+    if(data.status === "PENDING"){
+      formData.append('startDate', data.startDate!)
+      if(data.typeLaunch === "IS_ENDDATE"){
+        formData.append('endDate', data.endDate!)
+      }
+      formData.append('typeLaunch', data.typeLaunch!)
+    }
     return httpClient
       .post(BASE_URL + '/promotion/news/upload', formData)
       .then((res) => {
@@ -156,8 +160,13 @@ export class NewsDatasource {
       formData.append('pinAll', new Boolean(data.pinAll).toString())
       formData.append('pinMain', new Boolean(data.pinMain).toString())
       formData.append('startDate', data.startDate!)
-      formData.append('endDate', data.endDate!)
-      formData.append('typeLaunch', data.typeLaunch!)
+      if(data.status === "PENDING"){
+        formData.append('startDate', data.startDate!)
+        if(data.typeLaunch === "IS_ENDDATE"){
+          formData.append('endDate', data.endDate!)
+        }
+        formData.append('typeLaunch', data.typeLaunch!)
+      }
     } else {
       formData.append('file', data.file)
       formData.append('title', data.title)
@@ -170,8 +179,13 @@ export class NewsDatasource {
       formData.append('pinAll', new Boolean(data.pinAll).toString())
       formData.append('pinMain', new Boolean(data.pinMain).toString())
       formData.append('startDate', data.startDate!)
-      formData.append('endDate', data.endDate!)
-      formData.append('typeLaunch', data.typeLaunch!)
+      if(data.status === "PENDING"){
+        formData.append('startDate', data.startDate!)
+        if(data.typeLaunch === "IS_ENDDATE"){
+          formData.append('endDate', data.endDate!)
+        }
+        formData.append('typeLaunch', data.typeLaunch!)
+      }
     }
     return httpClient
       .post(BASE_URL + `/promotion/news/update/${data.id}`, formData)

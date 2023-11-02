@@ -1,5 +1,13 @@
 ## [Version - 0]
 
+## Fix [v0.39.7] 2023-11-1
+
+- fixed status for news
+
+## improve [v0.39.6] 2023-11-1
+
+- fixed timer setting for news when NON_ENDDATE
+
 ## improve [v0.39.5] 2023-11-1
 
 - added droneAbility
