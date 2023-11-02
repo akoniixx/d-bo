@@ -117,10 +117,10 @@ const EditFarmer = () => {
             findAddress[0].subdistrictId,
           )
           const postcode = Map(subdistrictId.toJS()).set('postcode', findAddress[0].postcode)
-          setAddress(postcode.toJS())
+          const addressId = Map(postcode.toJS()).set('id', res.addressId)
+          setAddress(addressId.toJS())
         }
       }
-
       setFarmerPlotList(res.farmerPlot)
       const getPathPro = res.file.filter((x) => x.category === 'PROFILE_IMAGE')
       const getPathCard = res.file.filter((x) => x.category === 'ID_CARD_IMAGE')
@@ -152,6 +152,7 @@ const EditFarmer = () => {
       }
     })
   }
+
   const indexOfLastItem = currentPage * itemsPerPage
   const indexOfFirstItem = indexOfLastItem - itemsPerPage
   const currentItems = farmerPlotList.slice(indexOfFirstItem, indexOfLastItem)
@@ -170,7 +171,7 @@ const EditFarmer = () => {
     LocationDatasource.getProvince().then((res) => {
       setProvince(res)
     })
-    if (address !== null) {
+    if (address) {
       if (address.provinceId) {
         LocationDatasource.getDistrict(address.provinceId).then((res) => {
           setDistrict(res)
@@ -282,6 +283,17 @@ const EditFarmer = () => {
       ...plot,
       farmerId,
     }
+    const addr = {
+      id: '',
+      address1: '',
+      address2: '',
+      address3: '',
+      provinceId: plot.provinceId || 0,
+      districtId: plot.districtId || 0,
+      subdistrictId: plot.subdistrictId || 0,
+      postcode: plot.postcode || '',
+    }
+    checkValidateAddr(addr)
     if (payload.id) {
       await FarmerPlotDatasource.updateFarmerPlot(payload).then((res) => {
         if (res) {
@@ -312,7 +324,6 @@ const EditFarmer = () => {
       })
     }
     fecthFarmer()
-    checkValidate(data)
   }
   //#endregion
 
@@ -799,6 +810,7 @@ const EditFarmer = () => {
                     optionA.children.toLowerCase().localeCompare(optionB.children.toLowerCase())
                   }
                   onChange={handleOnChangeProvince}
+                  key={address ? address.provinceId : 0}
                 >
                   {province.map((item: any, index: any) => (
                     <Select.Option key={index} value={item.provinceId}>
@@ -829,6 +841,7 @@ const EditFarmer = () => {
                   }
                   disabled={!address || !address.provinceId}
                   onChange={handleOnChangeDistrict}
+                  key={address ? address.districtId : 0}
                 >
                   {district.map((item: any, index: any) => (
                     <Select.Option key={index} value={item.districtId}>
@@ -861,6 +874,7 @@ const EditFarmer = () => {
                   }
                   onChange={handleOnChangeSubdistrict}
                   disabled={!address || !address.districtId}
+                  key={address ? address.subdistrictId : 0}
                 >
                   {subdistrict?.map((item: any, index: any) => (
                     <Select.Option key={index} value={item.subdistrictId}>

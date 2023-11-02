@@ -306,7 +306,7 @@ export const pathLists = (isAccounting: boolean, isAdminTask?: boolean) => {
             {
               path: '/IndexAdminTask',
               name: 'IndexAdminTask',
-              title: 'การแก้ไข/ประวัติงาน',
+              title: 'แก้ไข/ประวัติงาน',
               subMenu: [],
             },
           ],

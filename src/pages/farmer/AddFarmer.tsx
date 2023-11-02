@@ -67,6 +67,7 @@ const AddFarmer = () => {
   const [autoProvince, setAutoProvince] = useState<any>()
   const [autoDistrict, setAutoDistrict] = useState<any>()
   const [autoSubdistrict, setAutoSubdistrict] = useState<any>()
+  const [autoPostCode, setAutoPostcode] = useState<any>()
 
   const [createImgProfile, setCreateImgProfile] =
     useState<UploadImageEntity>(UploadImageEntity_INTI)
@@ -77,6 +78,7 @@ const AddFarmer = () => {
       setProvince(res)
     })
   }
+
   useEffect(() => {
     fetchProvince()
   }, [])
@@ -176,14 +178,30 @@ const AddFarmer = () => {
           icon: 'success',
           timer: 1500,
           showConfirmButton: false,
+        }).then(async () => {
+          if (address.provinceId !== 0) {
+            setDistrict(district)
+          } else {
+            await LocationDatasource.getDistrict(data.provinceId!).then((res) => {
+              setDistrict(res)
+            })
+          }
+          if (address.districtId !== 0) {
+            setSubdistrict(subdistrict)
+          } else {
+            await LocationDatasource.getSubdistrict(data.districtId).then((res) => {
+              setSubdistrict(res)
+            })
+          }
+
+          setAutoProvince(data.provinceId)
+          setAutoDistrict(data.districtId)
+          setAutoSubdistrict(data.subdistrictId)
+          setAutoPostcode(data.postcode)
         })
-
-        setAutoProvince(data.provinceId)
-        setAutoDistrict(data.districtId)
-        setAutoSubdistrict(data.subdistrictId)
-
         setFarmerPlotList([...farmerPlotList, pushId.toJS()])
       }
+      checkValidateAddr(pushId.toJS())
     } else {
       const newData = farmerPlotList.filter((x) => x.plotId !== data.plotId)
       if ([...newData, data].length > 0) {
@@ -330,7 +348,19 @@ const AddFarmer = () => {
   }
 
   const insertFarmer = async () => {
-    const pushAddr = Map(data).set('address', address)
+    let pushAddr: any
+    if (address.provinceId === 0 && address.districtId === 0 && address.subdistrictId === 0) {
+      const mapProvince = Map(address).set('provinceId', farmerPlotList[0].provinceId)
+      const mapDistrictId = Map(mapProvince.toJS()).set('districtId', farmerPlotList[0].districtId)
+      const mapSubdistrictId = Map(mapDistrictId.toJS()).set(
+        'subdistrictId',
+        farmerPlotList[0].subdistrictId,
+      )
+      const mapPostCode = Map(mapSubdistrictId.toJS()).set('postcode', farmerPlotList[0].postcode)
+      pushAddr = Map(data).set('address', mapPostCode.toJS())
+    } else {
+      pushAddr = Map(data).set('address', address)
+    }
 
     const payload = {
       ...pushAddr.toJS(),
@@ -342,35 +372,33 @@ const AddFarmer = () => {
       ...prev,
       farmerPlot: farmerPlotList,
     }))
-    console.log(payload)
+    await FarmerDatasource.insertFarmer(payload).then(async (res) => {
+      if (res != undefined) {
+        const fileList = [createImgProfile, createImgIdCard]
+          .filter((el) => {
+            return el.file !== '' && el.file !== undefined
+          })
+          .map((el) => {
+            return UploadImageDatasouce.uploadImage(Map(el).set('resourceId', res.id).toJS())
+          })
 
-    // await FarmerDatasource.insertFarmer(payload).then(async (res) => {
-    //   if (res != undefined) {
-    //     const fileList = [createImgProfile, createImgIdCard]
-    //       .filter((el) => {
-    //         return el.file !== '' && el.file !== undefined
-    //       })
-    //       .map((el) => {
-    //         return UploadImageDatasouce.uploadImage(Map(el).set('resourceId', res.id).toJS())
-    //       })
-
-    //     await Promise.all(fileList)
-    //     Swal.fire({
-    //       title: 'บันทึกสำเร็จ',
-    //       icon: 'success',
-    //       timer: 1500,
-    //       showConfirmButton: false,
-    //     }).then(() => {
-    //       navigate('/IndexFarmer')
-    //     })
-    //   } else {
-    //     Swal.fire({
-    //       title: 'เบอร์โทร หรือ รหัสบัตรประชาชน <br/> ซ้ำในระบบ',
-    //       icon: 'error',
-    //       showConfirmButton: true,
-    //     })
-    //   }
-    // })
+        await Promise.all(fileList)
+        Swal.fire({
+          title: 'บันทึกสำเร็จ',
+          icon: 'success',
+          timer: 1500,
+          showConfirmButton: false,
+        }).then(() => {
+          navigate('/IndexFarmer')
+        })
+      } else {
+        Swal.fire({
+          title: 'เบอร์โทร หรือ รหัสบัตรประชาชน <br/> ซ้ำในระบบ',
+          icon: 'error',
+          showConfirmButton: true,
+        })
+      }
+    })
   }
 
   const renderFromData = (
@@ -603,6 +631,8 @@ const AddFarmer = () => {
                     optionA.children.toLowerCase().localeCompare(optionB.children.toLowerCase())
                   }
                   onChange={handleOnChangeProvince}
+                  defaultValue={autoProvince}
+                  key={autoProvince}
                 >
                   {province?.map((item, index) => (
                     <Option key={index} value={item.provinceId}>
@@ -627,6 +657,8 @@ const AddFarmer = () => {
                     optionA.children.toLowerCase().localeCompare(optionB.children.toLowerCase())
                   }
                   onChange={handleOnChangeDistrict}
+                  defaultValue={autoDistrict}
+                  key={autoDistrict}
                 >
                   {district?.map((item, index) => (
                     <Option key={index} value={item.districtId}>
@@ -653,6 +685,8 @@ const AddFarmer = () => {
                     optionA.children.toLowerCase().localeCompare(optionB.children.toLowerCase())
                   }
                   onChange={handleOnChangeSubdistrict}
+                  defaultValue={autoSubdistrict}
+                  key={autoSubdistrict}
                 >
                   {subdistrict?.map((item, index) => (
                     <Option key={index} value={item.subdistrictId}>
@@ -669,8 +703,8 @@ const AddFarmer = () => {
               <Form.Item name='postcode'>
                 <Input
                   placeholder='เลือกรหัสไปรษณีย์'
-                  defaultValue={address.postcode}
-                  key={address.subdistrictId}
+                  defaultValue={address.postcode || autoPostCode}
+                  key={address.subdistrictId || autoSubdistrict}
                   disabled
                 />
               </Form.Item>
@@ -835,7 +869,6 @@ const AddFarmer = () => {
       </CardContainer>
       <div className='d-flex justify-content-between pt-5'>
         <p>รายการทั้งหมด {farmerPlotList?.length} รายการ</p>
-        {/* <Pagination defaultCurrent={1} total={1} /> */}
       </div>
     </div>
   )
@@ -855,7 +888,7 @@ const AddFarmer = () => {
       <FooterPage
         onClickBack={() => navigate(-1)}
         onClickSave={insertFarmer}
-        // disableSaveBtn={saveBtnDisable}
+        disableSaveBtn={saveBtnDisable}
       />
 
       <ModalFarmerPlot
