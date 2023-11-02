@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
 import { DownOutlined, SearchOutlined, StarFilled } from '@ant-design/icons'
 import {
   Avatar,
@@ -24,8 +25,8 @@ import { Select as AntdSelect } from 'antd'
 import Select from 'react-select'
 import TextArea from 'antd/lib/input/TextArea'
 import { RowSelectionType } from 'antd/lib/table/interface'
-import moment, { utc } from 'moment'
-import React, { useEffect, useRef, useState } from 'react'
+import moment from 'moment'
+import React, { useEffect, useState } from 'react'
 import { BackButton, BackIconButton } from '../../../components/button/BackButton'
 import SaveButton from '../../../components/button/SaveButton'
 import { CardContainer } from '../../../components/card/CardContainer'
@@ -73,13 +74,12 @@ import {
   TaskCoupon_INIT,
 } from '../../../entities/CalculateTask'
 import { useNavigate } from 'react-router-dom'
-import { OptionType } from './AddNewTask'
 import 'rsuite/dist/rsuite.min.css'
 import { ModalAcceptedTask } from '../../../components/modal/ModalAcceptedTask'
 import ShowNickName from '../../../components/popover/ShowNickName'
 import '../newTask/Styles.css'
 import { TargetSpray } from '../../../datasource/TargetSprayDatarource'
-import { AllTargetSpayEntities } from '../../../entities/TargetSprayEntities'
+import { TargetSpayEntities } from '../../../entities/TargetSprayEntities'
 
 const dateFormat = 'DD/MM/YYYY'
 const dateCreateFormat = 'YYYY-MM-DD'
@@ -115,7 +115,7 @@ const EditNewTask = () => {
     message: '',
   })
   const [modalCheckUpdate, setModalCheckUpdate] = useState<boolean>(false)
-  const [targetSpray, setTargetSpray] = useState<AllTargetSpayEntities[]>([])
+  const [targetSpray, setTargetSpray] = useState<TargetSpayEntities[]>([])
 
   const [couponData, setCouponData] = useState<TaskCoupon>(TaskCoupon_INIT)
   const [getCoupon, setGetCoupon] = useState<GetTaskCoupon>(GetTaskCoupon_INIT)

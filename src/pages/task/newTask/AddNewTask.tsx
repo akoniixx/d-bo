@@ -70,7 +70,7 @@ export type OptionType = {
 }
 import '../newTask/Styles.css'
 import { TargetSpray } from '../../../datasource/TargetSprayDatarource'
-import { AllTargetSpayEntities } from '../../../entities/TargetSprayEntities'
+import { TargetSpayEntities } from '../../../entities/TargetSprayEntities'
 const { Step } = Steps
 const { Option } = AntdSelect
 const dateFormat = 'DD/MM/YYYY'
@@ -135,7 +135,7 @@ const AddNewTask = () => {
   const [farmerListDropdown, setFarmerListDropdown] = useState<any>([])
   const [showData, setShowData] = useState<boolean>(false)
   const [rowFarmer, setRowFarmer] = useState(10)
-  const [targetSpray, setTargetSpray] = useState<AllTargetSpayEntities[]>([])
+  const [targetSpray, setTargetSpray] = useState<TargetSpayEntities[]>([])
 
   const fetchFarmerList = () => {
     TaskDatasource.getFarmerListTask(searchFilterFarmer, currenSearch, rowFarmer).then(

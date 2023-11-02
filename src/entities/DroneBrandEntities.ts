@@ -63,7 +63,7 @@ export const CreateDroneEntity_INIT: CreateDroneEntity = {
   droneId: 0,
   series: '',
   isActive: true,
-  droneAbility: ['']
+  droneAbility: [''],
 }
 export interface CreateDroneBrandEntity {
   id?: string
