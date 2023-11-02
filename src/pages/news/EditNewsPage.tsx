@@ -149,7 +149,7 @@ function EditNewsPage() {
   }
 
   const handleShowTimer = (e: any) => {
-    setShowTimer(e.target.value === 'ACTIVE')
+    setShowTimer(e.target.value === 'PENDING')
   }
 
   const handleTypeLaunch = (e: any) => {
@@ -226,7 +226,24 @@ function EditNewsPage() {
   }
 
   const onSubmit = () => {
-    const { newsName, newsDescription, newsStatus } = form.getFieldsValue()
+    const { newsName,
+      newsDescription,
+      newsStatus,
+      startDate,
+      startTime,
+      typeLaunch,
+      endDate,
+      endTime, } = form.getFieldsValue()
+    const dateStart =
+      newsStatus === 'PENDING'
+        ? moment(startDate).format('YYYY-MM-DD') + ' ' + moment(startTime).format('HH:mm:ss')
+        : null
+    const dateEnd =
+      newsStatus === 'PENDING'
+        ? typeLaunch === 'IS_ENDDATE'
+          ? moment(endDate).format('YYYY-MM-DD') + ' ' + moment(endTime).format('HH:mm:ss')
+          : null
+        : null
     if (!createImgProfile.file) {
       NewsDatasource.editNews({
         id: queryString[1],
@@ -237,8 +254,11 @@ function EditNewsPage() {
         categoryNews: categoryNews,
         campaignId: campId,
         createBy: profile.firstname + ' ' + profile.lastname,
-        pinAll: appPinAll,
-        pinMain: appPinMain,
+        pinAll: false,
+        pinMain: false,
+        startDate: dateStart,
+        typeLaunch: (!typeLaunch) ? (newsStatus === "PENDING") ? 'NON_ENDDATE' : undefined : typeLaunch,
+        endDate: dateEnd,
       })
         .then((res) => {
           Swal.fire({
@@ -269,8 +289,11 @@ function EditNewsPage() {
         campaignId: campId,
         file: createImgProfile.file,
         createBy: profile.firstname + ' ' + profile.lastname,
-        pinAll: appPinAll,
-        pinMain: appPinMain,
+        pinAll: false,
+        pinMain: false,
+        startDate: dateStart,
+        typeLaunch: (!typeLaunch) ? (newsStatus === "PENDING") ? 'NON_ENDDATE' : undefined : typeLaunch,
+        endDate: dateEnd,
       })
         .then((res) => {
           Swal.fire({

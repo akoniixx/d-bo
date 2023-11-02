@@ -40,7 +40,9 @@ export class NewsDatasource {
     formData.append('pinAll', new Boolean(data.pinAll).toString())
     formData.append('pinMain', new Boolean(data.pinMain).toString())
     formData.append('startDate', data.startDate!)
-    formData.append('endDate', data.endDate!)
+    if(data.typeLaunch === "IS_ENDDATE"){
+      formData.append('endDate', data.endDate!)
+    }
     formData.append('typeLaunch', data.typeLaunch!)
     return httpClient
       .post(BASE_URL + '/promotion/news/upload', formData)
@@ -156,7 +158,9 @@ export class NewsDatasource {
       formData.append('pinAll', new Boolean(data.pinAll).toString())
       formData.append('pinMain', new Boolean(data.pinMain).toString())
       formData.append('startDate', data.startDate!)
-      formData.append('endDate', data.endDate!)
+      if(data.typeLaunch === "IS_ENDDATE"){
+        formData.append('endDate', data.endDate!)
+      }
       formData.append('typeLaunch', data.typeLaunch!)
     } else {
       formData.append('file', data.file)
@@ -170,7 +174,9 @@ export class NewsDatasource {
       formData.append('pinAll', new Boolean(data.pinAll).toString())
       formData.append('pinMain', new Boolean(data.pinMain).toString())
       formData.append('startDate', data.startDate!)
-      formData.append('endDate', data.endDate!)
+      if(data.typeLaunch === "IS_ENDDATE"){
+        formData.append('endDate', data.endDate!)
+      }
       formData.append('typeLaunch', data.typeLaunch!)
     }
     return httpClient
