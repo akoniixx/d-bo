@@ -262,6 +262,8 @@ function Content({ application }: Props) {
             backgroundColor: currentApp.color,
             height: 40,
             fontSize: 16,
+            borderWidth: 1,
+            borderColor: currentApp.color,
           }}
         >
           บันทึก
