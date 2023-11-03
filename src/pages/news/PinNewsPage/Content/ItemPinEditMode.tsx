@@ -78,20 +78,27 @@ function ItemPinEditMode({
     const getNewsBySearch = async (searchKeyword: string) => {
       try {
         setFetching(true)
+        const currentForm = form.getFieldValue(nameHead) || []
+
         const res = await NewsDatasource.searchNews({
           application: currentApp.app,
           search: searchKeyword,
           status: 'ACTIVE',
         })
-        const formatData = res.data.map((item: any) => {
-          return {
-            label: item.title,
-            value: item.id,
-            id: item.id,
-            startDate: item.create_at,
-            categoryNews: item.category_news,
-          }
-        })
+        const formatData = res.data
+          .map((item: any) => {
+            return {
+              label: item.title,
+              value: item.id,
+              id: item.id,
+              startDate: item.create_at,
+              categoryNews: item.category_news,
+            }
+          })
+          .filter((item: any) => {
+            const findIndex = currentForm.findIndex((el: any) => el.newsId === item.id)
+            return findIndex === -1
+          })
 
         setOptionFetch(formatData)
         setFetching(false)

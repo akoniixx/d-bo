@@ -1,5 +1,17 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
 import { EditOutlined } from '@ant-design/icons'
-import { Avatar, DatePicker, Form, Input, Radio, Row, Select, Space, TimePicker } from 'antd'
+import {
+  Avatar,
+  Checkbox,
+  DatePicker,
+  Form,
+  Input,
+  Radio,
+  Row,
+  Select,
+  Space,
+  TimePicker,
+} from 'antd'
 import TextArea from 'antd/lib/input/TextArea'
 import moment from 'moment'
 import React, { useEffect, useState } from 'react'
@@ -15,7 +27,6 @@ import { CouponDataSource } from '../../../datasource/CouponDatasource'
 import { CropDatasource } from '../../../datasource/CropDatasource'
 import { TaskDatasource } from '../../../datasource/TaskDatasource'
 import { LAT_LNG_BANGKOK } from '../../../definitions/Location'
-import { PURPOSE_SPRAY, PURPOSE_SPRAY_CHECKBOX } from '../../../definitions/PurposeSpray'
 import { STATUS_INPROGRESS_CHECKBOX } from '../../../definitions/Status'
 import { CropPurposeSprayEntity } from '../../../entities/CropEntities'
 import {
@@ -30,12 +41,13 @@ import {
   UpdateInprogressTaskEntity_INIT,
 } from '../../../entities/TaskInprogress'
 import { TaskSearchDroner } from '../../../entities/TaskSearchDroner'
-import { color, icon } from '../../../resource'
+import { color } from '../../../resource'
 import { numberWithCommas, numberWithCommasToFixed } from '../../../utilities/TextFormatter'
-import { DashboardLayout } from '../../../components/layout/Layout'
 import { useNavigate } from 'react-router-dom'
 import { listAppType } from '../../../definitions/ApplicatoionTypes'
 import ShowNickName from '../../../components/popover/ShowNickName'
+import { TargetSpayEntities } from '../../../entities/TargetSprayEntities'
+import { TargetSpray } from '../../../datasource/TargetSprayDatarource'
 const { Option } = Select
 
 const dateFormat = 'DD/MM/YYYY'
@@ -75,6 +87,8 @@ const EditInprogressTask = () => {
   })
   const [showModel, setShowModal] = useState<boolean>(false)
   const [dronerSelected, setDronerSelected] = useState<DronerEntity>(DronerEntity_INIT)
+  const [targetSpray, setTargetSpray] = useState<TargetSpayEntities[]>([])
+  const [someTargetSpray, setSomeTargetSpray] = useState<any>()
 
   const fetchInprogressTask = async () => {
     await TaskDatasource.getInprogressTaskById(queryString[1]).then((res) => {
@@ -94,6 +108,12 @@ const EditInprogressTask = () => {
       )
     })
   }
+  const getAllTargetSpray = async () => {
+    await TargetSpray.getAllTargetSpray().then((res) => {
+      setTargetSpray(res.data)
+      setSomeTargetSpray(res.data.map((item: any) => item.name))
+    })
+  }
 
   const fetchPurposeSpray = async (crop: string) => {
     await CropDatasource.getPurposeByCroupName(crop).then((res) => {
@@ -103,6 +123,7 @@ const EditInprogressTask = () => {
 
   useEffect(() => {
     fetchInprogressTask()
+    getAllTargetSpray()
   }, [])
 
   const handleChangeStatus = (e: any) => {
@@ -140,8 +161,8 @@ const EditInprogressTask = () => {
     const checked = e.target.checked
     const value = e.target.value
     setCheckCrop(value == 'อื่นๆ' ? !checked : otherSpray != null ? false : true)
-    PURPOSE_SPRAY_CHECKBOX.map((item) =>
-      _.set(item, 'isChecked', item.crop == value ? checked : item.isChecked),
+    targetSpray.map((item: any) =>
+      _.set(item, 'isChecked', item.name == value ? checked : item.isChecked),
     )
     let p: any = ''
 
@@ -192,10 +213,6 @@ const EditInprogressTask = () => {
   }
   const handleDateAppointment = (e: any) => {
     setDateAppointment(moment(new Date(e)).format(dateCreateFormat))
-    checkValidate(data)
-  }
-  const handleTimeAppiontment = (e: any) => {
-    setTimeAppointment(moment(new Date(e).getTime()))
     checkValidate(data)
   }
 
@@ -277,7 +294,9 @@ const EditInprogressTask = () => {
                   >
                     {periodSpray?.purposeSpray?.length ? (
                       periodSpray?.purposeSpray?.map((item) => (
-                        <Option value={item.id}>{item.purposeSprayName}</Option>
+                        <Option key={item.id} value={item.id}>
+                          {item.purposeSprayName}
+                        </Option>
                       ))
                     ) : (
                       <Option>-</Option>
@@ -289,51 +308,56 @@ const EditInprogressTask = () => {
                 <label>
                   เป้าหมายการฉีดพ่น <span style={{ color: 'red' }}>*</span>
                 </label>
-                {PURPOSE_SPRAY_CHECKBOX.map((item) =>
-                  _.set(
-                    item,
-                    'isChecked',
-                    data?.targetSpray?.map((x) => x).find((y) => y === item.crop)
-                      ? true
-                      : item.isChecked,
-                  ),
-                ).map((x, index) => (
-                  <div className='form-group'>
-                    <input
-                      type='checkbox'
-                      value={x.crop}
-                      checked={x.isChecked}
-                      onChange={handlePurposeSpray}
-                    />{' '}
-                    <label style={{ padding: '0 8px 0 0' }}>{x.crop}</label>
-                    {index == 4 && (
-                      <>
-                        <Input
-                          status={validateComma.status}
-                          className='col-lg-9'
-                          placeholder='โปรดระบุ เช่น เพลี้ย,หอย'
-                          onChange={handleOtherSpray}
-                          disabled={checkCrop}
-                          defaultValue={Array.from(
-                            new Set(
-                              data?.targetSpray.filter((a) => !PURPOSE_SPRAY.some((x) => x === a)),
-                            ),
-                          )}
-                        />
-                        {validateComma.status == 'error' && (
-                          <p
-                            style={{
-                              color: color.Error,
-                              padding: '0 0 0 55px',
-                            }}
-                          >
-                            {validateComma.message}
-                          </p>
+                {targetSpray
+                  .map((item: any) =>
+                    _.set(
+                      item,
+                      'isChecked',
+                      data?.targetSpray?.map((x) => x).find((y) => y === item.name)
+                        ? true
+                        : item.isChecked,
+                    ),
+                  )
+                  .map((x, index) => (
+                    <>
+                      <div className='form-group'>
+                        <Checkbox
+                          value={x.name}
+                          checked={x.isChecked}
+                          onChange={handlePurposeSpray}
+                        />{' '}
+                        <label style={{ padding: '0 8px 0 0' }}>{x.name}</label>
+                        {index == 4 && (
+                          <>
+                            <Input
+                              status={validateComma.status}
+                              className='col-lg-9'
+                              placeholder='โปรดระบุ เช่น เพลี้ย,หอย'
+                              onChange={handleOtherSpray}
+                              disabled={checkCrop}
+                              defaultValue={Array.from(
+                                new Set(
+                                  data?.targetSpray.filter(
+                                    (a) => !someTargetSpray.some((x: any) => x === a),
+                                  ),
+                                ),
+                              )}
+                            />
+                            {validateComma.status == 'error' && (
+                              <p
+                                style={{
+                                  color: color.Error,
+                                  padding: '0 0 0 55px',
+                                }}
+                              >
+                                {validateComma.message}
+                              </p>
+                            )}
+                          </>
                         )}
-                      </>
-                    )}
-                  </div>
-                ))}
+                      </div>
+                    </>
+                  ))}
               </div>
               <div className='row form-group p-2'>
                 <label>
@@ -372,7 +396,7 @@ const EditInprogressTask = () => {
                 {listAppType.map(
                   (item, index) =>
                     data.applicationType === item.value && (
-                      <div>
+                      <div key={index}>
                         <img src={item.icon} style={{ width: 22, height: 22 }} />
                         <span> {data.createBy ? data.createBy + ` ${item.create}` : '-'}</span>
                       </div>
@@ -385,7 +409,7 @@ const EditInprogressTask = () => {
                 <Radio.Group defaultValue={data.status} onChange={handleChangeStatus}>
                   <Space direction='vertical'>
                     {STATUS_INPROGRESS_CHECKBOX.map((item, index) => (
-                      <Radio value={item.value} className='col-lg-12'>
+                      <Radio key={index} value={item.value} className='col-lg-12'>
                         {item.name}
                         {data.status == 'CANCELED' && index == 1 && (
                           <TextArea
@@ -677,26 +701,6 @@ const EditInprogressTask = () => {
                 />
               </div>
             </div>
-            {/* <div className="row pt-3">
-              <div className="form-group col-lg-6 p-2">
-                <label>โปรโมชั่นนักบินโดรน</label>
-                <Input
-                  suffix="บาท"
-                  value={data.discountPromotion}
-                  disabled
-                  autoComplete="off"
-                />
-              </div>
-              <div className="form-group col-lg-6 p-2">
-                <label>โปรโมชั่นเกษตรกร</label>
-                <Input
-                  suffix="บาท"
-                  value={data.revenuePromotion}
-                  disabled
-                  autoComplete="off"
-                />
-              </div>
-            </div> */}
           </Form>
         </CardContainer>
       </Form>

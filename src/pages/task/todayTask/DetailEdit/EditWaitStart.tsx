@@ -27,7 +27,6 @@ import { TaskInprogressDatasource } from '../../../../datasource/TaskInprogressD
 import FooterPage from '../../../../components/footer/FooterPage'
 import { CropPurposeSprayEntity } from '../../../../entities/CropEntities'
 import { CropDatasource } from '../../../../datasource/CropDatasource'
-import { PURPOSE_SPRAY, PURPOSE_SPRAY_CHECKBOX } from '../../../../definitions/PurposeSpray'
 import TextArea from 'antd/lib/input/TextArea'
 import {
   STATUS_COLOR_MAPPING,
@@ -41,6 +40,8 @@ import { numberWithCommas } from '../../../../utilities/TextFormatter'
 import { useNavigate } from 'react-router-dom'
 import { listAppType } from '../../../../definitions/ApplicatoionTypes'
 import ShowNickName from '../../../../components/popover/ShowNickName'
+import { TargetSpayEntities } from '../../../../entities/TargetSprayEntities'
+import { TargetSpray } from '../../../../datasource/TargetSprayDatarource'
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const { Map } = require('immutable')
 // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -77,7 +78,17 @@ function EditWaitStart() {
     status: '',
     message: '',
   })
+  const [targetSpray, setTargetSpray] = useState<TargetSpayEntities[]>([])
+  const [someTargetSpray, setSomeTargetSpray] = useState<any>()
   const [otherSpray, setOtherSpray] = useState<any>()
+
+  const getAllTargetSpray = async () => {
+    await TargetSpray.getAllTargetSpray().then((res) => {
+      setTargetSpray(res.data)
+      setSomeTargetSpray(res.data.map((item: any) => item.name))
+    })
+  }
+
   const fetchTaskDetail = async () => {
     await TaskInprogressDatasource.getTaskDetailById(taskId).then((res) => {
       if (res.couponId !== null) {
@@ -91,7 +102,9 @@ function EditWaitStart() {
       }
       setCheckCrop(!res.targetSpray.includes('อื่นๆ'))
       setData(res)
-      setOtherSpray(res.targetSpray.filter((a) => !PURPOSE_SPRAY.some((x) => x === a)).join(','))
+      setOtherSpray(
+        res.targetSpray.filter((a) => !someTargetSpray.some((x: any) => x === a)).join(','),
+      )
       fetchPurposeSpray(res.farmerPlot.plantName)
       setMapPosition({
         lat: parseFloat(res.farmerPlot.lat),
@@ -107,6 +120,7 @@ function EditWaitStart() {
 
   useEffect(() => {
     fetchTaskDetail()
+    getAllTargetSpray()
   }, [])
 
   const handlerDate = (e: any) => {
@@ -137,10 +151,10 @@ function EditWaitStart() {
     const checked = e.target.checked
     const value = e.target.value
     setCheckCrop(value == 'อื่นๆ' ? !checked : otherSpray != null ? false : true)
-    PURPOSE_SPRAY_CHECKBOX.map((item) =>
-      _.set(item, 'isChecked', item.crop == value ? checked : item.isChecked),
+    targetSpray.map((item: any) =>
+      _.set(item, 'isChecked', item.name == value ? checked : item.isChecked),
     )
-    if (PURPOSE_SPRAY_CHECKBOX[4].isChecked == true) {
+    if (targetSpray[4].isChecked === true) {
       setCheckCrop(false)
     } else {
       setCheckCrop(true)
@@ -307,49 +321,51 @@ function EditWaitStart() {
               <span style={{ color: 'red' }}>*</span>
             </label>
             {data.targetSpray != null
-              ? PURPOSE_SPRAY_CHECKBOX.map((item) =>
-                  _.set(
-                    item,
-                    'isChecked',
-                    data?.targetSpray.map((x) => x).find((y) => y === item.crop)
-                      ? true
-                      : item.isChecked,
-                  ),
-                ).map((x, index) => (
-                  <>
-                    <div className='form-group'>
-                      <Checkbox
-                        key={x.key}
-                        value={x.crop}
-                        onClick={handlerTargetSpray}
-                        checked={x.isChecked}
-                      />{' '}
-                      <label>{x.crop}</label>
-                      <br />
-                      {PURPOSE_SPRAY_CHECKBOX[4] && index == 4 && (
-                        <>
-                          <Input
-                            key={data?.targetSpray[0]}
-                            disabled={checkCrop}
-                            onChange={handleOtherSpray}
-                            placeholder='โปรดระบุ เช่น เพลี้ย,หอย'
-                            autoComplete='off'
-                            defaultValue={Array.from(
-                              new Set(
-                                data?.targetSpray.filter(
-                                  (a) => !PURPOSE_SPRAY.some((x) => x === a),
+              ? targetSpray
+                  .map((item: any) =>
+                    _.set(
+                      item,
+                      'isChecked',
+                      data?.targetSpray.map((x) => x).find((y) => y === item.name)
+                        ? true
+                        : item.isChecked,
+                    ),
+                  )
+                  .map((x, index) => (
+                    <>
+                      <div className='form-group'>
+                        <Checkbox
+                          key={x.id}
+                          value={x.name}
+                          onClick={handlerTargetSpray}
+                          checked={x.isChecked}
+                        />{' '}
+                        <label>{x.name}</label>
+                        <br />
+                        {targetSpray[4] && index == 4 && (
+                          <>
+                            <Input
+                              key={data?.targetSpray[0]}
+                              disabled={checkCrop}
+                              onChange={handleOtherSpray}
+                              placeholder='โปรดระบุ เช่น เพลี้ย,หอย'
+                              autoComplete='off'
+                              defaultValue={Array.from(
+                                new Set(
+                                  data?.targetSpray.filter(
+                                    (a) => !someTargetSpray.some((x: any) => x === a),
+                                  ),
                                 ),
-                              ),
+                              )}
+                            />
+                            {validateComma.status == 'error' && (
+                              <p style={{ color: color.Error }}>{validateComma.message}</p>
                             )}
-                          />
-                          {validateComma.status == 'error' && (
-                            <p style={{ color: color.Error }}>{validateComma.message}</p>
-                          )}
-                        </>
-                      )}
-                    </div>
-                  </>
-                ))
+                          </>
+                        )}
+                      </div>
+                    </>
+                  ))
               : null}
           </div>
           <div className='row form-group col-lg-6 p-2'>

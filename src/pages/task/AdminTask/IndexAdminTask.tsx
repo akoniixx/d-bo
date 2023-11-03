@@ -30,6 +30,7 @@ import {
   numberWithCommasToFixed,
   validateOnlyNumWDecimal,
 } from '../../../utilities/TextFormatter'
+import Select from 'react-select'
 
 const NewTable = styled(Table)`
   .ant-table-container table thead tr th {
@@ -45,6 +46,7 @@ const IndexAdminTask = () => {
   const [form] = Form.useForm()
   const profile = JSON.parse(localStorage.getItem('profile') || '{  }')
   const [current, setCurrent] = useState(1)
+  const [row, setRow] = useState(10)
   const [taskList, setTaskList] = useState<any>()
   const [searchTaskList, setSearchTaskList] = useState<any>()
   const [source, setSource] = useState<string>('EDIT')
@@ -58,7 +60,7 @@ const IndexAdminTask = () => {
   const [history, setHistory] = useState<any>()
 
   const fetchTaskList = () => {
-    TaskDatasource.getAllTaskList(10, current, taskNo).then((res: AllTaskListEntity) => {
+    TaskDatasource.getAllTaskList(row, current, taskNo).then((res: AllTaskListEntity) => {
       setTaskList(res.data)
       const data = res.data.map((item) => {
         return {
@@ -74,27 +76,21 @@ const IndexAdminTask = () => {
 
   useEffect(() => {
     fetchTaskList()
-  }, [taskNo])
+  }, [taskNo, current, row])
 
-  const onItemsRendered = (props: any) => {
-    if (props.visibleStopIndex >= searchTaskList.length - 1) {
-      if (searchTaskList.length < count) {
-        TaskDatasource.getAllTaskList(10, current + 1, taskNo).then((res: AllTaskListEntity) => {
-          setTaskList([...taskList, res.data])
-          const data = res.data.map((item) => {
-            return {
-              ...item,
-              label: `${item.taskNo} (สถานะ : ${ALL_TASK_MAPPING[item.status]})`,
-              value: item.id,
-            }
-          })
-          setCurrent(current + 1)
-          setSearchTaskList([...searchTaskList, ...data])
-        })
-      }
+  const handleInputChange = (inputValue: any) => {
+    const uppercase = inputValue.toUpperCase()
+    if (uppercase) {
+      setCurrent(1)
+      setTaskNo(uppercase)
     }
   }
-
+  const handleMenuScrollToBottom = () => {
+    if (row === searchTaskList.length) {
+      setCurrent(current)
+      setRow(row + 10)
+    }
+  }
   const handleSearchTask = () => {
     TaskDatasource.getManageTaskByTaskId(taskId).then((res) => {
       setTaskSelected(res)
@@ -887,32 +883,18 @@ const IndexAdminTask = () => {
             <Row gutter={8}>
               <Col span={12}>
                 <Form.Item name='searchAddress'>
-                  <InputPicker
-                    virtualized
-                    value={taskNo}
-                    listProps={{
-                      onItemsRendered,
-                    }}
-                    onChange={(e) => {
-                      setTaskId(e)
+                  <Select
+                    placeholder='ค้นหารหัสงาน (Task No.)'
+                    isSearchable
+                    isClearable
+                    onInputChange={handleInputChange}
+                    onChange={(e: any) => {
+                      setTaskId(e.id)
                       setSearch(false)
                     }}
-                    placeholder='ค้นหารหัสงาน (Task No.)'
-                    onSearch={(val: any) => {
-                      const uppercase = val.toUpperCase()
-                      if (uppercase) {
-                        setCurrent(1)
-                        setTaskNo(uppercase)
-                      }
-                    }}
-                    onClean={() => {
-                      setCurrent(1)
-                      setTaskNo(undefined)
-                    }}
-                    data={searchTaskList}
-                    style={{
-                      width: '100%',
-                    }}
+                    options={searchTaskList}
+                    value={taskNo}
+                    onMenuScrollToBottom={handleMenuScrollToBottom}
                   />
                 </Form.Item>
               </Col>

@@ -23,6 +23,10 @@ export interface FarmerPlotEntity {
   status: string
   plantCharacteristics: string[]
   reason?: string
+  provinceId?: number
+  districtId?: number
+  subdistrictId?: number
+  postcode?: string
 }
 export const FarmerPlotEntity_INIT: FarmerPlotEntity = {
   id: '',
@@ -42,6 +46,10 @@ export const FarmerPlotEntity_INIT: FarmerPlotEntity = {
   plotAreaId: 0,
   status: 'PENDING',
   plantCharacteristics: [],
+  provinceId: 0,
+  districtId: 0,
+  subdistrictId: 0,
+  postcode: '',
 }
 
 export interface PlotEntity {
