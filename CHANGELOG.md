@@ -1,4 +1,6 @@
 ## [Version - 0]
+## Fix [v0.39.8] 2023-11-1
+- filter new already pin cant select
 
 ## improve [v0.39.8] 2023-11-2
 
