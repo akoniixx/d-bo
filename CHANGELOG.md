@@ -1,5 +1,9 @@
 ## [Version - 0]
 
+## Fix [v0.39.8] 2023-11-3
+
+- fixed endtime from edit news
+
 ## Fix [v0.39.7] 2023-11-1
 
 - fixed status for news
