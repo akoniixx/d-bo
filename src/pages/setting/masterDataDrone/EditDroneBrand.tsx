@@ -270,71 +270,72 @@ const EditDroneBrand = () => {
           {dataDrone?.data.length != 0 ? (
             <div className='container'>
               {dataDrone?.data.map((item, index) => (
-              <>
-                <div className='row pt-3 pb-3'>
-                  <div className='col-lg-5'>
-                    <p
-                      style={{
-                        textOverflow: 'ellipsis',
-                        overflow: 'hidden',
-                        whiteSpace: 'nowrap',
-                        marginBottom: 0,
-                      }}
-                    >
-                      {item.series}
-                    </p>
-                  </div>
-                  <div className='col-lg'>
-                    <p
-                      style={{
-                        textOverflow: 'ellipsis',
-                        overflow: 'hidden',
-                        whiteSpace: 'nowrap',
-                        marginBottom: 0,
-                      }}
-                    >
-                      {item.dronerDrone + ' ลำ'}
-                    </p>
-                  </div>
-                  <div className='col-lg'>
-                    <span
-                      style={{
-                        color: item.isActive ? color.Success : color.Error,
-                      }}
-                    >
-                      <Badge color={item.isActive ? color.Success : color.Error} />{' '}
-                      {item.isActive ? 'ใช้งาน' : 'ไม่ใช้งาน'}
-                    </span>
-                  </div>
-
-                  <div className='col-lg d-flex justify-content-between'>
-                    <div className='col-lg'>
-                      <ActionButton
-                        icon={<EditOutlined />}
-                        color={color.primary1}
-                        onClick={() => editDroneIndex(item, index)}
-                      />
+                <>
+                  <div className='row pt-3 pb-3'>
+                    <div className='col-lg-5'>
+                      <p
+                        style={{
+                          textOverflow: 'ellipsis',
+                          overflow: 'hidden',
+                          whiteSpace: 'nowrap',
+                          marginBottom: 0,
+                        }}
+                      >
+                        {item.series}
+                      </p>
                     </div>
-                    {item.dronerDrone === 0 ? (
-                      <div>
+                    <div className='col-lg'>
+                      <p
+                        style={{
+                          textOverflow: 'ellipsis',
+                          overflow: 'hidden',
+                          whiteSpace: 'nowrap',
+                          marginBottom: 0,
+                        }}
+                      >
+                        {item.dronerDrone + ' ลำ'}
+                      </p>
+                    </div>
+                    <div className='col-lg'>
+                      <span
+                        style={{
+                          color: item.isActive ? color.Success : color.Error,
+                        }}
+                      >
+                        <Badge color={item.isActive ? color.Success : color.Error} />{' '}
+                        {item.isActive ? 'ใช้งาน' : 'ไม่ใช้งาน'}
+                      </span>
+                    </div>
+
+                    <div className='col-lg d-flex justify-content-between'>
+                      <div className='col-lg'>
                         <ActionButton
-                          icon={<DeleteOutlined />}
-                          color={color.Error}
-                          onClick={() => removeDrone(item)}
+                          icon={<EditOutlined />}
+                          color={color.primary1}
+                          onClick={() => editDroneIndex(item, index)}
                         />
                       </div>
-                    ) : (
-                      <div>
-                        <Button
-                          disabled
-                          style={{ borderRadius: 5 }}
-                          icon={<DeleteOutlined />}
-                          color={color.Disable}
-                        />
-                      </div>
-                    )}
+                      {item.dronerDrone === 0 ? (
+                        <div>
+                          <ActionButton
+                            icon={<DeleteOutlined />}
+                            color={color.Error}
+                            onClick={() => removeDrone(item)}
+                          />
+                        </div>
+                      ) : (
+                        <div>
+                          <Button
+                            disabled
+                            style={{ borderRadius: 5 }}
+                            icon={<DeleteOutlined />}
+                            color={color.Disable}
+                          />
+                        </div>
+                      )}
+                    </div>
                   </div>
-                </div></>
+                </>
               ))}
             </div>
           ) : (

@@ -65,6 +65,7 @@ export interface GetFarmerEntity {
   reason: string
   birthDate: string | Moment
   address: AddressEntity
+  addressId: string
   farmerPlot: FarmerPlotEntity[]
   file: ImageEntity[]
   createdAt?: string
@@ -83,6 +84,7 @@ export const GetFarmerEntity_INIT: GetFarmerEntity = {
   reason: '',
   birthDate: '',
   address: AddressEntity_INIT,
+  addressId: '',
   farmerPlot: [FarmerPlotEntity_INIT],
   file: [ImageEntity_INTI],
   comment: '',

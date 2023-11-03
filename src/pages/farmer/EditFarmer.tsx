@@ -11,7 +11,6 @@ import {
   Space,
   Tag,
   DatePicker,
-  PaginationProps,
 } from 'antd'
 import { CardContainer } from '../../components/card/CardContainer'
 import { BackIconButton } from '../../components/button/BackButton'
@@ -51,14 +50,14 @@ import bth_img_empty from '../../resource/media/empties/upload_Img_btn.png'
 import moment from 'moment'
 import { useLocalStorage } from '../../hook/useLocalStorage'
 import { resizeFileImg } from '../../utilities/ResizeImage'
-import { Navigate, useNavigate } from 'react-router-dom'
-import { DashboardLayout } from '../../components/layout/Layout'
-const { Option } = Select
+import { useNavigate } from 'react-router-dom'
 
 const dateFormat = 'DD/MM/YYYY'
 const dateCreateFormat = 'YYYY-MM-DD'
 
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const _ = require('lodash')
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const { Map } = require('immutable')
 
 const EditFarmer = () => {
@@ -92,7 +91,6 @@ const EditFarmer = () => {
       if (res) {
         const findId = res.find((x) => x.provinceId === 0)
         setLocateNull(findId)
-        console.log(findId)
       }
     })
   }, [])
@@ -102,8 +100,27 @@ const EditFarmer = () => {
         ...res,
         birthDate: res.birthDate ? moment(res.birthDate) : moment(),
       })
-
-      setAddress(res.address)
+      if (
+        res.address &&
+        res.address.provinceId &&
+        res.address.districtId &&
+        res.address.subdistrictId
+      ) {
+        setAddress(res.address)
+      } else {
+        if (res.farmerPlot.length > 0) {
+          const findAddress = res.farmerPlot.map((item) => item.plotArea)
+          const province = Map(address).set('provinceId', findAddress[0].provinceId)
+          const districtId = Map(province.toJS()).set('districtId', findAddress[0].districtId)
+          const subdistrictId = Map(districtId.toJS()).set(
+            'subdistrictId',
+            findAddress[0].subdistrictId,
+          )
+          const postcode = Map(subdistrictId.toJS()).set('postcode', findAddress[0].postcode)
+          const addressId = Map(postcode.toJS()).set('id', res.addressId)
+          setAddress(addressId.toJS())
+        }
+      }
       setFarmerPlotList(res.farmerPlot)
       const getPathPro = res.file.filter((x) => x.category === 'PROFILE_IMAGE')
       const getPathCard = res.file.filter((x) => x.category === 'ID_CARD_IMAGE')
@@ -135,6 +152,7 @@ const EditFarmer = () => {
       }
     })
   }
+
   const indexOfLastItem = currentPage * itemsPerPage
   const indexOfFirstItem = indexOfLastItem - itemsPerPage
   const currentItems = farmerPlotList.slice(indexOfFirstItem, indexOfLastItem)
@@ -153,7 +171,7 @@ const EditFarmer = () => {
     LocationDatasource.getProvince().then((res) => {
       setProvince(res)
     })
-    if (address !== null) {
+    if (address) {
       if (address.provinceId) {
         LocationDatasource.getDistrict(address.provinceId).then((res) => {
           setDistrict(res)
@@ -265,6 +283,17 @@ const EditFarmer = () => {
       ...plot,
       farmerId,
     }
+    const addr = {
+      id: '',
+      address1: '',
+      address2: '',
+      address3: '',
+      provinceId: plot.provinceId || 0,
+      districtId: plot.districtId || 0,
+      subdistrictId: plot.subdistrictId || 0,
+      postcode: plot.postcode || '',
+    }
+    checkValidateAddr(addr)
     if (payload.id) {
       await FarmerPlotDatasource.updateFarmerPlot(payload).then((res) => {
         if (res) {
@@ -273,7 +302,7 @@ const EditFarmer = () => {
             icon: 'success',
             timer: 1500,
             showConfirmButton: false,
-          }).then((time) => {
+          }).then(() => {
             setEditIndex(0)
             setShowAddModal((prev) => !prev)
           })
@@ -287,7 +316,7 @@ const EditFarmer = () => {
             icon: 'success',
             timer: 1500,
             showConfirmButton: false,
-          }).then((time) => {
+          }).then(() => {
             setEditIndex(0)
             setShowAddModal((prev) => !prev)
           })
@@ -295,7 +324,6 @@ const EditFarmer = () => {
       })
     }
     fecthFarmer()
-    checkValidate(data)
   }
   //#endregion
 
@@ -311,7 +339,8 @@ const EditFarmer = () => {
         compressFormat: source?.type.split('/')[1],
         quality: 70,
         rotation: 0,
-        responseUriFunc: (res: any) => {},
+        // eslint-disable-next-line @typescript-eslint/no-empty-function
+        responseUriFunc: () => {},
       })
     }
     const img_base64 = await new Promise((resolve) => {
@@ -373,7 +402,8 @@ const EditFarmer = () => {
         compressFormat: source?.type.split('/')[1],
         quality: 70,
         rotation: 0,
-        responseUriFunc: (res: any) => {},
+        // eslint-disable-next-line @typescript-eslint/no-empty-function
+        responseUriFunc: () => {},
       })
     }
     const img_base64 = await new Promise((resolve) => {
@@ -427,12 +457,7 @@ const EditFarmer = () => {
   //#endregion
 
   const checkValidate = (data: GetFarmerEntity) => {
-    const checkEmptySting = ![
-      data.firstname,
-      data.lastname,
-      data.telephoneNo,
-      address.address1,
-    ].includes('')
+    const checkEmptySting = ![data.firstname, data.lastname, data.telephoneNo].includes('')
     const checkEmptyNumber = ![
       address.provinceId,
       address.districtId,
@@ -447,13 +472,7 @@ const EditFarmer = () => {
   }
 
   const checkValidateAddr = (addr: AddressEntity) => {
-    const checkEmptySting = ![
-      data.firstname,
-      data.lastname,
-      data.telephoneNo,
-      address.address1,
-      address.address2,
-    ].includes('')
+    const checkEmptySting = ![data.firstname, data.lastname, data.telephoneNo].includes('')
     const checkEmptyNumber = ![addr.provinceId, addr.districtId, addr.subdistrictId].includes(0)
     const checkEmptyDate = ![data.birthDate].includes('1970-01-01')
     if (checkEmptySting && checkEmptyNumber && checkEmptyDate) {
@@ -494,7 +513,7 @@ const EditFarmer = () => {
           icon: 'success',
           timer: 1500,
           showConfirmButton: false,
-        }).then((time) => {
+        }).then(() => {
           navigate('/IndexFarmer')
         })
       } else {
@@ -506,7 +525,6 @@ const EditFarmer = () => {
       }
     })
   }
-
   const renderFromData = (
     <div className='col-lg-7'>
       <CardContainer>
@@ -792,6 +810,7 @@ const EditFarmer = () => {
                     optionA.children.toLowerCase().localeCompare(optionB.children.toLowerCase())
                   }
                   onChange={handleOnChangeProvince}
+                  key={address ? address.provinceId : 0}
                 >
                   {province.map((item: any, index: any) => (
                     <Select.Option key={index} value={item.provinceId}>
@@ -822,6 +841,7 @@ const EditFarmer = () => {
                   }
                   disabled={!address || !address.provinceId}
                   onChange={handleOnChangeDistrict}
+                  key={address ? address.districtId : 0}
                 >
                   {district.map((item: any, index: any) => (
                     <Select.Option key={index} value={item.districtId}>
@@ -854,6 +874,7 @@ const EditFarmer = () => {
                   }
                   onChange={handleOnChangeSubdistrict}
                   disabled={!address || !address.districtId}
+                  key={address ? address.subdistrictId : 0}
                 >
                   {subdistrict?.map((item: any, index: any) => (
                     <Select.Option key={index} value={item.subdistrictId}>
@@ -881,18 +902,8 @@ const EditFarmer = () => {
           </div>
           <div className='row'>
             <div className='form-group col-lg-12'>
-              <label>
-                บ้านเลขที่ <span style={{ color: 'red' }}>*</span>
-              </label>
-              <Form.Item
-                name='address1'
-                rules={[
-                  {
-                    required: true,
-                    message: 'กรุณากรอกบ้านเลขที่',
-                  },
-                ]}
-              >
+              <label>บ้านเลขที่</label>
+              <Form.Item name='address1'>
                 <Input
                   placeholder='กรอกบ้านเลขที่'
                   onChange={handleOnChangeAddress1}
@@ -904,18 +915,8 @@ const EditFarmer = () => {
           </div>
           <div className='row'>
             <div className='form-group'>
-              <label>
-                ที่อยู่บ้าน <span style={{ color: 'red' }}>*</span>
-              </label>
-              <Form.Item
-                name='Address'
-                rules={[
-                  {
-                    required: true,
-                    message: 'กรุณากรอกที่อยู่บ้าน!',
-                  },
-                ]}
-              >
+              <label>ที่อยู่บ้าน</label>
+              <Form.Item name='Address'>
                 <TextArea
                   className='col-lg-12'
                   rows={5}
@@ -936,28 +937,30 @@ const EditFarmer = () => {
               <Radio.Group defaultValue={data.status} onChange={handleChangeFarmerstatus}>
                 <Space direction='vertical'>
                   {FARMER_STATUS_SEARCH.map((item, index) => (
-                    <Radio value={item.value}>
-                      {item.name}
-                      {(data.status == 'REJECTED' && index == 3) ||
-                      (data.status == 'INACTIVE' && index == 4) ? (
-                        <div>
-                          <div className='form-group'>
-                            <label></label>
-                            <br />
-                            <Form.Item>
-                              <TextArea
-                                className='col-lg-12'
-                                rows={3}
-                                placeholder='กรอกเหตุผล/เหตุหมายเพิ่มเติม'
-                                autoComplete='off'
-                                onChange={handleOnChangeReason}
-                                defaultValue={data.reason}
-                              />
-                            </Form.Item>
+                    <>
+                      <Radio value={item.value} key={index}>
+                        {item.name}
+                        {(data.status == 'REJECTED' && index == 3) ||
+                        (data.status == 'INACTIVE' && index == 4) ? (
+                          <div>
+                            <div className='form-group'>
+                              <label></label>
+                              <br />
+                              <Form.Item>
+                                <TextArea
+                                  className='col-lg-12'
+                                  rows={3}
+                                  placeholder='กรอกเหตุผล/เหตุหมายเพิ่มเติม'
+                                  autoComplete='off'
+                                  onChange={handleOnChangeReason}
+                                  defaultValue={data.reason}
+                                />
+                              </Form.Item>
+                            </div>
                           </div>
-                        </div>
-                      ) : null}
-                    </Radio>
+                        ) : null}
+                      </Radio>
+                    </>
                   ))}
                 </Space>
               </Radio.Group>
@@ -1013,50 +1016,52 @@ const EditFarmer = () => {
           {farmerPlotList.length !== 0 ? (
             <div className='container'>
               {currentItems.map((item, index) => (
-                <div className='row pt-3 pb-3' style={{ justifyContent: 'space-between' }}>
-                  <div className='col-lg-4'>
-                    <p
-                      style={{
-                        textOverflow: 'ellipsis',
-                        overflow: 'hidden',
-                        whiteSpace: 'nowrap',
-                        marginBottom: 0,
-                      }}
-                    >
-                      {item.plotName}
-                    </p>
-                    <p style={{ fontSize: '12px', color: color.Grey }}>{item.plantName}</p>
-                  </div>
-                  <div className='col-lg-2'>
-                    <span>{item.raiAmount} ไร่</span>
-                  </div>
-                  <div className='col-lg-3'>
-                    <span
-                      style={{
-                        color: STATUS_FARMERPLOT_COLOR_MAPPING[item.status],
-                      }}
-                    >
-                      <Badge color={STATUS_FARMERPLOT_COLOR_MAPPING[item.status]} />{' '}
-                      {STATUS_NORMAL_MAPPING[item.status]}
-                    </span>
-                  </div>
-                  <div className='col-lg-3 d-flex justify-content-between'>
-                    <div className='col-lg-6'>
-                      <ActionButton
-                        icon={<EditOutlined />}
-                        color={color.primary1}
-                        onClick={() => editPlot(item, index + 1)}
-                      />
+                <>
+                  <div className='row pt-3 pb-3' style={{ justifyContent: 'space-between' }}>
+                    <div className='col-lg-4'>
+                      <p
+                        style={{
+                          textOverflow: 'ellipsis',
+                          overflow: 'hidden',
+                          whiteSpace: 'nowrap',
+                          marginBottom: 0,
+                        }}
+                      >
+                        {item.plotName}
+                      </p>
+                      <p style={{ fontSize: '12px', color: color.Grey }}>{item.plantName}</p>
                     </div>
-                    <div className='col-lg-6'>
-                      <ActionButton
-                        icon={<DeleteOutlined />}
-                        color={color.Error}
-                        onClick={() => removePlot(item)}
-                      />
+                    <div className='col-lg-2'>
+                      <span>{item.raiAmount} ไร่</span>
+                    </div>
+                    <div className='col-lg-3'>
+                      <span
+                        style={{
+                          color: STATUS_FARMERPLOT_COLOR_MAPPING[item.status],
+                        }}
+                      >
+                        <Badge color={STATUS_FARMERPLOT_COLOR_MAPPING[item.status]} />{' '}
+                        {STATUS_NORMAL_MAPPING[item.status]}
+                      </span>
+                    </div>
+                    <div className='col-lg-3 d-flex justify-content-between'>
+                      <div className='col-lg-6'>
+                        <ActionButton
+                          icon={<EditOutlined />}
+                          color={color.primary1}
+                          onClick={() => editPlot(item, index + 1)}
+                        />
+                      </div>
+                      <div className='col-lg-6'>
+                        <ActionButton
+                          icon={<DeleteOutlined />}
+                          color={color.Error}
+                          onClick={() => removePlot(item)}
+                        />
+                      </div>
                     </div>
                   </div>
-                </div>
+                </>
               ))}
             </div>
           ) : (

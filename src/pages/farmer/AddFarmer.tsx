@@ -37,7 +37,6 @@ import moment from 'moment'
 import { useLocalStorage } from '../../hook/useLocalStorage'
 import { resizeFileImg } from '../../utilities/ResizeImage'
 import { useNavigate } from 'react-router-dom'
-import { DashboardLayout } from '../../components/layout/Layout'
 import '../farmer/Style.css'
 
 const dateFormat = 'DD/MM/YYYY'
@@ -45,27 +44,30 @@ const dateCreateFormat = 'YYYY-MM-DD'
 
 const { Option } = Select
 
-const _ = require('lodash')
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const { Map } = require('immutable')
 
 const AddFarmer = () => {
   const [profile] = useLocalStorage('profile', [])
   const navigate = useNavigate()
-
+  const [form] = Form.useForm()
   const [data, setData] = useState<CreateFarmerEntity>(CreateFarmerEntity_INIT)
   const [address, setAddress] = useState<CreateAddressEntity>(CreateAddressEntity_INIT)
   const [saveBtnDisable, setBtnSaveDisable] = useState<boolean>(true)
   const [showAddModal, setShowAddModal] = useState(false)
-  const [showEditModal, setShowEditModal] = useState(false)
   const [editIndex, setEditIndex] = useState(0)
   const [province, setProvince] = useState<ProviceEntity[]>([ProvinceEntity_INIT])
   const [district, setDistrict] = useState<DistrictEntity[]>([DistrictEntity_INIT])
   const [subdistrict, setSubdistrict] = useState<SubdistrictEntity[]>([SubdistrictEntity_INIT])
   const [editFarmerPlot, setEditFarmerPlot] = useState<FarmerPlotEntity>(FarmerPlotEntity_INIT)
   const [farmerPlotList, setFarmerPlotList] = useState<FarmerPlotEntity[]>([])
-
   const [imgProfile, setImgProfile] = useState<any>()
   const [imgIdCard, setImgIdCard] = useState<any>()
+
+  const [autoProvince, setAutoProvince] = useState<any>()
+  const [autoDistrict, setAutoDistrict] = useState<any>()
+  const [autoSubdistrict, setAutoSubdistrict] = useState<any>()
+  const [autoPostCode, setAutoPostcode] = useState<any>()
 
   const [createImgProfile, setCreateImgProfile] =
     useState<UploadImageEntity>(UploadImageEntity_INTI)
@@ -176,9 +178,30 @@ const AddFarmer = () => {
           icon: 'success',
           timer: 1500,
           showConfirmButton: false,
+        }).then(async () => {
+          if (address.provinceId !== 0) {
+            setDistrict(district)
+          } else {
+            await LocationDatasource.getDistrict(data.provinceId!).then((res) => {
+              setDistrict(res)
+            })
+          }
+          if (address.districtId !== 0) {
+            setSubdistrict(subdistrict)
+          } else {
+            await LocationDatasource.getSubdistrict(data.districtId).then((res) => {
+              setSubdistrict(res)
+            })
+          }
+
+          setAutoProvince(data.provinceId)
+          setAutoDistrict(data.districtId)
+          setAutoSubdistrict(data.subdistrictId)
+          setAutoPostcode(data.postcode)
         })
         setFarmerPlotList([...farmerPlotList, pushId.toJS()])
       }
+      checkValidateAddr(pushId.toJS())
     } else {
       const newData = farmerPlotList.filter((x) => x.plotId !== data.plotId)
       if ([...newData, data].length > 0) {
@@ -192,7 +215,6 @@ const AddFarmer = () => {
       setFarmerPlotList([...newData, data])
     }
     setShowAddModal(false)
-    setShowEditModal(false)
     setEditIndex(0)
   }
   //#endregion
@@ -209,7 +231,8 @@ const AddFarmer = () => {
         compressFormat: source?.type.split('/')[1],
         quality: 70,
         rotation: 0,
-        responseUriFunc: (res: any) => {},
+        // eslint-disable-next-line @typescript-eslint/no-empty-function
+        responseUriFunc: () => {},
       })
     }
     const img_base64 = await new Promise((resolve) => {
@@ -256,7 +279,8 @@ const AddFarmer = () => {
         compressFormat: source?.type.split('/')[1],
         quality: 70,
         rotation: 0,
-        responseUriFunc: (res: any) => {},
+        // eslint-disable-next-line @typescript-eslint/no-empty-function
+        responseUriFunc: () => {},
       })
     }
     const img_base64 = await new Promise((resolve) => {
@@ -292,14 +316,8 @@ const AddFarmer = () => {
     checkValidate(data)
   }
   //#endregion
-
   const checkValidate = (data: CreateFarmerEntity) => {
-    const checkEmptySting = ![
-      data.firstname,
-      data.lastname,
-      data.telephoneNo,
-      address.address1,
-    ].includes('')
+    const checkEmptySting = ![data.firstname, data.lastname, data.telephoneNo].includes('')
     const checkEmptyNumber = ![
       address.provinceId,
       address.districtId,
@@ -319,8 +337,6 @@ const AddFarmer = () => {
       data.lastname,
       data.telephoneNo,
       data.birthDate,
-      addr.address1,
-      addr.address2,
     ].includes('')
     const checkEmptyNumber = ![addr.provinceId, addr.districtId, addr.subdistrictId].includes(0)
     const checkEmptyDate = ![data.birthDate].includes('1970-01-01')
@@ -332,7 +348,19 @@ const AddFarmer = () => {
   }
 
   const insertFarmer = async () => {
-    const pushAddr = Map(data).set('address', address)
+    let pushAddr: any
+    if (address.provinceId === 0 && address.districtId === 0 && address.subdistrictId === 0) {
+      const mapProvince = Map(address).set('provinceId', farmerPlotList[0].provinceId)
+      const mapDistrictId = Map(mapProvince.toJS()).set('districtId', farmerPlotList[0].districtId)
+      const mapSubdistrictId = Map(mapDistrictId.toJS()).set(
+        'subdistrictId',
+        farmerPlotList[0].subdistrictId,
+      )
+      const mapPostCode = Map(mapSubdistrictId.toJS()).set('postcode', farmerPlotList[0].postcode)
+      pushAddr = Map(data).set('address', mapPostCode.toJS())
+    } else {
+      pushAddr = Map(data).set('address', address)
+    }
 
     const payload = {
       ...pushAddr.toJS(),
@@ -344,7 +372,6 @@ const AddFarmer = () => {
       ...prev,
       farmerPlot: farmerPlotList,
     }))
-
     await FarmerDatasource.insertFarmer(payload).then(async (res) => {
       if (res != undefined) {
         const fileList = [createImgProfile, createImgIdCard]
@@ -361,7 +388,7 @@ const AddFarmer = () => {
           icon: 'success',
           timer: 1500,
           showConfirmButton: false,
-        }).then((time) => {
+        }).then(() => {
           navigate('/IndexFarmer')
         })
       } else {
@@ -378,7 +405,7 @@ const AddFarmer = () => {
     <div className='col-lg-7'>
       <CardContainer>
         <CardHeader textHeader='ข้อมูลเกษตรกร' />
-        <Form style={{ padding: '32px' }}>
+        <Form style={{ padding: '32px' }} form={form}>
           <div className='row'>
             <div className='form-group text-center pb-5'>
               <div
@@ -604,10 +631,13 @@ const AddFarmer = () => {
                     optionA.children.toLowerCase().localeCompare(optionB.children.toLowerCase())
                   }
                   onChange={handleOnChangeProvince}
-                  key={address.provinceId}
+                  defaultValue={autoProvince}
+                  key={autoProvince}
                 >
-                  {province?.map((item) => (
-                    <Option value={item.provinceId}>{item.provinceName}</Option>
+                  {province?.map((item, index) => (
+                    <Option key={index} value={item.provinceId}>
+                      {item.provinceName}
+                    </Option>
                   ))}
                 </Select>
               </Form.Item>
@@ -627,9 +657,13 @@ const AddFarmer = () => {
                     optionA.children.toLowerCase().localeCompare(optionB.children.toLowerCase())
                   }
                   onChange={handleOnChangeDistrict}
+                  defaultValue={autoDistrict}
+                  key={autoDistrict}
                 >
-                  {district?.map((item) => (
-                    <Option value={item.districtId}>{item.districtName}</Option>
+                  {district?.map((item, index) => (
+                    <Option key={index} value={item.districtId}>
+                      {item.districtName}
+                    </Option>
                   ))}
                 </Select>
               </Form.Item>
@@ -651,9 +685,13 @@ const AddFarmer = () => {
                     optionA.children.toLowerCase().localeCompare(optionB.children.toLowerCase())
                   }
                   onChange={handleOnChangeSubdistrict}
+                  defaultValue={autoSubdistrict}
+                  key={autoSubdistrict}
                 >
-                  {subdistrict?.map((item) => (
-                    <Option value={item.subdistrictId}>{item.subdistrictName}</Option>
+                  {subdistrict?.map((item, index) => (
+                    <Option key={index} value={item.subdistrictId}>
+                      {item.subdistrictName}
+                    </Option>
                   ))}
                 </Select>
               </Form.Item>
@@ -665,8 +703,8 @@ const AddFarmer = () => {
               <Form.Item name='postcode'>
                 <Input
                   placeholder='เลือกรหัสไปรษณีย์'
-                  defaultValue={address.postcode}
-                  key={address.subdistrictId}
+                  defaultValue={address.postcode || autoPostCode}
+                  key={address.subdistrictId || autoSubdistrict}
                   disabled
                 />
               </Form.Item>
@@ -674,36 +712,16 @@ const AddFarmer = () => {
           </div>
           <div className='row'>
             <div className='form-group col-lg-12'>
-              <label>
-                บ้านเลขที่ <span style={{ color: 'red' }}>*</span>
-              </label>
-              <Form.Item
-                name='address1'
-                rules={[
-                  {
-                    required: true,
-                    message: 'กรุณากรอกบ้านเลขที่',
-                  },
-                ]}
-              >
+              <label>บ้านเลขที่</label>
+              <Form.Item name='address1'>
                 <Input placeholder='กรอกบ้านเลขที่' onChange={handleOnChangeAddress1} />
               </Form.Item>
             </div>
           </div>
           <div className='row'>
             <div className='form-group'>
-              <label>
-                รายละเอียดที่อยู่ <span style={{ color: 'red' }}>*</span>
-              </label>
-              <Form.Item
-                name='address2'
-                rules={[
-                  {
-                    required: true,
-                    message: 'กรุณากรอกรายละเอียด',
-                  },
-                ]}
-              >
+              <label>รายละเอียดที่อยู่</label>
+              <Form.Item name='address2'>
                 <TextArea
                   className='col-lg-12'
                   rows={5}
@@ -724,8 +742,10 @@ const AddFarmer = () => {
                 <Space direction='vertical'>
                   {FARMER_STATUS_SEARCH.filter(
                     (x) => x.value != 'INACTIVE' && x.value != 'REJECTED',
-                  ).map((item) => (
-                    <Radio value={item.value}>{item.name}</Radio>
+                  ).map((item, index) => (
+                    <Radio key={index} value={item.value}>
+                      {item.name}
+                    </Radio>
                   ))}
                 </Space>
               </Radio.Group>
@@ -782,58 +802,60 @@ const AddFarmer = () => {
             {farmerPlotList
               .sort((x, y) => x.plotId - y.plotId)
               .map((item, index) => (
-                <div className='container'>
-                  <div className='row pt-3 pb-3'>
-                    <div className='col-lg-4'>
-                      <p
-                        style={{
-                          textOverflow: 'ellipsis',
-                          overflow: 'hidden',
-                          whiteSpace: 'nowrap',
-                          marginBottom: 0,
-                        }}
-                      >
-                        {item.plotName}
-                      </p>
-                      <br />
-                      <p
-                        style={{
-                          fontSize: '12px',
-                          color: color.Grey,
-                        }}
-                      >
-                        {item.plantName}
-                      </p>
-                    </div>
-                    <div className='col-lg-2'>{item.raiAmount} ไร่</div>
-                    <div className='col-lg-3'>
-                      <span
-                        style={{
-                          color: colorStatus(item.status),
-                        }}
-                      >
-                        <Badge color={colorStatus(item.status)} />
-                        {STATUS_NORMAL_MAPPING[item.status]}
-                      </span>
-                    </div>
-                    <div className='col-lg-3 d-flex justify-content-between'>
-                      <div className='col-lg-6'>
-                        <ActionButton
-                          icon={<EditOutlined />}
-                          color={color.primary1}
-                          onClick={() => editPlot(item, index + 1)}
-                        />
+                <>
+                  <div className='container'>
+                    <div className='row pt-3 pb-3'>
+                      <div className='col-lg-4'>
+                        <p
+                          style={{
+                            textOverflow: 'ellipsis',
+                            overflow: 'hidden',
+                            whiteSpace: 'nowrap',
+                            marginBottom: 0,
+                          }}
+                        >
+                          {item.plotName}
+                        </p>
+                        <br />
+                        <p
+                          style={{
+                            fontSize: '12px',
+                            color: color.Grey,
+                          }}
+                        >
+                          {item.plantName}
+                        </p>
                       </div>
-                      <div className='col-lg-6'>
-                        <ActionButton
-                          icon={<DeleteOutlined />}
-                          color={color.Error}
-                          onClick={() => removePlot(index + 1)}
-                        />
+                      <div className='col-lg-2'>{item.raiAmount} ไร่</div>
+                      <div className='col-lg-3'>
+                        <span
+                          style={{
+                            color: colorStatus(item.status),
+                          }}
+                        >
+                          <Badge color={colorStatus(item.status)} />
+                          {STATUS_NORMAL_MAPPING[item.status]}
+                        </span>
+                      </div>
+                      <div className='col-lg-3 d-flex justify-content-between'>
+                        <div className='col-lg-6'>
+                          <ActionButton
+                            icon={<EditOutlined />}
+                            color={color.primary1}
+                            onClick={() => editPlot(item, index + 1)}
+                          />
+                        </div>
+                        <div className='col-lg-6'>
+                          <ActionButton
+                            icon={<DeleteOutlined />}
+                            color={color.Error}
+                            onClick={() => removePlot(index + 1)}
+                          />
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
+                </>
               ))}
           </Form>
         ) : (
@@ -847,7 +869,6 @@ const AddFarmer = () => {
       </CardContainer>
       <div className='d-flex justify-content-between pt-5'>
         <p>รายการทั้งหมด {farmerPlotList?.length} รายการ</p>
-        {/* <Pagination defaultCurrent={1} total={1} /> */}
       </div>
     </div>
   )
