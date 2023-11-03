@@ -55,7 +55,7 @@ const IndexAdminTask = () => {
   const [taskSelected, setTaskSelected] = useState<TaskManageEntity>()
   const [taskNo, setTaskNo] = useState()
   const [count, setCount] = useState<number>(0)
-  const [taskId, setTaskId] = useState('')
+  const [taskId, setTaskId] = useState<any>('')
   const [edit, setEdit] = useState<any>()
   const [history, setHistory] = useState<any>()
 
@@ -92,14 +92,16 @@ const IndexAdminTask = () => {
     }
   }
   const handleSearchTask = () => {
-    TaskDatasource.getManageTaskByTaskId(taskId).then((res) => {
-      setTaskSelected(res)
-      setHistory(res.data.taskHistory)
-      form.setFieldsValue({
-        unitPrice: res.data.unitPrice,
-        farmAreaAmount: res.data.farmAreaAmount,
+    if (taskId) {
+      TaskDatasource.getManageTaskByTaskId(taskId?.id).then((res) => {
+        setTaskSelected(res)
+        setHistory(res.data.taskHistory)
+        form.setFieldsValue({
+          unitPrice: res.data.unitPrice,
+          farmAreaAmount: res.data.farmAreaAmount,
+        })
       })
-    })
+    }
   }
   const calculateTask = () => {
     TaskDatasource.calculateManageTask(
@@ -889,7 +891,7 @@ const IndexAdminTask = () => {
                     isClearable
                     onInputChange={handleInputChange}
                     onChange={(e: any) => {
-                      setTaskId(e.id)
+                      setTaskId(e)
                       setSearch(false)
                     }}
                     options={searchTaskList}
