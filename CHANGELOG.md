@@ -1,8 +1,17 @@
 ## [Version - 0]
 
-## Fix [v0.39.8] 2023-11-3
+## Fix [v0.39.10] 2023-11-3
 
 - fixed endtime from edit news
+## improve [v0.39.9] 2023-11-3
+
+- auto address add/edit farmer menu
+- change search input in admin task menu
+- get data the target spray from api
+
+## Fix [v0.39.8] 2023-11-1
+
+- filter new already pin cant select
 
 ## Fix [v0.39.7] 2023-11-1
 

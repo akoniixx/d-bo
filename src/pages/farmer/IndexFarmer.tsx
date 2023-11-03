@@ -1,13 +1,10 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import {
   Badge,
   Button,
-  Checkbox,
   ConfigProvider,
-  Dropdown,
   Image,
   Input,
-  Menu,
-  MenuProps,
   Pagination,
   PaginationProps,
   Popover,
@@ -17,15 +14,12 @@ import {
   Table,
 } from 'antd'
 import React, { useEffect, useState } from 'react'
-import { Option } from 'antd/lib/mentions'
 import color from '../../resource/color'
 import ActionButton from '../../components/button/ActionButton'
 import {
   CaretDownOutlined,
   CaretUpOutlined,
-  DownOutlined,
   EditOutlined,
-  FolderViewOutlined,
   InfoCircleFilled,
   SearchOutlined,
   UserOutlined,
@@ -34,32 +28,20 @@ import AddButtton from '../../components/button/AddButton'
 import { CardContainer } from '../../components/card/CardContainer'
 import { FarmerPageEntity } from '../../entities/FarmerEntities'
 import { FarmerDatasource } from '../../datasource/FarmerDatasource'
-import {
-  FARMER_STATUS_SEARCH,
-  STATUS_COLOR_MAPPING,
-  STATUS_FARMER_MAPPING,
-} from '../../definitions/Status'
+import { STATUS_COLOR_MAPPING, STATUS_FARMER_MAPPING } from '../../definitions/Status'
 import moment from 'moment'
 import { LocationDatasource } from '../../datasource/LocationDatasource'
 import { DistrictEntity, ProviceEntity, SubdistrictEntity } from '../../entities/LocationEntities'
 import { useNavigate, useSearchParams } from 'react-router-dom'
-import { useEffectOnce } from '../../hook/useEffectOnce'
-import SearchDebounce from '../../components/searchDebounce/SearchDebounce'
 import StatusPlots from '../../components/card/StatusPlots'
 import StatusButton from '../../components/button/StatusButton'
 import icon from '../../resource/icon'
 import { numberWithCommas } from '../../utilities/TextFormatter'
 import { image } from '../../resource'
-import { CheckboxValueType } from 'antd/lib/checkbox/Group'
-import { STATUS_NORMAL_MAPPING } from '../../definitions/Status'
 import { ListCheck } from '../../components/dropdownCheck/ListStatusAppType'
 import { DropdownStatus } from '../../components/dropdownCheck/DropDownStatus'
 import ShowNickName from '../../components/popover/ShowNickName'
 
-interface SearchSelectType {
-  label: any
-  value: any
-}
 function IndexFarmer() {
   const [current, setCurrent] = useState(1)
   const navigate = useNavigate()
@@ -78,7 +60,6 @@ function IndexFarmer() {
   const [appTypeArr, setAppTypeArr] = useState<string[]>([])
   const [row, setRow] = useState(10)
   const [loading, setLoading] = useState(false)
-  const [searchQuery] = useSearchParams()
   const [sumPlotCard, setSumPlotCard] = useState<any>({
     card1: 'รอตรวจสอบ',
     card2: 'ไม่อนุมัติ',
@@ -326,7 +307,9 @@ function IndexFarmer() {
             }
           >
             {province?.map((item) => (
-              <option value={item.provinceId.toString()}>{item.provinceName}</option>
+              <option key={item.provinceId} value={item.provinceId.toString()}>
+                {item.provinceName}
+              </option>
             ))}
           </Select>
         </div>
@@ -346,7 +329,9 @@ function IndexFarmer() {
             value={searchDistrict}
           >
             {district?.map((item) => (
-              <option value={item.districtId.toString()}>{item.districtName}</option>
+              <option key={item.districtId} value={item.districtId.toString()}>
+                {item.districtName}
+              </option>
             ))}
           </Select>
         </div>
@@ -366,7 +351,9 @@ function IndexFarmer() {
             value={searchSubdistrict}
           >
             {subdistrict?.map((item) => (
-              <option value={item.subdistrictId.toString()}>{item.subdistrictName}</option>
+              <option key={item.subdistrictId} value={item.subdistrictId.toString()}>
+                {item.subdistrictName}
+              </option>
             ))}
           </Select>
         </div>
