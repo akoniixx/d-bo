@@ -399,10 +399,11 @@ function EditNewsPage() {
         endDate: !res.endDate
           ? moment(new Date().toUTCString())
           : moment(new Date(res.endDate).toUTCString()),
-        endTime: !res.endTime
+        endTime: !res.endDate
           ? moment(new Date().toUTCString())
-          : moment(new Date(res.endTime).toUTCString()),
+          : moment(new Date(res.endDate).toUTCString()),
       })
+      console.log(res.endTime)
       setStatus(res.status)
       setNewsName(res.title)
       setDescriptionEditor(res.details)
