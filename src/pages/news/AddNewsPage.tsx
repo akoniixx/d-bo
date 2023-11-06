@@ -316,7 +316,7 @@ function AddNewsPage() {
       pinAll: false,
       pinMain: false,
       startDate: dateStart,
-      typeLaunch: (!typeLaunch) ? (newsStatus === "PENDING") ? 'NON_ENDDATE' : undefined : typeLaunch,
+      typeLaunch: !typeLaunch ? (newsStatus === 'PENDING' ? 'NON_ENDDATE' : undefined) : typeLaunch,
       endDate: dateEnd,
     })
       .then((res) => {

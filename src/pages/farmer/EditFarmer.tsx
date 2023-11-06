@@ -51,6 +51,7 @@ import moment from 'moment'
 import { useLocalStorage } from '../../hook/useLocalStorage'
 import { resizeFileImg } from '../../utilities/ResizeImage'
 import { useNavigate } from 'react-router-dom'
+import locale from 'antd/es/date-picker/locale/th_TH'
 
 const dateFormat = 'DD/MM/YYYY'
 const dateCreateFormat = 'YYYY-MM-DD'
@@ -73,16 +74,15 @@ const EditFarmer = () => {
   const [locateNull, setLocateNull] = useState<any>()
   const [showAddModal, setShowAddModal] = useState(false)
   const [editIndex, setEditIndex] = useState(0)
-
+  const [birthDay, setBirthDay] = useState<string>()
   const [province, setProvince] = useState<ProviceEntity[]>([ProvinceEntity_INIT])
   const [district, setDistrict] = useState<DistrictEntity[]>([DistrictEntity_INIT])
   const [subdistrict, setSubdistrict] = useState<SubdistrictEntity[]>([SubdistrictEntity_INIT])
   const [saveBtnDisable, setBtnSaveDisable] = useState<boolean>(false)
   const [editFarmerPlot, setEditFarmerPlot] = useState<FarmerPlotEntity>(FarmerPlotEntity_INIT)
-
+  const [form] = Form.useForm()
   const [imgProfile, setImgProfile] = useState<any>()
   const [imgIdCard, setImgIdCard] = useState<any>()
-
   const [createImgProfile, setCreateImgProfile] = useState<ImageEntity>(ImageEntity_INTI)
   const [createImgIdCard, setCreateImgIdCrad] = useState<ImageEntity>(ImageEntity_INTI)
 
@@ -96,9 +96,9 @@ const EditFarmer = () => {
   }, [])
   const fecthFarmer = async () => {
     await FarmerDatasource.getFarmerById(farmerId).then((res) => {
-      setData({
+      setData(res)
+      form.setFieldsValue({
         ...res,
-        birthDate: res.birthDate ? moment(res.birthDate) : moment(),
       })
       if (
         res.address &&
@@ -191,13 +191,7 @@ const EditFarmer = () => {
     setData(m.toJS())
     checkValidate(m.toJS())
   }
-  const handleOnChangeBirthday = (e: any) => {
-    const d = Map(data)
-      .set('birthDate', moment(new Date(e)).format(dateCreateFormat))
-      .toJS()
-    setData(d)
-    checkValidate(d)
-  }
+
   const handleOnChangeProvince = async (provinceId: number) => {
     const d = Map(address).set('provinceId', provinceId == undefined ? 0 : provinceId)
     setAddress(d.toJS())
@@ -227,13 +221,11 @@ const EditFarmer = () => {
   const handleOnChangeAddress1 = (e: React.ChangeEvent<HTMLInputElement>) => {
     const d = Map(address).set('address1', e.target.value)
     setAddress(d.toJS())
-    checkValidateAddr(d.toJS())
   }
 
   const handleOnChangeAddress2 = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const d = Map(address).set('address2', e.target.value)
     setAddress(d.toJS())
-    checkValidateAddr(d.toJS())
   }
 
   const handleChangeFarmerstatus = (e: any) => {
@@ -242,14 +234,12 @@ const EditFarmer = () => {
     }
     const m = Map(data).set('status', e.target.value)
     setData(m.toJS())
-    checkValidate(m.toJS())
     checkValidateReason(m.toJS())
   }
 
   const handleOnChangeReason = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const d = Map(data).set('reason', e.target.value)
     setData(d.toJS())
-    checkValidateAddr(d.toJS())
     checkValidateReason(d.toJS())
   }
   //#endregion
@@ -350,7 +340,6 @@ const EditFarmer = () => {
     })
 
     setImgProfile(img_base64)
-    checkValidate(data)
     const d = Map(createImgProfile).set('file', isFileMoreThan2MB ? newSource : source)
     const e = Map(d.toJS()).set('resource', 'FARMER')
     const f = Map(e.toJS()).set('category', 'PROFILE_IMAGE')
@@ -387,7 +376,6 @@ const EditFarmer = () => {
         UploadImageDatasouce.deleteImage(getImg.id, getImg.path)
         setCreateImgProfile(ImageEntity_INTI)
         setImgProfile(undefined)
-        checkValidate(data)
       }
     })
   }
@@ -413,7 +401,6 @@ const EditFarmer = () => {
     })
 
     setImgIdCard(img_base64)
-    checkValidate(data)
     const d = Map(createImgProfile).set('file', isFileMoreThan2MB ? newSource : source)
     const e = Map(d.toJS()).set('resource', 'FARMER')
     const f = Map(e.toJS()).set('category', 'ID_CARD_IMAGE')
@@ -450,7 +437,6 @@ const EditFarmer = () => {
         UploadImageDatasouce.deleteImage(getImg.id, getImg.path)
         setCreateImgIdCrad(ImageEntity_INTI)
         setImgIdCard(undefined)
-        checkValidate(data)
       }
     })
   }
@@ -463,8 +449,7 @@ const EditFarmer = () => {
       address.districtId,
       address.subdistrictId,
     ].includes(0)
-    const checkEmptyDate = ![data.birthDate].includes('1970-01-01')
-    if (checkEmptySting && checkEmptyNumber && checkEmptyDate) {
+    if (checkEmptySting && checkEmptyNumber) {
       setBtnSaveDisable(false)
     } else {
       setBtnSaveDisable(true)
@@ -474,8 +459,7 @@ const EditFarmer = () => {
   const checkValidateAddr = (addr: AddressEntity) => {
     const checkEmptySting = ![data.firstname, data.lastname, data.telephoneNo].includes('')
     const checkEmptyNumber = ![addr.provinceId, addr.districtId, addr.subdistrictId].includes(0)
-    const checkEmptyDate = ![data.birthDate].includes('1970-01-01')
-    if (checkEmptySting && checkEmptyNumber && checkEmptyDate) {
+    if (checkEmptySting && checkEmptyNumber) {
       setBtnSaveDisable(false)
     } else {
       setBtnSaveDisable(true)
@@ -495,8 +479,10 @@ const EditFarmer = () => {
     const payload = {
       ...pushPin.toJS(),
       updateBy: `${profile.firstname} ${profile.lastname}`,
+      birthDate: birthDay,
     }
     delete payload.farmerPlot
+    console.log(payload)
     await FarmerDatasource.updateFarmer(payload).then((res) => {
       if (res !== undefined) {
         let i = 0
@@ -529,7 +515,7 @@ const EditFarmer = () => {
     <div className='col-lg-7'>
       <CardContainer>
         <CardHeader textHeader='ข้อมูลเกษตรกร' />
-        <Form style={{ padding: '32px' }}>
+        <Form style={{ padding: '32px' }} initialValues={{ birthDate: null }}>
           <div className='row'>
             <div className='form-group text-center pb-4'>
               <div
@@ -687,28 +673,21 @@ const EditFarmer = () => {
               </Form.Item>
             </div>
             <div className='form-group col-lg-6'>
-              <label>
-                วันเดือนปีเกิด <span style={{ color: 'red' }}>*</span>
-              </label>
-              <Form.Item
-                name='birthDate'
-                rules={[
-                  {
-                    required: true,
-                    message: 'กรุณากรอกวันเดือนปีเกิด',
-                  },
-                ]}
-              >
+              <label>วันเดือนปีเกิด</label>
+              <Form.Item name='birthDay'>
                 <DatePicker
                   placeholder='กรอกวันเดือนปีเกิด'
+                  locale={locale}
                   format={dateFormat}
-                  className='col-lg-12'
                   disabledDate={(current) =>
                     (current && current > moment().endOf('day')) ||
                     moment().diff(current, 'years') < 18
                   }
-                  onChange={(e: any) => handleOnChangeBirthday(e)}
-                  defaultValue={moment(data.birthDate)}
+                  defaultValue={data.birthDate !== null ? moment(data.birthDate) : undefined}
+                  onChange={(e) => {
+                    setBirthDay(moment(e).toISOString())
+                  }}
+                  className='col-lg-12'
                 />
               </Form.Item>
             </div>

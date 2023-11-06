@@ -327,7 +327,7 @@ const EditInprogressTask = () => {
                           onChange={handlePurposeSpray}
                         />{' '}
                         <label style={{ padding: '0 8px 0 0' }}>{x.name}</label>
-                        {index == 4 && (
+                        {x.name === 'อื่นๆ' && (
                           <>
                             <Input
                               status={validateComma.status}

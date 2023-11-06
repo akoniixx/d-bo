@@ -1,12 +1,12 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import {
   CaretDownOutlined,
   CaretUpOutlined,
   DeleteOutlined,
   EditOutlined,
-  FileAddFilled,
-  FileTextFilled,
   FileTextOutlined,
   SearchOutlined,
+  UserOutlined,
 } from '@ant-design/icons'
 import {
   Button,
@@ -16,22 +16,30 @@ import {
   Pagination,
   PaginationProps,
   Row,
-  Select,
   Spin,
   Table,
 } from 'antd'
-import React, { useState } from 'react'
-import { color, icon, image } from '../../resource'
-import { BackIconButton } from '../../components/button/BackButton'
+import React, { useEffect, useState } from 'react'
+import { color, image } from '../../resource'
 import { useNavigate } from 'react-router-dom'
 import AddButtton from '../../components/button/AddButton'
 import { CardContainer } from '../../components/card/CardContainer'
 import ActionButton from '../../components/button/ActionButton'
 import ModalDelete from '../../components/modal/ModalDelete'
 import ModalPointManual from '../../components/modal/ModalPointManual'
+import {
+  AllSpecialListEntities,
+  InsertSpecialListEntities_INIT,
+  SpecialListEntities,
+  SpecialListEntities_INIT,
+} from '../../entities/SpecialListEntities'
+import { SpecialPointDataSource } from '../../datasource/SpecialPointDatasource'
+import moment from 'moment'
+import { numberWithCommas } from '../../utilities/TextFormatter'
 
 function IndexPointManual() {
-  const [row, setRow] = useState(5)
+  const [data, setData] = useState<AllSpecialListEntities>()
+  const [row, setRow] = useState(10)
   const [searchKeyword, setSearchKeyword] = useState('')
   const [searchTask, setSearchTask] = useState('')
   const [searchType, setSearchType] = useState('')
@@ -46,14 +54,33 @@ function IndexPointManual() {
   const [modalDelete, setModalDelete] = useState<boolean>(false)
   const [modalPointManual, setModalPointManual] = useState<boolean>(false)
   const [editIndex, setEditIndex] = useState(0)
+  const [dataPoint, setDataPoint] = useState<SpecialListEntities>(SpecialListEntities_INIT)
+  const [specialPointDelete, setSpecialPointDelete] = useState<string>()
+
+  useEffect(() => {
+    getSpecialPoint()
+  }, [current, sortDirection])
+  const getSpecialPoint = async () => {
+    await SpecialPointDataSource.getListSpecialPoint(
+      current,
+      row,
+      searchKeyword,
+      sortField,
+      sortDirection,
+    ).then((res) => {
+      setData(res)
+    })
+  }
 
   const showDelete = (id: string) => {
+    setSpecialPointDelete(id)
     setModalDelete(!modalDelete)
   }
 
   const showModalPointManual = (data: any, index: number) => {
     setModalPointManual((prev) => !prev)
     setEditIndex(index)
+    setDataPoint(data)
   }
   const pageTitle = (
     <>
@@ -86,7 +113,12 @@ function IndexPointManual() {
               color: color.secondary2,
               backgroundColor: color.Success,
             }}
-            // onClick={onSearch}
+            onClick={() => {
+              setCurrent(1)
+              if (current === 1) {
+                getSpecialPoint()
+              }
+            }}
           >
             ค้นหาข้อมูล
           </Button>
@@ -94,17 +126,7 @@ function IndexPointManual() {
       </div>
     </>
   )
-  const data = [
-    {
-      updatedAt: '18/05/2565, 10:00',
-      name: 'แต้มสำหรับแนะนำยาให้เกษตรกร',
-      countFarmer: 1,
-      timeFramer: 1,
-      countDroner: 1,
-      timeDroner: 1,
-      sumTotal: 200,
-    },
-  ]
+
   const columns = [
     {
       title: () => {
@@ -118,7 +140,7 @@ function IndexPointManual() {
                 cursor: 'pointer',
               }}
               onClick={() => {
-                setSortField('updatedAt')
+                setSortField('updateAt')
                 setSortDirection((prev) => {
                   if (prev === 'ASC') {
                     return 'DESC'
@@ -157,8 +179,17 @@ function IndexPointManual() {
           </div>
         )
       },
-      dataIndex: 'updatedAt',
-      key: 'updatedAt',
+      dataIndex: 'updateAt',
+      key: 'updateAt',
+      render: (value: any, row: any, index: number) => {
+        return {
+          children: (
+            <>
+              <span>{moment(row.updateAt).format('DD/MM/YYYY HH:mm')}</span>
+            </>
+          ),
+        }
+      },
     },
     {
       title: () => {
@@ -172,7 +203,7 @@ function IndexPointManual() {
                 cursor: 'pointer',
               }}
               onClick={() => {
-                setSortField('updatedAt')
+                setSortField('name')
                 setSortDirection((prev) => {
                   if (prev === 'ASC') {
                     return 'DESC'
@@ -182,7 +213,7 @@ function IndexPointManual() {
                     return undefined
                   }
                 })
-                setSortDirection1((prev) => {
+                setSortDirection2((prev) => {
                   if (prev === 'ASC') {
                     return 'DESC'
                   } else if (prev === undefined) {
@@ -197,14 +228,14 @@ function IndexPointManual() {
                 style={{
                   position: 'relative',
                   top: 2,
-                  color: sortDirection1 === 'ASC' ? '#ffca37' : 'white',
+                  color: sortDirection2 === 'ASC' ? '#ffca37' : 'white',
                 }}
               />
               <CaretDownOutlined
                 style={{
                   position: 'relative',
                   bottom: 2,
-                  color: sortDirection1 === 'DESC' ? '#ffca37' : 'white',
+                  color: sortDirection2 === 'DESC' ? '#ffca37' : 'white',
                 }}
               />
             </div>
@@ -215,120 +246,32 @@ function IndexPointManual() {
       key: 'name',
     },
     {
-      title: () => {
-        return (
-          <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-            จำนวนเกษตรกร
-            <div
-              style={{
-                display: 'flex',
-                flexDirection: 'column',
-                cursor: 'pointer',
-              }}
-              onClick={() => {
-                setSortField('updatedAt')
-                setSortDirection((prev) => {
-                  if (prev === 'ASC') {
-                    return 'DESC'
-                  } else if (prev === undefined) {
-                    return 'ASC'
-                  } else {
-                    return undefined
-                  }
-                })
-                setSortDirection1((prev) => {
-                  if (prev === 'ASC') {
-                    return 'DESC'
-                  } else if (prev === undefined) {
-                    return 'ASC'
-                  } else {
-                    return undefined
-                  }
-                })
-              }}
-            >
-              <CaretUpOutlined
-                style={{
-                  position: 'relative',
-                  top: 2,
-                  color: sortDirection1 === 'ASC' ? '#ffca37' : 'white',
-                }}
-              />
-              <CaretDownOutlined
-                style={{
-                  position: 'relative',
-                  bottom: 2,
-                  color: sortDirection1 === 'DESC' ? '#ffca37' : 'white',
-                }}
-              />
-            </div>
-          </div>
-        )
-      },
+      title: 'จำนวนเกษตรกร',
       dataIndex: 'countFarmer',
       key: 'countFarmer',
       render: (value: any, row: any, index: number) => {
         return {
-          children: <>1 ครั้ง (1 คน)</>,
+          children: (
+            <span>
+              {numberWithCommas(row.farmerCount) || 0} ครั้ง (
+              {numberWithCommas(row.farmerAmount) || 0} คน)
+            </span>
+          ),
         }
       },
     },
     {
-      title: () => {
-        return (
-          <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-            จำนวนนักบินโดรน
-            <div
-              style={{
-                display: 'flex',
-                flexDirection: 'column',
-                cursor: 'pointer',
-              }}
-              onClick={() => {
-                setSortField('updatedAt')
-                setSortDirection((prev) => {
-                  if (prev === 'ASC') {
-                    return 'DESC'
-                  } else if (prev === undefined) {
-                    return 'ASC'
-                  } else {
-                    return undefined
-                  }
-                })
-                setSortDirection1((prev) => {
-                  if (prev === 'ASC') {
-                    return 'DESC'
-                  } else if (prev === undefined) {
-                    return 'ASC'
-                  } else {
-                    return undefined
-                  }
-                })
-              }}
-            >
-              <CaretUpOutlined
-                style={{
-                  position: 'relative',
-                  top: 2,
-                  color: sortDirection1 === 'ASC' ? '#ffca37' : 'white',
-                }}
-              />
-              <CaretDownOutlined
-                style={{
-                  position: 'relative',
-                  bottom: 2,
-                  color: sortDirection1 === 'DESC' ? '#ffca37' : 'white',
-                }}
-              />
-            </div>
-          </div>
-        )
-      },
+      title: 'จำนวนนักบินโดรน',
       dataIndex: 'countDroner',
       key: 'countDroner',
       render: (value: any, row: any, index: number) => {
         return {
-          children: <>1 ครั้ง (1 คน)</>,
+          children: (
+            <span>
+              {numberWithCommas(row.dronerCount) || 0} ครั้ง (
+              {numberWithCommas(row.dronerAmount) || 0} คน)
+            </span>
+          ),
         }
       },
     },
@@ -344,7 +287,7 @@ function IndexPointManual() {
                 cursor: 'pointer',
               }}
               onClick={() => {
-                setSortField('updatedAt')
+                setSortField('point')
                 setSortDirection((prev) => {
                   if (prev === 'ASC') {
                     return 'DESC'
@@ -354,7 +297,7 @@ function IndexPointManual() {
                     return undefined
                   }
                 })
-                setSortDirection1((prev) => {
+                setSortDirection3((prev) => {
                   if (prev === 'ASC') {
                     return 'DESC'
                   } else if (prev === undefined) {
@@ -369,25 +312,25 @@ function IndexPointManual() {
                 style={{
                   position: 'relative',
                   top: 2,
-                  color: sortDirection1 === 'ASC' ? '#ffca37' : 'white',
+                  color: sortDirection3 === 'ASC' ? '#ffca37' : 'white',
                 }}
               />
               <CaretDownOutlined
                 style={{
                   position: 'relative',
                   bottom: 2,
-                  color: sortDirection1 === 'DESC' ? '#ffca37' : 'white',
+                  color: sortDirection3 === 'DESC' ? '#ffca37' : 'white',
                 }}
               />
             </div>
           </div>
         )
       },
-      dataIndex: 'sumTotal',
-      key: 'sumTotal',
+      dataIndex: 'point',
+      key: 'point',
       render: (value: any, row: any, index: number) => {
         return {
-          children: <>200 แต้ม</>,
+          children: <span>{numberWithCommas(row.point) || 0} แต้ม</span>,
         }
       },
     },
@@ -403,7 +346,7 @@ function IndexPointManual() {
                 <ActionButton
                   icon={<FileTextOutlined />}
                   color={color.primary1}
-                  onClick={() => navigate('/DetailPointManual')}
+                  onClick={() => navigate('/DetailPointManual/id=' + row.id)}
                 />
                 <ActionButton
                   icon={<EditOutlined />}
@@ -412,8 +355,11 @@ function IndexPointManual() {
                 />
                 <ActionButton
                   icon={<DeleteOutlined />}
-                  color={color.Error}
+                  color={
+                    row.dronerAmount > 0 || row.farmerAmount > 0 ?  color.Grey : color.Error 
+                  }
                   onClick={() => showDelete(row.id)}
+                  actionDisable={row.dronerAmount > 0 || row.farmerAmount > 0 ? true : false}
                 />
               </Row>
             </>
@@ -443,7 +389,7 @@ function IndexPointManual() {
         <Spin tip='กำลังโหลดข้อมูล...' size='large' spinning={loading}>
           <ConfigProvider renderEmpty={customizeRenderEmpty}>
             <Table
-              dataSource={data}
+              dataSource={data?.data}
               columns={columns}
               pagination={false}
               scroll={{ x: 'max-content' }}
@@ -452,35 +398,39 @@ function IndexPointManual() {
         </Spin>
       </CardContainer>
       <div className='d-flex justify-content-between pt-3 pb-3'>
-        <p>รายการทั้งหมด {1} รายการ</p>
+        <p>รายการทั้งหมด {data?.count} รายการ</p>
         <Pagination
-          current={1}
+          current={current}
           showSizeChanger
           onChange={onChangePage}
           onShowSizeChange={onShowSizeChange}
-          total={1}
+          total={data?.count}
         />
       </div>
       <ModalDelete
         show={modalDelete}
         backButton={() => setModalDelete(!modalDelete)}
-        callBack={() => {
+        callBack={async () => {
+          await SpecialPointDataSource.deleteSpecialPoint(specialPointDelete)
           setModalDelete(!modalDelete)
-          console.log(1)
+          getSpecialPoint()
         }}
         title1={'โปรดตรวจสอบของรายการแต้มพิเศษที่คุณต้องการลบ ก่อนที่จะกด'}
         title2={'ยืนยันเพราะอาจส่งผลต่อการแสดงผลแต้มของผู้ใช้ในแอปพลิเคชัน'}
       />
       <ModalPointManual
+        action='edit'
         show={modalPointManual}
-        backButton={() => setModalPointManual(!modalPointManual)}
-        callBack={() => {
-          setModalPointManual(!modalPointManual)
-          console.log(1)
+        backButton={() => {
+          setEditIndex(0)
+          getSpecialPoint()
+          setModalPointManual((prev) => !prev)
         }}
-        name={''}
-        detail={''}
-        editIndex={editIndex}
+        data={editIndex > 0 ? dataPoint : SpecialListEntities_INIT}
+        callBack={() => {
+          getSpecialPoint()
+          setModalPointManual((prev) => !prev)
+        }}
         isEditModal={editIndex > 0 ? true : false}
         title={editIndex > 0 ? 'แก้ไขชื่อรายการแต้มพิเศษ' : 'เพิ่มชื่อรายการแต้มพิเศษ'}
       />

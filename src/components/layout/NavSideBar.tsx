@@ -24,7 +24,7 @@ const NavSidebar: React.FC<any> = ({ children }) => {
     'oatchara.s@iconkaset',
     'nathapon.h@iconkaset.com',
     'sawatdee.k',
-    'natarkarn.h'
+    'natarkarn.h',
   ]
   const checkReportAcc = listReportAcc.includes(persistedProfile.username)
   const checkAdminTask = listAdminTask.includes(persistedProfile.username)

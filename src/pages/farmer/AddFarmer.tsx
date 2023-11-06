@@ -38,6 +38,7 @@ import { useLocalStorage } from '../../hook/useLocalStorage'
 import { resizeFileImg } from '../../utilities/ResizeImage'
 import { useNavigate } from 'react-router-dom'
 import '../farmer/Style.css'
+import locale from 'antd/es/date-picker/locale/th_TH'
 
 const dateFormat = 'DD/MM/YYYY'
 const dateCreateFormat = 'YYYY-MM-DD'
@@ -63,7 +64,7 @@ const AddFarmer = () => {
   const [farmerPlotList, setFarmerPlotList] = useState<FarmerPlotEntity[]>([])
   const [imgProfile, setImgProfile] = useState<any>()
   const [imgIdCard, setImgIdCard] = useState<any>()
-
+  const [birthDay, setBirthDay] = useState<string>()
   const [autoProvince, setAutoProvince] = useState<any>()
   const [autoDistrict, setAutoDistrict] = useState<any>()
   const [autoSubdistrict, setAutoSubdistrict] = useState<any>()
@@ -88,13 +89,6 @@ const AddFarmer = () => {
     const m = Map(data).set(e.target.id, e.target.value)
     setData(m.toJS())
     checkValidate(m.toJS())
-  }
-  const handleOnChangeBirthday = (e: any) => {
-    const d = Map(data)
-      .set('birthDate', moment(new Date(e)).format(dateCreateFormat))
-      .toJS()
-    setData(d)
-    checkValidate(d)
   }
 
   const handleOnChangeProvince = async (provinceId: number) => {
@@ -136,19 +130,16 @@ const AddFarmer = () => {
   const handleOnChangeAddress1 = (e: React.ChangeEvent<HTMLInputElement>) => {
     const d = Map(address).set('address1', e.target.value)
     setAddress(d.toJS())
-    checkValidateAddr(d.toJS())
   }
 
   const handleOnChangeAddress2 = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const d = Map(address).set('address2', e.target.value)
     setAddress(d.toJS())
-    checkValidateAddr(d.toJS())
   }
 
   const handleChangeStatus = (e: any) => {
     const m = Map(data).set('status', e.target.value)
     setData(m.toJS())
-    checkValidate(m.toJS())
   }
   //#endregion
 
@@ -242,7 +233,6 @@ const AddFarmer = () => {
     })
 
     setImgProfile(img_base64)
-    checkValidate(data)
     const d = Map(createImgProfile).set('file', isFileMoreThan2MB ? newSource : source)
     const e = Map(d.toJS()).set('resource', 'FARMER')
     const f = Map(e.toJS()).set('category', 'PROFILE_IMAGE')
@@ -265,7 +255,6 @@ const AddFarmer = () => {
   const removeImgProfile = () => {
     setImgProfile(undefined)
     setCreateImgProfile(UploadImageEntity_INTI)
-    checkValidate(data)
   }
 
   const onChangeIdCard = async (file: any) => {
@@ -290,7 +279,6 @@ const AddFarmer = () => {
     })
 
     setImgIdCard(img_base64)
-    checkValidate(data)
     const d = Map(createImgProfile).set('file', isFileMoreThan2MB ? newSource : source)
     const e = Map(d.toJS()).set('resource', 'FARMER')
     const f = Map(e.toJS()).set('category', 'ID_CARD_IMAGE')
@@ -313,7 +301,6 @@ const AddFarmer = () => {
   const removeImgIdCard = () => {
     setImgIdCard(undefined)
     setCreateImgIdCrad(UploadImageEntity_INTI)
-    checkValidate(data)
   }
   //#endregion
   const checkValidate = (data: CreateFarmerEntity) => {
@@ -323,8 +310,7 @@ const AddFarmer = () => {
       address.districtId,
       address.subdistrictId,
     ].includes(0)
-    const checkEmptyDate = ![data.birthDate].includes('1970-01-01')
-    if (checkEmptySting && checkEmptyNumber && checkEmptyDate) {
+    if (checkEmptySting && checkEmptyNumber) {
       setBtnSaveDisable(false)
     } else {
       setBtnSaveDisable(true)
@@ -332,15 +318,9 @@ const AddFarmer = () => {
   }
 
   const checkValidateAddr = (addr: CreateAddressEntity) => {
-    const checkEmptySting = ![
-      data.firstname,
-      data.lastname,
-      data.telephoneNo,
-      data.birthDate,
-    ].includes('')
+    const checkEmptySting = ![data.firstname, data.lastname, data.telephoneNo].includes('')
     const checkEmptyNumber = ![addr.provinceId, addr.districtId, addr.subdistrictId].includes(0)
-    const checkEmptyDate = ![data.birthDate].includes('1970-01-01')
-    if (checkEmptySting && checkEmptyNumber && checkEmptyDate) {
+    if (checkEmptySting && checkEmptyNumber) {
       setBtnSaveDisable(false)
     } else {
       setBtnSaveDisable(true)
@@ -367,6 +347,7 @@ const AddFarmer = () => {
       farmerPlot: farmerPlotList,
       comment: data.comment,
       createBy: `${profile?.firstname} ${profile?.lastname}`,
+      birthDate: birthDay,
     }
     setData((prev) => ({
       ...prev,
@@ -515,27 +496,20 @@ const AddFarmer = () => {
               </Form.Item>
             </div>
             <div className='form-group col-lg-6'>
-              <label>
-                วันเดือนปีเกิด <span style={{ color: 'red' }}>*</span>
-              </label>
-              <Form.Item
-                name='birthDate'
-                rules={[
-                  {
-                    required: true,
-                    message: 'กรุณากรอกวันเดือนปีเกิด',
-                  },
-                ]}
-              >
+              <label>วันเดือนปีเกิด</label>
+              <Form.Item name='birthDate'>
                 <DatePicker
                   placeholder='กรอกวันเดือนปีเกิด'
                   format={dateFormat}
-                  className='col-lg-12'
+                  locale={locale}
                   disabledDate={(current) =>
                     (current && current > moment().endOf('day')) ||
                     moment().diff(current, 'years') < 18
                   }
-                  onChange={(e: any) => handleOnChangeBirthday(e)}
+                  onChange={(e) => {
+                    setBirthDay(moment(e).toISOString())
+                  }}
+                  className='col-lg-12'
                 />
               </Form.Item>
             </div>
