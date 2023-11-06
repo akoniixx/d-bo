@@ -346,7 +346,7 @@ function IndexPointManual() {
                 <ActionButton
                   icon={<FileTextOutlined />}
                   color={color.primary1}
-                  onClick={() => navigate('/DetailPointManual')}
+                  onClick={() => navigate('/DetailPointManual/id=' + row.id)}
                 />
                 <ActionButton
                   icon={<EditOutlined />}
@@ -356,10 +356,10 @@ function IndexPointManual() {
                 <ActionButton
                   icon={<DeleteOutlined />}
                   color={
-                    row.dronerAmount === 0 || row.farmerAmount === 0 ? color.Error : color.Grey
+                    row.dronerAmount > 0 || row.farmerAmount > 0 ?  color.Grey : color.Error 
                   }
                   onClick={() => showDelete(row.id)}
-                  actionDisable={row.dronerAmount === 0 || row.farmerAmount === 0 ? false : true}
+                  actionDisable={row.dronerAmount > 0 || row.farmerAmount > 0 ? true : false}
                 />
               </Row>
             </>

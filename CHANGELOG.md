@@ -1,5 +1,11 @@
 ## [Version - 0]
 
+## Fix [v0.39.10] 2023-11-6
+
+- fixed target spray in all task menu
+- farmer birthday not required
+- call api index list special point
+
 ## improve [v0.39.9] 2023-11-3
 
 - auto address add/edit farmer menu

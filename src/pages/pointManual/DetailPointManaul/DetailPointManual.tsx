@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { useEffect, useState } from 'react'
 import { BackIconButton } from '../../../components/button/BackButton'
 import { useNavigate } from 'react-router-dom'
@@ -6,44 +7,65 @@ import { Badge, Button, Col, Image, Input, Pagination, Row, Select, Spin, Table,
 import SummaryPoint from '../../../components/card/SummaryPoint'
 import { color, icon } from '../../../resource'
 import { DeleteOutlined, EditOutlined, SearchOutlined } from '@ant-design/icons'
-import { PointReceiveDatasource } from '../../../datasource/PointReceiveDatasource'
 import { Container } from 'react-bootstrap'
 import { numberWithCommas } from '../../../utilities/TextFormatter'
 import { DateTimeUtil } from '../../../utilities/DateTimeUtil'
 import { STATUS_COLOR_POINT_MANUAL, STATUS_POINT_MANUAL } from '../../../definitions/Status'
 import ActionButton from '../../../components/button/ActionButton'
 import ModalDelete from '../../../components/modal/ModalDelete'
+import {
+  SpecialPointDataSource,
+  SpecialPointListDataSource,
+} from '../../../datasource/SpecialPointDatasource'
+import ShowNickName from '../../../components/popover/ShowNickName'
+import {
+  AllDetailSpecialPointEntities,
+  SpecialListEntities,
+} from '../../../entities/SpecialListEntities'
+import _ from 'lodash'
 
 function DetailPointManual() {
   const { TabPane } = Tabs
   const navigate = useNavigate()
-  const dateFormat = 'DD/MM/YYYY'
   const row = 5
+  const queryString = _.split(window.location.pathname, '=')
+  const specialPointId = queryString[1]
   const [current, setCurrent] = useState(1)
-  const [data, setData] = useState<any>()
+  const [data, setData] = useState<AllDetailSpecialPointEntities>()
   const [searchKeyword, setSearchKeyword] = useState('')
   const [searchKeyPoint, setSearchKeyPoint] = useState('รอ')
-
-  const [searchTask, setSearchTask] = useState('')
-  const [searchStartDate, setSearchStartDate] = useState<any>(null)
-  const [searchEndDate, setSearchEndDate] = useState<any>(null)
+  const [sortDirection, setSortDirection] = useState<string | undefined>()
+  const [sortField, setSortField] = useState<string | undefined>()
+  const [sortDirection1, setSortDirection1] = useState<string | undefined>(undefined)
+  const [sortDirection2, setSortDirection2] = useState<string | undefined>(undefined)
+  const [sortDirection3, setSortDirection3] = useState<string | undefined>(undefined)
   const [loading, setLoading] = useState(false)
-  const [searchType, setSearchType] = useState('')
+  const [user, setUser] = useState<any>()
+  const [summaryCount, setSummaryCount] = useState<SpecialListEntities>()
+  const [returnPoint, setReturnPoint] = useState<any>()
+  const [status, setStatus] = useState<any>('PENDING')
   const [modalReturnPoint, setModalReturnPoint] = useState<boolean>(false)
   const [modalDeletePoint, setModalDeletePoint] = useState<boolean>(false)
 
-  const fetchPlanningPoint = () => {
+  useEffect(() => {
+    fetchAllSpecialPointList()
+    getSummaryCount()
+  }, [current, status])
+
+  const fetchAllSpecialPointList = () => {
     setLoading(true)
-    PointReceiveDatasource.getPlanningPoint(
-      'PENDING',
-      row,
+    SpecialPointListDataSource.getSpecialPointList(
+      specialPointId,
       current,
+      row,
+      user,
+      status,
       searchKeyword,
-      searchTask,
-      searchStartDate,
-      searchEndDate,
+      sortField,
+      sortDirection,
     )
       .then((res) => {
+        console.log(res)
         const mapKey = res.data.map((x, i) => ({
           ...x,
           key: i + 1,
@@ -53,10 +75,11 @@ function DetailPointManual() {
       .catch((err) => console.log(err))
       .finally(() => setLoading(false))
   }
-
-  useEffect(() => {
-    fetchPlanningPoint()
-  }, [searchStartDate, searchEndDate, current])
+  const getSummaryCount = async () => {
+    await SpecialPointDataSource.getListSpecialPointById(specialPointId).then((res) => {
+      setSummaryCount(res)
+    })
+  }
 
   const summary = (
     <>
@@ -65,8 +88,8 @@ function DetailPointManual() {
           <SummaryPoint
             title={'จำนวนนักบินโดรน'}
             bgColor={color.Warning}
-            point={1}
-            time={1}
+            point={summaryCount?.dronerAmount || 0}
+            time={summaryCount?.dronerCount || 0}
             label={'นักบินโดรน'}
             pointManual={true}
           />
@@ -75,8 +98,8 @@ function DetailPointManual() {
           <SummaryPoint
             title={'จำนวนเกษตรกร'}
             bgColor={color.Success}
-            point={1}
-            time={1}
+            point={summaryCount?.farmerAmount || 0}
+            time={summaryCount?.farmerCount || 0}
             label={'เกษตรกร'}
             pointManual={true}
           />
@@ -85,7 +108,7 @@ function DetailPointManual() {
           <SummaryPoint
             title={'แต้มที่ให้ทั้งหมด'}
             bgColor={color.Grey}
-            point={200}
+            point={summaryCount?.point || 0}
             label={'แต้มที่ให้ทั้งหมด'}
           />
         </Col>
@@ -93,14 +116,14 @@ function DetailPointManual() {
     </>
   )
   const onChange = (key: string) => {
-    setSearchKeyPoint(key)
-    console.log(key)
+    setStatus(key)
   }
   const onChangePage = (page: number) => {
     setCurrent(page)
   }
   const returnPointManual = (value: any) => {
     setModalReturnPoint((prev) => !prev)
+    setReturnPoint(value)
   }
   const DeletePointManual = (value: any) => {
     setModalDeletePoint((prev) => !prev)
@@ -109,13 +132,13 @@ function DetailPointManual() {
   const columns = [
     {
       title: 'วันที่อัพเดต',
-      dataIndex: 'created_at',
-      key: 'created_at',
+      dataIndex: 'updateAt',
+      key: 'updateAt',
       render: (value: any, row: any, index: number) => {
         return {
           children: (
             <>
-              <span>{row.created_at && DateTimeUtil.formatDateTime(row.created_at)}</span>
+              <span>{row.updateAt && DateTimeUtil.formatDateTime(row.updateAt)}</span>
             </>
           ),
         }
@@ -123,13 +146,31 @@ function DetailPointManual() {
     },
     {
       title: 'Point No.',
-      dataIndex: 'point_no',
-      key: 'point_no',
+      dataIndex: 'pointNo',
+      key: 'pointNo',
+      render: (value: any, row: any, index: number) => {
+        return {
+          children: (
+            <>
+              <span>{row.pointNo || '-'}</span>
+            </>
+          ),
+        }
+      },
     },
     {
       title: 'Task No.',
-      dataIndex: 'task_no',
-      key: 'task_no',
+      dataIndex: 'taskNo',
+      key: 'taskNo',
+      render: (value: any, row: any, index: number) => {
+        return {
+          children: (
+            <>
+              <span>{row.taskNo || '-'}</span>
+            </>
+          ),
+        }
+      },
     },
     {
       title: 'หมายเหตุ',
@@ -137,7 +178,7 @@ function DetailPointManual() {
       key: 'reason',
       render: (value: any, row: any, index: number) => {
         return {
-          children: <p>-</p>,
+          children: <span>{row.reason || '-'}</span>,
         }
       },
     },
@@ -147,7 +188,7 @@ function DetailPointManual() {
       key: 'createBy',
       render: (value: any, row: any, index: number) => {
         return {
-          children: <span>แอดมิน ไอคอน (Admin)</span>,
+          children: <span>{row.createBy}</span>,
         }
       },
     },
@@ -160,9 +201,9 @@ function DetailPointManual() {
           children: (
             <>
               {' '}
-              <span style={{ color: STATUS_COLOR_POINT_MANUAL[searchKeyPoint] }}>
-                <Badge color={STATUS_COLOR_POINT_MANUAL[searchKeyPoint]} />{' '}
-                {STATUS_POINT_MANUAL[searchKeyPoint]}
+              <span style={{ color: STATUS_COLOR_POINT_MANUAL[row.status] }}>
+                <Badge color={STATUS_COLOR_POINT_MANUAL[row.status]} />{' '}
+                {STATUS_POINT_MANUAL[row.status]}
               </span>
             </>
           ),
@@ -177,7 +218,7 @@ function DetailPointManual() {
         return {
           children: (
             <Row justify={'space-between'}>
-              {searchKeyPoint === 'รอ' ? (
+              {status === 'PENDING' ? (
                 <>
                   <ActionButton
                     icon={<EditOutlined />}
@@ -190,21 +231,19 @@ function DetailPointManual() {
                     onClick={() => DeletePointManual(row)}
                   />
                 </>
-              ) : (
-                <>
-                  <ActionButton
-                    icon={
-                      <Image
-                        src={icon.returnPoint}
-                        preview={false}
-                        style={{ width: 15, height: 18 }}
-                      />
-                    }
-                    color={color.Error}
-                    onClick={() => returnPointManual(row)}
-                  />
-                </>
-              )}
+              ) : status === 'SUCCESS' ? (
+                <ActionButton
+                  icon={
+                    <Image
+                      src={icon.returnPoint}
+                      preview={false}
+                      style={{ width: 15, height: 18 }}
+                    />
+                  }
+                  color={color.Error}
+                  onClick={() => returnPointManual(row)}
+                />
+              ) : null}
             </Row>
           ),
         }
@@ -221,7 +260,7 @@ function DetailPointManual() {
             prefix={<SearchOutlined style={{ color: color.Disable }} />}
             placeholder='ค้นหาชื่อนักบินโดรน / ชื่อเกษตรกร / รหัส / เบอร์โทร'
             className='col-lg-12'
-            onChange={(e) => console.log(e.target.value)}
+            onChange={(e) => setSearchKeyword(e.target.value)}
           />
         </div>
         <div className='col-lg-3 p-1'>
@@ -229,7 +268,7 @@ function DetailPointManual() {
             className='col-lg-12'
             placeholder='ประเภทผู้ใช้งาน'
             allowClear
-            onChange={(e) => console.log(e)}
+            onChange={(e) => setUser(e)}
           >
             <option value='FARMER'>เกษตรกร</option>
             <option value='DRONER'>นักบินโดรน</option>
@@ -243,7 +282,10 @@ function DetailPointManual() {
               color: color.secondary2,
               backgroundColor: color.Success,
             }}
-            // onClick={onSearch}
+            onClick={() => {
+              setCurrent(1)
+              fetchAllSpecialPointList()
+            }}
           >
             ค้นหาข้อมูล
           </Button>
@@ -252,7 +294,9 @@ function DetailPointManual() {
     </>
   )
   const expandData = (record: any) => {
-    const checkFarmer = record.farmer
+    const checkFarmer = record.farmerId
+    const checkDroner = record.dronerId
+
     return (
       <Row justify={'space-between'} gutter={16}>
         {checkFarmer !== null && (
@@ -268,15 +312,52 @@ function DetailPointManual() {
                 <Col span={12}>
                   <label>เกษตรกร : </label>{' '}
                   <span style={{ color: color.Success }}>
-                    <u>{checkFarmer[0].first_name + ' ' + checkFarmer[0].last_name}</u>
+                    <u>{record.firstname + ' ' + record.lastname}</u>
                   </span>
+                  {record.nickname && <ShowNickName data={record.nickname} menu='INFO' />}
                 </Col>
                 <Col span={7}>
-                  <label>เบอร์ : </label> <span>{checkFarmer[0].telephone_no}</span>
+                  <label>เบอร์ : </label> <span>{record.telephoneNo}</span>
                 </Col>
                 <Col span={5}>
                   <label>แต้ม :</label>{' '}
-                  <span>+ {numberWithCommas(checkFarmer[0].receive_point)}</span>
+                  <span>
+                    {' '}
+                    {status === 'RETURN' && '-'} {numberWithCommas(record.point)}
+                  </span>
+                </Col>
+              </Row>
+            </Container>
+          </Col>
+        )}
+        {checkDroner !== null && (
+          <Col span={24}>
+            <Container
+              style={{
+                backgroundColor: '#EA973E1A',
+                borderRadius: '5px',
+              }}
+              className='p-3'
+            >
+              <Row>
+                <Col span={12}>
+                  <label>นักบินโดรน : </label>{' '}
+                  <span style={{ color: color.Warning }}>
+                    <u>{record.firstname + ' ' + record.lastname}</u>
+                  </span>
+                  {record.nickname && (
+                    <ShowNickName data={record.nickname} menu='INFO' colorTooltip={color.Warning} />
+                  )}
+                </Col>
+                <Col span={7}>
+                  <label>เบอร์ : </label> <span>{record.telephoneNo}</span>
+                </Col>
+                <Col span={5}>
+                  <label>แต้ม :</label>{' '}
+                  <span>
+                    {' '}
+                    {status === 'RETURN' && '-'} {numberWithCommas(record.point)}
+                  </span>
                 </Col>
               </Row>
             </Container>
@@ -312,15 +393,15 @@ function DetailPointManual() {
   const tabsContent = (
     <div className='pt-3'>
       <Tabs onChange={onChange} type='card'>
-        <TabPane tab='รอรับแต้ม (1)' key='รอ'>
+        <TabPane tab={`รอรับแต้ม ${data?.pending}`} key='PENDING'>
           {searchContent}
           {tableContent}
         </TabPane>
-        <TabPane tab='ได้รับแต้ม (1)' key='ได้'>
+        <TabPane tab={`ได้รับแต้ม ${data?.success}`} key='SUCCESS'>
           {searchContent}
           {tableContent}
         </TabPane>
-        <TabPane tab='คืนแต้ม (1)' key='คืน'>
+        <TabPane tab={`คืนแต้ม ${data?.return}`} key='RETURN'>
           {searchContent}
           {tableContent}
         </TabPane>
@@ -335,12 +416,18 @@ function DetailPointManual() {
           <div className='d-flex'>
             <BackIconButton onClick={() => navigate(-1)} />
             <span className='pt-3'>
-              <strong style={{ fontSize: '20px' }}>รายละเอียด : แต้มสำหรับแนะนำยาให้เกษตรกร</strong>
+              <strong style={{ fontSize: '20px' }}>รายละเอียด : {summaryCount?.name}</strong>
             </span>
           </div>
 
           <div className='align-self-center'>
-            <AddButtton text='เพิ่มแต้มพิเศษ' onClick={() => navigate('/AddDetailPointManual')} />
+            <AddButtton
+              text='เพิ่มแต้มพิเศษ'
+              onClick={() => {
+                localStorage.setItem('specialPointId', specialPointId)
+                navigate('/AddDetailPointManual')
+              }}
+            />
           </div>
         </div>
         {summary}
@@ -349,9 +436,17 @@ function DetailPointManual() {
           title='ยืนยันการคืนแต้ม'
           show={modalReturnPoint}
           backButton={() => setModalReturnPoint(!modalReturnPoint)}
-          callBack={() => {
+          callBack={async () => {
+            const dataReturn = {
+              id: returnPoint.id,
+              updateBy: returnPoint.updateBy,
+              reason: returnPoint.reason,
+              taskId: returnPoint.taskId,
+              taskNo: returnPoint.taskNo,
+            }
             setModalReturnPoint(!modalReturnPoint)
-            console.log(1)
+            await SpecialPointListDataSource.returnSpecialPoint(returnPoint)
+            fetchAllSpecialPointList()
           }}
           title1={'โปรดตรวจสอบของคืนแต้มที่คุณต้องการ ก่อนที่จะกดยืนยัน'}
           title2={'เพราะอาจส่งผลต่อการแสดงผลแต้มของผู้ใช้ในแอปพลิเคชัน'}

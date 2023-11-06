@@ -63,7 +63,7 @@ export interface GetFarmerEntity {
   telephoneNo: string
   status: string
   reason: string
-  birthDate: string | Moment
+  birthDate?: string | Moment
   address: AddressEntity
   addressId: string
   farmerPlot: FarmerPlotEntity[]
@@ -102,7 +102,7 @@ export interface CreateFarmerEntity {
   idNo: string
   telephoneNo: string
   status: string
-  birthDate: string
+  birthDate?: string
   address: CreateAddressEntity
   farmerPlot: FarmerPlotEntity[]
   comment?: string

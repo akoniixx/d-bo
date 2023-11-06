@@ -154,7 +154,7 @@ function EditWaitStart() {
     targetSpray.map((item: any) =>
       _.set(item, 'isChecked', item.name == value ? checked : item.isChecked),
     )
-    if (targetSpray[4].isChecked === true) {
+    if (value == 'อื่นๆ' && checked) {
       setCheckCrop(false)
     } else {
       setCheckCrop(true)
@@ -342,7 +342,7 @@ function EditWaitStart() {
                         />{' '}
                         <label>{x.name}</label>
                         <br />
-                        {targetSpray[4] && index == 4 && (
+                        {x.name === 'อื่นๆ' && (
                           <>
                             <Input
                               key={data?.targetSpray[0]}
