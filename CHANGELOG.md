@@ -1,5 +1,7 @@
 ## [Version - 0]
 
+## Fix [v0.39.12] 2023-11-08 
+- fixed payload pin news 
 ## Fix [v0.39.11] 2023-11-6
 
 - fixed target spray in all task menu
