@@ -501,8 +501,9 @@ function DetailPointManual() {
               taskNo: returnPoint.taskNo,
             }
             setModalReturnPoint(!modalReturnPoint)
-            await SpecialPointListDataSource.returnSpecialPoint(dataReturn)
+            await SpecialPointListDataSource.returnSpecialPoint(dataReturn).then((res) => {})
             fetchAllSpecialPointList()
+            getSummaryCount()
           }}
           title1={'โปรดตรวจสอบของคืนแต้มที่คุณต้องการ ก่อนที่จะกดยืนยัน'}
           title2={'เพราะอาจส่งผลต่อการแสดงผลแต้มของผู้ใช้ในแอปพลิเคชัน'}
@@ -514,6 +515,7 @@ function DetailPointManual() {
             await SpecialPointListDataSource.deleteSpecialPointList(specialPointDelete)
             setModalDeletePoint(!modalDeletePoint)
             fetchAllSpecialPointList()
+            getSummaryCount()
           }}
           title1={'โปรดตรวจสอบของแต้มพิเศษที่คุณต้องการลบ ก่อนที่จะกดยืนยัน'}
           title2={'เพราะอาจส่งผลต่อการแสดงผลแต้มของผู้ใช้ในแอปพลิเคชัน'}
