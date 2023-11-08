@@ -199,7 +199,7 @@ const WebRoutes: React.FC<any> = () => {
             <Route path='/IndexPointManual' element={<IndexPointManual />} />
             <Route path='/DetailPointManual/:id' element={<DetailPointManual />} />
             <Route path='/AddDetailPointManual' element={<AddDetailPointManual />} />
-            <Route path='/EditDetailPointManual' element={<EditDetailPointManual />} />
+            <Route path='/EditDetailPointManual/:id' element={<EditDetailPointManual />} />
           </Route>
           <Route element={<PublicRoute />}>
             <Route index element={<AuthPage />} />

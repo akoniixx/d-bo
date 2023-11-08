@@ -68,7 +68,7 @@ const SummaryPoint: React.FC<SummaryProps> = ({
                 <div style={{ fontSize: '16px' }}>{numberWithCommas(point) + ' แต้ม'}</div>
               ) : (
                 <div style={{ fontSize: '16px' }}>
-                  {numberWithCommas(point) + ' ครั้ง' + ` ( ${numberWithCommas(time!)}  คน)`}
+                  {numberWithCommas(time || 0) + ' ครั้ง' + ` ( ${numberWithCommas(point || 0)}  คน)`}
                 </div>
               )}
             </div>

@@ -233,12 +233,12 @@ export const STATUS_SEARCH: any = {
 }
 
 export const STATUS_COLOR_POINT_MANUAL: any = {
-  'RETURN': color.Error,
-  'SUCCESS': color.Success,
-  'PENDING': color.Grey,
+  RETURN: color.Error,
+  SUCCESS: color.Success,
+  PENDING: color.Grey,
 }
 export const STATUS_POINT_MANUAL: any = {
-  'RETURN': 'คืนแต้ม',
-  'SUCCESS': 'ได้รับแต้ม',
-  'PENDING': 'รอรับแต้ม',
+  RETURN: 'คืนแต้ม',
+  SUCCESS: 'ได้รับแต้ม',
+  PENDING: 'รอรับแต้ม',
 }
