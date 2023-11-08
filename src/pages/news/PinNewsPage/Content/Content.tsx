@@ -208,10 +208,11 @@ function Content({ application }: Props) {
         pinMain,
         deletePinAll,
         deletePinMain,
+        application: currentApp.app,
       } as any
       const result = await NewsDatasource.postPinNews(payload)
       if (result.success) {
-        Swal.fire({
+        await Swal.fire({
           icon: 'success',
           title: 'บันทึกข้อมูลสำเร็จ',
           showConfirmButton: false,
