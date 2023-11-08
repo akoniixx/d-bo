@@ -6,7 +6,7 @@ import AddButtton from '../../../components/button/AddButton'
 import { Badge, Button, Col, Image, Input, Pagination, Row, Select, Spin, Table, Tabs } from 'antd'
 import SummaryPoint from '../../../components/card/SummaryPoint'
 import { color, icon } from '../../../resource'
-import { DeleteOutlined, EditOutlined, SearchOutlined } from '@ant-design/icons'
+import { CaretDownOutlined, CaretUpOutlined, DeleteOutlined, EditOutlined, SearchOutlined } from '@ant-design/icons'
 import { Container } from 'react-bootstrap'
 import { numberWithCommas } from '../../../utilities/TextFormatter'
 import { DateTimeUtil } from '../../../utilities/DateTimeUtil'
@@ -33,12 +33,9 @@ function DetailPointManual() {
   const [current, setCurrent] = useState(1)
   const [data, setData] = useState<AllDetailSpecialPointEntities>()
   const [searchKeyword, setSearchKeyword] = useState('')
-  const [searchKeyPoint, setSearchKeyPoint] = useState('รอ')
   const [sortDirection, setSortDirection] = useState<string | undefined>()
   const [sortField, setSortField] = useState<string | undefined>()
   const [sortDirection1, setSortDirection1] = useState<string | undefined>(undefined)
-  const [sortDirection2, setSortDirection2] = useState<string | undefined>(undefined)
-  const [sortDirection3, setSortDirection3] = useState<string | undefined>(undefined)
   const [loading, setLoading] = useState(false)
   const [user, setUser] = useState<any>()
   const [summaryCount, setSummaryCount] = useState<SpecialListEntities>()
@@ -46,11 +43,13 @@ function DetailPointManual() {
   const [status, setStatus] = useState<any>('PENDING')
   const [modalReturnPoint, setModalReturnPoint] = useState<boolean>(false)
   const [modalDeletePoint, setModalDeletePoint] = useState<boolean>(false)
+  const [specialPointDelete, setSpecialPointDelete] = useState<string>()
+  const profile = JSON.parse(localStorage.getItem('profile') || '{  }')
 
   useEffect(() => {
     fetchAllSpecialPointList()
     getSummaryCount()
-  }, [current, status])
+  }, [current, status, sortDirection])
 
   const fetchAllSpecialPointList = () => {
     setLoading(true)
@@ -65,7 +64,6 @@ function DetailPointManual() {
       sortDirection,
     )
       .then((res) => {
-        console.log(res)
         const mapKey = res.data.map((x, i) => ({
           ...x,
           key: i + 1,
@@ -127,11 +125,61 @@ function DetailPointManual() {
   }
   const DeletePointManual = (value: any) => {
     setModalDeletePoint((prev) => !prev)
+    setSpecialPointDelete(value)
   }
 
   const columns = [
     {
-      title: 'วันที่อัพเดต',
+      title: () => {
+        return (
+          <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+            วันที่อัพเดต
+            <div
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                cursor: 'pointer',
+              }}
+              onClick={() => {
+                setSortField('updateAt')
+                setSortDirection((prev) => {
+                  if (prev === 'ASC') {
+                    return 'DESC'
+                  } else if (prev === undefined) {
+                    return 'ASC'
+                  } else {
+                    return undefined
+                  }
+                })
+                setSortDirection1((prev) => {
+                  if (prev === 'ASC') {
+                    return 'DESC'
+                  } else if (prev === undefined) {
+                    return 'ASC'
+                  } else {
+                    return undefined
+                  }
+                })
+              }}
+            >
+              <CaretUpOutlined
+                style={{
+                  position: 'relative',
+                  top: 2,
+                  color: sortDirection1 === 'ASC' ? '#ffca37' : 'white',
+                }}
+              />
+              <CaretDownOutlined
+                style={{
+                  position: 'relative',
+                  bottom: 2,
+                  color: sortDirection1 === 'DESC' ? '#ffca37' : 'white',
+                }}
+              />
+            </div>
+          </div>
+        )
+      },
       dataIndex: 'updateAt',
       key: 'updateAt',
       render: (value: any, row: any, index: number) => {
@@ -223,12 +271,12 @@ function DetailPointManual() {
                   <ActionButton
                     icon={<EditOutlined />}
                     color={color.primary1}
-                    onClick={() => navigate('/EditDetailPointManual')}
+                    onClick={() => navigate('/EditDetailPointManual/id=' + row.id)}
                   />
                   <ActionButton
                     icon={<DeleteOutlined />}
                     color={color.Error}
-                    onClick={() => DeletePointManual(row)}
+                    onClick={() => DeletePointManual(row.id)}
                   />
                 </>
               ) : status === 'SUCCESS' ? (
@@ -260,6 +308,7 @@ function DetailPointManual() {
             prefix={<SearchOutlined style={{ color: color.Disable }} />}
             placeholder='ค้นหาชื่อนักบินโดรน / ชื่อเกษตรกร / รหัส / เบอร์โทร'
             className='col-lg-12'
+            value={searchKeyword}
             onChange={(e) => setSearchKeyword(e.target.value)}
           />
         </div>
@@ -269,6 +318,7 @@ function DetailPointManual() {
             placeholder='ประเภทผู้ใช้งาน'
             allowClear
             onChange={(e) => setUser(e)}
+            value={user}
           >
             <option value='FARMER'>เกษตรกร</option>
             <option value='DRONER'>นักบินโดรน</option>
@@ -439,13 +489,13 @@ function DetailPointManual() {
           callBack={async () => {
             const dataReturn = {
               id: returnPoint.id,
-              updateBy: returnPoint.updateBy,
+              updateBy: profile.firstname + ' ' + profile.lastname,
               reason: returnPoint.reason,
               taskId: returnPoint.taskId,
               taskNo: returnPoint.taskNo,
             }
             setModalReturnPoint(!modalReturnPoint)
-            await SpecialPointListDataSource.returnSpecialPoint(returnPoint)
+            await SpecialPointListDataSource.returnSpecialPoint(dataReturn)
             fetchAllSpecialPointList()
           }}
           title1={'โปรดตรวจสอบของคืนแต้มที่คุณต้องการ ก่อนที่จะกดยืนยัน'}
@@ -454,9 +504,10 @@ function DetailPointManual() {
         <ModalDelete
           show={modalDeletePoint}
           backButton={() => setModalDeletePoint(!modalDeletePoint)}
-          callBack={() => {
+          callBack={async () => {
+            await SpecialPointListDataSource.deleteSpecialPointList(specialPointDelete)
             setModalDeletePoint(!modalDeletePoint)
-            console.log(1)
+            fetchAllSpecialPointList()
           }}
           title1={'โปรดตรวจสอบของแต้มพิเศษที่คุณต้องการลบ ก่อนที่จะกดยืนยัน'}
           title2={'เพราะอาจส่งผลต่อการแสดงผลแต้มของผู้ใช้ในแอปพลิเคชัน'}

@@ -1,215 +1,165 @@
-import { DeleteOutlined, DownCircleFilled, UpCircleFilled } from '@ant-design/icons'
-import { Button, Col, Divider, Form, Input, Radio, Row, Table } from 'antd'
+import { DownCircleFilled, UpCircleFilled } from '@ant-design/icons'
+import { Col, Divider, Form, Input, Radio, Row, Table } from 'antd'
 import Select from 'react-select'
 import TextArea from 'antd/lib/input/TextArea'
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import ActionButton from '../../../components/button/ActionButton'
 import { BackIconButton } from '../../../components/button/BackButton'
 import { CardContainer } from '../../../components/card/CardContainer'
 import FooterPage from '../../../components/footer/FooterPage'
 import { CardHeader } from '../../../components/header/CardHearder'
-import {
-  CampaignConditionEntity,
-  CampaignConditionEntity_INIT,
-} from '../../../entities/CampaignPointEntites'
 import { color } from '../../../resource'
-import { ProviceEntity } from '../../../entities/LocationEntities'
 import { LocationDatasource } from '../../../datasource/LocationDatasource'
-import { TaskDatasource } from '../../../datasource/TaskDatasource'
-import { FarmerPageEntity } from '../../../entities/FarmerEntities'
+import { SpecialPointListDataSource } from '../../../datasource/SpecialPointDatasource'
+import _ from 'lodash'
+import {
+  SpecialPointConditionEntity,
+  SpecialPointConditionEntity_INIT,
+} from '../../../entities/SpecialListEntities'
+import { DronerDatasource } from '../../../datasource/DronerDatasource'
+import { FarmerDatasource } from '../../../datasource/FarmerDatasource'
+import Swal from 'sweetalert2'
+import { TaskFinishedDatasource } from '../../../datasource/TaskFinishDatasource'
 
 const EditDetailPointManual = () => {
   const navigate = useNavigate()
+  const queryString = _.split(window.location.pathname, '=')
+  const specialPointId = queryString[1]
   const [form] = Form.useForm()
   const [formTable] = Form.useForm()
   const [saveBtnDisable, setBtnSaveDisable] = useState<boolean>(true)
-  const [dataSubMission, setDataSubMission] = useState<CampaignConditionEntity[]>([
-    CampaignConditionEntity_INIT,
+  const [dataSubSpecial, setDataSubSpecial] = useState<SpecialPointConditionEntity[]>([
+    SpecialPointConditionEntity_INIT,
   ])
-  const [count, setCount] = useState(1)
-  const [currentPage, setCurrentPage] = useState(1)
-  const [row, setRow] = useState(10)
-  const [farmerList, setFarmerList] = useState<any>()
-  const [searchFarmer, setSearchFarmer] = useState<string>('')
-  const [provinceListId, setProvinceListId] = useState<ProviceEntity[]>([])
-  const [provinceList, setProvinceList] = useState<string[]>([])
-  useEffect(() => {
-    fetchTypeUserList(searchFarmer, provinceListId)
-  }, [searchFarmer, provinceListId, currentPage, row])
-  useEffect(() => {
-    getProvince()
-  }, [])
+  const [taskList, setTaskList] = useState<any>()
+  const [currentTask, setCurrentTask] = useState(1)
+  const [rowTask, setRowTask] = useState(10)
+  const [checkTask, setCheckTask] = useState<boolean>()
+  const [searchTask, setSearchTask] = useState<string>('')
+  const [selectedTask, setSelectedTask] = useState<any>()
+  const profile = JSON.parse(localStorage.getItem('profile') || '{  }')
+  const [tel, setTel] = useState<any>()
 
-  const getProvince = async () => {
-    await LocationDatasource.getProvince()
-      .then((res) => {
-        setProvinceList(res.map((item: any) => (item.provinceName ? item.provinceName : '-')))
-        setProvinceListId(res)
-      })
-      .catch((err) => console.log(err))
+  useEffect(() => {
+    getSpecialPointById()
+    getTaskStatusDone()
+  }, [tel, rowTask, searchTask])
+
+  const getSpecialPointById = async () => {
+    await SpecialPointListDataSource.getSpecialPointListById(specialPointId).then((res) => {
+      if (res) {
+        getInfoUserManual(res)
+        const mapKey = res
+        setDataSubSpecial([mapKey])
+        form.setFieldsValue({
+          isDroner: res.isDroner,
+          status: res.status,
+          user: res.dronerId ? 'นักบินโดรน' : 'เกษตรกร',
+        })
+        formTable.setFieldsValue({
+          user: res.dronerId ? 'นักบินโดรน' : 'เกษตรกร',
+          point: res.point,
+          reason: res.reason,
+          taskNo: res.taskNo ? { value: res.taskNo, label: res.taskNo } : undefined,
+          taskId: res.taskId || undefined,
+          checkTaskNo: res.taskId ? true : false,
+        })
+      }
+    })
   }
-  const fetchTypeUserList = (text?: string, dataProvice?: any) => {
-    // const typeUser = form.getFieldsValue();
-    //   console.log(typeUser)
-    TaskDatasource.getFarmerListTask(text, currentPage, text ? 0 : row).then(
-      (res: FarmerPageEntity) => {
-        const data = res.data.map((x: any) => {
-          const res = { ...x, provinceName: '' }
-          return res
-        })
-        const mapData = data.map((x) => {
-          if (x.address && x.address.provinceId) {
-            const matching = dataProvice.find(
-              (i: any) => `${i.provinceId}` === `${x.address.provinceId}`,
-            )
-            if (matching) {
-              return { ...x, provinceName: matching.provinceName }
-            }
-          }
-
+  const getInfoUserManual = async (data: any) => {
+    const mapData = [data]
+    let result: any
+    if (form.getFieldValue('user') === 'เกษตรกร') {
+      result = await Promise.all(
+        mapData.map(async (item: any, index: number) => {
+          const farmer = await FarmerDatasource.getFarmerById(item.farmerId)
+          setTel(farmer.telephoneNo)
+          const province = await LocationDatasource.getSubdistrict(farmer.address.districtId)
           return {
-            ...x,
-            provinceName: x.provinceName,
+            id: item.id,
+            farmerId: item.farmerId,
+            firstname: farmer.firstname,
+            lastname: farmer.lastname,
+            tel: farmer.telephoneNo,
+            provinceName: province[0].provinceName,
           }
-        })
-
-        const result = mapData.map((item) => {
+        }),
+      )
+    } else {
+      result = await Promise.all(
+        mapData.map(async (item: any, index: number) => {
+          const droner = await DronerDatasource.getDronerByID(item.dronerId)
+          setTel(droner.telephoneNo)
+          const province = await LocationDatasource.getSubdistrict(droner.address.districtId)
           return {
-            ...item,
-            label:
-              item.firstname +
-              ' ' +
-              item.lastname +
-              ' | ' +
-              item.telephoneNo +
-              ' | ' +
-              (item.provinceName ? item.provinceName : '-'),
-            value: item.id,
+            id: item.id,
+            farmerId: item.dronerId,
+            firstname: droner.firstname,
+            lastname: droner.lastname,
+            tel: droner.telephoneNo,
+            provinceName: province ? province[0].provinceName : '-',
           }
-        })
-        setFarmerList(result)
+        }),
+      )
+    }
+    formTable.setFieldValue(
+      'user',
+      result.map((item: any) => {
+        return {
+          value: item.farmerId,
+          label:
+            item.firstname +
+            ' ' +
+            item.lastname +
+            ' | ' +
+            item.tel +
+            ' | จังหวัด ' +
+            item.provinceName,
+          id: item.id,
+        }
+      }),
+    )
+  }
+  const getTaskStatusDone = async () => {
+    await TaskFinishedDatasource.getTaskFinishList(currentTask, rowTask, 'DONE', tel || '').then(
+      (res) => {
+        setTaskList(res.data)
       },
     )
   }
-  const handleInputChange = (inputValue: any) => {
-    if (currentPage === 1) {
-      setSearchFarmer(inputValue)
+  const options =
+    checkTask === true
+      ? taskList?.map((task: any) => ({
+          label: task.taskNo,
+          value: task.id,
+        }))
+      : []
+
+  const handleInputTask = (inputValue: any) => {
+    if (currentTask === 1) {
+      setSearchTask(inputValue)
     }
     return inputValue
   }
-  const handleMenuScrollToBottom = () => {
-    if (row === farmerList.length) {
-      setCurrentPage(currentPage)
-      setRow(row + 10)
-    }
-  }
-
-  const countExpand = () => {
-    const allCount = []
-    for (let i = 0; 50 > i; i++) {
-      allCount.push(i + 1)
-    }
-    return allCount
-  }
-
-  const mapCondition = (e: any) => {
-    const mapList = e
-    const sTable = formTable.getFieldsValue()
-    const value = mapList.map((y: any, i: number) => {
-      return {
-        ...y,
-        num: i + 1,
-        nameUser: sTable[`${y.num}_nameUser`],
-        point: sTable[`${y.num}_point`],
-        task: sTable[`${y.num}_task`],
-        taskNo: sTable[`${y.num}_taskNo`],
-        description: sTable[`${y.num}_description`],
-      }
-    })
-    return value
-  }
-
-  const mapForm = (e: any) => {
-    const mapList = e
-    mapList.map((y: any) => {
-      formTable.setFieldValue(`${y.num}_nameUser`, y.nameUser)
-      formTable.setFieldValue(`${y.num}_point`, y.point)
-      formTable.setFieldValue(`${y.num}_task`, y.task)
-      formTable.setFieldValue(`${y.num}_taskNo`, y.taskNo)
-      formTable.setFieldValue(`${y.num}_description`, y.description)
-    })
-  }
-
-  const newDataSubMission = useMemo(() => {
-    if (dataSubMission.length > 0) {
-      const d = dataSubMission.map((el: any, index: any) => {
-        return {
-          ...el,
-          key: index + 1,
-          num: index + 1,
-        }
-      })
-      return d
-    }
-  }, [dataSubMission])
-
-  const addRow = () => {
-    setCount(count + 1)
-    const addList = mapCondition([
-      ...dataSubMission,
-      { ...CampaignConditionEntity_INIT, num: dataSubMission.length + 1 },
-    ])
-    setDataSubMission(addList)
-  }
-
-  const removeRow = async (key: number) => {
-    const mapData = await mapCondition(dataSubMission)
-    const e = mapData.filter((x: any) => x.num !== key)
-    const mData = await mapCondition(e)
-    mapForm(mData)
-    setDataSubMission(e)
-    setCount(count - 1)
-    formTable.setFieldValue(`${e.length + 1}_nameUser`, '')
-    formTable.setFieldValue(`${e.length + 1}_point`, '')
-    formTable.setFieldValue(`${e.length + 1}_task`, '')
-    formTable.setFieldValue(`${e.length + 1}_taskNo`, '')
-    formTable.setFieldValue(`${e.length + 1}_description`, '')
-  }
-
-  const checkLimit = () => {
-    const v = formTable.getFieldsValue()
-    const d = []
-    if (count > 1) {
-      for (let i = 0; count > i; i++) {
-        d.push(parseFloat(v[`${i + 1}_point`]))
-      }
-    }
-    if (d.length > 0) {
-      if (d[0] < d[1] && d[d.length - 2] <= d[d.length - 1]) {
-        return false
-      } else {
-        return true
-      }
+  const handleMenuScrollTask = () => {
+    if (rowTask === taskList.length) {
+      setCurrentTask(currentTask)
+      setRowTask(rowTask + 10)
     }
   }
   const checkNumber = (e: React.ChangeEvent<HTMLInputElement>, name: string) => {
-    const checkName = name.split('_')[1]
     const { value: inputValue } = e.target
-    if (checkName === 'taskNo') {
-      const allowedCharacters = inputValue.replace(/[^0-9A-Za-z.]/g, '')
-      const convertedValue = allowedCharacters.replace(/^(\d*\.\d{0,2}).*$/, '$1')
-      formTable.setFieldsValue({ [name]: convertedValue })
-    } else {
-      const withoutDecimal = inputValue.replace(/[^0-9]/g, '')
-      const convertedNumber = withoutDecimal.replace(/^0+(\d*)/, '$1')
-      formTable.setFieldsValue({ [name]: convertedNumber })
-    }
+    const withoutDecimal = inputValue.replace(/[^0-9]/g, '')
+    const convertedNumber = withoutDecimal.replace(/^0+(\d*)/, '$1')
+    formTable.setFieldsValue({ [name]: convertedNumber })
   }
 
   const columns = [
     {
       title: '',
+      dataIndex: '',
+      key: '',
       render: (value: any, row: any, index: number) => {
         return {
           children: <span>{index + 1}</span>,
@@ -219,31 +169,14 @@ const EditDetailPointManual = () => {
     Table.EXPAND_COLUMN,
     {
       title: 'ชื่อผู้ใช้',
+      dataIndex: 'farmerId',
+      key: 'farmerId',
       width: '30%',
       render: (value: any, row: any, index: number) => {
         return {
           children: (
-            <Form.Item
-              key={index}
-              style={{ margin: 0 }}
-              name={`${row.num}_nameUser`}
-              rules={[
-                {
-                  required: true,
-                  message: 'กรุณากรอกชื่อผู้ใช้',
-                },
-              ]}
-            >
-              <Select
-                placeholder='กรุณาเลือกเกษตรกร'
-                isSearchable
-                isClearable
-                onInputChange={handleInputChange}
-                options={farmerList}
-                value={farmerList}
-                onMenuScrollToBottom={handleMenuScrollToBottom}
-                closeMenuOnSelect={false}
-              />
+            <Form.Item className='col-lg-12' style={{ margin: 0, width: '100%' }} name='user'>
+              <Select isDisabled />
             </Form.Item>
           ),
         }
@@ -252,6 +185,7 @@ const EditDetailPointManual = () => {
     {
       title: 'จำนวนแต้ม',
       dataIndex: 'point',
+      key: 'point',
       width: '20%',
       render: (value: any, row: any, index: number) => {
         return {
@@ -259,7 +193,7 @@ const EditDetailPointManual = () => {
             <Form.Item
               key={index}
               style={{ margin: 0 }}
-              name={`${row.num}_point`}
+              name='point'
               rules={[
                 {
                   required: true,
@@ -271,7 +205,7 @@ const EditDetailPointManual = () => {
                 placeholder='กรอกจำนวนแต้ม'
                 suffix='แต้ม'
                 autoComplete='off'
-                onChange={(e) => checkNumber(e, `${row.num}_point`)}
+                onChange={(e) => checkNumber(e, 'point')}
               />
             </Form.Item>
           ),
@@ -280,50 +214,41 @@ const EditDetailPointManual = () => {
     },
     {
       title: 'งานที่เกี่ยวข้อง (เฉพาะงานที่รีวิวแล้วเท่านั้น)',
+      dataIndex: 'taskNo',
+      key: 'taskNo',
       render: (value: any, row: any, index: number) => {
         return {
           children: (
             <div className='d-flex'>
-              <Form.Item key={index} name={`${row.num}_task`} style={{ margin: 0 }}>
-                <Radio.Group>
-                  <Radio value='YES'>ไม่มี</Radio>
-                  <Radio value='NO'>มี</Radio>
+              <Form.Item name='checkTaskNo' style={{ margin: 0 }}>
+                <Radio.Group
+                  onChange={(e) => {
+                    if (e.target.value === false) {
+                      formTable.setFieldValue('taskNo', undefined)
+                    }
+                    setCheckTask(e.target.value)
+                    onFieldsChange()
+                  }}
+                >
+                  <Radio value={false}>ไม่มี</Radio>
+                  <Radio value={true}>มี</Radio>
                 </Radio.Group>
               </Form.Item>
-              <Form.Item
-                style={{ margin: 0 }}
-                name={`${row.num}_taskNo`}
-                rules={[
-                  {
-                    required: true,
-                    message: 'กรุณากรอกรหัส Task No.',
-                  },
-                ]}
-              >
-                <Input
+              <Form.Item className='col-lg-12' style={{ margin: 0, width: '65%' }} name='taskNo'>
+                <Select
+                  isDisabled={!formTable.getFieldValue('checkTaskNo')}
                   placeholder='กรอกรหัส Task No.'
-                  onChange={(e) => checkNumber(e, `${row.num}_taskNo`)}
+                  isSearchable
+                  isClearable
+                  onInputChange={handleInputTask}
+                  options={options || []}
+                  onMenuScrollToBottom={handleMenuScrollTask}
+                  closeMenuOnSelect
+                  onChange={(selectedOption) => {
+                    setSelectedTask(selectedOption)
+                  }}
                 />
               </Form.Item>
-            </div>
-          ),
-        }
-      },
-    },
-    {
-      title: '',
-      render: (value: any, row: any) => {
-        return {
-          children: (
-            <div className='d-flex flex-row justify-content-center'>
-              <div className='col-lg-3'>
-                <ActionButton
-                  icon={<DeleteOutlined />}
-                  color={count > 1 ? color.Error : color.Grey}
-                  actionDisable={count > 1 ? false : true}
-                  onClick={() => removeRow(row.num)}
-                />
-              </div>
             </div>
           ),
         }
@@ -331,80 +256,52 @@ const EditDetailPointManual = () => {
     },
   ]
   const onFieldsChange = () => {
-    const typeUser = form.getFieldsValue()
-    const dataSub: any = newDataSubMission
     const fs = formTable.getFieldsValue()
-    const condition: any = dataSub?.map((y: any, i: number) => {
-      const filterIdUser = fs[`${y.num}_nameUser`]
-      return {
-        num: i + 1,
-        nameUser: filterIdUser ? filterIdUser.id : null,
-        point: fs[`${y.num}_point`],
-        task: fs[`${y.num}_task`],
-        taskNo: fs[`${y.num}_taskNo`],
-        description: fs[`${y.num}_description`],
-      }
-    })
     let fieldErr = true
-    let fieldNull = true
-    condition.length > 0 &&
-    condition.every(
-      (item: any) =>
-        item &&
-        item.nameUser &&
-        item.point &&
-        item.task &&
-        item.taskNo &&
-        item.num &&
-        !checkLimit(),
-    )
-      ? (fieldNull = false)
-      : (fieldNull = true)
+    let formErr = true
+    if (formTable.getFieldError('taskNo').length === 0) {
+      formErr = false
+    } else {
+      formErr = true
+    }
 
-    if (typeUser) {
+    if (fs.point) {
       fieldErr = false
     } else {
       fieldErr = true
     }
-    setBtnSaveDisable(fieldErr || fieldNull)
+    setBtnSaveDisable(fieldErr || formErr || form.getFieldValue('status') !== 'SUCCESS')
   }
   const subMissionTextArea = (recode: any) => {
     return (
       <Row justify={'space-between'} gutter={16}>
         <Col span={24}>
           <label>หมายเหตุ</label>
-          <Form.Item style={{ margin: 0 }} name={`${recode.num}_description`}>
+          <Form.Item style={{ margin: 0 }} name='reason'>
             <TextArea placeholder='กรอกรายหมายเหตุ' rows={4} />
           </Form.Item>
         </Col>
       </Row>
     )
   }
-
+  const countExpand = () => {
+    const allCount = []
+    for (let i = 0; 50 > i; i++) {
+      allCount.push(i + 1)
+    }
+    return allCount
+  }
   const subMission = (
     <>
       <Row className='pb-3'>
         <Col span={21}>
           <label>รายชื่อผู้ใช้</label>
         </Col>
-        <Col span={3}>
-          <Button
-            style={{
-              borderColor: 'rgba(33, 150, 83, 0.1)',
-              borderRadius: '5px',
-              color: color.Success,
-              backgroundColor: 'rgba(33, 150, 83, 0.1)',
-            }}
-            onClick={() => addRow()}
-          >
-            + เพิ่มชื่อผู้ใช้
-          </Button>
-        </Col>
       </Row>
       <Form form={formTable} onFieldsChange={onFieldsChange}>
         <Table
           columns={columns}
-          dataSource={newDataSubMission}
+          dataSource={dataSubSpecial}
           pagination={false}
           expandable={{
             expandedRowRender: (record) => subMissionTextArea(record),
@@ -431,7 +328,30 @@ const EditDetailPointManual = () => {
   )
 
   // eslint-disable-next-line @typescript-eslint/no-empty-function
-  const submit = async () => {}
+  const submit = async () => {
+    await form.validateFields()
+    await formTable.validateFields()
+    const create: any = {}
+    const fs = formTable.getFieldsValue()
+    create.id = specialPointId
+    create.point = fs.point
+    create.reason = fs.reason
+    create.taskId = fs.taskNo?.value
+    create.taskNo = fs.taskNo?.label
+    create.createBy = profile.firstname + ' ' + profile.lastname
+    await SpecialPointListDataSource.updateToSuccess(create).then((res) => {
+      if (res) {
+        Swal.fire({
+          title: 'บันทึกสำเร็จ',
+          icon: 'success',
+          timer: 1500,
+          showConfirmButton: false,
+        }).then(() => {
+          navigate(-1)
+        })
+      }
+    })
+  }
 
   return (
     <>
@@ -445,19 +365,19 @@ const EditDetailPointManual = () => {
         <CardHeader textHeader='รายละแต้มพิเศษ' />
         <Form style={{ padding: '32px' }} form={form} onFieldsChange={onFieldsChange}>
           <div className='row'>
-            <div className='col-lg-2'>
+            <Form.Item name='user' className='col-lg-2'>
               <label style={{ fontWeight: '500' }}>
                 ประเภทผู้ใช้งาน <span style={{ color: color.Error }}>*</span>
               </label>
-              <p className='pt-2'>เกษตรกร</p>
-            </div>
+              <p className='pt-2'>{form.getFieldValue('user')}</p>
+            </Form.Item>
 
             <div className='col-lg'>
               <label style={{ fontWeight: '500' }}>
                 สถานะ <span style={{ color: color.Error }}>*</span>
               </label>
               <Form.Item
-                name='typeUser'
+                name='status'
                 rules={[
                   {
                     required: true,
@@ -466,8 +386,8 @@ const EditDetailPointManual = () => {
                 ]}
               >
                 <Radio.Group className='d-flex flex-row'>
-                  <Radio value='1'>รอรับแต้ม</Radio>
-                  <Radio value='2'>ได้รับแต้ม</Radio>
+                  <Radio value='PENDING'>รอรับแต้ม</Radio>
+                  <Radio value='SUCCESS'>ได้รับแต้ม</Radio>
                 </Radio.Group>
               </Form.Item>
             </div>

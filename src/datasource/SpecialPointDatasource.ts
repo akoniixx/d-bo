@@ -105,6 +105,16 @@ export class SpecialPointListDataSource {
         console.log(err, 'err specialpoint')
       })
   }
+  static getSpecialPointListById(id: string): Promise<any> {
+    return httpClient
+      .get(BASE_URL + `/promotion/specialpointlist/${id}`)
+      .then((response) => {
+        return response.data
+      })
+      .catch((err) => {
+        console.log(err, 'err specialpointById')
+      })
+  }
   static insertSpecialPointList(data: InsertDetailSpecialPointEntities): Promise<any> {
     delete data.id
     return httpClient
@@ -124,6 +134,16 @@ export class SpecialPointListDataSource {
       })
       .catch((err) => {
         console.log(err, 'err updateSpecialPointList')
+      })
+  }
+  static updateToSuccess(data: ReturnSpecialPoint): Promise<any> {
+    return httpClient
+      .patch(BASE_URL + `/promotion/specialpointlist/update-to-success/` + data.id, data)
+      .then((response) => {
+        return response.data
+      })
+      .catch((err) => {
+        console.log(err, 'err deleteSpecialPointList')
       })
   }
   static returnSpecialPoint(data: ReturnSpecialPoint): Promise<any> {

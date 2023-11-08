@@ -87,7 +87,8 @@ export interface AllDetailSpecialPointEntities {
   success: number
 }
 export interface SpecialPointConditionEntity {
-  num: number
+  id?: string
+  num?: number
   farmer?: string | null
   droner?: string | null
   point: number
@@ -97,6 +98,7 @@ export interface SpecialPointConditionEntity {
 }
 
 export const SpecialPointConditionEntity_INIT: SpecialPointConditionEntity = {
+  id: '',
   num: 1,
   farmer: '',
   droner: '',
@@ -123,6 +125,7 @@ export const InsertDetailSpecialPointEntities_INIT: InsertDetailSpecialPointEnti
 }
 export interface ReturnSpecialPoint {
   id: string
+  point?: number
   updateBy: string
   reason: string
   taskId: string

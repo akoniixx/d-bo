@@ -45,21 +45,17 @@ const AddDetailPointManual = () => {
   const [provinceListId, setProvinceListId] = useState<ProviceEntity[]>([])
   const [provinceList, setProvinceList] = useState<string[]>([])
   const profile = JSON.parse(localStorage.getItem('profile') || '{  }')
-  const [checkTask, setCheckTask] = useState<any>()
+  const [checkTask, setCheckTask] = useState<boolean>()
   const [taskList, setTaskList] = useState<any>()
   const [currentTask, setCurrentTask] = useState(1)
   const [isDroner, setIsDroner] = useState<boolean>()
   const [userId, setUserId] = useState<any>()
 
   useEffect(() => {
-    // fetchFarmer(searchFarmer, provinceListId)
-    // fetchDroner(searchDroner, provinceListId)
-    if(isDroner === true){
+    if (isDroner === true) {
       fetchDroner(searchDroner, provinceListId)
-    }else{
-      fetchFarmer(searchFarmer, provinceListId)}
-    if (checkTask === 'YES' || userId) {
-      getTaskStatusDone()
+    } else {
+      fetchFarmer(searchFarmer, provinceListId)
     }
   }, [searchFarmer, provinceListId, currentPage, row, searchTask, rowTask])
   useEffect(() => {
@@ -167,11 +163,12 @@ const AddDetailPointManual = () => {
     })
   }
   const options =
-    taskList &&
-    taskList.map((task: any) => ({
-      label: task.taskNo,
-      value: task.id,
-    }))
+    checkTask === true
+      ? taskList?.map((task: any) => ({
+          label: task.taskNo,
+          value: task.id,
+        }))
+      : []
 
   const handleInputChange = (inputValue: any) => {
     if (currentPage === 1) {
@@ -205,35 +202,37 @@ const AddDetailPointManual = () => {
     return allCount
   }
 
-  const mapCondition = (e: any) => {
-    const mapList = e
-    const sTable = formTable.getFieldsValue()
-    const value = mapList.map((y: any, i: number) => {
-      return {
-        ...y,
-        num: i + 1,
-        farmer: sTable[`${y.num}_Farmer`],
-        droner: sTable[`${y.num}_Droner`],
-        point: sTable[`${y.num}_point`],
-        taskNo: sTable[`${y.num}_taskNo`],
-        taskId: sTable[`${y.num}_taskNo`],
-        reason: sTable[`${y.num}_reason`],
+  const mapCondition = (data: any) => {
+    const formValues = formTable.getFieldsValue()
+    return data.map((row: { num: undefined }, index: number) => {
+      if (row && row.num !== undefined) {
+        const fieldKey = isDroner ? 'droner' : 'farmer'
+        const rowKey = row.num
+        const newRow = {
+          ...row,
+          num: index + 1,
+          [fieldKey]: isDroner ? formValues[`${rowKey}_droner`] : formValues[`${rowKey}_farmer`],
+          point: formValues[`${rowKey}_point`],
+          taskNo: formValues[`${rowKey}_taskNo`],
+          reason: formValues[`${rowKey}_reason`],
+        }
+        return newRow
+      } else {
+        return row
       }
     })
-    return value
   }
 
-  const mapForm = (e: any) => {
-    const mapList = e
-    console.log(mapList)
-    mapList.map((y: any, i: number) => {
-      console.log(y)
-      formTable.setFieldValue(`${y.num}_Farmer`, y.farmer)
-      formTable.setFieldValue(`${y.num}_Droner`, y.droner)
-      formTable.setFieldValue(`${y.num}_point`, y.point)
-      formTable.setFieldValue(`${y.num}_taskNo`, y.taskNo)
-      formTable.setFieldValue(`${y.num}_taskNo`, y.taskId)
-      formTable.setFieldValue(`${y.num}_reason`, y.reason)
+  const mapForm = (data: any) => {
+    data.forEach((row: any, index: number) => {
+      const rowKey = row.num
+      formTable.setFieldsValue({
+        [`${rowKey}_droner`]: row.droner,
+        [`${rowKey}_farmer`]: row.farmer,
+        [`${rowKey}_point`]: row.point,
+        [`${rowKey}_taskNo`]: row.taskNo,
+        [`${rowKey}_reason`]: row.reason,
+      })
     })
   }
 
@@ -251,12 +250,12 @@ const AddDetailPointManual = () => {
   }, [dataSubSpecial])
 
   const addRow = () => {
+    const newRowNumber = dataSubSpecial.length + 1
+    const newRow = { ...SpecialPointConditionEntity_INIT, num: newRowNumber }
     setCount(count + 1)
-    const addList = mapCondition([
-      ...dataSubSpecial,
-      { ...SpecialPointConditionEntity_INIT, num: dataSubSpecial.length + 1 },
-    ])
-    setDataSubSpecial(addList)
+
+    const updatedDataSubSpecial = [...dataSubSpecial, newRow]
+    setDataSubSpecial(updatedDataSubSpecial)
   }
 
   const removeRow = async (key: number) => {
@@ -266,10 +265,12 @@ const AddDetailPointManual = () => {
     mapForm(mData)
     setDataSubSpecial(e)
     setCount(count - 1)
-    formTable.setFieldValue(`${e.length + 1}_nameUser`, '')
+    formTable.setFieldValue(`${e.length + 1}_droner`, '')
+    formTable.setFieldValue(`${e.length + 1}_farmer`, '')
     formTable.setFieldValue(`${e.length + 1}_point`, '')
     formTable.setFieldValue(`${e.length + 1}_taskNo`, '')
     formTable.setFieldValue(`${e.length + 1}_reason`, '')
+    formTable.setFieldValue(`${e.length + 1}_checkTaskNo`, '')
   }
 
   const checkLimit = () => {
@@ -298,6 +299,7 @@ const AddDetailPointManual = () => {
     getTaskStatusDone()
     setUserId(id)
   }
+
   const columns = [
     {
       title: '',
@@ -312,11 +314,13 @@ const AddDetailPointManual = () => {
       title: 'ชื่อผู้ใช้',
       width: '30%',
       render: (value: any, row: any, index: number) => {
+        const name = isDroner ? `${row.num}_droner` : `${row.num}_farmer`
+        const placeholder = 'กรุณาเลือกชื่อผู้ใช้'
         return {
           children: (
             <Form.Item
               style={{ margin: 0 }}
-              name={isDroner === true ? `${row.num}_Droner` : `${row.num}_Farmer`}
+              name={name}
               rules={[
                 {
                   required: true,
@@ -325,15 +329,15 @@ const AddDetailPointManual = () => {
               ]}
             >
               <Select
-                placeholder='กรุณาเลือกชื่อผู้ใช้'
+                placeholder={placeholder}
                 isSearchable
                 isClearable
                 onInputChange={handleInputChange}
-                options={isDroner === false ? farmerList : dronerList}
-                value={isDroner === false ? farmerList : dronerList}
+                options={isDroner ? dronerList : farmerList}
+                value={isDroner ? dronerList : farmerList}
                 onMenuScrollToBottom={handleMenuScrollToBottom}
-                onChange={(selectedOptions: any) => {
-                  selectedOptions ? getTaskStatusDone() : null
+                onChange={(selectedOptions) => {
+                  selectedOptions?.id ? getTaskStatusDone() : null
                   handleSelectUsers(selectedOptions)
                 }}
                 closeMenuOnSelect
@@ -361,7 +365,7 @@ const AddDetailPointManual = () => {
               ]}
             >
               <Input
-                placeholder='กรอกจำนวนแต้ม'
+                placeholder={'กรอกจำนวนแต้ม'}
                 suffix='แต้ม'
                 autoComplete='off'
                 onChange={(e) => checkNumber(e, `${row.num}_point`)}
@@ -377,63 +381,21 @@ const AddDetailPointManual = () => {
         return {
           children: (
             <div className='d-flex'>
-              {/* <Form.Item style={{ margin: 0 }}>
+              <Form.Item name={`${row.num}_checkTaskNo`} style={{ margin: 0 }}>
                 <Radio.Group
                   onChange={(e) => {
-                    e.target.value === 'YES' ? getTaskStatusDone() : null
-                    setCheckTask(e.target.value)
-                  }}
-                >
-                  <Radio key={1} value='NO'>
-                    ไม่มี
-                  </Radio>
-                  <Radio key={2} value='YES'>
-                    มี
-                  </Radio>
-                </Radio.Group>
-              </Form.Item>
-              <Form.Item
-                className='col-lg-12'
-                style={{ margin: 0, width: '65%' }}
-                name={`${row.num}_taskNo`}
-                rules={[
-                  {
-                    required: checkTask === 'YES',
-                    message: 'กรุณากรอกรหัส Task No.',
-                  },
-                ]}
-              >
-                <Select
-                  isDisabled={checkTask !== 'YES'}
-                  placeholder='กรอกรหัส Task No.'
-                  isSearchable
-                  isClearable={checkTask === 'NO'}
-                  onInputChange={handleInputTask}
-                  options={options}
-                  value={checkTask === 'NO' ? undefined : selectedTask}
-                  onMenuScrollToBottom={handleMenuScrollTask}
-                  closeMenuOnSelect
-                  onChange={(selectedOption) => {
-                    setSelectedTask(checkTask === 'YES' ? selectedOption : undefined)
-                  }}
-                />
-              </Form.Item> */}
-              <Form.Item style={{ margin: 0 }}>
-                <Radio.Group
-                  onChange={(e) => {
-                    if (e.target.value === 'NO') {
-                      // Clear the selectedTask state when 'NO' is selected
-                      setSelectedTask(undefined)
-                    } else if (e.target.value === 'YES') {
+                    if (e.target.value === true) {
                       getTaskStatusDone()
+                    } else {
+                      setSelectedTask(undefined)
                     }
                     setCheckTask(e.target.value)
                   }}
                 >
-                  <Radio key={1} value='NO'>
+                  <Radio key={1} value={false}>
                     ไม่มี
                   </Radio>
-                  <Radio key={2} value='YES'>
+                  <Radio key={2} value={true}>
                     มี
                   </Radio>
                 </Radio.Group>
@@ -442,25 +404,19 @@ const AddDetailPointManual = () => {
                 className='col-lg-12'
                 style={{ margin: 0, width: '65%' }}
                 name={`${row.num}_taskNo`}
-                rules={[
-                  {
-                    required: checkTask === 'YES',
-                    message: 'กรุณากรอกรหัส Task No.',
-                  },
-                ]}
               >
                 <Select
-                  isDisabled={checkTask !== 'YES'}
+                  isDisabled={!formTable.getFieldValue(`${row.num}_checkTaskNo`)}
                   placeholder='กรอกรหัส Task No.'
                   isSearchable
-                  isClearable={checkTask === 'NO'}
+                  isClearable
                   onInputChange={handleInputTask}
-                  options={options}
-                  value={checkTask === 'NO' ? undefined : selectedTask}
+                  options={options || []}
                   onMenuScrollToBottom={handleMenuScrollTask}
                   closeMenuOnSelect
-                  onChange={(selectedOption) => {
-                    setSelectedTask(checkTask === 'YES' ? selectedOption : undefined)
+                  onChange={(selectedOption: any) => {
+                    setSelectedTask(selectedOption)
+                    onFieldsChange()
                   }}
                 />
               </Form.Item>
@@ -489,6 +445,7 @@ const AddDetailPointManual = () => {
       },
     },
   ]
+
   const onFieldsChange = () => {
     const typeUser = form.getFieldsValue()
     const dataSub: any = newDataSubSpecial
@@ -496,19 +453,24 @@ const AddDetailPointManual = () => {
     const condition: any = dataSub?.map((y: any, i: number) => {
       return {
         num: i + 1,
-        farmer: (isDroner === false && userId?.id) || undefined,
-        droner: (isDroner === true && userId?.id) || undefined,
+        farmer: userId?.id,
+        droner: userId?.id,
         point: fs[`${y.num}_point`],
-        taskNo: checkTask === 'YES' ? fs[`${y.num}_taskNo`] : undefined,
-        taskId: checkTask === 'YES' ? fs[`${y.num}_taskNo`] : undefined,
+        taskNo: fs[`${y.num}_taskNo`]?.label,
+        taskId: fs[`${y.num}_taskNo`]?.value,
+        checkTaskNo: fs[`${y.num}_checkTaskNo`],
       }
     })
+
     let fieldErr: boolean = true
     let fieldNull: boolean = true
     condition.length > 0 &&
     condition.every(
       (item: any) =>
-        item && (item.farmer || item.droner) && item.point && item.num && !checkLimit(),
+        (isDroner ? item.droner : item.farmer) &&
+        item.point &&
+        item.num &&
+        (item.checkTaskNo === true ? item.taskNo : item.checkTaskNo === false),
     )
       ? (fieldNull = false)
       : (fieldNull = true)
@@ -591,11 +553,11 @@ const AddDetailPointManual = () => {
     const dataSub: any = newDataSubSpecial
     const specialPointList = dataSub?.map((y: any, i: number) => {
       return {
-        farmer: (isDroner === false && userId.id) || undefined,
-        droner: (isDroner === true && userId.id) || undefined,
+        farmer: fs[`${y.num}_farmer`]?.id,
+        droner: fs[`${y.num}_droner`]?.id,
         point: fs[`${y.num}_point`],
-        taskNo: (checkTask === 'YES' && fs[`${y.num}_taskNo`].label) || undefined,
-        taskId: (checkTask === 'YES' && fs[`${y.num}_taskNo`].value) || undefined,
+        taskNo: fs[`${y.num}_taskNo`]?.label,
+        taskId: fs[`${y.num}_taskNo`]?.value,
         reason: fs[`${y.num}_reason`],
       }
     })
@@ -603,20 +565,16 @@ const AddDetailPointManual = () => {
     create.specialPointId = specialPointId
     create.specialPointList = specialPointList
     create.createBy = profile.firstname + ' ' + profile.lastname
-    console.log(create)
-    // await SpecialPointListDataSource.insertSpecialPointList(create).then((res)=> {
-    //   console.log(res)
-    //   if (res.success) {
-    //     Swal.fire({
-    //       title: 'บันทึกสำเร็จ',
-    //       icon: 'success',
-    //       timer: 1500,
-    //       showConfirmButton: false,
-    //     }).then(() => {
-    //       // navigate('/DetailPointManual')
-    //     })
-    //   }
-    // })
+    await SpecialPointListDataSource.insertSpecialPointList(create).then((res) => {
+      Swal.fire({
+        title: 'บันทึกสำเร็จ',
+        icon: 'success',
+        timer: 1500,
+        showConfirmButton: false,
+      }).then(() => {
+        navigate(-1)
+      })
+    })
   }
 
   return (
@@ -642,15 +600,18 @@ const AddDetailPointManual = () => {
               },
             ]}
           >
-            <Radio.Group onChange={(e) => {
-              console.log(e.target.value)
-              if(e.target.value === true){
-                fetchDroner(searchDroner, provinceListId)
-              }else{
-                fetchFarmer(searchFarmer, provinceListId)
-              }
-              setIsDroner(e.target.value)}
-              } className='d-flex flex-row'>
+            <Radio.Group
+              onChange={(e) => {
+                if (e.target.value === true) {
+                  fetchDroner(searchDroner, provinceListId)
+                } else {
+                  fetchFarmer(searchFarmer, provinceListId)
+                }
+                formTable.resetFields()
+                setIsDroner(e.target.value)
+              }}
+              className='d-flex flex-row'
+            >
               <Radio value={false}>เกษตรกร</Radio>
               <Radio value={true}>นักบินโดรน</Radio>
             </Radio.Group>
@@ -664,7 +625,7 @@ const AddDetailPointManual = () => {
           onClickBack={() => navigate(-1)}
           styleFooter={{ padding: '6px' }}
           onClickSave={() => submit()}
-          // disableSaveBtn={saveBtnDisable}
+          disableSaveBtn={saveBtnDisable}
         />
       </div>
     </>

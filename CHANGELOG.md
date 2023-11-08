@@ -1,5 +1,9 @@
 ## [Version - 0]
 
+## improve [v0.39.12] 2023-11-8
+
+- call api add/edit special point menu
+
 ## Fix [v0.39.11] 2023-11-6
 
 - fixed target spray in all task menu

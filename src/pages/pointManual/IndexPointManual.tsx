@@ -355,9 +355,7 @@ function IndexPointManual() {
                 />
                 <ActionButton
                   icon={<DeleteOutlined />}
-                  color={
-                    row.dronerAmount > 0 || row.farmerAmount > 0 ?  color.Grey : color.Error 
-                  }
+                  color={row.dronerAmount > 0 || row.farmerAmount > 0 ? color.Grey : color.Error}
                   onClick={() => showDelete(row.id)}
                   actionDisable={row.dronerAmount > 0 || row.farmerAmount > 0 ? true : false}
                 />
