@@ -6,7 +6,13 @@ import AddButtton from '../../../components/button/AddButton'
 import { Badge, Button, Col, Image, Input, Pagination, Row, Select, Spin, Table, Tabs } from 'antd'
 import SummaryPoint from '../../../components/card/SummaryPoint'
 import { color, icon } from '../../../resource'
-import { CaretDownOutlined, CaretUpOutlined, DeleteOutlined, EditOutlined, SearchOutlined } from '@ant-design/icons'
+import {
+  CaretDownOutlined,
+  CaretUpOutlined,
+  DeleteOutlined,
+  EditOutlined,
+  SearchOutlined,
+} from '@ant-design/icons'
 import { Container } from 'react-bootstrap'
 import { numberWithCommas } from '../../../utilities/TextFormatter'
 import { DateTimeUtil } from '../../../utilities/DateTimeUtil'

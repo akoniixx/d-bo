@@ -296,7 +296,7 @@ export const pathLists = (isAccounting: boolean, isAdminTask?: boolean) => {
 
   if (isAdminTask) {
     return menu.map((x: any) => {
-      const find = menu.findIndex((y) => x.name === 'task')
+      const find = menu.findIndex(() => x.name === 'task')
       if (find === 0) {
         const newMenu = menu[find]
         return {
@@ -304,10 +304,23 @@ export const pathLists = (isAccounting: boolean, isAdminTask?: boolean) => {
           subMenu: [
             ...newMenu.subMenu,
             {
-              path: '/IndexAdminTask',
-              name: 'IndexAdminTask',
-              title: 'แก้ไข/ประวัติงาน',
-              subMenu: [],
+              path: 'AdminTask',
+              name: 'AdminTask',
+              title: 'จัดการงานทั้งหมด',
+              subMenu: [
+                {
+                  path: '/IndexAdminTask',
+                  name: 'IndexAdminTask',
+                  title: 'แก้ไข/ประวัติงาน',
+                  subMenu: [],
+                },
+                {
+                  path: '/AdminCancelTask',
+                  name: 'AdminCancelTask',
+                  title: 'ยกเลิกงาน',
+                  subMenu: [],
+                },
+              ],
             },
           ],
         }
