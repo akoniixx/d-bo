@@ -1,7 +1,5 @@
-import { Col, Image, Row } from 'antd'
+import { Col, Row } from 'antd'
 import React, { useState } from 'react'
-import { color } from '../../resource'
-import { numberWithCommas } from '../../utilities/TextFormatter'
 
 interface ImagCardsProps {
   imageName: string
@@ -9,7 +7,7 @@ interface ImagCardsProps {
   onClick: () => void
 }
 const ImagCards: React.FC<ImagCardsProps> = ({ imageName, image, onClick }) => {
-  const pathnameParts = imageName.split('/')
+  const pathnameParts = imageName.split('-')
   const shortImageName = pathnameParts[pathnameParts.length - 1].split('?')[0]
 
   return (
@@ -42,7 +40,7 @@ const ImagCards: React.FC<ImagCardsProps> = ({ imageName, image, onClick }) => {
           />
         </Col>
         <Col span={16} className='align-self-center'>
-          <span>{shortImageName}</span>
+          <span>{shortImageName || '-'}</span>
         </Col>
       </Row>
     </div>

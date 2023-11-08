@@ -1,4 +1,5 @@
 import { CropPurposeSprayEntity, CropPurposeSprayEntity_INT } from './CropEntities'
+import { DronerEntity, DronerEntity_INIT } from './DronerEntities'
 import {
   FarmerEntity,
   FarmerEntity_INIT,
@@ -127,6 +128,7 @@ export interface GetNewTaskEntity {
   reviewFarmerScore: string
   reviewFarmerComment: string
   imagePathFinishTask: string
+  imagePathDrug: string
   comment: string
   isProblem: boolean
   problemRemark: string
@@ -136,7 +138,7 @@ export interface GetNewTaskEntity {
   delayRejectRemark: string
   purposeSpray: CropPurposeSprayEntity
   farmer: FarmerEntity
-  droner: string
+  droner: DronerEntity
   farmerPlot: FarmerPlotEntity
   updatedAt?: string
   revenuePromotion: string
@@ -175,6 +177,7 @@ export const GetNewTaskEntity_INIT: GetNewTaskEntity = {
   reviewFarmerScore: '',
   reviewFarmerComment: '',
   imagePathFinishTask: '',
+  imagePathDrug: '',
   comment: '',
   isProblem: false,
   problemRemark: '',
@@ -184,7 +187,7 @@ export const GetNewTaskEntity_INIT: GetNewTaskEntity = {
   delayRejectRemark: '',
   purposeSpray: CropPurposeSprayEntity_INT,
   farmer: FarmerEntity_INIT,
-  droner: '',
+  droner: DronerEntity_INIT,
   farmerPlot: FarmerPlotEntity_INIT,
   updatedAt: '',
   revenuePromotion: '',
@@ -272,6 +275,7 @@ export interface AllTaskListEntity {
 
 export interface AllTaskEntity {
   id: string
+  taskName ?: string
   taskNo: string
   createdAt: string
   updatedAt: string

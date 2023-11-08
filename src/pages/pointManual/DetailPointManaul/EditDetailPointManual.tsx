@@ -70,7 +70,7 @@ const EditDetailPointManual = () => {
   const getInfoUserManual = async (data: any) => {
     const mapData = [data]
     let result: any
-    if (form.getFieldValue('user') === 'เกษตรกร') {
+    if (data.farmerId) {
       result = await Promise.all(
         mapData.map(async (item: any, index: number) => {
           const farmer = await FarmerDatasource.getFarmerById(item.farmerId)

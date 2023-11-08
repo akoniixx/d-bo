@@ -80,6 +80,7 @@ import ShowNickName from '../../../components/popover/ShowNickName'
 import '../newTask/Styles.css'
 import { TargetSpray } from '../../../datasource/TargetSprayDatarource'
 import { TargetSpayEntities } from '../../../entities/TargetSprayEntities'
+import { DronerEntity_INIT } from '../../../entities/DronerEntities'
 
 const dateFormat = 'DD/MM/YYYY'
 const dateCreateFormat = 'YYYY-MM-DD'
@@ -306,7 +307,7 @@ const EditNewTask = () => {
     newData.statusDelay = ''
     newData.delayRejectRemark = ''
     newData.purposeSpray = CropPurposeSprayEntity_INT
-    newData.droner = ''
+    newData.droner = DronerEntity_INIT
     newData.farmerPlot = FarmerPlotEntity_INIT
     setData(newData)
     setShowData(true)
