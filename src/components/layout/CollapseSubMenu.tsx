@@ -1,10 +1,8 @@
-import React, { useState } from 'react'
+import React from 'react'
 import { useNavigate } from 'react-router-dom'
 import styled from 'styled-components'
 import { color, icon } from '../../resource'
 import { Image } from 'antd'
-import { DownOutlined, UpOutlined } from '@ant-design/icons'
-import { useEffectOnce } from '../../hook/useEffectOnce'
 
 interface CollapseSubMenuProps {
   subLists: {
@@ -31,7 +29,7 @@ interface CollapseSubMenuProps {
 
 const ListStyled = styled.div<{ isFocus?: boolean }>`
   padding: 16px;
-  padding-left: 54px;
+  padding-left: 38px;
   cursor: pointer;
   background-color: #ceeed5;
   color: ${color.Success};
@@ -43,7 +41,7 @@ const ListStyled = styled.div<{ isFocus?: boolean }>`
 `
 const SubListItem = styled.div<{ isFocus?: boolean }>`
   padding: 16px;
-  padding-left: 64px;
+  padding-left: 54px;
   cursor: pointer;
   color: ${(props) => (props.isFocus ? color.Success : '#231F20')};
   width: 100%;
@@ -54,7 +52,6 @@ const SubListItem = styled.div<{ isFocus?: boolean }>`
 export const CollapseSubMenu: React.FC<CollapseSubMenuProps> = ({
   title,
   subLists,
-  name,
   setCurrentSub,
   currentSub,
   path,
@@ -100,7 +97,7 @@ export const CollapseSubMenu: React.FC<CollapseSubMenuProps> = ({
                 width: '100%',
                 alignItems: 'center',
                 height: '50px',
-                paddingLeft: '52px',
+                paddingLeft: '38px',
               }}
             >
               {title}

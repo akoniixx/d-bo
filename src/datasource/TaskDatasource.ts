@@ -16,6 +16,31 @@ import {
 } from '../entities/TaskInprogress'
 
 export class TaskDatasource {
+  static getAllTask(search: string, page: number, take: number): Promise<any> {
+    const params = {
+      search: search,
+      page: page,
+      take: take,
+    }
+    return httpClient
+      .get(BASE_URL + '/tasks/task/find-all-task', { params })
+      .then((response) => {
+        return response.data
+      })
+      .catch((err) => {
+        console.log(err, 'err getAlltask')
+      })
+  }
+  static getEstimatePoint(taskId: string): Promise<any> {
+    return httpClient
+      .get(BASE_URL + `/tasks/task-estimate-point/finish-estimate-point/${taskId}`)
+      .then((response) => {
+        return response.data
+      })
+      .catch((err) => {
+        console.log(err, 'err getEstimatePoint')
+      })
+  }
   static getNewTaskList(
     take: number,
     page: number,

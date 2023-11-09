@@ -6,7 +6,13 @@ import AddButtton from '../../../components/button/AddButton'
 import { Badge, Button, Col, Image, Input, Pagination, Row, Select, Spin, Table, Tabs } from 'antd'
 import SummaryPoint from '../../../components/card/SummaryPoint'
 import { color, icon } from '../../../resource'
-import { CaretDownOutlined, CaretUpOutlined, DeleteOutlined, EditOutlined, SearchOutlined } from '@ant-design/icons'
+import {
+  CaretDownOutlined,
+  CaretUpOutlined,
+  DeleteOutlined,
+  EditOutlined,
+  SearchOutlined,
+} from '@ant-design/icons'
 import { Container } from 'react-bootstrap'
 import { numberWithCommas } from '../../../utilities/TextFormatter'
 import { DateTimeUtil } from '../../../utilities/DateTimeUtil'
@@ -495,8 +501,9 @@ function DetailPointManual() {
               taskNo: returnPoint.taskNo,
             }
             setModalReturnPoint(!modalReturnPoint)
-            await SpecialPointListDataSource.returnSpecialPoint(dataReturn)
+            await SpecialPointListDataSource.returnSpecialPoint(dataReturn).then((res) => {})
             fetchAllSpecialPointList()
+            getSummaryCount()
           }}
           title1={'โปรดตรวจสอบของคืนแต้มที่คุณต้องการ ก่อนที่จะกดยืนยัน'}
           title2={'เพราะอาจส่งผลต่อการแสดงผลแต้มของผู้ใช้ในแอปพลิเคชัน'}
@@ -508,6 +515,7 @@ function DetailPointManual() {
             await SpecialPointListDataSource.deleteSpecialPointList(specialPointDelete)
             setModalDeletePoint(!modalDeletePoint)
             fetchAllSpecialPointList()
+            getSummaryCount()
           }}
           title1={'โปรดตรวจสอบของแต้มพิเศษที่คุณต้องการลบ ก่อนที่จะกดยืนยัน'}
           title2={'เพราะอาจส่งผลต่อการแสดงผลแต้มของผู้ใช้ในแอปพลิเคชัน'}

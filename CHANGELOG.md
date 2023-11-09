@@ -1,11 +1,17 @@
 ## [Version - 0]
 
+## improve [v0.39.14] 2023-11-9
+
+- added cancel task for admin menu
+- fixed bug special point menu
+
 ## improve [v0.39.13] 2023-11-8
 
 - call api add/edit special point menu
 
-## Fix [v0.39.12] 2023-11-08 
-- fixed payload pin news 
+## Fix [v0.39.12] 2023-11-08
+
+- fixed payload pin news
 
 ## Fix [v0.39.11] 2023-11-6
 

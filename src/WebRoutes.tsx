@@ -79,6 +79,7 @@ const MissionReport = lazy(() => import('./pages/mission/droner/MissionReport'))
 const QuotaReport = lazy(() => import('./pages/quotaSetting/droner/QuotaReport'))
 const RewardReceived = lazy(() => import('./pages/quotaSetting/droner/RewardReceived'))
 const IndexAdminTask = lazy(() => import('./pages/task/AdminTask/IndexAdminTask'))
+const AdminCancelTask = lazy(() => import('./pages/task/AdminTask/AdminCancelTask'))
 const IndexPlotList = lazy(() => import('./pages/farmer/plotList/IndexPlotList'))
 const IndexPermission = lazy(() => import('./pages/permission/IndexPermission'))
 const EditPermission = lazy(() => import('./pages/permission/EditPermission'))
@@ -200,6 +201,9 @@ const WebRoutes: React.FC<any> = () => {
             <Route path='/DetailPointManual/:id' element={<DetailPointManual />} />
             <Route path='/AddDetailPointManual' element={<AddDetailPointManual />} />
             <Route path='/EditDetailPointManual/:id' element={<EditDetailPointManual />} />
+            <Route path='/AdminCancelTask' element={<AdminCancelTask />} />
+
+
           </Route>
           <Route element={<PublicRoute />}>
             <Route index element={<AuthPage />} />

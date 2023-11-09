@@ -4,8 +4,6 @@ import styled from 'styled-components'
 import { color } from '../../resource'
 import { CollapseSubMenu } from './CollapseSubMenu'
 import { IconMenu, IconMenuActive } from './IconMenu'
-import { DownOutlined, UpOutlined } from '@ant-design/icons'
-
 import { useEffectOnce } from '../../hook/useEffectOnce'
 import { Image } from 'antd'
 import icon from '../../resource/icon'
@@ -49,7 +47,7 @@ const ListStyled = styled.div`
 `
 const SubListItem = styled.div<{ isFocus?: boolean }>`
   padding: 14px;
-  padding-left: 52px;
+  padding-left: 38px;
   cursor: pointer;
   background-color: ${'#ceeed5'};
   color: ${color.Success};
@@ -63,9 +61,7 @@ export const CollapseMenu: React.FC<CollapseMenuProps> = ({
   subLists,
   name,
   setCurrent,
-  current,
   path,
-  count,
   checkPath,
   setCheckPath,
 }) => {
@@ -121,7 +117,7 @@ export const CollapseMenu: React.FC<CollapseMenuProps> = ({
               style={{
                 color: '#231F20',
                 display: 'flex',
-                gap: 18,
+                gap: 8,
                 padding: '8px',
                 cursor: 'pointer',
                 width: '100%',
@@ -171,7 +167,7 @@ export const CollapseMenu: React.FC<CollapseMenuProps> = ({
               style={{
                 color: '#FFCA37',
                 display: 'flex',
-                gap: 18,
+                gap: 8,
                 paddingLeft: '16px',
               }}
             >
@@ -265,7 +261,7 @@ export const CollapseMenu: React.FC<CollapseMenuProps> = ({
                   <div
                     style={{
                       padding: '14px',
-                      paddingLeft: '52px',
+                      paddingLeft: '38px',
                       cursor: 'pointer',
                       width: '100%',
                       display: 'flex',

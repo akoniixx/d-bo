@@ -148,8 +148,10 @@ table tr td :hover {
   left: 0;
   right: 0;
   top: 50%;
-  /* Position the line in the center of the screen vertically */
   border-bottom: 0.5px solid #ccc;
-  /* You can adjust the width, color, and style of the line here */
   z-index: 999;
+}
+.rs-picker-has-value .rs-btn .rs-picker-toggle-value,
+.rs-picker-has-value .rs-picker-toggle .rs-picker-toggle-value {
+  color: #000 !important;
 }

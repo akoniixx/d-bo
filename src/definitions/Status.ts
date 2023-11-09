@@ -211,6 +211,12 @@ export const ALL_TASK_MAPPING: any = {
   WAIT_REVIEW: 'รอรีวิว',
   DONE: 'งานเสร็จสิ้น',
 }
+export const ALL_TASK_MENU: any = {
+  WAIT_START: 'เมนูรอดำเนินงาน',
+  IN_PROGRESS: 'เมนูงานในวันนี้',
+  WAIT_REVIEW: 'เมนูงานเสร็จสิ้น',
+  DONE: 'เมนูงานเสร็จสิ้น',
+}
 export const HISTORY_TASK: any = {
   FinishTask: 'งานเสร็จสิ้น',
   ChangeDroner: 'มีการเปลี่ยนนักบินโดรน',
