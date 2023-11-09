@@ -1,5 +1,9 @@
 ## [Version - 0]
 
+## improve [v0.39.15] 2023-11-9
+
+- fixed modal alert
+
 ## improve [v0.39.14] 2023-11-9
 
 - added cancel task for admin menu
