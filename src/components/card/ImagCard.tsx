@@ -9,7 +9,7 @@ interface ImagCardsProps {
 const ImagCards: React.FC<ImagCardsProps> = ({ imageName, image, onClick }) => {
   const pathnameParts = imageName.split('-')
   const shortImageName = pathnameParts[pathnameParts.length - 1].split('?')[0]
-
+  const truncatedText = shortImageName.length > 30 ? shortImageName.slice(0, 20) : shortImageName
   return (
     <div className='form-group col-lg-12'>
       <Row
@@ -40,7 +40,7 @@ const ImagCards: React.FC<ImagCardsProps> = ({ imageName, image, onClick }) => {
           />
         </Col>
         <Col span={16} className='align-self-center'>
-          <span>{shortImageName || '-'}</span>
+          <span>{truncatedText || '-'}</span>
         </Col>
       </Row>
     </div>
