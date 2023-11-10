@@ -1,5 +1,10 @@
 ## [Version - 0]
 
+## Fix [v0.39.16] 2023-11-10
+
+- change api search task un point manual
+- set loading detail task
+
 ## improve [v0.39.15] 2023-11-9
 
 - fixed modal alert
