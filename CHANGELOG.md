@@ -1,5 +1,9 @@
 ## [Version - 0]
 
+## Fix [v0.39.17] 2023-11-10
+
+- fixed update time for news
+
 ## Fix [v0.39.16] 2023-11-10
 
 - change api search task in point manual
