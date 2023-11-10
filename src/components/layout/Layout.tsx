@@ -1,8 +1,7 @@
 import React from 'react'
 
-import { color } from '../../resource'
 import { Layout } from 'antd'
-import { Content, Footer, Header } from 'antd/lib/layout/layout'
+import { Content } from 'antd/lib/layout/layout'
 import NavSidebar from './NavSideBar'
 
 export const DashboardLayout = ({ children }: any) => {

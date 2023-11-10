@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { Avatar, Badge, Form, Input, Row, Select } from 'antd'
+import { Avatar, Badge, Form, Input, Row, Select, Spin } from 'antd'
 import { BackIconButton } from '../../../../components/button/BackButton'
 import { CardContainer } from '../../../../components/card/CardContainer'
 import { CardHeader } from '../../../../components/header/CardHearder'
@@ -45,24 +45,30 @@ function CancelTask() {
     couponName: '',
     couponDiscount: null,
   })
+  const [loading, setLoading] = useState<boolean>(true)
+
   const fetchDetailTask = async () => {
-    await TaskFinishedDatasource.getDetailFinishTaskById(taskId).then((res) => {
-      if (res.data.couponId !== null) {
-        CouponDataSource.getPromotionCode(res.data.couponId).then((result) =>
-          setCouponData({
-            couponCode: res.data.couponCode ?? '',
-            couponDiscount: !res.data.discountCoupon ? null : parseInt(res.data.discountCoupon),
-            couponName: result.couponName ?? '',
-          }),
-        )
-      }
-      setHistory(res.data.taskHistory[0])
-      setData(res)
-      setMapPosition({
-        lat: parseFloat(res.data.farmerPlot.lat),
-        lng: parseFloat(res.data.farmerPlot.long),
+    setLoading(true)
+    await TaskFinishedDatasource.getDetailFinishTaskById(taskId)
+      .then((res) => {
+        if (res.data.couponId !== null) {
+          CouponDataSource.getPromotionCode(res.data.couponId).then((result) =>
+            setCouponData({
+              couponCode: res.data.couponCode ?? '',
+              couponDiscount: !res.data.discountCoupon ? null : parseInt(res.data.discountCoupon),
+              couponName: result.couponName ?? '',
+            }),
+          )
+        }
+        setHistory(res.data.taskHistory[0])
+        setData(res)
+        setMapPosition({
+          lat: parseFloat(res.data.farmerPlot.lat),
+          lng: parseFloat(res.data.farmerPlot.long),
+        })
       })
-    })
+      .catch((error) => console.log(error))
+      .finally(() => setLoading(false))
   }
 
   useEffect(() => {
@@ -533,25 +539,27 @@ function CancelTask() {
           <strong style={{ fontSize: '20px' }}>รายละเอียดงาน #{data.data.taskNo}</strong>
         </span>
       </Row>
-      <CardContainer>
-        <CardHeader textHeader='นัดหมายบริการ' />
-        {renderAppointment}
-      </CardContainer>{' '}
-      <br />
-      <CardContainer>
-        <CardHeader textHeader='ข้อมูลเกษตรกรและแปลง' />
-        {renderFarmer}
-      </CardContainer>
-      <br />
-      <CardContainer>
-        <CardHeader textHeader='รายชื่อนักบินโดรน' />
-        {renderDroner}
-      </CardContainer>
-      <br />
-      <CardContainer>
-        <CardHeader textHeader='ยอดรวมค่าบริการ' />
-        {renderPrice}
-      </CardContainer>
+      <Spin tip='กำลังโหลดข้อมูล...' size='large' spinning={loading}>
+        <CardContainer>
+          <CardHeader textHeader='นัดหมายบริการ' />
+          {renderAppointment}
+        </CardContainer>{' '}
+        <br />
+        <CardContainer>
+          <CardHeader textHeader='ข้อมูลเกษตรกรและแปลง' />
+          {renderFarmer}
+        </CardContainer>
+        <br />
+        <CardContainer>
+          <CardHeader textHeader='รายชื่อนักบินโดรน' />
+          {renderDroner}
+        </CardContainer>
+        <br />
+        <CardContainer>
+          <CardHeader textHeader='ยอดรวมค่าบริการ' />
+          {renderPrice}
+        </CardContainer>
+      </Spin>
     </>
   )
 }

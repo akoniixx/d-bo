@@ -36,7 +36,7 @@ const ListStyled = styled.div<{ isFocus?: boolean }>`
   height: 50px;
   background-color: ${color.Success};
 `
-export const MenuSide: React.FC<MenuSideProps> = ({ lists, isOpenSidebar }) => {
+export const MenuSide: React.FC<MenuSideProps> = ({ lists }) => {
   const navigate = useNavigate()
 
   const [checkPath, setCheckPath] = useState<string | undefined>()

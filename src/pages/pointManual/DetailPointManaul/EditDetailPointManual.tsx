@@ -38,8 +38,8 @@ const EditDetailPointManual = () => {
   const [searchTask, setSearchTask] = useState<string>('')
   const [selectedTask, setSelectedTask] = useState<any>()
   const profile = JSON.parse(localStorage.getItem('profile') || '{  }')
+  const [editData, setEditData] = useState<any>()
   const [tel, setTel] = useState<any>()
-
   useEffect(() => {
     getSpecialPointById()
     getTaskStatusDone()
@@ -51,8 +51,8 @@ const EditDetailPointManual = () => {
         getInfoUserManual(res)
         const mapKey = res
         setDataSubSpecial([mapKey])
+        setEditData(res)
         form.setFieldsValue({
-          isDroner: res.isDroner,
           status: res.status,
           user: res.dronerId ? 'นักบินโดรน' : 'เกษตรกร',
         })
@@ -60,7 +60,7 @@ const EditDetailPointManual = () => {
           user: res.dronerId ? 'นักบินโดรน' : 'เกษตรกร',
           point: res.point,
           reason: res.reason,
-          taskNo: res.taskNo ? { value: res.taskNo, label: res.taskNo } : undefined,
+          taskNo: res.taskNo ? { value: res.taskId, label: res.taskNo } : undefined,
           taskId: res.taskId || undefined,
           checkTaskNo: res.taskId ? true : false,
         })
@@ -70,7 +70,7 @@ const EditDetailPointManual = () => {
   const getInfoUserManual = async (data: any) => {
     const mapData = [data]
     let result: any
-    if (form.getFieldValue('user') === 'เกษตรกร') {
+    if (data.farmerId) {
       result = await Promise.all(
         mapData.map(async (item: any, index: number) => {
           const farmer = await FarmerDatasource.getFarmerById(item.farmerId)
@@ -122,19 +122,19 @@ const EditDetailPointManual = () => {
     )
   }
   const getTaskStatusDone = async () => {
-    await TaskFinishedDatasource.getTaskFinishList(currentTask, rowTask, 'DONE', tel || '').then(
-      (res) => {
-        setTaskList(res.data)
-      },
-    )
+    await TaskFinishedDatasource.getTaskManual(
+      editData.dronerId ? editData.dronerId : editData.farmerId,
+      editData.dronerId ? 'DRONER' : 'FARMER',
+      currentTask,
+      rowTask,
+    ).then((res) => {
+      setTaskList(res.data)
+    })
   }
-  const options =
-    checkTask === true
-      ? taskList?.map((task: any) => ({
-          label: task.taskNo,
-          value: task.id,
-        }))
-      : []
+  const options = taskList?.map((task: any) => ({
+    label: task.taskNo,
+    value: task.id,
+  }))
 
   const handleInputTask = (inputValue: any) => {
     if (currentTask === 1) {

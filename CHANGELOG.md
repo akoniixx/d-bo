@@ -1,11 +1,26 @@
 ## [Version - 0]
 
+## Fix [v0.39.16] 2023-11-10
+
+- change api search task in point manual
+- set loading detail task
+
+## improve [v0.39.15] 2023-11-9
+
+- fixed modal alert
+
+## improve [v0.39.14] 2023-11-9
+
+- added cancel task for admin menu
+- fixed bug special point menu
+
 ## improve [v0.39.13] 2023-11-8
 
 - call api add/edit special point menu
 
-## Fix [v0.39.12] 2023-11-08 
-- fixed payload pin news 
+## Fix [v0.39.12] 2023-11-08
+
+- fixed payload pin news
 
 ## Fix [v0.39.11] 2023-11-6
 

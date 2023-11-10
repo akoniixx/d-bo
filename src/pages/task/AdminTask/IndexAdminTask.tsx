@@ -11,6 +11,7 @@ import {
   Input,
   Table,
   Modal,
+  Spin,
 } from 'antd'
 import { useEffect, useState } from 'react'
 import { CardContainer } from '../../../components/card/CardContainer'
@@ -57,6 +58,7 @@ const IndexAdminTask = () => {
   const [taskId, setTaskId] = useState('')
   const [edit, setEdit] = useState<any>()
   const [history, setHistory] = useState<any>()
+  const [loading, setLoading] = useState(false)
 
   const fetchTaskList = () => {
     TaskDatasource.getAllTaskList(10, current, taskNo).then((res: AllTaskListEntity) => {
@@ -97,14 +99,21 @@ const IndexAdminTask = () => {
   }
 
   const handleSearchTask = () => {
-    TaskDatasource.getManageTaskByTaskId(taskId).then((res) => {
-      setTaskSelected(res)
-      setHistory(res.data.taskHistory)
-      form.setFieldsValue({
-        unitPrice: res.data.unitPrice,
-        farmAreaAmount: res.data.farmAreaAmount,
+    setLoading(true)
+    TaskDatasource.getManageTaskByTaskId(taskId)
+      .then((res) => {
+        if(res.data && res.data.taskHistory){
+          setHistory(res.data.taskHistory)
+          setTaskSelected(res)       
+          form.setFieldsValue({
+            unitPrice: res.data.unitPrice,
+            farmAreaAmount: res.data.farmAreaAmount,
+          })
+        }
       })
-    })
+      .finally(() => {
+        setLoading(false)
+      })
   }
   const calculateTask = () => {
     TaskDatasource.calculateManageTask(
@@ -883,117 +892,121 @@ const IndexAdminTask = () => {
       {pageTitle}
       <div style={{ padding: '10px' }}>
         <CardContainer>
-          <CardHeader textHeader='รายละเอียดงาน' />
-          <Container style={{ padding: '20px', paddingBottom: '0px' }}>
-            <Row gutter={8}>
-              <Col span={12}>
-                <Form.Item name='searchAddress'>
-                  <InputPicker
-                    virtualized
-                    value={taskNo}
-                    listProps={{
-                      onItemsRendered,
-                    }}
-                    onChange={(e) => {
-                      setTaskId(e)
-                      setSearch(false)
-                    }}
-                    placeholder='ค้นหารหัสงาน (Task No.)'
-                    onSearch={(val: any) => {
-                      const uppercase = val.toUpperCase()
-                      if (!uppercase) {
+          <Spin tip='กำลังโหลดข้อมูล...' size='large' spinning={loading}>
+            <CardHeader textHeader='รายละเอียดงาน' />
+            <Container style={{ padding: '20px', paddingBottom: '0px' }}>
+              <Row gutter={8}>
+                <Col span={12}>
+                  <Form.Item name='searchAddress'>
+                    <InputPicker
+                      virtualized
+                      value={taskNo}
+                      listProps={{
+                        onItemsRendered,
+                      }}
+                      onChange={(e) => {
+                        setTaskId(e)
+                        setSearch(false)
+                      }}
+                      placeholder='ค้นหารหัสงาน (Task No.)'
+                      onSearch={(val: any) => {
+                        const uppercase = val.toUpperCase()
+                        if (!uppercase) {
+                          setCurrent(1)
+                          setTaskNo(uppercase)
+                        }
+                      }}
+                      onClean={() => {
                         setCurrent(1)
-                        setTaskNo(uppercase)
-                      }
-                    }}
-                    onClean={() => {
-                      setCurrent(1)
-                      setTaskNo(undefined)
-                    }}
-                    data={searchTaskList}
-                    style={{
-                      width: '100%',
-                    }}
-                  />
-                </Form.Item>
-              </Col>
-              <Col span={8}>
-                <Button
-                  style={{
-                    border: '1px dashed #219653',
-                    borderRadius: '5px',
-                    backgroundColor: 'rgba(33, 150, 83, 0.1)',
-                    color: color.Success,
-                    width: 100,
-                    height: 35,
-                  }}
-                  onClick={() => {
-                    handleSearchTask()
-                    setSearch(taskId ? true : false)
-                    setSource('EDIT')
-                  }}
-                >
-                  ค้นหา
-                </Button>
-              </Col>
-              {taskId && search && (
-                <Col span={4}>
-                  <Radio.Group buttonStyle='outline'>
-                    <Radio.Button
-                      value='EDIT'
-                      style={
-                        source === 'EDIT'
-                          ? {
-                              color: color.Success,
-                              borderColor: color.Success,
-                              borderRadius: '5px, 5px',
-                              backgroundColor: 'rgba(33, 150, 83, 0.1)',
-                              height: 35,
-                            }
-                          : { height: 35, color: color.BK }
-                      }
-                      onClick={() => {
-                        setSource('EDIT')
+                        setTaskNo(undefined)
                       }}
-                    >
-                      แก้ไขงาน
-                    </Radio.Button>
-                    <Radio.Button
-                      value='HISTORY'
-                      style={
-                        source === 'HISTORY'
-                          ? {
-                              color: color.Success,
-                              borderColor: color.Success,
-                              borderRadius: '5px, 5px',
-                              backgroundColor: 'rgba(33, 150, 83, 0.1)',
-                              height: 35,
-                            }
-                          : { height: 35, color: color.BK }
-                      }
-                      onClick={() => {
-                        setSource('HISTORY')
+                      data={searchTaskList}
+                      style={{
+                        width: '100%',
                       }}
-                    >
-                      ประวัติงาน
-                    </Radio.Button>
-                  </Radio.Group>
+                    />
+                  </Form.Item>
                 </Col>
-              )}
-            </Row>
-          </Container>
-          {taskId &&
-            search &&
-            (source === 'EDIT' ? (
-              <Container style={{ paddingBottom: '10px' }}>
-                <Row gutter={8} justify={'space-between'}>
-                  {cardCurrentTask}
-                  {cardEditTask}
-                </Row>
-              </Container>
-            ) : (
-              <>{cardHistoryTask}</>
-            ))}
+                <Col span={8}>
+                  <Button
+                    style={{
+                      border: '1px dashed #219653',
+                      borderRadius: '5px',
+                      backgroundColor: 'rgba(33, 150, 83, 0.1)',
+                      color: color.Success,
+                      width: 100,
+                      height: 35,
+                    }}
+                    onClick={() => {
+                      if(taskId){
+                        handleSearchTask()
+                      }
+                      setSearch(taskId ? true : false)
+                      setSource('EDIT')
+                    }}
+                  >
+                    ค้นหา
+                  </Button>
+                </Col>
+                {taskId && search && (
+                  <Col span={4}>
+                    <Radio.Group buttonStyle='outline'>
+                      <Radio.Button
+                        value='EDIT'
+                        style={
+                          source === 'EDIT'
+                            ? {
+                                color: color.Success,
+                                borderColor: color.Success,
+                                borderRadius: '5px, 5px',
+                                backgroundColor: 'rgba(33, 150, 83, 0.1)',
+                                height: 35,
+                              }
+                            : { height: 35, color: color.BK }
+                        }
+                        onClick={() => {
+                          setSource('EDIT')
+                        }}
+                      >
+                        แก้ไขงาน
+                      </Radio.Button>
+                      <Radio.Button
+                        value='HISTORY'
+                        style={
+                          source === 'HISTORY'
+                            ? {
+                                color: color.Success,
+                                borderColor: color.Success,
+                                borderRadius: '5px, 5px',
+                                backgroundColor: 'rgba(33, 150, 83, 0.1)',
+                                height: 35,
+                              }
+                            : { height: 35, color: color.BK }
+                        }
+                        onClick={() => {
+                          setSource('HISTORY')
+                        }}
+                      >
+                        ประวัติงาน
+                      </Radio.Button>
+                    </Radio.Group>
+                  </Col>
+                )}
+              </Row>
+            </Container>
+            {taskId &&
+              search &&
+              (source === 'EDIT' ? (
+                <Container style={{ paddingBottom: '10px' }}>
+                  <Row gutter={8} justify={'space-between'}>
+                    {cardCurrentTask}
+                    {cardEditTask}
+                  </Row>
+                </Container>
+              ) : (
+                <>{cardHistoryTask}</>
+              ))}
+          </Spin>
         </CardContainer>
       </div>
       {showModal && (
