@@ -275,7 +275,7 @@ export interface AllTaskListEntity {
 
 export interface AllTaskEntity {
   id: string
-  taskName ?: string
+  taskName?: string
   taskNo: string
   createdAt: string
   updatedAt: string

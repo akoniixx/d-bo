@@ -10,6 +10,7 @@ import {
   Row,
   Select,
   Space,
+  Spin,
   TimePicker,
 } from 'antd'
 import TextArea from 'antd/lib/input/TextArea'
@@ -89,8 +90,10 @@ const EditInprogressTask = () => {
   const [dronerSelected, setDronerSelected] = useState<DronerEntity>(DronerEntity_INIT)
   const [targetSpray, setTargetSpray] = useState<TargetSpayEntities[]>([])
   const [someTargetSpray, setSomeTargetSpray] = useState<any>()
+  const [loading, setLoading] = useState<boolean>(true)
 
   const fetchInprogressTask = async () => {
+    setLoading(true)
     await TaskDatasource.getInprogressTaskById(queryString[1]).then((res) => {
       res.droner.totalDroneCount = res.droner.dronerDrone.length
       setDateAppointment(new Date(res.dateAppointment).toUTCString())
@@ -99,13 +102,20 @@ const EditInprogressTask = () => {
       setDronerSelected(res.droner)
       setCheckCrop(!res.targetSpray.includes('อื่นๆ'))
       setData(res)
-      CouponDataSource.getPromotionCode(res.couponId).then((result) =>
-        setCouponData({
-          couponCode: result.couponCode ?? '',
-          couponDiscount: !res.discountCoupon ? null : parseInt(res.discountCoupon),
-          couponName: result.couponName ?? '',
-        }),
-      )
+      CouponDataSource.getPromotionCode(res.couponId)
+        .then((result) =>
+          setCouponData({
+            couponCode: result.couponCode ?? '',
+            couponDiscount: !res.discountCoupon ? null : parseInt(res.discountCoupon),
+            couponName: result.couponName ?? '',
+          }),
+        )
+        .catch((error) => {
+          console.log(error)
+        })
+        .finally(() => {
+          setLoading(false)
+        })
     })
   }
   const getAllTargetSpray = async () => {
@@ -776,26 +786,28 @@ const EditInprogressTask = () => {
 
   return (
     <>
-      <div key={data?.id}>
-        <Row>
-          <BackIconButton onClick={() => navigate('/IndexInprogressTask')} />
-          <span className='pt-3'>
-            <strong style={{ fontSize: '20px' }}>แก้ไขงาน #{data?.taskNo}</strong>
-          </span>
-        </Row>
-        <CardContainer>{renderFormAppointment}</CardContainer>
-        <br />
-        <CardContainer>{renderFormSearchFarmer}</CardContainer>
-        <br />
-        <CardContainer>{renderDronerSelectedList}</CardContainer>
-        <br />
-        <CardContainer>{renderServiceCharge}</CardContainer>
-        <FooterPage
-          onClickBack={() => navigate('/IndexInprogressTask')}
-          onClickSave={updateInprogressTask}
-          disableSaveBtn={saveBtnDisable}
-        />
-      </div>
+      <Spin tip='กำลังโหลดข้อมูล...' size='large' spinning={loading}>
+        <div key={data?.id}>
+          <Row>
+            <BackIconButton onClick={() => navigate('/IndexInprogressTask')} />
+            <span className='pt-3'>
+              <strong style={{ fontSize: '20px' }}>แก้ไขงาน #{data?.taskNo}</strong>
+            </span>
+          </Row>
+          <CardContainer>{renderFormAppointment}</CardContainer>
+          <br />
+          <CardContainer>{renderFormSearchFarmer}</CardContainer>
+          <br />
+          <CardContainer>{renderDronerSelectedList}</CardContainer>
+          <br />
+          <CardContainer>{renderServiceCharge}</CardContainer>
+          <FooterPage
+            onClickBack={() => navigate('/IndexInprogressTask')}
+            onClickSave={updateInprogressTask}
+            disableSaveBtn={saveBtnDisable}
+          />
+        </div>
+      </Spin>
       {showModel && (
         <ModalSelectedDroner
           show={showModel}

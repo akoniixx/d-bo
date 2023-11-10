@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { Avatar, Badge, Empty, Form, Input, Row, Select, Tag, Upload } from 'antd'
+import { Avatar, Badge, Empty, Form, Input, Row, Select, Spin, Tag, Upload } from 'antd'
 import { BackIconButton } from '../../../../components/button/BackButton'
 import { CardContainer } from '../../../../components/card/CardContainer'
 import { CardHeader } from '../../../../components/header/CardHearder'
@@ -45,33 +45,39 @@ function FinishTasks() {
   })
   const [imgControl, setImgControl] = useState<any>()
   const [imgDrug, setImgDrug] = useState<any>()
+  const [loading, setLoading] = useState<boolean>(true)
+
   const fetchDetailTask = async () => {
-    await TaskFinishedDatasource.getDetailFinishTaskById(taskId).then((res) => {
-      if (res.data.couponId !== null) {
-        CouponDataSource.getPromotionCode(res.data.couponId).then((result) =>
-          setCouponData({
-            couponCode: res.data.couponCode ?? '',
-            couponDiscount: !res.data.discountCoupon ? null : parseInt(res.data.discountCoupon),
-            couponName: result.couponName ?? '',
-          }),
-        )
-      }
-      if (res.data.imagePathFinishTask) {
-        UploadImageDatasouce.getImage(res.data.imagePathFinishTask).then((resImg) => {
-          setImgControl(resImg.url)
+    setLoading(true)
+    await TaskFinishedDatasource.getDetailFinishTaskById(taskId)
+      .then((res) => {
+        if (res.data.couponId !== null) {
+          CouponDataSource.getPromotionCode(res.data.couponId).then((result) =>
+            setCouponData({
+              couponCode: res.data.couponCode ?? '',
+              couponDiscount: !res.data.discountCoupon ? null : parseInt(res.data.discountCoupon),
+              couponName: result.couponName ?? '',
+            }),
+          )
+        }
+        if (res.data.imagePathFinishTask) {
+          UploadImageDatasouce.getImage(res.data.imagePathFinishTask).then((resImg) => {
+            setImgControl(resImg.url)
+          })
+        }
+        if (res.data.imagePathDrug) {
+          UploadImageDatasouce.getImage(res.data.imagePathDrug).then((resImg) => {
+            setImgDrug(resImg.url)
+          })
+        }
+        setData(res)
+        setMapPosition({
+          lat: parseFloat(res.data.farmerPlot.lat),
+          lng: parseFloat(res.data.farmerPlot.long),
         })
-      }
-      if (res.data.imagePathDrug) {
-        UploadImageDatasouce.getImage(res.data.imagePathDrug).then((resImg) => {
-          setImgDrug(resImg.url)
-        })
-      }
-      setData(res)
-      setMapPosition({
-        lat: parseFloat(res.data.farmerPlot.lat),
-        lng: parseFloat(res.data.farmerPlot.long),
       })
-    })
+      .catch((error) => console.log(error))
+      .finally(() => setLoading(false))
   }
 
   useEffect(() => {
@@ -586,25 +592,27 @@ function FinishTasks() {
           <strong style={{ fontSize: '20px' }}>รายละเอียดงาน #{data.data.taskNo}</strong>
         </span>
       </Row>
-      <CardContainer>
-        <CardHeader textHeader='นัดหมายบริการ' />
-        {renderAppointment}
-      </CardContainer>{' '}
-      <br />
-      <CardContainer>
-        <CardHeader textHeader='ข้อมูลเกษตรกรและแปลง' />
-        {renderFarmer}
-      </CardContainer>
-      <br />
-      <CardContainer>
-        <CardHeader textHeader='รายชื่อนักบินโดรน' />
-        {renderDroner}
-      </CardContainer>
-      <br />
-      <CardContainer>
-        <CardHeader textHeader='ยอดรวมค่าบริการ' />
-        {renderPrice}
-      </CardContainer>
+      <Spin tip='กำลังโหลดข้อมูล...' size='large' spinning={loading}>
+        <CardContainer>
+          <CardHeader textHeader='นัดหมายบริการ' />
+          {renderAppointment}
+        </CardContainer>{' '}
+        <br />
+        <CardContainer>
+          <CardHeader textHeader='ข้อมูลเกษตรกรและแปลง' />
+          {renderFarmer}
+        </CardContainer>
+        <br />
+        <CardContainer>
+          <CardHeader textHeader='รายชื่อนักบินโดรน' />
+          {renderDroner}
+        </CardContainer>
+        <br />
+        <CardContainer>
+          <CardHeader textHeader='ยอดรวมค่าบริการ' />
+          {renderPrice}
+        </CardContainer>
+      </Spin>
     </>
   )
 }

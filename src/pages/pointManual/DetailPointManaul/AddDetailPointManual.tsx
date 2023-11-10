@@ -43,7 +43,6 @@ const AddDetailPointManual = () => {
   const [searchTask, setSearchTask] = useState<string>('')
   const [selectedTask, setSelectedTask] = useState<any>()
   const [provinceListId, setProvinceListId] = useState<ProviceEntity[]>([])
-  const [provinceList, setProvinceList] = useState<string[]>([])
   const profile = JSON.parse(localStorage.getItem('profile') || '{  }')
   const [checkTask, setCheckTask] = useState<boolean>()
   const [taskList, setTaskList] = useState<any>()
@@ -52,6 +51,7 @@ const AddDetailPointManual = () => {
   const [userId, setUserId] = useState<any>()
 
   useEffect(() => {
+    getTaskStatusDone()
     if (isDroner === true) {
       fetchDroner(searchDroner, provinceListId)
     } else {
@@ -64,7 +64,6 @@ const AddDetailPointManual = () => {
   const getProvince = async () => {
     await LocationDatasource.getProvince()
       .then((res) => {
-        setProvinceList(res.map((item: any) => (item.provinceName ? item.provinceName : '-')))
         setProvinceListId(res)
       })
       .catch((err) => console.log(err))
@@ -153,12 +152,13 @@ const AddDetailPointManual = () => {
   }
   const getTaskStatusDone = async () => {
     const id = userId && userId.id
-    await TaskFinishedDatasource.getTaskFinishList(
+    await TaskFinishedDatasource.getTaskManual(
+      id,
+      isDroner ? 'DRONER' : 'FARMER',
       currentTask,
       rowTask,
-      'DONE',
-      id ? userId.telephoneNo : '',
     ).then((res) => {
+      console.log(res)
       setTaskList(res.data)
     })
   }
@@ -173,6 +173,7 @@ const AddDetailPointManual = () => {
   const handleInputChange = (inputValue: any) => {
     if (currentPage === 1) {
       setSearchFarmer(inputValue)
+      setSearchDroner(inputValue)
     }
     return inputValue
   }
@@ -337,7 +338,10 @@ const AddDetailPointManual = () => {
                 value={isDroner ? dronerList : farmerList}
                 onMenuScrollToBottom={handleMenuScrollToBottom}
                 onChange={(selectedOptions) => {
-                  selectedOptions?.id ? getTaskStatusDone() : null
+                  if (selectedOptions) {
+                    formTable.resetFields([`${row.num}_checkTaskNo`])
+                    formTable.resetFields([`${row.num}_taskNo`])
+                  }
                   handleSelectUsers(selectedOptions)
                 }}
                 closeMenuOnSelect
