@@ -3,6 +3,7 @@ import React, { useState } from 'react'
 import { color } from '../../resource'
 import TextArea from 'antd/lib/input/TextArea'
 import { TaskDatasource } from '../../datasource/TaskDatasource'
+import Swal from 'sweetalert2'
 
 interface ModalCancelTaskProps {
   show: boolean
@@ -33,9 +34,30 @@ const ModalCancelTask: React.FC<ModalCancelTaskProps> = ({
     payload.statusRemark = reason
     payload.updateBy = profile.firstname + ' ' + profile.lastname
     if (payload) {
-      await TaskDatasource.cancelNewTask(payload).then(() => {
-        backButton()
-      })
+      await TaskDatasource.cancelNewTask(payload)
+        .then((res) => {
+          if (res.success === true) {
+            Swal.fire({
+              title: 'สำเร็จ',
+              icon: 'success',
+              timer: 1500,
+              text: 'งานที่ดำเนินงาน “ยกเลิก” ถูกดำเนินการเรียบร้อยแล้ว',
+              showConfirmButton: false,
+            }).then(() => {
+              backButton()
+            })
+          } else {
+            Swal.fire({
+              title: 'ติดปัญหา',
+              icon: 'error',
+              text: `เนื่องจากรายการที่คุณต้องการ “ยกเลิก”
+              ติดปัญหาเรื่องแต้มของนักบินโดรนหรือเกษตรกรไม่เพียงพอ
+              โปรดติดต่อนักบินโดรนหรือเกษตรกรเพื่อสอบถาม และแจ้งให้ทราบ`,
+              showConfirmButton: false,
+            })
+          }
+        })
+        .catch((err) => console.log(err))
     }
     callBack(payload)
   }
