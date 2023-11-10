@@ -158,7 +158,6 @@ const AddDetailPointManual = () => {
       currentTask,
       rowTask,
     ).then((res) => {
-      console.log(res)
       setTaskList(res.data)
     })
   }
