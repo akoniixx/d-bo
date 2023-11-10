@@ -29,6 +29,7 @@ import {
   SpecialListEntities,
 } from '../../../entities/SpecialListEntities'
 import _ from 'lodash'
+import Swal from 'sweetalert2'
 
 function DetailPointManual() {
   const { TabPane } = Tabs
@@ -501,7 +502,26 @@ function DetailPointManual() {
               taskNo: returnPoint.taskNo,
             }
             setModalReturnPoint(!modalReturnPoint)
-            await SpecialPointListDataSource.returnSpecialPoint(dataReturn).then((res) => {})
+            await SpecialPointListDataSource.returnSpecialPoint(dataReturn).then((res) => {
+              if (res.success) {
+                Swal.fire({
+                  title: 'สำเร็จ',
+                  icon: 'success',
+                  timer: 1500,
+                  text: 'รายการคืนแต้มของคุณสำเร็จ',
+                  showConfirmButton: false,
+                })
+              } else {
+                Swal.fire({
+                  title: 'ติดปัญหา',
+                  icon: 'error',
+                  text: `เนื่องจากรายการที่คุณขอคืนแต้มติดปัญหาเรื่องแต้มของ
+                    นักบินโดรนหรือเกษตรกรไม่เพียงพอ
+                    โปรดติดต่อนักบินโดรนหรือเกษตรกรเพื่อสอบถาม และแจ้งให้ทราบ`,
+                  showConfirmButton: false,
+                })
+              }
+            })
             fetchAllSpecialPointList()
             getSummaryCount()
           }}

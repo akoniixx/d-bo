@@ -60,7 +60,7 @@ const EditDetailPointManual = () => {
           user: res.dronerId ? 'นักบินโดรน' : 'เกษตรกร',
           point: res.point,
           reason: res.reason,
-          taskNo: res.taskNo ? { value: res.taskNo, label: res.taskNo } : undefined,
+          taskNo: res.taskNo ? { value: res.taskId, label: res.taskNo } : undefined,
           taskId: res.taskId || undefined,
           checkTaskNo: res.taskId ? true : false,
         })
