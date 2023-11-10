@@ -489,7 +489,9 @@ const AdminCancelTask = () => {
                       height: 35,
                     }}
                     onClick={() => {
-                      handleSearchTask()
+                      if(taskId){
+                        handleSearchTask()
+                      }
                       setSearch(taskId ? true : false)
                     }}
                   >
