@@ -2,7 +2,7 @@
 
 ## Fix [v0.39.16] 2023-11-10
 
-- change api search task un point manual
+- change api search task in point manual
 - set loading detail task
 
 ## improve [v0.39.15] 2023-11-9
