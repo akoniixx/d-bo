@@ -159,7 +159,6 @@ export class NewsDatasource {
       formData.append('campaignId', data.campaignId)
       formData.append('pinAll', new Boolean(data.pinAll).toString())
       formData.append('pinMain', new Boolean(data.pinMain).toString())
-      formData.append('startDate', data.startDate!)
       if (data.status === 'PENDING') {
         formData.append('startDate', data.startDate!)
         if (data.typeLaunch === 'IS_ENDDATE') {
@@ -178,7 +177,6 @@ export class NewsDatasource {
       formData.append('campaignId', data.campaignId)
       formData.append('pinAll', new Boolean(data.pinAll).toString())
       formData.append('pinMain', new Boolean(data.pinMain).toString())
-      formData.append('startDate', data.startDate!)
       if (data.status === 'PENDING') {
         formData.append('startDate', data.startDate!)
         if (data.typeLaunch === 'IS_ENDDATE') {
