@@ -938,7 +938,9 @@ const IndexAdminTask = () => {
                       height: 35,
                     }}
                     onClick={() => {
-                      handleSearchTask()
+                      if(taskId){
+                        handleSearchTask()
+                      }
                       setSearch(taskId ? true : false)
                       setSource('EDIT')
                     }}
