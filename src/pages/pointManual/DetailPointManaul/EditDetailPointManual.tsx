@@ -38,8 +38,8 @@ const EditDetailPointManual = () => {
   const [searchTask, setSearchTask] = useState<string>('')
   const [selectedTask, setSelectedTask] = useState<any>()
   const profile = JSON.parse(localStorage.getItem('profile') || '{  }')
+  const [editData, setEditData] = useState<any>()
   const [tel, setTel] = useState<any>()
-
   useEffect(() => {
     getSpecialPointById()
     getTaskStatusDone()
@@ -51,8 +51,8 @@ const EditDetailPointManual = () => {
         getInfoUserManual(res)
         const mapKey = res
         setDataSubSpecial([mapKey])
+        setEditData(res)
         form.setFieldsValue({
-          isDroner: res.isDroner,
           status: res.status,
           user: res.dronerId ? 'นักบินโดรน' : 'เกษตรกร',
         })
@@ -122,19 +122,19 @@ const EditDetailPointManual = () => {
     )
   }
   const getTaskStatusDone = async () => {
-    await TaskFinishedDatasource.getTaskFinishList(currentTask, rowTask, 'DONE', tel || '').then(
-      (res) => {
-        setTaskList(res.data)
-      },
-    )
+    await TaskFinishedDatasource.getTaskManual(
+      editData.dronerId ? editData.dronerId : editData.farmerId,
+      editData.dronerId ? 'DRONER' : 'FARMER',
+      currentTask,
+      rowTask,
+    ).then((res) => {
+      setTaskList(res.data)
+    })
   }
-  const options =
-    checkTask === true
-      ? taskList?.map((task: any) => ({
-          label: task.taskNo,
-          value: task.id,
-        }))
-      : []
+  const options = taskList?.map((task: any) => ({
+    label: task.taskNo,
+    value: task.id,
+  }))
 
   const handleInputTask = (inputValue: any) => {
     if (currentTask === 1) {

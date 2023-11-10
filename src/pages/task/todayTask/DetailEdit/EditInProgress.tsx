@@ -1,4 +1,16 @@
-import { Avatar, Badge, DatePicker, Form, Input, Radio, Row, Select, Space, TimePicker } from 'antd'
+import {
+  Avatar,
+  Badge,
+  DatePicker,
+  Form,
+  Input,
+  Radio,
+  Row,
+  Select,
+  Space,
+  Spin,
+  TimePicker,
+} from 'antd'
 import type { RadioChangeEvent } from 'antd'
 import moment from 'moment'
 import React, { useEffect, useState } from 'react'
@@ -62,23 +74,29 @@ function EditInProgress() {
   const [periodSpray, setPeriodSpray] = useState<CropPurposeSprayEntity>()
   const [saveBtnDisable, setBtnSaveDisable] = useState<boolean>(true)
   const [updateExtend, setUpdateExtend] = useState<any>()
+  const [loading, setLoading] = useState<boolean>(true)
+
   const fetchTaskDetail = async () => {
-    await TaskInprogressDatasource.getTaskDetailById(taskId).then((res) => {
-      if (res.couponId !== null) {
-        CouponDataSource.getPromotionCode(res.couponId).then((result) =>
-          setCouponData({
-            couponCode: result.couponCode ?? '',
-            couponDiscount: !res.discountCoupon ? null : parseInt(res.discountCoupon),
-            couponName: result.couponName ?? '',
-          }),
-        )
-      }
-      setData(res)
-      setMapPosition({
-        lat: parseFloat(res.farmerPlot.lat),
-        lng: parseFloat(res.farmerPlot.long),
+    setLoading(true)
+    await TaskInprogressDatasource.getTaskDetailById(taskId)
+      .then((res) => {
+        if (res.couponId !== null) {
+          CouponDataSource.getPromotionCode(res.couponId).then((result) =>
+            setCouponData({
+              couponCode: result.couponCode ?? '',
+              couponDiscount: !res.discountCoupon ? null : parseInt(res.discountCoupon),
+              couponName: result.couponName ?? '',
+            }),
+          )
+        }
+        setData(res)
+        setMapPosition({
+          lat: parseFloat(res.farmerPlot.lat),
+          lng: parseFloat(res.farmerPlot.long),
+        })
       })
-    })
+      .catch((error) => console.log(error))
+      .finally(() => setLoading(false))
   }
   const fetchPurposeSpray = async () => {
     await CropDatasource.getPurposeByCroupName(data.farmerPlot.plantName).then((res) => {
@@ -799,25 +817,27 @@ function EditInProgress() {
           <strong style={{ fontSize: '20px' }}>รายละเอียดงาน #{data.taskNo}</strong>
         </span>
       </Row>
-      <CardContainer>
-        <CardHeader textHeader='นัดหมายบริการ' />
-        {renderAppointment}
-      </CardContainer>{' '}
-      <br />
-      <CardContainer>
-        <CardHeader textHeader='ข้อมูลเกษตรกรและแปลง' />
-        {renderFarmer}
-      </CardContainer>
-      <br />
-      <CardContainer>
-        <CardHeader textHeader='รายชื่อนักบินโดรน' />
-        {renderDroner}
-      </CardContainer>
-      <br />
-      <CardContainer>
-        <CardHeader textHeader='ยอดรวมค่าบริการ' />
-        {renderPrice}
-      </CardContainer>
+      <Spin tip='กำลังโหลดข้อมูล...' size='large' spinning={loading}>
+        <CardContainer>
+          <CardHeader textHeader='นัดหมายบริการ' />
+          {renderAppointment}
+        </CardContainer>{' '}
+        <br />
+        <CardContainer>
+          <CardHeader textHeader='ข้อมูลเกษตรกรและแปลง' />
+          {renderFarmer}
+        </CardContainer>
+        <br />
+        <CardContainer>
+          <CardHeader textHeader='รายชื่อนักบินโดรน' />
+          {renderDroner}
+        </CardContainer>
+        <br />
+        <CardContainer>
+          <CardHeader textHeader='ยอดรวมค่าบริการ' />
+          {renderPrice}
+        </CardContainer>
+      </Spin>
       <FooterPage
         onClickBack={() => navigate('/IndexTodayTask')}
         onClickSave={() => UpdateTaskWaitStart(data)}

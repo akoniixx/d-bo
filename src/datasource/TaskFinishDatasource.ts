@@ -51,4 +51,25 @@ export class TaskFinishedDatasource {
         console.log(err)
       })
   }
+  static getTaskManual(
+    resultId: string,
+    applicationType: string,
+    page: number,
+    take: number,
+  ): Promise<any> {
+    const params = {
+      resultId: resultId,
+      applicationType: applicationType,
+      page: page,
+      take: take,
+    }
+    return httpClient
+      .get(BASE_URL + '/tasks/task-finish/task-finish-manual', { params })
+      .then((response) => {
+        return response.data
+      })
+      .catch((error) => {
+        console.log(error)
+      })
+  }
 }

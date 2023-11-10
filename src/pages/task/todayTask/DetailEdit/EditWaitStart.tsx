@@ -9,6 +9,7 @@ import {
   Row,
   Select,
   Space,
+  Spin,
   TimePicker,
 } from 'antd'
 import moment from 'moment'
@@ -68,6 +69,7 @@ function EditWaitStart() {
     couponName: '',
     couponDiscount: null,
   })
+  const [loading, setLoading] = useState<boolean>(true)
   const [periodSpray, setPeriodSpray] = useState<CropPurposeSprayEntity>()
   const [checkCrop, setCheckCrop] = useState<boolean>(true)
   const [saveBtnDisable, setBtnSaveDisable] = useState<boolean>(true)
@@ -90,27 +92,31 @@ function EditWaitStart() {
   }
 
   const fetchTaskDetail = async () => {
-    await TaskInprogressDatasource.getTaskDetailById(taskId).then((res) => {
-      if (res.couponId !== null) {
-        CouponDataSource.getPromotionCode(res.couponId).then((result) =>
-          setCouponData({
-            couponCode: result.couponCode ?? '',
-            couponDiscount: !res.discountCoupon ? null : parseInt(res.discountCoupon),
-            couponName: result.couponName ?? '',
-          }),
+    setLoading(true)
+    await TaskInprogressDatasource.getTaskDetailById(taskId)
+      .then((res) => {
+        if (res.couponId !== null) {
+          CouponDataSource.getPromotionCode(res.couponId).then((result) =>
+            setCouponData({
+              couponCode: result.couponCode ?? '',
+              couponDiscount: !res.discountCoupon ? null : parseInt(res.discountCoupon),
+              couponName: result.couponName ?? '',
+            }),
+          )
+        }
+        setCheckCrop(!res.targetSpray.includes('อื่นๆ'))
+        setData(res)
+        setOtherSpray(
+          res.targetSpray.filter((a) => !someTargetSpray.some((x: any) => x === a)).join(','),
         )
-      }
-      setCheckCrop(!res.targetSpray.includes('อื่นๆ'))
-      setData(res)
-      setOtherSpray(
-        res.targetSpray.filter((a) => !someTargetSpray.some((x: any) => x === a)).join(','),
-      )
-      fetchPurposeSpray(res.farmerPlot.plantName)
-      setMapPosition({
-        lat: parseFloat(res.farmerPlot.lat),
-        lng: parseFloat(res.farmerPlot.long),
+        fetchPurposeSpray(res.farmerPlot.plantName)
+        setMapPosition({
+          lat: parseFloat(res.farmerPlot.lat),
+          lng: parseFloat(res.farmerPlot.long),
+        })
       })
-    })
+      .catch((error) => console.log(error))
+      .finally(() => setLoading(false))
   }
   const fetchPurposeSpray = async (crop: string) => {
     await CropDatasource.getPurposeByCroupName(crop).then((res) => {
@@ -793,25 +799,28 @@ function EditWaitStart() {
           <strong style={{ fontSize: '20px' }}>รายละเอียดงาน #{data.taskNo}</strong>
         </span>
       </Row>
-      <CardContainer>
-        <CardHeader textHeader='นัดหมายบริการ' />
-        {renderAppointment}
-      </CardContainer>{' '}
-      <br />
-      <CardContainer>
-        <CardHeader textHeader='ข้อมูลเกษตรกรและแปลง' />
-        {renderFarmer}
-      </CardContainer>
-      <br />
-      <CardContainer>
-        <CardHeader textHeader='รายชื่อนักบินโดรน' />
-        {renderDroner}
-      </CardContainer>
-      <br />
-      <CardContainer>
-        <CardHeader textHeader='ยอดรวมค่าบริการ' />
-        {renderPrice}
-      </CardContainer>
+      <Spin tip='กำลังโหลดข้อมูล...' size='large' spinning={loading}>
+        <CardContainer>
+          <CardHeader textHeader='นัดหมายบริการ' />
+          {renderAppointment}
+        </CardContainer>{' '}
+        <br />
+        <CardContainer>
+          <CardHeader textHeader='ข้อมูลเกษตรกรและแปลง' />
+          {renderFarmer}
+        </CardContainer>
+        <br />
+        <CardContainer>
+          <CardHeader textHeader='รายชื่อนักบินโดรน' />
+          {renderDroner}
+        </CardContainer>
+        <br />
+        <CardContainer>
+          <CardHeader textHeader='ยอดรวมค่าบริการ' />
+          {renderPrice}
+        </CardContainer>
+      </Spin>
+
       <FooterPage
         onClickBack={() => navigate('/IndexTodayTask')}
         onClickSave={() => UpdateTaskWaitStart(data)}

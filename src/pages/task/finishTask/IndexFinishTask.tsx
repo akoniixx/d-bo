@@ -330,7 +330,9 @@ export default function IndexFinishTask() {
             allowClear
           >
             {FINISH_TASK_SEARCH.map((item) => (
-              <option key={item.value} value={item.value}>{item.name}</option>
+              <option key={item.value} value={item.value}>
+                {item.name}
+              </option>
             ))}
           </Select>
         </div>

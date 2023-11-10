@@ -1,17 +1,6 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
 import React, { useEffect, useState } from 'react'
-import {
-  Avatar,
-  Badge,
-  Form,
-  Input,
-  Radio,
-  RadioChangeEvent,
-  Row,
-  Select,
-  Space,
-  Tag,
-  Upload,
-} from 'antd'
+import { Avatar, Badge, Form, Input, Radio, Row, Select, Spin } from 'antd'
 import { BackIconButton } from '../../../../components/button/BackButton'
 import { CardContainer } from '../../../../components/card/CardContainer'
 import { CardHeader } from '../../../../components/header/CardHearder'
@@ -19,8 +8,7 @@ import color from '../../../../resource/color'
 import GoogleMap from '../../../../components/map/GoogleMap'
 import { LAT_LNG_BANGKOK } from '../../../../definitions/Location'
 import TextArea from 'antd/lib/input/TextArea'
-import { AddressEntity, AddressEntity_INIT } from '../../../../entities/AddressEntities'
-import { StarFilled, CalendarOutlined, ClockCircleOutlined } from '@ant-design/icons'
+import { CalendarOutlined, ClockCircleOutlined } from '@ant-design/icons'
 import { TaskFinishedDatasource } from '../../../../datasource/TaskFinishDatasource'
 import moment from 'moment'
 import { UploadImageDatasouce } from '../../../../datasource/UploadImageDatasource'
@@ -29,19 +17,11 @@ import FooterPage from '../../../../components/footer/FooterPage'
 
 import { TaskReviewDronerDatasource } from '../../../../datasource/TaskReviewDronerDatasource'
 import Swal from 'sweetalert2'
-import {
-  CreateReviewDroner_INIT,
-  DetailFinishTask,
-  DetailFinishTask_INIT,
-  DetailReviewTask,
-  DetailReviewTask_INIT,
-} from '../../../../entities/TaskFinishEntities'
+import { DetailReviewTask, DetailReviewTask_INIT } from '../../../../entities/TaskFinishEntities'
 import { CouponDataSource } from '../../../../datasource/CouponDatasource'
 import { numberWithCommas, numberWithCommasToFixed } from '../../../../utilities/TextFormatter'
-import { DashboardLayout } from '../../../../components/layout/Layout'
 import { useNavigate } from 'react-router-dom'
 import ImagCards from '../../../../components/card/ImagCard'
-import icon from '../../../../resource/icon'
 import { image } from '../../../../resource'
 import { listAppType } from '../../../../definitions/ApplicatoionTypes'
 import ShowNickName from '../../../../components/popover/ShowNickName'
@@ -76,34 +56,40 @@ function ReviewTask() {
   const [imgDrug, setImgDrug] = useState<any>()
   const [saveBtnDisable, setBtnSaveDisable] = useState<boolean>(true)
   const [saveRate, setSaveRate] = useState<boolean>(true)
+  const [loading, setLoading] = useState<boolean>(true)
+
   const fetchDetailTask = async () => {
-    await TaskFinishedDatasource.getDetailFinishTaskById(taskId).then((res) => {
-      if (res.data.couponId !== null) {
-        CouponDataSource.getPromotionCode(res.data.couponId).then((result) => {
-          setCouponData({
-            couponCode: res.data.couponCode ?? '',
-            couponDiscount: !res.data.discountCoupon ? null : parseInt(res.data.discountCoupon),
-            couponName: result.couponName ?? '',
+    setLoading(true)
+    await TaskFinishedDatasource.getDetailFinishTaskById(taskId)
+      .then((res) => {
+        if (res.data.couponId !== null) {
+          CouponDataSource.getPromotionCode(res.data.couponId).then((result) => {
+            setCouponData({
+              couponCode: res.data.couponCode ?? '',
+              couponDiscount: !res.data.discountCoupon ? null : parseInt(res.data.discountCoupon),
+              couponName: result.couponName ?? '',
+            })
           })
+        }
+        if (res.data.imagePathFinishTask) {
+          UploadImageDatasouce.getImage(res.data.imagePathFinishTask).then((resImg) => {
+            setImgControl(resImg.url)
+          })
+        }
+        if (res.data.imagePathDrug) {
+          UploadImageDatasouce.getImage(res.data.imagePathDrug).then((resImg) => {
+            setImgDrug(resImg.url)
+          })
+        }
+        setData(res)
+        setImgTask(data)
+        setMapPosition({
+          lat: parseFloat(res.data.farmerPlot.lat),
+          lng: parseFloat(res.data.farmerPlot.long),
         })
-      }
-      if (res.data.imagePathFinishTask) {
-        UploadImageDatasouce.getImage(res.data.imagePathFinishTask).then((resImg) => {
-          setImgControl(resImg.url)
-        })
-      }
-      if (res.data.imagePathDrug) {
-        UploadImageDatasouce.getImage(res.data.imagePathDrug).then((resImg) => {
-          setImgDrug(resImg.url)
-        })
-      }
-      setData(res)
-      setImgTask(data)
-      setMapPosition({
-        lat: parseFloat(res.data.farmerPlot.lat),
-        lng: parseFloat(res.data.farmerPlot.long),
       })
-    })
+      .catch((error) => console.log(error))
+      .finally(() => setLoading(false))
   }
 
   useEffect(() => {
@@ -283,7 +269,7 @@ function ReviewTask() {
             {listAppType.map(
               (item, index) =>
                 data.data.applicationType === item.value && (
-                  <div>
+                  <div key={index}>
                     <img src={item.icon} style={{ width: 22, height: 22 }} />
                     <span>
                       {' '}
@@ -304,7 +290,9 @@ function ReviewTask() {
                   <span className='col-lg-5'>1. มารยาทนักบิน</span>
                   <Select onChange={manners} disabled={saveRate} style={{ width: 75 }}>
                     {RATE_SELECT.map((item: any) => (
-                      <option value={item.value}>{item.name}</option>
+                      <option key={item.value} value={item.value}>
+                        {item.name}
+                      </option>
                     ))}
                   </Select>
                 </div>
@@ -312,7 +300,9 @@ function ReviewTask() {
                   <span className='col-lg-5'>2. ความตรงต่อเวลา</span>
                   <Select onChange={punctuality} disabled={saveRate} style={{ width: 75 }}>
                     {RATE_SELECT.map((item: any) => (
-                      <option value={item.value}>{item.name}</option>
+                      <option key={item.value} value={item.value}>
+                        {item.name}
+                      </option>
                     ))}
                   </Select>
                 </div>
@@ -320,7 +310,9 @@ function ReviewTask() {
                   <span className='col-lg-5'>3. ความเชี่ยวชาญในการพ่น</span>
                   <Select onChange={expertise} disabled={saveRate} style={{ width: 75 }}>
                     {RATE_SELECT.map((item: any) => (
-                      <option value={item.value}>{item.name}</option>
+                      <option key={item.value} value={item.value}>
+                        {item.name}
+                      </option>
                     ))}
                   </Select>
                 </div>
@@ -626,25 +618,28 @@ function ReviewTask() {
           <strong style={{ fontSize: '20px' }}>รายละเอียดงาน #{data.data.taskNo}</strong>
         </span>
       </Row>
-      <CardContainer>
-        <CardHeader textHeader='นัดหมายบริการ' />
-        {renderAppointment}
-      </CardContainer>
-      <br />
-      <CardContainer>
-        <CardHeader textHeader='ข้อมูลเกษตรกรและแปลง' />
-        {renderFarmer}
-      </CardContainer>
-      <br />
-      <CardContainer>
-        <CardHeader textHeader='รายชื่อนักบินโดรน' />
-        {renderDroner}
-      </CardContainer>
-      <br />
-      <CardContainer>
-        <CardHeader textHeader='ยอดรวมค่าบริการ' />
-        {renderPrice}
-      </CardContainer>
+      <Spin tip='กำลังโหลดข้อมูล...' size='large' spinning={loading}>
+        <CardContainer>
+          <CardHeader textHeader='นัดหมายบริการ' />
+          {renderAppointment}
+        </CardContainer>
+        <br />
+        <CardContainer>
+          <CardHeader textHeader='ข้อมูลเกษตรกรและแปลง' />
+          {renderFarmer}
+        </CardContainer>
+        <br />
+        <CardContainer>
+          <CardHeader textHeader='รายชื่อนักบินโดรน' />
+          {renderDroner}
+        </CardContainer>
+        <br />
+        <CardContainer>
+          <CardHeader textHeader='ยอดรวมค่าบริการ' />
+          {renderPrice}
+        </CardContainer>
+      </Spin>
+
       <FooterPage
         onClickBack={() => navigate('/IndexFinishTask')}
         onClickSave={() => UpdateReviewDroner(data)}

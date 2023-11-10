@@ -102,12 +102,14 @@ const IndexAdminTask = () => {
     setLoading(true)
     TaskDatasource.getManageTaskByTaskId(taskId)
       .then((res) => {
-        setTaskSelected(res)
-        setHistory(res.data.taskHistory)
-        form.setFieldsValue({
-          unitPrice: res.data.unitPrice,
-          farmAreaAmount: res.data.farmAreaAmount,
-        })
+        if(res.data && res.data.taskHistory){
+          setHistory(res.data.taskHistory)
+          setTaskSelected(res)       
+          form.setFieldsValue({
+            unitPrice: res.data.unitPrice,
+            farmAreaAmount: res.data.farmAreaAmount,
+          })
+        }
       })
       .finally(() => {
         setLoading(false)
