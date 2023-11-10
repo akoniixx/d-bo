@@ -503,7 +503,7 @@ function DetailPointManual() {
             }
             setModalReturnPoint(!modalReturnPoint)
             await SpecialPointListDataSource.returnSpecialPoint(dataReturn).then((res) => {
-              if (res.success) {
+              if (res && res.success !== false) {
                 Swal.fire({
                   title: 'สำเร็จ',
                   icon: 'success',
