@@ -15,6 +15,7 @@ import { UploadImageEntity, UploadImageEntity_INTI } from '../../entities/Upload
 import { FarmerPlotDatasource } from '../../datasource/FarmerPlotDatasource'
 import { useNavigate } from 'react-router-dom'
 import { validateOnlyNumWDecimal, validateOnlyNumber } from '../../utilities/TextFormatter'
+import '../../pages/farmer/Style.css'
 
 interface ModalEditRaiAmountProps {
   show: boolean

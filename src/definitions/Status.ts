@@ -214,7 +214,7 @@ export const ALL_TASK_MAPPING: any = {
 export const ALL_TASK_MENU: any = {
   WAIT_START: 'เมนูรอดำเนินงาน',
   IN_PROGRESS: 'เมนูงานในวันนี้',
-  WAIT_REVIEW: 'เมนูงานเสร็จสิ้น',
+  WAIT_REVIEW: 'เมนูงานรอรีวิว',
   DONE: 'เมนูงานเสร็จสิ้น',
 }
 export const HISTORY_TASK: any = {

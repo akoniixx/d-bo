@@ -353,7 +353,6 @@ function DetailPointManual() {
   const expandData = (record: any) => {
     const checkFarmer = record.farmerId
     const checkDroner = record.dronerId
-
     return (
       <Row justify={'space-between'} gutter={16}>
         {checkFarmer !== null && (
@@ -368,13 +367,24 @@ function DetailPointManual() {
               <Row>
                 <Col span={12}>
                   <label>เกษตรกร : </label>{' '}
-                  <span style={{ color: color.Success }}>
+                  <span
+                    style={{
+                      color: record.firstname !== 'ผู้ใช้งานนี้' ? color.Success : color.Error,
+                    }}
+                  >
                     <u>{record.firstname + ' ' + record.lastname}</u>
                   </span>
                   {record.nickname && <ShowNickName data={record.nickname} menu='INFO' />}
                 </Col>
                 <Col span={7}>
-                  <label>เบอร์ : </label> <span>{record.telephoneNo}</span>
+                  <label>เบอร์ : </label>{' '}
+                  <span
+                    style={{
+                      color: record.telephoneNo !== 'ไม่พบหมายเลขนี้' ? color.font : color.Error,
+                    }}
+                  >
+                    {record.telephoneNo}
+                  </span>
                 </Col>
                 <Col span={5}>
                   <label>แต้ม :</label>{' '}
@@ -399,7 +409,11 @@ function DetailPointManual() {
               <Row>
                 <Col span={12}>
                   <label>นักบินโดรน : </label>{' '}
-                  <span style={{ color: color.Warning }}>
+                  <span
+                    style={{
+                      color: record.firstname !== 'ผู้ใช้งานนี้' ? color.Warning : color.Error,
+                    }}
+                  >
                     <u>{record.firstname + ' ' + record.lastname}</u>
                   </span>
                   {record.nickname && (
@@ -407,7 +421,14 @@ function DetailPointManual() {
                   )}
                 </Col>
                 <Col span={7}>
-                  <label>เบอร์ : </label> <span>{record.telephoneNo}</span>
+                  <label>เบอร์ : </label>{' '}
+                  <span
+                    style={{
+                      color: record.telephoneNo !== 'ไม่พบหมายเลขนี้' ? color.font : color.Error,
+                    }}
+                  >
+                    {record.telephoneNo}
+                  </span>
                 </Col>
                 <Col span={5}>
                   <label>แต้ม :</label>{' '}

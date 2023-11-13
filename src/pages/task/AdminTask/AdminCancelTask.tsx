@@ -173,7 +173,7 @@ const AdminCancelTask = () => {
         </Row>
         <Row justify={'space-between'} gutter={8}>
           <Col span={12} style={{ textAlign: 'center', borderRight: '2px groove' }}>
-            {taskSelected?.farmer && (
+            {taskSelected?.farmer ? (
               <>
                 {`${taskSelected?.farmer.firstname || '-'} ${taskSelected?.farmer.lastname || '-'}`}
                 {` (${taskSelected?.farmer.telephoneNo || '-'})`}
@@ -185,10 +185,12 @@ const AdminCancelTask = () => {
                   />
                 )}
               </>
+            ) : (
+              <span style={{ color: color.Error }}>ผู้ใช้บัญชีนี้ ถูกลบแล้ว</span>
             )}
           </Col>
           <Col span={12} style={{ textAlign: 'center' }}>
-            {taskSelected?.droner && (
+            {taskSelected?.droner ? (
               <>
                 {`${taskSelected?.droner.firstname || '-'} ${taskSelected?.droner.lastname || '-'}`}
                 {` (${taskSelected?.droner.telephoneNo || '-'})`}
@@ -200,6 +202,8 @@ const AdminCancelTask = () => {
                   />
                 )}
               </>
+            ) : (
+              <span style={{ color: color.Error }}>ผู้ใช้บัญชีนี้ ถูกลบแล้ว</span>
             )}
           </Col>
         </Row>
@@ -489,7 +493,7 @@ const AdminCancelTask = () => {
                       height: 35,
                     }}
                     onClick={() => {
-                      if(taskId){
+                      if (taskId) {
                         handleSearchTask()
                       }
                       setSearch(taskId ? true : false)

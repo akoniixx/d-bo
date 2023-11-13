@@ -159,7 +159,11 @@ const IndexReceivePoint = () => {
               <Row>
                 <Col span={11}>
                   <label>ชื่อเกษตรกร : </label>{' '}
-                  <u style={{ color: color.Success }}>
+                  <u
+                    style={{
+                      color: checkFarmer.firstname === 'ผู้ใช้งานนี้' ? color.Error : color.Success,
+                    }}
+                  >
                     {checkFarmer.mission !== null
                       ? (checkFarmer.firstname + ' ' + checkFarmer.lastname).length > 20 &&
                         checkFarmer.mission === null
@@ -170,7 +174,15 @@ const IndexReceivePoint = () => {
                   {checkFarmer.nickname && <ShowNickName data={checkFarmer.nickname} menu='INFO' />}
                 </Col>
                 <Col span={8}>
-                  <label>เบอร์โทร : </label> <span>{checkFarmer.telephoneNo}</span>
+                  <label>เบอร์โทร : </label>{' '}
+                  <span
+                    style={{
+                      color:
+                        checkFarmer.telephoneNo === 'ไม่พบหมายเลขนี้' ? color.Error : color.font,
+                    }}
+                  >
+                    {checkFarmer.telephoneNo}
+                  </span>
                 </Col>
                 <Col span={5}>
                   <label>แต้ม :</label> <span>+ {numberWithCommas(checkFarmer.amountValue)}</span>
@@ -213,7 +225,7 @@ const IndexReceivePoint = () => {
               <Row>
                 <Col span={11}>
                   <label>ชื่อนักบินโดรน :</label>{' '}
-                  <u style={{ color: color.Warning }}>
+                  <u style={{ color: checkDroner.isDelete ? color.Error : color.Warning }}>
                     {(checkDroner.firstname + ' ' + checkDroner.lastname).length > 20 &&
                     checkDroner.mission === null
                       ? (checkDroner.firstname + ' ' + checkDroner.lastname).substring(0, 20) +
@@ -229,7 +241,10 @@ const IndexReceivePoint = () => {
                   )}
                 </Col>
                 <Col span={8}>
-                  <label>เบอร์โทร :</label> <span>{checkDroner.telephoneNo}</span>
+                  <label>เบอร์โทร :</label>{' '}
+                  <span style={{ color: checkDroner.isDelete ? color.Error : color.font }}>
+                    {checkDroner.telephoneNo}
+                  </span>
                 </Col>
                 <Col span={5}>
                   <label>แต้ม :</label> <span>+ {numberWithCommas(checkDroner.amountValue)}</span>

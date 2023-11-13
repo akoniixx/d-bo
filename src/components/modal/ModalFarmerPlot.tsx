@@ -570,8 +570,8 @@ const ModalFarmerPlot: React.FC<ModalFarmerPlotProps> = ({
           callBackEditRai={(data) => {
             setModalEdit((prev) => !prev)
             callBackModal(show, parseInt(data.responseData.raiAfter))
-            form.setFieldValue('raiAmount', parseFloat(data.responseData.raiAfter).toFixed(2))
-            setRai(parseFloat(data.responseData.raiAfter).toFixed(2))
+            form.setFieldValue('raiAmount', parseFloat(data.responseData.raiAfter))
+            setRai(parseFloat(data.responseData.raiAfter))
           }}
         />
       )}
