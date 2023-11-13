@@ -1,5 +1,10 @@
 ## [Version - 0]
 
+## Fix [v0.39.18] 2023-11-13
+
+- text color
+- decimal rai amount
+
 ## Fix [v0.39.17] 2023-11-10
 
 - fixed update time for news

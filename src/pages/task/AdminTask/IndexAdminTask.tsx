@@ -102,9 +102,9 @@ const IndexAdminTask = () => {
     setLoading(true)
     TaskDatasource.getManageTaskByTaskId(taskId)
       .then((res) => {
-        if(res.data && res.data.taskHistory){
+        if (res.data && res.data.taskHistory) {
           setHistory(res.data.taskHistory)
-          setTaskSelected(res)       
+          setTaskSelected(res)
           form.setFieldsValue({
             unitPrice: res.data.unitPrice,
             farmAreaAmount: res.data.farmAreaAmount,
@@ -938,7 +938,7 @@ const IndexAdminTask = () => {
                       height: 35,
                     }}
                     onClick={() => {
-                      if(taskId){
+                      if (taskId) {
                         handleSearchTask()
                       }
                       setSearch(taskId ? true : false)

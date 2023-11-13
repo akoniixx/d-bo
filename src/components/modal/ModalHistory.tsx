@@ -95,8 +95,8 @@ const ModalHistory: React.FC<ModalHistoryProps> = ({ show, backButton, data, cal
             <span
               style={{
                 color: color.Success,
-                textDecoration: 'underline',
-                cursor: 'pointer',
+                textDecoration: row.fileName ? 'underline' : 'none',
+                cursor: row.fileName ? 'pointer' : 'default',
               }}
               onClick={() => onPreviewImg(row.pathFile)}
             >
