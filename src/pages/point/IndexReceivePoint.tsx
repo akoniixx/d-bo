@@ -124,6 +124,7 @@ const IndexReceivePoint = () => {
           >
             <option value='JOB'>การจ้างงาน</option>
             <option value='MISSION'>ภารกิจ</option>
+            <option value='SPECIAL_POINT'>แต้มพิเศษ</option>
           </Select>
         </div>
         <div className='pt-1'>
