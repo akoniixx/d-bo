@@ -2,6 +2,8 @@ export interface PlanningPointEntity {
   task_id: string
   task_no: string
   created_at: string
+  type_estimate: string
+  campaignNme: string
   droner: DronerPointEntiry[]
   farmer: FarmerPointEntiry[]
 }

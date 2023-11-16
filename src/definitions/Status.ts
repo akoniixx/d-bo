@@ -226,6 +226,7 @@ export const HISTORY_TASK: any = {
   ChangeDateAppointment: 'แก้ไข/เปลี่ยนวันที่นัดหมาย',
   ChangeRai: 'แก้ไข/เปลี่ยนจำนวนแปลง',
   แก้ไขจำนวนแปลง: 'แก้ไขจำนวนแปลง',
+  แก้ไขรูปภาพเสร็จสิ้นงาน : 'แก้ไขรูปภาพเสร็จสิ้นงาน'
 }
 export const STATUS_SEARCH: any = {
   PENDING: 'รอตรวจสอบ',
@@ -244,7 +245,13 @@ export const STATUS_COLOR_POINT_MANUAL: any = {
   PENDING: color.Grey,
 }
 export const STATUS_POINT_MANUAL: any = {
-  RETURN: 'คืนแต้ม',
+  RETURN: 'ยกเลิกให้แต้ม',
   SUCCESS: 'ได้รับแต้ม',
   PENDING: 'รอรับแต้ม',
+}
+
+export const STATUS_RECEIVE_TYPE: any = {
+  POINT: 'การจ้างงาน',
+  SPECIAL_POINT: 'แต้มพิเศษ',
+  MISSION_POINT : 'ภารกิจ'
 }

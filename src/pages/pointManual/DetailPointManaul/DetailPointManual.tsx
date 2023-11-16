@@ -479,7 +479,7 @@ function DetailPointManual() {
           {searchContent}
           {tableContent}
         </TabPane>
-        <TabPane tab={`คืนแต้ม ${data?.return}`} key='RETURN'>
+        <TabPane tab={`ยกเลิกให้แต้ม ${data?.return}`} key='RETURN'>
           {searchContent}
           {tableContent}
         </TabPane>

@@ -1,5 +1,10 @@
 ## [Version - 0]
 
+## improve [v0.39.19] 2023-11-16
+
+- fixed wording return point & button cancel task
+- added upload image in task for admin
+
 ## Fix [v0.39.18] 2023-11-13
 
 - text color
