@@ -33,7 +33,7 @@ export class TaskDatasource {
   }
   static getEstimatePoint(taskId: string): Promise<any> {
     return httpClient
-      .get(BASE_URL + `/tasks/task-estimate-point/finish-estimate-point/${taskId}`)
+      .get(BASE_URL + `/tasks/task-estimate-point/find-estimate-point/${taskId}`)
       .then((response) => {
         return response.data
       })
@@ -201,11 +201,11 @@ export class TaskDatasource {
         console.log(error)
       })
   }
-  static getAllTaskList(take: number, page: number, search?: string): Promise<AllTaskListEntity> {
+  static getAllTaskList(search?: string, page?: number, take?: number): Promise<AllTaskListEntity> {
     const params = {
-      take: take,
-      page: page,
       searchText: search,
+      page: page,
+      take: take,
     }
     return httpClient
       .get(BASE_URL + '/tasks/task-manage-area', { params })
@@ -265,6 +265,27 @@ export class TaskDatasource {
     }
     return httpClient
       .post(BASE_URL + `/tasks/task-manage-area/save-change-area`, param)
+      .then((response) => {
+        return response.data
+      })
+      .catch((err) => {
+        console.log(err, 'err getnewtask')
+      })
+  }
+  static insertManageTaskImg(
+    taskId: string,
+    updateBy: string,
+    file: File,
+    fileDrug: File,
+  ): Promise<any> {
+    const formData = new FormData()
+    formData.append('taskId', taskId)
+    formData.append('updateBy', updateBy)
+    formData.append('file', file)
+    formData.append('fileDrug', fileDrug)
+
+    return httpClient
+      .patch(BASE_URL + `/tasks/task-manage-area/edit-task-image`, formData)
       .then((response) => {
         return response.data
       })

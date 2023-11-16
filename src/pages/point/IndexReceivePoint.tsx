@@ -10,6 +10,7 @@ import { color } from '../../resource'
 import { DateTimeUtil } from '../../utilities/DateTimeUtil'
 import { numberWithCommas } from '../../utilities/TextFormatter'
 import ShowNickName from '../../components/popover/ShowNickName'
+import { STATUS_RECEIVE_TYPE } from '../../definitions/Status'
 const { RangePicker } = DatePicker
 const dateSearchFormat = 'YYYY-MM-DD'
 const dateFormat = 'DD/MM/YYYY'
@@ -284,7 +285,6 @@ const IndexReceivePoint = () => {
       title: 'วันที่อัพเดท',
       dataIndex: 'dateTime',
       key: 'dateTime',
-      width: '15%',
       render: (value: any, row: any, index: number) => {
         return {
           children: (
@@ -311,7 +311,7 @@ const IndexReceivePoint = () => {
       dataIndex: 'taskNo',
       render: (value: any, row: any, index: number) => {
         return {
-          children: <u style={{ color: color.Success }}>{row.taskNo}</u>,
+          children: <>{row.taskNo ? <u style={{ color: color.Success }}>{row.taskNo}</u> : '-'}</>,
         }
       },
     },
@@ -349,19 +349,27 @@ const IndexReceivePoint = () => {
       title: 'ชื่อรายการแต้มพิเศษ',
       dataIndex: '',
       render: (value: any, row: any, index: number) => {
+        const checkPointSpecial = row.dronerTransaction || row.farmerTransaction
         return {
-          children: <span>-</span>,
+          children: (
+            <span>
+              {checkPointSpecial.campaign.campaignType === 'SPECIAL_POINT'
+                ? checkPointSpecial.campaignName
+                : '-'}
+            </span>
+          ),
         }
       },
     },
     {
       title: 'ประเภทการได้รับแต้ม',
       render: (value: any, row: any, index: number) => {
+        const checkPointSpecial = row.dronerTransaction || row.farmerTransaction
         return {
           children: (
             <>
               <span>
-                {row.taskId ? 'การจ้างงาน' : 'ภารกิจ'}
+                {STATUS_RECEIVE_TYPE[checkPointSpecial.campaign.campaignType]}
                 {row.action === 'RETURN' && ' (คืนแต้ม)'}
               </span>
               <br />
@@ -385,6 +393,7 @@ const IndexReceivePoint = () => {
               expandedRowKeys: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
               showExpandColumn: false,
             }}
+            scroll={{ x: 'max-content' }}
             pagination={false}
             size='large'
             tableLayout='fixed'

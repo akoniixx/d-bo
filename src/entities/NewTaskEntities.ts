@@ -288,13 +288,16 @@ export interface TaskManageEntity {
     discountCampaignPoint: string
     discountCoupon: string
     discountFee: string
+    comment: string
+    imagePathFinishTask: string
+    imagePathDrug: string
     droner: {
       firstname: string
       lastname: string
       telephoneNo: string
     }
     dronerId: string
-    farmAreaAmount: string
+    farmAreaAmount: any
     farmer: {
       firstname: string
       lastname: string
@@ -336,4 +339,49 @@ export interface TaskManageEntity {
     taskId: string
     updatedAt: string
   }[]
+}
+export const TaskManageEntity_INIT: TaskManageEntity = {
+  data: {
+    dateAppointment: "",
+    discountCampaignPoint: "",
+    discountCoupon: "",
+    discountFee: "",
+    comment: "",
+    imagePathFinishTask: "",
+    imagePathDrug: "",
+    droner: {
+      firstname: "",
+      lastname: "",
+      telephoneNo: "",
+    },
+    dronerId: "",
+    farmAreaAmount: 0,
+    farmer: {
+      firstname: "",
+      lastname: "",
+      telephoneNo: "",
+    },
+    farmerId: "",
+    farmerPlot: {
+      plotName: "",
+      raiAmount: "",
+    },
+    fee: 0,
+    id: "",
+    preparationBy: "",
+    price: "",
+    purposeSpray: {
+      crop: {
+        cropName: "",
+      },
+      purposeSprayName: "",
+    },
+    status: "",
+    targetSpray: [""],
+    taskHistory: [],
+    totalPrice: 0,
+    unitPrice: 0,
+    usePoint: "",
+  },
+  taskEstimatePoint: []
 }

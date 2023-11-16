@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
 import {
   Badge,
   Button,
@@ -7,16 +8,16 @@ import {
   Form,
   Radio,
   Row,
-  Image,
   Input,
   Table,
   Modal,
   Spin,
+  Checkbox,
 } from 'antd'
 import { useEffect, useState } from 'react'
 import { CardContainer } from '../../../components/card/CardContainer'
 import { CardHeader } from '../../../components/header/CardHearder'
-import { color } from '../../../resource'
+import { color, image } from '../../../resource'
 import { ALL_TASK_COLOR_MAPPING, ALL_TASK_MAPPING, HISTORY_TASK } from '../../../definitions/Status'
 import icon from '../../../resource/icon'
 import TextArea from 'antd/lib/input/TextArea'
@@ -25,13 +26,24 @@ import styled from 'styled-components'
 import { Container } from 'react-bootstrap'
 import { InputPicker } from 'rsuite'
 import { TaskDatasource } from '../../../datasource/TaskDatasource'
-import { AllTaskListEntity, TaskManageEntity } from '../../../entities/NewTaskEntities'
+import {
+  AllTaskListEntity,
+  TaskManageEntity,
+  TaskManageEntity_INIT,
+} from '../../../entities/NewTaskEntities'
 import {
   numberWithCommas,
   numberWithCommasToFixed,
   validateOnlyNumWDecimal,
 } from '../../../utilities/TextFormatter'
 import 'rsuite/dist/rsuite.min.css'
+import ImagCards from '../../../components/card/ImagCard'
+import img_empty from '../../../resource/media/empties/uploadImgTask.png'
+import '../../farmer/Style.css'
+import { UploadImageDatasouce } from '../../../datasource/UploadImageDatasource'
+import { resizeFileImg } from '../../../utilities/ResizeImage'
+import { UploadImageEntity, UploadImageEntity_INTI } from '../../../entities/UploadImageEntities'
+import { DeleteOutlined } from '@ant-design/icons'
 
 const NewTable = styled(Table)`
   .ant-table-container table thead tr th {
@@ -52,16 +64,25 @@ const IndexAdminTask = () => {
   const [source, setSource] = useState<string>('EDIT')
   const [showModal, setShowModal] = useState<boolean>(false)
   const [search, setSearch] = useState<boolean>(false)
-  const [taskSelected, setTaskSelected] = useState<TaskManageEntity>()
+  const [taskSelected, setTaskSelected] = useState<TaskManageEntity>(TaskManageEntity_INIT)
   const [taskNo, setTaskNo] = useState()
   const [count, setCount] = useState<number>(0)
   const [taskId, setTaskId] = useState('')
   const [edit, setEdit] = useState<any>()
   const [history, setHistory] = useState<any>()
   const [loading, setLoading] = useState(false)
+  const [imgControl, setImgControl] = useState<any>(null)
+  const [imgDrug, setImgDrug] = useState<any>(null)
+  const [upImgControl, setUpImgControl] = useState<any>()
+  const [upImgDrug, setUpImgDrug] = useState<any>()
+  const [checkTask, setCheckTask] = useState<boolean>(false)
+  const { Map } = require('immutable')
+  const [createImgControl, setCreateImgControl] =
+    useState<UploadImageEntity>(UploadImageEntity_INTI)
+  const [createImgDrug, setCreateImgDrug] = useState<UploadImageEntity>(UploadImageEntity_INTI)
 
   const fetchTaskList = () => {
-    TaskDatasource.getAllTaskList(10, current, taskNo).then((res: AllTaskListEntity) => {
+    TaskDatasource.getAllTaskList(taskNo, current, 10).then((res: AllTaskListEntity) => {
       setTaskList(res.data)
       const data = res.data.map((item) => {
         return {
@@ -82,7 +103,7 @@ const IndexAdminTask = () => {
   const onItemsRendered = (props: any) => {
     if (props.visibleStopIndex >= searchTaskList.length - 1) {
       if (searchTaskList.length < count) {
-        TaskDatasource.getAllTaskList(10, current + 1, taskNo).then((res: AllTaskListEntity) => {
+        TaskDatasource.getAllTaskList(taskNo, current + 1, 10).then((res: AllTaskListEntity) => {
           setTaskList([...taskList, res.data])
           const data = res.data.map((item) => {
             return {
@@ -101,14 +122,22 @@ const IndexAdminTask = () => {
   const handleSearchTask = () => {
     setLoading(true)
     TaskDatasource.getManageTaskByTaskId(taskId)
-      .then((res) => {
-        if (res.data && res.data.taskHistory) {
+      .then(async (res) => {
+        if (res.data) {
           setHistory(res.data.taskHistory)
           setTaskSelected(res)
           form.setFieldsValue({
             unitPrice: res.data.unitPrice,
             farmAreaAmount: res.data.farmAreaAmount,
           })
+        }
+        if (res.data.imagePathFinishTask) {
+          const resImg = await UploadImageDatasouce.getImage(res.data.imagePathFinishTask)
+          setImgControl(resImg.url)
+        }
+        if (res.data.imagePathDrug) {
+          const resImg = await UploadImageDatasouce.getImage(res.data.imagePathDrug)
+          setImgDrug(resImg.url)
         }
       })
       .finally(() => {
@@ -136,23 +165,70 @@ const IndexAdminTask = () => {
     const newRai = Number(form.getFieldValue('farmAreaAmount'))
     return newRai > oldRai
   }
-  const onSubmit = async () => {
-    TaskDatasource.insertManageTask(
-      taskId,
-      form.getFieldValue('farmAreaAmount'),
-      form.getFieldValue('unitPrice'),
-      form.getFieldValue('remark'),
-      `${profile.firstname} ${profile.lastname}`,
-    ).then((res) => {
-      if (res.success) {
-        handleSearchTask()
-        setShowModal(!showModal)
-        form.setFieldsValue({
-          remark: '',
-        })
-      }
+  const onChangeControl = async (file: any) => {
+    const source = file.target.files[0]
+    let newSource: any
+
+    const isFileMoreThan2MB = source.size > 2 * 1024 * 1024
+    if (isFileMoreThan2MB) {
+      newSource = await resizeFileImg({
+        file: source,
+        compressFormat: source?.type.split('/')[1],
+        quality: 70,
+        rotation: 0,
+        responseUriFunc: (res: any) => {},
+      })
+    }
+    const img_base64 = await new Promise((resolve) => {
+      const reader = new FileReader()
+      reader.readAsDataURL(isFileMoreThan2MB ? newSource : source)
+      reader.onload = () => resolve(reader.result)
     })
+
+    setUpImgControl(img_base64)
+    const d = Map(createImgControl).set('file', isFileMoreThan2MB ? newSource : source)
+    setCreateImgControl(d.toJS())
   }
+  const onChangeDrug = async (file: any) => {
+    const source = file.target.files[0]
+    let newSource: any
+
+    const isFileMoreThan2MB = source.size > 2 * 1024 * 1024
+    if (isFileMoreThan2MB) {
+      newSource = await resizeFileImg({
+        file: source,
+        compressFormat: source?.type.split('/')[1],
+        quality: 70,
+        rotation: 0,
+        responseUriFunc: (res: any) => {},
+      })
+    }
+    const img_base64 = await new Promise((resolve) => {
+      const reader = new FileReader()
+      reader.readAsDataURL(isFileMoreThan2MB ? newSource : source)
+      reader.onload = () => resolve(reader.result)
+    })
+
+    setUpImgDrug(img_base64)
+    const d = Map(createImgDrug).set('file', isFileMoreThan2MB ? newSource : source)
+    setCreateImgDrug(d.toJS())
+  }
+
+  const onPreviewImg = async (e: any) => {
+    let src = e
+    if (!src) {
+      src = await new Promise((resolve) => {
+        const reader = new FileReader()
+      })
+    }
+    const image = new Image()
+    image.src = src
+    const imgWindow = window.open(src)
+    imgWindow?.document.write(image.outerHTML)
+  }
+  const handleClearCheckbox = () => {
+    setCheckTask(false);
+  };
 
   const pageTitle = (
     <Row style={{ padding: '10px' }}>
@@ -172,7 +248,7 @@ const IndexAdminTask = () => {
   )
   const cardCurrentTask = (
     <Col span={12}>
-      <Card style={{ backgroundColor: '#F2F5FC', height: '140px' }}>
+      <Card style={{ backgroundColor: '#F2F5FC', height: '138px' }}>
         <Row
           justify={'center'}
           gutter={8}
@@ -224,7 +300,7 @@ const IndexAdminTask = () => {
           </Col>
         </Row>
       </Card>
-      <Card style={{ height: '45%' }}>
+      <Card style={{ height: checkTask ? '54%' : '49%' }}>
         <Row justify={'space-between'} gutter={8} style={{ paddingBottom: '15px' }}>
           <>
             <Col span={8} style={{ fontWeight: 'bold' }}>
@@ -290,6 +366,50 @@ const IndexAdminTask = () => {
                 {ALL_TASK_MAPPING[taskSelected?.data.status || '']}
               </span>
             </Col>
+          </>
+        </Row>
+        <Row justify={'space-between'} gutter={14} style={{ paddingBottom: '15px' }}>
+          <>
+            <Col span={12} style={{ fontWeight: 'bold' }}>
+              ภาพหลักฐานการบิน
+            </Col>
+            <Col span={12} style={{ fontWeight: 'bold' }}>
+              ภาพปุ๋ยและยา
+            </Col>
+          </>
+          <>
+            <Col span={12}>
+              {imgControl ? (
+                <ImagCards
+                  imageName={imgControl}
+                  image={imgControl}
+                  onClick={() => onPreviewImg(imgControl)}
+                />
+              ) : (
+                '-'
+              )}
+            </Col>
+            <Col span={12}>
+              {imgDrug ? (
+                <ImagCards
+                  imageName={imgControl}
+                  image={imgDrug}
+                  onClick={() => onPreviewImg(imgDrug)}
+                />
+              ) : (
+                '-'
+              )}
+            </Col>
+          </>
+        </Row>
+        <Row justify={'space-between'} gutter={8} style={{ paddingBottom: '15px' }}>
+          <>
+            <Col span={24} style={{ fontWeight: 'bold' }}>
+              หมายเหตุ
+            </Col>
+          </>
+          <>
+            <Col span={24}>{taskSelected?.data.comment || '-'}</Col>
           </>
         </Row>
       </Card>
@@ -396,11 +516,7 @@ const IndexAdminTask = () => {
               borderRight: '2px groove',
             }}
           >
-            <Image
-              preview={false}
-              src={icon.coinFarmer}
-              style={{ width: '25px', height: '25px' }}
-            />{' '}
+            <img src={icon.coinFarmer} style={{ width: '25px', height: '25px' }} />{' '}
             {numberWithCommas(
               Number(
                 taskSelected?.taskEstimatePoint.find((x) => x.application === 'FARMER')
@@ -410,11 +526,7 @@ const IndexAdminTask = () => {
             แต้ม
           </Col>
           <Col span={12} style={{ textAlign: 'center' }}>
-            <Image
-              preview={false}
-              src={icon.coinDroner}
-              style={{ width: '25px', height: '25px' }}
-            />{' '}
+            <img src={icon.coinDroner} style={{ width: '25px', height: '25px' }} />{' '}
             {numberWithCommas(
               Number(
                 taskSelected?.taskEstimatePoint.find((x) => x.application === 'DRONER')
@@ -429,7 +541,7 @@ const IndexAdminTask = () => {
   )
   const cardEditTask = (
     <Col span={12}>
-      <Card style={{ backgroundColor: 'rgba(33, 150, 83, 0.1)', height: '140px' }}>
+      <Card style={{ backgroundColor: 'rgba(33, 150, 83, 0.1)', height: 'max-content' }}>
         <Row
           justify={'center'}
           gutter={8}
@@ -490,7 +602,7 @@ const IndexAdminTask = () => {
           </Col>
         </Row>
       </Card>
-      <Card style={{ height: '45%' }}>
+      <Card>
         <Row justify={'space-between'} gutter={8} style={{ paddingBottom: '15px' }}>
           <>
             <Col span={8} style={{ fontWeight: 'bold' }}>
@@ -583,6 +695,7 @@ const IndexAdminTask = () => {
                 ]}
               >
                 <Input
+                  disabled={taskSelected?.data.status === 'DONE'}
                   suffix='ไร่'
                   onChange={(e) => {
                     checkNumber(e, 'farmAreaAmount')
@@ -599,6 +712,138 @@ const IndexAdminTask = () => {
               <TextArea rows={2} />
             </Form.Item>
           </Col>
+          <Col span={24}>
+            <Form.Item name='checkImg'>
+              <Checkbox
+                checked={checkTask}
+                disabled={taskSelected?.data.status !== 'DONE'}
+                onChange={(e) => setCheckTask(!checkTask)}
+                >
+                ต้องการอัพโหลดภาพหลักฐานการบิน และปุ๋ยยาใหม่
+              </Checkbox>
+            </Form.Item>
+          </Col>
+          {checkTask && (
+            <>
+              <Row justify={'space-between'} gutter={8}>
+                <Col span={12}>
+                  <label style={{ fontWeight: 'bold' }}>ภาพหลักฐานการบิน</label>
+                </Col>
+                <Col span={12}>
+                  <label style={{ fontWeight: 'bold' }}>ภาพปุ๋ยและยา</label>
+                </Col>
+              </Row>
+              <Row justify={'space-between'} gutter={32} style={{ paddingBottom: '4%' }}>
+                <Col span={12}>
+                  <div className='form-group col-lg-12'>
+                    <Row
+                      style={{
+                        border: upImgControl && 'dotted',
+                        borderWidth: upImgControl && 0.5,
+                        borderRadius: upImgControl && '8px',
+                        width: upImgControl && '100%',
+                        height: upImgControl && '75px',
+                        paddingLeft: upImgControl && 2,
+                      }}
+                      gutter={8}
+                    >
+                      <Col span={4} className='align-self-center'>
+                        <span
+                          style={{
+                            backgroundImage: `url(${upImgControl})`,
+                            display: upImgControl ? 'block' : 'none',
+                            borderRadius: upImgControl ? 6 : 0,
+                            width: '65px',
+                            height: '65px',
+                            overflow: 'hidden',
+                            backgroundRepeat: 'no-repeat',
+                            backgroundPosition: 'center',
+                            backgroundSize: '100%',
+                          }}
+                        />
+                      </Col>
+                      <Col span={14} className='align-self-center' />
+                      <Col span={2} className='align-self-center'>
+                        <span>
+                          {upImgControl && (
+                            <DeleteOutlined
+                              style={{ fontSize: 20, color: color.Error }}
+                              onClick={() => setUpImgControl(undefined)}
+                            />
+                          )}
+                        </span>
+                      </Col>
+                    </Row>
+                    <div
+                      className='hiddenFileInputTask'
+                      style={{
+                        backgroundImage: `url(${img_empty})`,
+                        display: upImgControl ? 'none' : 'block',
+                      }}
+                    >
+                      <input
+                        key={upImgControl}
+                        type='file'
+                        onChange={onChangeControl}
+                        title='เลือกรูป'
+                      />
+                    </div>
+                  </div>
+                </Col>
+                <Col span={12}>
+                  <>
+                    <Row
+                      style={{
+                        border: upImgDrug && 'dotted',
+                        borderWidth: upImgDrug && 0.5,
+                        borderRadius: upImgDrug && '8px',
+                        width: upImgDrug && '100%',
+                        height: upImgDrug && '75px',
+                        paddingLeft: upImgDrug && 2,
+                      }}
+                      gutter={8}
+                    >
+                      <Col span={4} className='align-self-center'>
+                        <span
+                          style={{
+                            backgroundImage: `url(${upImgDrug})`,
+                            display: upImgDrug ? 'block' : 'none',
+                            borderRadius: upImgDrug ? 6 : 0,
+                            width: '65px',
+                            height: '65px',
+                            overflow: 'hidden',
+                            backgroundRepeat: 'no-repeat',
+                            backgroundPosition: 'center',
+                            backgroundSize: '100%',
+                          }}
+                        />
+                      </Col>
+                      <Col span={14} className='align-self-center' />
+                      <Col span={2} className='align-self-center'>
+                        <span>
+                          {upImgDrug && (
+                            <DeleteOutlined
+                              style={{ fontSize: 20, color: color.Error }}
+                              onClick={() => setUpImgDrug(undefined)}
+                            />
+                          )}
+                        </span>
+                      </Col>
+                    </Row>
+                    <div
+                      className='hiddenFileInputTask'
+                      style={{
+                        backgroundImage: `url(${img_empty})`,
+                        display: upImgDrug ? 'none' : 'block',
+                      }}
+                    >
+                      <input key={upImgDrug} type='file' onChange={onChangeDrug} title='เลือกรูป' />
+                    </div>
+                  </>
+                </Col>
+              </Row>
+            </>
+          )}
         </Form>
         <Button
           style={{
@@ -760,11 +1005,7 @@ const IndexAdminTask = () => {
               borderRight: '2px groove',
             }}
           >
-            <Image
-              preview={false}
-              src={icon.coinFarmer}
-              style={{ width: '25px', height: '25px' }}
-            />{' '}
+            <img src={icon.coinFarmer} style={{ width: '25px', height: '25px' }} />{' '}
             {numberWithCommas(Number(`${edit?.farmerPoint}`)) ||
               numberWithCommas(
                 Number(
@@ -775,11 +1016,7 @@ const IndexAdminTask = () => {
             แต้ม
           </Col>
           <Col span={12} style={{ textAlign: 'center' }}>
-            <Image
-              preview={false}
-              src={icon.coinDroner}
-              style={{ width: '25px', height: '25px' }}
-            />{' '}
+            <img src={icon.coinDroner} style={{ width: '25px', height: '25px' }} />{' '}
             {numberWithCommas(Number(`${edit?.dronerPoint}`)) ||
               numberWithCommas(
                 Number(
@@ -886,7 +1123,38 @@ const IndexAdminTask = () => {
       scroll={{ y: 500 }}
     />
   )
-
+  const onSubmit = async () => {
+    if (upImgControl || upImgDrug) {
+      TaskDatasource.insertManageTaskImg(
+        taskId,
+        `${profile.firstname} ${profile.lastname}`,
+        createImgControl.file,
+        createImgDrug.file,
+      ).then(() => {
+        handleSearchTask()
+        setShowModal(!showModal)
+        setUpImgControl(undefined)
+        setUpImgDrug(undefined)
+        setCheckTask(false)
+      })
+    } else {
+      TaskDatasource.insertManageTask(
+        taskId,
+        form.getFieldValue('farmAreaAmount'),
+        form.getFieldValue('unitPrice'),
+        form.getFieldValue('remark'),
+        `${profile.firstname} ${profile.lastname}`,
+      ).then((res) => {
+        if (res.success) {
+          handleSearchTask()
+          setShowModal(!showModal)
+          form.setFieldsValue({
+            remark: '',
+          })
+        }
+      })
+    }
+  }
   return (
     <>
       {pageTitle}
@@ -905,6 +1173,10 @@ const IndexAdminTask = () => {
                         onItemsRendered,
                       }}
                       onChange={(e) => {
+                        if (e !== taskId) {
+                          setImgControl(null)
+                          setImgDrug(null)
+                        }
                         setTaskId(e)
                         setSearch(false)
                       }}
