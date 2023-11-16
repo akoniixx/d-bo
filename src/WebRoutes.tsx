@@ -95,6 +95,7 @@ const AddDetailPointManual = lazy(
 const EditDetailPointManual = lazy(
   () => import('./pages/pointManual/DetailPointManaul/EditDetailPointManual'),
 )
+const HighlightNewsPage = lazy(() => import('./pages/highlightNews/HighlightNewsPage'))
 
 const FallBack = () => {
   return (
@@ -202,6 +203,7 @@ const WebRoutes: React.FC<any> = () => {
             <Route path='/AddDetailPointManual' element={<AddDetailPointManual />} />
             <Route path='/EditDetailPointManual/:id' element={<EditDetailPointManual />} />
             <Route path='/AdminCancelTask' element={<AdminCancelTask />} />
+            <Route path='/HighlightNewsPage' element={<HighlightNewsPage />} />
           </Route>
           <Route element={<PublicRoute />}>
             <Route index element={<AuthPage />} />
