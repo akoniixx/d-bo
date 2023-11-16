@@ -226,9 +226,6 @@ const IndexAdminTask = () => {
     const imgWindow = window.open(src)
     imgWindow?.document.write(image.outerHTML)
   }
-  const handleClearCheckbox = () => {
-    setCheckTask(false);
-  };
 
   const pageTitle = (
     <Row style={{ padding: '10px' }}>
@@ -718,7 +715,7 @@ const IndexAdminTask = () => {
                 checked={checkTask}
                 disabled={taskSelected?.data.status !== 'DONE'}
                 onChange={(e) => setCheckTask(!checkTask)}
-                >
+              >
                 ต้องการอัพโหลดภาพหลักฐานการบิน และปุ๋ยยาใหม่
               </Checkbox>
             </Form.Item>
@@ -1095,10 +1092,9 @@ const IndexAdminTask = () => {
       title: 'หมายเหตุ',
       dataIndex: 'remark',
       key: 'remark',
-      width: '25%',
       render: (value: any, row: any, index: number) => {
         return {
-          children: <span>{value}</span>,
+          children: <span>{value || '-'}</span>,
         }
       },
     },
@@ -1108,7 +1104,7 @@ const IndexAdminTask = () => {
       key: 'createdBy',
       render: (value: any, row: any, index: number) => {
         return {
-          children: <span>{value}</span>,
+          children: <span>{value || '-'}</span>,
         }
       },
     },
@@ -1120,7 +1116,7 @@ const IndexAdminTask = () => {
       dataSource={(history || [])
         .filter((x: any) => x.createdBy !== 'System')
         ?.sort((a: any, b: any) => (a.createdAt < b.createdAt ? 1 : -1))}
-      scroll={{ y: 500 }}
+      scroll={{ x: 'max-content' }}
     />
   )
   const onSubmit = async () => {
@@ -1128,11 +1124,15 @@ const IndexAdminTask = () => {
       TaskDatasource.insertManageTaskImg(
         taskId,
         `${profile.firstname} ${profile.lastname}`,
+        form.getFieldValue('remark'),
         createImgControl.file,
         createImgDrug.file,
-      ).then(() => {
+      ).then((res) => {
         handleSearchTask()
         setShowModal(!showModal)
+        form.setFieldsValue({
+          remark: '',
+        })
         setUpImgControl(undefined)
         setUpImgDrug(undefined)
         setCheckTask(false)

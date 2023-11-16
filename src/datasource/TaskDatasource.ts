@@ -275,12 +275,14 @@ export class TaskDatasource {
   static insertManageTaskImg(
     taskId: string,
     updateBy: string,
+    remark: string,
     file: File,
     fileDrug: File,
   ): Promise<any> {
     const formData = new FormData()
     formData.append('taskId', taskId)
     formData.append('updateBy', updateBy)
+    formData.append('remark', remark)
     formData.append('file', file)
     formData.append('fileDrug', fileDrug)
 

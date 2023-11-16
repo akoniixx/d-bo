@@ -226,6 +226,7 @@ export const HISTORY_TASK: any = {
   ChangeDateAppointment: 'แก้ไข/เปลี่ยนวันที่นัดหมาย',
   ChangeRai: 'แก้ไข/เปลี่ยนจำนวนแปลง',
   แก้ไขจำนวนแปลง: 'แก้ไขจำนวนแปลง',
+  แก้ไขรูปภาพเสร็จสิ้นงาน : 'แก้ไขรูปภาพเสร็จสิ้นงาน'
 }
 export const STATUS_SEARCH: any = {
   PENDING: 'รอตรวจสอบ',
