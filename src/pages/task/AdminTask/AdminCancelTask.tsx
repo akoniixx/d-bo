@@ -31,8 +31,8 @@ const AdminCancelTask = () => {
   const [taskNo, setTaskNo] = useState<any>()
   const [count, setCount] = useState<number>(0)
   const [taskId, setTaskId] = useState('')
-  const [imgControl, setImgControl] = useState<any>()
-  const [imgDrug, setImgDrug] = useState<any>()
+  const [imgControl, setImgControl] = useState<any>(null)
+  const [imgDrug, setImgDrug] = useState<any>(null)
   const [dronerPoint, setDronerPoint] = useState<any>()
   const [farmerPoint, setFarmerPoint] = useState<any>()
   const [loading, setLoading] = useState(false)
@@ -62,7 +62,7 @@ const AdminCancelTask = () => {
   const onItemsRendered = (props: any) => {
     if (props.visibleStopIndex >= searchTaskList.length - 1) {
       if (searchTaskList.length < count) {
-        TaskDatasource.getAllTaskList(10, current + 1, taskNo).then((res: AllTaskListEntity) => {
+        TaskDatasource.getAllTask(taskNo, current + 1, 10).then((res: AllTaskListEntity) => {
           setTaskList([...taskList, res.data])
           const data = res.data.map((item) => {
             return {
@@ -140,6 +140,7 @@ const AdminCancelTask = () => {
       </Col>
     </Row>
   )
+
   const cardTask = (
     <Col span={24}>
       <Card style={{ backgroundColor: '#FDEEEE', height: '140px' }}>
@@ -290,7 +291,7 @@ const AdminCancelTask = () => {
                 imageName={
                   taskSelected?.imagePathFinishTask ? taskSelected?.imagePathFinishTask : ''
                 }
-                image={imgControl ? imgControl : image.empty_cover}
+                image={imgControl || image.empty_cover}
                 onClick={() => onPreviewImg(imgControl)}
               />
             </Col>
@@ -298,32 +299,33 @@ const AdminCancelTask = () => {
             <Col span={8} style={{ paddingRight: 20 }}>
               <ImagCards
                 imageName={taskSelected?.imagePathDrug ? taskSelected?.imagePathDrug : ''}
-                image={imgDrug ? imgDrug : image.empty_cover}
+                image={imgDrug || image.empty_cover}
                 onClick={() => onPreviewImg(imgDrug)}
               />
             </Col>
+
             <Col span={8}>{taskSelected?.comment || '-'}</Col>
           </>
         </Row>
       </Card>
-      <div className='pt-2 pb-2'>
-        <Button
-          style={{
-            backgroundColor: checkStatus === 'CANCELED' ? color.Grey : color.Error,
-            color: 'white',
-            width: '100%',
-            borderRadius: '5px',
-          }}
-          size='large'
-          disabled={checkStatus === 'CANCELED'}
-          onClick={async () => {
-            setShowModal(!showModal)
-            console.log(taskId)
-          }}
-        >
-          ยกเลิกงาน
-        </Button>
-      </div>
+      {checkStatus !== 'CANCELED' &&
+       <div className='pt-2 pb-2'>
+       <Button
+         style={{
+           backgroundColor: color.Error,
+           color: 'white',
+           width: '100%',
+           borderRadius: '5px',
+         }}
+         size='large'
+         onClick={async () => {
+           setShowModal(!showModal)
+         }}
+       >
+         ยกเลิกงาน
+       </Button>
+     </div>}
+     
 
       <Card style={{ backgroundColor: '#F2F5FC' }}>
         <Row justify={'space-between'} gutter={8}>
@@ -464,6 +466,10 @@ const AdminCancelTask = () => {
                         onItemsRendered,
                       }}
                       onChange={(e) => {
+                        if (e !== taskId) {
+                          setImgControl(null)
+                          setImgDrug(null)
+                        }
                         setTaskId(e)
                         setSearch(false)
                       }}
@@ -474,6 +480,8 @@ const AdminCancelTask = () => {
                       onClean={() => {
                         setCurrent(1)
                         setTaskNo(undefined)
+                        setImgControl(null)
+                        setImgDrug(null)
                       }}
                       data={searchTaskList}
                       style={{

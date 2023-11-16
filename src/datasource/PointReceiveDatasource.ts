@@ -16,6 +16,7 @@ export class PointReceiveDatasource {
     taskNo?: string,
     startDate?: string,
     endDate?: string,
+    typeEstimate?: string,
   ): Promise<PlanningPointListEntity> {
     const params = {
       status: status,
@@ -25,6 +26,7 @@ export class PointReceiveDatasource {
       taskNo: taskNo,
       startDate: startDate,
       endDate: endDate,
+      typeEstimate: typeEstimate,
     }
     return httpClient
       .get(BASE_URL + '/tasks/task-estimate-point/task-estimate-point-bo', {

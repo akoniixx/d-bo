@@ -23,7 +23,7 @@ const IndexPlanningPoint = () => {
   const [searchStartDate, setSearchStartDate] = useState<any>(null)
   const [searchEndDate, setSearchEndDate] = useState<any>(null)
   const [loading, setLoading] = useState(false)
-  const [searchType, setSearchType] = useState('')
+  const [typeEstimate, setTypeEstimate] = useState<any>()
 
   const fetchPlanningPoint = () => {
     setLoading(true)
@@ -35,6 +35,7 @@ const IndexPlanningPoint = () => {
       searchTask,
       searchStartDate,
       searchEndDate,
+      typeEstimate,
     )
       .then((res) => {
         const mapKey = res.data.map((x, i) => ({
@@ -118,10 +119,10 @@ const IndexPlanningPoint = () => {
             className='col-lg-12 p-1'
             placeholder='ประเภทการได้รับแต้ม'
             allowClear
-            onChange={(e) => setSearchType(e)}
+            onChange={(e) => setTypeEstimate(e)}
           >
-            <option value='JOB'>การจ้างงาน</option>
-            <option value='MISSION'>ภารกิจ</option>
+            <option value='POINT'>การจ้างงาน</option>
+            <option value='SPECIAL_POINT'>แต้มพิเศษ</option>
           </Select>
         </div>
         <div className='pt-1'>
@@ -146,7 +147,7 @@ const IndexPlanningPoint = () => {
     return (
       <Row justify={'space-between'} gutter={16}>
         {checkFarmer !== null && (
-          <Col span={12}>
+          <Col span={checkDroner !== null ? 12 : 24}>
             <Container
               style={{
                 backgroundColor: 'rgba(86, 167, 104, 0.1)',
@@ -196,7 +197,7 @@ const IndexPlanningPoint = () => {
           </Col>
         )}
         {checkDroner !== null && (
-          <Col span={12}>
+          <Col span={checkFarmer !== null ? 12 : 24}>
             <Container
               style={{
                 backgroundColor: 'rgba(235, 87, 87, 0.1)',
@@ -265,7 +266,7 @@ const IndexPlanningPoint = () => {
         return {
           children: (
             <>
-              <span>{row.created_at && DateTimeUtil.formatDateTime(row.created_at)}</span>
+              <span>{(row.created_at && DateTimeUtil.formatDateTime(row.created_at)) || '-'}</span>
             </>
           ),
         }
@@ -277,7 +278,9 @@ const IndexPlanningPoint = () => {
       width: '25%',
       render: (value: any, row: any, index: number) => {
         return {
-          children: <u style={{ color: color.Success }}>{row.task_no}</u>,
+          children: (
+            <>{row.task_no ? <u style={{ color: color.Success }}>{row.task_no}</u> : '-'}</>
+          ),
         }
       },
     },
@@ -286,7 +289,7 @@ const IndexPlanningPoint = () => {
       dataIndex: '',
       render: (value: any, row: any, index: number) => {
         return {
-          children: <span>-</span>,
+          children: <span>{row.type_estimate === 'SPECIAL_POINT' ? row.campaign_name : '-'}</span>,
         }
       },
     },
@@ -295,7 +298,7 @@ const IndexPlanningPoint = () => {
       width: '20%',
       render: (value: any, row: any, index: number) => {
         return {
-          children: <span>การจ้างงาน</span>,
+          children: <span>{row.type_estimate === 'POINT' ? 'การจ้างงาน' : 'แต้มพิเศษ'}</span>,
         }
       },
     },

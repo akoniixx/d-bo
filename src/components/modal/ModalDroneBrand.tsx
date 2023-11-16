@@ -32,7 +32,7 @@ const ModalDroneBrand: React.FC<ModalDroneProps> = ({
         ...data,
         series: isEditModal ? dataDrone.series : undefined,
         isActive: isEditModal ? dataDrone.isActive : undefined,
-        droneAbility: isEditModal ? dataDrone.droneAbility : undefined,
+        droneAbility: isEditModal ? [dataDrone.droneAbility] : ['SPRAY'],
       })
     }
   }, [dataDrone, form, isEditModal])
