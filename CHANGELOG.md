@@ -1,5 +1,9 @@
 ## [Version - 0]
 
+## Feature [v0.40.0] 2023-11-17
+
+- news highlight menu
+
 ## improve [v0.39.19] 2023-11-16
 
 - fixed wording return point & button cancel task
