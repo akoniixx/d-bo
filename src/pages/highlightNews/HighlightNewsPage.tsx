@@ -159,7 +159,7 @@ function HighlightNewsPage() {
                 cursor: 'pointer',
               }}
               onClick={() => {
-                setSortField('updateAt')
+                setSortField('startDate')
                 setSortDirection((prev) => {
                   if (prev === 'ASC') {
                     return 'DESC'
@@ -200,12 +200,17 @@ function HighlightNewsPage() {
       },
       dataIndex: 'updateAt',
       key: 'updateAt',
+      width: '16%',
       render: (value: any, row: any, index: number) => {
         return {
           children: (
             <div className='container'>
               <span className='text-dark-75  d-block font-size-lg'>
-                {DateTimeUtil.formatDateTime(row.updateAt)}
+                {row.startDate || row.endDate
+                  ? DateTimeUtil.formatDateTime(row.startDate) +
+                    ' - ' +
+                    DateTimeUtil.formatDateTime(row.endDate)
+                  : '-'}
               </span>
             </div>
           ),
