@@ -255,3 +255,16 @@ export const STATUS_RECEIVE_TYPE: any = {
   SPECIAL_POINT: 'แต้มพิเศษ',
   MISSION_POINT : 'ภารกิจ'
 }
+
+export const STATUS_HIGHLIGHT: any = {
+  ACTIVE: 'ใช้งาน',
+  DRAFTING: 'แบบร่าง',
+  PENDING : 'รอเผยแพร่',
+  INACTIVE: 'ปิดการใช้งาน'
+}
+export const STATUS_COLOR_HIGHLIGHT: any = {
+  PENDING: '#EA973E',
+  ACTIVE: color.Success,
+  DRAFTING: color.Grey,
+  INACTIVE: color.Error
+}

@@ -91,3 +91,18 @@
   opacity: 0;
   cursor: pointer;
 }
+
+.hiddenFileInputHighLight > input {
+  height: 100%;
+  width: 100%;
+  opacity: 0;
+  cursor: pointer;
+}
+.hiddenFileInputHighLight {
+  width: 264px;
+  height: 330px;
+  display: inline-block;
+  overflow: hidden;
+  background: center center no-repeat;
+  background-size: 100%;
+}

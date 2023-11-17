@@ -1,6 +1,6 @@
 {
   "name": "bo-drone",
-  "version": "0.39.19",
+  "version": "0.40.0",
   "private": true,
   "dependencies": {
     "@ant-design/icons": "^4.7.0",
