@@ -87,17 +87,20 @@ const AddPermission = lazy(() => import('./pages/permission/AddPermission'))
 const PinNewsPage = lazy(() => import('./pages/news/PinNewsPage'))
 const IndexPointManual = lazy(() => import('./pages/pointManual/IndexPointManual'))
 const DetailPointManual = lazy(
-  () => import('./pages/pointManual/DetailPointManaul/DetailPointManual'),
+  () => import('./pages/pointManual/DetailPointManual/DetailPointManual'),
 )
 const AddDetailPointManual = lazy(
-  () => import('./pages/pointManual/DetailPointManaul/AddDetailPointManual'),
+  () => import('./pages/pointManual/DetailPointManual/AddDetailPointManual'),
 )
 const EditDetailPointManual = lazy(
-  () => import('./pages/pointManual/DetailPointManaul/EditDetailPointManual'),
+  () => import('./pages/pointManual/DetailPointManual/EditDetailPointManual'),
 )
 const HighlightNewsPage = lazy(() => import('./pages/highlightNews/HighlightNewsPage'))
 const AddHighlightPage = lazy(() => import('./pages/highlightNews/AddHighlightPage'))
 const EditAddHighlightPage = lazy(() => import('./pages/highlightNews/EditAddHighlightPage'))
+const IndexGuru = lazy(() => import('./pages/gurukaset/listGuru/IndexGuru'))
+const AddGuru = lazy(() => import('./pages/gurukaset/listGuru/AddGuru'))
+const EditGuru = lazy(() => import('./pages/gurukaset/listGuru/EditGuru'))
 
 const FallBack = () => {
   return (
@@ -208,6 +211,9 @@ const WebRoutes: React.FC<any> = () => {
             <Route path='/HighlightNewsPage' element={<HighlightNewsPage />} />
             <Route path='/AddHighlightPage' element={<AddHighlightPage />} />
             <Route path='/EditAddHighlightPage/:id' element={<EditAddHighlightPage />} />
+            <Route path='/IndexGuru' element={<IndexGuru />} />
+            <Route path='/AddGuru' element={<AddGuru />} />
+            <Route path='/EditGuru/:id' element={<EditGuru />} />
           </Route>
           <Route element={<PublicRoute />}>
             <Route index element={<AuthPage />} />
