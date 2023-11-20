@@ -105,6 +105,8 @@ function EditAddHighlightPage() {
     setImgProfile(img_base64)
     const d = Map(createImgProfile).set('file', isFileMoreThan2MB ? newSource : source)
     setCreateImgProfile(d.toJS())
+    form.setFieldValue('img', createImgProfile.file)
+    onFieldsChange()
   }
 
   const onPreviewProfile = async () => {
@@ -127,7 +129,6 @@ function EditAddHighlightPage() {
     setCreateImgProfile(UploadImageEntity_INTI)
     form.setFieldValue('img', null)
     onFieldsChange()
-    // checkValidate(data);
   }
 
   const handleShowTimer = (e: any) => {
@@ -169,14 +170,14 @@ function EditAddHighlightPage() {
     }
   }
   const onFieldsChange = () => {
-    const { name, urlNews, application, startDate, startTime, endDate, endTime, status, img } =
+    const { name, application, startDate, startTime, endDate, endTime, status, img } =
       form.getFieldsValue()
     let fieldInfo = false
     let fieldapp = false
     let fieldimg = false
     let fieldDate = false
 
-    if (name && urlNews) {
+    if (name) {
       fieldInfo = false
     } else {
       fieldInfo = true

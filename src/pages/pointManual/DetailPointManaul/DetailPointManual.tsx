@@ -471,15 +471,15 @@ function DetailPointManual() {
   const tabsContent = (
     <div className='pt-3'>
       <Tabs onChange={onChange} type='card'>
-        <TabPane tab={`รอรับแต้ม ${data?.pending}`} key='PENDING'>
+        <TabPane tab={`รอรับแต้ม (${data?.pending})`} key='PENDING'>
           {searchContent}
           {tableContent}
         </TabPane>
-        <TabPane tab={`ได้รับแต้ม ${data?.success}`} key='SUCCESS'>
+        <TabPane tab={`ได้รับแต้ม (${data?.success})`} key='SUCCESS'>
           {searchContent}
           {tableContent}
         </TabPane>
-        <TabPane tab={`ยกเลิกให้แต้ม ${data?.return}`} key='RETURN'>
+        <TabPane tab={`ยกเลิกให้แต้ม (${data?.return})`} key='RETURN'>
           {searchContent}
           {tableContent}
         </TabPane>

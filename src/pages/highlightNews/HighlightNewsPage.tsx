@@ -1,4 +1,15 @@
-import { Badge, Button, Pagination, PaginationProps, Select, Spin, Table, Tooltip } from 'antd'
+import {
+  Badge,
+  Button,
+  Input,
+  Pagination,
+  PaginationProps,
+  Select,
+  Spin,
+  Table,
+  Tabs,
+  Tooltip,
+} from 'antd'
 import Search from 'antd/lib/input/Search'
 import { Option } from 'antd/lib/mentions'
 import React, { useEffect, useState } from 'react'
@@ -9,6 +20,7 @@ import {
   CaretUpOutlined,
   DeleteOutlined,
   EditOutlined,
+  SearchOutlined,
   UserOutlined,
 } from '@ant-design/icons'
 import { DateTimeUtil } from '../../utilities/DateTimeUtil'
@@ -23,7 +35,7 @@ function HighlightNewsPage() {
   const navigate = useNavigate()
   const [loading, setLoading] = useState(false)
   const [data, setData] = useState<AllHighlightEntities>()
-  const [status, setStatus] = useState<string>('')
+  const [status, setStatus] = useState<string>('ACTIVE')
   const [row, setRow] = useState(10)
   const [current, setCurrent] = useState(1)
   const [searchText, setSearchText] = useState<string>('')
@@ -52,7 +64,7 @@ function HighlightNewsPage() {
 
   useEffect(() => {
     fetchNewsHighlight()
-  }, [current, sortDirection])
+  }, [current, sortDirection, status])
 
   const onChangeApplication = (e: string) => {
     setApplication(e)
@@ -68,6 +80,14 @@ function HighlightNewsPage() {
     setCurrent(current)
     setRow(pageSize)
   }
+
+  const tabConfigurations = [
+    { title: `ใช้งาน (0)`, key: 'ACTIVE' },
+    { title: `รอเผยแพร่ (0)`, key: 'PENDING' },
+    { title: `แบบร่าง (0)`, key: 'DRAFTING' },
+    { title: `ปิดการใช้งาน (0)`, key: 'INACTIVE' },
+  ]
+
   const PageTitle = (
     <div className='row pb-4'>
       <div className='col-lg-3' style={{ padding: '10px' }}>
@@ -86,10 +106,11 @@ function HighlightNewsPage() {
       <div className='col-lg justify-content-end' style={{ padding: '10px' }}>
         <div className='row d-flex justify-content-end'>
           <div className='col-lg-5'>
-            <Search
+            <Input
+              allowClear
+              prefix={<SearchOutlined style={{ color: color.Disable }} />}
               placeholder='ค้นหาชื่อข่าวสาร'
-              className='col-lg-12'
-              value={searchText}
+              className='col-lg-12 p-1'
               onChange={(e: any) => setSearchText(e.target.value)}
             />
           </div>
@@ -143,6 +164,13 @@ function HighlightNewsPage() {
             </Button>
           </div>
         </div>
+      </div>
+      <div className='pt-3'>
+        <Tabs onChange={(key: any) => setStatus(key)} type='card'>
+          {tabConfigurations.map((tab) => (
+            <Tabs.TabPane tab={tab.title} key={tab.key}></Tabs.TabPane>
+          ))}
+        </Tabs>
       </div>
     </div>
   )
