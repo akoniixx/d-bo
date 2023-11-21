@@ -1,5 +1,4 @@
-import { Badge, Button, Pagination, PaginationProps, Select, Spin, Table, Tooltip } from 'antd'
-import Search from 'antd/lib/input/Search'
+import { Badge, Button, Input, Pagination, PaginationProps, Select, Spin, Table, Tabs } from 'antd'
 import { Option } from 'antd/lib/mentions'
 import React, { useEffect, useState } from 'react'
 import { color, icon } from '../../resource'
@@ -9,11 +8,12 @@ import {
   CaretUpOutlined,
   DeleteOutlined,
   EditOutlined,
+  SearchOutlined,
   UserOutlined,
 } from '@ant-design/icons'
 import { DateTimeUtil } from '../../utilities/DateTimeUtil'
 import ActionButton from '../../components/button/ActionButton'
-import { STATUS_COLOR_HIGHLIGHT, STATUS_COUPON, STATUS_HIGHLIGHT } from '../../definitions/Status'
+import { STATUS_COLOR_HIGHLIGHT, STATUS_HIGHLIGHT } from '../../definitions/Status'
 import { HighlightDatasource } from '../../datasource/HighlightDatasource'
 import { AllHighlightEntities } from '../../entities/HighlightEntities'
 import { numberWithCommas } from '../../utilities/TextFormatter'
@@ -23,7 +23,7 @@ function HighlightNewsPage() {
   const navigate = useNavigate()
   const [loading, setLoading] = useState(false)
   const [data, setData] = useState<AllHighlightEntities>()
-  const [status, setStatus] = useState<string>('')
+  const [status, setStatus] = useState<string>('ACTIVE')
   const [row, setRow] = useState(10)
   const [current, setCurrent] = useState(1)
   const [searchText, setSearchText] = useState<string>('')
@@ -35,6 +35,7 @@ function HighlightNewsPage() {
   const [sortField, setSortField] = useState<string | undefined>(undefined)
   const [modalDelete, setModalDelete] = useState<boolean>(false)
   const [deleteId, setDeleteId] = useState<any>()
+  const [summary, setSummary] = useState<AllHighlightEntities>()
 
   const fetchNewsHighlight = async () => {
     await HighlightDatasource.getNewsHighlight(
@@ -45,14 +46,14 @@ function HighlightNewsPage() {
       searchText,
       sortField,
       sortDirection,
-    ).then((res) => {
+    ).then((res: AllHighlightEntities) => {
       setData(res)
     })
   }
 
   useEffect(() => {
     fetchNewsHighlight()
-  }, [current, sortDirection])
+  }, [current, sortDirection, status])
 
   const onChangeApplication = (e: string) => {
     setApplication(e)
@@ -68,6 +69,26 @@ function HighlightNewsPage() {
     setCurrent(current)
     setRow(pageSize)
   }
+
+  const tabConfigurations = [
+    {
+      title: `ใช้งาน (${numberWithCommas(parseFloat(data?.summary[0].active || '0'))})`,
+      key: 'ACTIVE',
+    },
+    {
+      title: `รอเผยแพร่ (${numberWithCommas(parseFloat(data?.summary[0].pending || '0'))})`,
+      key: 'PENDING',
+    },
+    {
+      title: `แบบร่าง (${numberWithCommas(parseFloat(data?.summary[0].drafting || '0'))})`,
+      key: 'DRAFTING',
+    },
+    {
+      title: `ปิดการใช้งาน (${numberWithCommas(parseFloat(data?.summary[0].inactive || '0'))})`,
+      key: 'INACTIVE',
+    },
+  ]
+
   const PageTitle = (
     <div className='row pb-4'>
       <div className='col-lg-3' style={{ padding: '10px' }}>
@@ -86,10 +107,11 @@ function HighlightNewsPage() {
       <div className='col-lg justify-content-end' style={{ padding: '10px' }}>
         <div className='row d-flex justify-content-end'>
           <div className='col-lg-5'>
-            <Search
+            <Input
+              allowClear
+              prefix={<SearchOutlined style={{ color: color.Disable }} />}
               placeholder='ค้นหาชื่อข่าวสาร'
-              className='col-lg-12'
-              value={searchText}
+              className='col-lg-12 p-1'
               onChange={(e: any) => setSearchText(e.target.value)}
             />
           </div>
@@ -143,6 +165,13 @@ function HighlightNewsPage() {
             </Button>
           </div>
         </div>
+      </div>
+      <div className='pt-3'>
+        <Tabs onChange={(key: any) => setStatus(key)} type='card'>
+          {tabConfigurations.map((tab) => (
+            <Tabs.TabPane tab={tab.title} key={tab.key}></Tabs.TabPane>
+          ))}
+        </Tabs>
       </div>
     </div>
   )
