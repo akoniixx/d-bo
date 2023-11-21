@@ -57,8 +57,6 @@ function AddHighlightPage() {
     setImgProfile(img_base64)
     const d = Map(createImgProfile).set('file', isFileMoreThan2MB ? newSource : source)
     setCreateImgProfile(d.toJS())
-    form.setFieldValue('img', createImgProfile.file)
-    onFieldsChange()
   }
 
   const onPreviewProfile = async () => {
@@ -147,7 +145,7 @@ function AddHighlightPage() {
       fieldimg = true
     }
 
-    if (status !== 'DRAFTING') {
+    if (status === 'ACTIVE' || status === 'PENDING') {
       if (startDate && startTime && endDate && endTime) {
         fieldDate = false
       } else {

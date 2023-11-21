@@ -99,8 +99,8 @@
   cursor: pointer;
 }
 .hiddenFileInputHighLight {
-  width: 264px;
-  height: 330px;
+  width: 264px !important;
+  height: 330px !important;
   display: inline-block;
   overflow: hidden;
   background: center center no-repeat;

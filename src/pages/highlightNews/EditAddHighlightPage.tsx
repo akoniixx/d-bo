@@ -105,8 +105,6 @@ function EditAddHighlightPage() {
     setImgProfile(img_base64)
     const d = Map(createImgProfile).set('file', isFileMoreThan2MB ? newSource : source)
     setCreateImgProfile(d.toJS())
-    form.setFieldValue('img', createImgProfile.file)
-    onFieldsChange()
   }
 
   const onPreviewProfile = async () => {
@@ -189,10 +187,10 @@ function EditAddHighlightPage() {
       fieldapp = true
     }
 
-    if (!img) {
-      fieldimg = true
-    } else {
+    if (img) {
       fieldimg = false
+    } else {
+      fieldimg = true
     }
 
     if (status === 'ACTIVE' || status === 'PENDING') {
@@ -204,7 +202,6 @@ function EditAddHighlightPage() {
     } else {
       fieldDate = false
     }
-    console.log(fieldInfo, fieldapp, fieldimg, fieldDate)
     setBtnSaveDisable(fieldInfo || fieldapp || fieldimg || fieldDate)
   }
   const onSubmit = async () => {
@@ -234,7 +231,7 @@ function EditAddHighlightPage() {
         urlNews: urlNews,
         application: application,
         updateBy: profile.firstname + ' ' + profile.lastname,
-        file: img ? img : createImgProfile.file,
+        file: createImgProfile.file,
       }
 
       if (status === 'ACTIVE') {
@@ -245,8 +242,9 @@ function EditAddHighlightPage() {
         requestData.endDate = dateEndPending
       }
       console.log(requestData)
-
       const res = await HighlightDatasource.editNewsHighlight(requestData)
+      console.log(res)
+
       if (res) {
         setModalSave(!modalSave)
         Swal.fire({
@@ -255,7 +253,7 @@ function EditAddHighlightPage() {
           timer: 1500,
           showConfirmButton: false,
         }).then(() => {
-          navigate('/HighlightNewsPage')
+          // navigate('/HighlightNewsPage')
         })
       }
     } catch (err) {
@@ -267,6 +265,7 @@ function EditAddHighlightPage() {
       })
     }
   }
+
   return (
     <>
       <div className='d-flex align-items-center'>
