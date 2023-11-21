@@ -157,7 +157,7 @@ function AddHighlightPage() {
     setBtnSaveDisable(fieldInfo || fieldapp || fieldimg || fieldDate)
   }
   const onSubmit = async () => {
-    const { name, urlName, application, startDate, startTime, endDate, endTime, status } =
+    const { name, urlNews, application, startDate, startTime, endDate, endTime, status } =
       form.getFieldsValue()
     let dateStartActive: string | null = null
     let dateEndActive: string | null = null
@@ -179,7 +179,7 @@ function AddHighlightPage() {
       const requestData: AddHighlightEntities = {
         name: name,
         status: status,
-        urlNews: urlName,
+        urlNews: urlNews,
         application: application,
         createBy: profile.firstname + ' ' + profile.lastname,
         updateBy: profile.firstname + ' ' + profile.lastname,
@@ -195,6 +195,7 @@ function AddHighlightPage() {
       }
 
       const res = await HighlightDatasource.addNewsHighlight(requestData)
+
       if (res) {
         setModalSave(!modalSave)
         Swal.fire({
@@ -302,7 +303,7 @@ function AddHighlightPage() {
               </div>
               <div className='form-group col-lg-12'>
                 <label>URL ภาพข่าวสาร</label>
-                <Form.Item name='urlName'>
+                <Form.Item name='urlNews'>
                   <Input placeholder='กรอก URL ภาพข่าวสาร' autoComplete='off' />
                 </Form.Item>
               </div>

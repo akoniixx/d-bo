@@ -33,7 +33,9 @@ export class HighlightDatasource {
     const formData = new FormData()
     formData.append('name', data.name)
     formData.append('status', data.status)
-    formData.append('urlNews', data.urlNews)
+    if (data.urlNews) {
+      formData.append('urlNews', data.urlNews)
+    }
     formData.append('application', data.application)
     if (data.status !== 'DRAFTING') {
       formData.append('startDate', data.startDate!)
@@ -54,7 +56,9 @@ export class HighlightDatasource {
     const formData = new FormData()
     formData.append('name', data.name)
     formData.append('status', data.status)
-    formData.append('urlNews', data.urlNews)
+    if (data.urlNews) {
+      formData.append('urlNews', data.urlNews)
+    }
     formData.append('application', data.application)
     if (data.status === 'ACTIVE' || data.status === 'PENDING') {
       formData.append('startDate', data.startDate!)

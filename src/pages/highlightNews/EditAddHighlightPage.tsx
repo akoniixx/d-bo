@@ -241,9 +241,7 @@ function EditAddHighlightPage() {
         requestData.startDate = dateStartPending
         requestData.endDate = dateEndPending
       }
-      console.log(requestData)
       const res = await HighlightDatasource.editNewsHighlight(requestData)
-      console.log(res)
 
       if (res) {
         setModalSave(!modalSave)
@@ -253,7 +251,7 @@ function EditAddHighlightPage() {
           timer: 1500,
           showConfirmButton: false,
         }).then(() => {
-          // navigate('/HighlightNewsPage')
+          navigate('/HighlightNewsPage')
         })
       }
     } catch (err) {

@@ -1,16 +1,4 @@
-import {
-  Badge,
-  Button,
-  Input,
-  Pagination,
-  PaginationProps,
-  Select,
-  Spin,
-  Table,
-  Tabs,
-  Tooltip,
-} from 'antd'
-import Search from 'antd/lib/input/Search'
+import { Badge, Button, Input, Pagination, PaginationProps, Select, Spin, Table, Tabs } from 'antd'
 import { Option } from 'antd/lib/mentions'
 import React, { useEffect, useState } from 'react'
 import { color, icon } from '../../resource'
@@ -25,7 +13,7 @@ import {
 } from '@ant-design/icons'
 import { DateTimeUtil } from '../../utilities/DateTimeUtil'
 import ActionButton from '../../components/button/ActionButton'
-import { STATUS_COLOR_HIGHLIGHT, STATUS_COUPON, STATUS_HIGHLIGHT } from '../../definitions/Status'
+import { STATUS_COLOR_HIGHLIGHT, STATUS_HIGHLIGHT } from '../../definitions/Status'
 import { HighlightDatasource } from '../../datasource/HighlightDatasource'
 import { AllHighlightEntities } from '../../entities/HighlightEntities'
 import { numberWithCommas } from '../../utilities/TextFormatter'
@@ -47,6 +35,7 @@ function HighlightNewsPage() {
   const [sortField, setSortField] = useState<string | undefined>(undefined)
   const [modalDelete, setModalDelete] = useState<boolean>(false)
   const [deleteId, setDeleteId] = useState<any>()
+  const [summary, setSummary] = useState<AllHighlightEntities>()
 
   const fetchNewsHighlight = async () => {
     await HighlightDatasource.getNewsHighlight(
@@ -57,7 +46,7 @@ function HighlightNewsPage() {
       searchText,
       sortField,
       sortDirection,
-    ).then((res) => {
+    ).then((res: AllHighlightEntities) => {
       setData(res)
     })
   }
@@ -82,10 +71,22 @@ function HighlightNewsPage() {
   }
 
   const tabConfigurations = [
-    { title: `ใช้งาน (0)`, key: 'ACTIVE' },
-    { title: `รอเผยแพร่ (0)`, key: 'PENDING' },
-    { title: `แบบร่าง (0)`, key: 'DRAFTING' },
-    { title: `ปิดการใช้งาน (0)`, key: 'INACTIVE' },
+    {
+      title: `ใช้งาน (${numberWithCommas(parseFloat(data?.summary[0].active || '0'))})`,
+      key: 'ACTIVE',
+    },
+    {
+      title: `รอเผยแพร่ (${numberWithCommas(parseFloat(data?.summary[0].pending || '0'))})`,
+      key: 'PENDING',
+    },
+    {
+      title: `แบบร่าง (${numberWithCommas(parseFloat(data?.summary[0].drafting || '0'))})`,
+      key: 'DRAFTING',
+    },
+    {
+      title: `ปิดการใช้งาน (${numberWithCommas(parseFloat(data?.summary[0].inactive || '0'))})`,
+      key: 'INACTIVE',
+    },
   ]
 
   const PageTitle = (
