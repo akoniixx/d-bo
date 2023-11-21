@@ -1,12 +1,11 @@
 import React from 'react'
 
-function AddGuru() {
+function EditArticleGuru() {
   return (
     <div>
-        test
       
     </div>
   )
 }
 
-export default AddGuru
+export default EditArticleGuru

@@ -53,3 +53,10 @@ export function validateNumber(t: string): string {
 export function formatNumberWithCommas(number: number) {
   return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')
 }
+
+export function formatNumberToK(number: number) {
+  if (number >= 1000) {
+    return (number / 1000).toFixed(1) + 'k'
+  }
+  return number.toString()
+}

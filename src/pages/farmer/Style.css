@@ -106,3 +106,17 @@
   background: center center no-repeat;
   background-size: 100%;
 }
+.hiddenFileInputGuru > input {
+  height: 100%;
+  width: 100%;
+  opacity: 0;
+  cursor: pointer;
+}
+.hiddenFileInputGuru {
+  width: 310px;
+  height: 310px;
+  display: inline-block;
+  overflow: hidden;
+  background: center center no-repeat;
+  background-size: 100%;
+}

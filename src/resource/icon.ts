@@ -58,4 +58,7 @@ export default {
   arrowDownMenu: require('./media/images/arrowDownMenu.png'),
   arrowUpMenu: require('./media/images/arrowUpMenu.png'),
   arrowUpYellowMenu: require('./media/images/arrowUpMenuYellow.png'),
+  comment: require('./media/images/comments.png'),
+  love: require('./media/images/love.png'),
+  view: require('./media/images/view.png'),
 }

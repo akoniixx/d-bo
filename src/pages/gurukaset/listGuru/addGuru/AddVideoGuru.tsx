@@ -1,6 +1,6 @@
 import React from 'react'
 
-function EditGuru() {
+function AddVideoGuru() {
   return (
     <div>
       
@@ -8,4 +8,4 @@ function EditGuru() {
   )
 }
 
-export default EditGuru
+export default AddVideoGuru
