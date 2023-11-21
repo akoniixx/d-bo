@@ -282,7 +282,9 @@ export class TaskDatasource {
     const formData = new FormData()
     formData.append('taskId', taskId)
     formData.append('updateBy', updateBy)
-    formData.append('remark', remark)
+    if (remark) {
+      formData.append('remark', remark)
+    }
     formData.append('file', file)
     formData.append('fileDrug', fileDrug)
 
