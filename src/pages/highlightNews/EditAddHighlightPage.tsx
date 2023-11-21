@@ -127,7 +127,6 @@ function EditAddHighlightPage() {
     setCreateImgProfile(UploadImageEntity_INTI)
     form.setFieldValue('img', null)
     onFieldsChange()
-    // checkValidate(data);
   }
 
   const handleShowTimer = (e: any) => {
@@ -169,14 +168,14 @@ function EditAddHighlightPage() {
     }
   }
   const onFieldsChange = () => {
-    const { name, urlNews, application, startDate, startTime, endDate, endTime, status, img } =
+    const { name, application, startDate, startTime, endDate, endTime, status, img } =
       form.getFieldsValue()
     let fieldInfo = false
     let fieldapp = false
     let fieldimg = false
     let fieldDate = false
 
-    if (name && urlNews) {
+    if (name) {
       fieldInfo = false
     } else {
       fieldInfo = true
@@ -188,10 +187,10 @@ function EditAddHighlightPage() {
       fieldapp = true
     }
 
-    if (!img) {
-      fieldimg = true
-    } else {
+    if (img) {
       fieldimg = false
+    } else {
+      fieldimg = true
     }
 
     if (status === 'ACTIVE' || status === 'PENDING') {
@@ -203,7 +202,6 @@ function EditAddHighlightPage() {
     } else {
       fieldDate = false
     }
-    console.log(fieldInfo, fieldapp, fieldimg, fieldDate)
     setBtnSaveDisable(fieldInfo || fieldapp || fieldimg || fieldDate)
   }
   const onSubmit = async () => {
@@ -233,7 +231,7 @@ function EditAddHighlightPage() {
         urlNews: urlNews,
         application: application,
         updateBy: profile.firstname + ' ' + profile.lastname,
-        file: img ? img : createImgProfile.file,
+        file: createImgProfile.file,
       }
 
       if (status === 'ACTIVE') {
@@ -243,9 +241,8 @@ function EditAddHighlightPage() {
         requestData.startDate = dateStartPending
         requestData.endDate = dateEndPending
       }
-      console.log(requestData)
-
       const res = await HighlightDatasource.editNewsHighlight(requestData)
+
       if (res) {
         setModalSave(!modalSave)
         Swal.fire({
@@ -266,6 +263,7 @@ function EditAddHighlightPage() {
       })
     }
   }
+
   return (
     <>
       <div className='d-flex align-items-center'>

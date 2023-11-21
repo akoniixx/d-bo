@@ -3,7 +3,7 @@ export interface HighlightEntities {
   name: string
   status: string
   imagePath: string
-  urlNews: string
+  urlNews: any
   read: number
   application: string
   startDate: string
@@ -14,16 +14,29 @@ export interface HighlightEntities {
   updateBy: string
 }
 
+export interface summaryHightLight {
+  active: string
+  pending: string
+  drafting: string
+  inactive: string
+}
+export const summaryHightLight_INIT: summaryHightLight = {
+  active: "",
+  pending: "",
+  drafting: "",
+  inactive: "",
+}
 export interface AllHighlightEntities {
   data: HighlightEntities[]
   count: number
+  summary: [summaryHightLight]
 }
 
 export interface AddHighlightEntities {
   id?: string
   name: string
   status: string
-  urlNews: string
+  urlNews?: string
   application: string
   startDate?: string | null
   endDate?: string | null

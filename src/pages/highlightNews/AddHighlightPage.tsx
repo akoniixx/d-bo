@@ -79,7 +79,6 @@ function AddHighlightPage() {
     setCreateImgProfile(UploadImageEntity_INTI)
     form.setFieldValue('img', null)
     onFieldsChange()
-    // checkValidate(data);
   }
 
   const handleShowTimer = (e: any) => {
@@ -122,14 +121,14 @@ function AddHighlightPage() {
   }
 
   const onFieldsChange = () => {
-    const { name, urlName, application, startDate, startTime, endDate, endTime, status, img } =
+    const { name, application, startDate, startTime, endDate, endTime, status, img } =
       form.getFieldsValue()
     let fieldInfo = false
     let fieldapp = false
     let fieldimg = false
     let fieldDate = false
 
-    if (name && urlName) {
+    if (name) {
       fieldInfo = false
     } else {
       fieldInfo = true
@@ -140,14 +139,13 @@ function AddHighlightPage() {
     } else {
       fieldapp = true
     }
-
-    if (!img) {
-      fieldimg = true
-    } else {
+    if (img) {
       fieldimg = false
+    } else {
+      fieldimg = true
     }
 
-    if (status !== 'DRAFTING') {
+    if (status === 'ACTIVE' || status === 'PENDING') {
       if (startDate && startTime && endDate && endTime) {
         fieldDate = false
       } else {
@@ -156,11 +154,10 @@ function AddHighlightPage() {
     } else {
       fieldDate = false
     }
-    console.log(fieldInfo, fieldapp, fieldimg, fieldDate)
     setBtnSaveDisable(fieldInfo || fieldapp || fieldimg || fieldDate)
   }
   const onSubmit = async () => {
-    const { name, urlName, application, startDate, startTime, endDate, endTime, status } =
+    const { name, urlNews, application, startDate, startTime, endDate, endTime, status } =
       form.getFieldsValue()
     let dateStartActive: string | null = null
     let dateEndActive: string | null = null
@@ -182,7 +179,7 @@ function AddHighlightPage() {
       const requestData: AddHighlightEntities = {
         name: name,
         status: status,
-        urlNews: urlName,
+        urlNews: urlNews,
         application: application,
         createBy: profile.firstname + ' ' + profile.lastname,
         updateBy: profile.firstname + ' ' + profile.lastname,
@@ -198,6 +195,7 @@ function AddHighlightPage() {
       }
 
       const res = await HighlightDatasource.addNewsHighlight(requestData)
+
       if (res) {
         setModalSave(!modalSave)
         Swal.fire({
@@ -305,7 +303,7 @@ function AddHighlightPage() {
               </div>
               <div className='form-group col-lg-12'>
                 <label>URL ภาพข่าวสาร</label>
-                <Form.Item name='urlName'>
+                <Form.Item name='urlNews'>
                   <Input placeholder='กรอก URL ภาพข่าวสาร' autoComplete='off' />
                 </Form.Item>
               </div>

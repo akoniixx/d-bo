@@ -1,5 +1,9 @@
 ## [Version - 0]
 
+## Fix [v0.40.1] 2023-11-21
+
+- fixed news highlight
+
 ## Feature [v0.40.0] 2023-11-17
 
 - news highlight menu
