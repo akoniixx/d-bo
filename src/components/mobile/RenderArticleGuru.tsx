@@ -1,25 +1,23 @@
 import React, { useState } from 'react'
 import { CardHeaderPromotion } from '../header/CardHeaderPromotion'
 import { color, icon } from '../../resource'
-import { CloseOutlined } from '@ant-design/icons'
 import { Button, Divider, Image, Radio } from 'antd'
 import '../../pages/gurukaset/styles.css'
 import uploadImg from '../../resource/media/empties/defaultImgGuru.png'
 import moment from 'moment'
 import { DateTimeUtil } from '../../utilities/DateTimeUtil'
+import parse from 'html-react-parser'
 
 interface RenderArticleGuruProps {
   img: string
   title: string
   detail: string
-  date: any
   category: string
 }
 const RenderArticleGuru: React.FC<RenderArticleGuruProps> = ({
   img = uploadImg,
   title = 'หัวข้อ',
   detail,
-  date,
   category = 'ชื่อหมวดหมู่',
 }) => {
   const [key, setKey] = useState<string>('feed')
@@ -42,7 +40,7 @@ const RenderArticleGuru: React.FC<RenderArticleGuruProps> = ({
   return (
     <div className='col'>
       <CardHeaderPromotion textHeader='ตัวอย่างในแอปพลิเคชั่น' center={false} button={headButton} />
-      <div className='bg-white p-4'>
+      <div className='bg-white p-4 '>
         <div style={{ position: 'relative' }}>
           <Image src={img} width={'100%'} height={'100%'} preview={false} />
           <div
@@ -51,7 +49,7 @@ const RenderArticleGuru: React.FC<RenderArticleGuruProps> = ({
               bottom: 8,
               right: 8,
               padding: '8px',
-              backgroundColor: color.White,
+              backgroundColor: 'rgba(255, 255, 255, 0.9)',
               borderRadius: '16px',
             }}
           >
@@ -61,51 +59,107 @@ const RenderArticleGuru: React.FC<RenderArticleGuruProps> = ({
         <div className='p-4'>
           <h4>{title}</h4>
           {key !== 'detail' ? (
-            <p style={{ fontSize: 16, fontFamily: 'Sarabun' }}>
-              {!detail ? (
-                <span>
-                  รายละเอียด... <span style={{ color: 'grey' }}>อ่านเพิ่ม</span>
-                </span>
-              ) : (
-                detail
-              )}
-            </p>
-          ) : (
-            <span>{DateTimeUtil.formatDateThShort(moment().toString())}</span>
-          )}
+            <>
+              <p style={{ fontSize: 16, fontFamily: 'Sarabun' }}>
+                {!detail ? (
+                  <span style={{ fontFamily: 'Sarabun' }}>รายละเอียด...</span>
+                ) : (
+                  <>
+                    {detail.trim().length > 50 ? (
+                      <div className='d-flex'>
+                        {parse(detail.substring(0, 50))}
 
-          <div className='d-flex justify-content-between'>
-            <div className='d-flex col-lg '>
-              <div className='col-3'>
-                <img src={icon.love} style={{ width: '16px', height: '16px' }} alt='Love Icon' />
-                <span> 0</span>
+                        <span style={{ fontFamily: 'Sarabun', color: color.Grey }}>
+                          ... อ่านเพิ่ม
+                        </span>
+                      </div>
+                    ) : (
+                      parse(detail)
+                    )}
+                  </>
+                )}
+              </p>
+              <div className='d-flex justify-content-between'>
+                <div className='d-flex col-lg '>
+                  <div className='col-3'>
+                    <img
+                      src={icon.love}
+                      style={{ width: '16px', height: '16px' }}
+                      alt='Love Icon'
+                    />
+                    <span> 0</span>
+                  </div>
+                  <div>
+                    <img
+                      src={icon.comment}
+                      style={{ width: '16px', height: '16px' }}
+                      alt='Comment Icon'
+                    />
+                    <span> 0</span>
+                  </div>
+                </div>
+                <div className='d-flex col-lg justify-content-end'>
+                  <span
+                    className='text-secondary'
+                    style={{ display: 'flex', alignItems: 'center' }}
+                  >
+                    <span style={{ marginRight: '5px' }}>xx นาที</span>
+                    <span style={{ fontSize: '24px', margin: '0 5px' }}>•</span>
+                    <img
+                      src={icon.view}
+                      style={{ width: '16px', height: '14px', marginLeft: '5px' }}
+                      alt='View Icon'
+                    />
+                    <span style={{ marginLeft: '5px' }}>xx</span>
+                  </span>
+                </div>
               </div>
-              <div>
-                <img
-                  src={icon.comment}
-                  style={{ width: '16px', height: '16px' }}
-                  alt='Comment Icon'
-                />
-                <span> 0</span>
+              <Divider style={{ margin: '8px' }} />
+            </>
+          ) : (
+            <>
+              <div className='d-flex' style={{ fontFamily: 'sarabun', color: color.Grey }}>
+                <span className='col-3'>{DateTimeUtil.formatDateThShort(moment().toString())}</span>
+                <p>อ่านแล้ว 0 ครั้ง</p>
               </div>
-            </div>
-            <div className='d-flex col-lg justify-content-end'>
-              <span className='text-secondary' style={{ display: 'flex', alignItems: 'center' }}>
-                <span style={{ marginRight: '5px' }}>xx นาที</span>
-                <span style={{ fontSize: '24px', margin: '0 5px' }}>•</span>
-                <img
-                  src={icon.view}
-                  style={{ width: '16px', height: '14px', marginLeft: '5px' }}
-                  alt='View Icon'
-                />
-                <span style={{ marginLeft: '5px' }}>xx</span>
-              </span>
-            </div>
-          </div>
-          <Divider />
-          <div>
-            {!detail ? <span style={{ fontFamily: 'Sarabun' }}>รายละเอียด...</span> : detail}
-          </div>
+              <Divider style={{ margin: '8px' }} />
+              <div
+                className='d-flex justify-content-between'
+                style={{ padding: '0px 42px 0px 42px' }}
+              >
+                <span style={{ fontWeight: 'bold' }}>
+                  <img src={icon.love} style={{ width: '22px', height: '22px', marginRight: 6 }} />
+                  ถูกใจ <span style={{ color: color.Grey, fontWeight: 'initial' }}>0</span>
+                </span>
+                <span style={{ fontWeight: 'bold' }}>
+                  <img
+                    src={icon.comment}
+                    style={{ width: '22px', height: '22px', marginRight: 6 }}
+                  />
+                  ความคิดเห็น <span style={{ color: color.Grey, fontWeight: 'initial' }}>0</span>
+                </span>{' '}
+              </div>
+              <Divider style={{ margin: '8px' }} />
+              <div className='pt-3 pb-5'>
+                <p style={{ fontSize: 16, fontFamily: 'Sarabun' }}>
+                  <div className='d-flex'>
+                    <p style={{ fontSize: 16, fontFamily: 'Sarabun' }}>
+                      {!detail ? (
+                        <span style={{ fontFamily: 'Sarabun' }}>รายละเอียด...</span>
+                      ) : (
+                        <>
+                          <span style={{ fontFamily: 'Sarabun' }}>{parse(detail)}</span>
+                        </>
+                      )}
+                    </p>
+                    {/* <span style={{ fontFamily: 'Sarabun', color: color.Grey }}>
+                      {parse(detail)}
+                    </span> */}
+                  </div>
+                </p>
+              </div>
+            </>
+          )}
         </div>
       </div>
     </div>

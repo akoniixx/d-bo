@@ -18,7 +18,7 @@ export const ModalPage: React.FC<ModalProps> = ({
   data,
   backButton,
   saveButton,
-  title
+  title,
 }) => (
   <Modal
     title={
@@ -36,10 +36,8 @@ export const ModalPage: React.FC<ModalProps> = ({
     // eslint-disable-next-line react/jsx-key
     footer={[<FooterPage onClickBack={backButton} onClickSave={saveButton} />]}
   >
-    {title &&
-     <span className='text-secondary'>{title}</span>
-  }
-    
+    {title && <span className='text-secondary'>{title}</span>}
+
     {data}
   </Modal>
 )

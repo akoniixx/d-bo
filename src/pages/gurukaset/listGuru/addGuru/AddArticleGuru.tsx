@@ -1,6 +1,6 @@
 import 'react-quill/dist/quill.snow.css'
 import '../../../farmer/Style.css'
-import React, { useEffect, useMemo, useRef, useState } from 'react'
+import React, { useMemo, useRef, useState } from 'react'
 import { UploadImageEntity, UploadImageEntity_INTI } from '../../../../entities/UploadImageEntities'
 import { useNavigate } from 'react-router-dom'
 import { DatePicker, Form, Input, Radio, Select, Tag, TimePicker } from 'antd'
@@ -31,6 +31,9 @@ function AddArticleGuru() {
   const dateFormat = 'DD/MM/YYYY'
   const [saveBtnDisable, setBtnSaveDisable] = useState<boolean>(true)
   const [duplicateTime, setDuplicateTime] = useState<any>()
+  const [name, setName] = useState<any>()
+  const [category, setCategory] = useState<any>()
+
   const [modalSave, setModalSave] = useState<boolean>(false)
   const quillRef = useRef<any>(null)
   const [descriptionEditor, setDescriptionEditor] = useState<string | null>(null)
@@ -137,44 +140,7 @@ function AddArticleGuru() {
     return current && current.isBefore(moment())
   }
 
-  const onFieldsChange = () => {
-    const { name, urlName, application, startDate, startTime, endDate, endTime, status, img } =
-      form.getFieldsValue()
-    let fieldInfo = false
-    let fieldapp = false
-    let fieldimg = false
-    let fieldDate = false
-
-    if (name && urlName) {
-      fieldInfo = false
-    } else {
-      fieldInfo = true
-    }
-
-    if (application) {
-      fieldapp = false
-    } else {
-      fieldapp = true
-    }
-
-    if (!img) {
-      fieldimg = true
-    } else {
-      fieldimg = false
-    }
-
-    if (status !== 'DRAFTING') {
-      if (startDate && startTime && endDate && endTime) {
-        fieldDate = false
-      } else {
-        fieldDate = true
-      }
-    } else {
-      fieldDate = false
-    }
-    console.log(fieldInfo, fieldapp, fieldimg, fieldDate)
-    setBtnSaveDisable(fieldInfo || fieldapp || fieldimg || fieldDate)
-  }
+  const onFieldsChange = () => {}
   const onSubmit = () => {}
   return (
     <>
@@ -241,10 +207,10 @@ function AddArticleGuru() {
                   </div>
                 </div>
               </div>
-              <span className='text-center text-muted'style={{fontSize: '13px'}}>
-                  *รูปภาพจะต้องมีสัดส่วน 16:6 หรือ 1,000px * 375px เท่านั้น
-                  เพื่อความสวยงามของภาพในแอปพลิเคชัน*
-                </span>
+              <span className='text-center text-muted' style={{ fontSize: '13px' }}>
+                *รูปภาพจะต้องมีสัดส่วน 16:6 หรือ 1,000px * 375px เท่านั้น
+                เพื่อความสวยงามของภาพในแอปพลิเคชัน*
+              </span>
               <div className='form-group col-lg-12 pt-4'>
                 <label>
                   หัวข้อ <span style={{ color: 'red' }}>*</span>
@@ -258,7 +224,9 @@ function AddArticleGuru() {
                     },
                   ]}
                 >
-                  <Input placeholder='กรอกหัวข้อ' autoComplete='off' />
+                  <Input placeholder='กรอกหัวข้อ' autoComplete='off' onChange={(e) => {
+                      setName(e.target.value)
+                    }} />
                 </Form.Item>
               </div>
               <div className='form-group col-lg-12 pt-1 pb-5'>
@@ -312,6 +280,30 @@ function AddArticleGuru() {
                   </Select>
                 </Form.Item>
               </div>
+              <div className='form-group col-lg-12 pt-4 pb-2'>
+                <label>
+                  หมวดหมู่ <span style={{ color: 'red' }}>*</span>
+                </label>
+                <Form.Item
+                  initialValue={false}
+                  name='application'
+                  valuePropName='select'
+                  className='my-0'
+                >
+                  <Select
+                    allowClear
+                    placeholder='เลือกหมวดหมู่'
+                    onChange={(e:any) => setCategory(e)}
+                  >
+                    <option key={1} value='ปลูกผัก'>
+                      <span style={{ paddingLeft: '4px' }}>ปลูกผัก</span>
+                    </option>
+                    <option key={2} value='โรคพืช'>
+                      <span style={{ paddingLeft: '4px' }}>โรคพืช</span>
+                    </option>
+                  </Select>
+                </Form.Item>
+              </div>
               <div className='row pt-3'>
                 <div className='form-group col-lg-12 d-flex flex-column'>
                   <label>
@@ -326,99 +318,6 @@ function AddArticleGuru() {
                     >
                       <Radio value={'ACTIVE'}>
                         ใช้งาน (เผยแพร่ทันที)
-                        <div
-                          className='d-flex flex-column'
-                          style={{ display: showTimerActive ? 'block' : 'none' }}
-                        >
-                          <div className='d-flex'>
-                            <div>
-                              <label
-                                style={{
-                                  display: showTimerActive ? 'block' : 'none',
-                                  paddingTop: 8,
-                                }}
-                              >
-                                วันเริ่มต้น <span style={{ color: 'red' }}>*</span>
-                              </label>
-                              <div className='d-flex flex-row'>
-                                <Form.Item
-                                  initialValue={moment()}
-                                  name='startDate'
-                                  style={{ display: showTimerActive ? 'block' : 'none' }}
-                                >
-                                  <DatePicker
-                                    placeholder='เลือกวันที่'
-                                    format={dateFormat}
-                                    disabled
-                                    defaultValue={moment()}
-                                  />
-                                </Form.Item>
-                                <Form.Item
-                                  initialValue={moment('00:00', 'HH:mm')}
-                                  name='startTime'
-                                  style={{ display: showTimerActive ? 'block' : 'none' }}
-                                >
-                                  <TimePicker
-                                    disabled
-                                    format={'HH:mm'}
-                                    className='ms-3'
-                                    placeholder='เลือกเวลา'
-                                    defaultValue={moment('00:00', 'HH:mm')}
-                                    allowClear={false}
-                                  />
-                                </Form.Item>
-                              </div>
-                            </div>
-                            <div className='mx-4'>
-                              <label
-                                style={{
-                                  display: showTimerActive ? 'block' : 'none',
-                                  paddingTop: 8,
-                                }}
-                              >
-                                วันสิ้นสุด <span style={{ color: 'red' }}>*</span>
-                              </label>
-                              <div className='d-flex flex-row'>
-                                <Form.Item
-                                  initialValue={moment()}
-                                  name='endDate'
-                                  style={{
-                                    display: showTimerActive ? 'block' : 'none',
-                                  }}
-                                  validateStatus={showTimerActive && duplicateTime ? 'error' : ''}
-                                >
-                                  <DatePicker
-                                    placeholder='เลือกวันที่'
-                                    format={dateFormat}
-                                    disabledDate={disabledDateEnd}
-                                    defaultValue={moment()}
-                                  />
-                                </Form.Item>
-                                <Form.Item
-                                  initialValue={moment('23:59', 'HH:mm')}
-                                  name='endTime'
-                                  style={{
-                                    display: showTimerActive ? 'block' : 'none',
-                                  }}
-                                  validateStatus={showTimerActive && duplicateTime ? 'error' : ''}
-                                >
-                                  <TimePicker
-                                    format={'HH:mm'}
-                                    className='ms-3'
-                                    placeholder='เลือกเวลา'
-                                    defaultValue={moment('23:59', 'HH:mm')}
-                                    allowClear={false}
-                                  />
-                                </Form.Item>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                        {showTimerActive && duplicateTime && (
-                          <span style={{ color: color.Error, fontSize: '13px' }}>
-                            {duplicateTime}
-                          </span>
-                        )}
                       </Radio>
                       <Radio value={'PENDING'}>
                         รอเผยแพร่
@@ -434,7 +333,7 @@ function AddArticleGuru() {
                                   paddingTop: 8,
                                 }}
                               >
-                                วันเริ่มต้น <span style={{ color: 'red' }}>*</span>
+                                กำหนดเวลา <span style={{ color: 'red' }}>*</span>
                               </label>
                               <div className='d-flex flex-row'>
                                 <Form.Item
@@ -464,54 +363,8 @@ function AddArticleGuru() {
                                 </Form.Item>
                               </div>
                             </div>
-                            <div className='mx-4'>
-                              <label
-                                style={{
-                                  display: showTimer ? 'block' : 'none',
-                                  paddingTop: 8,
-                                }}
-                              >
-                                วันสิ้นสุด <span style={{ color: 'red' }}>*</span>
-                              </label>
-                              <div className='d-flex flex-row'>
-                                <Form.Item
-                                  name='endDate'
-                                  style={{
-                                    display: showTimer ? 'block' : 'none',
-                                  }}
-                                  validateStatus={showTimer && duplicateTime ? 'error' : ''}
-                                >
-                                  <DatePicker
-                                    placeholder='เลือกวันที่'
-                                    format={dateFormat}
-                                    disabledDate={disabledDateEnd}
-                                    defaultValue={moment()}
-                                  />
-                                </Form.Item>
-                                <Form.Item
-                                  name='endTime'
-                                  style={{
-                                    display: showTimer ? 'block' : 'none',
-                                  }}
-                                  validateStatus={showTimer && duplicateTime ? 'error' : ''}
-                                >
-                                  <TimePicker
-                                    format={'HH:mm'}
-                                    className='ms-3'
-                                    placeholder='เลือกเวลา'
-                                    defaultValue={moment('23:59', 'HH:mm')}
-                                    allowClear={false}
-                                  />
-                                </Form.Item>
-                              </div>
-                            </div>
                           </div>
                         </div>
-                        {showTimer && duplicateTime && (
-                          <span style={{ color: color.Error, fontSize: '13px' }}>
-                            {duplicateTime}
-                          </span>
-                        )}
                       </Radio>
                       <Radio value={'DRAFTING'}>รอเปิดใช้งาน</Radio>
                     </Radio.Group>
@@ -531,10 +384,9 @@ function AddArticleGuru() {
         <div className='col-lg'>
           <RenderArticleGuru
             img={imgProfile}
-            title={''}
-            detail={''}
-            date={undefined}
-            category={''}
+            title={name}
+            detail={descriptionEditor!}
+            category={category}
           />
         </div>
       </div>
@@ -548,7 +400,7 @@ function AddArticleGuru() {
           setModalSave(!modalSave)
         }}
         closeModal={() => setModalSave(!modalSave)}
-        saveButton={onSubmit}
+        saveButton={onSubmit} 
       />
     </>
   )

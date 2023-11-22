@@ -9,11 +9,11 @@
 }
 
 .custom-btn-left {
-    border-top-left-radius: 5px;
-    border-bottom-left-radius: 5px;
-  }
-  
-  .custom-btn-right {
-    border-top-right-radius: 5px;
-    border-bottom-right-radius: 5px;
-  }
+  border-top-left-radius: 5px;
+  border-bottom-left-radius: 5px;
+}
+
+.custom-btn-right {
+  border-top-right-radius: 5px;
+  border-bottom-right-radius: 5px;
+}
