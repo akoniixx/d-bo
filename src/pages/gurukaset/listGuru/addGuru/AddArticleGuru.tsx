@@ -16,18 +16,17 @@ import { ModalPage } from '../../../../components/modal/ModalPage'
 import RenderArticleGuru from '../../../../components/mobile/RenderArticleGuru'
 import ReactQuill from 'react-quill'
 import { formats } from '../../../../components/editor/EditorToolbar'
+import Swal from 'sweetalert2'
 
 const { Map } = require('immutable')
 
 function AddArticleGuru() {
   const profile = JSON.parse(localStorage.getItem('profile') || '{  }')
-  const [imgProfile, setImgProfile] = useState<any>()
-  const [createImgProfile, setCreateImgProfile] =
-    useState<UploadImageEntity>(UploadImageEntity_INTI)
+  const [imgGuru, setImgGuru] = useState<any>()
+  const [createImgGuru, setCreateImgGuru] = useState<UploadImageEntity>(UploadImageEntity_INTI)
   const navigate = useNavigate()
   const [form] = Form.useForm()
   const [showTimer, setShowTimer] = useState<boolean>(false)
-  const [showTimerActive, setShowTimerActive] = useState<boolean>(false)
   const dateFormat = 'DD/MM/YYYY'
   const [saveBtnDisable, setBtnSaveDisable] = useState<boolean>(true)
   const [duplicateTime, setDuplicateTime] = useState<any>()
@@ -58,17 +57,17 @@ function AddArticleGuru() {
       reader.onload = () => resolve(reader.result)
     })
 
-    setImgProfile(img_base64)
-    const d = Map(createImgProfile).set('file', isFileMoreThan2MB ? newSource : source)
-    setCreateImgProfile(d.toJS())
+    setImgGuru(img_base64)
+    const d = Map(createImgGuru).set('file', isFileMoreThan2MB ? newSource : source)
+    setCreateImgGuru(d.toJS())
   }
 
   const onPreviewProfile = async () => {
-    let src = imgProfile
+    let src = imgGuru
     if (!src) {
       src = await new Promise((resolve) => {
         const reader = new FileReader()
-        reader.readAsDataURL(imgProfile)
+        reader.readAsDataURL(imgGuru)
         reader.onload = () => resolve(reader.result)
       })
     }
@@ -115,33 +114,94 @@ function AddArticleGuru() {
     [],
   )
   const removeImgProfile = () => {
-    setImgProfile(undefined)
-    setCreateImgProfile(UploadImageEntity_INTI)
+    setImgGuru(undefined)
+    setCreateImgGuru(UploadImageEntity_INTI)
     form.setFieldValue('img', null)
     onFieldsChange()
   }
 
   const handleShowTimer = (e: any) => {
-    setShowTimer(e.target.value === 'PENDING')
-    setShowTimerActive(e.target.value === 'ACTIVE')
-
-    if (showTimer || showTimerActive) {
-      form.resetFields(['startDate', 'startTime', 'endDate', 'endTime'])
+    if (e.target.value === 'PENDING') {
+      setShowTimer(true)
+    } else {
+      form.resetFields(['startDate', 'startTime'])
+      setShowTimer(false)
     }
-  }
-
-  const disabledDateEnd = (current: any) => {
-    const f = form.getFieldsValue()
-    const startDate = moment(f.startDate).format('YYYY-MM-DD')
-    return current && current < moment(startDate, 'YYYY-MM-DD')
   }
 
   const disabledDateStart = (current: any) => {
     return current && current.isBefore(moment())
   }
 
-  const onFieldsChange = () => {}
-  const onSubmit = () => {}
+  const onFieldsChange = () => {
+    const { name, description, category, application, startDate, startTime, status, img } =
+      form.getFieldsValue()
+    let fieldInfo = false
+    let fieldDate = false
+
+    if (name && description !== '<p><br></p>' && application && category && img) {
+      fieldInfo = false
+    } else {
+      fieldInfo = true
+    }
+
+    if (status === 'PENDING') {
+      if (startDate && startTime) {
+        fieldDate = false
+      } else {
+        fieldDate = true
+      }
+    } else {
+      fieldDate = false
+    }
+    setBtnSaveDisable(fieldInfo || fieldDate)
+  }
+  const onSubmit = async () => {
+    const { name, description, category, application, startDate, startTime, status } =
+      form.getFieldsValue()
+    let dateStartPending: string | null = null
+
+    if (status === 'PENDING') {
+      dateStartPending =
+        moment(startDate).format('YYYY-MM-DD') + ' ' + moment(startTime).format('HH:mm:ss')
+    }
+    try {
+      const requestData: any = {
+        name: name,
+        status: status,
+        description: description,
+        application: application,
+        category: category,
+        createBy: profile.firstname + ' ' + profile.lastname,
+        updateBy: profile.firstname + ' ' + profile.lastname,
+        file: createImgGuru.file,
+      }
+
+      if (status === 'PENDING') {
+        requestData.startDate = dateStartPending
+      }
+      // const res = await HighlightDatasource.addNewsHighlight(requestData)
+
+      if (requestData) {
+        setModalSave(!modalSave)
+        Swal.fire({
+          title: 'บันทึกสำเร็จ',
+          icon: 'success',
+          timer: 1500,
+          showConfirmButton: false,
+        }).then(() => {
+          navigate('/IndexGuru')
+        })
+      }
+    } catch (err) {
+      console.log(err)
+      Swal.fire({
+        title: 'เกิดข้อผิดพลาก',
+        icon: 'error',
+        showConfirmButton: true,
+      })
+    }
+  }
   return (
     <>
       <div className='d-flex align-items-center'>
@@ -168,11 +228,11 @@ function AddArticleGuru() {
                     <div
                       className='hiddenFileInputGuru'
                       style={{
-                        backgroundImage: `url(${imgProfile == undefined ? uploadImg : imgProfile})`,
+                        backgroundImage: `url(${imgGuru == undefined ? uploadImg : imgGuru})`,
                       }}
                     >
                       <input
-                        key={imgProfile}
+                        key={imgGuru}
                         type='file'
                         onChange={onChangeProfile}
                         title='เลือกรูป'
@@ -180,7 +240,7 @@ function AddArticleGuru() {
                     </div>
                   </Form.Item>
                   <div>
-                    {imgProfile != undefined && (
+                    {imgGuru != undefined && (
                       <div className='pb-2'>
                         <Tag
                           color={color.Success}
@@ -224,15 +284,21 @@ function AddArticleGuru() {
                     },
                   ]}
                 >
-                  <Input placeholder='กรอกหัวข้อ' autoComplete='off' onChange={(e) => {
+                  <Input
+                    placeholder='กรอกหัวข้อ'
+                    autoComplete='off'
+                    onChange={(e) => {
                       setName(e.target.value)
-                    }} />
+                    }}
+                  />
                 </Form.Item>
               </div>
               <div className='form-group col-lg-12 pt-1 pb-5'>
-                <label>รายละเอียด</label>
+                <label>
+                  รายละเอียด <span style={{ color: 'red' }}>*</span>
+                </label>
                 <Form.Item
-                  name='newsDescription'
+                  name='description'
                   rules={[
                     {
                       required: true,
@@ -286,14 +352,14 @@ function AddArticleGuru() {
                 </label>
                 <Form.Item
                   initialValue={false}
-                  name='application'
+                  name='category'
                   valuePropName='select'
                   className='my-0'
                 >
                   <Select
                     allowClear
                     placeholder='เลือกหมวดหมู่'
-                    onChange={(e:any) => setCategory(e)}
+                    onChange={(e: any) => setCategory(e)}
                   >
                     <option key={1} value='ปลูกผัก'>
                       <span style={{ paddingLeft: '4px' }}>ปลูกผัก</span>
@@ -316,9 +382,7 @@ function AddArticleGuru() {
                         handleShowTimer(e)
                       }}
                     >
-                      <Radio value={'ACTIVE'}>
-                        ใช้งาน (เผยแพร่ทันที)
-                      </Radio>
+                      <Radio value={'ACTIVE'}>ใช้งาน (เผยแพร่ทันที)</Radio>
                       <Radio value={'PENDING'}>
                         รอเผยแพร่
                         <div
@@ -366,27 +430,27 @@ function AddArticleGuru() {
                           </div>
                         </div>
                       </Radio>
-                      <Radio value={'DRAFTING'}>รอเปิดใช้งาน</Radio>
+                      <Radio value={'DRAFTING'}>แบบร่าง</Radio>
                     </Radio.Group>
                   </Form.Item>
                 </div>
               </div>
             </Form>
           </div>
+        </div>
+        <RenderArticleGuru
+          img={imgGuru}
+          title={name}
+          detail={descriptionEditor!}
+          category={category}
+        />
+        <div className='col-7'>
           <FooterPage
             disableSaveBtn={saveBtnDisable}
             onClickBack={() => navigate(-1)}
             onClickSave={() => {
               setModalSave(true)
             }}
-          />
-        </div>
-        <div className='col-lg'>
-          <RenderArticleGuru
-            img={imgProfile}
-            title={name}
-            detail={descriptionEditor!}
-            category={category}
           />
         </div>
       </div>
@@ -400,7 +464,7 @@ function AddArticleGuru() {
           setModalSave(!modalSave)
         }}
         closeModal={() => setModalSave(!modalSave)}
-        saveButton={onSubmit} 
+        saveButton={onSubmit}
       />
     </>
   )

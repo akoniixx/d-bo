@@ -466,7 +466,7 @@ function IndexGuru() {
                   icon={<EditOutlined />}
                   color={color.primary1}
                   onClick={() => {
-                    navigate('/EditGuru/id=' + row.id)
+                    navigate('/EditArticleGuru/id=' + row.id)
                   }}
                 />
               </div>
@@ -534,7 +534,7 @@ function IndexGuru() {
         </Tabs>
       </div>
       <div className='d-flex justify-content-between pb-4'>
-        <div className='col-lg-7 p-1'>
+        <div className='col-lg-6 p-1'>
           <Input
             placeholder='ค้นหาชื่อหัวข้อ / ชื่อแคปชั่น'
             className='col-lg-12'
@@ -577,7 +577,7 @@ function IndexGuru() {
             <Option value={'DRONER'}>Droner App</Option>
           </Select>
         </div>
-        <div className='col-lg p-1'>
+        <div className='col-lg-1 p-1'>
           <Button
             className='col-lg-12'
             style={{
