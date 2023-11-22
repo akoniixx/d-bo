@@ -1184,9 +1184,9 @@ const IndexAdminTask = () => {
                       onSearch={(val: any) => {
                         const uppercase = val.toUpperCase()
                         if (!uppercase) {
-                          setCurrent(1)
                           setTaskNo(uppercase)
                         }
+                        setTaskNo(uppercase)
                       }}
                       onClean={() => {
                         setCurrent(1)
