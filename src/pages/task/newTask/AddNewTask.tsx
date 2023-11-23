@@ -1,3 +1,4 @@
+/* eslint-disable react/jsx-key */
 import { DownOutlined, SearchOutlined, StarFilled } from '@ant-design/icons'
 import {
   Avatar,
@@ -71,6 +72,7 @@ export type OptionType = {
 import '../newTask/Styles.css'
 import { TargetSpray } from '../../../datasource/TargetSprayDatarource'
 import { TargetSpayEntities } from '../../../entities/TargetSprayEntities'
+import ConfirmNewTask from './ConfirmNewTask'
 const { Step } = Steps
 const { Option } = AntdSelect
 const dateFormat = 'DD/MM/YYYY'
@@ -89,7 +91,7 @@ const AddNewTask = () => {
   const navigate = useNavigate()
   const [form] = Form.useForm()
   const profile = JSON.parse(localStorage.getItem('profile') || '{  }')
-  const [current, setCurrent] = useState(0)
+  const [current, setCurrent] = useState(2)
   const [createNewTask, setCreateNewTask] = useState<CreateNewTaskEntity>(CreateNewTaskEntity_INIT)
   const [dataFarmer, setDataFarmer] = useState<FarmerEntity>()
   const [farmerSelected, setFarmerSelected] = useState<any>()
@@ -838,58 +840,44 @@ const AddNewTask = () => {
             <label>
               เป้าหมายการฉีดพ่น <span style={{ color: 'red' }}>*</span>
             </label>
-            {targetSpray
-              .map((item: any) =>
-                _.set(
-                  item,
-                  'isChecked',
-                  createNewTask?.targetSpray.map((x) => x).find((y) => y === item.name)
-                    ? true
-                    : false,
-                ),
-              )
-              .map((x, index) => (
-                <>
-                  <div className='form-group'>
-                    <Checkbox
-                      value={x.name}
-                      disabled={current === 2 || checkSelectPlot === 'error'}
-                      onChange={handlePurposeSpray}
-                      defaultChecked={x.isChecked}
-                    />{' '}
-                    <label style={{ padding: '0 8px 0 0' }}>{x.name}</label>
-                    {x.name === 'อื่นๆ' && (
-                      <>
-                        <Input
-                          status={validateComma.status}
-                          className='col-lg-5'
-                          disabled={current === 2 || checkCrop}
-                          placeholder='โปรดระบุ เช่น เพลี้ย,หอย'
-                          onChange={handleOtherSpray}
-                          defaultValue={Array.from(
-                            new Set(
-                              createNewTask.targetSpray.filter(
-                                (a) => !someTargetSpray.some((x: any) => x === a),
-                              ),
+            <div className='checkbox-grid'>
+              {targetSpray.map((item, index) => (
+                <div key={index} className='form-group checkbox-item'>
+                  <Checkbox
+                    value={item.name}
+                    disabled={current === 2 || checkSelectPlot === 'error'}
+                    onChange={handlePurposeSpray}
+                    defaultChecked={item.isChecked}
+                  />
+                  <label style={{ padding: '0 8px 0 8px' }}>{item.name}</label>
+                  {item.name === 'อื่นๆ' && (
+                    <>
+                      <Input
+                        status={validateComma.status}
+                        className='col-lg-12'
+                        disabled={current === 2 || checkCrop}
+                        placeholder='โปรดระบุ เช่น เพลี้ย,หอย'
+                        onChange={handleOtherSpray}
+                        defaultValue={Array.from(
+                          new Set(
+                            createNewTask.targetSpray.filter(
+                              (a) => !someTargetSpray.some((x: any) => x === a),
                             ),
-                          )}
-                        />
-                        {validateComma.status === 'error' && (
-                          <p
-                            style={{
-                              color: color.Error,
-                              padding: '0 0 0 55px',
-                            }}
-                          >
-                            {validateComma.message}
-                          </p>
+                          ),
                         )}
-                      </>
-                    )}
-                  </div>
-                </>
+                      />
+                      {validateComma.status === 'error' && (
+                        <p style={{ color: color.Error, padding: '0 0 0 55px' }}>
+                          {validateComma.message}
+                        </p>
+                      )}
+                    </>
+                  )}
+                </div>
               ))}
+            </div>
           </div>
+
           <div className='row form-group col-lg-6 p-2'>
             <label>
               การเตรียมยา <span style={{ color: 'red' }}>*</span>
@@ -1932,12 +1920,13 @@ const AddNewTask = () => {
       title: 'ยืนยันข้อมูล',
       content: (
         <>
-          {renderFormSearchFarmer} <br />
+          <ConfirmNewTask dataSearchFarmer={dataFarmer}/>
+          {/* {renderFormSearchFarmer} <br />
           {renderFormAppointment}
           <br />
           {renderDronerSelectedList}
           <br />
-          {renderServiceCharge}
+          {renderServiceCharge} */}
         </>
       ),
     },
@@ -1954,8 +1943,8 @@ const AddNewTask = () => {
       </div>
       <div className='steps-content'>{titleStep[current].content}</div>
       <Row className='d-flex justify-content-between pt-2'>
-        {current === 0 && <BackButton onClick={() => navigate('/IndexNewTask')} />}
-        {current > 0 && <BackButton onClick={() => previousStep()} />}
+        {current === 0  && <BackButton onClick={() => navigate('/IndexNewTask')} />}
+        {current > 0 && current < 2 && <BackButton onClick={() => previousStep()} />}
         {current < titleStep.length - 1 && (
           <Button
             style={{
@@ -1970,7 +1959,7 @@ const AddNewTask = () => {
             ถัดไป
           </Button>
         )}
-        {current === titleStep.length - 1 && <SaveButton onClick={insertNewTask} />}
+        {current === titleStep.length - 1 && current !== 2 && <SaveButton onClick={insertNewTask} />}
       </Row>
     </>
   )
