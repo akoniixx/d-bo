@@ -713,7 +713,10 @@ const IndexAdminTask = () => {
             <Form.Item name='checkImg'>
               <Checkbox
                 checked={checkTask}
-                disabled={taskSelected?.data.status !== 'DONE'}
+                disabled={
+                  taskSelected?.data.status !== 'DONE' &&
+                  taskSelected?.data.status !== 'WAIT_REVIEW'
+                }
                 onChange={(e) => setCheckTask(!checkTask)}
               >
                 ต้องการอัพโหลดภาพหลักฐานการบิน และปุ๋ยยาใหม่
