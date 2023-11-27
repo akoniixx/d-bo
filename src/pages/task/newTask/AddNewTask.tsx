@@ -91,7 +91,7 @@ const AddNewTask = () => {
   const navigate = useNavigate()
   const [form] = Form.useForm()
   const profile = JSON.parse(localStorage.getItem('profile') || '{  }')
-  const [current, setCurrent] = useState(2)
+  const [current, setCurrent] = useState(0)
   const [createNewTask, setCreateNewTask] = useState<CreateNewTaskEntity>(CreateNewTaskEntity_INIT)
   const [dataFarmer, setDataFarmer] = useState<FarmerEntity>()
   const [farmerSelected, setFarmerSelected] = useState<any>()
@@ -1920,7 +1920,17 @@ const AddNewTask = () => {
       title: 'ยืนยันข้อมูล',
       content: (
         <>
-          <ConfirmNewTask dataSearchFarmer={dataFarmer}/>
+          <ConfirmNewTask
+            dataSearchFarmer={dataFarmer}
+            farmerPlotSeleced={farmerPlotSeleced}
+            dataAppointment={
+              moment(new Date(dateAppointment)).format(dateFormat) +
+              ', ' +
+              moment(new Date(timeAppointment)).format(timeFormat)
+            }
+            createNewTask={createNewTask}
+            discountResult={discountResult}
+          />
           {/* {renderFormSearchFarmer} <br />
           {renderFormAppointment}
           <br />
@@ -1943,7 +1953,7 @@ const AddNewTask = () => {
       </div>
       <div className='steps-content'>{titleStep[current].content}</div>
       <Row className='d-flex justify-content-between pt-2'>
-        {current === 0  && <BackButton onClick={() => navigate('/IndexNewTask')} />}
+        {current === 0 && <BackButton onClick={() => navigate('/IndexNewTask')} />}
         {current > 0 && current < 2 && <BackButton onClick={() => previousStep()} />}
         {current < titleStep.length - 1 && (
           <Button
@@ -1959,7 +1969,9 @@ const AddNewTask = () => {
             ถัดไป
           </Button>
         )}
-        {current === titleStep.length - 1 && current !== 2 && <SaveButton onClick={insertNewTask} />}
+        {current === titleStep.length - 1 && current !== 2 && (
+          <SaveButton onClick={insertNewTask} />
+        )}
       </Row>
     </>
   )
