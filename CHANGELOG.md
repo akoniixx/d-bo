@@ -1,8 +1,124 @@
 ## [Version - 0]
+
+## Fix [v0.40.1] 2023-11-21
+
+- fixed news highlight
+
+## Feature [v0.40.0] 2023-11-17
+
+- news highlight menu
+
+## improve [v0.39.19] 2023-11-16
+
+- fixed wording return point & button cancel task
+- added upload image in task for admin
+
+## Fix [v0.39.18] 2023-11-13
+
+- text color
+- decimal rai amount
+
+## Fix [v0.39.17] 2023-11-10
+
+- fixed update time for news
+
+## Fix [v0.39.16] 2023-11-10
+
+- change api search task in point manual
+- set loading detail task
+
+## improve [v0.39.15] 2023-11-9
+
+- fixed modal alert
+
+## improve [v0.39.14] 2023-11-9
+
+- added cancel task for admin menu
+- fixed bug special point menu
+
+## improve [v0.39.13] 2023-11-8
+
+- call api add/edit special point menu
+
+## Fix [v0.39.12] 2023-11-08
+
+- fixed payload pin news
+
+## Fix [v0.39.11] 2023-11-6
+
+- fixed target spray in all task menu
+- farmer birthday not required
+- call api index list special point
+
+## Fix [v0.39.10] 2023-11-3
+
+- fixed endtime from edit news
+
+## improve [v0.39.9] 2023-11-3
+
+- auto address add/edit farmer menu
+- change search input in admin task menu
+- get data the target spray from api
+
+## Fix [v0.39.8] 2023-11-1
+
+- filter new already pin cant select
+
+## Fix [v0.39.7] 2023-11-1
+
+- fixed status for news
+
+## improve [v0.39.6] 2023-11-1
+
+- fixed timer setting for news when NON_ENDDATE
+
+## improve [v0.39.5] 2023-11-1
+
+- added droneAbility
+- fixed sort filter index master data drone page
+
+## Fix [v0.39.4] 2022-11-1
+
+- fixed text color in new task menu
+- fixed status mission menu
+- close pin in add/edit news menu
+
+## Fix [v0.39.3] 2022-10-31
+
+- fixed field time news
+
+## Fix [v0.39.2] 2022-10-31
+
+- fixed style
+
+## Fix [v0.39.1] 2022-10-30
+
+- import css for news guru
+
+## Feature [v0.39.0] 2022-10-30
+
+- eslint & prettier setup
+- lazy load
+- Pin News Screen
+
+## Feature [v0.38.0] 2022-10-30
+
+- added ui point manual menu
+- fixed search farmer in new task menu
+- fixed style tabs menu
+
+## Feature [v0.37.11] 2023-10-27
+
+- add image to news guru
+- add video link to news guru
+
 ## Fix [v0.37.10] 2023-10-22
-- fixed  show tel droner
+
+- fixed show tel droner
+
 ## Fix [v0.37.9] 2023-10-21
-- fixed  validate rai in addNewTask
+
+- fixed validate rai in addNewTask
 
 ## Fix [v0.37.8] 2023-10-20
 

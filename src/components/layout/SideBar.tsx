@@ -1,224 +1,255 @@
 export const pathLists = (isAccounting: boolean, isAdminTask?: boolean) => {
   const menu = [
     {
-      path: "task",
-      name: "task",
-      title: "ติดตามงาน",
+      path: 'task',
+      name: 'task',
+      title: 'ติดตามงาน',
       permission: null,
       subMenu: [
         {
-          path: "/IndexNewTask",
-          name: "IndexNewTask",
-          title: "งานใหม่ (รอนักบิน)",
+          path: '/IndexNewTask',
+          name: 'IndexNewTask',
+          title: 'งานใหม่ (รอนักบิน)',
           subMenu: [],
         },
         {
-          path: "/IndexInprogressTask",
-          name: "IndexInprogressTask",
-          title: "งานรอดำเนินการ",
+          path: '/IndexInprogressTask',
+          name: 'IndexInprogressTask',
+          title: 'งานรอดำเนินการ',
           subMenu: [],
         },
         {
-          path: "/IndexTodayTask",
-          name: "IndexTodayTask",
-          title: "งานในวันนี้",
+          path: '/IndexTodayTask',
+          name: 'IndexTodayTask',
+          title: 'งานในวันนี้',
           subMenu: [],
         },
         {
-          path: isAccounting ? "/IndexReport" : "/IndexFinishTask",
-          name: isAccounting ? "IndexReport" : "IndexFinishTask",
-          title: "งานที่เสร็จสิ้น",
+          path: isAccounting ? '/IndexReport' : '/IndexFinishTask',
+          name: isAccounting ? 'IndexReport' : 'IndexFinishTask',
+          title: 'งานที่เสร็จสิ้น',
           subMenu: [],
         },
       ],
     },
     {
-      path: "farmer",
-      name: "farmer",
-      title: "ข้อมูลเกษตรกร",
+      path: 'farmer',
+      name: 'farmer',
+      title: 'ข้อมูลเกษตรกร',
       permission: null,
       subMenu: [
         {
-          path: "/IndexFarmer",
-          name: "IndexFarmer",
-          title: "รายชื่อเกษตรกร",
+          path: '/IndexFarmer',
+          name: 'IndexFarmer',
+          title: 'รายชื่อเกษตรกร',
           permission: null,
           subMenu: [],
         },
         {
-          path: "/IndexPlotList",
-          name: "IndexPlotList",
-          title: "รายการแปลงเกษตร",
+          path: '/IndexPlotList',
+          name: 'IndexPlotList',
+          title: 'รายการแปลงเกษตร',
           permission: null,
           subMenu: [],
         },
       ],
     },
     {
-      path: "droner",
-      name: "droner",
-      title: "ข้อมูลนักบินโดรน",
+      path: 'droner',
+      name: 'droner',
+      title: 'ข้อมูลนักบินโดรน',
       permission: null,
       subMenu: [
         {
-          path: "/IndexDroner",
-          name: "IndexDroner",
-          title: "รายชื่อนักบินโดรน",
+          path: '/IndexDroner',
+          name: 'IndexDroner',
+          title: 'รายชื่อนักบินโดรน',
           permission: null,
           subMenu: [],
         },
         {
-          path: "/DroneList",
-          name: "DroneList",
-          title: "รายการโดรนเกษตร",
+          path: '/DroneList',
+          name: 'DroneList',
+          title: 'รายการโดรนเกษตร',
           permission: null,
           subMenu: [],
         },
         {
-          path: "/IndexRankDroner",
-          name: "IndexRankDroner",
-          title: "อันดับนักบินโดรน",
+          path: '/IndexRankDroner',
+          name: 'IndexRankDroner',
+          title: 'อันดับนักบินโดรน',
           permission: null,
           subMenu: [],
         },
       ],
     },
     {
-      path: "news",
-      name: "news",
-      title: "ข่าวสาร/กูรูเกษตร",
+      path: 'news',
+      name: 'news',
+      title: 'ข่าวสาร/กูรูเกษตร',
       subMenu: [
         {
-          path: "/NewsPage",
-          name: "NewsPage",
-          title: "ข่าวสาร",
-          subMenu: [],
-        },
-      ],
-    },
-    {
-      path: "promotion",
-      name: "promotion",
-      title: "โปรโมชั่น/คูปอง",
-      subMenu: [
-        {
-          path: "/PromotionPage",
-          name: "PromotionPage",
-          title: "คูปอง",
-          subMenu: [],
-        },
-      ],
-    },
-    {
-      path: "campaign",
-      name: "campaign",
-      title: "แต้มสะสม",
-      subMenu: [
-        {
-          path: "listPoint",
-          name: "listPoint",
-          title: "รายการแต้ม",
+          path: 'newsIndex',
+          name: 'news',
+          title: 'ข่าวสาร',
           subMenu: [
             {
-              path: "/IndexPlanningPoint",
-              name: "IndexPlanningPoint",
-              title: "รอรับแต้ม",
+              path: '/NewsPage',
+              name: 'NewsPage',
+              title: 'รายการข่าวสาร',
               subMenu: [],
             },
             {
-              path: "/IndexReceivePoint",
-              name: "IndexReceivePoint",
-              title: "ได้รับแต้ม",
+              path: '/PinNewsPage',
+              name: 'PinNewsPage',
+              title: 'ปักหมุดข่าวสาร',
               subMenu: [],
             },
             {
-              path: "/IndexRedeem/Farmer",
-              name: "IndexRedeem/Farmer",
-              title: "รายงานการแลก",
+              path: '/HighlightNewsPage',
+              name: 'HighlightNewsPage',
+              title: 'ข่าวสารไฮไลท์',
               subMenu: [],
             },
           ],
         },
         {
-          path: "summaryPoint",
-          name: "summaryPoint",
-          title: "แต้มรายบุคคล",
+          path: '/GuruPage',
+          name: 'GuruPage',
+          title: 'กูรูเกษตร',
+          subMenu: [],
+        },
+      ],
+    },
+    {
+      path: 'promotion',
+      name: 'promotion',
+      title: 'โปรโมชั่น/คูปอง',
+      subMenu: [
+        {
+          path: '/PromotionPage',
+          name: 'PromotionPage',
+          title: 'คูปอง',
+          subMenu: [],
+        },
+      ],
+    },
+    {
+      path: 'campaign',
+      name: 'campaign',
+      title: 'แต้มสะสม',
+      subMenu: [
+        {
+          path: 'listPoint',
+          name: 'listPoint',
+          title: 'รายการแต้ม',
+          subMenu: [
+            {
+              path: '/IndexPlanningPoint',
+              name: 'IndexPlanningPoint',
+              title: 'รอรับแต้ม',
+              subMenu: [],
+            },
+            {
+              path: '/IndexReceivePoint',
+              name: 'IndexReceivePoint',
+              title: 'ได้รับแต้ม',
+              subMenu: [],
+            },
+            {
+              path: '/IndexRedeem/Farmer',
+              name: 'IndexRedeem/Farmer',
+              title: 'รายงานการแลก',
+              subMenu: [],
+            },
+            {
+              path: '/IndexPointManual',
+              name: 'IndexPointManual',
+              title: 'รายการแต้มพิเศษ',
+              subMenu: [],
+            },
+          ],
+        },
+        {
+          path: 'summaryPoint',
+          name: 'summaryPoint',
+          title: 'แต้มรายบุคคล',
           permission: null,
           subMenu: [
             {
-              path: "/IndexDronerSummaryPoint",
-              name: "IndexDronerSummaryPoint",
-              title: "นักบินโดรน",
+              path: '/IndexDronerSummaryPoint',
+              name: 'IndexDronerSummaryPoint',
+              title: 'นักบินโดรน',
               permission: null,
               subMenu: [],
             },
             {
-              path: "/IndexFarmerSummary",
-              name: "IndexDronerSummary",
-              title: "เกษตรกร",
+              path: '/IndexFarmerSummary',
+              name: 'IndexDronerSummary',
+              title: 'เกษตรกร',
               permission: null,
               subMenu: [],
             },
           ],
         },
         {
-          path: "/IndexCampaignPoint",
-          name: "IndexCampaignPoint",
-          title: "แคมเปญแต้ม",
+          path: '/IndexCampaignPoint',
+          name: 'IndexCampaignPoint',
+          title: 'แคมเปญแต้ม',
           subMenu: [],
         },
       ],
     },
     {
-      path: "rewards",
-      name: "rewards",
-      title: "ของรางวัล",
+      path: 'rewards',
+      name: 'rewards',
+      title: 'ของรางวัล',
       permission: null,
       subMenu: [
         {
-          path: "/IndexReward",
-          name: "IndexReward",
-          title: "นักบินโดรน",
+          path: '/IndexReward',
+          name: 'IndexReward',
+          title: 'นักบินโดรน',
           permission: null,
           subMenu: [],
         },
       ],
     },
     {
-      path: "mission",
-      name: "mission",
-      title: "ภารกิจ",
+      path: 'mission',
+      name: 'mission',
+      title: 'ภารกิจ',
       subMenu: [
         {
-          path: "/IndexDronerMission",
-          name: "IndexDronerMission",
-          title: "นักบินโดรน",
+          path: '/IndexDronerMission',
+          name: 'IndexDronerMission',
+          title: 'นักบินโดรน',
           subMenu: [],
         },
       ],
     },
     {
-      path: "challenge",
-      name: "challenge",
-      title: "ชาเลนจ์",
+      path: 'challenge',
+      name: 'challenge',
+      title: 'ชาเลนจ์',
       subMenu: [
         {
-          path: "/IndexQuota",
-          name: "IndexQuota",
-          title: "นักบินโดรน",
+          path: '/IndexQuota',
+          name: 'IndexQuota',
+          title: 'นักบินโดรน',
           subMenu: [],
         },
       ],
     },
     {
-      path: "admin",
-      name: "admin",
-      title: "ผู้ดูแลระบบ",
+      path: 'admin',
+      name: 'admin',
+      title: 'ผู้ดูแลระบบ',
       subMenu: [
         {
-          path: "/IndexAdmin",
-          name: "IndexAdmin",
-          title: "รายชื่อผู้ดูแลระบบ",
+          path: '/IndexAdmin',
+          name: 'IndexAdmin',
+          title: 'รายชื่อผู้ดูแลระบบ',
           subMenu: [],
         },
         // {
@@ -230,60 +261,73 @@ export const pathLists = (isAccounting: boolean, isAdminTask?: boolean) => {
       ],
     },
     {
-      path: "setting",
-      name: "setting",
-      title: "ตั้งค่า",
+      path: 'setting',
+      name: 'setting',
+      title: 'ตั้งค่า',
       subMenu: [
         {
-          path: "/IndexDroneBrand",
-          name: "IndexDroneBrand",
-          title: "ยี่ห้อโดรน",
+          path: '/IndexDroneBrand',
+          name: 'IndexDroneBrand',
+          title: 'ยี่ห้อโดรน',
           subMenu: [],
         },
         {
-          path: "/PricePage",
-          name: "PricePage",
-          title: "ราคาฉีดพ่น",
+          path: '/PricePage',
+          name: 'PricePage',
+          title: 'ราคาฉีดพ่น',
           subMenu: [],
         },
         {
-          path: "/reward",
-          name: "reward",
-          title: "แต้ม",
+          path: '/reward',
+          name: 'reward',
+          title: 'แต้ม',
           subMenu: [
             {
-              path: "/ConditionFarmer",
-              name: "ConditionFarmer",
-              title: "เงื่อนไขเกษตรกร",
+              path: '/ConditionFarmer',
+              name: 'ConditionFarmer',
+              title: 'เงื่อนไขเกษตรกร',
               subMenu: [],
             },
           ],
         },
       ],
     },
-  ];
+  ]
 
   if (isAdminTask) {
     return menu.map((x: any) => {
-      const find = menu.findIndex((y) => x.name === "task");
+      const find = menu.findIndex(() => x.name === 'task')
       if (find === 0) {
-        const newMenu = menu[find];
+        const newMenu = menu[find]
         return {
           ...newMenu,
           subMenu: [
             ...newMenu.subMenu,
             {
-              path: "/IndexAdminTask",
-              name: "IndexAdminTask",
-              title: "การแก้ไข/ประวัติงาน",
-              subMenu: [],
+              path: 'AdminTask',
+              name: 'AdminTask',
+              title: 'จัดการงานทั้งหมด',
+              subMenu: [
+                {
+                  path: '/IndexAdminTask',
+                  name: 'IndexAdminTask',
+                  title: 'แก้ไข/ประวัติงาน',
+                  subMenu: [],
+                },
+                {
+                  path: '/AdminCancelTask',
+                  name: 'AdminCancelTask',
+                  title: 'ยกเลิกงาน',
+                  subMenu: [],
+                },
+              ],
             },
           ],
-        };
+        }
       } else {
-        return { ...x };
+        return { ...x }
       }
-    });
+    })
   }
-  return menu;
-};
+  return menu
+}

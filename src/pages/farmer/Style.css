@@ -50,7 +50,7 @@
 }
 .zoom {
   padding: 50px;
-  transition: transform .2s;
+  transition: transform 0.2s;
   margin: 0 auto;
 }
 
@@ -73,6 +73,36 @@
   overflow: hidden;
 
   /*for the background, optional*/
+  background: center center no-repeat;
+  background-size: 100%;
+}
+.hiddenFileInputTask {
+  border-radius: 8px;
+  width: 240px;
+  height: 75px;
+  display: flex;
+  overflow: hidden;
+  background: center center no-repeat;
+  background-size: 100%;
+}
+.hiddenFileInputTask > input {
+  height: 100%;
+  width: 100%;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.hiddenFileInputHighLight > input {
+  height: 100%;
+  width: 100%;
+  opacity: 0;
+  cursor: pointer;
+}
+.hiddenFileInputHighLight {
+  width: 264px !important;
+  height: 330px !important;
+  display: inline-block;
+  overflow: hidden;
   background: center center no-repeat;
   background-size: 100%;
 }

@@ -1,17 +1,17 @@
-import { TaskFinishListEntity, TaskReportListEntity } from "./../entities/TaskFinishEntities";
-import { BASE_URL, httpClient } from "../config/config";
+import { TaskFinishListEntity, TaskReportListEntity } from './../entities/TaskFinishEntities'
+import { BASE_URL, httpClient } from '../config/config'
 
 export class TaskFinishedDatasource {
   static getTaskFinishList(
     page: number,
     row: number,
+    status?: string,
+    searchText?: string,
     subdistrictId?: number,
     districtId?: number,
     provinceId?: number,
     dateAppointmentStart?: string,
     dateAppointmentEnd?: string,
-    status?: string,
-    searchText?: string,
     applicationType?: string[],
     sortDirection?: string,
     sortField?: string,
@@ -20,35 +20,56 @@ export class TaskFinishedDatasource {
     const params = {
       page: page,
       take: row,
+      status: status,
+      searchText: searchText,
       subdistrictId: subdistrictId,
       districtId: districtId,
       provinceId: provinceId,
       dateAppointmentStart: dateAppointmentStart,
       dateAppointmentEnd: dateAppointmentEnd,
-      status: status,
-      searchText: searchText,
       applicationType: applicationType,
       sortDirection: sortDirection,
       sortField: sortField,
-      documentPersons:documentPersons
-    };
+      documentPersons: documentPersons,
+    }
     return httpClient
-      .get(BASE_URL + "/tasks/task-finish/get-all-task-finish", { params })
+      .get(BASE_URL + '/tasks/task-finish/get-all-task-finish', { params })
       .then((response) => {
-        return response.data;
+        return response.data
       })
       .catch((error) => {
-        console.log(error);
-      });
+        console.log(error)
+      })
   }
   static getDetailFinishTaskById(id: string): Promise<any> {
     return httpClient
       .get(`${BASE_URL}/tasks/task-finish/get-task-detail/${id}`)
       .then((res) => {
-        return res.data;
+        return res.data
       })
       .catch((err) => {
-        console.log(err);
-      });
+        console.log(err)
+      })
+  }
+  static getTaskManual(
+    resultId: string,
+    applicationType: string,
+    page: number,
+    take: number,
+  ): Promise<any> {
+    const params = {
+      resultId: resultId,
+      applicationType: applicationType,
+      page: page,
+      take: take,
+    }
+    return httpClient
+      .get(BASE_URL + '/tasks/task-finish/task-finish-manual', { params })
+      .then((response) => {
+        return response.data
+      })
+      .catch((error) => {
+        console.log(error)
+      })
   }
 }

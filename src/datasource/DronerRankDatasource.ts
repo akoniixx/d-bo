@@ -2,8 +2,8 @@ import {
   DronerRankDetailEntity,
   DronerRankListEntity,
   taskDetailEntity,
-} from "./../entities/DronerRankEntities";
-import { BASE_URL, httpClient } from "../config/config";
+} from './../entities/DronerRankEntities'
+import { BASE_URL, httpClient } from '../config/config'
 export class DronerRankDatasource {
   static getDronerRank(
     page: number,
@@ -17,7 +17,7 @@ export class DronerRankDatasource {
     endDate?: number,
     search?: string,
     sortDirection?: string,
-    sortField?: string
+    sortField?: string,
   ): Promise<DronerRankListEntity> {
     const params = {
       page: page,
@@ -32,49 +32,49 @@ export class DronerRankDatasource {
       search: search,
       sortDirection: sortDirection,
       sortField: sortField,
-    };
+    }
     return httpClient
-      .get(BASE_URL + "/tasks/droner-ranking/get-all-droner-ranking", {
+      .get(BASE_URL + '/tasks/droner-ranking/get-all-droner-ranking', {
         params,
       })
       .then((response) => {
-        return response.data;
+        return response.data
       })
       .catch((error) => {
-        console.log(error);
-      });
+        console.log(error)
+      })
   }
   static getDronerRankById(
     id: string,
     page: number,
     row: number,
     sortField?: string,
-    sortDirection?: string
+    sortDirection?: string,
   ): Promise<DronerRankDetailEntity> {
     const params = {
       dronerId: id,
       page: page,
       take: row,
-      sortField:sortField,
-      sortDirection: sortDirection
+      sortField: sortField,
+      sortDirection: sortDirection,
     }
     return httpClient
-      .get(BASE_URL + "/tasks/droner-ranking/get-droner-detail" ,{params})
+      .get(BASE_URL + '/tasks/droner-ranking/get-droner-detail', { params })
       .then((response) => {
-        return response.data;
+        return response.data
       })
       .catch((error) => {
-        console.log(error);
-      });
+        console.log(error)
+      })
   }
   static getTaskDetail(id: string): Promise<taskDetailEntity> {
     return httpClient
-      .get(BASE_URL + "/tasks/droner-ranking/get-task-detail/" + id)
+      .get(BASE_URL + '/tasks/droner-ranking/get-task-detail/' + id)
       .then((response) => {
-        return response.data;
+        return response.data
       })
       .catch((error) => {
-        console.log(error);
-      });
+        console.log(error)
+      })
   }
 }

@@ -1,229 +1,338 @@
-import React, { useEffect, useState } from "react";
-import { Badge, Button, Input, Pagination, Spin, Table } from "antd";
+import React, { useEffect, useState } from 'react'
+import { Badge, Button, Input, Pagination, Spin, Table } from 'antd'
 import {
   DroneBrandEntity,
   DroneBrandListEntity,
   DroneBrandListEntity_INIT,
-} from "../../../entities/DroneBrandEntities";
-import { DroneDatasource } from "../../../datasource/DroneDatasource";
-import { color } from "../../../resource";
-import moment from "moment";
-import ActionButton from "../../../components/button/ActionButton";
+} from '../../../entities/DroneBrandEntities'
+import { DroneDatasource } from '../../../datasource/DroneDatasource'
+import { color } from '../../../resource'
+import moment from 'moment'
+import ActionButton from '../../../components/button/ActionButton'
 import {
+  CaretDownOutlined,
+  CaretUpOutlined,
   DeleteOutlined,
   EditOutlined,
   SearchOutlined,
-} from "@ant-design/icons";
-import Swal from "sweetalert2";
-import { DashboardLayout } from "../../../components/layout/Layout";
-import { useNavigate } from "react-router-dom";
+} from '@ant-design/icons'
+import Swal from 'sweetalert2'
+import { useNavigate } from 'react-router-dom'
 
 const IndexDroneBrand: React.FC = () => {
-  const navigate = useNavigate();
-  const [data, setData] = useState<DroneBrandListEntity>(
-    DroneBrandListEntity_INIT
-  );
-  const [loading, setLoading] = useState(false);
-  const [searchText, setSearchText] = useState<string>();
-
+  const navigate = useNavigate()
+  const [data, setData] = useState<DroneBrandListEntity>(DroneBrandListEntity_INIT)
+  const [loading, setLoading] = useState(false)
+  const [searchText, setSearchText] = useState<string>()
+  const [current, setCurrent] = useState(1)
+  const [sortDirection, setSortDirection] = useState<string | undefined>()
+  const [sortField, setSortField] = useState<string | undefined>()
+  const [sortDirection1, setSortDirection1] = useState<string | undefined>(undefined)
+  const [sortDirection2, setSortDirection2] = useState<string | undefined>(undefined)
+  const [sortDirection3, setSortDirection3] = useState<string | undefined>(undefined)
   const fetchDrone = async () => {
-    setLoading(true);
-    await DroneDatasource.getCountDroneBrandList(searchText)
+    setLoading(true)
+    await DroneDatasource.getCountDroneBrandList(10, current, searchText, sortField, sortDirection)
       .then((res) => {
-        setData(res);
+        setData(res)
       })
       .catch((err) => console.log(err))
-      .finally(() => setLoading(false));
-  };
+      .finally(() => setLoading(false))
+  }
   useEffect(() => {
-    fetchDrone();
-  }, []);
+    fetchDrone()
+  }, [current, sortDirection])
   const changeTextSearch = (searchText: any) => {
-    setSearchText(searchText.target.value);
-  };
-  const isNumber = (n: any) => {
-    return !isNaN(parseFloat(n)) && isFinite(n);
-  };
-  const sorter = (a: any, b: any) => {
-    if (a === null) {
-      return 1;
-    }
-    if (b === null) {
-      return -1;
-    }
-    if (isNumber(a) && isNumber(b)) {
-      if (parseInt(a, 10) === parseInt(b, 10)) {
-        return 0;
-      }
-      return parseInt(a, 10) > parseInt(b, 10) ? 1 : -1;
-    }
-    if (isNumber(a)) {
-      return -1;
-    }
-    if (isNumber(b)) {
-      return 1;
-    }
-    if (a === b) {
-      return 0;
-    }
-    return a > b ? 1 : -1;
-  };
+    setSearchText(searchText.target.value)
+  }
+  const onChangePage = (page: number) => {
+    setCurrent(page)
+  }
+
   const removeDroneBrand = (data: DroneBrandEntity) => {
     Swal.fire({
-      title: "ยืนยันการลบ",
-      text: "โปรดตรวจสอบยี่ห้อโดรนที่คุณต้องการลบ ก่อนที่จะกดยืนยันการลบ เพราะอาจส่งผลต่อข้อมูลยี่ห้อโดรนและรุ่นโดรนในระบบ",
-      cancelButtonText: "ยกเลิก",
-      confirmButtonText: "ลบ",
-      confirmButtonColor: "#d33",
+      title: 'ยืนยันการลบ',
+      text: 'โปรดตรวจสอบยี่ห้อโดรนที่คุณต้องการลบ ก่อนที่จะกดยืนยันการลบ เพราะอาจส่งผลต่อข้อมูลยี่ห้อโดรนและรุ่นโดรนในระบบ',
+      cancelButtonText: 'ยกเลิก',
+      confirmButtonText: 'ลบ',
+      confirmButtonColor: '#d33',
       showCancelButton: true,
       showCloseButton: true,
     }).then(async (result) => {
       if (result.isConfirmed) {
-        await DroneDatasource.deleteDroneBrand(data.id);
+        await DroneDatasource.deleteDroneBrand(data.id)
       }
-      fetchDrone();
-    });
-  };
+      fetchDrone()
+    })
+  }
   const pageTitle = (
-    <div className="container d-flex pb-3" style={{ padding: "8px" }}>
-      <div className="col-lg-6">
+    <div className='container d-flex pb-3' style={{ padding: '8px' }}>
+      <div className='col-lg-6'>
         <span
-          className="card-label font-weight-bolder text-dark"
-          style={{ fontSize: 22, fontWeight: "bold", padding: "8px" }}
+          className='card-label font-weight-bolder text-dark'
+          style={{ fontSize: 22, fontWeight: 'bold', padding: '8px' }}
         >
           <strong>ยี่ห้อโดรน (Drone Brand)</strong>
         </span>
       </div>
-      <div className="col-lg-3 p-1">
+      <div className='col-lg-3 p-1'>
         <Input
           style={{ height: 35 }}
           allowClear
           prefix={<SearchOutlined style={{ color: color.Disable }} />}
-          placeholder="ค้นหาชื่อยี่ห้อโดรน"
-          className="col-lg-12 p-1"
+          placeholder='ค้นหาชื่อยี่ห้อโดรน'
+          className='col-lg-12 p-1'
           onChange={changeTextSearch}
         />
       </div>
-      <div className="col-lg p-1">
+      <div className='col-lg p-1'>
         <Button
           style={{
             height: 35,
             borderColor: color.Success,
-            borderRadius: "5px",
+            borderRadius: '5px',
             color: color.secondary2,
             backgroundColor: color.Success,
           }}
-          className="col-lg-12"
+          className='col-lg-12'
           onClick={fetchDrone}
         >
           ค้นหาข้อมูล
         </Button>
       </div>
-      <div className="col-lg p-1">
+      <div className='col-lg p-1'>
         <Button
           style={{
             height: 35,
             borderColor: color.Success,
-            borderRadius: "5px",
+            borderRadius: '5px',
             color: color.secondary2,
             backgroundColor: color.Success,
           }}
-          onClick={() => navigate("/AddDroneBrand")}
+          onClick={() => navigate('/AddDroneBrand')}
         >
           + เพิ่มยี่ห้อโดรน
         </Button>
       </div>
     </div>
-  );
+  )
   const columns = [
     {
-      title: "ชื่อยี่ห้อ/แบรนด์",
-      dataIndex: "name",
-      key: "name",
-      width: "25%",
-      sorter: (a: any, b: any) => sorter(a.name, b.name),
+      title: 'ชื่อยี่ห้อ/แบรนด์',
+      dataIndex: 'name',
+      key: 'name',
+      width: '25%',
     },
     {
-      title: "จำนวนรุ่นโดรน",
-      dataIndex: "drone",
-      key: "drone",
-      sorter: (a: any, b: any) => sorter(a.drone, b.drone),
+      title: () => {
+        return (
+          <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+            จำนวนรุ่นโดรน
+            <div
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                cursor: 'pointer',
+              }}
+              onClick={() => {
+                setSortField('drone')
+                setSortDirection((prev) => {
+                  if (prev === 'ASC') {
+                    return 'DESC'
+                  } else if (prev === undefined) {
+                    return 'ASC'
+                  } else {
+                    return undefined
+                  }
+                })
+                setSortDirection1((prev) => {
+                  if (prev === 'ASC') {
+                    return 'DESC'
+                  } else if (prev === undefined) {
+                    return 'ASC'
+                  } else {
+                    return undefined
+                  }
+                })
+              }}
+            >
+              <CaretUpOutlined
+                style={{
+                  position: 'relative',
+                  top: 2,
+                  color: sortDirection1 === 'ASC' ? '#ffca37' : 'white',
+                }}
+              />
+              <CaretDownOutlined
+                style={{
+                  position: 'relative',
+                  bottom: 2,
+                  color: sortDirection1 === 'DESC' ? '#ffca37' : 'white',
+                }}
+              />
+            </div>
+          </div>
+        )
+      },
+      dataIndex: 'drone',
+      key: 'drone',
       render: (value: any, row: any, index: number) => {
         return {
           children: (
-            <span>
-              {row.drone !== 0
-                ? `${row.drone + " " + "รุ่น"}`
-                : 0 + " " + "รุ่น"}
-            </span>
+            <span>{row.drone !== 0 ? `${row.drone + ' ' + 'รุ่น'}` : 0 + ' ' + 'รุ่น'}</span>
           ),
-        };
+        }
       },
     },
     {
-      title: "จำนวนเครื่องโดรน",
-      dataIndex: "droneCount",
-      key: "droneCount",
-      sorter: (a: any, b: any) => sorter(a.droneCount, b.droneCount),
+      title: () => {
+        return (
+          <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+            จำนวนเครื่องโดรน
+            <div
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                cursor: 'pointer',
+              }}
+              onClick={() => {
+                setSortField('droneCount')
+                setSortDirection((prev) => {
+                  if (prev === 'ASC') {
+                    return 'DESC'
+                  } else if (prev === undefined) {
+                    return 'ASC'
+                  } else {
+                    return undefined
+                  }
+                })
+                setSortDirection2((prev) => {
+                  if (prev === 'ASC') {
+                    return 'DESC'
+                  } else if (prev === undefined) {
+                    return 'ASC'
+                  } else {
+                    return undefined
+                  }
+                })
+              }}
+            >
+              <CaretUpOutlined
+                style={{
+                  position: 'relative',
+                  top: 2,
+                  color: sortDirection2 === 'ASC' ? '#ffca37' : 'white',
+                }}
+              />
+              <CaretDownOutlined
+                style={{
+                  position: 'relative',
+                  bottom: 2,
+                  color: sortDirection2 === 'DESC' ? '#ffca37' : 'white',
+                }}
+              />
+            </div>
+          </div>
+        )
+      },
+      dataIndex: 'droneCount',
+      key: 'droneCount',
       render: (value: any, row: any, index: number) => {
         return {
           children: (
-            <span>
-              {row.droneCount !== 0
-                ? `${row.droneCount + " " + "ลำ"}`
-                : 0 + " " + "ลำ"}
-            </span>
+            <span>{row.droneCount !== 0 ? `${row.droneCount + ' ' + 'ลำ'}` : 0 + ' ' + 'ลำ'}</span>
           ),
-        };
+        }
       },
     },
     {
-      title: "สถานะ",
-      dataIndex: "isActive",
-      key: "isActive",
-      width: "10%",
-      sorter: (a: any, b: any) => sorter(a.isActive, b.isActive),
+      title: 'สถานะ',
+      dataIndex: 'isActive',
+      key: 'isActive',
+      width: '10%',
       render: (value: any, row: any, index: number) => {
         return {
           children: (
             <span style={{ color: value ? color.Success : color.Error }}>
-              <Badge color={value ? color.Success : color.Error} />{" "}
-              {value ? "ใช้งาน" : "ไม่ใช้งาน"}
+              <Badge color={value ? color.Success : color.Error} /> {value ? 'ใช้งาน' : 'ไม่ใช้งาน'}
             </span>
           ),
-        };
+        }
       },
     },
     {
-      title: "อัพเดตล่าสุด",
-      dataIndex: "updatedAt",
-      key: "updatedAt",
-      sorter: (a: any, b: any) => sorter(a.updatedAt, b.updatedAt),
-      render: (value: any, row: any, index: number) => {
-        return {
-          children: (
-            <span> {moment(row.updatedAt).format("DD/MM/YYYY, HH:mm")}</span>
-          ),
-        };
-      },
-    },
-    {
-      title: "",
-      dataIndex: "action",
-      key: "action",
-      width: "13%",
-      render: (value: any, row: any, index: number) => {
-        return {
-          children: (
+      title: () => {
+        return (
+          <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+            อัพเดตล่าสุด
             <div
-              className="d-flex flex-row"
-              style={{ justifyContent: "center" }}
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                cursor: 'pointer',
+              }}
+              onClick={() => {
+                setSortField('updatedAt')
+                setSortDirection((prev) => {
+                  if (prev === 'ASC') {
+                    return 'DESC'
+                  } else if (prev === undefined) {
+                    return 'ASC'
+                  } else {
+                    return undefined
+                  }
+                })
+                setSortDirection3((prev) => {
+                  if (prev === 'ASC') {
+                    return 'DESC'
+                  } else if (prev === undefined) {
+                    return 'ASC'
+                  } else {
+                    return undefined
+                  }
+                })
+              }}
             >
-              <div className="col-lg-4">
+              <CaretUpOutlined
+                style={{
+                  position: 'relative',
+                  top: 2,
+                  color: sortDirection3 === 'ASC' ? '#ffca37' : 'white',
+                }}
+              />
+              <CaretDownOutlined
+                style={{
+                  position: 'relative',
+                  bottom: 2,
+                  color: sortDirection3 === 'DESC' ? '#ffca37' : 'white',
+                }}
+              />
+            </div>
+          </div>
+        )
+      },
+      dataIndex: 'updatedAt',
+      key: 'updatedAt',
+      render: (value: any, row: any, index: number) => {
+        return {
+          children: <span> {moment(row.updatedAt).format('DD/MM/YYYY, HH:mm')}</span>,
+        }
+      },
+    },
+    {
+      title: '',
+      dataIndex: 'action',
+      key: 'action',
+      width: '13%',
+      render: (value: any, row: any, index: number) => {
+        return {
+          children: (
+            <div className='d-flex flex-row' style={{ justifyContent: 'center' }}>
+              <div className='col-lg-4'>
                 <ActionButton
                   icon={<EditOutlined />}
                   color={color.primary1}
-                  onClick={() => navigate("/EditDroneBrand/id=" + row.id)}
+                  onClick={() => navigate('/EditDroneBrand/id=' + row.id)}
                 />
               </div>
               {row.drone === 0 ? (
@@ -246,19 +355,22 @@ const IndexDroneBrand: React.FC = () => {
               )}
             </div>
           ),
-        };
+        }
       },
     },
-  ];
+  ]
   return (
     <>
       {pageTitle}
-      <Spin tip="กำลังโหลดข้อมูล..." size="large" spinning={loading}>
-        <Table columns={columns} dataSource={data.data} />
+      <Spin tip='กำลังโหลดข้อมูล...' size='large' spinning={loading}>
+        <Table columns={columns} dataSource={data.data} pagination={false} />
       </Spin>
-      <p>รายการทั้งหมด {data.count} รายการ</p>
+      <div className='d-flex justify-content-between pt-4 pb-3'>
+        <p>รายการทั้งหมด {data?.count} รายการ</p>
+        <Pagination current={current} onChange={onChangePage} total={data?.count} />
+      </div>
     </>
-  );
-};
+  )
+}
 
-export default IndexDroneBrand;
+export default IndexDroneBrand

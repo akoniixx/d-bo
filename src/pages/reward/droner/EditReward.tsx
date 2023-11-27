@@ -1,70 +1,52 @@
-import {
-  DatePicker,
-  Divider,
-  Form,
-  Input,
-  Radio,
-  Row,
-  Select,
-  Space,
-  Tag,
-  TimePicker,
-} from "antd";
-import { Option } from "antd/lib/mentions";
-import React, { useEffect, useState } from "react";
-import ReactQuill from "react-quill";
-import { useNavigate } from "react-router-dom";
-import {
-  UploadImageEntity,
-  UploadImageEntity_INTI,
-} from "../../../entities/UploadImageEntities";
-import { resizeFileImg } from "../../../utilities/ResizeImage";
-import { CardContainer } from "../../../components/card/CardContainer";
-import { CardHeader } from "../../../components/header/CardHearder";
-import { color, image } from "../../../resource";
-import { formats, modules } from "../../../components/editor/EditorToolbar";
-import { BackIconButton } from "../../../components/button/BackButton";
-import { FooterPage } from "../../../components/footer/FooterPage";
-import RenderReward from "../../../components/mobile/RenderReward";
-import moment from "moment";
-import { RewardDatasource } from "../../../datasource/RewardDatasource";
-import Swal from "sweetalert2";
-import dayjs from "dayjs";
-import { RewardEntities } from "../../../entities/RewardEntites";
-import {
-  numberWithCommas,
-  validateOnlyNumber,
-} from "../../../utilities/TextFormatter";
-
-const { Map } = require("immutable");
-const _ = require("lodash");
+import { DatePicker, Divider, Form, Input, Radio, Row, Select, Space, Tag, TimePicker } from 'antd'
+import { Option } from 'antd/lib/mentions'
+import React, { useEffect, useState } from 'react'
+import ReactQuill from 'react-quill'
+import { useNavigate } from 'react-router-dom'
+import { UploadImageEntity, UploadImageEntity_INTI } from '../../../entities/UploadImageEntities'
+import { resizeFileImg } from '../../../utilities/ResizeImage'
+import { CardContainer } from '../../../components/card/CardContainer'
+import { CardHeader } from '../../../components/header/CardHearder'
+import { color, image } from '../../../resource'
+import { formats, modules } from '../../../components/editor/EditorToolbar'
+import { BackIconButton } from '../../../components/button/BackButton'
+import { FooterPage } from '../../../components/footer/FooterPage'
+import RenderReward from '../../../components/mobile/RenderReward'
+import moment from 'moment'
+import { RewardDatasource } from '../../../datasource/RewardDatasource'
+import Swal from 'sweetalert2'
+import dayjs from 'dayjs'
+import { RewardEntities } from '../../../entities/RewardEntites'
+import { numberWithCommas, validateOnlyNumber } from '../../../utilities/TextFormatter'
+import 'react-quill/dist/quill.snow.css'
+import '../../farmer/Style.css'
+const { Map } = require('immutable')
+const _ = require('lodash')
 function EditReward() {
-  let queryString = _.split(window.location.pathname, "=");
-  const profile = JSON.parse(localStorage.getItem("profile") || "{  }");
-  const dateFormat = "DD/MM/YYYY";
-  const navigate = useNavigate();
-  const [form] = Form.useForm();
-  const [imgReward, setImgReward] = useState<any>();
-  const [createImgReward, setCreateImgReward] = useState<UploadImageEntity>(
-    UploadImageEntity_INTI
-  );
-  const [rewardType, setRewardType] = useState<string | null>(null);
-  const [rewardName, setRewardName] = useState<string | null>(null);
-  const [rewardExchange, setRewardExchange] = useState<string | null>(null);
-  const [description, setDescription] = useState<string | null>(null);
-  const [condition, setCondition] = useState<string | null>(null);
-  const [score, setScore] = useState<any>();
-  const [rewardStatus, setRewardStatus] = useState<any>();
-  const [startExchangeDate, setStartExchangeDate] = useState<any>();
-  const [startExchangeTime, setStartExchangeTime] = useState<any>();
-  const [EndExchangeDate, setEndExchangeDate] = useState<any>();
-  const [EndExchangeTime, setEndExchangeTime] = useState<any>();
-  const [usedDate, setUsedDate] = useState<any>();
-  const [startUsedTime, setStartUsedTime] = useState<any>();
-  const [endUsedDate, setEndUsedDate] = useState<any>();
-  const [endUsedTime, setEndUsedTime] = useState<any>();
-  const [saveBtnDisable, setBtnSaveDisable] = useState<boolean>(false);
-  const [checkStatus, setCheckStatus] = useState();
+  const queryString = _.split(window.location.pathname, '=')
+  const profile = JSON.parse(localStorage.getItem('profile') || '{  }')
+  const dateFormat = 'DD/MM/YYYY'
+  const navigate = useNavigate()
+  const [form] = Form.useForm()
+  const [imgReward, setImgReward] = useState<any>()
+  const [createImgReward, setCreateImgReward] = useState<UploadImageEntity>(UploadImageEntity_INTI)
+  const [rewardType, setRewardType] = useState<string | null>(null)
+  const [rewardName, setRewardName] = useState<string | null>(null)
+  const [rewardExchange, setRewardExchange] = useState<string | null>(null)
+  const [description, setDescription] = useState<string | null>(null)
+  const [condition, setCondition] = useState<string | null>(null)
+  const [score, setScore] = useState<any>()
+  const [rewardStatus, setRewardStatus] = useState<any>()
+  const [startExchangeDate, setStartExchangeDate] = useState<any>()
+  const [startExchangeTime, setStartExchangeTime] = useState<any>()
+  const [EndExchangeDate, setEndExchangeDate] = useState<any>()
+  const [EndExchangeTime, setEndExchangeTime] = useState<any>()
+  const [usedDate, setUsedDate] = useState<any>()
+  const [startUsedTime, setStartUsedTime] = useState<any>()
+  const [endUsedDate, setEndUsedDate] = useState<any>()
+  const [endUsedTime, setEndUsedTime] = useState<any>()
+  const [saveBtnDisable, setBtnSaveDisable] = useState<boolean>(false)
+  const [checkStatus, setCheckStatus] = useState()
 
   useEffect(() => {
     RewardDatasource.getAllRewardById(queryString[1]).then((res) => {
@@ -102,96 +84,91 @@ function EditReward() {
         expiredUsedTime: !res.expiredUsedDate
           ? moment(new Date().getTime())
           : moment(new Date(res.expiredUsedDate).getTime()),
-      });
-      setRewardName(res.rewardName);
-      setRewardType(res.rewardType);
-      setRewardExchange(res.rewardExchange);
-      setDescription(res.description);
-      setCondition(res.condition);
-      setScore(res.score);
-      setImgReward(res.imagePath);
-      setUsedDate(res.startUsedDate);
-      setEndUsedDate(res.expiredUsedDate);
-      setCheckStatus(res.status);
-    });
-  }, []);
+      })
+      setRewardName(res.rewardName)
+      setRewardType(res.rewardType)
+      setRewardExchange(res.rewardExchange)
+      setDescription(res.description)
+      setCondition(res.condition)
+      setScore(res.score)
+      setImgReward(res.imagePath)
+      setUsedDate(res.startUsedDate)
+      setEndUsedDate(res.expiredUsedDate)
+      setCheckStatus(res.status)
+    })
+  }, [])
   const onChangeImg = async (file: any) => {
-    const source = file.target.files[0];
-    let newSource: any;
+    const source = file.target.files[0]
+    let newSource: any
 
-    const isFileMoreThan2MB = source.size > 2 * 1024 * 1024;
+    const isFileMoreThan2MB = source.size > 2 * 1024 * 1024
     if (isFileMoreThan2MB) {
       newSource = await resizeFileImg({
         file: source,
-        compressFormat: source?.type.split("/")[1],
+        compressFormat: source?.type.split('/')[1],
         quality: 70,
         rotation: 0,
         responseUriFunc: (res: any) => {},
-      });
+      })
     }
     const img_base64 = await new Promise((resolve) => {
-      const reader = new FileReader();
-      reader.readAsDataURL(isFileMoreThan2MB ? newSource : source);
-      reader.onload = () => resolve(reader.result);
-    });
+      const reader = new FileReader()
+      reader.readAsDataURL(isFileMoreThan2MB ? newSource : source)
+      reader.onload = () => resolve(reader.result)
+    })
 
-    setImgReward(img_base64);
-    const d = Map(createImgReward).set(
-      "file",
-      isFileMoreThan2MB ? newSource : source
-    );
-    setCreateImgReward(d.toJS());
-  };
+    setImgReward(img_base64)
+    const d = Map(createImgReward).set('file', isFileMoreThan2MB ? newSource : source)
+    setCreateImgReward(d.toJS())
+  }
 
   const onPreviewImg = async () => {
-    let src = imgReward;
+    let src = imgReward
     if (!src) {
       src = await new Promise((resolve) => {
-        const reader = new FileReader();
-        reader.readAsDataURL(imgReward);
-        reader.onload = () => resolve(reader.result);
-      });
+        const reader = new FileReader()
+        reader.readAsDataURL(imgReward)
+        reader.onload = () => resolve(reader.result)
+      })
     }
-    const image = new Image();
-    image.src = src;
-    const imgWindow = window.open(src);
-    imgWindow?.document.write(image.outerHTML);
-  };
+    const image = new Image()
+    image.src = src
+    const imgWindow = window.open(src)
+    imgWindow?.document.write(image.outerHTML)
+  }
 
   const onRemoveImg = () => {
-    setImgReward(undefined);
-    setCreateImgReward(UploadImageEntity_INTI);
-    form.setFieldValue("file", null);
-    onFieldsChange();
-  };
+    setImgReward(undefined)
+    setCreateImgReward(UploadImageEntity_INTI)
+    form.setFieldValue('file', null)
+    onFieldsChange()
+  }
   const handleRewardType = (type: string) => {
-    setRewardType(type);
-  };
+    setRewardType(type)
+  }
   const onChangePoint = (point: any) => {
-    setRewardExchange(point.target.value);
-  };
+    setRewardExchange(point.target.value)
+  }
   const handleDescription = (des: string) => {
-    setDescription(des);
-  };
+    setDescription(des)
+  }
   const handleCondition = (con: string) => {
-    setCondition(con);
-  };
+    setCondition(con)
+  }
 
-  let start = new Date(usedDate).getTime();
-  let expired = new Date(endUsedDate).getTime();
-  let result = (expired - start) / 86400000;
+  const start = new Date(usedDate).getTime()
+  const expired = new Date(endUsedDate).getTime()
+  const result = (expired - start) / 86400000
   const disabledDateChange = (current: any) => {
-    const getValueDate = form.getFieldsValue();
-    const startDate = moment(getValueDate.startExchangeDate).format(
-      "YYYY-MM-DD"
-    );
-    return current && current < dayjs(startDate);
-  };
+    const getValueDate = form.getFieldsValue()
+    const startDate = moment(getValueDate.startExchangeDate).format('YYYY-MM-DD')
+    return current && current < dayjs(startDate)
+  }
   const disabledDateUsed = (current: any) => {
-    const getValueDate = form.getFieldsValue();
-    const startDate = moment(getValueDate.startUsedDate).format("YYYY-MM-DD");
-    return current && current < dayjs(startDate);
-  };
+    const getValueDate = form.getFieldsValue()
+    const startDate = moment(getValueDate.startUsedDate).format('YYYY-MM-DD')
+    return current && current < dayjs(startDate)
+  }
   const onFieldsChange = () => {
     const {
       rewardName,
@@ -206,23 +183,23 @@ function EditReward() {
       expiredExchangeDate,
       startUsedDate,
       file,
-    } = form.getFieldsValue();
-    let fieldErr: boolean = true;
-    let imgErr: boolean = true;
-    let rwTypeErr: boolean = true;
+    } = form.getFieldsValue()
+    let fieldErr: boolean = true
+    let imgErr: boolean = true
+    let rwTypeErr: boolean = true
     if (
       rewardName &&
       amount >= 0 &&
-      description != "<p><br></p>" &&
-      condition != "<p><br></p>" &&
+      description != '<p><br></p>' &&
+      condition != '<p><br></p>' &&
       status
     ) {
-      fieldErr = false;
+      fieldErr = false
     } else {
-      fieldErr = true;
+      fieldErr = true
     }
 
-    if (rewardType === "DIGITAL" && rewardExchange === "SCORE") {
+    if (rewardType === 'DIGITAL' && rewardExchange === 'SCORE') {
       if (
         score >= 0 &&
         amount > 0 &&
@@ -231,86 +208,71 @@ function EditReward() {
         startExchangeDate &&
         expiredExchangeDate
       ) {
-        rwTypeErr = false;
+        rwTypeErr = false
       } else {
-        rwTypeErr = true;
+        rwTypeErr = true
       }
-    } else if (rewardType === "DIGITAL" && rewardExchange === "MISSION") {
+    } else if (rewardType === 'DIGITAL' && rewardExchange === 'MISSION') {
       if (amount > 0 && startUsedDate && endUsedDate) {
-        rwTypeErr = false;
+        rwTypeErr = false
       } else {
-        rwTypeErr = true;
+        rwTypeErr = true
       }
-    } else if (rewardType === "PHYSICAL" && rewardExchange === "SCORE") {
-      if (
-        score >= 0 &&
-        amount > 0 &&
-        startExchangeDate &&
-        expiredExchangeDate
-      ) {
-        rwTypeErr = false;
+    } else if (rewardType === 'PHYSICAL' && rewardExchange === 'SCORE') {
+      if (score >= 0 && amount > 0 && startExchangeDate && expiredExchangeDate) {
+        rwTypeErr = false
       } else {
-        rwTypeErr = true;
+        rwTypeErr = true
       }
-    } else if (rewardType === "PHYSICAL" && rewardExchange === "MISSION") {
+    } else if (rewardType === 'PHYSICAL' && rewardExchange === 'MISSION') {
       if (amount > 0) {
-        rwTypeErr = false;
+        rwTypeErr = false
       } else {
-        rwTypeErr = true;
+        rwTypeErr = true
       }
     } else {
-      rwTypeErr = true;
+      rwTypeErr = true
     }
     if (!file) {
-      imgErr = true;
+      imgErr = true
     } else {
-      imgErr = false;
+      imgErr = false
     }
-    setBtnSaveDisable(fieldErr || imgErr || rwTypeErr);
-  };
-  const checkNumber = (
-    e: React.ChangeEvent<HTMLInputElement>,
-    name: string
-  ) => {
-    const { value: inputValue } = e.target;
-    const convertedNumber = validateOnlyNumber(inputValue);
+    setBtnSaveDisable(fieldErr || imgErr || rwTypeErr)
+  }
+  const checkNumber = (e: React.ChangeEvent<HTMLInputElement>, name: string) => {
+    const { value: inputValue } = e.target
+    const convertedNumber = validateOnlyNumber(inputValue)
     const convertedNumberScore =
-      inputValue === "" || isNaN(Number(inputValue)) ? "" : Number(inputValue);
-    if (name === "score") {
-      form.setFieldsValue({ [name]: convertedNumberScore });
+      inputValue === '' || isNaN(Number(inputValue)) ? '' : Number(inputValue)
+    if (name === 'score') {
+      form.setFieldsValue({ [name]: convertedNumberScore })
     } else {
-      form.setFieldsValue({ [name]: convertedNumber });
+      form.setFieldsValue({ [name]: convertedNumber })
     }
-  };
+  }
   const renderDataReward = (
-    <div className="col-lg-7">
+    <div className='col-lg-7'>
       <CardContainer>
-        <CardHeader textHeader="ข้อมูลของรางวัล" />
+        <CardHeader textHeader='ข้อมูลของรางวัล' />
         <Form form={form} onFieldsChange={onFieldsChange}>
-          <div className="form-group text-center" style={{ marginTop: "5%" }}>
+          <div className='form-group text-center' style={{ marginTop: '5%' }}>
             <Form.Item
-              name="file"
+              name='file'
               rules={[
                 {
                   required: true,
-                  message: "กรุณาใส่รูปภาพ!",
+                  message: 'กรุณาใส่รูปภาพ!',
                 },
               ]}
             >
               <div
-                className="hiddenFileInput"
+                className='hiddenFileInput'
                 style={{
-                  backgroundImage: `url(${
-                    imgReward == undefined ? image.emptyUpload : imgReward
-                  })`,
+                  backgroundImage: `url(${imgReward == undefined ? image.emptyUpload : imgReward})`,
                 }}
               >
-                <input
-                  key={imgReward}
-                  type="file"
-                  onChange={onChangeImg}
-                  title="เลือกรูป"
-                />
+                <input key={imgReward} type='file' onChange={onChangeImg} title='เลือกรูป' />
               </div>
             </Form.Item>
             <div>
@@ -320,8 +282,8 @@ function EditReward() {
                     color={color.Success}
                     onClick={onPreviewImg}
                     style={{
-                      cursor: "pointer",
-                      borderRadius: "5px",
+                      cursor: 'pointer',
+                      borderRadius: '5px',
                     }}
                   >
                     View
@@ -330,8 +292,8 @@ function EditReward() {
                     color={color.Error}
                     onClick={onRemoveImg}
                     style={{
-                      cursor: "pointer",
-                      borderRadius: "5px",
+                      cursor: 'pointer',
+                      borderRadius: '5px',
                     }}
                   >
                     Remove
@@ -340,264 +302,246 @@ function EditReward() {
               )}
             </div>
           </div>
-          <p className="text-center text-danger pt-3 pb-4">
+          <p className='text-center text-danger pt-3 pb-4'>
             **รูปภาพจะต้องมีสัดส่วน 1:1 หรือ 800px * 800px เท่านั้น
             เพื่อความสวยงามของภาพในแอปพลิเคชัน**
           </p>
           <div style={{ padding: 30 }}>
-            <div className="form-group col-lg-12">
+            <div className='form-group col-lg-12'>
               <label>
-                ชื่อของรางวัล <span style={{ color: "red" }}>*</span>
+                ชื่อของรางวัล <span style={{ color: 'red' }}>*</span>
               </label>
               <Form.Item
-                name="rewardName"
+                name='rewardName'
                 rules={[
                   {
                     required: true,
-                    message: "กรุณากรอกชื่อของรางวัล!",
+                    message: 'กรุณากรอกชื่อของรางวัล!',
                   },
                 ]}
               >
                 <Input
-                  placeholder="กรอกชื่อของรางวัล"
-                  autoComplete="off"
+                  placeholder='กรอกชื่อของรางวัล'
+                  autoComplete='off'
                   onChange={(e) => {
-                    setRewardName(e.target.value);
+                    setRewardName(e.target.value)
                   }}
                 />
               </Form.Item>
             </div>
-            <div className="row">
-              <div className="form-group col-lg-6">
+            <div className='row'>
+              <div className='form-group col-lg-6'>
                 <label>
-                  ประเภทของรางวัล <span style={{ color: "red" }}>*</span>
+                  ประเภทของรางวัล <span style={{ color: 'red' }}>*</span>
                 </label>
-                {checkStatus === "DRAFTING" ? (
+                {checkStatus === 'DRAFTING' ? (
                   <Form.Item
-                    name="rewardType"
+                    name='rewardType'
                     rules={[
                       {
                         required: true,
-                        message: "กรุณาเลือกประเภทของรางวัล!",
+                        message: 'กรุณาเลือกประเภทของรางวัล!',
                       },
                     ]}
                   >
                     <Select
-                      className="col-lg-12 p-1"
-                      placeholder="เลือกประเภทของรางวัล"
+                      className='col-lg-12 p-1'
+                      placeholder='เลือกประเภทของรางวัล'
                       onChange={handleRewardType}
                       showSearch
                       value={rewardType}
                       allowClear
-                      optionFilterProp="children"
-                      filterOption={(input: any, option: any) =>
-                        option.children.includes(input)
-                      }
+                      optionFilterProp='children'
+                      filterOption={(input: any, option: any) => option.children.includes(input)}
                       filterSort={(optionA, optionB) =>
-                        optionA.children
-                          .toLowerCase()
-                          .localeCompare(optionB.children.toLowerCase())
+                        optionA.children.toLowerCase().localeCompare(optionB.children.toLowerCase())
                       }
                     >
-                      <Option value={"PHYSICAL"}>Physical</Option>
-                      <Option value={"DIGITAL"}>Digital</Option>
+                      <Option value={'PHYSICAL'}>Physical</Option>
+                      <Option value={'DIGITAL'}>Digital</Option>
                     </Select>
                   </Form.Item>
                 ) : (
-                  <Form.Item name="rewardType">
-                    <span>
-                      {rewardType === "PHYSICAL" ? "Physical" : "Digital"}
-                    </span>
+                  <Form.Item name='rewardType'>
+                    <span>{rewardType === 'PHYSICAL' ? 'Physical' : 'Digital'}</span>
                   </Form.Item>
                 )}
               </div>
-              <div className="form-group col-lg-6">
+              <div className='form-group col-lg-6'>
                 <label>
-                  การแลกเปลี่ยน <span style={{ color: "red" }}>*</span>
+                  การแลกเปลี่ยน <span style={{ color: 'red' }}>*</span>
                 </label>
-                {checkStatus === "DRAFTING" ? (
-                  <div className="row">
-                    <div className="col-12">
-                      <Form.Item name="rewardExchange">
+                {checkStatus === 'DRAFTING' ? (
+                  <div className='row'>
+                    <div className='col-12'>
+                      <Form.Item name='rewardExchange'>
                         <Radio.Group onChange={onChangePoint}>
-                          <Radio value={"SCORE"}>ใช้แต้ม</Radio>
-                          <Radio value={"MISSION"}>ภารกิจ</Radio>
+                          <Radio value={'SCORE'}>ใช้แต้ม</Radio>
+                          <Radio value={'MISSION'}>ภารกิจ</Radio>
                         </Radio.Group>
                       </Form.Item>
                     </div>
                   </div>
                 ) : (
-                  <Form.Item name="rewardExchange">
-                    <p>{rewardExchange === "SCORE" ? "ใช้แต้ม" : "ภารกิจ"}</p>
+                  <Form.Item name='rewardExchange'>
+                    <p>{rewardExchange === 'SCORE' ? 'ใช้แต้ม' : 'ภารกิจ'}</p>
                   </Form.Item>
                 )}
               </div>
             </div>
-            {rewardExchange === "MISSION" ? (
-              <div className="row">
-                <div className="form-group col-lg-6">
+            {rewardExchange === 'MISSION' ? (
+              <div className='row'>
+                <div className='form-group col-lg-6'>
                   <label>
-                    จำนวน{" "}
-                    <span style={{ color: "red" }}>
-                      (ต้องไม่น้อยกว่าที่แลกไป)*
-                    </span>
+                    จำนวน <span style={{ color: 'red' }}>(ต้องไม่น้อยกว่าที่แลกไป)*</span>
                   </label>
                   <Form.Item
-                    name="amount"
+                    name='amount'
                     rules={[
                       {
                         required: true,
-                        message: "กรุณากรอกจำนวน!",
+                        message: 'กรุณากรอกจำนวน!',
                       },
                     ]}
                   >
                     <Input
-                      placeholder="กรอกจำนวน"
-                      autoComplete="off"
-                      onChange={(e) => checkNumber(e, "amount")}
+                      placeholder='กรอกจำนวน'
+                      autoComplete='off'
+                      onChange={(e) => checkNumber(e, 'amount')}
                     />
                   </Form.Item>
                 </div>
               </div>
             ) : (
-              <div className="row">
-                <div className="form-group col-lg-6">
+              <div className='row'>
+                <div className='form-group col-lg-6'>
                   <label>
-                    แต้มที่ต้องใช้แลก <span style={{ color: "red" }}>*</span>
+                    แต้มที่ต้องใช้แลก <span style={{ color: 'red' }}>*</span>
                   </label>
-                  {checkStatus === "DRAFTING" ? (
+                  {checkStatus === 'DRAFTING' ? (
                     <Form.Item
-                      name="score"
+                      name='score'
                       rules={[
                         {
                           required: true,
-                          message: "กรุณากรอกแต้มที่ต้องการใช้แลก!",
+                          message: 'กรุณากรอกแต้มที่ต้องการใช้แลก!',
                         },
                       ]}
                     >
                       <Input
-                        type="number"
-                        placeholder="กรอกแต้มที่ต้องใช้แลก"
-                        autoComplete="off"
-                        suffix="แต้ม"
+                        type='number'
+                        placeholder='กรอกแต้มที่ต้องใช้แลก'
+                        autoComplete='off'
+                        suffix='แต้ม'
                         onChange={(e) => {
-                          checkNumber(e, "score");
-                          setScore(e.target.value);
+                          checkNumber(e, 'score')
+                          setScore(e.target.value)
                         }}
                       />
                     </Form.Item>
                   ) : (
-                    <Form.Item name="score">
-                      <p>{numberWithCommas(score) + " " + "แต้ม"}</p>
+                    <Form.Item name='score'>
+                      <p>{numberWithCommas(score) + ' ' + 'แต้ม'}</p>
                     </Form.Item>
                   )}
                 </div>
-                <div className="form-group col-lg-6">
+                <div className='form-group col-lg-6'>
                   <label>
-                    จำนวน{" "}
-                    <span style={{ color: "red" }}>
-                      (ต้องไม่น้อยกว่าที่แลกไป) *
-                    </span>
+                    จำนวน <span style={{ color: 'red' }}>(ต้องไม่น้อยกว่าที่แลกไป) *</span>
                   </label>
                   <Form.Item
-                    name="amount"
+                    name='amount'
                     rules={[
                       {
                         required: true,
-                        message: "กรุณากรอกจำนวน!",
+                        message: 'กรุณากรอกจำนวน!',
                       },
                     ]}
                   >
                     <Input
-                      placeholder="กรอกจำนวน"
-                      autoComplete="off"
-                      onChange={(e) => checkNumber(e, "amount")}
+                      placeholder='กรอกจำนวน'
+                      autoComplete='off'
+                      onChange={(e) => checkNumber(e, 'amount')}
                     />
                   </Form.Item>
                 </div>
               </div>
             )}
-            {rewardExchange === "SCORE" && (
+            {rewardExchange === 'SCORE' && (
               <>
                 <Divider />
                 <p style={{ color: color.Error }}>ช่วงเวลาที่สามารถแลกได้</p>
-                <div className="row">
-                  <div className="col-lg-6">
+                <div className='row'>
+                  <div className='col-lg-6'>
                     <label>
                       วันเริ่มต้น<span style={{ color: color.Error }}>*</span>
                     </label>
-                    <div className="d-flex">
+                    <div className='d-flex'>
                       <Form.Item
-                        name="startExchangeDate"
+                        name='startExchangeDate'
                         rules={[
                           {
                             required: true,
-                            message: "กรุณากรอกวันที่!",
+                            message: 'กรุณากรอกวันที่!',
                           },
                         ]}
                       >
                         <DatePicker
                           disabled
-                          placeholder="เลือกวันที่"
+                          placeholder='เลือกวันที่'
                           onChange={(val) => {
-                            setStartExchangeDate(val);
+                            setStartExchangeDate(val)
                           }}
                           format={dateFormat}
                         />
                       </Form.Item>
-                      <Form.Item
-                        name="startExchangeTime"
-                        initialValue={moment("00:00", "HH:mm")}
-                      >
+                      <Form.Item name='startExchangeTime' initialValue={moment('00:00', 'HH:mm')}>
                         <TimePicker
                           disabled
-                          format={"HH:mm"}
-                          className="ms-3"
-                          placeholder="เลือกเวลา"
+                          format={'HH:mm'}
+                          className='ms-3'
+                          placeholder='เลือกเวลา'
                           onChange={(val) => {
-                            setStartExchangeTime(val);
+                            setStartExchangeTime(val)
                           }}
-                          defaultValue={moment("00:00", "HH:mm")}
+                          defaultValue={moment('00:00', 'HH:mm')}
                           allowClear={false}
                         />
                       </Form.Item>
                     </div>
                   </div>
-                  <div className="col-lg-6">
+                  <div className='col-lg-6'>
                     <label>
                       วันสิ้นสุด<span style={{ color: color.Error }}>*</span>
                     </label>
-                    <div className="d-flex">
+                    <div className='d-flex'>
                       <Form.Item
-                        name="expiredExchangeDate"
+                        name='expiredExchangeDate'
                         rules={[
                           {
                             required: true,
-                            message: "กรุณากรอกวันที่!",
+                            message: 'กรุณากรอกวันที่!',
                           },
                         ]}
                       >
                         <DatePicker
-                          placeholder="เลือกวันที่"
+                          placeholder='เลือกวันที่'
                           onChange={(val) => {
-                            setEndExchangeDate(val);
+                            setEndExchangeDate(val)
                           }}
                           format={dateFormat}
                           disabledDate={disabledDateChange}
                         />
                       </Form.Item>
-                      <Form.Item
-                        name="expiredExchangeTime"
-                        initialValue={moment("23:59", "HH:mm")}
-                      >
+                      <Form.Item name='expiredExchangeTime' initialValue={moment('23:59', 'HH:mm')}>
                         <TimePicker
-                          format={"HH:mm"}
-                          className="ms-3"
-                          placeholder="เลือกเวลา"
+                          format={'HH:mm'}
+                          className='ms-3'
+                          placeholder='เลือกเวลา'
                           onChange={(val) => {
-                            setEndExchangeTime(val);
+                            setEndExchangeTime(val)
                           }}
-                          defaultValue={moment("23:59", "HH:mm")}
+                          defaultValue={moment('23:59', 'HH:mm')}
                           allowClear={false}
                         />
                       </Form.Item>
@@ -607,86 +551,80 @@ function EditReward() {
                 <Divider />
               </>
             )}
-            {rewardType === "DIGITAL" && (
+            {rewardType === 'DIGITAL' && (
               <>
                 <p style={{ color: color.Success }}>ช่วงเวลาที่ใช้ได้</p>
-                <div className="row">
-                  <div className="col-lg-6">
+                <div className='row'>
+                  <div className='col-lg-6'>
                     <label>
                       วันเริ่มต้น<span style={{ color: color.Error }}>*</span>
                     </label>
-                    <div className="d-flex">
+                    <div className='d-flex'>
                       <Form.Item
-                        name="startUsedDate"
+                        name='startUsedDate'
                         rules={[
                           {
                             required: true,
-                            message: "กรุณากรอกวันที่!",
+                            message: 'กรุณากรอกวันที่!',
                           },
                         ]}
                       >
                         <DatePicker
                           disabled
-                          placeholder="เลือกวันที่"
+                          placeholder='เลือกวันที่'
                           format={dateFormat}
                           onChange={(val) => {
-                            setUsedDate(val);
+                            setUsedDate(val)
                           }}
                         />
                       </Form.Item>
-                      <Form.Item
-                        name="startUsedTime"
-                        initialValue={moment("00:00", "HH:mm")}
-                      >
+                      <Form.Item name='startUsedTime' initialValue={moment('00:00', 'HH:mm')}>
                         <TimePicker
                           disabled
-                          format={"HH:mm"}
-                          className="ms-3"
-                          placeholder="เลือกเวลา"
-                          defaultValue={moment("00:00", "HH:mm")}
+                          format={'HH:mm'}
+                          className='ms-3'
+                          placeholder='เลือกเวลา'
+                          defaultValue={moment('00:00', 'HH:mm')}
                           allowClear={false}
                           onChange={(val) => {
-                            setStartUsedTime(val);
+                            setStartUsedTime(val)
                           }}
                         />
                       </Form.Item>
                     </div>
                   </div>
-                  <div className="col-lg-6">
+                  <div className='col-lg-6'>
                     <label>
                       วันสิ้นสุด<span style={{ color: color.Error }}>*</span>
                     </label>
-                    <div className="d-flex">
+                    <div className='d-flex'>
                       <Form.Item
-                        name="expiredUsedDate"
+                        name='expiredUsedDate'
                         rules={[
                           {
                             required: true,
-                            message: "กรุณากรอกวันที่!",
+                            message: 'กรุณากรอกวันที่!',
                           },
                         ]}
                       >
                         <DatePicker
-                          placeholder="เลือกวันที่"
+                          placeholder='เลือกวันที่'
                           format={dateFormat}
                           onChange={(val) => {
-                            setEndUsedDate(val);
+                            setEndUsedDate(val)
                           }}
                           disabledDate={disabledDateUsed}
                         />
                       </Form.Item>
-                      <Form.Item
-                        name="expiredUsedTime"
-                        initialValue={moment("23:59", "HH:mm")}
-                      >
+                      <Form.Item name='expiredUsedTime' initialValue={moment('23:59', 'HH:mm')}>
                         <TimePicker
-                          format={"HH:mm"}
-                          className="ms-3"
-                          placeholder="เลือกเวลา"
-                          defaultValue={moment("00:00", "HH:mm")}
+                          format={'HH:mm'}
+                          className='ms-3'
+                          placeholder='เลือกเวลา'
+                          defaultValue={moment('00:00', 'HH:mm')}
                           allowClear={false}
                           onChange={(val) => {
-                            setEndUsedTime(val);
+                            setEndUsedTime(val)
                           }}
                         />
                       </Form.Item>
@@ -696,78 +634,77 @@ function EditReward() {
                 <Divider />
               </>
             )}
-            <div className="row py-4">
-              <div className="form-group col-lg-12">
+            <div className='row py-4'>
+              <div className='form-group col-lg-12'>
                 <label>
-                  รายละเอียด (จะแสดงใน Application){" "}
-                  <span style={{ color: "red" }}>*</span>
+                  รายละเอียด (จะแสดงใน Application) <span style={{ color: 'red' }}>*</span>
                 </label>
                 <Form.Item
-                  name="description"
+                  name='description'
                   rules={[
                     {
                       required: true,
-                      message: "กรุณากรอกรายละเอียด",
+                      message: 'กรุณากรอกรายละเอียด',
                     },
                   ]}
                 >
                   <ReactQuill
-                    className="react-editor"
-                    theme="snow"
+                    className='react-editor'
+                    theme='snow'
                     onChange={handleDescription}
-                    placeholder={"กรอกรายละเอียด (จะแสดงใน Application)"}
+                    placeholder={'กรอกรายละเอียด (จะแสดงใน Application)'}
                     modules={modules}
                     formats={formats}
                   />
                 </Form.Item>
               </div>
             </div>
-            <div className="row py-4">
-              <div className="form-group col-lg-12">
+            <div className='row py-4'>
+              <div className='form-group col-lg-12'>
                 <label>
                   เงื่อนไข (จะแสดงใน Application)
-                  <span style={{ color: "red" }}>*</span>
+                  <span style={{ color: 'red' }}>*</span>
                 </label>
                 <Form.Item
-                  name="condition"
+                  name='condition'
                   rules={[
                     {
                       required: true,
-                      message: "กรุณากรอกเงื่อนไข",
+                      message: 'กรุณากรอกเงื่อนไข',
                     },
                   ]}
                 >
                   <ReactQuill
-                    className="react-editor"
-                    theme="snow"
+                    className='react-editor'
+                    theme='snow'
                     onChange={handleCondition}
-                    placeholder={"กรอกเงื่อนไข (จะแสดงใน Application)"}
+                    placeholder={'กรอกเงื่อนไข (จะแสดงใน Application)'}
                     modules={modules}
                     formats={formats}
                   />
                 </Form.Item>
               </div>
             </div>
-            <div className="row pt-3">
-              <div className="form-group col-lg-12 d-flex flex-column">
+            <div className='row pt-3'>
+              <div className='form-group col-lg-12 d-flex flex-column'>
                 <label>
-                  สถานะ<span style={{ color: "red" }}> *</span>
+                  สถานะ<span style={{ color: 'red' }}> *</span>
                 </label>
                 <Form.Item
-                  name="status"
+                  name='status'
                   rules={[
                     {
                       required: true,
-                      message: "กรุณาเลือกสถานะ",
+                      message: 'กรุณาเลือกสถานะ',
                     },
                   ]}
                 >
                   <Radio.Group
-                    className="d-flex flex-column"
+                    className='d-flex flex-column'
                     onChange={(e) => setRewardStatus(e.target.value)}
                   >
-                    <Radio value={"ACTIVE"}>ใช้งาน</Radio>
-                    <Radio value={"INACTIVE"}>ปิดการใช้งาน</Radio>
+                    <Radio value={'ACTIVE'}>ใช้งาน</Radio>
+                    <Radio value={'INACTIVE'}>ปิดการใช้งาน</Radio>
                   </Radio.Group>
                 </Form.Item>
               </div>
@@ -776,9 +713,9 @@ function EditReward() {
         </Form>
       </CardContainer>
     </div>
-  );
+  )
   const renderRedeem = (
-    <div className="col-lg-4">
+    <div className='col-lg-4'>
       <RenderReward
         img={imgReward}
         name={rewardName}
@@ -791,7 +728,7 @@ function EditReward() {
         countdownTime={result < 0 ? 0 : parseInt(result.toString())}
       />
     </div>
-  );
+  )
   const onSubmit = () => {
     const {
       rewardName,
@@ -810,21 +747,21 @@ function EditReward() {
       startUsedTime,
       expiredUsedDate,
       expiredUsedTime,
-    } = form.getFieldsValue();
+    } = form.getFieldsValue()
     const startDate = new Date(
-      moment(startExchangeDate).format("YYYY-MM-DD") +
-        " " +
-        moment(startExchangeTime).format("HH:mm:ss")
-    ).getTime();
-    const dateNow = Date.now();
-    if (status === "DRAFTING") {
+      moment(startExchangeDate).format('YYYY-MM-DD') +
+        ' ' +
+        moment(startExchangeTime).format('HH:mm:ss'),
+    ).getTime()
+    const dateNow = Date.now()
+    if (status === 'DRAFTING') {
       if (startDate - dateNow > 0) {
-        setRewardStatus("ACTIVE");
+        setRewardStatus('ACTIVE')
       } else {
-        setRewardStatus("DRAFTING");
+        setRewardStatus('DRAFTING')
       }
     } else {
-      setRewardStatus(status);
+      setRewardStatus(status)
     }
     const rewardData: RewardEntities = {
       rewardName: rewardName,
@@ -836,64 +773,60 @@ function EditReward() {
       condition: condition,
       status: !rewardStatus ? status : rewardStatus,
       startExchangeDate:
-        moment(startExchangeDate).format("YYYY-MM-DD") +
-        " " +
-        moment(startExchangeTime).format("HH:mm:ss"),
-      expiredExchangeDate: !!expiredExchangeDate
-        ? moment(expiredExchangeDate).format("YYYY-MM-DD") +
-          " " +
-          moment(expiredExchangeTime).format("HH:mm:ss")
-        : moment(EndExchangeDate).format("YYYY-MM-DD") +
-          " " +
-          moment(EndExchangeTime).format("HH:mm:ss"),
+        moment(startExchangeDate).format('YYYY-MM-DD') +
+        ' ' +
+        moment(startExchangeTime).format('HH:mm:ss'),
+      expiredExchangeDate: expiredExchangeDate
+        ? moment(expiredExchangeDate).format('YYYY-MM-DD') +
+          ' ' +
+          moment(expiredExchangeTime).format('HH:mm:ss')
+        : moment(EndExchangeDate).format('YYYY-MM-DD') +
+          ' ' +
+          moment(EndExchangeTime).format('HH:mm:ss'),
       startUsedDate:
-        moment(startUsedDate).format("YYYY-MM-DD") +
-        " " +
-        moment(startUsedTime).format("HH:mm:ss"),
-      expiredUsedDate: !!expiredUsedDate
-        ? moment(expiredUsedDate).format("YYYY-MM-DD") +
-          " " +
-          moment(expiredUsedTime).format("HH:mm:ss")
-        : moment(endUsedDate).format("YYYY-MM-DD") +
-          " " +
-          moment(endUsedTime).format("HH:mm:ss"),
+        moment(startUsedDate).format('YYYY-MM-DD') + ' ' + moment(startUsedTime).format('HH:mm:ss'),
+      expiredUsedDate: expiredUsedDate
+        ? moment(expiredUsedDate).format('YYYY-MM-DD') +
+          ' ' +
+          moment(expiredUsedTime).format('HH:mm:ss')
+        : moment(endUsedDate).format('YYYY-MM-DD') + ' ' + moment(endUsedTime).format('HH:mm:ss'),
       file: !createImgReward.file ? imgReward : createImgReward.file,
-      createBy: profile.firstname + " " + profile.lastname,
-    };
+      createBy: profile.firstname + ' ' + profile.lastname,
+    }
     RewardDatasource.updateReward(queryString[1], rewardData)
       .then((res) => {
         Swal.fire({
-          title: "บันทึกสำเร็จ",
-          icon: "success",
+          title: 'บันทึกสำเร็จ',
+          icon: 'success',
           timer: 1500,
           showConfirmButton: false,
         }).then((time) => {
-          navigate("/IndexReward");
-        });
+          navigate('/IndexReward')
+        })
       })
       .catch((err) => {
-        console.log(err);
+        console.log(err)
         Swal.fire({
-          title: "เกิดข้อผิดพลาก",
-          icon: "error",
+          title: 'เกิดข้อผิดพลาก',
+          icon: 'error',
           showConfirmButton: true,
-        });
-      });
-  };
+        })
+      })
+  }
 
   return (
     <>
       <Row>
         <BackIconButton
           onClick={() => {
-            navigate(-1);
+            navigate(-1)
           }}
         />
-        <span className="pt-3">
-          <strong style={{ fontSize: "20px" }}>แก้ไขของรางวัล</strong>
+        <span className='pt-3'>
+          <strong style={{ fontSize: '20px' }}>แก้ไขของรางวัล</strong>
         </span>
       </Row>
-      <Row className="d-flex justify-content-around">
+      <Row className='d-flex justify-content-around'>
         {renderDataReward}
         {renderRedeem}
       </Row>
@@ -904,7 +837,7 @@ function EditReward() {
         onClickSave={onSubmit}
       />
     </>
-  );
+  )
 }
 
-export default EditReward;
+export default EditReward

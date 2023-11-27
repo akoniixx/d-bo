@@ -1,11 +1,11 @@
-import { BASE_URL, httpClient } from "../config/config";
+import { BASE_URL, httpClient } from '../config/config'
 import {
   DetailSummaryListEntity,
   DronerSummaryPointListEntity,
   FarmerSummaryPointListEntity,
   PlanningPointListEntity,
   ReceivePointListEntity,
-} from "../entities/PointReceiveEntities";
+} from '../entities/PointReceiveEntities'
 
 export class PointReceiveDatasource {
   static getPlanningPoint(
@@ -15,7 +15,8 @@ export class PointReceiveDatasource {
     search?: string,
     taskNo?: string,
     startDate?: string,
-    endDate?: string
+    endDate?: string,
+    typeEstimate?: string,
   ): Promise<PlanningPointListEntity> {
     const params = {
       status: status,
@@ -25,17 +26,18 @@ export class PointReceiveDatasource {
       taskNo: taskNo,
       startDate: startDate,
       endDate: endDate,
-    };
+      typeEstimate: typeEstimate,
+    }
     return httpClient
-      .get(BASE_URL + "/tasks/task-estimate-point/task-estimate-point-bo", {
+      .get(BASE_URL + '/tasks/task-estimate-point/task-estimate-point-bo', {
         params,
       })
       .then((response) => {
-        return response.data;
+        return response.data
       })
       .catch((err) => {
-        console.log(err, "err getnewtask");
-      });
+        console.log(err, 'err getnewtask')
+      })
   }
 
   static getReceivePoint(
@@ -45,7 +47,7 @@ export class PointReceiveDatasource {
     taskMission?: string,
     startDate?: string,
     endDate?: string,
-    type?: string
+    type?: string,
   ): Promise<ReceivePointListEntity> {
     const params = {
       take: take,
@@ -55,44 +57,41 @@ export class PointReceiveDatasource {
       startDate: startDate,
       endDate: endDate,
       type: type,
-    };
+    }
     return httpClient
-      .get(BASE_URL + "/promotion/historypoint-quota/getallhistoryincrease", {
+      .get(BASE_URL + '/promotion/historypoint-quota/getallhistoryincrease', {
         params,
       })
       .then((response) => {
-        return response.data;
+        return response.data
       })
       .catch((err) => {
-        console.log(err, "err get receive point");
-      });
+        console.log(err, 'err get receive point')
+      })
   }
 
   static getFarmerSumPoint(
     take?: number,
     page?: number,
     search?: string,
-    sortDirection?: string
+    sortDirection?: string,
   ): Promise<FarmerSummaryPointListEntity> {
     const params = {
       take: take,
       page: page,
       search: search,
       sortDirection: sortDirection,
-    };
+    }
     return httpClient
-      .get(
-        BASE_URL + "/promotion/historypoint-quota/getIndividualPointFarmer",
-        {
-          params,
-        }
-      )
+      .get(BASE_URL + '/promotion/historypoint-quota/getIndividualPointFarmer', {
+        params,
+      })
       .then((response) => {
-        return response.data;
+        return response.data
       })
       .catch((err) => {
-        console.log(err, "err getnewtask");
-      });
+        console.log(err, 'err getnewtask')
+      })
   }
   static getFarmerSumById(
     id: string,
@@ -102,7 +101,7 @@ export class PointReceiveDatasource {
     startDate?: string,
     endDate?: string,
     sortField?: string,
-    sortDirection?: string
+    sortDirection?: string,
   ): Promise<DetailSummaryListEntity> {
     const params = {
       action: action,
@@ -112,46 +111,41 @@ export class PointReceiveDatasource {
       endDate: endDate,
       sortField: sortField,
       sortDirection: sortDirection,
-    };
+    }
     return httpClient
-      .get(
-        BASE_URL +
-          `/promotion/historypoint-quota/getIndividualPointDetailFarmer/${id}`,
-        { params }
-      )
+      .get(BASE_URL + `/promotion/historypoint-quota/getIndividualPointDetailFarmer/${id}`, {
+        params,
+      })
       .then((response) => {
-        return response.data;
+        return response.data
       })
       .catch((err) => {
-        console.log(err, "err get farmer sum");
-      });
+        console.log(err, 'err get farmer sum')
+      })
   }
 
   static getDronerSumPoint(
     take?: number,
     page?: number,
     search?: string,
-    sortDirection?: string
+    sortDirection?: string,
   ): Promise<DronerSummaryPointListEntity> {
     const params = {
       take: take,
       page: page,
       search: search,
       sortDirection: sortDirection,
-    };
+    }
     return httpClient
-      .get(
-        BASE_URL + "/promotion/historypoint-quota/getIndividualPointDroner",
-        {
-          params,
-        }
-      )
+      .get(BASE_URL + '/promotion/historypoint-quota/getIndividualPointDroner', {
+        params,
+      })
       .then((response) => {
-        return response.data;
+        return response.data
       })
       .catch((err) => {
-        console.log(err, "err getnewtask");
-      });
+        console.log(err, 'err getnewtask')
+      })
   }
 
   static getDronerSumById(
@@ -162,7 +156,7 @@ export class PointReceiveDatasource {
     startDate?: string,
     endDate?: string,
     sortField?: string,
-    sortDirection?: string
+    sortDirection?: string,
   ): Promise<DetailSummaryListEntity> {
     const params = {
       action: action,
@@ -172,18 +166,16 @@ export class PointReceiveDatasource {
       endDate: endDate,
       sortField: sortField,
       sortDirection: sortDirection,
-    };
+    }
     return httpClient
-      .get(
-        BASE_URL +
-          `/promotion/historypoint-quota/getIndividualPointDetailDroner/${id}`,
-        { params }
-      )
+      .get(BASE_URL + `/promotion/historypoint-quota/getIndividualPointDetailDroner/${id}`, {
+        params,
+      })
       .then((response) => {
-        return response.data;
+        return response.data
       })
       .catch((err) => {
-        console.log(err, "err get droner sum");
-      });
+        console.log(err, 'err get droner sum')
+      })
   }
 }
