@@ -125,8 +125,8 @@ export const pathLists = (isAccounting: boolean, isAdminTask?: boolean) => {
               subMenu: [],
             },
             {
-              path: '/IndexCategoryGuru',
-              name: 'IndexCategoryGuru',
+              path: '/IndexGroupGuru',
+              name: 'IndexGroupGuru',
               title: 'หมวดหมู่',
               subMenu: [],
             },

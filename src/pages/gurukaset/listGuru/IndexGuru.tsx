@@ -33,13 +33,15 @@ import ActionButton from '../../../components/button/ActionButton'
 import { HighlightDatasource } from '../../../datasource/HighlightDatasource'
 import moment from 'moment'
 import ModalDelete from '../../../components/modal/ModalDelete'
+import { AllGuruKasetEntities } from '../../../entities/GuruKasetEntities'
+import { GuruKasetDataSource } from '../../../datasource/GuruKasetDatasource'
 
 function IndexGuru() {
   const [loading, setLoading] = useState<boolean>(false)
   const { RangePicker } = DatePicker
 
   const navigate = useNavigate()
-  const [data, setData] = useState<any>()
+  const [data, setData] = useState<AllGuruKasetEntities>()
   const [status, setStatus] = useState<string>('ACTIVE')
   const [row, setRow] = useState(10)
   const [current, setCurrent] = useState(1)
@@ -57,9 +59,9 @@ function IndexGuru() {
   const [modalDelete, setModalDelete] = useState<boolean>(false)
   const [deleteId, setDeleteId] = useState<any>()
 
-  const fetchNewsHighlight = async () => {
+  const getGuruKaset = async () => {
     setLoading(true)
-    await HighlightDatasource.getNewsHighlight(
+    await GuruKasetDataSource.getAllGuruKaset(
       current,
       row,
       status,
@@ -76,7 +78,7 @@ function IndexGuru() {
   }
 
   useEffect(() => {
-    fetchNewsHighlight()
+    getGuruKaset()
   }, [current, sortDirection, status, startDate, expiredDate])
 
   const tabConfigurations = [
@@ -588,7 +590,7 @@ function IndexGuru() {
             }}
             onClick={() => {
               setCurrent(1)
-              // fetchNewsHighlight()
+              // getGuruKaset()
             }}
           >
             ค้นหาข้อมูล
