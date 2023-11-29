@@ -338,11 +338,7 @@ function NewsPage() {
                       row.pin_all === true ? 'หน้าข่าวสารทั้งหมด' : ''
                     }`}
                   >
-                    <Image
-                      preview={false}
-                      src={icon.pin}
-                      style={{ width: '22', height: '22px', paddingRight: 5 }}
-                    />
+                    <img src={icon.pin} style={{ width: '22', height: '22px', paddingRight: 5 }} />
                   </Tooltip>
                 ) : null}
 

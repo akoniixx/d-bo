@@ -308,24 +308,24 @@ const AdminCancelTask = () => {
           </>
         </Row>
       </Card>
-      {checkStatus !== 'CANCELED' &&
-       <div className='pt-2 pb-2'>
-       <Button
-         style={{
-           backgroundColor: color.Error,
-           color: 'white',
-           width: '100%',
-           borderRadius: '5px',
-         }}
-         size='large'
-         onClick={async () => {
-           setShowModal(!showModal)
-         }}
-       >
-         ยกเลิกงาน
-       </Button>
-     </div>}
-     
+      {checkStatus !== 'CANCELED' && (
+        <div className='pt-2 pb-2'>
+          <Button
+            style={{
+              backgroundColor: color.Error,
+              color: 'white',
+              width: '100%',
+              borderRadius: '5px',
+            }}
+            size='large'
+            onClick={async () => {
+              setShowModal(!showModal)
+            }}
+          >
+            ยกเลิกงาน
+          </Button>
+        </div>
+      )}
 
       <Card style={{ backgroundColor: '#F2F5FC' }}>
         <Row justify={'space-between'} gutter={8}>

@@ -40,6 +40,7 @@ import { CropPurposeSprayEntity, CropPurposeSprayEntity_INT } from '../../../ent
 import { FarmerEntity, FarmerEntity_INIT, FarmerPageEntity } from '../../../entities/FarmerEntities'
 import { FarmerPlotEntity, FarmerPlotEntity_INIT } from '../../../entities/FarmerPlotEntities'
 import {
+  CreateNewTaskEntity_INIT,
   GetNewTaskEntity,
   GetNewTaskEntity_INIT,
   UpdateNewTask,
@@ -81,6 +82,7 @@ import '../newTask/Styles.css'
 import { TargetSpray } from '../../../datasource/TargetSprayDatarource'
 import { TargetSpayEntities } from '../../../entities/TargetSprayEntities'
 import { DronerEntity_INIT } from '../../../entities/DronerEntities'
+import { ConfirmNewTask } from './ConfirmNewTask'
 
 const dateFormat = 'DD/MM/YYYY'
 const dateCreateFormat = 'YYYY-MM-DD'
@@ -818,61 +820,63 @@ const EditNewTask = () => {
             <label>
               เป้าหมายการฉีดพ่น <span style={{ color: 'red' }}>*</span>
             </label>
-            {targetSpray
-              .map((item: any) =>
-                _.set(
-                  item,
-                  'isChecked',
-                  data?.targetSpray.map((x) => x).find((y) => y === item.name)
-                    ? true
-                    : item.isChecked,
-                ),
-              )
-              .map((x, index) => (
-                <>
-                  <div className='form-group'>
-                    <Checkbox
-                      key={data.targetSpray[0]}
-                      defaultChecked={x.isChecked}
-                      value={x.name}
-                      disabled={
-                        current == 2 || checkSelectPlot == 'error' || data.couponId ? true : false
-                      }
-                      onChange={handlePurposeSpray}
-                    />{' '}
-                    <label style={{ padding: '0 8px 0 0' }}>{x.name}</label>
-                    {x.name === 'อื่นๆ' && (
-                      <>
-                        <Input
-                          status={validateComma.status}
-                          key={data.targetSpray[0]}
-                          className='col-lg-5'
-                          disabled={current == 2 || checkCrop}
-                          placeholder='โปรดระบุ เช่น เพลี้ย,หอย'
-                          defaultValue={Array.from(
-                            new Set(
-                              data?.targetSpray.filter(
-                                (a) => !someTargetSpray.some((x: any) => x === a),
+            <div className='checkbox-grid'>
+              {targetSpray
+                .map((item: any) =>
+                  _.set(
+                    item,
+                    'isChecked',
+                    data?.targetSpray.map((x) => x).find((y) => y === item.name)
+                      ? true
+                      : item.isChecked,
+                  ),
+                )
+                .map((x, index) => (
+                  <>
+                    <div className='form-group'>
+                      <Checkbox
+                        key={data.targetSpray[0]}
+                        defaultChecked={x.isChecked}
+                        value={x.name}
+                        disabled={
+                          current == 2 || checkSelectPlot == 'error' || data.couponId ? true : false
+                        }
+                        onChange={handlePurposeSpray}
+                      />{' '}
+                      <label style={{ padding: '0 8px 0 0' }}>{x.name}</label>
+                      {x.name === 'อื่นๆ' && (
+                        <>
+                          <Input
+                            status={validateComma.status}
+                            key={data.targetSpray[0]}
+                            className='col-lg-8'
+                            disabled={current == 2 || checkCrop}
+                            placeholder='โปรดระบุ เช่น เพลี้ย,หอย'
+                            defaultValue={Array.from(
+                              new Set(
+                                data?.targetSpray.filter(
+                                  (a) => !someTargetSpray.some((x: any) => x === a),
+                                ),
                               ),
-                            ),
-                          ).join(',')}
-                          onChange={handleOtherSpray}
-                        />
-                        {validateComma.status == 'error' && (
-                          <p
-                            style={{
-                              color: color.Error,
-                              padding: '0 0 0 55px',
-                            }}
-                          >
-                            {validateComma.message}
-                          </p>
-                        )}
-                      </>
-                    )}
-                  </div>
-                </>
-              ))}
+                            ).join(',')}
+                            onChange={handleOtherSpray}
+                          />
+                          {validateComma.status == 'error' && (
+                            <p
+                              style={{
+                                color: color.Error,
+                                padding: '0 0 0 55px',
+                              }}
+                            >
+                              {validateComma.message}
+                            </p>
+                          )}
+                        </>
+                      )}
+                    </div>
+                  </>
+                ))}
+            </div>
           </div>
           <div className='row form-group col-lg-6 p-2'>
             <label>
@@ -1506,230 +1510,6 @@ const EditNewTask = () => {
   )
   //#endregion
 
-  //#region Step3
-  const renderDronerSelectedList = (
-    <CardContainer>
-      <CardHeader textHeader='รายชื่อนักบินโดรน' />
-      <Form>
-        <div className='container'>
-          {current == 2 &&
-            dronerSelectedList?.map((item) => (
-              <>
-                <div className='row pt-3'>
-                  {item?.dronerDetail[0] != '' && (
-                    <>
-                      <div className='col-lg-3'>
-                        {JSON.parse(item?.dronerDetail).firstname}{' '}
-                        {JSON.parse(item?.dronerDetail).lastname}
-                        <br />
-                        <p
-                          style={{
-                            fontSize: '12px',
-                            color: color.Grey,
-                          }}
-                        >
-                          {JSON.parse(item?.dronerDetail).droner_code}
-                          {JSON.parse(item?.dronerDetail).nickname && (
-                            <ShowNickName
-                              data={JSON.parse(item?.dronerDetail).nickname}
-                              menu='INFO'
-                            />
-                          )}
-                        </p>
-                      </div>
-                      <div className='col-lg-2'>{JSON.parse(item?.dronerDetail).telephone_no}</div>
-                      <div className='col-lg-3'>
-                        {JSON.parse(item?.dronerDetail).subdistrict_name ? (
-                          <>{JSON.parse(item?.dronerDetail).subdistrict_name}/</>
-                        ) : (
-                          '-/'
-                        )}
-                        {JSON.parse(item?.dronerDetail).district_name ? (
-                          <>{JSON.parse(item?.dronerDetail).district_name}/</>
-                        ) : (
-                          '-/'
-                        )}
-                        {JSON.parse(item?.dronerDetail).province_name ? (
-                          <>{JSON.parse(item?.dronerDetail).province_name}</>
-                        ) : (
-                          '-'
-                        )}
-                      </div>
-                      <div className='col-lg-1'>{JSON.parse(item.distance).toFixed(0)} km</div>
-                      <div className='col-lg-2'>
-                        {JSON.parse(item?.dronerDetail).drone_brand ? (
-                          <>
-                            <Avatar
-                              size={25}
-                              src={JSON.parse(item.dronerDetail).logo_drone_brand}
-                              style={{ marginRight: '5px' }}
-                            />
-                            {JSON.parse(item?.dronerDetail).drone_brand}
-                            <br />
-                            <p
-                              style={{
-                                fontSize: '12px',
-                                color: color.Grey,
-                              }}
-                            >
-                              {JSON.parse(item.dronerDetail).count_drone > 1 &&
-                                '(มากกว่า 1 ยี่หัอ)'}
-                            </p>
-                          </>
-                        ) : (
-                          '-'
-                        )}
-                      </div>
-                      <div className='col-lg-1'>
-                        <span
-                          style={{
-                            color:
-                              JSON.parse(item?.dronerDetail).droner_status == 'สะดวก'
-                                ? color.Success
-                                : color.Error,
-                          }}
-                        >
-                          <Badge
-                            color={
-                              JSON.parse(item?.dronerDetail).droner_status == 'สะดวก'
-                                ? color.Success
-                                : color.Error
-                            }
-                          />{' '}
-                          {JSON.parse(item?.dronerDetail).droner_status}
-                          <br />
-                        </span>
-                      </div>
-                    </>
-                  )}
-                </div>
-              </>
-            ))}
-        </div>
-      </Form>
-    </CardContainer>
-  )
-  const renderServiceCharge = (
-    <CardContainer>
-      <CardHeader textHeader='ยอดรวมค่าบริการ' />
-      <Form style={{ padding: '20px' }}>
-        <CardContainer style={{ backgroundColor: 'rgba(33, 150, 83, 0.1)' }}>
-          <Form style={{ padding: '20px' }}>
-            <div className='row'>
-              <div className='col-lg-3'>
-                <label>ยอดรวมค่าบริการ (เกษตรกร)</label>
-                <h5 style={{ color: color.primary1 }} className='p-2'>
-                  {numberWithCommasToFixed(couponData?.netPrice)} บาท
-                </h5>
-              </div>
-              <div className='col-lg-3' style={{ paddingLeft: '40px', borderLeft: 'solid' }}>
-                <label>รายได้ที่นักบินโดรนได้รับ</label>
-                <h5 style={{ color: color.Warning }} className='p-2'>
-                  {data?.price &&
-                    numberWithCommasToFixed(
-                      parseFloat(data?.price) + parseFloat(data?.revenuePromotion),
-                    )}{' '}
-                  บาท
-                </h5>
-              </div>
-            </div>
-            <div className='row'>
-              <div className='form-group col-lg-4'>
-                <label>ค่าบริการ (ก่อนคิดค่าธรรมเนียม)</label>
-                <Form.Item>
-                  <Input
-                    suffix='บาท'
-                    value={numberWithCommasToFixed(couponData?.priceBefore)}
-                    disabled={current == 2}
-                    autoComplete='off'
-                    step='0.01'
-                  />
-                </Form.Item>
-              </div>
-              <div className='form-group col-lg-4'>
-                <label>ค่าธรรมเนียม (คิด 5% ของราคารวม)</label>
-                <Form.Item>
-                  <Input
-                    suffix='บาท'
-                    value={numberWithCommasToFixed(couponData?.fee)}
-                    disabled={current == 2}
-                    autoComplete='off'
-                    step='0.01'
-                  />
-                </Form.Item>
-              </div>
-              <div className='form-group col-lg-4'>
-                <label>ส่วนลดค่าธรรมเนียม</label>
-                <Form.Item>
-                  <Input
-                    suffix='บาท'
-                    value={numberWithCommasToFixed(couponData?.discountFee)}
-                    disabled={current == 2}
-                    autoComplete='off'
-                    step='0.01'
-                  />
-                </Form.Item>
-              </div>
-              <div className='form-group col-lg-4'>
-                <label>รหัสคูปอง</label>
-                <Input value={data.couponCode} disabled autoComplete='off' />
-              </div>
-              <div className='form-group col-lg-4'>
-                <label>ชื่อคูปอง</label>
-                <Input value={couponData.couponName} disabled autoComplete='off' />
-              </div>
-              <div className='form-group col-lg-4'>
-                <label>ส่วนลดคูปอง</label>
-                <Input
-                  suffix='บาท'
-                  value={numberWithCommasToFixed(couponData.priceCouponDiscount!)}
-                  disabled
-                  autoComplete='off'
-                />
-              </div>
-            </div>
-            <div className='row pt-3'>
-              <div className='form-group col-lg-6 p-2'>
-                <label>จำนวนแต้มที่ใช้แลก</label>
-                <Input suffix='แต้ม' value={data.usePoint} disabled autoComplete='off' />
-              </div>
-              <div className='form-group col-lg-6 p-2'>
-                <label>ส่วนลดจากการใช้แต้ม</label>
-                <Input
-                  suffix='บาท'
-                  value={data.discountCampaignPoint}
-                  disabled
-                  autoComplete='off'
-                />
-              </div>
-            </div>
-            {/* <div className="row pt-3">
-              <div className="form-group col-lg-6 p-2">
-                <label>โปรโมชั่นนักบินโดรน</label>
-                <Input
-                  suffix="บาท"
-                  value={data.discountPromotion}
-                  disabled
-                  autoComplete="off"
-                />
-              </div>
-              <div className="form-group col-lg-6 p-2">
-                <label>โปรโมชั่นเกษตรกร</label>
-                <Input
-                  suffix="บาท"
-                  value={data.revenuePromotion}
-                  disabled
-                  autoComplete="off"
-                />
-              </div>
-            </div> */}
-          </Form>
-        </CardContainer>
-      </Form>
-    </CardContainer>
-  )
-  //#endregion
-
   const nextStep = () => {
     if (current == 0) {
       const changeTimeFormat = moment(timeAppointment).format(timeCreateFormat)
@@ -1830,12 +1610,23 @@ const EditNewTask = () => {
       title: 'ยืนยันข้อมูล',
       content: (
         <>
-          {renderFormSearchFarmer} <br />
-          {renderFormAppointment}
-          <br />
-          {renderDronerSelectedList}
-          <br />
-          {renderServiceCharge}
+          <ConfirmNewTask
+            dataSearchFarmer={dataFarmer}
+            farmerPlotSeleced={FarmerPlotEntity_INIT}
+            dataAppointment={
+              moment(new Date(dateAppointment)).format(dateFormat) +
+              ', ' +
+              moment(new Date(timeAppointment)).format(timeFormat)
+            }
+            createNewTask={data}
+            farmerPlotId={farmerPlotSeleced?.id}
+            cropSelected={''}
+            isEdit={true}
+            couponData={couponData}
+            updateNewTask={updateNewTask}
+            setCurrent={setCurrent}
+            dronerSelectedList={dronerSelectedList}
+          />
         </>
       ),
     },
@@ -1853,7 +1644,9 @@ const EditNewTask = () => {
       <div className='steps-content'>{titleStep[current].content}</div>
       <Row className='d-flex justify-content-between pt-2'>
         {current == 0 && <BackButton onClick={() => navigate('/IndexNewTask')} />}
-        {current > 0 && <BackButton onClick={() => setCurrent((prev) => prev - 1)} />}
+        {current > 0 && current < 2 && (
+          <BackButton onClick={() => setCurrent((prev) => prev - 1)} />
+        )}
         {current < titleStep.length - 1 && (
           <Button
             style={{
@@ -1867,7 +1660,9 @@ const EditNewTask = () => {
             ถัดไป
           </Button>
         )}
-        {current === titleStep.length - 1 && <SaveButton onClick={updateNewTask} />}
+        {current === titleStep.length - 1 && current !== 2 && (
+          <SaveButton onClick={updateNewTask} />
+        )}
       </Row>
     </>
   )

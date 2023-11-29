@@ -1,19 +1,34 @@
-import React, { useState } from 'react'
-import { Card, Table, Divider, Input, Button, Select, Row, Col, Avatar } from 'antd'
+import React, { useState, useEffect } from 'react'
+import {
+  Card,
+  Table,
+  Divider,
+  Input,
+  Button,
+  Select,
+  Row,
+  Col,
+  Avatar,
+  Form,
+  Pagination,
+} from 'antd'
 import { CardHeader } from '../../../components/header/CardHearder'
 import styled from 'styled-components'
 import color from '../../../resource/color'
 import { DateTimeUtil } from '../../../utilities/DateTimeUtil'
 import { CouponKeepByFarmer } from '../../../entities/CouponEntites'
-import { FarmerEntity } from '../../../entities/FarmerEntities'
 import { FarmerPlotEntity } from '../../../entities/FarmerPlotEntities'
-import moment from 'moment'
-import { CreateNewTaskEntity } from '../../../entities/NewTaskEntities'
 import {
   formatNumberWithCommas,
   numberWithCommas,
   numberWithCommasToFixed,
 } from '../../../utilities/TextFormatter'
+import { CouponDataSource } from '../../../datasource/CouponDatasource'
+import { GetTaskCoupon, GetTaskCoupon_INIT, TaskCoupon } from '../../../entities/CalculateTask'
+import ModalMapPlot from '../../../components/modal/task/finishTask/ModalMapPlot'
+import SaveButtton from '../../../components/button/SaveButton'
+import { BackButton } from '../../../components/button/BackButton'
+import { TaskDronerTempEntity } from '../../../entities/TaskDronerTemp'
 
 const CustomTable = styled(Table)`
   .ant-table-container table thead th {
@@ -26,17 +41,29 @@ const CustomTable = styled(Table)`
 interface ConfirmNewTaskProps {
   dataSearchFarmer: any
   farmerPlotSeleced: FarmerPlotEntity
-  createNewTask: CreateNewTaskEntity
-  discountResult: any
+  createNewTask: any
   dataAppointment: any
+  farmerPlotId: any
+  cropSelected: any
+  isEdit: boolean
+  couponData: TaskCoupon
+  updateNewTask: (data: any) => void
+  setCurrent: React.Dispatch<React.SetStateAction<number>>
+  dronerSelectedList?: TaskDronerTempEntity[]
 }
 
-const ConfirmNewTask: React.FC<ConfirmNewTaskProps> = ({
+export const ConfirmNewTask: React.FC<ConfirmNewTaskProps> = ({
   dataSearchFarmer,
   farmerPlotSeleced,
   dataAppointment,
   createNewTask,
-  discountResult,
+  farmerPlotId,
+  cropSelected,
+  isEdit,
+  couponData,
+  updateNewTask,
+  setCurrent,
+  dronerSelectedList,
 }) => {
   const [couponUsedBtn, setCouponUsedBtn] = useState<boolean[]>([false, true])
   const [couponCode, setCouponCode] = useState<string>('')
@@ -44,8 +71,25 @@ const ConfirmNewTask: React.FC<ConfirmNewTaskProps> = ({
   const [couponId, setCouponId] = useState<string>('')
   const [couponKeepList, setCouponKeepList] = useState<CouponKeepByFarmer[]>()
   const { Option } = Select
+  const [couponMessage, setCouponMessage] = useState<string>('')
+  const [form] = Form.useForm()
+  const [colorCouponBtn, setColorCouponBtn] = useState<boolean>(true)
+  const [dataCouponKeep, setCouponKeep] = useState<CouponKeepByFarmer>()
+  const [getCoupon] = useState<GetTaskCoupon>(GetTaskCoupon_INIT)
+  const [discountResult, setDiscountResult] = useState<number | null>()
+  const [showModalMap, setShowModalMap] = useState<boolean>(false)
+  const pageSize = 5
+  const [currentPage, setCurrentPage] = useState(1)
 
-  console.log(createNewTask)
+  const handlePaginationChange = (page: number) => {
+    setCurrentPage(page)
+  }
+  const startIndex = (currentPage - 1) * pageSize
+  const endIndex = startIndex + pageSize
+  const currentData = createNewTask?.taskDronerTemp?.slice(startIndex, endIndex)
+  const dronerSelected = dronerSelectedList?.slice(startIndex, endIndex)
+  const total = isEdit ? dronerSelectedList?.length : createNewTask?.taskDronerTemp?.length
+
   const columns = [
     {
       dataIndex: 'index',
@@ -165,11 +209,125 @@ const ConfirmNewTask: React.FC<ConfirmNewTaskProps> = ({
       }
     }
   }
-  const pageSize = 5
-  const currentPage = 1
-  const startIndex = (currentPage - 1) * pageSize
-  const endIndex = startIndex + pageSize
-  const currentItems = createNewTask?.taskDronerTemp?.slice(startIndex, endIndex)
+
+  useEffect(() => {
+    fetchCouponKeep(createNewTask?.farmerId)
+    couponId && calculatePrice(couponCode)
+  }, [])
+
+  const fetchCouponKeep = async (id?: string) => {
+    const data = await CouponDataSource.getCouponKeepByFarmerId(id).then((res) => {
+      return res
+    })
+
+    const result: any = []
+    data.map((item: any) => {
+      const checkCondition = true
+      const checkPlant = item.promotion.couponConditionPlant
+        ? item.promotion.couponConditionPlantList.some(
+            (plant: any) =>
+              plant.plantName === cropSelected &&
+              plant.injectionTiming.includes(createNewTask.purposeSprayName),
+          )
+        : checkCondition
+
+      const checkProvince = item.promotion.couponConditionProvince
+        ? item.promotion.couponConditionProvinceList.some(
+            (prov: any) => prov === farmerPlotSeleced.plotArea.provinceName,
+          )
+        : checkCondition
+
+      const checkRai = item.promotion.couponConditionRai
+        ? createNewTask.farmAreaAmount >= item.promotion.couponConditionRaiMin &&
+          createNewTask.farmAreaAmount <= item.promotion.couponConditionRaiMax
+        : checkCondition
+
+      const checkService = item.promotion.couponConditionService
+        ? createNewTask.price - (discountResult ?? 0) >= item.promotion.couponConditionServiceMin &&
+          createNewTask.price - (discountResult ?? 0) <= item.promotion.couponConditionServiceMax
+        : checkCondition
+
+      checkPlant && checkProvince && checkRai && checkService && result.push(item)
+      setCouponKeepList(result)
+    })
+  }
+
+  const handleChangeCoupon = (e: any) => {
+    if (e.target.value) {
+      setCouponCode(e.target.value)
+      setCouponUsedBtn([false, true])
+      setCheckKeepCoupon(true)
+    } else {
+      setCouponUsedBtn([false, false])
+      setCheckKeepCoupon(false)
+    }
+  }
+
+  const calculatePrice = (coupon: string) => {
+    const couponInfo = { ...getCoupon }
+    couponInfo.farmerPlotId = farmerPlotId
+    couponInfo.cropName = farmerPlotSeleced?.plantName
+    couponInfo.couponCode = coupon //couponCode;
+    couponInfo.raiAmount =
+      (farmerPlotSeleced.raiAmount && parseInt(farmerPlotSeleced.raiAmount)) || 0
+    couponInfo.priceCustom =
+      createNewTask.unitPriceStandard === 0 ? createNewTask.unitPrice.toString() : '0'
+    CouponDataSource.calculateCoupon(couponInfo).then((res) => {
+      const calCoupon =
+        res.responseData.priceCouponDiscount > createNewTask.price
+          ? createNewTask.price
+          : res.responseData.priceCouponDiscount
+      setDiscountResult(calCoupon)
+    })
+  }
+  const checkCoupon = (section: number, e: any, order?: string) => {
+    if (section === 1) {
+      if (order === 'ยกเลิก') {
+        setCouponCode('')
+        setCouponUsedBtn([false, true])
+        form.setFieldsValue({ couponCode: '' })
+        setCouponMessage('')
+        setCheckKeepCoupon(false)
+        setDiscountResult(0)
+      } else {
+        CouponDataSource.getCoupon(couponCode).then((result) => {
+          if (!result.userMessage) {
+            if (result.canUsed) {
+              setCouponId(result.id)
+              setColorCouponBtn(true)
+              setCouponUsedBtn([false, false])
+              setCouponMessage('รหัสคูปองสามารถใช้ได้')
+              calculatePrice(couponCode)
+            } else {
+              setColorCouponBtn(false)
+              setCouponUsedBtn([false, false])
+              setCouponMessage('รหัสคูปองสามารถนี้ถูกใช้ไปแล้ว')
+            }
+          } else {
+            setColorCouponBtn(false)
+            setCouponUsedBtn([false, false])
+            setCouponMessage(result.userMessage)
+          }
+        })
+      }
+    } else {
+      if (e) {
+        const mapCoupon = couponKeepList?.find((x) => x.promotion.id === e)
+        setCouponKeep(mapCoupon)
+        setCouponId(mapCoupon?.promotion?.id || '')
+        setCouponCode(mapCoupon?.promotion.couponCode || '')
+        setColorCouponBtn(true)
+        setCouponUsedBtn([true, true])
+        calculatePrice(mapCoupon?.promotion?.couponCode || '')
+      } else {
+        setCouponId('')
+        setCouponCode('')
+        calculatePrice('')
+        setColorCouponBtn(false)
+        setCouponUsedBtn([false, true])
+      }
+    }
+  }
 
   return (
     <>
@@ -180,7 +338,7 @@ const ConfirmNewTask: React.FC<ConfirmNewTaskProps> = ({
               <Card
                 title='ข้อมูลเกษตรกร'
                 bordered={true}
-                style={{ marginRight: 8, height: '340px' }}
+                style={{ marginRight: 8, height: renderValues() ? '370px' : '340px' }}
               >
                 <div className='d-flex'>
                   <span className='col'>ชื่อเกษตรกร</span>
@@ -197,7 +355,15 @@ const ConfirmNewTask: React.FC<ConfirmNewTaskProps> = ({
                   <span className='col'>พื้นที่แปลงเกษตร</span>
                 </div>
                 <div className='d-flex'>
-                  <span className='col'>{dataSearchFarmer?.farmerPlot[0].plotName}</span>
+                  <span className='col'>
+                    {dataSearchFarmer?.farmerPlot[0].plotName}
+                    <u
+                      onClick={() => setShowModalMap((prev) => !prev)}
+                      style={{ cursor: 'pointer', color: color.Success, marginLeft: 10 }}
+                    >
+                      ดูแผนที่
+                    </u>
+                  </span>
                   <span className='col'>
                     {(!farmerPlotSeleced?.plotArea.subdistrictName
                       ? ''
@@ -222,16 +388,14 @@ const ConfirmNewTask: React.FC<ConfirmNewTaskProps> = ({
               <Card
                 title='ข้อมูลการจ้างงาน'
                 bordered={true}
-                style={{ marginRight: 8, height: '340px' }}
+                style={{ marginRight: 8, height: renderValues() ? '370px' : '340px' }}
               >
                 <div className='d-flex'>
                   <span className='col'>วันที่นัดหมาย</span>
-                  <span className='col'>ประเภทงาน</span>
                   <span className='col'>พืชที่ปลูก</span>
                 </div>
                 <div className='d-flex'>
                   <span className='col'>{dataAppointment}</span>
-                  <span className='col'>ฉีด</span>
                   <span className='col'>{dataSearchFarmer?.farmerPlot[0].plantName}</span>
                 </div>
                 <div className='d-flex pt-4'>
@@ -264,218 +428,279 @@ const ConfirmNewTask: React.FC<ConfirmNewTaskProps> = ({
               showHeader={false}
               style={{ marginRight: 10 }}
               columns={columns}
-              dataSource={currentItems}
+              dataSource={isEdit ? dronerSelected : currentData}
+              pagination={false}
               title={() => <strong style={{ fontSize: 16 }}>รายชื่อนักบินโดรน</strong>}
             />
-            <p>รายการทั้งหมด {createNewTask?.taskDronerTemp?.length} รายการ</p>
+            <div className='pagination-container'>
+              <div className='left-content'>
+                <p>รายการทั้งหมด {total} รายการ</p>
+              </div>
+              <div className='right-content p-3'>
+                <Pagination
+                  className='pt-3'
+                  current={currentPage}
+                  pageSize={pageSize}
+                  total={total}
+                  onChange={handlePaginationChange}
+                  showSizeChanger={false}
+                />
+              </div>
+            </div>
           </div>
         </div>
         <div className='right-column'>
           <div className='div3' style={{ fontWeight: '500', color: color.font }}>
             <CardHeader textHeader={'สรุปค่าบริการ'} />
-            <div
-              style={{
-                width: '100%',
-              }}
-              className='bg-white'
-            >
+            <Form form={form}>
               <div
                 style={{
                   width: '100%',
-                  height: '100%',
                 }}
+                className='bg-white'
               >
-                <div className='p-4'>
-                  <div className='d-flex'>
-                    <span className='col'>ค่าบริการ</span>
-                    <span className='col' style={{ textAlign: 'end' }}>
-                      {numberWithCommasToFixed(createNewTask?.price - (discountResult ?? 0))} ฿
-                    </span>
-                  </div>
-                  <div className='d-flex pt-2'>
-                    <span className='col' style={{ fontWeight: 'lighter' }}>
-                      (จำนวนไร่{' '}
-                      <span style={{ color: color.Success }}>
-                        {formatNumberWithCommas(parseFloat(createNewTask?.farmAreaAmount))} ไร่
-                      </span>{' '}
-                      x ค่าบริการ{' '}
-                      <span style={{ color: color.Success }}>
-                        {formatNumberWithCommas(createNewTask?.unitPriceStandard)} บาท/ไร่
-                      </span>
-                      )
-                    </span>
-                  </div>
-                  <div className='d-flex pt-4'>
-                    <span className='col'>ค่าธรรมเนียม (5%)</span>
-                    <span className='col' style={{ textAlign: 'end' }}>
-                      {numberWithCommasToFixed(createNewTask?.fee)} ฿
-                    </span>
-                  </div>
-                  <div className='d-flex pt-2'>
-                    <span className='col'>ส่วนลดค่าธรรมเนียม</span>
-                    <span className='col' style={{ textAlign: 'end', color: color.Error }}>
-                      - {numberWithCommasToFixed(createNewTask?.discountFee)} ฿
-                    </span>
-                  </div>
-                  <Divider />
-                  <div className='d-flex'>
-                    <span className='col'>คูปองส่วนลด</span>
-                  </div>
-                  <div className='d-flex pt-2'>
-                    <Input
-                      disabled={couponUsedBtn[0]}
-                      // onChange={handleChangeCoupon}
-                      onKeyPress={(e) => {
-                        const allowedCharacters = /^[a-zA-Z0-9]+$/
-                        if (!allowedCharacters.test(e.key)) {
-                          e.preventDefault()
-                        }
-                      }}
-                      style={{
-                        paddingRight: 0,
-                        paddingTop: 0,
-                        paddingBottom: 0,
-                        borderRadius: 3,
-                      }}
-                      defaultValue={couponUsedBtn ? couponCode : ''}
-                      placeholder='กรอกรหัสคูปอง'
-                      suffix={
-                        <Button
-                          disabled={couponUsedBtn[0]}
-                          style={
-                            !couponUsedBtn[0] && !couponUsedBtn[1]
-                              ? {
-                                  borderColor: color.Error,
-                                  backgroundColor: '#FAEEEE',
-                                  color: color.Error, //ยกเลิก
-                                  borderRadius: 3,
-                                }
-                              : {
-                                  borderColor: color.Success,
-                                  backgroundColor: '#E6F2EC',
-                                  color: color.Success, //ใช้รหัส
-                                  borderRadius: 3,
-                                }
-                          }
-                          // onClick={(e) => checkCoupon(1, e, couponUsedBtn[1] ? 'ใช้รหัส' : 'ยกเลิก')}
-                        >
-                          {couponUsedBtn[1] ? 'ใช้รหัส' : 'ยกเลิก'}
-                        </Button>
-                      }
-                    />
-                  </div>
-                  <div className='d-flex pt-4'>
-                    <span className='col'>หรือเลือกคูปอง (เกษตรกรเก็บไว้ในระบบ)</span>
-                  </div>
-                  <div className='d-flex pt-2'>
-                    <Select
-                      disabled={checkKeepCoupon}
-                      placeholder='เลือกคูปอง'
-                      style={{
-                        width: '100%',
-                      }}
-                      //   onChange={(e) => checkCoupon(2, e)}
-                      allowClear
-                      defaultValue={checkKeepCoupon ? couponId : null}
-                    >
-                      {couponKeepList?.map((item) => (
-                        <Option key={item.promotion.id} value={item.promotion.id}>
-                          <div>
-                            {item.promotion.couponName}
-                            <br />
-                            <Row>
-                              <Col style={{ fontSize: '12px' }} span={13}>
-                                {item.promotion.couponConditionRai
-                                  ? mapWordingCondition(item)
-                                  : '-'}
-                              </Col>
-                              <Col
-                                style={{
-                                  fontSize: '12px',
-                                  alignItems: 'end',
-                                }}
-                              >
-                                หมดเขต{' '}
-                                {DateTimeUtil.formatDateTh(
-                                  item?.promotion?.expiredDate?.toString() || '',
-                                )}
-                              </Col>
-                            </Row>
-                          </div>
-                        </Option>
-                      ))}
-                    </Select>
-                  </div>
-                  <div className='d-flex pt-4'>
-                    <span className='col '>ส่วนลดจากคูปอง</span>
-                    <span className='col' style={{ textAlign: 'end', color: color.Error }}>
-                      - {numberWithCommas(discountResult!)}
-                    </span>
-                  </div>
-                  <Divider />
-                  <div className='d-flex'>
-                    <span className='col '>ส่วนลดจากโปรโมชั่น</span>
-                    <span className='col' style={{ textAlign: 'end', color: color.Error }}>
-                      0.00 ฿
-                    </span>
-                  </div>
-                  <div className='d-flex pt-2'>
-                    <span className='col '>ส่วนลดจากแต้ม</span>
-                    <span className='col' style={{ textAlign: 'end', color: color.Error }}>
-                      0.00 ฿
-                    </span>
-                  </div>
-                </div>
-                <Divider
+                <div
                   style={{
-                    border: 'none',
-                    height: '1.5px',
-                    backgroundColor: color.Success,
-                    margin: '10px 0',
                     width: '100%',
+                    height: '100%',
                   }}
-                />
-                <div className='p-4'>
-                  <div className='d-flex'>
-                    <span className='col-lg-8' style={{ fontWeight: 'lighter' }}>
-                      ยอดรวมค่าบริการ (เกษตรกร)
-                    </span>
-                    <span className='col' style={{ textAlign: 'end', color: color.Success }}>
-                      1,000.00 ฿
-                    </span>
-                  </div>
-                  <div className='d-flex pt-2'>
-                    <span className='col' style={{ fontWeight: 'lighter' }}>
-                      ยอดรวมรายได้ (นักบินโดรน)
-                    </span>
-                    <span className='col' style={{ textAlign: 'end', color: color.Warning }}>
-                      {numberWithCommasToFixed(createNewTask?.price || 0)} ฿
-                    </span>
-                  </div>
-                  <div className='pt-3'>
-                    <Button
+                >
+                  <div className='p-4'>
+                    <div className='d-flex'>
+                      <span className='col'>ค่าบริการ</span>
+                      <span className='col' style={{ textAlign: 'end' }}>
+                        {isEdit
+                          ? numberWithCommasToFixed(couponData?.netPrice)
+                          : numberWithCommasToFixed(createNewTask?.price - (discountResult ?? 0))}
+                        ฿
+                      </span>
+                    </div>
+                    <div className='d-flex pt-2'>
+                      <span className='col' style={{ fontWeight: 'lighter', fontSize: 13 }}>
+                        (จำนวนไร่{' '}
+                        <span style={{ color: color.Success }}>
+                          {formatNumberWithCommas(parseFloat(createNewTask?.farmAreaAmount))} ไร่
+                        </span>{' '}
+                        x ค่าบริการ{' '}
+                        <span style={{ color: color.Success }}>
+                          {formatNumberWithCommas(createNewTask?.unitPriceStandard)} บาท/ไร่
+                        </span>
+                        )
+                      </span>
+                    </div>
+                    <div className='d-flex pt-4'>
+                      <span className='col'>ค่าธรรมเนียม (5%)</span>
+                      <span className='col' style={{ textAlign: 'end' }}>
+                        {isEdit
+                          ? numberWithCommasToFixed(couponData?.fee)
+                          : numberWithCommasToFixed(createNewTask?.fee)}{' '}
+                        ฿{' '}
+                      </span>
+                    </div>
+                    <div className='d-flex pt-2'>
+                      <span className='col'>ส่วนลดค่าธรรมเนียม</span>
+                      <span className='col' style={{ textAlign: 'end', color: color.Error }}>
+                        -{' '}
+                        {isEdit
+                          ? numberWithCommasToFixed(couponData?.discountFee)
+                          : numberWithCommasToFixed(createNewTask?.discountFee)}{' '}
+                        ฿
+                      </span>
+                    </div>
+                    <Divider />
+                    <div className='d-flex'>
+                      <span className='col'>คูปองส่วนลด</span>
+                    </div>
+                    <div className='pt-2'>
+                      <Form.Item
+                        name='couponCode'
+                        style={{
+                          marginBottom: '2px',
+                        }}
+                      >
+                        <Input
+                          disabled={couponUsedBtn[0] || isEdit}
+                          onChange={handleChangeCoupon}
+                          onKeyPress={(e) => {
+                            const allowedCharacters = /^[a-zA-Z0-9]+$/
+                            if (!allowedCharacters.test(e.key)) {
+                              e.preventDefault()
+                            }
+                          }}
+                          style={{
+                            paddingRight: 0,
+                            paddingTop: 0,
+                            paddingBottom: 0,
+                          }}
+                          defaultValue={
+                            isEdit ? createNewTask?.couponCode : couponUsedBtn ? couponCode : ''
+                          }
+                          placeholder='กรอกรหัสคูปอง'
+                          suffix={
+                            <Button
+                              disabled={couponUsedBtn[0] || isEdit}
+                              style={
+                                !couponUsedBtn[0] && !couponUsedBtn[1]
+                                  ? {
+                                      borderColor: color.Error,
+                                      backgroundColor: '#FAEEEE',
+                                      color: color.Error, //ยกเลิก
+                                    }
+                                  : {
+                                      borderColor: color.Success,
+                                      backgroundColor: '#E6F2EC',
+                                      color: color.Success, //ใช้รหัส
+                                    }
+                              }
+                              onClick={(e) =>
+                                checkCoupon(1, e, couponUsedBtn[1] ? 'ใช้รหัส' : 'ยกเลิก')
+                              }
+                            >
+                              {couponUsedBtn[1] ? 'ใช้รหัส' : 'ยกเลิก'}
+                            </Button>
+                          }
+                        />
+                      </Form.Item>
+                    </div>
+                    <p
                       style={{
-                        color: color.White,
-                        backgroundColor: color.Success,
-                        borderRadius: 5,
-                        borderColor: color.Success,
-                        width: '100%',
-                        height: '40px',
-                        fontSize: 16,
-                        fontWeight: '500',
+                        padding: 0,
+                        margin: 0,
+                        color: colorCouponBtn ? color.Success : color.Error,
                       }}
                     >
-                      ยืนยันการเพิ่มงาน
-                    </Button>
+                      {couponMessage}
+                    </p>
+                    <div className='d-flex pt-4'>
+                      <span className='col'>หรือเลือกคูปอง (เกษตรกรเก็บไว้ในระบบ)</span>
+                    </div>
+                    <div className='d-flex pt-2'>
+                      <Select
+                        disabled={checkKeepCoupon || isEdit}
+                        placeholder='เลือกคูปอง'
+                        style={{
+                          width: '100%',
+                        }}
+                        onChange={(e) => checkCoupon(2, e)}
+                        allowClear
+                        defaultValue={
+                          isEdit ? couponData.couponName : checkKeepCoupon ? couponId : null
+                        }
+                      >
+                        {couponKeepList?.map((item) => (
+                          <Option key={item.promotion.id} value={item.promotion.id}>
+                            <div>
+                              {item.promotion.couponName}
+                              <br />
+                              <Row>
+                                <Col style={{ fontSize: '12px' }} span={13}>
+                                  {item.promotion.couponConditionRai
+                                    ? mapWordingCondition(item)
+                                    : '-'}
+                                </Col>
+                                <Col
+                                  style={{
+                                    fontSize: '12px',
+                                    alignItems: 'end',
+                                  }}
+                                >
+                                  หมดเขต{' '}
+                                  {DateTimeUtil.formatDateTh(
+                                    item?.promotion?.expiredDate?.toString() || '',
+                                  )}
+                                </Col>
+                              </Row>
+                            </div>
+                          </Option>
+                        ))}
+                      </Select>
+                    </div>
+                    <div className='d-flex pt-4'>
+                      <span className='col '>ส่วนลดจากคูปอง</span>
+                      <span className='col' style={{ textAlign: 'end', color: color.Error }}>
+                        -{' '}
+                        {isEdit
+                          ? numberWithCommasToFixed(couponData.priceCouponDiscount!)
+                          : numberWithCommas(discountResult!)}{' '}
+                        ฿
+                      </span>
+                    </div>
+                    <Divider />
+                    <div className='d-flex'></div>
+                    <div className='d-flex pt-2'>
+                      <span className='col '>ส่วนลดจากแต้ม</span>
+                      <span className='col' style={{ textAlign: 'end', color: color.Error }}>
+                        {numberWithCommas(createNewTask?.discountCampaignPoint) || 0} ฿
+                      </span>
+                    </div>
+                  </div>
+                  <Divider
+                    style={{
+                      border: 'none',
+                      height: '1.5px',
+                      backgroundColor: color.Success,
+                      margin: '10px 0',
+                      width: '100%',
+                    }}
+                  />
+                  <div className='p-4'>
+                    <div className='d-flex'>
+                      <span className='col-lg-7' style={{ fontWeight: 'lighter' }}>
+                        ยอดรวมค่าบริการ (เกษตรกร)
+                      </span>
+                      <span className='col' style={{ textAlign: 'end', color: color.Success }}>
+                        {isEdit
+                          ? numberWithCommasToFixed(couponData?.netPrice)
+                          : numberWithCommasToFixed(
+                              createNewTask?.price - (discountResult ?? 0),
+                            )}{' '}
+                        ฿
+                      </span>
+                    </div>
+                    <div className='d-flex pt-2'>
+                      <span className='col' style={{ fontWeight: 'lighter' }}>
+                        ยอดรวมรายได้ (นักบินโดรน)
+                      </span>
+                      <span className='col' style={{ textAlign: 'end', color: color.Warning }}>
+                        {isEdit
+                          ? numberWithCommasToFixed(
+                              parseFloat(createNewTask?.price) +
+                                parseFloat(createNewTask?.revenuePromotion),
+                            )
+                          : numberWithCommasToFixed(createNewTask?.price) || 0}{' '}
+                        ฿
+                      </span>
+                    </div>
+                    <div className='pt-3 d-flex justify-content-between'>
+                      <BackButton onClick={() => setCurrent((prev) => prev - 1)} />
+                      <SaveButtton
+                        onClick={async () => {
+                          const payload: any = {}
+                          payload.couponId = couponId
+                          payload.dataCouponKeep = dataCouponKeep
+                          payload.discountResult = discountResult
+                          payload.couponCode = couponCode
+                          updateNewTask(payload)
+                        }}
+                        title='บันทึกงาน'
+                        size={'220px'}
+                      />
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
+            </Form>
+            {showModalMap && (
+              <ModalMapPlot
+                show={showModalMap}
+                backButton={() => setShowModalMap((prev) => !prev)}
+                title='แผนที่แปลงเกษตร'
+                plotId={createNewTask?.farmerPlotId}
+              />
+            )}
           </div>
         </div>
       </div>
     </>
   )
 }
-
-export default ConfirmNewTask

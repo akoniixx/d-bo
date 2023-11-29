@@ -330,7 +330,7 @@ function AddDroneBrand() {
           callBack={insertSeriesDrone}
           data={editDrone}
           editIndex={editIndex}
-          title='แก้ไขแปลงเกษตร'
+          title='แก้ไขรุ่นโดรน'
         />
       )}
     </>
