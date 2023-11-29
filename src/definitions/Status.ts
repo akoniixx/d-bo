@@ -226,7 +226,7 @@ export const HISTORY_TASK: any = {
   ChangeDateAppointment: 'แก้ไข/เปลี่ยนวันที่นัดหมาย',
   ChangeRai: 'แก้ไข/เปลี่ยนจำนวนแปลง',
   แก้ไขจำนวนแปลง: 'แก้ไขจำนวนแปลง',
-  แก้ไขรูปภาพเสร็จสิ้นงาน : 'แก้ไขรูปภาพเสร็จสิ้นงาน'
+  แก้ไขรูปภาพเสร็จสิ้นงาน: 'แก้ไขรูปภาพเสร็จสิ้นงาน',
 }
 export const STATUS_SEARCH: any = {
   PENDING: 'รอตรวจสอบ',
@@ -253,18 +253,18 @@ export const STATUS_POINT_MANUAL: any = {
 export const STATUS_RECEIVE_TYPE: any = {
   POINT: 'การจ้างงาน',
   SPECIAL_POINT: 'แต้มพิเศษ',
-  MISSION_POINT : 'ภารกิจ'
+  MISSION_POINT: 'ภารกิจ',
 }
 
 export const STATUS_HIGHLIGHT: any = {
   ACTIVE: 'ใช้งาน',
   DRAFTING: 'แบบร่าง',
-  PENDING : 'รอเผยแพร่',
-  INACTIVE: 'ปิดการใช้งาน'
+  PENDING: 'รอเผยแพร่',
+  INACTIVE: 'ปิดการใช้งาน',
 }
 export const STATUS_COLOR_HIGHLIGHT: any = {
   PENDING: '#EA973E',
   ACTIVE: color.Success,
   DRAFTING: color.Grey,
-  INACTIVE: color.Error
+  INACTIVE: color.Error,
 }
