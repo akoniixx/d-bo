@@ -33,7 +33,6 @@ function AddHighlightPage() {
   const [saveBtnDisable, setBtnSaveDisable] = useState<boolean>(true)
   const [duplicateTime, setDuplicateTime] = useState<any>()
   const [modalSave, setModalSave] = useState<boolean>(false)
-
   const onChangeProfile = async (file: any) => {
     const source = file.target.files[0]
     let newSource: any
@@ -193,10 +192,11 @@ function AddHighlightPage() {
         requestData.startDate = dateStartPending
         requestData.endDate = dateEndPending
       }
-
+      setBtnSaveDisable(true)
       const res = await HighlightDatasource.addNewsHighlight(requestData)
 
       if (res) {
+        setBtnSaveDisable(false)
         setModalSave(!modalSave)
         Swal.fire({
           title: 'บันทึกสำเร็จ',
@@ -585,6 +585,7 @@ function AddHighlightPage() {
         }}
         closeModal={() => setModalSave(!modalSave)}
         saveButton={onSubmit}
+        disableSaveBtn={saveBtnDisable}
       />
     </>
   )

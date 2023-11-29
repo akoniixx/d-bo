@@ -241,9 +241,11 @@ function EditAddHighlightPage() {
         requestData.startDate = dateStartPending
         requestData.endDate = dateEndPending
       }
+      setBtnSaveDisable(true)
       const res = await HighlightDatasource.editNewsHighlight(requestData)
 
       if (res) {
+        setBtnSaveDisable(false)
         setModalSave(!modalSave)
         Swal.fire({
           title: 'บันทึกสำเร็จ',
@@ -643,6 +645,7 @@ function EditAddHighlightPage() {
         }}
         closeModal={() => setModalSave(!modalSave)}
         saveButton={onSubmit}
+        disableSaveBtn={saveBtnDisable}
       />
     </>
   )
