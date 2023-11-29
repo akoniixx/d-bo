@@ -32,11 +32,10 @@ const ModalDroneBrand: React.FC<ModalDroneProps> = ({
         ...data,
         series: isEditModal ? dataDrone.series : undefined,
         isActive: isEditModal ? dataDrone.isActive : undefined,
-        droneAbility: isEditModal ? [dataDrone.droneAbility] : ['SPRAY'],
+        droneAbility: isEditModal ? dataDrone.droneAbility : 'SPRAY',
       })
     }
   }, [dataDrone, form, isEditModal])
-
   const handleChangestatus = (e: any) => {
     const m = Map(dataDrone).set('isActive', e.target.value)
     setDataDrone(m.toJS())
@@ -111,7 +110,6 @@ const ModalDroneBrand: React.FC<ModalDroneProps> = ({
             <Form.Item name='droneAbility'>
               <Checkbox.Group style={{ width: '100%' }}>
                 <Checkbox value='SPRAY'>ฉีดพ่น</Checkbox>
-
                 <Checkbox value='SOW'>หว่าน</Checkbox>
               </Checkbox.Group>
             </Form.Item>

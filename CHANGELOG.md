@@ -1,5 +1,9 @@
 ## [Version - 0]
 
+## improve [v0.40.2] 2023-11-29
+
+- enhance layout new task page in step 3
+
 ## Fix [v0.40.1] 2023-11-21
 
 - fixed news highlight
