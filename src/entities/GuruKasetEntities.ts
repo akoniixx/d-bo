@@ -5,6 +5,17 @@ export interface GroupGuruEntities {
   videoCount: number
   __v: number
 }
+export const GroupGuruEntities_INIT: GroupGuruEntities = {
+  _id: "",
+  groupName: "",
+  articleCount: 0,
+  videoCount: 0,
+  __v: 0,
+}
+export interface insertGroupGuru {
+  _id?: string
+  groupName: string
+}
 
 export interface AllGroupGuruEntities {
   data: GroupGuruEntities[]
@@ -33,4 +44,17 @@ export interface GuruKasetEntities {
 export interface AllGuruKasetEntities {
   data: GuruKasetEntities[]
   count: number
+}
+export interface AddGuruKasetEntities {
+  id?: string
+  name: string
+  description: string
+  createBy: string
+  updateBy: string
+  type: string
+  application: string
+  startDate?: string | null
+  status: string
+  file: any
+  groupingId: string
 }

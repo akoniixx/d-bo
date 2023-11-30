@@ -1,6 +1,6 @@
 import 'react-quill/dist/quill.snow.css'
 import '../../../farmer/Style.css'
-import React, { useMemo, useRef, useState } from 'react'
+import React, { useMemo, useRef, useState, useEffect } from 'react'
 import { UploadImageEntity, UploadImageEntity_INTI } from '../../../../entities/UploadImageEntities'
 import { useNavigate } from 'react-router-dom'
 import { DatePicker, Form, Input, Radio, Select, Tag, TimePicker } from 'antd'
@@ -17,10 +17,14 @@ import RenderArticleGuru from '../../../../components/mobile/RenderArticleGuru'
 import ReactQuill from 'react-quill'
 import { formats } from '../../../../components/editor/EditorToolbar'
 import Swal from 'sweetalert2'
-
+import { GuruKasetDataSource } from '../../../../datasource/GuruKasetDatasource'
+import { GroupGuruDataSource } from '../../../../datasource/GroupGuruDatasource'
+const _ = require('lodash')
 const { Map } = require('immutable')
 
 function EditArticleGuru() {
+  const queryString = _.split(window.location.pathname, '=')
+  const guruId = queryString[1]
   const profile = JSON.parse(localStorage.getItem('profile') || '{  }')
   const [imgGuru, setImgGuru] = useState<any>()
   const [createImgGuru, setCreateImgGuru] = useState<UploadImageEntity>(UploadImageEntity_INTI)
@@ -29,13 +33,61 @@ function EditArticleGuru() {
   const [showTimer, setShowTimer] = useState<boolean>(false)
   const dateFormat = 'DD/MM/YYYY'
   const [saveBtnDisable, setBtnSaveDisable] = useState<boolean>(true)
-  const [duplicateTime, setDuplicateTime] = useState<any>()
   const [name, setName] = useState<any>()
   const [category, setCategory] = useState<any>()
-
   const [modalSave, setModalSave] = useState<boolean>(false)
   const quillRef = useRef<any>(null)
   const [descriptionEditor, setDescriptionEditor] = useState<string | null>(null)
+  const [groupGuru, setGroupGuru] = useState<any>()
+  const [groupName, setGroupName] = useState<any>()
+  const [groupingId, setGroupingId] = useState<any>()
+  const [createBy, setCreateBy] = useState<any>()
+
+  useEffect(() => {
+     GuruKasetDataSource.getAllGuruKasetById(guruId).then((res) => {
+      if (res) {
+        setImgGuru(res.image)
+        setCreateBy(res.createBy)
+        setDescriptionEditor(res.description)
+        setName(res.name)
+        form.setFieldsValue({
+          img: res.image,
+          name: res.name,
+          status: res.status,
+          description: res.description,
+          grouping: res.grouping,
+          startDate: !res.startDate
+            ? moment(new Date().toUTCString())
+            : moment(new Date(res.startDate).toUTCString()),
+          startTime: !res.startDate
+            ? moment(new Date().toUTCString())
+            : moment(new Date(res.startDate).toUTCString()),
+          application: res.application,
+        })
+        if (res.grouping) {
+          GroupGuruDataSource.getGroupGuruById(res.grouping).then((res) => {
+            setGroupName(res)
+          })
+        }
+      }
+    })
+    if (quillRef.current) {
+      const quill = quillRef.current.getEditor()
+
+      quill.on('text-change', async () => {
+        const imgs = quill.container.querySelectorAll('img')
+        imgs.forEach((img: any) => img.classList.add('editor-img'))
+      })
+    }
+  }, [])
+
+  useEffect(() => {
+      GroupGuruDataSource.getAllGroupGuru().then((res) => {
+        if (res) {
+          setGroupGuru(res.data)
+        } 
+      })
+  }, [])
 
   const onChangeProfile = async (file: any) => {
     const source = file.target.files[0]
@@ -61,7 +113,6 @@ function EditArticleGuru() {
     const d = Map(createImgGuru).set('file', isFileMoreThan2MB ? newSource : source)
     setCreateImgGuru(d.toJS())
   }
-
   const onPreviewProfile = async () => {
     let src = imgGuru
     if (!src) {
@@ -84,18 +135,17 @@ function EditArticleGuru() {
     input.setAttribute('type', 'file')
     input.setAttribute('accept', 'image/png')
     input.click()
-
     input.onchange = async () => {
       const file = input?.files![0]
-      // NewsDatasource.uploadNewsImageDescription(file).then((resImg) => {
-      //   setTimeout(() => {
-      //     const range = quillRef.current.getEditor().getSelection(true)
-      //     // eslint-disable-next-line prefer-const
-      //     let quill = quillRef.current.getEditor()
-      //     quill.insertEmbed(range.index, 'image', resImg.url)
-      //     quill.formatText(range.index, 1, { width: `100%`, height: `200px` })
-      //   }, 2000)
-      // })
+      GuruKasetDataSource.uploadImageDescription(file).then((resImg) => {
+        setTimeout(() => {
+          const range = quillRef.current.getEditor().getSelection(true)
+          // eslint-disable-next-line prefer-const
+          let quill = quillRef.current.getEditor()
+          quill.insertEmbed(range.index, 'image', resImg.url)
+          quill.formatText(range.index, 1, { width: `100%`, height: `200px` })
+        }, 2000)
+      })
     }
   }
   const modulesGuru = useMemo(
@@ -134,17 +184,19 @@ function EditArticleGuru() {
   }
 
   const onFieldsChange = () => {
-    const { name, description, category, application, startDate, startTime, status, img } =
+    const quill = quillRef.current.getEditor()
+    const imgs = quill.container.querySelectorAll('img')
+    imgs.forEach((img: any) => img.classList.add('editor-img'))
+    const { name, description, application, startDate, startTime, status, img } =
       form.getFieldsValue()
     let fieldInfo = false
     let fieldDate = false
 
-    if (name && description !== '<p><br></p>' && application && category && img) {
+    if (name && description !== '<p><br></p>' && descriptionEditor && application && img) {
       fieldInfo = false
     } else {
       fieldInfo = true
     }
-
     if (status === 'PENDING') {
       if (startDate && startTime) {
         fieldDate = false
@@ -157,7 +209,7 @@ function EditArticleGuru() {
     setBtnSaveDisable(fieldInfo || fieldDate)
   }
   const onSubmit = async () => {
-    const { name, description, category, application, startDate, startTime, status } =
+    const { name, description, application, startDate, startTime, status, img } =
       form.getFieldsValue()
     let dateStartPending: string | null = null
 
@@ -165,24 +217,26 @@ function EditArticleGuru() {
       dateStartPending =
         moment(startDate).format('YYYY-MM-DD') + ' ' + moment(startTime).format('HH:mm:ss')
     }
+
     try {
       const requestData: any = {
+        id: guruId,
         name: name,
         status: status,
         description: description,
         application: application,
-        category: category,
-        createBy: profile.firstname + ' ' + profile.lastname,
+        createBy: createBy,
         updateBy: profile.firstname + ' ' + profile.lastname,
         file: createImgGuru.file,
+        type: 'ARTICLE',
+        groupingId: groupingId ? groupingId : groupName?._id,
       }
-
       if (status === 'PENDING') {
         requestData.startDate = dateStartPending
       }
-      // const res = await HighlightDatasource.addNewsHighlight(requestData)
+      const res = await GuruKasetDataSource.editGuruKaset(requestData)
 
-      if (requestData) {
+      if (res) {
         setModalSave(!modalSave)
         Swal.fire({
           title: 'บันทึกสำเร็จ',
@@ -268,8 +322,8 @@ function EditArticleGuru() {
                 </div>
               </div>
               <span className='text-center text-muted' style={{ fontSize: '13px' }}>
-                *รูปภาพจะต้องมีสัดส่วน 16:6 หรือ 1,000px * 375px เท่านั้น
-                เพื่อความสวยงามของภาพในแอปพลิเคชัน*
+                รูปภาพจะต้องมีสัดส่วน 1:1 หรือ 1,000px * 1,000px เท่านั้น
+                เพื่อความสวยงามของภาพในแอปพลิเคชัน
               </span>
               <div className='form-group col-lg-12 pt-4'>
                 <label>
@@ -315,7 +369,7 @@ function EditArticleGuru() {
                     formats={formats}
                     ref={quillRef}
                     style={{
-                      height: '270px',
+                      height: '400px',
                     }}
                   />
                 </Form.Item>
@@ -324,22 +378,13 @@ function EditArticleGuru() {
                 <label>
                   แอปพลิเคชั่น <span style={{ color: 'red' }}>*</span>
                 </label>
-                <Form.Item
-                  initialValue={false}
-                  name='application'
-                  valuePropName='select'
-                  className='my-0'
-                >
-                  <Select
-                    allowClear
-                    placeholder='เลือกแอปพลิเคชั่น'
-                    onChange={() => console.log(1)}
-                  >
-                    <option key={1} value='FARMER'>
+                <Form.Item name='application' className='my-0'>
+                  <Select allowClear placeholder='เลือกแอปพลิเคชั่น'>
+                    <option key='FARMER' value='FARMER'>
                       <img src={icon.farmerApp} style={{ width: '20px', height: '20px' }} />
                       <span style={{ paddingLeft: '4px' }}>Farmer App</span>
                     </option>
-                    <option key={2} value='DRONER'>
+                    <option key='DRONER' value='DRONER'>
                       <img src={icon.dronerApp} style={{ width: '20px', height: '20px' }} />
                       <span style={{ paddingLeft: '4px' }}>Droner App</span>
                     </option>
@@ -350,23 +395,29 @@ function EditArticleGuru() {
                 <label>
                   หมวดหมู่ <span style={{ color: 'red' }}>*</span>
                 </label>
-                <Form.Item
-                  initialValue={false}
-                  name='category'
-                  valuePropName='select'
-                  className='my-0'
-                >
+                <Form.Item initialValue={false} valuePropName='select' className='my-0'>
                   <Select
+                    key={groupName?._id}
                     allowClear
                     placeholder='เลือกหมวดหมู่'
-                    onChange={(e: any) => setCategory(e)}
+                    defaultValue={groupName?.groupName}
+                    onChange={(e: any) => {
+                      if (e) {
+                        const findGetName = groupGuru.find((i: any) => i._id === e)
+                        setGroupingId(e)
+                        setCategory(findGetName?.groupName)
+                        setBtnSaveDisable(false)
+                      } else {
+                        setBtnSaveDisable(true)
+                      }
+                    }}
                   >
-                    <option key={1} value='ปลูกผัก'>
-                      <span style={{ paddingLeft: '4px' }}>ปลูกผัก</span>
-                    </option>
-                    <option key={2} value='โรคพืช'>
-                      <span style={{ paddingLeft: '4px' }}>โรคพืช</span>
-                    </option>
+                    {groupGuru &&
+                      groupGuru.map((item: any) => (
+                        <option key={item._id} value={item?._id}>
+                          <span style={{ paddingLeft: '4px' }}>{item.groupName}</span>
+                        </option>
+                      ))}
                   </Select>
                 </Form.Item>
               </div>
@@ -403,7 +454,6 @@ function EditArticleGuru() {
                                 <Form.Item
                                   name='startDate'
                                   style={{ display: showTimer ? 'block' : 'none' }}
-                                  validateStatus={showTimer && duplicateTime ? 'error' : ''}
                                 >
                                   <DatePicker
                                     disabledDate={disabledDateStart}
@@ -415,7 +465,6 @@ function EditArticleGuru() {
                                 <Form.Item
                                   name='startTime'
                                   style={{ display: showTimer ? 'block' : 'none' }}
-                                  validateStatus={showTimer && duplicateTime ? 'error' : ''}
                                 >
                                   <TimePicker
                                     format={'HH:mm'}
@@ -430,7 +479,7 @@ function EditArticleGuru() {
                           </div>
                         </div>
                       </Radio>
-                      <Radio value={'DRAFTING'}>แบบร่าง</Radio>
+                      <Radio value={'INACTIVE'}>ปิดการใช้งาน</Radio>
                     </Radio.Group>
                   </Form.Item>
                 </div>
@@ -442,7 +491,7 @@ function EditArticleGuru() {
           img={imgGuru}
           title={name}
           detail={descriptionEditor!}
-          category={category}
+          category={category ? category : groupName?.groupName}
         />
         <div className='col-7'>
           <FooterPage

@@ -1,6 +1,6 @@
 import 'react-quill/dist/quill.snow.css'
 import '../../../farmer/Style.css'
-import React, { useMemo, useRef, useState } from 'react'
+import React, { useMemo, useRef, useState, useEffect } from 'react'
 import { UploadImageEntity, UploadImageEntity_INTI } from '../../../../entities/UploadImageEntities'
 import { useNavigate } from 'react-router-dom'
 import { DatePicker, Form, Input, Radio, Select, Tag, TimePicker } from 'antd'
@@ -17,6 +17,8 @@ import RenderArticleGuru from '../../../../components/mobile/RenderArticleGuru'
 import ReactQuill from 'react-quill'
 import { formats } from '../../../../components/editor/EditorToolbar'
 import Swal from 'sweetalert2'
+import { GroupGuruDataSource } from '../../../../datasource/GroupGuruDatasource'
+import { GuruKasetDataSource } from '../../../../datasource/GuruKasetDatasource'
 
 const { Map } = require('immutable')
 
@@ -32,10 +34,22 @@ function AddArticleGuru() {
   const [duplicateTime, setDuplicateTime] = useState<any>()
   const [name, setName] = useState<any>()
   const [category, setCategory] = useState<any>()
-
+  const [groupingId, setGroupingId] = useState<any>()
   const [modalSave, setModalSave] = useState<boolean>(false)
   const quillRef = useRef<any>(null)
   const [descriptionEditor, setDescriptionEditor] = useState<string | null>(null)
+  const [groupGuru, setGroupGuru] = useState<any>()
+
+  useEffect(() => {
+    const getGroupGuru = () => {
+      GroupGuruDataSource.getAllGroupGuru().then((res) => {
+        if (res.data) {
+          setGroupGuru(res.data)
+        }
+      })
+    }
+    getGroupGuru()
+  }, [])
 
   const onChangeProfile = async (file: any) => {
     const source = file.target.files[0]
@@ -87,15 +101,15 @@ function AddArticleGuru() {
 
     input.onchange = async () => {
       const file = input?.files![0]
-      // NewsDatasource.uploadNewsImageDescription(file).then((resImg) => {
-      //   setTimeout(() => {
-      //     const range = quillRef.current.getEditor().getSelection(true)
-      //     // eslint-disable-next-line prefer-const
-      //     let quill = quillRef.current.getEditor()
-      //     quill.insertEmbed(range.index, 'image', resImg.url)
-      //     quill.formatText(range.index, 1, { width: `100%`, height: `200px` })
-      //   }, 2000)
-      // })
+      GuruKasetDataSource.uploadImageDescription(file).then((resImg) => {
+        setTimeout(() => {
+          const range = quillRef.current.getEditor().getSelection(true)
+          // eslint-disable-next-line prefer-const
+          let quill = quillRef.current.getEditor()
+          quill.insertEmbed(range.index, 'image', resImg.url)
+          quill.formatText(range.index, 1, { width: `100%`, height: `200px` })
+        }, 2000)
+      })
     }
   }
   const modulesGuru = useMemo(
@@ -139,7 +153,14 @@ function AddArticleGuru() {
     let fieldInfo = false
     let fieldDate = false
 
-    if (name && description !== '<p><br></p>' && application && category && img) {
+    if (
+      name &&
+      description !== '<p><br></p>' &&
+      descriptionEditor &&
+      application &&
+      category &&
+      img
+    ) {
       fieldInfo = false
     } else {
       fieldInfo = true
@@ -151,8 +172,10 @@ function AddArticleGuru() {
       } else {
         fieldDate = true
       }
-    } else {
+    } else if (status) {
       fieldDate = false
+    } else {
+      fieldDate = true
     }
     setBtnSaveDisable(fieldInfo || fieldDate)
   }
@@ -171,18 +194,19 @@ function AddArticleGuru() {
         status: status,
         description: description,
         application: application,
-        category: category,
         createBy: profile.firstname + ' ' + profile.lastname,
         updateBy: profile.firstname + ' ' + profile.lastname,
         file: createImgGuru.file,
+        type: 'ARTICLE',
+        groupingId: groupingId,
       }
 
       if (status === 'PENDING') {
         requestData.startDate = dateStartPending
       }
-      // const res = await HighlightDatasource.addNewsHighlight(requestData)
+      const res = await GuruKasetDataSource.addGuruKaset(requestData)
 
-      if (requestData) {
+      if (res) {
         setModalSave(!modalSave)
         Swal.fire({
           title: 'บันทึกสำเร็จ',
@@ -268,8 +292,7 @@ function AddArticleGuru() {
                 </div>
               </div>
               <span className='text-center text-muted' style={{ fontSize: '13px' }}>
-                *รูปภาพจะต้องมีสัดส่วน 16:6 หรือ 1,000px * 375px เท่านั้น
-                เพื่อความสวยงามของภาพในแอปพลิเคชัน*
+              รูปภาพจะต้องมีสัดส่วน 1:1 หรือ 1,000px * 1,000px เท่านั้น เพื่อความสวยงามของภาพในแอปพลิเคชัน
               </span>
               <div className='form-group col-lg-12 pt-4'>
                 <label>
@@ -335,11 +358,11 @@ function AddArticleGuru() {
                     placeholder='เลือกแอปพลิเคชั่น'
                     onChange={() => console.log(1)}
                   >
-                    <option key={1} value='FARMER'>
+                    <option key={'FARMER'} value='FARMER'>
                       <img src={icon.farmerApp} style={{ width: '20px', height: '20px' }} />
                       <span style={{ paddingLeft: '4px' }}>Farmer App</span>
                     </option>
-                    <option key={2} value='DRONER'>
+                    <option key={'DRONER'} value='DRONER'>
                       <img src={icon.dronerApp} style={{ width: '20px', height: '20px' }} />
                       <span style={{ paddingLeft: '4px' }}>Droner App</span>
                     </option>
@@ -359,14 +382,18 @@ function AddArticleGuru() {
                   <Select
                     allowClear
                     placeholder='เลือกหมวดหมู่'
-                    onChange={(e: any) => setCategory(e)}
+                    onChange={(e: any) => {
+                      const findGetName = groupGuru.find((i: any) => i._id === e)
+                      setGroupingId(e)
+                      setCategory(findGetName.groupName)
+                    }}
                   >
-                    <option key={1} value='ปลูกผัก'>
-                      <span style={{ paddingLeft: '4px' }}>ปลูกผัก</span>
-                    </option>
-                    <option key={2} value='โรคพืช'>
-                      <span style={{ paddingLeft: '4px' }}>โรคพืช</span>
-                    </option>
+                    {groupGuru &&
+                      groupGuru.map((item: any) => (
+                        <option key={item._id} value={item._id}>
+                          <span style={{ paddingLeft: '4px' }}>{item.groupName}</span>
+                        </option>
+                      ))}
                   </Select>
                 </Form.Item>
               </div>
@@ -403,7 +430,6 @@ function AddArticleGuru() {
                                 <Form.Item
                                   name='startDate'
                                   style={{ display: showTimer ? 'block' : 'none' }}
-                                  validateStatus={showTimer && duplicateTime ? 'error' : ''}
                                 >
                                   <DatePicker
                                     disabledDate={disabledDateStart}
@@ -415,7 +441,6 @@ function AddArticleGuru() {
                                 <Form.Item
                                   name='startTime'
                                   style={{ display: showTimer ? 'block' : 'none' }}
-                                  validateStatus={showTimer && duplicateTime ? 'error' : ''}
                                 >
                                   <TimePicker
                                     format={'HH:mm'}
@@ -455,9 +480,9 @@ function AddArticleGuru() {
         </div>
       </div>
       <ModalPage
-        textHeader={'ยืนยันการสร้างข่าวสารไฮไลท์'}
-        title={`โปรดตรวจสอบรายละเอียดที่คุณต้องการสร้างข่าวสารไฮไลท์
-ก่อนเสมอเพราะอาจต่อการแสดงผลข่าวสารในระบบแอปพลิเคชัน`}
+        textHeader={'ยืนยันการสร้างบทความ'}
+        title={`โปรดตรวจสอบรายละเอียดที่คุณต้องการสร้างบทความใหม่ก่อนเสมอ
+        เพราะอาจต่อการแสดงผลบทความในระบบแอปพลิเคชัน`}
         visible={modalSave}
         data={undefined}
         backButton={() => {

@@ -47,28 +47,31 @@ function IndexGuru() {
   const [current, setCurrent] = useState(1)
   const [searchText, setSearchText] = useState<string>('')
   const [application, setApplication] = useState<any>()
+  const [type, setType] = useState<any>()
   const [sortDirection, setSortDirection] = useState<string | undefined>(undefined)
   const [sortDirection1, setSortDirection1] = useState<string | undefined>(undefined)
   const [sortDirection2, setSortDirection2] = useState<string | undefined>(undefined)
   const [sortDirection3, setSortDirection3] = useState<string | undefined>(undefined)
   const [sortDirection4, setSortDirection4] = useState<string | undefined>(undefined)
   const [sortField, setSortField] = useState<string | undefined>(undefined)
-  const [startDate, setStartDate] = useState<string>('')
-  const [expiredDate, setExpiredDate] = useState<string>('')
-  const [guruType, setGuruType] = useState<any>()
   const [modalDelete, setModalDelete] = useState<boolean>(false)
   const [deleteId, setDeleteId] = useState<any>()
+  const [startDate, setStartDate] = useState<any>(null)
+  const [endDate, setEndDate] = useState<any>(null)
 
   const getGuruKaset = async () => {
     setLoading(true)
     await GuruKasetDataSource.getAllGuruKaset(
       current,
       row,
+      type,
       status,
       application,
       searchText,
       sortField,
       sortDirection,
+      startDate,
+      endDate,
     )
       .then((res) => {
         setData(res)
@@ -79,7 +82,7 @@ function IndexGuru() {
 
   useEffect(() => {
     getGuruKaset()
-  }, [current, sortDirection, status, startDate, expiredDate])
+  }, [current, sortDirection, status, startDate, endDate])
 
   const tabConfigurations = [
     { title: 'ใช้งาน', key: 'ACTIVE' },
@@ -94,14 +97,13 @@ function IndexGuru() {
   const handleChangeDateRange = (date: any) => {
     if (date !== null) {
       setStartDate(moment(new Date(date[0])).format('YYYY-MM-DD'))
-      setExpiredDate(moment(new Date(date[1])).format('YYYY-MM-DD'))
+      setEndDate(moment(new Date(date[1])).format('YYYY-MM-DD'))
     } else {
       setStartDate(date)
-      setExpiredDate(date)
+      setEndDate(date)
     }
     setCurrent(1)
   }
-  const type: any = 'บทความ'
 
   const showDelete = (id: string) => {
     setDeleteId(id)
@@ -120,21 +122,21 @@ function IndexGuru() {
                 cursor: 'pointer',
               }}
               onClick={() => {
-                setSortField('startDate')
+                setSortField('updatedAt')
                 setSortDirection((prev) => {
-                  if (prev === 'ASC') {
-                    return 'DESC'
+                  if (prev === 'asc') {
+                    return 'desc'
                   } else if (prev === undefined) {
-                    return 'ASC'
+                    return 'asc'
                   } else {
                     return undefined
                   }
                 })
                 setSortDirection1((prev) => {
-                  if (prev === 'ASC') {
-                    return 'DESC'
+                  if (prev === 'asc') {
+                    return 'desc'
                   } else if (prev === undefined) {
-                    return 'ASC'
+                    return 'asc'
                   } else {
                     return undefined
                   }
@@ -145,29 +147,28 @@ function IndexGuru() {
                 style={{
                   position: 'relative',
                   top: 2,
-                  color: sortDirection1 === 'ASC' ? '#ffca37' : 'white',
+                  color: sortDirection1 === 'asc' ? '#ffca37' : 'white',
                 }}
               />
               <CaretDownOutlined
                 style={{
                   position: 'relative',
                   bottom: 2,
-                  color: sortDirection1 === 'DESC' ? '#ffca37' : 'white',
+                  color: sortDirection1 === 'desc' ? '#ffca37' : 'white',
                 }}
               />
             </div>
           </div>
         )
       },
-      dataIndex: 'updateAt',
-      key: 'updateAt',
-      width: '16%',
+      dataIndex: 'updatedAt',
+      key: 'updatedAt',
       render: (value: any, row: any, index: number) => {
         return {
           children: (
             <div className='container'>
               <span className='text-dark-75  d-block font-size-lg'>
-                {DateTimeUtil.formatDateTime(row.updateAt) || '-'}
+                {DateTimeUtil.formatDateTime(row.updatedAt) || '-'}
               </span>
               {row.status === 'PENDING' && (
                 <span style={{ display: 'flex', alignItems: 'center', color: color.secondary3 }}>
@@ -193,19 +194,19 @@ function IndexGuru() {
                 style={{
                   borderRadius: '5px',
                   border: '1px solid',
-                  borderColor: type === 'วิดีโอ' ? color.Success : color.Warning,
-                  backgroundColor: type === 'วิดีโอ' ? color.primary3 : color.secondary4,
+                  borderColor: row.type !== 'ARTICLE' ? color.Success : color.Warning,
+                  backgroundColor: row.type !== 'ARTICLE' ? color.primary3 : color.secondary4,
                   padding: '0px 4px 0px 4px',
                 }}
               >
                 <span
                   style={{
-                    color: type === 'วิดีโอ' ? color.Success : color.Warning,
+                    color: row.type !== 'ARTICLE' ? color.Success : color.Warning,
                     fontWeight: 'lighter',
                     fontSize: '13px',
                   }}
                 >
-                  {type}
+                  {row.type !== 'ARTICLE' ? 'วิดีโอ' : 'บทความ'}
                 </span>
               </span>
             </>
@@ -225,21 +226,21 @@ function IndexGuru() {
                 cursor: 'pointer',
               }}
               onClick={() => {
-                setSortField('liked')
+                setSortField('like')
                 setSortDirection((prev) => {
-                  if (prev === 'ASC') {
-                    return 'DESC'
+                  if (prev === 'asc') {
+                    return 'desc'
                   } else if (prev === undefined) {
-                    return 'ASC'
+                    return 'asc'
                   } else {
                     return undefined
                   }
                 })
                 setSortDirection2((prev) => {
-                  if (prev === 'ASC') {
-                    return 'DESC'
+                  if (prev === 'asc') {
+                    return 'desc'
                   } else if (prev === undefined) {
-                    return 'ASC'
+                    return 'asc'
                   } else {
                     return undefined
                   }
@@ -250,25 +251,25 @@ function IndexGuru() {
                 style={{
                   position: 'relative',
                   top: 2,
-                  color: sortDirection2 === 'ASC' ? '#ffca37' : 'white',
+                  color: sortDirection2 === 'asc' ? '#ffca37' : 'white',
                 }}
               />
               <CaretDownOutlined
                 style={{
                   position: 'relative',
                   bottom: 2,
-                  color: sortDirection2 === 'DESC' ? '#ffca37' : 'white',
+                  color: sortDirection2 === 'desc' ? '#ffca37' : 'white',
                 }}
               />
             </div>
           </div>
         )
       },
-      dataIndex: 'liked',
-      key: 'liked',
+      dataIndex: 'like',
+      key: 'like',
       render: (value: any, row: any, index: number) => {
         return {
-          children: <span>{numberWithCommas(row.liked) || 0} ครั้ง</span>,
+          children: <span>{numberWithCommas(row.like) || 0} ครั้ง</span>,
         }
       },
     },
@@ -284,21 +285,21 @@ function IndexGuru() {
                 cursor: 'pointer',
               }}
               onClick={() => {
-                setSortField('commented')
+                setSortField('commentCount')
                 setSortDirection((prev) => {
-                  if (prev === 'ASC') {
-                    return 'DESC'
+                  if (prev === 'asc') {
+                    return 'desc'
                   } else if (prev === undefined) {
-                    return 'ASC'
+                    return 'asc'
                   } else {
                     return undefined
                   }
                 })
                 setSortDirection3((prev) => {
-                  if (prev === 'ASC') {
-                    return 'DESC'
+                  if (prev === 'asc') {
+                    return 'desc'
                   } else if (prev === undefined) {
-                    return 'ASC'
+                    return 'asc'
                   } else {
                     return undefined
                   }
@@ -309,25 +310,25 @@ function IndexGuru() {
                 style={{
                   position: 'relative',
                   top: 2,
-                  color: sortDirection3 === 'ASC' ? '#ffca37' : 'white',
+                  color: sortDirection3 === 'asc' ? '#ffca37' : 'white',
                 }}
               />
               <CaretDownOutlined
                 style={{
                   position: 'relative',
                   bottom: 2,
-                  color: sortDirection3 === 'DESC' ? '#ffca37' : 'white',
+                  color: sortDirection3 === 'desc' ? '#ffca37' : 'white',
                 }}
               />
             </div>
           </div>
         )
       },
-      dataIndex: 'commented',
-      key: 'commented',
+      dataIndex: 'commentCount',
+      key: 'commentCount',
       render: (value: any, row: any, index: number) => {
         return {
-          children: <span>{numberWithCommas(row.commented) || 0} ครั้ง</span>,
+          children: <span>{numberWithCommas(row.commentCount) || 0} ครั้ง</span>,
         }
       },
     },
@@ -345,19 +346,19 @@ function IndexGuru() {
               onClick={() => {
                 setSortField('read')
                 setSortDirection((prev) => {
-                  if (prev === 'ASC') {
-                    return 'DESC'
+                  if (prev === 'asc') {
+                    return 'desc'
                   } else if (prev === undefined) {
-                    return 'ASC'
+                    return 'asc'
                   } else {
                     return undefined
                   }
                 })
                 setSortDirection4((prev) => {
-                  if (prev === 'ASC') {
-                    return 'DESC'
+                  if (prev === 'asc') {
+                    return 'desc'
                   } else if (prev === undefined) {
-                    return 'ASC'
+                    return 'asc'
                   } else {
                     return undefined
                   }
@@ -368,14 +369,14 @@ function IndexGuru() {
                 style={{
                   position: 'relative',
                   top: 2,
-                  color: sortDirection4 === 'ASC' ? '#ffca37' : 'white',
+                  color: sortDirection4 === 'asc' ? '#ffca37' : 'white',
                 }}
               />
               <CaretDownOutlined
                 style={{
                   position: 'relative',
                   bottom: 2,
-                  color: sortDirection4 === 'DESC' ? '#ffca37' : 'white',
+                  color: sortDirection4 === 'desc' ? '#ffca37' : 'white',
                 }}
               />
             </div>
@@ -386,7 +387,7 @@ function IndexGuru() {
       key: 'read',
       render: (value: any, row: any, index: number) => {
         return {
-          children: <span>{formatNumberToK(1500) || 0} ครั้ง</span>,
+          children: <span>{formatNumberToK(row.read) || 0} ครั้ง</span>,
         }
       },
     },
@@ -436,7 +437,7 @@ function IndexGuru() {
               <div className='d-flex'>
                 <span style={{ color: color.Grey }}>
                   <UserOutlined style={{ padding: '0 4px 0 0', verticalAlign: 0.5 }} />
-                  {row.createBy ?? '-'}
+                  {row.updateBy ?? '-'}
                 </span>
               </div>
             </div>
@@ -468,7 +469,7 @@ function IndexGuru() {
                   icon={<EditOutlined />}
                   color={color.primary1}
                   onClick={() => {
-                    navigate('/EditArticleGuru/id=' + row.id)
+                    navigate('/EditArticleGuru/id=' + row._id)
                   }}
                 />
               </div>
@@ -477,7 +478,7 @@ function IndexGuru() {
                   icon={<DeleteOutlined />}
                   color={color.Error}
                   onClick={() => {
-                    showDelete(row.id)
+                    showDelete(row._id)
                   }}
                 />
               </div>
@@ -547,9 +548,9 @@ function IndexGuru() {
           <Select
             className='col-lg-12'
             placeholder='เลือกประเภท'
-            onChange={(type: any) => setGuruType(type)}
+            onChange={(type: any) => setType(type)}
             showSearch
-            value={guruType}
+            value={type}
             allowClear
             optionFilterProp='children'
             filterOption={(input: any, option: any) => option.children.includes(input)}
@@ -557,8 +558,8 @@ function IndexGuru() {
               optionA.children.toLowerCase().localeCompare(optionB.children.toLowerCase())
             }
           >
-            <Option value={'1'}>บทความ</Option>
-            <Option value={'2'}>วิดีโอ</Option>
+            <Option value={'ARTICLE'}>บทความ</Option>
+            <Option value={'VIDEO'}>วิดีโอ</Option>
           </Select>
         </div>
         <div className='col-lg p-1'>
@@ -590,7 +591,7 @@ function IndexGuru() {
             }}
             onClick={() => {
               setCurrent(1)
-              // getGuruKaset()
+              getGuruKaset()
             }}
           >
             ค้นหาข้อมูล
@@ -620,8 +621,13 @@ function IndexGuru() {
         title1={'โปรดตรวจสอบบทความที่คุณต้องการลบก่อนที่จะกดยืนยันการลบ '}
         title2={'เพราะอาจต่อการแสดงผลบทความในระบบแอปพลิเคชัน'}
         backButton={() => setModalDelete(!modalDelete)}
-        callBack={async () => {
-          setModalDelete(!modalDelete)
+        callBack={() => {
+          GuruKasetDataSource.deleteGuru(deleteId).then((res) => {
+            if (res) {
+              setModalDelete(!modalDelete)
+              getGuruKaset()
+            }
+          })
         }}
       />
     </>

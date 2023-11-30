@@ -7,7 +7,14 @@ import { DateTimeUtil } from '../../../utilities/DateTimeUtil'
 import ActionButton from '../../../components/button/ActionButton'
 import { useNavigate } from 'react-router-dom'
 import { GroupGuruDataSource } from '../../../datasource/GroupGuruDatasource'
-import { AllGroupGuruEntities } from '../../../entities/GuruKasetEntities'
+import {
+  AllGroupGuruEntities,
+  GroupGuruEntities,
+  GroupGuruEntities_INIT,
+} from '../../../entities/GuruKasetEntities'
+import { numberWithCommas } from '../../../utilities/TextFormatter'
+import ModalGroupGuru from '../../../components/modal/ModalGroupGuru'
+import ModalDelete from '../../../components/modal/ModalDelete'
 
 function IndexGroupGuru() {
   const navigate = useNavigate
@@ -20,6 +27,11 @@ function IndexGroupGuru() {
   const [sortDirection1, setSortDirection1] = useState<string | undefined>(undefined)
   const [sortDirection2, setSortDirection2] = useState<string | undefined>(undefined)
   const [sortField, setSortField] = useState<string | undefined>(undefined)
+  const [showModal, setShowModal] = useState<boolean>(false)
+  const [editIndex, setEditIndex] = useState(0)
+  const [dataGroupGuru, setDataGroupGuru] = useState<GroupGuruEntities>(GroupGuruEntities_INIT)
+  const [groupGuruId, setGroupGuruId] = useState('')
+  const [modalDelete, setModalDelete] = useState<boolean>(false)
 
   useEffect(() => {
     getGroupGuru()
@@ -40,6 +52,15 @@ function IndexGroupGuru() {
     setRow(pageSize)
   }
 
+  const showModalGroupGuru = (data: any, index: number) => {
+    setShowModal((prev) => !prev)
+    setEditIndex(index)
+    setDataGroupGuru(data)
+  }
+  const showDelete = (id: string) => {
+    setGroupGuruId(id)
+    setModalDelete(!modalDelete)
+  }
   const columns = [
     {
       title: () => {
@@ -53,21 +74,21 @@ function IndexGroupGuru() {
                 cursor: 'pointer',
               }}
               onClick={() => {
-                setSortField('startDate')
+                setSortField('updatedAt')
                 setSortDirection((prev) => {
-                  if (prev === 'ASC') {
-                    return 'DESC'
+                  if (prev === 'asc') {
+                    return 'desc'
                   } else if (prev === undefined) {
-                    return 'ASC'
+                    return 'asc'
                   } else {
                     return undefined
                   }
                 })
                 setSortDirection1((prev) => {
-                  if (prev === 'ASC') {
-                    return 'DESC'
+                  if (prev === 'asc') {
+                    return 'desc'
                   } else if (prev === undefined) {
-                    return 'ASC'
+                    return 'asc'
                   } else {
                     return undefined
                   }
@@ -78,29 +99,29 @@ function IndexGroupGuru() {
                 style={{
                   position: 'relative',
                   top: 2,
-                  color: sortDirection1 === 'ASC' ? '#ffca37' : 'white',
+                  color: sortDirection1 === 'asc' ? '#ffca37' : 'white',
                 }}
               />
               <CaretDownOutlined
                 style={{
                   position: 'relative',
                   bottom: 2,
-                  color: sortDirection1 === 'DESC' ? '#ffca37' : 'white',
+                  color: sortDirection1 === 'desc' ? '#ffca37' : 'white',
                 }}
               />
             </div>
           </div>
         )
       },
-      dataIndex: 'updateAt',
-      key: 'updateAt',
+      dataIndex: 'updatedAt',
+      key: 'updatedAt',
       width: '15%',
       render: (value: any, row: any, index: number) => {
         return {
           children: (
             <div className='container'>
               <span className='text-dark-75  d-block font-size-lg'>
-                {DateTimeUtil.formatDateTime(row.updateAt) || '-'}
+                {DateTimeUtil.formatDateTime(row.updatedAt) || '-'}
               </span>
             </div>
           ),
@@ -136,19 +157,19 @@ function IndexGroupGuru() {
               onClick={() => {
                 setSortField('articleCount')
                 setSortDirection((prev) => {
-                  if (prev === 'ASC') {
-                    return 'DESC'
+                  if (prev === 'asc') {
+                    return 'desc'
                   } else if (prev === undefined) {
-                    return 'ASC'
+                    return 'asc'
                   } else {
                     return undefined
                   }
                 })
                 setSortDirection2((prev) => {
-                  if (prev === 'ASC') {
-                    return 'DESC'
+                  if (prev === 'asc') {
+                    return 'desc'
                   } else if (prev === undefined) {
-                    return 'ASC'
+                    return 'asc'
                   } else {
                     return undefined
                   }
@@ -159,14 +180,14 @@ function IndexGroupGuru() {
                 style={{
                   position: 'relative',
                   top: 2,
-                  color: sortDirection2 === 'ASC' ? '#ffca37' : 'white',
+                  color: sortDirection2 === 'asc' ? '#ffca37' : 'white',
                 }}
               />
               <CaretDownOutlined
                 style={{
                   position: 'relative',
                   bottom: 2,
-                  color: sortDirection2 === 'DESC' ? '#ffca37' : 'white',
+                  color: sortDirection2 === 'desc' ? '#ffca37' : 'white',
                 }}
               />
             </div>
@@ -180,7 +201,8 @@ function IndexGroupGuru() {
           children: (
             <div className='container'>
               <span className='text-dark-75  d-block font-size-lg'>
-                {row.articleCount || 0} บทความ | {row.videoCount || 0} วิดิโอ
+                {numberWithCommas(row.articleCount) || 0} บทความ |{' '}
+                {numberWithCommas(row.videoCount) || 0} วิดิโอ
               </span>
             </div>
           ),
@@ -192,6 +214,7 @@ function IndexGroupGuru() {
       dataIndex: 'action',
       key: 'action',
       render: (value: any, row: any, index: number) => {
+        const checkDelete = row.videoCount === 0 && row.articleCount === 0
         return {
           children: (
             <div className='d-flex flex-row justify-content-between'>
@@ -199,18 +222,15 @@ function IndexGroupGuru() {
                 <ActionButton
                   icon={<EditOutlined />}
                   color={color.primary1}
-                  onClick={() => {
-                    // navigate('/EditArticleGuru/id=' + row.id)
-                  }}
+                  onClick={() => showModalGroupGuru(row, index + 1)}
                 />
               </div>
               <div className='pr-1'>
                 <ActionButton
+                  actionDisable={!checkDelete}
                   icon={<DeleteOutlined />}
-                  color={color.Error}
-                  onClick={() => {
-                    //   showDelete(row.id)
-                  }}
+                  color={checkDelete ? color.Error : color.Grey}
+                  onClick={() => showDelete(row._id)}
                 />
               </div>
             </div>
@@ -260,10 +280,7 @@ function IndexGroupGuru() {
               color: color.secondary2,
               backgroundColor: color.Success,
             }}
-            onClick={() => {
-              //   setCurrent(1)
-              // fetchNewsHighlight()
-            }}
+            onClick={() => setShowModal((prev) => !prev)}
           >
             เพิ่มชื่อหมวดหมู่
           </Button>
@@ -288,6 +305,37 @@ function IndexGroupGuru() {
           total={data?.count}
         />
       </div>
+
+      <ModalGroupGuru
+        action='edit'
+        show={showModal}
+        backButton={() => {
+          setEditIndex(0)
+          getGroupGuru()
+          setShowModal((prev) => !prev)
+        }}
+        data={editIndex > 0 ? dataGroupGuru : GroupGuruEntities_INIT}
+        callBack={() => {
+          getGroupGuru()
+          setShowModal((prev) => !prev)
+        }}
+        isEditModal={editIndex > 0 ? true : false}
+        title={editIndex > 0 ? 'แก้ไขหมวดหมู่' : 'เพิ่มหมวดหมู่'}
+      />
+      <ModalDelete
+        show={modalDelete}
+        backButton={() => setModalDelete(!modalDelete)}
+        callBack={() => {
+          GroupGuruDataSource.deleteGroupGuru(groupGuruId).then((res) => {
+            if (res) {
+              setModalDelete(!modalDelete)
+              getGroupGuru()
+            }
+          })
+        }}
+        title1={'โปรดตรวจสอบหมวดหมู่ที่คุณต้องการลบ ก่อนที่จะกดยืนยันการลบ '}
+        title2={'เพราะอาจต่อการแสดงผลบทความ/วิดีโอในระบบแอปพลิเคชัน'}
+      />
     </div>
   )
 }
