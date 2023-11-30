@@ -1,5 +1,10 @@
 ## [Version - 0]
 
+## Feature [v0.41.0] 2023-11-30
+
+- guru kaset (article)
+- group guru kaset
+
 ## improve [v0.40.2] 2023-11-29
 
 - enhance layout new task page in step 3
