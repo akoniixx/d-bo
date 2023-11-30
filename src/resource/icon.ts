@@ -58,4 +58,13 @@ export default {
   arrowDownMenu: require('./media/images/arrowDownMenu.png'),
   arrowUpMenu: require('./media/images/arrowUpMenu.png'),
   arrowUpYellowMenu: require('./media/images/arrowUpMenuYellow.png'),
+  comment: require('./media/images/comments.png'),
+  love: require('./media/images/love.png'),
+  view: require('./media/images/view.png'),
+  typcn_video: require('./media/images/typcn_video.png'),
+  iconkaset: require('./media/images/iconkaset.png'),
+  love_bullet: require('./media/images/love-bullet.png'),
+  comments_bullet: require('./media/images/comments-bullet.png'),
+  play: require('./media/images/play.png'),
+  pause: require('./media/images/pause.png'),
 }

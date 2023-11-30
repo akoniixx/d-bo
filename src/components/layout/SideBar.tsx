@@ -117,7 +117,20 @@ export const pathLists = (isAccounting: boolean, isAdminTask?: boolean) => {
           path: '/GuruPage',
           name: 'GuruPage',
           title: 'กูรูเกษตร',
-          subMenu: [],
+          subMenu: [
+            {
+              path: '/IndexGuru',
+              name: 'IndexGuru',
+              title: 'รายการกูรูเกษตร',
+              subMenu: [],
+            },
+            {
+              path: '/IndexGroupGuru',
+              name: 'IndexGroupGuru',
+              title: 'หมวดหมู่',
+              subMenu: [],
+            },
+          ],
         },
       ],
     },

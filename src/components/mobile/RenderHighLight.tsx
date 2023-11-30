@@ -8,10 +8,6 @@ interface RenderHighLightProps {
   img: string
 }
 
-interface RenderHighLightProps {
-  img: string
-}
-
 const RenderHighLight: React.FC<RenderHighLightProps> = ({ img }) => {
   return (
     <div className='col-4'>

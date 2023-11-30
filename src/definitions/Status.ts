@@ -268,3 +268,9 @@ export const STATUS_COLOR_HIGHLIGHT: any = {
   DRAFTING: color.Grey,
   INACTIVE: color.Error,
 }
+export const STATUS_COLOR_GURU: any = {
+  PENDING: color.secondary3,
+  ACTIVE: color.Success,
+  DRAFTING: color.Grey,
+  INACTIVE: color.Error,
+}

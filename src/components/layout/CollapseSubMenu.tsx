@@ -41,7 +41,7 @@ const ListStyled = styled.div<{ isFocus?: boolean }>`
 `
 const SubListItem = styled.div<{ isFocus?: boolean }>`
   padding: 16px;
-  padding-left: 54px;
+  padding-left: 38px;
   cursor: pointer;
   color: ${(props) => (props.isFocus ? color.Success : '#231F20')};
   width: 100%;

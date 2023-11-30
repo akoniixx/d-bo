@@ -741,7 +741,10 @@ const AddNewTask = () => {
                         )}
                       />
                       {validateComma.status === 'error' && (
-                        <p style={{ color: color.Error, padding: '0 0 0 55px' }}>
+                        <p
+                          className='col-lg-12'
+                          style={{ color: color.Error, padding: '0 0 0 8px' }}
+                        >
                           {validateComma.message}
                         </p>
                       )}
@@ -1501,11 +1504,19 @@ const AddNewTask = () => {
           .then(async (res) => {
             if (res.userMessage === 'success') {
               if (!data?.couponCode) {
-                navigate('/IndexNewTask')
+                if (res.responseData.dronerId) {
+                  navigate('/IndexInprogressTask')
+                } else {
+                  navigate('/IndexNewTask')
+                }
               } else {
-                await CouponDataSource.usedCoupon(data?.couponCode).then((res) =>
-                  navigate('/IndexNewTask'),
-                )
+                await CouponDataSource.usedCoupon(data?.couponCode).then(() => {
+                  if (res.responseData.dronerId) {
+                    navigate('/IndexInprogressTask')
+                  } else {
+                    navigate('/IndexNewTask')
+                  }
+                })
               }
             }
           })

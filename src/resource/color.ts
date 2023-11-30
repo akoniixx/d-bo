@@ -1,9 +1,11 @@
 export default {
   primary1: '#219653',
   primary2: '#56A768',
+  primary3: '#EEF6F0',
   secondary1: '#EA973E',
   secondary2: '#FFCA37',
   secondary3: '#A9CB62',
+  secondary4: '#FCF4EB',
   BG: '#F2F5FC',
   BK: '#2B2B2B',
   Grey: '#7B7B7B',

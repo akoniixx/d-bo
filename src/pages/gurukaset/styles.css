@@ -1,0 +1,17 @@
+
+.ant-btn:focus,
+.ant-btn:hover {
+  color: #219653;
+  border-color: #219653;
+  background-color: #eef6f0;
+}
+
+.custom-btn-left {
+  border-top-left-radius: 5px;
+  border-bottom-left-radius: 5px;
+}
+
+.custom-btn-right {
+  border-top-right-radius: 5px;
+  border-bottom-right-radius: 5px;
+}
