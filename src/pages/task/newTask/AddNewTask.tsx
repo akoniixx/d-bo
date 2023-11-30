@@ -1499,8 +1499,7 @@ const AddNewTask = () => {
         payload.cropName = farmerPlotSeleced?.plantName
         payload.couponCode = data?.couponCode
         payload.couponId = data?.couponId
-        payload.discountCoupon = data?.discountResult
-        console.log(payload)
+        payload.discountCoupon = data?.discountResult ?? 0
         await TaskDatasource.insertNewTask(payload)
           .then(async (res) => {
             if (res.userMessage === 'success') {
