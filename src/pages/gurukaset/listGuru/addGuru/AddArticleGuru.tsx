@@ -292,7 +292,8 @@ function AddArticleGuru() {
                 </div>
               </div>
               <span className='text-center text-muted' style={{ fontSize: '13px' }}>
-              รูปภาพจะต้องมีสัดส่วน 1:1 หรือ 1,000px * 1,000px เท่านั้น เพื่อความสวยงามของภาพในแอปพลิเคชัน
+                รูปภาพจะต้องมีสัดส่วน 1:1 หรือ 1,000px * 1,000px เท่านั้น
+                เพื่อความสวยงามของภาพในแอปพลิเคชัน
               </span>
               <div className='form-group col-lg-12 pt-4'>
                 <label>

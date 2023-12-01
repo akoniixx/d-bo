@@ -44,7 +44,7 @@ function EditArticleGuru() {
   const [createBy, setCreateBy] = useState<any>()
 
   useEffect(() => {
-     GuruKasetDataSource.getAllGuruKasetById(guruId).then((res) => {
+    GuruKasetDataSource.getAllGuruKasetById(guruId).then((res) => {
       if (res) {
         setImgGuru(res.image)
         setCreateBy(res.createBy)
@@ -82,11 +82,11 @@ function EditArticleGuru() {
   }, [])
 
   useEffect(() => {
-      GroupGuruDataSource.getAllGroupGuru().then((res) => {
-        if (res) {
-          setGroupGuru(res.data)
-        } 
-      })
+    GroupGuruDataSource.getAllGroupGuru().then((res) => {
+      if (res) {
+        setGroupGuru(res.data)
+      }
+    })
   }, [])
 
   const onChangeProfile = async (file: any) => {
