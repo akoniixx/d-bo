@@ -102,8 +102,10 @@ function ReviewTask() {
     setDetailDroner(n.toJS())
     if (e.target.value === 'Yes') {
       setSaveRate(false)
+      setBtnSaveDisable(true)
     } else {
       setSaveRate(true)
+      setBtnSaveDisable(false)
     }
   }
 
