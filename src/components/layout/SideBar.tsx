@@ -265,12 +265,12 @@ export const pathLists = (isAccounting: boolean, isAdminTask?: boolean) => {
           title: 'รายชื่อผู้ดูแลระบบ',
           subMenu: [],
         },
-        // {
-        //   path: "/IndexPermission",
-        //   name: "IndexPermission",
-        //   title: "บทบาทผู้ดูแล",
-        //   subMenu: [],
-        // },
+        {
+          path: "/IndexPermission",
+          name: "IndexPermission",
+          title: "บทบาทผู้ดูแล",
+          subMenu: [],
+        },
       ],
     },
     {
