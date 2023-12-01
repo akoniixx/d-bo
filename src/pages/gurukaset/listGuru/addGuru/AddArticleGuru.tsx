@@ -144,7 +144,8 @@ function AddArticleGuru() {
   }
 
   const disabledDateStart = (current: any) => {
-    return current && current.isBefore(moment())
+    const customDate = moment().format('YYYY-MM-DD')
+    return current && current < moment(customDate, 'YYYY-MM-DD')
   }
 
   const onFieldsChange = () => {
@@ -292,7 +293,8 @@ function AddArticleGuru() {
                 </div>
               </div>
               <span className='text-center text-muted' style={{ fontSize: '13px' }}>
-              รูปภาพจะต้องมีสัดส่วน 1:1 หรือ 1,000px * 1,000px เท่านั้น เพื่อความสวยงามของภาพในแอปพลิเคชัน
+                รูปภาพจะต้องมีสัดส่วน 1:1 หรือ 1,000px * 1,000px เท่านั้น
+                เพื่อความสวยงามของภาพในแอปพลิเคชัน
               </span>
               <div className='form-group col-lg-12 pt-4'>
                 <label>
@@ -435,7 +437,6 @@ function AddArticleGuru() {
                                     disabledDate={disabledDateStart}
                                     placeholder='เลือกวันที่'
                                     format={dateFormat}
-                                    defaultValue={moment()}
                                   />
                                 </Form.Item>
                                 <Form.Item
@@ -446,7 +447,6 @@ function AddArticleGuru() {
                                     format={'HH:mm'}
                                     className='ms-3'
                                     placeholder='เลือกเวลา'
-                                    defaultValue={moment('00:00', 'HH:mm')}
                                     allowClear={false}
                                   />
                                 </Form.Item>
