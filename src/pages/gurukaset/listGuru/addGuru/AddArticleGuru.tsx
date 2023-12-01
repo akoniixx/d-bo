@@ -31,7 +31,6 @@ function AddArticleGuru() {
   const [showTimer, setShowTimer] = useState<boolean>(false)
   const dateFormat = 'DD/MM/YYYY'
   const [saveBtnDisable, setBtnSaveDisable] = useState<boolean>(true)
-  const [duplicateTime, setDuplicateTime] = useState<any>()
   const [name, setName] = useState<any>()
   const [category, setCategory] = useState<any>()
   const [groupingId, setGroupingId] = useState<any>()
@@ -205,9 +204,11 @@ function AddArticleGuru() {
       if (status === 'PENDING') {
         requestData.startDate = dateStartPending
       }
+      setBtnSaveDisable(true)
       const res = await GuruKasetDataSource.addGuruKaset(requestData)
 
       if (res) {
+        setBtnSaveDisable(false)
         setModalSave(!modalSave)
         Swal.fire({
           title: 'บันทึกสำเร็จ',
@@ -490,6 +491,7 @@ function AddArticleGuru() {
         }}
         closeModal={() => setModalSave(!modalSave)}
         saveButton={onSubmit}
+        disableSaveBtn={saveBtnDisable}
       />
     </>
   )

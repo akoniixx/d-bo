@@ -42,6 +42,7 @@ function EditArticleGuru() {
   const [groupName, setGroupName] = useState<any>()
   const [groupingId, setGroupingId] = useState<any>()
   const [createBy, setCreateBy] = useState<any>()
+  const [status, setStatus] = useState<any>()
 
   useEffect(() => {
     GuruKasetDataSource.getAllGuruKasetById(guruId).then((res) => {
@@ -50,6 +51,7 @@ function EditArticleGuru() {
         setCreateBy(res.createBy)
         setDescriptionEditor(res.description)
         setName(res.name)
+        setStatus(res.status)
         form.setFieldsValue({
           img: res.image,
           name: res.name,
@@ -231,9 +233,11 @@ function EditArticleGuru() {
       if (status === 'PENDING') {
         requestData.startDate = dateStartPending
       }
+      setBtnSaveDisable(true)
       const res = await GuruKasetDataSource.editGuruKaset(requestData)
 
       if (res) {
+        setBtnSaveDisable(false)
         setModalSave(!modalSave)
         Swal.fire({
           title: 'บันทึกสำเร็จ',
@@ -476,7 +480,11 @@ function EditArticleGuru() {
                           </div>
                         </div>
                       </Radio>
-                      <Radio value={'INACTIVE'}>ปิดการใช้งาน</Radio>
+                      {status === 'DRAFTING' ? (
+                        <Radio value={'DRAFTING'}>แบบร่าง</Radio>
+                      ) : (
+                        <Radio value={'INACTIVE'}>ปิดการใช้งาน</Radio>
+                      )}
                     </Radio.Group>
                   </Form.Item>
                 </div>
@@ -511,6 +519,7 @@ function EditArticleGuru() {
         }}
         closeModal={() => setModalSave(!modalSave)}
         saveButton={onSubmit}
+        disableSaveBtn={saveBtnDisable}
       />
     </>
   )

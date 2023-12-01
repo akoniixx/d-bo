@@ -86,8 +86,8 @@ const RenderArticleGuru: React.FC<RenderArticleGuruProps> = ({
               <div
                 style={{
                   position: 'absolute',
-                  bottom: 8,
-                  right: 8,
+                  bottom: 14,
+                  right: 12,
                   padding: '8px',
                   backgroundColor: 'rgba(255, 255, 255, 0.9)',
                   borderRadius: '16px',

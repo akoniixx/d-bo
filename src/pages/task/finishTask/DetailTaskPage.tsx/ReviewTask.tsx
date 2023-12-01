@@ -95,15 +95,14 @@ function ReviewTask() {
   useEffect(() => {
     fetchDetailTask()
   }, [])
+
   const onChangeCanReview = (e: any) => {
     const m = Map(detailDroner).set('canReview', e.target.value)
     const n = Map(m.toJS()).set('taskId', taskId)
     setDetailDroner(n.toJS())
     if (e.target.value === 'Yes') {
-      setBtnSaveDisable(true)
       setSaveRate(false)
     } else {
-      setBtnSaveDisable(false)
       setSaveRate(true)
     }
   }
@@ -112,20 +111,32 @@ function ReviewTask() {
     const m = Map(detailDroner).set('pilotEtiquette', parseInt(e))
     const n = Map(m.toJS()).set('taskId', taskId)
     setDetailDroner(n.toJS())
-    setBtnSaveDisable(false)
+    checkValidateRating(n.toJS())
   }
   const punctuality = (e: any) => {
     const m = Map(detailDroner).set('punctuality', parseInt(e))
     const n = Map(m.toJS()).set('taskId', taskId)
     setDetailDroner(n.toJS())
-    setBtnSaveDisable(false)
+    checkValidateRating(n.toJS())
   }
   const expertise = (e: any) => {
     const m = Map(detailDroner).set('sprayExpertise', parseInt(e))
     const n = Map(m.toJS()).set('taskId', taskId)
     setDetailDroner(n.toJS())
-    {
-      e == 0 ? setBtnSaveDisable(true) : setBtnSaveDisable(false)
+    checkValidateRating(n.toJS())
+  }
+  const checkValidateRating = (data: any) => {
+    if (
+      data?.pilotEtiquette !== undefined &&
+      data?.pilotEtiquette > 0 &&
+      data?.punctuality !== undefined &&
+      data?.punctuality > 0 &&
+      data?.sprayExpertise !== undefined &&
+      data?.sprayExpertise > 0
+    ) {
+      setBtnSaveDisable(false)
+    } else {
+      setBtnSaveDisable(true)
     }
   }
   const commentReview = (e: any) => {
@@ -133,6 +144,7 @@ function ReviewTask() {
     const n = Map(m.toJS()).set('taskId', taskId)
     setDetailDroner(n.toJS())
   }
+
   const onPreviewImg = async (e: any) => {
     let src = e
     if (!src) {

@@ -1,5 +1,11 @@
 ## [Version - 0]
 
+## Fix [v0.41.1] 2023-12-1
+
+- fixed date time in edit guru kaset page
+- change fields in list guru page
+- validate review rating
+
 ## Feature [v0.41.0] 2023-11-30
 
 - guru kaset (article)

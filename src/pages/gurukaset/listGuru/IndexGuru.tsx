@@ -344,7 +344,7 @@ function IndexGuru() {
                 cursor: 'pointer',
               }}
               onClick={() => {
-                setSortField('read')
+                setSortField('view')
                 setSortDirection((prev) => {
                   if (prev === 'asc') {
                     return 'desc'
@@ -383,11 +383,11 @@ function IndexGuru() {
           </div>
         )
       },
-      dataIndex: 'read',
-      key: 'read',
+      dataIndex: 'view',
+      key: 'view',
       render: (value: any, row: any, index: number) => {
         return {
-          children: <span>{formatNumberToK(row.read) || 0} ครั้ง</span>,
+          children: <span>{formatNumberToK(row.view) || 0} ครั้ง</span>,
         }
       },
     },
