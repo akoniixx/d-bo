@@ -8,6 +8,7 @@ interface CardHeaderProps {
   onClickButoon?: () => void
   buttonName?: string
   bgColor?: string
+  radius?: any
 }
 export const CardHeader: React.FC<CardHeaderProps> = ({
   textHeader,
@@ -15,11 +16,12 @@ export const CardHeader: React.FC<CardHeaderProps> = ({
   onClickButoon,
   buttonName,
   bgColor,
+  radius
 }) => (
   <div
     style={{
       backgroundColor: bgColor ? bgColor : color.Success,
-      borderRadius: '12px 12px 0px 0px',
+      borderRadius: radius? radius :'12px 12px 0px 0px',
       padding: '10px 10px 10px 10px',
     }}
     className='d-flex justify-content-between'
