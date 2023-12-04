@@ -1,0 +1,20 @@
+
+.ant-table-row-expand-icon,
+.ant-table-row-expand-icon-expanded,
+.ant-table-row-expand-icon-hover,
+.ant-table-row-expend-icon:focus-visible {
+  color: #219653 !important;
+}
+.display-table-row td{
+  background-color: #ffffff !important;
+}
+.hide-table-row td{
+  background-color: #ffffff !important;
+}
+.normal-row td{
+  background-color: #eef6f0 !important;
+}
+
+.highlighted-row td {
+  background-color: #eef6f0 !important;
+}
