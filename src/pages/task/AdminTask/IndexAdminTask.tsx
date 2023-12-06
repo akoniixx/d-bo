@@ -44,6 +44,7 @@ import { UploadImageDatasouce } from '../../../datasource/UploadImageDatasource'
 import { resizeFileImg } from '../../../utilities/ResizeImage'
 import { UploadImageEntity, UploadImageEntity_INTI } from '../../../entities/UploadImageEntities'
 import { DeleteOutlined } from '@ant-design/icons'
+import UploadIMGMulti from '../../../components/uploadImg/uploadImgMulti'
 
 const NewTable = styled(Table)`
   .ant-table-container table thead tr th {
@@ -54,7 +55,11 @@ const NewTable = styled(Table)`
     font-weight: bold !important;
   }
 `
-
+interface ImageData {
+  id: number
+  url: string
+  percent?: number
+}
 const IndexAdminTask = () => {
   const [form] = Form.useForm()
   const profile = JSON.parse(localStorage.getItem('profile') || '{  }')
@@ -73,7 +78,7 @@ const IndexAdminTask = () => {
   const [loading, setLoading] = useState(false)
   const [imgControl, setImgControl] = useState<any>(null)
   const [imgDrug, setImgDrug] = useState<any>(null)
-  const [upImgControl, setUpImgControl] = useState<any>()
+  const [upImgControl, setUpImgControl] = useState<ImageData[]>([])
   const [upImgDrug, setUpImgDrug] = useState<any>()
   const [checkTask, setCheckTask] = useState<boolean>(false)
   const { Map } = require('immutable')
@@ -165,30 +170,93 @@ const IndexAdminTask = () => {
     const newRai = Number(form.getFieldValue('farmAreaAmount'))
     return newRai > oldRai
   }
-  const onChangeControl = async (file: any) => {
-    const source = file.target.files[0]
-    let newSource: any
+  // const onChangeControl = async (file: any) => {
+  //   const source = file.target.files[0]
+  //   let newSource: any
 
-    const isFileMoreThan2MB = source.size > 2 * 1024 * 1024
-    if (isFileMoreThan2MB) {
-      newSource = await resizeFileImg({
-        file: source,
-        compressFormat: source?.type.split('/')[1],
-        quality: 70,
-        rotation: 0,
-        responseUriFunc: (res: any) => {},
-      })
+  //   const isFileMoreThan2MB = source.size > 2 * 1024 * 1024
+  //   if (isFileMoreThan2MB) {
+  //     newSource = await resizeFileImg({
+  //       file: source,
+  //       compressFormat: source?.type.split('/')[1],
+  //       quality: 70,
+  //       rotation: 0,
+  //       responseUriFunc: (res: any) => {},
+  //     })
+  //   }
+  //   const img_base64 = await new Promise((resolve) => {
+  //     const reader = new FileReader()
+  //     reader.readAsDataURL(isFileMoreThan2MB ? newSource : source)
+  //     reader.onload = () => resolve(reader.result)
+  //   })
+
+  //   setUpImgControl(img_base64)
+  //   const d = Map(createImgControl).set('file', isFileMoreThan2MB ? newSource : source)
+  //   setCreateImgControl(d.toJS())
+  // }
+
+  const onChangeControl = async (fileList: FileList | null) => {
+    if (fileList) {
+      try {
+        const updatedImages: ImageData[] = [...upImgControl];
+        const totalFiles = fileList.length;
+  
+        for (let i = 0; i < totalFiles; i++) {
+          const source = fileList[i];
+          let newSource: any;
+  
+          const isFileMoreThan2MB = source.size > 2 * 1024 * 1024;
+          if (isFileMoreThan2MB) {
+            newSource = await resizeFileImg({
+              file: source,
+              compressFormat: source?.type.split('/')[1],
+              quality: 70,
+              rotation: 0,
+              responseUriFunc: (res: any) => {},
+            });
+          }
+  
+          const imgBase64 = await new Promise<string>((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () => resolve(reader.result as string);
+            reader.onerror = () => reject(reader.error);
+            reader.readAsDataURL(isFileMoreThan2MB ? newSource! : source);
+          });
+  
+          const imageData: ImageData = {
+            id: updatedImages.length + i + 1,
+            url: imgBase64,
+            percent: 0, // Initialize percent for each image
+          };
+          updatedImages.push(imageData);
+  
+          let currentPercent = 0;
+          const timer = setInterval(() => {
+            currentPercent++;
+            const imageIndex = updatedImages.findIndex(img => img.id === imageData.id);
+            if (imageIndex !== -1) {
+              const updatedImagesCopy = [...updatedImages];
+              updatedImagesCopy[imageIndex] = { ...imageData, percent: currentPercent }; // Update percent for current image
+              setUpImgControl(updatedImagesCopy);
+            }
+
+            if (currentPercent === 100) {
+              clearInterval(timer);
+            }
+          }, 50);
+        }
+      } catch (error) {
+        console.error('Error occurred while processing images:', error);
+      }
     }
-    const img_base64 = await new Promise((resolve) => {
-      const reader = new FileReader()
-      reader.readAsDataURL(isFileMoreThan2MB ? newSource : source)
-      reader.onload = () => resolve(reader.result)
-    })
+  };
+  
+  
 
-    setUpImgControl(img_base64)
-    const d = Map(createImgControl).set('file', isFileMoreThan2MB ? newSource : source)
-    setCreateImgControl(d.toJS())
-  }
+  const deleteImg = (index: number) => {
+    const updatedImages = upImgControl.filter((e) => e.id !== index);
+    setUpImgControl([...updatedImages]);
+  };
   const onChangeDrug = async (file: any) => {
     const source = file.target.files[0]
     let newSource: any
@@ -213,7 +281,6 @@ const IndexAdminTask = () => {
     const d = Map(createImgDrug).set('file', isFileMoreThan2MB ? newSource : source)
     setCreateImgDrug(d.toJS())
   }
-
   const onPreviewImg = async (e: any) => {
     let src = e
     if (!src) {
@@ -226,7 +293,6 @@ const IndexAdminTask = () => {
     const imgWindow = window.open(src)
     imgWindow?.document.write(image.outerHTML)
   }
-
   const pageTitle = (
     <Row style={{ padding: '10px' }}>
       <Col span={24}>
@@ -735,60 +801,12 @@ const IndexAdminTask = () => {
               </Row>
               <Row justify={'space-between'} gutter={32} style={{ paddingBottom: '4%' }}>
                 <Col span={12}>
-                  <div className='form-group col-lg-12'>
-                    <Row
-                      style={{
-                        border: upImgControl && 'dotted',
-                        borderWidth: upImgControl && 0.5,
-                        borderRadius: upImgControl && '8px',
-                        width: upImgControl && '100%',
-                        height: upImgControl && '75px',
-                        paddingLeft: upImgControl && 2,
-                      }}
-                      gutter={8}
-                    >
-                      <Col span={4} className='align-self-center'>
-                        <span
-                          style={{
-                            backgroundImage: `url(${upImgControl})`,
-                            display: upImgControl ? 'block' : 'none',
-                            borderRadius: upImgControl ? 6 : 0,
-                            width: '65px',
-                            height: '65px',
-                            overflow: 'hidden',
-                            backgroundRepeat: 'no-repeat',
-                            backgroundPosition: 'center',
-                            backgroundSize: '100%',
-                          }}
-                        />
-                      </Col>
-                      <Col span={14} className='align-self-center' />
-                      <Col span={2} className='align-self-center'>
-                        <span>
-                          {upImgControl && (
-                            <DeleteOutlined
-                              style={{ fontSize: 20, color: color.Error }}
-                              onClick={() => setUpImgControl(undefined)}
-                            />
-                          )}
-                        </span>
-                      </Col>
-                    </Row>
-                    <div
-                      className='hiddenFileInputTask'
-                      style={{
-                        backgroundImage: `url(${img_empty})`,
-                        display: upImgControl ? 'none' : 'block',
-                      }}
-                    >
-                      <input
-                        key={upImgControl}
-                        type='file'
-                        onChange={onChangeControl}
-                        title='เลือกรูป'
-                      />
-                    </div>
-                  </div>
+                  <UploadIMGMulti
+                    img={upImgControl}
+                    onChangeControl={onChangeControl}
+                    handleDelete={deleteImg}
+                    // percent={}
+                  />
                 </Col>
                 <Col span={12}>
                   <>
@@ -1136,7 +1154,7 @@ const IndexAdminTask = () => {
         form.setFieldsValue({
           remark: '',
         })
-        setUpImgControl(undefined)
+        // setUpImgControl(undefined)
         setUpImgDrug(undefined)
         setCheckTask(false)
       })
