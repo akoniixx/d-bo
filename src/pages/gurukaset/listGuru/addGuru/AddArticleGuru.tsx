@@ -348,7 +348,7 @@ function AddArticleGuru() {
               </div>
               <div className='form-group col-lg-4'>
                 <label>
-                  แอปพลิเคชั่น <span style={{ color: 'red' }}>*</span>
+                  แอปพลิเคชัน <span style={{ color: 'red' }}>*</span>
                 </label>
                 <Form.Item
                   initialValue={false}
@@ -356,11 +356,7 @@ function AddArticleGuru() {
                   valuePropName='select'
                   className='my-0'
                 >
-                  <Select
-                    allowClear
-                    placeholder='เลือกแอปพลิเคชั่น'
-                    onChange={() => console.log(1)}
-                  >
+                  <Select allowClear placeholder='เลือกแอปพลิเคชัน' onChange={() => console.log(1)}>
                     <option key={'FARMER'} value='FARMER'>
                       <img src={icon.farmerApp} style={{ width: '20px', height: '20px' }} />
                       <span style={{ paddingLeft: '4px' }}>Farmer App</span>

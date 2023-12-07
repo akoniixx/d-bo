@@ -563,10 +563,10 @@ function EditNewsPage() {
               </div>
               <div className='form-group col-lg-4'>
                 <label>
-                  แอปพลิเคชั่น <span style={{ color: 'red' }}>*</span>
+                  แอปพลิเคชัน <span style={{ color: 'red' }}>*</span>
                 </label>
                 <Form.Item initialValue={false} name='applicationType' className='my-0'>
-                  <Select allowClear placeholder='เลือกแอปพลิเคชั่น' onChange={handleChooseAppType}>
+                  <Select allowClear placeholder='เลือกแอปพลิเคชัน' onChange={handleChooseAppType}>
                     <option key={1} value='FARMER'>
                       Farmer Application
                     </option>

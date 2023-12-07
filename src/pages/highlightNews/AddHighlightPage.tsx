@@ -309,7 +309,7 @@ function AddHighlightPage() {
               </div>
               <div className='form-group col-lg-4'>
                 <label>
-                  แอปพลิเคชั่น <span style={{ color: 'red' }}>*</span>
+                  แอปพลิเคชัน <span style={{ color: 'red' }}>*</span>
                 </label>
                 <Form.Item
                   initialValue={false}
@@ -319,7 +319,7 @@ function AddHighlightPage() {
                 >
                   <Select
                     allowClear
-                    placeholder='เลือกแอปพลิเคชั่น'
+                    placeholder='เลือกแอปพลิเคชัน'
                     onChange={() => checkDupDateTime()}
                   >
                     <option key={1} value='FARMER'>

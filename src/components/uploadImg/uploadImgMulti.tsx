@@ -13,9 +13,10 @@ interface ImagProps {
   img: ImageData[]
   onChangeControl: (file: FileList | null) => void
   handleDelete: (index: number) => void
+  disable?: boolean
 }
 
-const UploadIMGMulti: React.FC<ImagProps> = ({ img, onChangeControl, handleDelete }) => {
+const UploadIMGMulti: React.FC<ImagProps> = ({ img, onChangeControl, handleDelete, disable }) => {
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const fileList = e.target.files
     if (fileList) {
@@ -23,11 +24,11 @@ const UploadIMGMulti: React.FC<ImagProps> = ({ img, onChangeControl, handleDelet
     }
   }
   const deleteImg = (index: number) => {
-    if (index) {
+    if (index || index === 0) {
       handleDelete(index)
     }
   }
-
+  console.log(img)
   return (
     <>
       <div className='form-group col-lg-12'>
@@ -55,12 +56,18 @@ const UploadIMGMulti: React.FC<ImagProps> = ({ img, onChangeControl, handleDelet
             display: 'block',
           }}
         >
-          <input type='file' onChange={handleImageChange} title='Choose Image' multiple />
+          <input
+            type='file'
+            disabled={disable}
+            onChange={handleImageChange}
+            title='Choose Image'
+            multiple
+          />
         </div>
       </div>
       <div className='position-relative' style={{ maxWidth: 'fit-content' }}>
         <div className='row justify-content-start' style={{ paddingLeft: 2 }}>
-          {img?.length > 0 &&
+          {img &&
             img.map((imageData, index) => (
               <div key={index} className='col' style={{ paddingLeft: 2 }}>
                 <div className='position-relative' style={{ maxWidth: 'fit-content' }}>
@@ -79,25 +86,41 @@ const UploadIMGMulti: React.FC<ImagProps> = ({ img, onChangeControl, handleDelet
                         alt='Your Image'
                       />
                       {imageData.percent !== 100 && (
-                        <Progress
-                          key={imageData.id}
-                          showInfo={false}
-                          percent={imageData.percent}
-                          size='small'
-                          style={{
-                            position: 'absolute',
-                            top: '50%',
-                            left: '50%',
-                            transform: 'translate(-50%, -50%)',
-                            width: '80%',
-                            color: color.Success,
-                          }}
-                        />
+                        <>
+                          <div
+                            style={{
+                              position: 'absolute',
+                              top: 10,
+                              left: '0',
+                              width: '100%',
+                              textAlign: 'center',
+                              fontSize: '8px',
+                              zIndex: 1,
+                              color: color.White,
+                            }}
+                          >
+                            Uploading..
+                          </div>
+                          <Progress
+                            key={imageData.id}
+                            showInfo={false}
+                            percent={imageData.percent}
+                            size='small'
+                            style={{
+                              position: 'absolute',
+                              top: '50%',
+                              left: '50%',
+                              transform: 'translate(-50%, -50%)',
+                              width: '80%',
+                              color: color.Success,
+                            }}
+                          />
+                        </>
                       )}
                     </div>
                     <span
                       className='position-absolute top-0 end-0'
-                      onClick={() => deleteImg(imageData?.id)}
+                      onClick={() => deleteImg(imageData.id)}
                       style={{ padding: 1, borderRadius: '50%', cursor: 'pointer', left: 38 }}
                     >
                       <img src={icon.cancel} style={{ width: 20, height: 20 }} alt='Delete' />

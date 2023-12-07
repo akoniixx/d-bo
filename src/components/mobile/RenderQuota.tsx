@@ -62,7 +62,7 @@ const RenderQuota: React.FC<RenderQuota> = ({
   return (
     <div className='col-lg-12'>
       <div ref={div}>
-        <CardHeaderPromotion textHeader='ตัวอย่างในแอปพลิเคชั่น' center={true} />
+        <CardHeaderPromotion textHeader='ตัวอย่างในแอปพลิเคชัน' center={true} />
         <div
           style={{
             width: '100%',

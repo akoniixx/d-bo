@@ -12,7 +12,7 @@ export class GuruKasetDataSource {
     sortBy?: string,
     sortDirection?: string,
     startDate?: any,
-    endDate?: any
+    endDate?: any,
   ): Promise<AllGuruKasetEntities> {
     const params = {
       page: page,
@@ -24,7 +24,7 @@ export class GuruKasetDataSource {
       sortDirection: sortDirection,
       sortBy: sortBy,
       startDate: startDate,
-      endDate: endDate
+      endDate: endDate,
     }
     return httpClient
       .get(BASE_URL + '/guru/guru', { params })

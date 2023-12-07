@@ -6,8 +6,8 @@ export interface GroupGuruEntities {
   __v: number
 }
 export const GroupGuruEntities_INIT: GroupGuruEntities = {
-  _id: "",
-  groupName: "",
+  _id: '',
+  groupName: '',
   articleCount: 0,
   videoCount: 0,
   __v: 0,

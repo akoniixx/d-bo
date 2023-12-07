@@ -76,15 +76,16 @@ const IndexAdminTask = () => {
   const [edit, setEdit] = useState<any>()
   const [history, setHistory] = useState<any>()
   const [loading, setLoading] = useState(false)
-  const [imgControl, setImgControl] = useState<any>(null)
-  const [imgDrug, setImgDrug] = useState<any>(null)
+  const [imgControl, setImgControl] = useState<ImageData[]>([])
+  const [imgDrug, setImgDrug] = useState<ImageData[]>([])
   const [upImgControl, setUpImgControl] = useState<ImageData[]>([])
-  const [upImgDrug, setUpImgDrug] = useState<any>()
+  const [upImgDrug, setUpImgDrug] = useState<ImageData[]>([])
   const [checkTask, setCheckTask] = useState<boolean>(false)
   const { Map } = require('immutable')
   const [createImgControl, setCreateImgControl] =
     useState<UploadImageEntity>(UploadImageEntity_INTI)
   const [createImgDrug, setCreateImgDrug] = useState<UploadImageEntity>(UploadImageEntity_INTI)
+  const [disableUpImage, setDisableUpImage] = useState<boolean>(false)
 
   const fetchTaskList = () => {
     TaskDatasource.getAllTaskList(taskNo, current, 10).then((res: AllTaskListEntity) => {
@@ -138,11 +139,25 @@ const IndexAdminTask = () => {
         }
         if (res.data.imagePathFinishTask) {
           const resImg = await UploadImageDatasouce.getImage(res.data.imagePathFinishTask)
-          setImgControl(resImg.url)
+          const imgCon: ImageData[] = [...imgControl]
+          const imageData: ImageData = {
+            id: 0,
+            url: resImg.url,
+            percent: 100,
+          }
+          imgCon.push(imageData)
+          setImgControl(imgCon)
         }
         if (res.data.imagePathDrug) {
           const resImg = await UploadImageDatasouce.getImage(res.data.imagePathDrug)
-          setImgDrug(resImg.url)
+          const imgDrugData: ImageData[] = [...imgDrug]
+          const imageData: ImageData = {
+            id: 0,
+            url: resImg.url,
+            percent: 100,
+          }
+          imgDrugData.push(imageData)
+          setImgDrug(imgDrugData)
         }
       })
       .finally(() => {
@@ -170,42 +185,16 @@ const IndexAdminTask = () => {
     const newRai = Number(form.getFieldValue('farmAreaAmount'))
     return newRai > oldRai
   }
-  // const onChangeControl = async (file: any) => {
-  //   const source = file.target.files[0]
-  //   let newSource: any
-
-  //   const isFileMoreThan2MB = source.size > 2 * 1024 * 1024
-  //   if (isFileMoreThan2MB) {
-  //     newSource = await resizeFileImg({
-  //       file: source,
-  //       compressFormat: source?.type.split('/')[1],
-  //       quality: 70,
-  //       rotation: 0,
-  //       responseUriFunc: (res: any) => {},
-  //     })
-  //   }
-  //   const img_base64 = await new Promise((resolve) => {
-  //     const reader = new FileReader()
-  //     reader.readAsDataURL(isFileMoreThan2MB ? newSource : source)
-  //     reader.onload = () => resolve(reader.result)
-  //   })
-
-  //   setUpImgControl(img_base64)
-  //   const d = Map(createImgControl).set('file', isFileMoreThan2MB ? newSource : source)
-  //   setCreateImgControl(d.toJS())
-  // }
-
   const onChangeControl = async (fileList: FileList | null) => {
     if (fileList) {
       try {
-        const updatedImages: ImageData[] = [...upImgControl];
-        const totalFiles = fileList.length;
-  
+        const updatedImages: ImageData[] = [...imgControl]
+        const totalFiles = Math.min(fileList.length, 5)
         for (let i = 0; i < totalFiles; i++) {
-          const source = fileList[i];
-          let newSource: any;
-  
-          const isFileMoreThan2MB = source.size > 2 * 1024 * 1024;
+          const source = fileList[i]
+          let newSource: any
+
+          const isFileMoreThan2MB = source.size > 2 * 1024 * 1024
           if (isFileMoreThan2MB) {
             newSource = await resizeFileImg({
               file: source,
@@ -213,73 +202,137 @@ const IndexAdminTask = () => {
               quality: 70,
               rotation: 0,
               responseUriFunc: (res: any) => {},
-            });
+            })
           }
-  
+
           const imgBase64 = await new Promise<string>((resolve, reject) => {
-            const reader = new FileReader();
-            reader.onload = () => resolve(reader.result as string);
-            reader.onerror = () => reject(reader.error);
-            reader.readAsDataURL(isFileMoreThan2MB ? newSource! : source);
-          });
-  
+            const reader = new FileReader()
+            reader.onload = () => resolve(reader.result as string)
+            reader.onerror = () => reject(reader.error)
+            reader.readAsDataURL(isFileMoreThan2MB ? newSource! : source)
+          })
+
+          const imageData: ImageData = {
+            id: i + 1,
+            url: imgBase64,
+            percent: 0,
+          }
+          updatedImages.push(imageData)
+          await updateImageProgressControl(updatedImages)
+        }
+      } catch (error) {
+        console.error('Error occurred while processing images:', error)
+      }
+    }
+  }
+  const updateImageProgressControl = async (updatedImages: ImageData[]) => {
+    return new Promise<void>((resolve) => {
+      const intervalDuration = 200
+      let currentImageIndex = 0
+      const updatePercent = () => {
+        const currentImage = updatedImages[currentImageIndex]
+        if (currentImage && typeof currentImage.percent === 'number') {
+          const updatedPercent = Math.min(currentImage.percent + 20, 100)
+          updatedImages[currentImageIndex] = { ...currentImage, percent: updatedPercent }
+          setImgControl([...updatedImages])
+          if (updatedPercent < 100) {
+            setDisableUpImage(true)
+            setTimeout(updatePercent, intervalDuration)
+          } else {
+            currentImageIndex++
+            if (currentImageIndex === updatedImages.length) {
+              setDisableUpImage(false)
+              resolve()
+              return
+            }
+            setTimeout(updatePercent, intervalDuration)
+          }
+        }
+      }
+      updatePercent()
+    })
+  }
+
+  const deleteImg = (index: number) => {
+    const updatedImages = imgControl.filter((e) => e.id !== index)
+    setImgControl([...updatedImages])
+  }
+  const onChangeDrug = async (fileList: FileList | null) => {
+    if (fileList) {
+      try {
+        const updatedImages: ImageData[] = [...upImgDrug]
+        const totalFiles = fileList.length
+
+        for (let i = 0; i < totalFiles; i++) {
+          const source = fileList[i]
+          let newSource: any
+
+          const isFileMoreThan2MB = source.size > 2 * 1024 * 1024
+          if (isFileMoreThan2MB) {
+            newSource = await resizeFileImg({
+              file: source,
+              compressFormat: source?.type.split('/')[1],
+              quality: 70,
+              rotation: 0,
+              responseUriFunc: (res: any) => {},
+            })
+          }
+
+          const imgBase64 = await new Promise<string>((resolve, reject) => {
+            const reader = new FileReader()
+            reader.onload = () => resolve(reader.result as string)
+            reader.onerror = () => reject(reader.error)
+            reader.readAsDataURL(isFileMoreThan2MB ? newSource! : source)
+          })
+
           const imageData: ImageData = {
             id: updatedImages.length + i + 1,
             url: imgBase64,
-            percent: 0, // Initialize percent for each image
-          };
-          updatedImages.push(imageData);
-  
-          let currentPercent = 0;
-          const timer = setInterval(() => {
-            currentPercent++;
-            const imageIndex = updatedImages.findIndex(img => img.id === imageData.id);
-            if (imageIndex !== -1) {
-              const updatedImagesCopy = [...updatedImages];
-              updatedImagesCopy[imageIndex] = { ...imageData, percent: currentPercent }; // Update percent for current image
-              setUpImgControl(updatedImagesCopy);
-            }
+            percent: 0,
+          }
+          updatedImages.push(imageData)
+          await updateImageProgressDrug(imageData, updatedImages)
 
-            if (currentPercent === 100) {
-              clearInterval(timer);
-            }
-          }, 50);
+          // setDisableUpImage(true)
         }
       } catch (error) {
-        console.error('Error occurred while processing images:', error);
+        console.error('Error occurred while processing images:', error)
       }
     }
-  };
-  
-  
+  }
+  const updateImageProgressDrug = async (imageData: ImageData, updatedImages: ImageData[]) => {
+    return new Promise<void>((resolve) => {
+      const intervalDuration = 200
 
-  const deleteImg = (index: number) => {
-    const updatedImages = upImgControl.filter((e) => e.id !== index);
-    setUpImgControl([...updatedImages]);
-  };
-  const onChangeDrug = async (file: any) => {
-    const source = file.target.files[0]
-    let newSource: any
+      let currentImageIndex = 0
 
-    const isFileMoreThan2MB = source.size > 2 * 1024 * 1024
-    if (isFileMoreThan2MB) {
-      newSource = await resizeFileImg({
-        file: source,
-        compressFormat: source?.type.split('/')[1],
-        quality: 70,
-        rotation: 0,
-        responseUriFunc: (res: any) => {},
-      })
-    }
-    const img_base64 = await new Promise((resolve) => {
-      const reader = new FileReader()
-      reader.readAsDataURL(isFileMoreThan2MB ? newSource : source)
-      reader.onload = () => resolve(reader.result)
+      const updatePercent = () => {
+        const currentImage = updatedImages[currentImageIndex]
+        if (currentImage && typeof currentImage.percent === 'number') {
+          const updatedPercent = Math.min(currentImage.percent + 20, 100)
+          updatedImages[currentImageIndex] = { ...currentImage, percent: updatedPercent }
+          setUpImgDrug([...updatedImages])
+
+          if (updatedPercent < 100) {
+            setTimeout(updatePercent, intervalDuration)
+          } else {
+            currentImageIndex++
+            if (currentImageIndex === updatedImages.length) {
+              setDisableUpImage(false)
+              resolve()
+              return
+            }
+            setTimeout(updatePercent, intervalDuration)
+          }
+        }
+      }
+
+      updatePercent()
     })
-
-    setUpImgDrug(img_base64)
-    const d = Map(createImgDrug).set('file', isFileMoreThan2MB ? newSource : source)
-    setCreateImgDrug(d.toJS())
+  }
+  const deleteImgDrug = (index: number) => {
+    const updatedImages = upImgDrug.filter((e) => e.id !== index)
+    setUpImgDrug([...updatedImages])
   }
   const onPreviewImg = async (e: any) => {
     let src = e
@@ -441,7 +494,7 @@ const IndexAdminTask = () => {
             </Col>
           </>
           <>
-            <Col span={12}>
+            {/* <Col span={12}>
               {imgControl ? (
                 <ImagCards
                   imageName={imgControl}
@@ -462,7 +515,7 @@ const IndexAdminTask = () => {
               ) : (
                 '-'
               )}
-            </Col>
+            </Col> */}
           </>
         </Row>
         <Row justify={'space-between'} gutter={8} style={{ paddingBottom: '15px' }}>
@@ -802,62 +855,19 @@ const IndexAdminTask = () => {
               <Row justify={'space-between'} gutter={32} style={{ paddingBottom: '4%' }}>
                 <Col span={12}>
                   <UploadIMGMulti
-                    img={upImgControl}
+                    img={imgControl}
                     onChangeControl={onChangeControl}
                     handleDelete={deleteImg}
-                    // percent={}
+                    disable={disableUpImage}
                   />
                 </Col>
                 <Col span={12}>
-                  <>
-                    <Row
-                      style={{
-                        border: upImgDrug && 'dotted',
-                        borderWidth: upImgDrug && 0.5,
-                        borderRadius: upImgDrug && '8px',
-                        width: upImgDrug && '100%',
-                        height: upImgDrug && '75px',
-                        paddingLeft: upImgDrug && 2,
-                      }}
-                      gutter={8}
-                    >
-                      <Col span={4} className='align-self-center'>
-                        <span
-                          style={{
-                            backgroundImage: `url(${upImgDrug})`,
-                            display: upImgDrug ? 'block' : 'none',
-                            borderRadius: upImgDrug ? 6 : 0,
-                            width: '65px',
-                            height: '65px',
-                            overflow: 'hidden',
-                            backgroundRepeat: 'no-repeat',
-                            backgroundPosition: 'center',
-                            backgroundSize: '100%',
-                          }}
-                        />
-                      </Col>
-                      <Col span={14} className='align-self-center' />
-                      <Col span={2} className='align-self-center'>
-                        <span>
-                          {upImgDrug && (
-                            <DeleteOutlined
-                              style={{ fontSize: 20, color: color.Error }}
-                              onClick={() => setUpImgDrug(undefined)}
-                            />
-                          )}
-                        </span>
-                      </Col>
-                    </Row>
-                    <div
-                      className='hiddenFileInputTask'
-                      style={{
-                        backgroundImage: `url(${img_empty})`,
-                        display: upImgDrug ? 'none' : 'block',
-                      }}
-                    >
-                      <input key={upImgDrug} type='file' onChange={onChangeDrug} title='เลือกรูป' />
-                    </div>
-                  </>
+                  <UploadIMGMulti
+                    img={imgDrug}
+                    onChangeControl={onChangeDrug}
+                    handleDelete={deleteImgDrug}
+                    disable={disableUpImage}
+                  />
                 </Col>
               </Row>
             </>
@@ -1155,7 +1165,7 @@ const IndexAdminTask = () => {
           remark: '',
         })
         // setUpImgControl(undefined)
-        setUpImgDrug(undefined)
+        // setUpImgDrug(undefined)
         setCheckTask(false)
       })
     } else {
@@ -1195,8 +1205,8 @@ const IndexAdminTask = () => {
                       }}
                       onChange={(e) => {
                         if (e !== taskId) {
-                          setImgControl(null)
-                          setImgDrug(null)
+                          // setImgControl(null)
+                          // setImgDrug(null)
                         }
                         setTaskId(e)
                         setSearch(false)

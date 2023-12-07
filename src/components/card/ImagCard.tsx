@@ -64,7 +64,7 @@ const ImagCards: React.FC<ImagCardsProps> = ({ imageName, image, onClick }) => {
         closable={false}
         bodyStyle={{ padding: 0, backgroundColor: 'transparent', boxShadow: 'none' }}
       >
-        <div style={{ position: 'relative', width: '100%', height: '100%'}}>
+        <div style={{ position: 'relative', width: '100%', height: '100%' }}>
           <div
             style={{ position: 'absolute', top: '40%', left: -60, transform: 'translateY(-50%)' }}
           >
