@@ -1,5 +1,9 @@
 ## [Version - 0]
 
+## improve [v0.41.2] 2023-12-10
+
+- edit image in finish task
+
 ## Fix [v0.41.1] 2023-12-1
 
 - fixed date time in edit guru kaset page
