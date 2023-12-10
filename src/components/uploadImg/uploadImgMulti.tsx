@@ -10,13 +10,20 @@ interface ImageData {
   percent?: number
 }
 interface ImagProps {
-  img: ImageData[]
+  img: any[]
   onChangeControl: (file: FileList | null) => void
   handleDelete: (index: number) => void
   disable?: boolean
+  show?: boolean
 }
 
-const UploadIMGMulti: React.FC<ImagProps> = ({ img, onChangeControl, handleDelete, disable }) => {
+const UploadIMGMulti: React.FC<ImagProps> = ({
+  img,
+  onChangeControl,
+  handleDelete,
+  disable,
+  show,
+}) => {
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const fileList = e.target.files
     if (fileList) {
@@ -28,7 +35,6 @@ const UploadIMGMulti: React.FC<ImagProps> = ({ img, onChangeControl, handleDelet
       handleDelete(index)
     }
   }
-  console.log(img)
   return (
     <>
       <div className='form-group col-lg-12'>
@@ -74,7 +80,7 @@ const UploadIMGMulti: React.FC<ImagProps> = ({ img, onChangeControl, handleDelet
                   <div className='pt-3 position-relative'>
                     <div style={{ position: 'relative', display: 'inline-block' }}>
                       <img
-                        src={imageData.url}
+                        src={show ? imageData : imageData.url}
                         style={{
                           width: '50px',
                           height: '50px',
@@ -85,45 +91,53 @@ const UploadIMGMulti: React.FC<ImagProps> = ({ img, onChangeControl, handleDelet
                         }}
                         alt='Your Image'
                       />
-                      {imageData.percent !== 100 && (
-                        <>
-                          <div
-                            style={{
-                              position: 'absolute',
-                              top: 10,
-                              left: '0',
-                              width: '100%',
-                              textAlign: 'center',
-                              fontSize: '8px',
-                              zIndex: 1,
-                              color: color.White,
-                            }}
-                          >
-                            Uploading..
-                          </div>
-                          <Progress
-                            key={imageData.id}
-                            showInfo={false}
-                            percent={imageData.percent}
-                            size='small'
-                            style={{
-                              position: 'absolute',
-                              top: '50%',
-                              left: '50%',
-                              transform: 'translate(-50%, -50%)',
-                              width: '80%',
-                              color: color.Success,
-                            }}
-                          />
-                        </>
-                      )}
+                      {show
+                        ? null
+                        : imageData.percent !== 100 && (
+                            <>
+                              <div
+                                style={{
+                                  position: 'absolute',
+                                  top: 10,
+                                  left: '0',
+                                  width: '100%',
+                                  textAlign: 'center',
+                                  fontSize: '8px',
+                                  zIndex: 1,
+                                  color: color.White,
+                                }}
+                              >
+                                Uploading..
+                              </div>
+                              <Progress
+                                key={imageData.id}
+                                showInfo={false}
+                                percent={imageData.percent}
+                                size='small'
+                                style={{
+                                  position: 'absolute',
+                                  top: '50%',
+                                  left: '50%',
+                                  transform: 'translate(-50%, -50%)',
+                                  width: '80%',
+                                  color: color.Success,
+                                }}
+                              />
+                            </>
+                          )}
                     </div>
                     <span
                       className='position-absolute top-0 end-0'
-                      onClick={() => deleteImg(imageData.id)}
+                      onClick={() => deleteImg(show ? imageData : imageData.id)}
                       style={{ padding: 1, borderRadius: '50%', cursor: 'pointer', left: 38 }}
                     >
-                      <img src={icon.cancel} style={{ width: 20, height: 20 }} alt='Delete' />
+                      {typeof imageData.id === 'string' && img.length > 1 ? (
+                        <img src={icon.cancel} style={{ width: 20, height: 20 }} alt='Delete' />
+                      ) : (
+                        typeof imageData.id === 'number' && (
+                          <img src={icon.cancel} style={{ width: 20, height: 20 }} alt='Delete' />
+                        )
+                      )}
                     </span>
                   </div>
                 </div>

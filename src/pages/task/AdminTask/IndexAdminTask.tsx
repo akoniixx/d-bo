@@ -45,6 +45,8 @@ import { resizeFileImg } from '../../../utilities/ResizeImage'
 import { UploadImageEntity, UploadImageEntity_INTI } from '../../../entities/UploadImageEntities'
 import { DeleteOutlined } from '@ant-design/icons'
 import UploadIMGMulti from '../../../components/uploadImg/uploadImgMulti'
+import ModalDelete from '../../../components/modal/ModalDelete'
+import Pagination from 'antd/es/pagination'
 
 const NewTable = styled(Table)`
   .ant-table-container table thead tr th {
@@ -56,8 +58,9 @@ const NewTable = styled(Table)`
   }
 `
 interface ImageData {
-  id: number
+  id: any
   url: string
+  file: string
   percent?: number
 }
 const IndexAdminTask = () => {
@@ -68,24 +71,35 @@ const IndexAdminTask = () => {
   const [searchTaskList, setSearchTaskList] = useState<any>()
   const [source, setSource] = useState<string>('EDIT')
   const [showModal, setShowModal] = useState<boolean>(false)
+  const [modalDelete, setModalDelete] = useState<boolean>(false)
   const [search, setSearch] = useState<boolean>(false)
   const [taskSelected, setTaskSelected] = useState<TaskManageEntity>(TaskManageEntity_INIT)
   const [taskNo, setTaskNo] = useState()
   const [count, setCount] = useState<number>(0)
   const [taskId, setTaskId] = useState('')
   const [edit, setEdit] = useState<any>()
-  const [history, setHistory] = useState<any>()
+  const [history, setHistory] = useState<any>([])
   const [loading, setLoading] = useState(false)
-  const [imgControl, setImgControl] = useState<ImageData[]>([])
-  const [imgDrug, setImgDrug] = useState<ImageData[]>([])
-  const [upImgControl, setUpImgControl] = useState<ImageData[]>([])
-  const [upImgDrug, setUpImgDrug] = useState<ImageData[]>([])
+  const [imgControl, setImgControl] = useState<any>()
+  const [imgDrug, setImgDrug] = useState<any>()
+  const [mockImgDrug, setMockImgDrug] = useState<any>()
   const [checkTask, setCheckTask] = useState<boolean>(false)
   const { Map } = require('immutable')
   const [createImgControl, setCreateImgControl] =
     useState<UploadImageEntity>(UploadImageEntity_INTI)
   const [createImgDrug, setCreateImgDrug] = useState<UploadImageEntity>(UploadImageEntity_INTI)
-  const [disableUpImage, setDisableUpImage] = useState<boolean>(false)
+  const [deleteId, setDeleteId] = useState<any>()
+  const [uploadedImageCount, setUploadedImageCount] = useState<number>(0)
+  const [disableUpSave, setDisableSave] = useState<boolean>(false)
+  const itemsPerPage = 10
+  const [currentPage, setCurrentPage] = useState(1)
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page)
+  }
+  const startIndex = (currentPage - 1) * itemsPerPage
+  const endIndex = startIndex + itemsPerPage
+  const slicedData = history && history.length > 0 ? history.slice(startIndex, endIndex) : []
 
   const fetchTaskList = () => {
     TaskDatasource.getAllTaskList(taskNo, current, 10).then((res: AllTaskListEntity) => {
@@ -101,7 +115,6 @@ const IndexAdminTask = () => {
       setSearchTaskList(data)
     })
   }
-
   useEffect(() => {
     fetchTaskList()
   }, [taskNo])
@@ -130,34 +143,38 @@ const IndexAdminTask = () => {
     TaskDatasource.getManageTaskByTaskId(taskId)
       .then(async (res) => {
         if (res.data) {
-          setHistory(res.data.taskHistory)
+          const datas = res.data.taskHistory
+          const filterData = (datas || [])
+            .filter((x: any) => x.createdBy !== 'System')
+            ?.sort((a: any, b: any) => (a.createdAt < b.createdAt ? 1 : -1))
+          setHistory(filterData)
           setTaskSelected(res)
           form.setFieldsValue({
             unitPrice: res.data.unitPrice,
             farmAreaAmount: res.data.farmAreaAmount,
           })
         }
-        if (res.data.imagePathFinishTask) {
-          const resImg = await UploadImageDatasouce.getImage(res.data.imagePathFinishTask)
-          const imgCon: ImageData[] = [...imgControl]
-          const imageData: ImageData = {
-            id: 0,
-            url: resImg.url,
-            percent: 100,
-          }
-          imgCon.push(imageData)
-          setImgControl(imgCon)
+        if (res.imageTask) {
+          const imgArray: ImageData[] = res.imageTask.map((item) => {
+            return {
+              id: item.id,
+              url: item.pathFinishTask,
+              file: item.pathFinishTask,
+              percent: 100,
+            }
+          })
+          setImgControl(imgArray)
         }
         if (res.data.imagePathDrug) {
           const resImg = await UploadImageDatasouce.getImage(res.data.imagePathDrug)
-          const imgDrugData: ImageData[] = [...imgDrug]
-          const imageData: ImageData = {
-            id: 0,
-            url: resImg.url,
-            percent: 100,
-          }
-          imgDrugData.push(imageData)
-          setImgDrug(imgDrugData)
+          setImgDrug([
+            {
+              id: 1,
+              url: resImg.url,
+              file: resImg.url,
+              percent: 100,
+            },
+          ])
         }
       })
       .finally(() => {
@@ -189,8 +206,7 @@ const IndexAdminTask = () => {
     if (fileList) {
       try {
         const updatedImages: ImageData[] = [...imgControl]
-        const totalFiles = Math.min(fileList.length, 5)
-        for (let i = 0; i < totalFiles; i++) {
+        for (let i = 0; i < fileList.length; i++) {
           const source = fileList[i]
           let newSource: any
 
@@ -211,13 +227,16 @@ const IndexAdminTask = () => {
             reader.onerror = () => reject(reader.error)
             reader.readAsDataURL(isFileMoreThan2MB ? newSource! : source)
           })
+          const d = Map(createImgControl).set('file', isFileMoreThan2MB ? newSource : source)
 
           const imageData: ImageData = {
             id: i + 1,
             url: imgBase64,
+            file: d.toJS(),
             percent: 0,
           }
           updatedImages.push(imageData)
+
           await updateImageProgressControl(updatedImages)
         }
       } catch (error) {
@@ -236,12 +255,15 @@ const IndexAdminTask = () => {
           updatedImages[currentImageIndex] = { ...currentImage, percent: updatedPercent }
           setImgControl([...updatedImages])
           if (updatedPercent < 100) {
-            setDisableUpImage(true)
             setTimeout(updatePercent, intervalDuration)
           } else {
             currentImageIndex++
-            if (currentImageIndex === updatedImages.length) {
-              setDisableUpImage(false)
+            setUploadedImageCount(currentImageIndex)
+            checkImgSave()
+            if (
+              currentImageIndex === updatedImages.length ||
+              uploadedImageCount === updatedImages.length
+            ) {
               resolve()
               return
             }
@@ -252,99 +274,89 @@ const IndexAdminTask = () => {
       updatePercent()
     })
   }
-
   const deleteImg = (index: number) => {
-    const updatedImages = imgControl.filter((e) => e.id !== index)
-    setImgControl([...updatedImages])
+    if (typeof index !== 'string') {
+      const updatedImages = imgControl.filter((e: any) => e.id !== index)
+      setImgControl([...updatedImages])
+      setUploadedImageCount((prevCount) => (prevCount > 0 ? prevCount - 1 : 0))
+    } else {
+      setDeleteId(index)
+      setModalDelete(!modalDelete)
+    }
+    checkImgSave()
   }
   const onChangeDrug = async (fileList: FileList | null) => {
     if (fileList) {
+      const file = fileList[0]
       try {
-        const updatedImages: ImageData[] = [...upImgDrug]
-        const totalFiles = fileList.length
+        let newSource: any
 
-        for (let i = 0; i < totalFiles; i++) {
-          const source = fileList[i]
-          let newSource: any
-
-          const isFileMoreThan2MB = source.size > 2 * 1024 * 1024
-          if (isFileMoreThan2MB) {
-            newSource = await resizeFileImg({
-              file: source,
-              compressFormat: source?.type.split('/')[1],
-              quality: 70,
-              rotation: 0,
-              responseUriFunc: (res: any) => {},
-            })
-          }
-
-          const imgBase64 = await new Promise<string>((resolve, reject) => {
-            const reader = new FileReader()
-            reader.onload = () => resolve(reader.result as string)
-            reader.onerror = () => reject(reader.error)
-            reader.readAsDataURL(isFileMoreThan2MB ? newSource! : source)
+        const isFileMoreThan2MB = file.size > 2 * 1024 * 1024
+        if (isFileMoreThan2MB) {
+          newSource = await resizeFileImg({
+            file,
+            compressFormat: file.type.split('/')[1],
+            quality: 70,
+            rotation: 0,
+            responseUriFunc: (res: any) => {},
           })
-
-          const imageData: ImageData = {
-            id: updatedImages.length + i + 1,
-            url: imgBase64,
-            percent: 0,
-          }
-          updatedImages.push(imageData)
-          await updateImageProgressDrug(imageData, updatedImages)
-
-          // setDisableUpImage(true)
         }
+
+        const imgBase64 = await new Promise<string>((resolve, reject) => {
+          const reader = new FileReader()
+          reader.onload = () => resolve(reader.result as string)
+          reader.onerror = () => reject(reader.error)
+          reader.readAsDataURL(isFileMoreThan2MB ? newSource! : file)
+        })
+
+        const d = Map(createImgDrug).set('file', isFileMoreThan2MB ? newSource : file)
+        const imageData: ImageData = {
+          id: 1,
+          url: imgBase64,
+          file: d.toJS(),
+          percent: 0,
+        }
+
+        await updateImageProgressDrug(imageData)
       } catch (error) {
-        console.error('Error occurred while processing images:', error)
+        console.error('Error occurred while processing the image:', error)
       }
     }
   }
-  const updateImageProgressDrug = async (imageData: ImageData, updatedImages: ImageData[]) => {
+  const updateImageProgressDrug = async (imageData: ImageData) => {
     return new Promise<void>((resolve) => {
       const intervalDuration = 200
-
-      let currentImageIndex = 0
-
+      let updatedPercent = 0
       const updatePercent = () => {
-        const currentImage = updatedImages[currentImageIndex]
-        if (currentImage && typeof currentImage.percent === 'number') {
-          const updatedPercent = Math.min(currentImage.percent + 20, 100)
-          updatedImages[currentImageIndex] = { ...currentImage, percent: updatedPercent }
-          setUpImgDrug([...updatedImages])
+        if (typeof imageData.percent === 'number') {
+          updatedPercent = Math.min(imageData.percent + 20, 100)
+          imageData.percent = updatedPercent
+          setImgDrug([imageData])
+          checkImgSave([imageData])
 
           if (updatedPercent < 100) {
             setTimeout(updatePercent, intervalDuration)
           } else {
-            currentImageIndex++
-            if (currentImageIndex === updatedImages.length) {
-              setDisableUpImage(false)
-              resolve()
-              return
-            }
-            setTimeout(updatePercent, intervalDuration)
+            resolve()
           }
         }
       }
-
       updatePercent()
     })
   }
-  const deleteImgDrug = (index: number) => {
-    const updatedImages = upImgDrug.filter((e) => e.id !== index)
-    setUpImgDrug([...updatedImages])
+
+  const deleteImgDrugs = (index: any) => {
+    const updatedImages = imgDrug.filter((e: any) => e.id !== index)
+    setImgDrug([...updatedImages])
+    checkImgSave([...updatedImages])
   }
-  const onPreviewImg = async (e: any) => {
-    let src = e
-    if (!src) {
-      src = await new Promise((resolve) => {
-        const reader = new FileReader()
-      })
+
+  const checkImgSave = (val?: any) => {
+    if (val?.length !== 0) {
+      setDisableSave(false)
+    } else {
+      setDisableSave(true)
     }
-    const image = new Image()
-    image.src = src
-    const imgWindow = window.open(src)
-    imgWindow?.document.write(image.outerHTML)
   }
   const pageTitle = (
     <Row style={{ padding: '10px' }}>
@@ -487,35 +499,22 @@ const IndexAdminTask = () => {
         <Row justify={'space-between'} gutter={14} style={{ paddingBottom: '15px' }}>
           <>
             <Col span={12} style={{ fontWeight: 'bold' }}>
-              ภาพหลักฐานการบิน
+              ภาพหลักฐานการบิน{' '}
+              <span style={{ color: color.Grey, fontWeight: 'lighter' }}>
+                ({taskSelected.imageTask.length || 0} รูป)
+              </span>
             </Col>
             <Col span={12} style={{ fontWeight: 'bold' }}>
-              ภาพปุ๋ยและยา
+              ภาพปุ๋ยและยา{' '}
+              <span style={{ color: color.Grey, fontWeight: 'lighter' }}>
+                {' '}
+                ({imgDrug?.length || 0} รูป)
+              </span>
             </Col>
           </>
           <>
-            {/* <Col span={12}>
-              {imgControl ? (
-                <ImagCards
-                  imageName={imgControl}
-                  image={imgControl}
-                  onClick={() => onPreviewImg(imgControl)}
-                />
-              ) : (
-                '-'
-              )}
-            </Col>
-            <Col span={12}>
-              {imgDrug ? (
-                <ImagCards
-                  imageName={imgControl}
-                  image={imgDrug}
-                  onClick={() => onPreviewImg(imgDrug)}
-                />
-              ) : (
-                '-'
-              )}
-            </Col> */}
+            <Col span={12}>{imgControl ? <ImagCards image={imgControl} /> : '-'}</Col>
+            <Col span={12}>{imgDrug ? <ImagCards image={imgDrug} /> : '-'}</Col>
           </>
         </Row>
         <Row justify={'space-between'} gutter={8} style={{ paddingBottom: '15px' }}>
@@ -836,7 +835,10 @@ const IndexAdminTask = () => {
                   taskSelected?.data.status !== 'DONE' &&
                   taskSelected?.data.status !== 'WAIT_REVIEW'
                 }
-                onChange={(e) => setCheckTask(!checkTask)}
+                onChange={(e) => {
+                  setCheckTask(!checkTask)
+                  checkImgSave()
+                }}
               >
                 ต้องการอัพโหลดภาพหลักฐานการบิน และปุ๋ยยาใหม่
               </Checkbox>
@@ -858,15 +860,14 @@ const IndexAdminTask = () => {
                     img={imgControl}
                     onChangeControl={onChangeControl}
                     handleDelete={deleteImg}
-                    disable={disableUpImage}
+                    disable={imgControl.length >= 5}
                   />
                 </Col>
                 <Col span={12}>
                   <UploadIMGMulti
                     img={imgDrug}
                     onChangeControl={onChangeDrug}
-                    handleDelete={deleteImgDrug}
-                    disable={disableUpImage}
+                    handleDelete={deleteImgDrugs}
                   />
                 </Col>
               </Row>
@@ -874,8 +875,9 @@ const IndexAdminTask = () => {
           )}
         </Form>
         <Button
+          disabled={disableUpSave}
           style={{
-            backgroundColor: color.Success,
+            backgroundColor: disableUpSave ? color.Grey : color.Success,
             color: 'white',
             width: '100%',
             borderRadius: '5px',
@@ -1141,51 +1143,102 @@ const IndexAdminTask = () => {
     },
   ]
   const cardHistoryTask = (
-    <NewTable
-      columns={columns}
-      pagination={false}
-      dataSource={(history || [])
-        .filter((x: any) => x.createdBy !== 'System')
-        ?.sort((a: any, b: any) => (a.createdAt < b.createdAt ? 1 : -1))}
-      scroll={{ x: 'max-content' }}
-    />
+    <>
+      <NewTable
+        pagination={false}
+        columns={columns}
+        dataSource={slicedData}
+        scroll={{ x: 'max-content' }}
+      />
+      <div
+        className='p-3'
+        style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
+      >
+        <div style={{ flexGrow: 1, textAlign: 'left' }}>
+          <p>รายการทั้งหมด {history?.length || 0} รายการ</p>
+        </div>
+        <div>
+          <Pagination
+            className='pt-3'
+            current={currentPage}
+            pageSize={itemsPerPage}
+            total={history?.length || 0}
+            onChange={handlePageChange}
+            showSizeChanger={false}
+          />
+        </div>
+      </div>
+    </>
   )
+
   const onSubmit = async () => {
-    if (upImgControl || upImgDrug) {
-      TaskDatasource.insertManageTaskImg(
-        taskId,
-        `${profile.firstname} ${profile.lastname}`,
-        form.getFieldValue('remark'),
-        createImgControl.file,
-        createImgDrug.file,
-      ).then((res) => {
-        handleSearchTask()
-        setShowModal(!showModal)
-        form.setFieldsValue({
-          remark: '',
-        })
-        // setUpImgControl(undefined)
-        // setUpImgDrug(undefined)
-        setCheckTask(false)
-      })
-    } else {
-      TaskDatasource.insertManageTask(
-        taskId,
-        form.getFieldValue('farmAreaAmount'),
-        form.getFieldValue('unitPrice'),
-        form.getFieldValue('remark'),
-        `${profile.firstname} ${profile.lastname}`,
-      ).then((res) => {
-        if (res.success) {
-          handleSearchTask()
-          setShowModal(!showModal)
-          form.setFieldsValue({
-            remark: '',
-          })
-        }
+    const getUpdateBy = () => `${profile.firstname} ${profile.lastname}`
+    const resetFormFields = () => {
+      form.setFieldsValue({
+        remark: '',
       })
     }
+    const filteredArray = imgControl.filter((item: any) => typeof item.id === 'number')
+    try {
+      if (Array.isArray(imgControl) && filteredArray.length > 0) {
+        for (let i = 0; i < filteredArray.length; i++) {
+          const currentImage = filteredArray[i].file
+          if (currentImage) {
+            await TaskDatasource.updateImageFinishTask(
+              taskId,
+              taskSelected.data.dronerId,
+              getUpdateBy(),
+              currentImage.file,
+              form.getFieldValue('remark'),
+            ).then((res) => {
+              if (res.success) {
+                resetFormFields()
+              }
+            })
+          }
+          handleSearchTask()
+        }
+      } else if (imgDrug) {
+        const firstMockImgFile = imgDrug[0].file.file
+        const timestamp = new Date().getTime()
+        const fileExtension = firstMockImgFile.type.split('/')[1]
+        const modifiedFile = new File([firstMockImgFile], `${timestamp}.${fileExtension}`, {
+          type: firstMockImgFile.type,
+        })
+        if (firstMockImgFile) {
+          await TaskDatasource.insertManageTaskImg(
+            taskId,
+            getUpdateBy(),
+            form.getFieldValue('remark'),
+            undefined,
+            modifiedFile,
+          ).then((res) => {
+            if (res.success) {
+              resetFormFields()
+            }
+          })
+        }
+        handleSearchTask()
+      } else {
+        const res = await TaskDatasource.insertManageTask(
+          taskId,
+          form.getFieldValue('farmAreaAmount'),
+          form.getFieldValue('unitPrice'),
+          form.getFieldValue('remark'),
+          getUpdateBy(),
+        )
+        if (res.success) {
+          resetFormFields()
+        }
+      }
+      handleSearchTask()
+      setShowModal(!showModal)
+      resetFormFields()
+    } catch (error) {
+      console.error('An error occurred:', error)
+    }
   }
+
   return (
     <>
       {pageTitle}
@@ -1204,11 +1257,9 @@ const IndexAdminTask = () => {
                         onItemsRendered,
                       }}
                       onChange={(e) => {
-                        if (e !== taskId) {
-                          // setImgControl(null)
-                          // setImgDrug(null)
-                        }
                         setTaskId(e)
+                        setImgControl([])
+                        setImgDrug([])
                         setSearch(false)
                       }}
                       placeholder='ค้นหารหัสงาน (Task No.)'
@@ -1360,6 +1411,25 @@ const IndexAdminTask = () => {
             </Button>
           </div>
         </Modal>
+      )}
+      {modalDelete && (
+        <ModalDelete
+          show={modalDelete}
+          title1={'โปรดตรวจสอบรูปภาพที่คุณต้องการลบก่อนที่จะกดยืนยันการลบ '}
+          title2={'เพราะอาจส่งผลต่องานในระบบ'}
+          backButton={() => setModalDelete(!modalDelete)}
+          callBack={() => {
+            setLoading(true)
+            TaskDatasource.deleteImageFinishTask(deleteId)
+              .then((res) => {
+                if (res.success) {
+                  setModalDelete(!modalDelete)
+                  handleSearchTask()
+                }
+              })
+              .finally(() => setLoading(false))
+          }}
+        />
       )}
     </>
   )

@@ -1,59 +1,53 @@
 import { Col, Image, Modal } from 'antd'
 import React, { useState } from 'react'
 import color from '../../resource/color'
-import {
-  ArrowLeftOutlined,
-  ArrowRightOutlined,
-  CloseOutlined,
-  LeftOutlined,
-  RightOutlined,
-} from '@ant-design/icons'
+import { CloseOutlined, LeftOutlined, RightOutlined } from '@ant-design/icons'
 
 interface ImagCardsProps {
-  imageName: string
-  image: string
-  onClick: () => void
+  show?: boolean
+  image: any[]
+  onClick?: () => void
+  imageName?: any
 }
-const ImagCards: React.FC<ImagCardsProps> = ({ imageName, image, onClick }) => {
-  const imgList = [
-    'https://static.thairath.co.th/media/dFQROr7oWzulq5Fa5nRRVgnzYSSwUoPM7rigVHaj4QhdURLfyt90hBPNzf89n8vZ5bp.jpg',
-    'https://ichef.bbci.co.uk/news/640/cpsprodpb/9970/live/9e4ab180-fd11-11ed-b2aa-9935735a579c.png',
-    'https://shortrecap.co/wp-content/uploads/2020/05/Catcover_web.jpg',
-    'https://www.sarakadee.com/blog/oneton/wp-content/uploads/2017/12/cat-cute-e1533862828469.jpg',
-  ]
-
+const ImagCards: React.FC<ImagCardsProps> = ({ image, show }) => {
   const [previewVisible, setPreviewVisible] = useState(false)
-  const [previewImage, setPreviewImage] = useState('')
+  const [currentIndex, setCurrentIndex] = useState(0)
 
   const handlePreview = (url: string) => {
-    setPreviewImage(url)
     setPreviewVisible(true)
   }
 
   const handleCancel = () => {
     setPreviewVisible(false)
+    setCurrentIndex(0)
   }
-  const [currentIndex, setCurrentIndex] = useState(0)
 
   const handleNext = () => {
-    setCurrentIndex((prevIndex) => (prevIndex + 1) % imgList.length)
+    setCurrentIndex((prevIndex) => (prevIndex + 1) % image.length)
   }
 
   const handlePrevious = () => {
-    setCurrentIndex((prevIndex) => (prevIndex - 1 + imgList.length) % imgList.length)
+    setCurrentIndex((prevIndex) => (prevIndex - 1 + image.length) % image.length)
   }
   return (
     <div className='form-group'>
       <div style={{ display: 'flex', flexWrap: 'wrap' }}>
-        {imgList.length > 0 && (
-          <div style={{ margin: '5px' }}>
+        {image.length > 0 && image ? (
+          <div className='pt-3'>
             <Image
               preview={false}
-              width={200}
-              src={imgList[0]}
-              onClick={() => handlePreview(imgList[0])}
+              style={{
+                borderRadius: '8px',
+                width: '140px',
+                height: '90px',
+                objectFit: 'cover',
+              }}
+              src={show ? image[0] : image[0].url}
+              onClick={() => handlePreview(image[0].url)}
             />
           </div>
+        ) : (
+          '-'
         )}
       </div>
       <Modal
@@ -97,16 +91,21 @@ const ImagCards: React.FC<ImagCardsProps> = ({ imageName, image, onClick }) => {
               style={{ backgroundColor: color.White, padding: 8, borderRadius: 50 }}
             />
           </div>
-          <img
-            alt='preview'
-            style={{ width: '100%', height: 'auto' }}
-            src={imgList[currentIndex]}
-          />
+          {image.length > 0 && image ? (
+            <img
+              alt='preview'
+              style={{ width: '100%', height: '100%' }}
+              src={show ? image[currentIndex] : image[currentIndex].url}
+            />
+          ) : (
+            '-'
+          )}
+
           <div
             style={{ position: 'absolute', bottom: -40, left: 0, right: 0, textAlign: 'center' }}
           >
             <span style={{ color: 'white' }}>
-              {currentIndex + 1} / {imgList.length}
+              {currentIndex + 1} / {image.length}
             </span>
           </div>
         </div>

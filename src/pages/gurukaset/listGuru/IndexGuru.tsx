@@ -619,7 +619,7 @@ function IndexGuru() {
       <ModalDelete
         show={modalDelete}
         title1={'โปรดตรวจสอบบทความที่คุณต้องการลบก่อนที่จะกดยืนยันการลบ '}
-        title2={'เพราะอาจต่อการแสดงผลบทความในระบบแอปพลิเคชัน'}
+        title2={'เพราะอาจส่งผลต่อการแสดงผลบทความในระบบแอปพลิเคชัน'}
         backButton={() => setModalDelete(!modalDelete)}
         callBack={() => {
           GuruKasetDataSource.deleteGuru(deleteId).then((res) => {
