@@ -152,7 +152,7 @@ function NewsPage() {
           <div className='col'>
             <Select
               className='col-lg-12 p-1'
-              placeholder='เลือกแอปพลิเคชั่น'
+              placeholder='เลือกแอปพลิเคชัน'
               onChange={onChangeApplication}
               showSearch
               value={application}
@@ -413,7 +413,7 @@ function NewsPage() {
       },
     },
     {
-      title: 'แอปพลิเคชั่น',
+      title: 'แอปพลิเคชัน',
       dataIndex: 'application',
       key: 'application',
       render: (value: any, row: any, index: number) => {

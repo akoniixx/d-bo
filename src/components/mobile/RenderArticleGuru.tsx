@@ -65,7 +65,7 @@ const RenderArticleGuru: React.FC<RenderArticleGuruProps> = ({
     <div className='col'>
       <div ref={div}>
         <CardHeaderPromotion
-          textHeader='ตัวอย่างในแอปพลิเคชั่น'
+          textHeader='ตัวอย่างในแอปพลิเคชัน'
           center={false}
           button={headButton}
         />
