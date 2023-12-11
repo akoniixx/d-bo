@@ -1,5 +1,9 @@
 ## [Version - 0]
 
+## Fix [v0.41.3] 2023-12-12
+
+- fixed logic of add / delete images
+
 ## improve [v0.41.2] 2023-12-10
 
 - edit image in finish task

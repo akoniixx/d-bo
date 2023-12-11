@@ -12,7 +12,7 @@ interface ImageData {
 interface ImagProps {
   img: any[]
   onChangeControl: (file: FileList | null) => void
-  handleDelete: (index: number) => void
+  handleDelete: (index: any) => void
   disable?: boolean
   show?: boolean
 }
@@ -24,17 +24,27 @@ const UploadIMGMulti: React.FC<ImagProps> = ({
   disable,
   show,
 }) => {
+  const [selectedIndices, setSelectedIndices] = useState<any[]>([])
+
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const fileList = e.target.files
     if (fileList) {
       onChangeControl(fileList)
     }
   }
-  const deleteImg = (index: number) => {
-    if (index || index === 0) {
-      handleDelete(index)
+  const deleteImg = (index: any) => {
+    const updatedIndices = [...selectedIndices]
+    if (updatedIndices.includes(index)) {
+      const indexToRemove = updatedIndices.indexOf(index)
+      updatedIndices.splice(indexToRemove, 1)
+    } else {
+      updatedIndices.push(index)
     }
+
+    setSelectedIndices(updatedIndices)
+    handleDelete(updatedIndices)
   }
+
   return (
     <>
       <div className='form-group col-lg-12'>
@@ -131,13 +141,7 @@ const UploadIMGMulti: React.FC<ImagProps> = ({
                       onClick={() => deleteImg(show ? imageData : imageData.id)}
                       style={{ padding: 1, borderRadius: '50%', cursor: 'pointer', left: 38 }}
                     >
-                      {typeof imageData.id === 'string' && img.length > 1 ? (
-                        <img src={icon.cancel} style={{ width: 20, height: 20 }} alt='Delete' />
-                      ) : (
-                        typeof imageData.id === 'number' && (
-                          <img src={icon.cancel} style={{ width: 20, height: 20 }} alt='Delete' />
-                        )
-                      )}
+                      <img src={icon.cancel} style={{ width: 20, height: 20 }} alt='Delete' />
                     </span>
                   </div>
                 </div>

@@ -73,7 +73,7 @@ const ImagCards: React.FC<ImagCardsProps> = ({ image, show }) => {
             />
           </div>
           <div
-            style={{ position: 'absolute', top: '40%', right: -30, transform: 'translateY(-50%)' }}
+            style={{ position: 'absolute', top: '40%', right: -130, transform: 'translateY(-50%)' }}
           >
             <RightOutlined
               onClick={handleNext}
@@ -85,7 +85,7 @@ const ImagCards: React.FC<ImagCardsProps> = ({ image, show }) => {
               }}
             />
           </div>
-          <div style={{ position: 'absolute', top: -40, right: -30 }}>
+          <div style={{ position: 'absolute', top: -40, right: -140 }}>
             <CloseOutlined
               onClick={handleCancel}
               style={{ backgroundColor: color.White, padding: 8, borderRadius: 50 }}
@@ -94,7 +94,7 @@ const ImagCards: React.FC<ImagCardsProps> = ({ image, show }) => {
           {image.length > 0 && image ? (
             <img
               alt='preview'
-              style={{ width: '100%', height: '100%' }}
+              style={{ width: '620px', height: '404px', objectFit: 'cover' }}
               src={show ? image[currentIndex] : image[currentIndex].url}
             />
           ) : (
