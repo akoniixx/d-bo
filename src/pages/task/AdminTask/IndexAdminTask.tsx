@@ -71,7 +71,6 @@ const IndexAdminTask = () => {
   const [searchTaskList, setSearchTaskList] = useState<any>()
   const [source, setSource] = useState<string>('EDIT')
   const [showModal, setShowModal] = useState<boolean>(false)
-  const [modalDelete, setModalDelete] = useState<boolean>(false)
   const [search, setSearch] = useState<boolean>(false)
   const [taskSelected, setTaskSelected] = useState<TaskManageEntity>(TaskManageEntity_INIT)
   const [taskNo, setTaskNo] = useState()
@@ -81,8 +80,9 @@ const IndexAdminTask = () => {
   const [history, setHistory] = useState<any>([])
   const [loading, setLoading] = useState(false)
   const [imgControl, setImgControl] = useState<any>()
+  const [deleteImgControl, setDeleteImgControl] = useState<any>()
+  const [deleteImgDrug, setDeleteImgDrug] = useState<any>()
   const [imgDrug, setImgDrug] = useState<any>()
-  const [mockImgDrug, setMockImgDrug] = useState<any>()
   const [checkTask, setCheckTask] = useState<boolean>(false)
   const { Map } = require('immutable')
   const [createImgControl, setCreateImgControl] =
@@ -117,7 +117,7 @@ const IndexAdminTask = () => {
   }
   useEffect(() => {
     fetchTaskList()
-  }, [taskNo])
+  }, [taskNo, taskId])
 
   const onItemsRendered = (props: any) => {
     if (props.visibleStopIndex >= searchTaskList.length - 1) {
@@ -163,18 +163,36 @@ const IndexAdminTask = () => {
               percent: 100,
             }
           })
-          setImgControl(imgArray)
+          setLoading(true)
+          setTimeout(() => {
+            setImgControl(imgArray)
+            setDeleteImgControl(imgArray)
+            setLoading(false)
+          }, 1000)
         }
         if (res.data.imagePathDrug) {
           const resImg = await UploadImageDatasouce.getImage(res.data.imagePathDrug)
-          setImgDrug([
-            {
-              id: 1,
-              url: resImg.url,
-              file: resImg.url,
-              percent: 100,
-            },
-          ])
+
+          setTimeout(() => {
+            setLoading(true)
+            setImgDrug([
+              {
+                id: 1,
+                url: resImg.url,
+                file: resImg.url,
+                percent: 100,
+              },
+            ])
+            setDeleteImgDrug([
+              {
+                id: 1,
+                url: resImg.url,
+                file: resImg.url,
+                percent: 100,
+              },
+            ])
+            setLoading(false)
+          }, 1000)
         }
       })
       .finally(() => {
@@ -205,16 +223,17 @@ const IndexAdminTask = () => {
   const onChangeControl = async (fileList: FileList | null) => {
     if (fileList) {
       try {
-        const updatedImages: ImageData[] = [...imgControl]
+        const updatedImages: ImageData[] = deleteImgControl.slice()
+
         for (let i = 0; i < fileList.length; i++) {
           const source = fileList[i]
-          let newSource: any
-
+          let newSource: any = source
           const isFileMoreThan2MB = source.size > 2 * 1024 * 1024
+
           if (isFileMoreThan2MB) {
             newSource = await resizeFileImg({
               file: source,
-              compressFormat: source?.type.split('/')[1],
+              compressFormat: source.type.split('/')[1],
               quality: 70,
               rotation: 0,
               responseUriFunc: (res: any) => {},
@@ -225,25 +244,28 @@ const IndexAdminTask = () => {
             const reader = new FileReader()
             reader.onload = () => resolve(reader.result as string)
             reader.onerror = () => reject(reader.error)
-            reader.readAsDataURL(isFileMoreThan2MB ? newSource! : source)
+            reader.readAsDataURL(isFileMoreThan2MB ? newSource : source)
           })
-          const d = Map(createImgControl).set('file', isFileMoreThan2MB ? newSource : source)
+          const timestamp = new Date().getTime()
 
           const imageData: ImageData = {
-            id: i + 1,
+            id: timestamp,
             url: imgBase64,
-            file: d.toJS(),
+            file: Map(createImgControl)
+              .set('file', isFileMoreThan2MB ? newSource : source)
+              .toJS(),
             percent: 0,
           }
           updatedImages.push(imageData)
-
-          await updateImageProgressControl(updatedImages)
         }
+
+        await updateImageProgressControl(updatedImages)
       } catch (error) {
         console.error('Error occurred while processing images:', error)
       }
     }
   }
+
   const updateImageProgressControl = async (updatedImages: ImageData[]) => {
     return new Promise<void>((resolve) => {
       const intervalDuration = 200
@@ -254,12 +276,13 @@ const IndexAdminTask = () => {
           const updatedPercent = Math.min(currentImage.percent + 20, 100)
           updatedImages[currentImageIndex] = { ...currentImage, percent: updatedPercent }
           setImgControl([...updatedImages])
+          setDeleteImgControl([...updatedImages])
+          checkImgSave([...updatedImages], deleteImgDrug)
           if (updatedPercent < 100) {
             setTimeout(updatePercent, intervalDuration)
           } else {
             currentImageIndex++
             setUploadedImageCount(currentImageIndex)
-            checkImgSave()
             if (
               currentImageIndex === updatedImages.length ||
               uploadedImageCount === updatedImages.length
@@ -274,16 +297,11 @@ const IndexAdminTask = () => {
       updatePercent()
     })
   }
-  const deleteImg = (index: number) => {
-    if (typeof index !== 'string') {
-      const updatedImages = imgControl.filter((e: any) => e.id !== index)
-      setImgControl([...updatedImages])
-      setUploadedImageCount((prevCount) => (prevCount > 0 ? prevCount - 1 : 0))
-    } else {
-      setDeleteId(index)
-      setModalDelete(!modalDelete)
-    }
-    checkImgSave()
+  const deleteImg = (id: any[]) => {
+    const updatedImages = deleteImgControl.filter((e: any) => !id.includes(e.id))
+    setDeleteImgControl([...updatedImages])
+    setDeleteId([...id])
+    checkImgSave([...updatedImages], deleteImgDrug)
   }
   const onChangeDrug = async (fileList: FileList | null) => {
     if (fileList) {
@@ -332,8 +350,8 @@ const IndexAdminTask = () => {
           updatedPercent = Math.min(imageData.percent + 20, 100)
           imageData.percent = updatedPercent
           setImgDrug([imageData])
-          checkImgSave([imageData])
-
+          setDeleteImgDrug([imageData])
+          checkImgSave(deleteImgControl, [imageData])
           if (updatedPercent < 100) {
             setTimeout(updatePercent, intervalDuration)
           } else {
@@ -345,14 +363,14 @@ const IndexAdminTask = () => {
     })
   }
 
-  const deleteImgDrugs = (index: any) => {
-    const updatedImages = imgDrug.filter((e: any) => e.id !== index)
-    setImgDrug([...updatedImages])
-    checkImgSave([...updatedImages])
+  const deleteImgDrugs = (id: any[]) => {
+    const updatedImages = deleteImgDrug.filter((e: any) => !id.includes(e.id))
+    setDeleteImgDrug([...updatedImages])
+    checkImgSave(deleteImgControl, [...updatedImages])
   }
 
-  const checkImgSave = (val?: any) => {
-    if (val?.length !== 0) {
+  const checkImgSave = (img1: any, img2: any) => {
+    if (img1?.length !== 0 && img2.length !== 0) {
       setDisableSave(false)
     } else {
       setDisableSave(true)
@@ -837,7 +855,6 @@ const IndexAdminTask = () => {
                 }
                 onChange={(e) => {
                   setCheckTask(!checkTask)
-                  checkImgSave()
                 }}
               >
                 ต้องการอัพโหลดภาพหลักฐานการบิน และปุ๋ยยาใหม่
@@ -857,15 +874,14 @@ const IndexAdminTask = () => {
               <Row justify={'space-between'} gutter={32} style={{ paddingBottom: '4%' }}>
                 <Col span={12}>
                   <UploadIMGMulti
-                    img={imgControl}
+                    img={deleteImgControl}
                     onChangeControl={onChangeControl}
                     handleDelete={deleteImg}
-                    disable={imgControl.length >= 5}
                   />
                 </Col>
                 <Col span={12}>
                   <UploadIMGMulti
-                    img={imgDrug}
+                    img={deleteImgDrug}
                     onChangeControl={onChangeDrug}
                     handleDelete={deleteImgDrugs}
                   />
@@ -1178,28 +1194,36 @@ const IndexAdminTask = () => {
         remark: '',
       })
     }
-    const filteredArray = imgControl.filter((item: any) => typeof item.id === 'number')
+    const filteredArray = deleteImgControl.filter((item: any) => typeof item?.id === 'number')
+    const filteredTypeString = deleteImgControl.filter((item: any) => typeof item?.id === 'string')
+    let sumFilters: any = []
+    if (Array.isArray(deleteImgControl) && deleteImgControl.length > 0) {
+      sumFilters = filteredArray
+    } else {
+      sumFilters = filteredTypeString
+    }
     try {
-      if (Array.isArray(imgControl) && filteredArray.length > 0) {
-        for (let i = 0; i < filteredArray.length; i++) {
-          const currentImage = filteredArray[i].file
+      if (deleteId) {
+        for (const id of deleteId) {
+          await TaskDatasource.deleteImageFinishTask(id)
+        }
+      }
+      if (sumFilters.length > 0) {
+        for (let i = 0; i < sumFilters.length; i++) {
+          const currentImage = sumFilters[i].file
+          const remarkValue = form.getFieldValue('remark')
           if (currentImage) {
             await TaskDatasource.updateImageFinishTask(
               taskId,
               taskSelected.data.dronerId,
               getUpdateBy(),
               currentImage.file,
-              form.getFieldValue('remark'),
-            ).then((res) => {
-              if (res.success) {
-                resetFormFields()
-              }
-            })
+              remarkValue,
+            )
           }
-          handleSearchTask()
         }
-      } else if (imgDrug) {
-        const firstMockImgFile = imgDrug[0].file.file
+      } else if (deleteImgDrug) {
+        const firstMockImgFile = deleteImgDrug[0].file.file
         const timestamp = new Date().getTime()
         const fileExtension = firstMockImgFile.type.split('/')[1]
         const modifiedFile = new File([firstMockImgFile], `${timestamp}.${fileExtension}`, {
@@ -1212,30 +1236,23 @@ const IndexAdminTask = () => {
             form.getFieldValue('remark'),
             undefined,
             modifiedFile,
-          ).then((res) => {
-            if (res.success) {
-              resetFormFields()
-            }
-          })
+          )
         }
-        handleSearchTask()
       } else {
-        const res = await TaskDatasource.insertManageTask(
+        await TaskDatasource.insertManageTask(
           taskId,
           form.getFieldValue('farmAreaAmount'),
           form.getFieldValue('unitPrice'),
           form.getFieldValue('remark'),
           getUpdateBy(),
         )
-        if (res.success) {
-          resetFormFields()
-        }
       }
+      fetchTaskList()
       handleSearchTask()
       setShowModal(!showModal)
       resetFormFields()
     } catch (error) {
-      console.error('An error occurred:', error)
+      console.error(error)
     }
   }
 
@@ -1257,9 +1274,13 @@ const IndexAdminTask = () => {
                         onItemsRendered,
                       }}
                       onChange={(e) => {
+                        if (e !== taskId) {
+                          setImgControl(null)
+                          setImgDrug(null)
+                          setDeleteImgControl(null)
+                          setDeleteImgDrug(null)
+                        }
                         setTaskId(e)
-                        setImgControl([])
-                        setImgDrug([])
                         setSearch(false)
                       }}
                       placeholder='ค้นหารหัสงาน (Task No.)'
@@ -1411,25 +1432,6 @@ const IndexAdminTask = () => {
             </Button>
           </div>
         </Modal>
-      )}
-      {modalDelete && (
-        <ModalDelete
-          show={modalDelete}
-          title1={'โปรดตรวจสอบรูปภาพที่คุณต้องการลบก่อนที่จะกดยืนยันการลบ '}
-          title2={'เพราะอาจส่งผลต่องานในระบบ'}
-          backButton={() => setModalDelete(!modalDelete)}
-          callBack={() => {
-            setLoading(true)
-            TaskDatasource.deleteImageFinishTask(deleteId)
-              .then((res) => {
-                if (res.success) {
-                  setModalDelete(!modalDelete)
-                  handleSearchTask()
-                }
-              })
-              .finally(() => setLoading(false))
-          }}
-        />
       )}
     </>
   )

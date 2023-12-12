@@ -618,10 +618,13 @@ export const ConfirmNewTask: React.FC<ConfirmNewTaskProps> = ({
                     <div className='d-flex pt-4'>
                       <span className='col '>ส่วนลดจากคูปอง</span>
                       <span className='col' style={{ textAlign: 'end', color: color.Error }}>
-                        -{' '}
                         {isEdit
                           ? numberWithCommasToFixed(couponData.priceCouponDiscount!)
-                          : numberWithCommas(discountResult!)}{' '}
+                            ? `- ${numberWithCommasToFixed(couponData.priceCouponDiscount!)}`
+                            : 0
+                          : numberWithCommas(discountResult!)
+                          ? `- ${numberWithCommas(discountResult!)}`
+                          : 0}{' '}
                         ฿
                       </span>
                     </div>
@@ -630,7 +633,10 @@ export const ConfirmNewTask: React.FC<ConfirmNewTaskProps> = ({
                     <div className='d-flex pt-2'>
                       <span className='col '>ส่วนลดจากแต้ม</span>
                       <span className='col' style={{ textAlign: 'end', color: color.Error }}>
-                        {numberWithCommas(createNewTask?.discountCampaignPoint) || 0} ฿
+                        {createNewTask?.discountCampaignPoint > 0
+                          ? '- ' + numberWithCommas(createNewTask?.discountCampaignPoint)
+                          : 0}{' '}
+                        ฿
                       </span>
                     </div>
                   </div>
