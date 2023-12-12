@@ -112,6 +112,16 @@ export class TaskDatasource {
         console.log(err, 'err getnewtaskbyid')
       })
   }
+  static getTaskForCancel(id: string): Promise<TaskManageEntity> {
+    return httpClient
+      .get(BASE_URL + '/tasks/task/' + id)
+      .then((response) => {
+        return response.data
+      })
+      .catch((err) => {
+        console.log(err, 'err getnewtaskbyid')
+      })
+  }
   static updateNewTask(data: UpdateNewTask): Promise<any> {
     return httpClient
       .patch(BASE_URL + '/tasks/task/' + data.id, data)
@@ -276,8 +286,8 @@ export class TaskDatasource {
     taskId: string,
     updateBy: string,
     remark: string,
-    file: File,
-    fileDrug: File,
+    file?: File,
+    fileDrug?: File,
   ): Promise<any> {
     const formData = new FormData()
     formData.append('taskId', taskId)
@@ -285,9 +295,12 @@ export class TaskDatasource {
     if (remark) {
       formData.append('remark', remark)
     }
-    formData.append('file', file)
-    formData.append('fileDrug', fileDrug)
-
+    if (file) {
+      formData.append('file', file)
+    }
+    if (fileDrug) {
+      formData.append('fileDrug', fileDrug)
+    }
     return httpClient
       .patch(BASE_URL + `/tasks/task-manage-area/edit-task-image`, formData)
       .then((response) => {
@@ -295,6 +308,40 @@ export class TaskDatasource {
       })
       .catch((err) => {
         console.log(err, 'err getnewtask')
+      })
+  }
+  static updateImageFinishTask(
+    taskId: string,
+    dronerId: string,
+    updateBy: string,
+    file: any,
+    remark: string,
+  ): Promise<any> {
+    const formData = new FormData()
+    formData.append('taskId', taskId)
+    formData.append('dronerId', dronerId)
+    formData.append('updateBy', updateBy)
+    formData.append('file', file)
+    if (remark) {
+      formData.append('remark', remark)
+    }
+    return httpClient
+      .post(BASE_URL + `//tasks/task-image/image-finish-task`, formData)
+      .then((response) => {
+        return response.data
+      })
+      .catch((err) => {
+        console.log(err, 'err updateImageFinishTask')
+      })
+  }
+  static deleteImageFinishTask(id: string): Promise<any> {
+    return httpClient
+      .delete(BASE_URL + `/tasks/task-image/delete-task-image/${id}`)
+      .then((response) => {
+        return response.data
+      })
+      .catch((err) => {
+        console.log(err, 'err deleteImageFinishTask')
       })
   }
 }

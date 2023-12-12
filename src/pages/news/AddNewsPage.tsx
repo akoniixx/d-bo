@@ -462,7 +462,7 @@ function AddNewsPage() {
               </div>
               <div className='form-group col-lg-4'>
                 <label>
-                  แอปพลิเคชั่น <span style={{ color: 'red' }}>*</span>
+                  แอปพลิเคชัน <span style={{ color: 'red' }}>*</span>
                 </label>
                 {/* <img src={"https://storage.googleapis.com/dnds/news-image/dollar.png?GoogleAccessId=dnds-storage%40iconkaset-app.iam.gserviceaccount.com&Expires=1697429940&Signature=D69Jy%2BoF16bqk8GZ%2BuwfGgo2sNq8uH9k%2F5Oxi%2F%2FirFok2OzI%2FY9b2KO1P7Om2Z7wWAfBZJ%2FEobsSLh%2BQq%2FU7tNk3rJR12VaBtYF0PUwI2DITDyY%2FvGwI5twB06m%2BYsJAhaHvVSUFbWSRptkPBvCpFGqGLnh1A7chI%2BHcZ%2Bk%2BQqmCqXAOr7TPiTODSZ0v%2BE9DUo3Pxu%2FVprLLl1xtXa55OfDB166PLuzakZRiQo7NIdJ3Cfcit0uKdHOLIzcXr0MUZM%2F5lV43PDBbNw6v2lxTie7LHwikCCOxINwb5z25h%2Fd1pJ3rvFA7%2Fu%2BXgUUo2rO%2BPtzczPyMZ4LrDhTF6bGpTw%3D%3D"}/> */}
                 <Form.Item
@@ -471,7 +471,7 @@ function AddNewsPage() {
                   valuePropName='select'
                   className='my-0'
                 >
-                  <Select allowClear placeholder='เลือกแอปพลิเคชั่น' onChange={handleChooseAppType}>
+                  <Select allowClear placeholder='เลือกแอปพลิเคชัน' onChange={handleChooseAppType}>
                     <option key={1} value='FARMER'>
                       Farmer Application
                     </option>

@@ -307,6 +307,7 @@ export interface TaskManageEntity {
     farmerPlot: {
       plotName?: string
       raiAmount?: string
+      plantName?: string
     }
     fee: number
     id: string
@@ -325,6 +326,12 @@ export interface TaskManageEntity {
     unitPrice: number
     usePoint: string
   }
+  imageTask: [
+    {
+      id: string
+      pathFinishTask: string
+    },
+  ]
   taskEstimatePoint: {
     application: string
     campaignId: string
@@ -365,6 +372,7 @@ export const TaskManageEntity_INIT: TaskManageEntity = {
     farmerPlot: {
       plotName: '',
       raiAmount: '',
+      plantName: '',
     },
     fee: 0,
     id: '',
@@ -383,5 +391,11 @@ export const TaskManageEntity_INIT: TaskManageEntity = {
     unitPrice: 0,
     usePoint: '',
   },
+  imageTask: [
+    {
+      id: '',
+      pathFinishTask: '',
+    },
+  ],
   taskEstimatePoint: [],
 }

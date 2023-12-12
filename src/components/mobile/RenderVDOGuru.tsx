@@ -46,7 +46,7 @@ const RenderVDOGuru: React.FC<RenderVDOGuruProps> = ({ vdo, caption }) => {
 
   return (
     <div className='col'>
-      <CardHeaderPromotion textHeader='ตัวอย่างในแอปพลิเคชั่น' center={false} button={headButton} />
+      <CardHeaderPromotion textHeader='ตัวอย่างในแอปพลิเคชัน' center={false} button={headButton} />
       <div
         className='bg-white'
         style={{ padding: key === 'feed' ? 20 : 0, justifyContent: 'center', alignItems: 'center' }}

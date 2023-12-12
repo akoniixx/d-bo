@@ -7,7 +7,6 @@ import color from '../../../../resource/color'
 import GoogleMap from '../../../../components/map/GoogleMap'
 import { LAT_LNG_BANGKOK } from '../../../../definitions/Location'
 import TextArea from 'antd/lib/input/TextArea'
-import { AddressEntity, AddressEntity_INIT } from '../../../../entities/AddressEntities'
 import { StarFilled, CalendarOutlined, ClockCircleOutlined } from '@ant-design/icons'
 import { DetailFinishTask, DetailFinishTask_INIT } from '../../../../entities/TaskFinishEntities'
 import { TaskFinishedDatasource } from '../../../../datasource/TaskFinishDatasource'
@@ -15,7 +14,6 @@ import moment from 'moment'
 import { UploadImageDatasouce } from '../../../../datasource/UploadImageDatasource'
 import { CouponDataSource } from '../../../../datasource/CouponDatasource'
 import { numberWithCommas, numberWithCommasToFixed } from '../../../../utilities/TextFormatter'
-import { DashboardLayout } from '../../../../components/layout/Layout'
 import { useNavigate } from 'react-router-dom'
 import ImagCards from '../../../../components/card/ImagCard'
 import image from '../../../../resource/image'
@@ -43,7 +41,6 @@ function FinishTasks() {
     lat: LAT_LNG_BANGKOK.lat,
     lng: LAT_LNG_BANGKOK.lng,
   })
-  const [imgControl, setImgControl] = useState<any>()
   const [imgDrug, setImgDrug] = useState<any>()
   const [loading, setLoading] = useState<boolean>(true)
 
@@ -60,14 +57,9 @@ function FinishTasks() {
             }),
           )
         }
-        if (res.data.imagePathFinishTask) {
-          UploadImageDatasouce.getImage(res.data.imagePathFinishTask).then((resImg) => {
-            setImgControl(resImg.url)
-          })
-        }
         if (res.data.imagePathDrug) {
           UploadImageDatasouce.getImage(res.data.imagePathDrug).then((resImg) => {
-            setImgDrug(resImg.url)
+            setImgDrug([resImg.url])
           })
         }
         setData(res)
@@ -83,26 +75,6 @@ function FinishTasks() {
   useEffect(() => {
     fetchDetailTask()
   }, [])
-
-  const formatCurrency = (e: any) => {
-    e = parseFloat(e)
-    return e.toFixed(2).replace(/./g, function (c: any, i: any, a: any) {
-      return i > 0 && c !== '.' && (a.length - i) % 3 === 0 ? ',' + c : c
-    })
-  }
-  const onPreviewImg = async (e: any) => {
-    let src = e
-    if (!src) {
-      src = await new Promise((resolve) => {
-        const reader = new FileReader()
-      })
-    }
-    const image = new Image()
-    image.src = src
-    const imgWindow = window.open(src)
-    imgWindow?.document.write(image.outerHTML)
-  }
-
   const starIcon = (
     <StarFilled
       style={{
@@ -164,22 +136,16 @@ function FinishTasks() {
           </Form.Item>
           <div className='row'>
             <div className='col-lg'>
-              <label>ภาพหลักฐานการบิน</label>
+              <label>ภาพหลักฐานการบิน </label>
+              <span style={{ color: color.Grey }}> ({data.imageTaskUrl.length || 0} รูป)</span>
               <br />
-              <ImagCards
-                imageName={data.data?.imagePathFinishTask ? data.data?.imagePathFinishTask : ''}
-                image={imgControl ? imgControl : image.empty_cover}
-                onClick={() => onPreviewImg(imgControl)}
-              />
+              <ImagCards image={data.imageTaskUrl || image.empty_cover} show={true} />
             </div>
             <div className='col-lg'>
-              <label>ภาพปุ๋ยและยา</label>
+              <label>ภาพปุ๋ยและยา </label>
+              <span style={{ color: color.Grey }}> ({imgDrug?.length || 0} รูป)</span>
               <br />
-              <ImagCards
-                imageName={data.data?.imagePathDrug ? data.data?.imagePathDrug : ''}
-                image={imgDrug ? imgDrug : image.empty_cover}
-                onClick={() => onPreviewImg(imgDrug)}
-              />
+              <ImagCards image={imgDrug ? imgDrug : image.empty_cover} show={true} />
             </div>
           </div>
 

@@ -36,7 +36,7 @@ const RenderNews: React.FC<RenderNews> = ({ img, name, description }) => {
   return (
     <div className='col-4'>
       <div ref={div}>
-        <CardHeaderPromotion textHeader='ตัวอย่างในแอปพลิเคชั่น' center={true} />
+        <CardHeaderPromotion textHeader='ตัวอย่างในแอปพลิเคชัน' center={true} />
         <div
           style={{
             width: '100%',

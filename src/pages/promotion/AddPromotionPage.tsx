@@ -783,7 +783,7 @@ export default function AddPromotion() {
       >
         <div className='px-4 pt-4'>
           <span className='text-secondary'>โปรดตรวจสอบรายละเอียดที่คุณต้องการเพิ่มคูปอง</span>
-          <p className='text-secondary'>เพราะอาจส่งผลต่อการจ้างงานของเกษตรกรในระบบแอปพลิเคชั่น</p>
+          <p className='text-secondary'>เพราะอาจส่งผลต่อการจ้างงานของเกษตรกรในระบบแอปพลิเคชัน</p>
         </div>
         <Divider
           style={{

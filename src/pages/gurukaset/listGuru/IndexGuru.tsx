@@ -392,7 +392,7 @@ function IndexGuru() {
       },
     },
     {
-      title: 'แอปพลิเคชั่น',
+      title: 'แอปพลิเคชัน',
       dataIndex: 'application',
       key: 'application',
       render: (value: any, row: any, index: number) => {
@@ -565,7 +565,7 @@ function IndexGuru() {
         <div className='col-lg p-1'>
           <Select
             className='col-lg-12'
-            placeholder='เลือกแอปพลิเคชั่น'
+            placeholder='เลือกแอปพลิเคชัน'
             onChange={(val: any) => setApplication(val)}
             showSearch
             value={application}
@@ -619,7 +619,7 @@ function IndexGuru() {
       <ModalDelete
         show={modalDelete}
         title1={'โปรดตรวจสอบบทความที่คุณต้องการลบก่อนที่จะกดยืนยันการลบ '}
-        title2={'เพราะอาจต่อการแสดงผลบทความในระบบแอปพลิเคชัน'}
+        title2={'เพราะอาจส่งผลต่อการแสดงผลบทความในระบบแอปพลิเคชัน'}
         backButton={() => setModalDelete(!modalDelete)}
         callBack={() => {
           GuruKasetDataSource.deleteGuru(deleteId).then((res) => {

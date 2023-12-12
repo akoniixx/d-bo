@@ -377,10 +377,10 @@ function EditArticleGuru() {
               </div>
               <div className='form-group col-lg-4'>
                 <label>
-                  แอปพลิเคชั่น <span style={{ color: 'red' }}>*</span>
+                  แอปพลิเคชัน <span style={{ color: 'red' }}>*</span>
                 </label>
                 <Form.Item name='application' className='my-0'>
-                  <Select allowClear placeholder='เลือกแอปพลิเคชั่น'>
+                  <Select allowClear placeholder='เลือกแอปพลิเคชัน'>
                     <option key='FARMER' value='FARMER'>
                       <img src={icon.farmerApp} style={{ width: '20px', height: '20px' }} />
                       <span style={{ paddingLeft: '4px' }}>Farmer App</span>
@@ -439,13 +439,13 @@ function EditArticleGuru() {
                         รอเผยแพร่
                         <div
                           className='d-flex flex-column'
-                          style={{ display: showTimer ? 'block' : 'none' }}
+                          style={{ display: showTimer || status === 'PENDING' ? 'block' : 'none' }}
                         >
                           <div className='d-flex'>
                             <div>
                               <label
                                 style={{
-                                  display: showTimer ? 'block' : 'none',
+                                  display: showTimer || status === 'PENDING' ? 'block' : 'none',
                                   paddingTop: 8,
                                 }}
                               >
@@ -454,7 +454,9 @@ function EditArticleGuru() {
                               <div className='d-flex flex-row'>
                                 <Form.Item
                                   name='startDate'
-                                  style={{ display: showTimer ? 'block' : 'none' }}
+                                  style={{
+                                    display: showTimer || status === 'PENDING' ? 'block' : 'none',
+                                  }}
                                 >
                                   <DatePicker
                                     disabledDate={disabledDateStart}
@@ -465,7 +467,9 @@ function EditArticleGuru() {
                                 </Form.Item>
                                 <Form.Item
                                   name='startTime'
-                                  style={{ display: showTimer ? 'block' : 'none' }}
+                                  style={{
+                                    display: showTimer || status === 'PENDING' ? 'block' : 'none',
+                                  }}
                                 >
                                   <TimePicker
                                     format={'HH:mm'}
