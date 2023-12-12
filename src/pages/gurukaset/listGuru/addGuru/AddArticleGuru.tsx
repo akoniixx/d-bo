@@ -341,7 +341,7 @@ function AddArticleGuru() {
                     formats={formats}
                     ref={quillRef}
                     style={{
-                      height: '270px',
+                      height: '400px',
                     }}
                   />
                 </Form.Item>
