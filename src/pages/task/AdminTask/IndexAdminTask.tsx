@@ -93,6 +93,7 @@ const IndexAdminTask = () => {
   const [uploadedImageCount, setUploadedImageCount] = useState<number>(0)
   const itemsPerPage = 10
   const [currentPage, setCurrentPage] = useState(1)
+  const [saveBtnDisable, setBtnSaveDisable] = useState<boolean>(false)
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page)
@@ -1197,6 +1198,7 @@ const IndexAdminTask = () => {
       })
     }
     const filteredArray = deleteImgControl.filter((item: any) => item?.id === null)
+    setBtnSaveDisable(true)
     try {
       if (deleteId) {
         for (const id of deleteId) {
@@ -1247,8 +1249,10 @@ const IndexAdminTask = () => {
         handleSearchTask()
         resetFormFields()
       })
+      setBtnSaveDisable(false)
     } catch (error) {
       console.error(error)
+      setBtnSaveDisable(false)
     }
   }
 
@@ -1418,11 +1422,12 @@ const IndexAdminTask = () => {
             </Button>
             <Button
               style={{
-                borderColor: color.Success,
-                backgroundColor: color.Success,
+                borderColor: saveBtnDisable ? color.Grey : color.Success,
+                backgroundColor: saveBtnDisable ? color.Grey : color.Success,
                 color: color.White,
               }}
               onClick={() => onSubmit()}
+              disabled={saveBtnDisable}
             >
               ยืนยัน
             </Button>
