@@ -453,17 +453,17 @@ function IndexGuru() {
         return {
           children: (
             <div className='d-flex flex-row justify-content-between'>
-              <div className='pr-1'>
+              {/* <div className='pr-1'>
                 {(row.status === 'ACTIVE' || row.status === 'INACTIVE') && (
                   <ActionButton
                     icon={<CommentOutlined />}
                     color={color.primary1}
                     onClick={() => {
-                      // navigate('/AddGuru')
+                      navigate('/AddGuru')
                     }}
                   />
                 )}
-              </div>
+              </div> */}
               <div className='pr-1'>
                 <ActionButton
                   icon={<EditOutlined />}
@@ -509,9 +509,9 @@ function IndexGuru() {
                   <Menu.Item key='article' onClick={() => navigate('/AddArticleGuru')}>
                     เพิ่มบทความ
                   </Menu.Item>
-                  <Menu.Item key='video' onClick={() => navigate('/AddVideoGuru')}>
+                  {/* <Menu.Item key='video' onClick={() => navigate('/AddVideoGuru')}>
                     เพิ่มวิดีโอ
-                  </Menu.Item>
+                  </Menu.Item> */}
                 </Menu>
               }
             >

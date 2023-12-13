@@ -2,6 +2,7 @@ import { Col, Image, Modal } from 'antd'
 import React, { useState } from 'react'
 import color from '../../resource/color'
 import { CloseOutlined, LeftOutlined, RightOutlined } from '@ant-design/icons'
+import styled from 'styled-components'
 
 interface ImagCardsProps {
   show?: boolean
@@ -9,6 +10,15 @@ interface ImagCardsProps {
   onClick?: () => void
   imageName?: any
 }
+const MoDalCard = styled(Modal)`
+  .ant-modal-content {
+    position: relative;
+    background-color: #fff0;
+    border: 0;
+    border-radius: 2px;
+    box-shadow: none;
+  }
+`
 const ImagCards: React.FC<ImagCardsProps> = ({ image, show }) => {
   const [previewVisible, setPreviewVisible] = useState(false)
   const [currentIndex, setCurrentIndex] = useState(0)
@@ -30,7 +40,7 @@ const ImagCards: React.FC<ImagCardsProps> = ({ image, show }) => {
     setCurrentIndex((prevIndex) => (prevIndex - 1 + image.length) % image.length)
   }
   return (
-    <div className='form-group'>
+    <div className='form-group' style={{ cursor: 'pointer' }}>
       <div style={{ display: 'flex', flexWrap: 'wrap' }}>
         {image.length > 0 && image ? (
           <div className='pt-3'>
@@ -50,17 +60,17 @@ const ImagCards: React.FC<ImagCardsProps> = ({ image, show }) => {
           '-'
         )}
       </div>
-      <Modal
+      <MoDalCard
         visible={previewVisible}
         onCancel={handleCancel}
         footer={null}
         centered
         closable={false}
-        bodyStyle={{ padding: 0, backgroundColor: 'transparent', boxShadow: 'none' }}
+        bodyStyle={{ padding: 0 }}
       >
-        <div style={{ position: 'relative', width: '100%', height: '100%' }}>
+        <div style={{ position: 'relative', width: '100%', height: '100%', textAlign: 'center' }}>
           <div
-            style={{ position: 'absolute', top: '40%', left: -60, transform: 'translateY(-50%)' }}
+            style={{ position: 'absolute', top: '40%', left: '0%', transform: 'translateY(-50%)' }}
           >
             <LeftOutlined
               onClick={handlePrevious}
@@ -73,7 +83,7 @@ const ImagCards: React.FC<ImagCardsProps> = ({ image, show }) => {
             />
           </div>
           <div
-            style={{ position: 'absolute', top: '40%', right: -130, transform: 'translateY(-50%)' }}
+            style={{ position: 'absolute', top: '40%', right: '6%', transform: 'translateY(-50%)' }}
           >
             <RightOutlined
               onClick={handleNext}
@@ -85,7 +95,7 @@ const ImagCards: React.FC<ImagCardsProps> = ({ image, show }) => {
               }}
             />
           </div>
-          <div style={{ position: 'absolute', top: -40, right: -140 }}>
+          <div style={{ position: 'absolute', top: -40, right: '1%' }}>
             <CloseOutlined
               onClick={handleCancel}
               style={{ backgroundColor: color.White, padding: 8, borderRadius: 50 }}
@@ -94,7 +104,7 @@ const ImagCards: React.FC<ImagCardsProps> = ({ image, show }) => {
           {image.length > 0 && image ? (
             <img
               alt='preview'
-              style={{ width: '620px', height: '404px', objectFit: 'cover' }}
+              style={{ width: '80%', height: 'auto' }}
               src={show ? image[currentIndex] : image[currentIndex].url}
             />
           ) : (
@@ -109,7 +119,7 @@ const ImagCards: React.FC<ImagCardsProps> = ({ image, show }) => {
             </span>
           </div>
         </div>
-      </Modal>
+      </MoDalCard>
     </div>
   )
 }

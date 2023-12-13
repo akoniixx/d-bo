@@ -1,3 +1,4 @@
+/* eslint-disable react/jsx-key */
 import { Form, Input, Modal, Radio, Select, Space, Tag } from 'antd'
 import { Option } from 'antd/lib/mentions'
 import React, { useEffect, useState } from 'react'
@@ -318,7 +319,7 @@ const ModalDrone: React.FC<ModalDroneProps> = ({
     const checkEmptyMoreReason = [moreReason].includes('')
     setBtnSaveDisable(checkEmptyMoreReason)
   }
-
+  const debouncedHandleCallBack = _.debounce(handleCallBack, 300)
   return (
     <>
       <Modal
@@ -338,9 +339,7 @@ const ModalDrone: React.FC<ModalDroneProps> = ({
         footer={[
           <FooterPage
             onClickBack={backButton}
-            onClickSave={() => {
-              handleCallBack()
-            }}
+            onClickSave={debouncedHandleCallBack}
             disableSaveBtn={saveBtnDisable}
           />,
         ]}

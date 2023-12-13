@@ -32,15 +32,14 @@ const UploadIMGMulti: React.FC<ImagProps> = ({
       onChangeControl(fileList)
     }
   }
-  const deleteImg = (index: any) => {
+  const deleteImg = (id: any) => {
     const updatedIndices = [...selectedIndices]
-    if (updatedIndices.includes(index)) {
-      const indexToRemove = updatedIndices.indexOf(index)
+    if (updatedIndices.includes(id)) {
+      const indexToRemove = updatedIndices.indexOf(id)
       updatedIndices.splice(indexToRemove, 1)
     } else {
-      updatedIndices.push(index)
+      updatedIndices.push(id)
     }
-
     setSelectedIndices(updatedIndices)
     handleDelete(updatedIndices)
   }
@@ -138,7 +137,7 @@ const UploadIMGMulti: React.FC<ImagProps> = ({
                     </div>
                     <span
                       className='position-absolute top-0 end-0'
-                      onClick={() => deleteImg(show ? imageData : imageData.id)}
+                      onClick={() => deleteImg(imageData)}
                       style={{ padding: 1, borderRadius: '50%', cursor: 'pointer', left: 38 }}
                     >
                       <img src={icon.cancel} style={{ width: 20, height: 20 }} alt='Delete' />
