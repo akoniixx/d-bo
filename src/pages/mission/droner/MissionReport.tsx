@@ -110,7 +110,6 @@ function MissionReport() {
       startDate,
       endDate,
     ).then((res) => {
-      console.log(res)
       setCountSuccess(res.count)
       const tableList = []
       for (let i = 0; res.data.length > i; i++) {
