@@ -1,5 +1,5 @@
 import { Button, Input, Pagination, Table } from 'antd'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { color } from '../../resource'
 import {
   CaretDownOutlined,
@@ -11,15 +11,35 @@ import {
 import ActionButton from '../../components/button/ActionButton'
 import { useNavigate } from 'react-router-dom'
 import ModalDelete from '../../components/modal/ModalDelete'
+import { RoleManage } from '../../datasource/RoleManageDatasource'
+import { RoleAllEntity } from '../../entities/RoleEntities'
 
 function IndexPermission() {
   const navigate = useNavigate()
   const [modalDelete, setModalDelete] = useState<boolean>(false)
+  const [loading, setLoading] = useState<boolean>(false)
   const [permissionDelete, setPermissionDelete] = useState<any>()
   const [sortField, setSortField] = useState<any>()
   const [sortDirection, setSortDirection] = useState<string | undefined>(undefined)
   const [sortDirection1, setSortDirection1] = useState<string | undefined>(undefined)
+  const [data, setData] = useState<RoleAllEntity>()
+  const [current, setCurrent] = useState<number>(1)
+  const [row, setRow] = useState<number>(10)
 
+
+  useEffect(() => {
+    fetchAllRole()
+  }, [])
+  const fetchAllRole = async () => {
+    setLoading(true)
+    await RoleManage.getAllRole(1, 10)
+      .then((res) => {
+        console.log(res)
+        setData(res)
+      })
+      .catch((err) => console.log(err))
+      .finally(() => setLoading(false))
+  }
   const deletePermission = async (data: any) => {
     setModalDelete(!modalDelete)
   }
@@ -27,33 +47,6 @@ function IndexPermission() {
     setModalDelete(!modalDelete)
   }
 
-  const data = [
-    {
-      id: 0,
-      name: 'Super Admin',
-      count: 2,
-    },
-    {
-      id: 1,
-      name: 'Admin',
-      count: 2,
-    },
-    {
-      id: 2,
-      name: 'Management',
-      count: 2,
-    },
-    {
-      id: 3,
-      name: 'Marketing',
-      count: 2,
-    },
-    {
-      id: 4,
-      name: 'Customer support',
-      count: 2,
-    },
-  ]
   const columns = [
     {
       title: 'บทบาท',
@@ -202,11 +195,11 @@ function IndexPermission() {
         </div>
       </div>
       <div className='pt-3'>
-        <Table columns={columns} dataSource={data} pagination={false} />
+        <Table columns={columns} dataSource={data?.data} pagination={false} />
       </div>
       <div className='d-flex justify-content-between pt-3 pb-3'>
-        <p>รายการทั้งหมด {data.length} รายการ</p>
-        <Pagination current={data.length} total={data.length} pageSize={10} />
+        <p>รายการทั้งหมด {data?.count} รายการ</p>
+        <Pagination current={current} total={data?.count} pageSize={10} />
       </div>
 
       <ModalDelete

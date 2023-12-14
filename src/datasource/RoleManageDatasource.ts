@@ -1,0 +1,28 @@
+import { BASE_URL, httpClient } from '../config/config'
+import { RoleAllEntity } from '../entities/RoleEntities'
+
+export class RoleManage {
+  static getAllRole(
+    page: number,
+    take: number,
+    search?: string,
+    sortBy?: string,
+    sortDirection?: string,
+  ): Promise<RoleAllEntity> {
+    const params = {
+      page: page,
+      take: take,
+      search: search,
+      sortBy: sortBy,
+      sortDirection: sortDirection,
+    }
+    return httpClient
+      .get(BASE_URL + '/role-management', { params })
+      .then((response) => {
+        return response.data
+      })
+      .catch((err) => {
+        console.log(err, 'err getnewtask')
+      })
+  }
+}
