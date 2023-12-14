@@ -204,7 +204,7 @@ const WebRoutes: React.FC<any> = () => {
             <Route path='/IndexAdminTask' element={<IndexAdminTask />} />
             <Route path='/IndexPlotList' element={<IndexPlotList />} />
             <Route path='/IndexPermission' element={<IndexPermission />} />
-            <Route path='/EditPermission' element={<EditPermission />} />
+            <Route path='/EditPermission/:id' element={<EditPermission />} />
             <Route path='/AddPermission' element={<AddPermission />} />
             <Route path='/IndexPointManual' element={<IndexPointManual />} />
             <Route path='/DetailPointManual/:id' element={<DetailPointManual />} />

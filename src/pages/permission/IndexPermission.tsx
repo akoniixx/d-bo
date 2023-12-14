@@ -13,6 +13,7 @@ import { useNavigate } from 'react-router-dom'
 import ModalDelete from '../../components/modal/ModalDelete'
 import { RoleManage } from '../../datasource/RoleManageDatasource'
 import { RoleAllEntity } from '../../entities/RoleEntities'
+import { numberWithCommas } from '../../utilities/TextFormatter'
 
 function IndexPermission() {
   const navigate = useNavigate()
@@ -25,37 +26,35 @@ function IndexPermission() {
   const [data, setData] = useState<RoleAllEntity>()
   const [current, setCurrent] = useState<number>(1)
   const [row, setRow] = useState<number>(10)
-
+  const [searchText, setSearchText] = useState<string>('')
+  const [roleId, setRoleId] = useState<string>('')
 
   useEffect(() => {
     fetchAllRole()
-  }, [])
+  }, [sortDirection])
   const fetchAllRole = async () => {
     setLoading(true)
-    await RoleManage.getAllRole(1, 10)
+    await RoleManage.getAllRole(current, row, searchText, sortField, sortDirection)
       .then((res) => {
-        console.log(res)
         setData(res)
       })
       .catch((err) => console.log(err))
       .finally(() => setLoading(false))
   }
-  const deletePermission = async (data: any) => {
-    setModalDelete(!modalDelete)
-  }
   const showDelete = (id: string) => {
+    setRoleId(id)
     setModalDelete(!modalDelete)
   }
 
   const columns = [
     {
       title: 'บทบาท',
-      dataIndex: 'name',
-      key: 'name',
+      dataIndex: 'role',
+      key: 'role',
       width: '80%',
       render: (value: any, row: any, index: number) => {
         return {
-          children: <span>{value}</span>,
+          children: <span>{row.role}</span>,
         }
       },
     },
@@ -114,7 +113,7 @@ function IndexPermission() {
       key: 'count',
       render: (value: any, row: any, index: number) => {
         return {
-          children: <span>{value}</span>,
+          children: <span>{numberWithCommas(row.count)} คน</span>,
         }
       },
     },
@@ -129,12 +128,12 @@ function IndexPermission() {
               <ActionButton
                 icon={<EditOutlined />}
                 color={color.primary1}
-                onClick={() => navigate('/EditPermission')}
+                onClick={() => navigate('/EditPermission/id=' + row.id)}
               />
               <ActionButton
                 icon={<DeleteOutlined />}
                 color={color.Error}
-                onClick={() => showDelete(value)}
+                onClick={() => showDelete(row.id)}
               />
             </div>
           ),
@@ -164,6 +163,7 @@ function IndexPermission() {
             prefix={<SearchOutlined style={{ color: color.Disable }} />}
             placeholder='ค้นหาชื่อบทบาท'
             className='col-lg-12'
+            onChange={(e) => setSearchText(e.target.value)}
           />
         </div>
         <div className='col-lg'>
@@ -174,6 +174,10 @@ function IndexPermission() {
               borderRadius: '5px',
               color: color.secondary2,
               backgroundColor: color.Success,
+            }}
+            onClick={() => {
+              setCurrent(1)
+              fetchAllRole()
             }}
           >
             ค้นหาข้อมูล
@@ -207,7 +211,17 @@ function IndexPermission() {
         title1='โปรดตรวจสอบบทบาทผู้ดูแลระบบที่คุณต้องการลบ ก่อนที่จะกด'
         title2='ยืนยันการลบ เพราะอาจส่งผลต่อการทำงานของผู้ดูแลระบบ'
         backButton={() => setModalDelete(!modalDelete)}
-        callBack={() => deletePermission(permissionDelete)}
+        callBack={async () => {
+          try {
+            const res = await RoleManage.deleteRole(roleId)
+            if (res) {
+              setModalDelete(!modalDelete)
+              fetchAllRole()
+            }
+          } catch (error) {
+            console.error(error)
+          }
+        }}
       />
     </div>
   )

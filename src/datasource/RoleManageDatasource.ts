@@ -1,5 +1,5 @@
 import { BASE_URL, httpClient } from '../config/config'
-import { RoleAllEntity } from '../entities/RoleEntities'
+import { RoleAllEntity, RoleEntity } from '../entities/RoleEntities'
 
 export class RoleManage {
   static getAllRole(
@@ -22,7 +22,27 @@ export class RoleManage {
         return response.data
       })
       .catch((err) => {
-        console.log(err, 'err getnewtask')
+        console.log(err, 'err role')
+      })
+  }
+  static getRoleById(id: string): Promise<RoleEntity> {
+    return httpClient
+      .get(BASE_URL + `/role-management/${id}`)
+      .then((response) => {
+        return response.data
+      })
+      .catch((err) => {
+        console.log(err, 'err roleById')
+      })
+  }
+  static deleteRole(id: string): Promise<any> {
+    return httpClient
+      .delete(BASE_URL + `/role-management/${id}`)
+      .then((response) => {
+        return response.data
+      })
+      .catch((err) => {
+        console.log(err, 'err delete role')
       })
   }
 }

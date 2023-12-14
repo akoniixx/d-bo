@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { BackIconButton } from '../../components/button/BackButton'
 import { useNavigate } from 'react-router-dom'
 import { Checkbox, Form, Input, Row, Table } from 'antd'
@@ -7,68 +7,115 @@ import { CardHeader } from '../../components/header/CardHearder'
 import { CardContainer } from '../../components/card/CardContainer'
 import FooterPage from '../../components/footer/FooterPage'
 import Swal from 'sweetalert2'
+import { RoleManage } from '../../datasource/RoleManageDatasource'
+import { RoleEntity, listMenu, listMenu_INIT } from '../../entities/RoleEntities'
+import { numberWithCommas } from '../../utilities/TextFormatter'
+import { set } from 'immutable'
+
+const _ = require('lodash')
 
 function EditPermission() {
+  const queryString = _.split(window.location.pathname, '=')
+  const roleId = queryString[1]
   const navigate = useNavigate()
-  const [selectedPermission, setSelectedPermission] = useState<number | null>(null)
+  const [selectedPermission, setSelectedPermission] = useState<any>()
+  const [data, setData] = useState<RoleEntity>()
+  const [form] = Form.useForm()
+  const [admin, setAdmin] = useState<any>()
+  const [challenge, setChallenge] = useState<any>()
+  const [dronerInfo, setDronerInfo] = useState<any>()
+  const [farmerInfo, setFarmerInfo] = useState<any>()
+  const [followJob, setFollowJob] = useState<listMenu | undefined>(undefined)
+  const [guru, setGuru] = useState<any>()
+  const [mission, setMission] = useState<any>()
+  const [point, setPoint] = useState<any>()
+  const [pointResult, setPointResult] = useState<any>()
+  const [promotion, setPromotion] = useState<any>()
+  const [reward, setReward] = useState<any>()
+  const [settings, setSettings] = useState<any>()
+
+  useEffect(() => {
+    fetchRoleById()
+  }, [])
+  const fetchRoleById = async () => {
+    await RoleManage.getRoleById(roleId).then((res: RoleEntity) => {
+      setData(res)
+      setAdmin(res.admin)
+      setChallenge(res.challenge)
+      setDronerInfo(res.dronerInfo)
+      setFarmerInfo(res.farmerInfo)
+      setFollowJob(res.followJob)
+      setGuru(res.guru)
+      setMission(res.mission)
+      setPoint(res.point)
+      setPointResult(res.pointResult)
+      setPromotion(res.promotion)
+      setReward(res.reward)
+      setSettings(res.settings)
+      form.setFieldsValue({
+        role: res.role,
+        count: numberWithCommas(res.count),
+      })
+    })
+  }
 
   const handleRowClick = (record: any) => {
-    setSelectedPermission(record.key)
+    setSelectedPermission(record.menu)
   }
   const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     console.log(e.target.value)
   }
   const listMenu = [
     {
-      key: 0,
-      menu: 'ติดตามงาน',
+      key: 'ติดตามงาน',
+      name: 'ติดตามงาน',
     },
     {
-      key: 1,
-      menu: 'ข้อมูลเกษตรกร',
+      key: 'ข้อมูลเกษตรกร',
+      name: 'ข้อมูลเกษตรกร',
     },
     {
-      key: 2,
-      menu: 'ข้อมูลนักบินโดรน',
+      key: 'ข้อมูลนักบินโดรน',
+      name: 'ข้อมูลนักบินโดรน',
     },
     {
-      key: 3,
-      menu: 'ข่าวสาร / กูรูเกษตร',
+      key: 'ข่าวสาร / กูรูเกษตร',
+      name: 'ข่าวสาร / กูรูเกษตร',
     },
     {
-      key: 4,
-      menu: 'โปรโมชั่น',
+      key: 'โปรโมชั่น',
+      name: 'โปรโมชั่น',
     },
     {
-      key: 5,
-      menu: 'แต้มสะสม',
+      key: 'แต้มสะสม',
+      name: 'แต้มสะสม',
     },
     {
-      key: 6,
-      menu: 'ของรางวัล',
+      key: 'ของรางวัล',
+      name: 'ของรางวัล',
     },
     {
-      key: 7,
-      menu: 'ภารกิจ',
+      key: 'ภารกิจ',
+      name: 'ภารกิจ',
     },
     {
-      key: 8,
-      menu: 'ชาเลนจ์',
+      key: 'ชาเลนจ์',
+      name: 'ชาเลนจ์',
     },
     {
-      key: 9,
-      menu: 'ผู้ดูแลระบบ',
+      key: 'ผู้ดูแลระบบ',
+      name: 'ผู้ดูแลระบบ',
     },
     {
-      key: 10,
-      menu: 'ตั้งค่า',
+      key: 'ตั้งค่า',
+      name: 'ตั้งค่า',
     },
   ]
   const columns = [
     {
       title: 'ชื่อเมนู',
-      dataIndex: 'menu',
-      key: 'menu',
+      dataIndex: 'name',
+      key: 'name',
       width: '21%',
       render: (value: any, row: any, index: number) => {
         return {
@@ -78,14 +125,16 @@ function EditPermission() {
     },
     {
       title: 'ดูข้อมูล (View)',
-      dataIndex: 'add',
-      key: 'add',
+      dataIndex: 'view',
+      key: 'view',
       width: '11%',
       render: (value: any, row: any, index: number) => {
+        const isViewDefined = row.view && typeof row.view === 'object' && 'disabled' in row.view
+        const isDisabled = isViewDefined ? row.view.disabled : false
         return {
           children: (
             <>
-              <Checkbox />
+              <Checkbox disabled={isDisabled} />
             </>
           ),
         }
@@ -97,10 +146,12 @@ function EditPermission() {
       key: 'add',
       width: '11%',
       render: (value: any, row: any, index: number) => {
+        const isViewDefined = row.add && typeof row.add === 'object' && 'disabled' in row.add
+        const isDisabled = isViewDefined ? row.add.disabled : false
         return {
           children: (
             <>
-              <Checkbox />
+              <Checkbox disabled={isDisabled} />
             </>
           ),
         }
@@ -112,10 +163,12 @@ function EditPermission() {
       key: 'edit',
       width: '11%',
       render: (value: any, row: any, index: number) => {
+        const isViewDefined = row.edit && typeof row.edit === 'object' && 'disabled' in row.edit
+        const isDisabled = isViewDefined ? row.edit.disabled : false
         return {
           children: (
             <>
-              <Checkbox />
+              <Checkbox disabled={isDisabled} />
             </>
           ),
         }
@@ -127,10 +180,14 @@ function EditPermission() {
       key: 'delete',
       width: '11%',
       render: (value: any, row: any, index: number) => {
+        const isViewDefined =
+          row.delete && typeof row.delete === 'object' && 'disabled' in row.delete
+        const isDisabled = isViewDefined ? row.delete.disabled : false
         return {
           children: (
             <>
-              <Checkbox />
+              {' '}
+              <Checkbox disabled={isDisabled} />
             </>
           ),
         }
@@ -142,10 +199,13 @@ function EditPermission() {
       key: 'cancel',
       width: '13%',
       render: (value: any, row: any, index: number) => {
+        const isViewDefined =
+          row.cancel && typeof row.cancel === 'object' && 'disabled' in row.cancel
+        const isDisabled = isViewDefined ? row.cancel.disabled : false
         return {
           children: (
             <>
-              <Checkbox />
+              <Checkbox disabled={isDisabled} />
             </>
           ),
         }
@@ -153,193 +213,34 @@ function EditPermission() {
     },
     {
       title: 'บันทึกไฟล์ (Export File)',
-      dataIndex: 'export',
-      key: 'export',
+      dataIndex: 'excel',
+      key: 'excel',
       width: '18%',
       render: (value: any, row: any, index: number) => {
+        const isViewDefined = row.excel && typeof row.excel === 'object' && 'disabled' in row.excel
+        const isDisabled = isViewDefined ? row.excel.disabled : false
+
         return {
           children: (
             <>
-              <Checkbox />
+              <Checkbox disabled={isDisabled} />
             </>
           ),
         }
       },
     },
   ]
-  const dataTacking = [
-    {
-      key: 0,
-      menu: 'งานไหม่ (รอนักบิน)',
-    },
-    {
-      key: 1,
-      menu: 'งานรอดำเนินงาน',
-    },
-    {
-      key: 2,
-      menu: 'งานในวันนี้',
-    },
-    {
-      key: 3,
-      menu: 'งานที่เสร็จแล้ว',
-    },
-    {
-      key: 4,
-      menu: 'แก้ไขงาน/ดูประวัติงาน',
-    },
-  ]
-  const dataFarmer = [
-    {
-      key: 0,
-      menu: 'รายชื่อเกษตรกร',
-    },
-    {
-      key: 1,
-      menu: 'รายการแปลงเกษตร',
-    },
-  ]
-  const dataDroner = [
-    {
-      key: 0,
-      menu: 'รายชื่อนักบินโดรน',
-    },
-    {
-      key: 1,
-      menu: 'รายการโดรนเกษตร',
-    },
-    {
-      key: 2,
-      menu: 'อันดับนักบินโดรน',
-    },
-  ]
-  const dataNews = [
-    {
-      key: 0,
-      menu: 'ข่าวสาร',
-    },
-    {
-      key: 1,
-      menu: 'กูรูเกษตร',
-    },
-  ]
-  const dataPromotion = [
-    {
-      key: 0,
-      menu: 'โปรโมชั่น',
-    },
-    {
-      key: 1,
-      menu: 'คูปอง',
-    },
-  ]
-  const dataPoint = [
-    {
-      key: 0,
-      menu: 'รายงานแต้ม',
-      children: [
-        {
-          key: 0,
-          menu: 'รอรับแต้ม',
-        },
-        {
-          key: 'ได้รับแต้ม',
-          menu: 'ได้รับแต้ม',
-        },
-      ],
-    },
-    {
-      key: 1,
-      menu: 'แลกแต้ม/ของรางวัล',
-      children: [
-        {
-          key: 0,
-          menu: 'นักบินโดรน',
-        },
-        {
-          key: 1,
-          menu: 'เกษตรกร',
-        },
-      ],
-    },
-    {
-      key: 2,
-      menu: 'แต้มรายบุคคล',
-    },
-    {
-      key: 3,
-      menu: 'ให้แต้มพิเศษ',
-    },
-  ]
-  const dataReward = [
-    {
-      key: 0,
-      menu: 'นักบินโดรน',
-    },
-    {
-      key: 1,
-      menu: 'เกษตรกร',
-    },
-  ]
-  const dataChallenge = [
-    {
-      key: 0,
-      menu: 'นักบินโดรน',
-    },
-    {
-      key: 1,
-      menu: 'เกษตรกร',
-    },
-  ]
-  const dataAdmin = [
-    {
-      key: 0,
-      menu: 'รายชื่อผู้ดูแล',
-    },
-    {
-      key: 1,
-      menu: 'บทบาทผู้ดูแล',
-    },
-  ]
-  const dataSetting = [
-    {
-      key: 0,
-      menu: 'ยี่ห้อโดรน',
-    },
-    {
-      key: 1,
-      menu: 'รายชื่อพืช',
-    },
-    {
-      key: 2,
-      menu: 'เป้าหมาย',
-    },
-    {
-      key: 3,
-      menu: 'ราคา',
-    },
-  ]
-  const dataPointSetting = [
-    {
-      key: 0,
-      menu: 'นักบินโดรน',
-    },
-    {
-      key: 1,
-      menu: 'เกษตรกร',
-    },
-  ]
   const permissionData = (
     <div className='pt-1'>
       <CardContainer>
         <CardHeader textHeader='ข้อมูลบทบาทผู้ดูแล' />
-        <Form style={{ padding: '32px' }} className='row'>
+        <Form form={form} style={{ padding: '32px' }} className='row'>
           <div className='form-group col-lg-6'>
             <label>
               ชื่อบทบาท <span style={{ color: 'red' }}>*</span>
             </label>
             <Form.Item
-              name='permission'
+              name='role'
               rules={[
                 {
                   required: true,
@@ -347,25 +248,19 @@ function EditPermission() {
                 },
               ]}
             >
-              <Input
-                placeholder='กรอกชื่อบทบาท'
-                defaultValue='Super Admin'
-                onChange={handleOnChange}
-                autoComplete='off'
-              />
+              <Input placeholder='กรอกชื่อบทบาท' autoComplete='off' />
             </Form.Item>
           </div>
           <div className='form-group col-lg-6'>
             <label>จำนวนผู้ดูแลระบบ</label>
-            <Form.Item name='permission'>
-              <Input placeholder='2 คน' disabled />
+            <Form.Item name='count'>
+              <Input disabled />
             </Form.Item>
           </div>
         </Form>
       </CardContainer>
     </div>
   )
-
   const updatePermission = () => {
     Swal.fire({
       title: 'บันทึกสำเร็จ',
@@ -376,6 +271,8 @@ function EditPermission() {
       navigate('/IndexPermission')
     })
   }
+  console.log(data)
+
   return (
     <div>
       <Row>
@@ -390,49 +287,45 @@ function EditPermission() {
         columns={columns}
         expandable={{
           expandedRowRender: (record) => {
-            let data: readonly any[] | undefined = []
+            let dataRole: any
             switch (record.key) {
-              case 0:
-                data = dataTacking
+              case 'ติดตามงาน':
+                dataRole = followJob
                 break
-              case 1:
-                data = dataFarmer
+              case 'ข้อมูลเกษตรกร':
+                dataRole = farmerInfo
                 break
-              case 2:
-                data = dataDroner
+              case 'ข้อมูลนักบินโดรน':
+                dataRole = dronerInfo
                 break
-              case 3:
-                data = dataNews
+              case 'ข่าวสาร / กูรูเกษตร':
+                dataRole = guru
                 break
-              case 4:
-                data = dataPromotion
+              case 'โปรโมชั่น':
+                dataRole = promotion
                 break
-              case 5:
-                data = dataPoint
+              case 'แต้มสะสม':
+                dataRole = point
                 break
-              case 6:
-                data = dataReward
+              case 'ของรางวัล':
+                dataRole = reward
                 break
-              case 7:
-                data = dataChallenge
+              case 'ชาเลนจ์':
+                dataRole = challenge
                 break
-              case 8:
-                data = dataAdmin
+              case 'ผู้ดูแลระบบ':
+                dataRole = admin
                 break
-              case 9:
-                data = dataSetting
-                break
-              case 10:
-                data = dataPointSetting
+              case 'ตั้งค่า':
+                dataRole = settings
                 break
               default:
                 break
             }
-
             return (
               <Table
                 columns={columns}
-                dataSource={data}
+                dataSource={dataRole}
                 pagination={false}
                 showHeader={false}
                 rowClassName={(record) =>
@@ -441,9 +334,7 @@ function EditPermission() {
               />
             )
           },
-          defaultExpandedRowKeys: [
-            selectedPermission !== null ? selectedPermission.toString() : '0',
-          ],
+          defaultExpandedRowKeys: [selectedPermission],
           onExpand: (expanded, record) => {
             if (expanded) {
               handleRowClick(record)
@@ -458,7 +349,7 @@ function EditPermission() {
           onClick: () => handleRowClick(record),
         })}
         rowClassName={(record) =>
-          record.key === selectedPermission ? 'highlighted-row' : 'normal-row'
+          record.name === selectedPermission ? 'highlighted-row' : 'normal-row'
         }
       />
       <FooterPage
