@@ -1,5 +1,9 @@
 ## [Version - 0]
 
+## Fix [v0.41.5] 2023-12-14
+
+- fixed mission point date
+
 ## Fix [v0.41.4] 2023-12-13
 
 - fixed bug guru & multi image finish task
