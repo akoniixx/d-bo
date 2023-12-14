@@ -1,5 +1,9 @@
 ## [Version - 0]
 
+## Fix [v0.41.4] 2023-12-13
+
+- fixed bug guru & multi image finish task
+
 ## Fix [v0.41.3] 2023-12-12
 
 - fixed logic of add / delete images

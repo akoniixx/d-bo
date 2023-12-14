@@ -47,6 +47,7 @@ import { DeleteOutlined } from '@ant-design/icons'
 import UploadIMGMulti from '../../../components/uploadImg/uploadImgMulti'
 import ModalDelete from '../../../components/modal/ModalDelete'
 import Pagination from 'antd/es/pagination'
+import Swal from 'sweetalert2'
 
 const NewTable = styled(Table)`
   .ant-table-container table thead tr th {
@@ -90,9 +91,9 @@ const IndexAdminTask = () => {
   const [createImgDrug, setCreateImgDrug] = useState<UploadImageEntity>(UploadImageEntity_INTI)
   const [deleteId, setDeleteId] = useState<any>()
   const [uploadedImageCount, setUploadedImageCount] = useState<number>(0)
-  const [disableUpSave, setDisableSave] = useState<boolean>(false)
   const itemsPerPage = 10
   const [currentPage, setCurrentPage] = useState(1)
+  const [saveBtnDisable, setBtnSaveDisable] = useState<boolean>(false)
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page)
@@ -221,10 +222,9 @@ const IndexAdminTask = () => {
     return newRai > oldRai
   }
   const onChangeControl = async (fileList: FileList | null) => {
-    if (fileList) {
+    if (fileList && fileList.length <= 5) {
       try {
         const updatedImages: ImageData[] = deleteImgControl.slice()
-
         for (let i = 0; i < fileList.length; i++) {
           const source = fileList[i]
           let newSource: any = source
@@ -246,10 +246,9 @@ const IndexAdminTask = () => {
             reader.onerror = () => reject(reader.error)
             reader.readAsDataURL(isFileMoreThan2MB ? newSource : source)
           })
-          const timestamp = new Date().getTime()
 
           const imageData: ImageData = {
-            id: timestamp,
+            id: null,
             url: imgBase64,
             file: Map(createImgControl)
               .set('file', isFileMoreThan2MB ? newSource : source)
@@ -258,8 +257,11 @@ const IndexAdminTask = () => {
           }
           updatedImages.push(imageData)
         }
-
-        await updateImageProgressControl(updatedImages)
+        let imagesToUpdate = updatedImages
+        if (updatedImages.length > 5) {
+          imagesToUpdate = updatedImages.slice(0, 5)
+        }
+        await updateImageProgressControl(imagesToUpdate)
       } catch (error) {
         console.error('Error occurred while processing images:', error)
       }
@@ -277,7 +279,6 @@ const IndexAdminTask = () => {
           updatedImages[currentImageIndex] = { ...currentImage, percent: updatedPercent }
           setImgControl([...updatedImages])
           setDeleteImgControl([...updatedImages])
-          checkImgSave([...updatedImages], deleteImgDrug)
           if (updatedPercent < 100) {
             setTimeout(updatePercent, intervalDuration)
           } else {
@@ -297,11 +298,18 @@ const IndexAdminTask = () => {
       updatePercent()
     })
   }
-  const deleteImg = (id: any[]) => {
-    const updatedImages = deleteImgControl.filter((e: any) => !id.includes(e.id))
-    setDeleteImgControl([...updatedImages])
-    setDeleteId([...id])
-    checkImgSave([...updatedImages], deleteImgDrug)
+  const deleteImg = (ids: any[]) => {
+    const filters = ids.map((res) => res.id)
+    const filterUrl = ids.map((res) => res.url)
+    if (Array.isArray(filters) && filters.length > 0 && !filters.every((val) => val === null)) {
+      const updatedImages = deleteImgControl.filter((e: any) => !filters.includes(e.id))
+      setDeleteImgControl([...updatedImages])
+      setDeleteId([...filters])
+    } else {
+      const updatedImages = deleteImgControl.filter((e: any) => !filterUrl.includes(e.url))
+      setDeleteImgControl([...updatedImages])
+      setDeleteId([...filters])
+    }
   }
   const onChangeDrug = async (fileList: FileList | null) => {
     if (fileList) {
@@ -334,7 +342,6 @@ const IndexAdminTask = () => {
           file: d.toJS(),
           percent: 0,
         }
-
         await updateImageProgressDrug(imageData)
       } catch (error) {
         console.error('Error occurred while processing the image:', error)
@@ -351,7 +358,6 @@ const IndexAdminTask = () => {
           imageData.percent = updatedPercent
           setImgDrug([imageData])
           setDeleteImgDrug([imageData])
-          checkImgSave(deleteImgControl, [imageData])
           if (updatedPercent < 100) {
             setTimeout(updatePercent, intervalDuration)
           } else {
@@ -364,18 +370,12 @@ const IndexAdminTask = () => {
   }
 
   const deleteImgDrugs = (id: any[]) => {
-    const updatedImages = deleteImgDrug.filter((e: any) => !id.includes(e.id))
+    const filters = id.map((res) => res.id)
+    const updatedImages = deleteImgDrug.filter((e: any) => !filters.includes(e.id))
     setDeleteImgDrug([...updatedImages])
-    checkImgSave(deleteImgControl, [...updatedImages])
+    setDeleteId([...filters])
   }
 
-  const checkImgSave = (img1: any, img2: any) => {
-    if (img1?.length !== 0 && img2.length !== 0) {
-      setDisableSave(false)
-    } else {
-      setDisableSave(true)
-    }
-  }
   const pageTitle = (
     <Row style={{ padding: '10px' }}>
       <Col span={24}>
@@ -877,6 +877,7 @@ const IndexAdminTask = () => {
                     img={deleteImgControl}
                     onChangeControl={onChangeControl}
                     handleDelete={deleteImg}
+                    disable={deleteImgControl.length >= 5}
                   />
                 </Col>
                 <Col span={12}>
@@ -891,9 +892,12 @@ const IndexAdminTask = () => {
           )}
         </Form>
         <Button
-          disabled={disableUpSave}
+          disabled={deleteImgControl?.length === 0 || deleteImgDrug?.length === 0}
           style={{
-            backgroundColor: disableUpSave ? color.Grey : color.Success,
+            backgroundColor:
+              deleteImgControl?.length === 0 || deleteImgDrug?.length === 0
+                ? color.Grey
+                : color.Success,
             color: 'white',
             width: '100%',
             borderRadius: '5px',
@@ -1186,7 +1190,6 @@ const IndexAdminTask = () => {
       </div>
     </>
   )
-
   const onSubmit = async () => {
     const getUpdateBy = () => `${profile.firstname} ${profile.lastname}`
     const resetFormFields = () => {
@@ -1194,23 +1197,28 @@ const IndexAdminTask = () => {
         remark: '',
       })
     }
-    const filteredArray = deleteImgControl.filter((item: any) => typeof item?.id === 'number')
-    const filteredTypeString = deleteImgControl.filter((item: any) => typeof item?.id === 'string')
-    let sumFilters: any = []
-    if (Array.isArray(deleteImgControl) && deleteImgControl.length > 0) {
-      sumFilters = filteredArray
-    } else {
-      sumFilters = filteredTypeString
-    }
+    const filteredArray = deleteImgControl.filter((item: any) => item?.id === null)
+    setBtnSaveDisable(true)
     try {
       if (deleteId) {
         for (const id of deleteId) {
           await TaskDatasource.deleteImageFinishTask(id)
         }
       }
-      if (sumFilters.length > 0) {
-        for (let i = 0; i < sumFilters.length; i++) {
-          const currentImage = sumFilters[i].file
+      if (typeof deleteImgDrug[0].file !== 'string') {
+        if (deleteImgDrug) {
+          await TaskDatasource.insertManageTaskImg(
+            taskId,
+            getUpdateBy(),
+            form.getFieldValue('remark'),
+            undefined,
+            deleteImgDrug[0].file.file,
+          )
+        }
+      }
+      if (filteredArray || filteredArray.length > 0) {
+        for (let i = 0; i < filteredArray.length; i++) {
+          const currentImage = filteredArray[i].file
           const remarkValue = form.getFieldValue('remark')
           if (currentImage) {
             await TaskDatasource.updateImageFinishTask(
@@ -1222,22 +1230,6 @@ const IndexAdminTask = () => {
             )
           }
         }
-      } else if (deleteImgDrug) {
-        const firstMockImgFile = deleteImgDrug[0].file.file
-        const timestamp = new Date().getTime()
-        const fileExtension = firstMockImgFile.type.split('/')[1]
-        const modifiedFile = new File([firstMockImgFile], `${timestamp}.${fileExtension}`, {
-          type: firstMockImgFile.type,
-        })
-        if (firstMockImgFile) {
-          await TaskDatasource.insertManageTaskImg(
-            taskId,
-            getUpdateBy(),
-            form.getFieldValue('remark'),
-            undefined,
-            modifiedFile,
-          )
-        }
       } else {
         await TaskDatasource.insertManageTask(
           taskId,
@@ -1247,12 +1239,20 @@ const IndexAdminTask = () => {
           getUpdateBy(),
         )
       }
-      fetchTaskList()
-      handleSearchTask()
       setShowModal(!showModal)
-      resetFormFields()
+      Swal.fire({
+        title: 'บันทึกสำเร็จ',
+        icon: 'success',
+        timer: 1500,
+        showConfirmButton: false,
+      }).then((time) => {
+        handleSearchTask()
+        resetFormFields()
+      })
+      setBtnSaveDisable(false)
     } catch (error) {
       console.error(error)
+      setBtnSaveDisable(false)
     }
   }
 
@@ -1422,11 +1422,12 @@ const IndexAdminTask = () => {
             </Button>
             <Button
               style={{
-                borderColor: color.Success,
-                backgroundColor: color.Success,
+                borderColor: saveBtnDisable ? color.Grey : color.Success,
+                backgroundColor: saveBtnDisable ? color.Grey : color.Success,
                 color: color.White,
               }}
               onClick={() => onSubmit()}
+              disabled={saveBtnDisable}
             >
               ยืนยัน
             </Button>
