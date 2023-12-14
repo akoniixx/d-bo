@@ -67,4 +67,5 @@ export default {
   comments_bullet: require('./media/images/comments-bullet.png'),
   play: require('./media/images/play.png'),
   pause: require('./media/images/pause.png'),
+  fertilizer: require('./media/images/fertilizer.png'),
 }

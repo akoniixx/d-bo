@@ -31,7 +31,7 @@ import { BackButton, BackIconButton } from '../../../components/button/BackButto
 import SaveButton from '../../../components/button/SaveButton'
 import { CardContainer } from '../../../components/card/CardContainer'
 import { CardHeader } from '../../../components/header/CardHearder'
-import GooleMap from '../../../components/map/GoogleMap'
+import MapGoogle from '../../../components/map/GoogleMap'
 import { CropDatasource } from '../../../datasource/CropDatasource'
 import { TaskDatasource } from '../../../datasource/TaskDatasource'
 import { TaskSearchDronerDatasource } from '../../../datasource/TaskSearchDronerDatasource'
@@ -610,7 +610,7 @@ const EditNewTask = () => {
                 </div>
                 <div className='row'>
                   <div className='form-group col-lg-12'>
-                    <GooleMap
+                    <MapGoogle
                       changeLatLng={(lat, lng) => {
                         const oldfarmerPlotSeleced = farmerPlotSeleced
                         setFarmerPlotSelected({

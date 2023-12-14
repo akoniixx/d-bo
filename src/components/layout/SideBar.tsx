@@ -305,6 +305,19 @@ export const pathLists = (isAccounting: boolean, isAdminTask?: boolean) => {
         },
       ],
     },
+    {
+      path: 'infinity',
+      name: 'infinity',
+      title: 'ระบบ 1-Finity',
+      subMenu: [
+        {
+          path: '/IndexListStore',
+          name: 'IndexListStore',
+          title: 'รายชื่อร้านค้า',
+          subMenu: [],
+        },
+      ],
+    },
   ]
 
   if (isAdminTask) {
