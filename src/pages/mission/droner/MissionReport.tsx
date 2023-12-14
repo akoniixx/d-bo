@@ -80,7 +80,9 @@ function MissionReport() {
       const tableList = []
       for (let i = 0; res.data.length > i; i++) {
         const table: any = {
-          updateAt: res.data[i].updateAt,
+          updateAt: res.data[i].conditionUpdate
+            ? res.data[i].conditionUpdate[`conditionUpdate${num}`]
+            : res.data[i].updateAt,
           name: res.data[i].firstname + ' ' + res.data[i].lastname,
           nickname: res.data[i].nickname,
           telephone: res.data[i].telephoneNo,
@@ -108,6 +110,7 @@ function MissionReport() {
       startDate,
       endDate,
     ).then((res) => {
+      console.log(res)
       setCountSuccess(res.count)
       const tableList = []
       for (let i = 0; res.data.length > i; i++) {

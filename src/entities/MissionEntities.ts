@@ -20,6 +20,7 @@ export interface MissionDetailEntity {
     dronerId: string
     campaignId: string
     missionType: string
+    conditionUpdate: any
     missionNo: string
     allraiAmount: number
     firstname: string
