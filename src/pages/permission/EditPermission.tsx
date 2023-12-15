@@ -11,6 +11,7 @@ import { RoleManage } from '../../datasource/RoleManageDatasource'
 import { RoleEntity, listMenu, listMenu_INIT } from '../../entities/RoleEntities'
 import { numberWithCommas } from '../../utilities/TextFormatter'
 import { set } from 'immutable'
+import { CheckboxChangeEvent } from 'antd/lib/checkbox'
 
 const _ = require('lodash')
 
@@ -33,6 +34,7 @@ function EditPermission() {
   const [promotion, setPromotion] = useState<any>()
   const [reward, setReward] = useState<any>()
   const [settings, setSettings] = useState<any>()
+  const [checkboxValues, setCheckboxValues] = useState<any>({})
 
   useEffect(() => {
     fetchRoleById()
@@ -62,9 +64,7 @@ function EditPermission() {
   const handleRowClick = (record: any) => {
     setSelectedPermission(record.menu)
   }
-  const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    console.log(e.target.value)
-  }
+
   const listMenu = [
     {
       key: 'ติดตามงาน',
@@ -129,12 +129,16 @@ function EditPermission() {
       key: 'view',
       width: '11%',
       render: (value: any, row: any, index: number) => {
-        const isViewDefined = row.view && typeof row.view === 'object' && 'disabled' in row.view
-        const isDisabled = isViewDefined ? row.view.disabled : false
+        const isDisabled = row.view?.disabled ?? false
+        const isValue = row.view?.value ?? false
         return {
           children: (
             <>
-              <Checkbox disabled={isDisabled} />
+              <Checkbox
+                disabled={isDisabled}
+                defaultChecked={isValue}
+                onChange={(e) => handleCheckboxChange(e.target.checked, row.key, 'view')}
+              />
             </>
           ),
         }
@@ -146,12 +150,16 @@ function EditPermission() {
       key: 'add',
       width: '11%',
       render: (value: any, row: any, index: number) => {
-        const isViewDefined = row.add && typeof row.add === 'object' && 'disabled' in row.add
-        const isDisabled = isViewDefined ? row.add.disabled : false
+        const isDisabled = row.view?.disabled ?? false
+        const isValue = row.view?.value ?? false
         return {
           children: (
             <>
-              <Checkbox disabled={isDisabled} />
+              <Checkbox
+                disabled={isDisabled}
+                defaultChecked={isValue}
+                onChange={(e) => handleCheckboxChange(e.target.checked, row.key, 'add')}
+              />
             </>
           ),
         }
@@ -163,12 +171,16 @@ function EditPermission() {
       key: 'edit',
       width: '11%',
       render: (value: any, row: any, index: number) => {
-        const isViewDefined = row.edit && typeof row.edit === 'object' && 'disabled' in row.edit
-        const isDisabled = isViewDefined ? row.edit.disabled : false
+        const isDisabled = row.edit?.disabled ?? false
+        const isValue = row.edit?.value ?? false
         return {
           children: (
             <>
-              <Checkbox disabled={isDisabled} />
+              <Checkbox
+                disabled={isDisabled}
+                defaultChecked={isValue}
+                onChange={(e) => handleCheckboxChange(e.target.checked, row.key, 'edit')}
+              />
             </>
           ),
         }
@@ -180,14 +192,16 @@ function EditPermission() {
       key: 'delete',
       width: '11%',
       render: (value: any, row: any, index: number) => {
-        const isViewDefined =
-          row.delete && typeof row.delete === 'object' && 'disabled' in row.delete
-        const isDisabled = isViewDefined ? row.delete.disabled : false
+        const isDisabled = row.delete?.disabled ?? false
+        const isValue = row.delete?.value ?? false
         return {
           children: (
             <>
-              {' '}
-              <Checkbox disabled={isDisabled} />
+              <Checkbox
+                disabled={isDisabled}
+                defaultChecked={isValue}
+                onChange={(e) => handleCheckboxChange(e.target.checked, row.key, 'delete')}
+              />
             </>
           ),
         }
@@ -199,13 +213,16 @@ function EditPermission() {
       key: 'cancel',
       width: '13%',
       render: (value: any, row: any, index: number) => {
-        const isViewDefined =
-          row.cancel && typeof row.cancel === 'object' && 'disabled' in row.cancel
-        const isDisabled = isViewDefined ? row.cancel.disabled : false
+        const isDisabled = row.cancel?.disabled ?? false
+        const isValue = row.cancel?.value ?? false
         return {
           children: (
             <>
-              <Checkbox disabled={isDisabled} />
+              <Checkbox
+                disabled={isDisabled}
+                defaultChecked={isValue}
+                onChange={(e) => handleCheckboxChange(e.target.checked, row.key, 'cancel')}
+              />
             </>
           ),
         }
@@ -217,13 +234,16 @@ function EditPermission() {
       key: 'excel',
       width: '18%',
       render: (value: any, row: any, index: number) => {
-        const isViewDefined = row.excel && typeof row.excel === 'object' && 'disabled' in row.excel
-        const isDisabled = isViewDefined ? row.excel.disabled : false
-
+        const isDisabled = row.excel?.disabled ?? false
+        const isValue = row.excel?.value ?? false
         return {
           children: (
             <>
-              <Checkbox disabled={isDisabled} />
+              <Checkbox
+                disabled={isDisabled}
+                defaultChecked={isValue}
+                onChange={(e) => handleCheckboxChange(e.target.checked, row.key, 'excel')}
+              />
             </>
           ),
         }
@@ -262,17 +282,114 @@ function EditPermission() {
     </div>
   )
   const updatePermission = () => {
-    Swal.fire({
-      title: 'บันทึกสำเร็จ',
-      icon: 'success',
-      timer: 1500,
-      showConfirmButton: false,
-    }).then(() => {
-      navigate('/IndexPermission')
-    })
+   console.log(checkboxValues)
   }
-  console.log(data)
+  const handleCheckboxChange = (e: boolean | CheckboxChangeEvent, key: any, column: string) => {
+    const updatedCheckboxValues = {
+      ...checkboxValues,
+      [column]: {
+        ...(checkboxValues[column] || {}),
+        value: e,
+      },
+    };
+  
+    setCheckboxValues(updatedCheckboxValues);
+  };
+  // const handleFormSubmission = () => {
+  //   console.log('Checkbox values:', checkboxValues)
+  // }
+  // return (
+  //   <div>
+  //     <Row>
+  //       <BackIconButton onClick={() => navigate(-1)} />
+  //       <span className='pt-3'>
+  //         <strong style={{ fontSize: '20px' }}>แก้ไขบทบาทผู้ดูแลระบบ</strong>
+  //       </span>
+  //     </Row>
+  //     {permissionData}
+  //     <Form onFinish={handleFormSubmission}>
+  //       <Table
+  //         className='pt-3'
+  //         columns={columns}
+  //         expandable={{
+  //           expandedRowRender: (record) => {
+  //             let dataRole: any
+  //             switch (record.key) {
+  //               case 'ติดตามงาน':
+  //                 dataRole = followJob
+  //                 break
+  //               case 'ข้อมูลเกษตรกร':
+  //                 dataRole = farmerInfo
+  //                 break
+  //               case 'ข้อมูลนักบินโดรน':
+  //                 dataRole = dronerInfo
+  //                 break
+  //               case 'ข่าวสาร / กูรูเกษตร':
+  //                 dataRole = guru
+  //                 break
+  //               case 'โปรโมชั่น':
+  //                 dataRole = promotion
+  //                 break
+  //               case 'แต้มสะสม':
+  //                 dataRole = point
+  //                 break
+  //               case 'ของรางวัล':
+  //                 dataRole = reward
+  //                 break
+  //               case 'ภารกิจ':
+  //                 dataRole = mission
+  //                 break
+  //               case 'ชาเลนจ์':
+  //                 dataRole = challenge
+  //                 break
+  //               case 'ผู้ดูแลระบบ':
+  //                 dataRole = admin
+  //                 break
+  //               case 'ตั้งค่า':
+  //                 dataRole = settings
+  //                 break
+  //               default:
+  //                 break
+  //             }
+  //             return (
+  //               <Table
+  //                 columns={columns}
+  //                 dataSource={dataRole}
+  //                 pagination={false}
+  //                 showHeader={false}
+  //                 rowClassName={(record) =>
+  //                   record.key === selectedPermission ? 'display-table-row' : 'hide-table-row'
+  //                 }
+  //               />
+  //             )
+  //           },
+  //           defaultExpandedRowKeys: [selectedPermission],
+  //           onExpand: (expanded, record) => {
+  //             if (expanded) {
+  //               handleRowClick(record)
+  //             } else {
+  //               setSelectedPermission(null)
+  //             }
+  //           },
+  //         }}
+  //         dataSource={listMenu}
+  //         pagination={false}
+  //         onRow={(record) => ({
+  //           onClick: () => handleRowClick(record),
+  //         })}
+  //         rowClassName={(record) =>
+  //           record.name === selectedPermission ? 'highlighted-row' : 'normal-row'
+  //         }
+  //       />
+  //     </Form>
 
+  //     <FooterPage
+  //       onClickBack={() => navigate(-1)}
+  //       onClickSave={updatePermission}
+  //       // disableSaveBtn={saveBtnDisable}
+  //     />
+  //   </div>
+  // )
   return (
     <div>
       <Row>
@@ -282,76 +399,58 @@ function EditPermission() {
         </span>
       </Row>
       {permissionData}
-      <Table
-        className='pt-3'
-        columns={columns}
-        expandable={{
-          expandedRowRender: (record) => {
-            let dataRole: any
-            switch (record.key) {
-              case 'ติดตามงาน':
-                dataRole = followJob
-                break
-              case 'ข้อมูลเกษตรกร':
-                dataRole = farmerInfo
-                break
-              case 'ข้อมูลนักบินโดรน':
-                dataRole = dronerInfo
-                break
-              case 'ข่าวสาร / กูรูเกษตร':
-                dataRole = guru
-                break
-              case 'โปรโมชั่น':
-                dataRole = promotion
-                break
-              case 'แต้มสะสม':
-                dataRole = point
-                break
-              case 'ของรางวัล':
-                dataRole = reward
-                break
-              case 'ชาเลนจ์':
-                dataRole = challenge
-                break
-              case 'ผู้ดูแลระบบ':
-                dataRole = admin
-                break
-              case 'ตั้งค่า':
-                dataRole = settings
-                break
-              default:
-                break
-            }
-            return (
-              <Table
-                columns={columns}
-                dataSource={dataRole}
-                pagination={false}
-                showHeader={false}
-                rowClassName={(record) =>
-                  record.key === selectedPermission ? 'display-table-row' : 'hide-table-row'
-                }
-              />
-            )
-          },
-          defaultExpandedRowKeys: [selectedPermission],
-          onExpand: (expanded, record) => {
-            if (expanded) {
-              handleRowClick(record)
-            } else {
-              setSelectedPermission(null)
-            }
-          },
-        }}
-        dataSource={listMenu}
-        pagination={false}
-        onRow={(record) => ({
-          onClick: () => handleRowClick(record),
-        })}
-        rowClassName={(record) =>
-          record.name === selectedPermission ? 'highlighted-row' : 'normal-row'
-        }
-      />
+      <Form form={form}>
+        <Table
+          className='pt-3'
+          columns={columns}
+          expandable={{
+            expandedRowRender: (record) => {
+              const dataRole = {
+                ติดตามงาน: followJob,
+                ข้อมูลเกษตรกร: farmerInfo,
+                ข้อมูลนักบินโดรน: dronerInfo,
+                'ข่าวสาร / กูรูเกษตร': guru,
+                โปรโมชั่น: promotion,
+                แต้มสะสม: point,
+                ของรางวัล: reward,
+                ภารกิจ: mission,
+                ชาเลนจ์: challenge,
+                ผู้ดูแลระบบ: admin,
+                ตั้งค่า: settings,
+              }[record.key]
+
+              return (
+                <Table
+                  columns={columns}
+                  dataSource={dataRole}
+                  pagination={false}
+                  showHeader={false}
+                  rowClassName={(record) =>
+                    record.key === selectedPermission ? 'display-table-row' : 'hide-table-row'
+                  }
+                />
+              )
+            },
+            defaultExpandedRowKeys: [selectedPermission],
+            onExpand: (expanded, record) => {
+              if (expanded) {
+                handleRowClick(record)
+              } else {
+                setSelectedPermission(null)
+              }
+            },
+          }}
+          dataSource={listMenu}
+          pagination={false}
+          onRow={(record) => ({
+            onClick: () => handleRowClick(record),
+          })}
+          rowClassName={(record) =>
+            record.name === selectedPermission ? 'highlighted-row' : 'normal-row'
+          }
+        />
+      </Form>
+
       <FooterPage
         onClickBack={() => navigate(-1)}
         onClickSave={updatePermission}
