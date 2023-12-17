@@ -79,10 +79,18 @@ function MissionReport() {
       setCountInpro(res.count)
       const tableList = []
       for (let i = 0; res.data.length > i; i++) {
+        let updateAt = null
+        if (res.data[i].dronerTransactions && res.data[i].dronerTransactions.length > 0) {
+          for (let j = 0; j < res.data[i].dronerTransactions.length; j++) {
+            if (res.data[i].dronerTransactions[j].updateAt) {
+              updateAt = res.data[i].dronerTransactions[j].updateAt
+              break
+            }
+          }
+        }
+
         const table: any = {
-          updateAt: res.data[i].conditionUpdate
-            ? res.data[i].conditionUpdate[`conditionUpdate${num}`]
-            : res.data[i].updateAt,
+          updateAt: updateAt ?? res.data[i].updateAt,
           name: res.data[i].firstname + ' ' + res.data[i].lastname,
           nickname: res.data[i].nickname,
           telephone: res.data[i].telephoneNo,
