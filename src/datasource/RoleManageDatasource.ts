@@ -25,7 +25,7 @@ export class RoleManage {
         console.log(err, 'err role')
       })
   }
-  static getRoleById(id: string): Promise<RoleEntity> {
+  static getRoleById(id: string): Promise<any> {
     return httpClient
       .get(BASE_URL + `/role-management/${id}`)
       .then((response) => {

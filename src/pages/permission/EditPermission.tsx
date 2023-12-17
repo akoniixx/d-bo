@@ -20,6 +20,7 @@ function EditPermission() {
   const roleId = queryString[1]
   const navigate = useNavigate()
   const [selectedPermission, setSelectedPermission] = useState<any>()
+  const [selectedPermissionSub, setSelectedPermissionSub] = useState<any>()
   const [data, setData] = useState<RoleEntity>()
   const [form] = Form.useForm()
   const [admin, setAdmin] = useState<any>()
@@ -31,6 +32,7 @@ function EditPermission() {
   const [mission, setMission] = useState<any>()
   const [point, setPoint] = useState<any>()
   const [pointResult, setPointResult] = useState<any>()
+  const [pointList, setPointList] = useState<any>()
   const [promotion, setPromotion] = useState<any>()
   const [reward, setReward] = useState<any>()
   const [settings, setSettings] = useState<any>()
@@ -41,6 +43,7 @@ function EditPermission() {
   }, [])
   const fetchRoleById = async () => {
     await RoleManage.getRoleById(roleId).then((res: RoleEntity) => {
+      console.log(res)
       setData(res)
       setAdmin(res.admin)
       setChallenge(res.challenge)
@@ -62,53 +65,73 @@ function EditPermission() {
   }
 
   const handleRowClick = (record: any) => {
-    setSelectedPermission(record.menu)
+    console.log(record)
+    setSelectedPermission(record.name)
+  }
+  const handleRowSubClick = (record: any) => {
+    setSelectedPermissionSub(record.name)
   }
 
   const listMenu = [
     {
       key: 'ติดตามงาน',
       name: 'ติดตามงาน',
+      value: followJob,
     },
     {
       key: 'ข้อมูลเกษตรกร',
       name: 'ข้อมูลเกษตรกร',
+      value: farmerInfo,
     },
     {
       key: 'ข้อมูลนักบินโดรน',
       name: 'ข้อมูลนักบินโดรน',
+      value: dronerInfo,
     },
     {
       key: 'ข่าวสาร / กูรูเกษตร',
       name: 'ข่าวสาร / กูรูเกษตร',
+      value: guru,
     },
     {
       key: 'โปรโมชั่น',
       name: 'โปรโมชั่น',
+      value: promotion,
     },
     {
       key: 'แต้มสะสม',
       name: 'แต้มสะสม',
+      value: pointResult,
     },
     {
       key: 'ของรางวัล',
       name: 'ของรางวัล',
+      value: reward,
     },
     {
       key: 'ภารกิจ',
       name: 'ภารกิจ',
+      value: mission,
     },
     {
       key: 'ชาเลนจ์',
       name: 'ชาเลนจ์',
+      value: challenge,
     },
     {
       key: 'ผู้ดูแลระบบ',
       name: 'ผู้ดูแลระบบ',
+      value: admin,
     },
     {
       key: 'ตั้งค่า',
       name: 'ตั้งค่า',
+      value: settings,
+    },
+    {
+      key: 'แต้ม',
+      name: 'แต้ม',
+      value: point,
     },
   ]
   const columns = [
@@ -137,7 +160,7 @@ function EditPermission() {
               <Checkbox
                 disabled={isDisabled}
                 defaultChecked={isValue}
-                onChange={(e) => handleCheckboxChange(e.target.checked, row.key, 'view')}
+                onChange={(e) => handleCheckboxChange(e.target.checked,isValue,row['name'], 'view')}
               />
             </>
           ),
@@ -158,7 +181,7 @@ function EditPermission() {
               <Checkbox
                 disabled={isDisabled}
                 defaultChecked={isValue}
-                onChange={(e) => handleCheckboxChange(e.target.checked, row.key, 'add')}
+                onChange={(e) => handleCheckboxChange(e.target.checked,isValue,row['name'], 'add')}
               />
             </>
           ),
@@ -179,7 +202,7 @@ function EditPermission() {
               <Checkbox
                 disabled={isDisabled}
                 defaultChecked={isValue}
-                onChange={(e) => handleCheckboxChange(e.target.checked, row.key, 'edit')}
+                onChange={(e) => handleCheckboxChange(e.target.checked,isValue,row['name'], 'edit')}
               />
             </>
           ),
@@ -200,7 +223,7 @@ function EditPermission() {
               <Checkbox
                 disabled={isDisabled}
                 defaultChecked={isValue}
-                onChange={(e) => handleCheckboxChange(e.target.checked, row.key, 'delete')}
+                onChange={(e) => handleCheckboxChange(e.target.checked,isValue,row['name'], 'delete')}
               />
             </>
           ),
@@ -221,7 +244,7 @@ function EditPermission() {
               <Checkbox
                 disabled={isDisabled}
                 defaultChecked={isValue}
-                onChange={(e) => handleCheckboxChange(e.target.checked, row.key, 'cancel')}
+                onChange={(e) => handleCheckboxChange(e.target.checked,isValue,row['name'], 'cancel')}
               />
             </>
           ),
@@ -242,7 +265,7 @@ function EditPermission() {
               <Checkbox
                 disabled={isDisabled}
                 defaultChecked={isValue}
-                onChange={(e) => handleCheckboxChange(e.target.checked, row.key, 'excel')}
+                onChange={(e) => handleCheckboxChange(e.target.checked,isValue,row['name'], 'excel')}
               />
             </>
           ),
@@ -282,114 +305,97 @@ function EditPermission() {
     </div>
   )
   const updatePermission = () => {
-   console.log(checkboxValues)
+    console.log(checkboxValues)
   }
-  const handleCheckboxChange = (e: boolean | CheckboxChangeEvent, key: any, column: string) => {
-    const updatedCheckboxValues = {
-      ...checkboxValues,
-      [column]: {
-        ...(checkboxValues[column] || {}),
-        value: e,
-      },
+  const handleCheckboxChange = (e: boolean, disable: boolean, key: string, column: string) => {
+    // Assuming menuData is the state object storing menu data
+    const updatedMenuData = {
+      ...menuData,
+      [key]: [
+        {
+          add: {
+            value: column === 'add' ? e : menuData[key][0].add.value,
+            disabled: column === 'add' ? disable : menuData[key][0].add.disabled,
+          },
+          sub: false, // Assuming this property remains unchanged
+          edit: {
+            value: column === 'edit' ? e : menuData[key][0].edit.value,
+            disabled: column === 'edit' ? disable : menuData[key][0].edit.disabled,
+          },
+          // Other properties follow a similar pattern
+          name: menuData[key][0].name,
+          view: {
+            value: column === 'view' ? e : menuData[key][0].view.value,
+            disabled: column === 'view' ? disable : menuData[key][0].view.disabled,
+          },
+          excel: {
+            value: column === 'excel' ? e : menuData[key][0].excel.value,
+            disabled: column === 'excel' ? disable : menuData[key][0].excel.disabled,
+          },
+          cancel: {
+            value: column === 'cancel' ? e : menuData[key][0].cancel.value,
+            disabled: column === 'cancel' ? disable : menuData[key][0].cancel.disabled,
+          },
+          delete: {
+            value: column === 'delete' ? e : menuData[key][0].delete.value,
+            disabled: column === 'delete' ? disable : menuData[key][0].delete.disabled,
+          },
+          subItem: [], // Assuming this property remains unchanged
+        },
+      ],
     };
   
-    setCheckboxValues(updatedCheckboxValues);
+    // Set the updated menuData state
+    setMenuData(updatedMenuData);
   };
-  // const handleFormSubmission = () => {
-  //   console.log('Checkbox values:', checkboxValues)
-  // }
-  // return (
-  //   <div>
-  //     <Row>
-  //       <BackIconButton onClick={() => navigate(-1)} />
-  //       <span className='pt-3'>
-  //         <strong style={{ fontSize: '20px' }}>แก้ไขบทบาทผู้ดูแลระบบ</strong>
-  //       </span>
-  //     </Row>
-  //     {permissionData}
-  //     <Form onFinish={handleFormSubmission}>
-  //       <Table
-  //         className='pt-3'
-  //         columns={columns}
-  //         expandable={{
-  //           expandedRowRender: (record) => {
-  //             let dataRole: any
-  //             switch (record.key) {
-  //               case 'ติดตามงาน':
-  //                 dataRole = followJob
-  //                 break
-  //               case 'ข้อมูลเกษตรกร':
-  //                 dataRole = farmerInfo
-  //                 break
-  //               case 'ข้อมูลนักบินโดรน':
-  //                 dataRole = dronerInfo
-  //                 break
-  //               case 'ข่าวสาร / กูรูเกษตร':
-  //                 dataRole = guru
-  //                 break
-  //               case 'โปรโมชั่น':
-  //                 dataRole = promotion
-  //                 break
-  //               case 'แต้มสะสม':
-  //                 dataRole = point
-  //                 break
-  //               case 'ของรางวัล':
-  //                 dataRole = reward
-  //                 break
-  //               case 'ภารกิจ':
-  //                 dataRole = mission
-  //                 break
-  //               case 'ชาเลนจ์':
-  //                 dataRole = challenge
-  //                 break
-  //               case 'ผู้ดูแลระบบ':
-  //                 dataRole = admin
-  //                 break
-  //               case 'ตั้งค่า':
-  //                 dataRole = settings
-  //                 break
-  //               default:
-  //                 break
-  //             }
-  //             return (
-  //               <Table
-  //                 columns={columns}
-  //                 dataSource={dataRole}
-  //                 pagination={false}
-  //                 showHeader={false}
-  //                 rowClassName={(record) =>
-  //                   record.key === selectedPermission ? 'display-table-row' : 'hide-table-row'
-  //                 }
-  //               />
-  //             )
-  //           },
-  //           defaultExpandedRowKeys: [selectedPermission],
-  //           onExpand: (expanded, record) => {
-  //             if (expanded) {
-  //               handleRowClick(record)
-  //             } else {
-  //               setSelectedPermission(null)
-  //             }
-  //           },
-  //         }}
-  //         dataSource={listMenu}
-  //         pagination={false}
-  //         onRow={(record) => ({
-  //           onClick: () => handleRowClick(record),
-  //         })}
-  //         rowClassName={(record) =>
-  //           record.name === selectedPermission ? 'highlighted-row' : 'normal-row'
-  //         }
-  //       />
-  //     </Form>
+  
+  console.log(checkboxValues)
+  const subInSubMenu = (dataRole: any) => (
+    <Table
+      columns={columns}
+      dataSource={dataRole}
+      pagination={false}
+      rowKey={(record) => record.key}
+      showHeader={false}
+      rowClassName={(record) =>
+        record.name === selectedPermissionSub ? 'display-table-row' : 'hide-table-row'
+      }
+    />
+  )
+  const subMenu = (dataRole: any) => {
+    const hasSubTrue = dataRole.some((role: any) => role.sub === true)
 
-  //     <FooterPage
-  //       onClickBack={() => navigate(-1)}
-  //       onClickSave={updatePermission}
-  //       // disableSaveBtn={saveBtnDisable}
-  //     />
-  //   </div>
-  // )
+    return (
+      <Table
+        columns={columns}
+        dataSource={dataRole}
+        pagination={false}
+        rowKey={(record) => record.key}
+        showHeader={false}
+        expandable={
+          hasSubTrue
+            ? {
+                expandedRowRender: (record) => {
+                  return <>{subInSubMenu(record['subItem'])}</>
+                },
+                defaultExpandedRowKeys: [selectedPermission],
+                onExpand: (expanded, record) => {
+                  if (expanded) {
+                    handleRowSubClick(record)
+                  } else {
+                    setSelectedPermission(null)
+                  }
+                },
+              }
+            : undefined
+        }
+        rowClassName={(record) =>
+          record.name === selectedPermissionSub ? 'display-table-row' : 'hide-table-row'
+        }
+      />
+    )
+  }
+
   return (
     <div>
       <Row>
@@ -399,57 +405,46 @@ function EditPermission() {
         </span>
       </Row>
       {permissionData}
-      <Form form={form}>
-        <Table
-          className='pt-3'
-          columns={columns}
-          expandable={{
-            expandedRowRender: (record) => {
-              const dataRole = {
-                ติดตามงาน: followJob,
-                ข้อมูลเกษตรกร: farmerInfo,
-                ข้อมูลนักบินโดรน: dronerInfo,
-                'ข่าวสาร / กูรูเกษตร': guru,
-                โปรโมชั่น: promotion,
-                แต้มสะสม: point,
-                ของรางวัล: reward,
-                ภารกิจ: mission,
-                ชาเลนจ์: challenge,
-                ผู้ดูแลระบบ: admin,
-                ตั้งค่า: settings,
-              }[record.key]
-
-              return (
-                <Table
-                  columns={columns}
-                  dataSource={dataRole}
-                  pagination={false}
-                  showHeader={false}
-                  rowClassName={(record) =>
-                    record.key === selectedPermission ? 'display-table-row' : 'hide-table-row'
-                  }
-                />
-              )
-            },
-            defaultExpandedRowKeys: [selectedPermission],
-            onExpand: (expanded, record) => {
-              if (expanded) {
-                handleRowClick(record)
-              } else {
-                setSelectedPermission(null)
-              }
-            },
-          }}
-          dataSource={listMenu}
-          pagination={false}
-          onRow={(record) => ({
-            onClick: () => handleRowClick(record),
-          })}
-          rowClassName={(record) =>
-            record.name === selectedPermission ? 'highlighted-row' : 'normal-row'
-          }
-        />
-      </Form>
+      <Table
+        className='pt-3'
+        columns={columns}
+        expandable={{
+          expandedRowRender: (record) => {
+            const dataRole = {
+              ติดตามงาน: followJob,
+              ข้อมูลเกษตรกร: farmerInfo,
+              ข้อมูลนักบินโดรน: dronerInfo,
+              'ข่าวสาร / กูรูเกษตร': guru,
+              โปรโมชั่น: promotion,
+              แต้มสะสม: pointResult,
+              ของรางวัล: reward,
+              ภารกิจ: mission,
+              ชาเลนจ์: challenge,
+              ผู้ดูแลระบบ: admin,
+              ตั้งค่า: settings,
+              แต้ม: point,
+            }[record.key]
+            return <>{subMenu(dataRole)}</>
+          },
+          defaultExpandedRowKeys: [selectedPermission],
+          onExpand: (expanded, record) => {
+            if (expanded) {
+              handleRowSubClick(record)
+            } else {
+              setSelectedPermission(null)
+            }
+          },
+        }}
+        dataSource={listMenu}
+        pagination={false}
+        rowKey={(record) => record.key}
+        onRow={(record) => ({
+          onClick: () => handleRowClick(record),
+        })}
+        rowClassName={(record) =>
+          record.name === selectedPermission ? 'highlighted-row' : 'normal-row'
+        }
+      />
 
       <FooterPage
         onClickBack={() => navigate(-1)}
