@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { BackIconButton } from '../../components/button/BackButton'
 import { useNavigate } from 'react-router-dom'
-import { Checkbox, Form, Input, Row, Table } from 'antd'
+import { Checkbox, Form, Input, MenuProps, Row, Table } from 'antd'
 import { CardHeader } from '../../components/header/CardHearder'
 import { CardContainer } from '../../components/card/CardContainer'
 import FooterPage from '../../components/footer/FooterPage'
@@ -17,52 +17,26 @@ function AddPermission() {
   const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     console.log(e.target.value)
   }
-  const listMenu = [
-    {
-      key: 0,
-      menu: 'ติดตามงาน',
-    },
-    {
-      key: 1,
-      menu: 'ข้อมูลเกษตรกร',
-    },
-    {
-      key: 2,
-      menu: 'ข้อมูลนักบินโดรน',
-    },
-    {
-      key: 3,
-      menu: 'ข่าวสาร / กูรูเกษตร',
-    },
-    {
-      key: 4,
-      menu: 'โปรโมชั่น',
-    },
-    {
-      key: 5,
-      menu: 'แต้มสะสม',
-    },
-    {
-      key: 6,
-      menu: 'ของรางวัล',
-    },
-    {
-      key: 7,
-      menu: 'ภารกิจ',
-    },
-    {
-      key: 8,
-      menu: 'ชาเลนจ์',
-    },
-    {
-      key: 9,
-      menu: 'ผู้ดูแลระบบ',
-    },
-    {
-      key: 10,
-      menu: 'ตั้งค่า',
-    },
+  const menuName = [
+    'ติดตามงาน',
+    'ข้อมูลเกษตรกร',
+    'ข้อมูลนักบินโดรน',
+    'ข่าวสาร / กูรูเกษตร',
+    'โปรโมชั่น',
+    'แต้มสะสม',
+    'ของรางวัล',
+    'ภารกิจ',
+    'ชาเลนจ์',
+    'ผู้ดูแลระบบ',
+    'ตั้งค่า',
+    'แต้ม',
   ]
+  const items: any = menuName.map((v, i) => {
+    return {
+      key: i,
+      name: v,
+    }
+  })
 
   const permissionData = (
     <div className='pt-1'>
@@ -103,8 +77,8 @@ function AddPermission() {
   const columns = [
     {
       title: 'ชื่อเมนู',
-      dataIndex: 'menu',
-      key: 'menu',
+      dataIndex: 'name',
+      key: 'name',
       width: '21%',
       render: (value: any, row: any, index: number) => {
         return {
@@ -133,10 +107,11 @@ function AddPermission() {
       key: 'add',
       width: '11%',
       render: (value: any, row: any, index: number) => {
+        const isDisable = ['แต้มสะสม', 'แต้ม'].includes(row.name)
         return {
           children: (
             <>
-              <Checkbox />
+              <Checkbox disabled={isDisable} />
             </>
           ),
         }
@@ -163,10 +138,11 @@ function AddPermission() {
       key: 'delete',
       width: '11%',
       render: (value: any, row: any, index: number) => {
+        const isDisable = ['ติดตามงาน', 'แต้ม'].includes(row.name)
         return {
           children: (
             <>
-              <Checkbox />
+              <Checkbox disabled={isDisable} />
             </>
           ),
         }
@@ -178,10 +154,22 @@ function AddPermission() {
       key: 'cancel',
       width: '13%',
       render: (value: any, row: any, index: number) => {
+        const isDisable = [
+          'ข้อมูลเกษตรกร',
+          'ข้อมูลนักบินโดรน',
+          'ข่าวสาร/กูรูเกษตร',
+          'โปรโมชั่น',
+          'ของรางวัล',
+          'ภารกิจ',
+          'ชาเลนจ์',
+          'ผู้ดูแลระบบ',
+          'ตั้งค่า',
+          'แต้ม',
+        ].includes(row.name)
         return {
           children: (
             <>
-              <Checkbox />
+              <Checkbox disabled={isDisable} />
             </>
           ),
         }
@@ -193,6 +181,197 @@ function AddPermission() {
       key: 'export',
       width: '18%',
       render: (value: any, row: any, index: number) => {
+        const isDisable = ['งานที่เสร็จแล้ว (บัญชี)'].includes(row.name)
+        return {
+          children: (
+            <>
+              <Checkbox disabled={!isDisable} />
+            </>
+          ),
+        }
+      },
+    },
+  ]
+  const columnSub = [
+    {
+      title: 'ชื่อเมนู',
+      dataIndex: 'name',
+      key: 'name',
+      width: '21%',
+      render: (value: any, row: any, index: number) => {
+        return {
+          children: <span>{value}</span>,
+        }
+      },
+    },
+    {
+      title: 'ดูข้อมูล (View)',
+      dataIndex: 'add',
+      key: 'add',
+      width: '11%',
+      render: (value: any, row: any, index: number) => {
+        const isDisable = ['อันดับเกษตรกร', 'กูรูเกษตร', 'โปรโมชั่น'].includes(row.name)
+        return {
+          children: (
+            <>
+              <Checkbox disabled={isDisable} />
+            </>
+          ),
+        }
+      },
+    },
+    {
+      title: 'เพิ่ม (Add)',
+      dataIndex: 'add',
+      key: 'add',
+      width: '11%',
+      render: (value: any, row: any, index: number) => {
+        const isDisable = [
+          'งานรอดำเนินงาน',
+          'งานในวันนี้',
+          'งานที่เสร็จแล้ว',
+          'งานที่เสร็จแล้ว (บัญชี)',
+          'แก้ไขงาน/ดูประวัติงาน',
+          'อันดับเกษตรกร',
+          'อันดับนักบินโดรน',
+          'กูรูเกษตร',
+          'โปรโมชั่น',
+          'แลกแต้ม/ของรางวัล',
+          'รายงานแต้ม',
+          'ราคา',
+          'แต้ม',
+        ].includes(row.name)
+        return {
+          children: (
+            <>
+              <Checkbox disabled={isDisable} />
+            </>
+          ),
+        }
+      },
+    },
+    {
+      title: 'แก้ไข (Edit)',
+      dataIndex: 'edit',
+      key: 'edit',
+      width: '11%',
+      render: (value: any, row: any, index: number) => {
+        const isDisable = ['อันดับเกษตรกร', 'อันดับนักบินโดรน', 'กูรูเกษตร', 'โปรโมชั่น'].includes(
+          row.name,
+        )
+        return {
+          children: (
+            <>
+              <Checkbox disabled={isDisable} />
+            </>
+          ),
+        }
+      },
+    },
+    {
+      title: 'ลบ (Delete)',
+      dataIndex: 'delete',
+      key: 'delete',
+      width: '11%',
+      render: (value: any, row: any, index: number) => {
+        const isDisable = [
+          'งานใหม่ (รอนักบิน)',
+          'งานรอดำเนินงาน',
+          'งานในวันนี้',
+          'งานที่เสร็จแล้ว',
+          'งานที่เสร็จแล้ว (บัญชี)',
+          'แก้ไขงาน/ดูประวัติงาน',
+          'อันดับเกษตรกร',
+          'อันดับนักบินโดรน',
+          'กูรูเกษตร',
+          'โปรโมชั่น',
+          'รายงานแต้ม',
+          'แลกแต้ม/ของรางวัล',
+          'รายชื่อพืช',
+          'ราคา',
+        ].includes(row.name)
+        return {
+          children: (
+            <>
+              <Checkbox disabled={isDisable} />
+            </>
+          ),
+        }
+      },
+    },
+    {
+      title: 'ยกเลิก (cancel)',
+      dataIndex: 'cancel',
+      key: 'cancel',
+      width: '13%',
+      render: (value: any, row: any, index: number) => {
+        const isDisable = [
+          'งานรอดำเนินงาน',
+          'งานในวันนี้',
+          'งานที่เสร็จแล้ว',
+          'งานที่เสร็จแล้ว (บัญชี)',
+          'รายชื่อเกษตรกร',
+          'รายการแปลงเกษตร',
+          'อันดับเกษตรกร',
+          'รายชื่อนักบินโดรน',
+          'รายการโดรนเกษตร',
+          'อันดับนักบินโดรน',
+          'ข่าวสาร',
+          'กูรูเกษตร',
+          'โปรโมชั่น',
+          'คูปอง',
+          'รายงานแต้ม',
+          'รายชื่อผู้ดูแลระบบ',
+          'บทบาทผู้ดูแล',
+          'ยี่ห้อโดรน',
+          'รายชื่อพืช',
+          'เป้าหมาย',
+          'ราคา',
+        ].includes(row.name)
+        return {
+          children: (
+            <>
+              <Checkbox disabled={isDisable} />
+            </>
+          ),
+        }
+      },
+    },
+    {
+      title: 'บันทึกไฟล์ (Export File)',
+      dataIndex: 'export',
+      key: 'export',
+      width: '18%',
+      render: (value: any, row: any, index: number) => {
+        const isDisable = ['งานที่เสร็จแล้ว (บัญชี)'].includes(row.name)
+        return {
+          children: (
+            <>
+              <Checkbox disabled={!isDisable} />
+            </>
+          ),
+        }
+      },
+    },
+  ]
+  const columnSubInSub = [
+    {
+      title: 'ชื่อเมนู',
+      dataIndex: 'name',
+      key: 'name',
+      width: '21%',
+      render: (value: any, row: any, index: number) => {
+        return {
+          children: <span>{value}</span>,
+        }
+      },
+    },
+    {
+      title: 'ดูข้อมูล (View)',
+      dataIndex: 'add',
+      key: 'add',
+      width: '11%',
+      render: (value: any, row: any, index: number) => {
         return {
           children: (
             <>
@@ -202,167 +381,254 @@ function AddPermission() {
         }
       },
     },
+    {
+      title: 'เพิ่ม (Add)',
+      dataIndex: 'add',
+      key: 'add',
+      width: '11%',
+      render: (value: any, row: any, index: number) => {
+        const isDisable = ['รอรับแต้ม', 'ได้รับแต้ม', 'นักบินโดรน', 'เกษตรกร'].includes(row.name)
+        return {
+          children: (
+            <>
+              <Checkbox disabled={isDisable} />
+            </>
+          ),
+        }
+      },
+    },
+    {
+      title: 'แก้ไข (Edit)',
+      dataIndex: 'edit',
+      key: 'edit',
+      width: '11%',
+      render: (value: any, row: any, index: number) => {
+        const isDisable = ['รอรับแต้ม', 'ได้รับแต้ม'].includes(row.name)
+        return {
+          children: (
+            <>
+              <Checkbox disabled={isDisable} />
+            </>
+          ),
+        }
+      },
+    },
+    {
+      title: 'ลบ (Delete)',
+      dataIndex: 'delete',
+      key: 'delete',
+      width: '11%',
+      render: (value: any, row: any, index: number) => {
+        const isDisable = ['รอรับแต้ม', 'ได้รับแต้ม', 'นักบินโดรน', 'เกษตรกร'].includes(row.name)
+        return {
+          children: (
+            <>
+              <Checkbox disabled={isDisable} />
+            </>
+          ),
+        }
+      },
+    },
+    {
+      title: 'ยกเลิก (cancel)',
+      dataIndex: 'cancel',
+      key: 'cancel',
+      width: '13%',
+      render: (value: any, row: any, index: number) => {
+        const isDisable = ['รอรับแต้ม', 'ได้รับแต้ม', 'นักบินโดรน', 'เกษตรกร'].includes(row.name)
+
+        return {
+          children: (
+            <>
+              <Checkbox disabled={isDisable} />
+            </>
+          ),
+        }
+      },
+    },
+    {
+      title: 'บันทึกไฟล์ (Export File)',
+      dataIndex: 'export',
+      key: 'export',
+      width: '18%',
+      render: (value: any, row: any, index: number) => {
+        const isDisable = ['รอรับแต้ม', 'ได้รับแต้ม', 'นักบินโดรน', 'เกษตรกร'].includes(row.name)
+        return {
+          children: (
+            <>
+              <Checkbox disabled={!isDisable} />
+            </>
+          ),
+        }
+      },
+    },
   ]
   const dataTacking = [
     {
       key: 0,
-      menu: 'งานไหม่ (รอนักบิน)',
+      name: 'งานใหม่ (รอนักบิน)',
     },
     {
       key: 1,
-      menu: 'งานรอดำเนินงาน',
+      name: 'งานรอดำเนินงาน',
     },
     {
       key: 2,
-      menu: 'งานในวันนี้',
+      name: 'งานในวันนี้',
     },
     {
       key: 3,
-      menu: 'งานที่เสร็จแล้ว',
+      name: 'งานที่เสร็จแล้ว',
     },
     {
       key: 4,
-      menu: 'แก้ไขงาน/ดูประวัติงาน',
+      name: 'แก้ไขงาน/ดูประวัติงาน',
     },
   ]
   const dataFarmer = [
     {
       key: 0,
-      menu: 'รายชื่อเกษตรกร',
+      name: 'รายชื่อเกษตรกร',
     },
     {
       key: 1,
-      menu: 'รายการแปลงเกษตร',
+      name: 'รายการแปลงเกษตร',
+    },
+    {
+      key: 3,
+      name: 'อันดับเกษตรกร',
     },
   ]
   const dataDroner = [
     {
       key: 0,
-      menu: 'รายชื่อนักบินโดรน',
+      name: 'รายชื่อนักบินโดรน',
     },
     {
       key: 1,
-      menu: 'รายการโดรนเกษตร',
+      name: 'รายการโดรนเกษตร',
     },
     {
       key: 2,
-      menu: 'อันดับนักบินโดรน',
+      name: 'อันดับนักบินโดรน',
     },
   ]
   const dataNews = [
     {
       key: 0,
-      menu: 'ข่าวสาร',
+      name: 'ข่าวสาร',
     },
     {
       key: 1,
-      menu: 'กูรูเกษตร',
+      name: 'กูรูเกษตร',
     },
   ]
   const dataPromotion = [
     {
       key: 0,
-      menu: 'โปรโมชั่น',
+      name: 'โปรโมชั่น',
     },
     {
       key: 1,
-      menu: 'คูปอง',
+      name: 'คูปอง',
     },
   ]
   const dataPoint = [
     {
       key: 0,
-      menu: 'รายงานแต้ม',
+      name: 'รายงานแต้ม',
       children: [
         {
           key: 0,
-          menu: 'รอรับแต้ม',
+          name: 'รอรับแต้ม',
         },
         {
           key: 'ได้รับแต้ม',
-          menu: 'ได้รับแต้ม',
+          name: 'ได้รับแต้ม',
         },
       ],
     },
     {
       key: 1,
-      menu: 'แลกแต้ม/ของรางวัล',
+      name: 'แลกแต้ม/ของรางวัล',
       children: [
         {
           key: 0,
-          menu: 'นักบินโดรน',
+          name: 'นักบินโดรน',
         },
         {
           key: 1,
-          menu: 'เกษตรกร',
+          name: 'เกษตรกร',
         },
       ],
-    },
-    {
-      key: 2,
-      menu: 'แต้มรายบุคคล',
-    },
-    {
-      key: 3,
-      menu: 'ให้แต้มพิเศษ',
     },
   ]
   const dataReward = [
     {
       key: 0,
-      menu: 'นักบินโดรน',
+      name: 'นักบินโดรน',
     },
     {
       key: 1,
-      menu: 'เกษตรกร',
+      name: 'เกษตรกร',
+    },
+  ]
+  const dataMission = [
+    {
+      key: 0,
+      name: 'นักบินโดรน',
+    },
+    {
+      key: 1,
+      name: 'เกษตรกร',
     },
   ]
   const dataChallenge = [
     {
       key: 0,
-      menu: 'นักบินโดรน',
+      name: 'นักบินโดรน',
     },
     {
       key: 1,
-      menu: 'เกษตรกร',
+      name: 'เกษตรกร',
     },
   ]
   const dataAdmin = [
     {
       key: 0,
-      menu: 'รายชื่อผู้ดูแล',
+      name: 'รายชื่อผู้ดูแล',
     },
     {
       key: 1,
-      menu: 'บทบาทผู้ดูแล',
+      name: 'บทบาทผู้ดูแล',
     },
   ]
   const dataSetting = [
     {
       key: 0,
-      menu: 'ยี่ห้อโดรน',
+      name: 'ยี่ห้อโดรน',
     },
     {
       key: 1,
-      menu: 'รายชื่อพืช',
+      name: 'รายชื่อพืช',
     },
     {
       key: 2,
-      menu: 'เป้าหมาย',
+      name: 'เป้าหมาย',
     },
     {
       key: 3,
-      menu: 'ราคา',
+      name: 'ราคา',
     },
   ]
   const dataPointSetting = [
     {
       key: 0,
-      menu: 'นักบินโดรน',
+      name: 'นักบินโดรน',
     },
     {
       key: 1,
-      menu: 'เกษตรกร',
+      name: 'เกษตรกร',
     },
   ]
 
@@ -404,15 +670,18 @@ function AddPermission() {
                 data = dataReward
                 break
               case 7:
-                data = dataChallenge
+                data = dataMission
                 break
               case 8:
-                data = dataAdmin
+                data = dataChallenge
                 break
               case 9:
-                data = dataSetting
+                data = dataAdmin
                 break
               case 10:
+                data = dataSetting
+                break
+              case 11:
                 data = dataPointSetting
                 break
               default:
@@ -421,7 +690,7 @@ function AddPermission() {
 
             return (
               <Table
-                columns={columns}
+                columns={columnSub}
                 dataSource={data}
                 pagination={false}
                 showHeader={false}
@@ -442,14 +711,11 @@ function AddPermission() {
             }
           },
         }}
-        dataSource={listMenu}
+        dataSource={items}
         pagination={false}
         onRow={(record) => ({
           onClick: () => handleRowClick(record),
         })}
-        rowClassName={(record) =>
-          record.key === selectedPermission ? 'highlighted-row' : 'normal-row'
-        }
       />
       <FooterPage
         onClickBack={() => navigate(-1)}
