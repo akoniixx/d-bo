@@ -45,4 +45,14 @@ export class RoleManage {
         console.log(err, 'err delete role')
       })
   }
+  static updateRole(data: RoleEntity): Promise<any> {
+    return httpClient
+      .patch(BASE_URL + `/role-management/`+ data.id, data)
+      .then((response) => {
+        return response.data
+      })
+      .catch((err) => {
+        console.log(err, 'err update role')
+      })
+  }
 }

@@ -8,9 +8,8 @@ import { CardContainer } from '../../components/card/CardContainer'
 import FooterPage from '../../components/footer/FooterPage'
 import Swal from 'sweetalert2'
 import { RoleManage } from '../../datasource/RoleManageDatasource'
-import { RoleEntity, listMenu, listMenu_INIT } from '../../entities/RoleEntities'
+import { RoleEntity, RoleEntity_INIT, listMenu, listMenu_INIT } from '../../entities/RoleEntities'
 import { numberWithCommas } from '../../utilities/TextFormatter'
-import { set } from 'immutable'
 import { CheckboxChangeEvent } from 'antd/lib/checkbox'
 
 const _ = require('lodash')
@@ -19,32 +18,28 @@ function EditPermission() {
   const queryString = _.split(window.location.pathname, '=')
   const roleId = queryString[1]
   const navigate = useNavigate()
-  const [selectedPermission, setSelectedPermission] = useState<any>()
-  const [selectedPermissionSub, setSelectedPermissionSub] = useState<any>()
-  const [data, setData] = useState<RoleEntity>()
+  const [data, setData] = useState<RoleEntity>(RoleEntity_INIT)
+  const [role, setRole] = useState<any>({})
+
   const [form] = Form.useForm()
   const [admin, setAdmin] = useState<any>()
   const [challenge, setChallenge] = useState<any>()
   const [dronerInfo, setDronerInfo] = useState<any>()
   const [farmerInfo, setFarmerInfo] = useState<any>()
-  const [followJob, setFollowJob] = useState<listMenu | undefined>(undefined)
+  const [followJob, setFollowJob] = useState<any>()
   const [guru, setGuru] = useState<any>()
   const [mission, setMission] = useState<any>()
   const [point, setPoint] = useState<any>()
   const [pointResult, setPointResult] = useState<any>()
-  const [pointList, setPointList] = useState<any>()
   const [promotion, setPromotion] = useState<any>()
   const [reward, setReward] = useState<any>()
   const [settings, setSettings] = useState<any>()
-  const [checkboxValues, setCheckboxValues] = useState<any>({})
 
   useEffect(() => {
     fetchRoleById()
   }, [])
   const fetchRoleById = async () => {
     await RoleManage.getRoleById(roleId).then((res: RoleEntity) => {
-      console.log(res)
-      setData(res)
       setAdmin(res.admin)
       setChallenge(res.challenge)
       setDronerInfo(res.dronerInfo)
@@ -64,14 +59,6 @@ function EditPermission() {
     })
   }
 
-  const handleRowClick = (record: any) => {
-    console.log(record)
-    setSelectedPermission(record.name)
-  }
-  const handleRowSubClick = (record: any) => {
-    setSelectedPermissionSub(record.name)
-  }
-
   const listMenu = [
     {
       key: 'ติดตามงาน',
@@ -86,7 +73,7 @@ function EditPermission() {
     {
       key: 'ข้อมูลนักบินโดรน',
       name: 'ข้อมูลนักบินโดรน',
-      value: dronerInfo,
+      value: farmerInfo,
     },
     {
       key: 'ข่าวสาร / กูรูเกษตร',
@@ -152,15 +139,15 @@ function EditPermission() {
       key: 'view',
       width: '11%',
       render: (value: any, row: any, index: number) => {
-        const isDisabled = row.view?.disabled ?? false
-        const isValue = row.view?.value ?? false
+        const isValue =
+          Array.isArray(row.value) && row.value.every((item: any) => item.view?.value === true)
+          
         return {
           children: (
             <>
               <Checkbox
-                disabled={isDisabled}
                 defaultChecked={isValue}
-                onChange={(e) => handleCheckboxChange(e.target.checked,isValue,row['name'], 'view')}
+                onChange={(e) => handleCheckboxChange(e.target.checked, 'view', row)}
               />
             </>
           ),
@@ -173,15 +160,15 @@ function EditPermission() {
       key: 'add',
       width: '11%',
       render: (value: any, row: any, index: number) => {
-        const isDisabled = row.view?.disabled ?? false
-        const isValue = row.view?.value ?? false
+        const isValue =
+          Array.isArray(row.value) && row.value.every((item: any) => item.add?.value === true)
+
         return {
           children: (
             <>
               <Checkbox
-                disabled={isDisabled}
                 defaultChecked={isValue}
-                onChange={(e) => handleCheckboxChange(e.target.checked,isValue,row['name'], 'add')}
+                onChange={(e) => handleCheckboxChange(e.target.checked, 'add', row)}
               />
             </>
           ),
@@ -194,15 +181,15 @@ function EditPermission() {
       key: 'edit',
       width: '11%',
       render: (value: any, row: any, index: number) => {
-        const isDisabled = row.edit?.disabled ?? false
-        const isValue = row.edit?.value ?? false
+        const isValue =
+          Array.isArray(row.value) && row.value.every((item: any) => item.edit?.value === true)
+
         return {
           children: (
             <>
               <Checkbox
-                disabled={isDisabled}
                 defaultChecked={isValue}
-                onChange={(e) => handleCheckboxChange(e.target.checked,isValue,row['name'], 'edit')}
+                onChange={(e) => handleCheckboxChange(e.target.checked, 'edit', row)}
               />
             </>
           ),
@@ -215,15 +202,15 @@ function EditPermission() {
       key: 'delete',
       width: '11%',
       render: (value: any, row: any, index: number) => {
-        const isDisabled = row.delete?.disabled ?? false
-        const isValue = row.delete?.value ?? false
+        const isValue =
+          Array.isArray(row.value) && row.value.every((item: any) => item.disable?.value === true)
+
         return {
           children: (
             <>
               <Checkbox
-                disabled={isDisabled}
                 defaultChecked={isValue}
-                onChange={(e) => handleCheckboxChange(e.target.checked,isValue,row['name'], 'delete')}
+                onChange={(e) => handleCheckboxChange(e.target.checked, 'delete', row)}
               />
             </>
           ),
@@ -236,15 +223,15 @@ function EditPermission() {
       key: 'cancel',
       width: '13%',
       render: (value: any, row: any, index: number) => {
-        const isDisabled = row.cancel?.disabled ?? false
-        const isValue = row.cancel?.value ?? false
+        const isValue =
+          Array.isArray(row.value) && row.value.every((item: any) => item.cancel?.value === true)
+
         return {
           children: (
             <>
               <Checkbox
-                disabled={isDisabled}
                 defaultChecked={isValue}
-                onChange={(e) => handleCheckboxChange(e.target.checked,isValue,row['name'], 'cancel')}
+                onChange={(e) => handleCheckboxChange(e.target.checked, 'cancel', row)}
               />
             </>
           ),
@@ -257,15 +244,15 @@ function EditPermission() {
       key: 'excel',
       width: '18%',
       render: (value: any, row: any, index: number) => {
-        const isDisabled = row.excel?.disabled ?? false
-        const isValue = row.excel?.value ?? false
+        const isValue =
+          Array.isArray(row.value) && row.value.every((item: any) => item.excel?.value === true)
+
         return {
           children: (
             <>
               <Checkbox
-                disabled={isDisabled}
                 defaultChecked={isValue}
-                onChange={(e) => handleCheckboxChange(e.target.checked,isValue,row['name'], 'excel')}
+                onChange={(e) => handleCheckboxChange(e.target.checked, 'excel', row)}
               />
             </>
           ),
@@ -304,93 +291,388 @@ function EditPermission() {
       </CardContainer>
     </div>
   )
-  const updatePermission = () => {
-    console.log(checkboxValues)
-  }
-  const handleCheckboxChange = (e: boolean, disable: boolean, key: string, column: string) => {
-    // Assuming menuData is the state object storing menu data
-    const updatedMenuData = {
-      ...menuData,
-      [key]: [
-        {
-          add: {
-            value: column === 'add' ? e : menuData[key][0].add.value,
-            disabled: column === 'add' ? disable : menuData[key][0].add.disabled,
-          },
-          sub: false, // Assuming this property remains unchanged
-          edit: {
-            value: column === 'edit' ? e : menuData[key][0].edit.value,
-            disabled: column === 'edit' ? disable : menuData[key][0].edit.disabled,
-          },
-          // Other properties follow a similar pattern
-          name: menuData[key][0].name,
-          view: {
-            value: column === 'view' ? e : menuData[key][0].view.value,
-            disabled: column === 'view' ? disable : menuData[key][0].view.disabled,
-          },
-          excel: {
-            value: column === 'excel' ? e : menuData[key][0].excel.value,
-            disabled: column === 'excel' ? disable : menuData[key][0].excel.disabled,
-          },
-          cancel: {
-            value: column === 'cancel' ? e : menuData[key][0].cancel.value,
-            disabled: column === 'cancel' ? disable : menuData[key][0].cancel.disabled,
-          },
-          delete: {
-            value: column === 'delete' ? e : menuData[key][0].delete.value,
-            disabled: column === 'delete' ? disable : menuData[key][0].delete.disabled,
-          },
-          subItem: [], // Assuming this property remains unchanged
-        },
-      ],
-    };
-  
-    // Set the updated menuData state
-    setMenuData(updatedMenuData);
-  };
-  
-  console.log(checkboxValues)
-  const subInSubMenu = (dataRole: any) => (
-    <Table
-      columns={columns}
-      dataSource={dataRole}
-      pagination={false}
-      rowKey={(record) => record.key}
-      showHeader={false}
-      rowClassName={(record) =>
-        record.name === selectedPermissionSub ? 'display-table-row' : 'hide-table-row'
+  const updatePermission = async () => {
+    const payload = {
+      id: roleId,
+      role: form.getFieldValue('role'),
+      count: form.getFieldValue('count'),
+      followJob: followJob,
+      farmerInfo: farmerInfo,
+      dronerInfo: dronerInfo,
+      guru: guru,
+      promotion: promotion,
+      pointResult: pointResult,
+      reward: reward,
+      mission: mission,
+      challenge: challenge,
+      admin: admin,
+      settings: settings,
+      point: point,
+    }
+    console.log(payload)
+    await RoleManage.updateRole(payload).then((res) => {
+      if (res) {
+        Swal.fire({
+          title: 'บันทึกสำเร็จ',
+          icon: 'success',
+          timer: 1500,
+          showConfirmButton: false,
+        }).then(() => {
+          // navigate('/IndexPermission')
+        })
       }
-    />
-  )
-  const subMenu = (dataRole: any) => {
-    const hasSubTrue = dataRole.some((role: any) => role.sub === true)
+    })
+  }
+  const handleCheckboxChange = (checked: boolean, propertyName: string, row: any) => {
+    row.value.forEach((item: any) => {
+      if (propertyName in item) {
+        item[propertyName].value = checked
+      }
+    })
 
+    const stateSetterMap: { [key: string]: (value: any) => void } = {
+      ติดตามงาน: setFollowJob,
+      ข้อมูลเกษตรกร: setFarmerInfo,
+      ข้อมูลนักบินโดรน: setDronerInfo,
+      'ข่าวสาร / กูรูเกษตร': setGuru,
+      โปรโมชั่น: setPromotion,
+      แต้มสะสม: setPointResult,
+      ของรางวัล: setReward,
+      ภารกิจ: setMission,
+      ชาเลนจ์: setChallenge,
+      ผู้ดูแลระบบ: setAdmin,
+      ตั้งค่า: setSettings,
+      แต้ม: setPoint,
+    }
+
+    const stateSetter = stateSetterMap[row.name]
+    if (stateSetter) {
+      stateSetter(row.value)
+    }
+  }
+
+  const handleCheckboxChangeSub = (checked: boolean, propertyName: string, row: any) => {
+    const updatedRow = { ...row };
+    updatedRow[propertyName].value = checked;
+    console.log(updatedRow);
+    console.log(followJob)
+  }
+  const handleCheckboxChangeSubInSub = (checked: boolean, propertyName: string, row: any) => {}
+  const expandedRowRenderSub = (record: listMenu) => {
+    const subItemData = record.subItem.map((subItem, index) => ({
+      key: `${index}`,
+      name: subItem.name,
+      add: subItem.add,
+      edit: subItem.edit,
+      view: subItem.view,
+      delete: subItem.delete,
+      cancel: subItem.cancel,
+      excel: subItem.excel,
+    }))
+
+    const columns = [
+      {
+        title: 'ชื่อเมนู',
+        dataIndex: 'name',
+        key: 'name',
+        width: '21%',
+        render: (value: any, row: any, index: number) => {
+          return {
+            children: <span>{value}</span>,
+          }
+        },
+      },
+      {
+        title: 'ดูข้อมูล (View)',
+        dataIndex: 'view',
+        key: 'view',
+        width: '11%',
+        render: (value: any, row: any, index: number) => {
+          const isDisabled = row.view?.disabled ?? false
+          const isValue = row.view?.value ?? false
+          return {
+            children: (
+              <>
+                <Checkbox
+                  disabled={isDisabled}
+                  defaultChecked={isValue}
+                  onChange={(e) => handleCheckboxChangeSubInSub(e.target.checked, 'view', row)}
+                />
+              </>
+            ),
+          }
+        },
+      },
+      {
+        title: 'เพิ่ม (Add)',
+        dataIndex: 'add',
+        key: 'add',
+        width: '11%',
+        render: (value: any, row: any, index: number) => {
+          const isDisabled = row.add?.disabled ?? false
+          const isValue = row.add?.value ?? false
+          return {
+            children: (
+              <>
+                <Checkbox
+                  disabled={isDisabled}
+                  defaultChecked={isValue}
+                  onChange={(e) => handleCheckboxChangeSubInSub(e.target.checked, 'add', row)}
+                />
+              </>
+            ),
+          }
+        },
+      },
+      {
+        title: 'แก้ไข (Edit)',
+        dataIndex: 'edit',
+        key: 'edit',
+        width: '11%',
+        render: (value: any, row: any, index: number) => {
+          const isDisabled = row.edit?.disabled ?? false
+          const isValue = row.edit?.value ?? false
+          return {
+            children: (
+              <>
+                <Checkbox
+                  disabled={isDisabled}
+                  defaultChecked={isValue}
+                  onChange={(e) => handleCheckboxChangeSubInSub(e.target.checked, 'edit', row)}
+                />
+              </>
+            ),
+          }
+        },
+      },
+      {
+        title: 'ลบ (Delete)',
+        dataIndex: 'delete',
+        key: 'delete',
+        width: '11%',
+        render: (value: any, row: any, index: number) => {
+          const isDisabled = row.delete?.disabled ?? false
+          const isValue = row.delete?.value ?? false
+          return {
+            children: (
+              <>
+                <Checkbox
+                  disabled={isDisabled}
+                  defaultChecked={isValue}
+                  onChange={(e) => handleCheckboxChangeSubInSub(e.target.checked, 'delete', row)}
+                />
+              </>
+            ),
+          }
+        },
+      },
+      {
+        title: 'ยกเลิก (cancel)',
+        dataIndex: 'cancel',
+        key: 'cancel',
+        width: '13%',
+        render: (value: any, row: any, index: number) => {
+          const isDisabled = row.cancel?.disabled ?? false
+          const isValue = row.cancel?.value ?? false
+          return {
+            children: (
+              <>
+                <Checkbox
+                  disabled={isDisabled}
+                  defaultChecked={isValue}
+                  onChange={(e) => handleCheckboxChangeSubInSub(e.target.checked, 'cancel', row)}
+                />
+              </>
+            ),
+          }
+        },
+      },
+      {
+        title: 'บันทึกไฟล์ (Export File)',
+        dataIndex: 'excel',
+        key: 'excel',
+        width: '18%',
+        render: (value: any, row: any, index: number) => {
+          const isDisabled = row.excel?.disabled ?? false
+          const isValue = row.excel?.value ?? false
+          return {
+            children: (
+              <>
+                <Checkbox
+                  disabled={isDisabled}
+                  defaultChecked={isValue}
+                  onChange={(e) => handleCheckboxChangeSubInSub(e.target.checked, 'excel', row)}
+                />
+              </>
+            ),
+          }
+        },
+      },
+    ]
     return (
       <Table
+        showHeader={false}
+        columns={columns}
+        dataSource={subItemData}
+        pagination={false}
+        rowKey={(record) => record.key}
+      />
+    )
+  }
+  const expandedRowRender = (dataRole: any[]) => {
+    const hasSubTrue = dataRole.some((role: any) => role.sub === true)
+    const columns = [
+      {
+        title: 'ชื่อเมนู',
+        dataIndex: 'name',
+        key: 'name',
+        width: '21%',
+        render: (value: any, row: any, index: number) => {
+          return {
+            children: <span>{value}</span>,
+          }
+        },
+      },
+      {
+        title: 'ดูข้อมูล (View)',
+        dataIndex: 'view',
+        key: 'view',
+        width: '11%',
+        render: (value: any, row: any, index: number) => {
+          const isDisabled = row.view?.disabled ?? false
+          const isValue = row.view?.value ?? false
+          return {
+            children: (
+              <>
+                <Checkbox
+                  disabled={isDisabled}
+                  defaultChecked={isValue}
+                  onChange={(e) => handleCheckboxChangeSub(e.target.checked, 'view', row)}
+                />
+              </>
+            ),
+          }
+        },
+      },
+      {
+        title: 'เพิ่ม (Add)',
+        dataIndex: 'add',
+        key: 'add',
+        width: '11%',
+        render: (value: any, row: any, index: number) => {
+          const isDisabled = row.add?.disabled ?? false
+          const isValue = row.add?.value ?? false
+          return {
+            children: (
+              <>
+                <Checkbox
+                  disabled={isDisabled}
+                  defaultChecked={isValue}
+                  onChange={(e) => handleCheckboxChangeSub(e.target.checked, 'add', row)}
+                />
+              </>
+            ),
+          }
+        },
+      },
+      {
+        title: 'แก้ไข (Edit)',
+        dataIndex: 'edit',
+        key: 'edit',
+        width: '11%',
+        render: (value: any, row: any, index: number) => {
+          const isDisabled = row.edit?.disabled ?? false
+          const isValue = row.edit?.value ?? false
+          return {
+            children: (
+              <>
+                <Checkbox
+                  disabled={isDisabled}
+                  defaultChecked={isValue}
+                  onChange={(e) => handleCheckboxChangeSub(e.target.checked, 'edit', row)}
+                />
+              </>
+            ),
+          }
+        },
+      },
+      {
+        title: 'ลบ (Delete)',
+        dataIndex: 'delete',
+        key: 'delete',
+        width: '11%',
+        render: (value: any, row: any, index: number) => {
+          const isDisabled = row.delete?.disabled ?? false
+          const isValue = row.delete?.value ?? false
+          return {
+            children: (
+              <>
+                <Checkbox
+                  disabled={isDisabled}
+                  defaultChecked={isValue}
+                  onChange={(e) => handleCheckboxChangeSub(e.target.checked, 'delete', row)}
+                />
+              </>
+            ),
+          }
+        },
+      },
+      {
+        title: 'ยกเลิก (cancel)',
+        dataIndex: 'cancel',
+        key: 'cancel',
+        width: '13%',
+        render: (value: any, row: any, index: number) => {
+          const isDisabled = row.cancel?.disabled ?? false
+          const isValue = row.cancel?.value ?? false
+          return {
+            children: (
+              <>
+                <Checkbox
+                  disabled={isDisabled}
+                  defaultChecked={isValue}
+                  onChange={(e) => handleCheckboxChangeSub(e.target.checked, 'cancel', row)}
+                />
+              </>
+            ),
+          }
+        },
+      },
+      {
+        title: 'บันทึกไฟล์ (Export File)',
+        dataIndex: 'excel',
+        key: 'excel',
+        width: '18%',
+        render: (value: any, row: any, index: number) => {
+          const isDisabled = row.excel?.disabled ?? false
+          const isValue = row.excel?.value ?? false
+          return {
+            children: (
+              <>
+                <Checkbox
+                  disabled={isDisabled}
+                  defaultChecked={isValue}
+                  onChange={(e) => handleCheckboxChangeSub(e.target.checked, 'excel', row)}
+                />
+              </>
+            ),
+          }
+        },
+      },
+    ]
+    return (
+      <Table
+        showHeader={false}
         columns={columns}
         dataSource={dataRole}
         pagination={false}
         rowKey={(record) => record.key}
-        showHeader={false}
         expandable={
           hasSubTrue
             ? {
-                expandedRowRender: (record) => {
-                  return <>{subInSubMenu(record['subItem'])}</>
-                },
-                defaultExpandedRowKeys: [selectedPermission],
-                onExpand: (expanded, record) => {
-                  if (expanded) {
-                    handleRowSubClick(record)
-                  } else {
-                    setSelectedPermission(null)
-                  }
-                },
+                expandedRowRender: (record) => expandedRowRenderSub(record),
               }
             : undefined
-        }
-        rowClassName={(record) =>
-          record.name === selectedPermissionSub ? 'display-table-row' : 'hide-table-row'
         }
       />
     )
@@ -424,26 +706,11 @@ function EditPermission() {
               ตั้งค่า: settings,
               แต้ม: point,
             }[record.key]
-            return <>{subMenu(dataRole)}</>
-          },
-          defaultExpandedRowKeys: [selectedPermission],
-          onExpand: (expanded, record) => {
-            if (expanded) {
-              handleRowSubClick(record)
-            } else {
-              setSelectedPermission(null)
-            }
+            return <>{expandedRowRender(dataRole)}</>
           },
         }}
         dataSource={listMenu}
         pagination={false}
-        rowKey={(record) => record.key}
-        onRow={(record) => ({
-          onClick: () => handleRowClick(record),
-        })}
-        rowClassName={(record) =>
-          record.name === selectedPermission ? 'highlighted-row' : 'normal-row'
-        }
       />
 
       <FooterPage
