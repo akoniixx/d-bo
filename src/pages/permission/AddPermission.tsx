@@ -10,12 +10,14 @@ import '../permission/styles.css'
 function AddPermission() {
   const navigate = useNavigate()
   const [selectedPermission, setSelectedPermission] = useState<number | null>(null)
+  const [role, setRole] = useState<any>()
+  const [checkedItems, setCheckedItems] = useState({});
 
   const handleRowClick = (record: any) => {
     setSelectedPermission(record.key)
   }
   const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    console.log(e.target.value)
+    setRole(e.target.value)
   }
   const menuName = [
     'ติดตามงาน',
@@ -65,14 +67,30 @@ function AddPermission() {
   )
 
   const insertPermission = () => {
-    Swal.fire({
-      title: 'บันทึกสำเร็จ',
-      icon: 'success',
-      timer: 1500,
-      showConfirmButton: false,
-    }).then(() => {
-      navigate('/IndexPermission')
-    })
+    const payload = {
+      role: role,
+      followJob: [],
+      farmerInfo: [],
+      dronerInfo: [],
+      guru: [],
+      promotion: [],
+      pointResult: [],
+      mission: [],
+      challenge: [],
+      admin: [],
+      settings: [],
+      point: [],
+      reward: [],
+    }
+    console.log(payload)
+    // Swal.fire({
+    //   title: 'บันทึกสำเร็จ',
+    //   icon: 'success',
+    //   timer: 1500,
+    //   showConfirmButton: false,
+    // }).then(() => {
+    //   navigate('/IndexPermission')
+    // })
   }
   const columns = [
     {
@@ -192,277 +210,7 @@ function AddPermission() {
       },
     },
   ]
-  const columnSub = [
-    {
-      title: 'ชื่อเมนู',
-      dataIndex: 'name',
-      key: 'name',
-      width: '21%',
-      render: (value: any, row: any, index: number) => {
-        return {
-          children: <span>{value}</span>,
-        }
-      },
-    },
-    {
-      title: 'ดูข้อมูล (View)',
-      dataIndex: 'add',
-      key: 'add',
-      width: '11%',
-      render: (value: any, row: any, index: number) => {
-        const isDisable = ['อันดับเกษตรกร', 'กูรูเกษตร', 'โปรโมชั่น'].includes(row.name)
-        return {
-          children: (
-            <>
-              <Checkbox disabled={isDisable} />
-            </>
-          ),
-        }
-      },
-    },
-    {
-      title: 'เพิ่ม (Add)',
-      dataIndex: 'add',
-      key: 'add',
-      width: '11%',
-      render: (value: any, row: any, index: number) => {
-        const isDisable = [
-          'งานรอดำเนินงาน',
-          'งานในวันนี้',
-          'งานที่เสร็จแล้ว',
-          'งานที่เสร็จแล้ว (บัญชี)',
-          'แก้ไขงาน/ดูประวัติงาน',
-          'อันดับเกษตรกร',
-          'อันดับนักบินโดรน',
-          'กูรูเกษตร',
-          'โปรโมชั่น',
-          'แลกแต้ม/ของรางวัล',
-          'รายงานแต้ม',
-          'ราคา',
-          'แต้ม',
-        ].includes(row.name)
-        return {
-          children: (
-            <>
-              <Checkbox disabled={isDisable} />
-            </>
-          ),
-        }
-      },
-    },
-    {
-      title: 'แก้ไข (Edit)',
-      dataIndex: 'edit',
-      key: 'edit',
-      width: '11%',
-      render: (value: any, row: any, index: number) => {
-        const isDisable = ['อันดับเกษตรกร', 'อันดับนักบินโดรน', 'กูรูเกษตร', 'โปรโมชั่น'].includes(
-          row.name,
-        )
-        return {
-          children: (
-            <>
-              <Checkbox disabled={isDisable} />
-            </>
-          ),
-        }
-      },
-    },
-    {
-      title: 'ลบ (Delete)',
-      dataIndex: 'delete',
-      key: 'delete',
-      width: '11%',
-      render: (value: any, row: any, index: number) => {
-        const isDisable = [
-          'งานใหม่ (รอนักบิน)',
-          'งานรอดำเนินงาน',
-          'งานในวันนี้',
-          'งานที่เสร็จแล้ว',
-          'งานที่เสร็จแล้ว (บัญชี)',
-          'แก้ไขงาน/ดูประวัติงาน',
-          'อันดับเกษตรกร',
-          'อันดับนักบินโดรน',
-          'กูรูเกษตร',
-          'โปรโมชั่น',
-          'รายงานแต้ม',
-          'แลกแต้ม/ของรางวัล',
-          'รายชื่อพืช',
-          'ราคา',
-        ].includes(row.name)
-        return {
-          children: (
-            <>
-              <Checkbox disabled={isDisable} />
-            </>
-          ),
-        }
-      },
-    },
-    {
-      title: 'ยกเลิก (cancel)',
-      dataIndex: 'cancel',
-      key: 'cancel',
-      width: '13%',
-      render: (value: any, row: any, index: number) => {
-        const isDisable = [
-          'งานรอดำเนินงาน',
-          'งานในวันนี้',
-          'งานที่เสร็จแล้ว',
-          'งานที่เสร็จแล้ว (บัญชี)',
-          'รายชื่อเกษตรกร',
-          'รายการแปลงเกษตร',
-          'อันดับเกษตรกร',
-          'รายชื่อนักบินโดรน',
-          'รายการโดรนเกษตร',
-          'อันดับนักบินโดรน',
-          'ข่าวสาร',
-          'กูรูเกษตร',
-          'โปรโมชั่น',
-          'คูปอง',
-          'รายงานแต้ม',
-          'รายชื่อผู้ดูแลระบบ',
-          'บทบาทผู้ดูแล',
-          'ยี่ห้อโดรน',
-          'รายชื่อพืช',
-          'เป้าหมาย',
-          'ราคา',
-        ].includes(row.name)
-        return {
-          children: (
-            <>
-              <Checkbox disabled={isDisable} />
-            </>
-          ),
-        }
-      },
-    },
-    {
-      title: 'บันทึกไฟล์ (Export File)',
-      dataIndex: 'export',
-      key: 'export',
-      width: '18%',
-      render: (value: any, row: any, index: number) => {
-        const isDisable = ['งานที่เสร็จแล้ว (บัญชี)'].includes(row.name)
-        return {
-          children: (
-            <>
-              <Checkbox disabled={!isDisable} />
-            </>
-          ),
-        }
-      },
-    },
-  ]
-  const columnSubInSub = [
-    {
-      title: 'ชื่อเมนู',
-      dataIndex: 'name',
-      key: 'name',
-      width: '21%',
-      render: (value: any, row: any, index: number) => {
-        return {
-          children: <span>{value}</span>,
-        }
-      },
-    },
-    {
-      title: 'ดูข้อมูล (View)',
-      dataIndex: 'add',
-      key: 'add',
-      width: '11%',
-      render: (value: any, row: any, index: number) => {
-        return {
-          children: (
-            <>
-              <Checkbox />
-            </>
-          ),
-        }
-      },
-    },
-    {
-      title: 'เพิ่ม (Add)',
-      dataIndex: 'add',
-      key: 'add',
-      width: '11%',
-      render: (value: any, row: any, index: number) => {
-        const isDisable = ['รอรับแต้ม', 'ได้รับแต้ม', 'นักบินโดรน', 'เกษตรกร'].includes(row.name)
-        return {
-          children: (
-            <>
-              <Checkbox disabled={isDisable} />
-            </>
-          ),
-        }
-      },
-    },
-    {
-      title: 'แก้ไข (Edit)',
-      dataIndex: 'edit',
-      key: 'edit',
-      width: '11%',
-      render: (value: any, row: any, index: number) => {
-        const isDisable = ['รอรับแต้ม', 'ได้รับแต้ม'].includes(row.name)
-        return {
-          children: (
-            <>
-              <Checkbox disabled={isDisable} />
-            </>
-          ),
-        }
-      },
-    },
-    {
-      title: 'ลบ (Delete)',
-      dataIndex: 'delete',
-      key: 'delete',
-      width: '11%',
-      render: (value: any, row: any, index: number) => {
-        const isDisable = ['รอรับแต้ม', 'ได้รับแต้ม', 'นักบินโดรน', 'เกษตรกร'].includes(row.name)
-        return {
-          children: (
-            <>
-              <Checkbox disabled={isDisable} />
-            </>
-          ),
-        }
-      },
-    },
-    {
-      title: 'ยกเลิก (cancel)',
-      dataIndex: 'cancel',
-      key: 'cancel',
-      width: '13%',
-      render: (value: any, row: any, index: number) => {
-        const isDisable = ['รอรับแต้ม', 'ได้รับแต้ม', 'นักบินโดรน', 'เกษตรกร'].includes(row.name)
 
-        return {
-          children: (
-            <>
-              <Checkbox disabled={isDisable} />
-            </>
-          ),
-        }
-      },
-    },
-    {
-      title: 'บันทึกไฟล์ (Export File)',
-      dataIndex: 'export',
-      key: 'export',
-      width: '18%',
-      render: (value: any, row: any, index: number) => {
-        const isDisable = ['รอรับแต้ม', 'ได้รับแต้ม', 'นักบินโดรน', 'เกษตรกร'].includes(row.name)
-        return {
-          children: (
-            <>
-              <Checkbox disabled={!isDisable} />
-            </>
-          ),
-        }
-      },
-    },
-  ]
   const dataTacking = [
     {
       key: 0,
@@ -539,7 +287,7 @@ function AddPermission() {
       name: 'รายงานแต้ม',
       children: [
         {
-          key: 0,
+          key: 'รอรับแต้ม',
           name: 'รอรับแต้ม',
         },
         {
@@ -553,11 +301,11 @@ function AddPermission() {
       name: 'แลกแต้ม/ของรางวัล',
       children: [
         {
-          key: 0,
+          key: 'นักบินโดรน',
           name: 'นักบินโดรน',
         },
         {
-          key: 1,
+          key: 'เกษตรกร',
           name: 'เกษตรกร',
         },
       ],
@@ -631,7 +379,306 @@ function AddPermission() {
       name: 'เกษตรกร',
     },
   ]
+  const expandedRowRenderSub = (record: any) => {
+    console.log(record)
 
+    const columnSubInSub = [
+      {
+        title: 'ชื่อเมนู',
+        dataIndex: 'name',
+        key: 'name',
+        width: '21%',
+        render: (value: any, row: any, index: number) => {
+          return {
+            children: <span>{value}</span>,
+          }
+        },
+      },
+      {
+        title: 'ดูข้อมูล (View)',
+        dataIndex: 'add',
+        key: 'add',
+        width: '11%',
+        render: (value: any, row: any, index: number) => {
+          return {
+            children: (
+              <>
+                <Checkbox />
+              </>
+            ),
+          }
+        },
+      },
+      {
+        title: 'เพิ่ม (Add)',
+        dataIndex: 'add',
+        key: 'add',
+        width: '11%',
+        render: (value: any, row: any, index: number) => {
+          const isDisable = ['รอรับแต้ม', 'ได้รับแต้ม', 'นักบินโดรน', 'เกษตรกร'].includes(row.name)
+          return {
+            children: (
+              <>
+                <Checkbox disabled={isDisable} />
+              </>
+            ),
+          }
+        },
+      },
+      {
+        title: 'แก้ไข (Edit)',
+        dataIndex: 'edit',
+        key: 'edit',
+        width: '11%',
+        render: (value: any, row: any, index: number) => {
+          const isDisable = ['รอรับแต้ม', 'ได้รับแต้ม'].includes(row.name)
+          return {
+            children: (
+              <>
+                <Checkbox disabled={isDisable} />
+              </>
+            ),
+          }
+        },
+      },
+      {
+        title: 'ลบ (Delete)',
+        dataIndex: 'delete',
+        key: 'delete',
+        width: '11%',
+        render: (value: any, row: any, index: number) => {
+          const isDisable = ['รอรับแต้ม', 'ได้รับแต้ม', 'นักบินโดรน', 'เกษตรกร'].includes(row.name)
+          return {
+            children: (
+              <>
+                <Checkbox disabled={isDisable} />
+              </>
+            ),
+          }
+        },
+      },
+      {
+        title: 'ยกเลิก (cancel)',
+        dataIndex: 'cancel',
+        key: 'cancel',
+        width: '13%',
+        render: (value: any, row: any, index: number) => {
+          const isDisable = ['รอรับแต้ม', 'ได้รับแต้ม', 'นักบินโดรน', 'เกษตรกร'].includes(row.name)
+
+          return {
+            children: (
+              <>
+                <Checkbox disabled={isDisable} />
+              </>
+            ),
+          }
+        },
+      },
+      {
+        title: 'บันทึกไฟล์ (Export File)',
+        dataIndex: 'export',
+        key: 'export',
+        width: '18%',
+        render: (value: any, row: any, index: number) => {
+          const isDisable = ['รอรับแต้ม', 'ได้รับแต้ม', 'นักบินโดรน', 'เกษตรกร'].includes(row.name)
+          return {
+            children: (
+              <>
+                <Checkbox disabled={!isDisable} />
+              </>
+            ),
+          }
+        },
+      },
+    ]
+    return (
+      <Table showHeader={false} columns={columnSubInSub} dataSource={record} pagination={false} />
+    )
+  }
+  const expandedRowRender = (data: any) => {
+    const hasSubTrue = data.some((role: any) => role.sub === true)
+    const columnSub = [
+      {
+        title: 'ชื่อเมนู',
+        dataIndex: 'name',
+        key: 'name',
+        width: '21%',
+        render: (value: any, row: any, index: number) => {
+          return {
+            children: <span>{value}</span>,
+          }
+        },
+      },
+      {
+        title: 'ดูข้อมูล (View)',
+        dataIndex: 'add',
+        key: 'add',
+        width: '11%',
+        render: (value: any, row: any, index: number) => {
+          const isDisable = ['อันดับเกษตรกร', 'กูรูเกษตร', 'โปรโมชั่น'].includes(row.name)
+          return {
+            children: (
+              <>
+                <Checkbox disabled={isDisable} />
+              </>
+            ),
+          }
+        },
+      },
+      {
+        title: 'เพิ่ม (Add)',
+        dataIndex: 'add',
+        key: 'add',
+        width: '11%',
+        render: (value: any, row: any, index: number) => {
+          const isDisable = [
+            'งานรอดำเนินงาน',
+            'งานในวันนี้',
+            'งานที่เสร็จแล้ว',
+            'งานที่เสร็จแล้ว (บัญชี)',
+            'แก้ไขงาน/ดูประวัติงาน',
+            'อันดับเกษตรกร',
+            'อันดับนักบินโดรน',
+            'กูรูเกษตร',
+            'โปรโมชั่น',
+            'แลกแต้ม/ของรางวัล',
+            'รายงานแต้ม',
+            'ราคา',
+            'แต้ม',
+          ].includes(row.name)
+          return {
+            children: (
+              <>
+                <Checkbox disabled={isDisable} />
+              </>
+            ),
+          }
+        },
+      },
+      {
+        title: 'แก้ไข (Edit)',
+        dataIndex: 'edit',
+        key: 'edit',
+        width: '11%',
+        render: (value: any, row: any, index: number) => {
+          const isDisable = [
+            'อันดับเกษตรกร',
+            'อันดับนักบินโดรน',
+            'กูรูเกษตร',
+            'โปรโมชั่น',
+          ].includes(row.name)
+          return {
+            children: (
+              <>
+                <Checkbox disabled={isDisable} />
+              </>
+            ),
+          }
+        },
+      },
+      {
+        title: 'ลบ (Delete)',
+        dataIndex: 'delete',
+        key: 'delete',
+        width: '11%',
+        render: (value: any, row: any, index: number) => {
+          const isDisable = [
+            'งานใหม่ (รอนักบิน)',
+            'งานรอดำเนินงาน',
+            'งานในวันนี้',
+            'งานที่เสร็จแล้ว',
+            'งานที่เสร็จแล้ว (บัญชี)',
+            'แก้ไขงาน/ดูประวัติงาน',
+            'อันดับเกษตรกร',
+            'อันดับนักบินโดรน',
+            'กูรูเกษตร',
+            'โปรโมชั่น',
+            'รายงานแต้ม',
+            'แลกแต้ม/ของรางวัล',
+            'รายชื่อพืช',
+            'ราคา',
+          ].includes(row.name)
+          return {
+            children: (
+              <>
+                <Checkbox disabled={isDisable} />
+              </>
+            ),
+          }
+        },
+      },
+      {
+        title: 'ยกเลิก (cancel)',
+        dataIndex: 'cancel',
+        key: 'cancel',
+        width: '13%',
+        render: (value: any, row: any, index: number) => {
+          const isDisable = [
+            'งานรอดำเนินงาน',
+            'งานในวันนี้',
+            'งานที่เสร็จแล้ว',
+            'งานที่เสร็จแล้ว (บัญชี)',
+            'รายชื่อเกษตรกร',
+            'รายการแปลงเกษตร',
+            'อันดับเกษตรกร',
+            'รายชื่อนักบินโดรน',
+            'รายการโดรนเกษตร',
+            'อันดับนักบินโดรน',
+            'ข่าวสาร',
+            'กูรูเกษตร',
+            'โปรโมชั่น',
+            'คูปอง',
+            'รายงานแต้ม',
+            'รายชื่อผู้ดูแลระบบ',
+            'บทบาทผู้ดูแล',
+            'ยี่ห้อโดรน',
+            'รายชื่อพืช',
+            'เป้าหมาย',
+            'ราคา',
+          ].includes(row.name)
+          return {
+            children: (
+              <>
+                <Checkbox disabled={isDisable} />
+              </>
+            ),
+          }
+        },
+      },
+      {
+        title: 'บันทึกไฟล์ (Export File)',
+        dataIndex: 'export',
+        key: 'export',
+        width: '18%',
+        render: (value: any, row: any, index: number) => {
+          const isDisable = ['งานที่เสร็จแล้ว (บัญชี)'].includes(row.name)
+          return {
+            children: (
+              <>
+                <Checkbox disabled={!isDisable} />
+              </>
+            ),
+          }
+        },
+      },
+    ]
+    return (
+      <Table
+        showHeader={false}
+        columns={columnSub}
+        dataSource={data}
+        pagination={false}
+        rowKey={(record) => record.key}
+        expandable={
+          hasSubTrue
+            ? {
+                expandedRowRender: (record) => expandedRowRenderSub(record),
+              }
+            : undefined
+        }
+      />
+    )
+  }
   return (
     <>
       <Row>
@@ -687,18 +734,7 @@ function AddPermission() {
               default:
                 break
             }
-
-            return (
-              <Table
-                columns={columnSub}
-                dataSource={data}
-                pagination={false}
-                showHeader={false}
-                rowClassName={(record) =>
-                  record.key === selectedPermission ? 'display-table-row' : 'hide-table-row'
-                }
-              />
-            )
+            return <>{expandedRowRender(data)}</>
           },
           defaultExpandedRowKeys: [
             selectedPermission !== null ? selectedPermission.toString() : '0',
