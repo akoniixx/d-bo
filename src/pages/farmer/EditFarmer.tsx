@@ -482,34 +482,40 @@ const EditFarmer = () => {
       birthDate: birthDay,
     }
     delete payload.farmerPlot
-    console.log(payload)
-    await FarmerDatasource.updateFarmer(payload).then((res) => {
-      if (res !== undefined) {
-        let i = 0
-        for (i; 2 > i; i++) {
-          i === 0 &&
-            createImgProfile.file !== '' &&
-            UploadImageDatasouce.uploadImage(createImgProfile).then(res)
-          i === 1 &&
-            createImgIdCard.file !== '' &&
-            UploadImageDatasouce.uploadImage(createImgIdCard).then(res)
+    try {
+      setBtnSaveDisable(true)
+      await FarmerDatasource.updateFarmer(payload).then((res) => {
+        if (res !== undefined) {
+          let i = 0
+          for (i; 2 > i; i++) {
+            i === 0 &&
+              createImgProfile.file !== '' &&
+              UploadImageDatasouce.uploadImage(createImgProfile).then(res)
+            i === 1 &&
+              createImgIdCard.file !== '' &&
+              UploadImageDatasouce.uploadImage(createImgIdCard).then(res)
+          }
+          Swal.fire({
+            title: 'บันทึกสำเร็จ',
+            icon: 'success',
+            timer: 1500,
+            showConfirmButton: false,
+          }).then(() => {
+            navigate('/IndexFarmer')
+          })
+        } else {
+          Swal.fire({
+            title: 'เบอร์โทร หรือ รหัสบัตรประชาชน <br/> ซ้ำในระบบ',
+            icon: 'error',
+            showConfirmButton: true,
+          })
         }
-        Swal.fire({
-          title: 'บันทึกสำเร็จ',
-          icon: 'success',
-          timer: 1500,
-          showConfirmButton: false,
-        }).then(() => {
-          navigate('/IndexFarmer')
-        })
-      } else {
-        Swal.fire({
-          title: 'เบอร์โทร หรือ รหัสบัตรประชาชน <br/> ซ้ำในระบบ',
-          icon: 'error',
-          showConfirmButton: true,
-        })
-      }
-    })
+      })
+      setBtnSaveDisable(false)
+    } catch (error) {
+      setBtnSaveDisable(false)
+      console.error('Error inserting farmer data:', error)
+    }
   }
   const renderFromData = (
     <div className='col-lg-7'>
