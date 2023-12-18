@@ -86,6 +86,7 @@ export interface RedeemDronerEntity {
   dronerId: string
   campaignName: string
   campaignId: string
+  conditionUpdate: any
   allValue: number
   amountValue: number
   beforeValue: number

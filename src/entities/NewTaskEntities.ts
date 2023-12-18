@@ -307,6 +307,7 @@ export interface TaskManageEntity {
     farmerPlot: {
       plotName?: string
       raiAmount?: string
+      plantName?: string
     }
     fee: number
     id: string
@@ -325,6 +326,12 @@ export interface TaskManageEntity {
     unitPrice: number
     usePoint: string
   }
+  imageTask: [
+    {
+      id: string
+      pathFinishTask: string
+    },
+  ]
   taskEstimatePoint: {
     application: string
     campaignId: string
@@ -342,46 +349,53 @@ export interface TaskManageEntity {
 }
 export const TaskManageEntity_INIT: TaskManageEntity = {
   data: {
-    dateAppointment: "",
-    discountCampaignPoint: "",
-    discountCoupon: "",
-    discountFee: "",
-    comment: "",
-    imagePathFinishTask: "",
-    imagePathDrug: "",
+    dateAppointment: '',
+    discountCampaignPoint: '',
+    discountCoupon: '',
+    discountFee: '',
+    comment: '',
+    imagePathFinishTask: '',
+    imagePathDrug: '',
     droner: {
-      firstname: "",
-      lastname: "",
-      telephoneNo: "",
+      firstname: '',
+      lastname: '',
+      telephoneNo: '',
     },
-    dronerId: "",
+    dronerId: '',
     farmAreaAmount: 0,
     farmer: {
-      firstname: "",
-      lastname: "",
-      telephoneNo: "",
+      firstname: '',
+      lastname: '',
+      telephoneNo: '',
     },
-    farmerId: "",
+    farmerId: '',
     farmerPlot: {
-      plotName: "",
-      raiAmount: "",
+      plotName: '',
+      raiAmount: '',
+      plantName: '',
     },
     fee: 0,
-    id: "",
-    preparationBy: "",
-    price: "",
+    id: '',
+    preparationBy: '',
+    price: '',
     purposeSpray: {
       crop: {
-        cropName: "",
+        cropName: '',
       },
-      purposeSprayName: "",
+      purposeSprayName: '',
     },
-    status: "",
-    targetSpray: [""],
+    status: '',
+    targetSpray: [''],
     taskHistory: [],
     totalPrice: 0,
     unitPrice: 0,
-    usePoint: "",
+    usePoint: '',
   },
-  taskEstimatePoint: []
+  imageTask: [
+    {
+      id: '',
+      pathFinishTask: '',
+    },
+  ],
+  taskEstimatePoint: [],
 }

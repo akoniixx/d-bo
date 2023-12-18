@@ -75,13 +75,6 @@ function CancelTask() {
     fetchDetailTask()
   }, [])
 
-  const formatCurrency = (e: any) => {
-    e = parseFloat(e)
-    return e.toFixed(2).replace(/./g, function (c: any, i: any, a: any) {
-      return i > 0 && c !== '.' && (a.length - i) % 3 === 0 ? ',' + c : c
-    })
-  }
-
   const renderAppointment = (
     <Form style={{ padding: '32px' }}>
       <div className='row'>

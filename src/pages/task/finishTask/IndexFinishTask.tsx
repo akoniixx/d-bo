@@ -807,9 +807,9 @@ export default function IndexFinishTask() {
             <>
               <span style={{ color: STATUS_COLOR_TASK[row.status] }}>
                 <Badge color={STATUS_COLOR_TASK[row.status]} /> {FINISH_TASK[row.status]}
-                {beforeValue != undefined
-                  ? row.status == 'CANCELED'
-                    ? ' ' + '(' + TASK_HISTORY[beforeValue.beforeValue] + ')'
+                {beforeValue
+                  ? row.status === 'CANCELED'
+                    ? ' ' + '(' + TASK_HISTORY[beforeValue?.beforeValue] + ')'
                     : null
                   : null}
                 <br />

@@ -5,3 +5,53 @@
 .ant-radio-disabled + span {
   color: #2b2b2b;
 }
+
+.checkbox-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  grid-gap: 10px;
+}
+
+.checkbox-item {
+  display: flex;
+  align-items: center;
+}
+
+.containerConfirm {
+  display: flex;
+}
+
+.left-column {
+  flex: 2;
+  display: flex;
+  flex-direction: column;
+}
+
+.right-column {
+  flex: 1;
+}
+
+.div1,
+.div2,
+.div3 {
+  margin: 4px;
+}
+
+.div1,
+.div2 {
+  margin-bottom: 10px;
+}
+.pagination-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.left-content {
+  flex-grow: 1;
+  text-align: left;
+}
+
+.right-content {
+  text-align: right;
+}

@@ -21,10 +21,10 @@ export interface summaryHightLight {
   inactive: string
 }
 export const summaryHightLight_INIT: summaryHightLight = {
-  active: "",
-  pending: "",
-  drafting: "",
-  inactive: "",
+  active: '',
+  pending: '',
+  drafting: '',
+  inactive: '',
 }
 export interface AllHighlightEntities {
   data: HighlightEntities[]

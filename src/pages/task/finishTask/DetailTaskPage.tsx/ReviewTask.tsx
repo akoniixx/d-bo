@@ -71,14 +71,9 @@ function ReviewTask() {
             })
           })
         }
-        if (res.data.imagePathFinishTask) {
-          UploadImageDatasouce.getImage(res.data.imagePathFinishTask).then((resImg) => {
-            setImgControl(resImg.url)
-          })
-        }
         if (res.data.imagePathDrug) {
           UploadImageDatasouce.getImage(res.data.imagePathDrug).then((resImg) => {
-            setImgDrug(resImg.url)
+            setImgDrug([resImg.url])
           })
         }
         setData(res)
@@ -95,16 +90,17 @@ function ReviewTask() {
   useEffect(() => {
     fetchDetailTask()
   }, [])
+
   const onChangeCanReview = (e: any) => {
     const m = Map(detailDroner).set('canReview', e.target.value)
     const n = Map(m.toJS()).set('taskId', taskId)
     setDetailDroner(n.toJS())
     if (e.target.value === 'Yes') {
-      setBtnSaveDisable(true)
       setSaveRate(false)
+      setBtnSaveDisable(true)
     } else {
-      setBtnSaveDisable(false)
       setSaveRate(true)
+      setBtnSaveDisable(false)
     }
   }
 
@@ -112,38 +108,38 @@ function ReviewTask() {
     const m = Map(detailDroner).set('pilotEtiquette', parseInt(e))
     const n = Map(m.toJS()).set('taskId', taskId)
     setDetailDroner(n.toJS())
-    setBtnSaveDisable(false)
+    checkValidateRating(n.toJS())
   }
   const punctuality = (e: any) => {
     const m = Map(detailDroner).set('punctuality', parseInt(e))
     const n = Map(m.toJS()).set('taskId', taskId)
     setDetailDroner(n.toJS())
-    setBtnSaveDisable(false)
+    checkValidateRating(n.toJS())
   }
   const expertise = (e: any) => {
     const m = Map(detailDroner).set('sprayExpertise', parseInt(e))
     const n = Map(m.toJS()).set('taskId', taskId)
     setDetailDroner(n.toJS())
-    {
-      e == 0 ? setBtnSaveDisable(true) : setBtnSaveDisable(false)
+    checkValidateRating(n.toJS())
+  }
+  const checkValidateRating = (data: any) => {
+    if (
+      data?.pilotEtiquette !== undefined &&
+      data?.pilotEtiquette > 0 &&
+      data?.punctuality !== undefined &&
+      data?.punctuality > 0 &&
+      data?.sprayExpertise !== undefined &&
+      data?.sprayExpertise > 0
+    ) {
+      setBtnSaveDisable(false)
+    } else {
+      setBtnSaveDisable(true)
     }
   }
   const commentReview = (e: any) => {
     const m = Map(detailDroner).set('comment', e.target.value)
     const n = Map(m.toJS()).set('taskId', taskId)
     setDetailDroner(n.toJS())
-  }
-  const onPreviewImg = async (e: any) => {
-    let src = e
-    if (!src) {
-      src = await new Promise((resolve) => {
-        const reader = new FileReader()
-      })
-    }
-    const image = new Image()
-    image.src = src
-    const imgWindow = window.open(src)
-    imgWindow?.document.write(image.outerHTML)
   }
 
   const UpdateReviewDroner = async (data: DetailReviewTask) => {
@@ -223,22 +219,15 @@ function ReviewTask() {
           </Form.Item>
           <div className='row'>
             <div className='col-lg'>
-              <label>ภาพหลักฐานการบิน</label>
+              <label>ภาพหลักฐานการบิน</label> ({data.imageTaskUrl.length || 0} รูป)
               <br />
-              <ImagCards
-                imageName={data.data?.imagePathFinishTask ? data.data?.imagePathFinishTask : ''}
-                image={imgControl ? imgControl : image.empty_cover}
-                onClick={() => onPreviewImg(imgControl)}
-              />
+              <ImagCards image={data.imageTaskUrl || image.empty_cover} show={true} />
             </div>
             <div className='col-lg'>
-              <label>ภาพปุ๋ยและยา</label>
+              <label>ภาพปุ๋ยและยา</label>{' '}
+              <span style={{ color: color.Grey }}> ({imgDrug?.length || 0} รูป)</span>
               <br />
-              <ImagCards
-                imageName={data.data?.imagePathDrug ? data.data?.imagePathDrug : ''}
-                image={imgDrug ? imgDrug : image.empty_cover}
-                onClick={() => onPreviewImg(imgDrug)}
-              />
+              <ImagCards image={imgDrug ? imgDrug : image.empty_cover} show={true} />
             </div>
           </div>
 

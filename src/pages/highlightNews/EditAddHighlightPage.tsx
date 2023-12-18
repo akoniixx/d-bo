@@ -359,12 +359,12 @@ function EditAddHighlightPage() {
               </div>
               <div className='form-group col-lg-4'>
                 <label>
-                  แอปพลิเคชั่น <span style={{ color: 'red' }}>*</span>
+                  แอปพลิเคชัน <span style={{ color: 'red' }}>*</span>
                 </label>
                 <Form.Item name='application' className='my-0'>
                   <Select
                     allowClear
-                    placeholder='เลือกแอปพลิเคชั่น'
+                    placeholder='เลือกแอปพลิเคชัน'
                     onChange={(e) => {
                       checkDupDateTime()
                       handleApplication(e)

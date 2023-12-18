@@ -152,7 +152,7 @@ function NewsPage() {
           <div className='col'>
             <Select
               className='col-lg-12 p-1'
-              placeholder='เลือกแอปพลิเคชั่น'
+              placeholder='เลือกแอปพลิเคชัน'
               onChange={onChangeApplication}
               showSearch
               value={application}
@@ -338,11 +338,7 @@ function NewsPage() {
                       row.pin_all === true ? 'หน้าข่าวสารทั้งหมด' : ''
                     }`}
                   >
-                    <Image
-                      preview={false}
-                      src={icon.pin}
-                      style={{ width: '22', height: '22px', paddingRight: 5 }}
-                    />
+                    <img src={icon.pin} style={{ width: '22', height: '22px', paddingRight: 5 }} />
                   </Tooltip>
                 ) : null}
 
@@ -417,7 +413,7 @@ function NewsPage() {
       },
     },
     {
-      title: 'แอปพลิเคชั่น',
+      title: 'แอปพลิเคชัน',
       dataIndex: 'application',
       key: 'application',
       render: (value: any, row: any, index: number) => {

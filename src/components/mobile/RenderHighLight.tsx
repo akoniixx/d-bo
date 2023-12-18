@@ -8,14 +8,10 @@ interface RenderHighLightProps {
   img: string
 }
 
-interface RenderHighLightProps {
-  img: string
-}
-
 const RenderHighLight: React.FC<RenderHighLightProps> = ({ img }) => {
   return (
     <div className='col-4'>
-      <CardHeaderPromotion textHeader='ตัวอย่างในแอปพลิเคชั่น' center={true} />
+      <CardHeaderPromotion textHeader='ตัวอย่างในแอปพลิเคชัน' center={true} />
       <div
         style={{
           width: '100%',

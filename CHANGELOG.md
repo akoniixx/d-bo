@@ -1,5 +1,36 @@
 ## [Version - 0]
 
+## Fix [v0.41.5] 2023-12-14
+
+- fixed mission point date
+
+## Fix [v0.41.4] 2023-12-13
+
+- fixed bug guru & multi image finish task
+
+## Fix [v0.41.3] 2023-12-12
+
+- fixed logic of add / delete images
+
+## improve [v0.41.2] 2023-12-10
+
+- edit image in finish task
+
+## Fix [v0.41.1] 2023-12-1
+
+- fixed date time in edit guru kaset page
+- change fields in list guru page
+- validate review rating
+
+## Feature [v0.41.0] 2023-11-30
+
+- guru kaset (article)
+- group guru kaset
+
+## improve [v0.40.2] 2023-11-29
+
+- enhance layout new task page in step 3
+
 ## Fix [v0.40.1] 2023-11-21
 
 - fixed news highlight

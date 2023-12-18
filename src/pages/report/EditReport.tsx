@@ -80,49 +80,36 @@ function EditReport() {
     lng: LAT_LNG_BANGKOK.lng,
   })
   const fetchDetailTask = async () => {
-    await TaskFinishedDatasource.getDetailFinishTaskById(taskId).then((res) => {
-      if (res.data.couponId !== null) {
-        CouponDataSource.getPromotionCode(res.data.couponId).then((result) =>
-          setCouponData({
-            couponCode: res.data.couponCode ?? '',
-            couponDiscount: !res.data.discountCoupon ? null : parseInt(res.data.discountCoupon),
-            couponName: result.couponName ?? '',
-          }),
-        )
-      }
-      if (res.data.imagePathFinishTask) {
-        UploadImageDatasouce.getImage(res.data.imagePathFinishTask).then((resImg) => {
-          setImgControl(resImg.url)
+    setLoading(true)
+    await TaskFinishedDatasource.getDetailFinishTaskById(taskId)
+      .then((res) => {
+        if (res.data.couponId !== null) {
+          CouponDataSource.getPromotionCode(res.data.couponId).then((result) =>
+            setCouponData({
+              couponCode: res.data.couponCode ?? '',
+              couponDiscount: !res.data.discountCoupon ? null : parseInt(res.data.discountCoupon),
+              couponName: result.couponName ?? '',
+            }),
+          )
+        }
+        if (res.data.imagePathDrug) {
+          UploadImageDatasouce.getImage(res.data.imagePathDrug).then((resImg) => {
+            setImgDrug([resImg.url])
+          })
+        }
+        setHistory(res.data.taskHistory[0])
+        setData(res)
+        setMapPosition({
+          lat: parseFloat(res.data.farmerPlot.lat),
+          lng: parseFloat(res.data.farmerPlot.long),
         })
-      }
-      if (res.data.imagePathDrug) {
-        UploadImageDatasouce.getImage(res.data.imagePathDrug).then((resImg) => {
-          setImgDrug(resImg.url)
-        })
-      }
-      setHistory(res.data.taskHistory[0])
-      setData(res)
-      setMapPosition({
-        lat: parseFloat(res.data.farmerPlot.lat),
-        lng: parseFloat(res.data.farmerPlot.long),
       })
-    })
+      .finally(() => setLoading(false))
   }
   useEffect(() => {
     fetchDetailTask()
   }, [])
-  const onPreviewImg = async (e: any) => {
-    let src = e
-    if (!src) {
-      src = await new Promise((resolve) => {
-        const reader = new FileReader()
-      })
-    }
-    const image = new Image()
-    image.src = src
-    const imgWindow = window.open(src)
-    imgWindow?.document.write(image.outerHTML)
-  }
+
   const handleChangeStatus = (e: any) => {
     setStatusPayment(e.target.value)
   }
@@ -226,21 +213,15 @@ function EditReport() {
           <div className='row'>
             <div className='col-lg'>
               <label>ภาพหลักฐานการบิน</label>
+              <span style={{ color: color.Grey }}> ({data.imageTaskUrl.length || 0} รูป)</span>
               <br />
-              <ImagCards
-                imageName={data.data?.imagePathFinishTask ? data.data?.imagePathFinishTask : ''}
-                image={imgControl ? imgControl : image.empty_cover}
-                onClick={() => onPreviewImg(imgControl)}
-              />
+              <ImagCards image={data.imageTaskUrl || image.empty_cover} show={true} />
             </div>
             <div className='col-lg'>
               <label>ภาพปุ๋ยและยา</label>
+              <span style={{ color: color.Grey }}> ({imgDrug?.length || 0} รูป)</span>
               <br />
-              <ImagCards
-                imageName={data.data?.imagePathDrug ? data.data?.imagePathDrug : ''}
-                image={imgDrug ? imgDrug : image.empty_cover}
-                onClick={() => onPreviewImg(imgDrug)}
-              />
+              <ImagCards image={imgDrug ? imgDrug : image.empty_cover} show={true} />
             </div>
           </div>
           <br />

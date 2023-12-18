@@ -12,7 +12,11 @@ import { DateTimeUtil } from '../../../utilities/DateTimeUtil'
 import { Container } from 'react-bootstrap'
 import { InputPicker } from 'rsuite'
 import { TaskDatasource } from '../../../datasource/TaskDatasource'
-import { AllTaskListEntity, GetNewTaskEntity } from '../../../entities/NewTaskEntities'
+import {
+  AllTaskListEntity,
+  GetNewTaskEntity,
+  TaskManageEntity,
+} from '../../../entities/NewTaskEntities'
 import { numberWithCommas, numberWithCommasToFixed } from '../../../utilities/TextFormatter'
 import 'rsuite/dist/rsuite.min.css'
 import ImagCards from '../../../components/card/ImagCard'
@@ -27,7 +31,7 @@ const AdminCancelTask = () => {
   const [searchTaskList, setSearchTaskList] = useState<any>()
   const [showModal, setShowModal] = useState<boolean>(false)
   const [search, setSearch] = useState<boolean>(false)
-  const [taskSelected, setTaskSelected] = useState<GetNewTaskEntity>()
+  const [taskSelected, setTaskSelected] = useState<TaskManageEntity>()
   const [taskNo, setTaskNo] = useState<any>()
   const [count, setCount] = useState<number>(0)
   const [taskId, setTaskId] = useState('')
@@ -83,20 +87,27 @@ const AdminCancelTask = () => {
   const handleSearchTask = async () => {
     try {
       setLoading(true)
-      const task = await TaskDatasource.getNewTaskById(taskId)
-      setCheckStatus(task.status)
-      if (task.imagePathFinishTask) {
-        const resImg = await UploadImageDatasouce.getImage(task.imagePathFinishTask)
-        setImgControl(resImg.url)
-      }
-      if (task.imagePathDrug) {
-        const resImg = await UploadImageDatasouce.getImage(task.imagePathDrug)
-        setImgDrug(resImg.url)
+      const task = await TaskDatasource.getTaskForCancel(taskId)
+      setCheckStatus(task.data.status)
+      if (task.data.imagePathDrug) {
+        const resImg = await UploadImageDatasouce.getImage(task.data.imagePathDrug)
+        setImgDrug([resImg.url])
       }
       setTaskSelected(task)
+      if (task.imageTask) {
+        const imgArray: any[] = task.imageTask.map((item) => {
+          return {
+            id: item.id,
+            url: item.pathFinishTask,
+            file: item.pathFinishTask,
+            percent: 100,
+          }
+        })
+        setImgControl(imgArray)
+      }
       const initialValues = {
-        unitPrice: task.unitPrice,
-        farmAreaAmount: task.farmAreaAmount,
+        unitPrice: task.data.unitPrice,
+        farmAreaAmount: task.data.farmAreaAmount,
       }
       form.setFieldsValue(initialValues)
       const estimatePoint = await TaskDatasource.getEstimatePoint(taskId)
@@ -109,19 +120,6 @@ const AdminCancelTask = () => {
       setLoading(false)
       console.error(error)
     }
-  }
-
-  const onPreviewImg = async (e: any) => {
-    let src = e
-    if (!src) {
-      src = await new Promise((resolve) => {
-        const reader = new FileReader()
-      })
-    }
-    const image = new Image()
-    image.src = src
-    const imgWindow = window.open(src)
-    imgWindow?.document.write(image.outerHTML)
   }
 
   const pageTitle = (
@@ -174,13 +172,15 @@ const AdminCancelTask = () => {
         </Row>
         <Row justify={'space-between'} gutter={8}>
           <Col span={12} style={{ textAlign: 'center', borderRight: '2px groove' }}>
-            {taskSelected?.farmer ? (
+            {taskSelected?.data.farmer ? (
               <>
-                {`${taskSelected?.farmer.firstname || '-'} ${taskSelected?.farmer.lastname || '-'}`}
-                {` (${taskSelected?.farmer.telephoneNo || '-'})`}
-                {taskSelected?.farmer.firstname && (
+                {`${taskSelected?.data.farmer.firstname || '-'} ${
+                  taskSelected?.data.farmer.lastname || '-'
+                }`}
+                {` (${taskSelected?.data.farmer.telephoneNo || '-'})`}
+                {taskSelected?.data.farmer.firstname && (
                   <ShowNickName
-                    data={taskSelected?.farmer.firstname}
+                    data={taskSelected?.data.farmer.firstname}
                     menu='INFO'
                     colorTooltip={color.Error}
                   />
@@ -191,13 +191,15 @@ const AdminCancelTask = () => {
             )}
           </Col>
           <Col span={12} style={{ textAlign: 'center' }}>
-            {taskSelected?.droner ? (
+            {taskSelected?.data.droner ? (
               <>
-                {`${taskSelected?.droner.firstname || '-'} ${taskSelected?.droner.lastname || '-'}`}
-                {` (${taskSelected?.droner.telephoneNo || '-'})`}
-                {taskSelected?.droner.firstname && (
+                {`${taskSelected?.data.droner.firstname || '-'} ${
+                  taskSelected?.data.droner.lastname || '-'
+                }`}
+                {` (${taskSelected?.data.droner.telephoneNo || '-'})`}
+                {taskSelected?.data.droner.firstname && (
                   <ShowNickName
-                    data={taskSelected?.droner.firstname}
+                    data={taskSelected?.data.droner.firstname}
                     menu='INFO'
                     colorTooltip={color.Error}
                   />
@@ -232,19 +234,23 @@ const AdminCancelTask = () => {
             </Col>
           </>
           <>
-            <Col span={4}>{DateTimeUtil.formatDateTime(taskSelected?.dateAppointment || '')}</Col>
-            <Col span={4}>{taskSelected?.purposeSpray.purposeSprayName}</Col>
-            <Col span={4}>{taskSelected?.targetSpray && taskSelected?.targetSpray.join(',')}</Col>
-            <Col span={4}>{taskSelected?.farmerPlot.plotName || '-'}</Col>
-            <Col span={4}>{taskSelected?.farmerPlot.plantName || '-'}</Col>
             <Col span={4}>
-              <Badge color={ALL_TASK_COLOR_MAPPING[taskSelected?.status || '']} />{' '}
+              {DateTimeUtil.formatDateTime(taskSelected?.data.dateAppointment || '')}
+            </Col>
+            <Col span={4}>{taskSelected?.data.purposeSpray.purposeSprayName}</Col>
+            <Col span={4}>
+              {taskSelected?.data.targetSpray && taskSelected?.data.targetSpray.join(',')}
+            </Col>
+            <Col span={4}>{taskSelected?.data.farmerPlot.plotName || '-'}</Col>
+            <Col span={4}>{taskSelected?.data.farmerPlot.plantName || '-'}</Col>
+            <Col span={4}>
+              <Badge color={ALL_TASK_COLOR_MAPPING[taskSelected?.data.status || '']} />{' '}
               <span
                 style={{
-                  color: ALL_TASK_COLOR_MAPPING[taskSelected?.status || ''],
+                  color: ALL_TASK_COLOR_MAPPING[taskSelected?.data.status || ''],
                 }}
               >
-                {ALL_TASK_MAPPING[taskSelected?.status || '']}
+                {ALL_TASK_MAPPING[taskSelected?.data.status || '']}
               </span>
             </Col>
           </>
@@ -265,9 +271,9 @@ const AdminCancelTask = () => {
             <Col span={4} style={{ fontWeight: 'bold' }} />
           </>
           <>
-            <Col span={4}>{taskSelected?.unitPrice} บาท/ไร่</Col>
-            <Col span={4}>{taskSelected?.farmAreaAmount} ไร่</Col>
-            <Col span={4}>{taskSelected?.preparationBy}</Col>
+            <Col span={4}>{taskSelected?.data.unitPrice} บาท/ไร่</Col>
+            <Col span={4}>{taskSelected?.data.farmAreaAmount} ไร่</Col>
+            <Col span={4}>{taskSelected?.data.preparationBy}</Col>
             <Col span={4} />
             <Col span={4} />
             <Col span={4} />
@@ -276,10 +282,17 @@ const AdminCancelTask = () => {
         <Row justify={'space-between'} gutter={8} style={{ paddingBottom: '15px' }}>
           <>
             <Col span={8} style={{ fontWeight: 'bold' }}>
-              ภาพหลักฐานการบิน
+              ภาพหลักฐานการบิน{' '}
+              <span style={{ color: color.Grey, fontWeight: 'lighter' }}>
+                ({taskSelected?.imageTask.length || 0} รูป)
+              </span>
             </Col>
             <Col span={8} style={{ fontWeight: 'bold' }}>
-              ภาพปุ๋ยและยา
+              ภาพปุ๋ยและยา{' '}
+              <span style={{ fontWeight: 'lighter', color: color.Grey }}>
+                {' '}
+                ({imgDrug?.length || 0} รูป)
+              </span>
             </Col>
             <Col span={8} style={{ fontWeight: 'bold' }}>
               หมายเหตุ
@@ -287,45 +300,35 @@ const AdminCancelTask = () => {
           </>
           <>
             <Col span={8} style={{ paddingRight: 20 }}>
-              <ImagCards
-                imageName={
-                  taskSelected?.imagePathFinishTask ? taskSelected?.imagePathFinishTask : ''
-                }
-                image={imgControl || image.empty_cover}
-                onClick={() => onPreviewImg(imgControl)}
-              />
+              <ImagCards image={imgControl || image.empty_cover} />
             </Col>
 
             <Col span={8} style={{ paddingRight: 20 }}>
-              <ImagCards
-                imageName={taskSelected?.imagePathDrug ? taskSelected?.imagePathDrug : ''}
-                image={imgDrug || image.empty_cover}
-                onClick={() => onPreviewImg(imgDrug)}
-              />
+              <ImagCards image={imgDrug ? imgDrug : image.empty_cover} show={true} />
             </Col>
 
-            <Col span={8}>{taskSelected?.comment || '-'}</Col>
+            <Col span={8}>{taskSelected?.data.comment || '-'}</Col>
           </>
         </Row>
       </Card>
-      {checkStatus !== 'CANCELED' &&
-       <div className='pt-2 pb-2'>
-       <Button
-         style={{
-           backgroundColor: color.Error,
-           color: 'white',
-           width: '100%',
-           borderRadius: '5px',
-         }}
-         size='large'
-         onClick={async () => {
-           setShowModal(!showModal)
-         }}
-       >
-         ยกเลิกงาน
-       </Button>
-     </div>}
-     
+      {checkStatus !== 'CANCELED' && (
+        <div className='pt-2 pb-2'>
+          <Button
+            style={{
+              backgroundColor: color.Error,
+              color: 'white',
+              width: '100%',
+              borderRadius: '5px',
+            }}
+            size='large'
+            onClick={async () => {
+              setShowModal(!showModal)
+            }}
+          >
+            ยกเลิกงาน
+          </Button>
+        </div>
+      )}
 
       <Card style={{ backgroundColor: '#F2F5FC' }}>
         <Row justify={'space-between'} gutter={8}>
@@ -354,16 +357,16 @@ const AdminCancelTask = () => {
             }}
           >
             {numberWithCommasToFixed(
-              Number(taskSelected?.price || 0) -
-                Number(taskSelected?.discountCoupon || 0) -
-                Number(taskSelected?.discountCampaignPoint || 0),
+              Number(taskSelected?.data.price || 0) -
+                Number(taskSelected?.data.discountCoupon || 0) -
+                Number(taskSelected?.data.discountCampaignPoint || 0),
             )}
           </Col>
           <Col span={12} style={{ fontSize: 18, textAlign: 'center', fontWeight: 'bold' }}>
             {numberWithCommasToFixed(
-              Number(taskSelected?.price || 0) +
-                Number(taskSelected?.discountCoupon || 0) +
-                Number(taskSelected?.discountCampaignPoint || 0),
+              Number(taskSelected?.data.price || 0) +
+                Number(taskSelected?.data.discountCoupon || 0) +
+                Number(taskSelected?.data.discountCampaignPoint || 0),
             )}
           </Col>
         </Row>
@@ -382,13 +385,13 @@ const AdminCancelTask = () => {
           </>
           <>
             <Col style={{ textAlign: 'center' }} span={8}>
-              {numberWithCommasToFixed(Number(taskSelected?.price) || 0)} บาท
+              {numberWithCommasToFixed(Number(taskSelected?.data.price) || 0)} บาท
             </Col>
             <Col style={{ textAlign: 'center' }} span={8}>
-              {numberWithCommasToFixed(Number(taskSelected?.fee) || 0)} บาท
+              {numberWithCommasToFixed(Number(taskSelected?.data.fee) || 0)} บาท
             </Col>
             <Col style={{ textAlign: 'center' }} span={8}>
-              {numberWithCommasToFixed(Number(taskSelected?.discountFee) || 0)} บาท
+              {numberWithCommasToFixed(Number(taskSelected?.data.discountFee) || 0)} บาท
             </Col>
           </>
         </Row>
@@ -404,10 +407,10 @@ const AdminCancelTask = () => {
           </>
           <>
             <Col style={{ textAlign: 'center' }} span={8}>
-              {numberWithCommasToFixed(Number(taskSelected?.discountCoupon)) || 0} บาท
+              {numberWithCommasToFixed(Number(taskSelected?.data.discountCoupon)) || 0} บาท
             </Col>
             <Col style={{ textAlign: 'center' }} span={8}>
-              {numberWithCommasToFixed(Number(taskSelected?.discountCampaignPoint)) || 0} บาท
+              {numberWithCommasToFixed(Number(taskSelected?.data.discountCampaignPoint)) || 0} บาท
             </Col>
             <Col span={8} />
           </>

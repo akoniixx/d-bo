@@ -40,8 +40,8 @@ const ListStyled = styled.div<{ isFocus?: boolean }>`
   justify-content: space-between;
 `
 const SubListItem = styled.div<{ isFocus?: boolean }>`
-  padding: 16px;
-  padding-left: 54px;
+  padding-top: 16px;
+  padding-left: 52px;
   cursor: pointer;
   color: ${(props) => (props.isFocus ? color.Success : '#231F20')};
   width: 100%;

@@ -5,8 +5,9 @@ import { color } from '../../resource'
 interface CardHeaderProps {
   textHeader: string
   center: boolean
+  button?: any
 }
-export const CardHeaderPromotion: React.FC<CardHeaderProps> = ({ textHeader, center }) => {
+export const CardHeaderPromotion: React.FC<CardHeaderProps> = ({ textHeader, center, button }) => {
   const styleCenter = center ? 'd-flex justify-content-center' : 'd-flex justify-content-between'
   return (
     <div
@@ -20,6 +21,7 @@ export const CardHeaderPromotion: React.FC<CardHeaderProps> = ({ textHeader, cen
       <h5 className='pt-2 ps-3' style={{ color: 'white' }}>
         {textHeader}
       </h5>
+      {button}
     </div>
   )
 }

@@ -1,10 +1,10 @@
+/* eslint-disable react/jsx-key */
 import { DownOutlined, SearchOutlined, StarFilled } from '@ant-design/icons'
 import {
   Avatar,
   Badge,
   Button,
   Checkbox,
-  Col,
   DatePicker,
   Dropdown,
   Form,
@@ -31,7 +31,7 @@ import { CardContainer } from '../../../components/card/CardContainer'
 import { CardHeader } from '../../../components/header/CardHearder'
 import color from '../../../resource/color'
 import { TaskDatasource } from '../../../datasource/TaskDatasource'
-import { FarmerEntity, FarmerEntity_INIT } from '../../../entities/FarmerEntities'
+import { FarmerEntity } from '../../../entities/FarmerEntities'
 import { FarmerPlotEntity, FarmerPlotEntity_INIT } from '../../../entities/FarmerPlotEntities'
 import GooleMap from '../../../components/map/GoogleMap'
 import { LAT_LNG_BANGKOK } from '../../../definitions/Location'
@@ -39,7 +39,6 @@ import { RowSelectionType } from 'antd/lib/table/interface'
 import { CreateNewTaskEntity, CreateNewTaskEntity_INIT } from '../../../entities/NewTaskEntities'
 import { CropPurposeSprayEntity } from '../../../entities/CropEntities'
 import { CropDatasource } from '../../../datasource/CropDatasource'
-import { PURPOSE_SPRAY, PURPOSE_SPRAY_CHECKBOX } from '../../../definitions/PurposeSpray'
 import { TaskSearchDroner, TaskSearchDroner_INIT } from '../../../entities/TaskSearchDroner'
 import { TaskSearchDronerDatasource } from '../../../datasource/TaskSearchDronerDatasource'
 import ModalSelectedDroner from '../../../components/modal/task/newTask/ModalSelectedDroner'
@@ -48,16 +47,13 @@ import TextArea from 'antd/lib/input/TextArea'
 import Swal from 'sweetalert2'
 import {
   formatNumberWithCommas,
-  numberWithCommas,
   numberWithCommasToFixed,
   validateOnlyNumWDecimal,
 } from '../../../utilities/TextFormatter'
 import icon from '../../../resource/icon'
 import { LocationPriceDatasource } from '../../../datasource/LocationPriceDatasource'
 import { CouponDataSource } from '../../../datasource/CouponDatasource'
-import { GetTaskCoupon, GetTaskCoupon_INIT } from '../../../entities/CalculateTask'
-import { CouponFarmerUsed, CouponKeepByFarmer } from '../../../entities/CouponEntites'
-import { DateTimeUtil } from '../../../utilities/DateTimeUtil'
+import { CouponFarmerUsed } from '../../../entities/CouponEntites'
 import { useNavigate } from 'react-router-dom'
 import { FarmerPageEntity } from '../../../entities/FarmerEntities'
 import 'rsuite/dist/rsuite.min.css'
@@ -71,6 +67,8 @@ export type OptionType = {
 import '../newTask/Styles.css'
 import { TargetSpray } from '../../../datasource/TargetSprayDatarource'
 import { TargetSpayEntities } from '../../../entities/TargetSprayEntities'
+import { ConfirmNewTask } from './ConfirmNewTask'
+import { TaskCoupon_INIT } from '../../../entities/CalculateTask'
 const { Step } = Steps
 const { Option } = AntdSelect
 const dateFormat = 'DD/MM/YYYY'
@@ -87,7 +85,6 @@ const AddNewTask = () => {
   // eslint-disable-next-line prefer-const
   let queryString = _.split(window.location.pathname, '=')
   const navigate = useNavigate()
-  const [form] = Form.useForm()
   const profile = JSON.parse(localStorage.getItem('profile') || '{  }')
   const [current, setCurrent] = useState(0)
   const [createNewTask, setCreateNewTask] = useState<CreateNewTaskEntity>(CreateNewTaskEntity_INIT)
@@ -116,19 +113,10 @@ const AddNewTask = () => {
   const [disableBtn, setDisableBtn] = useState<boolean>(true)
   const [searchTextDroner, setSearchTextDroner] = useState<string>('')
   const [priceMethod, setPriceMethod] = useState<string>('อัตโนมัติ')
-  const [getCoupon] = useState<GetTaskCoupon>(GetTaskCoupon_INIT)
   const [someTargetSpray, setSomeTargetSpray] = useState<any>()
-  const [couponCode, setCouponCode] = useState<string>('')
-  const [couponId, setCouponId] = useState<string>('')
-  const [couponUsedBtn, setCouponUsedBtn] = useState<boolean[]>([false, true])
-  const [colorCouponBtn, setColorCouponBtn] = useState<boolean>(true)
-  const [couponMessage, setCouponMessage] = useState<string>('')
   const [farmerPlotId, setFarmerPlotId] = useState<string>('')
-  const [discountResult, setDiscountResult] = useState<number | null>()
   const [loading, setLoading] = useState<boolean>(true)
-  const [couponKeepList, setCouponKeepList] = useState<CouponKeepByFarmer[]>()
   const [checkKeepCoupon, setCheckKeepCoupon] = useState<boolean>(false)
-  const [dataCouponKeep, setCouponKeep] = useState<CouponKeepByFarmer>()
   const [currenSearch, setCurrentSearch] = useState(1)
   const [selectFarmer, setSelectFarmer] = useState<string>('')
   const [searchFilterFarmer, setSearchFilterFarmer] = useState<string>('')
@@ -174,42 +162,6 @@ const AddNewTask = () => {
     await CropDatasource.getPurposeByCroupName(cropSelected).then((res) => {
       setPeriodSpray(res)
     })
-  }
-  const fetchCouponKeep = async (id?: string) => {
-    const data = await CouponDataSource.getCouponKeepByFarmerId(id).then((res) => {
-      return res
-    })
-
-    const result: any = []
-    data.map((item: any) => {
-      const checkCondition = true
-      const checkPlant = item.promotion.couponConditionPlant
-        ? item.promotion.couponConditionPlantList.some(
-            (plant: any) =>
-              plant.plantName === cropSelected &&
-              plant.injectionTiming.includes(createNewTask.purposeSprayName),
-          )
-        : checkCondition
-
-      const checkProvince = item.promotion.couponConditionProvince
-        ? item.promotion.couponConditionProvinceList.some(
-            (prov: any) => prov === farmerPlotSeleced.plotArea.provinceName,
-          )
-        : checkCondition
-
-      const checkRai = item.promotion.couponConditionRai
-        ? createNewTask.farmAreaAmount >= item.promotion.couponConditionRaiMin &&
-          createNewTask.farmAreaAmount <= item.promotion.couponConditionRaiMax
-        : checkCondition
-
-      const checkService = item.promotion.couponConditionService
-        ? createNewTask.price - (discountResult ?? 0) >= item.promotion.couponConditionServiceMin &&
-          createNewTask.price - (discountResult ?? 0) <= item.promotion.couponConditionServiceMax
-        : checkCondition
-
-      checkPlant && checkProvince && checkRai && checkService && result.push(item)
-    })
-    setCouponKeepList(result)
   }
 
   const [dataDronerList, setDataDronerList] = useState<TaskSearchDroner[]>([TaskSearchDroner_INIT])
@@ -422,82 +374,6 @@ const AddNewTask = () => {
         farmerPlotSeleced?.id,
       )
     }
-  }
-
-  const handleChangeCoupon = (e: any) => {
-    if (e.target.value) {
-      setCouponCode(e.target.value)
-      setCouponUsedBtn([false, true])
-      setCheckKeepCoupon(true)
-    } else {
-      setCouponUsedBtn([false, false])
-      setCheckKeepCoupon(false)
-    }
-  }
-
-  const checkCoupon = (section: number, e: any, order?: string) => {
-    if (section === 1) {
-      if (order === 'ยกเลิก') {
-        setCouponCode('')
-        setCouponUsedBtn([false, true])
-        form.setFieldsValue({ couponCode: '' })
-        setCouponMessage('')
-        setCheckKeepCoupon(false)
-      } else {
-        CouponDataSource.getCoupon(couponCode).then((result) => {
-          if (!result.userMessage) {
-            if (result.canUsed) {
-              setCouponId(result.id)
-              setColorCouponBtn(true)
-              setCouponUsedBtn([false, false])
-              setCouponMessage('รหัสคูปองสามารถใช้ได้')
-              calculatePrice(couponCode)
-            } else {
-              setColorCouponBtn(false)
-              setCouponUsedBtn([false, false])
-              setCouponMessage('รหัสคูปองสามารถนี้ถูกใช้ไปแล้ว')
-            }
-          } else {
-            setColorCouponBtn(false)
-            setCouponUsedBtn([false, false])
-            setCouponMessage(result.userMessage)
-          }
-        })
-      }
-    } else {
-      if (e) {
-        const mapCoupon = couponKeepList?.find((x) => x.promotion.id === e)
-        setCouponKeep(mapCoupon)
-        setCouponId(mapCoupon?.promotion?.id || '')
-        setCouponCode(mapCoupon?.promotion.couponCode || '')
-        setColorCouponBtn(true)
-        setCouponUsedBtn([true, true])
-        calculatePrice(mapCoupon?.promotion?.couponCode || '')
-      } else {
-        setCouponId('')
-        setCouponCode('')
-        calculatePrice('')
-        setColorCouponBtn(false)
-        setCouponUsedBtn([false, true])
-      }
-    }
-  }
-  const calculatePrice = (coupon: string) => {
-    const couponInfo = { ...getCoupon }
-    couponInfo.farmerPlotId = farmerPlotId
-    couponInfo.cropName = farmerPlotSeleced?.plantName
-    couponInfo.couponCode = coupon //couponCode;
-    couponInfo.raiAmount =
-      (farmerPlotSeleced.raiAmount && parseInt(farmerPlotSeleced.raiAmount)) || 0
-    couponInfo.priceCustom =
-      createNewTask.unitPriceStandard === 0 ? createNewTask.unitPrice.toString() : '0'
-    CouponDataSource.calculateCoupon(couponInfo).then((res) => {
-      const calCoupon =
-        res.responseData.priceCouponDiscount > createNewTask.price
-          ? createNewTask.price
-          : res.responseData.priceCouponDiscount
-      setDiscountResult(calCoupon)
-    })
   }
 
   const renderFormSearchFarmer = (
@@ -838,58 +714,47 @@ const AddNewTask = () => {
             <label>
               เป้าหมายการฉีดพ่น <span style={{ color: 'red' }}>*</span>
             </label>
-            {targetSpray
-              .map((item: any) =>
-                _.set(
-                  item,
-                  'isChecked',
-                  createNewTask?.targetSpray.map((x) => x).find((y) => y === item.name)
-                    ? true
-                    : false,
-                ),
-              )
-              .map((x, index) => (
-                <>
-                  <div className='form-group'>
-                    <Checkbox
-                      value={x.name}
-                      disabled={current === 2 || checkSelectPlot === 'error'}
-                      onChange={handlePurposeSpray}
-                      defaultChecked={x.isChecked}
-                    />{' '}
-                    <label style={{ padding: '0 8px 0 0' }}>{x.name}</label>
-                    {x.name === 'อื่นๆ' && (
-                      <>
-                        <Input
-                          status={validateComma.status}
-                          className='col-lg-5'
-                          disabled={current === 2 || checkCrop}
-                          placeholder='โปรดระบุ เช่น เพลี้ย,หอย'
-                          onChange={handleOtherSpray}
-                          defaultValue={Array.from(
-                            new Set(
-                              createNewTask.targetSpray.filter(
-                                (a) => !someTargetSpray.some((x: any) => x === a),
-                              ),
+            <div className='checkbox-grid'>
+              {targetSpray.map((item, index) => (
+                <div key={index} className='form-group checkbox-item'>
+                  <Checkbox
+                    value={item.name}
+                    disabled={current === 2 || checkSelectPlot === 'error'}
+                    onChange={handlePurposeSpray}
+                    defaultChecked={item.isChecked}
+                  />
+                  <label style={{ padding: '0 8px 0 8px' }}>{item.name}</label>
+                  {item.name === 'อื่นๆ' && (
+                    <>
+                      <Input
+                        status={validateComma.status}
+                        className='col-lg-12'
+                        disabled={current === 2 || checkCrop}
+                        placeholder='โปรดระบุ เช่น เพลี้ย,หอย'
+                        onChange={handleOtherSpray}
+                        defaultValue={Array.from(
+                          new Set(
+                            createNewTask.targetSpray.filter(
+                              (a) => !someTargetSpray.some((x: any) => x === a),
                             ),
-                          )}
-                        />
-                        {validateComma.status === 'error' && (
-                          <p
-                            style={{
-                              color: color.Error,
-                              padding: '0 0 0 55px',
-                            }}
-                          >
-                            {validateComma.message}
-                          </p>
+                          ),
                         )}
-                      </>
-                    )}
-                  </div>
-                </>
+                      />
+                      {validateComma.status === 'error' && (
+                        <p
+                          className='col-lg-12'
+                          style={{ color: color.Error, padding: '0 0 0 8px' }}
+                        >
+                          {validateComma.message}
+                        </p>
+                      )}
+                    </>
+                  )}
+                </div>
               ))}
+            </div>
           </div>
+
           <div className='row form-group col-lg-6 p-2'>
             <label>
               การเตรียมยา <span style={{ color: 'red' }}>*</span>
@@ -1474,269 +1339,6 @@ const AddNewTask = () => {
   )
   //#endregion
 
-  //#region Step3
-  const mapWordingCondition = (item: CouponKeepByFarmer) => {
-    const data = item.promotion
-    let mapping = '-'
-    if (data.couponConditionRai) {
-      const checkMin = data.couponConditionRaiMin
-        ? 'เมื่อจ้างขั้นต่ำ ' + data.couponConditionRaiMin + ' ไร่'
-        : ''
-
-      const checkMax = data.couponConditionRaiMax
-        ? !data.couponConditionRaiMin
-          ? 'เมื่อจ้างสูงสุด' + data.couponConditionRaiMax + ' ไร่'
-          : ' - ' + data.couponConditionRaiMax + ' ไร่'
-        : ''
-      mapping = checkMin + checkMax
-    }
-    return mapping
-  }
-  const renderDronerSelectedList = (
-    <CardContainer>
-      <CardHeader textHeader='รายชื่อนักบินโดรน' />
-      <Form>
-        <div className='container'>
-          {createNewTask.taskDronerTemp?.map((item) => (
-            <div className='row pt-3'>
-              {item.dronerDetail[0] != '' &&
-                item.dronerDetail.map((x) => (
-                  <>
-                    <div className='col-lg-3'>
-                      {JSON.parse(x).firstname} {JSON.parse(x).lastname}
-                      <br />
-                      <p
-                        style={{
-                          fontSize: '12px',
-                          color: color.Grey,
-                        }}
-                      >
-                        {JSON.parse(x).droner_code}
-                        {JSON.parse(x).nickname && (
-                          <ShowNickName data={JSON.parse(x).nickname} menu='INFO' />
-                        )}
-                      </p>
-                    </div>
-                    <div className='col-lg-2'>{JSON.parse(x).telephone_no}</div>
-                    <div className='col-lg-3'>
-                      {JSON.parse(x).subdistrict_name ? (
-                        <>{JSON.parse(x).subdistrict_name}/</>
-                      ) : (
-                        '-/'
-                      )}
-                      {JSON.parse(x).district_name ? <>{JSON.parse(x).district_name}/</> : '-/'}
-                      {JSON.parse(x).province_name ? <>{JSON.parse(x).province_name}</> : '-'}
-                    </div>
-                    <div className='col-lg-1'>{JSON.parse(x).distance.toFixed(0)} km</div>
-                    <div className='col-lg-2'>
-                      {JSON.parse(x).drone_brand ? (
-                        <>
-                          <Avatar
-                            size={25}
-                            src={JSON.parse(x).logo_drone_brand}
-                            style={{ marginRight: '5px' }}
-                          />
-                          <span>{JSON.parse(x).drone_brand}</span>
-                        </>
-                      ) : (
-                        '-'
-                      )}
-
-                      <br />
-                      <p
-                        style={{
-                          fontSize: '12px',
-                          color: color.Grey,
-                        }}
-                      >
-                        {JSON.parse(x).count_drone > 1 && '(มากกว่า 1 ยี่หัอ)'}
-                      </p>
-                    </div>
-                    <div className='col-lg-1'>
-                      <span
-                        style={{
-                          color:
-                            JSON.parse(x).droner_status === 'สะดวก' ? color.Success : color.Error,
-                        }}
-                      >
-                        <Badge
-                          color={
-                            JSON.parse(x).droner_status === 'สะดวก' ? color.Success : color.Error
-                          }
-                        />{' '}
-                        {JSON.parse(x).droner_status}
-                        <br />
-                      </span>
-                    </div>
-                  </>
-                ))}
-            </div>
-          ))}
-        </div>
-      </Form>
-    </CardContainer>
-  )
-  const renderServiceCharge = (
-    <CardContainer>
-      <CardHeader textHeader='ยอดรวมค่าบริการ' />
-      <Form style={{ padding: '20px' }}>
-        <CardContainer style={{ backgroundColor: 'rgba(33, 150, 83, 0.1)' }}>
-          <Form style={{ padding: '20px' }} form={form}>
-            <label>ยอดรวมค่าบริการ</label>
-            <h5 style={{ color: color.primary1 }} className='p-2'>
-              {numberWithCommasToFixed(createNewTask.price - (discountResult ?? 0))} บาท
-            </h5>
-            <div className='row'>
-              <div className='form-group col-lg-4'>
-                <label>ค่าบริการ (ก่อนคิดค่าธรรมเนียม)</label>
-                <Form.Item>
-                  <Input
-                    suffix='บาท'
-                    value={numberWithCommasToFixed(parseFloat(createNewTask.price.toString()))}
-                    disabled={current === 2 || checkSelectPlot === 'error'}
-                    autoComplete='off'
-                    step='0.01'
-                  />
-                </Form.Item>
-              </div>
-              <div className='form-group col-lg-4'>
-                <label>ค่าธรรมเนียม (คิด 5% ของราคารวม)</label>
-                <Form.Item>
-                  <Input
-                    suffix='บาท'
-                    value={numberWithCommasToFixed(createNewTask.fee)}
-                    disabled={current === 2 || checkSelectPlot === 'error'}
-                    autoComplete='off'
-                    step='0.01'
-                  />
-                </Form.Item>
-              </div>
-              <div className='form-group col-lg-4'>
-                <label>ส่วนลดค่าธรรมเนียม</label>
-                <Form.Item>
-                  <Input
-                    suffix='บาท'
-                    value={numberWithCommasToFixed(createNewTask.discountFee)}
-                    disabled={current === 2 || checkSelectPlot === 'error'}
-                    autoComplete='off'
-                    step='0.01'
-                  />
-                </Form.Item>
-              </div>
-              <div className='form-group col-lg-4'>
-                <label>รหัสคูปอง</label>
-                <Form.Item
-                  name='couponCode'
-                  style={{
-                    marginBottom: '2px',
-                  }}
-                >
-                  <Input
-                    disabled={couponUsedBtn[0]}
-                    onChange={handleChangeCoupon}
-                    onKeyPress={(e) => {
-                      const allowedCharacters = /^[a-zA-Z0-9]+$/
-                      if (!allowedCharacters.test(e.key)) {
-                        e.preventDefault()
-                      }
-                    }}
-                    style={{
-                      paddingRight: 0,
-                      paddingTop: 0,
-                      paddingBottom: 0,
-                    }}
-                    defaultValue={couponUsedBtn ? couponCode : ''}
-                    placeholder='กรอกรหัสคูปอง'
-                    suffix={
-                      <Button
-                        disabled={couponUsedBtn[0]}
-                        style={
-                          !couponUsedBtn[0] && !couponUsedBtn[1]
-                            ? {
-                                borderColor: color.Error,
-                                backgroundColor: '#FAEEEE',
-                                color: color.Error, //ยกเลิก
-                              }
-                            : {
-                                borderColor: color.Success,
-                                backgroundColor: '#E6F2EC',
-                                color: color.Success, //ใช้รหัส
-                              }
-                        }
-                        onClick={(e) => checkCoupon(1, e, couponUsedBtn[1] ? 'ใช้รหัส' : 'ยกเลิก')}
-                      >
-                        {couponUsedBtn[1] ? 'ใช้รหัส' : 'ยกเลิก'}
-                      </Button>
-                    }
-                  />
-                </Form.Item>
-                <p
-                  style={{
-                    padding: 0,
-                    margin: 0,
-                    color: colorCouponBtn ? color.Success : color.Error,
-                  }}
-                >
-                  {couponMessage}
-                </p>
-              </div>
-              <div className='form-group col-lg-4'>
-                <label>หรือเลือกคูปอง (คูปองที่เกษตรกรเก็บในระบบ)</label>
-                <AntdSelect
-                  disabled={checkKeepCoupon}
-                  placeholder='เลือกคูปอง'
-                  style={{
-                    width: '100%',
-                  }}
-                  onChange={(e) => checkCoupon(2, e)}
-                  allowClear
-                  defaultValue={checkKeepCoupon ? couponId : null}
-                >
-                  {couponKeepList?.map((item) => (
-                    <Option value={item.promotion.id}>
-                      <div>
-                        {item.promotion.couponName}
-                        <br />
-                        <Row>
-                          <Col style={{ fontSize: '12px' }} span={13}>
-                            {item.promotion.couponConditionRai ? mapWordingCondition(item) : '-'}
-                          </Col>
-                          <Col
-                            style={{
-                              fontSize: '12px',
-                              alignItems: 'end',
-                            }}
-                          >
-                            หมดเขต{' '}
-                            {DateTimeUtil.formatDateTh(
-                              item?.promotion?.expiredDate?.toString() || '',
-                            )}
-                          </Col>
-                        </Row>
-                      </div>
-                    </Option>
-                  ))}
-                </AntdSelect>
-              </div>
-              <div className='form-group col-lg-4'>
-                <label>ส่วนลดจากคูปอง</label>
-                <Form.Item>
-                  <Input
-                    suffix='บาท'
-                    disabled
-                    placeholder='ส่วนลดคูปอง'
-                    value={numberWithCommas(discountResult!)}
-                  />
-                </Form.Item>
-              </div>
-            </div>
-          </Form>
-        </CardContainer>
-      </Form>
-    </CardContainer>
-  )
-  //#endregion
-
   const checkValidateStep = (
     data: CreateNewTaskEntity,
     currentStep?: number,
@@ -1853,11 +1455,9 @@ const AddNewTask = () => {
       dronerSelected.filter((x) => x.droner_id != ''),
     )
     setCurrent(current + 1)
-    couponId && calculatePrice(couponCode)
-    fetchCouponKeep(createNewTask.farmerId)
   }
 
-  const insertNewTask = async () => {
+  const insertNewTask = async (data?: any) => {
     Swal.fire({
       title: 'ยืนยันการสร้างงาน',
       text: 'โปรดตรวจสอบรายละเอียดที่คุณต้องการแก้ไขข้อมูลก่อนเสมอ เพราะอาจส่งผลต่อการจ้างงานในระบบ',
@@ -1874,21 +1474,21 @@ const AddNewTask = () => {
         } else {
           delete createNewTask['taskDronerTemp']
         }
-        if (couponId) {
+        if (data.couponId) {
           const used: CouponFarmerUsed = {
             id: '',
             farmerId: '',
             promotionId: '',
             offlineCode: '',
           }
-          used.id = dataCouponKeep?.id
-          used.farmerId = dataCouponKeep?.farmerId
-          used.promotionId = dataCouponKeep?.promotionId
+          used.id = data?.couponId
+          used.farmerId = data?.dataCouponKeep?.farmerId
+          used.promotionId = data?.dataCouponKeep?.promotionId
           used.offlineCode = !checkKeepCoupon
-            ? !dataCouponKeep?.offlineCode
+            ? !data?.dataCouponKeep?.offlineCode
               ? null
-              : dataCouponKeep?.offlineCode
-            : couponCode
+              : data?.dataCouponKeep?.offlineCode
+            : data?.couponCode
           // eslint-disable-next-line @typescript-eslint/no-empty-function
           CouponDataSource.updateCouponFarmerUsed(used).then((res) => {})
         }
@@ -1897,18 +1497,26 @@ const AddNewTask = () => {
         const d = Map(createNewTask).set('targetSpray', checkDupSpray)
         const payload = d.toJS()
         payload.cropName = farmerPlotSeleced?.plantName
-        payload.couponCode = couponCode
-        payload.couponId = couponId
-        payload.discountCoupon = discountResult ?? 0
+        payload.couponCode = data?.couponCode
+        payload.couponId = data?.couponId
+        payload.discountCoupon = data?.discountResult ?? 0
         await TaskDatasource.insertNewTask(payload)
           .then(async (res) => {
             if (res.userMessage === 'success') {
-              if (!couponCode) {
-                navigate('/IndexNewTask')
+              if (!data?.couponCode) {
+                if (res.responseData.dronerId) {
+                  navigate('/IndexInprogressTask')
+                } else {
+                  navigate('/IndexNewTask')
+                }
               } else {
-                await CouponDataSource.usedCoupon(couponCode).then((res) =>
-                  navigate('/IndexNewTask'),
-                )
+                await CouponDataSource.usedCoupon(data?.couponCode).then(() => {
+                  if (res.responseData.dronerId) {
+                    navigate('/IndexInprogressTask')
+                  } else {
+                    navigate('/IndexNewTask')
+                  }
+                })
               }
             }
           })
@@ -1932,12 +1540,22 @@ const AddNewTask = () => {
       title: 'ยืนยันข้อมูล',
       content: (
         <>
-          {renderFormSearchFarmer} <br />
-          {renderFormAppointment}
-          <br />
-          {renderDronerSelectedList}
-          <br />
-          {renderServiceCharge}
+          <ConfirmNewTask
+            dataSearchFarmer={dataFarmer}
+            farmerPlotSeleced={farmerPlotSeleced}
+            dataAppointment={
+              moment(new Date(dateAppointment)).format(dateFormat) +
+              ', ' +
+              moment(new Date(timeAppointment)).format(timeFormat)
+            }
+            createNewTask={createNewTask}
+            farmerPlotId={farmerPlotId}
+            cropSelected={cropSelected}
+            isEdit={false}
+            couponData={TaskCoupon_INIT}
+            updateNewTask={insertNewTask}
+            setCurrent={setCurrent}
+          />
         </>
       ),
     },
@@ -1955,7 +1573,7 @@ const AddNewTask = () => {
       <div className='steps-content'>{titleStep[current].content}</div>
       <Row className='d-flex justify-content-between pt-2'>
         {current === 0 && <BackButton onClick={() => navigate('/IndexNewTask')} />}
-        {current > 0 && <BackButton onClick={() => previousStep()} />}
+        {current > 0 && current < 2 && <BackButton onClick={() => previousStep()} />}
         {current < titleStep.length - 1 && (
           <Button
             style={{
@@ -1970,7 +1588,9 @@ const AddNewTask = () => {
             ถัดไป
           </Button>
         )}
-        {current === titleStep.length - 1 && <SaveButton onClick={insertNewTask} />}
+        {current === titleStep.length - 1 && current !== 2 && (
+          <SaveButton onClick={insertNewTask} />
+        )}
       </Row>
     </>
   )
