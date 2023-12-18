@@ -492,57 +492,66 @@ function AddDroner() {
       isBookBank: bookBank?.isBookBank,
       file: imgBB,
     }
-    await DronerDatasource.createDronerList(payload).then(async (res) => {
-      if (res !== undefined) {
-        if (imgBB) {
-          UploadImageDatasouce.uploadImage(Map(imgBB).set('resourceId', res.id).toJS())
-        }
-        const fileList = [createImgProfile, createImgIdCard]
-          .filter((el) => {
-            return el.file !== '' && el.file !== undefined
-          })
-          .map((el) => {
-            return UploadImageDatasouce.uploadImage(Map(el).set('resourceId', res.id).toJS())
-          })
-
-        await Promise.all(fileList)
-
-        for (let i = 0; res.dronerDrone.length > i; i++) {
-          const findId = res.dronerDrone[i]
-          const getData = dronerDroneList.filter((x) => x.serialNo === findId.serialNo)[0]
-
-          for (let j = 0; getData.file.length > j; j++) {
-            const getImg = getData.file[j]
-            imgDroneList?.push({
-              resourceId: findId.id,
-              category: getImg.category,
-              file: getImg.file,
-              resource: getImg.resource,
-              path: '',
-            })
+    try {
+      setBtnSaveDisable(true)
+      await DronerDatasource.createDronerList(payload).then(async (res) => {
+        if (res !== undefined) {
+          if (imgBB) {
+            UploadImageDatasouce.uploadImage(Map(imgBB).set('resourceId', res.id).toJS())
           }
+          const fileList = [createImgProfile, createImgIdCard]
+            .filter((el) => {
+              return el.file !== '' && el.file !== undefined
+            })
+            .map((el) => {
+              return UploadImageDatasouce.uploadImage(Map(el).set('resourceId', res.id).toJS())
+            })
+  
+          await Promise.all(fileList)
+  
+          for (let i = 0; res.dronerDrone.length > i; i++) {
+            const findId = res.dronerDrone[i]
+            const getData = dronerDroneList.filter((x) => x.serialNo === findId.serialNo)[0]
+  
+            for (let j = 0; getData.file.length > j; j++) {
+              const getImg = getData.file[j]
+              imgDroneList?.push({
+                resourceId: findId.id,
+                category: getImg.category,
+                file: getImg.file,
+                resource: getImg.resource,
+                path: '',
+              })
+            }
+          }
+          const checkImg = imgDroneList.filter((x) => x.resourceId !== '')
+          for (let k = 0; checkImg.length > k; k++) {
+            const getDataImg: any = checkImg[k]
+            await UploadImageDatasouce.uploadImage(getDataImg).then(res)
+          }
+          Swal.fire({
+            title: 'บันทึกสำเร็จ',
+            icon: 'success',
+            timer: 1500,
+            showConfirmButton: false,
+          }).then((time) => {
+            navigate('/IndexDroner')
+          })
+        } else {
+          Swal.fire({
+            title: 'เบอร์โทร หรือ รหัสบัตรประชาชน <br/> ซ้ำในระบบ',
+            icon: 'error',
+            showConfirmButton: true,
+          })
         }
-        const checkImg = imgDroneList.filter((x) => x.resourceId !== '')
-        for (let k = 0; checkImg.length > k; k++) {
-          const getDataImg: any = checkImg[k]
-          await UploadImageDatasouce.uploadImage(getDataImg).then(res)
-        }
-        Swal.fire({
-          title: 'บันทึกสำเร็จ',
-          icon: 'success',
-          timer: 1500,
-          showConfirmButton: false,
-        }).then((time) => {
-          navigate('/IndexDroner')
-        })
-      } else {
-        Swal.fire({
-          title: 'เบอร์โทร หรือ รหัสบัตรประชาชน <br/> ซ้ำในระบบ',
-          icon: 'error',
-          showConfirmButton: true,
-        })
-      }
-    })
+      })
+      setBtnSaveDisable(false)
+
+    } catch (error) {
+      setBtnSaveDisable(false)
+      console.error('Error inserting farmer data:', error)
+    }
+ 
   }
   const renderFromData = (
     <div className='col-lg-7'>

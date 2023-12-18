@@ -271,9 +271,6 @@ const BookBankDroner: React.FC<BookBankDronerProps> = ({ callBack, data, dronerI
                     }}
                   />
                 </Col>
-                <Col span={14} className='align-self-center'>
-                  <span>{(bankImg && bankImgCreate.file.name) || imgName}</span>
-                </Col>
                 <Col span={2} className='align-self-center'>
                   <span>
                     {bankImg && (
