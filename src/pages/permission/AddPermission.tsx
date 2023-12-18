@@ -8,6 +8,9 @@ import FooterPage from '../../components/footer/FooterPage'
 import Swal from 'sweetalert2'
 import '../permission/styles.css'
 import { listMenu, listMenu_INIT } from '../../entities/RoleEntities'
+
+const { Map } = require('immutable')
+
 function AddPermission() {
   const navigate = useNavigate()
   const [selectedPermission, setSelectedPermission] = useState<number | null>(null)
@@ -25,6 +28,7 @@ function AddPermission() {
   const [promotion, setPromotion] = useState<listMenu>(listMenu_INIT)
   const [reward, setReward] = useState<listMenu>(listMenu_INIT)
   const [settings, setSettings] = useState<listMenu>(listMenu_INIT)
+  const [listArray, setListArray] = useState<any>([])
 
   const handleRowClick = (record: any) => {
     setSelectedPermission(record.key)
@@ -33,30 +37,87 @@ function AddPermission() {
     setRole(e.target.value)
   }
   const handleCheck = (checked: boolean, row: any, value: any) => {
-    if (row && value && typeof row === 'object' && typeof value === 'string') {
-      row['propertyName'] = checked ? value : null
+    const rowIndex = listArray.findIndex((item: any) => item.name === row.name)
+    const updatedFollowJob = {
+      ...row.value,
+      name: row['name'],
+      [value]: { value: checked, disabled: false },
     }
-      console.log(followJob);
+
+    const updatedListArray =
+      rowIndex === -1
+        ? [...listArray, updatedFollowJob]
+        : listArray.map((item: any, index: any) => (index === rowIndex ? updatedFollowJob : item))
+    setListArray(updatedListArray)
   }
-  
+
   const menuName = [
-    'ติดตามงาน',
-    'ข้อมูลเกษตรกร',
-    'ข้อมูลนักบินโดรน',
-    'ข่าวสาร / กูรูเกษตร',
-    'โปรโมชั่น',
-    'แต้มสะสม',
-    'ของรางวัล',
-    'ภารกิจ',
-    'ชาเลนจ์',
-    'ผู้ดูแลระบบ',
-    'ตั้งค่า',
-    'แต้ม',
+    {
+      key: 'ติดตามงาน',
+      name: 'ติดตามงาน',
+      value: followJob,
+    },
+    {
+      key: 'ข้อมูลเกษตรกร',
+      name: 'ข้อมูลเกษตรกร',
+      value: farmerInfo,
+    },
+    {
+      key: 'ข้อมูลนักบินโดรน',
+      name: 'ข้อมูลนักบินโดรน',
+      value: farmerInfo,
+    },
+    {
+      key: 'ข่าวสาร/กูรูเกษตร',
+      name: 'ข่าวสาร/กูรูเกษตร',
+      value: guru,
+    },
+    {
+      key: 'โปรโมชั่น',
+      name: 'โปรโมชั่น',
+      value: promotion,
+    },
+    {
+      key: 'แต้มสะสม',
+      name: 'แต้มสะสม',
+      value: pointResult,
+    },
+    {
+      key: 'ของรางวัล',
+      name: 'ของรางวัล',
+      value: reward,
+    },
+    {
+      key: 'ภารกิจ',
+      name: 'ภารกิจ',
+      value: mission,
+    },
+    {
+      key: 'ชาเลนจ์',
+      name: 'ชาเลนจ์',
+      value: challenge,
+    },
+    {
+      key: 'ผู้ดูแลระบบ',
+      name: 'ผู้ดูแลระบบ',
+      value: admin,
+    },
+    {
+      key: 'ตั้งค่า',
+      name: 'ตั้งค่า',
+      value: settings,
+    },
+    {
+      key: 'แต้ม',
+      name: 'แต้ม',
+      value: point,
+    },
   ]
   const items: any = menuName.map((v, i) => {
     return {
       key: i,
-      name: v,
+      name: v.name,
+      value: v.value,
     }
   })
 
@@ -89,7 +150,7 @@ function AddPermission() {
   const insertPermission = () => {
     const payload = {
       role: role,
-      followJob: [followJob],
+      followJob: listArray,
       farmerInfo: [farmerInfo],
       dronerInfo: [dronerInfo],
       guru: [guru],
@@ -243,174 +304,101 @@ function AddPermission() {
     },
   ]
 
-  const dataTacking = [
-    {
-      key: 0,
-      name: 'งานใหม่ (รอนักบิน)',
-    },
-    {
-      key: 1,
-      name: 'งานรอดำเนินงาน',
-    },
-    {
-      key: 2,
-      name: 'งานในวันนี้',
-    },
-    {
-      key: 3,
-      name: 'งานที่เสร็จแล้ว',
-    },
-    {
-      key: 4,
-      name: 'แก้ไขงาน/ดูประวัติงาน',
-    },
+  const tacking = [
+    'งานใหม่ (รอนักบิน)',
+    'งานรอดำเนินงาน',
+    'งานในวันนี้',
+    'งานที่เสร็จแล้ว',
+    'แก้ไขงาน/ดูประวัติงาน',
   ]
-  const dataFarmer = [
-    {
-      key: 0,
-      name: 'รายชื่อเกษตรกร',
-    },
-    {
-      key: 1,
-      name: 'รายการแปลงเกษตร',
-    },
-    {
-      key: 3,
-      name: 'อันดับเกษตรกร',
-    },
-  ]
-  const dataDroner = [
-    {
-      key: 0,
-      name: 'รายชื่อนักบินโดรน',
-    },
-    {
-      key: 1,
-      name: 'รายการโดรนเกษตร',
-    },
-    {
-      key: 2,
-      name: 'อันดับนักบินโดรน',
-    },
-  ]
-  const dataNews = [
-    {
-      key: 0,
-      name: 'ข่าวสาร',
-    },
-    {
-      key: 1,
-      name: 'กูรูเกษตร',
-    },
-  ]
-  const dataPromotion = [
-    {
-      key: 0,
-      name: 'โปรโมชั่น',
-    },
-    {
-      key: 1,
-      name: 'คูปอง',
-    },
-  ]
+  const dataFarmer = ['รายชื่อเกษตรกร', 'รายการแปลงเกษตร', 'อันดับเกษตรกร']
+  const dataDroner = ['รายชื่อนักบินโดรน', 'รายการโดรนเกษตร', 'อันดับนักบินโดรน']
+  const dataNews = ['ข่าวสาร', 'กูรูเกษตร']
+  const dataPromotion = ['โปรโมชั่น', 'คูปอง']
   const dataPoint = [
     {
-      key: 0,
       name: 'รายงานแต้ม',
-      children: [
-        {
-          key: 'รอรับแต้ม',
-          name: 'รอรับแต้ม',
-        },
-        {
-          key: 'ได้รับแต้ม',
-          name: 'ได้รับแต้ม',
-        },
-      ],
+      children: ['รอรับแต้ม', 'ได้รับแต้ม'],
     },
     {
-      key: 1,
       name: 'แลกแต้ม/ของรางวัล',
-      children: [
-        {
-          key: 'นักบินโดรน',
-          name: 'นักบินโดรน',
-        },
-        {
-          key: 'เกษตรกร',
-          name: 'เกษตรกร',
-        },
-      ],
+      children: ['นักบินโดรน', 'เกษตรกร'],
     },
   ]
-  const dataReward = [
-    {
-      key: 0,
-      name: 'นักบินโดรน',
-    },
-    {
-      key: 1,
-      name: 'เกษตรกร',
-    },
-  ]
-  const dataMission = [
-    {
-      key: 0,
-      name: 'นักบินโดรน',
-    },
-    {
-      key: 1,
-      name: 'เกษตรกร',
-    },
-  ]
-  const dataChallenge = [
-    {
-      key: 0,
-      name: 'นักบินโดรน',
-    },
-    {
-      key: 1,
-      name: 'เกษตรกร',
-    },
-  ]
-  const dataAdmin = [
-    {
-      key: 0,
-      name: 'รายชื่อผู้ดูแล',
-    },
-    {
-      key: 1,
-      name: 'บทบาทผู้ดูแล',
-    },
-  ]
-  const dataSetting = [
-    {
-      key: 0,
-      name: 'ยี่ห้อโดรน',
-    },
-    {
-      key: 1,
-      name: 'รายชื่อพืช',
-    },
-    {
-      key: 2,
-      name: 'เป้าหมาย',
-    },
-    {
-      key: 3,
-      name: 'ราคา',
-    },
-  ]
-  const dataPointSetting = [
-    {
-      key: 0,
-      name: 'นักบินโดรน',
-    },
-    {
-      key: 1,
-      name: 'เกษตรกร',
-    },
-  ]
+  const dataReward = ['นักบินโดรน', 'เกษตรกร']
+  const dataMission = ['นักบินโดรน', 'เกษตรกร']
+  const dataChallenge = ['นักบินโดรน', 'เกษตรกร']
+  const dataAdmin = ['รายชื่อผู้ดูแล', 'บทบาทผู้ดูแล']
+  const dataSetting = ['ยี่ห้อโดรน', 'รายชื่อพืช', 'เป้าหมาย', 'ราคา']
+  const dataPointSetting = ['นักบินโดรน', 'เกษตรกร']
+  const determineValue = (item: any) => {
+    if (tacking.includes(item)) {
+      return followJob
+    } else if (dataFarmer.includes(item)) {
+      return farmerInfo
+    } else if (dataDroner.includes(item)) {
+      return dronerInfo
+    } else if (dataNews.includes(item)) {
+      return guru
+    } else if (dataPromotion.includes(item)) {
+      return promotion
+    } else if (dataPoint.includes(item)) {
+      return pointResult
+    } else if (dataReward.includes(item)) {
+      return reward
+    } else if (dataMission.includes(item)) {
+      return mission
+    } else if (dataChallenge.includes(item)) {
+      return challenge
+    } else if (dataAdmin.includes(item)) {
+      return admin
+    } else if (dataSetting.includes(item)) {
+      return settings
+    } else if (dataPointSetting.includes(item)) {
+      return point
+    }
+  }
+
+  const determineChildValue = (child: any) => {
+    if (dataPoint.includes(child)) {
+      return pointResult
+    }
+  }
+  const mapArray = (arr: any[]) => {
+    let index = 0
+    return arr.map((item) => {
+      if (typeof item === 'string') {
+        return {
+          key: index++,
+          name: item,
+          value: determineValue(item),
+        }
+      } else {
+        return {
+          key: index++,
+          name: item.name,
+          children: item.children.map((child: any, childIndex: any) => ({
+            key: `${index}-${childIndex}`,
+            name: child,
+            value: determineChildValue(child),
+          })),
+        }
+      }
+    })
+  }
+  const dataTackings = mapArray(tacking)
+  const dataFarmers = mapArray(dataFarmer)
+  const dataDroners = mapArray(dataDroner)
+  const dataNewss = mapArray(dataNews)
+  const dataPromotions = mapArray(dataPromotion)
+  const dataPoints = mapArray(dataPoint)
+  const dataRewards = mapArray(dataReward)
+  const dataMissions = mapArray(dataMission)
+  const dataChallenges = mapArray(dataChallenge)
+  const dataAdmins = mapArray(dataAdmin)
+  const dataSettings = mapArray(dataSetting)
+  const dataPointSettings = mapArray(dataPointSetting)
+
   const expandedRowRenderSub = (record: any) => {
     const columnSubInSub = [
       {
@@ -744,40 +732,40 @@ function AddPermission() {
             let data: readonly any[] | undefined = []
             switch (record.key) {
               case 0:
-                data = dataTacking
+                data = dataTackings
                 break
               case 1:
-                data = dataFarmer
+                data = dataFarmers
                 break
               case 2:
-                data = dataDroner
+                data = dataDroners
                 break
               case 3:
-                data = dataNews
+                data = dataNewss
                 break
               case 4:
-                data = dataPromotion
+                data = dataPromotions
                 break
               case 5:
-                data = dataPoint
+                data = dataPoints
                 break
               case 6:
-                data = dataReward
+                data = dataRewards
                 break
               case 7:
-                data = dataMission
+                data = dataMissions
                 break
               case 8:
-                data = dataChallenge
+                data = dataChallenges
                 break
               case 9:
-                data = dataAdmin
+                data = dataAdmins
                 break
               case 10:
-                data = dataSetting
+                data = dataSettings
                 break
               case 11:
-                data = dataPointSetting
+                data = dataPointSettings
                 break
               default:
                 break
