@@ -106,6 +106,7 @@ const EditVideoGuru = lazy(() => import('./pages/gurukaset/listGuru/editGuru/Edi
 const IndexGroupGuru = lazy(() => import('./pages/gurukaset/groupGuru/IndexGroupGuru'))
 const IndexListStore = lazy(() => import('./pages/listStore/IndexListStore'))
 const DetailStore = lazy(() => import('./pages/listStore/DetailStore'))
+const CreditDroner = lazy(() => import('./pages/setting/credit/CreditDroner'))
 
 const FallBack = () => {
   return (
@@ -224,6 +225,7 @@ const WebRoutes: React.FC<any> = () => {
             <Route path='/IndexGroupGuru' element={<IndexGroupGuru />} />
             <Route path='/IndexListStore' element={<IndexListStore />} />
             <Route path='/DetailStore' element={<DetailStore />} />
+            <Route path='/CreditDroner' element={<CreditDroner />} />
           </Route>
           <Route element={<PublicRoute />}>
             <Route index element={<AuthPage />} />

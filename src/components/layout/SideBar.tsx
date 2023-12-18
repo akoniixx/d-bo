@@ -303,6 +303,19 @@ export const pathLists = (isAccounting: boolean, isAdminTask?: boolean) => {
             },
           ],
         },
+        {
+          path: '/credit',
+          name: 'credit',
+          title: 'เครดิต',
+          subMenu: [
+            {
+              path: '/CreditDroner',
+              name: 'CreditDroner',
+              title: 'นักบินโดรน',
+              subMenu: [],
+            },
+          ],
+        },
       ],
     },
     {
