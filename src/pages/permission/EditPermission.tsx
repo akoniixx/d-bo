@@ -359,17 +359,19 @@ function EditPermission() {
   }
   const handleCheckboxChangeSubInSub = (checked: boolean, propertyName: string, row: any) => {}
   const expandedRowRenderSub = (record: listMenu) => {
-    const subItemData = record.subItem.map((subItem, index) => ({
-      key: `${index}`,
-      name: subItem.name,
-      add: subItem.add,
-      edit: subItem.edit,
-      view: subItem.view,
-      delete: subItem.delete,
-      cancel: subItem.cancel,
-      excel: subItem.excel,
-    }))
-
+    let subItemData: any
+    if (Array.isArray(record.subItem)) {
+      subItemData = record.subItem.map((subItem, index) => ({
+          key: `${index}`,
+          name: subItem.name,
+          add: subItem.add,
+          edit: subItem.edit,
+          view: subItem.view,
+          delete: subItem.delete,
+          cancel: subItem.cancel,
+          excel: subItem.excel,
+      }));
+  } 
     const columns = [
       {
         title: 'ชื่อเมนู',

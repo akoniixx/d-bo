@@ -44,7 +44,7 @@ export const listMenu_INIT: listMenu = {
 }
 
 export interface RoleEntity {
-  [key: string]: any;
+  [key: string]: any
   id: string
   role: string
   count: number

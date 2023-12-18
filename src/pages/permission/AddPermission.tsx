@@ -7,11 +7,24 @@ import { CardContainer } from '../../components/card/CardContainer'
 import FooterPage from '../../components/footer/FooterPage'
 import Swal from 'sweetalert2'
 import '../permission/styles.css'
+import { listMenu, listMenu_INIT } from '../../entities/RoleEntities'
 function AddPermission() {
   const navigate = useNavigate()
   const [selectedPermission, setSelectedPermission] = useState<number | null>(null)
   const [role, setRole] = useState<any>()
-  const [checkedItems, setCheckedItems] = useState({});
+  const [checkedItems, setCheckedItems] = useState({})
+  const [admin, setAdmin] = useState<listMenu>(listMenu_INIT)
+  const [challenge, setChallenge] = useState<listMenu>(listMenu_INIT)
+  const [dronerInfo, setDronerInfo] = useState<listMenu>(listMenu_INIT)
+  const [farmerInfo, setFarmerInfo] = useState<listMenu>(listMenu_INIT)
+  const [followJob, setFollowJob] = useState<listMenu>(listMenu_INIT)
+  const [guru, setGuru] = useState<listMenu>(listMenu_INIT)
+  const [mission, setMission] = useState<listMenu>(listMenu_INIT)
+  const [point, setPoint] = useState<listMenu>(listMenu_INIT)
+  const [pointResult, setPointResult] = useState<listMenu>(listMenu_INIT)
+  const [promotion, setPromotion] = useState<listMenu>(listMenu_INIT)
+  const [reward, setReward] = useState<listMenu>(listMenu_INIT)
+  const [settings, setSettings] = useState<listMenu>(listMenu_INIT)
 
   const handleRowClick = (record: any) => {
     setSelectedPermission(record.key)
@@ -19,6 +32,13 @@ function AddPermission() {
   const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setRole(e.target.value)
   }
+  const handleCheck = (checked: boolean, row: any, value: any) => {
+    if (row && value && typeof row === 'object' && typeof value === 'string') {
+      row['propertyName'] = checked ? value : null
+    }
+      console.log(followJob);
+  }
+  
   const menuName = [
     'ติดตามงาน',
     'ข้อมูลเกษตรกร',
@@ -69,18 +89,18 @@ function AddPermission() {
   const insertPermission = () => {
     const payload = {
       role: role,
-      followJob: [],
-      farmerInfo: [],
-      dronerInfo: [],
-      guru: [],
-      promotion: [],
-      pointResult: [],
-      mission: [],
-      challenge: [],
-      admin: [],
-      settings: [],
-      point: [],
-      reward: [],
+      followJob: [followJob],
+      farmerInfo: [farmerInfo],
+      dronerInfo: [dronerInfo],
+      guru: [guru],
+      promotion: [promotion],
+      pointResult: [pointResult],
+      mission: [mission],
+      challenge: [challenge],
+      admin: [admin],
+      settings: [settings],
+      point: [point],
+      reward: [reward],
     }
     console.log(payload)
     // Swal.fire({
@@ -106,14 +126,14 @@ function AddPermission() {
     },
     {
       title: 'ดูข้อมูล (View)',
-      dataIndex: 'add',
-      key: 'add',
+      dataIndex: 'view',
+      key: 'view',
       width: '11%',
       render: (value: any, row: any, index: number) => {
         return {
           children: (
             <>
-              <Checkbox />
+              <Checkbox onChange={(e) => handleCheck(e.target.checked, row, 'view')} />
             </>
           ),
         }
@@ -129,7 +149,10 @@ function AddPermission() {
         return {
           children: (
             <>
-              <Checkbox disabled={isDisable} />
+              <Checkbox
+                disabled={isDisable}
+                onChange={(e) => handleCheck(e.target.checked, row, 'add')}
+              />
             </>
           ),
         }
@@ -144,7 +167,7 @@ function AddPermission() {
         return {
           children: (
             <>
-              <Checkbox />
+              <Checkbox onChange={(e) => handleCheck(e.target.checked, row, 'edit')} />
             </>
           ),
         }
@@ -160,7 +183,10 @@ function AddPermission() {
         return {
           children: (
             <>
-              <Checkbox disabled={isDisable} />
+              <Checkbox
+                disabled={isDisable}
+                onChange={(e) => handleCheck(e.target.checked, row, 'delete')}
+              />
             </>
           ),
         }
@@ -187,7 +213,10 @@ function AddPermission() {
         return {
           children: (
             <>
-              <Checkbox disabled={isDisable} />
+              <Checkbox
+                disabled={isDisable}
+                onChange={(e) => handleCheck(e.target.checked, row, 'cancel')}
+              />
             </>
           ),
         }
@@ -195,15 +224,18 @@ function AddPermission() {
     },
     {
       title: 'บันทึกไฟล์ (Export File)',
-      dataIndex: 'export',
-      key: 'export',
+      dataIndex: 'excel',
+      key: 'excel',
       width: '18%',
       render: (value: any, row: any, index: number) => {
         const isDisable = ['งานที่เสร็จแล้ว (บัญชี)'].includes(row.name)
         return {
           children: (
             <>
-              <Checkbox disabled={!isDisable} />
+              <Checkbox
+                disabled={!isDisable}
+                onChange={(e) => handleCheck(e.target.checked, row, 'excel')}
+              />
             </>
           ),
         }
@@ -380,8 +412,6 @@ function AddPermission() {
     },
   ]
   const expandedRowRenderSub = (record: any) => {
-    console.log(record)
-
     const columnSubInSub = [
       {
         title: 'ชื่อเมนู',
@@ -511,15 +541,18 @@ function AddPermission() {
       },
       {
         title: 'ดูข้อมูล (View)',
-        dataIndex: 'add',
-        key: 'add',
+        dataIndex: 'view',
+        key: 'view',
         width: '11%',
         render: (value: any, row: any, index: number) => {
           const isDisable = ['อันดับเกษตรกร', 'กูรูเกษตร', 'โปรโมชั่น'].includes(row.name)
           return {
             children: (
               <>
-                <Checkbox disabled={isDisable} />
+                <Checkbox
+                  disabled={isDisable}
+                  onChange={(e) => handleCheck(e.target.checked, row, 'view')}
+                />
               </>
             ),
           }
@@ -549,7 +582,10 @@ function AddPermission() {
           return {
             children: (
               <>
-                <Checkbox disabled={isDisable} />
+                <Checkbox
+                  disabled={isDisable}
+                  onChange={(e) => handleCheck(e.target.checked, row, 'add')}
+                />
               </>
             ),
           }
@@ -570,7 +606,10 @@ function AddPermission() {
           return {
             children: (
               <>
-                <Checkbox disabled={isDisable} />
+                <Checkbox
+                  disabled={isDisable}
+                  onChange={(e) => handleCheck(e.target.checked, row, 'edit')}
+                />
               </>
             ),
           }
@@ -601,7 +640,10 @@ function AddPermission() {
           return {
             children: (
               <>
-                <Checkbox disabled={isDisable} />
+                <Checkbox
+                  disabled={isDisable}
+                  onChange={(e) => handleCheck(e.target.checked, row, 'delete')}
+                />
               </>
             ),
           }
@@ -639,7 +681,10 @@ function AddPermission() {
           return {
             children: (
               <>
-                <Checkbox disabled={isDisable} />
+                <Checkbox
+                  disabled={isDisable}
+                  onChange={(e) => handleCheck(e.target.checked, row, 'cancel')}
+                />
               </>
             ),
           }
@@ -647,15 +692,18 @@ function AddPermission() {
       },
       {
         title: 'บันทึกไฟล์ (Export File)',
-        dataIndex: 'export',
-        key: 'export',
+        dataIndex: 'excel',
+        key: 'excel',
         width: '18%',
         render: (value: any, row: any, index: number) => {
           const isDisable = ['งานที่เสร็จแล้ว (บัญชี)'].includes(row.name)
           return {
             children: (
               <>
-                <Checkbox disabled={!isDisable} />
+                <Checkbox
+                  disabled={!isDisable}
+                  onChange={(e) => handleCheck(e.target.checked, row, 'excel')}
+                />
               </>
             ),
           }
