@@ -172,7 +172,7 @@ export const pathLists = (isAccounting: boolean, isAdminTask?: boolean) => {
             {
               path: '/IndexRedeem/Farmer',
               name: 'IndexRedeem/Farmer',
-              title: 'รายงานการแลก',
+              title: 'แลกแต้ม/ของรางวัล',
               subMenu: [],
             },
             {

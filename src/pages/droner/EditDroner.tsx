@@ -715,6 +715,7 @@ function EditDroner() {
       UploadImageDatasouce.uploadImage(imgBB).then((res) => {})
     }
     if (payload) {
+      setDisableSaveBtn(true)
       await DronerDatasource.updateDroner(payload).then((res) => {
         if (res !== undefined) {
           console.log(res)
@@ -753,7 +754,7 @@ function EditDroner() {
             showConfirmButton: true,
           })
         }
-      })
+      }).finally(()=> setDisableSaveBtn(false))
     }
   }
   const onFieldsChange = (field: any) => {
