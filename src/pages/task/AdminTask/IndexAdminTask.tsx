@@ -1216,7 +1216,7 @@ const IndexAdminTask = () => {
             await TaskDatasource.deleteImageFinishTask(id)
           }
         }
-        if (typeof deleteImgDrug[0].file !== 'string') {
+        if (deleteImgDrug && typeof deleteImgDrug[0].file !== 'string') {
           if (deleteImgDrug) {
             await TaskDatasource.insertManageTaskImg(
               taskId,
