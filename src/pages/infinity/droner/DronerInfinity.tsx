@@ -1,4 +1,18 @@
-import { Badge, Button, Input, Pagination, PaginationProps, Select, Spin, Table, Tabs } from 'antd'
+import {
+  Badge,
+  Button,
+  Dropdown,
+  Input,
+  Menu,
+  Pagination,
+  PaginationProps,
+  Row,
+  Select,
+  Slider,
+  Spin,
+  Table,
+  Tabs,
+} from 'antd'
 import React, { useEffect, useState } from 'react'
 import { color, image } from '../../../resource'
 import {
@@ -7,6 +21,7 @@ import {
   DeleteOutlined,
   EditOutlined,
   FileTextOutlined,
+  SwapOutlined,
 } from '@ant-design/icons'
 import { DateTimeUtil } from '../../../utilities/DateTimeUtil'
 import { numberWithCommas } from '../../../utilities/TextFormatter'
@@ -15,6 +30,7 @@ import { useNavigate } from 'react-router-dom'
 import { ProviceEntity } from '../../../entities/LocationEntities'
 import { LocationDatasource } from '../../../datasource/LocationDatasource'
 import icon from '../../../resource/icon'
+import AddButtton from '../../../components/button/AddButton'
 
 function DronerInfinity() {
   const [status, setStatus] = useState<any>()
@@ -30,9 +46,9 @@ function DronerInfinity() {
   const [sortDirection3, setSortDirection3] = useState<string | undefined>(undefined)
   const [sortDirection4, setSortDirection4] = useState<string | undefined>(undefined)
   const [sortField, setSortField] = useState<string | undefined>(undefined)
+  const [inputValue, setInputValue] = useState(1)
 
   const navigate = useNavigate()
- 
 
   const tabConfigurations = [
     { title: 'ใช้งาน', key: 'ACTIVE' },
@@ -41,6 +57,9 @@ function DronerInfinity() {
   const onShowSizeChange: PaginationProps['onShowSizeChange'] = (current, pageSize) => {
     setCurrent(current)
     setRow(pageSize)
+  }
+  const onChange = (newValue: number) => {
+    setInputValue(newValue)
   }
   const columns = [
     {
@@ -168,11 +187,7 @@ function DronerInfinity() {
       key: 'name',
       render: (value: any, row: any, index: number) => {
         return {
-          children: (
-            <span className=' d-block font-size-lg' >
-              081-234-5678
-            </span>
-          ),
+          children: <span className=' d-block font-size-lg'>081-234-5678</span>,
         }
       },
     },
@@ -222,16 +237,16 @@ function DronerInfinity() {
       key: 'status',
       render: (value: any, row: any, index: number) => {
         return {
-            children: (
-                <span
-                  style={{
-                    color: row.status !== 'CANCEL' ? color.Success : color.Error,
-                  }}
-                >
-                  <Badge color={row.status !== 'CANCEL' ? color.Success : color.Error} />{' '}
-                  {row.status === 'CANCEL' ? 'ปิดการใช้งาน' : 'ใช้งาน'}
-                </span>
-              ),
+          children: (
+            <span
+              style={{
+                color: row.status !== 'CANCEL' ? color.Success : color.Error,
+              }}
+            >
+              <Badge color={row.status !== 'CANCEL' ? color.Success : color.Error} />{' '}
+              {row.status === 'CANCEL' ? 'ปิดการใช้งาน' : 'ใช้งาน'}
+            </span>
+          ),
         }
       },
     },
@@ -242,20 +257,23 @@ function DronerInfinity() {
       render: (value: any, row: any, index: number) => {
         return {
           children: (
-            <div className='d-flex flex-row justify-content-between'>
-              <div className='pr-1'>
-                {/* <ActionButton
-                  icon={
-                    <img
-                      src={icon.fertilizer}
-                      style={{ width: 30, height: 30, paddingBottom: '10%' }}
-                    />
-                  }
-                  color={color.primary1}
-                  // onClick={() => navigate('/DetailStore')}
-                /> */}
-              </div>
-            </div>
+            <Row justify={'space-between'}>
+              <ActionButton
+                icon={<SwapOutlined />}
+                color={color.primary1}
+                // onClick={() => navigate('//id=' + row.id)}
+              />
+              <ActionButton
+                icon={<EditOutlined />}
+                color={color.primary1}
+                // onClick={() => navigate('/EditFarmer/id=' + row.id)}
+              />
+              <ActionButton
+                icon={<img src={icon.account_cancel} style={{ width: '20px', height: '20px' }} />}
+                color={color.Error}
+                // onClick={() => navigate('/EditFarmer/id=' + row.id)}
+              />
+            </Row>
           ),
         }
       },
@@ -270,13 +288,24 @@ function DronerInfinity() {
       </div>
     ),
   }
+
   return (
     <div>
-      <div className='d-flex justify-content-between'>
-        <div className='d-flex'>
-          <span className='p-3'>
-            <strong style={{ fontSize: '20px' }}>รายชื่อนักบินโดรน (แนะนำยา / ปุ๋ย) </strong>
+      <div className='d-flex justify-content-between pt-3 pb-3'>
+        <div>
+          <span
+            className='card-label font-weight-bolder text-dark'
+            style={{
+              fontSize: 22,
+              fontWeight: 'bold',
+              padding: '8px',
+            }}
+          >
+            <strong>รายชื่อนักบินโดรน (แนะนำยา / ปุ๋ย)</strong>
           </span>
+        </div>
+        <div>
+          <AddButtton text='เพิ่มชื่อนักบินโดรน' onClick={() => navigate('/')} />
         </div>
       </div>
       <div className='pt-3'>
@@ -319,26 +348,44 @@ function DronerInfinity() {
             ))}
           </Select>
         </div>
+
         <div className='col-lg p-1'>
-          <Select
-            className='col-lg-12'
-            placeholder='เลือกจำนวนเครดิต'
-            onChange={(province: any) => setProvinceSelect(province)}
-            showSearch
-            value={provinceSelect}
-            allowClear
-            optionFilterProp='children'
-            filterOption={(input: any, option: any) => option.children.includes(input)}
-            filterSort={(optionA, optionB) =>
-              optionA.children.toLowerCase().localeCompare(optionB.children.toLowerCase())
+          <Dropdown
+            overlay={
+              <div
+                style={{
+                  backgroundColor: color.White,
+                  padding: 20,
+                  width: '350px',
+                  height: '150px',
+                  textAlign: 'center',
+                  boxShadow: '0px 0px 4px 0px rgba(0, 0, 0, 0.15)',
+                }}
+              >
+                <label>จำนวนเครดิต</label>
+                <Slider
+                  style={{ color: color.Success }}
+                  onChange={onChange}
+                  min={1}
+                  max={100000}
+                  value={typeof inputValue === 'number' ? inputValue : 0}
+                />
+                <div className='d-flex justify-content-between pt-3 pb-3'>
+                  <Button style={{ width: '120px' }}>{0}</Button>
+                  <Button style={{ width: '120px' }}>{numberWithCommas(inputValue)}</Button>
+                </div>
+              </div>
             }
           >
-            {province?.map((item, index) => (
-              <option key={index} value={item.provinceId.toString()}>
-                {item.provinceName}
-              </option>
-            ))}
-          </Select>
+            <Button
+              className='col-lg-12'
+              style={{
+                color: color.Disable,
+              }}
+            >
+              เลือกจำนวนเครดิต
+            </Button>
+          </Dropdown>
         </div>
         <div className='col-lg-1 p-1'>
           <Button
