@@ -670,10 +670,10 @@ export const ConfirmNewTask: React.FC<ConfirmNewTaskProps> = ({
                       <span className='col' style={{ textAlign: 'end', color: color.Warning }}>
                         {isEdit
                           ? numberWithCommasToFixed(
-                              parseFloat(createNewTask?.price) +
-                                parseFloat(createNewTask?.revenuePromotion),
+                              parseInt(createNewTask?.price) +
+                                parseInt(createNewTask?.revenuePromotion),
                             )
-                          : numberWithCommasToFixed(createNewTask?.price) || 0}{' '}
+                          : numberWithCommasToFixed(parseInt(createNewTask?.price)) || 0}{' '}
                         ฿
                       </span>
                     </div>
