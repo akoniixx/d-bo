@@ -324,6 +324,12 @@ export const pathLists = (isAccounting: boolean, isAdminTask?: boolean) => {
       title: 'ระบบ 1-Finity',
       subMenu: [
         {
+          path: '/DronerInfinity',
+          name: 'DronerInfinity',
+          title: 'รายชื่อนักบินโดรน',
+          subMenu: [],
+        },
+        {
           path: '/IndexListStore',
           name: 'IndexListStore',
           title: 'รายชื่อร้านค้า',

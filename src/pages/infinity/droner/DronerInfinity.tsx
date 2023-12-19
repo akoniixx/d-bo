@@ -1,6 +1,6 @@
 import { Badge, Button, Input, Pagination, PaginationProps, Select, Spin, Table, Tabs } from 'antd'
 import React, { useEffect, useState } from 'react'
-import { color, image } from '../../resource'
+import { color, image } from '../../../resource'
 import {
   CaretDownOutlined,
   CaretUpOutlined,
@@ -8,15 +8,15 @@ import {
   EditOutlined,
   FileTextOutlined,
 } from '@ant-design/icons'
-import { DateTimeUtil } from '../../utilities/DateTimeUtil'
-import { numberWithCommas } from '../../utilities/TextFormatter'
-import ActionButton from '../../components/button/ActionButton'
+import { DateTimeUtil } from '../../../utilities/DateTimeUtil'
+import { numberWithCommas } from '../../../utilities/TextFormatter'
+import ActionButton from '../../../components/button/ActionButton'
 import { useNavigate } from 'react-router-dom'
-import { ProviceEntity } from '../../entities/LocationEntities'
-import { LocationDatasource } from '../../datasource/LocationDatasource'
-import icon from '../../resource/icon'
+import { ProviceEntity } from '../../../entities/LocationEntities'
+import { LocationDatasource } from '../../../datasource/LocationDatasource'
+import icon from '../../../resource/icon'
 
-function IndexListStore() {
+function DronerInfinity() {
   const [status, setStatus] = useState<any>()
   const [provinceSelect, setProvinceSelect] = useState<any>()
   const [searchText, setSearchText] = useState<string>('')
@@ -32,19 +32,11 @@ function IndexListStore() {
   const [sortField, setSortField] = useState<string | undefined>(undefined)
 
   const navigate = useNavigate()
-  useEffect(() => {
-    const fetchProvince = async () => {
-      await LocationDatasource.getProvince().then((res) => {
-        setProvince(res)
-      })
-    }
-
-    fetchProvince()
-  }, [])
+ 
 
   const tabConfigurations = [
     { title: 'ใช้งาน', key: 'ACTIVE' },
-    { title: 'ปิดการใช้งาน', key: 'INACTIVE' },
+    { title: 'ยกเลิก', key: 'CANCEL' },
   ]
   const onShowSizeChange: PaginationProps['onShowSizeChange'] = (current, pageSize) => {
     setCurrent(current)
@@ -55,7 +47,7 @@ function IndexListStore() {
       title: () => {
         return (
           <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-            รหัสร้านค้า
+            ชื่อนักบินโดรน
             <div
               style={{
                 display: 'flex',
@@ -108,7 +100,14 @@ function IndexListStore() {
         return {
           children: (
             <div className='container'>
-              <span className='text-dark-75  d-block font-size-lg'>CL0016</span>
+              <div className='container'>
+                <span className='text-dark-75  d-block font-size-lg'>โดรนเนอร์ พ่นปุ๋ย 1</span>
+                <div>
+                  <span className=' d-block font-size-lg' style={{ color: color.Grey }}>
+                    DN00000001{' '}
+                  </span>
+                </div>
+              </div>
             </div>
           ),
         }
@@ -118,7 +117,7 @@ function IndexListStore() {
       title: () => {
         return (
           <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-            ชื่อร้านค้า
+            เบอร์โทร
             <div
               style={{
                 display: 'flex',
@@ -170,106 +169,50 @@ function IndexListStore() {
       render: (value: any, row: any, index: number) => {
         return {
           children: (
-            <>
-              <div className='container'>
-                <span className='text-dark-75  d-block font-size-lg'>ไม้เมืองการเกษตร</span>
-                <div>
-                  <span className=' d-block font-size-lg' style={{ color: color.Grey }}>
-                    337766735542
-                  </span>
-                </div>
-              </div>
-            </>
+            <span className=' d-block font-size-lg' >
+              081-234-5678
+            </span>
           ),
         }
       },
     },
     {
-      title: 'ชื่อเจ้าของร้าน',
+      title: 'ที่อยู่',
       dataIndex: 'like',
       key: 'like',
       render: (value: any, row: any, index: number) => {
         return {
-          children: <span>นางแก้วคำมา แสนแปลง</span>,
+          children: <span>บ่อถ้ำ/ขาณุวรลักษบุรี/กำแพงเพชร</span>,
         }
       },
     },
     {
-      title: 'เบอร์โทร',
+      title: 'แต้มสะสม',
+      dataIndex: 'like',
+      key: 'like',
+      render: (value: any, row: any, index: number) => {
+        return {
+          children: <span>30,000</span>,
+        }
+      },
+    },
+    {
+      title: 'เครดิต',
       dataIndex: 'commentCount',
       key: 'commentCount',
       render: (value: any, row: any, index: number) => {
         return {
-          children: <span>0989284761</span>,
+          children: <span>1</span>,
         }
       },
     },
     {
-      title: 'จังหวัด',
+      title: 'จำนวนยา / ปุ๋ย',
       dataIndex: 'view',
       key: 'view',
       render: (value: any, row: any, index: number) => {
         return {
-          children: <span>กำแพงเพชร</span>,
-        }
-      },
-    },
-    {
-      title: () => {
-        return (
-          <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-            รายการยา / ปุ๋ย
-            <div
-              style={{
-                display: 'flex',
-                flexDirection: 'column',
-                cursor: 'pointer',
-              }}
-              onClick={() => {
-                setSortField('count')
-                setSortDirection((prev) => {
-                  if (prev === 'asc') {
-                    return 'desc'
-                  } else if (prev === undefined) {
-                    return 'asc'
-                  } else {
-                    return undefined
-                  }
-                })
-                setSortDirection3((prev) => {
-                  if (prev === 'asc') {
-                    return 'desc'
-                  } else if (prev === undefined) {
-                    return 'asc'
-                  } else {
-                    return undefined
-                  }
-                })
-              }}
-            >
-              <CaretUpOutlined
-                style={{
-                  position: 'relative',
-                  top: 2,
-                  color: sortDirection3 === 'asc' ? '#ffca37' : 'white',
-                }}
-              />
-              <CaretDownOutlined
-                style={{
-                  position: 'relative',
-                  bottom: 2,
-                  color: sortDirection3 === 'desc' ? '#ffca37' : 'white',
-                }}
-              />
-            </div>
-          </div>
-        )
-      },
-      dataIndex: 'count',
-      key: 'count',
-      render: (value: any, row: any, index: number) => {
-        return {
-          children: <span>{numberWithCommas(1000)} รายการ</span>,
+          children: <span>10 ขวด / 1 กระสอบ</span>,
         }
       },
     },
@@ -279,16 +222,16 @@ function IndexListStore() {
       key: 'status',
       render: (value: any, row: any, index: number) => {
         return {
-          children: (
-            <span
-              style={{
-                color: row.status !== 'INACTIVE' ? color.Success : color.Error,
-              }}
-            >
-              <Badge color={row.status !== 'INACTIVE' ? color.Success : color.Error} />{' '}
-              {row.status === 'INACTIVE' ? 'ปิดการใช้งาน' : 'ใช้งาน'}
-            </span>
-          ),
+            children: (
+                <span
+                  style={{
+                    color: row.status !== 'CANCEL' ? color.Success : color.Error,
+                  }}
+                >
+                  <Badge color={row.status !== 'CANCEL' ? color.Success : color.Error} />{' '}
+                  {row.status === 'CANCEL' ? 'ปิดการใช้งาน' : 'ใช้งาน'}
+                </span>
+              ),
         }
       },
     },
@@ -301,18 +244,16 @@ function IndexListStore() {
           children: (
             <div className='d-flex flex-row justify-content-between'>
               <div className='pr-1'>
-                <ActionButton
-                  icon={<img src={icon.fertilizer} style={{ width: 30, height: 30, paddingBottom: '10%' }} />}
+                {/* <ActionButton
+                  icon={
+                    <img
+                      src={icon.fertilizer}
+                      style={{ width: 30, height: 30, paddingBottom: '10%' }}
+                    />
+                  }
                   color={color.primary1}
                   // onClick={() => navigate('/DetailStore')}
-                />
-              </div>
-              <div className='pr-1'>
-                <ActionButton
-                  icon={<FileTextOutlined />}
-                  color={color.primary1}
-                  onClick={() => navigate('/DetailStore')}
-                />
+                /> */}
               </div>
             </div>
           ),
@@ -334,13 +275,13 @@ function IndexListStore() {
       <div className='d-flex justify-content-between'>
         <div className='d-flex'>
           <span className='p-3'>
-            <strong style={{ fontSize: '20px' }}>รายชื่อร้านค้า </strong>
+            <strong style={{ fontSize: '20px' }}>รายชื่อนักบินโดรน (แนะนำยา / ปุ๋ย) </strong>
           </span>
         </div>
       </div>
       <div className='pt-3'>
         <Tabs
-          className={status === 'INACTIVE' ? 'tab-status-inactive' : ''}
+          className={status === 'CANCEL' ? 'tab-status-inactive' : ''}
           onChange={(key: any) => setStatus(key)}
           type='card'
         >
@@ -350,9 +291,9 @@ function IndexListStore() {
         </Tabs>
       </div>
       <div className='d-flex justify-content-between pb-4'>
-        <div className='col-lg-8 p-1'>
+        <div className='col-lg-6 p-1'>
           <Input
-            placeholder='ค้นหาชื่อรัหสร้านค้า / ชื่อร้านค้า / หมายเลขนิติบุคคล / เบอร์โทร'
+            placeholder='ค้นหาชื่อนักบิน / เบอร์โทร / ID นักบินโดรน'
             className='col-lg-12'
             onChange={(e: any) => setSearchText(e.target.value)}
           />
@@ -360,7 +301,28 @@ function IndexListStore() {
         <div className='col-lg p-1'>
           <Select
             className='col-lg-12'
-            placeholder='เลือกจังหวัด'
+            placeholder='เลือกที่อยู่นักบินโดรน'
+            onChange={(province: any) => setProvinceSelect(province)}
+            showSearch
+            value={provinceSelect}
+            allowClear
+            optionFilterProp='children'
+            filterOption={(input: any, option: any) => option.children.includes(input)}
+            filterSort={(optionA, optionB) =>
+              optionA.children.toLowerCase().localeCompare(optionB.children.toLowerCase())
+            }
+          >
+            {province?.map((item, index) => (
+              <option key={index} value={item.provinceId.toString()}>
+                {item.provinceName}
+              </option>
+            ))}
+          </Select>
+        </div>
+        <div className='col-lg p-1'>
+          <Select
+            className='col-lg-12'
+            placeholder='เลือกจำนวนเครดิต'
             onChange={(province: any) => setProvinceSelect(province)}
             showSearch
             value={provinceSelect}
@@ -416,4 +378,4 @@ function IndexListStore() {
   )
 }
 
-export default IndexListStore
+export default DronerInfinity

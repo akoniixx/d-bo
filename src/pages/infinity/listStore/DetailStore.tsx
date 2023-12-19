@@ -1,13 +1,13 @@
 import React from 'react'
-import { BackIconButton } from '../../components/button/BackButton'
+import { BackIconButton } from '../../../components/button/BackButton'
 import { useNavigate } from 'react-router-dom'
-import { CardHeaderPromotion } from '../../components/header/CardHeaderPromotion'
-import MapGoogle from '../../components/map/GoogleMap'
-import { LAT_LNG_BANGKOK } from '../../definitions/Location'
-import color from '../../resource/color'
+import { CardHeaderPromotion } from '../../../components/header/CardHeaderPromotion'
+import MapGoogle from '../../../components/map/GoogleMap'
+import { LAT_LNG_BANGKOK } from '../../../definitions/Location'
+import color from '../../../resource/color'
 import { Badge, Button, Divider, Upload, UploadFile } from 'antd'
-import image from '../../resource/image'
-import { CardContainer } from '../../components/card/CardContainer'
+import image from '../../../resource/image'
+import { CardContainer } from '../../../components/card/CardContainer'
 
 function DetailStore() {
   const navigate = useNavigate()
