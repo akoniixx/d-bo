@@ -1,5 +1,11 @@
 ## [Version - 0]
 
+## Feature [v0.42.0] 2023-12-19
+
+- added ui droner list infinity
+- added ui detail shop infinity
+- added ui credit infinity
+
 ## Fix [v0.41.5] 2023-12-14
 
 - fixed mission point date

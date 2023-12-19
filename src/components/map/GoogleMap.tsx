@@ -13,7 +13,7 @@ interface GoogleMapProps {
   changeLatLng?: (lat: string, lng: string) => void
 }
 
-const GooleMap: React.FC<GoogleMapProps> = ({
+const MapGoogle: React.FC<GoogleMapProps> = ({
   width,
   height,
   zoom,
@@ -82,4 +82,4 @@ const GooleMap: React.FC<GoogleMapProps> = ({
 
   return isLoaded ? renderMap() : null
 }
-export default GooleMap
+export default MapGoogle

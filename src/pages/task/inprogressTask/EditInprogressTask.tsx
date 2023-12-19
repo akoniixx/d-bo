@@ -22,7 +22,7 @@ import { BackIconButton } from '../../../components/button/BackButton'
 import { CardContainer } from '../../../components/card/CardContainer'
 import FooterPage from '../../../components/footer/FooterPage'
 import { CardHeader } from '../../../components/header/CardHearder'
-import GooleMap from '../../../components/map/GoogleMap'
+import MapGoogle from '../../../components/map/GoogleMap'
 import ModalSelectedDroner from '../../../components/modal/task/inprogressTask/ModalSelectedDroner'
 import { CouponDataSource } from '../../../datasource/CouponDatasource'
 import { CropDatasource } from '../../../datasource/CropDatasource'
@@ -531,7 +531,7 @@ const EditInprogressTask = () => {
             </div>
             <div className='row'>
               <div className='form-group col-lg-12'>
-                <GooleMap
+                <MapGoogle
                   width='100%'
                   height='350px'
                   zoom={17}

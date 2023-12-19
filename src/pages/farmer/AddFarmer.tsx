@@ -382,7 +382,6 @@ const AddFarmer = () => {
         })
       }
       setBtnSaveDisable(false)
-
     } catch (error) {
       setBtnSaveDisable(false)
       console.error('Error inserting farmer data:', error)
