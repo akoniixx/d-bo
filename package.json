@@ -1,6 +1,6 @@
 {
   "name": "bo-drone",
-  "version": "0.41.5",
+  "version": "0.40.1",
   "private": true,
   "dependencies": {
     "@ant-design/icons": "^4.7.0",
@@ -24,6 +24,7 @@
     "react-bootstrap": "^2.4.0",
     "react-dom": "^18.2.0",
     "react-image-file-resizer": "^0.4.8",
+    "react-query": "^3.39.3",
     "react-quill": "^2.0.0",
     "react-router-dom": "^6.3.0",
     "react-scripts": "5.0.1",
