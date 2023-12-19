@@ -2,6 +2,7 @@ import {
   Badge,
   Button,
   Dropdown,
+  Form,
   Input,
   Menu,
   Pagination,
@@ -27,12 +28,17 @@ import { DateTimeUtil } from '../../../utilities/DateTimeUtil'
 import { numberWithCommas } from '../../../utilities/TextFormatter'
 import ActionButton from '../../../components/button/ActionButton'
 import { useNavigate } from 'react-router-dom'
-import { ProviceEntity } from '../../../entities/LocationEntities'
+import { ProviceEntity, SubdistrictEntity } from '../../../entities/LocationEntities'
 import { LocationDatasource } from '../../../datasource/LocationDatasource'
 import icon from '../../../resource/icon'
 import AddButtton from '../../../components/button/AddButton'
+import ModalDronerInfinity from '../../../components/modal/ModalDronerInfinity'
+import ModalDelete from '../../../components/modal/ModalDelete'
+import { DronerAreaEntity, DronerAreaEntity_INIT } from '../../../entities/DronerAreaEntities'
+import { LAT_LNG_BANGKOK } from '../../../definitions/Location'
 
 function DronerInfinity() {
+  const { Option } = Select
   const [status, setStatus] = useState<any>()
   const [provinceSelect, setProvinceSelect] = useState<any>()
   const [searchText, setSearchText] = useState<string>('')
@@ -47,9 +53,29 @@ function DronerInfinity() {
   const [sortDirection4, setSortDirection4] = useState<string | undefined>(undefined)
   const [sortField, setSortField] = useState<string | undefined>(undefined)
   const [inputValue, setInputValue] = useState(1)
-
+  const [showModal, setShowModal] = useState<boolean>(false)
+  const [editIndex, setEditIndex] = useState(0)
+  const [modalDelete, setModalDelete] = useState<boolean>(false)
+  const [location, setLocation] = useState<SubdistrictEntity[]>([])
+  const { Map } = require('immutable')
   const navigate = useNavigate()
+  const [mapPosition, setMapPosition] = useState<{
+    lat?: number
+    lng?: number
+  }>()
+  const [dronerArea, setDronerArea] = useState<DronerAreaEntity>(DronerAreaEntity_INIT)
+  const [form] = Form.useForm()
+  const [searchLocation] = useState('')
 
+  useEffect(() => {
+    fetchLocation(searchLocation)
+  }, [])
+  const fetchLocation = async (text?: string) => {
+    await LocationDatasource.getSubdistrict(0, text).then((res) => {
+      setLocation(res)
+    })
+  }
+ 
   const tabConfigurations = [
     { title: 'ใช้งาน', key: 'ACTIVE' },
     { title: 'ยกเลิก', key: 'CANCEL' },
@@ -61,6 +87,15 @@ function DronerInfinity() {
   const onChange = (newValue: number) => {
     setInputValue(newValue)
   }
+  const showModalDronerList = (data: any, index: number) => {
+    setShowModal((prev) => !prev)
+    setEditIndex(index)
+  }
+  const showDelete = (id: string) => {
+    // setDeleteId(id)
+    setModalDelete(!modalDelete)
+  }
+
   const columns = [
     {
       title: () => {
@@ -266,12 +301,14 @@ function DronerInfinity() {
               <ActionButton
                 icon={<EditOutlined />}
                 color={color.primary1}
-                // onClick={() => navigate('/EditFarmer/id=' + row.id)}
+                onClick={() => showModalDronerList(row, index + 1)}
               />
               <ActionButton
                 icon={<img src={icon.account_cancel} style={{ width: '20px', height: '20px' }} />}
                 color={color.Error}
-                // onClick={() => navigate('/EditFarmer/id=' + row.id)}
+                onClick={() => {
+                  showDelete(row.id)
+                }}
               />
             </Row>
           ),
@@ -305,7 +342,7 @@ function DronerInfinity() {
           </span>
         </div>
         <div>
-          <AddButtton text='เพิ่มชื่อนักบินโดรน' onClick={() => navigate('/')} />
+          <AddButtton text='เพิ่มชื่อนักบินโดรน' onClick={() => setShowModal((prev) => !prev)} />
         </div>
       </div>
       <div className='pt-3'>
@@ -329,22 +366,21 @@ function DronerInfinity() {
         </div>
         <div className='col-lg p-1'>
           <Select
-            className='col-lg-12'
-            placeholder='เลือกที่อยู่นักบินโดรน'
-            onChange={(province: any) => setProvinceSelect(province)}
-            showSearch
-            value={provinceSelect}
+          className='col-lg-12'
             allowClear
+            showSearch
+            placeholder='เลือกที่อยู่นักบินโดรน'
+            // onChange={handleSearchLocation}
             optionFilterProp='children'
-            filterOption={(input: any, option: any) => option.children.includes(input)}
             filterSort={(optionA, optionB) =>
               optionA.children.toLowerCase().localeCompare(optionB.children.toLowerCase())
             }
+            filterOption={(input: any, option: any) => option.children.includes(input)}
           >
-            {province?.map((item, index) => (
-              <option key={index} value={item.provinceId.toString()}>
-                {item.provinceName}
-              </option>
+            {location?.map((item, index) => (
+              <Option key={index} value={item.subdistrictId}>
+                {item.subdistrictName + '/' + item.districtName + '/' + item.provinceName}
+              </Option>
             ))}
           </Select>
         </div>
@@ -421,6 +457,37 @@ function DronerInfinity() {
           total={data.length}
         />
       </div>
+
+      <ModalDronerInfinity
+        action='edit'
+        show={showModal}
+        backButton={() => {
+          setEditIndex(0)
+          setShowModal((prev) => !prev)
+        }}
+        // data={editIndex > 0 ? dataGroupGuru : GroupGuruEntities_INIT}
+        callBack={() => {
+          setShowModal((prev) => !prev)
+        }}
+        isEditModal={editIndex > 0 ? true : false}
+        title={editIndex > 0 ? 'แก้ไขรายชื่อนักบินโดรน' : 'เพิ่มรายชื่อนักบินโดรน'}
+        data={undefined}
+      />
+      <ModalDelete
+        show={modalDelete}
+        title={'ยกเลิกนักบินโดรนที่เข้าร่วม 1-Finity'}
+        title1={'โปรดตรวจสอบชื่อนักบินโดรน ก่อนที่จะกดยืนยันการยกเลิกนักบินโดรน'}
+        title2={' เพราะอาจส่งผลต่อการคืนยา คืนเครดิต และคืนแต้มในระบบ'}
+        backButton={() => setModalDelete(!modalDelete)}
+        callBack={() => {
+          // GuruKasetDataSource.deleteGuru(deleteId).then((res) => {
+          //   if (res) {
+          //     setModalDelete(!modalDelete)
+          //     getGuruKaset()
+          //   }
+          // })
+        }}
+      />
     </div>
   )
 }

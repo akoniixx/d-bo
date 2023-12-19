@@ -302,7 +302,12 @@ function IndexListStore() {
             <div className='d-flex flex-row justify-content-between'>
               <div className='pr-1'>
                 <ActionButton
-                  icon={<img src={icon.fertilizer} style={{ width: 30, height: 30, paddingBottom: '10%' }} />}
+                  icon={
+                    <img
+                      src={icon.fertilizer}
+                      style={{ width: 30, height: 30, paddingBottom: '10%' }}
+                    />
+                  }
                   color={color.primary1}
                   // onClick={() => navigate('/DetailStore')}
                 />
