@@ -17,4 +17,5 @@ export default {
   empty_table_farmer: require('./media/empties/empty_table_farmer.png'),
   empty_table_droner: require('./media/empties/empty_table_droner.png'),
   empty_table_drone: require('./media/empties/empty_table_drone.png'),
+  empty_shop: require('./media/empties/empty_shop.png'),
 }

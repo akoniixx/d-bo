@@ -140,7 +140,7 @@ table tr td :hover {
   color: #404040 !important;
 }
 
-.ant-tabs-tab.ant-tabs-tab-active .ant-tabs-tab-btn {
+.ant-tabs-tab-active .ant-tabs-tab-btn {
   color: #219653 !important;
 }
 
@@ -155,4 +155,11 @@ table tr td :hover {
 .rs-picker-has-value .rs-btn .rs-picker-toggle-value,
 .rs-picker-has-value .rs-picker-toggle .rs-picker-toggle-value {
   color: #000 !important;
+}
+.tab-status-inactive .ant-tabs-tab-active {
+  border-color: #eb5757 !important;
+  border-radius: 4px 4px 0px 0px !important;
+}
+.tab-status-inactive .ant-tabs-tab-active .ant-tabs-tab-btn {
+  color: #eb5757 !important;
 }
