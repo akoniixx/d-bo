@@ -36,19 +36,87 @@ function AddPermission() {
   const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setRole(e.target.value)
   }
-  const handleCheck = (checked: boolean, row: any, value: any) => {
-    const rowIndex = listArray.findIndex((item: any) => item.name === row.name)
-    const updatedFollowJob = {
-      ...row.value,
-      name: row['name'],
-      [value]: { value: checked, disabled: false },
-    }
+  const handleCheckMenu = (checked: boolean, disabel: boolean, row: any, value: any) => {}
 
-    const updatedListArray =
-      rowIndex === -1
-        ? [...listArray, updatedFollowJob]
-        : listArray.map((item: any, index: any) => (index === rowIndex ? updatedFollowJob : item))
-    setListArray(updatedListArray)
+  const handleCheck = (checked: boolean, disable: boolean, row: any, value: any) => {
+    const isDisableView =
+      ['อันดับเกษตรกร', 'กูรูเกษตร', 'โปรโมชั่น'].includes(row.name) || value === 'view'
+    const isDisableAdd =
+      [
+        'งานรอดำเนินงาน',
+        'งานในวันนี้',
+        'งานที่เสร็จแล้ว',
+        'งานที่เสร็จแล้ว (บัญชี)',
+        'แก้ไขงาน/ดูประวัติงาน',
+        'อันดับเกษตรกร',
+        'อันดับนักบินโดรน',
+        'กูรูเกษตร',
+        'โปรโมชั่น',
+        'แลกแต้ม/ของรางวัล',
+        'รายงานแต้ม',
+        'ราคา',
+        'แต้ม',
+      ].includes(row['name']) || value === 'add'
+    const isDisableEdit =
+      ['อันดับเกษตรกร', 'อันดับนักบินโดรน', 'กูรูเกษตร', 'โปรโมชั่น'].includes(row.name) ||
+      value === 'edit'
+    const isDisableDelete =
+      [
+        'งานใหม่ (รอนักบิน)',
+        'งานรอดำเนินงาน',
+        'งานในวันนี้',
+        'งานที่เสร็จแล้ว',
+        'งานที่เสร็จแล้ว (บัญชี)',
+        'แก้ไขงาน/ดูประวัติงาน',
+        'อันดับเกษตรกร',
+        'อันดับนักบินโดรน',
+        'กูรูเกษตร',
+        'โปรโมชั่น',
+        'รายงานแต้ม',
+        'แลกแต้ม/ของรางวัล',
+        'รายชื่อพืช',
+        'ราคา',
+      ].includes(row.name) || value === 'delete'
+    const isDisableCancel =
+      [
+        'งานรอดำเนินงาน',
+        'งานในวันนี้',
+        'งานที่เสร็จแล้ว',
+        'งานที่เสร็จแล้ว (บัญชี)',
+        'รายชื่อเกษตรกร',
+        'รายการแปลงเกษตร',
+        'อันดับเกษตรกร',
+        'รายชื่อนักบินโดรน',
+        'รายการโดรนเกษตร',
+        'อันดับนักบินโดรน',
+        'ข่าวสาร',
+        'กูรูเกษตร',
+        'โปรโมชั่น',
+        'คูปอง',
+        'รายงานแต้ม',
+        'รายชื่อผู้ดูแลระบบ',
+        'บทบาทผู้ดูแล',
+        'ยี่ห้อโดรน',
+        'รายชื่อพืช',
+        'เป้าหมาย',
+        'ราคา',
+      ].includes(row.name) || value === 'cancel'
+    const isDisableExcel = ['งานที่เสร็จแล้ว (บัญชี)'].includes(row.name) || value === 'excel'
+    
+
+    // const rowIndex = listArray.findIndex((item: any) => item.name === row.name)
+    // const updatedFollowJob = {
+    //   ...row.value,
+    //   name: row['name'],
+    //   [value]: { value: checked, disable: disable },
+    // }
+
+    // const updatedListArray =
+    //   rowIndex === -1
+    //     ? [...listArray, updatedFollowJob]
+    //     : listArray.map((item: any, index: any) => (index === rowIndex ? updatedFollowJob : item))
+    // setListArray(updatedListArray)
+    // console.log(updatedListArray)
   }
 
   const menuName = [
@@ -194,7 +262,7 @@ function AddPermission() {
         return {
           children: (
             <>
-              <Checkbox onChange={(e) => handleCheck(e.target.checked, row, 'view')} />
+              <Checkbox onChange={(e) => handleCheckMenu(e.target.checked, false, row, 'view')} />
             </>
           ),
         }
@@ -212,7 +280,7 @@ function AddPermission() {
             <>
               <Checkbox
                 disabled={isDisable}
-                onChange={(e) => handleCheck(e.target.checked, row, 'add')}
+                onChange={(e) => handleCheckMenu(e.target.checked, isDisable, row, 'add')}
               />
             </>
           ),
@@ -228,7 +296,7 @@ function AddPermission() {
         return {
           children: (
             <>
-              <Checkbox onChange={(e) => handleCheck(e.target.checked, row, 'edit')} />
+              <Checkbox onChange={(e) => handleCheckMenu(e.target.checked, false, row, 'edit')} />
             </>
           ),
         }
@@ -246,7 +314,7 @@ function AddPermission() {
             <>
               <Checkbox
                 disabled={isDisable}
-                onChange={(e) => handleCheck(e.target.checked, row, 'delete')}
+                onChange={(e) => handleCheckMenu(e.target.checked, isDisable, row, 'delete')}
               />
             </>
           ),
@@ -276,7 +344,7 @@ function AddPermission() {
             <>
               <Checkbox
                 disabled={isDisable}
-                onChange={(e) => handleCheck(e.target.checked, row, 'cancel')}
+                onChange={(e) => handleCheckMenu(e.target.checked, isDisable, row, 'cancel')}
               />
             </>
           ),
@@ -295,7 +363,7 @@ function AddPermission() {
             <>
               <Checkbox
                 disabled={!isDisable}
-                onChange={(e) => handleCheck(e.target.checked, row, 'excel')}
+                onChange={(e) => handleCheckMenu(e.target.checked, isDisable, row, 'excel')}
               />
             </>
           ),
@@ -539,7 +607,7 @@ function AddPermission() {
               <>
                 <Checkbox
                   disabled={isDisable}
-                  onChange={(e) => handleCheck(e.target.checked, row, 'view')}
+                  onChange={(e) => handleCheck(e.target.checked, isDisable, row, 'view')}
                 />
               </>
             ),
@@ -572,7 +640,7 @@ function AddPermission() {
               <>
                 <Checkbox
                   disabled={isDisable}
-                  onChange={(e) => handleCheck(e.target.checked, row, 'add')}
+                  onChange={(e) => handleCheck(e.target.checked, isDisable, row, 'add')}
                 />
               </>
             ),
@@ -596,7 +664,7 @@ function AddPermission() {
               <>
                 <Checkbox
                   disabled={isDisable}
-                  onChange={(e) => handleCheck(e.target.checked, row, 'edit')}
+                  onChange={(e) => handleCheck(e.target.checked, isDisable, row, 'edit')}
                 />
               </>
             ),
@@ -630,7 +698,7 @@ function AddPermission() {
               <>
                 <Checkbox
                   disabled={isDisable}
-                  onChange={(e) => handleCheck(e.target.checked, row, 'delete')}
+                  onChange={(e) => handleCheck(e.target.checked, isDisable, row, 'delete')}
                 />
               </>
             ),
@@ -671,7 +739,7 @@ function AddPermission() {
               <>
                 <Checkbox
                   disabled={isDisable}
-                  onChange={(e) => handleCheck(e.target.checked, row, 'cancel')}
+                  onChange={(e) => handleCheck(e.target.checked, isDisable, row, 'cancel')}
                 />
               </>
             ),
@@ -690,7 +758,7 @@ function AddPermission() {
               <>
                 <Checkbox
                   disabled={!isDisable}
-                  onChange={(e) => handleCheck(e.target.checked, row, 'excel')}
+                  onChange={(e) => handleCheck(e.target.checked, !isDisable, row, 'excel')}
                 />
               </>
             ),
