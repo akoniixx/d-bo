@@ -375,7 +375,6 @@ const IndexAdminTask = () => {
     setDeleteImgDrug([...updatedImages])
     setDeleteId([...filters])
   }
-
   const pageTitle = (
     <Row style={{ padding: '10px' }}>
       <Col span={24}>
@@ -461,7 +460,7 @@ const IndexAdminTask = () => {
           </>
           <>
             <Col span={8}>
-              {DateTimeUtil.formatDateTime(taskSelected?.data.dateAppointment || '')}
+              {DateTimeUtil.formatDateTime(taskSelected?.data.dateAppointment || '-')}
             </Col>
             <Col span={8}>{taskSelected?.data.purposeSpray.purposeSprayName}</Col>
             <Col span={8}>
@@ -749,7 +748,7 @@ const IndexAdminTask = () => {
             </Col>
           </>
           <Col span={8}>
-            {DateTimeUtil.formatDateTime(taskSelected?.data.dateAppointment || '')}
+            {DateTimeUtil.formatDateTime(taskSelected?.data.dateAppointment || '-')}
           </Col>
           <Col span={8}>{taskSelected?.data.purposeSpray.purposeSprayName}</Col>
           <Col span={8}>
@@ -892,10 +891,10 @@ const IndexAdminTask = () => {
           )}
         </Form>
         <Button
-          disabled={deleteImgControl?.length === 0 || deleteImgDrug?.length === 0}
+          disabled={(deleteImgControl?.length === 0 || deleteImgDrug?.length === 0) && checkRai()}
           style={{
             backgroundColor:
-              deleteImgControl?.length === 0 || deleteImgDrug?.length === 0
+              (deleteImgControl?.length === 0 || deleteImgDrug?.length === 0) && checkRai()
                 ? color.Grey
                 : color.Success,
             color: 'white',
@@ -1197,63 +1196,71 @@ const IndexAdminTask = () => {
         remark: '',
       })
     }
+
+    const farmAreaAmount = form.getFieldValue('farmAreaAmount')
+    const unitPrice = form.getFieldValue('unitPrice')
+    const remark = form.getFieldValue('remark')
     const filteredArray = deleteImgControl.filter((item: any) => item?.id === null)
-    setBtnSaveDisable(true)
-    try {
-      if (deleteId) {
-        for (const id of deleteId) {
-          await TaskDatasource.deleteImageFinishTask(id)
+    setShowModal(!showModal)
+    Swal.fire({
+      title: 'บันทึกสำเร็จ',
+      icon: 'success',
+      timer: 1500,
+      showConfirmButton: false,
+    }).then(async () => {
+      try {
+        setBtnSaveDisable(true)
+        setLoading(true)
+        if (deleteId) {
+          for (const id of deleteId) {
+            await TaskDatasource.deleteImageFinishTask(id)
+          }
         }
-      }
-      if (typeof deleteImgDrug[0].file !== 'string') {
-        if (deleteImgDrug) {
-          await TaskDatasource.insertManageTaskImg(
-            taskId,
-            getUpdateBy(),
-            form.getFieldValue('remark'),
-            undefined,
-            deleteImgDrug[0].file.file,
-          )
-        }
-      }
-      if (filteredArray || filteredArray.length > 0) {
-        for (let i = 0; i < filteredArray.length; i++) {
-          const currentImage = filteredArray[i].file
-          const remarkValue = form.getFieldValue('remark')
-          if (currentImage) {
-            await TaskDatasource.updateImageFinishTask(
+        if (deleteImgDrug && typeof deleteImgDrug[0].file !== 'string') {
+          if (deleteImgDrug) {
+            await TaskDatasource.insertManageTaskImg(
               taskId,
-              taskSelected.data.dronerId,
               getUpdateBy(),
-              currentImage.file,
-              remarkValue,
+              form.getFieldValue('remark'),
+              undefined,
+              deleteImgDrug[0].file.file,
             )
           }
         }
-      } else {
-        await TaskDatasource.insertManageTask(
-          taskId,
-          form.getFieldValue('farmAreaAmount'),
-          form.getFieldValue('unitPrice'),
-          form.getFieldValue('remark'),
-          getUpdateBy(),
-        )
+        if (filteredArray || filteredArray.length > 0) {
+          for (let i = 0; i < filteredArray.length; i++) {
+            const currentImage = filteredArray[i].file
+            const remarkValue = form.getFieldValue('remark')
+            if (currentImage) {
+              await TaskDatasource.updateImageFinishTask(
+                taskId,
+                taskSelected.data.dronerId,
+                getUpdateBy(),
+                currentImage.file,
+                remarkValue,
+              )
+            }
+          }
+        }
+        if (farmAreaAmount) {
+          await TaskDatasource.insertManageTask(
+            taskId,
+            farmAreaAmount,
+            unitPrice,
+            remark,
+            getUpdateBy(),
+          )
+        }
+        setBtnSaveDisable(false)
+        setLoading(false)
+      } catch (error) {
+        console.error(error)
+        setBtnSaveDisable(false)
+        setLoading(false)
       }
-      setShowModal(!showModal)
-      Swal.fire({
-        title: 'บันทึกสำเร็จ',
-        icon: 'success',
-        timer: 1500,
-        showConfirmButton: false,
-      }).then((time) => {
-        handleSearchTask()
-        resetFormFields()
-      })
-      setBtnSaveDisable(false)
-    } catch (error) {
-      console.error(error)
-      setBtnSaveDisable(false)
-    }
+      handleSearchTask()
+      resetFormFields()
+    })
   }
 
   return (

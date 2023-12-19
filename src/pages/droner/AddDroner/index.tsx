@@ -147,6 +147,7 @@ function AddDroner() {
   const getProvince = async (provinceId: number, addr: CreateAddressEntity) => {
     const d = Map(addr).set('provinceId', provinceId)
     setAddress(d.toJS())
+    checkValidate(d.toJS())
     await LocationDatasource.getDistrict(provinceId).then((res) => {
       setDistrict(res)
     })
@@ -154,6 +155,7 @@ function AddDroner() {
   const handleOnChangeDistrict = async (districtId: number) => {
     const d = Map(address).set('districtId', districtId)
     setAddress(d.toJS())
+    checkValidate(d.toJS())
     await LocationDatasource.getSubdistrict(districtId).then((res) => {
       setSubdistrict(res)
     })
@@ -161,6 +163,7 @@ function AddDroner() {
   const handleOnChangeSubdistrict = async (subdistrictId: number) => {
     const d = Map(address).set('subdistrictId', subdistrictId)
     setAddress(d.toJS())
+    checkValidate(d.toJS())
     await handleOnChangePostcode(d.toJS())
   }
   const handleOnChangePostcode = (addr: CreateAddressEntity) => {
@@ -297,10 +300,10 @@ function AddDroner() {
       isConsentBookBank: data.isConsentBookBank,
       isBookBank: data.isConsentBookBank,
     }
-    const filterImg = data.file.find((x: any) => x.category === 'BOOK_BANK')
+    const filterImg = data.file?.find((x: any) => x.category === 'BOOK_BANK')
     setImgBB(filterImg)
     setBookBank(sumData)
-    setBtnSaveDisable(false)
+    checkValidate(sumData)
   }
   //#endregion
 
@@ -329,7 +332,6 @@ function AddDroner() {
     const e = Map(d.toJS()).set('resource', 'DRONER')
     const f = Map(e.toJS()).set('category', 'PROFILE_IMAGE')
     setCreateImgProfile(f.toJS())
-    setBtnSaveDisable(false)
   }
   const onPreviewProfile = async () => {
     let src = imgProfile
@@ -432,8 +434,26 @@ function AddDroner() {
     const isHasError = form.getFieldsError().some(({ errors }) => {
       return errors.length > 0
     })
-    const { mapUrl, plantsOther, dronerArea, checkPlantsOther, idNo, comment, ...rest } =
-      form.getFieldsValue()
+    const {
+      address1,
+      address2,
+      firstname,
+      lastname,
+      telephoneNo,
+      mapUrl,
+      plantsOther,
+      dronerArea,
+      checkPlantsOther,
+      idNo,
+      comment,
+      ...rest
+    } = form.getFieldsValue()
+    let fieldInfo = false
+    if (firstname && lastname && telephoneNo && address1 && address2) {
+      fieldInfo = true
+    } else {
+      fieldInfo = false
+    }
     const expPlant = []
     if (checkPlantsOther?.length > 0) {
       expPlant.push(...checkPlantsOther)
@@ -441,12 +461,28 @@ function AddDroner() {
     if (plantsOther) {
       expPlant.push(plantsOther)
     }
-    const isHasValues = Object.values({
-      ...rest,
-      expPlant: expPlant.length > 0,
-    }).every((el) => el)
+    const isHasValues = expPlant.length === 0
 
-    if (!isHasError && isHasValues) {
+    if (fieldInfo && !isHasValues) {
+      setBtnSaveDisable(false)
+    } else {
+      setBtnSaveDisable(true)
+    }
+  }
+  const checkValidate = (data: any) => {
+    const checkEmptyNumber = ![
+      address.provinceId,
+      address.districtId,
+      address.subdistrictId,
+    ].includes(0)
+    let checkEmpty = false
+    if (data.accountNumber && data.bankAccountName && data.bankName) {
+      checkEmpty = true
+    } else {
+      checkEmpty = false
+    }
+
+    if (checkEmptyNumber && checkEmpty) {
       setBtnSaveDisable(false)
     } else {
       setBtnSaveDisable(true)
@@ -492,57 +528,64 @@ function AddDroner() {
       isBookBank: bookBank?.isBookBank,
       file: imgBB,
     }
-    await DronerDatasource.createDronerList(payload).then(async (res) => {
-      if (res !== undefined) {
-        if (imgBB) {
-          UploadImageDatasouce.uploadImage(Map(imgBB).set('resourceId', res.id).toJS())
-        }
-        const fileList = [createImgProfile, createImgIdCard]
-          .filter((el) => {
-            return el.file !== '' && el.file !== undefined
-          })
-          .map((el) => {
-            return UploadImageDatasouce.uploadImage(Map(el).set('resourceId', res.id).toJS())
-          })
-
-        await Promise.all(fileList)
-
-        for (let i = 0; res.dronerDrone.length > i; i++) {
-          const findId = res.dronerDrone[i]
-          const getData = dronerDroneList.filter((x) => x.serialNo === findId.serialNo)[0]
-
-          for (let j = 0; getData.file.length > j; j++) {
-            const getImg = getData.file[j]
-            imgDroneList?.push({
-              resourceId: findId.id,
-              category: getImg.category,
-              file: getImg.file,
-              resource: getImg.resource,
-              path: '',
-            })
+    try {
+      setBtnSaveDisable(true)
+      await DronerDatasource.createDronerList(payload).then(async (res) => {
+        if (res !== undefined) {
+          if (imgBB) {
+            UploadImageDatasouce.uploadImage(Map(imgBB).set('resourceId', res.id).toJS())
           }
+          const fileList = [createImgProfile, createImgIdCard]
+            .filter((el) => {
+              return el.file !== '' && el.file !== undefined
+            })
+            .map((el) => {
+              return UploadImageDatasouce.uploadImage(Map(el).set('resourceId', res.id).toJS())
+            })
+
+          await Promise.all(fileList)
+
+          for (let i = 0; res.dronerDrone.length > i; i++) {
+            const findId = res.dronerDrone[i]
+            const getData = dronerDroneList.filter((x) => x.serialNo === findId.serialNo)[0]
+
+            for (let j = 0; getData.file.length > j; j++) {
+              const getImg = getData.file[j]
+              imgDroneList?.push({
+                resourceId: findId.id,
+                category: getImg.category,
+                file: getImg.file,
+                resource: getImg.resource,
+                path: '',
+              })
+            }
+          }
+          const checkImg = imgDroneList.filter((x) => x.resourceId !== '')
+          for (let k = 0; checkImg.length > k; k++) {
+            const getDataImg: any = checkImg[k]
+            await UploadImageDatasouce.uploadImage(getDataImg).then(res)
+          }
+          Swal.fire({
+            title: 'บันทึกสำเร็จ',
+            icon: 'success',
+            timer: 1500,
+            showConfirmButton: false,
+          }).then((time) => {
+            navigate('/IndexDroner')
+          })
+        } else {
+          Swal.fire({
+            title: 'เบอร์โทร หรือ รหัสบัตรประชาชน <br/> ซ้ำในระบบ',
+            icon: 'error',
+            showConfirmButton: true,
+          })
         }
-        const checkImg = imgDroneList.filter((x) => x.resourceId !== '')
-        for (let k = 0; checkImg.length > k; k++) {
-          const getDataImg: any = checkImg[k]
-          await UploadImageDatasouce.uploadImage(getDataImg).then(res)
-        }
-        Swal.fire({
-          title: 'บันทึกสำเร็จ',
-          icon: 'success',
-          timer: 1500,
-          showConfirmButton: false,
-        }).then((time) => {
-          navigate('/IndexDroner')
-        })
-      } else {
-        Swal.fire({
-          title: 'เบอร์โทร หรือ รหัสบัตรประชาชน <br/> ซ้ำในระบบ',
-          icon: 'error',
-          showConfirmButton: true,
-        })
-      }
-    })
+      })
+      setBtnSaveDisable(false)
+    } catch (error) {
+      setBtnSaveDisable(false)
+      console.error('Error inserting farmer data:', error)
+    }
   }
   const renderFromData = (
     <div className='col-lg-7'>
