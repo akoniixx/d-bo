@@ -47,7 +47,21 @@ export class RoleManage {
   }
   static updateRole(data: RoleEntity): Promise<any> {
     return httpClient
-      .patch(BASE_URL + `/role-management/`+ data.id, data)
+      .patch(BASE_URL + `/role-management/` + data.id, data)
+      .then((response) => {
+        return response.data
+      })
+      .catch((err) => {
+        console.log(err, 'err update role')
+      })
+  }
+  static insertRole(data: RoleEntity): Promise<any> {
+    const id: any = 'id'
+    const count: any = 'count'
+    delete data[id]
+    delete data[count]
+    return httpClient
+      .post(BASE_URL + `/role-management/` , data)
       .then((response) => {
         return response.data
       })
