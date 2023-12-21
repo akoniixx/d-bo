@@ -7,10 +7,10 @@ export interface CreditSettingEntity {
   updatedBy: string
 }
 export const CreditSettingEntity_INIT: CreditSettingEntity = {
-    applicationType: '',
-    cashCredit: 0,
-    id: '',
-    isActive: false,
-    pointCredit: 0,
-    updatedBy: '',
-  }
+  applicationType: '',
+  cashCredit: 0,
+  id: '',
+  isActive: false,
+  pointCredit: 0,
+  updatedBy: '',
+}

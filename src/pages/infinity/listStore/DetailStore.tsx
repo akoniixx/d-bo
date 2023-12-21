@@ -83,7 +83,7 @@ function DetailStore() {
             </div>
             <Divider />
             <div className='row' style={{ fontWeight: '500' }}>
-              <div className='col'>สัญญาเข้าร่สมโครงการ</div>
+              <div className='col'>สัญญาเข้าร่วมโครงการ</div>
             </div>
             <div className='row' style={{ fontWeight: '300' }}>
               <div className='col-lg-6'>

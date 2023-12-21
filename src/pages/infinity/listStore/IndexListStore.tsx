@@ -108,7 +108,7 @@ function IndexListStore() {
         return {
           children: (
             <div className='container'>
-              <span className='text-dark-75  d-block font-size-lg'>CL0016</span>
+              <span className='text-dark-75  d-block font-size-lg'>{value}</span>
             </div>
           ),
         }
@@ -165,17 +165,17 @@ function IndexListStore() {
           </div>
         )
       },
-      dataIndex: 'name',
-      key: 'name',
+      dataIndex: 'shopName',
+      key: 'shopName',
       render: (value: any, row: any, index: number) => {
         return {
           children: (
             <>
               <div className='container'>
-                <span className='text-dark-75  d-block font-size-lg'>ไม้เมืองการเกษตร</span>
+                <span className='text-dark-75  d-block font-size-lg'>{value}</span>
                 <div>
                   <span className=' d-block font-size-lg' style={{ color: color.Grey }}>
-                    337766735542
+                    {row.codeName}
                   </span>
                 </div>
               </div>
@@ -186,31 +186,31 @@ function IndexListStore() {
     },
     {
       title: 'ชื่อเจ้าของร้าน',
-      dataIndex: 'like',
-      key: 'like',
+      dataIndex: 'name',
+      key: 'name',
       render: (value: any, row: any, index: number) => {
         return {
-          children: <span>นางแก้วคำมา แสนแปลง</span>,
+          children: <span>{value}</span>,
         }
       },
     },
     {
       title: 'เบอร์โทร',
-      dataIndex: 'commentCount',
-      key: 'commentCount',
+      dataIndex: 'tel',
+      key: 'tel',
       render: (value: any, row: any, index: number) => {
         return {
-          children: <span>0989284761</span>,
+          children: <span>{value}</span>,
         }
       },
     },
     {
       title: 'จังหวัด',
-      dataIndex: 'view',
-      key: 'view',
+      dataIndex: 'province',
+      key: 'province',
       render: (value: any, row: any, index: number) => {
         return {
-          children: <span>กำแพงเพชร</span>,
+          children: <span>{value}</span>,
         }
       },
     },
@@ -265,11 +265,11 @@ function IndexListStore() {
           </div>
         )
       },
-      dataIndex: 'count',
-      key: 'count',
+      dataIndex: 'fer',
+      key: 'fer',
       render: (value: any, row: any, index: number) => {
         return {
-          children: <span>{numberWithCommas(1000)} รายการ</span>,
+          children: <span>{numberWithCommas(value)} รายการ</span>,
         }
       },
     },
@@ -325,7 +325,38 @@ function IndexListStore() {
       },
     },
   ]
-  const data = [{}]
+  const data = [
+    {
+      updatedAt: 'CL000001',
+      shopName: 'ไม้เมืองการเกษตร',
+      codeName : '3350700008073',
+      name: 'สายไหม เกษตรจ๋า',
+      tel: '0989284761',
+      province: 'สระบุรี',
+      fer: 3500,
+      status: 'ACTIVE',
+    },
+    {
+      updatedAt: 'CL000002',
+      shopName: 'สมรักษ์รักป่า',
+      codeName : '3350700008073',
+      name: 'นายครี มีงานทำ',
+      tel: '0887787442',
+      province: 'อ่างทอง',
+      fer: 10500,
+      status: 'ACTIVE',
+    },
+    {
+      updatedAt: 'Cl000003',
+      shopName: 'อุดมการณ์ยิ่งใหญ่',
+      codeName : '3350700008073',
+      name: 'สมควร แล้ว',
+      tel: '0928077231',
+      province: 'ชัยนาท',
+      fer: 720,
+      status: 'ACTIVE',
+    },
+  ]
   const emptyState = {
     emptyText: (
       <div style={{ textAlign: 'center', padding: '4%' }}>

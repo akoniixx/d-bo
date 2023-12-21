@@ -13,6 +13,14 @@ export const numberWithCommasToFixed = (x: number) => {
     .toString()
     .replace(/\B(?=(\d{3})+(?!\d))/g, ',')
 }
+export const numberWithCommasToFixed1 = (x: number) => {
+  if (!x) return 0
+
+  return x
+    .toFixed(1)
+    .toString()
+    .replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+}
 export function formatDate(d: string) {
   return moment(d).format('DD/MM/yyyy, HH:mm')
 }

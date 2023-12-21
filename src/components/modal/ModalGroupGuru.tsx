@@ -56,7 +56,6 @@ const ModalGroupGuru: React.FC<ModalGroupGuruProps> = ({
     payload.groupName = f.groupName
     if (data._id) {
       await GroupGuruDataSource.updateGroupGuru(payload).then((res) => {
-        console.log(res)
         if (res) {
           Swal.fire({
             title: 'แก้ไขสำเร็จ',
