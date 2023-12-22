@@ -94,7 +94,7 @@ const AddNewTask = () => {
     useState<FarmerPlotEntity>(FarmerPlotEntity_INIT)
   const [selectionType] = useState<RowSelectionType>(queryString[1])
   const [checkSelectPlot, setCheckSelectPlot] = useState<any>('error')
-
+  const [preparation, setPreparation] = useState<boolean>(false)
   const [otherSpray, setOtherSpray] = useState<any>()
   const [cropSelected, setCropSelected] = useState<any>('')
   const [periodSpray, setPeriodSpray] = useState<CropPurposeSprayEntity>()
@@ -314,6 +314,7 @@ const AddNewTask = () => {
     }
   }
   const handlePreparation = (e: any) => {
+    setPreparation(true)
     const d = Map(createNewTask).set('preparationBy', e.target.value)
     setCreateNewTask(d.toJS())
     checkValidateStep(d.toJS(), current)
@@ -344,6 +345,10 @@ const AddNewTask = () => {
   }
   const handleComment = (e: any) => {
     const d = Map(createNewTask).set('comment', e.target.value)
+    setCreateNewTask(d.toJS())
+  }
+  const handlePreparationRemark = (e: any) => {
+    const d = Map(createNewTask).set('preparationRemark', e.target.value)
     setCreateNewTask(d.toJS())
   }
   const handleDateAppointment = (e: any) => {
@@ -765,18 +770,32 @@ const AddNewTask = () => {
             >
               <Space direction='vertical' onChange={handlePreparation}>
                 <Radio value='เกษตรกรเตรียมยาเอง'>เกษตรกรเตรียมยาเอง</Radio>
-                <Radio value='นักบินโดรนเตรียมให้'>นักบินโดรนเตรียมให้</Radio>
+                <Radio value='นักบินโดรนเตรียมให้'>
+                  นักบินโดรนเตรียมให้
+                  {preparation ? (
+                    <div className='pt-3 pb-3'>
+                      <TextArea
+                        style={{ width: '530px', height: '80px' }}
+                        placeholder='(บังคับ) ระบุชื่อยา/ปุ๋ย และจำนวนที่ใช้ '
+                        disabled={current === 2 || checkSelectPlot === 'error'}
+                        onChange={handlePreparationRemark}
+                        defaultValue={createNewTask.preparationRemark}
+                      />
+                    </div>
+                  ) : null}
+                </Radio>
               </Space>
             </Radio.Group>
-          </div>
-          <div className='form-group'>
-            <label>หมายเหตุ</label>
-            <TextArea
-              placeholder='ระบุหมายเหตุเพื่อแจ้งนักบินโดรน เช่น เกษตรกรจะเตรียมยาให้, ฝากนักบินเลือกยาราคาไม่แพงมาให้หน่อย เป็นต้น'
-              disabled={current === 2 || checkSelectPlot === 'error'}
-              onChange={handleComment}
-              defaultValue={createNewTask.comment}
-            />
+            <div className='form-group'>
+              <label>หมายเหตุ</label>
+              <TextArea
+                style={{ left: 20, height: '80px' }}
+                placeholder='ระบุหมายเหตุเพื่อแจ้งนักบินโดรน เช่น เกษตรกรจะเตรียมยาให้, ฝากนักบินเลือกยาราคาไม่แพงมาให้หน่อย เป็นต้น'
+                disabled={current === 2 || checkSelectPlot === 'error'}
+                onChange={handleComment}
+                defaultValue={createNewTask.comment}
+              />
+            </div>
           </div>
         </Form>
       </div>

@@ -89,7 +89,7 @@ export const ConfirmNewTask: React.FC<ConfirmNewTaskProps> = ({
   const currentData = createNewTask?.taskDronerTemp?.slice(startIndex, endIndex)
   const dronerSelected = dronerSelectedList?.slice(startIndex, endIndex)
   const total = isEdit ? dronerSelectedList?.length : createNewTask?.taskDronerTemp?.length
-
+console.log(createNewTask)
   const columns = [
     {
       dataIndex: 'index',
@@ -412,6 +412,12 @@ export const ConfirmNewTask: React.FC<ConfirmNewTaskProps> = ({
                 <div className='d-flex'>
                   <span className='col'>{createNewTask?.purposeSprayName}</span>
                   <span className='col'>{createNewTask?.preparationBy}</span>
+                </div>
+                <div className='d-flex pt-4'>
+                  <span className='col'>รายละเอียดยา</span>
+                </div>
+                <div className='d-flex'>
+                  <span className='col'>{createNewTask?.preparationRemark || '-'}</span>
                 </div>
                 <div className='d-flex pt-4'>
                   <span className='col'>หมายเหตุ</span>

@@ -67,6 +67,7 @@ export interface CreateNewTaskEntity {
   farm_area_amount: string
   unit_price: string
   discount_fee: string
+  preparationRemark: string
 }
 export const CreateNewTaskEntity_INIT: CreateNewTaskEntity = {
   cropName: '',
@@ -96,6 +97,7 @@ export const CreateNewTaskEntity_INIT: CreateNewTaskEntity = {
   farm_area_amount: '',
   unit_price: '',
   discount_fee: '',
+  preparationRemark: ''
 }
 export interface GetNewTaskEntity {
   id: string
