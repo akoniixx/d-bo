@@ -70,4 +70,5 @@ export default {
   fertilizer: require('./media/images/fertilizer.png'),
   account_cancel_disable: require('./media/images/account_cancel_disable.png'),
   account_cancel: require('./media/images/account_cancel.png'),
+  upload_droner: require('./media/images/upload_droner.png'),
 }

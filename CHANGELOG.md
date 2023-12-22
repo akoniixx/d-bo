@@ -1,5 +1,10 @@
 ## [Version - 0]
 
+## improve [v0.42.1] 2023-12-22
+
+- call api credit setting
+- call api droner in finity
+
 ## Feature [v0.42.0] 2023-12-19
 
 - added ui droner list infinity
