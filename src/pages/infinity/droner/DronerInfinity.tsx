@@ -412,11 +412,15 @@ function DronerInfinity() {
                     onClick={() => showModalDronerList(row, index + 1)}
                   />
                   <ActionButton
-                    actionDisable={row.credit !== 0}
+                    actionDisable={row.credit > 0}
                     icon={
-                      <img src={icon.account_cancel} style={{ width: '20px', height: '20px' }} />
+                      <img
+                        src={row.credit > 0 ? icon.account_cancel_disable : icon.account_cancel}
+                        style={{ width: '20px', height: '20px' }}
+                      />
                     }
-                    color={row.credit !== 0 ? color.Grey : color.Error}
+                    color={row.credit > 0 ? color.Grey : color.Error}
+                    bgColor={row.credit > 0 ? '#F2F5FC' : 'none'}
                     onClick={() => {
                       showDelete(row.id)
                     }}
