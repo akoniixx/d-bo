@@ -95,7 +95,6 @@ const IndexDronerSummaryPoint = () => {
       title: 'ชื่อนักบินโดรน',
       width: '30%',
       render: (value: any, row: any, index: number) => {
-        console.log(row)
         return {
           children: (
             <span
