@@ -117,6 +117,7 @@ export interface DronerSummaryPointListEntity {
 export interface DetailSummaryEntity {
   histoPointQuotaId: string
   taskNo: string
+  campaignName: string
   pointNo: string
   redeemNo: string
   action: string

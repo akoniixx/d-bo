@@ -11,6 +11,7 @@ import { PointReceiveDatasource } from '../../../datasource/PointReceiveDatasour
 import { numberWithCommas } from '../../../utilities/TextFormatter'
 import moment from 'moment'
 import { CaretDownOutlined, CaretUpOutlined } from '@ant-design/icons'
+import CampaignNames from '../../../components/popover/CampaignNames'
 const { RangePicker } = DatePicker
 const _ = require('lodash')
 
@@ -250,7 +251,7 @@ function IndexDronerHistorySum() {
       width: type === 'INCREASE' ? '20%' : '50%',
       render: (value: any, row: any, index: number) => {
         return {
-          children: <span>{type === 'INCREASE' ? row.pointNo : row.redeemNo}</span>,
+          children: <span>{type === 'INCREASE' ? row.pointNo : row.redeemNo || '-'}</span>,
         }
       },
     },
@@ -261,7 +262,18 @@ function IndexDronerHistorySum() {
       width: '30%',
       render: (value: any, row: any, index: number) => {
         return {
-          children: <span>{row.taskNo}</span>,
+          children: <span>{row.taskNo || '-'}</span>,
+        }
+      },
+    },
+    {
+      title: 'Mission No.',
+      dataIndex: 'missionNo',
+      key: 'missionNo',
+      width: '30%',
+      render: (value: any, row: any, index: number) => {
+        return {
+          children: <span>{row.missionNo || '-'}</span>,
         }
       },
     },
@@ -283,8 +295,17 @@ function IndexDronerHistorySum() {
                   </span>
                 )
               ) : (
-                <span>{numberWithCommas(value) + ` แต้ม`}</span>
+                <>
+                  {row.action === 'RETURN_REVERT' ? (
+                    <span style={{ color: color.Error }}>
+                      {'-' + numberWithCommas(value) + ` แต้ม`}
+                    </span>
+                  ) : (
+                    <span>{numberWithCommas(value) + ` แต้ม`}</span>
+                  )}
+                </>
               )}
+              {row.action === 'RETURN_REVERT' && <CampaignNames data={row.campaignName} />}
             </>
           ),
         }

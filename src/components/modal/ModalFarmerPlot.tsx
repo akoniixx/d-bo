@@ -280,10 +280,6 @@ const ModalFarmerPlot: React.FC<ModalFarmerPlotProps> = ({
                 showSearch
                 placeholder='เลือกพืชที่ปลูก'
                 optionFilterProp='children'
-                filterSort={(optionA, optionB) =>
-                  optionA.children.toLowerCase().localeCompare(optionB.children.toLowerCase())
-                }
-                filterOption={(input: any, option: any) => option.children.includes(input)}
               >
                 {cropsName.map((item) => (
                   <Option key={item.id} value={item.cropName}>
@@ -293,27 +289,6 @@ const ModalFarmerPlot: React.FC<ModalFarmerPlotProps> = ({
               </Select>
             </Form.Item>
           </div>
-          {/* <div className="form-group">
-            <label>
-              ลักษณะเฉพาะของพืช (เลือกอย่างน้อย 1 อย่าง){" "}
-              <span style={{ color: "red" }}>*</span>
-            </label>
-            <Form.Item name="plantCharacteristics">
-              <Checkbox.Group
-                style={{ width: "100%" }}
-                onChange={onChangePlantCharacter}
-              >
-                <Row>
-                  <Col span={8}>
-                    <Checkbox value="นาหว่านน้ำตม">นาหว่านน้ำตม</Checkbox>
-                  </Col>
-                  <Col span={8}>
-                    <Checkbox value="นาหว่านข้าวแห้ง">นาหว่านข้าวแห้ง</Checkbox>
-                  </Col>
-                </Row>
-              </Checkbox.Group>
-            </Form.Item>
-          </div> */}
           <Row justify={'space-between'} gutter={8}>
             <Col span={isEditModal && action === 'edit' ? 12 : 24}>
               <label>
