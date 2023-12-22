@@ -1,3 +1,4 @@
+/* eslint-disable no-case-declarations */
 import React, { useState } from 'react'
 import { BackIconButton } from '../../components/button/BackButton'
 import { useNavigate } from 'react-router-dom'
@@ -32,7 +33,47 @@ function AddPermission() {
 
   const [role, setRole] = useState<any>()
   const [checkedItems, setCheckedItems] = useState({})
-  const [listArray, setListArray] = useState<any>([])
+  const [followjob, setFollowjob] = useState(followJob)
+  const [admin, setAdmin] = useState(adminJob)
+  const [challenge, setChallenge] = useState(challengeJob)
+  const [dronerInfo, setDronerInfo] = useState(dronerJob)
+  const [farmerInfo, setFarmerInfo] = useState(farmerJob)
+  const [guru, setGuru] = useState(newsJob)
+  const [mission, setMission] = useState(missionJob)
+  const [point, setPoint] = useState(pointSettingJob)
+  const [pointResult, setPointResult] = useState(pointJob)
+  const [promotion, setPromotion] = useState(promotionJob)
+  const [reward, setReward] = useState(rewardJob)
+  const [settings, setSettings] = useState(settingJob)
+  const [listArray, setListArray] = useState<any>({
+    role: '',
+    followJob,
+    farmerJob,
+    dronerJob,
+    newsJob,
+    promotionJob,
+    pointJob,
+    rewardJob,
+    missionJob,
+    challengeJob,
+    adminJob,
+    settingJob,
+    pointSettingJob,
+  })
+  const arrayJob = [
+    'followJob',
+    'farmerJob',
+    'dronerJob',
+    'guru',
+    'promotionJob',
+    'pointJob',
+    'rewardJob',
+    'missionJob',
+    'challengeJob',
+    'adminJob',
+    'settingJob',
+    'pointResultJob',
+  ]
 
   const handleRowClick = (record: any) => {
     setSelectedPermission(record.key)
@@ -40,30 +81,132 @@ function AddPermission() {
   const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setRole(e.target.value)
   }
-  const handleCheckMenu = (checked: boolean, disabel: boolean, row: any, value: any) => {}
+  const handleCheckMenu = (checked: boolean, disabel: boolean, row: any, value: any) => {
+    console.log(checked, row, value)
+    switch (row.key) {
+      case 0:
+        row.value['followJob'].map((item:any)=> item)
+        break
+      case 1:
+        break
+      case 2:
+        break
+      case 3:
+        break
+      case 4:
+        break
+      case 6:
+        break
+      case 7:
+        break
+      case 8:
+        break
+      case 9:
+        break
+      case 10:
+        break
 
-  const handleCheck = (checked: boolean, row: any, value: any) => {
-    const rowIndex = listArray.findIndex((item: any) => item.name === row.name)
-    const updatedFollowJob = {
-      ...row,
-      name: row['name'],
-      [value]: { value: checked, disabled: false },
+      default:
+        break
     }
-    const updatedListArray =
-      rowIndex === -1
-        ? [...listArray, updatedFollowJob]
-        : listArray.map((item: any, index: any) => (index === rowIndex ? updatedFollowJob : item))
+  }
+  const checkValues = (row: any, value: any, index: number): boolean => {
+    switch (row[value].name) {
+      case 'followJob':
+        return followjob[row[value].name][index][value]['value']
+      case 'farmerInfo':
+        return farmerInfo[row[value].name][index][value]['value']
+      case 'dronerInfo':
+        return dronerInfo[row[value].name][index][value]['value']
+      case 'guru':
+        console.log(guru[row[value].name], index)
+        return guru[row[value].name][index][value]['value']
+      case 'pointResult':
+        return pointResult[row[value].name][index][value]['value']
+      case 'promotion':
+        return promotion[row[value].name][index][value]['value']
+      case 'reward':
+        return reward[row[value].name][index][value]['value']
+      case 'mission':
+        return mission[row[value].name][index][value]['value']
+      case 'challenge':
+        return challenge[row[value].name][index][value]['value']
+      case 'admin':
+        return admin[row[value].name][index][value]['value']
+      case 'settings':
+        return settings[row[value].name][index][value]['value']
+      case 'point':
+        return point[row[value].name][index][value]['value']
+      default:
+        return false
+    }
+  }
 
-    setListArray(updatedListArray)
-    // const updatedRow = {
-    //   ...row,
-    //   [value]: { value: checked, disabled: false },
-    //   name: row['name'],
-    // };
-    // const setRoleData = {
-    //   followJob: [updatedRow],
-    // };
-    // console.log(setRoleData)
+  const handleCheck = (checked: boolean, row: any, value: any, index: number) => {
+    switch (row[value].name) {
+      case 'followJob':
+        const newFollowJob = followjob
+        newFollowJob[row[value].name][index][value]['value'] = checked
+        setFollowjob(newFollowJob)
+        break
+      case 'farmerInfo':
+        const newFarmerInfo = farmerInfo
+        newFarmerInfo[row[value].name][index][value]['value'] = checked
+        setFarmerInfo(newFarmerInfo)
+        break
+      case 'dronerInfo':
+        const droner = dronerInfo
+        droner[row[value].name][index][value]['value'] = checked
+        setDronerInfo(droner)
+        break
+      case 'guru':
+        const guruInfo = guru
+        guruInfo[row[value].name][index][value]['value'] = checked
+        setGuru(guruInfo)
+        break
+      case 'pointResult':
+        const pointResultInfo = pointResult
+        pointResultInfo[row[value].name][index][value]['value'] = checked
+        setPoint(pointResultInfo)
+        break
+      case 'promotion':
+        const promotionInfo = promotion
+        promotionInfo[row[value].name][index][value]['value'] = checked
+        setPromotion(promotionInfo)
+        break
+      case 'reward':
+        const rewardInfo = reward
+        rewardInfo[row[value].name][index][value]['value'] = checked
+        setReward(rewardInfo)
+        break
+      case 'mission':
+        const missionInfo = mission
+        missionInfo[row[value].name][index][value]['value'] = checked
+        setMission(missionInfo)
+        break
+      case 'challenge':
+        const challengeInfo = challenge
+        challengeInfo[row[value].name][index][value]['value'] = checked
+        setChallenge(challengeInfo)
+        break
+      case 'admin':
+        const adminInfo = admin
+        adminInfo[row[value].name][index][value]['value'] = checked
+        setAdmin(adminInfo)
+        break
+      case 'settings':
+        const settingsInfo = settings
+        settingsInfo[row[value].name][index][value]['value'] = checked
+        setSettings(settingsInfo)
+        break
+      case 'point':
+        const pointInfo = point
+        pointInfo[row[value].name][index][value]['value'] = checked
+        setPointResult(pointInfo)
+        break
+      default:
+        break
+    }
   }
 
   const menuName = [
@@ -162,27 +305,7 @@ function AddPermission() {
   )
 
   const insertPermission = () => {
-    const namesArray =  followJob.followJob.map(item => item.name);
-    // const foundItem = listArray.find((item:any) => namesArray.includes(item.name));
-
-    console.log(listArray,namesArray)
-
-    const payload = {
-      role: role,
-      followJob: followJob,
-      farmerInfo: farmerJob,
-      dronerInfo: dronerJob,
-      guru: newsJob,
-      promotion: promotionJob,
-      pointResult: pointJob,
-      mission: missionJob,
-      challenge: challengeJob,
-      admin: adminJob,
-      settings: settingJob,
-      point: pointSettingJob,
-      reward: rewardJob,
-    }
-    console.log(payload)
+    console.log(listArray)
     // await RoleManage.insertRole(payload).then((res) => {
     //   if (res) {
     //     Swal.fire({
@@ -472,7 +595,8 @@ function AddPermission() {
               <>
                 <Checkbox
                   disabled={row.view.disabled}
-                  onChange={(e) => handleCheck(e.target.checked, row, 'view')}
+                  onChange={(e) => handleCheck(e.target.checked, row, 'view', index)}
+                  checked={checkValues(row, 'view', index)}
                 />
               </>
             ),
@@ -490,7 +614,8 @@ function AddPermission() {
               <>
                 <Checkbox
                   disabled={row.add.disabled}
-                  onChange={(e) => handleCheck(e.target.checked, row, 'add')}
+                  onChange={(e) => handleCheck(e.target.checked, row, 'add', index)}
+                  checked={checkValues(row, 'add', index)}
                 />
               </>
             ),
@@ -508,7 +633,8 @@ function AddPermission() {
               <>
                 <Checkbox
                   disabled={row.edit.disabled}
-                  onChange={(e) => handleCheck(e.target.checked, row, 'edit')}
+                  onChange={(e) => handleCheck(e.target.checked, row, 'edit', index)}
+                  checked={checkValues(row, 'edit', index)}
                 />
               </>
             ),
@@ -526,7 +652,8 @@ function AddPermission() {
               <>
                 <Checkbox
                   disabled={row.delete.disabled}
-                  onChange={(e) => handleCheck(e.target.checked, row, 'delete')}
+                  onChange={(e) => handleCheck(e.target.checked, row, 'delete', index)}
+                  checked={checkValues(row, 'delete', index)}
                 />
               </>
             ),
@@ -544,7 +671,8 @@ function AddPermission() {
               <>
                 <Checkbox
                   disabled={row.cancel.disabled}
-                  onChange={(e) => handleCheck(e.target.checked, row, 'cancel')}
+                  onChange={(e) => handleCheck(e.target.checked, row, 'cancel', index)}
+                  checked={checkValues(row, 'cancel', index)}
                 />
               </>
             ),
@@ -562,7 +690,8 @@ function AddPermission() {
               <>
                 <Checkbox
                   disabled={row.excel.disabled}
-                  onChange={(e) => handleCheck(e.target.checked, row, 'excel')}
+                  onChange={(e) => handleCheck(e.target.checked, row, 'excel', index)}
+                  checked={checkValues(row, 'excel', index)}
                 />
               </>
             ),

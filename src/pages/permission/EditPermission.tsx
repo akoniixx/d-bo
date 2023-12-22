@@ -309,7 +309,6 @@ function EditPermission() {
       settings: settings,
       point: point,
     }
-    console.log(payload)
     await RoleManage.updateRole(payload).then((res) => {
       if (res) {
         Swal.fire({
@@ -318,7 +317,7 @@ function EditPermission() {
           timer: 1500,
           showConfirmButton: false,
         }).then(() => {
-          // navigate('/IndexPermission')
+          navigate('/IndexPermission')
         })
       }
     })
