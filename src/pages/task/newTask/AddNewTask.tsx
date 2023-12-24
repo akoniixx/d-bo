@@ -94,7 +94,6 @@ const AddNewTask = () => {
     useState<FarmerPlotEntity>(FarmerPlotEntity_INIT)
   const [selectionType] = useState<RowSelectionType>(queryString[1])
   const [checkSelectPlot, setCheckSelectPlot] = useState<any>('error')
-  const [preparation, setPreparation] = useState<boolean>(false)
   const [otherSpray, setOtherSpray] = useState<any>()
   const [cropSelected, setCropSelected] = useState<any>('')
   const [periodSpray, setPeriodSpray] = useState<CropPurposeSprayEntity>()
@@ -314,7 +313,6 @@ const AddNewTask = () => {
     }
   }
   const handlePreparation = (e: any) => {
-    setPreparation(true)
     const d = Map(createNewTask).set('preparationBy', e.target.value)
     setCreateNewTask(d.toJS())
     checkValidateStep(d.toJS(), current)
@@ -350,6 +348,7 @@ const AddNewTask = () => {
   const handlePreparationRemark = (e: any) => {
     const d = Map(createNewTask).set('preparationRemark', e.target.value)
     setCreateNewTask(d.toJS())
+    checkValidateStep(d.toJS(), current)
   }
   const handleDateAppointment = (e: any) => {
     setDateAppointment(moment(new Date(e)).format(dateCreateFormat))
@@ -773,23 +772,21 @@ const AddNewTask = () => {
             >
               <Space direction='vertical' onChange={handlePreparation}>
                 <Radio value='เกษตรกรเตรียมยาเอง'>เกษตรกรเตรียมยาเอง</Radio>
-                <Radio value='นักบินโดรนเตรียมให้'>
-                  นักบินโดรนเตรียมให้
-                  {preparation ? (
-                    <div className='pt-3 pb-3'>
-                      <TextArea
-                        style={{ width: '530px', height: '80px' }}
-                        placeholder='(บังคับ) ระบุชื่อยา/ปุ๋ย และจำนวนที่ใช้ '
-                        disabled={current === 2 || checkSelectPlot === 'error'}
-                        onChange={handlePreparationRemark}
-                        defaultValue={createNewTask.preparationRemark}
-                      />
-                    </div>
-                  ) : null}
-                </Radio>
+                <Radio value='นักบินโดรนเตรียมให้'>นักบินโดรนเตรียมให้</Radio>
               </Space>
             </Radio.Group>
-            <div className='form-group'>
+            {createNewTask.preparationBy === 'นักบินโดรนเตรียมให้' ? (
+              <div className='pt-3'>
+                <TextArea
+                  style={{ width: '530px', height: '80px', left: '4%' }}
+                  placeholder='(บังคับ) ระบุชื่อยา/ปุ๋ย และจำนวนที่ใช้'
+                  onChange={handlePreparationRemark}
+                  defaultValue={createNewTask.preparationRemark}
+                />
+              </div>
+            ) : null}
+
+            <div className='form-group pt-3'>
               <label>หมายเหตุ</label>
               <TextArea
                 style={{ left: 20, height: '80px' }}
@@ -1372,7 +1369,6 @@ const AddNewTask = () => {
         data?.farmerId,
         data?.farmerPlotId,
         data?.purposeSprayId,
-        data?.preparationBy,
         data.farmAreaAmount,
       ].includes('')
       const checkEmptyNumber = ![data.price, data.unitPrice, data.farmAreaAmount].includes(0)
@@ -1385,11 +1381,18 @@ const AddNewTask = () => {
       }
       const checkOtherSpray = otherSpray && otherSpray.trim().length !== 1
       const checkDateTime = ![dateAppointment, timeAppointment].includes('')
+      const checkPreparationBy =
+        data.preparationBy === 'นักบินโดรนเตรียมให้' && data.preparationRemark.trim().length !== 0
 
       if (
         checkEmptyArray && [data?.targetSpray][0]?.includes('อื่นๆ')
           ? checkOtherSpray
-          : checkEmptyArray && checkDateTime && checkEmptyNumber && defaultRai && checkEmptySting
+          : checkEmptyArray &&
+            checkDateTime &&
+            checkEmptyNumber &&
+            defaultRai &&
+            checkEmptySting &&
+            checkPreparationBy
       ) {
         setDisableBtn(false)
       } else {

@@ -329,7 +329,7 @@ function IndexListStore() {
     {
       updatedAt: 'CL000001',
       shopName: 'ไม้เมืองการเกษตร',
-      codeName : '3350700008073',
+      codeName: '3350700008073',
       name: 'สายไหม เกษตรจ๋า',
       tel: '0989284761',
       province: 'สระบุรี',
@@ -339,7 +339,7 @@ function IndexListStore() {
     {
       updatedAt: 'CL000002',
       shopName: 'สมรักษ์รักป่า',
-      codeName : '3350700008073',
+      codeName: '3350700008073',
       name: 'นายครี มีงานทำ',
       tel: '0887787442',
       province: 'อ่างทอง',
@@ -349,7 +349,7 @@ function IndexListStore() {
     {
       updatedAt: 'Cl000003',
       shopName: 'อุดมการณ์ยิ่งใหญ่',
-      codeName : '3350700008073',
+      codeName: '3350700008073',
       name: 'สมควร แล้ว',
       tel: '0928077231',
       province: 'ชัยนาท',

@@ -97,7 +97,7 @@ export const CreateNewTaskEntity_INIT: CreateNewTaskEntity = {
   farm_area_amount: '',
   unit_price: '',
   discount_fee: '',
-  preparationRemark: ''
+  preparationRemark: '',
 }
 export interface GetNewTaskEntity {
   id: string
@@ -147,6 +147,7 @@ export interface GetNewTaskEntity {
   discountPromotion: string
   usePoint: string
   discountCampaignPoint: string
+  preparationRemark: string
 }
 export const GetNewTaskEntity_INIT: GetNewTaskEntity = {
   id: '',
@@ -196,6 +197,7 @@ export const GetNewTaskEntity_INIT: GetNewTaskEntity = {
   discountPromotion: '',
   usePoint: '',
   discountCampaignPoint: '',
+  preparationRemark: '',
 }
 export interface UpdateNewTask {
   id: string
@@ -314,6 +316,7 @@ export interface TaskManageEntity {
     fee: number
     id: string
     preparationBy: string
+    preparationRemark: string
     price?: string
     purposeSpray: {
       crop: {
@@ -379,6 +382,7 @@ export const TaskManageEntity_INIT: TaskManageEntity = {
     fee: 0,
     id: '',
     preparationBy: '',
+    preparationRemark: '',
     price: '',
     purposeSpray: {
       crop: {

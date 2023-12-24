@@ -486,6 +486,15 @@ const IndexAdminTask = () => {
             <Col span={8}>{taskSelected?.data.purposeSpray.crop.cropName || '-'}</Col>
           </>
         </Row>
+        {taskSelected?.data.preparationBy === 'นักบินโดรนเตรียมให้' && (
+          <Row justify={'space-between'} gutter={8} style={{ paddingBottom: '15px' }}>
+            <Col span={24} style={{ fontWeight: 'bold' }}>
+              รายละเอียดยา
+            </Col>
+            <Col span={24}>{taskSelected?.data.preparationRemark || '-'}</Col>
+          </Row>
+        )}
+
         <Row justify={'space-between'} gutter={8} style={{ paddingBottom: '15px' }}>
           <>
             <Col span={8} style={{ fontWeight: 'bold' }}>
@@ -773,6 +782,14 @@ const IndexAdminTask = () => {
             <Col span={8}>{taskSelected?.data.purposeSpray.crop.cropName || '-'}</Col>
           </>
         </Row>
+        {taskSelected?.data.preparationBy === 'นักบินโดรนเตรียมให้' && (
+          <Row justify={'space-between'} gutter={8} style={{ paddingTop: '15px' }}>
+            <Col span={24} style={{ fontWeight: 'bold' }}>
+              รายละเอียดยา
+            </Col>
+            <Col span={24}>{taskSelected?.data.preparationRemark || '-'}</Col>
+          </Row>
+        )}
         <Divider />
         <Form form={form}>
           <Row justify={'space-between'} gutter={8}>

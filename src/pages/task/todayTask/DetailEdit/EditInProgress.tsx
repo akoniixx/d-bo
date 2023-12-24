@@ -232,12 +232,24 @@ function EditInProgress() {
                 {data.targetSpray !== null ? data.targetSpray.join(',') : '-'}
               </span>
             </Form.Item>
-            <label>การเตรียมยา</label>
-            <Form.Item>
-              <span style={{ color: color.Grey }}>
-                {data.preparationBy !== null ? data.preparationBy : '-'}
-              </span>
-            </Form.Item>
+          </div>
+          <div className='d-flex justify-content-between'>
+            <div className='col-lg-6'>
+              <label>การเตรียมยา</label>
+              <Form.Item>
+                <span style={{ color: color.Grey }}>
+                  {data.preparationBy !== null ? data.preparationBy : '-'}
+                </span>
+              </Form.Item>
+            </div>
+            {data.preparationBy === 'นักบินโดรนเตรียมให้' && (
+              <div className='col-lg'>
+                <label>รายละเอียดยา</label>
+                <Form.Item>
+                  <span style={{ color: color.Grey }}>{data.preparationRemark || '-'}</span>
+                </Form.Item>
+              </div>
+            )}
           </div>
           <div className='form-group col-lg-10'>
             <label>หมายเหตุ</label>

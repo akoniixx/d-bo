@@ -128,12 +128,22 @@ function FinishTasks() {
               {data.data.targetSpray !== null ? data.data.targetSpray.join(',') : '-'}
             </span>
           </Form.Item>
-          <label>การเตรียมยา</label>
-          <Form.Item>
-            <span style={{ color: color.Grey }}>
-              {data.data.preparationBy !== null ? data.data.preparationBy : '-'}
-            </span>
-          </Form.Item>
+          <div className='d-flex justify-content-between'>
+            <div className='col-lg-6'>
+              <label>การเตรียมยา</label>
+              <Form.Item>
+                <span style={{ color: color.Grey }}>{data.data.preparationBy || '-'}</span>
+              </Form.Item>
+            </div>
+            {data.data.preparationBy === 'นักบินโดรนเตรียมให้' && (
+              <div className='col-lg'>
+                <label>รายละเอียดยา</label>
+                <Form.Item>
+                  <span style={{ color: color.Grey }}>{data.data.preparationRemark || '-'}</span>
+                </Form.Item>
+              </div>
+            )}
+          </div>
           <div className='row'>
             <div className='col-lg'>
               <label>ภาพหลักฐานการบิน </label>
