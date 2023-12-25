@@ -2,9 +2,8 @@ import {
   Badge,
   Button,
   Dropdown,
-  Form,
   Input,
-  Menu,
+  InputNumber,
   Pagination,
   PaginationProps,
   Row,
@@ -19,83 +18,151 @@ import { color, image } from '../../../resource'
 import {
   CaretDownOutlined,
   CaretUpOutlined,
-  DeleteOutlined,
   EditOutlined,
-  FileTextOutlined,
+  StarFilled,
   SwapOutlined,
 } from '@ant-design/icons'
-import { DateTimeUtil } from '../../../utilities/DateTimeUtil'
 import { numberWithCommas } from '../../../utilities/TextFormatter'
 import ActionButton from '../../../components/button/ActionButton'
 import { useNavigate } from 'react-router-dom'
-import { ProviceEntity, SubdistrictEntity } from '../../../entities/LocationEntities'
+import {
+  DistrictEntity,
+  ProviceEntity,
+  SubdistrictEntity,
+} from '../../../entities/LocationEntities'
 import { LocationDatasource } from '../../../datasource/LocationDatasource'
 import icon from '../../../resource/icon'
 import AddButtton from '../../../components/button/AddButton'
 import ModalDronerInfinity from '../../../components/modal/ModalDronerInfinity'
 import ModalDelete from '../../../components/modal/ModalDelete'
-import { DronerAreaEntity, DronerAreaEntity_INIT } from '../../../entities/DronerAreaEntities'
-import { LAT_LNG_BANGKOK } from '../../../definitions/Location'
+
+import { DronerFinityDatasource } from '../../../datasource/DronerFinityDatasource'
+import { AllDronerFinityEntity, updateStatus } from '../../../entities/DronerFinityEntities'
+import { useLocalStorage } from '../../../hook/useLocalStorage'
+import { UploadImageEntity_INTI } from '../../../entities/UploadImageEntities'
 
 function DronerInfinity() {
-  const { Option } = Select
-  const [status, setStatus] = useState<any>()
-  const [provinceSelect, setProvinceSelect] = useState<any>()
+  const [status, setStatus] = useState<any>('ACTIVE')
   const [searchText, setSearchText] = useState<string>('')
   const [loading, setLoading] = useState<boolean>(false)
+  const [dataDroner, setDataDroner] = useState<AllDronerFinityEntity>()
   const [row, setRow] = useState(10)
   const [current, setCurrent] = useState(1)
   const [province, setProvince] = useState<ProviceEntity[]>([])
+  const [district, setDistrict] = useState<DistrictEntity[]>([])
+  const [subdistrict, setSubdistrict] = useState<SubdistrictEntity[]>([])
+  const [provinceId, setProvinceId] = useState<any>()
+  const [districtId, setDistrictId] = useState<any>()
+  const [subDistrictId, setSubDistrictId] = useState<any>()
   const [sortDirection, setSortDirection] = useState<string | undefined>(undefined)
   const [sortDirection1, setSortDirection1] = useState<string | undefined>(undefined)
   const [sortDirection2, setSortDirection2] = useState<string | undefined>(undefined)
-  const [sortDirection3, setSortDirection3] = useState<string | undefined>(undefined)
-  const [sortDirection4, setSortDirection4] = useState<string | undefined>(undefined)
   const [sortField, setSortField] = useState<string | undefined>(undefined)
-  const [inputValue, setInputValue] = useState(1)
   const [showModal, setShowModal] = useState<boolean>(false)
   const [editIndex, setEditIndex] = useState(0)
   const [modalDelete, setModalDelete] = useState<boolean>(false)
-  const [location, setLocation] = useState<SubdistrictEntity[]>([])
-  const { Map } = require('immutable')
-  const navigate = useNavigate()
-  const [mapPosition, setMapPosition] = useState<{
-    lat?: number
-    lng?: number
-  }>()
-  const [dronerArea, setDronerArea] = useState<DronerAreaEntity>(DronerAreaEntity_INIT)
-  const [form] = Form.useForm()
-  const [searchLocation] = useState('')
+  const [modalDronerCome, setModalDronerCome] = useState<boolean>(false)
+  const [deleteId, setDeleteId] = useState<any>()
+  const [dataEdit, setDataEdit] = useState<any>()
+  const [profile] = useLocalStorage('profile', [])
 
+  const [credit, setCredit] = useState<{
+    min: number
+    max: number
+  }>({
+    min: 0,
+    max: 0,
+  })
   useEffect(() => {
-    fetchLocation(searchLocation)
-  }, [])
-  const fetchLocation = async (text?: string) => {
-    await LocationDatasource.getSubdistrict(0, text).then((res) => {
-      setLocation(res)
+    fetchAllDroner()
+    fetchProvince()
+  }, [status, sortDirection, current, row])
+
+  const fetchAllDroner = async () => {
+    setLoading(true)
+    await DronerFinityDatasource.getAllDroner(
+      status,
+      searchText,
+      provinceId,
+      districtId,
+      subDistrictId,
+      credit.min,
+      credit.max,
+      sortField,
+      sortDirection,
+      current,
+      row,
+    )
+      .then((res) => {
+        setDataDroner(res)
+      })
+      .finally(() => setLoading(false))
+  }
+
+  const fetchProvince = async () => {
+    await LocationDatasource.getProvince().then((res) => {
+      setProvince(res)
     })
   }
- 
+  const fetchDistrict = async (provinceId: number) => {
+    await LocationDatasource.getDistrict(provinceId).then((res) => {
+      setDistrict(res)
+    })
+  }
+  const fetchSubdistrict = async (districtId: number) => {
+    await LocationDatasource.getSubdistrict(districtId).then((res) => {
+      setSubdistrict(res)
+    })
+  }
   const tabConfigurations = [
-    { title: 'ใช้งาน', key: 'ACTIVE' },
-    { title: 'ยกเลิก', key: 'CANCEL' },
+    { title: `ใช้งาน (${dataDroner?.summary.countactive})`, key: 'ACTIVE' },
+    { title: `ยกเลิก (${dataDroner?.summary.countcanceled})`, key: 'CANCELED' },
   ]
   const onShowSizeChange: PaginationProps['onShowSizeChange'] = (current, pageSize) => {
     setCurrent(current)
     setRow(pageSize)
   }
-  const onChange = (newValue: number) => {
-    setInputValue(newValue)
+  const handleSearchProvince = (provinceId: any) => {
+    if (!provinceId) {
+      setDistrictId(null)
+      setSubDistrictId(null)
+    }
+    setProvinceId(provinceId)
+    fetchDistrict(provinceId)
+  }
+  const handleSearchDistrict = (districtId: any) => {
+    if (!districtId) {
+      setSubDistrictId(null)
+    }
+    fetchSubdistrict(districtId)
+    setDistrictId(districtId)
+  }
+  const handleSearchSubdistrict = (subdistrictId: any) => {
+    setSubDistrictId(subdistrictId)
   }
   const showModalDronerList = (data: any, index: number) => {
     setShowModal((prev) => !prev)
     setEditIndex(index)
+    setDataEdit(data)
   }
   const showDelete = (id: string) => {
-    // setDeleteId(id)
+    setDeleteId(id)
     setModalDelete(!modalDelete)
   }
-
+  const showDronerCome = (data: any, index: number) => {
+    setModalDronerCome((prev) => !prev)
+    setEditIndex(index)
+    setDataEdit(data)
+  }
+  const onChangeSlider = (newValue: any) => {
+    setCredit({ min: newValue[0], max: newValue[1] })
+  }
+  const onChangeCreditMin = (e: any) => {
+    setCredit({ min: e, max: credit.max })
+  }
+  const onChangeCreditMax = (e: any) => {
+    setCredit({ min: credit.min, max: e })
+  }
   const columns = [
     {
       title: () => {
@@ -109,21 +176,21 @@ function DronerInfinity() {
                 cursor: 'pointer',
               }}
               onClick={() => {
-                setSortField('updatedAt')
+                setSortField('firstname')
                 setSortDirection((prev) => {
-                  if (prev === 'asc') {
-                    return 'desc'
+                  if (prev === 'ASC') {
+                    return 'DESC'
                   } else if (prev === undefined) {
-                    return 'asc'
+                    return 'ASC'
                   } else {
                     return undefined
                   }
                 })
                 setSortDirection1((prev) => {
-                  if (prev === 'asc') {
-                    return 'desc'
+                  if (prev === 'ASC') {
+                    return 'DESC'
                   } else if (prev === undefined) {
-                    return 'asc'
+                    return 'ASC'
                   } else {
                     return undefined
                   }
@@ -134,31 +201,33 @@ function DronerInfinity() {
                 style={{
                   position: 'relative',
                   top: 2,
-                  color: sortDirection1 === 'asc' ? '#ffca37' : 'white',
+                  color: sortDirection1 === 'ASC' ? '#ffca37' : 'white',
                 }}
               />
               <CaretDownOutlined
                 style={{
                   position: 'relative',
                   bottom: 2,
-                  color: sortDirection1 === 'desc' ? '#ffca37' : 'white',
+                  color: sortDirection1 === 'DESC' ? '#ffca37' : 'white',
                 }}
               />
             </div>
           </div>
         )
       },
-      dataIndex: 'updatedAt',
-      key: 'updatedAt',
+      dataIndex: 'droner',
+      key: 'droner',
       render: (value: any, row: any, index: number) => {
         return {
           children: (
             <div className='container'>
               <div className='container'>
-                <span className='text-dark-75  d-block font-size-lg'>โดรนเนอร์ พ่นปุ๋ย 1</span>
+                <span className='text-dark-75  d-block font-size-lg'>
+                  {row.droner.firstname || '-'} {row.droner.lastname || '-'}
+                </span>
                 <div>
                   <span className=' d-block font-size-lg' style={{ color: color.Grey }}>
-                    DN00000001{' '}
+                    {row.droner.dronerCode || '-'}
                   </span>
                 </div>
               </div>
@@ -168,10 +237,73 @@ function DronerInfinity() {
       },
     },
     {
+      title: 'เบอร์โทร',
+      dataIndex: 'telephoneNo',
+      key: 'telephoneNo',
+      render: (value: any, row: any, index: number) => {
+        return {
+          children: <span className=' d-block font-size-lg'>{row.droner.telephoneNo || '-'}</span>,
+        }
+      },
+    },
+    {
+      title: 'ที่อยู่',
+      dataIndex: 'address',
+      key: 'address',
+      render: (value: any, row: any, index: number) => {
+        const subdistrict = row.droner.address !== null ? row.droner.address.subdistrict : null
+        const district = row.droner.address !== null ? row.droner.address.district : null
+        const province = row.droner.address !== null ? row.droner.address.province : null
+        return {
+          children: (
+            <span>
+              {' '}
+              {subdistrict ? subdistrict.subdistrictName + '/' : '-/'}
+              {district ? district.districtName + '/' : '-/'}
+              {province ? province.provinceName : '-'}
+            </span>
+          ),
+        }
+      },
+    },
+    {
+      title: 'แต้มสะสม',
+      dataIndex: 'like',
+      key: 'like',
+      render: (value: any, row: any, index: number) => {
+        return {
+          children: (
+            <span>
+              {' '}
+              <StarFilled
+                style={{
+                  color: '#FFCA37',
+                  fontSize: '16px',
+                  marginRight: '7px',
+                  verticalAlign: 0.5,
+                }}
+              />
+              {numberWithCommas(row.point) || 0}
+            </span>
+          ),
+        }
+      },
+    },
+    {
+      title: 'เครดิต',
+      dataIndex: 'credit',
+      key: 'credit',
+      render: (value: any, row: any, index: number) => {
+        return {
+          children: <span>{numberWithCommas(row.credit)}</span>,
+        }
+      },
+    },
+    {
       title: () => {
         return (
           <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-            เบอร์โทร
+            จำนวนยา / ปุ๋ย
             <div
               style={{
                 display: 'flex',
@@ -179,21 +311,21 @@ function DronerInfinity() {
                 cursor: 'pointer',
               }}
               onClick={() => {
-                setSortField('name')
+                setSortField('updatedAt')
                 setSortDirection((prev) => {
-                  if (prev === 'asc') {
-                    return 'desc'
+                  if (prev === 'ASC') {
+                    return 'DESC'
                   } else if (prev === undefined) {
-                    return 'asc'
+                    return 'ASC'
                   } else {
                     return undefined
                   }
                 })
                 setSortDirection2((prev) => {
-                  if (prev === 'asc') {
-                    return 'desc'
+                  if (prev === 'ASC') {
+                    return 'DESC'
                   } else if (prev === undefined) {
-                    return 'asc'
+                    return 'ASC'
                   } else {
                     return undefined
                   }
@@ -204,65 +336,30 @@ function DronerInfinity() {
                 style={{
                   position: 'relative',
                   top: 2,
-                  color: sortDirection2 === 'asc' ? '#ffca37' : 'white',
+                  color: sortDirection2 === 'ASC' ? '#ffca37' : 'white',
                 }}
               />
               <CaretDownOutlined
                 style={{
                   position: 'relative',
                   bottom: 2,
-                  color: sortDirection2 === 'desc' ? '#ffca37' : 'white',
+                  color: sortDirection2 === 'DESC' ? '#ffca37' : 'white',
                 }}
               />
             </div>
           </div>
         )
       },
-      dataIndex: 'name',
-      key: 'name',
+      dataIndex: 'drugAmount',
+      key: 'drugAmount',
       render: (value: any, row: any, index: number) => {
         return {
-          children: <span className=' d-block font-size-lg'>081-234-5678</span>,
-        }
-      },
-    },
-    {
-      title: 'ที่อยู่',
-      dataIndex: 'like',
-      key: 'like',
-      render: (value: any, row: any, index: number) => {
-        return {
-          children: <span>บ่อถ้ำ/ขาณุวรลักษบุรี/กำแพงเพชร</span>,
-        }
-      },
-    },
-    {
-      title: 'แต้มสะสม',
-      dataIndex: 'like',
-      key: 'like',
-      render: (value: any, row: any, index: number) => {
-        return {
-          children: <span>30,000</span>,
-        }
-      },
-    },
-    {
-      title: 'เครดิต',
-      dataIndex: 'commentCount',
-      key: 'commentCount',
-      render: (value: any, row: any, index: number) => {
-        return {
-          children: <span>1</span>,
-        }
-      },
-    },
-    {
-      title: 'จำนวนยา / ปุ๋ย',
-      dataIndex: 'view',
-      key: 'view',
-      render: (value: any, row: any, index: number) => {
-        return {
-          children: <span>10 ขวด / 1 กระสอบ</span>,
+          children: (
+            <span>
+              {numberWithCommas(row.drugAmount)} ขวด / {numberWithCommas(row.fertilizerAmount)}{' '}
+              กระสอบ
+            </span>
+          ),
         }
       },
     },
@@ -275,11 +372,11 @@ function DronerInfinity() {
           children: (
             <span
               style={{
-                color: row.status !== 'CANCEL' ? color.Success : color.Error,
+                color: row.status !== 'CANCELED' ? color.Success : color.Error,
               }}
             >
-              <Badge color={row.status !== 'CANCEL' ? color.Success : color.Error} />{' '}
-              {row.status === 'CANCEL' ? 'ปิดการใช้งาน' : 'ใช้งาน'}
+              <Badge color={row.status !== 'CANCELED' ? color.Success : color.Error} />{' '}
+              {row.status === 'CANCELED' ? 'ยกเลิก' : 'ใช้งาน'}
             </span>
           ),
         }
@@ -293,30 +390,49 @@ function DronerInfinity() {
         return {
           children: (
             <Row justify={'space-between'}>
-              <ActionButton
-                icon={<SwapOutlined />}
-                color={color.primary1}
-                // onClick={() => navigate('//id=' + row.id)}
-              />
-              <ActionButton
-                icon={<EditOutlined />}
-                color={color.primary1}
-                onClick={() => showModalDronerList(row, index + 1)}
-              />
-              <ActionButton
-                icon={<img src={icon.account_cancel} style={{ width: '20px', height: '20px' }} />}
-                color={color.Error}
-                onClick={() => {
-                  showDelete(row.id)
-                }}
-              />
+              {row.status === 'CANCELED' ? (
+                <ActionButton
+                  actionDisable={row.credit !== 0}
+                  icon={<img src={icon.upload_droner} style={{ width: '20px', height: '20px' }} />}
+                  color={color.Success}
+                  onClick={() => {
+                    showModalDronerList(row, index + 1)
+                  }}
+                />
+              ) : (
+                <>
+                  <ActionButton
+                    icon={<SwapOutlined />}
+                    color={color.primary1}
+                    // onClick={() => showModalDronerList(row.id, index + 1)}
+                  />
+                  <ActionButton
+                    icon={<EditOutlined />}
+                    color={color.primary1}
+                    onClick={() => showModalDronerList(row, index + 1)}
+                  />
+                  <ActionButton
+                    actionDisable={row.credit > 0}
+                    icon={
+                      <img
+                        src={row.credit > 0 ? icon.account_cancel_disable : icon.account_cancel}
+                        style={{ width: '20px', height: '20px' }}
+                      />
+                    }
+                    color={row.credit > 0 ? color.Grey : color.Error}
+                    bgColor={row.credit > 0 ? '#F2F5FC' : 'none'}
+                    onClick={() => {
+                      showDelete(row.id)
+                    }}
+                  />
+                </>
+              )}
             </Row>
           ),
         }
       },
     },
   ]
-  const data = [{}]
   const emptyState = {
     emptyText: (
       <div style={{ textAlign: 'center', padding: '4%' }}>
@@ -325,7 +441,6 @@ function DronerInfinity() {
       </div>
     ),
   }
-
   return (
     <div>
       <div className='d-flex justify-content-between pt-3 pb-3'>
@@ -347,7 +462,7 @@ function DronerInfinity() {
       </div>
       <div className='pt-3'>
         <Tabs
-          className={status === 'CANCEL' ? 'tab-status-inactive' : ''}
+          className={status === 'CANCELED' ? 'tab-status-inactive' : ''}
           onChange={(key: any) => setStatus(key)}
           type='card'
         >
@@ -357,30 +472,74 @@ function DronerInfinity() {
         </Tabs>
       </div>
       <div className='d-flex justify-content-between pb-4'>
-        <div className='col-lg-6 p-1'>
+        <div className='col-lg-4 p-1'>
           <Input
             placeholder='ค้นหาชื่อนักบิน / เบอร์โทร / ID นักบินโดรน'
             className='col-lg-12'
             onChange={(e: any) => setSearchText(e.target.value)}
           />
         </div>
-        <div className='col-lg p-1'>
+        <div className='col-lg'>
           <Select
-          className='col-lg-12'
             allowClear
+            className='col-lg-12 p-1'
+            placeholder='เลือกจังหวัด'
+            onChange={handleSearchProvince}
             showSearch
-            placeholder='เลือกที่อยู่นักบินโดรน'
-            // onChange={handleSearchLocation}
             optionFilterProp='children'
+            filterOption={(input: any, option: any) => option.children.includes(input)}
             filterSort={(optionA, optionB) =>
               optionA.children.toLowerCase().localeCompare(optionB.children.toLowerCase())
             }
-            filterOption={(input: any, option: any) => option.children.includes(input)}
           >
-            {location?.map((item, index) => (
-              <Option key={index} value={item.subdistrictId}>
-                {item.subdistrictName + '/' + item.districtName + '/' + item.provinceName}
-              </Option>
+            {province?.map((item, index) => (
+              <option key={index} value={item.provinceId.toString()}>
+                {item.provinceName}
+              </option>
+            ))}
+          </Select>
+        </div>
+        <div className='col-lg'>
+          <Select
+            allowClear
+            className='col-lg-12 p-1'
+            placeholder='เลือกอำเภอ'
+            onChange={handleSearchDistrict}
+            showSearch
+            optionFilterProp='children'
+            filterOption={(input: any, option: any) => option.children.includes(input)}
+            filterSort={(optionA, optionB) =>
+              optionA.children.toLowerCase().localeCompare(optionB.children.toLowerCase())
+            }
+            disabled={!provinceId}
+            value={districtId}
+          >
+            {district?.map((item, index) => (
+              <option key={index} value={item.districtId.toString()}>
+                {item.districtName}
+              </option>
+            ))}
+          </Select>
+        </div>
+        <div className='col-lg'>
+          <Select
+            allowClear
+            className='col-lg-12 p-1'
+            placeholder='เลือกตำบล'
+            onChange={handleSearchSubdistrict}
+            showSearch
+            optionFilterProp='children'
+            filterOption={(input: any, option: any) => option.children.includes(input)}
+            filterSort={(optionA, optionB) =>
+              optionA.children.toLowerCase().localeCompare(optionB.children.toLowerCase())
+            }
+            disabled={!districtId}
+            value={subDistrictId}
+          >
+            {subdistrict?.map((item, index) => (
+              <option key={index} value={item.subdistrictId.toString()}>
+                {item.subdistrictName}
+              </option>
             ))}
           </Select>
         </div>
@@ -400,15 +559,35 @@ function DronerInfinity() {
               >
                 <label>จำนวนเครดิต</label>
                 <Slider
+                  range={{
+                    draggableTrack: true,
+                  }}
                   style={{ color: color.Success }}
-                  onChange={onChange}
-                  min={1}
+                  value={[credit.min, credit.max]}
+                  onChange={onChangeSlider}
                   max={100000}
-                  value={typeof inputValue === 'number' ? inputValue : 0}
                 />
                 <div className='d-flex justify-content-between pt-3 pb-3'>
-                  <Button style={{ width: '120px' }}>{0}</Button>
-                  <Button style={{ width: '120px' }}>{numberWithCommas(inputValue)}</Button>
+                  <InputNumber
+                    min={0}
+                    max={100000}
+                    style={{
+                      margin: '0 16px',
+                    }}
+                    id='min'
+                    value={credit.min}
+                    onChange={onChangeCreditMin}
+                  />
+                  <InputNumber
+                    min={0}
+                    max={100000}
+                    style={{
+                      margin: '0 16px',
+                    }}
+                    id='max'
+                    value={credit.max}
+                    onChange={onChangeCreditMax}
+                  />
                 </div>
               </div>
             }
@@ -432,6 +611,10 @@ function DronerInfinity() {
               color: color.secondary2,
               backgroundColor: color.Success,
             }}
+            onClick={() => {
+              setCurrent(1)
+              fetchAllDroner()
+            }}
           >
             ค้นหาข้อมูล
           </Button>
@@ -442,36 +625,40 @@ function DronerInfinity() {
         <Table
           locale={emptyState}
           columns={columns}
-          dataSource={data}
+          dataSource={dataDroner?.data}
           pagination={false}
+          rowKey='id'
           scroll={{ x: 'max-content' }}
         />
       </Spin>
       <div className='d-flex justify-content-between pt-3 pb-3'>
-        <p>รายการทั้งหมด {data.length} รายการ</p>
+        <p>รายการทั้งหมด {dataDroner?.count} รายการ</p>
         <Pagination
           current={current}
           showSizeChanger
           onChange={(page: number) => setCurrent(page)}
           onShowSizeChange={onShowSizeChange}
-          total={data.length}
+          total={dataDroner?.count}
         />
       </div>
 
       <ModalDronerInfinity
-        action='edit'
+        action={editIndex > 0 ? 'edit' : undefined}
         show={showModal}
         backButton={() => {
           setEditIndex(0)
           setShowModal((prev) => !prev)
-        }}
-        // data={editIndex > 0 ? dataGroupGuru : GroupGuruEntities_INIT}
-        callBack={() => {
-          setShowModal((prev) => !prev)
+          window.location.reload()
         }}
         isEditModal={editIndex > 0 ? true : false}
-        title={editIndex > 0 ? 'แก้ไขรายชื่อนักบินโดรน' : 'เพิ่มรายชื่อนักบินโดรน'}
-        data={undefined}
+        data={editIndex > 0 ? dataEdit : undefined}
+        title={
+          dataEdit?.status === 'CANCELED'
+            ? 'เปิดการเข้ากิจกรรมนักบินโดรนอีกครั้ง'
+            : editIndex > 0
+            ? 'แก้ไขรายชื่อนักบินโดรน'
+            : 'เพิ่มรายชื่อนักบินโดรน'
+        }
       />
       <ModalDelete
         show={modalDelete}
@@ -480,12 +667,17 @@ function DronerInfinity() {
         title2={' เพราะอาจส่งผลต่อการคืนยา คืนเครดิต และคืนแต้มในระบบ'}
         backButton={() => setModalDelete(!modalDelete)}
         callBack={() => {
-          // GuruKasetDataSource.deleteGuru(deleteId).then((res) => {
-          //   if (res) {
-          //     setModalDelete(!modalDelete)
-          //     getGuruKaset()
-          //   }
-          // })
+          const params: updateStatus = {
+            id: deleteId,
+            updatedBy: `${profile?.firstname} ${profile?.lastname}`,
+            status: status === 'ACTIVE' ? 'CANCELED' : 'ACTIVE',
+          }
+          DronerFinityDatasource.updateStatus(params).then((res) => {
+            if (res) {
+              setModalDelete(!modalDelete)
+              window.location.reload()
+            }
+          })
         }}
       />
     </div>

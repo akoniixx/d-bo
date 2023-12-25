@@ -149,7 +149,6 @@ function IndexDroner() {
     fetchDistrict(provinceId)
   }
   const handleSearchDistrict = (districtId: any) => {
-    console.log(districtId)
     if (!districtId) {
       setSearchSubdistrict(null)
     }
