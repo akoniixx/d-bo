@@ -375,6 +375,7 @@ const IndexAdminTask = () => {
     setDeleteImgDrug([...updatedImages])
     setDeleteId([...filters])
   }
+
   const pageTitle = (
     <Row style={{ padding: '10px' }}>
       <Col span={24}>
@@ -891,10 +892,10 @@ const IndexAdminTask = () => {
           )}
         </Form>
         <Button
-          disabled={(deleteImgControl?.length === 0 || deleteImgDrug?.length === 0) && checkRai()}
+          disabled={deleteImgControl?.length === 0 || deleteImgDrug?.length === 0 || checkRai()}
           style={{
             backgroundColor:
-              (deleteImgControl?.length === 0 || deleteImgDrug?.length === 0) && checkRai()
+              deleteImgControl?.length === 0 || deleteImgDrug?.length === 0 || checkRai()
                 ? color.Grey
                 : color.Success,
             color: 'white',

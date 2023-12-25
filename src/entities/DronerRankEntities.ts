@@ -291,6 +291,7 @@ export interface taskDetailEntity {
   reviewFarmerScore: null
   reviewFarmerComment: null
   imagePathFinishTask: null
+  imagePathDrug: null
   comment: null
   farmer: FarmerEntity
   farmerPlot: FarmerPlotEntity
@@ -337,6 +338,7 @@ export const taskDetailEntity_INIT: taskDetailEntity = {
   reviewFarmerScore: null,
   reviewFarmerComment: null,
   imagePathFinishTask: null,
+  imagePathDrug: null,
   comment: null,
   farmer: FarmerEntity_INIT,
   farmerPlot: FarmerPlotEntity_INIT,
