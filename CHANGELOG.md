@@ -1,5 +1,12 @@
 ## [Version - 0]
 
+## improve [v0.42.2] 2023-12-25
+
+- sort plants form api
+- fix count in mission
+- hide one finity menu
+- show missionNo. in point menu
+
 ## improve [v0.42.1] 2023-12-22
 
 - call api credit setting

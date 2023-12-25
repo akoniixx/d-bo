@@ -18,6 +18,7 @@ import { formatNumberWithCommas } from '../../utilities/TextFormatter'
 import ImagCards from '../../components/card/ImagCard'
 import { image } from '../../resource'
 import ShowNickName from '../../components/popover/ShowNickName'
+import { TaskImageDatasource } from '../../datasource/TaskImageDatasource'
 const _ = require('lodash')
 const dateFormat = 'DD/MM/YYYY'
 const timeFormat = 'HH:mm'
@@ -32,7 +33,9 @@ function DetailWorkDroner() {
     lat: LAT_LNG_BANGKOK.lat,
     lng: LAT_LNG_BANGKOK.lng,
   })
-  const [imgFinish, setImgFinish] = useState<any>()
+  const [imgDrug, setImgDrug] = useState<any>()
+
+  const [imgFinish, setImgFinish] = useState<any>(null)
   const [couponData, setCouponData] = useState<{
     couponCode: string
     couponName: string
@@ -55,37 +58,40 @@ function DetailWorkDroner() {
         )
       }
       setData(res)
+      if (res.imagePathDrug) {
+        UploadImageDatasouce.getImage(res.imagePathDrug).then((resImg) => {
+          setImgDrug([resImg.url])
+        })
+      }
       setMapPosition({
         lat: parseFloat(res.farmerPlot.lat),
         lng: parseFloat(res.farmerPlot.long),
       })
-      const getImgFinish = res.imagePathFinishTask
-      imgList.push(getImgFinish != null ? getImgFinish : '')
-      let i = 0
-      for (i; imgList.length > i; i++) {
-        i == 0 &&
-          UploadImageDatasouce.getImageFinish(imgList[i].toString()).then((resImg) => {
-            setImgFinish(resImg.url)
-          })
-      }
     })
   }
+  useEffect(() => {
+    const getImageTask = async () => {
+      await TaskImageDatasource.getImgByTask(taskId).then((res) => {
+        if (res) {
+          const imgArray: any[] = res.map((item: any) => {
+            return {
+              id: item.id,
+              url: item.pathFinishTask,
+              file: item.pathFinishTask,
+              percent: 100,
+            }
+          })
+          setImgFinish(imgArray)
+        }
+      })
+    }
+    getImageTask()
+  }, [])
 
   useEffect(() => {
     fetchTask()
   }, [])
-  const onPreviewImg = async (e: any) => {
-    let src = e
-    if (!src) {
-      src = await new Promise((resolve) => {
-        const reader = new FileReader()
-      })
-    }
-    const image = new Image()
-    image.src = src
-    const imgWindow = window.open(src)
-    imgWindow?.document.write(image.outerHTML)
-  }
+
   const starIcon = (
     <StarFilled
       style={{
@@ -137,17 +143,20 @@ function DetailWorkDroner() {
             </span>
           </Form.Item>
           <label>การเตรียมยา</label>
-          <Form.Item>
-            <span style={{ color: color.Grey }}>
-              {data.preparationBy !== null ? data.preparationBy : '-'}
-            </span>
-          </Form.Item>
-          <p>ภาพงานจากนักบินโดรน</p>
-          <ImagCards
-            imageName={imgFinish ? imgFinish : ''}
-            image={imgFinish ? imgFinish : image.empty_cover}
-            onClick={() => onPreviewImg(imgFinish)}
-          />
+          <div className='row'>
+            <div className='col-lg'>
+              <label>ภาพหลักฐานการบิน </label>
+              <span style={{ color: color.Grey }}> ({imgFinish?.length || 0} รูป)</span>
+              <br />
+              <ImagCards image={imgFinish || image.empty_cover} />
+            </div>
+            <div className='col-lg'>
+              <label>ภาพปุ๋ยและยา </label>
+              <span style={{ color: color.Grey }}> ({imgDrug?.length || 0} รูป)</span>
+              <br />
+              <ImagCards image={imgDrug ? imgDrug : image.empty_cover} show={true} />
+            </div>
+          </div>
           <br />
           <label>หมายเหตุ</label>
           <Form.Item>
