@@ -1,5 +1,10 @@
 ## [Version - 0]
 
+## Fix [v0.42.4] 2023-12-26
+
+- change image upload
+- set disable button save in reward menu
+
 ## improve [v0.42.3] 2023-12-26
 
 - preparation remark

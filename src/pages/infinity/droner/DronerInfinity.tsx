@@ -564,12 +564,12 @@ function DronerInfinity() {
                   style={{ color: color.Success }}
                   value={[credit.min || 0, credit.max || 0]}
                   onChange={onChangeSlider}
-                  max={1000}
+                  max={100}
                 />
                 <div className='d-flex justify-content-between pt-3 pb-3'>
                   <Input
                     min={0}
-                    max={100000}
+                    max={100}
                     style={{
                       margin: '0 16px',
                     }}
@@ -579,7 +579,7 @@ function DronerInfinity() {
                   />
                   <Input
                     min={0}
-                    max={100000}
+                    max={100}
                     style={{
                       margin: '0 16px',
                     }}

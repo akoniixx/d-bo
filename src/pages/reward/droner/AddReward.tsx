@@ -674,6 +674,7 @@ function AddReward() {
   )
 
   const onSubmit = () => {
+    setBtnSaveDisable(true)
     const {
       rewardName,
       rewardType,
@@ -734,6 +735,7 @@ function AddReward() {
       createBy: profile.firstname + ' ' + profile.lastname,
     })
       .then((res) => {
+        setBtnSaveDisable(false)
         Swal.fire({
           title: 'บันทึกสำเร็จ',
           icon: 'success',
@@ -744,6 +746,7 @@ function AddReward() {
         })
       })
       .catch((err) => {
+        setBtnSaveDisable(false)
         console.log(err)
         Swal.fire({
           title: 'เกิดข้อผิดพลาก',
