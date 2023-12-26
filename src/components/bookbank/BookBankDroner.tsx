@@ -44,8 +44,8 @@ const BookBankDroner: React.FC<BookBankDronerProps> = ({ callBack, data, dronerI
   useEffect(() => {
     const getDronerById = async () => {
       await DronerDatasource.getDronerByID(dronerId).then((res) => {
-        setImagName(res.file.find((x) => x.category === 'BOOK_BANK')?.fileName)
-        const getPathPro = res.file.find((x) => x.category === 'BOOK_BANK')
+        setImagName(res.file?.find((x) => x.category === 'BOOK_BANK')?.fileName)
+        const getPathPro = res.file?.find((x) => x.category === 'BOOK_BANK')
         getPathPro &&
           UploadImageDatasouce.getImage(getPathPro?.path).then((resImg) => {
             resImg?.url && setBankImg(resImg.url)
@@ -136,7 +136,7 @@ const BookBankDroner: React.FC<BookBankDronerProps> = ({ callBack, data, dronerI
   const checkValidate = async (data: DronerEntity) => {
     const payload: any = {}
     payload.id = data.id
-    payload.accountNumber = dataBookBank.accountNumber
+    payload.accountNumber = dataBookBank?.accountNumber
     callBack(data)
   }
 
@@ -270,9 +270,6 @@ const BookBankDroner: React.FC<BookBankDronerProps> = ({ callBack, data, dronerI
                       cursor: 'pointer',
                     }}
                   />
-                </Col>
-                <Col span={14} className='align-self-center'>
-                  <span>{(bankImg && bankImgCreate.file.name) || imgName}</span>
                 </Col>
                 <Col span={2} className='align-self-center'>
                   <span>

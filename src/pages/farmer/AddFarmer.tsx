@@ -353,8 +353,11 @@ const AddFarmer = () => {
       ...prev,
       farmerPlot: farmerPlotList,
     }))
-    await FarmerDatasource.insertFarmer(payload).then(async (res) => {
-      if (res != undefined) {
+
+    try {
+      setBtnSaveDisable(true)
+      const res = await FarmerDatasource.insertFarmer(payload)
+      if (res !== undefined) {
         const fileList = [createImgProfile, createImgIdCard]
           .filter((el) => {
             return el.file !== '' && el.file !== undefined
@@ -362,7 +365,6 @@ const AddFarmer = () => {
           .map((el) => {
             return UploadImageDatasouce.uploadImage(Map(el).set('resourceId', res.id).toJS())
           })
-
         await Promise.all(fileList)
         Swal.fire({
           title: 'บันทึกสำเร็จ',
@@ -379,7 +381,11 @@ const AddFarmer = () => {
           showConfirmButton: true,
         })
       }
-    })
+      setBtnSaveDisable(false)
+    } catch (error) {
+      setBtnSaveDisable(false)
+      console.error('Error inserting farmer data:', error)
+    }
   }
 
   const renderFromData = (

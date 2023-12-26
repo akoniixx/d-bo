@@ -1,3 +1,25 @@
+export interface dronerTransactionsEntity {
+  afterRai: number
+  allValue: number
+  amountValue: number
+  balance: number
+  beforeRai: number
+  beforeValue: number
+  campaignId: string
+  campaignName: string
+  createAt: string
+  dronerId: string
+  id: string
+  missionId: string
+  raiAmount: number
+  receiverDetail: string
+  redeemDetail: string
+  redeemNo: string
+  rewardId: string
+  rewardName: string
+  rewardQuantity: string
+  updateAt: string
+}
 export interface MissionDetailEntity {
   count: number
   id: string
@@ -23,6 +45,7 @@ export interface MissionDetailEntity {
     conditionUpdate: {
       [key: string]: string
     }
+    dronerTransactions: dronerTransactionsEntity[]
     missionNo: string
     allraiAmount: number
     firstname: string

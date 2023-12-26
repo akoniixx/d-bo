@@ -715,45 +715,48 @@ function EditDroner() {
       UploadImageDatasouce.uploadImage(imgBB).then((res) => {})
     }
     if (payload) {
-      await DronerDatasource.updateDroner(payload).then((res) => {
-        if (res !== undefined) {
-          console.log(res)
+      setDisableSaveBtn(true)
+      await DronerDatasource.updateDroner(payload)
+        .then((res) => {
+          if (res !== undefined) {
+            console.log(res)
 
-          let i = 0
-          for (i; 5 > i; i++) {
-            i === 0 &&
-              createImgProfile.file !== '' &&
-              UploadImageDatasouce.uploadImage(createImgProfile).then(res)
-            i === 1 &&
-              createImgIdCard.file !== '' &&
-              UploadImageDatasouce.uploadImage(createImgIdCard).then(res)
-            i === 2 &&
-              addOtherAddress === true &&
-              OtherAddressDatasource.addOtherAddress(dronerId, otherAdd).then(res)
-            i === 3 &&
-              updateOtherAddress === true &&
-              OtherAddressDatasource.updateOtherAddress(otherAdd).then(res)
-            i === 4 &&
-              deleteOtherAddress === true &&
-              OtherAddressDatasource.deleteOtherAddress(dronerId, otherAddress.id).then(res)
+            let i = 0
+            for (i; 5 > i; i++) {
+              i === 0 &&
+                createImgProfile.file !== '' &&
+                UploadImageDatasouce.uploadImage(createImgProfile).then(res)
+              i === 1 &&
+                createImgIdCard.file !== '' &&
+                UploadImageDatasouce.uploadImage(createImgIdCard).then(res)
+              i === 2 &&
+                addOtherAddress === true &&
+                OtherAddressDatasource.addOtherAddress(dronerId, otherAdd).then(res)
+              i === 3 &&
+                updateOtherAddress === true &&
+                OtherAddressDatasource.updateOtherAddress(otherAdd).then(res)
+              i === 4 &&
+                deleteOtherAddress === true &&
+                OtherAddressDatasource.deleteOtherAddress(dronerId, otherAddress.id).then(res)
+            }
+
+            Swal.fire({
+              title: 'บันทึกสำเร็จ',
+              icon: 'success',
+              timer: 1500,
+              showConfirmButton: false,
+            }).then((time) => {
+              navigate('/IndexDroner')
+            })
+          } else {
+            Swal.fire({
+              title: 'เบอร์โทร หรือ รหัส บัตรประชาชน <br/> ซ้ำในระบบ',
+              icon: 'error',
+              showConfirmButton: true,
+            })
           }
-
-          Swal.fire({
-            title: 'บันทึกสำเร็จ',
-            icon: 'success',
-            timer: 1500,
-            showConfirmButton: false,
-          }).then((time) => {
-            navigate('/IndexDroner')
-          })
-        } else {
-          Swal.fire({
-            title: 'เบอร์โทร หรือ รหัส บัตรประชาชน <br/> ซ้ำในระบบ',
-            icon: 'error',
-            showConfirmButton: true,
-          })
-        }
-      })
+        })
+        .finally(() => setDisableSaveBtn(false))
     }
   }
   const onFieldsChange = (field: any) => {

@@ -67,4 +67,10 @@ export default {
   comments_bullet: require('./media/images/comments-bullet.png'),
   play: require('./media/images/play.png'),
   pause: require('./media/images/pause.png'),
+  fertilizer: require('./media/images/fertilizer.png'),
+  account_cancel_disable: require('./media/images/account_cancel_disable.png'),
+  account_cancel: require('./media/images/account_cancel.png'),
+  wallet : require('./media/images/wallet.png'),
+  credit : require('./media/images/credit.png'),
+  nearequal : require('./media/images/nearequal.png'),
 }

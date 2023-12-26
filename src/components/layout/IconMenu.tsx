@@ -91,6 +91,13 @@ export const IconMenu = {
       style={{ width: 18, height: 18, color: color.BK }}
     />
   ),
+  infinity: (
+    <Image
+      src={icon.droner_inactive}
+      preview={false}
+      style={{ width: 18, height: 22, color: color.BK, paddingBottom: 4 }}
+    />
+  ),
 }
 export const IconMenuActive = {
   task: (
@@ -163,6 +170,13 @@ export const IconMenuActive = {
       src={icon.icon_challenge_active}
       preview={false}
       style={{ width: 18, height: 18, color: color.BK }}
+    />
+  ),
+  infinity: (
+    <Image
+      src={icon.droner_active}
+      preview={false}
+      style={{ width: 18, height: 22, color: color.BK, paddingBottom: 4 }}
     />
   ),
 }

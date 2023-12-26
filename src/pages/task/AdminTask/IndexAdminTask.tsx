@@ -375,7 +375,6 @@ const IndexAdminTask = () => {
     setDeleteImgDrug([...updatedImages])
     setDeleteId([...filters])
   }
-
   const pageTitle = (
     <Row style={{ padding: '10px' }}>
       <Col span={24}>
@@ -461,7 +460,7 @@ const IndexAdminTask = () => {
           </>
           <>
             <Col span={8}>
-              {DateTimeUtil.formatDateTime(taskSelected?.data.dateAppointment || '')}
+              {DateTimeUtil.formatDateTime(taskSelected?.data.dateAppointment || '-')}
             </Col>
             <Col span={8}>{taskSelected?.data.purposeSpray.purposeSprayName}</Col>
             <Col span={8}>
@@ -749,7 +748,7 @@ const IndexAdminTask = () => {
             </Col>
           </>
           <Col span={8}>
-            {DateTimeUtil.formatDateTime(taskSelected?.data.dateAppointment || '')}
+            {DateTimeUtil.formatDateTime(taskSelected?.data.dateAppointment || '-')}
           </Col>
           <Col span={8}>{taskSelected?.data.purposeSpray.purposeSprayName}</Col>
           <Col span={8}>
@@ -892,10 +891,10 @@ const IndexAdminTask = () => {
           )}
         </Form>
         <Button
-          disabled={deleteImgControl?.length === 0 || deleteImgDrug?.length === 0}
+          disabled={(deleteImgControl?.length === 0 || deleteImgDrug?.length === 0) && checkRai()}
           style={{
             backgroundColor:
-              deleteImgControl?.length === 0 || deleteImgDrug?.length === 0
+              (deleteImgControl?.length === 0 || deleteImgDrug?.length === 0) && checkRai()
                 ? color.Grey
                 : color.Success,
             color: 'white',
@@ -1217,7 +1216,7 @@ const IndexAdminTask = () => {
             await TaskDatasource.deleteImageFinishTask(id)
           }
         }
-        if (typeof deleteImgDrug[0].file !== 'string') {
+        if (deleteImgDrug && typeof deleteImgDrug[0].file !== 'string') {
           if (deleteImgDrug) {
             await TaskDatasource.insertManageTaskImg(
               taskId,

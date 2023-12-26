@@ -4,6 +4,7 @@ import { Routes, Route, Navigate, BrowserRouter } from 'react-router-dom'
 import { Spin } from 'antd'
 import ProtectRoute from './ProtectRoute'
 import PublicRoute from './PublicRoute'
+import DronerInfinityCreditList from './pages/infinity/droner/DronerInfinityCreditList'
 
 const ErrorLoginPage = lazy(() => import('./errorPage/ErrorLoginPage'))
 const PageNotFound = lazy(() => import('./httpError/PageNotFound'))
@@ -104,6 +105,10 @@ const AddVideoGuru = lazy(() => import('./pages/gurukaset/listGuru/addGuru/AddVi
 const EditArticleGuru = lazy(() => import('./pages/gurukaset/listGuru/editGuru/EditArticleGuru'))
 const EditVideoGuru = lazy(() => import('./pages/gurukaset/listGuru/editGuru/EditVideoGuru'))
 const IndexGroupGuru = lazy(() => import('./pages/gurukaset/groupGuru/IndexGroupGuru'))
+const IndexListStore = lazy(() => import('./pages/infinity/listStore/IndexListStore'))
+const DetailStore = lazy(() => import('./pages/infinity/listStore/DetailStore'))
+const CreditDroner = lazy(() => import('./pages/setting/credit/CreditDroner'))
+const DronerInfinity = lazy(() => import('./pages/infinity/droner/DronerInfinity'))
 
 const FallBack = () => {
   return (
@@ -220,6 +225,11 @@ const WebRoutes: React.FC<any> = () => {
             <Route path='/EditArticleGuru/:id' element={<EditArticleGuru />} />
             <Route path='/EditVideoGuru/:id' element={<EditVideoGuru />} />
             <Route path='/IndexGroupGuru' element={<IndexGroupGuru />} />
+            <Route path='/IndexListStore' element={<IndexListStore />} />
+            <Route path='/DetailStore' element={<DetailStore />} />
+            <Route path='/CreditDroner' element={<CreditDroner />} />
+            <Route path='/DronerInfinity' element={<DronerInfinity />} />
+            <Route path='/DronerInfinity/:id' element={<DronerInfinityCreditList />} />
           </Route>
           <Route element={<PublicRoute />}>
             <Route index element={<AuthPage />} />

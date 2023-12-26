@@ -33,7 +33,7 @@ import color from '../../../resource/color'
 import { TaskDatasource } from '../../../datasource/TaskDatasource'
 import { FarmerEntity } from '../../../entities/FarmerEntities'
 import { FarmerPlotEntity, FarmerPlotEntity_INIT } from '../../../entities/FarmerPlotEntities'
-import GooleMap from '../../../components/map/GoogleMap'
+import MapGoogle from '../../../components/map/GoogleMap'
 import { LAT_LNG_BANGKOK } from '../../../definitions/Location'
 import { RowSelectionType } from 'antd/lib/table/interface'
 import { CreateNewTaskEntity, CreateNewTaskEntity_INIT } from '../../../entities/NewTaskEntities'
@@ -528,7 +528,7 @@ const AddNewTask = () => {
               </div>
               <div className='row'>
                 <div className='form-group col-lg-12'>
-                  <GooleMap
+                  <MapGoogle
                     width='100%'
                     height='350px'
                     zoom={17}

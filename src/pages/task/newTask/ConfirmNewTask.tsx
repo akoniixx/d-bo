@@ -251,7 +251,6 @@ export const ConfirmNewTask: React.FC<ConfirmNewTaskProps> = ({
       setCouponKeepList(result)
     })
   }
-
   const handleChangeCoupon = (e: any) => {
     if (e.target.value) {
       setCouponCode(e.target.value)
@@ -483,7 +482,10 @@ export const ConfirmNewTask: React.FC<ConfirmNewTaskProps> = ({
                         </span>{' '}
                         x ค่าบริการ{' '}
                         <span style={{ color: color.Success }}>
-                          {formatNumberWithCommas(createNewTask?.unitPriceStandard)} บาท/ไร่
+                          {createNewTask?.unitPriceStandard !== 0
+                            ? formatNumberWithCommas(createNewTask?.unitPriceStandard)
+                            : formatNumberWithCommas(parseInt(createNewTask?.unitPrice))}{' '}
+                          บาท/ไร่
                         </span>
                         )
                       </span>
@@ -670,10 +672,10 @@ export const ConfirmNewTask: React.FC<ConfirmNewTaskProps> = ({
                       <span className='col' style={{ textAlign: 'end', color: color.Warning }}>
                         {isEdit
                           ? numberWithCommasToFixed(
-                              parseFloat(createNewTask?.price) +
-                                parseFloat(createNewTask?.revenuePromotion),
+                              parseInt(createNewTask?.price) +
+                                parseInt(createNewTask?.revenuePromotion),
                             )
-                          : numberWithCommasToFixed(createNewTask?.price) || 0}{' '}
+                          : numberWithCommasToFixed(parseInt(createNewTask?.price)) || 0}{' '}
                         ฿
                       </span>
                     </div>
