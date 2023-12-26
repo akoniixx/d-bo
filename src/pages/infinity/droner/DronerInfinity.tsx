@@ -42,6 +42,7 @@ import { useLocalStorage } from '../../../hook/useLocalStorage'
 import { UploadImageEntity_INTI } from '../../../entities/UploadImageEntities'
 
 function DronerInfinity() {
+  const navigate = useNavigate()
   const [status, setStatus] = useState<any>('ACTIVE')
   const [searchText, setSearchText] = useState<string>('')
   const [loading, setLoading] = useState<boolean>(false)
@@ -403,7 +404,7 @@ function DronerInfinity() {
                   <ActionButton
                     icon={<SwapOutlined />}
                     color={color.primary1}
-                    // onClick={() => showModalDronerList(row.id, index + 1)}
+                    onClick={() => navigate(`/DronerInfinity/${row.dronerId}`)}
                   />
                   <ActionButton
                     icon={<EditOutlined />}

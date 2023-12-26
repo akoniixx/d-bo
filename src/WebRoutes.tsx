@@ -4,6 +4,7 @@ import { Routes, Route, Navigate, BrowserRouter } from 'react-router-dom'
 import { Spin } from 'antd'
 import ProtectRoute from './ProtectRoute'
 import PublicRoute from './PublicRoute'
+import DronerInfinityCreditList from './pages/infinity/droner/DronerInfinityCreditList'
 
 const ErrorLoginPage = lazy(() => import('./errorPage/ErrorLoginPage'))
 const PageNotFound = lazy(() => import('./httpError/PageNotFound'))
@@ -228,6 +229,7 @@ const WebRoutes: React.FC<any> = () => {
             <Route path='/DetailStore' element={<DetailStore />} />
             <Route path='/CreditDroner' element={<CreditDroner />} />
             <Route path='/DronerInfinity' element={<DronerInfinity />} />
+            <Route path='/DronerInfinity/:id' element={<DronerInfinityCreditList />} />
           </Route>
           <Route element={<PublicRoute />}>
             <Route index element={<AuthPage />} />

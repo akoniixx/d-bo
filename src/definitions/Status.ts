@@ -31,6 +31,18 @@ export const STATUS_COLOR_MAPPING: any = {
   DRAFTING: color.Grey,
 }
 
+export const STATUS_COLOR_CREDIT: any ={
+  PENDING: '#EA973E',
+  APPROVE: color.Success,
+  CANCEL: color.Error,
+}
+
+export const STATUS_CREDIT_MAPPING: any = {
+  PENDING: 'รอตรวจสอบ',
+  APPROVE: 'อนุมัติ',
+  CANCEL: 'ยกเลิก'
+}
+
 export const FARMER_STATUS_SEARCH = [
   { value: 'OPEN', name: 'ยังไม่เปิดใช้งาน' },
   { value: 'PENDING', name: 'รอยืนยันตัวตน' },

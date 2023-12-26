@@ -1,5 +1,11 @@
 ## [Version - 0]
 
+## Feature [v0.42.5] 2023-12-29
+
+- added credit list for droner 1finity
+- add crud for droner 1finity
+
+
 ## Fix [v0.42.4] 2023-12-26
 
 - change image upload
