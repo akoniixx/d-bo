@@ -42,20 +42,24 @@ const ImagCards: React.FC<ImagCardsProps> = ({ image, show }) => {
   return (
     <div className='form-group' style={{ cursor: 'pointer' }}>
       <div style={{ display: 'flex', flexWrap: 'wrap' }}>
-        {image.length > 0 && image ? (
-          <div className='pt-3'>
-            <Image
-              preview={false}
-              style={{
-                borderRadius: '8px',
-                width: '140px',
-                height: '90px',
-                objectFit: 'cover',
-              }}
-              src={show ? image[0] : image[0].url}
-              onClick={() => handlePreview(image[0].url)}
-            />
-          </div>
+        {image ? (
+          image.length > 0 ? (
+            <div className='pt-3'>
+              <Image
+                preview={false}
+                style={{
+                  borderRadius: '8px',
+                  width: '140px',
+                  height: '90px',
+                  objectFit: 'cover',
+                }}
+                src={show ? image[0] : image[0].url}
+                onClick={() => handlePreview(image[0].url)}
+              />
+            </div>
+          ) : (
+            '-'
+          )
         ) : (
           '-'
         )}
@@ -101,23 +105,34 @@ const ImagCards: React.FC<ImagCardsProps> = ({ image, show }) => {
               style={{ backgroundColor: color.White, padding: 8, borderRadius: 50 }}
             />
           </div>
-          {image.length > 0 && image ? (
-            <img
-              alt='preview'
-              style={{ width: '80%', height: 'auto' }}
-              src={show ? image[currentIndex] : image[currentIndex].url}
-            />
+          {image ? (
+            image.length > 0 ? (
+              <>
+                <img
+                  alt='preview'
+                  style={{ width: '80%', height: 'auto' }}
+                  src={show ? image[currentIndex] : image[currentIndex].url}
+                />
+                <div
+                  style={{
+                    position: 'absolute',
+                    bottom: -40,
+                    left: 0,
+                    right: 0,
+                    textAlign: 'center',
+                  }}
+                >
+                  <span style={{ color: 'white' }}>
+                    {currentIndex + 1} / {image.length}
+                  </span>
+                </div>
+              </>
+            ) : (
+              '-'
+            )
           ) : (
             '-'
           )}
-
-          <div
-            style={{ position: 'absolute', bottom: -40, left: 0, right: 0, textAlign: 'center' }}
-          >
-            <span style={{ color: 'white' }}>
-              {currentIndex + 1} / {image.length}
-            </span>
-          </div>
         </div>
       </MoDalCard>
     </div>

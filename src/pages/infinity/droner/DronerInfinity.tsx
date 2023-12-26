@@ -62,7 +62,6 @@ function DronerInfinity() {
   const [showModal, setShowModal] = useState<boolean>(false)
   const [editIndex, setEditIndex] = useState(0)
   const [modalDelete, setModalDelete] = useState<boolean>(false)
-  const [modalDronerCome, setModalDronerCome] = useState<boolean>(false)
   const [deleteId, setDeleteId] = useState<any>()
   const [dataEdit, setDataEdit] = useState<any>()
   const [profile] = useLocalStorage('profile', [])
@@ -150,19 +149,19 @@ function DronerInfinity() {
     setDeleteId(id)
     setModalDelete(!modalDelete)
   }
-  const showDronerCome = (data: any, index: number) => {
-    setModalDronerCome((prev) => !prev)
-    setEditIndex(index)
-    setDataEdit(data)
-  }
   const onChangeSlider = (newValue: any) => {
-    setCredit({ min: newValue[0], max: newValue[1] })
+    const [newMin, newMax] = newValue
+    setCredit({ min: newMin === 0 ? null : newMin, max: newMax === 0 ? null : newMax })
   }
   const onChangeCreditMin = (e: any) => {
-    setCredit({ min: e, max: credit.max })
+    const inputValue = e.target.value
+    const convertedNumber = inputValue.replace(/[^\d1-9]/g, '')
+    setCredit({ min: convertedNumber, max: credit.max })
   }
   const onChangeCreditMax = (e: any) => {
-    setCredit({ min: credit.min, max: e })
+    const inputValue = e.target.value
+    const convertedNumber = inputValue.replace(/[^\d1-9]/g, '')
+    setCredit({ min: credit.min, max: convertedNumber })
   }
   const columns = [
     {
@@ -564,14 +563,14 @@ function DronerInfinity() {
                     draggableTrack: true,
                   }}
                   style={{ color: color.Success }}
-                  value={[credit.min, credit.max]}
+                  value={[credit.min || 0, credit.max || 0]}
                   onChange={onChangeSlider}
-                  max={100000}
+                  max={100}
                 />
                 <div className='d-flex justify-content-between pt-3 pb-3'>
-                  <InputNumber
+                  <Input
                     min={0}
-                    max={100000}
+                    max={100}
                     style={{
                       margin: '0 16px',
                     }}
@@ -579,9 +578,9 @@ function DronerInfinity() {
                     value={credit.min}
                     onChange={onChangeCreditMin}
                   />
-                  <InputNumber
+                  <Input
                     min={0}
-                    max={100000}
+                    max={100}
                     style={{
                       margin: '0 16px',
                     }}
@@ -599,7 +598,11 @@ function DronerInfinity() {
                 color: color.Disable,
               }}
             >
-              เลือกจำนวนเครดิต
+              {credit.min || credit.max ? (
+                <span>{credit.min + ' - ' + credit.max}</span>
+              ) : (
+                'เลือกจำนวนเครดิต'
+              )}
             </Button>
           </Dropdown>
         </div>

@@ -217,6 +217,10 @@ const EditInprogressTask = () => {
       setBtnSaveDisable(true)
     }
   }
+  const handlePreparationRemark = (e: any) => {
+    const d = Map(data).set('preparationRemark', e.target.value)
+    setData(d.toJS())
+  }
   const handleComment = (e: any) => {
     const d = Map(data).set('comment', e.target.value)
     setData(d.toJS())
@@ -257,7 +261,6 @@ const EditInprogressTask = () => {
       setBtnSaveDisable(true)
     }
   }
-
   const renderFormAppointment = (
     <CardContainer>
       <CardHeader textHeader='นัดหมายบริการ' />
@@ -379,6 +382,16 @@ const EditInprogressTask = () => {
                     <Radio value='นักบินโดรนเตรียมให้'>นักบินโดรนเตรียมให้</Radio>
                   </Space>
                 </Radio.Group>
+                {data?.preparationBy === 'นักบินโดรนเตรียมให้' ? (
+                  <div className='pt-3'>
+                    <TextArea
+                      style={{ width: '530px', height: '80px', left: '4%' }}
+                      placeholder='(บังคับ) ระบุชื่อยา/ปุ๋ย และจำนวนที่ใช้'
+                      onChange={handlePreparationRemark}
+                      defaultValue={data?.preparationRemark}
+                    />
+                  </div>
+                ) : null}
               </div>
               <div className='form-group'>
                 <label>หมายเหตุ</label>
@@ -756,6 +769,7 @@ const EditInprogressTask = () => {
     updateTask.purposeSprayId = data.purposeSprayId
     updateTask.targetSpray = data.targetSpray
     updateTask.preparationBy = data.preparationBy
+    updateTask.preparationRemark = data.preparationRemark
     updateTask.comment = data.comment
     updateTask.status = data.status
     updateTask.isProblem = data.isProblem

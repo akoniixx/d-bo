@@ -89,7 +89,6 @@ export const ConfirmNewTask: React.FC<ConfirmNewTaskProps> = ({
   const currentData = createNewTask?.taskDronerTemp?.slice(startIndex, endIndex)
   const dronerSelected = dronerSelectedList?.slice(startIndex, endIndex)
   const total = isEdit ? dronerSelectedList?.length : createNewTask?.taskDronerTemp?.length
-
   const columns = [
     {
       dataIndex: 'index',
@@ -261,7 +260,6 @@ export const ConfirmNewTask: React.FC<ConfirmNewTaskProps> = ({
       setCheckKeepCoupon(false)
     }
   }
-
   const calculatePrice = (coupon: string) => {
     const couponInfo = { ...getCoupon }
     couponInfo.farmerPlotId = farmerPlotId
@@ -337,7 +335,7 @@ export const ConfirmNewTask: React.FC<ConfirmNewTaskProps> = ({
               <Card
                 title='ข้อมูลเกษตรกร'
                 bordered={true}
-                style={{ marginRight: 8, height: renderValues() ? '370px' : '340px' }}
+                style={{ marginRight: 8, height: renderValues() ? '420px' : '340px' }}
               >
                 <div className='d-flex'>
                   <span className='col'>ชื่อเกษตรกร</span>
@@ -387,7 +385,7 @@ export const ConfirmNewTask: React.FC<ConfirmNewTaskProps> = ({
               <Card
                 title='ข้อมูลการจ้างงาน'
                 bordered={true}
-                style={{ marginRight: 8, height: renderValues() ? '370px' : '340px' }}
+                style={{ marginRight: 8, height: renderValues() ? '420px' : '340px' }}
               >
                 <div className='d-flex'>
                   <span className='col'>วันที่นัดหมาย</span>
@@ -413,6 +411,16 @@ export const ConfirmNewTask: React.FC<ConfirmNewTaskProps> = ({
                   <span className='col'>{createNewTask?.purposeSprayName}</span>
                   <span className='col'>{createNewTask?.preparationBy}</span>
                 </div>
+                {createNewTask?.preparationRemark && (
+                  <>
+                    <div className='d-flex pt-4'>
+                      <span className='col'>รายละเอียดยา</span>
+                    </div>
+                    <div className='d-flex'>
+                      <span className='col'>{createNewTask?.preparationRemark || '-'}</span>
+                    </div>
+                  </>
+                )}
                 <div className='d-flex pt-4'>
                   <span className='col'>หมายเหตุ</span>
                 </div>

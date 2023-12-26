@@ -290,7 +290,9 @@ function IndexFarmerHistorySum() {
                 <>
                   {' '}
                   {row.action === 'RETURN_REVERT' ? (
-                    <span  style={{ color: color.Error }}>{'-' + numberWithCommas(value) + ` แต้ม`}</span>
+                    <span style={{ color: color.Error }}>
+                      {'-' + numberWithCommas(value) + ` แต้ม`}
+                    </span>
                   ) : (
                     <span>{numberWithCommas(value) + ` แต้ม`}</span>
                   )}
