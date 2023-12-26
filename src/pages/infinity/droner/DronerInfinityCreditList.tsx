@@ -6,7 +6,6 @@ import icon from "../../../resource/icon";
 import { Badge, Button, DatePicker, Image, InputNumber, Pagination, PaginationProps, Popover, Row, Select, Slider, Spin, Table, Tabs } from "antd";
 import { useState } from "react";
 import { Option } from "antd/lib/mentions";
-import locale from 'antd/es/date-picker/locale/th_TH'
 import moment from "moment";
 import { CaretDownOutlined, CaretUpOutlined, DeleteOutlined, EditOutlined, FileTextOutlined, UserOutlined } from "@ant-design/icons";
 import { useQuery } from "react-query";
@@ -47,6 +46,10 @@ const DronerInfinityCreditList : React.FC<any> = () => {
       minCash : 0,
       maxCash : 0,
       toggle : true
+    })
+    const [condition,setCondition] = useState({
+      cashCreditCondition : 0,
+      pointCreditCondition : 0
     })
     const [addCredit,setAddCredit] = useState({
       open : false,
@@ -94,6 +97,10 @@ const DronerInfinityCreditList : React.FC<any> = () => {
         filter.minCash,
         filter.maxCash
       )
+      setCondition({
+        pointCreditCondition : data.pointCreditCondition,
+        cashCreditCondition : data.cashCreditCondition
+      })
       return data
     }
     const data = useQuery([
@@ -604,6 +611,8 @@ const DronerInfinityCreditList : React.FC<any> = () => {
     ]
     return  <div>
         <ModalEditCredit
+          cashCondition={condition.cashCreditCondition}
+          pointCondition={condition.pointCreditCondition}
           dronerId={queryString} 
           open={editCredit.open}
           name={editCredit.name}
@@ -634,7 +643,9 @@ const DronerInfinityCreditList : React.FC<any> = () => {
               navigate(0)
             })
           }}/>
-        <ModalCredit 
+        <ModalCredit
+          cashCondition={condition.cashCreditCondition}
+          pointCondition={condition.pointCreditCondition}
           open={addCredit.open}
           name={addCredit.name}
           tel={addCredit.tel}
@@ -663,7 +674,9 @@ const DronerInfinityCreditList : React.FC<any> = () => {
             })
           }}
         />
-        <ModalViewCredit 
+        <ModalViewCredit
+          cashCondition={condition.cashCreditCondition}
+          pointCondition={condition.pointCreditCondition} 
           open={viewCredit.open}
           name={viewCredit.name}
           tel={viewCredit.tel}
@@ -754,7 +767,7 @@ const DronerInfinityCreditList : React.FC<any> = () => {
                     <p style={{
                       margin : 0,
                       color : '#fff'
-                    }}>{data.isLoading ? 0 : data.data.point}</p>
+                    }}>{data.isLoading ? 0 : numberWithCommas(data.data.point)}</p>
                   </div>
                </div>
             </div>
@@ -780,7 +793,7 @@ const DronerInfinityCreditList : React.FC<any> = () => {
                     <p style={{
                       margin : 0,
                       color : '#000'
-                    }}>{data.isLoading ? 0 : data.data.pointCredit}</p>
+                    }}>{data.isLoading ? 0 : numberWithCommas(data.data.pointCredit)}</p>
                   </div>
               </div>
             </div>
@@ -806,7 +819,7 @@ const DronerInfinityCreditList : React.FC<any> = () => {
                     <p style={{
                       margin : 0,
                       color : '#fff'
-                    }}>{data.isLoading ? 0 : data.data.cashcredit}</p>
+                    }}>{data.isLoading ? 0 : numberWithCommas(data.data.cashcredit)}</p>
                   </div>
               </div>
             </div>
@@ -832,7 +845,7 @@ const DronerInfinityCreditList : React.FC<any> = () => {
                     <p style={{
                       margin : 0,
                       color : '#fff'
-                    }}>{data.isLoading ? 0 : data.data.credit}</p>
+                    }}>{data.isLoading ? 0 : numberWithCommas(data.data.credit)}</p>
                   </div>
               </div>
             </div>
@@ -843,7 +856,7 @@ const DronerInfinityCreditList : React.FC<any> = () => {
               ...filter,
               page : 1,
               take : 10,
-              dronerId : "4476a02f-9d38-43d4-872a-337bae43df49",
+              dronerId : queryString,
               status : key,
               exchangeType : "",
               startDate : "",
@@ -896,11 +909,11 @@ const DronerInfinityCreditList : React.FC<any> = () => {
                   }}
                   value={[filter.minCredit,filter.maxCredit]}
                   onChange={onChangeCredit}
-                  max={1000}
+                  max={100}
                 />
                 <InputNumber
                   min={0}
-                  max={200}
+                  max={100}
                   style={{
                     margin: '0 16px',
                   }}
@@ -909,7 +922,7 @@ const DronerInfinityCreditList : React.FC<any> = () => {
                 />
                 <InputNumber
                   min={0}
-                  max={200}
+                  max={100}
                   style={{
                     margin: '0 16px',
                   }}
@@ -925,7 +938,11 @@ const DronerInfinityCreditList : React.FC<any> = () => {
             onVisibleChange={handleVisibleCredit}
             placement='bottom'
           >
-            <Button style={{ width : '180px'}}>เลือกจำนวนเครดิต</Button>
+            <Button style={{ width : '180px'}}>{
+              (filter.minCredit === 0 && filter.maxCredit === 0)?
+              "เลือกจำนวนเครดิต" :
+              `${filter.minCredit} - ${filter.maxCredit} เครดิต`
+            }</Button>
           </Popover>
           <Popover
             content={
@@ -940,7 +957,7 @@ const DronerInfinityCreditList : React.FC<any> = () => {
                 />
                 <InputNumber
                   min={0}
-                  max={200}
+                  max={1000000}
                   style={{
                     margin: '0 16px',
                   }}
@@ -949,7 +966,7 @@ const DronerInfinityCreditList : React.FC<any> = () => {
                 />
                 <InputNumber
                   min={0}
-                  max={200}
+                  max={1000000}
                   style={{
                     margin: '0 16px',
                   }}
@@ -965,7 +982,11 @@ const DronerInfinityCreditList : React.FC<any> = () => {
             onVisibleChange={handleVisiblePoint}
             placement='bottom'
           >
-            <Button style={{ width : '180px'}}>เลือกจำนวนแต้ม</Button>
+            <Button style={{ width : '180px'}}>{
+              (filter.minPoint === 0 && filter.maxPoint === 0)?
+              "เลือกจำนวนแต้ม" :
+              `${filter.minPoint} - ${filter.maxPoint} แต้ม`
+            }</Button>
           </Popover>
           <Popover
             content={
@@ -980,7 +1001,7 @@ const DronerInfinityCreditList : React.FC<any> = () => {
                 />
                 <InputNumber
                   min={0}
-                  max={200}
+                  max={100000}
                   style={{
                     margin: '0 16px',
                   }}
@@ -989,7 +1010,7 @@ const DronerInfinityCreditList : React.FC<any> = () => {
                 />
                 <InputNumber
                   min={0}
-                  max={200}
+                  max={100000}
                   style={{
                     margin: '0 16px',
                   }}
@@ -1005,7 +1026,11 @@ const DronerInfinityCreditList : React.FC<any> = () => {
             onVisibleChange={handleVisibleCash}
             placement='bottom'
           >
-            <Button style={{ width : '180px'}}>เลือกจำนวนเงิน</Button>
+            <Button style={{ width : '180px'}}>{
+              (filter.minCash === 0 && filter.maxCash === 0)?
+              "เลือกจำนวนเงิน" :
+              `${filter.minCash} - ${filter.maxCash} บาท`
+            }</Button>
           </Popover>
           <RangePicker
             allowClear

@@ -73,4 +73,5 @@ export default {
   wallet : require('./media/images/wallet.png'),
   credit : require('./media/images/credit.png'),
   nearequal : require('./media/images/nearequal.png'),
+  upload_droner: require('./media/images/upload_droner.png'),
 }

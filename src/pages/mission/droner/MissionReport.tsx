@@ -77,7 +77,7 @@ function MissionReport() {
     ).then((res) => {
       setCampaignType(res.campaignType)
       setCountInpro(res.count)
-
+      setCountSuccess(res.count)
       const tableList = []
       for (let i = 0; res.data.length > i; i++) {
         const table: any = {
@@ -109,7 +109,6 @@ function MissionReport() {
       startDate,
       endDate,
     ).then((res) => {
-      setCountSuccess(res.count)
       const tableList = []
       for (let i = 0; res.data.length > i; i++) {
         const table: any = {

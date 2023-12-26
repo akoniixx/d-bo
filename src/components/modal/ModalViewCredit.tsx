@@ -14,6 +14,8 @@ interface ModalViewCreditProps{
     status : string
     reason? : string
     onClose : () => void
+    cashCondition : number
+    pointCondition : number
 }
 
 const ModalViewCredit : React.FC<ModalViewCreditProps> = ({
@@ -25,7 +27,9 @@ const ModalViewCredit : React.FC<ModalViewCreditProps> = ({
     credit,
     status,
     reason,
-    onClose
+    onClose,
+    cashCondition,
+    pointCondition
 }) =>{
     return <Modal
     title={
@@ -75,7 +79,7 @@ const ModalViewCredit : React.FC<ModalViewCreditProps> = ({
       <span style={{
           fontWeight : 500
         }}>จำนวนเครดิต</span>
-      <span style={{ color: color.Grey }}> (1 เครดิต = {exchangeType === "CASH" ? "2,200 บาท" : "22,000 แต้ม"})</span>
+      <span style={{ color: color.Grey }}> (1 เครดิต = {exchangeType === "CASH" ? `${numberWithCommas(cashCondition)} บาท` : `${numberWithCommas(pointCondition)} แต้ม`})</span>
     </div>
     <p>{credit} เครดิต</p>   
     <div className="mt-3">

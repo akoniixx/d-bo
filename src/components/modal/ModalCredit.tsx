@@ -21,6 +21,8 @@ interface ModalCreditProps{
     name : string
     tel : string
     point : number
+    cashCondition : number
+    pointCondition : number
     onClose : ()=>void
     onSubmit : ()=>void
 }
@@ -32,7 +34,9 @@ const ModalCredit : React.FC<ModalCreditProps> = ({
     tel,
     point,
     onClose,
-    onSubmit
+    onSubmit,
+    cashCondition,
+    pointCondition
 }) => {
     const [disabled,setDisabled] = useState<boolean>(true)
     const [credit,setCredit] = useState<number>(0)
@@ -62,8 +66,8 @@ const ModalCredit : React.FC<ModalCreditProps> = ({
             creditType,
             dronerId,
             creditType === "POINT" ? credit.toString() : creditCash.toString(),
-            (credit*22000).toString(),
-            (creditCash*2200).toString(),
+            (credit*pointCondition).toString(),
+            (creditCash*cashCondition).toString(),
             upload,
             cashCheck.name,
             cashCheck.bank,
@@ -82,7 +86,7 @@ const ModalCredit : React.FC<ModalCreditProps> = ({
                 setDisabled(true)
             }
             else{
-                if(credit * 22000 > point){
+                if(credit * pointCondition > point){
                     setDisabled(true)
                 }
                 else{
@@ -166,7 +170,7 @@ const ModalCredit : React.FC<ModalCreditProps> = ({
         <>
             <div className="mt-3">
               <span>จำนวนเครดิต</span>
-              <span style={{ color: color.Grey }}> (1 เครดิต = 22,000 แต้ม)</span>
+              <span style={{ color: color.Grey }}>{` (1 เครดิต = ${numberWithCommas(pointCondition)} แต้ม)`}</span>
               <span style={{ color: color.Error }}> *</span>
             </div>
             <div className="d-flex justify-content-between align-items-center mt-3">
@@ -176,7 +180,7 @@ const ModalCredit : React.FC<ModalCreditProps> = ({
                     height : '20px',
                     margin : '0px 10px'
                 }}/>
-                <Input value={!credit?0 : numberWithCommas(credit*22000)} disabled suffix="แต้ม"/>
+                <Input value={!credit?0 : numberWithCommas(credit*pointCondition)} disabled suffix="แต้ม"/>
             </div>
         </>
     }
@@ -185,7 +189,7 @@ const ModalCredit : React.FC<ModalCreditProps> = ({
         <>
             <div className="mt-3">
               <span>จำนวนเครดิต</span>
-              <span style={{ color: color.Grey }}> (1 เครดิต = 2,200 บาท)</span>
+              <span style={{ color: color.Grey }}> {`(1 เครดิต = ${numberWithCommas(cashCondition)} บาท)`}</span>
               <span style={{ color: color.Error }}> *</span>
             </div>
             <div className="d-flex justify-content-between align-items-center mt-3">
@@ -195,7 +199,7 @@ const ModalCredit : React.FC<ModalCreditProps> = ({
                     height : '20px',
                     margin : '0px 10px'
                 }}/>
-                <Input value={!creditCash?0 : numberWithCommas(creditCash*2200)} disabled suffix="บาท"/>
+                <Input value={!creditCash?0 : numberWithCommas(creditCash*cashCondition)} disabled suffix="บาท"/>
             </div>
             <div className="mt-3">
                 <div className="mt-3">

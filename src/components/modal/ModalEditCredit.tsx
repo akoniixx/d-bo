@@ -19,7 +19,9 @@ interface ModalEditCreditProps{
     dronerId : string,
     name : string
     tel : string
-    point : number
+    point : number,
+    cashCondition : number
+    pointCondition : number
     onClose : ()=>void
     onSubmit : ()=>void
 }
@@ -32,7 +34,9 @@ const ModalEditCredit: React.FC<ModalEditCreditProps> = ({
     tel,
     point,
     onClose,
-    onSubmit
+    onSubmit,
+    cashCondition,
+    pointCondition
 }) => {
     const onSave = async() =>{
         CreditDronerDatasource.editCredit(
@@ -41,7 +45,7 @@ const ModalEditCredit: React.FC<ModalEditCreditProps> = ({
             dronerId,
             queryData.data.credit,
             "0",
-            (queryData.data.credit*2200).toString(),
+            (queryData.data.credit*cashCondition).toString(),
             upload,
             cashCheck.name,
             cashCheck.bank,
@@ -148,7 +152,7 @@ const ModalEditCredit: React.FC<ModalEditCreditProps> = ({
     <p>เงิน</p>
     <div className="mt-3">
       <span>จำนวนเครดิต</span>
-      <span style={{ color: color.Grey }}> (1 เครดิต = 2,200 บาท)</span>
+      <span style={{ color: color.Grey }}> {`(1 เครดิต = ${numberWithCommas(cashCondition)} บาท)`}</span>
       <span style={{ color: color.Error }}> *</span>
     </div>
     <div className="d-flex justify-content-between align-items-center mt-3">
@@ -158,7 +162,7 @@ const ModalEditCredit: React.FC<ModalEditCreditProps> = ({
             height : '20px',
             margin : '0px 10px'
         }}/>
-        <Input value={queryData.isLoading ? 0  : numberWithCommas(queryData.data.credit*2200)} disabled suffix="บาท"/>
+        <Input value={queryData.isLoading ? 0  : numberWithCommas(queryData.data.credit*cashCondition)} disabled suffix="บาท"/>
     </div>
     <div className="mt-3">
         <div className="mt-3">
