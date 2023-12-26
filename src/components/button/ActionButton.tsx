@@ -10,13 +10,19 @@ interface ActionButtonProps {
   bgColor?: string
 }
 
-const ActionButton: React.FC<ActionButtonProps> = ({ onClick, icon, color, actionDisable,bgColor }) => (
+const ActionButton: React.FC<ActionButtonProps> = ({
+  onClick,
+  icon,
+  color,
+  actionDisable,
+  bgColor,
+}) => (
   <Button
     style={{
       borderRadius: '7px 7px 7px 7px',
       borderColor: color,
       color: color,
-      backgroundColor: bgColor
+      backgroundColor: bgColor,
     }}
     icon={icon}
     onClick={onClick}

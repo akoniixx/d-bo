@@ -72,6 +72,7 @@ export interface TaskFinish {
   usePoint: string
   discountCampaignPoint: string
   applicationType: string
+  preparationRemark: string
 }
 export const TaskFinish_INIT: TaskFinish = {
   id: '',
@@ -127,6 +128,7 @@ export const TaskFinish_INIT: TaskFinish = {
   usePoint: '',
   discountCampaignPoint: '',
   applicationType: '',
+  preparationRemark: '',
 }
 export interface TaskFinishListEntity {
   data: TaskFinish[]
@@ -192,6 +194,7 @@ export interface CreateReviewDroner {
   usePoint: string
   discountCampaignPoint: string
   applicationType: string
+  preparationRemark: string
 }
 export const CreateReviewDroner_INIT: CreateReviewDroner = {
   id: '',
@@ -239,6 +242,7 @@ export const CreateReviewDroner_INIT: CreateReviewDroner = {
   usePoint: '',
   discountCampaignPoint: '',
   applicationType: '',
+  preparationRemark: '',
 }
 export interface DetailReviewTask {
   data: CreateReviewDroner

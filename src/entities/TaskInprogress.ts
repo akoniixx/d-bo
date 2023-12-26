@@ -61,6 +61,7 @@ export interface GetTaskInprogressEntity {
   discountCampaignPoint: string
   usePoint: string
   applicationType: string
+  preparationRemark: string
 }
 export interface TaskInprogressEntity {
   task_id: string
@@ -213,6 +214,7 @@ export const GetTaskInprogressEntity_INIT: GetTaskInprogressEntity = {
   discountCampaignPoint: '',
   usePoint: '',
   applicationType: '',
+  preparationRemark: '',
 }
 export interface UpdateInprogressTaskEntity {
   id: string
@@ -229,6 +231,7 @@ export interface UpdateInprogressTaskEntity {
   problemRemark: string
   statusRemark: string
   farmerPlotId: string
+  preparationRemark: string
 }
 export const UpdateInprogressTaskEntity_INIT: UpdateInprogressTaskEntity = {
   id: '',
@@ -245,4 +248,5 @@ export const UpdateInprogressTaskEntity_INIT: UpdateInprogressTaskEntity = {
   problemRemark: '',
   statusRemark: '',
   farmerPlotId: '',
+  preparationRemark: '',
 }

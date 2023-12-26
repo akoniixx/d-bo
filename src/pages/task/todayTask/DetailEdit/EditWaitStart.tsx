@@ -190,6 +190,10 @@ function EditWaitStart() {
     setData(d.toJS())
     setBtnSaveDisable(false)
   }
+  const handlePreparationRemark = (e: any) => {
+    const d = Map(data).set('preparationRemark', e.target.value)
+    setData(d.toJS())
+  }
   const handleComment = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const d = Map(data).set('comment', e.target.value)
     setData(d.toJS())
@@ -389,6 +393,16 @@ function EditWaitStart() {
                   <Radio value='นักบินโดรนเตรียมให้'>นักบินโดรนเตรียมให้</Radio>
                 </Space>
               </Radio.Group>
+              {data?.preparationBy === 'นักบินโดรนเตรียมให้' ? (
+                <div className='pt-3'>
+                  <TextArea
+                    style={{ width: '530px', height: '80px', left: '4%' }}
+                    placeholder='(บังคับ) ระบุชื่อยา/ปุ๋ย และจำนวนที่ใช้'
+                    onChange={handlePreparationRemark}
+                    defaultValue={data?.preparationRemark}
+                  />
+                </div>
+              ) : null}
             </Form.Item>
           </div>
           <div className='form-group col-lg-10'>

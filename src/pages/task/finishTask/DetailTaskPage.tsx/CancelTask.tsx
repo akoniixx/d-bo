@@ -120,12 +120,22 @@ function CancelTask() {
               {data.data.targetSpray !== null ? data.data.targetSpray.join(',') : '-'}
             </span>
           </Form.Item>
-          <label>การเตรียมยา</label>
-          <Form.Item>
-            <span style={{ color: color.Grey }}>
-              {data.data.preparationBy !== null ? data.data.preparationBy : '-'}
-            </span>
-          </Form.Item>
+          <div className='d-flex justify-content-between'>
+            <div className='col-lg-6'>
+              <label>การเตรียมยา</label>
+              <Form.Item>
+                <span style={{ color: color.Grey }}>{data.data.preparationBy || '-'}</span>
+              </Form.Item>
+            </div>
+            {data.data.preparationBy === 'นักบินโดรนเตรียมให้' && (
+              <div className='col-lg'>
+                <label>รายละเอียดยา</label>
+                <Form.Item>
+                  <span style={{ color: color.Grey }}>{data.data.preparationRemark || '-'}</span>
+                </Form.Item>
+              </div>
+            )}
+          </div>
           <label>หมายเหตุ</label>
           <Form.Item>
             <span style={{ color: color.Grey }}>
@@ -133,7 +143,7 @@ function CancelTask() {
             </span>
           </Form.Item>
         </div>
-        <div className='col-lg-1'></div>
+        <div className='col-lg-1' />
         <div className='col-lg-5'>
           <label>ค่าบริการ</label>
           <Form.Item style={{ color: color.Grey }}>
