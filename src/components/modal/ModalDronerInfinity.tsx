@@ -52,8 +52,6 @@ const ModalDronerInfinity: React.FC<ModalDronerInfinityProps> = ({
     SearchDronerByIdEntity_INIT,
   )
   const [dropdownVisible, setDropdownVisible] = useState(false)
-
-  const navigate = useNavigate()
   const [profile] = useLocalStorage('profile', [])
   const [createImg, setCreateImg] = useState<UploadImageEntity>(UploadImageEntity_INTI)
   const [editCreateImg, setEditCreateImg] = useState<UploadImageEntity>(UploadImageEntity_INTI)
@@ -397,7 +395,7 @@ const ModalDronerInfinity: React.FC<ModalDronerInfinityProps> = ({
               </div>
               <div className='col-lg' style={{ textAlign: 'end' }}>
                 <u style={{ color: color.Success, fontWeight: 500, cursor: 'pointer' }}>
-                  ดาวน์โหลดสัญญาณ
+                  ดาวน์โหลดสัญญา
                 </u>
               </div>
             </div>

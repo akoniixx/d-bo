@@ -408,7 +408,7 @@ export const ConfirmNewTask: React.FC<ConfirmNewTaskProps> = ({
                   <span className='col'>การเตรียมยา</span>
                 </div>
                 <div className='d-flex'>
-                  <span className='col'>{createNewTask?.purposeSpray?.purposeSprayName}</span>
+                  <span className='col'>{createNewTask?.purposeSprayName}</span>
                   <span className='col'>{createNewTask?.preparationBy}</span>
                 </div>
                 {createNewTask?.preparationRemark && (
