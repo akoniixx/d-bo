@@ -730,6 +730,7 @@ function EditReward() {
     </div>
   )
   const onSubmit = () => {
+    setBtnSaveDisable(true)
     const {
       rewardName,
       rewardType,
@@ -795,6 +796,7 @@ function EditReward() {
     }
     RewardDatasource.updateReward(queryString[1], rewardData)
       .then((res) => {
+        setBtnSaveDisable(false)
         Swal.fire({
           title: 'บันทึกสำเร็จ',
           icon: 'success',
@@ -805,6 +807,7 @@ function EditReward() {
         })
       })
       .catch((err) => {
+        setBtnSaveDisable(false)
         console.log(err)
         Swal.fire({
           title: 'เกิดข้อผิดพลาก',
