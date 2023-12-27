@@ -174,7 +174,7 @@ const ModalCredit : React.FC<ModalCreditProps> = ({
               <span style={{ color: color.Error }}> *</span>
             </div>
             <div className="d-flex justify-content-between align-items-center mt-3">
-                <Input value={credit} onChange={(e)=>setCredit(parseInt(e.target.value))} type="number" suffix="เครดิต"/>
+                <Input value={credit} onChange={(e)=>(parseInt(e.target.value) < 0)? setCredit(0):setCredit(parseInt(e.target.value))} type="number" suffix="เครดิต"/>
                 <img src={icon.nearequal} style={{
                     width : '20px',
                     height : '20px',
@@ -193,7 +193,7 @@ const ModalCredit : React.FC<ModalCreditProps> = ({
               <span style={{ color: color.Error }}> *</span>
             </div>
             <div className="d-flex justify-content-between align-items-center mt-3">
-                <Input value={creditCash} onChange={(e)=>setCreditCash(parseInt(e.target.value))} type="number" suffix="เครดิต"/>
+                <Input value={creditCash} onChange={(e)=>(parseInt(e.target.value)<0)?setCreditCash(0):setCreditCash(parseInt(e.target.value))} type="number" suffix="เครดิต"/>
                 <img src={icon.nearequal} style={{
                     width : '20px',
                     height : '20px',

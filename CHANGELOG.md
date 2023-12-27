@@ -1,6 +1,10 @@
 ## [Version - 0]
 
-## Feature [v0.42.5] 2023-12-29
+## Fix [v0.42.6] 2023-12-27
+
+- fixed credit when less than 0
+
+## Feature [v0.42.5] 2023-12-26
 
 - added credit list for droner 1finity
 - add crud for droner 1finity
