@@ -8,7 +8,6 @@ import { CardHeader } from '../../components/header/CardHearder'
 import { CardContainer } from '../../components/card/CardContainer'
 import FooterPage from '../../components/footer/FooterPage'
 import Swal from 'sweetalert2'
-import { TableRoleManage } from './tableRole/TableRoleManage'
 import {
   adminJob,
   challengeJob,
@@ -26,136 +25,224 @@ import {
 
 function AddPermission() {
   const navigate = useNavigate()
+  const [role, setRole] = useState<string>('')
   const [followjob, setFollowjob] = useState({
-    key: 'ติดตามงาน',
     name: 'ติดตามงาน',
     value: followJob,
   })
   const [admin, setAdmin] = useState({
-    key: 'ผู้ดูแลระบบ',
     name: 'ผู้ดูแลระบบ',
     value: adminJob,
   })
   const [challenge, setChallenge] = useState({
-    key: 'ชาเลนจ์',
     name: 'ชาเลนจ์',
     value: challengeJob,
   })
   const [dronerInfo, setDronerInfo] = useState({
-    key: 'ข้อมูลนักบินโดรน',
     name: 'ข้อมูลนักบินโดรน',
     value: dronerJob,
   })
   const [farmerInfo, setFarmerInfo] = useState({
-    key: 'ข้อมูลเกษตรกร',
     name: 'ข้อมูลเกษตรกร',
     value: farmerJob,
   })
   const [guru, setGuru] = useState({
-    key: 'ข่าวสาร / กูรูเกษตร',
     name: 'ข่าวสาร / กูรูเกษตร',
     value: newsJob,
   })
   const [mission, setMission] = useState({
-    key: 'ภารกิจ',
     name: 'ภารกิจ',
     value: missionJob,
   })
   const [point, setPoint] = useState({
-    key: 'แต้ม',
     name: 'แต้ม',
     value: pointSettingJob,
   })
   const [pointResult, setPointResult] = useState({
-    key: 'แต้มสะสม',
     name: 'แต้มสะสม',
     value: pointJob,
   })
   const [promotion, setPromotion] = useState({
-    key: 'โปรโมชั่น',
     name: 'โปรโมชั่น',
     value: promotionJob,
   })
   const [reward, setReward] = useState({
-    key: 'ของรางวัล',
     name: 'ของรางวัล',
     value: rewardJob,
   })
   const [settings, setSettings] = useState({
-    key: 'ตั้งค่า',
     name: 'ตั้งค่า',
     value: settingJob,
   })
-
-  const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    console.log(e.target.value)
-  }
 
   const handleCheckMenu = (checked: boolean, row: any, value: any, index: number) => {
     switch (row[value].name) {
       case 'followJob':
         const newFollowJob = followjob.value
         newFollowJob[row[value].name][index][value]['value'] = checked
-        console.log(newFollowJob)
-        // setFollowjob(newFollowJob)
+        setFollowjob({
+          name: 'ติดตามงาน',
+          value: {
+            ...followJob.value,
+            ...newFollowJob,
+          },
+        })
         break
-        // case 'farmerInfo':
-        //   const newFarmerInfo = farmerInfo
-        //   newFarmerInfo[row[value].name][index][value]['value'] = checked
-        //   setFarmerInfo(newFarmerInfo)
-        //   break
-        // case 'dronerInfo':
-        //   const droner = dronerInfo
-        //   droner[row[value].name][index][value]['value'] = checked
-        //   setDronerInfo(droner)
-        //   break
-        // case 'guru':
-        //   const guruInfo = guru
-        //   guruInfo[row[value].name][index][value]['value'] = checked
-        //   setGuru(guruInfo)
-        //   break
-        // case 'pointResult':
-        //   const pointResultInfo = pointResult
-        //   pointResultInfo[row[value].name][index][value]['value'] = checked
-        //   setPoint(pointResultInfo)
-        //   break
-        // case 'promotion':
-        //   const promotionInfo = promotion
-        //   promotionInfo[row[value].name][index][value]['value'] = checked
-        //   setPromotion(promotionInfo)
-        //   break
-        // case 'reward':
-        //   const rewardInfo = reward
-        //   rewardInfo[row[value].name][index][value]['value'] = checked
-        //   setReward(rewardInfo)
-        //   break
-        // case 'mission':
-        //   const missionInfo = mission
-        //   missionInfo[row[value].name][index][value]['value'] = checked
-        //   setMission(missionInfo)
-        //   break
-        // case 'challenge':
-        //   const challengeInfo = challenge
-        //   challengeInfo[row[value].name][index][value]['value'] = checked
-        //   setChallenge(challengeInfo)
-        //   break
-        // case 'admin':
-        //   const adminInfo = admin
-        //   adminInfo[row[value].name][index][value]['value'] = checked
-        //   setAdmin(adminInfo)
-        //   break
-        // case 'settings':
-        //   const settingsInfo = settings
-        //   settingsInfo[row[value].name][index][value]['value'] = checked
-        //   setSettings(settingsInfo)
-        //   break
-        // case 'point':
-        // const pointInfo = point
-        // pointInfo[row[value].name][index][value]['value'] = checked
-        // setPointResult(pointInfo)
+      case 'farmerInfo':
+        const newFarmerInfo = farmerInfo.value
+        newFarmerInfo[row[value].name][index][value]['value'] = checked
+        setFarmerInfo({
+          name: 'ข้อมูลเกษตรกร',
+          value: {
+            ...farmerInfo.value,
+            ...newFarmerInfo,
+          },
+        })
+        break
+      case 'dronerInfo':
+        const newDronerInfo = dronerInfo.value
+        newDronerInfo[row[value].name][index][value]['value'] = checked
+        setDronerInfo({
+          name: 'ข้อมูลนักบินโดรน',
+          value: {
+            ...dronerInfo.value,
+            ...newDronerInfo,
+          },
+        })
+        break
+      case 'guru':
+        const newGuru = guru.value
+        newGuru[row[value].name][index][value]['value'] = checked
+        setGuru({
+          name: 'ข่าวสาร / กูรูเกษตร',
+          value: {
+            ...guru.value,
+            ...newGuru,
+          },
+        })
+        break
+      case 'pointResult':
+        const newPointResult = pointResult.value
+        newPointResult[row[value].name][index][value]['value'] = checked
+        setPointResult({
+          name: 'แต้มสะสม',
+          value: {
+            ...pointResult.value,
+            ...newPointResult,
+          },
+        })
+        break
+      case 'promotion':
+        const newPromotion = promotion.value
+        newPromotion[row[value].name][index][value]['value'] = checked
+        setPromotion({
+          name: 'แต้มสะสม',
+          value: {
+            ...promotion.value,
+            ...newPromotion,
+          },
+        })
+        break
+      case 'reward':
+        const newReward = reward.value
+        newReward[row[value].name][index][value]['value'] = checked
+        setReward({
+          name: 'แต้มสะสม',
+          value: {
+            ...reward.value,
+            ...newReward,
+          },
+        })
+        break
+      case 'mission':
+        const newMission = mission.value
+        newMission[row[value].name][index][value]['value'] = checked
+        setMission({
+          name: 'แต้มสะสม',
+          value: {
+            ...mission.value,
+            ...newMission,
+          },
+        })
+        break
+      case 'challenge':
+        const newChallenge = challenge.value
+        newChallenge[row[value].name][index][value]['value'] = checked
+        setChallenge({
+          name: 'แต้มสะสม',
+          value: {
+            ...challenge.value,
+            ...newChallenge,
+          },
+        })
+        break
+      case 'admin':
+        const newAdmin = admin.value
+        newAdmin[row[value].name][index][value]['value'] = checked
+        setAdmin({
+          name: 'แต้มสะสม',
+          value: {
+            ...admin.value,
+            ...newAdmin,
+          },
+        })
+        break
+      case 'settings':
+        const newSetting = settings.value
+        newSetting[row[value].name][index][value]['value'] = checked
+        setSettings({
+          name: 'แต้มสะสม',
+          value: {
+            ...settings.value,
+            ...newSetting,
+          },
+        })
+        break
+      case 'point':
+        const newPoint = point.value
+        newPoint[row[value].name][index][value]['value'] = checked
+        setPoint({
+          name: 'แต้มสะสม',
+          value: {
+            ...point.value,
+            ...newPoint,
+          },
+        })
         break
       default:
         break
+    }
+  }
+  const checkValues = (row: any, value: any, index: number): boolean => {
+    console.log(row[value]?.name)
+    switch (row[value]?.name) {
+      case 'followJob':
+        return followjob.value[row[value]?.name][index][value]['value']
+      case 'farmerInfo':
+        return farmerInfo.value[row[value]?.name][index][value]['value']
+      case 'dronerInfo':
+        return dronerInfo.value[row[value]?.name][index][value]['value']
+      case 'guru':
+        console.log(guru.value[row[value]?.name], index)
+        return guru.value[row[value]?.name][index][value]['value']
+      case 'pointResult':
+        return pointResult.value[row[value]?.name][index][value]['value']
+      case 'promotion':
+        return promotion.value[row[value]?.name][index][value]['value']
+      case 'reward':
+        return reward.value[row[value]?.name][index][value]['value']
+      case 'mission':
+        return mission.value[row[value]?.name][index][value]['value']
+      case 'challenge':
+        return challenge.value[row[value]?.name][index][value]['value']
+      case 'admin':
+        return admin.value[row[value]?.name][index][value]['value']
+      case 'settings':
+        return settings.value[row[value]?.name][index][value]['value']
+      case 'point':
+        return point.value[row[value]?.name][index][value]['value']
+      default:
+        return false
     }
   }
 
@@ -182,6 +269,7 @@ function AddPermission() {
             <>
               <Checkbox
                 disabled={value?.disabled}
+                checked={checkValues(row, 'view', index)}
                 onChange={(e) => handleCheckMenu(e.target.checked, row, 'view', index)}
               />
             </>
@@ -201,6 +289,7 @@ function AddPermission() {
               <Checkbox
                 disabled={value?.disabled}
                 onChange={(e) => handleCheckMenu(e.target.checked, row, 'add', index)}
+                checked={checkValues(row, 'add', index)}
               />
             </>
           ),
@@ -219,6 +308,7 @@ function AddPermission() {
               <Checkbox
                 disabled={value?.disabled}
                 onChange={(e) => handleCheckMenu(e.target.checked, row, 'edit', index)}
+                checked={checkValues(row, 'edit', index)}
               />
             </>
           ),
@@ -237,6 +327,7 @@ function AddPermission() {
               <Checkbox
                 disabled={value?.disabled}
                 onChange={(e) => handleCheckMenu(e.target.checked, row, 'delete', index)}
+                checked={checkValues(row, 'delete', index)}
               />
             </>
           ),
@@ -255,6 +346,7 @@ function AddPermission() {
               <Checkbox
                 disabled={value?.disabled}
                 onChange={(e) => handleCheckMenu(e.target.checked, row, 'cancel', index)}
+                checked={checkValues(row, 'cancel', index)}
               />
             </>
           ),
@@ -273,6 +365,7 @@ function AddPermission() {
               <Checkbox
                 disabled={value?.disabled}
                 onChange={(e) => handleCheckMenu(e.target.checked, row, 'excel', index)}
+                checked={checkValues(row, 'excel', index)}
               />
             </>
           ),
@@ -299,7 +392,11 @@ function AddPermission() {
                 },
               ]}
             >
-              <Input placeholder='กรอกชื่อบทบาท' onChange={handleOnChange} autoComplete='off' />
+              <Input
+                placeholder='กรอกชื่อบทบาท'
+                onChange={(e) => setRole(e.target.value)}
+                autoComplete='off'
+              />
             </Form.Item>
           </div>
         </Form>
@@ -502,14 +599,31 @@ function AddPermission() {
     </div>
   )
   const insertPermission = () => {
-    Swal.fire({
-      title: 'บันทึกสำเร็จ',
-      icon: 'success',
-      timer: 1500,
-      showConfirmButton: false,
-    }).then(() => {
-      navigate('/IndexPermission')
-    })
+    const payload: any = {}
+    payload.role = role
+    payload.followJob = followjob.value
+    payload.farmerInfo = farmerInfo.value
+    payload.dronerInfo = dronerInfo.value
+    payload.admin = admin.value
+    payload.guru = guru.value
+    payload.mission = mission.value
+    payload.challenge = challenge.value
+    payload.reward = reward.value
+    payload.pointResult = pointResult.value
+    payload.settings = settings.value
+    payload.point = point.value
+    payload.promotion = promotion.value
+
+    console.log(payload)
+
+    // Swal.fire({
+    //   title: 'บันทึกสำเร็จ',
+    //   icon: 'success',
+    //   timer: 1500,
+    //   showConfirmButton: false,
+    // }).then(() => {
+    //   navigate('/IndexPermission')
+    // })
   }
   return (
     <div>

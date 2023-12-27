@@ -103,7 +103,7 @@ export interface RoleObject {
         add: { value: false, disabled: disableAdd.includes(name), name: 'followJob' },
         sub: false,
         edit: { value: false, disabled: false, name: 'followJob' },
-        name,
+        name : name,
         view: { value: false, disabled: false, name: 'followJob' },
         excel: { value: false, disabled: !disableExcel.includes(name), name: 'followJob' },
         cancel: { value: false, disabled: disableCancel.includes(name), name: 'followJob' },
