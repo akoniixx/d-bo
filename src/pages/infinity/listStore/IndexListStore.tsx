@@ -388,7 +388,7 @@ function IndexListStore() {
       <div className='d-flex justify-content-between pb-4'>
         <div className='col-lg-8 p-1'>
           <Input
-            placeholder='ค้นหาชื่อรัหสร้านค้า / ชื่อร้านค้า / หมายเลขนิติบุคคล / เบอร์โทร'
+            placeholder='ค้นหาชื่อรหัสร้านค้า / ชื่อร้านค้า / หมายเลขนิติบุคคล / เบอร์โทร'
             className='col-lg-12'
             onChange={(e: any) => setSearchText(e.target.value)}
           />

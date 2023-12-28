@@ -3,7 +3,6 @@ import {
   Button,
   Dropdown,
   Input,
-  InputNumber,
   Pagination,
   PaginationProps,
   Row,
@@ -39,7 +38,6 @@ import ModalDelete from '../../../components/modal/ModalDelete'
 import { DronerFinityDatasource } from '../../../datasource/DronerFinityDatasource'
 import { AllDronerFinityEntity, updateStatus } from '../../../entities/DronerFinityEntities'
 import { useLocalStorage } from '../../../hook/useLocalStorage'
-import { UploadImageEntity_INTI } from '../../../entities/UploadImageEntities'
 
 function DronerInfinity() {
   const navigate = useNavigate()
@@ -151,7 +149,7 @@ function DronerInfinity() {
   }
   const onChangeSlider = (newValue: any) => {
     const [newMin, newMax] = newValue
-    setCredit({ min: newMin === 0 ? null : newMin, max: newMax === 0 ? null : newMax })
+    setCredit({ min: newMin , max: newMax  })
   }
   const onChangeCreditMin = (e: any) => {
     const inputValue = e.target.value
@@ -563,7 +561,7 @@ function DronerInfinity() {
                     draggableTrack: true,
                   }}
                   style={{ color: color.Success }}
-                  value={[credit.min || 0, credit.max || 0]}
+                  value={[credit.min, credit.max]}
                   onChange={onChangeSlider}
                   max={100}
                 />
@@ -599,7 +597,7 @@ function DronerInfinity() {
               }}
             >
               {credit.min || credit.max ? (
-                <span>{credit.min + ' - ' + credit.max}</span>
+                <span style={{color: color.font}}>{credit.min + ' - ' + credit.max} เครดิต</span>
               ) : (
                 'เลือกจำนวนเครดิต'
               )}
