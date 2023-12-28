@@ -119,7 +119,7 @@ const IndexAdminTask = () => {
   }
   useEffect(() => {
     fetchTaskList()
-  }, [taskNo, taskId])
+  }, [taskNo])
 
   const onItemsRendered = (props: any) => {
     if (props.visibleStopIndex >= searchTaskList.length - 1) {

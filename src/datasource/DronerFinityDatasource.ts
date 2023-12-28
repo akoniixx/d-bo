@@ -12,23 +12,21 @@ export class DronerFinityDatasource {
     provinceId?: number,
     districtId?: number,
     subdistrictId?: number,
-    creditMin?: number | null,
-    creditMax?: number | null,
+    creditMin?: number,
+    creditMax?: number,
     sortField?: string,
     sortDirection?: string,
     page?: number,
     take?: number,
   ): Promise<any> {
-    const adjustedCreditMin = creditMin === 0 ? null : creditMin
-    const adjustedCreditMax = creditMax === 0 ? null : creditMax
     const params = {
       status: status,
       search: search,
       provinceId: provinceId,
       districtId: districtId,
       subdistrictId: subdistrictId,
-      creditMin: adjustedCreditMin,
-      creditMax: adjustedCreditMax,
+      creditMin: creditMin === 0 && creditMax === 0 ? null : creditMin,
+      creditMax: creditMin === 0 && creditMax === 0 ? null : creditMax,
       sortField: sortField,
       sortDirection: sortDirection,
       page: page,
