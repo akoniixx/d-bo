@@ -22,11 +22,12 @@ import {
   rewardJob,
   settingJob,
 } from './DefaultRole'
+import TableRole from '../../components/table/TableRole'
 
 function AddPermission() {
   const navigate = useNavigate()
   const [role, setRole] = useState<string>('')
-  const [followjob, setFollowjob] = useState({
+  const [followjobs, setFollowjobs] = useState({
     name: 'ติดตามงาน',
     value: followJob,
   })
@@ -76,11 +77,40 @@ function AddPermission() {
   })
 
   const handleCheckMenu = (checked: boolean, row: any, value: any, index: number) => {
+    console.log(checked, row, value)
+    switch (row.key) {
+      case 0:
+        row.value['followJob'].map((item: any) => item)
+        break
+      case 1:
+        break
+      case 2:
+        break
+      case 3:
+        break
+      case 4:
+        break
+      case 6:
+        break
+      case 7:
+        break
+      case 8:
+        break
+      case 9:
+        break
+      case 10:
+        break
+
+      default:
+        break
+    }
+  }
+  const handleCheckMenuSub = (checked: boolean, row: any, value: any, index: number) => {
     switch (row[value].name) {
       case 'followJob':
-        const newFollowJob = followjob.value
+        const newFollowJob = followjobs.value
         newFollowJob[row[value].name][index][value]['value'] = checked
-        setFollowjob({
+        setFollowjobs({
           name: 'ติดตามงาน',
           value: {
             ...followJob.value,
@@ -214,33 +244,31 @@ function AddPermission() {
     }
   }
   const checkValues = (row: any, value: any, index: number): boolean => {
-    console.log(row[value]?.name)
     switch (row[value]?.name) {
       case 'followJob':
-        return followjob.value[row[value]?.name][index][value]['value']
-      case 'farmerInfo':
-        return farmerInfo.value[row[value]?.name][index][value]['value']
-      case 'dronerInfo':
-        return dronerInfo.value[row[value]?.name][index][value]['value']
-      case 'guru':
-        console.log(guru.value[row[value]?.name], index)
-        return guru.value[row[value]?.name][index][value]['value']
-      case 'pointResult':
-        return pointResult.value[row[value]?.name][index][value]['value']
-      case 'promotion':
-        return promotion.value[row[value]?.name][index][value]['value']
-      case 'reward':
-        return reward.value[row[value]?.name][index][value]['value']
-      case 'mission':
-        return mission.value[row[value]?.name][index][value]['value']
-      case 'challenge':
-        return challenge.value[row[value]?.name][index][value]['value']
-      case 'admin':
-        return admin.value[row[value]?.name][index][value]['value']
-      case 'settings':
-        return settings.value[row[value]?.name][index][value]['value']
-      case 'point':
-        return point.value[row[value]?.name][index][value]['value']
+        return followjobs.value[row[value]?.name][index][value]['value']
+      // case 'farmerInfo':
+      //   return farmerInfo.value[row[value]?.name][index][value]['value']
+      // case 'dronerInfo':
+      //   return dronerInfo.value[row[value]?.name][index][value]['value']
+      // case 'guru':
+      //   return guru.value[row[value]?.name][index][value]['value']
+      // case 'pointResult':
+      //   return pointResult.value[row[value]?.name][index][value]['value']
+      // case 'promotion':
+      //   return promotion.value[row[value]?.name][index][value]['value']
+      // case 'reward':
+      //   return reward.value[row[value]?.name][index][value]['value']
+      // case 'mission':
+      //   return mission.value[row[value]?.name][index][value]['value']
+      // case 'challenge':
+      //   return challenge.value[row[value]?.name][index][value]['value']
+      // case 'admin':
+      //   return admin.value[row[value]?.name][index][value]['value']
+      // case 'settings':
+      //   return settings.value[row[value]?.name][index][value]['value']
+      // case 'point':
+      //   return point.value[row[value]?.name][index][value]['value']
       default:
         return false
     }
@@ -269,7 +297,6 @@ function AddPermission() {
             <>
               <Checkbox
                 disabled={value?.disabled}
-                checked={checkValues(row, 'view', index)}
                 onChange={(e) => handleCheckMenu(e.target.checked, row, 'view', index)}
               />
             </>
@@ -289,7 +316,6 @@ function AddPermission() {
               <Checkbox
                 disabled={value?.disabled}
                 onChange={(e) => handleCheckMenu(e.target.checked, row, 'add', index)}
-                checked={checkValues(row, 'add', index)}
               />
             </>
           ),
@@ -308,7 +334,6 @@ function AddPermission() {
               <Checkbox
                 disabled={value?.disabled}
                 onChange={(e) => handleCheckMenu(e.target.checked, row, 'edit', index)}
-                checked={checkValues(row, 'edit', index)}
               />
             </>
           ),
@@ -327,7 +352,6 @@ function AddPermission() {
               <Checkbox
                 disabled={value?.disabled}
                 onChange={(e) => handleCheckMenu(e.target.checked, row, 'delete', index)}
-                checked={checkValues(row, 'delete', index)}
               />
             </>
           ),
@@ -346,7 +370,6 @@ function AddPermission() {
               <Checkbox
                 disabled={value?.disabled}
                 onChange={(e) => handleCheckMenu(e.target.checked, row, 'cancel', index)}
-                checked={checkValues(row, 'cancel', index)}
               />
             </>
           ),
@@ -365,6 +388,132 @@ function AddPermission() {
               <Checkbox
                 disabled={value?.disabled}
                 onChange={(e) => handleCheckMenu(e.target.checked, row, 'excel', index)}
+              />
+            </>
+          ),
+        }
+      },
+    },
+  ]
+  const subColumns = [
+    {
+      title: 'ชื่อเมนู',
+      dataIndex: 'name',
+      key: 'name',
+      width: '21%',
+      render: (value: any, row: any, index: number) => {
+        return {
+          children: <span>{value}</span>,
+        }
+      },
+    },
+    {
+      title: 'ดูข้อมูล (View)',
+      dataIndex: 'view',
+      key: 'view',
+      width: '11%',
+      render: (value: any, row: any, index: number) => {
+        return {
+          children: (
+            <>
+              <Checkbox
+                disabled={value?.disabled}
+                checked={checkValues(row, 'view', index)}
+                onChange={(e) => handleCheckMenuSub(e.target.checked, row, 'view', index)}
+              />
+            </>
+          ),
+        }
+      },
+    },
+    {
+      title: 'เพิ่ม (Add)',
+      dataIndex: 'add',
+      key: 'add',
+      width: '11%',
+      render: (value: any, row: any, index: number) => {
+        return {
+          children: (
+            <>
+              <Checkbox
+                disabled={value?.disabled}
+                onChange={(e) => handleCheckMenuSub(e.target.checked, row, 'add', index)}
+                checked={checkValues(row, 'add', index)}
+              />
+            </>
+          ),
+        }
+      },
+    },
+    {
+      title: 'แก้ไข (Edit)',
+      dataIndex: 'edit',
+      key: 'edit',
+      width: '11%',
+      render: (value: any, row: any, index: number) => {
+        return {
+          children: (
+            <>
+              <Checkbox
+                disabled={value?.disabled}
+                onChange={(e) => handleCheckMenuSub(e.target.checked, row, 'edit', index)}
+                checked={checkValues(row, 'edit', index)}
+              />
+            </>
+          ),
+        }
+      },
+    },
+    {
+      title: 'ลบ (Delete)',
+      dataIndex: 'delete',
+      key: 'delete',
+      width: '11%',
+      render: (value: any, row: any, index: number) => {
+        return {
+          children: (
+            <>
+              <Checkbox
+                disabled={value?.disabled}
+                onChange={(e) => handleCheckMenuSub(e.target.checked, row, 'delete', index)}
+                checked={checkValues(row, 'delete', index)}
+              />
+            </>
+          ),
+        }
+      },
+    },
+    {
+      title: 'ยกเลิก (cancel)',
+      dataIndex: 'cancel',
+      key: 'cancel',
+      width: '13%',
+      render: (value: any, row: any, index: number) => {
+        return {
+          children: (
+            <>
+              <Checkbox
+                disabled={value?.disabled}
+                onChange={(e) => handleCheckMenuSub(e.target.checked, row, 'cancel', index)}
+                checked={checkValues(row, 'cancel', index)}
+              />
+            </>
+          ),
+        }
+      },
+    },
+    {
+      title: 'บันทึกไฟล์ (Export File)',
+      dataIndex: 'excel',
+      key: 'excel',
+      width: '18%',
+      render: (value: any, row: any, index: number) => {
+        return {
+          children: (
+            <>
+              <Checkbox
+                disabled={value?.disabled}
+                onChange={(e) => handleCheckMenuSub(e.target.checked, row, 'excel', index)}
                 checked={checkValues(row, 'excel', index)}
               />
             </>
@@ -403,205 +552,205 @@ function AddPermission() {
       </CardContainer>
     </div>
   )
-  const listMenuData = (
-    <div className='pt-3'>
-      <Table
-        columns={columns}
-        dataSource={[followjob]}
-        pagination={false}
-        expandable={{
-          expandedRowRender: () => (
-            <Table
-              showHeader={false}
-              columns={columns}
-              dataSource={followjob?.value?.followJob}
-              pagination={false}
-            />
-          ),
-        }}
-      />
-      <Table
-        showHeader={false}
-        columns={columns}
-        dataSource={[farmerInfo]}
-        pagination={false}
-        expandable={{
-          expandedRowRender: () => (
-            <Table
-              showHeader={false}
-              columns={columns}
-              dataSource={farmerInfo?.value.farmerJob}
-              pagination={false}
-            />
-          ),
-        }}
-      />
-      <Table
-        showHeader={false}
-        columns={columns}
-        dataSource={[dronerInfo]}
-        pagination={false}
-        expandable={{
-          expandedRowRender: () => (
-            <Table
-              showHeader={false}
-              columns={columns}
-              dataSource={dronerInfo?.value?.dronerJob}
-              pagination={false}
-            />
-          ),
-        }}
-      />
-      <Table
-        showHeader={false}
-        columns={columns}
-        dataSource={[guru]}
-        pagination={false}
-        expandable={{
-          expandedRowRender: () => (
-            <Table
-              showHeader={false}
-              columns={columns}
-              dataSource={guru?.value?.guru}
-              pagination={false}
-            />
-          ),
-        }}
-      />
-      <Table
-        showHeader={false}
-        columns={columns}
-        dataSource={[promotion]}
-        pagination={false}
-        expandable={{
-          expandedRowRender: () => (
-            <Table
-              showHeader={false}
-              columns={columns}
-              dataSource={promotion?.value?.promotion}
-              pagination={false}
-            />
-          ),
-        }}
-      />
-      <Table
-        showHeader={false}
-        columns={columns}
-        dataSource={[pointResult]}
-        pagination={false}
-        expandable={{
-          expandedRowRender: () => (
-            <Table
-              showHeader={false}
-              columns={columns}
-              dataSource={pointResult?.value.pointResult}
-              pagination={false}
-            />
-          ),
-        }}
-      />
-      <Table
-        showHeader={false}
-        columns={columns}
-        dataSource={[reward]}
-        pagination={false}
-        expandable={{
-          expandedRowRender: () => (
-            <Table
-              showHeader={false}
-              columns={columns}
-              dataSource={reward?.value.reward}
-              pagination={false}
-            />
-          ),
-        }}
-      />
-      <Table
-        showHeader={false}
-        columns={columns}
-        dataSource={[mission]}
-        pagination={false}
-        expandable={{
-          expandedRowRender: () => (
-            <Table
-              showHeader={false}
-              columns={columns}
-              dataSource={mission?.value.mission}
-              pagination={false}
-            />
-          ),
-        }}
-      />
-      <Table
-        showHeader={false}
-        columns={columns}
-        dataSource={[challenge]}
-        pagination={false}
-        expandable={{
-          expandedRowRender: () => (
-            <Table
-              showHeader={false}
-              columns={columns}
-              dataSource={challenge?.value.challenge}
-              pagination={false}
-            />
-          ),
-        }}
-      />
-      <Table
-        showHeader={false}
-        columns={columns}
-        dataSource={[admin]}
-        pagination={false}
-        expandable={{
-          expandedRowRender: () => (
-            <Table
-              showHeader={false}
-              columns={columns}
-              dataSource={admin?.value.admin}
-              pagination={false}
-            />
-          ),
-        }}
-      />
-      <Table
-        showHeader={false}
-        columns={columns}
-        dataSource={[settings]}
-        pagination={false}
-        expandable={{
-          expandedRowRender: () => (
-            <Table
-              showHeader={false}
-              columns={columns}
-              dataSource={settings?.value.settings}
-              pagination={false}
-            />
-          ),
-        }}
-      />
-      <Table
-        showHeader={false}
-        columns={columns}
-        dataSource={[point]}
-        pagination={false}
-        expandable={{
-          expandedRowRender: () => (
-            <Table
-              showHeader={false}
-              columns={columns}
-              dataSource={point?.value.point}
-              pagination={false}
-            />
-          ),
-        }}
-      />
-    </div>
-  )
+  // const listMenuData = (
+  //   <div className='pt-3'>
+  //     <Table
+  //       columns={columns}
+  //       dataSource={[followjob]}
+  //       pagination={false}
+  //       expandable={{
+  //         expandedRowRender: () => (
+  //           <Table
+  //             showHeader={false}
+  //             columns={subColumns}
+  //             dataSource={followjob?.value?.followJob}
+  //             pagination={false}
+  //           />
+  //         ),
+  //       }}
+  //     />
+  //     <Table
+  //       showHeader={false}
+  //       columns={columns}
+  //       dataSource={[farmerInfo]}
+  //       pagination={false}
+  //       expandable={{
+  //         expandedRowRender: () => (
+  //           <Table
+  //             showHeader={false}
+  //             columns={subColumns}
+  //             dataSource={farmerInfo?.value.farmerJob}
+  //             pagination={false}
+  //           />
+  //         ),
+  //       }}
+  //     />
+  //     <Table
+  //       showHeader={false}
+  //       columns={columns}
+  //       dataSource={[dronerInfo]}
+  //       pagination={false}
+  //       expandable={{
+  //         expandedRowRender: () => (
+  //           <Table
+  //             showHeader={false}
+  //             columns={subColumns}
+  //             dataSource={dronerInfo?.value?.dronerJob}
+  //             pagination={false}
+  //           />
+  //         ),
+  //       }}
+  //     />
+  //     <Table
+  //       showHeader={false}
+  //       columns={columns}
+  //       dataSource={[guru]}
+  //       pagination={false}
+  //       expandable={{
+  //         expandedRowRender: () => (
+  //           <Table
+  //             showHeader={false}
+  //             columns={subColumns}
+  //             dataSource={guru?.value?.guru}
+  //             pagination={false}
+  //           />
+  //         ),
+  //       }}
+  //     />
+  //     <Table
+  //       showHeader={false}
+  //       columns={columns}
+  //       dataSource={[promotion]}
+  //       pagination={false}
+  //       expandable={{
+  //         expandedRowRender: () => (
+  //           <Table
+  //             showHeader={false}
+  //             columns={subColumns}
+  //             dataSource={promotion?.value?.promotion}
+  //             pagination={false}
+  //           />
+  //         ),
+  //       }}
+  //     />
+  //     <Table
+  //       showHeader={false}
+  //       columns={columns}
+  //       dataSource={[pointResult]}
+  //       pagination={false}
+  //       expandable={{
+  //         expandedRowRender: () => (
+  //           <Table
+  //             showHeader={false}
+  //             columns={subColumns}
+  //             dataSource={pointResult?.value.pointResult}
+  //             pagination={false}
+  //           />
+  //         ),
+  //       }}
+  //     />
+  //     <Table
+  //       showHeader={false}
+  //       columns={columns}
+  //       dataSource={[reward]}
+  //       pagination={false}
+  //       expandable={{
+  //         expandedRowRender: () => (
+  //           <Table
+  //             showHeader={false}
+  //             columns={subColumns}
+  //             dataSource={reward?.value.reward}
+  //             pagination={false}
+  //           />
+  //         ),
+  //       }}
+  //     />
+  //     <Table
+  //       showHeader={false}
+  //       columns={columns}
+  //       dataSource={[mission]}
+  //       pagination={false}
+  //       expandable={{
+  //         expandedRowRender: () => (
+  //           <Table
+  //             showHeader={false}
+  //             columns={subColumns}
+  //             dataSource={mission?.value.mission}
+  //             pagination={false}
+  //           />
+  //         ),
+  //       }}
+  //     />
+  //     <Table
+  //       showHeader={false}
+  //       columns={columns}
+  //       dataSource={[challenge]}
+  //       pagination={false}
+  //       expandable={{
+  //         expandedRowRender: () => (
+  //           <Table
+  //             showHeader={false}
+  //             columns={subColumns}
+  //             dataSource={challenge?.value.challenge}
+  //             pagination={false}
+  //           />
+  //         ),
+  //       }}
+  //     />
+  //     <Table
+  //       showHeader={false}
+  //       columns={columns}
+  //       dataSource={[admin]}
+  //       pagination={false}
+  //       expandable={{
+  //         expandedRowRender: () => (
+  //           <Table
+  //             showHeader={false}
+  //             columns={subColumns}
+  //             dataSource={admin?.value.admin}
+  //             pagination={false}
+  //           />
+  //         ),
+  //       }}
+  //     />
+  //     <Table
+  //       showHeader={false}
+  //       columns={columns}
+  //       dataSource={[settings]}
+  //       pagination={false}
+  //       expandable={{
+  //         expandedRowRender: () => (
+  //           <Table
+  //             showHeader={false}
+  //             columns={subColumns}
+  //             dataSource={settings?.value.settings}
+  //             pagination={false}
+  //           />
+  //         ),
+  //       }}
+  //     />
+  //     <Table
+  //       showHeader={false}
+  //       columns={columns}
+  //       dataSource={[point]}
+  //       pagination={false}
+  //       expandable={{
+  //         expandedRowRender: () => (
+  //           <Table
+  //             showHeader={false}
+  //             columns={subColumns}
+  //             dataSource={point?.value.point}
+  //             pagination={false}
+  //           />
+  //         ),
+  //       }}
+  //     />
+  //   </div>
+  // )
   const insertPermission = () => {
     const payload: any = {}
     payload.role = role
-    payload.followJob = followjob.value
+    payload.followJob = followjobs.value
     payload.farmerInfo = farmerInfo.value
     payload.dronerInfo = dronerInfo.value
     payload.admin = admin.value
@@ -634,7 +783,33 @@ function AddPermission() {
         </span>
       </Row>
       {permissionData}
-      {listMenuData}
+      <TableRole
+        column={columns}
+        subColumn={subColumns}  
+        onChangeJob={() => console.log(1)}
+        onChangeFarmer={() => console.log(1)}
+        onChangeDroner={() => console.log(1)}
+        onChangeGuru={() => console.log(1)}
+        onChangeReward={() => console.log(1)}
+        onChangeMission={() => console.log(1)}
+        onChangePromotion={() => console.log(1)}
+        onChangePointResult={() => console.log(1)}
+        onChangeAdmin={() => console.log(1)}
+        onChangeSetting={() => console.log(1)}
+        onChangePoint={() => console.log(1)}
+        onChangeChallenge={() => console.log(1)}
+        dataJob={[followjobs]}
+        dataFarmer={[farmerInfo]}
+        dataDroner={[dronerInfo]}
+        dataGuru={[guru]}
+        dataReward={[reward]}
+        dataMission={[mission]}
+        dataPromotion={[promotion]}
+        dataPointResult={[pointResult]}
+        dataAdmin={[admin]}
+        dataSetting={[settings]}
+        dataPoint={[point]}
+        dataChallenge={[challenge]}/>
       <FooterPage
         onClickBack={() => navigate(-1)}
         onClickSave={insertPermission}
