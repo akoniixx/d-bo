@@ -316,6 +316,11 @@ const AddNewTask = () => {
     const d = Map(createNewTask).set('preparationBy', e.target.value)
     setCreateNewTask(d.toJS())
     checkValidateStep(d.toJS(), current)
+    setCreateNewTask({
+      ...createNewTask,
+      preparationBy: e.target.value,
+      preparationRemark: '',
+    })
   }
   const handleCalServiceCharge = (e: any) => {
     const values = validateOnlyNumWDecimal(e.target.value)
@@ -1373,6 +1378,8 @@ const AddNewTask = () => {
       ].includes('')
       const checkEmptyNumber = ![data.price, data.unitPrice, data.farmAreaAmount].includes(0)
       let checkEmptyArray = false
+      let checkPreparationBy = false
+
       if (data?.targetSpray !== undefined) {
         checkEmptyArray =
           ![data?.targetSpray][0]?.includes('') &&
@@ -1381,8 +1388,15 @@ const AddNewTask = () => {
       }
       const checkOtherSpray = otherSpray && otherSpray.trim().length !== 1
       const checkDateTime = ![dateAppointment, timeAppointment].includes('')
-      const checkPreparationBy =
-        data.preparationBy === 'นักบินโดรนเตรียมให้' && data.preparationRemark.trim().length !== 0
+      if (data.preparationBy === 'นักบินโดรนเตรียมให้') {
+        if (data.preparationRemark.trim().length !== 0) {
+          checkPreparationBy = true
+        } else {
+          checkPreparationBy = false
+        }
+      } else {
+        checkPreparationBy = true
+      }
 
       if (
         checkEmptyArray && [data?.targetSpray][0]?.includes('อื่นๆ')

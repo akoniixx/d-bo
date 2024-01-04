@@ -213,6 +213,7 @@ export const ConfirmNewTask: React.FC<ConfirmNewTaskProps> = ({
     fetchCouponKeep(createNewTask?.farmerId)
     couponId && calculatePrice(couponCode)
   }, [])
+  console.log(createNewTask)
 
   const fetchCouponKeep = async (id?: string) => {
     const data = await CouponDataSource.getCouponKeepByFarmerId(id).then((res) => {
@@ -408,7 +409,7 @@ export const ConfirmNewTask: React.FC<ConfirmNewTaskProps> = ({
                   <span className='col'>การเตรียมยา</span>
                 </div>
                 <div className='d-flex'>
-                  <span className='col'>{createNewTask?.purposeSprayName}</span>
+                  <span className='col'>{createNewTask?.purposeSpray.id}</span>
                   <span className='col'>{createNewTask?.preparationBy}</span>
                 </div>
                 {createNewTask?.preparationRemark && (
