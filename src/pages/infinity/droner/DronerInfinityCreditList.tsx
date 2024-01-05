@@ -878,7 +878,7 @@ const DronerInfinityCreditList : React.FC<any> = () => {
         </div>
         <div className='pt-3 d-flex justify-content-between align-items-center'>
           <Select
-            value={filter.exchangeType}
+            value={filter.exchangeType === "" ? null : filter.exchangeType}
             style={{ width : '240px'}}
             allowClear
             showSearch

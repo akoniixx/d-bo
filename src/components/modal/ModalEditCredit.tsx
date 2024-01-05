@@ -213,7 +213,7 @@ const ModalEditCredit: React.FC<ModalEditCreditProps> = ({
     <Select
         placeholder='เลือกธนาคาร'
         allowClear
-        value={cashCheck.bank}
+        value={cashCheck.bank === "" ? null : cashCheck.bank}
         onChange={(e)=>setCashcheck({
           ...cashCheck,
           bank : e
