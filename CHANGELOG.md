@@ -1,5 +1,9 @@
 ## [Version - 0]
 
+## Fix [v0.42.7] 2023-12-27
+
+- fix placeholder not showed
+
 ## Fix [v0.42.6] 2023-12-27
 
 - fixed credit when less than 0
