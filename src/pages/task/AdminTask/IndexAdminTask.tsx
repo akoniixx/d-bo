@@ -94,6 +94,7 @@ const IndexAdminTask = () => {
   const itemsPerPage = 10
   const [currentPage, setCurrentPage] = useState(1)
   const [saveBtnDisable, setBtnSaveDisable] = useState<boolean>(false)
+  const [saveDisable, setSaveDisable] = useState<boolean>(false)
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page)
@@ -118,7 +119,7 @@ const IndexAdminTask = () => {
   }
   useEffect(() => {
     fetchTaskList()
-  }, [taskNo, taskId])
+  }, [taskNo])
 
   const onItemsRendered = (props: any) => {
     if (props.visibleStopIndex >= searchTaskList.length - 1) {
@@ -375,6 +376,22 @@ const IndexAdminTask = () => {
     setDeleteImgDrug([...updatedImages])
     setDeleteId([...filters])
   }
+
+  useEffect(() => {
+    const checkDisableSave = () => {
+      const { status } = taskSelected?.data || {}
+      if (status === 'DONE' || status === 'WAIT_REVIEW') {
+        const areImagesDeleted = deleteImgControl?.length === 0 || deleteImgDrug?.length === 0
+        const isRaiChecked = checkRai()
+        setSaveDisable(areImagesDeleted || isRaiChecked)
+      } else {
+        const isRaiChecked = checkRai()
+        setSaveDisable(isRaiChecked)
+      }
+    }
+
+    checkDisableSave()
+  }, [taskSelected?.data, deleteImgControl, deleteImgDrug, checkRai])
 
   const pageTitle = (
     <Row style={{ padding: '10px' }}>
@@ -909,12 +926,9 @@ const IndexAdminTask = () => {
           )}
         </Form>
         <Button
-          disabled={deleteImgControl?.length === 0 || deleteImgDrug?.length === 0 || checkRai()}
+          disabled={saveDisable}
           style={{
-            backgroundColor:
-              deleteImgControl?.length === 0 || deleteImgDrug?.length === 0 || checkRai()
-                ? color.Grey
-                : color.Success,
+            backgroundColor: saveDisable ? color.Grey : color.Success,
             color: 'white',
             width: '100%',
             borderRadius: '5px',
