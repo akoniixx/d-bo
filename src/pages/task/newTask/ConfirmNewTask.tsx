@@ -84,6 +84,7 @@ export const ConfirmNewTask: React.FC<ConfirmNewTaskProps> = ({
   const handlePaginationChange = (page: number) => {
     setCurrentPage(page)
   }
+
   const startIndex = (currentPage - 1) * pageSize
   const endIndex = startIndex + pageSize
   const currentData = createNewTask?.taskDronerTemp?.slice(startIndex, endIndex)
@@ -213,7 +214,6 @@ export const ConfirmNewTask: React.FC<ConfirmNewTaskProps> = ({
     fetchCouponKeep(createNewTask?.farmerId)
     couponId && calculatePrice(couponCode)
   }, [])
-  console.log(createNewTask)
 
   const fetchCouponKeep = async (id?: string) => {
     const data = await CouponDataSource.getCouponKeepByFarmerId(id).then((res) => {
@@ -409,7 +409,11 @@ export const ConfirmNewTask: React.FC<ConfirmNewTaskProps> = ({
                   <span className='col'>การเตรียมยา</span>
                 </div>
                 <div className='d-flex'>
-                  <span className='col'>{createNewTask?.purposeSpray.id}</span>
+                  <span className='col'>
+                    {isEdit
+                      ? createNewTask?.purposeSpray?.purposeSprayName
+                      : createNewTask?.purposeSprayName}
+                  </span>
                   <span className='col'>{createNewTask?.preparationBy}</span>
                 </div>
                 {createNewTask?.preparationRemark && (
