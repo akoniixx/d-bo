@@ -75,6 +75,15 @@ function AddPermission() {
     name: 'ตั้งค่า',
     value: settingJob,
   })
+  const [reportPoint, setReportPoint] = useState({
+    name: 'รายงานแต้ม',
+    value: pointJob.pointResult[0].subItem
+    ,
+  })
+  const [redeemPoint, setRedeemPoint] = useState({
+    name: 'แลกแต้ม/ของรางวัล',
+    value: pointJob.pointResult[1].subItem,
+  })
 
   const handleCheckMenu = (checked: boolean, row: any, value: any, index: number) => {
     console.log(checked, row, value)
@@ -784,20 +793,6 @@ function AddPermission() {
       </Row>
       {permissionData}
       <TableRole
-        column={columns}
-        subColumn={subColumns}  
-        onChangeJob={() => console.log(1)}
-        onChangeFarmer={() => console.log(1)}
-        onChangeDroner={() => console.log(1)}
-        onChangeGuru={() => console.log(1)}
-        onChangeReward={() => console.log(1)}
-        onChangeMission={() => console.log(1)}
-        onChangePromotion={() => console.log(1)}
-        onChangePointResult={() => console.log(1)}
-        onChangeAdmin={() => console.log(1)}
-        onChangeSetting={() => console.log(1)}
-        onChangePoint={() => console.log(1)}
-        onChangeChallenge={() => console.log(1)}
         dataJob={[followjobs]}
         dataFarmer={[farmerInfo]}
         dataDroner={[dronerInfo]}
@@ -806,10 +801,13 @@ function AddPermission() {
         dataMission={[mission]}
         dataPromotion={[promotion]}
         dataPointResult={[pointResult]}
+        dataReportPoint={[reportPoint]}
+        dataRedeemPoint={[redeemPoint]}
         dataAdmin={[admin]}
         dataSetting={[settings]}
         dataPoint={[point]}
-        dataChallenge={[challenge]}/>
+        dataChallenge={[challenge]}
+      />
       <FooterPage
         onClickBack={() => navigate(-1)}
         onClickSave={insertPermission}
