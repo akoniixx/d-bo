@@ -2,7 +2,6 @@
 import React, { useEffect, useState } from 'react'
 import { Form, Modal } from 'antd'
 import FooterPage from '../footer/FooterPage'
-import { useNavigate } from 'react-router-dom'
 import { DeleteOutlined, StarFilled } from '@ant-design/icons'
 import { color, icon } from '../../resource'
 import upload_droner_infinity from '../../resource/media/empties/upload_Img_btn.png'
@@ -180,6 +179,24 @@ const ModalDronerInfinity: React.FC<ModalDronerInfinityProps> = ({
       setRowDroner(rowDroner + 10)
     }
   }
+  const downloadFile = async () => {
+    try {
+      const response = await DronerFinityDatasource.downloadFile()
+      const blob = new Blob([response], { type: 'application/pdf' })
+      const fileName = 'สัญญาการเข้าร่วมโครงการแนะนำปุ๋ยยาให้แก่เกษตรกร.pdf'
+      const a = document.createElement('a')
+      a.href = window.URL.createObjectURL(blob)
+      a.download = fileName
+      a.style.display = 'none'
+      document.body.appendChild(a)
+      a.click()
+      document.body.removeChild(a)
+    } catch (error) {
+      console.error('Error downloading file:', error)
+      alert('Failed to download the file. Please try again later.')
+    }
+  }
+
   const handelCallBack = async () => {
     setBtnSaveDisable(true)
     const update = `${profile?.firstname} ${profile?.lastname}`
@@ -394,7 +411,10 @@ const ModalDronerInfinity: React.FC<ModalDronerInfinityProps> = ({
                 <span style={{ color: color.Error }}> *</span>
               </div>
               <div className='col-lg' style={{ textAlign: 'end' }}>
-                <u style={{ color: color.Success, fontWeight: 500, cursor: 'pointer' }}>
+                <u
+                  onClick={downloadFile}
+                  style={{ color: color.Success, fontWeight: 500, cursor: 'pointer' }}
+                >
                   ดาวน์โหลดสัญญา
                 </u>
               </div>
