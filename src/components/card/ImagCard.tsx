@@ -3,7 +3,6 @@ import React, { useState } from 'react'
 import color from '../../resource/color'
 import { CloseOutlined, LeftOutlined, RightOutlined } from '@ant-design/icons'
 import styled from 'styled-components'
-
 interface ImagCardsProps {
   show?: boolean
   image: any[]
@@ -70,11 +69,16 @@ const ImagCards: React.FC<ImagCardsProps> = ({ image, show }) => {
         footer={null}
         centered
         closable={false}
-        bodyStyle={{ padding: 0 }}
+        bodyStyle={{ padding: 50 }}
       >
-        <div style={{ position: 'relative', width: '100%', height: '100%', textAlign: 'center' }}>
+        <div style={{ position: 'relative', width: '100%', height: '100%', textAlign: 'center',}}>
           <div
-            style={{ position: 'absolute', top: '40%', left: '0%', transform: 'translateY(-50%)' }}
+            style={{
+              position: 'absolute',
+              top: '40%',
+              left: '-10%',
+              transform: 'translateY(-50%)',
+            }}
           >
             <LeftOutlined
               onClick={handlePrevious}
@@ -87,7 +91,12 @@ const ImagCards: React.FC<ImagCardsProps> = ({ image, show }) => {
             />
           </div>
           <div
-            style={{ position: 'absolute', top: '40%', right: '6%', transform: 'translateY(-50%)' }}
+            style={{
+              position: 'absolute',
+              top: '40%',
+              right: '-4%',
+              transform: 'translateY(-50%)',
+            }}
           >
             <RightOutlined
               onClick={handleNext}
@@ -108,9 +117,8 @@ const ImagCards: React.FC<ImagCardsProps> = ({ image, show }) => {
           {image ? (
             image.length > 0 ? (
               <>
-                <img
-                  alt='preview'
-                  style={{ width: '80%', height: 'auto' }}
+                <Image
+                 width={400}
                   src={show ? image[currentIndex] : image[currentIndex].url}
                 />
                 <div
