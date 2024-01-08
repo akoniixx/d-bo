@@ -66,7 +66,7 @@ const TableHeaderRole: React.FC<TableHeaderRoleProps> = ({
               <Checkbox
                 disabled={value?.disabled}
                 onChange={(e) => onChangeHeader(row.name, 'add', e.target.checked, index)}
-                checked={!stateHeader[method.indexOf('add')]}
+                checked={value?.disabled ? false : !stateHeader[method.indexOf('add')]}
               />
             </>
           ),
@@ -98,6 +98,8 @@ const TableHeaderRole: React.FC<TableHeaderRoleProps> = ({
       key: 'delete',
       width: '11%',
       render: (value: any, row: any, index: number) => {
+        const vals = row?.value
+        console.log(vals)
         return {
           children: (
             <>

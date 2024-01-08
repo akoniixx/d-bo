@@ -5,7 +5,7 @@ import TableHeaderRole from './TableHeaderRole'
 import TableInSubRole from './TableInSubRole'
 import { redeemHeaderPoint, reportHeaderPoint } from '../../pages/permission/DefaultRole'
 
-interface ConvertedDataType {
+export interface ConvertedDataType {
   name: string
   value: {
     [key: string]: any
@@ -26,6 +26,7 @@ interface TableRoleProps {
   dataChallenge: ConvertedDataType[]
   dataReportPoint: ConvertedDataType[]
   dataRedeemPoint: ConvertedDataType[]
+  callBack: (data: ConvertedDataType) => void
 }
 export const method = ['view', 'add', 'edit', 'delete', 'cancel', 'excel']
 
@@ -44,6 +45,7 @@ function TableRole({
   dataChallenge,
   dataReportPoint,
   dataRedeemPoint,
+  callBack,
 }: TableRoleProps) {
   const [followJob, setFollowJob] = useState(dataJob[0].value.followJob)
   const [farmer, setFarmer] = useState(dataFarmer[0].value.farmerJob)
@@ -177,8 +179,29 @@ function TableRole({
     headerState[index] = !headerState[index]
     setHeaderState([...headerState])
     setState(res)
+    callBackData()
   }
 
+  const callBackData = () => {
+    const payload: ConvertedDataType = {
+      name:'',
+      value: {
+        followJob: followJob,
+        farmerInfo: farmer,
+        dronerInfo: droner,
+        guru: guru,
+        promotion: promotion,
+        pointResult: pointResult,
+        reward: reward,
+        mission: mission,
+        challenge: challenge,
+        admin: admin,
+        settings: setting,
+        point: point,
+      },
+    }
+    callBack(payload)
+  }
   return (
     <div className='pt-3'>
       <TableHeaderRole
@@ -341,7 +364,7 @@ function TableRole({
                       headerAllPoint[method.indexOf(key)] = false
                       setHeaderAllPoint([...headerAllPoint])
                     }
-                  }}  
+                  }}
                 />
               }
             />
@@ -365,7 +388,10 @@ function TableRole({
                     redeemPointHeader[method.indexOf(key)] = result
                     setRedeemPoint(redeemPoint)
                     setRedeemPointHeader([...redeemPointHeader])
-                    console.log(reportPointHeader[method.indexOf(key)], redeemPointHeader[method.indexOf(key)])
+                    console.log(
+                      reportPointHeader[method.indexOf(key)],
+                      redeemPointHeader[method.indexOf(key)],
+                    )
                     if (
                       !reportPointHeader[method.indexOf(key)] &&
                       !redeemPointHeader[method.indexOf(key)]
