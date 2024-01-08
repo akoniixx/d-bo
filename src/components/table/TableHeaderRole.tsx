@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react'
 import { method } from './TableRole'
 
 interface TableHeaderRoleProps {
-  onChange: (data: any, key: string, checked: boolean, index: number) => void
+  onChange: (data: any, key: string, checked: boolean, index: number, row: any) => void
   data: any
   header: string
   subColumns: JSX.Element
@@ -20,8 +20,8 @@ const TableHeaderRole: React.FC<TableHeaderRoleProps> = ({
 }) => {
   useEffect(() => {}, [stateHeader])
 
-  const onChangeHeader = (data: any, key: string, checked: boolean, index: number) => {
-    onChange(data, key, checked, index)
+  const onChangeHeader = (data: any, key: string, checked: boolean, index: number, row: any) => {
+    onChange(data, key, checked, index, row.value)
   }
   const column = [
     {
@@ -46,7 +46,7 @@ const TableHeaderRole: React.FC<TableHeaderRoleProps> = ({
             <>
               <Checkbox
                 disabled={value?.disabled}
-                onChange={(e) => onChangeHeader(row.name, 'view', e.target.checked, index)}
+                onChange={(e) => onChangeHeader(row.name, 'view', e.target.checked, index, row)}
                 checked={!stateHeader[method.indexOf('view')]}
               />
             </>
@@ -65,7 +65,7 @@ const TableHeaderRole: React.FC<TableHeaderRoleProps> = ({
             <>
               <Checkbox
                 disabled={value?.disabled}
-                onChange={(e) => onChangeHeader(row.name, 'add', e.target.checked, index)}
+                onChange={(e) => onChangeHeader(row.name, 'add', e.target.checked, index, row)}
                 checked={value?.disabled ? false : !stateHeader[method.indexOf('add')]}
               />
             </>
@@ -84,7 +84,7 @@ const TableHeaderRole: React.FC<TableHeaderRoleProps> = ({
             <>
               <Checkbox
                 disabled={value?.disabled}
-                onChange={(e) => onChangeHeader(row.name, 'edit', e.target.checked, index)}
+                onChange={(e) => onChangeHeader(row.name, 'edit', e.target.checked, index, row)}
                 checked={!stateHeader[method.indexOf('edit')]}
               />
             </>
@@ -98,14 +98,12 @@ const TableHeaderRole: React.FC<TableHeaderRoleProps> = ({
       key: 'delete',
       width: '11%',
       render: (value: any, row: any, index: number) => {
-        const vals = row?.value
-        console.log(vals)
         return {
           children: (
             <>
               <Checkbox
                 disabled={value?.disabled}
-                onChange={(e) => onChangeHeader(row.name, 'delete', e.target.checked, index)}
+                onChange={(e) => onChangeHeader(row.name, 'delete', e.target.checked, index, row)}
                 checked={!stateHeader[method.indexOf('delete')]}
               />
             </>
@@ -124,7 +122,7 @@ const TableHeaderRole: React.FC<TableHeaderRoleProps> = ({
             <>
               <Checkbox
                 disabled={value?.disabled}
-                onChange={(e) => onChangeHeader(row.name, 'cancel', e.target.checked, index)}
+                onChange={(e) => onChangeHeader(row.name, 'cancel', e.target.checked, index, row)}
                 checked={!stateHeader[method.indexOf('cancel')]}
               />
             </>
@@ -143,7 +141,7 @@ const TableHeaderRole: React.FC<TableHeaderRoleProps> = ({
             <>
               <Checkbox
                 disabled={value?.disabled}
-                onChange={(e) => onChangeHeader(row.name, 'excel', e.target.checked, index)}
+                onChange={(e) => onChangeHeader(row.name, 'excel', e.target.checked, index, row)}
                 checked={!stateHeader[method.indexOf('excel')]}
               />
             </>
