@@ -839,7 +839,7 @@ const IndexAdminTask = () => {
             <Row justify={'space-between'} gutter={8}>
               <Col span={24}>
                 <label style={{ fontWeight: 'bold' }}>สถานะ</label>
-                <Form.Item name='status'>
+                <Form.Item>
                   <Select
                     options={[
                       { value: 'WAIT_REVIEW', label: 'รอรีวิว' },
@@ -931,7 +931,7 @@ const IndexAdminTask = () => {
                   setCheckTask(!checkTask)
                 }}
               >
-                ต้องการอัพโหลดภาพหลักฐานการบิน และปุ๋ยยาใหม่
+                ต้องการอัปโหลดภาพหลักฐานการบิน และปุ๋ยยาใหม่
               </Checkbox>
             </Form.Item>
           </Col>
