@@ -153,6 +153,7 @@ const TableHeaderRole: React.FC<TableHeaderRoleProps> = ({
 
   return (
     <Table
+      rowClassName={'table-head-role'}
       showHeader={showHeader}
       columns={column}
       dataSource={data}
