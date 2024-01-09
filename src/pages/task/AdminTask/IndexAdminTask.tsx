@@ -964,7 +964,7 @@ const IndexAdminTask = () => {
               </Row>
             </>
           )}
-          {changeStatus === 'WAIT_REVIEW' && (
+          {changeStatus === 'WAIT_REVIEW' && taskSelected.data.status === 'IN_PROGRESS' && (
             <Row justify={'space-between'} gutter={8}>
               <Col span={24}>
                 <label style={{ fontWeight: 'bold' }}>รีวิวเกษตรกร</label>
