@@ -29,7 +29,7 @@ import { RoleEntity, RoleEntity_INIT } from '../../entities/RoleEntities'
 function AddPermission() {
   const navigate = useNavigate()
   const [role, setRole] = useState<string>('')
-  const [insertRole, setInsertRole] = useState<RoleEntity>(RoleEntity_INIT)
+  const [insertRole, setInsertRole] = useState<any>()
   const [followjobs, setFollowjobs] = useState({
     name: 'ติดตามงาน',
     value: followJob,
@@ -115,7 +115,7 @@ function AddPermission() {
       </CardContainer>
     </div>
   )
-  const insertPermission = () => {
+  const insertPermission = async () => {
     const payload: any = {}
     payload.role = role
     payload.followJob = followjobs.value?.followJob
@@ -131,10 +131,7 @@ function AddPermission() {
     payload.point = point.value?.point
     payload.promotion = promotion.value?.promotion
     setInsertRole(payload)
-  }
-
-  const insertRoleData = async () => {
-    await RoleManage.insertRole(insertRole).then((res) => {
+     await RoleManage.insertRole(payload).then((res) => {
       if (res) {
         Swal.fire({
           title: 'บันทึกสำเร็จ',
@@ -147,6 +144,7 @@ function AddPermission() {
       }
     })
   }
+
   return (
     <div>
       <Row>
@@ -171,11 +169,10 @@ function AddPermission() {
         dataSetting={[settings]}
         dataPoint={[point]}
         dataChallenge={[challenge]}
-        callBack={insertPermission}
       />
       <FooterPage
         onClickBack={() => navigate(-1)}
-        onClickSave={insertRoleData}
+        onClickSave={insertPermission}
         // disableSaveBtn={saveBtnDisable}
       />
     </div>

@@ -24,7 +24,6 @@ interface TableRoleProps {
   dataChallenge: ConvertedDataType[]
   dataReportPoint: ConvertedDataType[]
   dataRedeemPoint: ConvertedDataType[]
-  callBack: (data: ConvertedDataType) => void
 }
 export const method = ['view', 'add', 'edit', 'delete', 'cancel', 'excel']
 
@@ -43,7 +42,6 @@ function TableRole({
   dataChallenge,
   dataReportPoint,
   dataRedeemPoint,
-  callBack,
 }: TableRoleProps) {
   const [followJob, setFollowJob] = useState(dataJob[0].value.followJob)
   const [farmer, setFarmer] = useState(dataFarmer[0].value.farmerJob)
@@ -162,9 +160,7 @@ function TableRole({
         setHeaderState: setRedeemPointHeader,
       },
     }
-
     const { data, headerState, setState, setHeaderState } = dataMap[header]
-
     const res = data.map((item: any) => {
       if (item[category].disabled === true) {
         item[category].value = false
@@ -178,29 +174,8 @@ function TableRole({
     headerState[index] = !headerState[index]
     setHeaderState([...headerState])
     setState(res)
-    callBackData()
   }
 
-  const callBackData = () => {
-    const payload: ConvertedDataType = {
-      name: '',
-      value: {
-        followJob: followJob,
-        farmerInfo: farmer,
-        dronerInfo: droner,
-        guru: guru,
-        promotion: promotion,
-        pointResult: pointResult,
-        reward: reward,
-        mission: mission,
-        challenge: challenge,
-        admin: admin,
-        settings: setting,
-        point: point,
-      },
-    }
-    callBack(payload)
-  }
   return (
     <div className='pt-3'>
       <TableHeaderRole

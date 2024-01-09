@@ -14,7 +14,6 @@ const TableSubRole: React.FC<TableSubRoleProps> = ({ onChange, data, subColumns,
   }
   const isSubTrue = data.some((item: any) => item.sub === true)
 
-  console.log(data)
   const subColumn = [
     {
       title: 'ชื่อเมนู',
