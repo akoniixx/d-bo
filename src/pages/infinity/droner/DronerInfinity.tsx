@@ -81,7 +81,7 @@ function DronerInfinity() {
     await DronerFinityDatasource.getAllDroner(
       status,
       searchText,
-      provinceId,
+      provinceId, 
       districtId,
       subDistrictId,
       credit.min,

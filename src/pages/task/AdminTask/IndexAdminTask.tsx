@@ -13,6 +13,7 @@ import {
   Modal,
   Spin,
   Checkbox,
+  Select,
 } from 'antd'
 import { useEffect, useState } from 'react'
 import { CardContainer } from '../../../components/card/CardContainer'
@@ -95,6 +96,8 @@ const IndexAdminTask = () => {
   const [currentPage, setCurrentPage] = useState(1)
   const [saveBtnDisable, setBtnSaveDisable] = useState<boolean>(false)
   const [saveDisable, setSaveDisable] = useState<boolean>(false)
+  const [changeStatus, setChangeStatus] = useState<string>('')
+  const [selectedNumber, setSelectedNumber] = useState(0)
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page)
@@ -107,6 +110,9 @@ const IndexAdminTask = () => {
     TaskDatasource.getAllTaskList(taskNo, current, 10).then((res: AllTaskListEntity) => {
       setTaskList(res.data)
       const data = res.data.map((item) => {
+        form.setFieldsValue({
+          status: item.status,
+        })
         return {
           ...item,
           label: `${item.taskNo} (สถานะ : ${ALL_TASK_MAPPING[item.status]})`,
@@ -201,6 +207,9 @@ const IndexAdminTask = () => {
         setLoading(false)
       })
   }
+  const handleChangeStatus = (value: string) => {
+    setChangeStatus(value)
+  }
   const calculateTask = () => {
     TaskDatasource.calculateManageTask(
       taskId,
@@ -211,6 +220,9 @@ const IndexAdminTask = () => {
     ).then((res) => {
       setEdit(res.responseData)
     })
+  }
+  const handleNumberChange = (value: string) => {
+    setSelectedNumber(parseInt(value, 10))
   }
   const checkNumber = (e: React.ChangeEvent<HTMLInputElement>, name: string) => {
     const { value: inputValue } = e.target
@@ -380,9 +392,15 @@ const IndexAdminTask = () => {
   useEffect(() => {
     const checkDisableSave = () => {
       const { status } = taskSelected?.data || {}
-      if (status === 'DONE' || status === 'WAIT_REVIEW') {
-        const areImagesDeleted = deleteImgControl?.length === 0 || deleteImgDrug?.length === 0
-        const isRaiChecked = checkRai()
+      const areImagesDeleted =
+        !deleteImgControl ||
+        deleteImgControl.length === 0 ||
+        !deleteImgDrug ||
+        deleteImgDrug.length === 0
+      const isRaiChecked = checkRai()
+      if (changeStatus === 'WAIT_REVIEW') {
+        setSaveDisable(areImagesDeleted || isRaiChecked || selectedNumber === 0)
+      } else if (status === 'DONE' || status === 'WAIT_REVIEW') {
         setSaveDisable(areImagesDeleted || isRaiChecked)
       } else {
         const isRaiChecked = checkRai()
@@ -391,8 +409,15 @@ const IndexAdminTask = () => {
     }
 
     checkDisableSave()
-  }, [taskSelected?.data, deleteImgControl, deleteImgDrug, checkRai])
+  }, [taskSelected?.data, deleteImgControl, deleteImgDrug, checkRai, selectedNumber, changeStatus])
 
+  const shouldDisableCheckbox = () => {
+    const isNotDoneOrWaitReview =
+      taskSelected?.data.status !== 'DONE' && taskSelected?.data.status !== 'WAIT_REVIEW'
+
+    return changeStatus === 'WAIT_REVIEW' ? false : isNotDoneOrWaitReview
+  }
+  const shouldShowImageUpload = checkTask || changeStatus === 'WAIT_REVIEW'
   const pageTitle = (
     <Row style={{ padding: '10px' }}>
       <Col span={24}>
@@ -463,7 +488,7 @@ const IndexAdminTask = () => {
           </Col>
         </Row>
       </Card>
-      <Card style={{ height: checkTask ? '54%' : '49%' }}>
+      <Card style={{ height: checkTask ? '60%' : '49%' }}>
         <Row justify={'space-between'} gutter={8} style={{ paddingBottom: '15px' }}>
           <>
             <Col span={8} style={{ fontWeight: 'bold' }}>
@@ -810,6 +835,24 @@ const IndexAdminTask = () => {
         )}
         <Divider />
         <Form form={form}>
+          {taskSelected?.data.status === 'IN_PROGRESS' && (
+            <Row justify={'space-between'} gutter={8}>
+              <Col span={24}>
+                <label style={{ fontWeight: 'bold' }}>สถานะ</label>
+                <Form.Item name='status'>
+                  <Select
+                    options={[
+                      { value: 'WAIT_REVIEW', label: 'รอรีวิว' },
+                      { value: 'IN_PROGRESS', label: 'กำลังดำเนินงาน' },
+                    ]}
+                    onChange={handleChangeStatus}
+                    defaultValue={taskSelected?.data.status}
+                  />
+                </Form.Item>
+              </Col>
+            </Row>
+          )}
+
           <Row justify={'space-between'} gutter={8}>
             <Col span={12}>
               <label style={{ fontWeight: 'bold' }}>ค่าบริการ/ไร่</label>
@@ -882,11 +925,8 @@ const IndexAdminTask = () => {
           <Col span={24}>
             <Form.Item name='checkImg'>
               <Checkbox
-                checked={checkTask}
-                disabled={
-                  taskSelected?.data.status !== 'DONE' &&
-                  taskSelected?.data.status !== 'WAIT_REVIEW'
-                }
+                checked={shouldShowImageUpload}
+                disabled={shouldDisableCheckbox()}
                 onChange={(e) => {
                   setCheckTask(!checkTask)
                 }}
@@ -895,7 +935,7 @@ const IndexAdminTask = () => {
               </Checkbox>
             </Form.Item>
           </Col>
-          {checkTask && (
+          {shouldShowImageUpload && (
             <>
               <Row justify={'space-between'} gutter={8}>
                 <Col span={12}>
@@ -923,6 +963,31 @@ const IndexAdminTask = () => {
                 </Col>
               </Row>
             </>
+          )}
+          {changeStatus === 'WAIT_REVIEW' && taskSelected.data.status === 'IN_PROGRESS' && (
+            <Row justify={'space-between'} gutter={8}>
+              <Col span={24}>
+                <label style={{ fontWeight: 'bold' }}>รีวิวเกษตรกร</label>
+                <span style={{ color: color.Error }}> *</span>
+                <Form.Item name='reviewFarmer'>
+                  <label style={{ paddingRight: '2%' }}>ภาพรวมเกษตรกร</label>
+                  <Select
+                    style={{ width: 60 }}
+                    value={selectedNumber.toString()}
+                    onChange={handleNumberChange}
+                  >
+                    {Array.from({ length: 5 }, (_, index) => (
+                      <Select.Option key={index + 1} value={`${index + 1}`}>
+                        {index + 1}
+                      </Select.Option>
+                    ))}
+                  </Select>
+                </Form.Item>
+                <Form.Item name='reasonReview'>
+                  <TextArea placeholder='กรอกหมายเหตุ' />
+                </Form.Item>
+              </Col>
+            </Row>
           )}
         </Form>
         <Button
@@ -1232,6 +1297,8 @@ const IndexAdminTask = () => {
     const farmAreaAmount = form.getFieldValue('farmAreaAmount')
     const unitPrice = form.getFieldValue('unitPrice')
     const remark = form.getFieldValue('remark')
+    const reasonReview = form.getFieldValue('reasonReview')
+
     const filteredArray = deleteImgControl.filter((item: any) => item?.id === null)
     setShowModal(!showModal)
     Swal.fire({
@@ -1274,13 +1341,25 @@ const IndexAdminTask = () => {
             }
           }
         }
-        if (farmAreaAmount) {
-          await TaskDatasource.insertManageTask(
+        if (farmAreaAmount || changeStatus || selectedNumber !== 0 || reasonReview) {
+          const taskParameters = [
             taskId,
             farmAreaAmount,
             unitPrice,
             remark,
             getUpdateBy(),
+            changeStatus ? changeStatus : taskSelected.data.status,
+          ]
+
+          if (selectedNumber !== 0) {
+            taskParameters.push(selectedNumber)
+          }
+
+          if (reasonReview) {
+            taskParameters.push(reasonReview)
+          }
+          await TaskDatasource.insertManageTask(
+            ...(taskParameters as [string, number?, number?, string?, string?, string?]),
           )
         }
         setBtnSaveDisable(false)
