@@ -1,6 +1,6 @@
-import { DatePicker, Divider, Form, Input, Radio, Row, Select, Tag, TimePicker } from 'antd'
+import { DatePicker, Divider, Form, Input, Radio, Row, Select, Space, Tag, TimePicker } from 'antd'
 import { Option } from 'antd/lib/mentions'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import ReactQuill from 'react-quill'
 import { useNavigate } from 'react-router-dom'
 import { UploadImageEntity, UploadImageEntity_INTI } from '../../../entities/UploadImageEntities'
@@ -16,37 +16,87 @@ import moment from 'moment'
 import { RewardDatasource } from '../../../datasource/RewardDatasource'
 import Swal from 'sweetalert2'
 import dayjs from 'dayjs'
-import { validateOnlyNumber } from '../../../utilities/TextFormatter'
+import { RewardEntities } from '../../../entities/RewardEntites'
+import { numberWithCommas, validateOnlyNumber } from '../../../utilities/TextFormatter'
 import 'react-quill/dist/quill.snow.css'
 import '../../farmer/Style.css'
 const { Map } = require('immutable')
-
-function AddReward() {
+const _ = require('lodash')
+function EditRewardDroner() {
+  const queryString = _.split(window.location.pathname, '=')
   const profile = JSON.parse(localStorage.getItem('profile') || '{  }')
   const dateFormat = 'DD/MM/YYYY'
   const navigate = useNavigate()
   const [form] = Form.useForm()
   const [imgReward, setImgReward] = useState<any>()
   const [createImgReward, setCreateImgReward] = useState<UploadImageEntity>(UploadImageEntity_INTI)
-
   const [rewardType, setRewardType] = useState<string | null>(null)
   const [rewardName, setRewardName] = useState<string | null>(null)
   const [rewardExchange, setRewardExchange] = useState<string | null>(null)
   const [description, setDescription] = useState<string | null>(null)
   const [condition, setCondition] = useState<string | null>(null)
-  const [amount, setAmount] = useState<any>()
   const [score, setScore] = useState<any>()
   const [rewardStatus, setRewardStatus] = useState<any>()
   const [startExchangeDate, setStartExchangeDate] = useState<any>()
   const [startExchangeTime, setStartExchangeTime] = useState<any>()
   const [EndExchangeDate, setEndExchangeDate] = useState<any>()
   const [EndExchangeTime, setEndExchangeTime] = useState<any>()
-  const [startUsedDate, setStartUsedDate] = useState<any>()
+  const [usedDate, setUsedDate] = useState<any>()
   const [startUsedTime, setStartUsedTime] = useState<any>()
   const [endUsedDate, setEndUsedDate] = useState<any>()
   const [endUsedTime, setEndUsedTime] = useState<any>()
-  const [saveBtnDisable, setBtnSaveDisable] = useState<boolean>(true)
+  const [saveBtnDisable, setBtnSaveDisable] = useState<boolean>(false)
+  const [checkStatus, setCheckStatus] = useState()
 
+  useEffect(() => {
+    RewardDatasource.getAllRewardById(queryString[1]).then((res) => {
+      form.setFieldsValue({
+        file: res.imagePath,
+        rewardName: res.rewardName,
+        rewardType: res.rewardType,
+        rewardExchange: res.rewardExchange,
+        score: res.score,
+        amount: res.amount,
+        description: res.description,
+        condition: res.condition,
+        status: res.status,
+        startExchangeDate: !res.startExchangeDate
+          ? moment(new Date().toUTCString())
+          : moment(new Date(res.startExchangeDate).toUTCString()),
+        startExchangeTime: !res.startExchangeDate
+          ? moment(new Date().getTime())
+          : moment(new Date(res.startExchangeDate).getTime()),
+        expiredExchangeDate: !res.expiredExchangeDate
+          ? moment(new Date().toUTCString())
+          : moment(new Date(res.expiredExchangeDate).toUTCString()),
+        expiredExchangeTime: !res.expiredExchangeDate
+          ? moment(new Date().getTime())
+          : moment(new Date(res.expiredExchangeDate).getTime()),
+        startUsedDate: !res.startUsedDate
+          ? moment(new Date().toUTCString())
+          : moment(new Date(res.startUsedDate).toUTCString()),
+        startUsedTime: !res.startUsedDate
+          ? moment(new Date().getTime())
+          : moment(new Date(res.startUsedDate).getTime()),
+        expiredUsedDate: !res.expiredUsedDate
+          ? moment(new Date().toUTCString())
+          : moment(new Date(res.expiredUsedDate).toUTCString()),
+        expiredUsedTime: !res.expiredUsedDate
+          ? moment(new Date().getTime())
+          : moment(new Date(res.expiredUsedDate).getTime()),
+      })
+      setRewardName(res.rewardName)
+      setRewardType(res.rewardType)
+      setRewardExchange(res.rewardExchange)
+      setDescription(res.description)
+      setCondition(res.condition)
+      setScore(res.score)
+      setImgReward(res.imagePath)
+      setUsedDate(res.startUsedDate)
+      setEndUsedDate(res.expiredUsedDate)
+      setCheckStatus(res.status)
+    })
+  }, [])
   const onChangeImg = async (file: any) => {
     const source = file.target.files[0]
     let newSource: any
@@ -86,6 +136,7 @@ function AddReward() {
     const imgWindow = window.open(src)
     imgWindow?.document.write(image.outerHTML)
   }
+
   const onRemoveImg = () => {
     setImgReward(undefined)
     setCreateImgReward(UploadImageEntity_INTI)
@@ -105,10 +156,7 @@ function AddReward() {
     setCondition(con)
   }
 
-  const handleRewardPoint = (point: any) => {
-    setScore(point.target.value)
-  }
-  const start = new Date(startUsedDate).getTime()
+  const start = new Date(usedDate).getTime()
   const expired = new Date(endUsedDate).getTime()
   const result = (expired - start) / 86400000
   const disabledDateChange = (current: any) => {
@@ -121,17 +169,6 @@ function AddReward() {
     const startDate = moment(getValueDate.startUsedDate).format('YYYY-MM-DD')
     return current && current < dayjs(startDate)
   }
-  const checkNumber = (e: React.ChangeEvent<HTMLInputElement>, name: string) => {
-    const { value: inputValue } = e.target
-    const convertedNumber = validateOnlyNumber(inputValue)
-    const convertedNumberScore =
-      inputValue === '' || isNaN(Number(inputValue)) ? '' : Number(inputValue)
-    if (name === 'score') {
-      form.setFieldsValue({ [name]: convertedNumberScore })
-    } else {
-      form.setFieldsValue({ [name]: convertedNumber })
-    }
-  }
   const onFieldsChange = () => {
     const {
       rewardName,
@@ -143,23 +180,16 @@ function AddReward() {
       condition,
       status,
       startExchangeDate,
-      startExchangeTime,
       expiredExchangeDate,
-      expiredExchangeTime,
       startUsedDate,
-      startUsedTime,
-      expiredUsedDate,
-      expiredUsedTime,
       file,
     } = form.getFieldsValue()
-
-    let fieldErr = false
-    let imgErr = false
-    let rwTypeErr = false
-
+    let fieldErr: boolean = true
+    let imgErr: boolean = true
+    let rwTypeErr: boolean = true
     if (
       rewardName &&
-      amount > 0 &&
+      amount >= 0 &&
       description != '<p><br></p>' &&
       condition != '<p><br></p>' &&
       status
@@ -209,6 +239,17 @@ function AddReward() {
       imgErr = false
     }
     setBtnSaveDisable(fieldErr || imgErr || rwTypeErr)
+  }
+  const checkNumber = (e: React.ChangeEvent<HTMLInputElement>, name: string) => {
+    const { value: inputValue } = e.target
+    const convertedNumber = validateOnlyNumber(inputValue)
+    const convertedNumberScore =
+      inputValue === '' || isNaN(Number(inputValue)) ? '' : Number(inputValue)
+    if (name === 'score') {
+      form.setFieldsValue({ [name]: convertedNumberScore })
+    } else {
+      form.setFieldsValue({ [name]: convertedNumber })
+    }
   }
   const renderDataReward = (
     <div className='col-lg-7'>
@@ -293,54 +334,66 @@ function AddReward() {
                 <label>
                   ประเภทของรางวัล <span style={{ color: 'red' }}>*</span>
                 </label>
-                <Form.Item
-                  name='rewardType'
-                  rules={[
-                    {
-                      required: true,
-                      message: 'กรุณาเลือกประเภทของรางวัล!',
-                    },
-                  ]}
-                >
-                  <Select
-                    className='col-lg-12 p-1'
-                    placeholder='เลือกประเภทของรางวัล'
-                    onChange={handleRewardType}
-                    showSearch
-                    value={rewardType}
-                    allowClear
-                    optionFilterProp='children'
-                    filterOption={(input: any, option: any) => option.children.includes(input)}
-                    filterSort={(optionA, optionB) =>
-                      optionA.children.toLowerCase().localeCompare(optionB.children.toLowerCase())
-                    }
+                {checkStatus === 'DRAFTING' ? (
+                  <Form.Item
+                    name='rewardType'
+                    rules={[
+                      {
+                        required: true,
+                        message: 'กรุณาเลือกประเภทของรางวัล!',
+                      },
+                    ]}
                   >
-                    <Option value={'PHYSICAL'}>Physical</Option>
-                    <Option value={'DIGITAL'}>Digital</Option>
-                  </Select>
-                </Form.Item>
+                    <Select
+                      className='col-lg-12 p-1'
+                      placeholder='เลือกประเภทของรางวัล'
+                      onChange={handleRewardType}
+                      showSearch
+                      value={rewardType}
+                      allowClear
+                      optionFilterProp='children'
+                      filterOption={(input: any, option: any) => option.children.includes(input)}
+                      filterSort={(optionA, optionB) =>
+                        optionA.children.toLowerCase().localeCompare(optionB.children.toLowerCase())
+                      }
+                    >
+                      <Option value={'PHYSICAL'}>Physical</Option>
+                      <Option value={'DIGITAL'}>Digital</Option>
+                    </Select>
+                  </Form.Item>
+                ) : (
+                  <Form.Item name='rewardType'>
+                    <span>{rewardType === 'PHYSICAL' ? 'Physical' : 'Digital'}</span>
+                  </Form.Item>
+                )}
               </div>
               <div className='form-group col-lg-6'>
                 <label>
                   การแลกเปลี่ยน <span style={{ color: 'red' }}>*</span>
                 </label>
-                <div className='row'>
-                  <div className='col-12'>
-                    <Form.Item name='rewardExchange'>
-                      <Radio.Group onChange={onChangePoint}>
-                        <Radio value={'SCORE'}>ใช้แต้ม</Radio>
-                        <Radio value={'MISSION'}>ภารกิจ</Radio>
-                      </Radio.Group>
-                    </Form.Item>
+                {checkStatus === 'DRAFTING' ? (
+                  <div className='row'>
+                    <div className='col-12'>
+                      <Form.Item name='rewardExchange'>
+                        <Radio.Group onChange={onChangePoint}>
+                          <Radio value={'SCORE'}>ใช้แต้ม</Radio>
+                          <Radio value={'MISSION'}>ภารกิจ</Radio>
+                        </Radio.Group>
+                      </Form.Item>
+                    </div>
                   </div>
-                </div>
+                ) : (
+                  <Form.Item name='rewardExchange'>
+                    <p>{rewardExchange === 'SCORE' ? 'ใช้แต้ม' : 'ภารกิจ'}</p>
+                  </Form.Item>
+                )}
               </div>
             </div>
             {rewardExchange === 'MISSION' ? (
               <div className='row'>
                 <div className='form-group col-lg-6'>
                   <label>
-                    จำนวน <span style={{ color: 'red' }}>*</span>
+                    จำนวน <span style={{ color: 'red' }}>(ต้องไม่น้อยกว่าที่แลกไป)*</span>
                   </label>
                   <Form.Item
                     name='amount'
@@ -354,10 +407,7 @@ function AddReward() {
                     <Input
                       placeholder='กรอกจำนวน'
                       autoComplete='off'
-                      onChange={(e) => {
-                        checkNumber(e, 'amount')
-                        setAmount(e.target.value)
-                      }}
+                      onChange={(e) => checkNumber(e, 'amount')}
                     />
                   </Form.Item>
                 </div>
@@ -368,29 +418,36 @@ function AddReward() {
                   <label>
                     แต้มที่ต้องใช้แลก <span style={{ color: 'red' }}>*</span>
                   </label>
-                  <Form.Item
-                    name='score'
-                    rules={[
-                      {
-                        required: true,
-                        message: 'กรุณากรอกแต้มที่ต้องการใช้แลก!',
-                      },
-                    ]}
-                  >
-                    <Input
-                      placeholder='กรอกแต้มที่ต้องใช้แลก'
-                      autoComplete='off'
-                      suffix='แต้ม'
-                      onChange={(e) => {
-                        checkNumber(e, 'score')
-                        setScore(e.target.value)
-                      }}
-                    />
-                  </Form.Item>
+                  {checkStatus === 'DRAFTING' ? (
+                    <Form.Item
+                      name='score'
+                      rules={[
+                        {
+                          required: true,
+                          message: 'กรุณากรอกแต้มที่ต้องการใช้แลก!',
+                        },
+                      ]}
+                    >
+                      <Input
+                        type='number'
+                        placeholder='กรอกแต้มที่ต้องใช้แลก'
+                        autoComplete='off'
+                        suffix='แต้ม'
+                        onChange={(e) => {
+                          checkNumber(e, 'score')
+                          setScore(e.target.value)
+                        }}
+                      />
+                    </Form.Item>
+                  ) : (
+                    <Form.Item name='score'>
+                      <p>{numberWithCommas(score) + ' ' + 'แต้ม'}</p>
+                    </Form.Item>
+                  )}
                 </div>
                 <div className='form-group col-lg-6'>
                   <label>
-                    จำนวน <span style={{ color: 'red' }}>*</span>
+                    จำนวน <span style={{ color: 'red' }}>(ต้องไม่น้อยกว่าที่แลกไป) *</span>
                   </label>
                   <Form.Item
                     name='amount'
@@ -417,8 +474,7 @@ function AddReward() {
                 <div className='row'>
                   <div className='col-lg-6'>
                     <label>
-                      วันเริ่มต้น
-                      <span style={{ color: color.Error }}>*</span>
+                      วันเริ่มต้น<span style={{ color: color.Error }}>*</span>
                     </label>
                     <div className='d-flex'>
                       <Form.Item
@@ -431,6 +487,7 @@ function AddReward() {
                         ]}
                       >
                         <DatePicker
+                          disabled
                           placeholder='เลือกวันที่'
                           onChange={(val) => {
                             setStartExchangeDate(val)
@@ -440,6 +497,7 @@ function AddReward() {
                       </Form.Item>
                       <Form.Item name='startExchangeTime' initialValue={moment('00:00', 'HH:mm')}>
                         <TimePicker
+                          disabled
                           format={'HH:mm'}
                           className='ms-3'
                           placeholder='เลือกเวลา'
@@ -454,8 +512,7 @@ function AddReward() {
                   </div>
                   <div className='col-lg-6'>
                     <label>
-                      วันสิ้นสุด
-                      <span style={{ color: color.Error }}>*</span>
+                      วันสิ้นสุด<span style={{ color: color.Error }}>*</span>
                     </label>
                     <div className='d-flex'>
                       <Form.Item
@@ -500,8 +557,7 @@ function AddReward() {
                 <div className='row'>
                   <div className='col-lg-6'>
                     <label>
-                      วันเริ่มต้น
-                      <span style={{ color: color.Error }}>*</span>
+                      วันเริ่มต้น<span style={{ color: color.Error }}>*</span>
                     </label>
                     <div className='d-flex'>
                       <Form.Item
@@ -514,15 +570,17 @@ function AddReward() {
                         ]}
                       >
                         <DatePicker
+                          disabled
                           placeholder='เลือกวันที่'
                           format={dateFormat}
                           onChange={(val) => {
-                            setStartUsedDate(val)
+                            setUsedDate(val)
                           }}
                         />
                       </Form.Item>
                       <Form.Item name='startUsedTime' initialValue={moment('00:00', 'HH:mm')}>
                         <TimePicker
+                          disabled
                           format={'HH:mm'}
                           className='ms-3'
                           placeholder='เลือกเวลา'
@@ -537,8 +595,7 @@ function AddReward() {
                   </div>
                   <div className='col-lg-6'>
                     <label>
-                      วันสิ้นสุด
-                      <span style={{ color: color.Error }}>*</span>
+                      วันสิ้นสุด<span style={{ color: color.Error }}>*</span>
                     </label>
                     <div className='d-flex'>
                       <Form.Item
@@ -646,8 +703,8 @@ function AddReward() {
                     className='d-flex flex-column'
                     onChange={(e) => setRewardStatus(e.target.value)}
                   >
-                    <Radio value={'DRAFTING'}>รอเปิดใช้งาน</Radio>
                     <Radio value={'ACTIVE'}>ใช้งาน</Radio>
+                    <Radio value={'INACTIVE'}>ปิดการใช้งาน</Radio>
                   </Radio.Group>
                 </Form.Item>
               </div>
@@ -667,12 +724,12 @@ function AddReward() {
         point={score}
         type={rewardType}
         endUseDateTime={endUsedDate}
+        endRedeemDateTime={EndExchangeDate}
         exChange={rewardExchange}
         countdownTime={result < 0 ? 0 : parseInt(result.toString())}
       />
     </div>
   )
-
   const onSubmit = () => {
     setBtnSaveDisable(true)
     const {
@@ -708,7 +765,7 @@ function AddReward() {
     } else {
       setRewardStatus(status)
     }
-    RewardDatasource.addReward({
+    const rewardData: RewardEntities = {
       rewardName: rewardName,
       rewardType: rewardType,
       rewardExchange: rewardExchange,
@@ -716,24 +773,30 @@ function AddReward() {
       amount: amount,
       description: description,
       condition: condition,
-      status: rewardStatus,
+      status: !rewardStatus ? status : rewardStatus,
       startExchangeDate:
         moment(startExchangeDate).format('YYYY-MM-DD') +
         ' ' +
         moment(startExchangeTime).format('HH:mm:ss'),
-      expiredExchangeDate:
-        moment(expiredExchangeDate).format('YYYY-MM-DD') +
-        ' ' +
-        moment(expiredExchangeTime).format('HH:mm:ss'),
+      expiredExchangeDate: expiredExchangeDate
+        ? moment(expiredExchangeDate).format('YYYY-MM-DD') +
+          ' ' +
+          moment(expiredExchangeTime).format('HH:mm:ss')
+        : moment(EndExchangeDate).format('YYYY-MM-DD') +
+          ' ' +
+          moment(EndExchangeTime).format('HH:mm:ss'),
       startUsedDate:
         moment(startUsedDate).format('YYYY-MM-DD') + ' ' + moment(startUsedTime).format('HH:mm:ss'),
-      expiredUsedDate:
-        moment(expiredUsedDate).format('YYYY-MM-DD') +
-        ' ' +
-        moment(expiredUsedTime).format('HH:mm:ss'),
-      file: createImgReward.file,
+      expiredUsedDate: expiredUsedDate
+        ? moment(expiredUsedDate).format('YYYY-MM-DD') +
+          ' ' +
+          moment(expiredUsedTime).format('HH:mm:ss')
+        : moment(endUsedDate).format('YYYY-MM-DD') + ' ' + moment(endUsedTime).format('HH:mm:ss'),
+      file: !createImgReward.file ? imgReward : createImgReward.file,
       createBy: profile.firstname + ' ' + profile.lastname,
-    })
+      application: 'DRONER'
+    }
+    RewardDatasource.updateReward(queryString[1], rewardData)
       .then((res) => {
         setBtnSaveDisable(false)
         Swal.fire({
@@ -742,7 +805,7 @@ function AddReward() {
           timer: 1500,
           showConfirmButton: false,
         }).then((time) => {
-          navigate('/IndexReward')
+          navigate('/IndexRewardDroner')
         })
       })
       .catch((err) => {
@@ -765,7 +828,7 @@ function AddReward() {
           }}
         />
         <span className='pt-3'>
-          <strong style={{ fontSize: '20px' }}>เพิ่มของรางวัล</strong>
+          <strong style={{ fontSize: '20px' }}>แก้ไขของรางวัล</strong>
         </span>
       </Row>
       <Row className='d-flex justify-content-around'>
@@ -782,4 +845,4 @@ function AddReward() {
   )
 }
 
-export default AddReward
+export default EditRewardDroner

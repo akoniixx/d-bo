@@ -22,6 +22,7 @@ export class RewardDatasource {
     data.startUsedDate && formData.append('startUsedDate', data.startUsedDate)
     data.expiredUsedDate && formData.append('expiredUsedDate', data.expiredUsedDate)
     formData.append('file', data.file)
+    formData.append('application', data.application)
     return httpClient
       .post(BASE_URL + '/promotion/reward/upload', formData)
       .then((res) => {
@@ -40,6 +41,7 @@ export class RewardDatasource {
     search?: string,
     sortDirection?: string,
     sortField?: string,
+    application?: string
   ): Promise<GetAllRewardEntities> {
     const params = {
       take: take,
@@ -52,6 +54,7 @@ export class RewardDatasource {
       search: search,
       sortDirection: sortDirection,
       sortField: sortField,
+      application: application
     }
     return httpClient
       .get(BASE_URL + '/promotion/reward/queryall', {
@@ -108,6 +111,8 @@ export class RewardDatasource {
       formData.append('expiredUsedDate', data.expiredUsedDate)
     }
     formData.append('file', data.file)
+    formData.append('application', data.application)
+
     return httpClient
       .patch(BASE_URL + `/promotion/reward/update/${id}`, formData)
       .then((res) => {

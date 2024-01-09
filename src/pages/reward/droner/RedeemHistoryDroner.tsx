@@ -17,7 +17,7 @@ import {
 } from '../../../definitions/Status'
 
 const _ = require('lodash')
-function RedeemHistory() {
+function RedeemHistoryDroner() {
   const queryString = _.split(window.location.pathname, '=')
   const { RangePicker } = DatePicker
   const [data, setData] = useState<GetAllDronerRewardHistoryEntities>()
@@ -333,4 +333,4 @@ function RedeemHistory() {
     </>
   )
 }
-export default RedeemHistory
+export default RedeemHistoryDroner

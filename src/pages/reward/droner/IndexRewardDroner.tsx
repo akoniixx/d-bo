@@ -41,7 +41,7 @@ import { GetAllRewardEntities } from '../../../entities/RewardEntites'
 import { UploadImageDatasouce } from '../../../datasource/UploadImageDatasource'
 import { REWARD_STATUS } from '../../../definitions/Status'
 
-function IndexReward() {
+function IndexRewardDroner() {
   const navigate = useNavigate()
   const { RangePicker } = DatePicker
   const dateFormat = 'DD/MM/YYYY'
@@ -292,7 +292,7 @@ function IndexReward() {
               padding: '8px',
             }}
           >
-            <strong>ของรางวัลนักบินโดรน</strong>
+            <strong>รายการของรางวัล (นักบินโดรน)</strong>
           </span>
         </div>
         <div className='col-lg'>
@@ -311,7 +311,7 @@ function IndexReward() {
               color: color.secondary2,
               backgroundColor: color.Success,
             }}
-            onClick={() => navigate('/AddReward')}
+            onClick={() => navigate('/AddRewardDroner')}
           >
             + เพิ่มของรางวัล
           </Button>
@@ -941,14 +941,14 @@ function IndexReward() {
                     />
                   }
                   color={color.primary1}
-                  onClick={() => navigate('/RedeemHistory/id=' + row.id)}
+                  onClick={() => navigate('/RedeemHistoryDroner/id=' + row.id)}
                 />
               </div>
               <div className='col-lg-4'>
                 <ActionButton
                   icon={<EditOutlined />}
                   color={color.primary1}
-                  onClick={() => navigate('/EditReward/id=' + row.id)}
+                  onClick={() => navigate('/EditRewardDroner/id=' + row.id)}
                 />
               </div>
               <div>
@@ -1042,4 +1042,4 @@ function IndexReward() {
     </>
   )
 }
-export default IndexReward
+export default IndexRewardDroner
