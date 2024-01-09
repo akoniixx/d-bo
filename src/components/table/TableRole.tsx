@@ -1,6 +1,5 @@
-import { Checkbox, Table } from 'antd'
 import TableSubRole from './TableSubRole'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import TableHeaderRole from './TableHeaderRole'
 import { redeemHeaderPoint, reportHeaderPoint } from '../../pages/permission/DefaultRole'
 
@@ -60,8 +59,6 @@ function TableRole({
   const [challenge, setChallenge] = useState(dataChallenge[0].value.challenge)
   const [reportPoint, setReportPoint] = useState(dataReportPoint[0].value.subPointResult)
   const [redeemPoint, setRedeemPoint] = useState(dataRedeemPoint[0].value.subPointResult)
-  const [headReportPoint, setHeadReportPoint] = useState(reportHeaderPoint)
-  const [headRedeemPoint, setHeadRedeemPoint] = useState(redeemHeaderPoint)
 
   const [followJobHeader, setFollowHeader] = useState<boolean[]>(new Array(6).fill(true))
   const [farmerHeader, setFarmerHeader] = useState<boolean[]>(new Array(6).fill(true))
@@ -70,7 +67,6 @@ function TableRole({
   const [rewardHeader, setRewardHeader] = useState<boolean[]>(new Array(6).fill(true))
   const [missionHeader, setMissionHeader] = useState<boolean[]>(new Array(6).fill(true))
   const [promotionHeader, setPromotionHeader] = useState<boolean[]>(new Array(6).fill(true))
-  // const [pointResultHeader, setPointResultHeader] = useState<boolean[]>(new Array(6).fill(true))
   const [adminHeader, setAdminHeader] = useState<boolean[]>(new Array(6).fill(true))
   const [settingHeader, setSettingHeader] = useState<boolean[]>(new Array(6).fill(true))
   const [pointHeader, setPointHeader] = useState<boolean[]>(new Array(6).fill(true))
@@ -79,7 +75,7 @@ function TableRole({
   const [redeemPointHeader, setRedeemPointHeader] = useState<boolean[]>(new Array(6).fill(true))
   const [headerAllPoint, setHeaderAllPoint] = useState<boolean[]>(new Array(6).fill(true))
 
-  const onChangeHeader = (header: string, category: string, value: boolean, row: any) => {
+  const onChangeHeader = (header: string, category: string, value: boolean) => {
     const dataMap: any = {
       ติดตามงาน: {
         data: followJob,
@@ -211,8 +207,8 @@ function TableRole({
         showHeader={true}
         header='ติดตามงาน'
         data={dataJob}
-        onChange={(data, key, checked, index, row) => {
-          onChangeHeader(data, key, checked, row)
+        onChange={(data, key, checked, index) => {
+          onChangeHeader(data, key, checked)
         }}
         stateHeader={followJobHeader}
         subColumns={
@@ -235,8 +231,8 @@ function TableRole({
         showHeader={false}
         header='ข้อมูลเกษตรกร'
         data={dataFarmer}
-        onChange={(data, key, checked, index, row) => {
-          onChangeHeader(data, key, checked, row)
+        onChange={(data, key, checked, index) => {
+          onChangeHeader(data, key, checked)
         }}
         stateHeader={farmerHeader}
         subColumns={
@@ -259,8 +255,8 @@ function TableRole({
         showHeader={false}
         header='ข้อมูลนักบินโดรน'
         data={dataDroner}
-        onChange={(data, key, checked, index, row) => {
-          onChangeHeader(data, key, checked, row)
+        onChange={(data, key, checked, index) => {
+          onChangeHeader(data, key, checked)
         }}
         stateHeader={dronerHeader}
         subColumns={
@@ -283,8 +279,8 @@ function TableRole({
         showHeader={false}
         header='ข่าวสาร / กูรูเกษตร'
         data={dataGuru}
-        onChange={(data, key, checked, index, row) => {
-          onChangeHeader(data, key, checked, row)
+        onChange={(data, key, checked, index) => {
+          onChangeHeader(data, key, checked)
         }}
         stateHeader={guruHeader}
         subColumns={
@@ -307,8 +303,8 @@ function TableRole({
         showHeader={false}
         header='โปรโมชั่น'
         data={dataPromotion}
-        onChange={(data, key, checked, index, row) => {
-          onChangeHeader(data, key, checked, row)
+        onChange={(data, key, checked, index) => {
+          onChangeHeader(data, key, checked)
         }}
         stateHeader={promotionHeader}
         subColumns={
@@ -331,8 +327,33 @@ function TableRole({
         showHeader={false}
         header='แต้มสะสม'
         data={dataPointResult}
-        onChange={(data, key, checked, index, row) => {
-          onChangeHeader(data, key, checked, row)
+        onChange={(data, key, checked, index) => {
+          const checkHeader = reportPoint.map((item: any) => {
+            return (item[key].value = checked)
+          })
+          const result = checkHeader.includes(false)
+          reportPointHeader[method.indexOf(key)] = result
+          setReportPoint(reportPoint)
+          setReportPointHeader([...reportPointHeader])
+          const checkHeaderRedeem = redeemPoint.map((item: any) => {
+            return (item[key].value = checked)
+          })
+          const resultRedeem = checkHeaderRedeem.includes(false)
+          redeemPointHeader[method.indexOf(key)] = resultRedeem
+          setRedeemPoint(redeemPoint)
+          setRedeemPointHeader([...redeemPointHeader])
+          onChangeHeader(data, key, checked)
+          if (checked) {
+            reportPointHeader[method.indexOf(key)] = false
+            setReportPointHeader([...reportPointHeader])
+            redeemPointHeader[method.indexOf(key)] = false
+            setRedeemPointHeader([...redeemPointHeader])
+          } else {
+            reportPointHeader[method.indexOf(key)] = true
+            setReportPointHeader([...reportPointHeader])
+            redeemPointHeader[method.indexOf(key)] = true
+            setRedeemPointHeader([...redeemPointHeader])
+          }
         }}
         stateHeader={headerAllPoint}
         subColumns={
@@ -340,9 +361,19 @@ function TableRole({
             <TableHeaderRole
               showHeader={false}
               header='รายงานแต้ม'
-              data={headReportPoint}
-              onChange={(data, key, checked, index, row) => {
-                onChangeHeader(data, key, checked, row)
+              data={reportHeaderPoint}
+              onChange={(data, key, checked, index) => {
+                onChangeHeader(data, key, checked)
+                if (
+                  !reportPointHeader[method.indexOf(key)] &&
+                  !redeemPointHeader[method.indexOf(key)]
+                ) {
+                  headerAllPoint[method.indexOf(key)] = false
+                  setHeaderAllPoint([...headerAllPoint])
+                } else {
+                  headerAllPoint[method.indexOf(key)] = true
+                  setHeaderAllPoint([...headerAllPoint])
+                }
               }}
               stateHeader={reportPointHeader}
               subColumns={
@@ -357,10 +388,6 @@ function TableRole({
                     reportPointHeader[method.indexOf(key)] = result
                     setReportPoint(reportPoint)
                     setReportPointHeader([...reportPointHeader])
-                    console.log(
-                      !reportPointHeader[method.indexOf(key)],
-                      !redeemPointHeader[method.indexOf(key)],
-                    )
                     if (
                       !reportPointHeader[method.indexOf(key)] &&
                       !redeemPointHeader[method.indexOf(key)]
@@ -378,9 +405,19 @@ function TableRole({
             <TableHeaderRole
               showHeader={false}
               header='แลกแต้ม/ของรางวัล'
-              data={headRedeemPoint}
-              onChange={(data, key, checked, index, row) => {
-                onChangeHeader(data, key, checked, row)
+              data={redeemHeaderPoint}
+              onChange={(data, key, checked, index) => {
+                onChangeHeader(data, key, checked)
+                if (
+                  !reportPointHeader[method.indexOf(key)] &&
+                  !redeemPointHeader[method.indexOf(key)]
+                ) {
+                  headerAllPoint[method.indexOf(key)] = false
+                  setHeaderAllPoint([...headerAllPoint])
+                } else {
+                  headerAllPoint[method.indexOf(key)] = true
+                  setHeaderAllPoint([...headerAllPoint])
+                }
               }}
               stateHeader={redeemPointHeader}
               subColumns={
@@ -395,10 +432,6 @@ function TableRole({
                     redeemPointHeader[method.indexOf(key)] = result
                     setRedeemPoint(redeemPoint)
                     setRedeemPointHeader([...redeemPointHeader])
-                    console.log(
-                      !reportPointHeader[method.indexOf(key)],
-                      !redeemPointHeader[method.indexOf(key)],
-                    )
                     if (
                       !reportPointHeader[method.indexOf(key)] &&
                       !redeemPointHeader[method.indexOf(key)]
@@ -420,8 +453,8 @@ function TableRole({
         showHeader={false}
         header='ของรางวัล'
         data={dataReward}
-        onChange={(data, key, checked, index, row) => {
-          onChangeHeader(data, key, checked, row)
+        onChange={(data, key, checked, index) => {
+          onChangeHeader(data, key, checked)
         }}
         stateHeader={rewardHeader}
         subColumns={
@@ -444,8 +477,8 @@ function TableRole({
         showHeader={false}
         header='ภารกิจ'
         data={dataMission}
-        onChange={(data, key, checked, index, row) => {
-          onChangeHeader(data, key, checked, row)
+        onChange={(data, key, checked, index) => {
+          onChangeHeader(data, key, checked)
         }}
         stateHeader={missionHeader}
         subColumns={
@@ -468,8 +501,8 @@ function TableRole({
         showHeader={false}
         header='ชาเลนจ์'
         data={dataChallenge}
-        onChange={(data, key, checked, index, row) => {
-          onChangeHeader(data, key, checked, row)
+        onChange={(data, key, checked, index) => {
+          onChangeHeader(data, key, checked)
         }}
         stateHeader={challengeHeader}
         subColumns={
@@ -492,8 +525,8 @@ function TableRole({
         showHeader={false}
         header='ผู้ดูแลระบบ'
         data={dataAdmin}
-        onChange={(data, key, checked, index, row) => {
-          onChangeHeader(data, key, checked, row)
+        onChange={(data, key, checked, index) => {
+          onChangeHeader(data, key, checked)
         }}
         stateHeader={adminHeader}
         subColumns={
@@ -516,8 +549,8 @@ function TableRole({
         showHeader={false}
         header='ตั้งค่า'
         data={dataSetting}
-        onChange={(data, key, checked, index, row) => {
-          onChangeHeader(data, key, checked, row)
+        onChange={(data, key, checked, index) => {
+          onChangeHeader(data, key, checked)
         }}
         stateHeader={settingHeader}
         subColumns={
@@ -540,8 +573,8 @@ function TableRole({
         showHeader={false}
         header='แต้ม'
         data={dataPoint}
-        onChange={(data, key, checked, index, row) => {
-          onChangeHeader(data, key, checked, row)
+        onChange={(data, key, checked, index) => {
+          onChangeHeader(data, key, checked)
         }}
         stateHeader={pointHeader}
         subColumns={

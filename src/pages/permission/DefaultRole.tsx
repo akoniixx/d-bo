@@ -178,15 +178,15 @@ const reportHeaderPoint = [
     sub: false,
     subItem: [],
     view: {
-      value: true,
+      value:false,
       disabled: false,
     },
     add: {
-      value: true,
+      value:false,
       disabled: false,
     },
     edit: {
-      value: true,
+      value:false,
       disabled: false,
     },
     delete: {
@@ -194,7 +194,7 @@ const reportHeaderPoint = [
       disabled: true,
     },
     cancel: {
-      value: true,
+      value:false,
       disabled: false,
     },
     excel: {
@@ -209,15 +209,15 @@ const redeemHeaderPoint = [
     sub: false,
     subItem: [],
     view: {
-      value: true,
+      value: false,
       disabled: false,
     },
     add: {
-      value: true,
+      value: false,
       disabled: false,
     },
     edit: {
-      value: true,
+      value: false,
       disabled: false,
     },
     delete: {
@@ -225,12 +225,12 @@ const redeemHeaderPoint = [
       disabled: true,
     },
     cancel: {
-      value: true,
+      value: false,
       disabled: false,
     },
     excel: {
       value: false,
-      disabled: true,
+      disabled: false,
     },
   },
 ]
