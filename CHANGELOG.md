@@ -1,5 +1,14 @@
 ## [Version - 0]
 
+## improve [v0.42.8] 2024-1-9
+
+- change status in edit task
+- call api download file droner 1-finity
+
+## Fix [v0.42.7] 2023-12-27
+
+- fix placeholder not showed
+
 ## Fix [v0.42.6] 2023-12-27
 
 - fixed credit when less than 0
@@ -8,7 +17,6 @@
 
 - added credit list for droner 1finity
 - add crud for droner 1finity
-
 
 ## Fix [v0.42.4] 2023-12-26
 
