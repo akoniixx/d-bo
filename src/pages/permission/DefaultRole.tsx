@@ -27,7 +27,30 @@ export interface RoleObject {
   }
   subItem: any[]
 }
-
+export interface ConvertedDataType {
+  name: string
+  value: {
+    [key: string]: any
+  }
+}
+export interface TableRoleProps {
+  page: string
+  dataJob: ConvertedDataType[]
+  dataFarmer: ConvertedDataType[]
+  dataDroner: ConvertedDataType[]
+  dataGuru: ConvertedDataType[]
+  dataReward: ConvertedDataType[]
+  dataMission: ConvertedDataType[]
+  dataPromotion: ConvertedDataType[]
+  dataPointResult: ConvertedDataType[]
+  dataAdmin: ConvertedDataType[]
+  dataSetting: ConvertedDataType[]
+  dataPoint: ConvertedDataType[]
+  dataChallenge: ConvertedDataType[]
+  dataReportPoint: ConvertedDataType[]
+  dataRedeemPoint: ConvertedDataType[]
+}
+export const method = ['view', 'add', 'edit', 'delete', 'cancel', 'excel']
 const tacking = [
   'งานใหม่ (รอนักบิน)',
   'งานรอดำเนินงาน',

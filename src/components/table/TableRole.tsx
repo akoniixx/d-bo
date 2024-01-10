@@ -1,33 +1,15 @@
 import TableSubRole from './TableSubRole'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import TableHeaderRole from './TableHeaderRole'
-import { redeemHeaderPoint, reportHeaderPoint } from '../../pages/permission/DefaultRole'
-
-export interface ConvertedDataType {
-  name: string
-  value: {
-    [key: string]: any
-  }
-}
-interface TableRoleProps {
-  dataJob: ConvertedDataType[]
-  dataFarmer: ConvertedDataType[]
-  dataDroner: ConvertedDataType[]
-  dataGuru: ConvertedDataType[]
-  dataReward: ConvertedDataType[]
-  dataMission: ConvertedDataType[]
-  dataPromotion: ConvertedDataType[]
-  dataPointResult: ConvertedDataType[]
-  dataAdmin: ConvertedDataType[]
-  dataSetting: ConvertedDataType[]
-  dataPoint: ConvertedDataType[]
-  dataChallenge: ConvertedDataType[]
-  dataReportPoint: ConvertedDataType[]
-  dataRedeemPoint: ConvertedDataType[]
-}
-export const method = ['view', 'add', 'edit', 'delete', 'cancel', 'excel']
+import {
+  TableRoleProps,
+  method,
+  redeemHeaderPoint,
+  reportHeaderPoint,
+} from '../../pages/permission/DefaultRole'
 
 function TableRole({
+  page,
   dataJob,
   dataFarmer,
   dataDroner,
@@ -93,7 +75,7 @@ function TableRole({
         setState: setDroner,
         setHeaderState: setDronerHeader,
       },
-      'ข่าวสาร / กรูรูเกษตร': {
+      'ข่าวสาร / กูรูเกษตร': {
         data: guru,
         headerState: guruHeader,
         setState: setGuru,
@@ -175,6 +157,322 @@ function TableRole({
     setHeaderState([...headerState])
     setState(res)
   }
+
+  useEffect(() => {
+    if (page === 'edit') {
+      const checkAllHeadJob = () => {
+        if (
+          Array.isArray(dataJob) &&
+          dataJob.length > 0 &&
+          Array.isArray(dataJob[0].value.followJob)
+        ) {
+          const updatedFollowJobHeader = [...followJobHeader]
+          dataJob[0].value.followJob.forEach((job, index) => {
+            method.forEach((key, idx) => {
+              if (job[key].disabled === true) {
+                job[key].value = false
+              } else {
+                updatedFollowJobHeader[idx] = !job[key].value
+              }
+            })
+          })
+
+          setFollowHeader(updatedFollowJobHeader)
+        }
+      }
+      const checkAllHeadFarmer = () => {
+        if (
+          Array.isArray(dataFarmer) &&
+          dataFarmer.length > 0 &&
+          Array.isArray(dataFarmer[0].value.farmerJob)
+        ) {
+          const updatedFollowJobHeader = [...farmerHeader]
+          dataFarmer[0].value.farmerJob.forEach((job, index) => {
+            method.forEach((key, idx) => {
+              if (job[key].disabled === true) {
+                job[key].value = false
+              } else {
+                updatedFollowJobHeader[idx] = !job[key].value
+              }
+            })
+          })
+
+          setFarmerHeader(updatedFollowJobHeader)
+        }
+      }
+      const checkAllHeadDroner = () => {
+        if (
+          Array.isArray(dataDroner) &&
+          dataDroner.length > 0 &&
+          Array.isArray(dataDroner[0].value.dronerJob)
+        ) {
+          const updatedFollowJobHeader = [...farmerHeader]
+
+          dataDroner[0].value.dronerJob.forEach((job, index) => {
+            method.forEach((key, idx) => {
+              if (job[key].disabled === true) {
+                job[key].value = false
+              } else {
+                updatedFollowJobHeader[idx] = !job[key].value
+              }
+            })
+          })
+
+          setDronerHeader(updatedFollowJobHeader)
+        }
+      }
+      const checkAllHeadGuru = () => {
+        if (
+          Array.isArray(dataGuru) &&
+          dataGuru.length > 0 &&
+          Array.isArray(dataGuru[0].value.guru)
+        ) {
+          const updatedFollowJobHeader = [...guruHeader]
+
+          dataGuru[0].value.guru.forEach((job, index) => {
+            method.forEach((key, idx) => {
+              if (job[key].disabled === true) {
+                job[key].value = false
+              } else {
+                updatedFollowJobHeader[idx] = !job[key].value
+              }
+            })
+          })
+
+          setGuruHeader(updatedFollowJobHeader)
+        }
+      }
+      const checkAllHeadMission = () => {
+        if (
+          Array.isArray(dataMission) &&
+          dataMission.length > 0 &&
+          Array.isArray(dataMission[0].value.mission)
+        ) {
+          const updatedFollowJobHeader = [...missionHeader]
+
+          dataMission[0].value.mission.forEach((job, index) => {
+            method.forEach((key, idx) => {
+              if (job[key].disabled === true) {
+                job[key].value = false
+              } else {
+                updatedFollowJobHeader[idx] = !job[key].value
+              }
+            })
+          })
+
+          setMissionHeader(updatedFollowJobHeader)
+        }
+      }
+      const checkAllHeadChallenge = () => {
+        if (
+          Array.isArray(dataChallenge) &&
+          dataChallenge.length > 0 &&
+          Array.isArray(dataChallenge[0].value.challenge)
+        ) {
+          const updatedFollowJobHeader = [...challengeHeader]
+
+          dataChallenge[0].value.challenge.forEach((job, index) => {
+            method.forEach((key, idx) => {
+              if (job[key].disabled === true) {
+                job[key].value = false
+              } else {
+                updatedFollowJobHeader[idx] = !job[key].value
+              }
+            })
+          })
+
+          setChallengeHeader(updatedFollowJobHeader)
+        }
+      }
+      const checkAllHeadReward = () => {
+        if (
+          Array.isArray(dataReward) &&
+          dataReward.length > 0 &&
+          Array.isArray(dataReward[0].value.reward)
+        ) {
+          const updatedFollowJobHeader = [...rewardHeader]
+
+          dataReward[0].value.reward.forEach((job, index) => {
+            method.forEach((key, idx) => {
+              if (job[key].disabled === true) {
+                job[key].value = false
+              } else {
+                updatedFollowJobHeader[idx] = !job[key].value
+              }
+            })
+          })
+
+          setRewardHeader(updatedFollowJobHeader)
+        }
+      }
+      const checkAllHeadAdmin = () => {
+        if (
+          Array.isArray(dataAdmin) &&
+          dataAdmin.length > 0 &&
+          Array.isArray(dataAdmin[0].value.admin)
+        ) {
+          const updatedFollowJobHeader = [...adminHeader]
+
+          dataAdmin[0].value.admin.forEach((job, index) => {
+            method.forEach((key, idx) => {
+              if (job[key].disabled === true) {
+                job[key].value = false
+              } else {
+                updatedFollowJobHeader[idx] = !job[key].value
+              }
+            })
+          })
+
+          setAdminHeader(updatedFollowJobHeader)
+        }
+      }
+      const checkAllHeadSetting = () => {
+        if (
+          Array.isArray(dataSetting) &&
+          dataSetting.length > 0 &&
+          Array.isArray(dataSetting[0].value.settings)
+        ) {
+          const updatedFollowJobHeader = [...settingHeader]
+
+          dataSetting[0].value.settings.forEach((job, index) => {
+            method.forEach((key, idx) => {
+              if (job[key].disabled === true) {
+                job[key].value = false
+              } else {
+                updatedFollowJobHeader[idx] = !job[key].value
+              }
+            })
+          })
+
+          setSettingHeader(updatedFollowJobHeader)
+        }
+      }
+      const checkAllHeadPoint = () => {
+        if (
+          Array.isArray(dataPoint) &&
+          dataPoint.length > 0 &&
+          Array.isArray(dataPoint[0].value.point)
+        ) {
+          const updatedFollowJobHeader = [...pointHeader]
+
+          dataPoint[0].value.point.forEach((job, index) => {
+            method.forEach((key, idx) => {
+              if (job[key].disabled === true) {
+                job[key].value = false
+              } else {
+                updatedFollowJobHeader[idx] = !job[key].value
+              }
+            })
+          })
+
+          setPointHeader(updatedFollowJobHeader)
+        }
+      }
+      const checkAllHeadPromotion = () => {
+        if (
+          Array.isArray(dataPromotion) &&
+          dataPromotion.length > 0 &&
+          Array.isArray(dataPromotion[0].value.promotion)
+        ) {
+          const updatedFollowJobHeader = [...promotionHeader]
+
+          dataPromotion[0].value.promotion.forEach((job, index) => {
+            method.forEach((key, idx) => {
+              if (job[key].disabled === true) {
+                job[key].value = false
+              } else {
+                updatedFollowJobHeader[idx] = !job[key].value
+              }
+            })
+          })
+
+          setPromotionHeader(updatedFollowJobHeader)
+        }
+      }
+      const checkAllHeadReportPoint = () => {
+        if (
+          Array.isArray(dataReportPoint) &&
+          dataReportPoint.length > 0 &&
+          Array.isArray(dataReportPoint[0].value.subPointResult)
+        ) {
+          const updatedFollowJobHeader = [...reportPointHeader]
+
+          dataReportPoint[0].value.subPointResult.forEach((job, index) => {
+            method.forEach((key, idx) => {
+              if (job[key].disabled === true) {
+                job[key].value = false
+              } else {
+                updatedFollowJobHeader[idx] = !job[key].value
+              }
+            })
+          })
+          setReportPointHeader(updatedFollowJobHeader)
+        }
+      }
+      const checkAllHeadRedeemPoint = () => {
+        if (
+          Array.isArray(dataRedeemPoint) &&
+          dataRedeemPoint.length > 0 &&
+          Array.isArray(dataRedeemPoint[0].value.subPointResult)
+        ) {
+          const updatedFollowJobHeader = [...redeemPointHeader]
+
+          dataRedeemPoint[0].value.subPointResult.forEach((job, index) => {
+            method.forEach((key, idx) => {
+              if (job[key].disabled === true) {
+                job[key].value = false
+              } else {
+                updatedFollowJobHeader[idx] = !job[key].value
+              }
+            })
+          })
+          setRedeemPointHeader(updatedFollowJobHeader)
+        }
+      }
+
+      checkAllHeadJob()
+      checkAllHeadFarmer()
+      checkAllHeadDroner()
+      checkAllHeadGuru()
+      checkAllHeadMission()
+      checkAllHeadChallenge()
+      checkAllHeadReward()
+      checkAllHeadAdmin()
+      checkAllHeadSetting()
+      checkAllHeadPoint()
+      checkAllHeadPromotion()
+      checkAllHeadReportPoint()
+      checkAllHeadRedeemPoint()
+    }
+  }, [
+    dataJob,
+    dataDroner,
+    dataFarmer,
+    dataGuru,
+    dataMission,
+    dataChallenge,
+    dataReward,
+    dataAdmin,
+    dataSetting,
+    dataPoint,
+    dataPromotion,
+    dataReportPoint,
+    dataRedeemPoint,
+  ])
+  useEffect(() => {
+    const checkAllHeadPointResult = () => {
+      method.forEach((key) => {
+        if (!reportPointHeader[method.indexOf(key)] && !redeemPointHeader[method.indexOf(key)]) {
+          headerAllPoint[method.indexOf(key)] = false
+          setHeaderAllPoint([...headerAllPoint])
+        } else {
+          headerAllPoint[method.indexOf(key)] = true
+          setHeaderAllPoint([...headerAllPoint])
+        }
+      })
+    }
+    checkAllHeadPointResult()
+  }, [reportPointHeader, redeemPointHeader])
 
   return (
     <div className='pt-3'>

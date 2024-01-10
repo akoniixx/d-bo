@@ -1,4 +1,4 @@
-import { Button, Input, Pagination, Table } from 'antd'
+import { Button, Input, Pagination, Spin, Table } from 'antd'
 import React, { useEffect, useState } from 'react'
 import { color } from '../../resource'
 import {
@@ -19,7 +19,6 @@ function IndexPermission() {
   const navigate = useNavigate()
   const [modalDelete, setModalDelete] = useState<boolean>(false)
   const [loading, setLoading] = useState<boolean>(false)
-  const [permissionDelete, setPermissionDelete] = useState<any>()
   const [sortField, setSortField] = useState<any>()
   const [sortDirection, setSortDirection] = useState<string | undefined>(undefined)
   const [sortDirection1, setSortDirection1] = useState<string | undefined>(undefined)
@@ -199,7 +198,9 @@ function IndexPermission() {
         </div>
       </div>
       <div className='pt-3'>
-        <Table columns={columns} dataSource={data?.data} pagination={false} />
+        <Spin tip='กำลังโหลดข้อมูล...' size='large' spinning={loading}>
+          <Table columns={columns} dataSource={data?.data} pagination={false} />
+        </Spin>
       </div>
       <div className='d-flex justify-content-between pt-3 pb-3'>
         <p>รายการทั้งหมด {data?.count} รายการ</p>

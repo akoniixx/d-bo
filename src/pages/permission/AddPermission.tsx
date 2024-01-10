@@ -1,5 +1,5 @@
 /* eslint-disable no-case-declarations */
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { BackIconButton } from '../../components/button/BackButton'
 import { useNavigate } from 'react-router-dom'
 import { Checkbox, Form, Input, Row, Table } from 'antd'
@@ -24,12 +24,11 @@ import {
 } from './DefaultRole'
 import TableRole from '../../components/table/TableRole'
 import { RoleManage } from '../../datasource/RoleManageDatasource'
-import { RoleEntity, RoleEntity_INIT } from '../../entities/RoleEntities'
 
 function AddPermission() {
   const navigate = useNavigate()
   const [role, setRole] = useState<string>('')
-  const [insertRole, setInsertRole] = useState<any>()
+  const [saveBtnDisable, setSaveBtnDisable] = useState<boolean>(true)
   const [followjobs, setFollowjobs] = useState({
     name: 'ติดตามงาน',
     value: followJob,
@@ -86,6 +85,7 @@ function AddPermission() {
     name: 'แลกแต้ม/ของรางวัล',
     value: pointJob.pointResult[1].subItem,
   })
+
   const permissionData = (
     <div className='pt-1'>
       <CardContainer>
@@ -106,7 +106,10 @@ function AddPermission() {
             >
               <Input
                 placeholder='กรอกชื่อบทบาท'
-                onChange={(e) => setRole(e.target.value)}
+                onChange={(e) => {
+                  setRole(e.target.value)
+                  setSaveBtnDisable(e.target.value ? false : true)
+                }}
                 autoComplete='off'
               />
             </Form.Item>
@@ -115,7 +118,9 @@ function AddPermission() {
       </CardContainer>
     </div>
   )
+
   const insertPermission = async () => {
+    setSaveBtnDisable(true)
     const payload: any = {}
     payload.role = role
     payload.followJob = followjobs.value?.followJob
@@ -130,19 +135,24 @@ function AddPermission() {
     payload.settings = settings.value?.settings
     payload.point = point.value?.point
     payload.promotion = promotion.value?.promotion
-    setInsertRole(payload)
-     await RoleManage.insertRole(payload).then((res) => {
-      if (res) {
-        Swal.fire({
-          title: 'บันทึกสำเร็จ',
-          icon: 'success',
-          timer: 1500,
-          showConfirmButton: false,
-        }).then(() => {
-          navigate('/IndexPermission')
-        })
-      }
-    })
+    await RoleManage.insertRole(payload)
+      .then((res) => {
+        setSaveBtnDisable(false)
+        if (res) {
+          Swal.fire({
+            title: 'บันทึกสำเร็จ',
+            icon: 'success',
+            timer: 1500,
+            showConfirmButton: false,
+          }).then(() => {
+            navigate('/IndexPermission')
+          })
+        }
+      })
+      .catch((err) => {
+        setSaveBtnDisable(false)
+        console.log(err)
+      })
   }
 
   return (
@@ -155,6 +165,7 @@ function AddPermission() {
       </Row>
       {permissionData}
       <TableRole
+        page='add'
         dataJob={[followjobs]}
         dataFarmer={[farmerInfo]}
         dataDroner={[dronerInfo]}
@@ -173,7 +184,7 @@ function AddPermission() {
       <FooterPage
         onClickBack={() => navigate(-1)}
         onClickSave={insertPermission}
-        // disableSaveBtn={saveBtnDisable}
+        disableSaveBtn={saveBtnDisable}
       />
     </div>
   )

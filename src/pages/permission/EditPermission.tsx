@@ -2,15 +2,12 @@ import React, { useEffect, useState } from 'react'
 import { BackIconButton } from '../../components/button/BackButton'
 import { useNavigate } from 'react-router-dom'
 import { Checkbox, Form, Input, Row, Table } from 'antd'
-import color from '../../resource/color'
 import { CardHeader } from '../../components/header/CardHearder'
 import { CardContainer } from '../../components/card/CardContainer'
 import FooterPage from '../../components/footer/FooterPage'
 import Swal from 'sweetalert2'
 import { RoleManage } from '../../datasource/RoleManageDatasource'
-import { RoleEntity, RoleEntity_INIT, listMenu, listMenu_INIT } from '../../entities/RoleEntities'
 import { numberWithCommas } from '../../utilities/TextFormatter'
-import { CheckboxChangeEvent } from 'antd/lib/checkbox'
 import TableRole from '../../components/table/TableRole'
 import {
   adminJob,
@@ -31,7 +28,7 @@ const _ = require('lodash')
 function EditPermission() {
   const queryString = _.split(window.location.pathname, '=')
   const roleId = queryString[1]
-  const [updateRole, setUpdateRole] = useState<RoleEntity>(RoleEntity_INIT)
+  const [saveBtnDisable, setSaveBtnDisable] = useState<boolean>(false)
 
   const navigate = useNavigate()
   const [followjobs, setFollowjobs] = useState({
@@ -222,6 +219,7 @@ function EditPermission() {
     </div>
   )
   const updatePermission = async () => {
+    setSaveBtnDisable(true)
     const payload: any = {}
     payload.id = roleId
     payload.role = form.getFieldValue('role')
@@ -238,18 +236,24 @@ function EditPermission() {
     payload.settings = settings.value?.settings
     payload.point = point.value?.point
     payload.promotion = promotion.value?.promotion
-    await RoleManage.updateRole(payload).then((res) => {
-      if (res) {
-        Swal.fire({
-          title: 'บันทึกสำเร็จ',
-          icon: 'success',
-          timer: 1500,
-          showConfirmButton: false,
-        }).then(() => {
-          navigate('/IndexPermission')
-        })
-      }
-    })
+    await RoleManage.updateRole(payload)
+      .then((res) => {
+        setSaveBtnDisable(false)
+        if (res) {
+          Swal.fire({
+            title: 'บันทึกสำเร็จ',
+            icon: 'success',
+            timer: 1500,
+            showConfirmButton: false,
+          }).then(() => {
+            navigate('/IndexPermission')
+          })
+        }
+      })
+      .catch((err) => {
+        setSaveBtnDisable(false)
+        console.log(err)
+      })
   }
 
   if (loading) {
@@ -265,6 +269,7 @@ function EditPermission() {
         </Row>
         {permissionData}
         <TableRole
+          page='edit'
           dataJob={[followjobs]}
           dataFarmer={[farmerInfo]}
           dataDroner={[dronerInfo]}
@@ -283,7 +288,7 @@ function EditPermission() {
         <FooterPage
           onClickBack={() => navigate(-1)}
           onClickSave={updatePermission}
-          // disableSaveBtn={saveBtnDisable}
+          disableSaveBtn={saveBtnDisable}
         />
       </div>
     )
