@@ -4,8 +4,8 @@ import { color } from '../../resource'
 import { LeftOutlined } from '@ant-design/icons'
 
 interface BackBackProps {
-  onClick?: () => void,
-  borderColor? : string
+  onClick?: () => void
+  borderColor?: string
   disableBtn?: boolean
 }
 

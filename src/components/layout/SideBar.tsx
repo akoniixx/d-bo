@@ -220,11 +220,26 @@ export const pathLists = (isAccounting: boolean, isAdminTask?: boolean) => {
       permission: null,
       subMenu: [
         {
-          path: '/IndexReward',
-          name: 'IndexReward',
-          title: 'นักบินโดรน',
+          path: 'listReward',
+          name: 'listReward',
+          title: 'รายการของรางวัล',
           permission: null,
-          subMenu: [],
+          subMenu: [
+            {
+              path: '/IndexRewardDroner',
+              name: 'IndexRewardDroner',
+              title: 'นักบินโดรน',
+              permission: null,
+              subMenu: [],
+            },
+            {
+              path: '/IndexRewardFarmer',
+              name: 'IndexRewardFarmer',
+              title: 'เกษตรกร',
+              permission: null,
+              subMenu: [],
+            },
+          ],
         },
       ],
     },

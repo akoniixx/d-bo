@@ -1,5 +1,9 @@
 ## [Version - 0]
 
+## Feature [v0.43.0] 2024-1-10
+
+- reward farmer menu
+
 ## improve [v0.42.8] 2024-1-9
 
 - change status in edit task

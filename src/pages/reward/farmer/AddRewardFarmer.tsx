@@ -21,7 +21,7 @@ import 'react-quill/dist/quill.snow.css'
 import '../../farmer/Style.css'
 const { Map } = require('immutable')
 
-function AddReward() {
+function AddRewardFarmer() {
   const profile = JSON.parse(localStorage.getItem('profile') || '{  }')
   const dateFormat = 'DD/MM/YYYY'
   const navigate = useNavigate()
@@ -667,6 +667,7 @@ function AddReward() {
         point={score}
         type={rewardType}
         endUseDateTime={endUsedDate}
+        endRedeemDateTime={EndExchangeDate}
         exChange={rewardExchange}
         countdownTime={result < 0 ? 0 : parseInt(result.toString())}
       />
@@ -733,6 +734,7 @@ function AddReward() {
         moment(expiredUsedTime).format('HH:mm:ss'),
       file: createImgReward.file,
       createBy: profile.firstname + ' ' + profile.lastname,
+      application: 'FARMER',
     })
       .then((res) => {
         setBtnSaveDisable(false)
@@ -742,7 +744,7 @@ function AddReward() {
           timer: 1500,
           showConfirmButton: false,
         }).then((time) => {
-          navigate('/IndexReward')
+          navigate('/IndexRewardFarmer')
         })
       })
       .catch((err) => {
@@ -782,4 +784,4 @@ function AddReward() {
   )
 }
 
-export default AddReward
+export default AddRewardFarmer

@@ -31,7 +31,7 @@ export const STATUS_COLOR_MAPPING: any = {
   DRAFTING: color.Grey,
 }
 
-export const STATUS_COLOR_CREDIT: any ={
+export const STATUS_COLOR_CREDIT: any = {
   PENDING: '#EA973E',
   APPROVE: color.Success,
   CANCEL: color.Error,
@@ -40,7 +40,7 @@ export const STATUS_COLOR_CREDIT: any ={
 export const STATUS_CREDIT_MAPPING: any = {
   PENDING: 'รอตรวจสอบ',
   APPROVE: 'อนุมัติ',
-  CANCEL: 'ยกเลิก'
+  CANCEL: 'ยกเลิก',
 }
 
 export const FARMER_STATUS_SEARCH = [
@@ -177,6 +177,13 @@ export const REWARD_REDEEM_HIS_STATUS = [
   { value: 'REQUEST', name: 'คำร้องขอแลก' },
   { value: 'PREPARE', name: 'เตรียมจัดส่ง' },
   { value: 'DONE', name: 'จัดส่งแล้ว' },
+  { value: 'CANCEL', name: 'ยกเลิก' },
+]
+export const REWARD_REDEEM_HIS_DIG_STATUS = [
+  { value: '', name: 'ทั้งหมด' },
+  { value: 'REQUEST', name: 'พร้อมใช้' },
+  { value: 'USED', name: 'ใช้แล้ว' },
+  { value: 'EXPIRED', name: 'หมดอายุ' },
   { value: 'CANCEL', name: 'ยกเลิก' },
 ]
 export const COLOR_QUOTA_REDEEM: any = {
