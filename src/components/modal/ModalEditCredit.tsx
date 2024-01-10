@@ -7,7 +7,7 @@ import icon from "../../resource/icon"
 import { numberWithCommas } from "../../utilities/TextFormatter"
 import { useQuery } from "react-query"
 import { CreditDronerDatasource } from "../../datasource/CreditDatasource"
-import upload_droner_infinity from '../../resource/media/empties/upload_droner_infinity.png'
+import upload_droner_infinity from '../../resource/media/empties/upload_Img_btn.png'
 import { DeleteOutlined } from "@ant-design/icons"
 import { Option } from "antd/lib/mentions"
 import { BookBankDatasource } from "../../datasource/BookBankDatasource"

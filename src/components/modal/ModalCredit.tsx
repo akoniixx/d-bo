@@ -7,7 +7,7 @@ import icon from "../../resource/icon"
 import { Option } from "antd/lib/mentions"
 import { useEffect, useState } from "react"
 import { numberWithCommas } from "../../utilities/TextFormatter"
-import upload_droner_infinity from '../../resource/media/empties/upload_droner_infinity.png'
+import upload_droner_infinity from '../../resource/media/empties/upload_Img_btn.png'
 import '../../pages/farmer/Style.css'
 import { useQuery } from "react-query"
 import { BookBankDatasource } from "../../datasource/BookBankDatasource"

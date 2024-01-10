@@ -179,6 +179,13 @@ export const REWARD_REDEEM_HIS_STATUS = [
   { value: 'DONE', name: 'จัดส่งแล้ว' },
   { value: 'CANCEL', name: 'ยกเลิก' },
 ]
+export const REWARD_REDEEM_HIS_DIG_STATUS = [
+  { value: '', name: 'ทั้งหมด' },
+  { value: 'REQUEST', name: 'พร้อมใช้' },
+  { value: 'USED', name: 'ใช้แล้ว' },
+  { value: 'EXPIRED', name: 'หมดอายุ' },
+  { value: 'CANCEL', name: 'ยกเลิก' },
+]
 export const COLOR_QUOTA_REDEEM: any = {
   REQUEST: color.secondary2,
   PREPARE: color.secondary1,

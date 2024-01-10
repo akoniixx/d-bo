@@ -83,6 +83,7 @@ function IndexRewardDroner() {
   const getAllReward = () => {
     setLoading(true)
     RewardDatasource.getAllReward(
+      'DRONER',
       row,
       current,
       startExchangeDate,

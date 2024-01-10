@@ -109,7 +109,7 @@ const EditDronerMission = () => {
     })
   }
   const fetchRewardList = () => {
-    RewardDatasource.getAllReward(0, 0, '', '', 'ACTIVE', ['PHYSICAL', 'DIGITAL'], 'MISSION').then(
+    RewardDatasource.getAllReward('DRONER',0, 0, '', '', 'ACTIVE', ['PHYSICAL', 'DIGITAL'], 'MISSION').then(
       (res) => {
         setRewardList(res)
       },

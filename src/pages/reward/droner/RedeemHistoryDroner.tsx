@@ -1,4 +1,4 @@
-import { SearchOutlined } from '@ant-design/icons'
+import { CaretDownOutlined, CaretUpOutlined, SearchOutlined } from '@ant-design/icons'
 import { Badge, Button, Checkbox, DatePicker, Input, Pagination, Select, Table } from 'antd'
 import moment from 'moment'
 import React, { useEffect, useState } from 'react'
@@ -11,6 +11,7 @@ import { numberWithCommas } from '../../../utilities/TextFormatter'
 import {
   COLOR_QUOTA_REDEEM,
   COLOR_QUOTA_REDEEM_DIG,
+  REWARD_REDEEM_HIS_DIG_STATUS,
   REWARD_REDEEM_HIS_STATUS,
   STATUS_QUOTA_REDEEM,
   STATUS_QUOTA_REDEEM_DIG,
@@ -33,6 +34,10 @@ function RedeemHistoryDroner() {
   const dateFormat = 'DD/MM/YYYY'
   const dateSearchFormat = 'YYYY-MM-DD'
   const navigate = useNavigate()
+  const [sortDirection1, setSortDirection1] = useState<string | undefined>(undefined)
+  const [sortDirection, setSortDirection] = useState<string | undefined>()
+  const [sortField, setSortField] = useState<string | undefined>()
+
   const fetchData = () => {
     RewardDatasource.getAllDronerRewardHistory(
       queryString[1],
@@ -42,13 +47,15 @@ function RedeemHistoryDroner() {
       endDate,
       status,
       searchText,
+      sortField,
+      sortDirection,
     ).then((res) => {
       setData(res)
     })
   }
   useEffect(() => {
     const getAllReward = () => {
-      RewardDatasource.getAllReward(0, 0).then((res) => {
+      RewardDatasource.getAllReward('DRONER', 0, 0).then((res) => {
         if (res.data) {
           const dataFilter = res.data.filter((x) => x.id === queryString[1])
           setDataRewardNo(dataFilter.map((x) => x.rewardNo)[0])
@@ -61,7 +68,7 @@ function RedeemHistoryDroner() {
   }, [])
   useEffect(() => {
     fetchData()
-  }, [current, startDate, endDate])
+  }, [current, startDate, endDate, sortDirection])
 
   const onChangePage = (page: number) => {
     setCurrent(page)
@@ -84,33 +91,14 @@ function RedeemHistoryDroner() {
   const onChangeStatus = (checkedValues: any) => {
     setStatus(checkedValues)
   }
-  const isNumber = (n: any) => {
-    return !isNaN(parseFloat(n)) && isFinite(n)
-  }
-  const sorter = (a: any, b: any) => {
-    if (a === null) {
-      return 1
-    }
-    if (b === null) {
-      return -1
-    }
-    if (isNumber(a) && isNumber(b)) {
-      if (parseInt(a, 10) === parseInt(b, 10)) {
-        return 0
-      }
-      return parseInt(a, 10) > parseInt(b, 10) ? 1 : -1
-    }
-    if (isNumber(a)) {
-      return -1
-    }
-    if (isNumber(b)) {
-      return 1
-    }
-    if (a === b) {
-      return 0
-    }
-    return a > b ? 1 : -1
-  }
+  const optionsToRender =
+    rewardType === 'DIGITAL' ? REWARD_REDEEM_HIS_DIG_STATUS : REWARD_REDEEM_HIS_STATUS
+
+  const renderOptions = optionsToRender.map((x) => (
+    <Select.Option key={x.value} value={x.value}>
+      {x.name}
+    </Select.Option>
+  ))
   const PageTitle = (
     <>
       <div className='container d-flex' style={{ padding: '8px' }}>
@@ -154,9 +142,7 @@ function RedeemHistoryDroner() {
             allowClear
             onChange={onChangeStatus}
           >
-            {REWARD_REDEEM_HIS_STATUS.map((x) => (
-              <Checkbox value={x.value}>{x.name}</Checkbox>
-            ))}
+            {renderOptions}
           </Select>
         </div>
         <div className='pt-1'>
@@ -177,10 +163,58 @@ function RedeemHistoryDroner() {
   )
   const columns = [
     {
-      title: 'วันที่อัพเดต',
+      title: () => {
+        return (
+          <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+            วันที่อัพเดต
+            <div
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                cursor: 'pointer',
+              }}
+              onClick={() => {
+                setSortField('updateAt')
+                setSortDirection((prev) => {
+                  if (prev === 'ASC') {
+                    return 'DESC'
+                  } else if (prev === undefined) {
+                    return 'ASC'
+                  } else {
+                    return undefined
+                  }
+                })
+                setSortDirection1((prev) => {
+                  if (prev === 'ASC') {
+                    return 'DESC'
+                  } else if (prev === undefined) {
+                    return 'ASC'
+                  } else {
+                    return undefined
+                  }
+                })
+              }}
+            >
+              <CaretUpOutlined
+                style={{
+                  position: 'relative',
+                  top: 2,
+                  color: sortDirection1 === 'ASC' ? '#ffca37' : 'white',
+                }}
+              />
+              <CaretDownOutlined
+                style={{
+                  position: 'relative',
+                  bottom: 2,
+                  color: sortDirection1 === 'DESC' ? '#ffca37' : 'white',
+                }}
+              />
+            </div>
+          </div>
+        )
+      },
       dataIndex: 'updateAt',
       key: 'updateAt',
-      sorter: (a: any, b: any) => sorter(a.updateAt, b.updateAt),
       render: (value: any, row: any, index: number) => {
         return {
           children: (
