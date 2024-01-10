@@ -69,4 +69,14 @@ export class RoleManage {
         console.log(err, 'err update role')
       })
   }
+  static getRoleOnly(): Promise<any> {
+    return httpClient
+      .get(BASE_URL + `/role-management/role-only`)
+      .then((response) => {
+        return response.data
+      })
+      .catch((err) => {
+        console.log(err, 'err roleById')
+      })
+  }
 }
