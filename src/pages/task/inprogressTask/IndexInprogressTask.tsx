@@ -193,6 +193,7 @@ const IndexInprogressTask = () => {
     }
     setApplicationType(arr)
   }
+
   const onShowSizeChange: PaginationProps['onShowSizeChange'] = (current, pageSize) => {
     setCurrent(current)
     setRow(pageSize)
