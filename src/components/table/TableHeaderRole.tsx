@@ -25,37 +25,18 @@ const TableHeaderRole: React.FC<TableHeaderRoleProps> = ({
   const [checkAllDelete, setCheckAllDelete] = useState<boolean>(false)
   const [checkAllCancel, setCheckAllCancel] = useState<boolean>(false)
   const [checkAllExcel, setCheckAllExcel] = useState<boolean>(false)
+  const [loading, setLoading] = useState<boolean>(true)
   const [sub, setSub] = useState<boolean>(false)
 
-  const checkAllTrue = (data:any) => {
-    if (data.length > 0 && data[0].value && data[0].value.followJob) {
-      const followJobs = data[0].value.followJob;
-        const allTrue = followJobs.every((job:any) => {
-        return (
-          job.view.value === true 
-        );
-      });
-  
-      return allTrue;
-    } else {
-      return false;
-    }
-  }
-  
-  const result = checkAllTrue(data);
-  console.log(result);
-
-  const onChangeHeader = (data: any, key: string, checked: boolean, index: number) => {
-    onChange(data, key, checked, index)
-  }
-
+  useEffect(() => {
+    setLoading(data ? false : true)
+  }, [data])
   const mergedArray = [
     'followJob',
     'farmerJob',
     'dronerJob',
     'guru',
     'promotion',
-    'pointResult',
     'reward',
     'mission',
     'challenge',
@@ -63,6 +44,10 @@ const TableHeaderRole: React.FC<TableHeaderRoleProps> = ({
     'settings',
     'point',
   ]
+
+  const onChangeHeader = (data: any, key: string, checked: boolean, index: number) => {
+    onChange(data, key, checked, index)
+  }
 
   const column = [
     {
@@ -82,13 +67,18 @@ const TableHeaderRole: React.FC<TableHeaderRoleProps> = ({
       key: 'view',
       width: '11%',
       render: (value: any, row: any, index: number) => {
+        mergedArray.forEach((name) => {
+          row?.value[name]?.some((job: any) => {
+            setCheckAllView(job.view.value)
+          })
+        })
         return {
           children: (
             <>
               <Checkbox
                 disabled={value?.disabled}
                 onChange={(e) => onChangeHeader(row.name, 'view', e.target.checked, index)}
-                checked={!stateHeader[method.indexOf('view')]}
+                checked={!stateHeader[method.indexOf('view')] || checkAllView}
               />
             </>
           ),
@@ -101,13 +91,18 @@ const TableHeaderRole: React.FC<TableHeaderRoleProps> = ({
       key: 'add',
       width: '11%',
       render: (value: any, row: any, index: number) => {
+        mergedArray.forEach((name) => {
+          row?.value[name]?.some((job: any) => {
+            setCheckAllAdd(job.add.value)
+          })
+        })
         return {
           children: (
             <>
               <Checkbox
                 disabled={value?.disabled}
                 onChange={(e) => onChangeHeader(row.name, 'add', e.target.checked, index)}
-                checked={value?.disabled ? false : !stateHeader[method.indexOf('add')]}
+                checked={!stateHeader[method.indexOf('add')] || checkAllAdd}
               />
             </>
           ),
@@ -120,13 +115,18 @@ const TableHeaderRole: React.FC<TableHeaderRoleProps> = ({
       key: 'edit',
       width: '11%',
       render: (value: any, row: any, index: number) => {
+        mergedArray.forEach((name) => {
+          row?.value[name]?.some((job: any) => {
+            setCheckAllEdit(job.edit.value)
+          })
+        })
         return {
           children: (
             <>
               <Checkbox
                 disabled={value?.disabled}
                 onChange={(e) => onChangeHeader(row.name, 'edit', e.target.checked, index)}
-                checked={!stateHeader[method.indexOf('edit')]}
+                checked={!stateHeader[method.indexOf('edit')] || checkAllAdd}
               />
             </>
           ),
@@ -139,13 +139,18 @@ const TableHeaderRole: React.FC<TableHeaderRoleProps> = ({
       key: 'delete',
       width: '11%',
       render: (value: any, row: any, index: number) => {
+        mergedArray.forEach((name) => {
+          row?.value[name]?.some((job: any) => {
+            setCheckAllDelete(job.delete.value)
+          })
+        })
         return {
           children: (
             <>
               <Checkbox
                 disabled={value?.disabled}
                 onChange={(e) => onChangeHeader(row.name, 'delete', e.target.checked, index)}
-                checked={!stateHeader[method.indexOf('delete')]}
+                checked={!stateHeader[method.indexOf('delete')] || checkAllDelete}
               />
             </>
           ),
@@ -158,13 +163,18 @@ const TableHeaderRole: React.FC<TableHeaderRoleProps> = ({
       key: 'cancel',
       width: '13%',
       render: (value: any, row: any, index: number) => {
+        mergedArray.forEach((name) => {
+          row?.value[name]?.some((job: any) => {
+            setCheckAllCancel(job.cancel.value)
+          })
+        })
         return {
           children: (
             <>
               <Checkbox
                 disabled={value?.disabled}
                 onChange={(e) => onChangeHeader(row.name, 'cancel', e.target.checked, index)}
-                checked={!stateHeader[method.indexOf('cancel')]}
+                checked={!stateHeader[method.indexOf('cancel')] || checkAllCancel}
               />
             </>
           ),
@@ -177,6 +187,11 @@ const TableHeaderRole: React.FC<TableHeaderRoleProps> = ({
       key: 'excel',
       width: '18%',
       render: (value: any, row: any, index: number) => {
+        mergedArray.forEach((name) => {
+          row?.value[name]?.some((job: any) => {
+            setCheckAllExcel(job.excel.value)
+          })
+        })
         return {
           children: (
             <>
