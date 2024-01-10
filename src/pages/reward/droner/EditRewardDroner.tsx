@@ -794,7 +794,7 @@ function EditRewardDroner() {
         : moment(endUsedDate).format('YYYY-MM-DD') + ' ' + moment(endUsedTime).format('HH:mm:ss'),
       file: !createImgReward.file ? imgReward : createImgReward.file,
       createBy: profile.firstname + ' ' + profile.lastname,
-      application: 'DRONER'
+      application: 'DRONER',
     }
     RewardDatasource.updateReward(queryString[1], rewardData)
       .then((res) => {

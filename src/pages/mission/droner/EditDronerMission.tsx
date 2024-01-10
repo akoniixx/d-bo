@@ -109,11 +109,18 @@ const EditDronerMission = () => {
     })
   }
   const fetchRewardList = () => {
-    RewardDatasource.getAllReward('DRONER',0, 0, '', '', 'ACTIVE', ['PHYSICAL', 'DIGITAL'], 'MISSION').then(
-      (res) => {
-        setRewardList(res)
-      },
-    )
+    RewardDatasource.getAllReward(
+      'DRONER',
+      0,
+      0,
+      '',
+      '',
+      'ACTIVE',
+      ['PHYSICAL', 'DIGITAL'],
+      'MISSION',
+    ).then((res) => {
+      setRewardList(res)
+    })
   }
 
   const countExpand = () => {

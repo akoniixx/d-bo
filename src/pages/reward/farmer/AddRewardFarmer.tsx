@@ -731,10 +731,10 @@ function AddRewardFarmer() {
       expiredUsedDate:
         moment(expiredUsedDate).format('YYYY-MM-DD') +
         ' ' +
-        moment(expiredUsedTime).format('HH:mm:ss'), 
+        moment(expiredUsedTime).format('HH:mm:ss'),
       file: createImgReward.file,
       createBy: profile.firstname + ' ' + profile.lastname,
-      application: 'FARMER'
+      application: 'FARMER',
     })
       .then((res) => {
         setBtnSaveDisable(false)

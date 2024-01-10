@@ -118,7 +118,7 @@ export class DronerFinityDatasource {
   }
   static downloadFile(): Promise<any> {
     return httpClient
-      .get(BASE_URL + '/droner-one-finity/file-promise-one-finity',{
+      .get(BASE_URL + '/droner-one-finity/file-promise-one-finity', {
         responseType: 'arraybuffer',
       })
       .then((response) => {

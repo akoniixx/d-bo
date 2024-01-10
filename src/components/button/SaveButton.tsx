@@ -7,13 +7,19 @@ interface SaveButtonProps {
   disableBtn?: boolean
   title?: string
   size?: any
-  colorBg? : string
+  colorBg?: string
 }
-export const SaveButtton: React.FC<SaveButtonProps> = ({ onClick, disableBtn, title, size, colorBg }) => (
+export const SaveButtton: React.FC<SaveButtonProps> = ({
+  onClick,
+  disableBtn,
+  title,
+  size,
+  colorBg,
+}) => (
   <Button
     style={{
-      backgroundColor: disableBtn ? color.Grey : colorBg? colorBg : color.Success,
-      borderColor: disableBtn ? color.Grey : colorBg? colorBg : color.Success,
+      backgroundColor: disableBtn ? color.Grey : colorBg ? colorBg : color.Success,
+      borderColor: disableBtn ? color.Grey : colorBg ? colorBg : color.Success,
       borderRadius: '5px',
       color: color.BG,
       width: size ? size : 'none',
