@@ -178,15 +178,15 @@ const reportHeaderPoint = [
     sub: false,
     subItem: [],
     view: {
-      value:false,
+      value: false,
       disabled: false,
     },
     add: {
-      value:false,
+      value: false,
       disabled: false,
     },
     edit: {
-      value:false,
+      value: false,
       disabled: false,
     },
     delete: {
@@ -194,7 +194,7 @@ const reportHeaderPoint = [
       disabled: true,
     },
     cancel: {
-      value:false,
+      value: false,
       disabled: false,
     },
     excel: {
@@ -230,7 +230,7 @@ const redeemHeaderPoint = [
     },
     excel: {
       value: false,
-      disabled: false,
+      disabled: true,
     },
   },
 ]
@@ -249,7 +249,7 @@ const pointJob: { [key: string]: any } = {
           view: { value: false, disabled: false, name: childName },
           excel: { value: false, disabled: true, name: childName },
           cancel: { value: false, disabled: false, name: childName },
-          delete: { value: false, disabled: false, name: childName },
+          delete: { value: false, disabled: true, name: childName },
           subItem: [],
         }
       }),
@@ -374,6 +374,5 @@ export {
   settingJob,
   pointSettingJob,
   redeemHeaderPoint,
-  reportHeaderPoint
-
+  reportHeaderPoint,
 }

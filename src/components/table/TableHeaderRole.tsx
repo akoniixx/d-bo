@@ -27,11 +27,27 @@ const TableHeaderRole: React.FC<TableHeaderRoleProps> = ({
   const [checkAllExcel, setCheckAllExcel] = useState<boolean>(false)
   const [sub, setSub] = useState<boolean>(false)
 
+  const checkAllTrue = (data:any) => {
+    if (data.length > 0 && data[0].value && data[0].value.followJob) {
+      const followJobs = data[0].value.followJob;
+        const allTrue = followJobs.every((job:any) => {
+        return (
+          job.view.value === true 
+        );
+      });
+  
+      return allTrue;
+    } else {
+      return false;
+    }
+  }
+  
+  const result = checkAllTrue(data);
+  console.log(result);
 
   const onChangeHeader = (data: any, key: string, checked: boolean, index: number) => {
     onChange(data, key, checked, index)
   }
-  console.log(data)
 
   const mergedArray = [
     'followJob',
@@ -66,27 +82,13 @@ const TableHeaderRole: React.FC<TableHeaderRoleProps> = ({
       key: 'view',
       width: '11%',
       render: (value: any, row: any, index: number) => {
-        let allSubAreTrue = true;
-         mergedArray.forEach((name) => {
-          const nameHead = row.value[name]
-          nameHead?.forEach((job: any) => {
-            if (job.sub === false) {
-              allSubAreTrue = false;
-            }
-            setCheckAllView(job.view.value)
-            
-          })
-        })
-        if(allSubAreTrue){
-          console.log(1)
-        }
         return {
           children: (
             <>
               <Checkbox
                 disabled={value?.disabled}
                 onChange={(e) => onChangeHeader(row.name, 'view', e.target.checked, index)}
-                checked={!stateHeader[method.indexOf('view')] || checkAllView}
+                checked={!stateHeader[method.indexOf('view')]}
               />
             </>
           ),
@@ -105,9 +107,7 @@ const TableHeaderRole: React.FC<TableHeaderRoleProps> = ({
               <Checkbox
                 disabled={value?.disabled}
                 onChange={(e) => onChangeHeader(row.name, 'add', e.target.checked, index)}
-                checked={
-                  value?.disabled ? false : !stateHeader[method.indexOf('add')]
-                }
+                checked={value?.disabled ? false : !stateHeader[method.indexOf('add')]}
               />
             </>
           ),

@@ -192,6 +192,9 @@ function TableRole({
             onChange={(data, index, key) => {
               followJob[index] = data
               const checkHeader = followJob.map((item: any) => {
+                if (item[key].disabled === true) {
+                  item[key].value = true
+                }
                 return item[key].value
               })
               const result = checkHeader.includes(false)
@@ -216,6 +219,9 @@ function TableRole({
             onChange={(data, index, key) => {
               farmer[index] = data
               const checkHeader = farmer.map((item: any) => {
+                if (item[key].disabled === true) {
+                  item[key].value = true
+                }
                 return item[key].value
               })
               const result = checkHeader.includes(false)
@@ -240,6 +246,9 @@ function TableRole({
             onChange={(data, index, key) => {
               droner[index] = data
               const checkHeader = droner.map((item: any) => {
+                if (item[key].disabled === true) {
+                  item[key].value = true
+                }
                 return item[key].value
               })
               const result = checkHeader.includes(false)
@@ -264,6 +273,9 @@ function TableRole({
             onChange={(data, index, key) => {
               guru[index] = data
               const checkHeader = guru.map((item: any) => {
+                if (item[key].disabled === true) {
+                  item[key].value = true
+                }
                 return item[key].value
               })
               const result = checkHeader.includes(false)
@@ -288,6 +300,9 @@ function TableRole({
             onChange={(data, index, key) => {
               promotion[index] = data
               const checkHeader = promotion.map((item: any) => {
+                if (item[key].disabled === true) {
+                  item[key].value = true
+                }
                 return item[key].value
               })
               const result = checkHeader.includes(false)
@@ -438,6 +453,9 @@ function TableRole({
             onChange={(data, index, key) => {
               reward[index] = data
               const checkHeader = reward.map((item: any) => {
+                if (item[key].disabled === true) {
+                  item[key].value = true
+                }
                 return item[key].value
               })
               const result = checkHeader.includes(false)
@@ -462,6 +480,9 @@ function TableRole({
             onChange={(data, index, key) => {
               mission[index] = data
               const checkHeader = mission.map((item: any) => {
+                if (item[key].disabled === true) {
+                  item[key].value = true
+                }
                 return item[key].value
               })
               const result = checkHeader.includes(false)
@@ -486,6 +507,9 @@ function TableRole({
             onChange={(data, index, key) => {
               challenge[index] = data
               const checkHeader = challenge.map((item: any) => {
+                if (item[key].disabled === true) {
+                  item[key].value = true
+                }
                 return item[key].value
               })
               const result = checkHeader.includes(false)
@@ -510,6 +534,9 @@ function TableRole({
             onChange={(data, index, key) => {
               admin[index] = data
               const checkHeader = admin.map((item: any) => {
+                if (item[key].disabled === true) {
+                  item[key].value = true
+                }
                 return item[key].value
               })
               const result = checkHeader.includes(false)
@@ -534,6 +561,9 @@ function TableRole({
             onChange={(data, index, key) => {
               setting[index] = data
               const checkHeader = setting.map((item: any) => {
+                if (item[key].disabled === true) {
+                  item[key].value = true
+                }
                 return item[key].value
               })
               const result = checkHeader.includes(false)
@@ -558,6 +588,9 @@ function TableRole({
             onChange={(data, index, key) => {
               point[index] = data
               const checkHeader = point.map((item: any) => {
+                if (item[key].disabled === true) {
+                  item[key].value = true
+                }
                 return item[key].value
               })
               const result = checkHeader.includes(false)
