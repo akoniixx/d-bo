@@ -13,6 +13,7 @@ export interface RewardEntities {
   expiredExchangeDate: string
   startUsedDate: string
   expiredUsedDate: string
+  application: string
   file?: any
 }
 export interface GetRewardEntities {

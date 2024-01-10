@@ -4,12 +4,10 @@ import {
   DeleteOutlined,
   DownOutlined,
   EditOutlined,
-  FileSearchOutlined,
   SearchOutlined,
   UserOutlined,
 } from '@ant-design/icons'
 import {
-  Avatar,
   Badge,
   Button,
   Checkbox,
@@ -38,10 +36,9 @@ import { DateTimeUtil } from '../../../utilities/DateTimeUtil'
 import { useNavigate } from 'react-router-dom'
 import { RewardDatasource } from '../../../datasource/RewardDatasource'
 import { GetAllRewardEntities } from '../../../entities/RewardEntites'
-import { UploadImageDatasouce } from '../../../datasource/UploadImageDatasource'
 import { REWARD_STATUS } from '../../../definitions/Status'
 
-function IndexReward() {
+function IndexRewardFarmer() {
   const navigate = useNavigate()
   const { RangePicker } = DatePicker
   const dateFormat = 'DD/MM/YYYY'
@@ -83,6 +80,7 @@ function IndexReward() {
   const getAllReward = () => {
     setLoading(true)
     RewardDatasource.getAllReward(
+      'FARMER',
       row,
       current,
       startExchangeDate,
@@ -292,7 +290,7 @@ function IndexReward() {
               padding: '8px',
             }}
           >
-            <strong>ของรางวัลนักบินโดรน</strong>
+            <strong>รายการของรางวัล (เกษตรกร)</strong>
           </span>
         </div>
         <div className='col-lg'>
@@ -311,7 +309,7 @@ function IndexReward() {
               color: color.secondary2,
               backgroundColor: color.Success,
             }}
-            onClick={() => navigate('/AddReward')}
+            onClick={() => navigate('/AddRewardFarmer')}
           >
             + เพิ่มของรางวัล
           </Button>
@@ -941,14 +939,14 @@ function IndexReward() {
                     />
                   }
                   color={color.primary1}
-                  onClick={() => navigate('/RedeemHistory/id=' + row.id)}
+                  onClick={() => navigate('/RedeemHistoryFarmer/id=' + row.id)}
                 />
               </div>
               <div className='col-lg-4'>
                 <ActionButton
                   icon={<EditOutlined />}
                   color={color.primary1}
-                  onClick={() => navigate('/EditReward/id=' + row.id)}
+                  onClick={() => navigate('/EditRewardFarmer/id=' + row.id)}
                 />
               </div>
               <div>
@@ -1042,4 +1040,4 @@ function IndexReward() {
     </>
   )
 }
-export default IndexReward
+export default IndexRewardFarmer

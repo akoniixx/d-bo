@@ -71,7 +71,7 @@ const ImagCards: React.FC<ImagCardsProps> = ({ image, show }) => {
         closable={false}
         bodyStyle={{ padding: 50 }}
       >
-        <div style={{ position: 'relative', width: '100%', height: '100%', textAlign: 'center',}}>
+        <div style={{ position: 'relative', width: '100%', height: '100%', textAlign: 'center' }}>
           <div
             style={{
               position: 'absolute',
@@ -117,10 +117,7 @@ const ImagCards: React.FC<ImagCardsProps> = ({ image, show }) => {
           {image ? (
             image.length > 0 ? (
               <>
-                <Image
-                 width={400}
-                  src={show ? image[currentIndex] : image[currentIndex].url}
-                />
+                <Image width={400} src={show ? image[currentIndex] : image[currentIndex].url} />
                 <div
                   style={{
                     position: 'absolute',

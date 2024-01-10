@@ -16,6 +16,7 @@ interface RenderReward {
   point: any
   type: string | null
   endUseDateTime: any
+  endRedeemDateTime?: any
   exChange: string | null
   countdownTime: any
 }
@@ -28,6 +29,7 @@ const RenderReward: React.FC<RenderReward> = ({
   point,
   type,
   endUseDateTime,
+  endRedeemDateTime,
   exChange,
   countdownTime,
 }) => {
@@ -45,6 +47,7 @@ const RenderReward: React.FC<RenderReward> = ({
     window.addEventListener('scroll', onScroll)
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
+
   return (
     <div className='col-lg-12'>
       <div ref={div}>
@@ -81,42 +84,111 @@ const RenderReward: React.FC<RenderReward> = ({
                   !point ? 0 : numberWithCommas(parseFloat(point))
                 } แต้ม`}</p>
               )}
-              {type === 'DIGITAL' && (
-                <div
-                  style={{
-                    width: '185px',
-                    height: '65px',
-                    backgroundColor: 'rgba(220, 241, 254, 1)',
-                    borderRadius: 10,
-                    padding: 10,
-                  }}
-                >
+              {type === 'DIGITAL' &&
+                (exChange === 'SCORE' ? (
+                  <div className='d-flex justify-content-between'>
+                    <div
+                      style={{
+                        width: 'max-content',
+                        backgroundColor: 'rgba(220, 241, 254, 1)',
+                        borderRadius: 10,
+                        padding: 10,
+                      }}
+                    >
+                      <div
+                        style={{
+                          color: 'rgba(12, 100, 141, 1)',
+                          fontSize: '15px',
+                          fontWeight: '500',
+                          lineHeight: '22px',
+                        }}
+                      >
+                        {`แลกได้ถึง`}
+                      </div>
+                      <div
+                        style={{
+                          color: 'black',
+                          fontSize: '16px',
+                          fontWeight: '700',
+                          lineHeight: '22px',
+                        }}
+                      >
+                        {endRedeemDateTime
+                          ? convertBuddhistYear.toBuddhistYear(
+                              moment(endRedeemDateTime),
+                              'DD MMMM YYYY',
+                            )
+                          : '-'}
+                      </div>
+                    </div>
+                    <div
+                      style={{
+                        width: 'max-content',
+                        backgroundColor: '#FFF2E3',
+                        borderRadius: 10,
+                        padding: 10,
+                      }}
+                    >
+                      <div
+                        style={{
+                          color: color.secondary1,
+                          fontSize: '15px',
+                          fontWeight: '500',
+                          lineHeight: '22px',
+                        }}
+                      >
+                        {`ใช้ได้ถึง`}
+                      </div>
+                      <div
+                        style={{
+                          color: 'black',
+                          fontSize: '16px',
+                          fontWeight: '700',
+                          lineHeight: '22px',
+                        }}
+                      >
+                        {endUseDateTime
+                          ? convertBuddhistYear.toBuddhistYear(
+                              moment(endUseDateTime),
+                              'DD MMMM YYYY',
+                            )
+                          : '-'}
+                      </div>
+                    </div>
+                  </div>
+                ) : (
                   <div
                     style={{
-                      color: 'rgba(12, 100, 141, 1)',
-                      fontSize: '15spanx',
-                      fontWeight: '500',
-                      lineHeight: '22px',
-                      paddingLeft: '12px',
+                      width: 'max-content',
+                      backgroundColor: '#FFF2E3',
+                      borderRadius: 10,
+                      padding: 10,
                     }}
                   >
-                    {`หมดอายุอีก ${countdownTime ? countdownTime : '0'} วัน`}
+                    <div
+                      style={{
+                        color: color.secondary1,
+                        fontSize: '15px',
+                        fontWeight: '500',
+                        lineHeight: '22px',
+                      }}
+                    >
+                      {`ใช้ได้ถึง`}
+                    </div>
+                    <div
+                      style={{
+                        color: 'black',
+                        fontSize: '16px',
+                        fontWeight: '700',
+                        lineHeight: '22px',
+                      }}
+                    >
+                      {endUseDateTime
+                        ? convertBuddhistYear.toBuddhistYear(moment(endUseDateTime), 'DD MMMM YYYY')
+                        : '-'}
+                    </div>
                   </div>
-                  <div
-                    style={{
-                      color: 'black',
-                      fontSize: '18px',
-                      fontWeight: '700',
-                      lineHeight: '22px',
-                      paddingLeft: '12px',
-                    }}
-                  >
-                    {endUseDateTime
-                      ? convertBuddhistYear.toBuddhistYear(moment(endUseDateTime), 'DD MMM YY')
-                      : '-'}
-                  </div>
-                </div>
-              )}
+                ))}
               <p className='pt-3'>รายละเอียด</p>
               <p style={{ fontWeight: '400', color: 'rgba(107, 117, 128, 1)' }}>
                 {!description ? '-' : parse(description)}

@@ -22,7 +22,7 @@ import 'react-quill/dist/quill.snow.css'
 import '../../farmer/Style.css'
 const { Map } = require('immutable')
 const _ = require('lodash')
-function EditReward() {
+function EditRewardFarmer() {
   const queryString = _.split(window.location.pathname, '=')
   const profile = JSON.parse(localStorage.getItem('profile') || '{  }')
   const dateFormat = 'DD/MM/YYYY'
@@ -50,6 +50,7 @@ function EditReward() {
 
   useEffect(() => {
     RewardDatasource.getAllRewardById(queryString[1]).then((res) => {
+      console.log(res)
       form.setFieldsValue({
         file: res.imagePath,
         rewardName: res.rewardName,
@@ -94,6 +95,7 @@ function EditReward() {
       setImgReward(res.imagePath)
       setUsedDate(res.startUsedDate)
       setEndUsedDate(res.expiredUsedDate)
+      setEndExchangeDate(res.expiredExchangeDate)
       setCheckStatus(res.status)
     })
   }, [])
@@ -723,7 +725,8 @@ function EditReward() {
         condition={condition}
         point={score}
         type={rewardType}
-        endUseDateTime={endUsedDate}
+        endUseDateTime={EndExchangeDate}
+        endRedeemDateTime={endUsedDate}
         exChange={rewardExchange}
         countdownTime={result < 0 ? 0 : parseInt(result.toString())}
       />
@@ -793,6 +796,7 @@ function EditReward() {
         : moment(endUsedDate).format('YYYY-MM-DD') + ' ' + moment(endUsedTime).format('HH:mm:ss'),
       file: !createImgReward.file ? imgReward : createImgReward.file,
       createBy: profile.firstname + ' ' + profile.lastname,
+      application: 'FARMER',
     }
     RewardDatasource.updateReward(queryString[1], rewardData)
       .then((res) => {
@@ -803,7 +807,7 @@ function EditReward() {
           timer: 1500,
           showConfirmButton: false,
         }).then((time) => {
-          navigate('/IndexReward')
+          navigate('/IndexRewardFarmer')
         })
       })
       .catch((err) => {
@@ -843,4 +847,4 @@ function EditReward() {
   )
 }
 
-export default EditReward
+export default EditRewardFarmer
