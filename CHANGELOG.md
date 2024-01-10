@@ -1,5 +1,9 @@
 ## [Version - 0]
 
+## Feature [v0.44.0] 2024-1-11
+
+- role management menu
+
 ## Feature [v0.43.0] 2024-1-10
 
 - reward farmer menu
