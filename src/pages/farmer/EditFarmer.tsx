@@ -349,7 +349,7 @@ const EditFarmer = () => {
   const onPreviewProfile = async () => {
     let src = imgProfile
     if (!src) {
-      src = await new Promise((resolve) => {
+       src = await new Promise((resolve) => {
         const reader = new FileReader()
         reader.readAsDataURL(imgProfile)
         reader.onload = () => resolve(reader.result)
