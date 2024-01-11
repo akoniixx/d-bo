@@ -18,6 +18,7 @@ import Swal from "sweetalert2";
 import ModalEditCredit from "../../../components/modal/ModalEditCredit";
 import ModalViewCredit from "../../../components/modal/ModalViewCredit";
 import ModalDeleteCredit from "../../../components/modal/ModalDeleteCredit";
+import ModalCreditApprove from "../../../components/modal/ModalCreditApprove";
 const _ = require('lodash')
 const { RangePicker } = DatePicker
 const dateSearchFormat = 'YYYY-MM-DD'
@@ -58,6 +59,13 @@ const DronerInfinityCreditList : React.FC<any> = () => {
       point : 0
     })
     const [editCredit,setEditCredit] = useState({
+      open : false,
+      id : "",
+      name : "",
+      tel : "",
+      point : 0
+    })
+    const [approveCredit,setApproveCredit] = useState({
       open : false,
       id : "",
       name : "",
@@ -569,17 +577,28 @@ const DronerInfinityCreditList : React.FC<any> = () => {
           else{
             return <Row justify={'space-between'}>
                 <ActionButton
-                  icon={row.status === "APPROVE" ? row.exchangeType === "CASH" ? <EditOutlined /> : <FileTextOutlined /> : <EditOutlined />}
+                  icon={row.status === "APPROVE" ?  <FileTextOutlined /> : <EditOutlined />}
                   color={color.primary1}
                   onClick={() => {
                     if(row.exchangeType === "CASH"){
-                      setEditCredit({
-                        open : true,
-                        id : row.id,
-                        name : data.data.name,
-                        tel : data.data.telephoneNo,
-                        point : data.data.point
-                      })
+                      if(row.status === "APPROVE"){
+                        setApproveCredit({
+                          open : true,
+                          id : row.id,
+                          name : data.data.name,
+                          tel : data.data.telephoneNo,
+                          point : data.data.point
+                        })
+                      }
+                      else{
+                        setEditCredit({
+                          open : true,
+                          id : row.id,
+                          name : data.data.name,
+                          tel : data.data.telephoneNo,
+                          point : data.data.point
+                        })
+                      }
                     }
                     else{
                       setViewCredit({
@@ -610,6 +629,40 @@ const DronerInfinityCreditList : React.FC<any> = () => {
       }
     ]
     return  <div>
+        <ModalCreditApprove 
+          cashCondition={condition.cashCreditCondition}
+          pointCondition={condition.pointCreditCondition}
+          dronerId={queryString} 
+          open={approveCredit.open}
+          name={approveCredit.name}
+          tel={approveCredit.tel}
+          id={approveCredit.id}
+          point={approveCredit.point}
+          onClose={()=>setApproveCredit({
+            id : "",
+            open : false,
+            name : "",
+            tel : "",
+            point : 0
+          })}
+          onSubmit={()=>{
+            Swal.fire({
+              title: 'แก้ไขสำเร็จ',
+              icon: 'success',
+              timer: 1500,
+              showConfirmButton: false,
+            }).then(() => {
+              setApproveCredit({
+                id : "",
+                open : false,
+                name : "",
+                tel : "",
+                point : 0
+              })
+              navigate(0)
+            })
+          }}
+        />
         <ModalEditCredit
           cashCondition={condition.cashCreditCondition}
           pointCondition={condition.pointCreditCondition}

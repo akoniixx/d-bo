@@ -167,3 +167,13 @@ table tr td :hover {
 .ant-slider-track-1{
   background-color: #219653 !important;
 }
+
+.ant-input-disabled,
+.ant-input-suffix,
+.ant-select-selection-item{
+  color: #000 !important;
+}
+
+.ant-picker-input>input[disabled]{
+  color: #000 !important;
+}
