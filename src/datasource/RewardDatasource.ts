@@ -176,7 +176,7 @@ export class RewardDatasource {
       sortDirection: sortDirection,
     }
     return httpClient
-      .get(BASE_URL + '/promotion/farmer-transactions/get-all-droner-reward-history', {
+      .get(BASE_URL + '/promotion/farmer-transactions/get-all-farmer-reward-history', {
         params,
       })
       .then((response) => {
