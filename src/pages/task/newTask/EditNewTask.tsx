@@ -529,7 +529,9 @@ const EditNewTask = () => {
                         defaultValue={data?.farmerPlotId}
                       >
                         {dataFarmer?.farmerPlot.map((item) => (
-                          <option value={item.id}>{item.plotName}</option>
+                          <option key={item.id} value={item.id}>
+                            {item.plotName} {`(${item.raiAmount} ไร่)`}
+                          </option>
                         ))}
                       </AntdSelect>
                       {checkSelectPlot == 'error' && (
