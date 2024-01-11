@@ -149,7 +149,7 @@ function DronerInfinity() {
   }
   const onChangeSlider = (newValue: any) => {
     const [newMin, newMax] = newValue
-    setCredit({ min: newMin , max: newMax  })
+    setCredit({ min: newMin, max: newMax })
   }
   const onChangeCreditMin = (e: any) => {
     const inputValue = e.target.value
@@ -597,7 +597,7 @@ function DronerInfinity() {
               }}
             >
               {credit.min || credit.max ? (
-                <span style={{color: color.font}}>{credit.min + ' - ' + credit.max} เครดิต</span>
+                <span style={{ color: color.font }}>{credit.min + ' - ' + credit.max} เครดิต</span>
               ) : (
                 'เลือกจำนวนเครดิต'
               )}

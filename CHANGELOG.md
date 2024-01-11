@@ -1,5 +1,33 @@
 ## [Version - 0]
 
+## Fix [v0.44.2] 2024-1-11
+
+- fixed edit cash credit
+- add watch detail cash credit
+
+## Fix [v0.44.1] 2024-1-11
+
+- fixed validate data highlight news
+- show tooltip landmark
+- head menu name new task
+- show rai amount in select dropdown in create new task
+
+## Feature [v0.44.0] 2024-1-11
+
+- role management menu
+- preview 1finity drone files
+- history page for redeeming farmer rewards
+- added DRONER option to job search page.
+
+## Feature [v0.43.0] 2024-1-10
+
+- reward farmer menu
+
+## improve [v0.42.8] 2024-1-9
+
+- change status in edit task
+- call api download file droner 1-finity
+
 ## Fix [v0.42.7] 2023-12-27
 
 - fix placeholder not showed
@@ -12,7 +40,6 @@
 
 - added credit list for droner 1finity
 - add crud for droner 1finity
-
 
 ## Fix [v0.42.4] 2023-12-26
 

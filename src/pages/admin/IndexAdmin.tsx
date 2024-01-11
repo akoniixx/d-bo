@@ -13,9 +13,11 @@ import { color } from '../../resource'
 import { DateTimeUtil } from '../../utilities/DateTimeUtil'
 import { DashboardLayout } from '../../components/layout/Layout'
 import { useNavigate } from 'react-router-dom'
+import { RoleManage } from '../../datasource/RoleManageDatasource'
 
 const IndexAdmin = () => {
   const navigate = useNavigate()
+  const [role, setRole] = useState<any>([])
   const row = 10
   const [data, setData] = useState<UserStaffPageEntity>(UserStaffPageEntity_INIT)
   const [current, setCurrent] = useState(1)
@@ -24,6 +26,12 @@ const IndexAdmin = () => {
   const [roleNull, setRoleNull] = useState<string>()
   const [loading, setLoading] = useState(false)
 
+  useEffect(() => {
+    const getRole = async () => {
+      await RoleManage.getRoleOnly().then((res) => setRole(res))
+    }
+    getRole()
+  }, [])
   const fecthAdmin = async () => {
     setLoading(true)
     await AdminDatasource.getAdminList(current, row, searchStatus, searchRole)
@@ -36,7 +44,7 @@ const IndexAdmin = () => {
 
   useEffect(() => {
     fecthAdmin()
-  }, [current, searchStatus, searchRole])
+  }, [current])
 
   const onChangePage = (page: number) => {
     setCurrent(page)
@@ -129,33 +137,68 @@ const IndexAdmin = () => {
   ]
 
   const pageTitle = (
-    <div className='container d-flex justify-content-between' style={{ padding: '10px' }}>
-      <div className='col-lg-5'>
+    <div className='d-flex justify-content-between' style={{ padding: '10px' }}>
+      <div className='col-lg-4'>
         <span
           className='card-label font-weight-bolder text-dark'
           style={{ fontSize: 22, fontWeight: 'bold', padding: '8px' }}
         >
-          <strong>รายชื่อผู้ดูแลระบบ (User Management)</strong>
+          <strong>รายชื่อผู้ดูแลระบบ (Admin)</strong>
         </span>
       </div>
-      <div className='col-lg-2'>
-        <Select className='col-lg-12' defaultValue='ALL' onChange={handleOnChangeRole}>
-          {ROLE_ADMIN.map((item) => (
-            <option value={item.key}>{item.status}</option>
+      <div className='col-lg-3'>
+        <Select
+          className='col-lg-12 p-1'
+          placeholder='เลือกบทบาท'
+          onChange={handleOnChangeRole}
+          allowClear
+        >
+          {role.map((item: any, index: number) => (
+            <option key={index} value={item.role} />
           ))}
         </Select>
       </div>
       <div className='col-lg-2'>
-        <Select className='col-lg-12' onChange={handleOnChangeStatus} defaultValue='สถานะทั้งหมด'>
-          <option value='' selected={true}>
-            สถานะทั้งหมด
-          </option>
+        <Select
+          className='col-lg-12 p-1'
+          onChange={handleOnChangeStatus}
+          placeholder='สถานะ'
+          allowClear
+        >
           <option value='true'>ใช้งาน</option>
           <option value='false'>ไม่ได้ใช้งาน</option>
         </Select>
       </div>
-      <div className='col-lg-2'>
-        <AddButtton text='เพิ่มผู้ดูแลระบบ' onClick={() => navigate('/AddAdmin')} />
+      <div className='col-lg p-1'>
+        <Button
+          className='col-lg-12'
+          style={{
+            borderColor: color.Success,
+            borderRadius: '5px',
+            color: color.secondary2,
+            backgroundColor: color.Success,
+          }}
+          onClick={() => navigate('/AddAdmin')}
+        >
+          + เพิ่มผู้ดูแลระบบ
+        </Button>
+      </div>
+      <div className='col-lg p-1'>
+        <Button
+          className='col-lg-12'
+          style={{
+            borderColor: color.Success,
+            borderRadius: '5px',
+            color: color.secondary2,
+            backgroundColor: color.Success,
+          }}
+          onClick={() => {
+            setCurrent(1)
+            fecthAdmin()
+          }}
+        >
+          ค้นหาข้อมูล
+        </Button>
       </div>
     </div>
   )

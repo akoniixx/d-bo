@@ -22,6 +22,7 @@ export class RewardDatasource {
     data.startUsedDate && formData.append('startUsedDate', data.startUsedDate)
     data.expiredUsedDate && formData.append('expiredUsedDate', data.expiredUsedDate)
     formData.append('file', data.file)
+    formData.append('application', data.application)
     return httpClient
       .post(BASE_URL + '/promotion/reward/upload', formData)
       .then((res) => {
@@ -30,6 +31,7 @@ export class RewardDatasource {
       .catch((err) => console.log(err))
   }
   static getAllReward(
+    application?: string,
     take?: number,
     page?: number,
     startExchangeDate?: string,
@@ -42,6 +44,7 @@ export class RewardDatasource {
     sortField?: string,
   ): Promise<GetAllRewardEntities> {
     const params = {
+      application: application,
       take: take,
       page: page,
       startExchangeDate: startExchangeDate,
@@ -108,6 +111,8 @@ export class RewardDatasource {
       formData.append('expiredUsedDate', data.expiredUsedDate)
     }
     formData.append('file', data.file)
+    formData.append('application', data.application)
+
     return httpClient
       .patch(BASE_URL + `/promotion/reward/update/${id}`, formData)
       .then((res) => {
@@ -123,6 +128,8 @@ export class RewardDatasource {
     endDate?: string,
     status?: string,
     search?: string,
+    sortField?: string,
+    sortDirection?: string,
   ): Promise<GetAllDronerRewardHistoryEntities> {
     const params = {
       rewardId: rewardId,
@@ -132,9 +139,44 @@ export class RewardDatasource {
       endDate: endDate,
       status: status,
       search: search,
+      sortField: sortField,
+      sortDirection: sortDirection,
     }
     return httpClient
       .get(BASE_URL + '/promotion/droner-transactions/get-all-droner-reward-history', {
+        params,
+      })
+      .then((response) => {
+        return response.data
+      })
+      .catch((error) => {
+        console.log(error)
+      })
+  }
+  static getAllFarmerRewardHistory(
+    rewardId: string,
+    page: number,
+    take: number,
+    startDate?: string,
+    endDate?: string,
+    status?: string,
+    search?: string,
+    sortField?: string,
+    sortDirection?: string,
+  ): Promise<GetAllDronerRewardHistoryEntities> {
+    const params = {
+      rewardId: rewardId,
+      page: page,
+      take: take,
+      startDate: startDate,
+      endDate: endDate,
+      status: status,
+      search: search,
+      sortField: sortField,
+      sortDirection: sortDirection,
+    }
+    return httpClient
+      .get(BASE_URL + '/promotion/farmer-transactions/get-all-farmer-reward-history', {
         params,
       })
       .then((response) => {

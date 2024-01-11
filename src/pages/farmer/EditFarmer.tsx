@@ -52,6 +52,7 @@ import { useLocalStorage } from '../../hook/useLocalStorage'
 import { resizeFileImg } from '../../utilities/ResizeImage'
 import { useNavigate } from 'react-router-dom'
 import locale from 'antd/es/date-picker/locale/th_TH'
+import ShowLandmark from '../../components/popover/ShowLandmark'
 
 const dateFormat = 'DD/MM/YYYY'
 const dateCreateFormat = 'YYYY-MM-DD'
@@ -1013,6 +1014,7 @@ const EditFarmer = () => {
                         }}
                       >
                         {item.plotName}
+                        {item.landmark && <ShowLandmark landmark={item.landmark} />}
                       </p>
                       <p style={{ fontSize: '12px', color: color.Grey }}>{item.plantName}</p>
                     </div>

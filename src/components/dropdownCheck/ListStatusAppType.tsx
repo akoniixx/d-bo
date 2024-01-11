@@ -29,20 +29,19 @@ export const ListCheck: React.FC<ListProps> = ({ onSearchType, list, title, menu
     const checked = optionIndex === -1
     onSearchType(value, checked)
   }
-
-  const listApp = [
-    { title: ' Back Office Website', icon: icon.bo, value: 'BO' },
-    menu === 'FARMER' || menu === 'TASK'
-      ? { title: ' Farmer Application', icon: icon.farmerApp, value: 'FARMER' }
-      : { title: ' Droner Application', icon: icon.dronerApp, value: 'DRONER' },
-  ]
-  if (menu === 'TASK') {
-    listApp.push({
-      title: ' Line Office Website',
-      icon: icon.lineApp,
-      value: 'LINE',
-    })
+  const listApp = [{ title: ' Back Office Website', icon: icon.bo, value: 'BO' }]
+  if (menu === 'FARMER') {
+    listApp.push({ title: ' Farmer Application', icon: icon.farmerApp, value: 'FARMER' })
+  } else if (menu === 'DRONER') {
+    listApp.push({ title: ' Droner Application', icon: icon.dronerApp, value: 'DRONER' })
+  } else if (menu === 'TASK') {
+    listApp.push(
+      { title: ' Line Office Website', icon: icon.lineApp, value: 'LINE' },
+      { title: ' Farmer Application', icon: icon.farmerApp, value: 'FARMER' },
+      { title: ' Droner Application', icon: icon.dronerApp, value: 'DRONER' },
+    )
   }
+
   const items: MenuProps['items'] = listApp.map((v, i) => {
     return {
       key: i,

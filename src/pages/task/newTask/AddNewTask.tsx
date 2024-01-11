@@ -54,7 +54,7 @@ import icon from '../../../resource/icon'
 import { LocationPriceDatasource } from '../../../datasource/LocationPriceDatasource'
 import { CouponDataSource } from '../../../datasource/CouponDatasource'
 import { CouponFarmerUsed } from '../../../entities/CouponEntites'
-import { useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { FarmerPageEntity } from '../../../entities/FarmerEntities'
 import 'rsuite/dist/rsuite.min.css'
 import ShowNickName from '../../../components/popover/ShowNickName'
@@ -123,6 +123,8 @@ const AddNewTask = () => {
   const [showData, setShowData] = useState<boolean>(false)
   const [rowFarmer, setRowFarmer] = useState(10)
   const [targetSpray, setTargetSpray] = useState<TargetSpayEntities[]>([])
+  const location = useLocation()
+  const currentPath = location.pathname
 
   const fetchFarmerList = () => {
     TaskDatasource.getFarmerListTask(searchFilterFarmer, currenSearch, rowFarmer).then(
@@ -316,6 +318,11 @@ const AddNewTask = () => {
     const d = Map(createNewTask).set('preparationBy', e.target.value)
     setCreateNewTask(d.toJS())
     checkValidateStep(d.toJS(), current)
+    setCreateNewTask({
+      ...createNewTask,
+      preparationBy: e.target.value,
+      preparationRemark: '',
+    })
   }
   const handleCalServiceCharge = (e: any) => {
     const values = validateOnlyNumWDecimal(e.target.value)
@@ -449,7 +456,7 @@ const AddNewTask = () => {
                     >
                       {dataFarmer.farmerPlot.map((item) => (
                         <option key={item.id} value={item.id}>
-                          {item.plotName}
+                          {item.plotName} {`(${item.raiAmount} ไร่)`}
                         </option>
                       ))}
                     </AntdSelect>
@@ -1373,6 +1380,8 @@ const AddNewTask = () => {
       ].includes('')
       const checkEmptyNumber = ![data.price, data.unitPrice, data.farmAreaAmount].includes(0)
       let checkEmptyArray = false
+      let checkPreparationBy = false
+
       if (data?.targetSpray !== undefined) {
         checkEmptyArray =
           ![data?.targetSpray][0]?.includes('') &&
@@ -1381,8 +1390,15 @@ const AddNewTask = () => {
       }
       const checkOtherSpray = otherSpray && otherSpray.trim().length !== 1
       const checkDateTime = ![dateAppointment, timeAppointment].includes('')
-      const checkPreparationBy =
-        data.preparationBy === 'นักบินโดรนเตรียมให้' && data.preparationRemark.trim().length !== 0
+      if (data.preparationBy === 'นักบินโดรนเตรียมให้') {
+        if (data.preparationRemark.trim().length !== 0) {
+          checkPreparationBy = true
+        } else {
+          checkPreparationBy = false
+        }
+      } else {
+        checkPreparationBy = true
+      }
 
       if (
         checkEmptyArray && [data?.targetSpray][0]?.includes('อื่นๆ')
@@ -1626,7 +1642,10 @@ const AddNewTask = () => {
         <Row>
           <BackIconButton onClick={() => navigate('/IndexNewTask')} />
           <span className='pt-3'>
-            <strong style={{ fontSize: '20px' }}>เพิ่มงานบินใหม่</strong>
+            <strong style={{ fontSize: '20px' }}>
+              เพิ่มงานบินใหม่{' '}
+              {currentPath === '/AddNewTask=radio' ? '(บังคับเลือกนักบิน)' : '(เลือกนักบินหลายคน)'}
+            </strong>
           </span>
         </Row>
         {renderStep}

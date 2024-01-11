@@ -577,7 +577,7 @@ const DronerInfinityCreditList : React.FC<any> = () => {
           else{
             return <Row justify={'space-between'}>
                 <ActionButton
-                  icon={row.status === "APPROVE" ?  <FileTextOutlined /> : <EditOutlined />}
+                  icon={row.status === "APPROVE" ? row.exchangeType === "CASH" ? <FileTextOutlined /> : <FileTextOutlined /> : <EditOutlined />}
                   color={color.primary1}
                   onClick={() => {
                     if(row.exchangeType === "CASH"){
