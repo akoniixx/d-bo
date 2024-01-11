@@ -18,6 +18,7 @@ import { useLocalStorage } from '../../hook/useLocalStorage'
 import { resizeFileImg } from '../../utilities/ResizeImage'
 import { UploadImageEntity, UploadImageEntity_INTI } from '../../entities/UploadImageEntities'
 import Swal from 'sweetalert2'
+import { UploadImageDatasouce } from '../../datasource/UploadImageDatasource'
 
 interface ModalDronerInfinityProps {
   show: boolean
@@ -54,6 +55,9 @@ const ModalDronerInfinity: React.FC<ModalDronerInfinityProps> = ({
   const [profile] = useLocalStorage('profile', [])
   const [createImg, setCreateImg] = useState<UploadImageEntity>(UploadImageEntity_INTI)
   const [editCreateImg, setEditCreateImg] = useState<UploadImageEntity>(UploadImageEntity_INTI)
+  const [previewFile, setPreviewFile] = useState<any>()
+  const [getImage, setGetImage] = useState<any>()
+
   const { Map } = require('immutable')
 
   useEffect(() => {
@@ -65,6 +69,9 @@ const ModalDronerInfinity: React.FC<ModalDronerInfinityProps> = ({
       })
       DronerFinityDatasource.getDronerById(data.id).then((res) => {
         if (res) {
+          UploadImageDatasouce.getImage(res.pathImage).then((resImg) => {
+            setGetImage(resImg.url)
+          })
           const file = res.pathImage
           const parts = file.split('/')
           const filename = parts[parts.length - 1]
@@ -253,6 +260,21 @@ const ModalDronerInfinity: React.FC<ModalDronerInfinityProps> = ({
     }
     resetState()
   }
+  const onPreviewFile = async () => {
+    const checkImage = action === 'edit' ? getImage : fileList
+    let src = checkImage
+    if (!src) {
+      src = await new Promise((resolve) => {
+        const reader = new FileReader()
+        reader.readAsDataURL(checkImage)
+        reader.onload = () => resolve(reader.result)
+      })
+    }
+    const image = new Image()
+    image.src = src
+    const imgWindow = window.open(src)
+    imgWindow?.document.write(image.outerHTML)
+  }
   const renderFile = (
     fileName:
       | string
@@ -266,7 +288,9 @@ const ModalDronerInfinity: React.FC<ModalDronerInfinityProps> = ({
   ) => {
     return (
       <div className='d-flex'>
-        <span style={{ fontSize: 14 }}>{fileName}</span>
+        <span onClick={onPreviewFile} style={{ fontSize: 14, cursor: 'pointer' }}>
+          {fileName}
+        </span>
         {fileName && (
           <DeleteOutlined
             style={{ color: color.Error, alignSelf: 'center', paddingLeft: 8 }}

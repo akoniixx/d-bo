@@ -1,5 +1,12 @@
 ## [Version - 0]
 
+## Feature [v0.44.0] 2024-1-11
+
+- role management menu
+- preview 1finity drone files
+- history page for redeeming farmer rewards
+- added DRONER option to job search page.
+
 ## Feature [v0.43.0] 2024-1-10
 
 - reward farmer menu
