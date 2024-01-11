@@ -281,9 +281,9 @@ export const pathLists = (isAccounting: boolean, isAdminTask?: boolean) => {
           subMenu: [],
         },
         {
-          path: "/IndexPermission",
-          name: "IndexPermission",
-          title: "บทบาทผู้ดูแล",
+          path: '/IndexPermission',
+          name: 'IndexPermission',
+          title: 'บทบาทผู้ดูแล',
           subMenu: [],
         },
       ],

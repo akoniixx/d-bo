@@ -100,11 +100,12 @@ function AddHighlightPage() {
   }
 
   const checkDupDateTime = () => {
-    const { application, startDate, startTime, endDate, endTime, status } = form.getFieldsValue()
+    const { name, application, startDate, startTime, endDate, endTime, status } =
+      form.getFieldsValue()
     const start =
       moment(startDate).format('YYYY-MM-DD') + ' ' + moment(startTime).format('HH:mm:ss')
     const end = moment(endDate).format('YYYY-MM-DD') + ' ' + moment(endTime).format('HH:mm:ss')
-    if (status !== 'DRAFTING') {
+    if (status !== 'DRAFTING' && application && name) {
       HighlightDatasource.checkDuplicate(application, start, end).then((res) => {
         if (res.success === false && res.userMessage === 'dupplicate') {
           setDuplicateTime(

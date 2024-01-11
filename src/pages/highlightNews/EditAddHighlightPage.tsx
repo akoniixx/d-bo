@@ -147,14 +147,13 @@ function EditAddHighlightPage() {
   }
 
   const checkDupDateTime = () => {
-    const { application, startDate, startTime, endDate, endTime, status } = form.getFieldsValue()
+    const { name, application, startDate, startTime, endDate, endTime, status } =
+      form.getFieldsValue()
     const start =
       moment(startDate).format('YYYY-MM-DD') + ' ' + moment(startTime).format('HH:mm:ss')
     const end = moment(endDate).format('YYYY-MM-DD') + ' ' + moment(endTime).format('HH:mm:ss')
-    if (status === 'ACTIVE' || status === 'PENDING') {
-      console.log(application, start, end, highlightId)
+    if (status === 'ACTIVE' || (status === 'PENDING' && application && name)) {
       HighlightDatasource.checkDuplicate(application, start, end, highlightId).then((res) => {
-        console.log(res)
         if (res.success === false && res.userMessage === 'dupplicate') {
           setDuplicateTime(
             'กรุณาเปลี่ยนแปลงช่วงเวลา “วันเริ่มต้น” หรือ “วันสิ้นสุด” เนื่องจากซ้ำกับช่วงเวลาของข่าวสารไฮไลท์อื่นที่สร้างไว้ก่อนหน้า',

@@ -61,7 +61,7 @@ export class RoleManage {
     delete data[id]
     delete data[count]
     return httpClient
-      .post(BASE_URL + `/role-management/` , data)
+      .post(BASE_URL + `/role-management/`, data)
       .then((response) => {
         return response.data
       })

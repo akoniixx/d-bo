@@ -1,5 +1,12 @@
 ## [Version - 0]
 
+## Fix [v0.44.1] 2024-1-11
+
+- fixed validate data highlight news
+- show tooltip landmark
+- head menu name new task
+- show rai amount in select dropdown in create new task
+
 ## Feature [v0.44.0] 2024-1-11
 
 - role management menu
