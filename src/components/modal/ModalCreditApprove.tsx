@@ -1,4 +1,4 @@
-import { DatePicker, Input, Modal, Radio, Row, Select, Space, TimePicker } from "antd"
+import { Badge, DatePicker, Input, Modal, Radio, Row, Select, Space, TimePicker } from "antd"
 import { BackButton } from "../button/BackButton"
 import SaveButtton from "../button/SaveButton"
 import { useEffect, useState } from "react"
@@ -12,8 +12,10 @@ import { DeleteOutlined } from "@ant-design/icons"
 import { Option } from "antd/lib/mentions"
 import { BookBankDatasource } from "../../datasource/BookBankDatasource"
 import moment from "moment"
+import { STATUS_COLOR_CREDIT, STATUS_CREDIT_MAPPING } from "../../definitions/Status"
+import { DateTimeUtil } from "../../utilities/DateTimeUtil"
 
-interface ModalEditCreditProps{
+interface ModalCreditApproveProps{
     open : boolean
     id : string,
     dronerId : string,
@@ -26,7 +28,7 @@ interface ModalEditCreditProps{
     onSubmit : ()=>void
 }
 
-const ModalEditCredit: React.FC<ModalEditCreditProps> = ({
+const ModalCreditApprove: React.FC<ModalCreditApproveProps> = ({
     open,
     id,
     name,
@@ -109,17 +111,14 @@ const ModalEditCredit: React.FC<ModalEditCreditProps> = ({
           cursor: 'move',
         }}
       >
-        แก้ไขรายการแลกเครดิต
+        รายละเอียดการแลกเครดิต
       </div>
     }
     visible={open}
     onCancel={onClose}
     width={600}
     footer={[
-      <Row className='d-flex justify-content-between'>
-        <BackButton onClick={onClose} disableBtn={false} />
-        <SaveButtton onClick={onSave} disableBtn={disabled} />
-      </Row>
+      
     ]}
   >
     <div className="px-4 py-4 d-flex justify-content-between align-items-center" style={{
@@ -154,129 +153,32 @@ const ModalEditCredit: React.FC<ModalEditCreditProps> = ({
       <span style={{ color: color.Grey }}> {`(1 เครดิต = ${numberWithCommas(cashCondition)} บาท)`}</span>
       <span style={{ color: color.Error }}> *</span>
     </div>
-    <div className="d-flex justify-content-between align-items-center mt-3">
-        <Input disabled value={queryData.isLoading ? 0 : queryData.data.credit ?? 0} type="number" suffix="เครดิต"/>
-        <img src={icon.nearequal} style={{
-            width : '20px',
-            height : '20px',
-            margin : '0px 10px'
-        }}/>
-        <Input value={queryData.isLoading ? 0  : numberWithCommas(queryData.data.credit*cashCondition)} disabled suffix="บาท"/>
-    </div>
+    <p>{queryData.isLoading ? 0 : queryData.data.credit ?? 0} เครดิต</p>
     <div className="mt-3">
         <div className="mt-3">
           <span>หลักฐานการชำระเงิน</span>
           <span style={{ color: color.Grey }}> (ไฟล์รูปภาพ JPG/PNG)</span>
           <span style={{ color: color.Error }}> *</span>
         </div>
-        <div
-          className='hiddenFileBtn mt-2'
-          style={{
-            backgroundImage: `url(${upload_droner_infinity})`,
-            display: 'block',
-          }}
-        >
-            <input key={upload} type='file' onChange={onChangeImage} title='เลือกรูป' />
-        </div>
-       {
-         img &&  <div style={{
-            display: img ? 'flex' : 'none',
-            alignItems : 'center'
-        }} className="mt-3">
-            <p className="m-0 p-0">{img}</p>
-            <DeleteOutlined onClick={()=>{
-                setUpload(null)
-                setImg("")
-            }} style={{
-                color : color.Error,
-                marginLeft : '10px'
-            }}/>
-        </div>
-       }
+        <p className="m-0 p-0" style={{
+            color : color.Success,
+            textDecoration : 'underline'
+        }}>{img}</p>
     </div>
-    <div className="mt-3">
-      <span>ชื่อผู้โอน</span>
-      <span style={{ color: color.Error }}> *</span>
-    </div>
-    <Input placeholder="กรอกชื่อผู้โอน" style={{
-        width : '100%'
-    }} value={cashCheck.name}
-    onChange={(e)=>setCashcheck({
-      ...cashCheck,
-      name : e.target.value
-    })}/>
-    <div className="mt-3">
-      <span>ธนาคาร</span>
-      <span style={{ color: color.Error }}> *</span>
-    </div>
-    <Select
-        placeholder='เลือกธนาคาร'
-        allowClear
-        value={cashCheck.bank === "" ? null : cashCheck.bank}
-        onChange={(e)=>setCashcheck({
-          ...cashCheck,
-          bank : e
-        })}
-        style={{
-            marginTop : '10px',
-            width : '100%',
-            borderRadius : '10px'
-        }}
-    >
-        {
-            bankQuery.isLoading ?
-            <></> :
-            bankQuery.isError ?
-            <></> :
-            bankQuery.data.map((item : any)=>(
-                <Option value={item.bankName} key={item.bankName}>
-                    <img src={item.logoPath} style={{
-                        width : '20px',
-                        height : '20px',
-                        marginRight : '10px'
-                    }}/>
-                    {item.bankName}
-                </Option>
-            ))
-        }
-    </Select>
     <div className="mt-3 row">
         <div className="col-5">
             <div>
               <span>วันที่โอน</span>
               <span style={{ color: color.Error }}> *</span>
             </div>
-            <DatePicker
-              placeholder='เลือกวันที่'
-              format={dateFormat}
-              style={{
-                width : '100%'
-              }}
-              value={cashCheck.date}
-              onChange={(e)=>setCashcheck({
-                ...cashCheck,
-                date : e
-              })}
-            />
+            <p className="mt-1 mb-0">{DateTimeUtil.formatDateThShort(moment(cashCheck.date).format("MM/DD/YYYY"))}</p>
         </div>
         <div className="col-5">
             <div>
               <span>เวลาที่โอน</span>
               <span style={{ color: color.Error }}> *</span>
             </div>
-            <TimePicker
-              value={cashCheck.time}
-              onChange={(e)=>setCashcheck({
-                ...cashCheck,
-                time : e
-              })}
-              format={'HH:mm'}
-              placeholder='เลือกเวลา'
-              style={{
-                width : '100%'
-              }}
-              allowClear={false}
-            />
+            <p className="mt-1 mb-0">{moment(cashCheck.date).format("HH:mm")}</p>
         </div>
     </div>
     <div className="mt-3">
@@ -284,16 +186,12 @@ const ModalEditCredit: React.FC<ModalEditCreditProps> = ({
           <span>สถานะ</span>
           <span style={{ color: color.Error }}> *</span>
         </div>
-        <Radio.Group value={status} className="mt-3"  onChange={(e)=>{
-            setStatus(e.target.value)
-        }}>
-          <Space direction='vertical'>
-            <Radio value={"PENDING"}>รอตรวจสอบ</Radio>
-            <Radio value={"APPROVE"}>อนุมัติ</Radio>
-          </Space>
-        </Radio.Group>
+        <span style={{ color: STATUS_COLOR_CREDIT[status] }}>
+        <Badge color={STATUS_COLOR_CREDIT[status]} />{' '}
+        {STATUS_CREDIT_MAPPING[status]}
+    </span>
     </div>
   </Modal>
 }
 
-export default ModalEditCredit
+export default ModalCreditApprove

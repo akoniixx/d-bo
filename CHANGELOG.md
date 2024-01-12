@@ -1,5 +1,10 @@
 ## [Version - 0]
 
+## Fix [v0.44.2] 2024-1-11
+
+- fixed edit cash credit
+- add watch detail cash credit
+
 ## Fix [v0.44.1] 2024-1-11
 
 - fixed validate data highlight news
