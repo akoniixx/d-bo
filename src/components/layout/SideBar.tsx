@@ -344,12 +344,12 @@ export const pathLists = (isAccounting: boolean, isAdminTask?: boolean) => {
           title: 'รายชื่อนักบินโดรน',
           subMenu: [],
         },
-        // {
-        //   path: '/IndexListStore',
-        //   name: 'IndexListStore',
-        //   title: 'รายชื่อร้านค้า',
-        //   subMenu: [],
-        // },
+        {
+          path: '/IndexListStore',
+          name: 'IndexListStore',
+          title: 'รายชื่อร้านค้า',
+          subMenu: [],
+        },
       ],
     },
   ]

@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { BackIconButton } from '../../../components/button/BackButton'
 import { useNavigate } from 'react-router-dom'
 import { CardHeaderPromotion } from '../../../components/header/CardHeaderPromotion'
@@ -8,9 +8,26 @@ import color from '../../../resource/color'
 import { Badge, Button, Divider, Upload, UploadFile } from 'antd'
 import image from '../../../resource/image'
 import { CardContainer } from '../../../components/card/CardContainer'
+import { OneFinityShopDatasource } from '../../../datasource/OneFinityShopDatasource'
+import { shopOneFinityEntity } from '../../../entities/OneFinityShopEntities'
+const _ = require('lodash')
 
 function DetailStore() {
   const navigate = useNavigate()
+  const queryString = _.split(window.location.pathname, '=')
+
+  const [detail, setDetail] = useState<shopOneFinityEntity>()
+
+  useEffect(() => {
+    const fetchShopDetail = async () => {
+      await OneFinityShopDatasource.getListShopById(queryString[1]).then((res) => {
+        setDetail(res)
+        console.log(res)
+      })
+    }
+    fetchShopDetail()
+  }, [])
+
   const fileList: UploadFile[] = [
     {
       uid: '1',
@@ -24,7 +41,7 @@ function DetailStore() {
     <>
       <div className='d-flex align-items-center'>
         <BackIconButton onClick={() => navigate(-1)} />
-        <strong style={{ fontSize: '20px' }}>{`รายละเอียด | ร้าน "ไม้เมืองการเกษตร"`}</strong>
+        <strong style={{ fontSize: '20px' }}>{`รายละเอียด | ร้าน "${detail?.shopName}"`}</strong>
       </div>
       <div className='row p-2 pb-4'>
         <div className='col-8'>
@@ -36,9 +53,9 @@ function DetailStore() {
               <div className='col'>หมายเลขนิติบุคคล</div>
             </div>
             <div className='row' style={{ fontWeight: '300' }}>
-              <div className='col'>CL00169</div>
-              <div className='col'>ไม้เมืองการเกษตร</div>
-              <div className='col'>33600006789</div>
+              <div className='col'>{detail?.shopNo || '-'}</div>
+              <div className='col'>{detail?.shopName || '-'}</div>
+              <div className='col'>{detail?.taxNo || '-'}</div>
             </div>
             <div className='row pt-4' style={{ fontWeight: '500' }}>
               <div className='col'>ที่อยู่ (บ้านเลขที่ หมู่ ซอย ชั้น อาคาร)</div>
@@ -46,9 +63,9 @@ function DetailStore() {
               <div className='col'>รหัสไปรษณีย์</div>
             </div>
             <div className='row' style={{ fontWeight: '300' }}>
-              <div className='col'>245 ม.5</div>
+              <div className='col'>{detail?.addressDesc || '-'}</div>
               <div className='col' />
-              <div className='col'>62000</div>
+              <div className='col'>{detail?.address.postcode || '-'}</div>
             </div>
             <div className='row pt-4' style={{ fontWeight: '500' }}>
               <div className='col'>ตำบล</div>
@@ -56,30 +73,28 @@ function DetailStore() {
               <div className='col'>จังหวัด</div>
             </div>
             <div className='row' style={{ fontWeight: '300' }}>
-              <div className='col'>นครชุม</div>
-              <div className='col'>เมือง</div>
-              <div className='col'>กำแพงเพชร</div>
+              <div className='col'>{detail?.address.subdistrictName || '-'}</div>
+              <div className='col'>{detail?.address.districtName || '-'}</div>
+              <div className='col'>{detail?.address.provinceName || '-'}</div>
             </div>
             <Divider />
             <div className='row' style={{ fontWeight: '500' }}>
               <div className='col'>เจ้าของร้าน</div>
-              <div className='col'>หมายเลขบัตรประชาชน</div>
+              <div className='col'>ชื่อเล่น</div>
+              <div className='col'>เบอร์โทรศัพท์</div>
+            </div>
+            <div className='row' style={{ fontWeight: '300' }}>
+              <div className='col'>
+                {detail?.title + ' ' + detail?.firstname + ' ' + detail?.lastname}
+              </div>
+              <div className='col'>{detail?.nickname || '-'}</div>
+              <div className='col'>{detail?.telephoneFirst || '-'}</div>
+            </div>
+            <div className='row pt-4' style={{ fontWeight: '500' }}>
               <div className='col'>อีเมล์</div>
             </div>
             <div className='row' style={{ fontWeight: '300' }}>
-              <div className='col'>นางแก้วคำมา แสนแปลง</div>
-              <div className='col'>-</div>
-              <div className='col'>-</div>
-            </div>
-            <div className='row pt-4' style={{ fontWeight: '500' }}>
-              <div className='col'>เบอร์โทรศัพท์ (หลัก)</div>
-              <div className='col'>เบอร์โทรศัพท์ (รอง)</div>
-              <div className='col' />
-            </div>
-            <div className='row' style={{ fontWeight: '300' }}>
-              <div className='col'>0989284761</div>
-              <div className='col'>0855233635</div>
-              <div className='col' />
+              <div className='col'>{detail?.email || '-'}</div>
             </div>
             <Divider />
             <div className='row' style={{ fontWeight: '500' }}>
@@ -98,9 +113,13 @@ function DetailStore() {
             <div className='row' style={{ fontWeight: '500' }}>
               <div className='col'>สถานะ</div>
             </div>
-            <div className='row' style={{ fontWeight: '500', color: color.Success }}>
+            <div
+              className='row'
+              style={{ fontWeight: '500', color: detail?.isActive ? color.Success : color.Error }}
+            >
               <div className='col'>
-                <Badge color={color.Success} /> ใช้งาน
+                <Badge color={detail?.isActive ? color.Success : color.Error} />{' '}
+                {detail?.isActive ? 'ใช้งาน' : 'ปิดการใช้งาน'}
               </div>
             </div>
           </div>
@@ -112,13 +131,13 @@ function DetailStore() {
               width='100%'
               height='370px'
               zoom={17}
-              lat={LAT_LNG_BANGKOK.lat}
-              lng={LAT_LNG_BANGKOK.lng}
+              lat={Number(detail?.latitude)}
+              lng={Number(detail?.longitude)}
             />
             <div className='p-3'>
               <span>ละติจูด / ลองติจูด</span>
               <p>
-                {LAT_LNG_BANGKOK.lat} / {LAT_LNG_BANGKOK.lng}
+                {detail?.latitude || '-'} / {detail?.longitude || '-'}
               </p>
               <Button
                 style={{
@@ -132,10 +151,7 @@ function DetailStore() {
                 }}
                 onClick={() =>
                   window.open(
-                    'https://maps.google.com?q=' +
-                      LAT_LNG_BANGKOK?.lat +
-                      ',' +
-                      LAT_LNG_BANGKOK?.lng,
+                    'https://maps.google.com?q=' + detail?.latitude + ',' + detail?.longitude,
                   )
                 }
               >

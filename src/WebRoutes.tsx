@@ -234,7 +234,7 @@ const WebRoutes: React.FC<any> = () => {
             <Route path='/EditVideoGuru/:id' element={<EditVideoGuru />} />
             <Route path='/IndexGroupGuru' element={<IndexGroupGuru />} />
             <Route path='/IndexListStore' element={<IndexListStore />} />
-            <Route path='/DetailStore' element={<DetailStore />} />
+            <Route path='/DetailStore/:id' element={<DetailStore />} />
             <Route path='/CreditDroner' element={<CreditDroner />} />
             <Route path='/DronerInfinity' element={<DronerInfinity />} />
             <Route path='/DronerInfinity/:id' element={<DronerInfinityCreditList />} />
