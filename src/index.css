@@ -172,10 +172,10 @@ table tr td :hover {
 
 .ant-input-disabled,
 .ant-input-suffix,
-.ant-select-selection-item{
+.ant-select-selection-item {
   color: #000 !important;
 }
 
-.ant-picker-input>input[disabled]{
+.ant-picker-input > input[disabled] {
   color: #000 !important;
 }

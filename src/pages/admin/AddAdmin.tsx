@@ -253,8 +253,8 @@ const AddAdmin = () => {
           </label>
           <Form.Item name='role'>
             <Select placeholder='เลือกบทบาท' onChange={handleOnChangeSelect}>
-              {role.map((item: any, index: number) => (
-                <option key={index} value={item.role} />
+              {ROLE_ADMIN.map((item, index) => (
+                <option key={index} value={item.key}></option>
               ))}
             </Select>
           </Form.Item>
