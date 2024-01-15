@@ -8,6 +8,14 @@ export interface address {
   subdistrictId: number
   subdistrictName: string
 }
+export interface shopFiles {
+  createDate: string
+  filePath: string
+  fileSize: string
+  onefinityShopFileId: string
+  shopId: string
+  updateDate: string
+}
 
 export interface shopOneFinityEntity {
   address: address
@@ -31,9 +39,10 @@ export interface shopOneFinityEntity {
   title: string
   updateBy: string
   updateDate: string
+  shopFiles: shopFiles[]
 }
 
 export interface AllshopOneFinityEntity {
-    data: shopOneFinityEntity[]
-    count: number
-  }
+  data: shopOneFinityEntity[]
+  count: number
+}

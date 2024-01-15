@@ -3,40 +3,28 @@ import { BackIconButton } from '../../../components/button/BackButton'
 import { useNavigate } from 'react-router-dom'
 import { CardHeaderPromotion } from '../../../components/header/CardHeaderPromotion'
 import MapGoogle from '../../../components/map/GoogleMap'
-import { LAT_LNG_BANGKOK } from '../../../definitions/Location'
 import color from '../../../resource/color'
-import { Badge, Button, Divider, Upload, UploadFile } from 'antd'
-import image from '../../../resource/image'
-import { CardContainer } from '../../../components/card/CardContainer'
+import { Badge, Button, Divider } from 'antd'
 import { OneFinityShopDatasource } from '../../../datasource/OneFinityShopDatasource'
 import { shopOneFinityEntity } from '../../../entities/OneFinityShopEntities'
+import ModalShowFile from '../../../components/modal/ModalShowFile'
 const _ = require('lodash')
 
 function DetailStore() {
   const navigate = useNavigate()
   const queryString = _.split(window.location.pathname, '=')
-
   const [detail, setDetail] = useState<shopOneFinityEntity>()
+  const [modalFile, setModalFile] = useState<boolean>(false)
 
   useEffect(() => {
     const fetchShopDetail = async () => {
       await OneFinityShopDatasource.getListShopById(queryString[1]).then((res) => {
         setDetail(res)
-        console.log(res)
       })
     }
     fetchShopDetail()
   }, [])
 
-  const fileList: UploadFile[] = [
-    {
-      uid: '1',
-      name: 'yyy.png',
-      status: 'done',
-      url: image.condition,
-      thumbUrl: image.condition,
-    },
-  ]
   return (
     <>
       <div className='d-flex align-items-center'>
@@ -100,13 +88,16 @@ function DetailStore() {
             <div className='row' style={{ fontWeight: '500' }}>
               <div className='col'>สัญญาเข้าร่วมโครงการ</div>
             </div>
-            <div className='row' style={{ fontWeight: '300' }}>
+            <div className='row' style={{ fontWeight: '500' }}>
               <div className='col-lg-6'>
-                <Upload
-                  listType='picture'
-                  defaultFileList={[...fileList]}
-                  showUploadList={{ showRemoveIcon: false }}
-                />
+                <u
+                  onClick={() => {
+                    setModalFile(!modalFile)
+                  }}
+                  style={{ color: color.Success, cursor: 'pointer' }}
+                >
+                  ดูสัญญาเข้าร่วมโครงการ
+                </u>
               </div>
             </div>
             <Divider />
@@ -161,6 +152,13 @@ function DetailStore() {
           </div>
         </div>
       </div>
+
+      <ModalShowFile
+        show={modalFile}
+        count={detail?.shopFiles.length}
+        file={detail?.shopFiles || []}
+        backButton={() => setModalFile(!modalFile)}
+      />
     </>
   )
 }
