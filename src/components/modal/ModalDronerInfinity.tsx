@@ -2,10 +2,9 @@
 import React, { useEffect, useState } from 'react'
 import { Form, Modal } from 'antd'
 import FooterPage from '../footer/FooterPage'
-import { useNavigate } from 'react-router-dom'
 import { DeleteOutlined, StarFilled } from '@ant-design/icons'
 import { color, icon } from '../../resource'
-import upload_droner_infinity from '../../resource/media/empties/upload_droner_infinity.png'
+import upload_droner_infinity from '../../resource/media/empties/upload_Img_btn.png'
 import '../../pages/farmer/Style.css'
 import { DronerFinityDatasource } from '../../datasource/DronerFinityDatasource'
 import Select from 'react-select'
@@ -19,6 +18,7 @@ import { useLocalStorage } from '../../hook/useLocalStorage'
 import { resizeFileImg } from '../../utilities/ResizeImage'
 import { UploadImageEntity, UploadImageEntity_INTI } from '../../entities/UploadImageEntities'
 import Swal from 'sweetalert2'
+import { UploadImageDatasouce } from '../../datasource/UploadImageDatasource'
 
 interface ModalDronerInfinityProps {
   show: boolean
@@ -52,11 +52,12 @@ const ModalDronerInfinity: React.FC<ModalDronerInfinityProps> = ({
     SearchDronerByIdEntity_INIT,
   )
   const [dropdownVisible, setDropdownVisible] = useState(false)
-
-  const navigate = useNavigate()
   const [profile] = useLocalStorage('profile', [])
   const [createImg, setCreateImg] = useState<UploadImageEntity>(UploadImageEntity_INTI)
   const [editCreateImg, setEditCreateImg] = useState<UploadImageEntity>(UploadImageEntity_INTI)
+  const [previewFile, setPreviewFile] = useState<any>()
+  const [getImage, setGetImage] = useState<any>()
+
   const { Map } = require('immutable')
 
   useEffect(() => {
@@ -68,6 +69,9 @@ const ModalDronerInfinity: React.FC<ModalDronerInfinityProps> = ({
       })
       DronerFinityDatasource.getDronerById(data.id).then((res) => {
         if (res) {
+          UploadImageDatasouce.getImage(res.pathImage).then((resImg) => {
+            setGetImage(resImg.url)
+          })
           const file = res.pathImage
           const parts = file.split('/')
           const filename = parts[parts.length - 1]
@@ -182,6 +186,24 @@ const ModalDronerInfinity: React.FC<ModalDronerInfinityProps> = ({
       setRowDroner(rowDroner + 10)
     }
   }
+  const downloadFile = async () => {
+    try {
+      const response = await DronerFinityDatasource.downloadFile()
+      const blob = new Blob([response], { type: 'application/pdf' })
+      const fileName = 'สัญญาการเข้าร่วมโครงการแนะนำปุ๋ยยาให้แก่เกษตรกร.pdf'
+      const a = document.createElement('a')
+      a.href = window.URL.createObjectURL(blob)
+      a.download = fileName
+      a.style.display = 'none'
+      document.body.appendChild(a)
+      a.click()
+      document.body.removeChild(a)
+    } catch (error) {
+      console.error('Error downloading file:', error)
+      alert('Failed to download the file. Please try again later.')
+    }
+  }
+
   const handelCallBack = async () => {
     setBtnSaveDisable(true)
     const update = `${profile?.firstname} ${profile?.lastname}`
@@ -238,6 +260,21 @@ const ModalDronerInfinity: React.FC<ModalDronerInfinityProps> = ({
     }
     resetState()
   }
+  const onPreviewFile = async () => {
+    const checkImage = action === 'edit' ? getImage : fileList
+    let src = checkImage
+    if (!src) {
+      src = await new Promise((resolve) => {
+        const reader = new FileReader()
+        reader.readAsDataURL(checkImage)
+        reader.onload = () => resolve(reader.result)
+      })
+    }
+    const image = new Image()
+    image.src = src
+    const imgWindow = window.open(src)
+    imgWindow?.document.write(image.outerHTML)
+  }
   const renderFile = (
     fileName:
       | string
@@ -251,7 +288,9 @@ const ModalDronerInfinity: React.FC<ModalDronerInfinityProps> = ({
   ) => {
     return (
       <div className='d-flex'>
-        <span style={{ fontSize: 14 }}>{fileName}</span>
+        <span onClick={onPreviewFile} style={{ fontSize: 14, cursor: 'pointer' }}>
+          {fileName}
+        </span>
         {fileName && (
           <DeleteOutlined
             style={{ color: color.Error, alignSelf: 'center', paddingLeft: 8 }}
@@ -396,8 +435,11 @@ const ModalDronerInfinity: React.FC<ModalDronerInfinityProps> = ({
                 <span style={{ color: color.Error }}> *</span>
               </div>
               <div className='col-lg' style={{ textAlign: 'end' }}>
-                <u style={{ color: color.Success, fontWeight: 500, cursor: 'pointer' }}>
-                  ดาวน์โหลดสัญญาณ
+                <u
+                  onClick={downloadFile}
+                  style={{ color: color.Success, fontWeight: 500, cursor: 'pointer' }}
+                >
+                  ดาวน์โหลดสัญญา
                 </u>
               </div>
             </div>

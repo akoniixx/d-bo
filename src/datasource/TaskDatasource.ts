@@ -265,6 +265,9 @@ export class TaskDatasource {
     unitPrice?: number,
     remark?: string,
     updateBy?: string,
+    status?: string,
+    reviewFarmerScore?: number,
+    reviewFarmerComment?: string,
   ): Promise<any> {
     const param = {
       taskId: taskId,
@@ -272,6 +275,9 @@ export class TaskDatasource {
       unitPrice: unitPrice,
       remark: remark,
       updateBy: updateBy,
+      status: status,
+      reviewFarmerScore: reviewFarmerScore,
+      reviewFarmerComment: reviewFarmerComment,
     }
     return httpClient
       .post(BASE_URL + `/tasks/task-manage-area/save-change-area`, param)

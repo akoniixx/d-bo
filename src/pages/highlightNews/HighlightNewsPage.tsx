@@ -91,7 +91,7 @@ function HighlightNewsPage() {
 
   const PageTitle = (
     <div className='row pb-4'>
-      <div className='col-lg-3' style={{ padding: '10px' }}>
+      <div className='col-lg-4' style={{ padding: '10px' }}>
         <div className='col-lg'>
           <span
             style={{
@@ -133,7 +133,7 @@ function HighlightNewsPage() {
               <Option value={'DRONER'}>Droner App</Option>
             </Select>
           </div>
-          <div className='col-lg'>
+          <div className='col-lg-2'>
             <Button
               className='col-lg-12'
               style={{
@@ -150,7 +150,7 @@ function HighlightNewsPage() {
               ค้นหาข้อมูล
             </Button>
           </div>
-          <div className='col-lg'>
+          <div className='col-lg-2'>
             <Button
               className='col-lg-12'
               onClick={() => navigate('/AddHighlightPage')}

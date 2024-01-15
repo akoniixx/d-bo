@@ -52,6 +52,7 @@ import { useLocalStorage } from '../../hook/useLocalStorage'
 import { resizeFileImg } from '../../utilities/ResizeImage'
 import { useNavigate } from 'react-router-dom'
 import locale from 'antd/es/date-picker/locale/th_TH'
+import ShowLandmark from '../../components/popover/ShowLandmark'
 
 const dateFormat = 'DD/MM/YYYY'
 const dateCreateFormat = 'YYYY-MM-DD'
@@ -1003,7 +1004,7 @@ const EditFarmer = () => {
               {currentItems.map((item, index) => (
                 <>
                   <div className='row pt-3 pb-3' style={{ justifyContent: 'space-between' }}>
-                    <div className='col-lg-4'>
+                    <div className='col-lg-5'>
                       <p
                         style={{
                           textOverflow: 'ellipsis',
@@ -1012,14 +1013,17 @@ const EditFarmer = () => {
                           marginBottom: 0,
                         }}
                       >
-                        {item.plotName}
+                        {item.plotName.length > 15
+                          ? `${item.plotName.slice(0, 15)}...`
+                          : item.plotName}
+                        {item.plotName.length > 15 && <ShowLandmark landmark={item.landmark} />}
                       </p>
                       <p style={{ fontSize: '12px', color: color.Grey }}>{item.plantName}</p>
                     </div>
-                    <div className='col-lg-2'>
+                    <div className='col-lg'>
                       <span>{item.raiAmount} ไร่</span>
                     </div>
-                    <div className='col-lg-3'>
+                    <div className='col-lg'>
                       <span
                         style={{
                           color: STATUS_FARMERPLOT_COLOR_MAPPING[item.status],
@@ -1029,7 +1033,7 @@ const EditFarmer = () => {
                         {STATUS_NORMAL_MAPPING[item.status]}
                       </span>
                     </div>
-                    <div className='col-lg-3 d-flex justify-content-between'>
+                    <div className='col-lg d-flex justify-content-between'>
                       <div className='col-lg-6'>
                         <ActionButton
                           icon={<EditOutlined />}

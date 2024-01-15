@@ -219,13 +219,28 @@ export const pathLists = (isAccounting: boolean, isAdminTask?: boolean) => {
       title: 'ของรางวัล',
       permission: null,
       subMenu: [
+        // {
+        //   path: 'listReward',
+        //   name: 'listReward',
+        //   title: 'รายการของรางวัล',
+        //   permission: null,
+        //   subMenu: [
         {
-          path: '/IndexReward',
-          name: 'IndexReward',
+          path: '/IndexRewardDroner',
+          name: 'IndexRewardDroner',
           title: 'นักบินโดรน',
           permission: null,
           subMenu: [],
         },
+        // {
+        //       path: '/IndexRewardFarmer',
+        //       name: 'IndexRewardFarmer',
+        //       title: 'เกษตรกร',
+        //       permission: null,
+        //       subMenu: [],
+        //     },
+        //   ],
+        // },
       ],
     },
     {
@@ -266,9 +281,9 @@ export const pathLists = (isAccounting: boolean, isAdminTask?: boolean) => {
           subMenu: [],
         },
         // {
-        //   path: "/IndexPermission",
-        //   name: "IndexPermission",
-        //   title: "บทบาทผู้ดูแล",
+        //   path: '/IndexPermission',
+        //   name: 'IndexPermission',
+        //   title: 'บทบาทผู้ดูแล',
         //   subMenu: [],
         // },
       ],
@@ -303,40 +318,40 @@ export const pathLists = (isAccounting: boolean, isAdminTask?: boolean) => {
             },
           ],
         },
+        {
+          path: '/credit',
+          name: 'credit',
+          title: 'เครดิต',
+          subMenu: [
+            {
+              path: '/CreditDroner',
+              name: 'CreditDroner',
+              title: 'นักบินโดรน',
+              subMenu: [],
+            },
+          ],
+        },
+      ],
+    },
+    {
+      path: 'infinity',
+      name: 'infinity',
+      title: 'ระบบ 1-Finity',
+      subMenu: [
+        {
+          path: '/DronerInfinity',
+          name: 'DronerInfinity',
+          title: 'รายชื่อนักบินโดรน',
+          subMenu: [],
+        },
         // {
-        //   path: '/credit',
-        //   name: 'credit',
-        //   title: 'เครดิต',
-        //   subMenu: [
-        //     {
-        //       path: '/CreditDroner',
-        //       name: 'CreditDroner',
-        //       title: 'นักบินโดรน',
-        //       subMenu: [],
-        //     },
-        //   ],
+        //   path: '/IndexListStore',
+        //   name: 'IndexListStore',
+        //   title: 'รายชื่อร้านค้า',
+        //   subMenu: [],
         // },
       ],
     },
-    // {
-    //   path: 'infinity',
-    //   name: 'infinity',
-    //   title: 'ระบบ 1-Finity',
-    //   subMenu: [
-    //     {
-    //       path: '/DronerInfinity',
-    //       name: 'DronerInfinity',
-    //       title: 'รายชื่อนักบินโดรน',
-    //       subMenu: [],
-    //     },
-    //     {
-    //       path: '/IndexListStore',
-    //       name: 'IndexListStore',
-    //       title: 'รายชื่อร้านค้า',
-    //       subMenu: [],
-    //     },
-    //   ],
-    // },
   ]
 
   if (isAdminTask) {

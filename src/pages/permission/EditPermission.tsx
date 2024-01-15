@@ -1,143 +1,203 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { BackIconButton } from '../../components/button/BackButton'
 import { useNavigate } from 'react-router-dom'
 import { Checkbox, Form, Input, Row, Table } from 'antd'
-import color from '../../resource/color'
 import { CardHeader } from '../../components/header/CardHearder'
 import { CardContainer } from '../../components/card/CardContainer'
 import FooterPage from '../../components/footer/FooterPage'
 import Swal from 'sweetalert2'
+import { RoleManage } from '../../datasource/RoleManageDatasource'
+import { numberWithCommas } from '../../utilities/TextFormatter'
+import TableRole from '../../components/table/TableRole'
+import {
+  adminJob,
+  challengeJob,
+  dronerJob,
+  farmerJob,
+  followJob,
+  missionJob,
+  newsJob,
+  pointJob,
+  pointSettingJob,
+  promotionJob,
+  rewardJob,
+  settingJob,
+} from './DefaultRole'
+const _ = require('lodash')
 
 function EditPermission() {
+  const queryString = _.split(window.location.pathname, '=')
+  const roleId = queryString[1]
+  const [saveBtnDisable, setSaveBtnDisable] = useState<boolean>(false)
+
   const navigate = useNavigate()
-  const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    console.log(e.target.value)
-  }
-  const listMenu = [
-    {
-      id: 0,
-      menu: 'ติดตามงาน',
-    },
-    {
-      id: 1,
-      menu: 'ข้อมูลเกษตรกร',
-    },
-    {
-      id: 2,
-      menu: 'ข้อมูลนักบินโดรน',
-    },
-    {
-      id: 3,
-      menu: 'ข่าวสาร / กูรูเกษตร',
-    },
-    {
-      id: 4,
-      menu: 'โปรโมชั่น / คูปอง',
-    },
-    {
-      id: 5,
-      menu: 'แต้มสะสม',
-    },
-    {
-      id: 6,
-      menu: 'ของรางวัล',
-    },
-    {
-      id: 7,
-      menu: 'ภารกิจ',
-    },
-    {
-      id: 8,
-      menu: 'ชาเลนจ์',
-    },
-    {
-      id: 9,
-      menu: 'ผู้ดูแลระบบ',
-    },
-    {
-      id: 10,
-      menu: 'ตั้งค่า',
-    },
-  ]
-  const columns = [
-    {
-      title: 'ชื่อเมนู',
-      dataIndex: 'menu',
-      key: 'menu',
-      render: (value: any, row: any, index: number) => {
-        return {
-          children: <span>{value}</span>,
-        }
-      },
-    },
-    {
-      title: 'เพิ่ม (Add)',
-      dataIndex: 'add',
-      key: 'add',
-      render: (value: any, row: any, index: number) => {
-        return {
-          children: (
-            <>
-              <Checkbox />
-            </>
-          ),
-        }
-      },
-    },
-    {
-      title: 'ดูข้อมูล (View)',
-      dataIndex: 'view',
-      key: 'view',
-      render: (value: any, row: any, index: number) => {
-        return {
-          children: (
-            <>
-              <Checkbox />
-            </>
-          ),
-        }
-      },
-    },
-    {
-      title: 'แก้ไข (Edit)',
-      dataIndex: 'edit',
-      key: 'edit',
-      render: (value: any, row: any, index: number) => {
-        return {
-          children: (
-            <>
-              <Checkbox />
-            </>
-          ),
-        }
-      },
-    },
-    {
-      title: 'ลบ (Delete)',
-      dataIndex: 'delete',
-      key: 'delete',
-      render: (value: any, row: any, index: number) => {
-        return {
-          children: (
-            <>
-              <Checkbox />
-            </>
-          ),
-        }
-      },
-    },
-  ]
+  const [followjobs, setFollowjobs] = useState({
+    name: 'ติดตามงาน',
+    value: followJob,
+  })
+  const [admin, setAdmin] = useState({
+    name: 'ผู้ดูแลระบบ',
+    value: adminJob,
+  })
+  const [challenge, setChallenge] = useState({
+    name: 'ชาเลนจ์',
+    value: challengeJob,
+  })
+  const [dronerInfo, setDronerInfo] = useState({
+    name: 'ข้อมูลนักบินโดรน',
+    value: dronerJob,
+  })
+  const [farmerInfo, setFarmerInfo] = useState({
+    name: 'ข้อมูลเกษตรกร',
+    value: farmerJob,
+  })
+  const [guru, setGuru] = useState({
+    name: 'ข่าวสาร / กูรูเกษตร',
+    value: newsJob,
+  })
+  const [mission, setMission] = useState({
+    name: 'ภารกิจ',
+    value: missionJob,
+  })
+  const [point, setPoint] = useState({
+    name: 'แต้ม',
+    value: pointSettingJob,
+  })
+  const [pointResult, setPointResult] = useState({
+    name: 'แต้มสะสม',
+    value: pointJob,
+  })
+  const [promotion, setPromotion] = useState({
+    name: 'โปรโมชั่น',
+    value: promotionJob,
+  })
+  const [reward, setReward] = useState({
+    name: 'ของรางวัล',
+    value: rewardJob,
+  })
+  const [settings, setSettings] = useState({
+    name: 'ตั้งค่า',
+    value: settingJob,
+  })
+  const [reportPoint, setReportPoint] = useState({
+    name: 'รายงานแต้ม',
+    value: pointJob.pointResult[0].subItem,
+  })
+  const [redeemPoint, setRedeemPoint] = useState({
+    name: 'แลกแต้ม/ของรางวัล',
+    value: pointJob.pointResult[1].subItem,
+  })
+  const [form] = Form.useForm()
+  const [loading, setReloading] = useState<boolean>(true)
+
+  useEffect(() => {
+    const fetchRoleById = async () => {
+      await RoleManage.getRoleById(roleId).then((res) => {
+        setFollowjobs({
+          ...followjobs,
+          value: {
+            followJob: res.followJob,
+          },
+        })
+        setReloading(false)
+        setAdmin({
+          ...admin,
+          value: {
+            admin: res.admin,
+          },
+        })
+        setChallenge({
+          ...challenge,
+          value: {
+            challenge: res.challenge,
+          },
+        })
+        setDronerInfo({
+          ...dronerInfo,
+          value: {
+            dronerJob: res.dronerInfo,
+          },
+        })
+        setFarmerInfo({
+          ...farmerInfo,
+          value: {
+            farmerJob: res.farmerInfo,
+          },
+        })
+        setGuru({
+          ...guru,
+          value: {
+            guru: res.guru,
+          },
+        })
+        setMission({
+          ...mission,
+          value: {
+            mission: res.mission,
+          },
+        })
+        setPoint({
+          ...point,
+          value: {
+            point: res.point,
+          },
+        })
+        setPointResult({
+          ...pointResult,
+          value: {
+            pointResult: res.pointResult,
+          },
+        })
+        setPromotion({
+          ...promotion,
+          value: {
+            promotion: res.promotion,
+          },
+        })
+        setReward({
+          ...reward,
+          value: {
+            reward: res.reward,
+          },
+        })
+        setSettings({
+          ...settings,
+          value: {
+            settings: res.settings,
+          },
+        })
+        setReportPoint({
+          ...reportPoint,
+          value: {
+            subPointResult: res.pointResult[0].subItem.subPointResult,
+          },
+        })
+        setRedeemPoint({
+          ...redeemPoint,
+          value: {
+            subPointResult: res.pointResult[1].subItem.subPointResult,
+          },
+        })
+        form.setFieldsValue({
+          role: res.role,
+          count: numberWithCommas(res.count),
+        })
+      })
+    }
+    fetchRoleById()
+  }, [])
+
   const permissionData = (
     <div className='pt-1'>
       <CardContainer>
         <CardHeader textHeader='ข้อมูลบทบาทผู้ดูแล' />
-        <Form style={{ padding: '32px' }} className='row'>
+        <Form form={form} style={{ padding: '32px' }} className='row'>
           <div className='form-group col-lg-6'>
             <label>
               ชื่อบทบาท <span style={{ color: 'red' }}>*</span>
             </label>
             <Form.Item
-              name='permission'
+              name='role'
               rules={[
                 {
                   required: true,
@@ -145,56 +205,94 @@ function EditPermission() {
                 },
               ]}
             >
-              <Input
-                placeholder='กรอกชื่อบทบาท'
-                defaultValue='Super Admin'
-                onChange={handleOnChange}
-                autoComplete='off'
-              />
+              <Input placeholder='กรอกชื่อบทบาท' autoComplete='off' />
             </Form.Item>
           </div>
           <div className='form-group col-lg-6'>
             <label>จำนวนผู้ดูแลระบบ</label>
-            <Form.Item name='permission'>
-              <Input placeholder='2 คน' disabled />
+            <Form.Item name='count'>
+              <Input disabled />
             </Form.Item>
           </div>
         </Form>
       </CardContainer>
     </div>
   )
-  const listMenuData = (
-    <div className='pt-3'>
-      <Table columns={columns} dataSource={listMenu} pagination={false} />
-    </div>
-  )
-  const updatePermission = () => {
-    Swal.fire({
-      title: 'บันทึกสำเร็จ',
-      icon: 'success',
-      timer: 1500,
-      showConfirmButton: false,
-    }).then(() => {
-      navigate('/IndexPermission')
-    })
+  const updatePermission = async () => {
+    setSaveBtnDisable(true)
+    const payload: any = {}
+    payload.id = roleId
+    payload.role = form.getFieldValue('role')
+    payload.count = form.getFieldValue('count')
+    payload.followJob = followjobs.value?.followJob
+    payload.farmerInfo = farmerInfo.value?.farmerJob
+    payload.dronerInfo = dronerInfo.value?.dronerJob
+    payload.admin = admin.value?.admin
+    payload.guru = guru.value?.guru
+    payload.mission = mission.value?.mission
+    payload.challenge = challenge.value?.challenge
+    payload.reward = reward.value?.reward
+    payload.pointResult = pointResult.value?.pointResult
+    payload.settings = settings.value?.settings
+    payload.point = point.value?.point
+    payload.promotion = promotion.value?.promotion
+    await RoleManage.updateRole(payload)
+      .then((res) => {
+        setSaveBtnDisable(false)
+        if (res) {
+          Swal.fire({
+            title: 'บันทึกสำเร็จ',
+            icon: 'success',
+            timer: 1500,
+            showConfirmButton: false,
+          }).then(() => {
+            navigate('/IndexPermission')
+          })
+        }
+      })
+      .catch((err) => {
+        setSaveBtnDisable(false)
+        console.log(err)
+      })
   }
-  return (
-    <div>
-      <Row>
-        <BackIconButton onClick={() => navigate(-1)} />
-        <span className='pt-3'>
-          <strong style={{ fontSize: '20px' }}>แก้ไขบทบาทผู้ดูแลระบบ</strong>
-        </span>
-      </Row>
-      {permissionData}
-      {listMenuData}
-      <FooterPage
-        onClickBack={() => navigate(-1)}
-        onClickSave={updatePermission}
-        // disableSaveBtn={saveBtnDisable}
-      />
-    </div>
-  )
+
+  if (loading) {
+    return <></>
+  } else {
+    return (
+      <div>
+        <Row>
+          <BackIconButton onClick={() => navigate(-1)} />
+          <span className='pt-3'>
+            <strong style={{ fontSize: '20px' }}>แก้ไขบทบาทผู้ดูแลระบบ</strong>
+          </span>
+        </Row>
+        {permissionData}
+        <TableRole
+          page='edit'
+          dataJob={[followjobs]}
+          dataFarmer={[farmerInfo]}
+          dataDroner={[dronerInfo]}
+          dataGuru={[guru]}
+          dataReward={[reward]}
+          dataMission={[mission]}
+          dataPromotion={[promotion]}
+          dataPointResult={[pointResult]}
+          dataReportPoint={[reportPoint]}
+          dataRedeemPoint={[redeemPoint]}
+          dataAdmin={[admin]}
+          dataSetting={[settings]}
+          dataPoint={[point]}
+          dataChallenge={[challenge]}
+        />
+        <FooterPage
+          onClickBack={() => navigate(-1)}
+          onClickSave={updatePermission}
+          disableSaveBtn={saveBtnDisable}
+        />
+      </div>
+    )
+  }
 }
 
 export default EditPermission

@@ -25,8 +25,8 @@ export class DronerFinityDatasource {
       provinceId: provinceId,
       districtId: districtId,
       subdistrictId: subdistrictId,
-      creditMin: creditMin,
-      creditMax: creditMax,
+      creditMin: creditMin === 0 && creditMax === 0 ? null : creditMin,
+      creditMax: creditMin === 0 && creditMax === 0 ? null : creditMax,
       sortField: sortField,
       sortDirection: sortDirection,
       page: page,
@@ -111,6 +111,18 @@ export class DronerFinityDatasource {
       .get(BASE_URL + `/droner-one-finity/find-one-droner-one-finity/${id}`)
       .then((response) => {
         return response.data.responseData
+      })
+      .catch((error) => {
+        console.log(error)
+      })
+  }
+  static downloadFile(): Promise<any> {
+    return httpClient
+      .get(BASE_URL + '/droner-one-finity/file-promise-one-finity', {
+        responseType: 'arraybuffer',
+      })
+      .then((response) => {
+        return response.data
       })
       .catch((error) => {
         console.log(error)

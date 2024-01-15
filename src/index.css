@@ -22,7 +22,9 @@ body {
 table tr td :hover {
   font-weight: normal !important;
 }
-
+.table-head-role td {
+  background-color: #eef6f0 !important;
+}
 .table-row-old td {
   background-color: rgba(244, 132, 26, 0.2) !important;
 }
@@ -162,4 +164,18 @@ table tr td :hover {
 }
 .tab-status-inactive .ant-tabs-tab-active .ant-tabs-tab-btn {
   color: #eb5757 !important;
+}
+
+.ant-slider-track-1 {
+  background-color: #219653 !important;
+}
+
+.ant-input-disabled,
+.ant-input-suffix,
+.ant-select-selection-item {
+  color: #000 !important;
+}
+
+.ant-picker-input > input[disabled] {
+  color: #000 !important;
 }

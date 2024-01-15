@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Form, Input, Radio, Row, Select, Space, Tooltip } from 'antd'
 import { BackIconButton } from '../../components/button/BackButton'
 import { CardContainer } from '../../components/card/CardContainer'
@@ -10,12 +10,14 @@ import { AdminDatasource } from '../../datasource/AdminDatasource'
 import Swal from 'sweetalert2'
 import { ExclamationCircleOutlined } from '@ant-design/icons'
 import { useNavigate } from 'react-router-dom'
+import { RoleManage } from '../../datasource/RoleManageDatasource'
 
 const _ = require('lodash')
 const { Map } = require('immutable')
 
 const AddAdmin = () => {
   const navigate = useNavigate()
+  const [role, setRole] = useState<any>([])
   const [showBtn, setShowBtn] = useState<boolean>(true)
   const [data, setData] = useState<UserStaffEntity>(UserStaffEntity_INIT)
   const textPassword = (
@@ -42,6 +44,12 @@ const AddAdmin = () => {
     const m = Map(data).set('isActive', e.target.value)
     setData(m.toJS())
   }
+  useEffect(() => {
+    const getRole = async () => {
+      await RoleManage.getRoleOnly().then((res) => setRole(res))
+    }
+    getRole()
+  }, [])
 
   const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const m = Map(data).set(e.target.id, e.target.value)
@@ -245,8 +253,8 @@ const AddAdmin = () => {
           </label>
           <Form.Item name='role'>
             <Select placeholder='เลือกบทบาท' onChange={handleOnChangeSelect}>
-              {ROLE_ADMIN.map((item) => (
-                <option value={item.key}></option>
+              {ROLE_ADMIN.map((item, index) => (
+                <option key={index} value={item.key}></option>
               ))}
             </Select>
           </Form.Item>
@@ -272,8 +280,8 @@ const AddAdmin = () => {
     <>
       <Row>
         <BackIconButton onClick={() => navigate('/IndexAdmin')} />
-        <span className='pt-4'>
-          <strong style={{ fontSize: '20px' }}>เพิ่มข้อมูลผู้ดูแลระบบ (User Management)</strong>
+        <span className='pt-3'>
+          <strong style={{ fontSize: '20px' }}>เพิ่มข้อมูลผู้ดูแลระบบ</strong>
         </span>
       </Row>
       <CardContainer>

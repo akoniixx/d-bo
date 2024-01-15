@@ -4,6 +4,7 @@ import { Routes, Route, Navigate, BrowserRouter } from 'react-router-dom'
 import { Spin } from 'antd'
 import ProtectRoute from './ProtectRoute'
 import PublicRoute from './PublicRoute'
+import DronerInfinityCreditList from './pages/infinity/droner/DronerInfinityCreditList'
 
 const ErrorLoginPage = lazy(() => import('./errorPage/ErrorLoginPage'))
 const PageNotFound = lazy(() => import('./httpError/PageNotFound'))
@@ -55,10 +56,14 @@ const IndexDetailDronerPoint = lazy(() => import('./pages/droner/IndexDetailDron
 const EditCampaignPoint = lazy(() => import('./pages/campaign/point/EditCampaignPoint'))
 const ConditionDroner = lazy(() => import('./pages/setting/pointSetting/ConditionDroner'))
 const ConditionFarmer = lazy(() => import('./pages/setting/pointSetting/ConditionFarmer'))
-const IndexReward = lazy(() => import('./pages/reward/droner/IndexReward'))
-const AddReward = lazy(() => import('./pages/reward/droner/AddReward'))
-const EditReward = lazy(() => import('./pages/reward/droner/EditReward'))
-const RedeemHistory = lazy(() => import('./pages/reward/droner/RedeemHistory'))
+const IndexRewardDroner = lazy(() => import('./pages/reward/droner/IndexRewardDroner'))
+const AddRewardDroner = lazy(() => import('./pages/reward/droner/AddRewardDroner'))
+const EditRewardDroner = lazy(() => import('./pages/reward/droner/EditRewardDroner'))
+const RedeemHistoryDroner = lazy(() => import('./pages/reward/droner/RedeemHistoryDroner'))
+const IndexRewardFarmer = lazy(() => import('./pages/reward/farmer/IndexRewardFarmer'))
+const AddRewardFarmer = lazy(() => import('./pages/reward/farmer/AddRewardFarmer'))
+const EditRewardFarmer = lazy(() => import('./pages/reward/farmer/EditRewardFarmer'))
+const RedeemHistoryFarmer = lazy(() => import('./pages/reward/farmer/RedeemHistoryFarmer'))
 const IndexReceivePoint = lazy(() => import('./pages/point/IndexReceivePoint'))
 const IndexPlanningPoint = lazy(() => import('./pages/point/IndexPlanningPoint'))
 const DetailReceivePoint = lazy(() => import('./pages/point/DetailReceivePoint'))
@@ -188,10 +193,14 @@ const WebRoutes: React.FC<any> = () => {
             <Route path='/DetailFarmerRedeem/:id' element={<DetailFarmerRedeem />} />
             <Route path='/DetailDronerRedeem/:id' element={<DetailDronerRedeem />} />
             <Route path='/IndexDronerSummaryPoint' element={<IndexDronerSummaryPoint />} />
-            <Route path='/IndexReward' element={<IndexReward />} />
-            <Route path='/AddReward' element={<AddReward />} />
-            <Route path='/EditReward/:id' element={<EditReward />} />
-            <Route path='/RedeemHistory/:id' element={<RedeemHistory />} />
+            <Route path='/IndexRewardDroner' element={<IndexRewardDroner />} />
+            <Route path='/AddRewardDroner' element={<AddRewardDroner />} />
+            <Route path='/EditRewardDroner/:id' element={<EditRewardDroner />} />
+            <Route path='/RedeemHistoryDroner/:id' element={<RedeemHistoryDroner />} />
+            <Route path='/IndexRewardFarmer' element={<IndexRewardFarmer />} />
+            <Route path='/AddRewardFarmer' element={<AddRewardFarmer />} />
+            <Route path='/EditRewardFarmer/:id' element={<EditRewardFarmer />} />
+            <Route path='/RedeemHistoryFarmer/:id' element={<RedeemHistoryFarmer />} />
             <Route path='/IndexFarmerSummary' element={<IndexFarmerSummary />} />
             <Route path='/IndexFarmerHistorySum/:id' element={<IndexFarmerHistorySum />} />
             <Route path='/DetailDronerHistorySum/:id' element={<DetailDronerHistorySum />} />
@@ -208,7 +217,7 @@ const WebRoutes: React.FC<any> = () => {
             <Route path='/IndexAdminTask' element={<IndexAdminTask />} />
             <Route path='/IndexPlotList' element={<IndexPlotList />} />
             <Route path='/IndexPermission' element={<IndexPermission />} />
-            <Route path='/EditPermission' element={<EditPermission />} />
+            <Route path='/EditPermission/:id' element={<EditPermission />} />
             <Route path='/AddPermission' element={<AddPermission />} />
             <Route path='/IndexPointManual' element={<IndexPointManual />} />
             <Route path='/DetailPointManual/:id' element={<DetailPointManual />} />
@@ -228,6 +237,7 @@ const WebRoutes: React.FC<any> = () => {
             <Route path='/DetailStore' element={<DetailStore />} />
             <Route path='/CreditDroner' element={<CreditDroner />} />
             <Route path='/DronerInfinity' element={<DronerInfinity />} />
+            <Route path='/DronerInfinity/:id' element={<DronerInfinityCreditList />} />
           </Route>
           <Route element={<PublicRoute />}>
             <Route index element={<AuthPage />} />

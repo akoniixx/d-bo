@@ -10,6 +10,7 @@ import { AdminDatasource } from '../../datasource/AdminDatasource'
 import Swal from 'sweetalert2'
 import { ExclamationCircleOutlined } from '@ant-design/icons'
 import { useNavigate } from 'react-router-dom'
+import { RoleManage } from '../../datasource/RoleManageDatasource'
 
 const _ = require('lodash')
 const { Map } = require('immutable')
@@ -17,6 +18,7 @@ const { Map } = require('immutable')
 const EditAdmin = () => {
   const queryString = _.split(window.location.pathname, '=')
   const navigate = useNavigate()
+  const [role, setRole] = useState<any>([])
   const admidId = queryString[1]
   const [showBtn, setShowBtn] = useState<boolean>(true)
   const [data, setData] = useState<UserStaffEntity>(UserStaffEntity_INIT)
@@ -27,7 +29,12 @@ const EditAdmin = () => {
     </span>
   )
   const [tooltipUserOpen, setTooltipUserOpen] = useState<boolean>(false)
-
+  useEffect(() => {
+    const getRole = async () => {
+      await RoleManage.getRoleOnly().then((res) => setRole(res))
+    }
+    getRole()
+  }, [])
   const fecthAdmin = async (id: string) => {
     await AdminDatasource.getAdminById(id).then((res) => {
       checkValidate(res)
@@ -190,8 +197,8 @@ const EditAdmin = () => {
               defaultValue={data.role}
               onChange={handleOnChangeSelect}
             >
-              {ROLE_ADMIN.map((item) => (
-                <option value={item.key}></option>
+              {ROLE_ADMIN.map((item, index) => (
+                <option key={index} value={item.key}></option>
               ))}
             </Select>
           </Form.Item>
@@ -218,8 +225,8 @@ const EditAdmin = () => {
     <>
       <Row>
         <BackIconButton onClick={() => navigate('/IndexAdmin')} />
-        <span className='pt-4'>
-          <strong style={{ fontSize: '20px' }}>แก้ไขข้อมูลผู้ดูแลระบบ (User Management)</strong>
+        <span className='pt-3'>
+          <strong style={{ fontSize: '20px' }}>แก้ไขข้อมูลผู้ดูแลระบบ</strong>
         </span>
       </Row>
       <CardContainer key={data.id}>

@@ -418,6 +418,10 @@ const EditNewTask = () => {
     const d = Map(data).set('preparationBy', e.target.value)
     setData(d.toJS())
   }
+  const handlePreparationRemark = (e: any) => {
+    const d = Map(data).set('preparationRemark', e.target.value)
+    setData(d.toJS())
+  }
   const handleComment = (e: any) => {
     const d = Map(data).set('comment', e.target.value)
     setData(d.toJS())
@@ -525,7 +529,9 @@ const EditNewTask = () => {
                         defaultValue={data?.farmerPlotId}
                       >
                         {dataFarmer?.farmerPlot.map((item) => (
-                          <option value={item.id}>{item.plotName}</option>
+                          <option key={item.id} value={item.id}>
+                            {item.plotName} {`(${item.raiAmount} ไร่)`}
+                          </option>
                         ))}
                       </AntdSelect>
                       {checkSelectPlot == 'error' && (
@@ -893,10 +899,21 @@ const EditNewTask = () => {
               </Space>
             </Radio.Group>
           </div>
-          <div className='form-group'>
+          {data.preparationBy === 'นักบินโดรนเตรียมให้' ? (
+            <div className='col-lg-6'>
+              <TextArea
+                style={{ height: '80px', left: '3%' }}
+                placeholder='(บังคับ) ระบุชื่อยา/ปุ๋ย และจำนวนที่ใช้'
+                onChange={handlePreparationRemark}
+                defaultValue={data.preparationRemark}
+              />
+            </div>
+          ) : null}
+          <div className='form-group pt-3 col-lg-6'>
             <label>หมายเหตุ</label>
             <Form.Item>
               <TextArea
+                style={{ left: 20, height: '80px' }}
                 value={data.comment}
                 placeholder='ระบุหมายเหตุเพื่อแจ้งนักบินโดรน เช่น เกษตรกรจะเตรียมยาให้, ฝากนักบินเลือกยาราคาไม่แพงมาให้หน่อย เป็นต้น'
                 disabled={current == 2 || checkSelectPlot == 'error'}

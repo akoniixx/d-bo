@@ -121,7 +121,6 @@ const AdminCancelTask = () => {
       console.error(error)
     }
   }
-
   const pageTitle = (
     <Row style={{ padding: '10px' }}>
       <Col span={24}>
@@ -279,37 +278,45 @@ const AdminCancelTask = () => {
             <Col span={4} />
           </>
         </Row>
-        <Row justify={'space-between'} gutter={8} style={{ paddingBottom: '15px' }}>
+        {taskSelected?.data.preparationBy === 'นักบินโดรนเตรียมให้' && (
+          <Row justify={'space-between'} gutter={8} style={{ paddingBottom: '15px' }}>
+            <Col span={24} style={{ fontWeight: 'bold' }}>
+              รายละเอียดยา
+            </Col>
+            <Col span={24}>{taskSelected?.data.preparationRemark || '-'}</Col>
+          </Row>
+        )}
+        <div className='d-flex ' style={{ paddingBottom: '15px' }}>
           <>
-            <Col span={8} style={{ fontWeight: 'bold' }}>
+            <div className='col-lg-2' style={{ fontWeight: 'bold' }}>
               ภาพหลักฐานการบิน{' '}
               <span style={{ color: color.Grey, fontWeight: 'lighter' }}>
                 ({taskSelected?.imageTask.length || 0} รูป)
               </span>
-            </Col>
-            <Col span={8} style={{ fontWeight: 'bold' }}>
+            </div>
+            <div className='col-lg-2' style={{ fontWeight: 'bold' }}>
               ภาพปุ๋ยและยา{' '}
               <span style={{ fontWeight: 'lighter', color: color.Grey }}>
                 {' '}
                 ({imgDrug?.length || 0} รูป)
               </span>
-            </Col>
-            <Col span={8} style={{ fontWeight: 'bold' }}>
+            </div>
+            <div className='col-lg-2' style={{ fontWeight: 'bold' }}>
               หมายเหตุ
-            </Col>
+            </div>
           </>
-          <>
-            <Col span={8} style={{ paddingRight: 20 }}>
-              <ImagCards image={imgControl || image.empty_cover} />
-            </Col>
+        </div>
+        <div className='d-flex'>
+          <div className='col-lg-2' style={{ paddingRight: 20 }}>
+            <ImagCards image={imgControl} />
+          </div>
 
-            <Col span={8} style={{ paddingRight: 20 }}>
-              <ImagCards image={imgDrug ? imgDrug : image.empty_cover} show={true} />
-            </Col>
+          <div className='col-lg-2' style={{ paddingRight: 20 }}>
+            <ImagCards image={imgDrug} show={true} />
+          </div>
 
-            <Col span={8}>{taskSelected?.data.comment || '-'}</Col>
-          </>
-        </Row>
+          <div className='col-lg-2'>{taskSelected?.data.comment || '-'}</div>
+        </div>
       </Card>
       {checkStatus !== 'CANCELED' && (
         <div className='pt-2 pb-2'>
