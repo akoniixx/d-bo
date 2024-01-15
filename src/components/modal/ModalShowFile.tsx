@@ -29,29 +29,24 @@ const ModalShowFile: React.FC<ModalShowFileProps> = ({ show, count, file, backBu
       <div className='px-4 pt-4'>
         <span className='text-secondary'>ทั้งหมด {count} ไฟล์</span>
       </div>
-      <Divider
-        style={{
-          marginBottom: '20px',
-        }}
-      />
-      {file &&
-        file.map((item, index) => (
-          <div key={index} className='d-flex p-2 justify-content-between'>
-            <div className='col-lg'>
-              <embed src={item.filePath} style={{ width: '120px', height: '90px' }} />
+      <div className='p-4 '>
+        {file &&
+          file.map((item, index) => (
+            <div
+              onClick={() => onPreviewFile(item.filePath)}
+              key={index}
+              className='d-flex p-2 pb-2 justify-content-between'
+              style={{ border: '0.2px solid ', borderRadius: '10px', cursor: 'pointer', marginBottom: '10px', }}
+            >
+              <div className='col-lg-4'>
+                <embed src={item.filePath} style={{ width: '120px', height: '90px' }} />
+              </div>
+              <div className='col-lg align-self-center'>
+                <span>{item.shopId}.png</span>
+              </div>
             </div>
-            <div className='col-lg'>
-              <span>{item.shopId}</span>
-            </div>
-            <div className='col-lg-2'>
-              <img
-                src={icon.view}
-                style={{ width: 22, height: 22, cursor: 'pointer' }}
-                onClick={() => onPreviewFile(item.filePath)}
-              />
-            </div>
-          </div>
-        ))}
+          ))}
+      </div>
     </Modal>
   )
 }
