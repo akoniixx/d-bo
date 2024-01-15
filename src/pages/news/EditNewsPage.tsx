@@ -325,10 +325,10 @@ function EditNewsPage() {
         })
     }
   }
-
   useEffect(() => {
     NewsDatasource.getNewsById(queryString[1]).then((res) => {
       const dataAll = res
+
       if (res) {
         NewsDatasource.checkCountPoint('DRONER').then((res) => {
           if (res) {
@@ -403,7 +403,6 @@ function EditNewsPage() {
           ? moment(new Date().toUTCString())
           : moment(new Date(res.endDate).toUTCString()),
       })
-      console.log(res.endTime)
       setStatus(res.status)
       setNewsName(res.title)
       setDescriptionEditor(res.details)
@@ -749,7 +748,11 @@ function EditNewsPage() {
                           </div>
                         </div>
                       </Radio>
-                      <Radio value={'DRAFTING'}>รอเปิดใช้งาน</Radio>
+                      {status === 'DRAFTING' ? (
+                        <Radio value={'DRAFTING'}>รอเปิดใช้งาน</Radio>
+                      ) : (
+                        <Radio value={'INACTIVE'}>ปิดการใช้งาน</Radio>
+                      )}
                     </Radio.Group>
                   </Form.Item>
                 </div>
