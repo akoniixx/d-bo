@@ -703,6 +703,7 @@ function EditRewardDroner() {
                     className='d-flex flex-column'
                     onChange={(e) => setRewardStatus(e.target.value)}
                   >
+                    {checkStatus === 'DRAFTING' && <Radio value={'DRAFTING'}>รอเปิดใช้งาน</Radio>}
                     <Radio value={'ACTIVE'}>ใช้งาน</Radio>
                     <Radio value={'INACTIVE'}>ปิดการใช้งาน</Radio>
                   </Radio.Group>

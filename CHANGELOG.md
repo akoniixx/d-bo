@@ -1,5 +1,10 @@
 ## [Version - 0]
 
+## Fix [v0.44.3] 2024-1-15
+
+- fixed some bugs (cut off)
+- hide reward farmer & role management menu
+
 ## Fix [v0.44.2] 2024-1-11
 
 - fixed edit cash credit

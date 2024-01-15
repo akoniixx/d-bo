@@ -153,8 +153,8 @@ const IndexAdmin = () => {
           onChange={handleOnChangeRole}
           allowClear
         >
-          {role.map((item: any, index: number) => (
-            <option key={index} value={item.role} />
+          {ROLE_ADMIN.map((item, index) => (
+            <option key={index} value={item.key}></option>
           ))}
         </Select>
       </div>
