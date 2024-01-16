@@ -1,13 +1,18 @@
-import { Badge, Button, Input, Pagination, PaginationProps, Select, Spin, Table, Tabs } from 'antd'
+import {
+  Alert,
+  Badge,
+  Button,
+  Input,
+  Pagination,
+  PaginationProps,
+  Select,
+  Spin,
+  Table,
+  Tabs,
+} from 'antd'
 import React, { useEffect, useState } from 'react'
 import { color, image } from '../../../resource'
-import {
-  CaretDownOutlined,
-  CaretUpOutlined,
-  DeleteOutlined,
-  EditOutlined,
-  FileTextOutlined,
-} from '@ant-design/icons'
+import { CaretDownOutlined, CaretUpOutlined, FileTextOutlined } from '@ant-design/icons'
 import { DateTimeUtil } from '../../../utilities/DateTimeUtil'
 import { numberWithCommas } from '../../../utilities/TextFormatter'
 import ActionButton from '../../../components/button/ActionButton'
@@ -15,11 +20,14 @@ import { useNavigate } from 'react-router-dom'
 import { ProviceEntity } from '../../../entities/LocationEntities'
 import { LocationDatasource } from '../../../datasource/LocationDatasource'
 import icon from '../../../resource/icon'
+import { AuthDatasource } from '../../../datasource/AuthDatasource'
+import { AllshopOneFinityEntity } from '../../../entities/OneFinityShopEntities'
+import { OneFinityShopDatasource } from '../../../datasource/OneFinityShopDatasource'
 
 function IndexListStore() {
-  const [status, setStatus] = useState<any>()
-  const [provinceSelect, setProvinceSelect] = useState<any>()
+  const [status, setStatus] = useState<boolean>(true)
   const [searchText, setSearchText] = useState<string>('')
+  const [searchProvince, setSearchProvince] = useState<any>()
   const [loading, setLoading] = useState<boolean>(false)
   const [row, setRow] = useState(10)
   const [current, setCurrent] = useState(1)
@@ -27,24 +35,70 @@ function IndexListStore() {
   const [sortDirection, setSortDirection] = useState<string | undefined>(undefined)
   const [sortDirection1, setSortDirection1] = useState<string | undefined>(undefined)
   const [sortDirection2, setSortDirection2] = useState<string | undefined>(undefined)
-  const [sortDirection3, setSortDirection3] = useState<string | undefined>(undefined)
-  const [sortDirection4, setSortDirection4] = useState<string | undefined>(undefined)
   const [sortField, setSortField] = useState<string | undefined>(undefined)
+  const [shopData, setShopData] = useState<AllshopOneFinityEntity>()
+  const [checkToken, setCheckToken] = useState<boolean>(false)
 
+  const profile = JSON.parse(localStorage.getItem('profile') || '{  }')
+  const [error, setError] = useState<any>(null)
   const navigate = useNavigate()
+
   useEffect(() => {
+    const fetchAuthUserShop = async () => {
+      await AuthDatasource.loginUserSellCoda(profile?.email).then((res) => {
+        if (res.accessToken) {
+          setCheckToken(true)
+          localStorage.setItem('onefinity-shop', res.accessToken)
+        } else {
+          setError(
+            <Alert
+              description={
+                <span>
+                  <strong>แจ้งเตือน!!</strong> เนื่องจากอีเมล์ของคุณไม่ได้เชื่อมต่อระบบ IconKaset
+                  Shop ทำให้ไม่สามารถดึงข้อมูลต่างๆ ได้ กรุณาติดต่อเจ้าหน้าที่เพื่อเชื่อมต่ออีเมล์
+                </span>
+              }
+              type='warning'
+              showIcon
+            />,
+          )
+        }
+      })
+    }
     const fetchProvince = async () => {
       await LocationDatasource.getProvince().then((res) => {
         setProvince(res)
       })
     }
-
+    fetchAuthUserShop()
     fetchProvince()
   }, [])
+  useEffect(() => {
+    if (checkToken) {
+      fetchListShop()
+    }
+  }, [checkToken, status, sortDirection])
+
+  const fetchListShop = async () => {
+    setLoading(true)
+    await OneFinityShopDatasource.getListShop(
+      current,
+      row,
+      sortField,
+      sortDirection,
+      searchText,
+      status,
+      searchProvince,
+    )
+      .then((res) => {
+        setShopData(res)
+      })
+      .finally(() => setLoading(false))
+  }
 
   const tabConfigurations = [
-    { title: 'ใช้งาน', key: 'ACTIVE' },
-    { title: 'ปิดการใช้งาน', key: 'INACTIVE' },
+    { title: 'ใช้งาน', key: true },
+    { title: 'ปิดการใช้งาน', key: false },
   ]
   const onShowSizeChange: PaginationProps['onShowSizeChange'] = (current, pageSize) => {
     setCurrent(current)
@@ -63,21 +117,21 @@ function IndexListStore() {
                 cursor: 'pointer',
               }}
               onClick={() => {
-                setSortField('updatedAt')
+                setSortField('shopNo')
                 setSortDirection((prev) => {
-                  if (prev === 'asc') {
-                    return 'desc'
+                  if (prev === 'ASC') {
+                    return 'DESC'
                   } else if (prev === undefined) {
-                    return 'asc'
+                    return 'ASC'
                   } else {
                     return undefined
                   }
                 })
                 setSortDirection1((prev) => {
-                  if (prev === 'asc') {
-                    return 'desc'
+                  if (prev === 'ASC') {
+                    return 'DESC'
                   } else if (prev === undefined) {
-                    return 'asc'
+                    return 'ASC'
                   } else {
                     return undefined
                   }
@@ -88,27 +142,27 @@ function IndexListStore() {
                 style={{
                   position: 'relative',
                   top: 2,
-                  color: sortDirection1 === 'asc' ? '#ffca37' : 'white',
+                  color: sortDirection1 === 'ASC' ? '#ffca37' : 'white',
                 }}
               />
               <CaretDownOutlined
                 style={{
                   position: 'relative',
                   bottom: 2,
-                  color: sortDirection1 === 'desc' ? '#ffca37' : 'white',
+                  color: sortDirection1 === 'DESC' ? '#ffca37' : 'white',
                 }}
               />
             </div>
           </div>
         )
       },
-      dataIndex: 'updatedAt',
-      key: 'updatedAt',
+      dataIndex: 'shopNo',
+      key: 'shopNo',
       render: (value: any, row: any, index: number) => {
         return {
           children: (
             <div className='container'>
-              <span className='text-dark-75  d-block font-size-lg'>{value}</span>
+              <span className='text-dark-75  d-block font-size-lg'>{value || '-'}</span>
             </div>
           ),
         }
@@ -126,21 +180,21 @@ function IndexListStore() {
                 cursor: 'pointer',
               }}
               onClick={() => {
-                setSortField('name')
+                setSortField('shopName')
                 setSortDirection((prev) => {
-                  if (prev === 'asc') {
-                    return 'desc'
+                  if (prev === 'ASC') {
+                    return 'DESC'
                   } else if (prev === undefined) {
-                    return 'asc'
+                    return 'ASC'
                   } else {
                     return undefined
                   }
                 })
                 setSortDirection2((prev) => {
-                  if (prev === 'asc') {
-                    return 'desc'
+                  if (prev === 'ASC') {
+                    return 'DESC'
                   } else if (prev === undefined) {
-                    return 'asc'
+                    return 'ASC'
                   } else {
                     return undefined
                   }
@@ -151,14 +205,14 @@ function IndexListStore() {
                 style={{
                   position: 'relative',
                   top: 2,
-                  color: sortDirection2 === 'asc' ? '#ffca37' : 'white',
+                  color: sortDirection2 === 'ASC' ? '#ffca37' : 'white',
                 }}
               />
               <CaretDownOutlined
                 style={{
                   position: 'relative',
                   bottom: 2,
-                  color: sortDirection2 === 'desc' ? '#ffca37' : 'white',
+                  color: sortDirection2 === 'DESC' ? '#ffca37' : 'white',
                 }}
               />
             </div>
@@ -172,12 +226,8 @@ function IndexListStore() {
           children: (
             <>
               <div className='container'>
-                <span className='text-dark-75  d-block font-size-lg'>{value}</span>
-                <div>
-                  <span className=' d-block font-size-lg' style={{ color: color.Grey }}>
-                    {row.codeName}
-                  </span>
-                </div>
+                <span className='text-dark-75  d-block font-size-lg'>{value || '-'}</span>
+                <div> </div>
               </div>
             </>
           ),
@@ -190,14 +240,14 @@ function IndexListStore() {
       key: 'name',
       render: (value: any, row: any, index: number) => {
         return {
-          children: <span>{value}</span>,
+          children: <span>{row.title + ' ' + row.firstname + ' ' + row.lastname}</span>,
         }
       },
     },
     {
       title: 'เบอร์โทร',
-      dataIndex: 'tel',
-      key: 'tel',
+      dataIndex: 'telephoneFirst',
+      key: 'telephoneFirst',
       render: (value: any, row: any, index: number) => {
         return {
           children: <span>{value}</span>,
@@ -209,62 +259,14 @@ function IndexListStore() {
       dataIndex: 'province',
       key: 'province',
       render: (value: any, row: any, index: number) => {
+        const province = row.address
         return {
-          children: <span>{value}</span>,
+          children: <span>{province ? row.address.provinceName : '-'}</span>,
         }
       },
     },
     {
-      title: () => {
-        return (
-          <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-            รายการยา / ปุ๋ย
-            <div
-              style={{
-                display: 'flex',
-                flexDirection: 'column',
-                cursor: 'pointer',
-              }}
-              onClick={() => {
-                setSortField('count')
-                setSortDirection((prev) => {
-                  if (prev === 'asc') {
-                    return 'desc'
-                  } else if (prev === undefined) {
-                    return 'asc'
-                  } else {
-                    return undefined
-                  }
-                })
-                setSortDirection3((prev) => {
-                  if (prev === 'asc') {
-                    return 'desc'
-                  } else if (prev === undefined) {
-                    return 'asc'
-                  } else {
-                    return undefined
-                  }
-                })
-              }}
-            >
-              <CaretUpOutlined
-                style={{
-                  position: 'relative',
-                  top: 2,
-                  color: sortDirection3 === 'asc' ? '#ffca37' : 'white',
-                }}
-              />
-              <CaretDownOutlined
-                style={{
-                  position: 'relative',
-                  bottom: 2,
-                  color: sortDirection3 === 'desc' ? '#ffca37' : 'white',
-                }}
-              />
-            </div>
-          </div>
-        )
-      },
+      title: ' รายการยา / ปุ๋ย',
       dataIndex: 'fer',
       key: 'fer',
       render: (value: any, row: any, index: number) => {
@@ -275,18 +277,18 @@ function IndexListStore() {
     },
     {
       title: 'สถานะ',
-      dataIndex: 'status',
-      key: 'status',
+      dataIndex: 'isActive',
+      key: 'isActive',
       render: (value: any, row: any, index: number) => {
         return {
           children: (
             <span
               style={{
-                color: row.status !== 'INACTIVE' ? color.Success : color.Error,
+                color: row.isActive ? color.Success : color.Error,
               }}
             >
-              <Badge color={row.status !== 'INACTIVE' ? color.Success : color.Error} />{' '}
-              {row.status === 'INACTIVE' ? 'ปิดการใช้งาน' : 'ใช้งาน'}
+              <Badge color={row.isActive ? color.Success : color.Error} />{' '}
+              {row.isActive ? 'ใช้งาน' : 'ปิดการใช้งาน'}
             </span>
           ),
         }
@@ -316,7 +318,7 @@ function IndexListStore() {
                 <ActionButton
                   icon={<FileTextOutlined />}
                   color={color.primary1}
-                  onClick={() => navigate('/DetailStore')}
+                  onClick={() => navigate('/DetailStore/id=' + row.shopId)}
                 />
               </div>
             </div>
@@ -325,38 +327,7 @@ function IndexListStore() {
       },
     },
   ]
-  const data = [
-    {
-      updatedAt: 'CL000001',
-      shopName: 'ไม้เมืองการเกษตร',
-      codeName: '3350700008073',
-      name: 'สายไหม เกษตรจ๋า',
-      tel: '0989284761',
-      province: 'สระบุรี',
-      fer: 3500,
-      status: 'ACTIVE',
-    },
-    {
-      updatedAt: 'CL000002',
-      shopName: 'สมรักษ์รักป่า',
-      codeName: '3350700008073',
-      name: 'นายครี มีงานทำ',
-      tel: '0887787442',
-      province: 'อ่างทอง',
-      fer: 10500,
-      status: 'ACTIVE',
-    },
-    {
-      updatedAt: 'Cl000003',
-      shopName: 'อุดมการณ์ยิ่งใหญ่',
-      codeName: '3350700008073',
-      name: 'สมควร แล้ว',
-      tel: '0928077231',
-      province: 'ชัยนาท',
-      fer: 720,
-      status: 'ACTIVE',
-    },
-  ]
+
   const emptyState = {
     emptyText: (
       <div style={{ textAlign: 'center', padding: '4%' }}>
@@ -376,12 +347,12 @@ function IndexListStore() {
       </div>
       <div className='pt-3'>
         <Tabs
-          className={status === 'INACTIVE' ? 'tab-status-inactive' : ''}
-          onChange={(key: any) => setStatus(key)}
+          className={status ? '' : 'tab-status-inactive'}
+          onChange={(key: string) => setStatus(key === 'true')}
           type='card'
         >
           {tabConfigurations.map((tab) => (
-            <Tabs.TabPane tab={tab.title} key={tab.key} />
+            <Tabs.TabPane tab={tab.title} key={String(tab.key)} />
           ))}
         </Tabs>
       </div>
@@ -397,9 +368,9 @@ function IndexListStore() {
           <Select
             className='col-lg-12'
             placeholder='เลือกจังหวัด'
-            onChange={(province: any) => setProvinceSelect(province)}
+            onChange={(province: any) => setSearchProvince(province)}
             showSearch
-            value={provinceSelect}
+            value={searchProvince}
             allowClear
             optionFilterProp='children'
             filterOption={(input: any, option: any) => option.children.includes(input)}
@@ -423,29 +394,34 @@ function IndexListStore() {
               color: color.secondary2,
               backgroundColor: color.Success,
             }}
+            onClick={() => {
+              setCurrent(1)
+              fetchListShop()
+            }}
           >
             ค้นหาข้อมูล
           </Button>
         </div>
       </div>
+      {error && <div className='error-message pb-4'>{error}</div>}
 
       <Spin tip='กำลังโหลดข้อมูล...' size='large' spinning={loading}>
         <Table
           locale={emptyState}
           columns={columns}
-          dataSource={data}
+          dataSource={shopData?.data}
           pagination={false}
           scroll={{ x: 'max-content' }}
         />
       </Spin>
       <div className='d-flex justify-content-between pt-3 pb-3'>
-        <p>รายการทั้งหมด {data.length} รายการ</p>
+        <p>รายการทั้งหมด {shopData?.count} รายการ</p>
         <Pagination
           current={current}
           showSizeChanger
           onChange={(page: number) => setCurrent(page)}
           onShowSizeChange={onShowSizeChange}
-          total={data.length}
+          total={shopData?.count}
         />
       </div>
     </div>

@@ -1,6 +1,5 @@
-import { message } from 'antd'
 import axios from 'axios'
-import { httpClient, BASE_URL } from '../config/config'
+import { BASE_URL, DEV_ICK_SHOP_URL } from '../config/config'
 
 export class AuthDatasource {
   static login(username: string, password: string) {
@@ -19,5 +18,15 @@ export class AuthDatasource {
 
   static logout() {
     localStorage.removeItem('username')
+  }
+
+  static loginUserSellCoda(email: string) {
+    return axios
+      .post(DEV_ICK_SHOP_URL + '/auth/auth/login-user-staff', {
+        email,
+      })
+      .then((response) => {
+        return response.data
+      })
   }
 }

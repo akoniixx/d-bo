@@ -1016,7 +1016,7 @@ const EditFarmer = () => {
                         {item.plotName.length > 15
                           ? `${item.plotName.slice(0, 15)}...`
                           : item.plotName}
-                        {item.plotName.length > 15 && <ShowLandmark landmark={item.landmark} />}
+                        {item.landmark && <ShowLandmark landmark={item.landmark} />}
                       </p>
                       <p style={{ fontSize: '12px', color: color.Grey }}>{item.plantName}</p>
                     </div>

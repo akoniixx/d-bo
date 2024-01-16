@@ -94,6 +94,7 @@ function EditRewardDroner() {
       setImgReward(res.imagePath)
       setUsedDate(res.startUsedDate)
       setEndUsedDate(res.expiredUsedDate)
+      setEndExchangeDate(res.expiredExchangeDate)
       setCheckStatus(res.status)
     })
   }, [])

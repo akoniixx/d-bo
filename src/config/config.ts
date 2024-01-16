@@ -3,6 +3,8 @@ import moment from 'moment'
 import { convertBuddhistYear } from '../utilities/ConvertToBuddhistYear'
 
 const DEV_URL = 'https://api-dnds-dev.iconkaset.com'
+export const DEV_ICK_SHOP_URL = 'https://iconkasetshop-api-dev.iconkaset.com'
+
 // const PROD_URL = "https://api-dnds.iconkaset.com";
 export const BASE_URL =
   process.env.NODE_ENV === 'development' ? DEV_URL : process.env.REACT_APP_URL_HOST
@@ -54,3 +56,12 @@ export const axiosFormBo = axios.create({
     Accept: 'application/json',
   },
 })
+const sellCodaInstance = axios.create({})
+
+sellCodaInstance.interceptors.request.use(async (config: any) => {
+  const token = localStorage.getItem('onefinity-shop')
+
+  config.headers.Authorization = `Bearer ${token || ''}`
+  return config
+})
+export const sellCodaClient = sellCodaInstance
