@@ -219,12 +219,12 @@ export const pathLists = (isAccounting: boolean, isAdminTask?: boolean) => {
       title: 'ของรางวัล',
       permission: null,
       subMenu: [
-        {
-          path: 'listReward',
-          name: 'listReward',
-          title: 'รายการของรางวัล',
-          permission: null,
-          subMenu: [
+        // {
+        //   path: 'listReward',
+        //   name: 'listReward',
+        //   title: 'รายการของรางวัล',
+        //   permission: null,
+        //   subMenu: [
             {
               path: '/IndexRewardDroner',
               name: 'IndexRewardDroner',
@@ -232,15 +232,15 @@ export const pathLists = (isAccounting: boolean, isAdminTask?: boolean) => {
               permission: null,
               subMenu: [],
             },
-            {
-              path: '/IndexRewardFarmer',
-              name: 'IndexRewardFarmer',
-              title: 'เกษตรกร',
-              permission: null,
-              subMenu: [],
-            },
-          ],
-        },
+        //     {
+        //       path: '/IndexRewardFarmer',
+        //       name: 'IndexRewardFarmer',
+        //       title: 'เกษตรกร',
+        //       permission: null,
+        //       subMenu: [],
+        //     },
+        //   ],
+        // },
       ],
     },
     {

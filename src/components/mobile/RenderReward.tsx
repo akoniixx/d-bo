@@ -88,11 +88,12 @@ const RenderReward: React.FC<RenderReward> = ({
                 (exChange === 'SCORE' ? (
                   <div className='d-flex justify-content-between'>
                     <div
+                      className='col-lg-6'
                       style={{
-                        width: 'max-content',
                         backgroundColor: 'rgba(220, 241, 254, 1)',
                         borderRadius: 10,
                         padding: 10,
+                        marginRight: 8,
                       }}
                     >
                       <div
@@ -122,8 +123,8 @@ const RenderReward: React.FC<RenderReward> = ({
                       </div>
                     </div>
                     <div
+                      className='col-lg-6'
                       style={{
-                        width: 'max-content',
                         backgroundColor: '#FFF2E3',
                         borderRadius: 10,
                         padding: 10,
@@ -158,8 +159,8 @@ const RenderReward: React.FC<RenderReward> = ({
                   </div>
                 ) : (
                   <div
+                    className='col-lg-6'
                     style={{
-                      width: 'max-content',
                       backgroundColor: '#FFF2E3',
                       borderRadius: 10,
                       padding: 10,
