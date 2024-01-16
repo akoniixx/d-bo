@@ -219,12 +219,12 @@ export const pathLists = (isAccounting: boolean, isAdminTask?: boolean) => {
       title: 'ของรางวัล',
       permission: null,
       subMenu: [
-        {
-          path: 'listReward',
-          name: 'listReward',
-          title: 'รายการของรางวัล',
-          permission: null,
-          subMenu: [
+        // {
+        //   path: 'listReward',
+        //   name: 'listReward',
+        //   title: 'รายการของรางวัล',
+        //   permission: null,
+        //   subMenu: [
             {
               path: '/IndexRewardDroner',
               name: 'IndexRewardDroner',
@@ -232,15 +232,15 @@ export const pathLists = (isAccounting: boolean, isAdminTask?: boolean) => {
               permission: null,
               subMenu: [],
             },
-            {
-              path: '/IndexRewardFarmer',
-              name: 'IndexRewardFarmer',
-              title: 'เกษตรกร',
-              permission: null,
-              subMenu: [],
-            },
-          ],
-        },
+        //     {
+        //       path: '/IndexRewardFarmer',
+        //       name: 'IndexRewardFarmer',
+        //       title: 'เกษตรกร',
+        //       permission: null,
+        //       subMenu: [],
+        //     },
+        //   ],
+        // },
       ],
     },
     {
@@ -280,12 +280,12 @@ export const pathLists = (isAccounting: boolean, isAdminTask?: boolean) => {
           title: 'รายชื่อผู้ดูแลระบบ',
           subMenu: [],
         },
-        {
-          path: '/IndexPermission',
-          name: 'IndexPermission',
-          title: 'บทบาทผู้ดูแล',
-          subMenu: [],
-        },
+        // {
+        //   path: '/IndexPermission',
+        //   name: 'IndexPermission',
+        //   title: 'บทบาทผู้ดูแล',
+        //   subMenu: [],
+        // },
       ],
     },
     {
@@ -344,12 +344,12 @@ export const pathLists = (isAccounting: boolean, isAdminTask?: boolean) => {
           title: 'รายชื่อนักบินโดรน',
           subMenu: [],
         },
-        {
-          path: '/IndexListStore',
-          name: 'IndexListStore',
-          title: 'รายชื่อร้านค้า',
-          subMenu: [],
-        },
+        // {
+        //   path: '/IndexListStore',
+        //   name: 'IndexListStore',
+        //   title: 'รายชื่อร้านค้า',
+        //   subMenu: [],
+        // },
       ],
     },
   ]
