@@ -725,8 +725,8 @@ function EditRewardFarmer() {
         condition={condition}
         point={score}
         type={rewardType}
-        endUseDateTime={EndExchangeDate}
-        endRedeemDateTime={endUsedDate}
+        endUseDateTime={endUsedDate}
+        endRedeemDateTime={EndExchangeDate}
         exChange={rewardExchange}
         countdownTime={result < 0 ? 0 : parseInt(result.toString())}
       />
