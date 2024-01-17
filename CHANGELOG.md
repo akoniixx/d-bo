@@ -1,5 +1,9 @@
 ## [Version - 0]
 
+## Fix [v0.46.1] 2024-1-17
+
+- fix bug feature setting point
+
 ## Feature [v0.46.0] 2024-1-17
 
 - add feature setting point for droner and farmer
