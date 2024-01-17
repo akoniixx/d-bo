@@ -1,5 +1,10 @@
 ## [Version - 0]
 
+## Feature [v0.46.0] 2024-1-17
+
+- add feature setting point for droner and farmer
+- add query dropdown role management
+
 ## Feature [v0.45.0] 2024-1-17
 
 - master data target spray
