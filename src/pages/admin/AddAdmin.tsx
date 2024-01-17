@@ -11,6 +11,7 @@ import Swal from 'sweetalert2'
 import { ExclamationCircleOutlined } from '@ant-design/icons'
 import { useNavigate } from 'react-router-dom'
 import { RoleManage } from '../../datasource/RoleManageDatasource'
+import { useQuery } from 'react-query'
 
 const _ = require('lodash')
 const { Map } = require('immutable')
@@ -39,6 +40,17 @@ const AddAdmin = () => {
     </span>
   )
   const [tooltipUserOpen, setTooltipUserOpen] = useState<boolean>(false)
+  const fetchRole = async() => {
+    const data = await RoleManage.getRoleOnly()
+    const result = data.map((item : any)=> {
+      return {
+        label : item.role,
+        value : item.id
+      }
+    })
+    return result
+  }
+  const getRole = useQuery(['role'],()=>fetchRole())
 
   const handleChangestatus = (e: any) => {
     const m = Map(data).set('isActive', e.target.value)
@@ -253,9 +265,13 @@ const AddAdmin = () => {
           </label>
           <Form.Item name='role'>
             <Select placeholder='เลือกบทบาท' onChange={handleOnChangeSelect}>
-              {ROLE_ADMIN.map((item, index) => (
-                <option key={index} value={item.key}></option>
-              ))}
+              {
+                getRole.isLoading ? []:
+                getRole.isError ? [] :
+                getRole.data.map((item : any,index : number)=>(
+                  <option key={index} value={item.value}>{item.label}</option>
+                ))
+              }
             </Select>
           </Form.Item>
         </div>
