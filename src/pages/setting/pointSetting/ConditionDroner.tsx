@@ -19,7 +19,7 @@ function ConditionDroner() {
     amounts: '1',
     minPoint: '',
     pointType: '',
-    application: 'FARMER',
+    application: 'DRONER',
     receiveType: 'TASK',
     status: '',
   })
@@ -29,9 +29,9 @@ function ConditionDroner() {
     const data = await PointSettingDatasource.getPointSettingApplication("DRONER")
     setDataPoint({
       ...dataPoint,
-      point : data.point.toString(),
+      point : data.point,
       pointType : "DISCOUNT_TASK",
-      minPoint : data.minPoint.toString(),
+      minPoint : data.minPoint,
       status : "ACTIVE"
     })
     return data
@@ -63,22 +63,33 @@ function ConditionDroner() {
   ])
 
   const onClickSave = async () => {
-    const body = {
-      ...dataPoint,
-      id : data.data.id
-    }
-    await PointSettingDatasource.editPointSetting(body).then((res) => {
-      console.log(res)
-      Swal.fire({
-        title: 'บันทึกสำเร็จ',
-        icon: 'success',
-        timer: 1500,
-        showConfirmButton: false,
-      }).then((time) => {})
+    if(!data.data){
+      await PointSettingDatasource.createPointSetting(dataPoint).then((res) => {
+        Swal.fire({
+          title: 'บันทึกสำเร็จ',
+          icon: 'success',
+          timer: 1500,
+          showConfirmButton: false,
+        }).then((time) => {})
     })
+    }
+    else{
+      const body = {
+        ...dataPoint,
+        id : data.data.id
+      }
+      await PointSettingDatasource.editPointSetting(body).then((res) => {
+        Swal.fire({
+          title: 'บันทึกสำเร็จ',
+          icon: 'success',
+          timer: 1500,
+          showConfirmButton: false,
+        }).then((time) => {})
+    })
+    }
   }
 
-  const renderConditionFarmer = (
+  const renderConditionDroner = (
     <CardContainer>
       <CardHeader textHeader='ข้อมูลแต้ม' />
         <div className='row m-3'>
@@ -104,11 +115,7 @@ function ConditionDroner() {
         </span>
       </Row>
       {
-        data.isLoading?
-        <></>:
-        data.isError?
-        <></>:
-        renderConditionFarmer
+        renderConditionDroner
       }
       <div className='col-lg'>
         <Row className='d-flex justify-content-between p-3'>
