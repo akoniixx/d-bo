@@ -324,9 +324,15 @@ export const pathLists = (isAccounting: boolean, isAdminTask?: boolean) => {
           title: 'แต้ม',
           subMenu: [
             {
+              path: '/ConditionDroner',
+              name: 'ConditionDroner',
+              title: 'นักบินโดรน',
+              subMenu: [],
+            },
+            {
               path: '/ConditionFarmer',
               name: 'ConditionFarmer',
-              title: 'เงื่อนไขเกษตรกร',
+              title: 'เกษตรกร',
               subMenu: [],
             },
           ],
