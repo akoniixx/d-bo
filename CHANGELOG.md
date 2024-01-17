@@ -1,5 +1,9 @@
 ## [Version - 0]
 
+## Feature [v0.45.0] 2024-1-17
+
+- master data target spray
+
 ## Fix [v0.44.3] 2024-1-15
 
 - fixed some bugs (cut off)

@@ -219,12 +219,12 @@ export const pathLists = (isAccounting: boolean, isAdminTask?: boolean) => {
       title: 'ของรางวัล',
       permission: null,
       subMenu: [
-        // {
-        //   path: 'listReward',
-        //   name: 'listReward',
-        //   title: 'รายการของรางวัล',
-        //   permission: null,
-        //   subMenu: [
+        {
+          path: 'listReward',
+          name: 'listReward',
+          title: 'รายการของรางวัล',
+          permission: null,
+          subMenu: [
             {
               path: '/IndexRewardDroner',
               name: 'IndexRewardDroner',
@@ -232,15 +232,15 @@ export const pathLists = (isAccounting: boolean, isAdminTask?: boolean) => {
               permission: null,
               subMenu: [],
             },
-        //     {
-        //       path: '/IndexRewardFarmer',
-        //       name: 'IndexRewardFarmer',
-        //       title: 'เกษตรกร',
-        //       permission: null,
-        //       subMenu: [],
-        //     },
-        //   ],
-        // },
+            {
+              path: '/IndexRewardFarmer',
+              name: 'IndexRewardFarmer',
+              title: 'เกษตรกร',
+              permission: null,
+              subMenu: [],
+            },
+          ],
+        },
       ],
     },
     {
@@ -298,6 +298,19 @@ export const pathLists = (isAccounting: boolean, isAdminTask?: boolean) => {
           name: 'IndexDroneBrand',
           title: 'ยี่ห้อโดรน',
           subMenu: [],
+        },
+        {
+          path: '/Target',
+          name: 'Target',
+          title: 'เป้าหมาย',
+          subMenu: [
+            {
+              path: '/IndexTargetSpray',
+              name: 'IndexTargetSpray',
+              title: 'ฉีดพ่น',
+              subMenu: [],
+            },
+          ],
         },
         {
           path: '/PricePage',

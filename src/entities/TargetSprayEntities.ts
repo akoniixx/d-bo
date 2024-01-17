@@ -6,6 +6,14 @@ export interface TargetSpayEntities {
   name: string
   updatedAt: string
 }
+export const TargetSpayEntities_INIT: TargetSpayEntities = {
+  createdAt: '',
+  id: '',
+  isActive: false,
+  isChecked: false,
+  name: '',
+  updatedAt: '',
+}
 
 export interface AllTargetSpayEntities {
   data: TargetSpayEntities[]
