@@ -258,7 +258,7 @@ const IndexPlanningPoint = () => {
 
   const columns = [
     {
-      title: 'วันที่อัพเดท',
+      title: 'วันที่อัปเดต',
       dataIndex: 'created_at',
       key: 'created_at',
       width: '15%',

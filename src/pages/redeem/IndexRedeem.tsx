@@ -324,7 +324,7 @@ const IndexRedeem = () => {
   )
   const columnsFarmer = [
     {
-      title: 'วันที่อัพเดท',
+      title: 'วันที่อัปเดต',
       dataIndex: 'createdAt',
       key: 'createdAt',
       render: (value: any, row: any, index: number) => {
@@ -421,7 +421,7 @@ const IndexRedeem = () => {
   ]
   const columnsDroner = [
     {
-      title: 'วันที่อัพเดท',
+      title: 'วันที่อัปเดต',
       dataIndex: 'createAt',
       key: 'createAt',
       render: (value: any, row: any, index: number) => {

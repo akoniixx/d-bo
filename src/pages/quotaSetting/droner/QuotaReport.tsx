@@ -205,7 +205,7 @@ function QuotaReport() {
 
   const columns = [
     {
-      title: 'วันที่อัพเดต',
+      title: 'วันที่อัปเดต',
       dataIndex: 'updateAt',
       key: 'updateAt',
       render: (value: any, row: any, index: number) => {

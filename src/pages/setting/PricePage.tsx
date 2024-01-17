@@ -139,7 +139,7 @@ function PricePage() {
       },
     },
     {
-      title: 'อัพเดตล่าสุด',
+      title: 'อัปเดตล่าสุด',
       dataIndex: 'update_at',
       key: 'update_at',
       render: (value: any, row: any, index: number) => {
@@ -219,7 +219,7 @@ function PricePage() {
             backgroundColor: color.Success,
           }}
         >
-          อัพโหลดราคา Excel
+          อัปโหลดราคา Excel
         </Button>
       </div>
     </div>
