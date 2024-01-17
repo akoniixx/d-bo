@@ -36,13 +36,18 @@ const ModalShowFile: React.FC<ModalShowFileProps> = ({ show, count, file, backBu
               onClick={() => onPreviewFile(item.filePath)}
               key={index}
               className='d-flex p-2 pb-2 justify-content-between'
-              style={{ border: '0.2px solid ', borderRadius: '10px', cursor: 'pointer', marginBottom: '10px', }}
+              style={{
+                border: '0.2px solid ',
+                borderRadius: '10px',
+                cursor: 'pointer',
+                marginBottom: '10px',
+              }}
             >
               <div className='col-lg-4'>
                 <embed src={item.filePath} style={{ width: '120px', height: '90px' }} />
               </div>
               <div className='col-lg align-self-center'>
-                <span>{item.shopId}.png</span>
+                <span>{item.fileName}</span>
               </div>
             </div>
           ))}

@@ -15,6 +15,7 @@ export interface shopFiles {
   onefinityShopFileId: string
   shopId: string
   updateDate: string
+  fileName: string
 }
 
 export interface shopOneFinityEntity {

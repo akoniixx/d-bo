@@ -213,7 +213,7 @@ const EditNewTask = () => {
   }, [searchFilterFarmer])
 
   const getAllTargetSpray = async () => {
-    await TargetSpray.getAllTargetSpray().then((res) => {
+    await TargetSpray.getAllTargetSprayOnTask().then((res) => {
       setTargetSpray(res.data)
       setSomeTargetSpray(res.data.map((item: any) => item.name))
     })
