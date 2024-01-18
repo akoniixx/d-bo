@@ -82,4 +82,14 @@ export class TargetSpray {
         console.log(err, 'err update target')
       })
   }
+  static updateOrderTarget(data: any): Promise<any> {
+    return httpClient
+      .post(BASE_URL + `/tasks/target-spray/update-target-spray-order`, data)
+      .then((response) => {
+        return response.data
+      })
+      .catch((err) => {
+        console.log(err, 'err update target')
+      })
+  }
 }

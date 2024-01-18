@@ -115,6 +115,7 @@ const CreditDroner = lazy(() => import('./pages/setting/credit/CreditDroner'))
 const DronerInfinity = lazy(() => import('./pages/infinity/droner/DronerInfinity'))
 const IndexTargetSpray = lazy(() => import('./pages/setting/targetSpray/IndexTargetSpray'))
 const InsertTargetSpray = lazy(() => import('./pages/setting/targetSpray/InsertTargetSpray'))
+const TargetSprayOrder = lazy(() => import('./pages/setting/targetSpray/orderTarget/TargetSprayOrder'))
 
 const FallBack = () => {
   return (
@@ -242,6 +243,7 @@ const WebRoutes: React.FC<any> = () => {
             <Route path='/DronerInfinity/:id' element={<DronerInfinityCreditList />} />
             <Route path='/IndexTargetSpray' element={<IndexTargetSpray />} />
             <Route path='/InsertTargetSpray/:id' element={<InsertTargetSpray />} />
+            <Route path='/TargetSprayOrder' element={<TargetSprayOrder />} />
           </Route>
           <Route element={<PublicRoute />}>
             <Route index element={<AuthPage />} />

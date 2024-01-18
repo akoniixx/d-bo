@@ -77,7 +77,7 @@ function IndexListStore() {
     if (checkToken) {
       fetchListShop()
     }
-  }, [checkToken, status, sortDirection])
+  }, [checkToken, status, sortDirection, current])
 
   const fetchListShop = async () => {
     setLoading(true)
