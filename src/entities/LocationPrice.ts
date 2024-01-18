@@ -46,14 +46,28 @@ export interface LocationPricePageEntity {
 export interface UpdateLocationPriceList {
   location_price_id: string
   price: number
+  priceSow: number
 }
 export const UpdateLocationPriceList_INIT: UpdateLocationPriceList = {
   location_price_id: '',
   price: 0,
+  priceSow: 0
 }
 export interface UpdateLocationPrice {
   priceData: UpdateLocationPriceList[]
 }
 export const UpdateLocationPrice_INIT: UpdateLocationPrice = {
   priceData: [UpdateLocationPriceList_INIT],
+}
+export interface EqualPriceEntities {
+  provinceId: number
+  price: number
+  priceSow: number
+  updateBy: string
+}
+export const EqualPriceEntities_INIT: EqualPriceEntities = {
+  provinceId: 0,
+  price: 0,
+  priceSow: 0,
+  updateBy: '',
 }

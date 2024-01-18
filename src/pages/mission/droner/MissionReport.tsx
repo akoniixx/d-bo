@@ -168,7 +168,7 @@ function MissionReport() {
       title: () => {
         return (
           <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-            วันที่อัพเดต
+            วันที่อัปเดต
             <div
               style={{
                 display: 'flex',

@@ -167,7 +167,7 @@ function RewardReceived() {
   )
   const columns: ColumnsType<any> = [
     {
-      title: 'วันที่อัพเดต',
+      title: 'วันที่อัปเดต',
       dataIndex: 'updateAt',
       key: 'updateAt',
       sorter: (a: any, b: any) => sorter(a.updateAt, b.updateAt),

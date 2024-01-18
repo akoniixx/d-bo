@@ -66,7 +66,7 @@ const IndexDetailDronerPoint = () => {
   )
   const columns = [
     {
-      title: 'วันที่อัพเดท',
+      title: 'วันที่อัปเดต',
       dataIndex: 'date_appointment',
       key: 'date_appointment',
       width: '20%',

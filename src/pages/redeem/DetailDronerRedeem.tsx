@@ -94,7 +94,7 @@ const DetailDronerRedeem = () => {
 
   const columeHisPhysical = [
     {
-      title: 'วันที่อัพเดท',
+      title: 'วันที่อัปเดต',
       dataIndex: 'updateAt',
       key: 'updateAt',
       render: (value: any, row: any, index: number) => {
@@ -165,7 +165,7 @@ const DetailDronerRedeem = () => {
       },
     },
     {
-      title: 'ผู้ใช้ที่อัพเดต',
+      title: 'ผู้ใช้ที่อัปเดต',
       dataIndex: 'updateBy',
       key: 'updateBy',
       render: (value: any, row: any, index: number) => {
@@ -181,7 +181,7 @@ const DetailDronerRedeem = () => {
   ]
   const columeHisDigital = [
     {
-      title: 'วันที่อัพเดท',
+      title: 'วันที่อัปเดต',
       dataIndex: 'updateAt',
       key: 'updateAt',
       render: (value: any, row: any, index: number) => {
@@ -258,7 +258,7 @@ const DetailDronerRedeem = () => {
       },
     },
     {
-      title: 'ผู้ใช้ที่อัพเดต',
+      title: 'ผู้ใช้ที่อัปเดต',
       dataIndex: 'updateBy',
       key: 'updateBy',
       render: (value: any, row: any, index: number) => {

@@ -315,7 +315,7 @@ export const pathLists = (isAccounting: boolean, isAdminTask?: boolean) => {
         {
           path: '/PricePage',
           name: 'PricePage',
-          title: 'ราคาฉีดพ่น',
+          title: 'ราคา',
           subMenu: [],
         },
         {

@@ -1,5 +1,10 @@
 ## [Version - 0]
 
+## improve [v0.46.4] 2024-1-18
+
+- added Equal Price
+- added Sow Price
+
 ## Fix [v0.46.3] 2024-1-18
 
 - detect number for form input setting point and detect value less than 0

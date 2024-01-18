@@ -271,7 +271,7 @@ const DetailDronerPoint = () => {
   const renderHistory = () => {
     const columns = [
       {
-        title: 'วันที่อัพเดท',
+        title: 'วันที่อัปเดต',
         dataIndex: 'dateTime',
         key: 'dateTime',
         render: (value: any, row: any, index: number) => {
@@ -310,7 +310,7 @@ const DetailDronerPoint = () => {
         },
       },
       {
-        title: 'ผู้ใช้งานที่อัพเดต',
+        title: 'ผู้ใช้งานที่อัปเดต',
         dataIndex: 'updateBy',
         key: 'updateBy',
         render: (value: any, row: any, index: number) => {
