@@ -43,15 +43,17 @@ function ConditionFarmer() {
   const data = useQuery(['data'],()=>getDataPoint())
 
   const handleOnPoint = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const point = (parseInt(e.target.value) < 0) ? "0" : e.target.value
     setDataPoint({
       ...dataPoint,
-      point : e.target.value
+      point : point
     })
   }
   const handleOnMinPoint = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const minpoint = (parseInt(e.target.value) < 0) ? "0" : e.target.value
     setDataPoint({
       ...dataPoint,
-      minPoint : e.target.value
+      minPoint : minpoint
     })
   }
   const checkValidate = () => {
@@ -108,6 +110,7 @@ function ConditionFarmer() {
             <span>การเปรียบเทียบแต้ม/เงิน</span>
             <br />
               <Input
+                type='number'
                 placeholder='กรอกแต้ม'
                 suffix='แต้ม / 1 บาท'
                 value={dataPoint.point}
@@ -118,6 +121,7 @@ function ConditionFarmer() {
           <div className='col-lg-6'>
             <span>การใช้แต้มขั้นต่ำ</span>
               <Input
+                type='number'
                 placeholder='กรอกแต้ม'
                 suffix='แต้ม'
                 value={dataPoint.minPoint}
