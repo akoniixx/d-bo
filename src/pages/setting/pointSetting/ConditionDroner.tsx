@@ -47,7 +47,6 @@ function ConditionDroner() {
   }
   const checkValidate = () => {
     if (
-      dataPoint.minPoint != '' &&
       dataPoint.point != ''
     ) {
       setBtnSaveDisable(false)
