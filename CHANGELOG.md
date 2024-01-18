@@ -1,5 +1,9 @@
 ## [Version - 0]
 
+## Fix [v0.46.3] 2024-1-18
+
+- detect number for form input setting point and detect value less than 0
+
 ## Fix [v0.46.2] 2024-1-18
 
 - fix bug feature setting point for droner
