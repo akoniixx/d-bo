@@ -40,9 +40,10 @@ function ConditionDroner() {
   const data = useQuery(['data'],()=>getDataPoint())
 
   const handleOnPoint = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const point = (parseInt(e.target.value) < 0) ? "0" : e.target.value
     setDataPoint({
       ...dataPoint,
-      point : e.target.value
+      point : point
     })
   }
   const checkValidate = () => {
@@ -96,6 +97,7 @@ function ConditionDroner() {
             <span>การเปรียบเทียบแต้ม/เงิน</span>
             <br />
               <Input
+                type='number'
                 placeholder='กรอกแต้ม'
                 suffix='แต้ม / 1 บาท'
                 value={dataPoint.point}
