@@ -1,6 +1,6 @@
 ## [Version - 0]
 
-## Fix [v0.46.2] 2024-1-17
+## Fix [v0.46.2] 2024-1-18
 
 - fix bug feature setting point for droner
 
