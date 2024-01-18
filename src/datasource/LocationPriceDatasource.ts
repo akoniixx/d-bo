@@ -25,10 +25,14 @@ export class LocationPriceDatasource {
     take: number,
     page: number,
     search?: string,
+    sortField?: string,
+    sortDirection?: string,
   ): Promise<LocationPricePageEntity> {
     return httpClient
       .post(BASE_URL + `/tasks/location-price/get-all-location-price?page=${page}&take=${take}`, {
         search,
+        sortField,
+        sortDirection,
       })
       .then((res) => {
         return res.data
@@ -47,6 +51,16 @@ export class LocationPriceDatasource {
   static updateLocationPrice(data: any): Promise<any> {
     return httpClient
       .post(BASE_URL + '/tasks/location-price/update-multiple-price', data)
+      .then((response) => {
+        return response.data
+      })
+      .catch((err) => {
+        console.log(err)
+      })
+  }
+  static updateLocationEqualPrice(data: any): Promise<any> {
+    return httpClient
+      .post(BASE_URL + '/tasks/location-price/update-equal-price', data)
       .then((response) => {
         return response.data
       })

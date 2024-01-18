@@ -1,5 +1,5 @@
-import { EditOutlined, SearchOutlined } from '@ant-design/icons'
-import { Button, Input, Pagination, Select, Spin, Table } from 'antd'
+import { CaretDownOutlined, CaretUpOutlined, EditOutlined, SearchOutlined } from '@ant-design/icons'
+import { Button, Input, Pagination, Spin, Table } from 'antd'
 import { useEffect, useState } from 'react'
 import ActionButton from '../../components/button/ActionButton'
 import ModalCropByProvince from '../../components/modal/ModalCropByProvince'
@@ -13,7 +13,6 @@ import {
   UpdateLocationPrice_INIT,
 } from '../../entities/LocationPrice'
 import moment from 'moment'
-import { DashboardLayout } from '../../components/layout/Layout'
 
 function PricePage() {
   const row = 10
@@ -25,14 +24,29 @@ function PricePage() {
   const [searchText, setSearchText] = useState<string>()
   const [provinceId, setProvinceId] = useState()
   const [loading, setLoading] = useState(false)
+  const [sortDirection, setSortDirection] = useState<string | undefined>()
+  const [sortField, setSortField] = useState<string | undefined>()
+  const [sortDirection1, setSortDirection1] = useState<string | undefined>(undefined)
+  const [sortDirection2, setSortDirection2] = useState<string | undefined>(undefined)
+  const [sortDirection3, setSortDirection3] = useState<string | undefined>(undefined)
+  const [sortDirection4, setSortDirection4] = useState<string | undefined>(undefined)
+  const [sortDirection5, setSortDirection5] = useState<string | undefined>(undefined)
+  const [sortDirection6, setSortDirection6] = useState<string | undefined>(undefined)
+
   const [editLocationPrice, setEditLocationPrice] =
     useState<UpdateLocationPrice>(UpdateLocationPrice_INIT)
   useEffect(() => {
     fetchLocationPrice()
-  }, [current])
+  }, [current, sortDirection])
   const fetchLocationPrice = async () => {
     setLoading(true)
-    await LocationPriceDatasource.getAllLocationPrice(row, current, searchText)
+    await LocationPriceDatasource.getAllLocationPrice(
+      row,
+      current,
+      searchText,
+      sortField,
+      sortDirection,
+    )
       .then((res: LocationPricePageEntity) => {
         setData(res)
       })
@@ -54,35 +68,77 @@ function PricePage() {
     setShowModalCrop((prev) => !prev)
     setProvinceId(province)
   }
-  const sorter = (a: any, b: any) => {
-    if (a === b) return 0
-    else if (a === null) return 1
-    else if (b === null) return -1
-    else return a.localeCompare(b)
-  }
   const updatePriceCrop = async (dataUpdate: UpdateLocationPriceList[]) => {
-    if (dataUpdate !== undefined) {
+    if (Array.isArray(dataUpdate)) {
       const dataArrPlants = {
         priceData: dataUpdate,
       }
       await LocationPriceDatasource.updateLocationPrice(dataArrPlants)
-      setShowModalEdit((prev) => !prev)
-      fetchLocationPrice()
+    } else {
+      await LocationPriceDatasource.updateLocationEqualPrice(dataUpdate)
     }
+    setShowModalEdit((prev) => !prev)
+    fetchLocationPrice()
   }
   const columns = [
     {
-      title: 'จังหวัด',
+      title: () => {
+        return (
+          <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+            จังหวัด
+            <div
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                cursor: 'pointer',
+              }}
+              onClick={() => {
+                setSortField('province_name')
+                setSortDirection((prev) => {
+                  if (prev === 'ASC') {
+                    return 'DESC'
+                  } else if (prev === undefined) {
+                    return 'ASC'
+                  } else {
+                    return ''
+                  }
+                })
+                setSortDirection1((prev) => {
+                  if (prev === 'ASC') {
+                    return 'DESC'
+                  } else if (prev === undefined) {
+                    return 'ASC'
+                  } else {
+                    return ''
+                  }
+                })
+              }}
+            >
+              <CaretUpOutlined
+                style={{
+                  position: 'relative',
+                  top: 2,
+                  color: sortDirection1 === 'ASC' ? '#ffca37' : 'white',
+                }}
+              />
+              <CaretDownOutlined
+                style={{
+                  position: 'relative',
+                  bottom: 2,
+                  color: sortDirection1 === 'DESC' ? '#ffca37' : 'white',
+                }}
+              />
+            </div>
+          </div>
+        )
+      },
       dataIndex: 'province_name',
       key: 'province_name',
-      width: '25%',
-      sorter: (a: any, b: any) => sorter(a.province_name, b.province_name),
     },
     {
       title: 'พืช',
       dataIndex: 'plants',
       key: 'plants',
-      width: '15%',
       render: (value: any, row: any, index: number) => {
         return {
           children: (
@@ -102,10 +158,58 @@ function PricePage() {
       },
     },
     {
-      title: 'ช่วงราคาฉีดพ่น',
+      title: () => {
+        return (
+          <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+            ราคาฉีดพ่น
+            <div
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                cursor: 'pointer',
+              }}
+              onClick={() => {
+                setSortField('max_price')
+                setSortDirection((prev) => {
+                  if (prev === 'ASC') {
+                    return 'DESC'
+                  } else if (prev === undefined) {
+                    return 'ASC'
+                  } else {
+                    return ''
+                  }
+                })
+                setSortDirection2((prev) => {
+                  if (prev === 'ASC') {
+                    return 'DESC'
+                  } else if (prev === undefined) {
+                    return 'ASC'
+                  } else {
+                    return ''
+                  }
+                })
+              }}
+            >
+              <CaretUpOutlined
+                style={{
+                  position: 'relative',
+                  top: 2,
+                  color: sortDirection2 === 'ASC' ? '#ffca37' : 'white',
+                }}
+              />
+              <CaretDownOutlined
+                style={{
+                  position: 'relative',
+                  bottom: 2,
+                  color: sortDirection2 === 'DESC' ? '#ffca37' : 'white',
+                }}
+              />
+            </div>
+          </div>
+        )
+      },
       dataIndex: 'price',
       key: 'price',
-      sorter: (a: any, b: any) => sorter(a.min_price, b.max_price),
       render: (value: any, row: any, index: number) => {
         return {
           children: (
@@ -117,10 +221,122 @@ function PricePage() {
       },
     },
     {
-      title: 'จำนวนอำเภอ',
+      title: () => {
+        return (
+          <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+            ราคาหว่าน
+            <div
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                cursor: 'pointer',
+              }}
+              onClick={() => {
+                setSortField('max_price_sow')
+                setSortDirection((prev) => {
+                  if (prev === 'ASC') {
+                    return 'DESC'
+                  } else if (prev === undefined) {
+                    return 'ASC'
+                  } else {
+                    return ''
+                  }
+                })
+                setSortDirection3((prev) => {
+                  if (prev === 'ASC') {
+                    return 'DESC'
+                  } else if (prev === undefined) {
+                    return 'ASC'
+                  } else {
+                    return ''
+                  }
+                })
+              }}
+            >
+              <CaretUpOutlined
+                style={{
+                  position: 'relative',
+                  top: 2,
+                  color: sortDirection3 === 'ASC' ? '#ffca37' : 'white',
+                }}
+              />
+              <CaretDownOutlined
+                style={{
+                  position: 'relative',
+                  bottom: 2,
+                  color: sortDirection3 === 'DESC' ? '#ffca37' : 'white',
+                }}
+              />
+            </div>
+          </div>
+        )
+      },
+      dataIndex: 'priceSow',
+      key: 'priceSow',
+      render: (value: any, row: any, index: number) => {
+        const checkNull = row.min_price_sow === null && row.max_price_sow === null
+        return {
+          children: (
+            <span style={{ color: color.primary1, fontWeight: '700' }}>
+              {`${checkNull ? '-' : row.min_price_sow + ' - ' + row.max_price_sow + ' บาท'}`}
+            </span>
+          ),
+        }
+      },
+    },
+    {
+      title: () => {
+        return (
+          <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+            จำนวนอำเภอ
+            <div
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                cursor: 'pointer',
+              }}
+              onClick={() => {
+                setSortField('count_district')
+                setSortDirection((prev) => {
+                  if (prev === 'ASC') {
+                    return 'DESC'
+                  } else if (prev === undefined) {
+                    return 'ASC'
+                  } else {
+                    return ''
+                  }
+                })
+                setSortDirection4((prev) => {
+                  if (prev === 'ASC') {
+                    return 'DESC'
+                  } else if (prev === undefined) {
+                    return 'ASC'
+                  } else {
+                    return ''
+                  }
+                })
+              }}
+            >
+              <CaretUpOutlined
+                style={{
+                  position: 'relative',
+                  top: 2,
+                  color: sortDirection4 === 'ASC' ? '#ffca37' : 'white',
+                }}
+              />
+              <CaretDownOutlined
+                style={{
+                  position: 'relative',
+                  bottom: 2,
+                  color: sortDirection4 === 'DESC' ? '#ffca37' : 'white',
+                }}
+              />
+            </div>
+          </div>
+        )
+      },
       dataIndex: 'count_district',
       key: 'count_district',
-      sorter: (a: any, b: any) => sorter(a.count_district, b.count_district),
       render: (value: any, row: any, index: number) => {
         return {
           children: <span>{row.count_district + `  อำเภอ`}</span>,
@@ -128,10 +344,58 @@ function PricePage() {
       },
     },
     {
-      title: 'จำนวนตำบล',
+      title: () => {
+        return (
+          <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+            จำนวนตำบล
+            <div
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                cursor: 'pointer',
+              }}
+              onClick={() => {
+                setSortField('count_subdistrict')
+                setSortDirection((prev) => {
+                  if (prev === 'ASC') {
+                    return 'DESC'
+                  } else if (prev === undefined) {
+                    return 'ASC'
+                  } else {
+                    return ''
+                  }
+                })
+                setSortDirection5((prev) => {
+                  if (prev === 'ASC') {
+                    return 'DESC'
+                  } else if (prev === undefined) {
+                    return 'ASC'
+                  } else {
+                    return ''
+                  }
+                })
+              }}
+            >
+              <CaretUpOutlined
+                style={{
+                  position: 'relative',
+                  top: 2,
+                  color: sortDirection5 === 'ASC' ? '#ffca37' : 'white',
+                }}
+              />
+              <CaretDownOutlined
+                style={{
+                  position: 'relative',
+                  bottom: 2,
+                  color: sortDirection5 === 'DESC' ? '#ffca37' : 'white',
+                }}
+              />
+            </div>
+          </div>
+        )
+      },
       dataIndex: 'count_subdistrict',
       key: 'count_subdistrict',
-      sorter: (a: any, b: any) => sorter(a.count_subdistrict, b.count_subdistrict),
       render: (value: any, row: any, index: number) => {
         return {
           children: <span>{row.count_subdistrict + `  ตำบล`}</span>,
@@ -139,7 +403,56 @@ function PricePage() {
       },
     },
     {
-      title: 'อัปเดตล่าสุด',
+      title: () => {
+        return (
+          <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+            อัปเดตล่าสุด
+            <div
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                cursor: 'pointer',
+              }}
+              onClick={() => {
+                setSortField('update_at')
+                setSortDirection((prev) => {
+                  if (prev === 'ASC') {
+                    return 'DESC'
+                  } else if (prev === undefined) {
+                    return 'ASC'
+                  } else {
+                    return ''
+                  }
+                })
+                setSortDirection6((prev) => {
+                  if (prev === 'ASC') {
+                    return 'DESC'
+                  } else if (prev === undefined) {
+                    return 'ASC'
+                  } else {
+                    return ''
+                  }
+                })
+              }}
+            >
+              <CaretUpOutlined
+                style={{
+                  position: 'relative',
+                  top: 2,
+                  color: sortDirection6 === 'ASC' ? '#ffca37' : 'white',
+                }}
+              />
+              <CaretDownOutlined
+                style={{
+                  position: 'relative',
+                  bottom: 2,
+                  color: sortDirection6 === 'DESC' ? '#ffca37' : 'white',
+                }}
+              />
+            </div>
+          </div>
+        )
+      },
       dataIndex: 'update_at',
       key: 'update_at',
       render: (value: any, row: any, index: number) => {
@@ -158,7 +471,6 @@ function PricePage() {
       title: '',
       dataIndex: 'id',
       key: 'id',
-      width: '6%',
       render: (value: any, row: any, index: number) => {
         return {
           children: (
