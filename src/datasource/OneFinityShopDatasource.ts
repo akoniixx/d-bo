@@ -1,4 +1,4 @@
-import { DEV_ICK_SHOP_URL, sellCodaClient } from '../config/config'
+import { BASE_URL_ICK_SHOP, DEV_ICK_SHOP_URL, sellCodaClient } from '../config/config'
 
 export class OneFinityShopDatasource {
   static getListShop(
@@ -20,7 +20,7 @@ export class OneFinityShopDatasource {
       provinceId: provinceId,
     }
     return sellCodaClient
-      .get(DEV_ICK_SHOP_URL + '/auth/onefinity-shop', { params })
+      .get(BASE_URL_ICK_SHOP + '/auth/onefinity-shop', { params })
       .then((response) => {
         return response.data.responseData
       })
@@ -30,7 +30,7 @@ export class OneFinityShopDatasource {
   }
   static getListShopById(id: string): Promise<any> {
     return sellCodaClient
-      .get(DEV_ICK_SHOP_URL + `/auth/onefinity-shop/${id}`)
+      .get(BASE_URL_ICK_SHOP + `/auth/onefinity-shop/${id}`)
       .then((response) => {
         return response.data.responseData
       })

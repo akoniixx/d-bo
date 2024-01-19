@@ -9,6 +9,9 @@ export const DEV_ICK_SHOP_URL = 'https://iconkasetshop-api-dev.iconkaset.com'
 export const BASE_URL =
   process.env.NODE_ENV === 'development' ? DEV_URL : process.env.REACT_APP_URL_HOST
 
+export const BASE_URL_ICK_SHOP =
+  process.env.NODE_ENV === 'development' ? DEV_ICK_SHOP_URL : process.env.REACT_APP_ICK_SHOP_URL
+
 const token = JSON.parse(localStorage.getItem('token') || '{  }')
 
 axios.interceptors.request.use(async (config: any) => {

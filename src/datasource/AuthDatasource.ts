@@ -1,5 +1,5 @@
 import axios from 'axios'
-import { BASE_URL, DEV_ICK_SHOP_URL } from '../config/config'
+import { BASE_URL, BASE_URL_ICK_SHOP } from '../config/config'
 
 export class AuthDatasource {
   static login(username: string, password: string) {
@@ -22,7 +22,7 @@ export class AuthDatasource {
 
   static loginUserSellCoda(email: string) {
     return axios
-      .post(DEV_ICK_SHOP_URL + '/auth/auth/login-user-staff', {
+      .post(BASE_URL_ICK_SHOP + '/auth/auth/login-user-staff', {
         email,
       })
       .then((response) => {
