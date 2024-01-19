@@ -36,7 +36,7 @@ const reOrder = (list: any, startIndex: any, endIndex: any) => {
   })
 }
 
-const getItemStyle = (isDragging: boolean, draggableStyle: any) => ({
+export const getItemStyle = (isDragging: boolean, draggableStyle: any) => ({
   // some basic styles to make the items look a bit nicer
   userSelect: 'none',
   margin: `0 0 ${grid}px 0`,
