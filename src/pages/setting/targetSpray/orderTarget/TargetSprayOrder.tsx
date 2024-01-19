@@ -135,7 +135,21 @@ function TargetSprayOrder() {
                                     marginRight: 16,
                                   }}
                                 />
-                                {item.name}
+                                <span
+                                  style={{
+                                    borderRadius: '4px',
+                                    border: '1px solid',
+                                    borderColor: '#E5EAEE',
+                                    width: '100%',
+                                    background: '#FFF',
+                                    display: 'flex',
+                                    padding: '8px 10px',
+                                    alignItems: 'center',
+                                    gap: '10px',
+                                  }}
+                                >
+                                  {item.name}
+                                </span>
                               </LeftSide>
                             </RowContainer>
                           </div>
