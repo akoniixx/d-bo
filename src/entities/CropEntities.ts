@@ -21,3 +21,16 @@ export const CropPurposeSprayEntity_INT: CropPurposeSprayEntity = {
   purposeSpray: [PurposeSprayEntity_INIT],
   purposeSprayName: '',
 }
+export interface CropListEntity {
+  cropId: string
+  cropName: string
+  isActive: boolean
+  maxPrice: string
+  minPrice: string
+  maxPriceSow: string
+  minPriceSow: string
+}
+export interface AllCropListEntity {
+  data: CropListEntity[]
+  count: number
+}

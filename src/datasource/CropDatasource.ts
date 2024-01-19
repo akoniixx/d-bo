@@ -1,5 +1,5 @@
 import { BASE_URL, httpClient } from '../config/config'
-import { CropPurposeSprayEntity } from '../entities/CropEntities'
+import { AllCropListEntity, CropPurposeSprayEntity } from '../entities/CropEntities'
 
 export class CropDatasource {
   static getPurposeByCroupName(name: string): Promise<CropPurposeSprayEntity> {
@@ -32,6 +32,29 @@ export class CropDatasource {
       })
       .catch((err) => {
         console.log(err, 'err getCropName')
+      })
+  }
+  static getCropList(
+    page: number,
+    task: number,
+    search?: string,
+    sortField?: string,
+    sortDirection?: string,
+  ): Promise<AllCropListEntity> {
+    const params = {
+      page: page,
+      task: task,
+      search: search,
+      sortField: sortField,
+      sortDirection: sortDirection,
+    }
+    return httpClient
+      .get(BASE_URL + '/tasks/crop/find-all-crop', { params })
+      .then((response) => {
+        return response.data
+      })
+      .catch((err) => {
+        console.log(err, 'err getCropList')
       })
   }
 }

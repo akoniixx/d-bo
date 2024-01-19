@@ -300,6 +300,12 @@ export const pathLists = (isAccounting: boolean, isAdminTask?: boolean) => {
           subMenu: [],
         },
         {
+          path: '/IndexCrop',
+          name: 'IndexCrop',
+          title: 'รายชื่อพืช',
+          subMenu: [],
+        },
+        {
           path: '/Target',
           name: 'Target',
           title: 'เป้าหมาย',

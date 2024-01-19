@@ -115,7 +115,12 @@ const CreditDroner = lazy(() => import('./pages/setting/credit/CreditDroner'))
 const DronerInfinity = lazy(() => import('./pages/infinity/droner/DronerInfinity'))
 const IndexTargetSpray = lazy(() => import('./pages/setting/targetSpray/IndexTargetSpray'))
 const InsertTargetSpray = lazy(() => import('./pages/setting/targetSpray/InsertTargetSpray'))
-const TargetSprayOrder = lazy(() => import('./pages/setting/targetSpray/orderTarget/TargetSprayOrder'))
+const TargetSprayOrder = lazy(
+  () => import('./pages/setting/targetSpray/orderTarget/TargetSprayOrder'),
+)
+const IndexCrop = lazy(() => import('./pages/setting/crop/IndexCrop'))
+const AddCrop = lazy(() => import('./pages/setting/crop/AddCrop'))
+const EditCrop = lazy(() => import('./pages/setting/crop/EditCrop'))
 
 const FallBack = () => {
   return (
@@ -209,7 +214,6 @@ const WebRoutes: React.FC<any> = () => {
             <Route path='/DetailDronerHistorySum/:id' element={<DetailDronerHistorySum />} />
             <Route path='/QuotaReport/:id' element={<QuotaReport />} />
             <Route path='/MissionReport/:id' element={<MissionReport />} />
-
             <Route path='/IndexQuota' element={<IndexQuota />} />
             <Route path='/AddQuota' element={<AddQuota />} />
             <Route path='/EditQuota/:id' element={<EditQuota />} />
@@ -244,6 +248,9 @@ const WebRoutes: React.FC<any> = () => {
             <Route path='/IndexTargetSpray' element={<IndexTargetSpray />} />
             <Route path='/InsertTargetSpray/:id' element={<InsertTargetSpray />} />
             <Route path='/TargetSprayOrder' element={<TargetSprayOrder />} />
+            <Route path='/IndexCrop' element={<IndexCrop />} />
+            <Route path='/AddCrop' element={<AddCrop />} />
+            <Route path='/EditCrop/:id' element={<EditCrop />} />
           </Route>
           <Route element={<PublicRoute />}>
             <Route index element={<AuthPage />} />
