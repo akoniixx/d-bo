@@ -39,7 +39,7 @@ import { DronerDatasource } from '../../../datasource/DronerDatasource'
 import {
   DistrictEntity,
   DistrictEntity_INIT,
-  ProviceEntity,
+  ProvinceEntity,
   ProvinceEntity_INIT,
   SubdistrictEntity,
   SubdistrictEntity_INIT,
@@ -89,11 +89,11 @@ function AddDroner() {
   const [editDrone, setEditDrone] = useState<DronerDroneEntity>(DronerDroneEntity_INIT)
   const [birthDay, setBirthDay] = useState<string>()
   const [saveBtnDisable, setBtnSaveDisable] = useState<boolean>(true)
-  const [province, setProvince] = useState<ProviceEntity[]>([ProvinceEntity_INIT])
+  const [province, setProvince] = useState<ProvinceEntity[]>([ProvinceEntity_INIT])
   const [district, setDistrict] = useState<DistrictEntity[]>([DistrictEntity_INIT])
   const [subdistrict, setSubdistrict] = useState<SubdistrictEntity[]>([SubdistrictEntity_INIT])
   const [plantsName, setPlantsName] = useState<any[]>([])
-  const [otherProvince, setOtherProvince] = useState<ProviceEntity[]>([ProvinceEntity_INIT])
+  const [otherProvince, setOtherProvince] = useState<ProvinceEntity[]>([ProvinceEntity_INIT])
   const [otherDistrict, setOtherDistrict] = useState<DistrictEntity[]>([DistrictEntity_INIT])
   const [otherSubdistrict, setOtherSubdistrict] = useState<SubdistrictEntity[]>([
     SubdistrictEntity_INIT,

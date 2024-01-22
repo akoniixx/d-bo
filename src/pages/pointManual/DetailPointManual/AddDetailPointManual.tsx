@@ -12,7 +12,7 @@ import { CardHeader } from '../../../components/header/CardHearder'
 import { color } from '../../../resource'
 import { FarmerPageEntity } from '../../../entities/FarmerEntities'
 import { TaskDatasource } from '../../../datasource/TaskDatasource'
-import { ProviceEntity } from '../../../entities/LocationEntities'
+import { ProvinceEntity } from '../../../entities/LocationEntities'
 import { LocationDatasource } from '../../../datasource/LocationDatasource'
 import { TaskFinishedDatasource } from '../../../datasource/TaskFinishDatasource'
 import { DronerDatasource } from '../../../datasource/DronerDatasource'
@@ -42,7 +42,7 @@ const AddDetailPointManual = () => {
   const [searchDroner, setSearchDroner] = useState<string>('')
   const [searchTask, setSearchTask] = useState<string>('')
   const [selectedTask, setSelectedTask] = useState<any>()
-  const [provinceListId, setProvinceListId] = useState<ProviceEntity[]>([])
+  const [provinceListId, setProvinceListId] = useState<ProvinceEntity[]>([])
   const profile = JSON.parse(localStorage.getItem('profile') || '{  }')
   const [checkTask, setCheckTask] = useState<boolean>()
   const [taskList, setTaskList] = useState<any>()

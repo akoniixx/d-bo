@@ -1,5 +1,9 @@
 import { BASE_URL, httpClient } from '../config/config'
-import { AllCropListEntity, CropPurposeSprayEntity } from '../entities/CropEntities'
+import {
+  AllCropListEntity,
+  CreateCropEntity,
+  CropPurposeSprayEntity,
+} from '../entities/CropEntities'
 
 export class CropDatasource {
   static getPurposeByCroupName(name: string): Promise<CropPurposeSprayEntity> {
@@ -34,6 +38,8 @@ export class CropDatasource {
         console.log(err, 'err getCropName')
       })
   }
+
+  //master data crop
   static getCropList(
     page: number,
     task: number,
@@ -55,6 +61,36 @@ export class CropDatasource {
       })
       .catch((err) => {
         console.log(err, 'err getCropList')
+      })
+  }
+  static insertCrop(data: CreateCropEntity): Promise<any> {
+    return httpClient
+      .post(BASE_URL + '/tasks/crop', data)
+      .then((response) => {
+        return response.data
+      })
+      .catch((err) => {
+        console.log(err, 'err insert crop')
+      })
+  }
+  static insertMultiPriceCrop(data: any): Promise<any> {
+    return httpClient
+      .post(BASE_URL + '/tasks/location-price/update-multiple-price-crop', data)
+      .then((response) => {
+        return response.data
+      })
+      .catch((err) => {
+        console.log(err, 'err insertMultiPriceCrop')
+      })
+  }
+  static getCropById(id: string): Promise<any> {
+    return httpClient
+      .get(BASE_URL + `/tasks/crop/find-one-crop/${id}`)
+      .then((response) => {
+        return response.data
+      })
+      .catch((err) => {
+        console.log(err, 'err getCropById')
       })
   }
 }

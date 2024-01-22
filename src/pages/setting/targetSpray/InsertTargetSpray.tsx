@@ -83,12 +83,12 @@ function InsertTargetSpray() {
             />
           </div>
         </div>
-        <FooterPage
-          onClickBack={() => navigate(-1)}
-          onClickSave={insertTarget}
-          disableSaveBtn={!data?.name || saveDisable}
-        />
       </CardContainer>
+      <FooterPage
+        onClickBack={() => navigate(-1)}
+        onClickSave={insertTarget}
+        disableSaveBtn={!data?.name || saveDisable}
+      />
     </div>
   )
 }

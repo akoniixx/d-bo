@@ -25,7 +25,7 @@ import { GetFarmerEntity, GetFarmerEntity_INIT } from '../../entities/FarmerEnti
 import {
   DistrictEntity,
   DistrictEntity_INIT,
-  ProviceEntity,
+  ProvinceEntity,
   ProvinceEntity_INIT,
   SubdistrictEntity,
   SubdistrictEntity_INIT,
@@ -76,7 +76,7 @@ const EditFarmer = () => {
   const [showAddModal, setShowAddModal] = useState(false)
   const [editIndex, setEditIndex] = useState(0)
   const [birthDay, setBirthDay] = useState<string>()
-  const [province, setProvince] = useState<ProviceEntity[]>([ProvinceEntity_INIT])
+  const [province, setProvince] = useState<ProvinceEntity[]>([ProvinceEntity_INIT])
   const [district, setDistrict] = useState<DistrictEntity[]>([DistrictEntity_INIT])
   const [subdistrict, setSubdistrict] = useState<SubdistrictEntity[]>([SubdistrictEntity_INIT])
   const [saveBtnDisable, setBtnSaveDisable] = useState<boolean>(false)

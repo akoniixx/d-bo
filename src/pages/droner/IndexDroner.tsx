@@ -28,7 +28,7 @@ import ActionButton from '../../components/button/ActionButton'
 import { DronerListEntity } from '../../entities/DronerEntities'
 import { DronerDatasource } from '../../datasource/DronerDatasource'
 import { LocationDatasource } from '../../datasource/LocationDatasource'
-import { DistrictEntity, ProviceEntity, SubdistrictEntity } from '../../entities/LocationEntities'
+import { DistrictEntity, ProvinceEntity, SubdistrictEntity } from '../../entities/LocationEntities'
 import moment from 'moment'
 import AddButtton from '../../components/button/AddButton'
 import { useNavigate } from 'react-router-dom'
@@ -50,7 +50,7 @@ function IndexDroner() {
   const [searchProvince, setSearchProvince] = useState<any>()
   const [searchDistrict, setSearchDistrict] = useState<any>()
   const [searchSubdistrict, setSearchSubdistrict] = useState<any>()
-  const [province, setProvince] = useState<ProviceEntity[]>([])
+  const [province, setProvince] = useState<ProvinceEntity[]>([])
   const [district, setDistrict] = useState<DistrictEntity[]>([])
   const [subdistrict, setSubdistrict] = useState<SubdistrictEntity[]>([])
   const [mainStatus, setMainStatus] = useState<any>('PENDING')

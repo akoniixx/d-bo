@@ -38,7 +38,7 @@ import ModalDeleteCoupon from '../../components/modal/ModalDeleteCoupon'
 import RenderMobile from '../../components/mobile/RenderMobile'
 import RenderOffline from '../../components/mobile/RenderOffline'
 import { CropPurposeSprayEntity } from '../../entities/CropEntities'
-import { ProviceEntity } from '../../entities/LocationEntities'
+import { ProvinceEntity } from '../../entities/LocationEntities'
 import { TaskDatasource } from '../../datasource/TaskDatasource'
 import { FarmerDatasource } from '../../datasource/FarmerDatasource'
 import { DashboardLayout } from '../../components/layout/Layout'
@@ -90,7 +90,7 @@ function EditPromotion() {
   const [specificFarmer, setSpecificFarmer] = useState<boolean>(false)
   const [farmerList, setFarmerList] = useState<any>()
   const fetchTwice = useRef<boolean>(true)
-  const [provinceListId, setProvinceListId] = useState<ProviceEntity[]>([])
+  const [provinceListId, setProvinceListId] = useState<ProvinceEntity[]>([])
   const [searchFarmer, setSearchFarmer] = useState<string>('')
   const [currentPage, setCurrentPage] = useState(1)
   const [row, setRow] = useState(10)

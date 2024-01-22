@@ -31,7 +31,7 @@ import { LocationDatasource } from '../../../datasource/LocationDatasource'
 import { TaskDatasource } from '../../../datasource/TaskDatasource'
 import {
   DistrictEntity,
-  ProviceEntity,
+  ProvinceEntity,
   SubdistrictEntity,
 } from '../../../entities/LocationEntities'
 import { InvoiceTaskEntity } from '../../../entities/NewTaskEntities'
@@ -62,7 +62,7 @@ const IndexInprogressTask = () => {
   const [searchDistrict, setSearchDistrict] = useState<any>()
   const [searchSubdistrict, setSearchSubdistrict] = useState<any>()
   const [searchStatus, setSearchStatus] = useState<any>()
-  const [province, setProvince] = useState<ProviceEntity[]>()
+  const [province, setProvince] = useState<ProvinceEntity[]>()
   const [district, setDistrict] = useState<DistrictEntity[]>()
   const [subdistrict, setSubdistrict] = useState<SubdistrictEntity[]>()
   const [appTypeArr, setAppTypeArr] = useState<string[]>([])
