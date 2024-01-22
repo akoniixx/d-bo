@@ -14,7 +14,7 @@ function IndexCrop() {
   const [loading, setLoading] = useState<boolean>(false)
   const [row, setRow] = useState<number>(10)
   const [current, setCurrent] = useState<number>(1)
-  const [status, setStatus] = useState<any>()
+  const [status, setStatus] = useState<boolean>()
   const [sortDirection, setSortDirection] = useState<string | undefined>(undefined)
   const [sortDirection1, setSortDirection1] = useState<string | undefined>(undefined)
   const [sortDirection2, setSortDirection2] = useState<string | undefined>(undefined)
@@ -28,7 +28,7 @@ function IndexCrop() {
 
   const fetchDataCrop = async () => {
     setLoading(true)
-    await CropDatasource.getCropList(current, row, searchText, sortField, sortDirection)
+    await CropDatasource.getCropList(current, row, searchText, sortField, sortDirection, status)
       .then((res) => {
         setData(res)
       })
@@ -300,7 +300,7 @@ function IndexCrop() {
               <Select
                 className='col-lg-12'
                 placeholder='เลือกสถานะ'
-                onChange={(e) => setStatus(e.target.value)}
+                onChange={(e) => setStatus(e)}
                 showSearch
                 value={status}
                 allowClear
@@ -310,8 +310,8 @@ function IndexCrop() {
                   optionA.children.toLowerCase().localeCompare(optionB.children.toLowerCase())
                 }
               >
-                <Option value={'ACTIVE'}>ใช้งาน</Option>
-                <Option value={'INACTIVE'}>ปิดการใช้งาน</Option>
+                <Option value={'true'}>ใช้งาน</Option>
+                <Option value={'false'}>ปิดการใช้งาน</Option>
               </Select>
             </div>
 

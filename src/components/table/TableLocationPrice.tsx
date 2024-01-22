@@ -1,19 +1,18 @@
 import React, { useEffect, useState } from 'react'
 import { color } from '../../resource'
-import { Button, Form, Input, InputNumber, Select, Table } from 'antd'
+import { Button, Input, Select, Table } from 'antd'
 import { LocationDatasource } from '../../datasource/LocationDatasource'
 import {
   ProvinceEntity,
-  ProvinceEntity_INIT,
   ProvincePriceEntity,
   ProvincePriceEntity_INIT,
 } from '../../entities/LocationEntities'
 import ModalSearchProvince from '../modal/ModalSearchProvince'
 
 interface TableLocationPriceProps {
-  price: number
+  callBack: (data: ProvincePriceEntity[]) => void
 }
-export const TableLocationPrice: React.FC<TableLocationPriceProps> = ({ price }) => {
+export const TableLocationPrice: React.FC<TableLocationPriceProps> = ({ callBack }) => {
   const [searchProvince, setSearchProvince] = useState<ProvinceEntity[]>()
   const [searchText, setSearchText] = useState<ProvincePriceEntity[]>()
   const [checkSearch, setCheckSearch] = useState<boolean>(false)
@@ -25,13 +24,16 @@ export const TableLocationPrice: React.FC<TableLocationPriceProps> = ({ price })
   useEffect(() => {
     fetchProvince()
   }, [])
+  useEffect(() => {
+    callBack(equalProvince)
+  }, [equalProvince])
 
   const fetchProvince = async () => {
     await LocationDatasource.getProvince().then((res) => {
       setSearchProvince(res)
       const arrayOfObjectsWithPrice = res.map((obj: ProvinceEntity) => ({
         ...obj,
-        price: price,
+        price: null,
       }))
       setEqualProvince(arrayOfObjectsWithPrice)
     })
@@ -43,8 +45,8 @@ export const TableLocationPrice: React.FC<TableLocationPriceProps> = ({ price })
     }
 
     const convertedNumber = inputValue.replace(/[^\d1-9]/g, '')
-    setEqualProvince((prev:any) =>
-      prev.map((item:any, i:any) =>
+    setEqualProvince((prev: any) =>
+      prev.map((item: any, i: any) =>
         i === index
           ? {
               ...item,
@@ -65,6 +67,7 @@ export const TableLocationPrice: React.FC<TableLocationPriceProps> = ({ price })
       setCheckSearch(false)
     }
   }
+
   const updatePriceTable = (updatedPrices: ProvincePriceEntity[]) => {
     updatedPrices.forEach((updatedProvince) => {
       const matchingIndex = equalProvince.findIndex(
@@ -76,6 +79,7 @@ export const TableLocationPrice: React.FC<TableLocationPriceProps> = ({ price })
       }
     })
   }
+
   const columns = [
     {
       title: 'ชื่อจังหวัด',
@@ -162,23 +166,13 @@ export const TableLocationPrice: React.FC<TableLocationPriceProps> = ({ price })
           </Button>
         </div>
       </div>
-      {/* {searchText && checkSearch ? (
-        <Table
-          style={{ borderWidth: 0.2, borderStyle: 'solid', borderColor: color.Disable }}
-          columns={columns}
-          dataSource={searchText}
-          scroll={{ y: 260 }}
-          pagination={false}
-        />
-      ) : ( */}
-        <Table
-          style={{ borderWidth: 0.2, borderStyle: 'solid', borderColor: color.Disable }}
-          columns={columns}
-          dataSource={equalProvince}
-          scroll={{ y: 260 }}
-          pagination={false}
-        />
-      {/* )} */}
+      <Table
+        style={{ borderWidth: 0.2, borderStyle: 'solid', borderColor: color.Disable }}
+        columns={columns}
+        dataSource={equalProvince}
+        scroll={{ y: 260 }}
+        pagination={false}
+      />
 
       <ModalSearchProvince
         show={showModal}

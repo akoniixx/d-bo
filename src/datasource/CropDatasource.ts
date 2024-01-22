@@ -46,6 +46,7 @@ export class CropDatasource {
     search?: string,
     sortField?: string,
     sortDirection?: string,
+    status?: boolean
   ): Promise<AllCropListEntity> {
     const params = {
       page: page,
@@ -53,6 +54,7 @@ export class CropDatasource {
       search: search,
       sortField: sortField,
       sortDirection: sortDirection,
+      status: status
     }
     return httpClient
       .get(BASE_URL + '/tasks/crop/find-all-crop', { params })
