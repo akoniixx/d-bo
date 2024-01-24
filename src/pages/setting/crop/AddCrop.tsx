@@ -17,6 +17,7 @@ import { CropDatasource } from '../../../datasource/CropDatasource'
 import { LocationDatasource } from '../../../datasource/LocationDatasource'
 import Swal from 'sweetalert2'
 import { TableLocationPrice } from '../../../components/table/TableLocationPrice'
+import { LocationPriceEntity_INIT } from '../../../entities/LocationPrice'
 
 function AddCrop() {
   const navigate = useNavigate()
@@ -139,8 +140,6 @@ function AddCrop() {
       return {
         orderPurpose: i + 1,
         purposeSprayName: fs[`${y.orderPurpose}_purposeSprayName`],
-        periodMin: fs[`${y.orderPurpose}_periodMin`],
-        periodMax: fs[`${y.orderPurpose}_periodMax`],
         isSpray: Boolean(fs[`${y.orderPurpose}_isSpray`]),
         isSow: Boolean(fs[`${y.orderPurpose}_isSow`]),
       }
@@ -152,8 +151,6 @@ function AddCrop() {
       (item: any) =>
         item &&
         item.purposeSprayName &&
-        item.periodMin &&
-        item.periodMax &&
         (item.isSpray || item.isSow) &&
         item.orderPurpose,
     )
@@ -425,7 +422,7 @@ function AddCrop() {
               value={price}
             />
           ) : (
-            <TableLocationPrice callBack={updatePriceTable} />
+            <TableLocationPrice data={LocationPriceEntity_INIT} callBack={updatePriceTable} />
           )}
 
           {subPurposeSpray}

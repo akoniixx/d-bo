@@ -1,5 +1,5 @@
 import { CaretDownOutlined, CaretUpOutlined, EditOutlined, SearchOutlined } from '@ant-design/icons'
-import { Button, Input, Pagination, Spin, Table } from 'antd'
+import { Button, Input, Pagination, PaginationProps, Spin, Table } from 'antd'
 import { useEffect, useState } from 'react'
 import ActionButton from '../../components/button/ActionButton'
 import ModalCropByProvince from '../../components/modal/ModalCropByProvince'
@@ -15,7 +15,7 @@ import {
 import moment from 'moment'
 
 function PricePage() {
-  const row = 10
+  const [row, setRow] = useState(10)
   const [current, setCurrent] = useState(1)
   const [data, setData] = useState<LocationPricePageEntity>()
   const [showModalEdit, setShowModalEdit] = useState(false)
@@ -37,7 +37,7 @@ function PricePage() {
     useState<UpdateLocationPrice>(UpdateLocationPrice_INIT)
   useEffect(() => {
     fetchLocationPrice()
-  }, [current, sortDirection])
+  }, [current, sortDirection, row])
   const fetchLocationPrice = async () => {
     setLoading(true)
     await LocationPriceDatasource.getAllLocationPrice(
@@ -67,6 +67,10 @@ function PricePage() {
   const previewCrop = (province: any) => {
     setShowModalCrop((prev) => !prev)
     setProvinceId(province)
+  }
+  const onShowSizeChange: PaginationProps['onShowSizeChange'] = (current, pageSize) => {
+    setCurrent(current)
+    setRow(pageSize)
   }
   const updatePriceCrop = async (dataUpdate: UpdateLocationPriceList[]) => {
     if (Array.isArray(dataUpdate)) {
@@ -550,7 +554,7 @@ function PricePage() {
           total={data?.count}
           onChange={onChangePage}
           pageSize={row}
-          showSizeChanger={false}
+          onShowSizeChange={onShowSizeChange}
         />
       </div>
 

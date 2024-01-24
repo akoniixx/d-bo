@@ -1,5 +1,5 @@
 /* eslint-disable react/jsx-key */
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Button, Form, Input, InputNumber, Modal, Radio, Table } from 'antd'
 import FooterPage from '../footer/FooterPage'
 import { AllLocatePriceEntity, UpdateLocationPriceList } from '../../entities/LocationPrice'
@@ -36,6 +36,14 @@ const ModalEditLocationPrice: React.FC<ModalLocationPriceProps> = ({
   const [type, setType] = useState<any>('SPRAY')
   const [equalPrice, setEqualPrice] = useState<number>()
   const [profile] = useLocalStorage('profile', [])
+  const [formTable] = Form.useForm()
+
+  useEffect(() => {
+    editIndex?.forEach((p: any, index: number) => {
+      console.log(`${index}_priceTable`,p.price)
+      formTable.setFieldValue(`${index}_priceTable`,p.price)
+    })
+  }, [])
 
   const searchPlants = async () => {
     await LocationPriceDatasource.getPrice(data.province_name, searchText).then((res) => {
@@ -68,9 +76,15 @@ const ModalEditLocationPrice: React.FC<ModalLocationPriceProps> = ({
     setType(e.target.value)
   }
 
-  const handleEqualPrice = (e: any) => {
-    setEqualPrice(e.target.value)
+  const checkNumber = (e: React.ChangeEvent<HTMLInputElement>, name: string) => {
+    const { value: inputValue } = e.target
+    const checkName = name.split('_')[1]
+    const justNumber = inputValue.replace(/[^0-9.]/g, '')
+    if (name === 'price' || checkName === 'priceTable') {
+      form.setFieldsValue({ [name]: justNumber })
+    }
   }
+
   const renderPriceColumn = (value: any, row: any, index: number) => {
     const handleItemClick = (indexData: number, newItem: number | null) => {
       const newItems = [...locationPrice]
@@ -94,14 +108,14 @@ const ModalEditLocationPrice: React.FC<ModalLocationPriceProps> = ({
         width: 200,
         color: (type === 'SOW' ? row.price_sow : row.price) === null ? 'grey' : 'black',
       },
-      defaultValue:
-        (type === 'SOW' ? row.price_sow : row.price) !== null
-          ? type === 'SOW'
-            ? row.price_sow
-            : row.price
-          : 'ยังไม่มีข้อมูล',
+      // defaultValue:
+      //   (type === 'SOW' ? row.price_sow : row.price) !== null
+      //     ? type === 'SOW'
+      //       ? row.price_sow
+      //       : row.price
+      //     : 'ยังไม่มีข้อมูล',
       step: '0.01',
-      onChange: (event: number | null) => handleItemClick(index, event),
+      onChange: (event: any) => checkNumber(event, 'priceTable'),
       stringMode: true,
       addonAfter: 'บาท',
     }
@@ -127,7 +141,21 @@ const ModalEditLocationPrice: React.FC<ModalLocationPriceProps> = ({
       dataIndex: 'prices',
       key: 'prices',
       width: '50%',
-      render: renderPriceColumn,
+      render: (value: any, row: any, index: any) => {
+        return {
+          children: (
+            <Form.Item style={{ margin: 0 }} name={`${index}_priceTable`}>
+              <Input
+                style={{ textAlign: 'center' }}
+                autoComplete='off'
+                suffix='บาท'
+                placeholder='กรอกราคา'
+                onChange={(e) => checkNumber(e, `${index}_priceTable`)}
+              />
+            </Form.Item>
+          ),
+        }
+      },
     },
   ]
 
@@ -177,12 +205,15 @@ const ModalEditLocationPrice: React.FC<ModalLocationPriceProps> = ({
             </Radio.Group>
             {selectPrice === 'equal' ? (
               <div className='pt-3'>
-                <Input
-                  placeholder='กรอกราคา'
-                  suffix='บาท'
-                  onChange={(e) => handleEqualPrice(e)}
-                  autoComplete='off'
-                />
+                <Form.Item style={{ margin: 0 }} name='price'>
+                  <Input
+                    style={{ textAlign: 'center' }}
+                    autoComplete='off'
+                    suffix='บาท'
+                    placeholder='กรอกราคา'
+                    onChange={(e) => checkNumber(e, 'price')}
+                  />
+                </Form.Item>
               </div>
             ) : (
               <>

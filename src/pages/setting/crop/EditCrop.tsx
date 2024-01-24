@@ -7,15 +7,14 @@ import { CardHeader } from '../../../components/header/CardHearder'
 import color from '../../../resource/color'
 import { DeleteOutlined } from '@ant-design/icons'
 import FooterPage from '../../../components/footer/FooterPage'
-import {
-  DataInsertCropEntity,
-  PurposeCropEntities,
-  PurposeCropEntities_INIT,
-} from '../../../entities/CropEntities'
+import { PurposeCropEntities, PurposeCropEntities_INIT } from '../../../entities/CropEntities'
 import ActionButton from '../../../components/button/ActionButton'
 import { CropDatasource } from '../../../datasource/CropDatasource'
 import { LocationDatasource } from '../../../datasource/LocationDatasource'
 import Swal from 'sweetalert2'
+import { TableLocationPrice } from '../../../components/table/TableLocationPrice'
+import { LocationPriceEntity } from '../../../entities/LocationPrice'
+import ModalDelete from '../../../components/modal/ModalDelete'
 
 const _ = require('lodash')
 
@@ -25,16 +24,22 @@ function EditCrop() {
   const cropId = queryString[1]
   const [form] = Form.useForm()
   const [formTable] = Form.useForm()
-  const [typePrice, setTypePrice] = useState<any>('EQUAL')
   const [count, setCount] = useState(1)
   const [provinceId, setProvinceId] = useState<any>()
   const [dataSubPurpose, setDataSubPurpose] = useState<PurposeCropEntities[]>([
     PurposeCropEntities_INIT,
   ])
-  const [data, setData] = useState<any>()
-  const [equalPrice, setEqualPrice] = useState<any>()
-
+  const [type, setType] = useState<boolean>(false)
+  const [price, setPrice] = useState<any>()
+  const [locationPrice, setLocationPrice] = useState<LocationPriceEntity[]>([])
+  const [loading, setLoading] = useState<boolean>(false)
+  const [modalDelete, setModalDelete] = useState<boolean>(false)
+  const [purposeSprayId, setPurposeSprayId] = useState<any>()
   const profile = JSON.parse(localStorage.getItem('profile') || '{  }')
+  const [dataFromTable, setDataFromTable] = useState<any>()
+  const [saveBtnDisable, setBtnSaveDisable] = useState<boolean>(false)
+  const [checkPrice, setCheckPrice] = useState<boolean>(true)
+  const [deleteId, setDeleteId] = useState<any>()
 
   useEffect(() => {
     const getProvinceId = () => {
@@ -53,38 +58,37 @@ function EditCrop() {
     getProvinceId()
   }, [])
   useEffect(() => {
-    const fetchCropById = () => {
-      CropDatasource.getCropById(cropId).then((res) => {
-        form.setFieldsValue({
-          cropName: res.data?.cropName,
-          price: res.equalPrice?.equalPrice,
-          status: res.data?.isActive,
-          equal: res.equalPrice?.checkEqualPrice,
-        })
-        if(res.data?.purposeSpray){
-          res.purposeSpray.forEach((item:any) => {
-            console.log(item);
-        });
-        }
-
-        // const mapKey = res.condition
-        // setDataSubPurpose(mapKey)
-        // setCount(mapKey.length)
-        // mapKey?.forEach((p: any) => {
-        //   formTable.setFieldValue(`${p.orderPurpose}_purposeSprayName`, p.purposeSprayName)
-        //   formTable.setFieldValue(`${p.orderPurpose}_periodMin`, p.periodMin)
-        //   formTable.setFieldValue(`${p.orderPurpose}_periodMax`, p.periodMax)
-        //   formTable.setFieldValue(`${p.orderPurpose}_isSpray`, p.isSpray)
-        //   formTable.setFieldValue(`${p.orderPurpose}_isSow`, p.isSow)
-        // })
-        console.log(res.data)
-        console.log(res.equalPrice)
-      })
-    }
     fetchCropById()
   }, [])
 
-  const onFieldsChange = () => {}
+  const fetchCropById = () => {
+    setLoading(true)
+    CropDatasource.getCropById(cropId)
+      .then((res) => {
+        form.setFieldsValue({
+          cropName: res.data?.cropName,
+          status: res.data?.isActive,
+          equal: res.equalPrice?.checkEqualPrice,
+        })
+        setLocationPrice(res.data?.locationPrice)
+        setType(res.equalPrice?.checkEqualPrice)
+        setPrice(res.equalPrice?.equalPrice)
+        const mapKey = res.data?.purposeSpray
+        setDataSubPurpose(mapKey)
+        setPurposeSprayId(res.data?.purposeSpray)
+        setCount(mapKey.length)
+        mapKey?.forEach((p: any, index: number) => {
+          const currentOrderPurpose = p.orderPurpose !== null ? p.orderPurpose : index + 1
+          formTable.setFieldValue(`${currentOrderPurpose}_id`, p.id)
+          formTable.setFieldValue(`${currentOrderPurpose}_purposeSprayName`, p.purposeSprayName)
+          formTable.setFieldValue(`${currentOrderPurpose}_periodMin`, p.periodMin)
+          formTable.setFieldValue(`${currentOrderPurpose}_periodMax`, p.periodMax)
+          formTable.setFieldValue(`${currentOrderPurpose}_isSpray`, p.isSpray)
+          formTable.setFieldValue(`${currentOrderPurpose}_isSow`, p.isSow)
+        })
+      })
+      .finally(() => setLoading(false))
+  }
 
   const mapCondition = (e: any) => {
     const mapList = e
@@ -112,18 +116,18 @@ function EditCrop() {
       formTable.setFieldValue(`${y.orderPurpose}_isSow`, y.isSow)
     })
   }
-  const newDataPurPose = useMemo(() => {
-    if (dataSubPurpose.length > 0) {
-      const d = dataSubPurpose.map((el: any, index: any) => {
-        return {
+  const newDataPurPose =
+    useMemo(() => {
+      if (dataSubPurpose.length > 0) {
+        return dataSubPurpose.map((el: any, index: any) => ({
           ...el,
           key: index + 1,
           orderPurpose: index + 1,
-        }
-      })
-      return d
-    }
-  }, [dataSubPurpose])
+        }))
+      } else {
+        return []
+      }
+    }, [dataSubPurpose]) || []
 
   const addRow = () => {
     setCount(count + 1)
@@ -134,21 +138,88 @@ function EditCrop() {
     setDataSubPurpose(addList)
   }
 
-  const removeRow = async (key: number) => {
-    const mapData = await mapCondition(dataSubPurpose)
-    const e = mapData.filter((x: any) => x.orderPurpose !== key)
-    const mData = await mapCondition(e)
+  const handleSuccessfulDelete = (row: any) => {
+    const mapData = mapCondition(dataSubPurpose)
+    const e = mapData.filter((x: any) => x.orderPurpose !== row.key)
+    const mData = mapCondition(e)
     mapForm(mData)
     setDataSubPurpose(e)
     setCount(count - 1)
     formTable.setFieldValue(`${e.length + 1}_purposeSprayName`, '')
     formTable.setFieldValue(`${e.length + 1}_periodMin`, '')
     formTable.setFieldValue(`${e.length + 1}_periodMax`, '')
-    formTable.setFieldValue(`${e.length + 1}_periodMax`, '')
     formTable.setFieldValue(`${e.length + 1}_isSpray`, false)
     formTable.setFieldValue(`${e.length + 1}_isSow`, false)
+    console.log(purposeSprayId)
+  }
+  const showDelete = (row: any) => {
+    setDeleteId(row)
+    setModalDelete(!modalDelete)
   }
 
+  const updatePriceTable = (data: any) => {
+    setDataFromTable(data)
+    checkPriceData(data)
+  }
+  const checkNumber = (e: React.ChangeEvent<HTMLInputElement>, name: string) => {
+    const checkName = name.split('_')[1]
+    const { value: inputValue } = e.target
+    const justNumber = inputValue.replace(/[^0-9.]/g, '')
+    if (checkName === 'periodMax' || checkName === 'periodMin') {
+      formTable.setFieldsValue({ [name]: justNumber })
+    }
+  }
+  const handleOnPrice = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const inputValue = e.target.value
+    if (inputValue.length === 1 && inputValue.startsWith('0')) {
+      return
+    }
+    const convertedNumber = inputValue.replace(/[^\d1-9]/g, '')
+    setPrice(convertedNumber)
+    checkPriceData(convertedNumber)
+  }
+  const checkPriceData = (data: any) => {
+    if (type) {
+      setCheckPrice(data ? false : true)
+    } else {
+      for (const entry of data) {
+        if (!Object.prototype.hasOwnProperty.call(entry, 'price')) {
+          setCheckPrice(true)
+          return
+        }
+      }
+      setCheckPrice(false)
+    }
+  }
+  const onFieldsChange = () => {
+    const { cropName, status } = form.getFieldsValue()
+    const dataSub: any = newDataPurPose
+    const fs = formTable.getFieldsValue()
+    const condition: any = dataSub?.map((y: any, i: number) => {
+      return {
+        orderPurpose: i + 1,
+        purposeSprayName: fs[`${y.orderPurpose}_purposeSprayName`],
+        isSpray: Boolean(fs[`${y.orderPurpose}_isSpray`]),
+        isSow: Boolean(fs[`${y.orderPurpose}_isSow`]),
+      }
+    })
+    let fieldErr: boolean = true
+    let fieldNull: boolean = true
+    condition.length > 0 &&
+    condition.every(
+      (item: any) =>
+        item && item.purposeSprayName && (item.isSpray || item.isSow) && item.orderPurpose,
+    )
+      ? (fieldNull = false)
+      : (fieldNull = true)
+
+    if (cropName) {
+      fieldErr = false
+    } else {
+      fieldErr = true
+    }
+    setBtnSaveDisable(fieldErr || fieldNull)
+  }
   const insertCrop = async () => {
     const dataSub = newDataPurPose
     await form.validateFields()
@@ -158,7 +229,9 @@ function EditCrop() {
     const f = form.getFieldsValue()
     const fs = formTable.getFieldsValue()
     const condition = dataSub?.map((y: any, i: number) => {
+      const id = purposeSprayId[i]?.id
       return {
+        ...(id && { id }),
         purposeSprayName: fs[`${y.orderPurpose}_purposeSprayName`],
         periodMin: fs[`${y.orderPurpose}_periodMin`],
         periodMax: fs[`${y.orderPurpose}_periodMax`],
@@ -167,18 +240,26 @@ function EditCrop() {
         orderPurpose: i + 1,
       }
     })
-
+    create.id = cropId
+    create.isActive = f.status
     create.cropName = f.cropName
     create.purposeSpray = condition
     try {
-      const res: DataInsertCropEntity = await CropDatasource.insertCrop(create)
-      if (res) {
-        const locationPriceData = provinceId.map((province: any) => {
+      await CropDatasource.updateCrop(create)
+      if (type) {
+        await CropDatasource.insertEqualPriceCrop({
+          cropId: cropId,
+          price: Number(price),
+          updateBy: `${profile.firstname} ${profile.lastname}`,
+        })
+      } else {
+        const locationPriceData = dataFromTable.map((item: any) => {
           return {
-            provinceId: province,
-            cropId: res.id,
-            cropName: res.cropName,
-            price: Number(f.price),
+            id: item.id,
+            provinceId: item.provinceId,
+            cropId: cropId,
+            cropName: f.cropName,
+            price: Number(item.price),
             updateBy: `${profile.firstname} ${profile.lastname}`,
           }
         })
@@ -194,7 +275,6 @@ function EditCrop() {
       console.error('An error occurred:', error)
     }
   }
-
   const columns = [
     {
       title: 'ลำดับ',
@@ -234,12 +314,20 @@ function EditCrop() {
           children: (
             <Space>
               <Form.Item style={{ margin: 0 }} name={`${row.orderPurpose}_periodMin`}>
-                <Input style={{ textAlign: 'center' }} />
+                <Input
+                  style={{ textAlign: 'center' }}
+                  autoComplete='off'
+                  placeholder=''
+                  onChange={(e) => checkNumber(e, `${row.orderPurpose}_periodMin`)}
+                />
               </Form.Item>
-
               <strong>-</strong>
               <Form.Item style={{ margin: 0 }} name={`${row.orderPurpose}_periodMax`}>
-                <Input style={{ textAlign: 'center' }} />
+                <Input
+                  style={{ textAlign: 'center' }}
+                  autoComplete='off'
+                  onChange={(e) => checkNumber(e, `${row.orderPurpose}_periodMax`)}
+                />
               </Form.Item>
             </Space>
           ),
@@ -285,7 +373,7 @@ function EditCrop() {
                   icon={<DeleteOutlined />}
                   color={count > 1 ? color.Error : color.Grey}
                   actionDisable={count > 1 ? false : true}
-                  onClick={() => removeRow(row.orderPurpose)}
+                  onClick={() => showDelete(row)}
                 />
               </div>
             </div>
@@ -295,7 +383,7 @@ function EditCrop() {
     },
   ]
   const subPurposeSpray = (
-    <>
+    <div className='pt-3'>
       <Row className='pb-3'>
         <Col span={21}>
           <label>
@@ -321,7 +409,7 @@ function EditCrop() {
       <Form form={formTable} onFieldsChange={onFieldsChange}>
         <Table columns={columns} dataSource={newDataPurPose} pagination={false} />
       </Form>
-    </>
+    </div>
   )
   return (
     <div className='p-2'>
@@ -357,35 +445,80 @@ function EditCrop() {
             ราคา <span style={{ color: color.Error }}>*</span>
           </label>
           <Form.Item name='equal'>
-            <Radio.Group
-              className='d-flex flex-row pb-3'
-              // defaultValue={typePrice}
-              // onChange={(e) => setTypePrice(e.target.value)}
-            >
+            <Radio.Group onChange={(e) => setType(e.target.value)} className='d-flex flex-row'>
               <Radio value={true}>ใช้ราคาเท่ากัน</Radio>
               <Radio value={false}>กำหนดรายจังหวัด</Radio>
             </Radio.Group>
           </Form.Item>
 
-          <Form.Item
-            className='col-lg-3'
-            name='price'
-            rules={[
-              {
-                required: true,
-                message: 'กรุณากรอกจำนวน',
-              },
-            ]}
-          >
-            <Input placeholder='กรอกจำนวน' autoComplete='off' suffix='บาท' />
-          </Form.Item>
+          {type ? (
+            <div className='pb-4'>
+              <Input
+                className='col-lg-4'
+                placeholder='กรอกจำนวน'
+                suffix='บาท'
+                onChange={(e) => {
+                  handleOnPrice(e)
+                }}
+                autoComplete='off'
+                value={price}
+              />
+            </div>
+          ) : (
+            <TableLocationPrice data={locationPrice} callBack={updatePriceTable} />
+          )}
           {subPurposeSpray}
+
+          <label className='pt-4'>
+            สถานะ<span style={{ color: color.Error }}>*</span>
+          </label>
+          <Form.Item name='status'>
+            <Radio.Group className='d-flex flex-column'>
+              <Radio value={true}>ใช้งาน</Radio>
+              <Radio value={false}>ปิดการใช้งาน</Radio>
+            </Radio.Group>
+          </Form.Item>
         </Form>
       </CardContainer>
       <FooterPage
         onClickBack={() => navigate(-1)}
         onClickSave={insertCrop}
-        // disableSaveBtn={!data?.name || saveDisable}
+        disableSaveBtn={saveBtnDisable || checkPrice}
+      />
+
+      <ModalDelete
+        show={modalDelete}
+        title1={'โปรดตรวจสอบรายชื่อช่วงเวลาที่คุณต้องการลบ '}
+        title2={'ก่อนที่จะกดยืนยันการลบ เพราะอาจส่งผลต่อการจ้างงานในระบบ'}
+        backButton={() => setModalDelete(!modalDelete)}
+        callBack={() => {
+          if (deleteId.id) {
+            CropDatasource.deletePurpose(deleteId.id).then((res) => {
+              if (res.success) {
+                Swal.fire({
+                  title: 'สำเร็จ',
+                  icon: 'success',
+                  timer: 1500,
+                  text: 'งานที่ดำเนินงาน “ยกเลิก” ถูกดำเนินการเรียบร้อยแล้ว',
+                  showConfirmButton: false,
+                })
+                setModalDelete(!modalDelete)
+                handleSuccessfulDelete(deleteId)
+              } else {
+                Swal.fire({
+                  title: 'ไม่สามารถดำเนินรายการได้',
+                  text: 'เนื่องจากข้อมูลช่วงเวลาถูกใช้งานในการสร้างงานบินแล้ว',
+                  icon: 'error',
+                  showConfirmButton: false,
+                })
+                setModalDelete(!modalDelete)
+              }
+            })
+          } else {
+            handleSuccessfulDelete(deleteId)
+            setModalDelete(!modalDelete)
+          }
+        }}
       />
     </div>
   )

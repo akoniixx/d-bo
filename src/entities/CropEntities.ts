@@ -58,10 +58,14 @@ export const PurposeCropEntities_INIT: PurposeCropEntities = {
 }
 
 export interface CreateCropEntity {
+  id?: string
+  isActive?: boolean
   cropName: string
   purposeSpray: PurposeCropEntities[]
 }
 export const CreateCropEntity_INIT: CreateCropEntity = {
+  id: '',
+  isActive: false,
   cropName: '',
   purposeSpray: [PurposeCropEntities_INIT],
 }

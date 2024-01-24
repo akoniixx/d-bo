@@ -46,7 +46,7 @@ export class CropDatasource {
     search?: string,
     sortField?: string,
     sortDirection?: string,
-    status?: boolean
+    status?: boolean,
   ): Promise<AllCropListEntity> {
     const params = {
       page: page,
@@ -54,7 +54,7 @@ export class CropDatasource {
       search: search,
       sortField: sortField,
       sortDirection: sortDirection,
-      status: status
+      status: status,
     }
     return httpClient
       .get(BASE_URL + '/tasks/crop/find-all-crop', { params })
@@ -66,8 +66,20 @@ export class CropDatasource {
       })
   }
   static insertCrop(data: CreateCropEntity): Promise<any> {
+    delete data.id
+    delete data.isActive
     return httpClient
       .post(BASE_URL + '/tasks/crop', data)
+      .then((response) => {
+        return response.data
+      })
+      .catch((err) => {
+        console.log(err, 'err insert crop')
+      })
+  }
+  static updateCrop(data: CreateCropEntity): Promise<any> {
+    return httpClient
+      .patch(BASE_URL + '/tasks/crop', data)
       .then((response) => {
         return response.data
       })
@@ -93,6 +105,26 @@ export class CropDatasource {
       })
       .catch((err) => {
         console.log(err, 'err getCropById')
+      })
+  }
+  static insertEqualPriceCrop(data: any): Promise<any> {
+    return httpClient
+      .post(BASE_URL + '/tasks/location-price/update-equal-price-crop', data)
+      .then((response) => {
+        return response.data
+      })
+      .catch((err) => {
+        console.log(err, 'err insertEqualPriceCrop')
+      })
+  }
+  static deletePurpose(id: string): Promise<any> {
+    return httpClient
+      .delete(BASE_URL + `/tasks/crop/delete-purpose/${id}`)
+      .then((response) => {
+        return response.data
+      })
+      .catch((err) => {
+        console.log(err, 'err delete purpose')
       })
   }
 }

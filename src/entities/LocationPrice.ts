@@ -1,11 +1,28 @@
+import { ProvinceEntity, ProvinceEntity_INIT } from './LocationEntities'
+
 export interface LocationPriceEntity {
-  id: string
-  provinceId: number
-  cropName: string
-  price: string
   createdAt: string
+  cropId: string
+  cropName: string
+  id: string
+  price: string
+  priceSow: string
+  province: ProvinceEntity
+  provinceId: number
+  updateBy: string
   updatedAt: string
-  updateAt: string
+}
+export const LocationPriceEntity_INIT: LocationPriceEntity = {
+  createdAt: '',
+  cropId: '',
+  cropName: '',
+  id: '',
+  price: '',
+  priceSow: '',
+  province: ProvinceEntity_INIT,
+  provinceId: 0,
+  updateBy: '',
+  updatedAt: '',
 }
 export interface PricePlantsEntity {
   id: string
@@ -51,7 +68,7 @@ export interface UpdateLocationPriceList {
 export const UpdateLocationPriceList_INIT: UpdateLocationPriceList = {
   location_price_id: '',
   price: 0,
-  priceSow: 0
+  priceSow: 0,
 }
 export interface UpdateLocationPrice {
   priceData: UpdateLocationPriceList[]
