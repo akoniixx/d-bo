@@ -1,11 +1,13 @@
 import { BASE_URL, httpClient } from '../config/config'
 import {
   DetailRedeemDronerEntity,
+  DetailRedeemFarmerEntity,
   DetailRedeemFermerEntity,
   RedeemDronerEntity,
   RedeemDronerListEntity,
   RedeemFarmerListEntity,
   UpdateRedeemDronerEntity,
+  UpdateRedeemFarmerEntity,
 } from '../entities/RedeemEntities'
 
 export class RedeemDatasource {
@@ -42,6 +44,37 @@ export class RedeemDatasource {
       })
       .catch((err) => {
         console.log(err, 'err getnewtask')
+      })
+  }
+  static getFarmerTransactions(
+    take: number,
+    page: number,
+    search?: string,
+    startDate?: string,
+    endDate?: string,
+    status?: string,
+    secondSearch?: string,
+    rewardType?: string,
+    rewardExchange?: string,
+  ): Promise<RedeemDronerListEntity> {
+    const params = {
+      take: take,
+      page: page,
+      search: search,
+      startDate: startDate,
+      endDate: endDate,
+      status: status,
+      secondSearch: secondSearch,
+      rewardType: rewardType,
+      rewardExchange: rewardExchange,
+    }
+    return httpClient
+      .get(BASE_URL + '/promotion/farmer-transactions/get-all-farmer-reward-history', { params })
+      .then((response) => {
+        return response.data
+      })
+      .catch((err) => {
+        console.log(err, 'err farmer transactions')
       })
   }
   static getRedeemDroner(
@@ -85,9 +118,29 @@ export class RedeemDatasource {
         console.log(err, 'err getnewtask')
       })
   }
+  static getRedeemFarmerTransactionsById(id: string): Promise<DetailRedeemFarmerEntity> {
+    return httpClient
+      .get(BASE_URL + `/promotion/farmer-transactions/get-farmer-reward-history/${id}`)
+      .then((response) => {
+        return response.data
+      })
+      .catch((err) => {
+        console.log(err, 'err farmer-transactions by id')
+      })
+  }
   static updateStatusRedeem(data: UpdateRedeemDronerEntity) {
     return httpClient
       .post(BASE_URL + '/promotion/droner-transactions/update-redeem-status', data)
+      .then((response) => {
+        return response.data
+      })
+      .catch((error) => {
+        console.log(error)
+      })
+  }
+  static updateStatusFarmerRedeem(data: UpdateRedeemFarmerEntity) {
+    return httpClient
+      .post(BASE_URL + '/promotion/farmer-transactions/update-redeem-status', data)
       .then((response) => {
         return response.data
       })

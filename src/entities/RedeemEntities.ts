@@ -202,7 +202,75 @@ export interface DetailRedeemDronerEntity {
     missionName: string
   }
 }
-
+export interface DetailRedeemFarmerEntity {
+  id: string
+  redeemNo: string
+  dronerId: string
+  campaignId: string
+  campaignName: string
+  allValue: number
+  amountValue: number
+  beforeValue: number
+  balance: number
+  beforeRai: number
+  afterRai: number
+  raiAmount: number
+  rewardId: string
+  rewardName: string
+  rewardQuantity: number
+  rewardCode: string
+  receiverDetail: {
+    firstname: string
+    lastname: string
+    nickname: string
+    tel: string
+    address: string
+  }
+  createAt: string
+  updateAt: string
+  redeemDetail: {
+    redeemStatus: string
+    rewardType: string
+    remark: string
+    deliveryCompany: string
+    trackingNo: string
+    missionName: string
+    missionNo: string
+    rewardExchange: string
+  }
+  farmerRedeemHistories: {
+    id: string
+    remark: string
+    status: string
+    trackingNo: string
+    beforeStatus: string
+    createAt: string
+    deliveryCompany: string
+    dronerTransactionId: string
+    branchCode: string
+    branchName: string
+    redeemCode: string
+  }[]
+  campaign: string
+  reward: {
+    id: string
+    rewardName: string
+    imagePath: string
+    rewardType: string
+    rewardExchange: string
+    rewardQuantity: number
+    rewardNo: string
+    score: number
+    amount: number
+    used: number
+    remain: number
+  }
+  mission: {
+    id: string
+    missionNo: string
+    missionName: string
+  }
+}
 export interface UpdateRedeemDronerEntity {
   dronerTransactionId: string | null | '' | undefined
   status: string
@@ -213,6 +281,22 @@ export interface UpdateRedeemDronerEntity {
 }
 export const UpdateRedeemDronerEntity_INIT: UpdateRedeemDronerEntity = {
   dronerTransactionId: '',
+  status: '',
+  updateBy: '',
+  deliveryCompany: '',
+  trackingNo: '',
+  remark: '',
+}
+export interface UpdateRedeemFarmerEntity {
+  farmerTransactionId: string | null | '' | undefined
+  status: string
+  updateBy: string
+  deliveryCompany: string
+  trackingNo: string
+  remark: string
+}
+export const UpdateRedeemFarmerEntity_INIT: UpdateRedeemFarmerEntity = {
+  farmerTransactionId: '',
   status: '',
   updateBy: '',
   deliveryCompany: '',

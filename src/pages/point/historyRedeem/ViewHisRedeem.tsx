@@ -14,18 +14,17 @@ import {
   Tooltip,
 } from 'antd'
 import moment from 'moment'
-import React, { useEffect, useState } from 'react'
-import { Container } from 'react-bootstrap'
-import ActionButton from '../../components/button/ActionButton'
-import { CardContainer } from '../../components/card/CardContainer'
-import { RedeemDatasource } from '../../datasource/RedeemDatasource'
-import { RedeemDronerListEntity, RedeemFarmerListEntity } from '../../entities/RedeemEntities'
-import { color } from '../../resource'
-import { DateTimeUtil } from '../../utilities/DateTimeUtil'
 import { useNavigate } from 'react-router-dom'
-import { numberWithCommas } from '../../utilities/TextFormatter'
-import ShowNickName from '../../components/popover/ShowNickName'
 import styled from 'styled-components'
+import { RedeemDronerListEntity, RedeemFarmerListEntity } from '../../../entities/RedeemEntities'
+import { RedeemDatasource } from '../../../datasource/RedeemDatasource'
+import { color } from '../../../resource'
+import { DateTimeUtil } from '../../../utilities/DateTimeUtil'
+import ShowNickName from '../../../components/popover/ShowNickName'
+import ActionButton from '../../../components/button/ActionButton'
+import { numberWithCommas } from '../../../utilities/TextFormatter'
+import { CardContainer } from '../../../components/card/CardContainer'
+import { useEffect, useState } from 'react'
 const NewTableDroner = styled(Table)`
   .ant-table-container table thead tr th {
     background-color: #ea973e !important;
@@ -38,7 +37,7 @@ const NewTableDroner = styled(Table)`
 const { RangePicker } = DatePicker
 const dateSearchFormat = 'YYYY-MM-DD'
 
-const IndexRedeem = () => {
+const ViewHisRedeem = () => {
   const navigate = useNavigate()
   const dateFormat = 'DD/MM/YYYY'
   const [current, setCurrent] = useState(1)
@@ -73,7 +72,7 @@ const IndexRedeem = () => {
   const fetchRedeemDroner = () => {
     setLoading(true)
     RedeemDatasource.getRedeemDroner(
-      5,
+      10,
       current,
       searchKeyword,
       searchStartDate,
@@ -127,7 +126,7 @@ const IndexRedeem = () => {
   const pageTitle = (
     <>
       <Row justify={'space-between'} style={{ padding: '10px' }}>
-        <Col span={source === 'Farmer' ? 14 : 10}>
+        <Col span={14}>
           <span
             className='card-label font-weight-bolder text-dark'
             style={{
@@ -136,7 +135,7 @@ const IndexRedeem = () => {
               padding: '8px',
             }}
           >
-            <strong>รายงานการแลก</strong>
+            <strong>ประวัติการแลกแต้ม</strong>
           </span>
         </Col>
         <Col span={4}>
@@ -181,20 +180,6 @@ const IndexRedeem = () => {
             </Radio.Button>
           </Radio.Group>
         </Col>
-        {source === 'Droner' && (
-          <Col span={4} className='pt-1'>
-            <Radio.Group
-              onChange={(e) => {
-                setCurrent(1)
-                setSearchType(e.target.value)
-              }}
-              defaultValue={searchType}
-            >
-              <Radio value='PHYSICAL'>Physical</Radio>
-              <Radio value='DIGITAL'>Digital</Radio>
-            </Radio.Group>
-          </Col>
-        )}
         <Col span={6} style={{ color: color.Error }}>
           <RangePicker
             allowClear
@@ -204,122 +189,43 @@ const IndexRedeem = () => {
           />
         </Col>
       </Row>
-      {source === 'Farmer' && (
-        <div className='container d-flex justify-content-between' style={{ padding: '8px' }}>
-          <div className='col-lg-8 p-1'>
-            <Input
-              allowClear
-              prefix={<SearchOutlined style={{ color: color.Disable }} />}
-              placeholder='ค้นหาชื่อเกษตรกร/เบอร์โทร'
-              className='col-lg-12 p-1'
-              onChange={(e) => setSearchKeyword(e.target.value)}
-            />
-          </div>
-          <div className='col-lg'>
-            <Select
-              className='col-lg-12 p-1'
-              placeholder='สถานะทั้งหมด'
-              allowClear
-              onChange={(e) => setSearchStatus(e)}
-            >
-              <option value='SUCCESS'>แลกสำเร็จ</option>
-              <option value='CANCELED'>ยกเลิก</option>
-            </Select>
-          </div>
-          <div className='pt-1'>
-            <Button
-              style={{
-                borderColor: color.Success,
-                borderRadius: '5px',
-                color: color.secondary2,
-                backgroundColor: color.Success,
-              }}
-              onClick={onSearch}
-            >
-              ค้นหาข้อมูล
-            </Button>
-          </div>
+      <div className='container d-flex justify-content-between' style={{ padding: '8px' }}>
+        <div className='col-lg-8 p-1'>
+          <Input
+            allowClear
+            prefix={<SearchOutlined style={{ color: color.Disable }} />}
+            placeholder={
+              source === 'Farmer' ? 'ค้นหาชื่อเกษตรกร/เบอร์โทร' : 'ค้นหาชื่อนักบินโดรน/เบอร์โทร'
+            }
+            className='col-lg-12 p-1'
+            onChange={(e) => setSearchKeyword(e.target.value)}
+          />
         </div>
-      )}
-      {source === 'Droner' && (
-        <div className='container d-flex justify-content-between' style={{ padding: '8px' }}>
-          <div className='col-lg-3 p-1'>
-            <Input
-              allowClear
-              prefix={<SearchOutlined style={{ color: color.Disable }} />}
-              placeholder='ค้นหาชื่อนักบินโดรน/เบอร์โทร'
-              className='col-lg-12 p-1'
-              onChange={(e) => setSearchKeyword(e.target.value)}
-            />
-          </div>
-          <div className='col-lg p-1'>
-            <Input
-              allowClear
-              prefix={<SearchOutlined style={{ color: color.Disable }} />}
-              placeholder='ค้นหารหัส Reward No./Mission No.'
-              className='col-lg-12 p-1'
-              onChange={(e) => setSearchMission(e.target.value)}
-            />
-          </div>
-          <div className='col-lg'>
-            <Select
-              className='col-lg-12 p-1'
-              placeholder='ประเภทของรางวัล'
-              allowClear
-              onChange={(e) => setSearchRewardEx(e)}
-            >
-              <option value='SCORE'>
-                {searchType === 'PHYSICAL' ? 'Physical' : 'Digital'} (ใช้แต้ม)
-              </option>
-              <option value='MISSION'>
-                {searchType === 'PHYSICAL' ? 'Physical' : 'Digital'} (ภารกิจ)
-              </option>
-            </Select>
-          </div>
-          {searchType === 'PHYSICAL' ? (
-            <div className='col-lg'>
-              <Select
-                className='col-lg-12 p-1'
-                placeholder='สถานะทั้งหมด'
-                allowClear
-                onChange={(e) => setSearchStatus(e)}
-              >
-                <option value='REQUEST'>คำร้องขอแลก</option>
-                <option value='PREPARE'>เตรียมจัดส่ง</option>
-                <option value='DONE'>ส่งแล้ว</option>
-                <option value='CANCEL'>ยกเลิก</option>
-              </Select>
-            </div>
-          ) : (
-            <div className='col-lg'>
-              <Select
-                className='col-lg-12 p-1'
-                placeholder='สถานะทั้งหมด'
-                allowClear
-                onChange={(e) => setSearchStatus(e)}
-              >
-                <option value='REQUEST'>พร้อมใช้</option>
-                <option value='USED'>ใช้แล้ว</option>
-                <option value='EXPIRED'>หมดอายุ</option>
-                <option value='CANCEL'>ยกเลิก</option>
-              </Select>
-            </div>
-          )}
-          <div className='pt-1'>
-            <Button
-              style={{
-                borderColor: color.Success,
-                borderRadius: '5px',
-                color: color.secondary2,
-                backgroundColor: color.Success,
-              }}
-              onClick={onSearch}
-            >
-              ค้นหาข้อมูล
-            </Button>
-          </div>
+        <div className='col-lg'>
+          <Select
+            className='col-lg-12 p-1'
+            placeholder='สถานะทั้งหมด'
+            allowClear
+            onChange={(e) => setSearchStatus(e)}
+          >
+            <option value='SUCCESS'>แลกสำเร็จ</option>
+            <option value='CANCELED'>ยกเลิก</option>
+          </Select>
         </div>
-      )}
+        <div className='pt-1'>
+          <Button
+            style={{
+              borderColor: color.Success,
+              borderRadius: '5px',
+              color: color.secondary2,
+              backgroundColor: color.Success,
+            }}
+            onClick={onSearch}
+          >
+            ค้นหาข้อมูล
+          </Button>
+        </div>
+      </div>
     </>
   )
   const columnsFarmer = [
@@ -334,11 +240,29 @@ const IndexRedeem = () => {
       },
     },
     {
+      title: 'Redeem No',
+      dataIndex: 'redeemNo',
+      render: (value: any, row: any, index: number) => {
+        return {
+          children: <span>{row.redeemNo || '-'}</span>,
+        }
+      },
+    },
+    {
       title: 'Task No',
       dataIndex: 'taskNo',
       render: (value: any, row: any, index: number) => {
         return {
           children: <u style={{ color: color.Success }}>{row.taskNo}</u>,
+        }
+      },
+    },
+    {
+      title: 'Reward No',
+      dataIndex: 'rewardNo',
+      render: (value: any, row: any, index: number) => {
+        return {
+          children: <u style={{ color: color.Success }}>{row.rewardNo || '-'}</u>,
         }
       },
     },
@@ -367,7 +291,6 @@ const IndexRedeem = () => {
     {
       title: 'แต้มที่แลก',
       dataIndex: 'point',
-      width: '12%',
       render: (value: any, row: any, index: number) => {
         return {
           children: (
@@ -379,7 +302,6 @@ const IndexRedeem = () => {
     {
       title: 'สถานะ',
       dataIndex: 'status',
-      width: '10%',
       render: (value: any, row: any, index: number) => {
         return {
           children: (
@@ -401,7 +323,6 @@ const IndexRedeem = () => {
       title: '',
       dataIndex: 'Action',
       key: 'Action',
-      width: '8%',
       render: (value: any, row: any, index: number) => {
         return {
           children: (
@@ -410,7 +331,7 @@ const IndexRedeem = () => {
                 <ActionButton
                   icon={<FileTextOutlined />}
                   color={color.primary1}
-                  onClick={() => navigate('/DetailFarmerRedeem/id=' + row.id)}
+                  onClick={() => navigate('/ViewDetailFarmer/id=' + row.id)}
                 />
               </div>
             </div>
@@ -431,11 +352,11 @@ const IndexRedeem = () => {
       },
     },
     {
-      title: 'Redeem No',
-      dataIndex: 'redeemNo',
+      title: 'Task No',
+      dataIndex: 'taskNo',
       render: (value: any, row: any, index: number) => {
         return {
-          children: <span>{row.redeemNo}</span>,
+          children: <span>{row.taskNo || '-'}</span>,
         }
       },
     },
@@ -481,10 +402,14 @@ const IndexRedeem = () => {
       render: (value: any, row: any, index: number) => {
         return {
           children: (
-            <u style={{ color: color.Success }}>
+            <u style={{ color: color.Warning }}>
               {row.receiverDetail.firstname + ' ' + row.receiverDetail.lastname}
               {row.receiverDetail.nickname && (
-                <ShowNickName data={row.receiverDetail.nickname} menu='INFO' />
+                <ShowNickName
+                  data={row.receiverDetail.nickname}
+                  menu='INFO'
+                  colorTooltip={color.Warning}
+                />
               )}
             </u>
           ),
@@ -526,28 +451,18 @@ const IndexRedeem = () => {
       title: 'สถานะ',
       dataIndex: 'status',
       render: (value: any, row: any, index: number) => {
-        const mapStatus: any = {
-          REQUEST: row?.redeemDetail.rewardType === 'PHYSICAL' ? 'คำร้องขอแลก' : 'พร้อมใช้',
-          PREPARE: 'เตรียมจัดส่ง',
-          DONE: 'ส่งแล้ว',
-          CANCEL: 'ยกเลิก',
-          USED: 'ใช้งาน',
-          EXPIRED: 'หมดอายุ',
-        }
-        const mapColor: any = {
-          REQUEST: row?.redeemDetail.rewardType === 'PHYSICAL' ? '#FFCA37' : '#EA973E',
-          PREPARE: '#EA973E',
-          DONE: '#219653',
-          CANCEL: color.Error,
-          USED: '#219653',
-          EXPIRED: '#7B7B7B',
-        }
         return {
           children: (
             <>
-              <span style={{ color: mapColor[row.redeemDetail?.redeemStatus] }}>
-                <Badge color={mapColor[row.redeemDetail?.redeemStatus]} />{' '}
-                {mapStatus[row.redeemDetail?.redeemStatus]}
+              <span
+                style={{
+                  color: row.redeemDetail?.redeemStatus !== 'CANCEL' ? color.Success : color.Error,
+                }}
+              >
+                <Badge
+                  color={row.redeemDetail?.redeemStatus !== 'CANCEL' ? color.Success : color.Error}
+                />{' '}
+                {row.redeemDetail?.redeemStatus === 'CANCEL' ? 'ยกเลิก' : 'แลกสำเร็จ'}
               </span>
             </>
           ),
@@ -566,7 +481,7 @@ const IndexRedeem = () => {
                 <ActionButton
                   icon={<FileTextOutlined />}
                   color={color.primary1}
-                  onClick={() => navigate('/DetailDronerRedeem/id=' + row.id)}
+                  onClick={() => navigate('/ViewDetailDroner/id=' + row.id)}
                 />
               </div>
             </div>
@@ -588,45 +503,6 @@ const IndexRedeem = () => {
     }
   })
 
-  const expandable = (record: any) => {
-    return (
-      <Container
-        style={{
-          backgroundColor: 'rgba(234, 151, 62, 0.10)',
-        }}
-        className='p-3'
-      >
-        <Row>
-          <Col span={2}>
-            <img src={record.reward.imagePath} width={55} height={55} />
-          </Col>
-          <Col span={10} className='p-2'>
-            <div>ชื่อของรางวัล</div>
-            <div>{record.reward.rewardName}</div>
-          </Col>
-          <Col span={4} className='p-2'>
-            <div>แต้มที่แลก</div>
-            <div>
-              {!record.reward.score ? '-' : numberWithCommas(record.reward.score) + ' แต้ม'}
-            </div>
-          </Col>
-          <Col span={3} className='p-2'>
-            <div>จำนวน</div>
-            <div>{record.rewardQuantity} ชิ้น</div>
-          </Col>
-          <Col span={3} className='p-2'>
-            <div>รวมแต้มทั้งหมด</div>
-            <div style={{ color: color.Error }}>
-              {record.amountValue === 0 || !record.amountValue
-                ? '-'
-                : numberWithCommas(record.amountValue) + ' แต้ม'}
-            </div>
-          </Col>
-        </Row>
-      </Container>
-    )
-  }
-
   return (
     <>
       {pageTitle}
@@ -637,8 +513,7 @@ const IndexRedeem = () => {
               dataSource={dataFarmer?.data}
               columns={columnsFarmer}
               pagination={false}
-              size='large'
-              tableLayout='fixed'
+              scroll={{ x: 'max-content' }}
             />
           </Spin>
         )}
@@ -646,15 +521,8 @@ const IndexRedeem = () => {
           <Spin tip='กำลังโหลดข้อมูล...' size='large' spinning={loading}>
             <NewTableDroner
               dataSource={dataDroner?.data}
-              expandable={{
-                expandedRowRender: (record) => expandable(record),
-                showExpandColumn: false,
-                defaultExpandedRowKeys: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
-              }}
               columns={[...tableDronerFix]}
-              scroll={{
-                x: 'auto',
-              }}
+              scroll={{ x: 'max-content' }}
               pagination={false}
               size='large'
               tableLayout='fixed'
@@ -668,7 +536,7 @@ const IndexRedeem = () => {
           current={current}
           total={source === 'Farmer' ? dataFarmer?.count : dataDroner?.count}
           onChange={onChangePage}
-          pageSize={source === 'Farmer' ? 10 : 5}
+          pageSize={10}
           showSizeChanger={false}
         />
       </div>
@@ -676,4 +544,4 @@ const IndexRedeem = () => {
   )
 }
 
-export default IndexRedeem
+export default ViewHisRedeem
