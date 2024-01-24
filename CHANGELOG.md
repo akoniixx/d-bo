@@ -1,5 +1,9 @@
 ## [Version - 0]
 
+## Feature [v0.47.0] 2024-1-24
+
+- crop and time period
+
 ## improve [v0.46.5] 2024-1-19
 
 - target spray order
