@@ -37,7 +37,7 @@ import { EXP_PLANT } from '../../definitions/ExpPlant'
 import ActionButton from '../../components/button/ActionButton'
 import { AddressEntity, AddressEntity_INIT } from '../../entities/AddressEntities'
 import { DronerDroneDatasource } from '../../datasource/DronerDroneDatasource'
-import { DistrictEntity, ProviceEntity, SubdistrictEntity } from '../../entities/LocationEntities'
+import { DistrictEntity, ProvinceEntity, SubdistrictEntity } from '../../entities/LocationEntities'
 import { DronerDroneEntity, DronerDroneEntity_INIT } from '../../entities/DronerDroneEntities'
 import ModalDrone from '../../components/modal/ModalDronerDrone'
 import { DRONER_DRONE_MAPPING, DRONER_STATUS, STATUS_COLOR } from '../../definitions/DronerStatus'
@@ -95,10 +95,10 @@ function EditDroner() {
   const [bookBank, setBookBank] = useState<BookBankEntities>(BookBankEntities_INIT)
   const [locatNull, setLocatNull] = useState<any>()
   const [imgBB, setImgBB] = useState<any>()
-  const [province, setProvince] = useState<ProviceEntity[]>([])
+  const [province, setProvince] = useState<ProvinceEntity[]>([])
   const [district, setDistrict] = useState<DistrictEntity[]>([])
   const [subdistrict, setSubdistrict] = useState<SubdistrictEntity[]>([])
-  const [otherProvince, setOtherProvince] = useState<ProviceEntity[]>([])
+  const [otherProvince, setOtherProvince] = useState<ProvinceEntity[]>([])
   const [otherDistrict, setOtherDistrict] = useState<DistrictEntity[]>([])
   const [otherSubdistrict, setOtherSubdistrict] = useState<SubdistrictEntity[]>([])
   const [isConSent, setIsConSent] = useState<any>()

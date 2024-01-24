@@ -26,7 +26,7 @@ import ActionButton from '../../../components/button/ActionButton'
 import { useNavigate } from 'react-router-dom'
 import {
   DistrictEntity,
-  ProviceEntity,
+  ProvinceEntity,
   SubdistrictEntity,
 } from '../../../entities/LocationEntities'
 import { LocationDatasource } from '../../../datasource/LocationDatasource'
@@ -47,7 +47,7 @@ function DronerInfinity() {
   const [dataDroner, setDataDroner] = useState<AllDronerFinityEntity>()
   const [row, setRow] = useState(10)
   const [current, setCurrent] = useState(1)
-  const [province, setProvince] = useState<ProviceEntity[]>([])
+  const [province, setProvince] = useState<ProvinceEntity[]>([])
   const [district, setDistrict] = useState<DistrictEntity[]>([])
   const [subdistrict, setSubdistrict] = useState<SubdistrictEntity[]>([])
   const [provinceId, setProvinceId] = useState<any>()

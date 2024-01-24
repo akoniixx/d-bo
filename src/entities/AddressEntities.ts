@@ -1,7 +1,7 @@
 import {
   DistrictEntity,
   DistrictEntity_INIT,
-  ProviceEntity,
+  ProvinceEntity,
   ProvinceEntity_INIT,
   SubdistrictEntity,
   SubdistrictEntity_INIT,
@@ -38,7 +38,7 @@ export interface FullAddressEntity {
   subdistrictId: number
   postcode: string
   district: DistrictEntity
-  province: ProviceEntity
+  province: ProvinceEntity
   subdistrict: SubdistrictEntity
 }
 

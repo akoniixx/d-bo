@@ -26,7 +26,7 @@ import {
   updateStatusPays,
   updateStatusPays_INIT,
 } from '../../entities/TaskFinishEntities'
-import { DistrictEntity, ProviceEntity, SubdistrictEntity } from '../../entities/LocationEntities'
+import { DistrictEntity, ProvinceEntity, SubdistrictEntity } from '../../entities/LocationEntities'
 import { useEffect } from 'react'
 import moment from 'moment'
 import color from '../../resource/color'
@@ -109,7 +109,7 @@ function IndexReport() {
   const [searchProvince, setSearchProvince] = useState<any>()
   const [searchDistrict, setSearchDistrict] = useState<any>()
   const [searchSubdistrict, setSearchSubdistrict] = useState<any>()
-  const [province, setProvince] = useState<ProviceEntity[]>()
+  const [province, setProvince] = useState<ProvinceEntity[]>()
   const [district, setDistrict] = useState<DistrictEntity[]>()
   const [subdistrict, setSubdistrict] = useState<SubdistrictEntity[]>()
   const profile = JSON.parse(localStorage.getItem('profile') || '{  }')

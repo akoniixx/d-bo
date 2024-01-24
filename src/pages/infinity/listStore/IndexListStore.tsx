@@ -17,7 +17,7 @@ import { DateTimeUtil } from '../../../utilities/DateTimeUtil'
 import { numberWithCommas } from '../../../utilities/TextFormatter'
 import ActionButton from '../../../components/button/ActionButton'
 import { useNavigate } from 'react-router-dom'
-import { ProviceEntity } from '../../../entities/LocationEntities'
+import { ProvinceEntity } from '../../../entities/LocationEntities'
 import { LocationDatasource } from '../../../datasource/LocationDatasource'
 import icon from '../../../resource/icon'
 import { AuthDatasource } from '../../../datasource/AuthDatasource'
@@ -31,7 +31,7 @@ function IndexListStore() {
   const [loading, setLoading] = useState<boolean>(false)
   const [row, setRow] = useState(10)
   const [current, setCurrent] = useState(1)
-  const [province, setProvince] = useState<ProviceEntity[]>([])
+  const [province, setProvince] = useState<ProvinceEntity[]>([])
   const [sortDirection, setSortDirection] = useState<string | undefined>(undefined)
   const [sortDirection1, setSortDirection1] = useState<string | undefined>(undefined)
   const [sortDirection2, setSortDirection2] = useState<string | undefined>(undefined)
