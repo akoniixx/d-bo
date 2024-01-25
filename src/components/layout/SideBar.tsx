@@ -155,7 +155,7 @@ export const pathLists = (isAccounting: boolean, isAdminTask?: boolean) => {
         {
           path: 'listPoint',
           name: 'listPoint',
-          title: 'รายการแต้ม',
+          title: 'รายงานแต้ม',
           subMenu: [
             {
               path: '/IndexPlanningPoint',
@@ -170,18 +170,18 @@ export const pathLists = (isAccounting: boolean, isAdminTask?: boolean) => {
               subMenu: [],
             },
             {
-              path: '/IndexRedeem/Farmer',
-              name: 'IndexRedeem/Farmer',
-              title: 'แลกแต้ม/ของรางวัล',
-              subMenu: [],
-            },
-            {
-              path: '/IndexPointManual',
-              name: 'IndexPointManual',
-              title: 'รายการแต้มพิเศษ',
+              path: '/ViewHisRedeem/Farmer',
+              name: 'ViewHisRedeem/Farmer',
+              title: 'ประวัติการแลก',
               subMenu: [],
             },
           ],
+        },
+        {
+          path: '/IndexPointManual',
+          name: 'IndexPointManual',
+          title: 'รายการแต้มพิเศษ',
+          subMenu: [],
         },
         {
           path: 'summaryPoint',
@@ -235,6 +235,28 @@ export const pathLists = (isAccounting: boolean, isAdminTask?: boolean) => {
             {
               path: '/IndexRewardFarmer',
               name: 'IndexRewardFarmer',
+              title: 'เกษตรกร',
+              permission: null,
+              subMenu: [],
+            },
+          ],
+        },
+        {
+          path: 'historyRedeem',
+          name: 'historyRedeem',
+          title: 'ประวัติการแลก',
+          permission: null,
+          subMenu: [
+            {
+              path: '/IndexRedeemDroner',
+              name: 'IndexRedeemDroner',
+              title: 'นักบินโดรน',
+              permission: null,
+              subMenu: [],
+            },
+            {
+              path: '/IndexRedeemFarmer',
+              name: 'IndexRedeemFarmer',
               title: 'เกษตรกร',
               permission: null,
               subMenu: [],

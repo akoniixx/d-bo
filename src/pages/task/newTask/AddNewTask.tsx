@@ -227,6 +227,7 @@ const AddNewTask = () => {
     setDataFarmer(farmerSelected)
     checkValidateStep(f.toJS(), current)
   }
+
   const handleSelectFarmerPlot = (value: any) => {
     const plotSelected = farmerSelected?.farmerPlot.filter((x: any) => x.id === value)[0]
     setPriceMethod('อัตโนมัติ')
@@ -418,6 +419,7 @@ const AddNewTask = () => {
                     borderRadius: '5px',
                     backgroundColor: 'rgba(33, 150, 83, 0.1)',
                     color: color.Success,
+                    height: '38px',
                   }}
                   onClick={handleSelectFarmer}
                 >
@@ -448,10 +450,13 @@ const AddNewTask = () => {
                   <Form.Item>
                     <AntdSelect
                       status={checkSelectPlot}
+                      allowClear
+                      className='col-lg-12 p-1'
                       placeholder='เลือกแปลง'
                       onChange={handleSelectFarmerPlot}
+                      showSearch
+                      optionFilterProp='children'
                       disabled={current === 2}
-                      defaultValue={createNewTask.farmerPlotId}
                       value={farmerPlotId}
                     >
                       {dataFarmer.farmerPlot.map((item) => (
@@ -682,7 +687,7 @@ const AddNewTask = () => {
                     return current.isBefore(yesterday)
                   }}
                   onChange={handleDateAppointment}
-                  defaultValue={moment(dateAppointment)}
+                  value={moment(dateAppointment)}
                 />
               </div>
             </div>
@@ -694,6 +699,9 @@ const AddNewTask = () => {
                   disabled={current === 2 || checkSelectPlot === 'error'}
                   format={timeFormat}
                   onSelect={(v) => {
+                    setTimeAppointment(v)
+                  }}
+                  onChange={(v) => {
                     setTimeAppointment(v)
                   }}
                   value={moment(timeAppointment)}
@@ -736,8 +744,9 @@ const AddNewTask = () => {
                     disabled={current === 2 || checkSelectPlot === 'error'}
                     onChange={handlePurposeSpray}
                     defaultChecked={item.isChecked}
-                  />
-                  <label style={{ padding: '0 8px 0 8px' }}>{item.name}</label>
+                  >
+                    {item.name}
+                  </Checkbox>
                   {item.name === 'อื่นๆ' && (
                     <>
                       <Input

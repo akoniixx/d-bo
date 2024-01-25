@@ -651,7 +651,7 @@ const DetailDronerRedeem = () => {
   return (
     <>
       <Row>
-        <BackIconButton onClick={() => navigate('/IndexRedeem/Droner')} />
+        <BackIconButton onClick={() => navigate(-1)} />
         <span className='pt-3'>
           <strong style={{ fontSize: '20px' }}>รายละเอียดการแลก | {data?.redeemNo}</strong>
         </span>
@@ -665,7 +665,7 @@ const DetailDronerRedeem = () => {
       )}
       {renderDronerDetail}
       <FooterPage
-        onClickBack={() => navigate('/IndexRedeem/Droner')}
+        onClickBack={() => navigate(-1)}
         styleFooter={{ padding: '6px' }}
         onClickSave={() => submit()}
         disableSaveBtn={checkDiscable()}
