@@ -206,7 +206,9 @@ const ViewHisRedeem = () => {
             className='col-lg-12 p-1'
             placeholder='สถานะทั้งหมด'
             allowClear
-            onChange={(e) => setSearchStatus(e)}
+            onChange={(e) => {
+              setSearchStatus(e)
+            }}
           >
             <option value='SUCCESS'>แลกสำเร็จ</option>
             <option value='CANCELED'>ยกเลิก</option>
@@ -253,16 +255,16 @@ const ViewHisRedeem = () => {
       dataIndex: 'taskNo',
       render: (value: any, row: any, index: number) => {
         return {
-          children: <u style={{ color: color.Success }}>{row.taskNo}</u>,
+          children: <span>{row.taskNo || '-'}</span>,
         }
       },
     },
     {
       title: 'Reward No',
-      dataIndex: 'rewardNo',
+      dataIndex: 'rewardCode',
       render: (value: any, row: any, index: number) => {
         return {
-          children: <u style={{ color: color.Success }}>{row.rewardNo || '-'}</u>,
+          children: <>{value ? <u style={{ color: color.Success }}>{row.rewardNo}</u> : '-'}</>,
         }
       },
     },
@@ -507,7 +509,7 @@ const ViewHisRedeem = () => {
     <>
       {pageTitle}
       <CardContainer>
-        {source === 'Farmer' && (
+        {source === 'Farmer' ? (
           <Spin tip='กำลังโหลดข้อมูล...' size='large' spinning={loading}>
             <Table
               dataSource={dataFarmer?.data}
@@ -516,8 +518,7 @@ const ViewHisRedeem = () => {
               scroll={{ x: 'max-content' }}
             />
           </Spin>
-        )}
-        {source === 'Droner' && (
+        ) : (
           <Spin tip='กำลังโหลดข้อมูล...' size='large' spinning={loading}>
             <NewTableDroner
               dataSource={dataDroner?.data}

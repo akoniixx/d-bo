@@ -1393,10 +1393,10 @@ const IndexAdminTask = () => {
                       }}
                       onChange={(e) => {
                         if (e !== taskId) {
-                          setImgControl(null)
-                          setImgDrug(null)
-                          setDeleteImgControl(null)
-                          setDeleteImgDrug(null)
+                          setImgControl([])
+                          setImgDrug([])
+                          setDeleteImgControl([])
+                          setDeleteImgDrug([])
                         }
                         setTaskId(e)
                         setSearch(false)
@@ -1412,6 +1412,10 @@ const IndexAdminTask = () => {
                       onClean={() => {
                         setCurrent(1)
                         setTaskNo(undefined)
+                        setImgControl([])
+                        setImgDrug([])
+                        setDeleteImgControl([])
+                        setDeleteImgDrug([])
                       }}
                       data={searchTaskList}
                       style={{
