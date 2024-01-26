@@ -23,9 +23,12 @@ import {
   rewardJob,
   settingJob,
 } from './DefaultRole'
+import { useSetRecoilState } from 'recoil'
+import { isTriggerRole } from '../../store/ProfileAtom'
 const _ = require('lodash')
 
 function EditPermission() {
+  const setTriggerRole = useSetRecoilState(isTriggerRole)
   const queryString = _.split(window.location.pathname, '=')
   const roleId = queryString[1]
   const [saveBtnDisable, setSaveBtnDisable] = useState<boolean>(false)
@@ -239,6 +242,8 @@ function EditPermission() {
     await RoleManage.updateRole(payload)
       .then((res) => {
         setSaveBtnDisable(false)
+        setTriggerRole((prev) => !prev)
+
         if (res) {
           Swal.fire({
             title: 'บันทึกสำเร็จ',

@@ -1,6 +1,7 @@
 export interface MenuPermission {
   value: boolean
   disabled: boolean
+  name?: string
 }
 export interface listMenu {
   add: MenuPermission
@@ -11,7 +12,19 @@ export interface listMenu {
   excel: MenuPermission
   cancel: MenuPermission
   delete: MenuPermission
-  subItem: any[]
+  subItem: any
+}
+export interface NewListType {
+  subNested: {
+    add: MenuPermission
+    sub: boolean
+    edit: MenuPermission
+    name: string
+    view: MenuPermission
+    excel: MenuPermission
+    cancel: MenuPermission
+    delete: MenuPermission
+  }[]
 }
 export const listMenu_INIT: listMenu = {
   add: {
@@ -27,6 +40,7 @@ export const listMenu_INIT: listMenu = {
   view: {
     value: false,
     disabled: false,
+    name: '',
   },
   excel: {
     value: false,

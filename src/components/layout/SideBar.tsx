@@ -155,7 +155,7 @@ export const pathLists = (isAccounting: boolean, isAdminTask?: boolean) => {
         {
           path: 'listPoint',
           name: 'listPoint',
-          title: 'รายการแต้ม',
+          title: 'รายงานแต้ม',
           subMenu: [
             {
               path: '/IndexPlanningPoint',
@@ -178,7 +178,7 @@ export const pathLists = (isAccounting: boolean, isAdminTask?: boolean) => {
             {
               path: '/IndexPointManual',
               name: 'IndexPointManual',
-              title: 'รายการแต้มพิเศษ',
+              title: 'รายงานแต้มพิเศษ',
               subMenu: [],
             },
           ],
@@ -315,7 +315,7 @@ export const pathLists = (isAccounting: boolean, isAdminTask?: boolean) => {
         {
           path: '/PricePage',
           name: 'PricePage',
-          title: 'ราคาฉีดพ่น',
+          title: 'ราคา',
           subMenu: [],
         },
         {
@@ -374,7 +374,7 @@ export const pathLists = (isAccounting: boolean, isAdminTask?: boolean) => {
   ]
 
   if (isAdminTask) {
-    return menu.map((x: any) => {
+    return menu.map((x) => {
       const find = menu.findIndex(() => x.name === 'task')
       if (find === 0) {
         const newMenu = menu[find]

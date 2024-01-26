@@ -1,5 +1,5 @@
 import axios from 'axios'
-import { BASE_URL, DEV_ICK_SHOP_URL } from '../config/config'
+import { BASE_URL, DEV_ICK_SHOP_URL, httpClient } from '../config/config'
 
 export class AuthDatasource {
   static login(username: string, password: string) {
@@ -28,5 +28,10 @@ export class AuthDatasource {
       .then((response) => {
         return response.data
       })
+  }
+  static async getRoleByRoleId(roleId: string) {
+    return httpClient.get(BASE_URL + '/role-management/' + roleId).then((response) => {
+      return response.data
+    })
   }
 }
