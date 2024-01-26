@@ -74,4 +74,6 @@ export default {
   credit: require('./media/images/credit.png'),
   nearequal: require('./media/images/nearequal.png'),
   upload_droner: require('./media/images/upload_droner.png'),
+  icon_setting_inactive: require('./media/images/icon_setting_inactive.png'),
+  icon_setting: require('./media/images/icon_setting.png'),
 }

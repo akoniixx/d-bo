@@ -1178,7 +1178,7 @@ const IndexAdminTask = () => {
   )
   const columns = [
     {
-      title: 'วันที่อัพเดต',
+      title: 'วันที่อัปเดต',
       dataIndex: 'createdAt',
       key: 'createdAt',
       render: (value: any, row: any, index: number) => {
@@ -1248,7 +1248,7 @@ const IndexAdminTask = () => {
       },
     },
     {
-      title: 'ผู้ใช้ที่อัพเดต',
+      title: 'ผู้ใช้ที่อัปเดต',
       dataIndex: 'createdBy',
       key: 'createdBy',
       render: (value: any, row: any, index: number) => {
@@ -1393,10 +1393,10 @@ const IndexAdminTask = () => {
                       }}
                       onChange={(e) => {
                         if (e !== taskId) {
-                          setImgControl(null)
-                          setImgDrug(null)
-                          setDeleteImgControl(null)
-                          setDeleteImgDrug(null)
+                          setImgControl([])
+                          setImgDrug([])
+                          setDeleteImgControl([])
+                          setDeleteImgDrug([])
                         }
                         setTaskId(e)
                         setSearch(false)
@@ -1412,6 +1412,10 @@ const IndexAdminTask = () => {
                       onClean={() => {
                         setCurrent(1)
                         setTaskNo(undefined)
+                        setImgControl([])
+                        setImgDrug([])
+                        setDeleteImgControl([])
+                        setDeleteImgDrug([])
                       }}
                       data={searchTaskList}
                       style={{

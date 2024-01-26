@@ -32,7 +32,7 @@ function IndexTargetSpray() {
 
   useEffect(() => {
     fetchData()
-  }, [sortDirection])
+  }, [sortDirection, current])
   const fetchData = async () => {
     try {
       setLoading(true)
@@ -115,7 +115,7 @@ function IndexTargetSpray() {
       title: () => {
         return (
           <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-            อัพเดตล่าสุด
+            อัปเดตล่าสุด
             <div
               style={{
                 display: 'flex',
@@ -203,7 +203,7 @@ function IndexTargetSpray() {
   return (
     <div className='pt-3'>
       <div className='row pb-4'>
-        <div className='col-lg-6'>
+        <div className='col-lg-5'>
           <span
             className='card-label font-weight-bolder text-dark'
             style={{
@@ -215,7 +215,7 @@ function IndexTargetSpray() {
             <strong>เป้าหมายการฉีดพ่น</strong>
           </span>
         </div>
-        <div className='col-lg-6 d-flex'>
+        <div className='col-lg-7 d-flex'>
           <div className='col-lg pt-1 me-2'>
             <Input
               allowClear
@@ -232,6 +232,7 @@ function IndexTargetSpray() {
                 borderRadius: '5px',
                 color: color.secondary2,
                 backgroundColor: color.Success,
+                boxShadow: '0px 4px 4px 0px rgba(0, 0, 0, 0.10)',
               }}
               onClick={() => {
                 setCurrent(1)
@@ -239,6 +240,19 @@ function IndexTargetSpray() {
               }}
             >
               ค้นหาข้อมูล
+            </Button>
+          </div>
+          <div className='pt-1 me-2'>
+            <Button
+              onClick={() => navigate('/TargetSprayOrder', { state: { data: data?.count } })}
+              style={{
+                borderColor: color.Success,
+                borderRadius: '5px',
+                color: color.Success,
+                boxShadow: '0px 4px 4px 0px rgba(0, 0, 0, 0.10)',
+              }}
+            >
+              เรียงลำดับการแสดง
             </Button>
           </div>
           <div className='pt-1'>
@@ -249,6 +263,7 @@ function IndexTargetSpray() {
                 borderRadius: '5px',
                 color: color.secondary2,
                 backgroundColor: color.Success,
+                boxShadow: '0px 4px 4px 0px rgba(0, 0, 0, 0.10)',
               }}
             >
               + เพิ่มเป้าหมาย

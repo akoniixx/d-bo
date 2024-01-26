@@ -31,7 +31,7 @@ import { FarmerDatasource } from '../../datasource/FarmerDatasource'
 import { STATUS_COLOR_MAPPING, STATUS_FARMER_MAPPING } from '../../definitions/Status'
 import moment from 'moment'
 import { LocationDatasource } from '../../datasource/LocationDatasource'
-import { DistrictEntity, ProviceEntity, SubdistrictEntity } from '../../entities/LocationEntities'
+import { DistrictEntity, ProvinceEntity, SubdistrictEntity } from '../../entities/LocationEntities'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import StatusPlots from '../../components/card/StatusPlots'
 import StatusButton from '../../components/button/StatusButton'
@@ -51,7 +51,7 @@ function IndexFarmer() {
   const [searchProvince, setSearchProvince] = useState<any>()
   const [searchDistrict, setSearchDistrict] = useState<any>()
   const [searchSubdistrict, setSearchSubdistrict] = useState<any>()
-  const [province, setProvince] = useState<ProviceEntity[]>()
+  const [province, setProvince] = useState<ProvinceEntity[]>()
   const [district, setDistrict] = useState<DistrictEntity[]>()
   const [subdistrict, setSubdistrict] = useState<SubdistrictEntity[]>()
   const [sortDirection, setSortDirection] = useState<string | undefined>()
@@ -399,7 +399,7 @@ function IndexFarmer() {
       title: () => {
         return (
           <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-            อัพเดตล่าสุด
+            อัปเดตล่าสุด
             <div
               style={{
                 display: 'flex',

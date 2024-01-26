@@ -18,7 +18,7 @@ import ActionButton from '../../../components/button/ActionButton'
 import { LocationDatasource } from '../../../datasource/LocationDatasource'
 import {
   DistrictEntity,
-  ProviceEntity,
+  ProvinceEntity,
   SubdistrictEntity,
 } from '../../../entities/LocationEntities'
 import color from '../../../resource/color'
@@ -64,7 +64,7 @@ export default function IndexFinishTask() {
   const [searchProvince, setSearchProvince] = useState<any>()
   const [searchDistrict, setSearchDistrict] = useState<any>()
   const [searchSubdistrict, setSearchSubdistrict] = useState<any>()
-  const [province, setProvince] = useState<ProviceEntity[]>()
+  const [province, setProvince] = useState<ProvinceEntity[]>()
   const [district, setDistrict] = useState<DistrictEntity[]>()
   const [subdistrict, setSubdistrict] = useState<SubdistrictEntity[]>()
   const [showModalMap, setShowModalMap] = useState<boolean>(false)

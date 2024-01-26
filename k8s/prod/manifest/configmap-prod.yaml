@@ -7,3 +7,4 @@ metadata:
 data:
   NODE_ENV: "production"
   REACT_APP_URL_HOST: "https://api-dnds.iconkaset.com"
+  REACT_APP_ICK_SHOP_URL: "https://iconkasetshop-api.iconkaset.com"

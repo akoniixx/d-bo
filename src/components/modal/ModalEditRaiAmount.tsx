@@ -151,7 +151,7 @@ const ModalEditRaiAmount: React.FC<ModalEditRaiAmountProps> = ({
             />
           </div>
           <div className='form-group col-lg-12 pb-5'>
-            <label>อัพโหลดหลักฐาน</label>
+            <label>อัปโหลดหลักฐาน</label>
             <Form.Item name='file'>
               <div className='pb-2'>
                 <div

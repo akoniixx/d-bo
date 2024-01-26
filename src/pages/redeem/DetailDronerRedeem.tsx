@@ -94,7 +94,7 @@ const DetailDronerRedeem = () => {
 
   const columeHisPhysical = [
     {
-      title: 'วันที่อัพเดท',
+      title: 'วันที่อัปเดต',
       dataIndex: 'updateAt',
       key: 'updateAt',
       render: (value: any, row: any, index: number) => {
@@ -165,7 +165,7 @@ const DetailDronerRedeem = () => {
       },
     },
     {
-      title: 'ผู้ใช้ที่อัพเดต',
+      title: 'ผู้ใช้ที่อัปเดต',
       dataIndex: 'updateBy',
       key: 'updateBy',
       render: (value: any, row: any, index: number) => {
@@ -181,7 +181,7 @@ const DetailDronerRedeem = () => {
   ]
   const columeHisDigital = [
     {
-      title: 'วันที่อัพเดท',
+      title: 'วันที่อัปเดต',
       dataIndex: 'updateAt',
       key: 'updateAt',
       render: (value: any, row: any, index: number) => {
@@ -258,7 +258,7 @@ const DetailDronerRedeem = () => {
       },
     },
     {
-      title: 'ผู้ใช้ที่อัพเดต',
+      title: 'ผู้ใช้ที่อัปเดต',
       dataIndex: 'updateBy',
       key: 'updateBy',
       render: (value: any, row: any, index: number) => {
@@ -651,7 +651,7 @@ const DetailDronerRedeem = () => {
   return (
     <>
       <Row>
-        <BackIconButton onClick={() => navigate('/IndexRedeem/Droner')} />
+        <BackIconButton onClick={() => navigate(-1)} />
         <span className='pt-3'>
           <strong style={{ fontSize: '20px' }}>รายละเอียดการแลก | {data?.redeemNo}</strong>
         </span>
@@ -665,7 +665,7 @@ const DetailDronerRedeem = () => {
       )}
       {renderDronerDetail}
       <FooterPage
-        onClickBack={() => navigate('/IndexRedeem/Droner')}
+        onClickBack={() => navigate(-1)}
         styleFooter={{ padding: '6px' }}
         onClickSave={() => submit()}
         disableSaveBtn={checkDiscable()}

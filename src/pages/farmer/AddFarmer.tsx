@@ -12,7 +12,7 @@ import { CreateFarmerEntity, CreateFarmerEntity_INIT } from '../../entities/Farm
 import {
   DistrictEntity,
   DistrictEntity_INIT,
-  ProviceEntity,
+  ProvinceEntity,
   ProvinceEntity_INIT,
   SubdistrictEntity,
   SubdistrictEntity_INIT,
@@ -57,7 +57,7 @@ const AddFarmer = () => {
   const [saveBtnDisable, setBtnSaveDisable] = useState<boolean>(true)
   const [showAddModal, setShowAddModal] = useState(false)
   const [editIndex, setEditIndex] = useState(0)
-  const [province, setProvince] = useState<ProviceEntity[]>([ProvinceEntity_INIT])
+  const [province, setProvince] = useState<ProvinceEntity[]>([ProvinceEntity_INIT])
   const [district, setDistrict] = useState<DistrictEntity[]>([DistrictEntity_INIT])
   const [subdistrict, setSubdistrict] = useState<SubdistrictEntity[]>([SubdistrictEntity_INIT])
   const [editFarmerPlot, setEditFarmerPlot] = useState<FarmerPlotEntity>(FarmerPlotEntity_INIT)

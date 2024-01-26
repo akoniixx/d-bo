@@ -40,7 +40,7 @@ import dayjs from 'dayjs'
 import { CropPurposeSprayEntity } from '../../entities/CropEntities'
 import { FarmerPageEntity } from '../../entities/FarmerEntities'
 import { TaskDatasource } from '../../datasource/TaskDatasource'
-import { ProviceEntity } from '../../entities/LocationEntities'
+import { ProvinceEntity } from '../../entities/LocationEntities'
 import { validateOnlyNumWDecimal, validateOnlyNumber } from '../../utilities/TextFormatter'
 import { OptionType } from '../task/newTask/AddNewTask'
 import Select, { Props as SelectProps } from 'react-select'
@@ -52,7 +52,7 @@ export default function AddPromotion() {
   const [plantName, setPlantName] = useState<CropPurposeSprayEntity[]>()
   const [provinceList, setProvinceList] = useState<string[]>([])
   const [farmerList, setFarmerList] = useState<any>()
-  const [provinceListId, setProvinceListId] = useState<ProviceEntity[]>([])
+  const [provinceListId, setProvinceListId] = useState<ProvinceEntity[]>([])
   const [searchFarmer, setSearchFarmer] = useState<string>('')
   const [crop, setCrop] = useState<any>([
     {

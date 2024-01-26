@@ -264,7 +264,7 @@ const IndexDroneBrand: React.FC = () => {
       title: () => {
         return (
           <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-            อัพเดตล่าสุด
+            อัปเดตล่าสุด
             <div
               style={{
                 display: 'flex',

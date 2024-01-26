@@ -1,5 +1,25 @@
 ## [Version - 0]
 
+## improve [v0.47.1] 2024-1-19
+
+- change icon menu
+- enhance menu point and reward menu
+- enhance role management
+- fixed bug by admin
+
+## Feature [v0.47.0] 2024-1-24
+
+- crop and time period
+
+## improve [v0.46.5] 2024-1-19
+
+- target spray order
+
+## improve [v0.46.4] 2024-1-18
+
+- added Equal Price
+- added Sow Price
+
 ## Fix [v0.46.3] 2024-1-18
 
 - detect number for form input setting point and detect value less than 0

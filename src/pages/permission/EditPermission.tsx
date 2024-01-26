@@ -17,8 +17,8 @@ import {
   followJob,
   missionJob,
   newsJob,
+  oneFinity,
   pointJob,
-  pointSettingJob,
   promotionJob,
   rewardJob,
   settingJob,
@@ -62,10 +62,6 @@ function EditPermission() {
     name: 'ภารกิจ',
     value: missionJob,
   })
-  const [point, setPoint] = useState({
-    name: 'แต้ม',
-    value: pointSettingJob,
-  })
   const [pointResult, setPointResult] = useState({
     name: 'แต้มสะสม',
     value: pointJob,
@@ -73,6 +69,10 @@ function EditPermission() {
   const [promotion, setPromotion] = useState({
     name: 'โปรโมชั่น',
     value: promotionJob,
+  })
+  const [finity, setDataFinity] = useState({
+    name: 'ระบบ 1-finity',
+    value: oneFinity,
   })
   const [reward, setReward] = useState({
     name: 'ของรางวัล',
@@ -109,6 +109,12 @@ function EditPermission() {
             admin: res.admin,
           },
         })
+        setDataFinity({
+          ...finity,
+          value: {
+            finity: res.finity,
+          },
+        })
         setChallenge({
           ...challenge,
           value: {
@@ -137,12 +143,6 @@ function EditPermission() {
           ...mission,
           value: {
             mission: res.mission,
-          },
-        })
-        setPoint({
-          ...point,
-          value: {
-            point: res.point,
           },
         })
         setPointResult({
@@ -237,7 +237,6 @@ function EditPermission() {
     payload.reward = reward.value?.reward
     payload.pointResult = pointResult.value?.pointResult
     payload.settings = settings.value?.settings
-    payload.point = point.value?.point
     payload.promotion = promotion.value?.promotion
     await RoleManage.updateRole(payload)
       .then((res) => {
@@ -283,12 +282,10 @@ function EditPermission() {
           dataMission={[mission]}
           dataPromotion={[promotion]}
           dataPointResult={[pointResult]}
-          dataReportPoint={[reportPoint]}
-          dataRedeemPoint={[redeemPoint]}
           dataAdmin={[admin]}
           dataSetting={[settings]}
-          dataPoint={[point]}
           dataChallenge={[challenge]}
+          dataFinity={[finity]}
         />
         <FooterPage
           onClickBack={() => navigate(-1)}
