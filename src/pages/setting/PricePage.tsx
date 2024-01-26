@@ -77,9 +77,9 @@ function PricePage() {
       const dataArrPlants = {
         priceData: dataUpdate,
       }
-      await LocationPriceDatasource.updateLocationPrice(dataArrPlants)
+      await LocationPriceDatasource.updateLocationPrice(dataArrPlants).then((res)=> console.log(res))
     } else {
-      await LocationPriceDatasource.updateLocationEqualPrice(dataUpdate)
+      await LocationPriceDatasource.updateLocationEqualPrice(dataUpdate).then((res)=>console.log(res))
     }
     setShowModalEdit((prev) => !prev)
     fetchLocationPrice()
