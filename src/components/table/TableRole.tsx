@@ -389,6 +389,7 @@ function TableRole({
     dataAdmin,
     dataSetting,
     dataPromotion,
+    dataPointResult
   ])
 
   return (
