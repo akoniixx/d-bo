@@ -79,20 +79,13 @@ function EditPermission() {
     name: 'ตั้งค่า',
     value: settingJob,
   })
-  const [reportPoint, setReportPoint] = useState({
-    name: 'รายงานแต้ม',
-    value: pointJob.pointResult[0].subItem,
-  })
-  const [redeemPoint, setRedeemPoint] = useState({
-    name: 'แลกแต้ม/ของรางวัล',
-    value: pointJob.pointResult[1].subItem,
-  })
   const [form] = Form.useForm()
   const [loading, setReloading] = useState<boolean>(true)
 
   useEffect(() => {
     const fetchRoleById = async () => {
       await RoleManage.getRoleById(roleId).then((res) => {
+        console.log(res)
         setFollowjobs({
           ...followjobs,
           value: {
