@@ -166,18 +166,6 @@ function EditPermission() {
             settings: res.settings,
           },
         })
-        setReportPoint({
-          ...reportPoint,
-          value: {
-            subPointResult: res.pointResult[0].subItem.subPointResult,
-          },
-        })
-        setRedeemPoint({
-          ...redeemPoint,
-          value: {
-            subPointResult: res.pointResult[1].subItem.subPointResult,
-          },
-        })
         form.setFieldsValue({
           role: res.role,
           count: numberWithCommas(res.count),
@@ -235,6 +223,8 @@ function EditPermission() {
     payload.pointResult = pointResult.value?.pointResult
     payload.settings = settings.value?.settings
     payload.promotion = promotion.value?.promotion
+    payload.finity = promotion.value?.finity
+
     await RoleManage.updateRole(payload)
       .then((res) => {
         setSaveBtnDisable(false)

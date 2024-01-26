@@ -126,6 +126,7 @@ function AddPermission() {
     payload.pointResult = pointResult.value?.pointResult
     payload.settings = settings.value?.settings
     payload.promotion = promotion.value?.promotion
+    payload.finity = finity.value?.finity
     await RoleManage.insertRole(payload)
       .then((res) => {
         setSaveBtnDisable(false)
