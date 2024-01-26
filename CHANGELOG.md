@@ -1,5 +1,12 @@
 ## [Version - 0]
 
+## improve [v0.47.1] 2024-1-19
+
+- change icon menu
+- enhance menu point and reward menu
+- enhance role management
+- fixed bug by admin
+
 ## Feature [v0.47.0] 2024-1-24
 
 - crop and time period

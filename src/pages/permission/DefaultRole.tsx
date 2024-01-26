@@ -45,10 +45,8 @@ export interface TableRoleProps {
   dataPointResult: ConvertedDataType[]
   dataAdmin: ConvertedDataType[]
   dataSetting: ConvertedDataType[]
-  dataPoint: ConvertedDataType[]
   dataChallenge: ConvertedDataType[]
-  dataReportPoint: ConvertedDataType[]
-  dataRedeemPoint: ConvertedDataType[]
+  dataFinity: ConvertedDataType[]
 }
 export const method = ['view', 'add', 'edit', 'delete', 'cancel', 'excel']
 const tacking = [
@@ -62,22 +60,21 @@ const dataFarmer = ['รายชื่อเกษตรกร', 'รายก�
 const dataDroner = ['รายชื่อนักบินโดรน', 'รายการโดรนเกษตร', 'อันดับนักบินโดรน']
 const dataNews = ['ข่าวสาร', 'กูรูเกษตร']
 const dataPromotion = ['โปรโมชั่น', 'คูปอง']
-const dataPoint = [
-  {
-    name: 'รายงานแต้ม',
-    children: ['รอรับแต้ม', 'ได้รับแต้ม'],
-  },
-  {
-    name: 'แลกแต้ม/ของรางวัล',
-    children: ['นักบินโดรน', 'เกษตรกร'],
-  },
-]
+const dataPoint = ['รายงานแต้ม', 'รายการแต้มพิเศษ', 'แต้มรายบุคคล', 'แคมเปญแต้ม']
 const dataReward = ['นักบินโดรน', 'เกษตรกร']
 const dataMission = ['นักบินโดรน', 'เกษตรกร']
 const dataChallenge = ['นักบินโดรน', 'เกษตรกร']
 const dataAdmin = ['รายชื่อผู้ดูแล', 'บทบาทผู้ดูแล']
-const dataSetting = ['ยี่ห้อโดรน', 'รายชื่อพืช', 'เป้าหมาย', 'ราคา']
-const dataPointSetting = ['นักบินโดรน', 'เกษตรกร']
+const dataFinity = ['สถิติภาพรวม', 'รายชื่อนักบิน', 'รายชื่อร้านค้า', 'รายการยา/ปุ๋ย']
+const dataSetting = [
+  'ยี่ห้อโดรน',
+  'รายชื่อพืช',
+  'รายชื่อบริษัท/ธนาคาร',
+  'เป้าหมาย',
+  'ราคา',
+  'เครดิต',
+  'แต้ม',
+]
 const disableAdd = [
   'งานรอดำเนินงาน',
   'งานในวันนี้',
@@ -87,12 +84,17 @@ const disableAdd = [
   'อันดับนักบินโดรน',
   'กูรูเกษตร',
   'โปรโมชั่น',
-  'ราคา',
   'นักบินโดรน',
   'เกษตรกร',
+  'แต้มรายบุคคล',
+  'รายการแต้มพิเศษ',
+  'ราคา',
+  'เครดิต',
+  'แต้ม',
+  'สถิติภาพรวม',
 ]
 const disableView = ['อันดับเกษตรกร', 'กูรูเกษตร', 'โปรโมชั่น']
-const disableEdit = ['อันดับเกษตรกร', 'อันดับนักบินโดรน', 'กูรูเกษตร', 'โปรโมชั่น']
+const disableEdit = ['อันดับเกษตรกร', 'อันดับนักบินโดรน', 'กูรูเกษตร', 'โปรโมชั่น', 'สถิติภาพรวม']
 const disableDelete = [
   ...dataFarmer,
   ...tacking,
@@ -101,12 +103,19 @@ const disableDelete = [
   'กูรูเกษตร',
   'โปรโมชั่น',
   'รายชื่อพืช',
+  'แต้มรายบุคคล',
+  'รายการแต้มพิเศษ',
   'ราคา',
+  'เครดิต',
+  'แต้ม',
+  ...dataFinity,
 ]
 const disableCancel = [
   'งานรอดำเนินงาน',
   'งานในวันนี้',
   'งานที่เสร็จแล้ว',
+  'แต้มรายบุคคล',
+  'สถิติภาพรวม',
   ...dataFarmer,
   ...dataDroner,
   ...dataNews,
@@ -115,8 +124,8 @@ const disableCancel = [
   ...dataMission,
   ...dataChallenge,
   ...dataAdmin,
-  ...dataPointSetting,
   ...dataSetting,
+  ...dataFinity,
 ]
 const disableExcel = ['งานที่เสร็จแล้ว (บัญชี)']
 
@@ -195,99 +204,19 @@ const promotionJob: { [key: string]: any } = {
     }
   }),
 }
-const reportHeaderPoint = [
-  {
-    name: 'รายงานแต้ม',
-    sub: false,
-    subItem: [],
-    view: {
-      value: false,
-      disabled: false,
-    },
-    add: {
-      value: false,
-      disabled: false,
-    },
-    edit: {
-      value: false,
-      disabled: false,
-    },
-    delete: {
-      value: false,
-      disabled: true,
-    },
-    cancel: {
-      value: false,
-      disabled: false,
-    },
-    excel: {
-      value: false,
-      disabled: true,
-    },
-  },
-]
-const redeemHeaderPoint = [
-  {
-    name: 'แลกแต้ม/ของรางวัล',
-    sub: false,
-    subItem: [],
-    view: {
-      value: false,
-      disabled: false,
-    },
-    add: {
-      value: false,
-      disabled: false,
-    },
-    edit: {
-      value: false,
-      disabled: false,
-    },
-    delete: {
-      value: false,
-      disabled: true,
-    },
-    cancel: {
-      value: false,
-      disabled: false,
-    },
-    excel: {
-      value: false,
-      disabled: true,
-    },
-  },
-]
+
 const pointJob: { [key: string]: any } = {
-  pointResult: dataPoint.map((point) => {
-    const isDisabled = dataPoint.some((item) => item.name === point.name)
-    const filteredChildren = (point.children || []).filter((child) => typeof child === 'string')
-
-    const subItems: { [key: string]: any } = {
-      subPointResult: filteredChildren.map((childName) => {
-        return {
-          add: { value: false, disabled: false, name: childName },
-          sub: false,
-          edit: { value: false, disabled: false, name: childName },
-          name: childName,
-          view: { value: false, disabled: false, name: childName },
-          excel: { value: false, disabled: true, name: childName },
-          cancel: { value: false, disabled: false, name: childName },
-          delete: { value: false, disabled: true, name: childName },
-          subItem: [],
-        }
-      }),
-    }
-
+  pointResult: dataPoint.map((name) => {
     return {
-      add: { value: false, disabled: isDisabled, name: 'pointResult' },
-      sub: true,
+      add: { value: false, disabled: disableAdd.includes(name), name: 'pointResult' },
+      sub: false,
       edit: { value: false, disabled: false, name: 'pointResult' },
-      name: point.name,
+      name,
       view: { value: false, disabled: false, name: 'pointResult' },
-      excel: { value: false, disabled: true, name: 'pointResult' },
-      cancel: { value: false, disabled: false, name: 'pointResult' },
-      delete: { value: false, disabled: false, name: 'pointResult' },
-      subItem: subItems,
+      excel: { value: false, disabled: !disableExcel.includes(name), name: 'pointResult' },
+      cancel: { value: false, disabled: disableCancel.includes(name), name: 'pointResult' },
+      delete: { value: false, disabled: disableDelete.includes(name), name: 'pointResult' },
+      subItem: [],
     }
   }),
 }
@@ -303,6 +232,21 @@ const rewardJob: { [key: string]: any } = {
       excel: { value: false, disabled: !disableExcel.includes(name), name: 'reward' },
       cancel: { value: false, disabled: disableCancel.includes(name), name: 'reward' },
       delete: { value: false, disabled: false, name: 'reward' },
+      subItem: [],
+    }
+  }),
+}
+const oneFinity: { [key: string]: any } = {
+  finity: dataFinity.map((name) => {
+    return {
+      add: { value: false, disabled: disableAdd.includes(name), name: '1finity' },
+      sub: false,
+      edit: { value: false, disabled: disableEdit.includes(name), name: '1finity' },
+      name,
+      view: { value: false, disabled: false, name: '1finity' },
+      excel: { value: false, disabled: !disableExcel.includes(name), name: '1finity' },
+      cancel: { value: false, disabled: disableCancel.includes(name), name: '1finity' },
+      delete: { value: false, disabled: disableDelete.includes(name), name: '1finity' },
       subItem: [],
     }
   }),
@@ -367,21 +311,6 @@ const settingJob: { [key: string]: any } = {
     }
   }),
 }
-const pointSettingJob: { [key: string]: any } = {
-  point: dataPointSetting.map((name) => {
-    return {
-      add: { value: false, disabled: disableAdd.includes(name), name: 'point' },
-      sub: false,
-      edit: { value: false, disabled: false, name: 'point' },
-      name,
-      view: { value: false, disabled: false, name: 'point' },
-      excel: { value: false, disabled: false, name: 'point' },
-      cancel: { value: false, disabled: disableCancel.includes(name), name: 'point' },
-      delete: { value: false, disabled: false, name: 'point' },
-      subItem: [],
-    }
-  }),
-}
 
 export {
   followJob,
@@ -395,7 +324,5 @@ export {
   challengeJob,
   adminJob,
   settingJob,
-  pointSettingJob,
-  redeemHeaderPoint,
-  reportHeaderPoint,
+  oneFinity,
 }

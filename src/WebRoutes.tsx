@@ -67,7 +67,8 @@ const RedeemHistoryFarmer = lazy(() => import('./pages/reward/farmer/RedeemHisto
 const IndexReceivePoint = lazy(() => import('./pages/point/IndexReceivePoint'))
 const IndexPlanningPoint = lazy(() => import('./pages/point/IndexPlanningPoint'))
 const DetailReceivePoint = lazy(() => import('./pages/point/DetailReceivePoint'))
-const IndexRedeem = lazy(() => import('./pages/redeem/IndexRedeem'))
+const IndexRedeemFarmer = lazy(() => import('./pages/redeem/IndexRedeemFarmer'))
+const IndexRedeemDroner = lazy(() => import('./pages/redeem/IndexRedeemDroner'))
 const DetailFarmerRedeem = lazy(() => import('./pages/redeem/DetailFarmerRedeem'))
 const DetailDronerRedeem = lazy(() => import('./pages/redeem/DetailDronerRedeem'))
 const IndexDronerSummaryPoint = lazy(() => import('./pages/point/droner/IndexDronerSummaryPoint'))
@@ -121,6 +122,9 @@ const TargetSprayOrder = lazy(
 const IndexCrop = lazy(() => import('./pages/setting/crop/IndexCrop'))
 const AddCrop = lazy(() => import('./pages/setting/crop/AddCrop'))
 const EditCrop = lazy(() => import('./pages/setting/crop/EditCrop'))
+const ViewHisRedeem = lazy(() => import('./pages/point/historyRedeem/ViewHisRedeem'))
+const ViewDetailDroner = lazy(() => import('./pages/point/historyRedeem/ViewDetailDroner'))
+const ViewDetailFarmer = lazy(() => import('./pages/point/historyRedeem/ViewDetailFarmer'))
 
 const FallBack = () => {
   return (
@@ -197,7 +201,8 @@ const WebRoutes: React.FC<any> = () => {
             <Route path='/IndexReceivePoint' element={<IndexReceivePoint />} />
             <Route path='/IndexPlanningPoint' element={<IndexPlanningPoint />} />
             <Route path='/DetailReceivePoint/:id' element={<DetailReceivePoint />} />
-            <Route path='/IndexRedeem/:type' element={<IndexRedeem />} />
+            <Route path='/IndexRedeemFarmer' element={<IndexRedeemFarmer />} />
+            <Route path='/IndexRedeemDroner' element={<IndexRedeemDroner />} />
             <Route path='/DetailFarmerRedeem/:id' element={<DetailFarmerRedeem />} />
             <Route path='/DetailDronerRedeem/:id' element={<DetailDronerRedeem />} />
             <Route path='/IndexDronerSummaryPoint' element={<IndexDronerSummaryPoint />} />
@@ -251,6 +256,9 @@ const WebRoutes: React.FC<any> = () => {
             <Route path='/IndexCrop' element={<IndexCrop />} />
             <Route path='/AddCrop' element={<AddCrop />} />
             <Route path='/EditCrop/:id' element={<EditCrop />} />
+            <Route path='/ViewHisRedeem/:type' element={<ViewHisRedeem />} />
+            <Route path='/ViewDetailFarmer/:id' element={<ViewDetailFarmer />} />
+            <Route path='/ViewDetailDroner/:id' element={<ViewDetailDroner />} />
           </Route>
           <Route element={<PublicRoute />}>
             <Route index element={<AuthPage />} />
