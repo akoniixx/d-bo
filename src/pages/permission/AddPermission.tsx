@@ -20,7 +20,7 @@ import {
   promotionJob,
   rewardJob,
   settingJob,
-  oneFinity
+  oneFinity,
 } from './DefaultRole'
 import TableRole from '../../components/table/TableRole'
 import { RoleManage } from '../../datasource/RoleManageDatasource'
