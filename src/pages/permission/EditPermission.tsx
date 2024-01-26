@@ -85,7 +85,6 @@ function EditPermission() {
   useEffect(() => {
     const fetchRoleById = async () => {
       await RoleManage.getRoleById(roleId).then((res) => {
-        console.log(res)
         setFollowjobs({
           ...followjobs,
           value: {
@@ -217,7 +216,6 @@ function EditPermission() {
     payload.settings = settings.value?.settings
     payload.promotion = promotion.value?.promotion
     payload.finity = promotion.value?.finity
-
     await RoleManage.updateRole(payload)
       .then((res) => {
         setSaveBtnDisable(false)
