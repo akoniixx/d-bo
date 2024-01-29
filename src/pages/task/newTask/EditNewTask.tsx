@@ -146,6 +146,7 @@ const EditNewTask = () => {
   const [count, setCount] = useState<number>(0)
   const [showData, setShowData] = useState<boolean>(true)
   const [someTargetSpray, setSomeTargetSpray] = useState<any>()
+  const refTime = React.useRef<any>(null)
 
   const fetchNewTask = async () => {
     await TaskDatasource.getNewTaskById(queryString[1]).then(async (res) => {
@@ -786,13 +787,40 @@ const EditNewTask = () => {
               <div>
                 <TimePicker
                   className='col-lg-12'
+                  value={moment(timeAppointment)}
+                  onChange={(e) => {
+                    setTimeAppointment(e)
+                  }}
+                  format={'HH:mm'}
+                  placeholder='เลือกเวลา'
+                  allowClear={false}
+                  ref={refTime}
+                  disabled={current === 2 || checkSelectPlot === 'error'}
+                  inputRender={(props) => {
+                    return (
+                      <input
+                        {...props}
+                        onBlur={(e) => {
+                          props.onBlur?.(e)
+                          const convertToMoment = moment(e.target.value, 'HH:mm')
+                          setTimeAppointment(convertToMoment)
+                        }}
+                      />
+                    )
+                  }}
+                  onBlur={() => {
+                    refTime.current.blur()
+                  }}
+                />
+                {/* <TimePicker
+                  className='col-lg-12'
                   disabled={current == 2 || checkSelectPlot == 'error'}
                   format={timeFormat}
                   onSelect={(v) => {
                     setTimeAppointment(v)
                   }}
                   value={moment(timeAppointment)}
-                />
+                /> */}
               </div>
             </div>
           </div>
