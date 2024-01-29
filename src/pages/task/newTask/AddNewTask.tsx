@@ -125,6 +125,7 @@ const AddNewTask = () => {
   const [targetSpray, setTargetSpray] = useState<TargetSpayEntities[]>([])
   const location = useLocation()
   const currentPath = location.pathname
+  const refTime = React.useRef<any>(null)
 
   const fetchFarmerList = () => {
     TaskDatasource.getFarmerListTask(searchFilterFarmer, currenSearch, rowFarmer).then(
@@ -696,15 +697,30 @@ const AddNewTask = () => {
               <div>
                 <TimePicker
                   className='col-lg-12'
-                  disabled={current === 2 || checkSelectPlot === 'error'}
-                  format={timeFormat}
-                  onSelect={(v) => {
-                    setTimeAppointment(v)
-                  }}
-                  onChange={(v) => {
-                    setTimeAppointment(v)
-                  }}
                   value={moment(timeAppointment)}
+                  onChange={(e) => {
+                    setTimeAppointment(e)
+                  }}
+                  format={'HH:mm'}
+                  placeholder='เลือกเวลา'
+                  allowClear={false}
+                  ref={refTime}
+                  disabled={current === 2 || checkSelectPlot === 'error'}
+                  inputRender={(props) => {
+                    return (
+                      <input
+                        {...props}
+                        onBlur={(e) => {
+                          props.onBlur?.(e)
+                          const convertToMoment = moment(e.target.value, 'HH:mm')
+                          setTimeAppointment(convertToMoment)
+                        }}
+                      />
+                    )
+                  }}
+                  onBlur={() => {
+                    refTime.current.blur()
+                  }}
                 />
               </div>
             </div>
