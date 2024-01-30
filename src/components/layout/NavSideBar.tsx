@@ -1,7 +1,7 @@
-import { Button } from 'antd'
+import { Button, TimePicker } from 'antd'
 import Layout, { Header } from 'antd/lib/layout/layout'
 import Sider from 'antd/lib/layout/Sider'
-import React, { useMemo } from 'react'
+import React, { useEffect, useMemo } from 'react'
 import { LogoutOutlined } from '@ant-design/icons'
 import { useNavigate } from 'react-router-dom'
 import color from '../../resource/color'
@@ -19,6 +19,7 @@ import {
   mappingRoles,
   mappingSubAllMenu,
 } from '../../definitions/RolesMappingObj'
+import moment, { Moment } from 'moment'
 
 const logout = () => {
   localStorage.clear()
@@ -59,133 +60,134 @@ const NavSidebar: React.FC<any> = ({ children }) => {
     const listNoPermissionSub = ['IndexCampaignPoint', 'DronerInfinity', 'IndexListStore']
     const listSpecialKey = ['news', 'GuruPage']
     const currentPathList = pathLists(isReportAccount, isAdminTask)
-    console.log('currentRole', currentRole)
-    console.log('currentPathList', currentPathList)
-    if (currentRole) {
-      const newSideBar = currentPathList.filter((el) => {
-        const key = mappingRoles[el.name as keyof typeof mappingRoles]
-        if (listNoPermission.includes(el.name)) {
-          return true
-        }
-        const currentRoleKey: listMenu[] = currentRole[key as keyof typeof currentRole]
-        if (currentRoleKey) {
-          const isHaveSomeView = currentRoleKey.some((role) => {
-            return role.view.value
-          })
-          return isHaveSomeView
-        }
-      })
+    // console.log('currentRole', currentRole)
+    // console.log('currentPathList', currentPathList)
+    // if (currentRole) {
+    //   const newSideBar = currentPathList.filter((el) => {
+    //     const key = mappingRoles[el.name as keyof typeof mappingRoles]
+    //     if (listNoPermission.includes(el.name)) {
+    //       return true
+    //     }
+    //     const currentRoleKey: listMenu[] = currentRole[key as keyof typeof currentRole]
+    //     if (currentRoleKey) {
+    //       const isHaveSomeView = currentRoleKey.some((role) => {
+    //         return role.view.value
+    //       })
+    //       return isHaveSomeView
+    //     }
+    //   })
 
-      const mutateNewSubMenus = newSideBar.map((el) => {
-        const key = mappingRoles[el.name as keyof typeof mappingRoles]
-        const currentRoleKey: listMenu[] = currentRole[key as keyof typeof currentRole]
-        if (el.subMenu.length > 0) {
-          if (listNoPermission.includes(el.name)) {
-            const filterSubMenu = el.subMenu.filter((subMenu) => {
-              if (listNoPermissionSub.includes(subMenu.name)) {
-                return true
-              } else {
-                const currentSubMenuKeyList =
-                  mappingNoPermissionSubMenu[el.name as keyof typeof mappingNoPermissionSubMenu]
-                if (currentSubMenuKeyList) {
-                  const findKey = Object.keys(currentSubMenuKeyList).find((key) => {
-                    return key === subMenu.name
-                  })
-                  const valueOfKey =
-                    currentSubMenuKeyList[findKey as keyof typeof currentSubMenuKeyList]
-                  const findSubMenu = currentRoleKey.find((roleSub) => {
-                    return roleSub.name === valueOfKey
-                  })
+    //   const mutateNewSubMenus = newSideBar.map((el) => {
+    //     const key = mappingRoles[el.name as keyof typeof mappingRoles]
+    //     const currentRoleKey: listMenu[] = currentRole[key as keyof typeof currentRole]
+    //     if (el.subMenu.length > 0) {
+    //       if (listNoPermission.includes(el.name)) {
+    //         const filterSubMenu = el.subMenu.filter((subMenu) => {
+    //           if (listNoPermissionSub.includes(subMenu.name)) {
+    //             return true
+    //           } else {
+    //             const currentSubMenuKeyList =
+    //               mappingNoPermissionSubMenu[el.name as keyof typeof mappingNoPermissionSubMenu]
+    //             if (currentSubMenuKeyList) {
+    //               const findKey = Object.keys(currentSubMenuKeyList).find((key) => {
+    //                 return key === subMenu.name
+    //               })
+    //               const valueOfKey =
+    //                 currentSubMenuKeyList[findKey as keyof typeof currentSubMenuKeyList]
+    //               const findSubMenu = currentRoleKey.find((roleSub) => {
+    //                 return roleSub.name === valueOfKey
+    //               })
 
-                  const isHaveSub = subMenu.subMenu.length > 0
-                  if (isHaveSub) {
-                    const nestedSub = findSubMenu?.subItem?.subNested.some((nested: any) => {
-                      return nested.view.value
-                    })
-                    return true
-                  }
+    //               const isHaveSub = subMenu.subMenu.length > 0
+    //               if (isHaveSub) {
+    //                 const nestedSub = findSubMenu?.subItem?.subNested.some((nested: any) => {
+    //                   return nested.view.value
+    //                 })
+    //                 return true
+    //               }
 
-                  return findSubMenu?.view.value
-                }
-              }
-            })
+    //               return findSubMenu?.view.value
+    //             }
+    //           }
+    //         })
 
-            return { ...el, subMenu: filterSubMenu }
-          }
+    //         return { ...el, subMenu: filterSubMenu }
+    //       }
 
-          const filterSubMenu = el.subMenu.filter((subMenu) => {
-            const currentSubMenuKeyList =
-              mappingSubAllMenu[el.name as keyof typeof mappingSubAllMenu]
-            if (currentSubMenuKeyList) {
-              const findKey = Object.keys(currentSubMenuKeyList).find((key) => {
-                return key === subMenu.name
-              })
-              const valueOfKey =
-                currentSubMenuKeyList[findKey as keyof typeof currentSubMenuKeyList]
-              const findSubMenu = currentRoleKey.find((roleSub) => {
-                return roleSub.name === valueOfKey
-              })
-              const isHaveSub = subMenu.subMenu.length > 0
+    //       const filterSubMenu = el.subMenu.filter((subMenu) => {
+    //         const currentSubMenuKeyList =
+    //           mappingSubAllMenu[el.name as keyof typeof mappingSubAllMenu]
+    //         if (currentSubMenuKeyList) {
+    //           const findKey = Object.keys(currentSubMenuKeyList).find((key) => {
+    //             return key === subMenu.name
+    //           })
+    //           const valueOfKey =
+    //             currentSubMenuKeyList[findKey as keyof typeof currentSubMenuKeyList]
+    //           const findSubMenu = currentRoleKey.find((roleSub) => {
+    //             return roleSub.name === valueOfKey
+    //           })
+    //           const isHaveSub = subMenu.subMenu.length > 0
 
-              if (isHaveSub) {
-                const isCredit = subMenu.subMenu.find((sub) => {
-                  return sub.name === 'CreditDroner'
-                })
-                if (isCredit) {
-                  return true
-                }
+    //           if (isHaveSub) {
+    //             const isCredit = subMenu.subMenu.find((sub) => {
+    //               return sub.name === 'CreditDroner'
+    //             })
+    //             if (isCredit) {
+    //               return true
+    //             }
 
-                const nestedSubMenu = subMenu.subMenu.filter((sub) => {
-                  const currentSubMenuKeyList =
-                    mappingSubAllMenu[el.name as keyof typeof mappingSubAllMenu]
-                  if (!currentSubMenuKeyList) {
-                    return false
-                  }
-                  const findKey = Object.keys(currentSubMenuKeyList).find((key) => {
-                    return key === subMenu.name
-                  })
+    //             const nestedSubMenu = subMenu.subMenu.filter((sub) => {
+    //               const currentSubMenuKeyList =
+    //                 mappingSubAllMenu[el.name as keyof typeof mappingSubAllMenu]
+    //               if (!currentSubMenuKeyList) {
+    //                 return false
+    //               }
+    //               const findKey = Object.keys(currentSubMenuKeyList).find((key) => {
+    //                 return key === subMenu.name
+    //               })
 
-                  if (!findKey) {
-                    return false
-                  }
-                  const isSpecialKey = listSpecialKey.includes(findKey)
-                  if (isSpecialKey) {
-                    const nameOfKey = mappingSpecialKey[findKey as keyof typeof mappingSpecialKey]
-                    const findSubMenu = currentRoleKey.find((roleSub) => {
-                      return roleSub.name === nameOfKey
-                    })
-                    return findSubMenu?.view.value
-                  }
-                  const valueOfKey =
-                    mappingNestedSubMenu[findKey as keyof typeof mappingNestedSubMenu]
+    //               if (!findKey) {
+    //                 return false
+    //               }
+    //               const isSpecialKey = listSpecialKey.includes(findKey)
+    //               if (isSpecialKey) {
+    //                 const nameOfKey = mappingSpecialKey[findKey as keyof typeof mappingSpecialKey]
+    //                 const findSubMenu = currentRoleKey.find((roleSub) => {
+    //                   return roleSub.name === nameOfKey
+    //                 })
+    //                 return findSubMenu?.view.value
+    //               }
+    //               const valueOfKey =
+    //                 mappingNestedSubMenu[findKey as keyof typeof mappingNestedSubMenu]
 
-                  if (!valueOfKey) {
-                    return false
-                  }
-                  const valueOfKeyNested = valueOfKey?.[sub.name as keyof typeof valueOfKey]
-                  if (!valueOfKeyNested) {
-                    return false
-                  }
+    //               if (!valueOfKey) {
+    //                 return false
+    //               }
+    //               const valueOfKeyNested = valueOfKey?.[sub.name as keyof typeof valueOfKey]
+    //               if (!valueOfKeyNested) {
+    //                 return false
+    //               }
 
-                  const findNestedMenu = currentRoleKey.find((roleSub) => {
-                    return roleSub.name === valueOfKeyNested
-                  })
-                  return findNestedMenu?.view.value
-                })
+    //               const findNestedMenu = currentRoleKey.find((roleSub) => {
+    //                 return roleSub.name === valueOfKeyNested
+    //               })
+    //               return findNestedMenu?.view.value
+    //             })
 
-                return !!findSubMenu?.view.value || nestedSubMenu.length > 0
-              } else {
-                return !!findSubMenu?.view.value
-              }
-            }
-          })
+    //             return !!findSubMenu?.view.value || nestedSubMenu.length > 0
+    //           } else {
+    //             return !!findSubMenu?.view.value
+    //           }
+    //         }
+    //       })
 
-          return { ...el, subMenu: filterSubMenu || [] }
-        }
-        return el
-      })
-      return mutateNewSubMenus as typeof newSideBar
-    }
+    //       return { ...el, subMenu: filterSubMenu || [] }
+    //     }
+    //     return el
+    //   })
+    //   return mutateNewSubMenus as typeof newSideBar
+    // }
+    // return currentPathList
     return currentPathList
   }, [currentRole, isReportAccount, isAdminTask])
 
@@ -214,6 +216,7 @@ const NavSidebar: React.FC<any> = ({ children }) => {
               onClick={() => navigate('/HomePage')}
             />
           </div>
+
           <div className='d-flex align-items-center'>
             <div className='me-4'>
               <span>
