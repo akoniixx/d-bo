@@ -47,11 +47,24 @@ const ViewHisRedeem = () => {
   const [searchKeyword, setSearchKeyword] = useState('')
   const [searchStartDate, setSearchStartDate] = useState<any>(null)
   const [searchEndDate, setSearchEndDate] = useState<any>(null)
-  const [searchStatus, setSearchStatus] = useState('')
-  const [searchMission, setSearchMission] = useState('')
-  const [searchType, setSearchType] = useState('PHYSICAL')
-  const [searchRewardEx, setSearchRewardEx] = useState('')
+  const [searchStatus, setSearchStatus] = useState<any>(null)
   const [loading, setLoading] = useState(false)
+
+  const resetState = () => {
+    setSearchKeyword('')
+    setSearchStartDate(null)
+    setSearchEndDate(null)
+    setSearchStatus(null)
+  }
+  useEffect(() => {
+    if (source === 'Farmer') {
+      fetchRedeemFarmer()
+      resetState()
+    } else {
+      fetchRedeemDroner()
+      resetState()
+    }
+  }, [current, searchStartDate, searchEndDate, source])
 
   const fetchRedeemFarmer = () => {
     setLoading(true)
@@ -78,9 +91,6 @@ const ViewHisRedeem = () => {
       searchStartDate,
       searchEndDate,
       searchStatus,
-      searchMission,
-      searchType,
-      searchRewardEx,
     )
       .then((res) => {
         const mapKey = res.data.map((x, i) => ({
@@ -93,19 +103,12 @@ const ViewHisRedeem = () => {
       .finally(() => setLoading(false))
   }
 
-  useEffect(() => {
-    if (source === 'Farmer') {
-      fetchRedeemFarmer()
-    } else {
-      fetchRedeemDroner()
-    }
-  }, [current, searchStartDate, searchEndDate, source, searchType])
-
   const onChangePage = (page: number) => {
     setCurrent(page)
   }
   const onSearch = () => {
     setCurrent(1)
+    resetState()
     if (source === 'Farmer') {
       fetchRedeemFarmer()
     } else {
@@ -206,12 +209,10 @@ const ViewHisRedeem = () => {
             className='col-lg-12 p-1'
             placeholder='สถานะทั้งหมด'
             allowClear
-            onChange={(e) => {
-              setSearchStatus(e)
-            }}
+            onChange={(e: any) => setSearchStatus(e)}
           >
             <option value='SUCCESS'>แลกสำเร็จ</option>
-            <option value='CANCELED'>ยกเลิก</option>
+            <option value={source === 'Farmer' ? 'CANCELED' : 'CANCEL'}>ยกเลิก</option>
           </Select>
         </div>
         <div className='pt-1'>
@@ -222,7 +223,9 @@ const ViewHisRedeem = () => {
               color: color.secondary2,
               backgroundColor: color.Success,
             }}
-            onClick={onSearch}
+            onClick={() => {
+              onSearch()
+            }}
           >
             ค้นหาข้อมูล
           </Button>
@@ -354,6 +357,15 @@ const ViewHisRedeem = () => {
       },
     },
     {
+      title: 'Redeem No',
+      dataIndex: 'redeemNo',
+      render: (value: any, row: any, index: number) => {
+        return {
+          children: <span>{row.redeemNo || '-'}</span>,
+        }
+      },
+    },
+    {
       title: 'Task No',
       dataIndex: 'taskNo',
       render: (value: any, row: any, index: number) => {
@@ -368,34 +380,6 @@ const ViewHisRedeem = () => {
       render: (value: any, row: any, index: number) => {
         return {
           children: <span>{row.reward.rewardNo}</span>,
-        }
-      },
-    },
-    {
-      title: 'Mission No',
-      render: (value: any, row: any, index: number) => {
-        return {
-          children: (
-            <>
-              <span>{row.missionId ? row.redeemDetail.missionNo : '-'}</span>
-              {row.missionId && row.redeemDetail.missionNo && (
-                <Tooltip
-                  placement='top'
-                  title={'ชื่อภารกิจ: ' + row.redeemDetail.missionName}
-                  key={row.key}
-                >
-                  <InfoCircleFilled
-                    style={{
-                      position: 'relative',
-                      bottom: 3,
-                      left: 4,
-                      color: color.Success,
-                    }}
-                  />
-                </Tooltip>
-              )}
-            </>
-          ),
         }
       },
     },

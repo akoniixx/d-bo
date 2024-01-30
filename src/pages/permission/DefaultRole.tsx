@@ -61,7 +61,7 @@ const dataDroner = ['รายชื่อนักบินโดรน', 'ร�
 const dataNews = ['ข่าวสาร', 'กูรูเกษตร']
 const dataPromotion = ['โปรโมชั่น', 'คูปอง']
 const dataPoint = ['รายงานแต้ม', 'รายการแต้มพิเศษ', 'แต้มรายบุคคล', 'แคมเปญแต้ม']
-const dataReward = ['นักบินโดรน', 'เกษตรกร']
+const dataReward = ['รายการของรางวัล', 'ประวัติการแลก']
 const dataMission = ['นักบินโดรน', 'เกษตรกร']
 const dataChallenge = ['นักบินโดรน', 'เกษตรกร']
 const dataAdmin = ['รายชื่อผู้ดูแล', 'บทบาทผู้ดูแล']
@@ -130,14 +130,14 @@ const disableExcel = ['งานที่เสร็จแล้ว (บัญ�
 const followJob: { [key: string]: any } = {
   followJob: tacking.map((name) => {
     return {
-      add: { value: false, disabled: disableAdd.includes(name), name: 'followJob' },
+      add: { value: false, disabled: disableAdd.includes(name) },
       sub: false,
-      edit: { value: false, disabled: false, name: 'followJob' },
+      edit: { value: false, disabled: false },
       name: name,
-      view: { value: false, disabled: false, name: 'followJob' },
-      excel: { value: false, disabled: !disableExcel.includes(name), name: 'followJob' },
-      cancel: { value: false, disabled: disableCancel.includes(name), name: 'followJob' },
-      delete: { value: false, disabled: disableDelete.includes(name), name: 'followJob' },
+      view: { value: false, disabled: false },
+      excel: { value: false, disabled: !disableExcel.includes(name) },
+      cancel: { value: false, disabled: disableCancel.includes(name) },
+      delete: { value: false, disabled: disableDelete.includes(name) },
       subItem: [],
     }
   }),
@@ -145,14 +145,14 @@ const followJob: { [key: string]: any } = {
 const farmerJob: { [key: string]: any } = {
   farmerJob: dataFarmer.map((name) => {
     return {
-      add: { value: false, disabled: disableAdd.includes(name), name: 'farmerInfo' },
+      add: { value: false, disabled: disableAdd.includes(name) },
       sub: false,
-      edit: { value: false, disabled: disableEdit.includes(name), name: 'farmerInfo' },
+      edit: { value: false, disabled: disableEdit.includes(name) },
       name,
-      view: { value: false, disabled: disableView.includes(name), name: 'farmerInfo' },
-      excel: { value: false, disabled: !disableExcel.includes(name), name: 'farmerInfo' },
-      cancel: { value: false, disabled: disableCancel.includes(name), name: 'farmerInfo' },
-      delete: { value: false, disabled: disableDelete.includes(name), name: 'farmerInfo' },
+      view: { value: false, disabled: disableView.includes(name) },
+      excel: { value: false, disabled: !disableExcel.includes(name) },
+      cancel: { value: false, disabled: disableCancel.includes(name) },
+      delete: { value: false, disabled: disableDelete.includes(name) },
       subItem: [],
     }
   }),
@@ -160,14 +160,14 @@ const farmerJob: { [key: string]: any } = {
 const dronerJob: { [key: string]: any } = {
   dronerJob: dataDroner.map((name) => {
     return {
-      add: { value: false, disabled: disableAdd.includes(name), name: 'dronerInfo' },
+      add: { value: false, disabled: disableAdd.includes(name) },
       sub: false,
-      edit: { value: false, disabled: disableEdit.includes(name), name: 'dronerInfo' },
+      edit: { value: false, disabled: disableEdit.includes(name) },
       name,
       view: { value: false, disabled: false },
-      excel: { value: false, disabled: !disableExcel.includes(name), name: 'dronerInfo' },
-      cancel: { value: false, disabled: disableCancel.includes(name), name: 'dronerInfo' },
-      delete: { value: false, disabled: disableDelete.includes(name), name: 'dronerInfo' },
+      excel: { value: false, disabled: !disableExcel.includes(name) },
+      cancel: { value: false, disabled: disableCancel.includes(name) },
+      delete: { value: false, disabled: disableDelete.includes(name) },
       subItem: [],
     }
   }),
@@ -175,14 +175,14 @@ const dronerJob: { [key: string]: any } = {
 const newsJob: { [key: string]: any } = {
   guru: dataNews.map((name) => {
     return {
-      add: { value: false, disabled: disableAdd.includes(name), name: 'guru' },
+      add: { value: false, disabled: disableAdd.includes(name) },
       sub: false,
-      edit: { value: false, disabled: disableEdit.includes(name), name: 'guru' },
+      edit: { value: false, disabled: disableEdit.includes(name) },
       name,
-      view: { value: false, disabled: disableView.includes(name), name: 'guru' },
-      excel: { value: false, disabled: !disableExcel.includes(name), name: 'guru' },
-      cancel: { value: false, disabled: disableCancel.includes(name), name: 'guru' },
-      delete: { value: false, disabled: disableDelete.includes(name), name: 'guru' },
+      view: { value: false, disabled: disableView.includes(name) },
+      excel: { value: false, disabled: !disableExcel.includes(name) },
+      cancel: { value: false, disabled: disableCancel.includes(name) },
+      delete: { value: false, disabled: disableDelete.includes(name) },
       subItem: [],
     }
   }),
@@ -190,14 +190,14 @@ const newsJob: { [key: string]: any } = {
 const promotionJob: { [key: string]: any } = {
   promotion: dataPromotion.map((name) => {
     return {
-      add: { value: false, disabled: disableAdd.includes(name), name: 'promotion' },
+      add: { value: false, disabled: disableAdd.includes(name) },
       sub: false,
-      edit: { value: false, disabled: disableEdit.includes(name), name: 'promotion' },
+      edit: { value: false, disabled: disableEdit.includes(name) },
       name,
-      view: { value: false, disabled: disableView.includes(name), name: 'promotion' },
-      excel: { value: false, disabled: !disableExcel.includes(name), name: 'promotion' },
-      cancel: { value: false, disabled: disableCancel.includes(name), name: 'promotion' },
-      delete: { value: false, disabled: disableDelete.includes(name), name: 'promotion' },
+      view: { value: false, disabled: disableView.includes(name) },
+      excel: { value: false, disabled: !disableExcel.includes(name) },
+      cancel: { value: false, disabled: disableCancel.includes(name) },
+      delete: { value: false, disabled: disableDelete.includes(name) },
       subItem: [],
     }
   }),
@@ -206,14 +206,14 @@ const promotionJob: { [key: string]: any } = {
 const pointJob: { [key: string]: any } = {
   pointResult: dataPoint.map((name) => {
     return {
-      add: { value: false, disabled: disableAdd.includes(name), name: 'pointResult' },
+      add: { value: false, disabled: disableAdd.includes(name) },
       sub: false,
-      edit: { value: false, disabled: false, name: 'pointResult' },
+      edit: { value: false, disabled: false },
       name,
-      view: { value: false, disabled: false, name: 'pointResult' },
-      excel: { value: false, disabled: !disableExcel.includes(name), name: 'pointResult' },
-      cancel: { value: false, disabled: disableCancel.includes(name), name: 'pointResult' },
-      delete: { value: false, disabled: disableDelete.includes(name), name: 'pointResult' },
+      view: { value: false, disabled: false },
+      excel: { value: false, disabled: !disableExcel.includes(name) },
+      cancel: { value: false, disabled: disableCancel.includes(name) },
+      delete: { value: false, disabled: disableDelete.includes(name) },
       subItem: [],
     }
   }),
@@ -222,14 +222,14 @@ const pointJob: { [key: string]: any } = {
 const rewardJob: { [key: string]: any } = {
   reward: dataReward.map((name) => {
     return {
-      add: { value: false, disabled: false, name: 'reward' },
+      add: { value: false, disabled: false },
       sub: false,
-      edit: { value: false, disabled: false, name: 'reward' },
+      edit: { value: false, disabled: false },
       name,
-      view: { value: false, disabled: false, name: 'reward' },
-      excel: { value: false, disabled: !disableExcel.includes(name), name: 'reward' },
-      cancel: { value: false, disabled: disableCancel.includes(name), name: 'reward' },
-      delete: { value: false, disabled: false, name: 'reward' },
+      view: { value: false, disabled: false },
+      excel: { value: false, disabled: !disableExcel.includes(name) },
+      cancel: { value: false, disabled: disableCancel.includes(name) },
+      delete: { value: false, disabled: false },
       subItem: [],
     }
   }),
@@ -237,14 +237,14 @@ const rewardJob: { [key: string]: any } = {
 const oneFinity: { [key: string]: any } = {
   finity: dataFinity.map((name) => {
     return {
-      add: { value: false, disabled: disableAdd.includes(name), name: '1finity' },
+      add: { value: false, disabled: disableAdd.includes(name) },
       sub: false,
-      edit: { value: false, disabled: disableEdit.includes(name), name: '1finity' },
+      edit: { value: false, disabled: disableEdit.includes(name) },
       name,
-      view: { value: false, disabled: false, name: '1finity' },
-      excel: { value: false, disabled: !disableExcel.includes(name), name: '1finity' },
-      cancel: { value: false, disabled: disableCancel.includes(name), name: '1finity' },
-      delete: { value: false, disabled: disableDelete.includes(name), name: '1finity' },
+      view: { value: false, disabled: false },
+      excel: { value: false, disabled: !disableExcel.includes(name) },
+      cancel: { value: false, disabled: disableCancel.includes(name) },
+      delete: { value: false, disabled: disableDelete.includes(name) },
       subItem: [],
     }
   }),
@@ -252,14 +252,14 @@ const oneFinity: { [key: string]: any } = {
 const missionJob: { [key: string]: any } = {
   mission: dataMission.map((name) => {
     return {
-      add: { value: false, disabled: false, name: 'mission' },
+      add: { value: false, disabled: false },
       sub: false,
-      edit: { value: false, disabled: false, name: 'mission' },
+      edit: { value: false, disabled: false },
       name,
-      view: { value: false, disabled: false, name: 'mission' },
-      excel: { value: false, disabled: !disableExcel.includes(name), name: 'mission' },
-      cancel: { value: false, disabled: disableCancel.includes(name), name: 'mission' },
-      delete: { value: false, disabled: false, name: 'mission' },
+      view: { value: false, disabled: false },
+      excel: { value: false, disabled: !disableExcel.includes(name) },
+      cancel: { value: false, disabled: disableCancel.includes(name) },
+      delete: { value: false, disabled: false },
       subItem: [],
     }
   }),
@@ -267,14 +267,14 @@ const missionJob: { [key: string]: any } = {
 const challengeJob: { [key: string]: any } = {
   challenge: dataChallenge.map((name) => {
     return {
-      add: { value: false, disabled: false, name: 'challenge' },
+      add: { value: false, disabled: false },
       sub: false,
-      edit: { value: false, disabled: false, name: 'challenge' },
+      edit: { value: false, disabled: false },
       name,
-      view: { value: false, disabled: false, name: 'challenge' },
-      excel: { value: false, disabled: !disableExcel.includes(name), name: 'challenge' },
-      cancel: { value: false, disabled: disableCancel.includes(name), name: 'challenge' },
-      delete: { value: false, disabled: false, name: 'challenge' },
+      view: { value: false, disabled: false },
+      excel: { value: false, disabled: !disableExcel.includes(name) },
+      cancel: { value: false, disabled: disableCancel.includes(name) },
+      delete: { value: false, disabled: false },
       subItem: [],
     }
   }),
@@ -282,14 +282,14 @@ const challengeJob: { [key: string]: any } = {
 const adminJob: { [key: string]: any } = {
   admin: dataAdmin.map((name) => {
     return {
-      add: { value: false, disabled: false, name: 'admin' },
+      add: { value: false, disabled: false },
       sub: false,
-      edit: { value: false, disabled: false, name: 'admin' },
+      edit: { value: false, disabled: false },
       name,
-      view: { value: false, disabled: false, name: 'admin' },
-      excel: { value: false, disabled: !disableExcel.includes(name), name: 'admin' },
-      cancel: { value: false, disabled: disableCancel.includes(name), name: 'admin' },
-      delete: { value: false, disabled: false, name: 'admin' },
+      view: { value: false, disabled: false },
+      excel: { value: false, disabled: !disableExcel.includes(name) },
+      cancel: { value: false, disabled: disableCancel.includes(name) },
+      delete: { value: false, disabled: false },
       subItem: [],
     }
   }),
@@ -297,14 +297,14 @@ const adminJob: { [key: string]: any } = {
 const settingJob: { [key: string]: any } = {
   settings: dataSetting.map((name) => {
     return {
-      add: { value: false, disabled: disableAdd.includes(name), name: 'settings' },
+      add: { value: false, disabled: disableAdd.includes(name) },
       sub: false,
-      edit: { value: false, disabled: false, name: 'settings' },
+      edit: { value: false, disabled: false },
       name,
-      view: { value: false, disabled: false, name: 'settings' },
-      excel: { value: false, disabled: !disableExcel.includes(name), name: 'settings' },
-      cancel: { value: false, disabled: disableCancel.includes(name), name: 'settings' },
-      delete: { value: false, disabled: disableDelete.includes(name), name: 'settings' },
+      view: { value: false, disabled: false },
+      excel: { value: false, disabled: !disableExcel.includes(name) },
+      cancel: { value: false, disabled: disableCancel.includes(name) },
+      delete: { value: false, disabled: disableDelete.includes(name) },
       subItem: [],
     }
   }),

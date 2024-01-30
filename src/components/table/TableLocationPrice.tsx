@@ -8,7 +8,6 @@ import {
   ProvincePriceEntity_INIT,
 } from '../../entities/LocationEntities'
 import ModalSearchProvince from '../modal/ModalSearchProvince'
-import { LocationPriceEntity, LocationPriceEntity_INIT } from '../../entities/LocationPrice'
 
 interface TableLocationPriceProps {
   callBack: (data: ProvincePriceEntity[]) => void
@@ -27,7 +26,7 @@ export const TableLocationPrice: React.FC<TableLocationPriceProps> = ({ callBack
     if (data?.id !== '') {
       setEqualProvince(data)
     } else {
-      fetchProvince
+      fetchProvince()
     }
   }, [data])
 
@@ -38,6 +37,7 @@ export const TableLocationPrice: React.FC<TableLocationPriceProps> = ({ callBack
   useEffect(() => {
     fetchProvinceInSearch()
   }, [])
+
   const fetchProvinceInSearch = async () => {
     setLoading(true)
     await LocationDatasource.getProvince()

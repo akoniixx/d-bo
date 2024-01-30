@@ -41,6 +41,8 @@ export interface AllLocatePriceEntity {
   count_subdistrict: number
   max_price: number
   min_price: number
+  max_price_sow: number
+  min_price_sow: number
   update_at: string
   plants: [PricePlantsEntity]
 }
@@ -51,6 +53,8 @@ export const AllLocatePriceEntity_INIT: AllLocatePriceEntity = {
   count_subdistrict: 0,
   max_price: 0,
   min_price: 0,
+  max_price_sow: 0,
+  min_price_sow: 0,
   update_at: '',
   plants: [PricePlantsEntity_INIT],
 }
