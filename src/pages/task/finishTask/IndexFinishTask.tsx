@@ -13,7 +13,7 @@ import {
   Table,
 } from 'antd'
 import moment from 'moment'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import ActionButton from '../../../components/button/ActionButton'
 import { LocationDatasource } from '../../../datasource/LocationDatasource'
 import {
@@ -52,8 +52,12 @@ import { listAppType } from '../../../definitions/ApplicatoionTypes'
 import CheckDocument from '../../../components/dropdownCheck/CheckDocument'
 import { icon } from '../../../resource'
 import ShowNickName from '../../../components/popover/ShowNickName'
+import { useRecoilValueLoadable } from 'recoil'
+import { getUserRoleById } from '../../../store/ProfileAtom'
 export default function IndexFinishTask() {
   const navigate = useNavigate()
+  const role = useRecoilValueLoadable(getUserRoleById)
+  const currentRole = role.state === 'hasValue' ? role.contents : null
   const [row, setRow] = useState(10)
   const [current, setCurrent] = useState(1)
   const [data, setData] = useState<TaskFinishListEntity>()
@@ -77,7 +81,7 @@ export default function IndexFinishTask() {
   const [appTypeArr, setAppTypeArr] = useState<string[]>([])
   const [applicationType, setApplicationType] = useState<any>()
   const [loading, setLoading] = useState(false)
-  const [problems, setProblems] = useState<any>([])
+
   const [sortDirection, setSortDirection] = useState<string | undefined>()
   const [sortField, setSortField] = useState<string | undefined>()
   const [documentPersons, setDocumentPersons] = useState<any>()
@@ -86,6 +90,11 @@ export default function IndexFinishTask() {
   const [sortDirection3, setSortDirection3] = useState<string | undefined>(undefined)
   const [sortDirection4, setSortDirection4] = useState<string | undefined>(undefined)
   const [sortDirection5, setSortDirection5] = useState<string | undefined>(undefined)
+
+  const finishTaskRole = useMemo(() => {
+    const find = currentRole?.followJob?.find((el) => el.name === 'งานที่เสร็จแล้ว')
+    return find
+  }, [currentRole])
 
   const fetchTaskFinish = async () => {
     setLoading(true)
@@ -829,7 +838,7 @@ export default function IndexFinishTask() {
       key: 'Action',
       render: (value: any, row: any, index: number) => {
         return {
-          children: (
+          children: finishTaskRole?.edit.value && (
             <div className='d-flex flex-row justify-content-between'>
               {row.status == 'WAIT_REVIEW' ? (
                 <ActionButton

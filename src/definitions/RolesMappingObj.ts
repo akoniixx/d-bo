@@ -10,6 +10,7 @@ export const mappingRoles = {
   promotion: 'promotion',
   rewards: 'reward',
   setting: 'settings',
+  infinity: 'finity',
 }
 
 const mappingTask = {
@@ -41,11 +42,13 @@ const mappingPromotion = {
 }
 const mappingCampaign = {
   listPoint: 'รายงานแต้ม',
+  IndexPointManual: 'รายการแต้มพิเศษ',
   summaryPoint: 'แต้มรายบุคคล',
   IndexCampaignPoint: 'แต้มรายบุคคล',
 }
 const mappingRewards = {
-  listReward: 'listReward',
+  listReward: 'รายการของรางวัล',
+  historyRedeem: 'ประวัติการแลก',
 }
 
 const mappingMission = {
@@ -56,9 +59,10 @@ const mappingChallenge = {
 }
 const mappingSetting = {
   IndexDroneBrand: 'ยี่ห้อโดรน',
-  Target: 'Target',
+  IndexCrop: 'รายชื่อพืช',
+  Target: 'เป้าหมาย',
   PricePage: 'ราคา',
-  reward: 'รางวัล',
+  reward: 'แต้ม',
   credit: 'เครดิต',
 }
 
@@ -88,8 +92,13 @@ export const mappingSubAllMenu = {
   droner: mappingDroner,
   news: mappingSpecialKey,
   promotion: mappingPromotion,
+  campaign: mappingCampaign,
   rewards: mappingRewards,
   mission: mappingMission,
   challenge: mappingChallenge,
   setting: mappingSetting,
+  infinity: {
+    DronerInfinity: 'รายชื่อนักบินโดรน',
+    IndexListStore: 'รายชื่อร้านค้า',
+  },
 }

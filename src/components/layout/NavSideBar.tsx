@@ -11,15 +11,8 @@ import { MenuSide } from './MenuSide'
 import { pathLists } from './SideBar'
 import { useRecoilValueLoadable } from 'recoil'
 import { getUserRoleById } from '../../store/ProfileAtom'
-import { NewListType, listMenu } from '../../entities/RoleEntities'
-import {
-  mappingNestedSubMenu,
-  mappingSpecialKey,
-  mappingNoPermissionSubMenu,
-  mappingRoles,
-  mappingSubAllMenu,
-} from '../../definitions/RolesMappingObj'
-import moment, { Moment } from 'moment'
+import { listMenu } from '../../entities/RoleEntities'
+import { mappingRoles, mappingSubAllMenu } from '../../definitions/RolesMappingObj'
 
 const logout = () => {
   localStorage.clear()
@@ -40,7 +33,7 @@ const NavSidebar: React.FC<any> = ({ children }) => {
     'arisa.m@iconkaset',
     'nathapon',
     'issariya',
-    'รชยา',
+    // 'user02',
   ]
   const listAdminTask = [
     'Khanittha.w',
@@ -49,145 +42,51 @@ const NavSidebar: React.FC<any> = ({ children }) => {
     'sawatdee.k',
     'natarkarn.h',
     'saimhai',
-    'รชยา',
+    'user02',
   ]
   const checkReportAcc = listReportAcc.includes(persistedProfile.username)
   const checkAdminTask = listAdminTask.includes(persistedProfile.username)
   const isReportAccount = checkReportAcc
   const isAdminTask = checkAdminTask
   const newSideBarWithPermission = useMemo(() => {
-    const listNoPermission = ['infinity', 'campaign']
-    const listNoPermissionSub = ['IndexCampaignPoint', 'DronerInfinity', 'IndexListStore']
-    const listSpecialKey = ['news', 'GuruPage']
     const currentPathList = pathLists(isReportAccount, isAdminTask)
-    // console.log('currentRole', currentRole)
-    // console.log('currentPathList', currentPathList)
-    // if (currentRole) {
-    //   const newSideBar = currentPathList.filter((el) => {
-    //     const key = mappingRoles[el.name as keyof typeof mappingRoles]
-    //     if (listNoPermission.includes(el.name)) {
-    //       return true
-    //     }
-    //     const currentRoleKey: listMenu[] = currentRole[key as keyof typeof currentRole]
-    //     if (currentRoleKey) {
-    //       const isHaveSomeView = currentRoleKey.some((role) => {
-    //         return role.view.value
-    //       })
-    //       return isHaveSomeView
-    //     }
-    //   })
+    if (currentRole) {
+      const newSideBar = currentPathList.filter((el) => {
+        const key = mappingRoles[el.name as keyof typeof mappingRoles]
 
-    //   const mutateNewSubMenus = newSideBar.map((el) => {
-    //     const key = mappingRoles[el.name as keyof typeof mappingRoles]
-    //     const currentRoleKey: listMenu[] = currentRole[key as keyof typeof currentRole]
-    //     if (el.subMenu.length > 0) {
-    //       if (listNoPermission.includes(el.name)) {
-    //         const filterSubMenu = el.subMenu.filter((subMenu) => {
-    //           if (listNoPermissionSub.includes(subMenu.name)) {
-    //             return true
-    //           } else {
-    //             const currentSubMenuKeyList =
-    //               mappingNoPermissionSubMenu[el.name as keyof typeof mappingNoPermissionSubMenu]
-    //             if (currentSubMenuKeyList) {
-    //               const findKey = Object.keys(currentSubMenuKeyList).find((key) => {
-    //                 return key === subMenu.name
-    //               })
-    //               const valueOfKey =
-    //                 currentSubMenuKeyList[findKey as keyof typeof currentSubMenuKeyList]
-    //               const findSubMenu = currentRoleKey.find((roleSub) => {
-    //                 return roleSub.name === valueOfKey
-    //               })
+        const currentRoleKey: listMenu[] = currentRole[key as keyof typeof currentRole]
+        if (currentRoleKey) {
+          const isHaveSomeView = currentRoleKey.some((role) => {
+            return role.view.value
+          })
+          return isHaveSomeView
+        }
+      })
 
-    //               const isHaveSub = subMenu.subMenu.length > 0
-    //               if (isHaveSub) {
-    //                 const nestedSub = findSubMenu?.subItem?.subNested.some((nested: any) => {
-    //                   return nested.view.value
-    //                 })
-    //                 return true
-    //               }
+      const mutateNewSubMenus = newSideBar.map((el) => {
+        const key = mappingRoles[el.name as keyof typeof mappingRoles]
+        const currentRoleKey: listMenu[] = currentRole[key as keyof typeof currentRole]
+        if (currentRoleKey.length > 0) {
+          const subMenu = el.subMenu.filter((sub) => {
+            const key = mappingSubAllMenu[el.name as keyof typeof mappingSubAllMenu]
+            const currentSubRoleKey = key[sub.name as keyof typeof key]
+            const findByKey = currentRoleKey.find((role) => {
+              return role.name === currentSubRoleKey
+            })
 
-    //               return findSubMenu?.view.value
-    //             }
-    //           }
-    //         })
+            if (findByKey) {
+              return findByKey?.view.value
+            } else {
+              return false
+            }
+          })
+          return { ...el, subMenu }
+        }
 
-    //         return { ...el, subMenu: filterSubMenu }
-    //       }
-
-    //       const filterSubMenu = el.subMenu.filter((subMenu) => {
-    //         const currentSubMenuKeyList =
-    //           mappingSubAllMenu[el.name as keyof typeof mappingSubAllMenu]
-    //         if (currentSubMenuKeyList) {
-    //           const findKey = Object.keys(currentSubMenuKeyList).find((key) => {
-    //             return key === subMenu.name
-    //           })
-    //           const valueOfKey =
-    //             currentSubMenuKeyList[findKey as keyof typeof currentSubMenuKeyList]
-    //           const findSubMenu = currentRoleKey.find((roleSub) => {
-    //             return roleSub.name === valueOfKey
-    //           })
-    //           const isHaveSub = subMenu.subMenu.length > 0
-
-    //           if (isHaveSub) {
-    //             const isCredit = subMenu.subMenu.find((sub) => {
-    //               return sub.name === 'CreditDroner'
-    //             })
-    //             if (isCredit) {
-    //               return true
-    //             }
-
-    //             const nestedSubMenu = subMenu.subMenu.filter((sub) => {
-    //               const currentSubMenuKeyList =
-    //                 mappingSubAllMenu[el.name as keyof typeof mappingSubAllMenu]
-    //               if (!currentSubMenuKeyList) {
-    //                 return false
-    //               }
-    //               const findKey = Object.keys(currentSubMenuKeyList).find((key) => {
-    //                 return key === subMenu.name
-    //               })
-
-    //               if (!findKey) {
-    //                 return false
-    //               }
-    //               const isSpecialKey = listSpecialKey.includes(findKey)
-    //               if (isSpecialKey) {
-    //                 const nameOfKey = mappingSpecialKey[findKey as keyof typeof mappingSpecialKey]
-    //                 const findSubMenu = currentRoleKey.find((roleSub) => {
-    //                   return roleSub.name === nameOfKey
-    //                 })
-    //                 return findSubMenu?.view.value
-    //               }
-    //               const valueOfKey =
-    //                 mappingNestedSubMenu[findKey as keyof typeof mappingNestedSubMenu]
-
-    //               if (!valueOfKey) {
-    //                 return false
-    //               }
-    //               const valueOfKeyNested = valueOfKey?.[sub.name as keyof typeof valueOfKey]
-    //               if (!valueOfKeyNested) {
-    //                 return false
-    //               }
-
-    //               const findNestedMenu = currentRoleKey.find((roleSub) => {
-    //                 return roleSub.name === valueOfKeyNested
-    //               })
-    //               return findNestedMenu?.view.value
-    //             })
-
-    //             return !!findSubMenu?.view.value || nestedSubMenu.length > 0
-    //           } else {
-    //             return !!findSubMenu?.view.value
-    //           }
-    //         }
-    //       })
-
-    //       return { ...el, subMenu: filterSubMenu || [] }
-    //     }
-    //     return el
-    //   })
-    //   return mutateNewSubMenus as typeof newSideBar
-    // }
-    // return currentPathList
+        return el
+      })
+      return mutateNewSubMenus as typeof newSideBar
+    }
     return currentPathList
   }, [currentRole, isReportAccount, isAdminTask])
 

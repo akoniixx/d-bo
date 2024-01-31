@@ -30,6 +30,7 @@ const getUserRoleById = selector({
     if (profile?.roleId) {
       try {
         const result = await AuthDatasource.getRoleByRoleId(profile.roleId)
+        console.log('result', result)
         return result as RoleEntity
       } catch (e) {
         console.log(e)

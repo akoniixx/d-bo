@@ -13,7 +13,7 @@ import {
   Spin,
   Table,
 } from 'antd'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import color from '../../resource/color'
 import ActionButton from '../../components/button/ActionButton'
 import {
@@ -41,8 +41,13 @@ import { image } from '../../resource'
 import { ListCheck } from '../../components/dropdownCheck/ListStatusAppType'
 import { DropdownStatus } from '../../components/dropdownCheck/DropDownStatus'
 import ShowNickName from '../../components/popover/ShowNickName'
+import { useRecoilValueLoadable } from 'recoil'
+import { getUserRoleById } from '../../store/ProfileAtom'
 
 function IndexFarmer() {
+  const role = useRecoilValueLoadable(getUserRoleById)
+  const currentRole = role.state === 'hasValue' ? role.contents : null
+
   const [current, setCurrent] = useState(1)
   const navigate = useNavigate()
   const [data, setData] = useState<FarmerPageEntity>()
@@ -75,6 +80,15 @@ function IndexFarmer() {
   const [sortDirection2, setSortDirection2] = useState<string | undefined>(undefined)
   const [sortDirection3, setSortDirection3] = useState<string | undefined>(undefined)
   const [fetchData, setFetchData] = useState<boolean>(false)
+
+  const { findFarmerRole, findHistoryPoint } = useMemo(() => {
+    const findFarmerRole = currentRole?.farmerInfo.find((el) => el.name === 'รายชื่อเกษตรกร')
+    const findHistoryPoint = currentRole?.pointResult.find((el) => el.name === 'รายงานแต้ม')
+    return {
+      findFarmerRole,
+      findHistoryPoint,
+    }
+  }, [])
 
   const fetchFarmer = async () => {
     setLoading(true)
@@ -255,9 +269,11 @@ function IndexFarmer() {
           label2={mainStatus}
           onClick={(e: any) => CheckStatus(e)}
         />
-        <div>
-          <AddButtton text='เพิ่มเกษตรกร' onClick={() => navigate('/AddFarmer')} />
-        </div>
+        {findFarmerRole?.add.value && (
+          <div>
+            <AddButtton text='เพิ่มเกษตรกร' onClick={() => navigate('/AddFarmer')} />
+          </div>
+        )}
       </div>
       <StatusPlots
         checkPage='DronerPage'
@@ -733,18 +749,26 @@ function IndexFarmer() {
         return {
           children: (
             <Row justify={'space-between'}>
-              <ActionButton
-                icon={
-                  <Image src={icon.folder_icon} preview={false} style={{ width: 22, height: 22 }} />
-                }
-                color={color.primary1}
-                onClick={() => navigate('/IndexFarmerHistorySum/id=' + row.id)}
-              />
-              <ActionButton
-                icon={<EditOutlined />}
-                color={color.primary1}
-                onClick={() => navigate('/EditFarmer/id=' + row.id)}
-              />
+              {findHistoryPoint?.view.value && (
+                <ActionButton
+                  icon={
+                    <Image
+                      src={icon.folder_icon}
+                      preview={false}
+                      style={{ width: 22, height: 22 }}
+                    />
+                  }
+                  color={color.primary1}
+                  onClick={() => navigate('/IndexFarmerHistorySum/id=' + row.id)}
+                />
+              )}
+              {findFarmerRole?.edit.value && (
+                <ActionButton
+                  icon={<EditOutlined />}
+                  color={color.primary1}
+                  onClick={() => navigate('/EditFarmer/id=' + row.id)}
+                />
+              )}
             </Row>
           ),
         }

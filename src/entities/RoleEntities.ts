@@ -73,7 +73,7 @@ export interface RoleEntity {
   challenge: listMenu[]
   admin: listMenu[]
   settings: listMenu[]
-  point: listMenu[]
+  infinity: listMenu[]
 }
 export const RoleEntity_INIT: RoleEntity = {
   id: '',
@@ -91,6 +91,7 @@ export const RoleEntity_INIT: RoleEntity = {
   admin: [listMenu_INIT],
   settings: [listMenu_INIT],
   point: [listMenu_INIT],
+  infinity: [listMenu_INIT],
 }
 export interface RoleAllEntity {
   data: RoleEntity[]
