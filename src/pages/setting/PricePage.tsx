@@ -218,7 +218,9 @@ function PricePage() {
         return {
           children: (
             <span style={{ color: color.primary1, fontWeight: '700' }}>
-              {`${row.min_price + ' - ' + row.max_price + ' บาท'}`}
+              {row.min_price === row.max_price ? 
+              `${row.max_price + ' บาท'}` : 
+              `${row.min_price + ' - ' + row.max_price + ' บาท'}`}
             </span>
           ),
         }
