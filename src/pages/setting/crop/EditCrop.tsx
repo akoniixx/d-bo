@@ -13,7 +13,7 @@ import { CropDatasource } from '../../../datasource/CropDatasource'
 import { LocationDatasource } from '../../../datasource/LocationDatasource'
 import Swal from 'sweetalert2'
 import { TableLocationPrice } from '../../../components/table/TableLocationPrice'
-import { LocationPriceEntity } from '../../../entities/LocationPrice'
+import { LocationPriceEntity, LocationPriceEntity_INIT } from '../../../entities/LocationPrice'
 import ModalDelete from '../../../components/modal/ModalDelete'
 
 const _ = require('lodash')
@@ -36,7 +36,7 @@ function EditCrop() {
   const [modalDelete, setModalDelete] = useState<boolean>(false)
   const [purposeSprayId, setPurposeSprayId] = useState<any>()
   const profile = JSON.parse(localStorage.getItem('profile') || '{  }')
-  const [dataFromTable, setDataFromTable] = useState<any>()
+  const [dataFromTable, setDataFromTable] = useState<LocationPriceEntity[]>([LocationPriceEntity_INIT])
   const [saveBtnDisable, setBtnSaveDisable] = useState<boolean>(false)
   const [checkPrice, setCheckPrice] = useState<boolean>(true)
   const [deleteId, setDeleteId] = useState<any>()
