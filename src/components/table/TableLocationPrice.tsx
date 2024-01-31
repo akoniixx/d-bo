@@ -17,9 +17,7 @@ export const TableLocationPrice: React.FC<TableLocationPriceProps> = ({ callBack
   const [searchProvince, setSearchProvince] = useState<ProvinceEntity[]>()
   const [searchText, setSearchText] = useState<ProvincePriceEntity[]>()
   const [showModal, setShowModal] = useState<boolean>(false)
-  const [equalProvince, setEqualProvince] = useState<ProvincePriceEntity[]>([
-    ProvincePriceEntity_INIT,
-  ])
+  const [equalProvince, setEqualProvince] = useState<ProvincePriceEntity[]>([data])
   const [loading, setLoading] = useState<boolean>(false)
 
   useEffect(() => {
@@ -76,33 +74,24 @@ export const TableLocationPrice: React.FC<TableLocationPriceProps> = ({ callBack
     )
   }
 
-  const handleSearchProvince = async (provinceId: any) => {
-    if (provinceId) {
+  const handleSearchProvince = (provinceId: any) => {
+    if (!provinceId) {
+      const updatedData = data.map((existingItem: any) => {
+        const matchingNewItem = equalProvince.find(
+          (newItem) => newItem.provinceId === existingItem.provinceId,
+        )
+        if (matchingNewItem) {
+          return { ...existingItem, ...matchingNewItem }
+        }
+        return existingItem
+      })
+
+      setEqualProvince(updatedData)
+      setSearchText(undefined)
+    } else {
       const findProvince = equalProvince.find((i) => i.provinceId === Number(provinceId))
       setSearchText([findProvince!])
-    } else {
-      try {
-        const res = await LocationDatasource.getProvince()
-        const arrayOfObjectsWithPrice = res.map((obj: ProvinceEntity) => ({
-          ...obj,
-          price: getUpdatedPrice(obj.provinceId),
-        }))
-        setEqualProvince(arrayOfObjectsWithPrice)
-        setSearchText(undefined)
-      } catch (error) {
-        console.log(error)
-      }
     }
-  }
-
-  const getUpdatedPrice = (provinceId: number) => {
-    const matchingProvince = equalProvince.find((equalObj) => equalObj.provinceId === provinceId)
-    return matchingProvince?.price ?? getDataPrice(provinceId)
-  }
-
-  const getDataPrice = (provinceId: number) => {
-    const dataObj = data.find((dataObj: any) => dataObj.provinceId === provinceId)
-    return dataObj?.price
   }
 
   const searchUpdatePrice = (data: any) => {
