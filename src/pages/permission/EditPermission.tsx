@@ -218,7 +218,7 @@ function EditPermission() {
     payload.pointResult = pointResult.value?.pointResult
     payload.settings = settings.value?.settings
     payload.promotion = promotion.value?.promotion
-    payload.finity = promotion.value?.finity
+    payload.finity = finity.value?.finity
     await RoleManage.updateRole(payload)
       .then((res) => {
         setSaveBtnDisable(false)

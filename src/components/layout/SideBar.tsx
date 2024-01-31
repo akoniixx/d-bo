@@ -383,7 +383,7 @@ export const pathLists = (isAccounting: boolean, isAdminTask?: boolean) => {
     {
       path: 'infinity',
       name: 'infinity',
-      title: 'ระบบ 1-Finity',
+      title: 'ระบบ 1-finity',
       subMenu: [
         {
           path: '/DronerInfinity',

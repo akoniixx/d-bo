@@ -366,6 +366,25 @@ function TableRole({
           setPointResultHeader(updatedFollowJobHeader)
         }
       }
+      const checkAllHeadInfinity = () => {
+        if (
+          Array.isArray(dataFinity) &&
+          dataFinity.length > 0 &&
+          Array.isArray(dataFinity[0].value.finity)
+        ) {
+          const updatedFollowJobHeader = [...finityHeader]
+          dataFinity[0].value.finity.forEach((job, index) => {
+            method.forEach((key, idx) => {
+              if (job[key].disabled === true) {
+                job[key].value = false
+              } else {
+                updatedFollowJobHeader[idx] = !job[key].value
+              }
+            })
+          })
+          setFinityHeader(updatedFollowJobHeader)
+        }
+      }
       checkAllHeadJob()
       checkAllHeadFarmer()
       checkAllHeadDroner()
@@ -377,6 +396,7 @@ function TableRole({
       checkAllHeadSetting()
       checkAllHeadPromotion()
       checkAllHeadPointResult()
+      checkAllHeadInfinity()
     }
   }, [
     dataJob,
@@ -389,7 +409,8 @@ function TableRole({
     dataAdmin,
     dataSetting,
     dataPromotion,
-    dataPointResult
+    dataPointResult,
+    dataFinity,
   ])
 
   return (
