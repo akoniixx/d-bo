@@ -1,12 +1,7 @@
 import TableSubRole from './TableSubRole'
 import { useEffect, useState } from 'react'
 import TableHeaderRole from './TableHeaderRole'
-import {
-  TableRoleProps,
-  method,
-  redeemHeaderPoint,
-  reportHeaderPoint,
-} from '../../pages/permission/DefaultRole'
+import { TableRoleProps, method } from '../../pages/permission/DefaultRole'
 
 function TableRole({
   page,
@@ -20,10 +15,8 @@ function TableRole({
   dataPointResult,
   dataAdmin,
   dataSetting,
-  dataPoint,
   dataChallenge,
-  dataReportPoint,
-  dataRedeemPoint,
+  dataFinity,
 }: TableRoleProps) {
   const [followJob, setFollowJob] = useState(dataJob[0].value.followJob)
   const [farmer, setFarmer] = useState(dataFarmer[0].value.farmerJob)
@@ -35,10 +28,8 @@ function TableRole({
   const [pointResult, setPointResult] = useState(dataPointResult[0].value.pointResult)
   const [admin, setAdmin] = useState(dataAdmin[0].value.admin)
   const [setting, setSetting] = useState(dataSetting[0].value.settings)
-  const [point, setPoint] = useState(dataPoint[0].value.point)
   const [challenge, setChallenge] = useState(dataChallenge[0].value.challenge)
-  const [reportPoint, setReportPoint] = useState(dataReportPoint[0].value.subPointResult)
-  const [redeemPoint, setRedeemPoint] = useState(dataRedeemPoint[0].value.subPointResult)
+  const [finity, setFinity] = useState(dataFinity[0].value.finity)
 
   const [followJobHeader, setFollowHeader] = useState<boolean[]>(new Array(6).fill(true))
   const [farmerHeader, setFarmerHeader] = useState<boolean[]>(new Array(6).fill(true))
@@ -49,11 +40,9 @@ function TableRole({
   const [promotionHeader, setPromotionHeader] = useState<boolean[]>(new Array(6).fill(true))
   const [adminHeader, setAdminHeader] = useState<boolean[]>(new Array(6).fill(true))
   const [settingHeader, setSettingHeader] = useState<boolean[]>(new Array(6).fill(true))
-  const [pointHeader, setPointHeader] = useState<boolean[]>(new Array(6).fill(true))
   const [challengeHeader, setChallengeHeader] = useState<boolean[]>(new Array(6).fill(true))
-  const [reportPointHeader, setReportPointHeader] = useState<boolean[]>(new Array(6).fill(true))
-  const [redeemPointHeader, setRedeemPointHeader] = useState<boolean[]>(new Array(6).fill(true))
-  const [headerAllPoint, setHeaderAllPoint] = useState<boolean[]>(new Array(6).fill(true))
+  const [pointResultHeader, setPointResultHeader] = useState<boolean[]>(new Array(6).fill(true))
+  const [finityHeader, setFinityHeader] = useState<boolean[]>(new Array(6).fill(true))
 
   const onChangeHeader = (header: string, category: string, value: boolean) => {
     const dataMap: any = {
@@ -89,9 +78,9 @@ function TableRole({
       },
       แต้มสะสม: {
         data: pointResult,
-        headerState: headerAllPoint,
+        headerState: pointResultHeader,
         setState: setPointResult,
-        setHeaderState: setHeaderAllPoint,
+        setHeaderState: setPointResultHeader,
       },
       ของรางวัล: {
         data: reward,
@@ -123,23 +112,11 @@ function TableRole({
         setState: setSetting,
         setHeaderState: setSettingHeader,
       },
-      แต้ม: {
-        data: point,
-        headerState: pointHeader,
-        setState: setPoint,
-        setHeaderState: setPointHeader,
-      },
-      รายงานแต้ม: {
-        data: reportPoint,
-        headerState: reportPointHeader,
-        setState: setReportPoint,
-        setHeaderState: setReportPointHeader,
-      },
-      'แลกแต้ม/ของรางวัล': {
-        data: redeemPoint,
-        headerState: redeemPointHeader,
-        setState: setRedeemPoint,
-        setHeaderState: setRedeemPointHeader,
+      'ระบบ 1-finity': {
+        data: finity,
+        headerState: finityHeader,
+        setState: setFinity,
+        setHeaderState: setFinityHeader,
       },
     }
     const { data, headerState, setState, setHeaderState } = dataMap[header]
@@ -347,27 +324,6 @@ function TableRole({
           setSettingHeader(updatedFollowJobHeader)
         }
       }
-      const checkAllHeadPoint = () => {
-        if (
-          Array.isArray(dataPoint) &&
-          dataPoint.length > 0 &&
-          Array.isArray(dataPoint[0].value.point)
-        ) {
-          const updatedFollowJobHeader = [...pointHeader]
-
-          dataPoint[0].value.point.forEach((job, index) => {
-            method.forEach((key, idx) => {
-              if (job[key].disabled === true) {
-                job[key].value = false
-              } else {
-                updatedFollowJobHeader[idx] = !job[key].value
-              }
-            })
-          })
-
-          setPointHeader(updatedFollowJobHeader)
-        }
-      }
       const checkAllHeadPromotion = () => {
         if (
           Array.isArray(dataPromotion) &&
@@ -389,15 +345,15 @@ function TableRole({
           setPromotionHeader(updatedFollowJobHeader)
         }
       }
-      const checkAllHeadReportPoint = () => {
+      const checkAllHeadPointResult = () => {
         if (
-          Array.isArray(dataReportPoint) &&
-          dataReportPoint.length > 0 &&
-          Array.isArray(dataReportPoint[0].value.subPointResult)
+          Array.isArray(dataPointResult) &&
+          dataPointResult.length > 0 &&
+          Array.isArray(dataPointResult[0].value.pointResult)
         ) {
-          const updatedFollowJobHeader = [...reportPointHeader]
+          const updatedFollowJobHeader = [...pointResultHeader]
 
-          dataReportPoint[0].value.subPointResult.forEach((job, index) => {
+          dataPointResult[0].value.pointResult.forEach((job, index) => {
             method.forEach((key, idx) => {
               if (job[key].disabled === true) {
                 job[key].value = false
@@ -406,18 +362,18 @@ function TableRole({
               }
             })
           })
-          setReportPointHeader(updatedFollowJobHeader)
+
+          setPointResultHeader(updatedFollowJobHeader)
         }
       }
-      const checkAllHeadRedeemPoint = () => {
+      const checkAllHeadInfinity = () => {
         if (
-          Array.isArray(dataRedeemPoint) &&
-          dataRedeemPoint.length > 0 &&
-          Array.isArray(dataRedeemPoint[0].value.subPointResult)
+          Array.isArray(dataFinity) &&
+          dataFinity.length > 0 &&
+          Array.isArray(dataFinity[0].value.finity)
         ) {
-          const updatedFollowJobHeader = [...redeemPointHeader]
-
-          dataRedeemPoint[0].value.subPointResult.forEach((job, index) => {
+          const updatedFollowJobHeader = [...finityHeader]
+          dataFinity[0].value.finity.forEach((job, index) => {
             method.forEach((key, idx) => {
               if (job[key].disabled === true) {
                 job[key].value = false
@@ -426,10 +382,9 @@ function TableRole({
               }
             })
           })
-          setRedeemPointHeader(updatedFollowJobHeader)
+          setFinityHeader(updatedFollowJobHeader)
         }
       }
-
       checkAllHeadJob()
       checkAllHeadFarmer()
       checkAllHeadDroner()
@@ -439,10 +394,9 @@ function TableRole({
       checkAllHeadReward()
       checkAllHeadAdmin()
       checkAllHeadSetting()
-      checkAllHeadPoint()
       checkAllHeadPromotion()
-      checkAllHeadReportPoint()
-      checkAllHeadRedeemPoint()
+      checkAllHeadPointResult()
+      checkAllHeadInfinity()
     }
   }, [
     dataJob,
@@ -454,25 +408,10 @@ function TableRole({
     dataReward,
     dataAdmin,
     dataSetting,
-    dataPoint,
     dataPromotion,
-    dataReportPoint,
-    dataRedeemPoint,
+    dataPointResult,
+    dataFinity,
   ])
-  useEffect(() => {
-    const checkAllHeadPointResult = () => {
-      method.forEach((key) => {
-        if (!reportPointHeader[method.indexOf(key)] && !redeemPointHeader[method.indexOf(key)]) {
-          headerAllPoint[method.indexOf(key)] = false
-          setHeaderAllPoint([...headerAllPoint])
-        } else {
-          headerAllPoint[method.indexOf(key)] = true
-          setHeaderAllPoint([...headerAllPoint])
-        }
-      })
-    }
-    checkAllHeadPointResult()
-  }, [reportPointHeader, redeemPointHeader])
 
   return (
     <div className='pt-3'>
@@ -616,125 +555,26 @@ function TableRole({
         header='แต้มสะสม'
         data={dataPointResult}
         onChange={(data, key, checked, index) => {
-          const checkHeader = reportPoint.map((item: any) => {
-            return (item[key].value = checked)
-          })
-          const result = checkHeader.includes(false)
-          reportPointHeader[method.indexOf(key)] = result
-          setReportPoint(reportPoint)
-          setReportPointHeader([...reportPointHeader])
-          const checkHeaderRedeem = redeemPoint.map((item: any) => {
-            return (item[key].value = checked)
-          })
-          const resultRedeem = checkHeaderRedeem.includes(false)
-          redeemPointHeader[method.indexOf(key)] = resultRedeem
-          setRedeemPoint(redeemPoint)
-          setRedeemPointHeader([...redeemPointHeader])
           onChangeHeader(data, key, checked)
-          if (checked) {
-            reportPointHeader[method.indexOf(key)] = false
-            setReportPointHeader([...reportPointHeader])
-            redeemPointHeader[method.indexOf(key)] = false
-            setRedeemPointHeader([...redeemPointHeader])
-          } else {
-            reportPointHeader[method.indexOf(key)] = true
-            setReportPointHeader([...reportPointHeader])
-            redeemPointHeader[method.indexOf(key)] = true
-            setRedeemPointHeader([...redeemPointHeader])
-          }
         }}
-        stateHeader={headerAllPoint}
+        stateHeader={pointResultHeader}
         subColumns={
-          <>
-            <TableHeaderRole
-              showHeader={false}
-              header='รายงานแต้ม'
-              data={reportHeaderPoint}
-              onChange={(data, key, checked, index) => {
-                onChangeHeader(data, key, checked)
-                if (
-                  !reportPointHeader[method.indexOf(key)] &&
-                  !redeemPointHeader[method.indexOf(key)]
-                ) {
-                  headerAllPoint[method.indexOf(key)] = false
-                  setHeaderAllPoint([...headerAllPoint])
-                } else {
-                  headerAllPoint[method.indexOf(key)] = true
-                  setHeaderAllPoint([...headerAllPoint])
+          <TableSubRole
+            data={pointResult}
+            onChange={(data, index, key) => {
+              pointResult[index] = data
+              const checkHeader = pointResult.map((item: any) => {
+                if (item[key].disabled === true) {
+                  item[key].value = true
                 }
-              }}
-              stateHeader={reportPointHeader}
-              subColumns={
-                <TableSubRole
-                  data={reportPoint}
-                  onChange={(data, index, key) => {
-                    reportPoint[index] = data
-                    const checkHeader = reportPoint.map((item: any) => {
-                      return item[key].value
-                    })
-                    const result = checkHeader.includes(false)
-                    reportPointHeader[method.indexOf(key)] = result
-                    setReportPoint(reportPoint)
-                    setReportPointHeader([...reportPointHeader])
-                    if (
-                      !reportPointHeader[method.indexOf(key)] &&
-                      !redeemPointHeader[method.indexOf(key)]
-                    ) {
-                      headerAllPoint[method.indexOf(key)] = false
-                      setHeaderAllPoint([...headerAllPoint])
-                    } else {
-                      headerAllPoint[method.indexOf(key)] = true
-                      setHeaderAllPoint([...headerAllPoint])
-                    }
-                  }}
-                />
-              }
-            />
-            <TableHeaderRole
-              showHeader={false}
-              header='แลกแต้ม/ของรางวัล'
-              data={redeemHeaderPoint}
-              onChange={(data, key, checked, index) => {
-                onChangeHeader(data, key, checked)
-                if (
-                  !reportPointHeader[method.indexOf(key)] &&
-                  !redeemPointHeader[method.indexOf(key)]
-                ) {
-                  headerAllPoint[method.indexOf(key)] = false
-                  setHeaderAllPoint([...headerAllPoint])
-                } else {
-                  headerAllPoint[method.indexOf(key)] = true
-                  setHeaderAllPoint([...headerAllPoint])
-                }
-              }}
-              stateHeader={redeemPointHeader}
-              subColumns={
-                <TableSubRole
-                  data={redeemPoint}
-                  onChange={(data, index, key) => {
-                    redeemPoint[index] = data
-                    const checkHeader = redeemPoint.map((item: any) => {
-                      return item[key].value
-                    })
-                    const result = checkHeader.includes(false)
-                    redeemPointHeader[method.indexOf(key)] = result
-                    setRedeemPoint(redeemPoint)
-                    setRedeemPointHeader([...redeemPointHeader])
-                    if (
-                      !reportPointHeader[method.indexOf(key)] &&
-                      !redeemPointHeader[method.indexOf(key)]
-                    ) {
-                      headerAllPoint[method.indexOf(key)] = false
-                      setHeaderAllPoint([...headerAllPoint])
-                    } else {
-                      headerAllPoint[method.indexOf(key)] = true
-                      setHeaderAllPoint([...headerAllPoint])
-                    }
-                  }}
-                />
-              }
-            />
-          </>
+                return item[key].value
+              })
+              const result = checkHeader.includes(false)
+              pointResultHeader[method.indexOf(key)] = result
+              setPointResult(pointResult)
+              setPointResultHeader([...pointResultHeader])
+            }}
+          />
         }
       />
       <TableHeaderRole
@@ -874,27 +714,27 @@ function TableRole({
       />
       <TableHeaderRole
         showHeader={false}
-        header='แต้ม'
-        data={dataPoint}
+        header='ระบบ 1-finity'
+        data={dataFinity}
         onChange={(data, key, checked, index) => {
           onChangeHeader(data, key, checked)
         }}
-        stateHeader={pointHeader}
+        stateHeader={finityHeader}
         subColumns={
           <TableSubRole
-            data={point}
+            data={finity}
             onChange={(data, index, key) => {
-              point[index] = data
-              const checkHeader = point.map((item: any) => {
+              finity[index] = data
+              const checkHeader = finity.map((item: any) => {
                 if (item[key].disabled === true) {
                   item[key].value = true
                 }
                 return item[key].value
               })
               const result = checkHeader.includes(false)
-              pointHeader[method.indexOf(key)] = result
-              setPoint(point)
-              setPointHeader([...pointHeader])
+              finityHeader[method.indexOf(key)] = result
+              setFinity(finity)
+              setFinityHeader([...finityHeader])
             }}
           />
         }

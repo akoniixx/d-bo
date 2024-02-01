@@ -32,6 +32,16 @@ export class PointSettingDatasource {
         console.log(err, 'err point-setting')
       })
   }
+  static getPointSettingApplication(app : string) : Promise<any> {
+    return httpClient
+      .get(BASE_URL + '/promotion/point/application/' + app)
+      .then((response) => {
+        return response.data
+      })
+      .catch((err) => {
+        console.log(err, 'err point-setting')
+      })
+  }
   static editPointSetting(data: PointSettingEntities): Promise<any> {
     return httpClient
       .patch(BASE_URL + `/promotion/point/` + data.id, data)

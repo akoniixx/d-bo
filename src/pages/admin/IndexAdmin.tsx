@@ -107,7 +107,7 @@ const IndexAdmin = () => {
       },
     },
     {
-      title: 'อัพเดทล่าสุด',
+      title: 'อัปเดตล่าสุด',
       dataIndex: 'updatedAt',
       key: 'updatedAt',
       render: (value: any, row: any, index: number) => {

@@ -226,7 +226,7 @@ function IndexDronerHistorySum() {
 
   const columns = [
     {
-      title: (a: any) => sortTitle('วันที่อัพเดต', 'updateAt'),
+      title: (a: any) => sortTitle('วันที่อัปเดต', 'updateAt'),
       dataIndex: 'updateAt',
       key: 'updateAt',
       width: '15%',

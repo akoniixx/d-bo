@@ -107,7 +107,7 @@ const ModalHistory: React.FC<ModalHistoryProps> = ({ show, backButton, data, cal
       },
     },
     {
-      title: 'ผู้อัพเดต',
+      title: 'ผู้อัปเดต',
       dataIndex: 'createBy',
       key: 'createBy',
       render: (value: any, row: any, index: number) => {

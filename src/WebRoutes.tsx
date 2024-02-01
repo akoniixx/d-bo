@@ -67,7 +67,8 @@ const RedeemHistoryFarmer = lazy(() => import('./pages/reward/farmer/RedeemHisto
 const IndexReceivePoint = lazy(() => import('./pages/point/IndexReceivePoint'))
 const IndexPlanningPoint = lazy(() => import('./pages/point/IndexPlanningPoint'))
 const DetailReceivePoint = lazy(() => import('./pages/point/DetailReceivePoint'))
-const IndexRedeem = lazy(() => import('./pages/redeem/IndexRedeem'))
+const IndexRedeemFarmer = lazy(() => import('./pages/redeem/IndexRedeemFarmer'))
+const IndexRedeemDroner = lazy(() => import('./pages/redeem/IndexRedeemDroner'))
 const DetailFarmerRedeem = lazy(() => import('./pages/redeem/DetailFarmerRedeem'))
 const DetailDronerRedeem = lazy(() => import('./pages/redeem/DetailDronerRedeem'))
 const IndexDronerSummaryPoint = lazy(() => import('./pages/point/droner/IndexDronerSummaryPoint'))
@@ -113,6 +114,17 @@ const IndexListStore = lazy(() => import('./pages/infinity/listStore/IndexListSt
 const DetailStore = lazy(() => import('./pages/infinity/listStore/DetailStore'))
 const CreditDroner = lazy(() => import('./pages/setting/credit/CreditDroner'))
 const DronerInfinity = lazy(() => import('./pages/infinity/droner/DronerInfinity'))
+const IndexTargetSpray = lazy(() => import('./pages/setting/targetSpray/IndexTargetSpray'))
+const InsertTargetSpray = lazy(() => import('./pages/setting/targetSpray/InsertTargetSpray'))
+const TargetSprayOrder = lazy(
+  () => import('./pages/setting/targetSpray/orderTarget/TargetSprayOrder'),
+)
+const IndexCrop = lazy(() => import('./pages/setting/crop/IndexCrop'))
+const AddCrop = lazy(() => import('./pages/setting/crop/AddCrop'))
+const EditCrop = lazy(() => import('./pages/setting/crop/EditCrop'))
+const ViewHisRedeem = lazy(() => import('./pages/point/historyRedeem/ViewHisRedeem'))
+const ViewDetailDroner = lazy(() => import('./pages/point/historyRedeem/ViewDetailDroner'))
+const ViewDetailFarmer = lazy(() => import('./pages/point/historyRedeem/ViewDetailFarmer'))
 
 const FallBack = () => {
   return (
@@ -189,7 +201,8 @@ const WebRoutes: React.FC<any> = () => {
             <Route path='/IndexReceivePoint' element={<IndexReceivePoint />} />
             <Route path='/IndexPlanningPoint' element={<IndexPlanningPoint />} />
             <Route path='/DetailReceivePoint/:id' element={<DetailReceivePoint />} />
-            <Route path='/IndexRedeem/:type' element={<IndexRedeem />} />
+            <Route path='/IndexRedeemFarmer' element={<IndexRedeemFarmer />} />
+            <Route path='/IndexRedeemDroner' element={<IndexRedeemDroner />} />
             <Route path='/DetailFarmerRedeem/:id' element={<DetailFarmerRedeem />} />
             <Route path='/DetailDronerRedeem/:id' element={<DetailDronerRedeem />} />
             <Route path='/IndexDronerSummaryPoint' element={<IndexDronerSummaryPoint />} />
@@ -206,7 +219,6 @@ const WebRoutes: React.FC<any> = () => {
             <Route path='/DetailDronerHistorySum/:id' element={<DetailDronerHistorySum />} />
             <Route path='/QuotaReport/:id' element={<QuotaReport />} />
             <Route path='/MissionReport/:id' element={<MissionReport />} />
-
             <Route path='/IndexQuota' element={<IndexQuota />} />
             <Route path='/AddQuota' element={<AddQuota />} />
             <Route path='/EditQuota/:id' element={<EditQuota />} />
@@ -238,6 +250,15 @@ const WebRoutes: React.FC<any> = () => {
             <Route path='/CreditDroner' element={<CreditDroner />} />
             <Route path='/DronerInfinity' element={<DronerInfinity />} />
             <Route path='/DronerInfinity/:id' element={<DronerInfinityCreditList />} />
+            <Route path='/IndexTargetSpray' element={<IndexTargetSpray />} />
+            <Route path='/InsertTargetSpray/:id' element={<InsertTargetSpray />} />
+            <Route path='/TargetSprayOrder' element={<TargetSprayOrder />} />
+            <Route path='/IndexCrop' element={<IndexCrop />} />
+            <Route path='/AddCrop' element={<AddCrop />} />
+            <Route path='/EditCrop/:id' element={<EditCrop />} />
+            <Route path='/ViewHisRedeem/:type' element={<ViewHisRedeem />} />
+            <Route path='/ViewDetailFarmer/:id' element={<ViewDetailFarmer />} />
+            <Route path='/ViewDetailDroner/:id' element={<ViewDetailDroner />} />
           </Route>
           <Route element={<PublicRoute />}>
             <Route index element={<AuthPage />} />

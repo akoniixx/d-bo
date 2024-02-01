@@ -32,7 +32,7 @@ import { TaskInprogressDatasource } from '../../../datasource/TaskInprogressData
 import { STATUS_COLOR_TASK_TODAY, TASK_TODAY_STATUS } from '../../../definitions/Status'
 import {
   DistrictEntity,
-  ProviceEntity,
+  ProvinceEntity,
   SubdistrictEntity,
 } from '../../../entities/LocationEntities'
 import { InvoiceTaskEntity } from '../../../entities/NewTaskEntities'
@@ -59,7 +59,7 @@ export default function IndexTodayTask() {
   const [isProblem, setIsProblem] = useState<boolean>()
   const [isDelay, setIsDelay] = useState<boolean>()
   const [statusDelay, setStatusDelay] = useState<any>()
-  const [province, setProvince] = useState<ProviceEntity[]>()
+  const [province, setProvince] = useState<ProvinceEntity[]>()
   const [district, setDistrict] = useState<DistrictEntity[]>()
   const [subdistrict, setSubdistrict] = useState<SubdistrictEntity[]>()
   const [visibleRating, setVisibleRating] = useState(false)

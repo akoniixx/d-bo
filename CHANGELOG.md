@@ -1,5 +1,46 @@
 ## [Version - 0]
 
+## improve [v0.47.1] 2024-1-19
+
+- change icon menu
+- enhance menu point and reward menu
+- enhance role management
+- fixed bug by admin
+
+## Feature [v0.47.0] 2024-1-24
+
+- crop and time period
+
+## improve [v0.46.5] 2024-1-19
+
+- target spray order
+
+## improve [v0.46.4] 2024-1-18
+
+- added Equal Price
+- added Sow Price
+
+## Fix [v0.46.3] 2024-1-18
+
+- detect number for form input setting point and detect value less than 0
+
+## Fix [v0.46.2] 2024-1-18
+
+- fix bug feature setting point for droner
+
+## Fix [v0.46.1] 2024-1-17
+
+- fix bug feature setting point
+
+## Feature [v0.46.0] 2024-1-17
+
+- add feature setting point for droner and farmer
+- add query dropdown role management
+
+## Feature [v0.45.0] 2024-1-17
+
+- master data target spray
+
 ## Fix [v0.44.3] 2024-1-15
 
 - fixed some bugs (cut off)

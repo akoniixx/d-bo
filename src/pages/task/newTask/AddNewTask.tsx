@@ -125,6 +125,7 @@ const AddNewTask = () => {
   const [targetSpray, setTargetSpray] = useState<TargetSpayEntities[]>([])
   const location = useLocation()
   const currentPath = location.pathname
+  const refTime = React.useRef<any>(null)
 
   const fetchFarmerList = () => {
     TaskDatasource.getFarmerListTask(searchFilterFarmer, currenSearch, rowFarmer).then(
@@ -141,7 +142,7 @@ const AddNewTask = () => {
     )
   }
   const getAllTargetSpray = async () => {
-    await TargetSpray.getAllTargetSpray().then((res) => {
+    await TargetSpray.getAllTargetSprayOnTask().then((res) => {
       setTargetSpray(res.data)
       setSomeTargetSpray(res.data.map((item: any) => item.name))
     })
@@ -227,6 +228,7 @@ const AddNewTask = () => {
     setDataFarmer(farmerSelected)
     checkValidateStep(f.toJS(), current)
   }
+
   const handleSelectFarmerPlot = (value: any) => {
     const plotSelected = farmerSelected?.farmerPlot.filter((x: any) => x.id === value)[0]
     setPriceMethod('อัตโนมัติ')
@@ -418,6 +420,7 @@ const AddNewTask = () => {
                     borderRadius: '5px',
                     backgroundColor: 'rgba(33, 150, 83, 0.1)',
                     color: color.Success,
+                    height: '38px',
                   }}
                   onClick={handleSelectFarmer}
                 >
@@ -448,10 +451,13 @@ const AddNewTask = () => {
                   <Form.Item>
                     <AntdSelect
                       status={checkSelectPlot}
+                      allowClear
+                      className='col-lg-12 p-1'
                       placeholder='เลือกแปลง'
                       onChange={handleSelectFarmerPlot}
+                      showSearch
+                      optionFilterProp='children'
                       disabled={current === 2}
-                      defaultValue={createNewTask.farmerPlotId}
                       value={farmerPlotId}
                     >
                       {dataFarmer.farmerPlot.map((item) => (
@@ -682,7 +688,7 @@ const AddNewTask = () => {
                     return current.isBefore(yesterday)
                   }}
                   onChange={handleDateAppointment}
-                  defaultValue={moment(dateAppointment)}
+                  value={moment(dateAppointment)}
                 />
               </div>
             </div>
@@ -691,12 +697,30 @@ const AddNewTask = () => {
               <div>
                 <TimePicker
                   className='col-lg-12'
-                  disabled={current === 2 || checkSelectPlot === 'error'}
-                  format={timeFormat}
-                  onSelect={(v) => {
-                    setTimeAppointment(v)
-                  }}
                   value={moment(timeAppointment)}
+                  onChange={(e) => {
+                    setTimeAppointment(e)
+                  }}
+                  format={'HH:mm'}
+                  placeholder='เลือกเวลา'
+                  allowClear={false}
+                  ref={refTime}
+                  disabled={current === 2 || checkSelectPlot === 'error'}
+                  inputRender={(props) => {
+                    return (
+                      <input
+                        {...props}
+                        onBlur={(e) => {
+                          props.onBlur?.(e)
+                          const convertToMoment = moment(e.target.value, 'HH:mm')
+                          setTimeAppointment(convertToMoment)
+                        }}
+                      />
+                    )
+                  }}
+                  onBlur={() => {
+                    refTime.current.blur()
+                  }}
                 />
               </div>
             </div>
@@ -736,8 +760,9 @@ const AddNewTask = () => {
                     disabled={current === 2 || checkSelectPlot === 'error'}
                     onChange={handlePurposeSpray}
                     defaultChecked={item.isChecked}
-                  />
-                  <label style={{ padding: '0 8px 0 8px' }}>{item.name}</label>
+                  >
+                    {item.name}
+                  </Checkbox>
                   {item.name === 'อื่นๆ' && (
                     <>
                       <Input

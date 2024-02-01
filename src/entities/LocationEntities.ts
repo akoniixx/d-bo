@@ -1,9 +1,9 @@
-export interface ProviceEntity {
+export interface ProvinceEntity {
   provinceId: number
   provinceName: string
   region: string
 }
-export const ProvinceEntity_INIT: ProviceEntity = {
+export const ProvinceEntity_INIT: ProvinceEntity = {
   provinceId: 0,
   provinceName: '',
   region: '',
@@ -43,4 +43,14 @@ export const SubdistrictEntity_INIT: SubdistrictEntity = {
   lat: '',
   long: '',
   postcode: '',
+}
+export interface ProvincePriceEntity {
+  provinceId: number
+  price: any
+  provinceName?: string
+}
+export const ProvincePriceEntity_INIT: ProvincePriceEntity = {
+  provinceId: 0,
+  price: '',
+  provinceName: '',
 }

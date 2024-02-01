@@ -17,8 +17,8 @@ import {
   followJob,
   missionJob,
   newsJob,
+  oneFinity,
   pointJob,
-  pointSettingJob,
   promotionJob,
   rewardJob,
   settingJob,
@@ -59,10 +59,6 @@ function EditPermission() {
     name: 'ภารกิจ',
     value: missionJob,
   })
-  const [point, setPoint] = useState({
-    name: 'แต้ม',
-    value: pointSettingJob,
-  })
   const [pointResult, setPointResult] = useState({
     name: 'แต้มสะสม',
     value: pointJob,
@@ -71,6 +67,10 @@ function EditPermission() {
     name: 'โปรโมชั่น',
     value: promotionJob,
   })
+  const [finity, setDataFinity] = useState({
+    name: 'ระบบ 1-finity',
+    value: oneFinity,
+  })
   const [reward, setReward] = useState({
     name: 'ของรางวัล',
     value: rewardJob,
@@ -78,14 +78,6 @@ function EditPermission() {
   const [settings, setSettings] = useState({
     name: 'ตั้งค่า',
     value: settingJob,
-  })
-  const [reportPoint, setReportPoint] = useState({
-    name: 'รายงานแต้ม',
-    value: pointJob.pointResult[0].subItem,
-  })
-  const [redeemPoint, setRedeemPoint] = useState({
-    name: 'แลกแต้ม/ของรางวัล',
-    value: pointJob.pointResult[1].subItem,
   })
   const [form] = Form.useForm()
   const [loading, setReloading] = useState<boolean>(true)
@@ -104,6 +96,12 @@ function EditPermission() {
           ...admin,
           value: {
             admin: res.admin,
+          },
+        })
+        setDataFinity({
+          ...finity,
+          value: {
+            finity: res.finity,
           },
         })
         setChallenge({
@@ -136,12 +134,6 @@ function EditPermission() {
             mission: res.mission,
           },
         })
-        setPoint({
-          ...point,
-          value: {
-            point: res.point,
-          },
-        })
         setPointResult({
           ...pointResult,
           value: {
@@ -164,18 +156,6 @@ function EditPermission() {
           ...settings,
           value: {
             settings: res.settings,
-          },
-        })
-        setReportPoint({
-          ...reportPoint,
-          value: {
-            subPointResult: res.pointResult[0].subItem.subPointResult,
-          },
-        })
-        setRedeemPoint({
-          ...redeemPoint,
-          value: {
-            subPointResult: res.pointResult[1].subItem.subPointResult,
           },
         })
         form.setFieldsValue({
@@ -234,8 +214,8 @@ function EditPermission() {
     payload.reward = reward.value?.reward
     payload.pointResult = pointResult.value?.pointResult
     payload.settings = settings.value?.settings
-    payload.point = point.value?.point
     payload.promotion = promotion.value?.promotion
+    payload.finity = finity.value?.finity
     await RoleManage.updateRole(payload)
       .then((res) => {
         setSaveBtnDisable(false)
@@ -278,12 +258,10 @@ function EditPermission() {
           dataMission={[mission]}
           dataPromotion={[promotion]}
           dataPointResult={[pointResult]}
-          dataReportPoint={[reportPoint]}
-          dataRedeemPoint={[redeemPoint]}
           dataAdmin={[admin]}
           dataSetting={[settings]}
-          dataPoint={[point]}
           dataChallenge={[challenge]}
+          dataFinity={[finity]}
         />
         <FooterPage
           onClickBack={() => navigate(-1)}

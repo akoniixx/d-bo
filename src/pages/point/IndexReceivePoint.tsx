@@ -283,7 +283,7 @@ const IndexReceivePoint = () => {
 
   const columns = [
     {
-      title: 'วันที่อัพเดท',
+      title: 'วันที่อัปเดต',
       dataIndex: 'dateTime',
       key: 'dateTime',
       render: (value: any, row: any, index: number) => {

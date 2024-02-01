@@ -11,6 +11,7 @@ import Swal from 'sweetalert2'
 import { ExclamationCircleOutlined } from '@ant-design/icons'
 import { useNavigate } from 'react-router-dom'
 import { RoleManage } from '../../datasource/RoleManageDatasource'
+import { useQuery } from 'react-query'
 
 const _ = require('lodash')
 const { Map } = require('immutable')
@@ -22,6 +23,17 @@ const EditAdmin = () => {
   const admidId = queryString[1]
   const [showBtn, setShowBtn] = useState<boolean>(true)
   const [data, setData] = useState<UserStaffEntity>(UserStaffEntity_INIT)
+  const fetchRole = async() => {
+    const data = await RoleManage.getRoleOnly()
+    const result = data.map((item : any)=> {
+      return {
+        label : item.role,
+        value : item.id
+      }
+    })
+    return result
+  }
+  const getRole = useQuery(['role'],()=>fetchRole())
   const textUserName = (
     <span>
       ● ตัวอักษรภาษาอังกฤษ
@@ -192,14 +204,14 @@ const EditAdmin = () => {
             บทบาท <span style={{ color: 'red' }}>*</span>
           </label>
           <Form.Item name='role'>
-            <Select
-              placeholder='เลือกบทบาท'
-              defaultValue={data.role}
-              onChange={handleOnChangeSelect}
-            >
-              {ROLE_ADMIN.map((item, index) => (
-                <option key={index} value={item.key}></option>
-              ))}
+            <Select placeholder='เลือกบทบาท' defaultValue={data.role} onChange={handleOnChangeSelect}>
+              {
+                getRole.isLoading ? []:
+                getRole.isError ? [] :
+                getRole.data.map((item : any,index : number)=>(
+                  <option key={index} value={item.value}>{item.label}</option>
+                ))
+              }
             </Select>
           </Form.Item>
         </div>

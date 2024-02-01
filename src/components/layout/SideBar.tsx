@@ -155,7 +155,7 @@ export const pathLists = (isAccounting: boolean, isAdminTask?: boolean) => {
         {
           path: 'listPoint',
           name: 'listPoint',
-          title: 'รายการแต้ม',
+          title: 'รายงานแต้ม',
           subMenu: [
             {
               path: '/IndexPlanningPoint',
@@ -170,18 +170,18 @@ export const pathLists = (isAccounting: boolean, isAdminTask?: boolean) => {
               subMenu: [],
             },
             {
-              path: '/IndexRedeem/Farmer',
-              name: 'IndexRedeem/Farmer',
-              title: 'แลกแต้ม/ของรางวัล',
-              subMenu: [],
-            },
-            {
-              path: '/IndexPointManual',
-              name: 'IndexPointManual',
-              title: 'รายการแต้มพิเศษ',
+              path: '/ViewHisRedeem/Farmer',
+              name: 'ViewHisRedeem/Farmer',
+              title: 'ประวัติการแลก',
               subMenu: [],
             },
           ],
+        },
+        {
+          path: '/IndexPointManual',
+          name: 'IndexPointManual',
+          title: 'รายการแต้มพิเศษ',
+          subMenu: [],
         },
         {
           path: 'summaryPoint',
@@ -219,12 +219,12 @@ export const pathLists = (isAccounting: boolean, isAdminTask?: boolean) => {
       title: 'ของรางวัล',
       permission: null,
       subMenu: [
-        // {
-        //   path: 'listReward',
-        //   name: 'listReward',
-        //   title: 'รายการของรางวัล',
-        //   permission: null,
-        //   subMenu: [
+        {
+          path: 'listReward',
+          name: 'listReward',
+          title: 'รายการของรางวัล',
+          permission: null,
+          subMenu: [
             {
               path: '/IndexRewardDroner',
               name: 'IndexRewardDroner',
@@ -232,15 +232,37 @@ export const pathLists = (isAccounting: boolean, isAdminTask?: boolean) => {
               permission: null,
               subMenu: [],
             },
-        //     {
-        //       path: '/IndexRewardFarmer',
-        //       name: 'IndexRewardFarmer',
-        //       title: 'เกษตรกร',
-        //       permission: null,
-        //       subMenu: [],
-        //     },
-        //   ],
-        // },
+            {
+              path: '/IndexRewardFarmer',
+              name: 'IndexRewardFarmer',
+              title: 'เกษตรกร',
+              permission: null,
+              subMenu: [],
+            },
+          ],
+        },
+        {
+          path: 'historyRedeem',
+          name: 'historyRedeem',
+          title: 'ประวัติการแลก',
+          permission: null,
+          subMenu: [
+            {
+              path: '/IndexRedeemDroner',
+              name: 'IndexRedeemDroner',
+              title: 'นักบินโดรน',
+              permission: null,
+              subMenu: [],
+            },
+            {
+              path: '/IndexRedeemFarmer',
+              name: 'IndexRedeemFarmer',
+              title: 'เกษตรกร',
+              permission: null,
+              subMenu: [],
+            },
+          ],
+        },
       ],
     },
     {
@@ -300,9 +322,28 @@ export const pathLists = (isAccounting: boolean, isAdminTask?: boolean) => {
           subMenu: [],
         },
         {
+          path: '/IndexCrop',
+          name: 'IndexCrop',
+          title: 'รายชื่อพืช',
+          subMenu: [],
+        },
+        {
+          path: '/Target',
+          name: 'Target',
+          title: 'เป้าหมาย',
+          subMenu: [
+            {
+              path: '/IndexTargetSpray',
+              name: 'IndexTargetSpray',
+              title: 'ฉีดพ่น',
+              subMenu: [],
+            },
+          ],
+        },
+        {
           path: '/PricePage',
           name: 'PricePage',
-          title: 'ราคาฉีดพ่น',
+          title: 'ราคา',
           subMenu: [],
         },
         {
@@ -311,9 +352,15 @@ export const pathLists = (isAccounting: boolean, isAdminTask?: boolean) => {
           title: 'แต้ม',
           subMenu: [
             {
+              path: '/ConditionDroner',
+              name: 'ConditionDroner',
+              title: 'นักบินโดรน',
+              subMenu: [],
+            },
+            {
               path: '/ConditionFarmer',
               name: 'ConditionFarmer',
-              title: 'เงื่อนไขเกษตรกร',
+              title: 'เกษตรกร',
               subMenu: [],
             },
           ],
@@ -336,7 +383,7 @@ export const pathLists = (isAccounting: boolean, isAdminTask?: boolean) => {
     {
       path: 'infinity',
       name: 'infinity',
-      title: 'ระบบ 1-Finity',
+      title: 'ระบบ 1-finity',
       subMenu: [
         {
           path: '/DronerInfinity',
