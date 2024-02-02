@@ -21,7 +21,7 @@ import {
   Table,
 } from 'antd'
 import moment from 'moment'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import ActionButton from '../../../components/button/ActionButton'
 import { CardContainer } from '../../../components/card/CardContainer'
@@ -30,10 +30,18 @@ import { CAMPAINGTYPE, STATUS_COLOR_MAPPING, STATUS_COUPON } from '../../../defi
 import { CampaignListEntity } from '../../../entities/CampaignPointEntites'
 import { color } from '../../../resource'
 import { DateTimeUtil } from '../../../utilities/DateTimeUtil'
+import { useRecoilValueLoadable } from 'recoil'
+import { getUserRoleById } from '../../../store/ProfileAtom'
 const { RangePicker } = DatePicker
 const dateSearchFormat = 'YYYY-MM-DD'
 
 const IndexDronerMission = () => {
+  const role = useRecoilValueLoadable(getUserRoleById)
+  const currentRole = role.state === 'hasValue' ? role.contents : null
+  const missionDronerRole = useMemo(() => {
+    const find = currentRole?.mission.find((el) => el.name === 'นักบินโดรน')
+    return find
+  }, [currentRole?.mission])
   const navigate = useNavigate()
   const dateFormat = 'DD/MM/YYYY'
   const row = 10
@@ -120,19 +128,21 @@ const IndexDronerMission = () => {
             onCalendarChange={(val) => handleSearchDate(val)}
           />
         </Col>
-        <Col span={2}>
-          <Button
-            style={{
-              borderColor: color.Success,
-              borderRadius: '5px',
-              color: color.secondary2,
-              backgroundColor: color.Success,
-            }}
-            onClick={() => navigate('/AddDronerMission')}
-          >
-            + เพิ่มภารกิจ
-          </Button>
-        </Col>
+        {missionDronerRole?.add.value && (
+          <Col span={2}>
+            <Button
+              style={{
+                borderColor: color.Success,
+                borderRadius: '5px',
+                color: color.secondary2,
+                backgroundColor: color.Success,
+              }}
+              onClick={() => navigate('/AddDronerMission')}
+            >
+              + เพิ่มภารกิจ
+            </Button>
+          </Col>
+        )}
       </Row>
       <div className='container d-flex justify-content-between' style={{ padding: '8px' }}>
         <div className='col-lg-6 p-1'>
@@ -429,24 +439,28 @@ const IndexDronerMission = () => {
                   onClick={() => navigate(`/MissionReport/id=${row.id}`)}
                 />
               </div>
-              <div className='col-lg-4'>
-                <ActionButton
-                  icon={<EditOutlined />}
-                  color={color.primary1}
-                  onClick={() => navigate(`/EditDronerMission/id=${row.id}`)}
-                />
-              </div>
-              <div className='col-lg-4'>
-                <ActionButton
-                  icon={<DeleteOutlined />}
-                  color={row.isDeleteDroner ? color.Grey : color.Error}
-                  onClick={() => {
-                    setShowModal(!showModal)
-                    setDeleteId(row.id)
-                  }}
-                  actionDisable={row.isDeleteDroner}
-                />
-              </div>
+              {missionDronerRole?.edit.value && (
+                <div className='col-lg-4'>
+                  <ActionButton
+                    icon={<EditOutlined />}
+                    color={color.primary1}
+                    onClick={() => navigate(`/EditDronerMission/id=${row.id}`)}
+                  />
+                </div>
+              )}
+              {missionDronerRole?.delete.value && (
+                <div className='col-lg-4'>
+                  <ActionButton
+                    icon={<DeleteOutlined />}
+                    color={row.isDeleteDroner ? color.Grey : color.Error}
+                    onClick={() => {
+                      setShowModal(!showModal)
+                      setDeleteId(row.id)
+                    }}
+                    actionDisable={row.isDeleteDroner}
+                  />
+                </div>
+              )}
             </div>
           ),
         }

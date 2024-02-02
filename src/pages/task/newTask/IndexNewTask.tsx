@@ -16,6 +16,7 @@ import {
   Image,
   Input,
   Menu,
+  MenuProps,
   Pagination,
   PaginationProps,
   Select,
@@ -23,7 +24,7 @@ import {
   Table,
 } from 'antd'
 import moment from 'moment'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import Swal from 'sweetalert2'
 import ActionButton from '../../../components/button/ActionButton'
 import { CardContainer } from '../../../components/card/CardContainer'
@@ -46,6 +47,8 @@ import { listAppType } from '../../../definitions/ApplicatoionTypes'
 import { ListCheck } from '../../../components/dropdownCheck/ListStatusAppType'
 import { ModalAcceptedTask } from '../../../components/modal/ModalAcceptedTask'
 import ShowNickName from '../../../components/popover/ShowNickName'
+import { useRecoilValueLoadable } from 'recoil'
+import { getUserRoleById } from '../../../store/ProfileAtom'
 
 const { RangePicker } = DatePicker
 const dateFormat = 'DD-MM-YYYY'
@@ -53,6 +56,9 @@ const dateSearchFormat = 'YYYY-MM-DD'
 
 const IndexNewTask = () => {
   const profile = JSON.parse(localStorage.getItem('profile') || '{  }')
+  const role = useRecoilValueLoadable(getUserRoleById)
+  const currentRole = role.state === 'hasValue' ? role.contents : null
+
   const navigate = useNavigate()
   const [row, setRow] = useState(10)
   const [current, setCurrent] = useState(1)
@@ -181,22 +187,24 @@ const IndexNewTask = () => {
     setCurrent(current)
     setRow(pageSize)
   }
-  const menu = (
-    <Menu
-      items={[
-        {
-          label: 'เลือกนักบินหลายคน (แบบปกติ)',
-          key: '1',
-          onClick: () => navigate('/AddNewTask=checkbox'),
-        },
-        {
-          label: 'บังคับเลือกนักบิน (ติดต่อแล้ว)',
-          key: '2',
-          onClick: () => navigate('/AddNewTask=radio'),
-        },
-      ]}
-    />
-  )
+  const menu: MenuProps['items'] = [
+    {
+      label: 'เลือกนักบินหลายคน (แบบปกติ)',
+      key: '1',
+      onClick: () => navigate('/AddNewTask=checkbox'),
+    },
+    {
+      label: 'บังคับเลือกนักบิน (ติดต่อแล้ว)',
+      key: '2',
+      onClick: () => navigate('/AddNewTask=radio'),
+    },
+  ]
+  const followJobRole = useMemo(() => {
+    const find = currentRole?.followJob.find((el) => {
+      return el.name === 'งานใหม่ (รอนักบิน)'
+    })
+    return find
+  }, [])
   const pageTitle = (
     <>
       <div className='d-flex justify-content-between' style={{ padding: '10px' }}>
@@ -214,25 +222,38 @@ const IndexNewTask = () => {
         </div>
         <div style={{ color: color.Error, textAlign: 'end' }}>
           <RangePicker
-            style={{ right: '4px' }}
             allowClear
             onCalendarChange={(val) => handleSearchDate(val)}
             format={dateFormat}
           />
-          <Dropdown overlay={menu}>
-            <Button
-              style={{
-                padding: '8 0',
-                backgroundColor: color.primary1,
-                color: color.secondary2,
-                borderColor: color.Success,
-                borderRadius: '5px',
-              }}
-            >
-              เพิ่มงานบินโดรนใหม่
-              <DownOutlined />
-            </Button>
-          </Dropdown>
+
+          {followJobRole?.add.value && (
+            <>
+              <div
+                style={{
+                  width: 4,
+                }}
+              />
+              <Dropdown
+                menu={{
+                  items: menu,
+                }}
+              >
+                <Button
+                  style={{
+                    padding: '8 0',
+                    backgroundColor: color.primary1,
+                    color: color.secondary2,
+                    borderColor: color.Success,
+                    borderRadius: '5px',
+                  }}
+                >
+                  เพิ่มงานบินโดรนใหม่
+                  <DownOutlined />
+                </Button>
+              </Dropdown>
+            </>
+          )}
         </div>
       </div>
       <div className=' d-flex justify-content-between pb-3'>
@@ -552,20 +573,24 @@ const IndexNewTask = () => {
         return {
           children: (
             <div className='d-flex flex-row justify-content-center'>
-              <div className='col-lg-6'>
-                <ActionButton
-                  icon={<EditOutlined />}
-                  color={color.primary1}
-                  onClick={() => checkDronerReceive(row.id)}
-                />
-              </div>
-              <div className='col-lg-6'>
-                <ActionButton
-                  icon={<ExceptionOutlined />}
-                  color={color.Error}
-                  onClick={() => removeNewTask(row.id)}
-                />
-              </div>
+              {followJobRole?.edit.value && (
+                <div className='col-lg-6'>
+                  <ActionButton
+                    icon={<EditOutlined />}
+                    color={color.primary1}
+                    onClick={() => checkDronerReceive(row.id)}
+                  />
+                </div>
+              )}
+              {followJobRole?.delete.value && (
+                <div className='col-lg-6'>
+                  <ActionButton
+                    icon={<ExceptionOutlined />}
+                    color={color.Error}
+                    onClick={() => removeNewTask(row.id)}
+                  />
+                </div>
+              )}
             </div>
           ),
         }

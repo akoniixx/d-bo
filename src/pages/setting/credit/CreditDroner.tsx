@@ -1,5 +1,5 @@
 import { Button, Form, Input, Row } from 'antd'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { CardContainer } from '../../../components/card/CardContainer'
 import { CardHeader } from '../../../components/header/CardHearder'
 import { color } from '../../../resource'
@@ -10,9 +10,18 @@ import {
 } from '../../../entities/CreditSettingEntities'
 import { useLocalStorage } from '../../../hook/useLocalStorage'
 import Swal from 'sweetalert2'
+import { useRecoilValueLoadable } from 'recoil'
+import { getUserRoleById } from '../../../store/ProfileAtom'
+import { numberWithCommas } from '../../../utilities/TextFormatter'
 
 function CreditDroner() {
   const [form] = Form.useForm()
+  const role = useRecoilValueLoadable(getUserRoleById)
+  const currentRole = role.state === 'hasValue' ? role.contents : null
+  const settingRole = useMemo(() => {
+    const find = currentRole?.settings.find((el) => el.name === 'เครดิต')
+    return find
+  }, [currentRole?.settings])
   const [dataCredit, setDataCredit] = useState<CreditSettingEntity>(CreditSettingEntity_INIT)
   const [profile] = useLocalStorage('profile', [])
 
@@ -109,12 +118,13 @@ function CreditDroner() {
                 <span className='text-danger'> *</span>
               </label>
               <Input
+                disabled={!settingRole?.edit.value}
                 name='point'
                 placeholder='กรอกแต้ม'
                 suffix='แต้ม / 1 เครดิต'
                 autoComplete='off'
                 onChange={(e) => handleOnPoint(e)}
-                value={dataCredit.pointCredit || undefined}
+                value={numberWithCommas(dataCredit.pointCredit) || undefined}
               />
             </div>
             <div className='col-lg'>
@@ -123,12 +133,13 @@ function CreditDroner() {
                 <span className='text-danger'> *</span>
               </label>
               <Input
+                disabled={!settingRole?.edit.value}
                 name='money'
                 placeholder='กรอกเงิน'
                 suffix='บาท / 1 เครดิต'
                 autoComplete='off'
                 onChange={(e) => handleOnCredit(e)}
-                value={dataCredit.cashCredit || undefined}
+                value={numberWithCommas(dataCredit.cashCredit) || undefined}
               />
             </div>
           </div>
@@ -137,6 +148,7 @@ function CreditDroner() {
       <div className='col-lg'>
         <Row className='d-flex justify-content-between p-3'>
           <Button
+            disabled={!settingRole?.edit.value}
             style={{
               backgroundColor: color.White,
               borderColor: color.Success,
@@ -148,7 +160,7 @@ function CreditDroner() {
             คืนค่าเดิม
           </Button>
           <Button
-            disabled={isDisabled}
+            disabled={isDisabled || !settingRole?.edit.value}
             style={{
               backgroundColor: isDisabled ? color.Grey : color.Success,
               borderColor: isDisabled ? color.Grey : color.Success,

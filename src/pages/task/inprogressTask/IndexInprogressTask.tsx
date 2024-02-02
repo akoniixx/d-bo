@@ -2,7 +2,6 @@ import {
   CaretDownOutlined,
   CaretUpOutlined,
   EditOutlined,
-  InfoCircleFilled,
   SearchOutlined,
   UserOutlined,
 } from '@ant-design/icons'
@@ -10,19 +9,17 @@ import {
   Badge,
   Button,
   DatePicker,
-  Divider,
   Image,
   Input,
   Pagination,
   PaginationProps,
-  Popover,
   Select,
   Spin,
   Table,
   Tooltip,
 } from 'antd'
 import moment from 'moment'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import ActionButton from '../../../components/button/ActionButton'
 import { CardContainer } from '../../../components/card/CardContainer'
 import ModalMapPlot from '../../../components/modal/task/newTask/ModalMapPlot'
@@ -44,6 +41,8 @@ import { useNavigate } from 'react-router-dom'
 import { listAppType } from '../../../definitions/ApplicatoionTypes'
 import { ListCheck } from '../../../components/dropdownCheck/ListStatusAppType'
 import ShowNickName from '../../../components/popover/ShowNickName'
+import { useRecoilValueLoadable } from 'recoil'
+import { getUserRoleById } from '../../../store/ProfileAtom'
 
 const { RangePicker } = DatePicker
 const dateFormat = 'DD/MM/YYYY'
@@ -51,6 +50,8 @@ const timeFormat = 'HH:mm'
 const dateSearchFormat = 'YYYY-MM-DD'
 
 const IndexInprogressTask = () => {
+  const role = useRecoilValueLoadable(getUserRoleById)
+  const currentRole = role.state === 'hasValue' ? role.contents : null
   const navigate = useNavigate()
   const [row, setRow] = useState(10)
   const [current, setCurrent] = useState(1)
@@ -118,6 +119,11 @@ const IndexInprogressTask = () => {
       setSubdistrict(res)
     })
   }
+  const inProgressTaskRole = useMemo(() => {
+    const find = currentRole?.followJob?.find((item) => item.name === 'งานรอดำเนินงาน')
+    return find
+  }, [currentRole])
+
   useEffect(() => {
     LocationDatasource.getDistrict(searchProvince).then((res) => {
       setDistrict(res)
@@ -692,7 +698,7 @@ const IndexInprogressTask = () => {
       key: 'Action',
       render: (value: any, row: any, index: number) => {
         return {
-          children: (
+          children: inProgressTaskRole?.edit.value && (
             <div className='d-flex flex-row justify-content-between'>
               <ActionButton
                 icon={<EditOutlined />}

@@ -12,7 +12,7 @@ import {
   Table,
   Tabs,
 } from 'antd'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { color, icon } from '../../../resource'
 import {
@@ -35,8 +35,16 @@ import moment from 'moment'
 import ModalDelete from '../../../components/modal/ModalDelete'
 import { AllGuruKasetEntities } from '../../../entities/GuruKasetEntities'
 import { GuruKasetDataSource } from '../../../datasource/GuruKasetDatasource'
+import { useRecoilValueLoadable } from 'recoil'
+import { getUserRoleById } from '../../../store/ProfileAtom'
 
 function IndexGuru() {
+  const role = useRecoilValueLoadable(getUserRoleById)
+  const currentRole = role.state === 'hasValue' ? role.contents : null
+  const guruRole = useMemo(() => {
+    return currentRole?.guru.find((el) => el.name === 'กูรูเกษตร')
+  }, [currentRole?.guru])
+
   const [loading, setLoading] = useState<boolean>(false)
   const { RangePicker } = DatePicker
 
@@ -464,24 +472,28 @@ function IndexGuru() {
                   />
                 )}
               </div> */}
-              <div className='pr-1'>
-                <ActionButton
-                  icon={<EditOutlined />}
-                  color={color.primary1}
-                  onClick={() => {
-                    navigate('/EditArticleGuru/id=' + row._id)
-                  }}
-                />
-              </div>
-              <div className='pr-1'>
-                <ActionButton
-                  icon={<DeleteOutlined />}
-                  color={color.Error}
-                  onClick={() => {
-                    showDelete(row._id)
-                  }}
-                />
-              </div>
+              {guruRole?.edit?.value && (
+                <div className='pr-1'>
+                  <ActionButton
+                    icon={<EditOutlined />}
+                    color={color.primary1}
+                    onClick={() => {
+                      navigate('/EditArticleGuru/id=' + row._id)
+                    }}
+                  />
+                </div>
+              )}
+              {guruRole?.delete?.value && (
+                <div className='pr-1'>
+                  <ActionButton
+                    icon={<DeleteOutlined />}
+                    color={color.Error}
+                    onClick={() => {
+                      showDelete(row._id)
+                    }}
+                  />
+                </div>
+              )}
             </div>
           ),
         }
@@ -502,31 +514,33 @@ function IndexGuru() {
           <div className='p-1'>
             <RangePicker allowClear onCalendarChange={handleChangeDateRange} format='DD/MM/YYYY' />
           </div>
-          <div className='p-1'>
-            <Dropdown
-              overlay={
-                <Menu>
-                  <Menu.Item key='article' onClick={() => navigate('/AddArticleGuru')}>
-                    เพิ่มบทความ
-                  </Menu.Item>
-                  {/* <Menu.Item key='video' onClick={() => navigate('/AddVideoGuru')}>
+          {guruRole?.add?.value && (
+            <div className='p-1'>
+              <Dropdown
+                overlay={
+                  <Menu>
+                    <Menu.Item key='article' onClick={() => navigate('/AddArticleGuru')}>
+                      เพิ่มบทความ
+                    </Menu.Item>
+                    {/* <Menu.Item key='video' onClick={() => navigate('/AddVideoGuru')}>
                     เพิ่มวิดีโอ
                   </Menu.Item> */}
-                </Menu>
-              }
-            >
-              <Button
-                style={{
-                  backgroundColor: color.primary1,
-                  color: color.secondary2,
-                  borderColor: color.Success,
-                  borderRadius: '5px',
-                }}
+                  </Menu>
+                }
               >
-                + เพิ่มบทความ/วิดีโอ <DownOutlined style={{ fontSize: '16px' }} />
-              </Button>
-            </Dropdown>
-          </div>
+                <Button
+                  style={{
+                    backgroundColor: color.primary1,
+                    color: color.secondary2,
+                    borderColor: color.Success,
+                    borderRadius: '5px',
+                  }}
+                >
+                  + เพิ่มบทความ/วิดีโอ <DownOutlined style={{ fontSize: '16px' }} />
+                </Button>
+              </Dropdown>
+            </div>
+          )}
         </div>
       </div>
       <div className='pt-3'>

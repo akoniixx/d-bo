@@ -18,9 +18,14 @@ import { useNavigate } from 'react-router-dom'
 import CheckRatingDroner from '../../components/dropdownCheck/CheckRatingDroner'
 import { formatNumberWithCommas, validateOnlyNumWDecimal } from '../../utilities/TextFormatter'
 import ShowNickName from '../../components/popover/ShowNickName'
+import { useRecoilValueLoadable } from 'recoil'
+import { getUserRoleById } from '../../store/ProfileAtom'
 
 export default function IndexRankDroner() {
   const navigate = useNavigate()
+  const role = useRecoilValueLoadable(getUserRoleById)
+  const currentRole = role.state === 'hasValue' ? role.contents : null
+
   const row = 10
   const [current, setCurrent] = useState(1)
   const [data, setData] = useState<DronerRankListEntity>()

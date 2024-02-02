@@ -1,14 +1,18 @@
-import { Menu, Button } from 'antd'
-import Layout, { Content, Footer, Header } from 'antd/lib/layout/layout'
+import { Button, TimePicker } from 'antd'
+import Layout, { Header } from 'antd/lib/layout/layout'
 import Sider from 'antd/lib/layout/Sider'
-import React, { Children, useEffect, useState } from 'react'
+import React, { useEffect, useMemo } from 'react'
 import { LogoutOutlined } from '@ant-design/icons'
-import { Link, useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import color from '../../resource/color'
 import icon from '../../resource/icon'
 import { useLocalStorage } from '../../hook/useLocalStorage'
 import { MenuSide } from './MenuSide'
 import { pathLists } from './SideBar'
+import { useRecoilValueLoadable } from 'recoil'
+import { getUserRoleById } from '../../store/ProfileAtom'
+import { listMenu } from '../../entities/RoleEntities'
+import { mappingRoles, mappingSubAllMenu } from '../../definitions/RolesMappingObj'
 
 const logout = () => {
   localStorage.clear()
@@ -16,9 +20,21 @@ const logout = () => {
   const url = window.location.origin + '/AuthPage'
   window.location.href = url
 }
+
 const NavSidebar: React.FC<any> = ({ children }) => {
+  const data = useRecoilValueLoadable(getUserRoleById)
+  const currentRole = data.state === 'hasValue' ? data.contents : null
+
   const [persistedProfile, setPersistedProfile] = useLocalStorage('profile', [])
-  const listReportAcc = ['ick_accounting', 'minkact', 'arisa.m@iconkaset', 'nathapon', 'issariya']
+
+  const listReportAcc = [
+    'ick_accounting',
+    'minkact',
+    'arisa.m@iconkaset',
+    'nathapon',
+    'issariya',
+    // 'user02',
+  ]
   const listAdminTask = [
     'Khanittha.w',
     'oatchara.s@iconkaset',
@@ -26,11 +42,54 @@ const NavSidebar: React.FC<any> = ({ children }) => {
     'sawatdee.k',
     'natarkarn.h',
     'saimhai',
+    'user02',
   ]
   const checkReportAcc = listReportAcc.includes(persistedProfile.username)
   const checkAdminTask = listAdminTask.includes(persistedProfile.username)
   const isReportAccount = checkReportAcc
   const isAdminTask = checkAdminTask
+  const newSideBarWithPermission = useMemo(() => {
+    const currentPathList = pathLists(isReportAccount, isAdminTask)
+    if (currentRole) {
+      const newSideBar = currentPathList.filter((el) => {
+        const key = mappingRoles[el.name as keyof typeof mappingRoles]
+
+        const currentRoleKey: listMenu[] = currentRole[key as keyof typeof currentRole]
+        if (currentRoleKey) {
+          const isHaveSomeView = currentRoleKey.some((role) => {
+            return role.view.value
+          })
+          return isHaveSomeView
+        }
+      })
+
+      const mutateNewSubMenus = newSideBar.map((el) => {
+        const key = mappingRoles[el.name as keyof typeof mappingRoles]
+        const currentRoleKey: listMenu[] = currentRole[key as keyof typeof currentRole]
+        if (currentRoleKey.length > 0) {
+          const subMenu = el.subMenu.filter((sub) => {
+            const key = mappingSubAllMenu[el.name as keyof typeof mappingSubAllMenu]
+            const currentSubRoleKey = key[sub.name as keyof typeof key]
+            const findByKey = currentRoleKey.find((role) => {
+              return role.name === currentSubRoleKey
+            })
+
+            if (findByKey) {
+              return findByKey?.view.value
+            } else {
+              return false
+            }
+          })
+          return { ...el, subMenu }
+        }
+
+        return el
+      })
+      return mutateNewSubMenus as typeof newSideBar
+    }
+    return currentPathList
+  }, [currentRole, isReportAccount, isAdminTask])
+
   const navigate = useNavigate()
 
   return (
@@ -56,6 +115,7 @@ const NavSidebar: React.FC<any> = ({ children }) => {
               onClick={() => navigate('/HomePage')}
             />
           </div>
+
           <div className='d-flex align-items-center'>
             <div className='me-4'>
               <span>
@@ -95,7 +155,7 @@ const NavSidebar: React.FC<any> = ({ children }) => {
             cursor: 'pointer',
           }}
         >
-          <MenuSide lists={pathLists(isReportAccount, isAdminTask)} />
+          <MenuSide lists={newSideBarWithPermission} />
         </Sider>
       </Layout>
     </Layout>

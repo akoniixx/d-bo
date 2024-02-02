@@ -19,7 +19,7 @@ import {
   Spin,
   Table,
 } from 'antd'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { color, image } from '../../resource'
 import { useNavigate } from 'react-router-dom'
 import AddButtton from '../../components/button/AddButton'
@@ -36,8 +36,15 @@ import {
 import { SpecialPointDataSource } from '../../datasource/SpecialPointDatasource'
 import moment from 'moment'
 import { numberWithCommas } from '../../utilities/TextFormatter'
+import { useRecoilValueLoadable } from 'recoil'
+import { getUserRoleById } from '../../store/ProfileAtom'
 
 function IndexPointManual() {
+  const role = useRecoilValueLoadable(getUserRoleById)
+  const currentRole = role.state === 'hasValue' ? role.contents : null
+  const pointManualRole = useMemo(() => {
+    return currentRole?.pointResult.find((el) => el.name === 'รายการแต้มพิเศษ')
+  }, [currentRole?.pointResult])
   const [data, setData] = useState<AllSpecialListEntities>()
   const [row, setRow] = useState(10)
   const [searchKeyword, setSearchKeyword] = useState('')
@@ -88,12 +95,14 @@ function IndexPointManual() {
         <span className='pt-3'>
           <strong style={{ fontSize: '20px' }}>รายการแต้มพิเศษ</strong>
         </span>
-        <div className='align-self-center'>
-          <AddButtton
-            text='เพิ่มรายการแต้มพิเศษ'
-            onClick={() => setModalPointManual((prev) => !prev)}
-          />
-        </div>
+        {pointManualRole?.add.value && (
+          <div className='align-self-center'>
+            <AddButtton
+              text='เพิ่มรายการแต้มพิเศษ'
+              onClick={() => setModalPointManual((prev) => !prev)}
+            />
+          </div>
+        )}
       </div>
       <div className='container d-flex justify-content-between' style={{ padding: '8px' }}>
         <div className='col-lg p-1'>
@@ -343,22 +352,28 @@ function IndexPointManual() {
           children: (
             <>
               <Row justify={'space-between'}>
-                <ActionButton
-                  icon={<FileTextOutlined />}
-                  color={color.primary1}
-                  onClick={() => navigate('/DetailPointManual/id=' + row.id)}
-                />
-                <ActionButton
-                  icon={<EditOutlined />}
-                  color={color.primary1}
-                  onClick={() => showModalPointManual(row, index + 1)}
-                />
-                <ActionButton
-                  icon={<DeleteOutlined />}
-                  color={row.dronerAmount > 0 || row.farmerAmount > 0 ? color.Grey : color.Error}
-                  onClick={() => showDelete(row.id)}
-                  actionDisable={row.dronerAmount > 0 || row.farmerAmount > 0 ? true : false}
-                />
+                {pointManualRole?.view.value && (
+                  <ActionButton
+                    icon={<FileTextOutlined />}
+                    color={color.primary1}
+                    onClick={() => navigate('/DetailPointManual/id=' + row.id)}
+                  />
+                )}
+                {pointManualRole?.edit.value && (
+                  <ActionButton
+                    icon={<EditOutlined />}
+                    color={color.primary1}
+                    onClick={() => showModalPointManual(row, index + 1)}
+                  />
+                )}
+                {pointManualRole?.delete.value && (
+                  <ActionButton
+                    icon={<DeleteOutlined />}
+                    color={row.dronerAmount > 0 || row.farmerAmount > 0 ? color.Grey : color.Error}
+                    onClick={() => showDelete(row.id)}
+                    actionDisable={row.dronerAmount > 0 || row.farmerAmount > 0 ? true : false}
+                  />
+                )}
               </Row>
             </>
           ),

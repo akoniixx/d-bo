@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import StatusButton from '../../../components/button/StatusButton'
 import { color, image } from '../../../resource'
 import StatusPlots from '../../../components/card/StatusPlots'
@@ -45,10 +45,14 @@ import emptyPlot from '../../../resource/media/empties/iconoir_farm.png'
 import { DropdownStatus } from '../../../components/dropdownCheck/DropDownStatus'
 import Swal from 'sweetalert2'
 import ShowNickName from '../../../components/popover/ShowNickName'
+import { useRecoilValueLoadable } from 'recoil'
+import { getUserRoleById } from '../../../store/ProfileAtom'
 
 const _ = require('lodash')
 const { Map } = require('immutable')
 function IndexPlotList() {
+  const role = useRecoilValueLoadable(getUserRoleById)
+  const currentRole = role.state === 'hasValue' ? role.contents : null
   const [mainStatus, setMainStatus] = useState<any>('PENDING')
   const [sumPlotCard, setSumPlotCard] = useState<any>({
     card1: 'รอตรวจสอบ',
@@ -83,6 +87,12 @@ function IndexPlotList() {
   const [sortDirection3, setSortDirection3] = useState<string | undefined>(undefined)
   const [sortDirection4, setSortDirection4] = useState<string | undefined>(undefined)
   const [sortDirection5, setSortDirection5] = useState<string | undefined>(undefined)
+
+  const farmerPlotRole = useMemo(() => {
+    const find = currentRole?.farmerInfo.find((x) => x.name === 'รายการแปลงเกษตร')
+    return find
+  }, [currentRole])
+
   useEffect(() => {
     getPlotsData()
   }, [currentPage, mainStatus, row, sortDirection])
@@ -609,20 +619,24 @@ function IndexPlotList() {
         return {
           children: (
             <Row justify={'space-between'}>
-              <ActionButton
-                icon={<EditOutlined />}
-                color={color.primary1}
-                onClick={() => {
-                  showEdit(row, index)
-                  setFarmerId(row.farmer.id)
-                  setFarmerPlotId(row.id)
-                }}
-              />
-              <ActionButton
-                icon={<DeleteOutlined />}
-                color={color.Error}
-                onClick={() => showDelete(row)}
-              />
+              {farmerPlotRole?.edit?.value && (
+                <ActionButton
+                  icon={<EditOutlined />}
+                  color={color.primary1}
+                  onClick={() => {
+                    showEdit(row, index)
+                    setFarmerId(row.farmer.id)
+                    setFarmerPlotId(row.id)
+                  }}
+                />
+              )}
+              {farmerPlotRole?.delete?.value && (
+                <ActionButton
+                  icon={<DeleteOutlined />}
+                  color={color.Error}
+                  onClick={() => showDelete(row)}
+                />
+              )}
             </Row>
           ),
         }

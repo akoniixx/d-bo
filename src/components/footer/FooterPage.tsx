@@ -10,6 +10,7 @@ interface FoolterPageProps {
   disableBackBtn?: boolean
   disableSaveBtn?: boolean
   styleFooter?: React.CSSProperties
+  hideSaveBtn?: boolean
 }
 export const FooterPage: React.FC<FoolterPageProps> = ({
   onClickBack,
@@ -17,11 +18,12 @@ export const FooterPage: React.FC<FoolterPageProps> = ({
   disableBackBtn,
   disableSaveBtn,
   styleFooter,
+  hideSaveBtn = false,
 }) => (
   <Footer style={styleFooter}>
     <Row className='d-flex justify-content-between'>
       <BackButton onClick={onClickBack} disableBtn={disableBackBtn} />
-      <SaveButton onClick={onClickSave} disableBtn={disableSaveBtn} />
+      {!hideSaveBtn && <SaveButton onClick={onClickSave} disableBtn={disableSaveBtn} />}
     </Row>
   </Footer>
 )

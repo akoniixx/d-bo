@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useMemo } from 'react'
 import { Input, Select, Button, Spin, Table, Pagination, PaginationProps } from 'antd'
 import { Option } from 'antd/lib/mentions'
 import { color } from '../../../resource'
@@ -15,9 +15,16 @@ import {
 import { numberWithCommas } from '../../../utilities/TextFormatter'
 import ModalGroupGuru from '../../../components/modal/ModalGroupGuru'
 import ModalDelete from '../../../components/modal/ModalDelete'
+import { useRecoilValueLoadable } from 'recoil'
+import { getUserRoleById } from '../../../store/ProfileAtom'
 
 function IndexGroupGuru() {
   const navigate = useNavigate
+  const role = useRecoilValueLoadable(getUserRoleById)
+  const currentRole = role.state === 'hasValue' ? role.contents : null
+  const guruRole = useMemo(() => {
+    return currentRole?.guru.find((el) => el.name === 'กูรูเกษตร')
+  }, [currentRole?.guru])
   const [searchText, setSearchText] = useState<string>('')
   const [loading, setLoading] = useState<boolean>(false)
   const [current, setCurrent] = useState(1)
@@ -218,21 +225,25 @@ function IndexGroupGuru() {
         return {
           children: (
             <div className='d-flex flex-row justify-content-between'>
-              <div className='pr-1'>
-                <ActionButton
-                  icon={<EditOutlined />}
-                  color={color.primary1}
-                  onClick={() => showModalGroupGuru(row, index + 1)}
-                />
-              </div>
-              <div className='pr-1'>
-                <ActionButton
-                  actionDisable={!checkDelete}
-                  icon={<DeleteOutlined />}
-                  color={checkDelete ? color.Error : color.Grey}
-                  onClick={() => showDelete(row._id)}
-                />
-              </div>
+              {guruRole?.edit.value && (
+                <div className='pr-1'>
+                  <ActionButton
+                    icon={<EditOutlined />}
+                    color={color.primary1}
+                    onClick={() => showModalGroupGuru(row, index + 1)}
+                  />
+                </div>
+              )}
+              {guruRole?.delete.value && (
+                <div className='pr-1'>
+                  <ActionButton
+                    actionDisable={!checkDelete}
+                    icon={<DeleteOutlined />}
+                    color={checkDelete ? color.Error : color.Grey}
+                    onClick={() => showDelete(row._id)}
+                  />
+                </div>
+              )}
             </div>
           ),
         }
@@ -271,20 +282,22 @@ function IndexGroupGuru() {
             ค้นหาข้อมูล
           </Button>
         </div>
-        <div className='col-lg-2 p-1'>
-          <Button
-            className='col-lg-12'
-            style={{
-              borderColor: color.Success,
-              borderRadius: '5px',
-              color: color.secondary2,
-              backgroundColor: color.Success,
-            }}
-            onClick={() => setShowModal((prev) => !prev)}
-          >
-            เพิ่มชื่อหมวดหมู่
-          </Button>
-        </div>
+        {guruRole?.add.value && (
+          <div className='col-lg-2 p-1'>
+            <Button
+              className='col-lg-12'
+              style={{
+                borderColor: color.Success,
+                borderRadius: '5px',
+                color: color.secondary2,
+                backgroundColor: color.Success,
+              }}
+              onClick={() => setShowModal((prev) => !prev)}
+            >
+              เพิ่มชื่อหมวดหมู่
+            </Button>
+          </div>
+        )}
       </div>
 
       <Spin tip='กำลังโหลดข้อมูล...' size='large' spinning={loading}>

@@ -1,5 +1,5 @@
 import { Button, Input, Pagination, Spin, Table } from 'antd'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { color } from '../../resource'
 import {
   CaretDownOutlined,
@@ -14,9 +14,17 @@ import ModalDelete from '../../components/modal/ModalDelete'
 import { RoleAllEntity } from '../../entities/RoleEntities'
 import { numberWithCommas } from '../../utilities/TextFormatter'
 import { RoleManage } from '../../datasource/RoleManageDatasource'
+import { useRecoilValueLoadable } from 'recoil'
+import { getUserRoleById } from '../../store/ProfileAtom'
 
 function IndexPermission() {
   const navigate = useNavigate()
+  const role = useRecoilValueLoadable(getUserRoleById)
+  const currentRole = role.state === 'hasValue' ? role.contents : null
+  const adminRole = useMemo(() => {
+    const find = currentRole?.admin.find((el) => el.name === 'บทบาทผู้ดูแล')
+    return find
+  }, [currentRole?.admin])
   const [modalDelete, setModalDelete] = useState<boolean>(false)
   const [loading, setLoading] = useState<boolean>(false)
   const [sortField, setSortField] = useState<any>()
@@ -124,16 +132,20 @@ function IndexPermission() {
         return {
           children: (
             <div className='d-flex flex-row justify-content-between'>
-              <ActionButton
-                icon={<EditOutlined />}
-                color={color.primary1}
-                onClick={() => navigate('/EditPermission/id=' + row.id)}
-              />
-              <ActionButton
-                icon={<DeleteOutlined />}
-                color={color.Error}
-                onClick={() => showDelete(row.id)}
-              />
+              {adminRole?.edit.value && (
+                <ActionButton
+                  icon={<EditOutlined />}
+                  color={color.primary1}
+                  onClick={() => navigate('/EditPermission/id=' + row.id)}
+                />
+              )}
+              {adminRole?.delete.value && (
+                <ActionButton
+                  icon={<DeleteOutlined />}
+                  color={color.Error}
+                  onClick={() => showDelete(row.id)}
+                />
+              )}
             </div>
           ),
         }
@@ -182,20 +194,22 @@ function IndexPermission() {
             ค้นหาข้อมูล
           </Button>
         </div>
-        <div className='col-lg'>
-          <Button
-            className='col-lg-12'
-            style={{
-              borderColor: color.Success,
-              borderRadius: '5px',
-              color: color.secondary2,
-              backgroundColor: color.Success,
-            }}
-            onClick={() => navigate('/AddPermission')}
-          >
-            + เพิ่มบทบาทผู้ดูแล
-          </Button>
-        </div>
+        {adminRole?.add?.value && (
+          <div className='col-lg'>
+            <Button
+              className='col-lg-12'
+              style={{
+                borderColor: color.Success,
+                borderRadius: '5px',
+                color: color.secondary2,
+                backgroundColor: color.Success,
+              }}
+              onClick={() => navigate('/AddPermission')}
+            >
+              + เพิ่มบทบาทผู้ดูแล
+            </Button>
+          </div>
+        )}
       </div>
       <div className='pt-3'>
         <Spin tip='กำลังโหลดข้อมูล...' size='large' spinning={loading}>

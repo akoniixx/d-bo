@@ -402,7 +402,7 @@ export const pathLists = (isAccounting: boolean, isAdminTask?: boolean) => {
   ]
 
   if (isAdminTask) {
-    return menu.map((x: any) => {
+    return menu.map((x) => {
       const find = menu.findIndex(() => x.name === 'task')
       if (find === 0) {
         const newMenu = menu[find]

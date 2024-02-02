@@ -1,7 +1,7 @@
 import { Badge, Col, Divider, Form, Input, Radio, Row, Select, Table } from 'antd'
 import { useForm } from 'antd/es/form/Form'
 import TextArea from 'antd/lib/input/TextArea'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { Container } from 'react-bootstrap'
 import { useNavigate } from 'react-router-dom'
 import styled from 'styled-components'
@@ -22,6 +22,8 @@ import { color } from '../../resource'
 import { DateTimeUtil } from '../../utilities/DateTimeUtil'
 import { numberWithCommas } from '../../utilities/TextFormatter'
 import ShowNickName from '../../components/popover/ShowNickName'
+import { useRecoilValueLoadable } from 'recoil'
+import { getUserRoleById } from '../../store/ProfileAtom'
 const _ = require('lodash')
 
 const NewTable = styled(Table)`
@@ -35,6 +37,12 @@ const NewTable = styled(Table)`
 `
 
 const DetailFarmerRedeem = () => {
+  const role = useRecoilValueLoadable(getUserRoleById)
+  const currentRole = role.state === 'hasValue' ? role.contents : null
+  const historyRole = useMemo(() => {
+    const find = currentRole?.reward.find((el) => el.name === 'ประวัติการแลก')
+    return find
+  }, [currentRole?.reward])
   const profile = JSON.parse(localStorage.getItem('profile') || '{  }')
   const [form] = useForm()
   const [formRemark] = useForm()
@@ -668,7 +676,8 @@ const DetailFarmerRedeem = () => {
         onClickBack={() => navigate(-1)}
         styleFooter={{ padding: '6px' }}
         onClickSave={() => submit()}
-        disableSaveBtn={checkDiscable()}
+        disableSaveBtn={checkDiscable() || !historyRole?.edit.value}
+        hideSaveBtn={!historyRole?.edit.value}
       />
     </>
   )

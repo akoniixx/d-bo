@@ -1,5 +1,5 @@
 import DatePicker from 'antd/lib/date-picker'
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useMemo, useRef, useState } from 'react'
 import Search from 'antd/lib/input/Search'
 import AddButtton from '../../components/button/AddButton'
 import Select from 'antd/lib/select'
@@ -26,8 +26,15 @@ import { color } from '../../resource'
 import ModalDeleteCoupon from '../../components/modal/ModalDeleteCoupon'
 import { STATUS_COUPON } from '../../definitions/Status'
 import { DashboardLayout } from '../../components/layout/Layout'
+import { useRecoilValueLoadable } from 'recoil'
+import { getUserRoleById } from '../../store/ProfileAtom'
 
 function PromotionPage() {
+  const role = useRecoilValueLoadable(getUserRoleById)
+  const currentRole = role.state === 'hasValue' ? role.contents : null
+  const promotionRole = useMemo(() => {
+    return currentRole?.promotion.find((el) => el.name === 'คูปอง')
+  }, [currentRole?.promotion])
   const dateSearchFormat = 'YYYY-MM-DD'
   const dateFormat = 'DD/MM/YYYY'
   const navigate = useNavigate()
@@ -211,9 +218,11 @@ function PromotionPage() {
         </div>
         <div className='d-flex'>
           <RangePicker allowClear onCalendarChange={handleChangeDateRange} format={dateFormat} />
-          <div className='ps-3'>
-            <AddButtton text='เพิ่มคูปอง' onClick={() => navigate('/AddPromotion')} />
-          </div>
+          {promotionRole?.add.value && (
+            <div className='ps-3'>
+              <AddButtton text='เพิ่มคูปอง' onClick={() => navigate('/AddPromotion')} />
+            </div>
+          )}
         </div>
       </div>
       <div className='container d-flex justify-content-between' style={{ padding: '8px' }}>
@@ -737,32 +746,38 @@ function PromotionPage() {
         return {
           children: (
             <div className='d-flex flex-row justify-content-between'>
-              <div className='pr-1'>
-                <ActionButton
-                  icon={<EditOutlined />}
-                  color={color.primary1}
-                  onClick={() => {
-                    navigate('/EditPromotion/id=' + row.id)
-                  }}
-                />
-              </div>
-              <div className='pr-1'>
-                <ActionButton
-                  icon={<img src={icon.iconcopy} width={12} height={14} />}
-                  color={color.primary1}
-                  onClick={() => {
-                    duplicateCoupon(row.id)
-                  }}
-                />
-              </div>
-              <div className='pr-1'>
-                <ActionButton
-                  icon={<DeleteOutlined />}
-                  color={row.used > 0 ? color.Grey : color.Error}
-                  onClick={() => showDelete(row.id)}
-                  actionDisable={row.used > 0 ? true : false}
-                />
-              </div>
+              {promotionRole?.edit.value && (
+                <div className='pr-1'>
+                  <ActionButton
+                    icon={<EditOutlined />}
+                    color={color.primary1}
+                    onClick={() => {
+                      navigate('/EditPromotion/id=' + row.id)
+                    }}
+                  />
+                </div>
+              )}
+              {promotionRole?.add.value && (
+                <div className='pr-1'>
+                  <ActionButton
+                    icon={<img src={icon.iconcopy} width={12} height={14} />}
+                    color={color.primary1}
+                    onClick={() => {
+                      duplicateCoupon(row.id)
+                    }}
+                  />
+                </div>
+              )}
+              {promotionRole?.delete.value && (
+                <div className='pr-1'>
+                  <ActionButton
+                    icon={<DeleteOutlined />}
+                    color={row.used > 0 ? color.Grey : color.Error}
+                    onClick={() => showDelete(row.id)}
+                    actionDisable={row.used > 0 ? true : false}
+                  />
+                </div>
+              )}
             </div>
           ),
         }

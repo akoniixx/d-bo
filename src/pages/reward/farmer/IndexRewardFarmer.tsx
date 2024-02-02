@@ -26,7 +26,7 @@ import {
   Table,
 } from 'antd'
 import moment from 'moment'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { CheckboxValueType } from 'antd/lib/checkbox/Group'
 import { color, icon } from '../../../resource'
 import { numberWithCommas } from '../../../utilities/TextFormatter'
@@ -37,9 +37,16 @@ import { useNavigate } from 'react-router-dom'
 import { RewardDatasource } from '../../../datasource/RewardDatasource'
 import { GetAllRewardEntities } from '../../../entities/RewardEntites'
 import { REWARD_STATUS } from '../../../definitions/Status'
+import { useRecoilValueLoadable } from 'recoil'
+import { getUserRoleById } from '../../../store/ProfileAtom'
 
 function IndexRewardFarmer() {
   const navigate = useNavigate()
+  const role = useRecoilValueLoadable(getUserRoleById)
+  const currentRole = role.state === 'hasValue' ? role.contents : null
+  const rewardRole = useMemo(() => {
+    return currentRole?.reward.find((el) => el.name === 'รายการของรางวัล')
+  }, [currentRole?.reward])
   const { RangePicker } = DatePicker
   const dateFormat = 'DD/MM/YYYY'
   const dateSearchFormat = 'YYYY-MM-DD'
@@ -300,20 +307,22 @@ function IndexRewardFarmer() {
             format={dateFormat}
           />
         </div>
-        <div>
-          <Button
-            style={{
-              width: 170,
-              borderColor: color.Success,
-              borderRadius: '5px',
-              color: color.secondary2,
-              backgroundColor: color.Success,
-            }}
-            onClick={() => navigate('/AddRewardFarmer')}
-          >
-            + เพิ่มของรางวัล
-          </Button>
-        </div>
+        {rewardRole?.add.value && (
+          <div>
+            <Button
+              style={{
+                width: 170,
+                borderColor: color.Success,
+                borderRadius: '5px',
+                color: color.secondary2,
+                backgroundColor: color.Success,
+              }}
+              onClick={() => navigate('/AddRewardFarmer')}
+            >
+              + เพิ่มของรางวัล
+            </Button>
+          </div>
+        )}
       </div>
       <div className='container d-flex justify-content-between' style={{ padding: '8px' }}>
         <div className='col-lg-6 p-1'>
@@ -929,36 +938,42 @@ function IndexRewardFarmer() {
         return {
           children: (
             <div className='d-flex flex-row' style={{ justifyContent: 'center' }}>
-              <div className='col-lg-4'>
-                <ActionButton
-                  icon={
-                    <Image
-                      src={icon.inforedeem}
-                      style={{ width: 20, height: 17 }}
-                      preview={false}
-                    />
-                  }
-                  color={color.primary1}
-                  onClick={() => navigate('/RedeemHistoryFarmer/id=' + row.id)}
-                />
-              </div>
-              <div className='col-lg-4'>
-                <ActionButton
-                  icon={<EditOutlined />}
-                  color={color.primary1}
-                  onClick={() => navigate('/EditRewardFarmer/id=' + row.id)}
-                />
-              </div>
-              <div>
-                <ActionButton
-                  icon={<DeleteOutlined />}
-                  color={
-                    row.status === 'DRAFTING' || checkDelete === true ? color.Error : color.Grey
-                  }
-                  onClick={() => showDelete(row.id)}
-                  actionDisable={row.status === 'DRAFTING' || checkDelete === true ? false : true}
-                />
-              </div>
+              {rewardRole?.view.value && (
+                <div className='col-lg-4'>
+                  <ActionButton
+                    icon={
+                      <Image
+                        src={icon.inforedeem}
+                        style={{ width: 20, height: 17 }}
+                        preview={false}
+                      />
+                    }
+                    color={color.primary1}
+                    onClick={() => navigate('/RedeemHistoryFarmer/id=' + row.id)}
+                  />
+                </div>
+              )}
+              {rewardRole?.edit.value && (
+                <div className='col-lg-4'>
+                  <ActionButton
+                    icon={<EditOutlined />}
+                    color={color.primary1}
+                    onClick={() => navigate('/EditRewardFarmer/id=' + row.id)}
+                  />
+                </div>
+              )}
+              {rewardRole?.delete.value && (
+                <div>
+                  <ActionButton
+                    icon={<DeleteOutlined />}
+                    color={
+                      row.status === 'DRAFTING' || checkDelete === true ? color.Error : color.Grey
+                    }
+                    onClick={() => showDelete(row.id)}
+                    actionDisable={row.status === 'DRAFTING' || checkDelete === true ? false : true}
+                  />
+                </div>
+              )}
             </div>
           ),
         }

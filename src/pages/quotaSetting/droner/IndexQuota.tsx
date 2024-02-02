@@ -15,7 +15,7 @@ import {
   Table,
 } from 'antd'
 import moment from 'moment'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { color } from '../../../resource'
 import ActionButton from '../../../components/button/ActionButton'
 import { DateTimeUtil } from '../../../utilities/DateTimeUtil'
@@ -25,8 +25,16 @@ import { CampaignDatasource } from '../../../datasource/CampaignDatasource'
 import { CampaignQuotaListEntity } from '../../../entities/CampaignPointEntites'
 import { numberWithCommas } from '../../../utilities/TextFormatter'
 import { CardContainer } from '../../../components/card/CardContainer'
+import { useRecoilValueLoadable } from 'recoil'
+import { getUserRoleById } from '../../../store/ProfileAtom'
 
 function IndexQuota() {
+  const role = useRecoilValueLoadable(getUserRoleById)
+  const currentRole = role.state === 'hasValue' ? role.contents : null
+  const challengeRole = useMemo(() => {
+    const find = currentRole?.challenge.find((el) => el.name === 'นักบินโดรน')
+    return find
+  }, [currentRole?.challenge])
   const navigate = useNavigate()
   const { RangePicker } = DatePicker
   const dateFormat = 'DD/MM/YYYY'
@@ -113,19 +121,21 @@ function IndexQuota() {
             onCalendarChange={(val) => handleSearchDate(val)}
           />
         </Col>
-        <Col span={3}>
-          <Button
-            style={{
-              borderColor: color.Success,
-              borderRadius: '5px',
-              color: color.secondary2,
-              backgroundColor: color.Success,
-            }}
-            onClick={() => navigate('/AddQuota')}
-          >
-            + เพิ่มชาเลนจ์
-          </Button>
-        </Col>
+        {challengeRole?.add.value && (
+          <Col span={3}>
+            <Button
+              style={{
+                borderColor: color.Success,
+                borderRadius: '5px',
+                color: color.secondary2,
+                backgroundColor: color.Success,
+              }}
+              onClick={() => navigate('/AddQuota')}
+            >
+              + เพิ่มชาเลนจ์
+            </Button>
+          </Col>
+        )}
       </Row>
       <div className='container d-flex justify-content-between' style={{ padding: '8px' }}>
         <div className='col-lg-8 p-1'>
@@ -150,8 +160,10 @@ function IndexQuota() {
               setStatus(e)
             }}
           >
-            {REWARD_STATUS.map((x) => (
-              <Checkbox value={x.value}>{x.name}</Checkbox>
+            {REWARD_STATUS.map((x, k) => (
+              <Checkbox value={x.value} key={k}>
+                {x.name}
+              </Checkbox>
             ))}
           </Select>
         </div>
@@ -274,29 +286,35 @@ function IndexQuota() {
         return {
           children: (
             <Row justify={'center'} gutter={16}>
-              <div className='col-lg-4'>
-                <ActionButton
-                  icon={<FolderViewOutlined />}
-                  color={row.status === 'DRAFTING' ? color.Grey : color.primary1}
-                  actionDisable={row.status === 'DRAFTING' ? true : false}
-                  onClick={() => navigate('/QuotaReport/id=' + row.id)}
-                />
-              </div>
-              <div className='col-lg-4'>
-                <ActionButton
-                  icon={<EditOutlined />}
-                  color={color.primary1}
-                  onClick={() => navigate('/EditQuota/id=' + row.id)}
-                />
-              </div>
-              <div className='col-lg-4'>
-                <ActionButton
-                  icon={<DeleteOutlined />}
-                  color={!row.isDeleteDroner ? color.Error : color.Grey}
-                  onClick={() => showDelete(row.id)}
-                  actionDisable={row.isDeleteDroner}
-                />
-              </div>
+              {challengeRole?.view.value && (
+                <div className='col-lg-4'>
+                  <ActionButton
+                    icon={<FolderViewOutlined />}
+                    color={row.status === 'DRAFTING' ? color.Grey : color.primary1}
+                    actionDisable={row.status === 'DRAFTING' ? true : false}
+                    onClick={() => navigate('/QuotaReport/id=' + row.id)}
+                  />
+                </div>
+              )}
+              {challengeRole?.edit.value && (
+                <div className='col-lg-4'>
+                  <ActionButton
+                    icon={<EditOutlined />}
+                    color={color.primary1}
+                    onClick={() => navigate('/EditQuota/id=' + row.id)}
+                  />
+                </div>
+              )}
+              {challengeRole?.delete.value && (
+                <div className='col-lg-4'>
+                  <ActionButton
+                    icon={<DeleteOutlined />}
+                    color={!row.isDeleteDroner ? color.Error : color.Grey}
+                    onClick={() => showDelete(row.id)}
+                    actionDisable={row.isDeleteDroner}
+                  />
+                </div>
+              )}
             </Row>
           ),
         }

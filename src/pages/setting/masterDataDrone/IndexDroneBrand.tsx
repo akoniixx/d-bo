@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { Badge, Button, Input, Pagination, Spin, Table } from 'antd'
 import {
   DroneBrandEntity,
@@ -18,9 +18,17 @@ import {
 } from '@ant-design/icons'
 import Swal from 'sweetalert2'
 import { useNavigate } from 'react-router-dom'
+import { useRecoilValueLoadable } from 'recoil'
+import { getUserRoleById } from '../../../store/ProfileAtom'
 
 const IndexDroneBrand: React.FC = () => {
   const navigate = useNavigate()
+  const role = useRecoilValueLoadable(getUserRoleById)
+  const currentRole = role.state === 'hasValue' ? role.contents : null
+  const settingRole = useMemo(() => {
+    const find = currentRole?.settings.find((el) => el.name === 'ยี่ห้อโดรน')
+    return find
+  }, [currentRole?.settings])
   const [data, setData] = useState<DroneBrandListEntity>(DroneBrandListEntity_INIT)
   const [loading, setLoading] = useState(false)
   const [searchText, setSearchText] = useState<string>()
@@ -100,20 +108,22 @@ const IndexDroneBrand: React.FC = () => {
           ค้นหาข้อมูล
         </Button>
       </div>
-      <div className='col-lg p-1'>
-        <Button
-          style={{
-            height: 35,
-            borderColor: color.Success,
-            borderRadius: '5px',
-            color: color.secondary2,
-            backgroundColor: color.Success,
-          }}
-          onClick={() => navigate('/AddDroneBrand')}
-        >
-          + เพิ่มยี่ห้อโดรน
-        </Button>
-      </div>
+      {settingRole?.add.value && (
+        <div className='col-lg p-1'>
+          <Button
+            style={{
+              height: 35,
+              borderColor: color.Success,
+              borderRadius: '5px',
+              color: color.secondary2,
+              backgroundColor: color.Success,
+            }}
+            onClick={() => navigate('/AddDroneBrand')}
+          >
+            + เพิ่มยี่ห้อโดรน
+          </Button>
+        </div>
+      )}
     </div>
   )
   const columns = [
@@ -328,30 +338,36 @@ const IndexDroneBrand: React.FC = () => {
         return {
           children: (
             <div className='d-flex flex-row' style={{ justifyContent: 'center' }}>
-              <div className='col-lg-4'>
-                <ActionButton
-                  icon={<EditOutlined />}
-                  color={color.primary1}
-                  onClick={() => navigate('/EditDroneBrand/id=' + row.id)}
-                />
-              </div>
-              {row.drone === 0 ? (
-                <div>
+              {settingRole?.edit.value && (
+                <div className='col-lg-4'>
                   <ActionButton
-                    icon={<DeleteOutlined />}
-                    color={color.Error}
-                    onClick={() => removeDroneBrand(row)}
+                    icon={<EditOutlined />}
+                    color={color.primary1}
+                    onClick={() => navigate('/EditDroneBrand/id=' + row.id)}
                   />
                 </div>
-              ) : (
-                <div>
-                  <Button
-                    disabled
-                    style={{ borderRadius: 5 }}
-                    icon={<DeleteOutlined />}
-                    color={color.Disable}
-                  />
-                </div>
+              )}
+              {settingRole?.delete.value && (
+                <>
+                  {row.drone === 0 ? (
+                    <div>
+                      <ActionButton
+                        icon={<DeleteOutlined />}
+                        color={color.Error}
+                        onClick={() => removeDroneBrand(row)}
+                      />
+                    </div>
+                  ) : (
+                    <div>
+                      <Button
+                        disabled
+                        style={{ borderRadius: 5 }}
+                        icon={<DeleteOutlined />}
+                        color={color.Disable}
+                      />
+                    </div>
+                  )}
+                </>
               )}
             </div>
           ),

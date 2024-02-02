@@ -1,6 +1,6 @@
 import { Badge, Button, Input, Pagination, PaginationProps, Select, Spin, Table, Tabs } from 'antd'
 import { Option } from 'antd/lib/mentions'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { color, icon } from '../../resource'
 import { useNavigate } from 'react-router-dom'
 import {
@@ -18,8 +18,12 @@ import { HighlightDatasource } from '../../datasource/HighlightDatasource'
 import { AllHighlightEntities } from '../../entities/HighlightEntities'
 import { numberWithCommas } from '../../utilities/TextFormatter'
 import ModalDelete from '../../components/modal/ModalDelete'
+import { getUserRoleById } from '../../store/ProfileAtom'
+import { useRecoilValueLoadable } from 'recoil'
 
 function HighlightNewsPage() {
+  const role = useRecoilValueLoadable(getUserRoleById)
+  const currentRole = role.state === 'hasValue' ? role.contents : null
   const navigate = useNavigate()
   const [loading, setLoading] = useState(false)
   const [data, setData] = useState<AllHighlightEntities>()
@@ -54,6 +58,10 @@ function HighlightNewsPage() {
   useEffect(() => {
     fetchNewsHighlight()
   }, [current, sortDirection, status])
+
+  const highlightRole = useMemo(() => {
+    return currentRole?.guru.find((el) => el.name === 'ข่าวสาร')
+  }, [])
 
   const onChangeApplication = (e: string) => {
     setApplication(e)
@@ -150,20 +158,22 @@ function HighlightNewsPage() {
               ค้นหาข้อมูล
             </Button>
           </div>
-          <div className='col-lg-2'>
-            <Button
-              className='col-lg-12'
-              onClick={() => navigate('/AddHighlightPage')}
-              style={{
-                borderColor: color.Success,
-                borderRadius: '5px',
-                color: color.secondary2,
-                backgroundColor: color.Success,
-              }}
-            >
-              + ข่าวสารไฮไลท์
-            </Button>
-          </div>
+          {highlightRole?.add.value && (
+            <div className='col-lg-2'>
+              <Button
+                className='col-lg-12'
+                onClick={() => navigate('/AddHighlightPage')}
+                style={{
+                  borderColor: color.Success,
+                  borderRadius: '5px',
+                  color: color.secondary2,
+                  backgroundColor: color.Success,
+                }}
+              >
+                + ข่าวสารไฮไลท์
+              </Button>
+            </div>
+          )}
         </div>
       </div>
       <div className='pt-3'>
@@ -423,24 +433,28 @@ function HighlightNewsPage() {
         return {
           children: (
             <div className='d-flex flex-row justify-content-between'>
-              <div className='pr-1'>
-                <ActionButton
-                  icon={<EditOutlined />}
-                  color={color.primary1}
-                  onClick={() => {
-                    navigate('/EditAddHighlightPage/id=' + row.id)
-                  }}
-                />
-              </div>
-              <div className='pr-1'>
-                <ActionButton
-                  icon={<DeleteOutlined />}
-                  color={color.Error}
-                  onClick={() => {
-                    showDelete(row.id)
-                  }}
-                />
-              </div>
+              {highlightRole?.edit.value && (
+                <div className='pr-1'>
+                  <ActionButton
+                    icon={<EditOutlined />}
+                    color={color.primary1}
+                    onClick={() => {
+                      navigate('/EditAddHighlightPage/id=' + row.id)
+                    }}
+                  />
+                </div>
+              )}
+              {highlightRole?.delete.value && (
+                <div className='pr-1'>
+                  <ActionButton
+                    icon={<DeleteOutlined />}
+                    color={color.Error}
+                    onClick={() => {
+                      showDelete(row.id)
+                    }}
+                  />
+                </div>
+              )}
             </div>
           ),
         }

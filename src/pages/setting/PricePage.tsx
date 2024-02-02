@@ -1,6 +1,6 @@
 import { CaretDownOutlined, CaretUpOutlined, EditOutlined, SearchOutlined } from '@ant-design/icons'
 import { Button, Input, Pagination, PaginationProps, Spin, Table } from 'antd'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import ActionButton from '../../components/button/ActionButton'
 import ModalCropByProvince from '../../components/modal/ModalCropByProvince'
 import ModalEditLocationPrice from '../../components/modal/ModalEditLocationPrice'
@@ -13,8 +13,16 @@ import {
   UpdateLocationPrice_INIT,
 } from '../../entities/LocationPrice'
 import moment from 'moment'
+import { useRecoilValueLoadable } from 'recoil'
+import { getUserRoleById } from '../../store/ProfileAtom'
 
 function PricePage() {
+  const role = useRecoilValueLoadable(getUserRoleById)
+  const currentRole = role.state === 'hasValue' ? role.contents : null
+  const settingRole = useMemo(() => {
+    const find = currentRole?.settings.find((el) => el.name === 'ราคา')
+    return find
+  }, [currentRole?.settings])
   const [row, setRow] = useState(10)
   const [current, setCurrent] = useState(1)
   const [data, setData] = useState<LocationPricePageEntity>()
@@ -222,11 +230,7 @@ function PricePage() {
             ? `${row.max_price} บาท`
             : `${row.min_price} - ${row.max_price} บาท`
         return {
-          children: (
-            <span style={{ color: color.primary1, fontWeight: '700' }}>
-              {priceText}
-            </span>
-          ),
+          children: <span style={{ color: color.primary1, fontWeight: '700' }}>{priceText}</span>,
         }
       },
     },
@@ -291,11 +295,7 @@ function PricePage() {
             ? `${row.max_price_sow} บาท`
             : `${row.min_price_sow} - ${row.max_price_sow} บาท`
         return {
-          children: (
-            <span style={{ color: color.primary1, fontWeight: '700' }}>
-              {priceText}
-            </span>
-          ),
+          children: <span style={{ color: color.primary1, fontWeight: '700' }}>{priceText}</span>,
         }
       },
     },
@@ -488,7 +488,7 @@ function PricePage() {
       key: 'id',
       render: (value: any, row: any, index: number) => {
         return {
-          children: (
+          children: settingRole?.edit.value && (
             <div className='d-flex flex-row justify-content-between'>
               <ActionButton
                 icon={<EditOutlined />}
@@ -537,18 +537,20 @@ function PricePage() {
           ค้นหาข้อมูล
         </Button>
       </div>
-      <div className='col-lg p-1'>
-        <Button
-          style={{
-            borderColor: color.Success,
-            borderRadius: '5px',
-            color: color.secondary2,
-            backgroundColor: color.Success,
-          }}
-        >
-          อัปโหลดราคา Excel
-        </Button>
-      </div>
+      {settingRole?.add.value && (
+        <div className='col-lg p-1'>
+          <Button
+            style={{
+              borderColor: color.Success,
+              borderRadius: '5px',
+              color: color.secondary2,
+              backgroundColor: color.Success,
+            }}
+          >
+            อัปโหลดราคา Excel
+          </Button>
+        </div>
+      )}
     </div>
   )
 
