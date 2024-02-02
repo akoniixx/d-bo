@@ -15,7 +15,7 @@ import {
 } from 'antd'
 import Search from 'antd/lib/input/Search'
 import moment from 'moment'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import ActionButton from '../../components/button/ActionButton'
 import { DroneDatasource } from '../../datasource/DroneDatasource'
 import { DronerDroneDatasource } from '../../datasource/DronerDroneDatasource'
@@ -41,9 +41,13 @@ import { CheckboxValueType } from 'antd/lib/checkbox/Group'
 import { image } from '../../resource'
 import { DropdownStatus } from '../../components/dropdownCheck/DropDownStatus'
 import ShowNickName from '../../components/popover/ShowNickName'
+import { getUserRoleById } from '../../store/ProfileAtom'
+import { useRecoilValueLoadable } from 'recoil'
 
 function DroneList() {
   const navigate = useNavigate()
+  const role = useRecoilValueLoadable(getUserRoleById)
+  const currentRole = role.state === 'hasValue' ? role.contents : null
   const [row, setRow] = useState(10)
   const [current, setCurrent] = useState(1)
   const [droneList, setDroneList] = useState<DronerDroneListEntity>()
@@ -73,6 +77,11 @@ function DroneList() {
   const [sortDirection4, setSortDirection4] = useState<string | undefined>(undefined)
   const [sortDirection5, setSortDirection5] = useState<string | undefined>(undefined)
   const [fetchData, setFetchData] = useState<boolean>(false)
+
+  const findDroneRole = useMemo(() => {
+    const find = currentRole?.dronerInfo.find((el) => el.name === 'รายการโดรนเกษตร')
+    return find
+  }, [currentRole])
 
   const fetchDronerDroneList = async () => {
     setLoading(true)
@@ -764,7 +773,7 @@ function DroneList() {
       key: 'Action',
       render: (value: any, row: any, index: number) => {
         return {
-          children: (
+          children: findDroneRole?.edit.value && (
             <div className='d-flex flex-row justify-content-between'>
               <ActionButton
                 icon={<EditOutlined />}

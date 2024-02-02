@@ -1,5 +1,9 @@
 ## [Version - 0]
 
+## Feature [v0.48.0] 2024-2-02
+- role management
+- detect permission in menu
+
 ## improve [v0.47.1] 2024-1-19
 
 - change icon menu

@@ -1,14 +1,22 @@
 import { CaretDownOutlined, CaretUpOutlined, EditOutlined, SearchOutlined } from '@ant-design/icons'
 import { Badge, Button, Input, Pagination, Select, Spin, Table } from 'antd'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { color } from '../../../resource'
 import { useNavigate } from 'react-router-dom'
 import { Option } from 'antd/lib/mentions'
 import ActionButton from '../../../components/button/ActionButton'
 import { AllCropListEntity } from '../../../entities/CropEntities'
 import { CropDatasource } from '../../../datasource/CropDatasource'
+import { useRecoilValueLoadable } from 'recoil'
+import { getUserRoleById } from '../../../store/ProfileAtom'
 
 function IndexCrop() {
+  const role = useRecoilValueLoadable(getUserRoleById)
+  const currentRole = role.state === 'hasValue' ? role.contents : null
+  const settingRole = useMemo(() => {
+    const find = currentRole?.settings.find((el) => el.name === 'รายชื่อพืช')
+    return find
+  }, [currentRole?.settings])
   const navigate = useNavigate()
   const [data, setData] = useState<AllCropListEntity>()
   const [loading, setLoading] = useState<boolean>(false)
@@ -255,7 +263,7 @@ function IndexCrop() {
       width: '6%',
       render: (value: any, row: any, index: number) => {
         return {
-          children: (
+          children: settingRole?.edit.value && (
             <div className='d-flex flex-row justify-content-between'>
               <div className='pr-1'>
                 <ActionButton
@@ -331,21 +339,22 @@ function IndexCrop() {
                 ค้นหาข้อมูล
               </Button>
             </div>
-
-            <div className='pt-1 col-lg-2'>
-              <Button
-                className='col-lg-12'
-                onClick={() => navigate('/AddCrop')}
-                style={{
-                  borderColor: color.Success,
-                  borderRadius: '5px',
-                  color: color.secondary2,
-                  backgroundColor: color.Success,
-                }}
-              >
-                + เพิ่มพืช
-              </Button>
-            </div>
+            {settingRole?.add.value && (
+              <div className='pt-1 col-lg-2'>
+                <Button
+                  className='col-lg-12'
+                  onClick={() => navigate('/AddCrop')}
+                  style={{
+                    borderColor: color.Success,
+                    borderRadius: '5px',
+                    color: color.secondary2,
+                    backgroundColor: color.Success,
+                  }}
+                >
+                  + เพิ่มพืช
+                </Button>
+              </div>
+            )}
           </div>
         </div>
         <Spin tip='กำลังโหลดข้อมูล...' size='large' spinning={loading}>

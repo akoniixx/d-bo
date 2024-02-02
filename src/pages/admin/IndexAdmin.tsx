@@ -1,7 +1,7 @@
 import { EditOutlined } from '@ant-design/icons'
 import { Badge, Button, Pagination, Select, Spin, Table } from 'antd'
 import 'antd/dist/antd.css'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import ActionButton from '../../components/button/ActionButton'
 import AddButtton from '../../components/button/AddButton'
 import { CardContainer } from '../../components/card/CardContainer'
@@ -14,9 +14,17 @@ import { DateTimeUtil } from '../../utilities/DateTimeUtil'
 import { DashboardLayout } from '../../components/layout/Layout'
 import { useNavigate } from 'react-router-dom'
 import { RoleManage } from '../../datasource/RoleManageDatasource'
+import { useRecoilValueLoadable } from 'recoil'
+import { getUserRoleById } from '../../store/ProfileAtom'
 
 const IndexAdmin = () => {
   const navigate = useNavigate()
+  const roleApi = useRecoilValueLoadable(getUserRoleById)
+  const currentRole = roleApi.state === 'hasValue' ? roleApi.contents : null
+  const adminRole = useMemo(() => {
+    const find = currentRole?.admin.find((el) => el.name === 'รายชื่อผู้ดูแล')
+    return find
+  }, [currentRole?.admin])
   const [role, setRole] = useState<any>([])
   const row = 10
   const [data, setData] = useState<UserStaffPageEntity>(UserStaffPageEntity_INIT)
@@ -122,7 +130,7 @@ const IndexAdmin = () => {
       key: 'id',
       render: (value: any, row: any, index: number) => {
         return {
-          children: (
+          children: adminRole?.edit.value && (
             <div className='d-flex flex-row justify-content-between'>
               <ActionButton
                 icon={<EditOutlined />}
@@ -169,20 +177,23 @@ const IndexAdmin = () => {
           <option value='false'>ไม่ได้ใช้งาน</option>
         </Select>
       </div>
-      <div className='col-lg p-1'>
-        <Button
-          className='col-lg-12'
-          style={{
-            borderColor: color.Success,
-            borderRadius: '5px',
-            color: color.secondary2,
-            backgroundColor: color.Success,
-          }}
-          onClick={() => navigate('/AddAdmin')}
-        >
-          + เพิ่มผู้ดูแลระบบ
-        </Button>
-      </div>
+      {adminRole?.add.value && (
+        <div className='col-lg p-1'>
+          <Button
+            className='col-lg-12'
+            style={{
+              borderColor: color.Success,
+              borderRadius: '5px',
+              color: color.secondary2,
+              backgroundColor: color.Success,
+            }}
+            onClick={() => navigate('/AddAdmin')}
+          >
+            + เพิ่มผู้ดูแลระบบ
+          </Button>
+        </div>
+      )}
+
       <div className='col-lg p-1'>
         <Button
           className='col-lg-12'

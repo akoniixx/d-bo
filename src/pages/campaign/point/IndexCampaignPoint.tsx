@@ -18,7 +18,7 @@ import {
   Table,
 } from 'antd'
 import moment from 'moment'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import ActionButton from '../../../components/button/ActionButton'
 import { CardContainer } from '../../../components/card/CardContainer'
@@ -28,6 +28,8 @@ import { STATUS_COUPON } from '../../../definitions/Status'
 import { CampaignListEntity, CampaignListEntity_INIT } from '../../../entities/CampaignPointEntites'
 import { color } from '../../../resource'
 import { DateTimeUtil } from '../../../utilities/DateTimeUtil'
+import { useRecoilValueLoadable } from 'recoil'
+import { getUserRoleById } from '../../../store/ProfileAtom'
 
 const { RangePicker } = DatePicker
 
@@ -35,7 +37,12 @@ const IndexCampaignPoint = () => {
   const navigate = useNavigate()
   const dateFormat = 'DD/MM/YYYY'
   const dateSearchFormat = 'YYYY-MM-DD'
-
+  const role = useRecoilValueLoadable(getUserRoleById)
+  const currentRole = role.state === 'hasValue' ? role.contents : null
+  const campaignRole = useMemo(() => {
+    const find = currentRole?.pointResult.find((el) => el.name === 'แคมเปญแต้ม')
+    return find
+  }, [currentRole?.pointResult])
   const row = 10
   const [current, setCurrent] = useState(1)
   const [showModal, setShowModal] = useState(false)
@@ -114,19 +121,21 @@ const IndexCampaignPoint = () => {
             onCalendarChange={(val) => handleSearchDate(val)}
           />
         </Col>
-        <Col span={3} style={{ textAlign: 'right' }}>
-          <Button
-            style={{
-              borderColor: color.Success,
-              borderRadius: '5px',
-              color: color.secondary2,
-              backgroundColor: color.Success,
-            }}
-            onClick={() => navigate('/AddCampaignPoint')}
-          >
-            เพิ่มแคมแปญ
-          </Button>
-        </Col>
+        {campaignRole?.add.value && (
+          <Col span={3} style={{ textAlign: 'right' }}>
+            <Button
+              style={{
+                borderColor: color.Success,
+                borderRadius: '5px',
+                color: color.secondary2,
+                backgroundColor: color.Success,
+              }}
+              onClick={() => navigate('/AddCampaignPoint')}
+            >
+              เพิ่มแคมแปญ
+            </Button>
+          </Col>
+        )}
       </Row>
       <div className='container d-flex justify-content-between' style={{ padding: '8px' }}>
         <div className='col-lg-5 p-1'>
@@ -262,29 +271,33 @@ const IndexCampaignPoint = () => {
         return {
           children: (
             <div className='d-flex flex-row justify-content-center'>
-              <div className='col-lg-6'>
-                <ActionButton
-                  icon={<EditOutlined />}
-                  color={color.primary1}
-                  onClick={() => navigate('/EditCampaignPoint/id=' + row.id)}
-                />
-              </div>
-              <div className='col-lg-6'>
-                <ActionButton
-                  icon={<DeleteOutlined />}
-                  color={
-                    row.isDeleteFarmer || row.isDeleteDroner || row.status === 'ACTIVE'
-                      ? color.Grey
-                      : color.Error
-                  }
-                  onClick={() => setDeleteCampaign(row.id)}
-                  actionDisable={
-                    row.isDeleteFarmer || row.isDeleteDroner || row.status === 'ACTIVE'
-                      ? true
-                      : false
-                  }
-                />
-              </div>
+              {campaignRole?.edit.value && (
+                <div className='col-lg-6'>
+                  <ActionButton
+                    icon={<EditOutlined />}
+                    color={color.primary1}
+                    onClick={() => navigate('/EditCampaignPoint/id=' + row.id)}
+                  />
+                </div>
+              )}
+              {campaignRole?.delete.value && (
+                <div className='col-lg-6'>
+                  <ActionButton
+                    icon={<DeleteOutlined />}
+                    color={
+                      row.isDeleteFarmer || row.isDeleteDroner || row.status === 'ACTIVE'
+                        ? color.Grey
+                        : color.Error
+                    }
+                    onClick={() => setDeleteCampaign(row.id)}
+                    actionDisable={
+                      row.isDeleteFarmer || row.isDeleteDroner || row.status === 'ACTIVE'
+                        ? true
+                        : false
+                    }
+                  />
+                </div>
+              )}
             </div>
           ),
         }
