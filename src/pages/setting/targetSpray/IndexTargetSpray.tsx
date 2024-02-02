@@ -1,6 +1,6 @@
 import { Badge, Button, Input, Pagination, Spin, Table } from 'antd'
 import Search from 'antd/lib/input/Search'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { color } from '../../../resource'
 import { useNavigate } from 'react-router-dom'
 import {
@@ -15,9 +15,17 @@ import { TargetSpray } from '../../../datasource/TargetSprayDatarource'
 import { AllTargetSpayEntities } from '../../../entities/TargetSprayEntities'
 import { DateTimeUtil } from '../../../utilities/DateTimeUtil'
 import ModalDelete from '../../../components/modal/ModalDelete'
+import { useRecoilValueLoadable } from 'recoil'
+import { getUserRoleById } from '../../../store/ProfileAtom'
 
 function IndexTargetSpray() {
   const navigate = useNavigate()
+  const role = useRecoilValueLoadable(getUserRoleById)
+  const currentRole = role.state === 'hasValue' ? role.contents : null
+  const settingRole = useMemo(() => {
+    const find = currentRole?.settings.find((el) => el.name === 'เป้าหมาย')
+    return find
+  }, [currentRole?.settings])
   const [data, setData] = useState<AllTargetSpayEntities>()
   const [row, setRow] = useState<number>(10)
   const [current, setCurrent] = useState<number>(1)
@@ -180,19 +188,23 @@ function IndexTargetSpray() {
         return {
           children: (
             <div className='d-flex flex-row justify-content-between'>
-              <ActionButton
-                icon={<EditOutlined />}
-                color={color.primary1}
-                onClick={() => navigate('/InsertTargetSpray/id=' + value)}
-              />
-              <ActionButton
-                icon={<DeleteOutlined />}
-                color={color.Error}
-                onClick={() => {
-                  setShowModal(!showModal)
-                  setDeleteId(value)
-                }}
-              />
+              {settingRole?.edit.value && (
+                <ActionButton
+                  icon={<EditOutlined />}
+                  color={color.primary1}
+                  onClick={() => navigate('/InsertTargetSpray/id=' + value)}
+                />
+              )}
+              {settingRole?.delete.value && (
+                <ActionButton
+                  icon={<DeleteOutlined />}
+                  color={color.Error}
+                  onClick={() => {
+                    setShowModal(!showModal)
+                    setDeleteId(value)
+                  }}
+                />
+              )}
             </div>
           ),
         }
@@ -255,20 +267,22 @@ function IndexTargetSpray() {
               เรียงลำดับการแสดง
             </Button>
           </div>
-          <div className='pt-1'>
-            <Button
-              onClick={() => navigate('/InsertTargetSpray/id=', undefined)}
-              style={{
-                borderColor: color.Success,
-                borderRadius: '5px',
-                color: color.secondary2,
-                backgroundColor: color.Success,
-                boxShadow: '0px 4px 4px 0px rgba(0, 0, 0, 0.10)',
-              }}
-            >
-              + เพิ่มเป้าหมาย
-            </Button>
-          </div>
+          {settingRole?.add.value && (
+            <div className='pt-1'>
+              <Button
+                onClick={() => navigate('/InsertTargetSpray/id=', undefined)}
+                style={{
+                  borderColor: color.Success,
+                  borderRadius: '5px',
+                  color: color.secondary2,
+                  backgroundColor: color.Success,
+                  boxShadow: '0px 4px 4px 0px rgba(0, 0, 0, 0.10)',
+                }}
+              >
+                + เพิ่มเป้าหมาย
+              </Button>
+            </div>
+          )}
         </div>
       </div>
       <Spin tip='กำลังโหลดข้อมูล...' size='large' spinning={loading}>

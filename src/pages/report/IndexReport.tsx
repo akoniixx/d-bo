@@ -1057,7 +1057,7 @@ function IndexReport() {
           <>
             {CheckEnum.length > 0 && CheckEnum.length != 2 ? (
               <>
-                <div>
+                <div style={{}}>
                   <div>
                     <Dropdown overlay={downloadFile}>
                       <Button

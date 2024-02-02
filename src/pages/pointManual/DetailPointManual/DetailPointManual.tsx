@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { BackIconButton } from '../../../components/button/BackButton'
 import { useNavigate } from 'react-router-dom'
 import AddButtton from '../../../components/button/AddButton'
@@ -30,8 +30,15 @@ import {
 } from '../../../entities/SpecialListEntities'
 import _ from 'lodash'
 import Swal from 'sweetalert2'
+import { useRecoilValueLoadable } from 'recoil'
+import { getUserRoleById } from '../../../store/ProfileAtom'
 
 function DetailPointManual() {
+  const role = useRecoilValueLoadable(getUserRoleById)
+  const currentRole = role.state === 'hasValue' ? role.contents : null
+  const pointManualRole = useMemo(() => {
+    return currentRole?.pointResult.find((el) => el.name === 'รายการแต้มพิเศษ')
+  }, [currentRole?.pointResult])
   const { TabPane } = Tabs
   const navigate = useNavigate()
   const row = 5
@@ -275,29 +282,37 @@ function DetailPointManual() {
             <Row justify={'space-between'}>
               {status === 'PENDING' ? (
                 <>
-                  <ActionButton
-                    icon={<EditOutlined />}
-                    color={color.primary1}
-                    onClick={() => navigate('/EditDetailPointManual/id=' + row.id)}
-                  />
-                  <ActionButton
-                    icon={<DeleteOutlined />}
-                    color={color.Error}
-                    onClick={() => DeletePointManual(row.id)}
-                  />
+                  {pointManualRole?.edit.value && (
+                    <ActionButton
+                      icon={<EditOutlined />}
+                      color={color.primary1}
+                      onClick={() => navigate('/EditDetailPointManual/id=' + row.id)}
+                    />
+                  )}
+                  {pointManualRole?.delete.value && (
+                    <ActionButton
+                      icon={<DeleteOutlined />}
+                      color={color.Error}
+                      onClick={() => DeletePointManual(row.id)}
+                    />
+                  )}
                 </>
               ) : status === 'SUCCESS' ? (
-                <ActionButton
-                  icon={
-                    <Image
-                      src={icon.returnPoint}
-                      preview={false}
-                      style={{ width: 15, height: 18 }}
+                <>
+                  {pointManualRole?.edit.value && (
+                    <ActionButton
+                      icon={
+                        <Image
+                          src={icon.returnPoint}
+                          preview={false}
+                          style={{ width: 15, height: 18 }}
+                        />
+                      }
+                      color={color.Error}
+                      onClick={() => returnPointManual(row)}
                     />
-                  }
-                  color={color.Error}
-                  onClick={() => returnPointManual(row)}
-                />
+                  )}
+                </>
               ) : null}
             </Row>
           ),
@@ -497,16 +512,17 @@ function DetailPointManual() {
               <strong style={{ fontSize: '20px' }}>รายละเอียด : {summaryCount?.name}</strong>
             </span>
           </div>
-
-          <div className='align-self-center'>
-            <AddButtton
-              text='เพิ่มแต้มพิเศษ'
-              onClick={() => {
-                localStorage.setItem('specialPointId', specialPointId)
-                navigate('/AddDetailPointManual')
-              }}
-            />
-          </div>
+          {pointManualRole?.add.value && (
+            <div className='align-self-center'>
+              <AddButtton
+                text='เพิ่มแต้มพิเศษ'
+                onClick={() => {
+                  localStorage.setItem('specialPointId', specialPointId)
+                  navigate('/AddDetailPointManual')
+                }}
+              />
+            </div>
+          )}
         </div>
         {summary}
         {tabsContent}

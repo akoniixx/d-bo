@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import Search from 'antd/lib/input/Search'
 import Select from 'antd/lib/select'
 import { Option } from 'antd/lib/mentions'
@@ -19,8 +19,12 @@ import { DateTimeUtil } from '../../utilities/DateTimeUtil'
 import { STATUS_COUPON } from '../../definitions/Status'
 import ModalDeleteNews from '../../components/modal/ModalDeleteNews'
 import ModalNotiHistory from '../../components/modal/ModalNotiHistory'
+import { getUserRoleById } from '../../store/ProfileAtom'
+import { useRecoilValueLoadable } from 'recoil'
 
 function NewsPage() {
+  const role = useRecoilValueLoadable(getUserRoleById)
+  const currentRole = role.state === 'hasValue' ? role.contents : null
   const navigate = useNavigate()
   const row = 10
   const [newsDelete, setNewsDelete] = useState<any>({
@@ -105,6 +109,13 @@ function NewsPage() {
   useEffect(() => {
     fetchNews()
   }, [current, sortDirection])
+
+  const findNewsRole = useMemo(() => {
+    const find = currentRole?.guru.find((el) => {
+      return el.name === 'ข่าวสาร'
+    })
+    return find
+  }, [currentRole?.guru])
   const PageTitle = (
     <>
       <div className='container d-flex justify-content-between' style={{ padding: '10px' }}>
@@ -186,21 +197,23 @@ function NewsPage() {
               ค้นหาข้อมูล
             </Button>
           </div>
-          <div className='pt-1 col'>
-            <Button
-              onClick={() => navigate('/AddNews')}
-              style={{
-                borderColor: color.Success,
-                borderRadius: '5px',
-                color: color.secondary2,
-                backgroundColor: color.Success,
-                paddingLeft: '50px',
-                paddingRight: '50px',
-              }}
-            >
-              + เพิ่มข่าวสาร
-            </Button>
-          </div>
+          {findNewsRole?.add.value && (
+            <div className='pt-1 col'>
+              <Button
+                onClick={() => navigate('/AddNews')}
+                style={{
+                  borderColor: color.Success,
+                  borderRadius: '5px',
+                  color: color.secondary2,
+                  backgroundColor: color.Success,
+                  paddingLeft: '50px',
+                  paddingRight: '50px',
+                }}
+              >
+                + เพิ่มข่าวสาร
+              </Button>
+            </div>
+          )}
         </div>
       </div>
     </>
@@ -695,30 +708,34 @@ function NewsPage() {
         return {
           children: (
             <div className='d-flex flex-row justify-content-between'>
-              <div className='pr-1'>
-                <ActionButton
-                  icon={<EditOutlined />}
-                  color={color.primary1}
-                  onClick={() => {
-                    navigate('/EditNews/id=' + row.id)
-                  }}
-                />
-              </div>
-              <div className='pr-1'>
-                <ActionButton
-                  icon={<DeleteOutlined />}
-                  color={row.read > 0 || row.status === 'ACTIVE' ? color.Grey : color.Error}
-                  onClick={() =>
-                    showDelete(
-                      row.id,
-                      row.image_path
-                        .split('https://storage.googleapis.com/dnds-public-dev/news-image/')[1]
-                        .split('?')[0],
-                    )
-                  }
-                  actionDisable={row.read > 0 || row.status === 'ACTIVE' ? true : false}
-                />
-              </div>
+              {findNewsRole?.edit.value && (
+                <div className='pr-1'>
+                  <ActionButton
+                    icon={<EditOutlined />}
+                    color={color.primary1}
+                    onClick={() => {
+                      navigate('/EditNews/id=' + row.id)
+                    }}
+                  />
+                </div>
+              )}
+              {findNewsRole?.delete.value && (
+                <div className='pr-1'>
+                  <ActionButton
+                    icon={<DeleteOutlined />}
+                    color={row.read > 0 || row.status === 'ACTIVE' ? color.Grey : color.Error}
+                    onClick={() =>
+                      showDelete(
+                        row.id,
+                        row.image_path
+                          .split('https://storage.googleapis.com/dnds-public-dev/news-image/')[1]
+                          .split('?')[0],
+                      )
+                    }
+                    actionDisable={row.read > 0 || row.status === 'ACTIVE' ? true : false}
+                  />
+                </div>
+              )}
             </div>
           ),
         }

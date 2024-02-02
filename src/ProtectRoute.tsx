@@ -7,8 +7,21 @@ import { convertBuddhistYear } from './utilities/ConvertToBuddhistYear'
 import React, { useEffect, useState } from 'react'
 import { ModalMaintence } from './components/modal/ModalMaintenance'
 import { useLocation } from 'react-router-dom'
+import { useSetRecoilState } from 'recoil'
+import { profileAtom } from './store/ProfileAtom'
 const useAuth = () => {
   const username = localStorage.getItem('token')
+  const profile = localStorage.getItem('profile')
+  const setProfileAtom = useSetRecoilState(profileAtom)
+
+  useEffect(() => {
+    if (profile) {
+      const profileObj = JSON.parse(profile)
+
+      setProfileAtom(profileObj)
+    }
+  }, [profile])
+
   if (username) {
     return true
   } else {
@@ -18,6 +31,7 @@ const useAuth = () => {
 
 const ProtectRoute = () => {
   const auth = useAuth()
+
   const [dataMaintance, setDataMaintance] = useState<MaintenanceSystem>(MaintenanceSystem_INIT)
   const [showModalMaintance, setShowModalMaintance] = useState<boolean>(true)
   const dateNow = moment(Date.now())

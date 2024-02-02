@@ -22,7 +22,7 @@ import {
   Tooltip,
 } from 'antd'
 import moment from 'moment'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import ActionButton from '../../../components/button/ActionButton'
 import { CardContainer } from '../../../components/card/CardContainer'
 import ModalMapPlot from '../../../components/modal/task/finishTask/ModalMapPlot'
@@ -45,8 +45,12 @@ import { listAppType } from '../../../definitions/ApplicatoionTypes'
 import { ListCheck } from '../../../components/dropdownCheck/ListStatusAppType'
 import { CheckboxValueType } from 'antd/lib/checkbox/Group'
 import ShowNickName from '../../../components/popover/ShowNickName'
+import { useRecoilValueLoadable } from 'recoil'
+import { getUserRoleById } from '../../../store/ProfileAtom'
 
 export default function IndexTodayTask() {
+  const role = useRecoilValueLoadable(getUserRoleById)
+  const currentRole = role.state === 'hasValue' ? role.contents : null
   const navigate = useNavigate()
   const [row, setRow] = useState(10)
   const [current, setCurrent] = useState(1)
@@ -91,6 +95,10 @@ export default function IndexTodayTask() {
   ]
 
   const [statusArrMain, setStatusArrMain] = useState<string[]>([])
+  const todayTaskRole = useMemo(() => {
+    const find = currentRole?.followJob?.find((el) => el.name === 'งานในวันนี้')
+    return find
+  }, [])
 
   const fetchAllTaskToday = async () => {
     setLoading(true)
@@ -898,7 +906,7 @@ export default function IndexTodayTask() {
       key: 'Action',
       render: (value: any, row: any) => {
         return {
-          children: (
+          children: todayTaskRole?.edit.value && (
             <div className='d-flex flex-row justify-content-between'>
               {row.task_status == 'IN_PROGRESS' ? (
                 <ActionButton

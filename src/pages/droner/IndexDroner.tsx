@@ -13,7 +13,7 @@ import {
   Spin,
   Table,
 } from 'antd'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import color from '../../resource/color'
 import {
   CaretDownOutlined,
@@ -41,8 +41,12 @@ import CheckDocument from '../../components/dropdownCheck/CheckDocument'
 import { ListCheck } from '../../components/dropdownCheck/ListStatusAppType'
 import { DropdownStatus } from '../../components/dropdownCheck/DropDownStatus'
 import ShowNickName from '../../components/popover/ShowNickName'
+import { useRecoilValueLoadable } from 'recoil'
+import { getUserRoleById } from '../../store/ProfileAtom'
 
 function IndexDroner() {
+  const role = useRecoilValueLoadable(getUserRoleById)
+  const currentRole = role.state === 'hasValue' ? role.contents : null
   const [row, setRow] = useState(10)
   const [current, setCurrent] = useState(1)
   const [data, setData] = useState<DronerListEntity>()
@@ -77,6 +81,16 @@ function IndexDroner() {
   const [sortDirection1, setSortDirection1] = useState<string | undefined>(undefined)
   const [sortDirection2, setSortDirection2] = useState<string | undefined>(undefined)
   const [sortDirection3, setSortDirection3] = useState<string | undefined>(undefined)
+
+  const { findDronerRole, findHistoryPointRole } = useMemo(() => {
+    const findDronerRole = currentRole?.dronerInfo?.find((x) => x.name === 'รายชื่อนักบินโดรน')
+    const findHistoryPointRole = currentRole?.pointResult?.find((x) => x.name === 'รายงานแต้ม')
+    return {
+      findDronerRole,
+      findHistoryPointRole,
+    }
+  }, [currentRole])
+
   const fetchDronerList = async () => {
     setLoading(true)
     await DronerDatasource.getDronerList(
@@ -266,9 +280,11 @@ function IndexDroner() {
           label2={mainStatus}
           onClick={(e: any) => CheckStatus(e)}
         />
-        <div>
-          <AddButtton text='เพิ่มนักบินโดรน' onClick={() => navigate('/AddDroner')} />
-        </div>
+        {findDronerRole?.add?.value && (
+          <div>
+            <AddButtton text='เพิ่มนักบินโดรน' onClick={() => navigate('/AddDroner')} />
+          </div>
+        )}
       </div>
       <StatusPlots
         checkPage='DronerPage'
@@ -834,22 +850,26 @@ function IndexDroner() {
         return {
           children: (
             <Row justify={'space-between'} gutter={8}>
-              <Col span={12}>
-                <ActionButton
-                  icon={<StarOutlined />}
-                  color={color.primary1}
-                  onClick={() => navigate('/DetailDronerHistorySum/id=' + row.id)}
-                />
-              </Col>
-              <Col span={12}>
-                <ActionButton
-                  icon={<EditOutlined />}
-                  color={color.primary1}
-                  onClick={() => {
-                    navigate('/EditDroner?=' + row.id)
-                  }}
-                />
-              </Col>
+              {findHistoryPointRole?.view.value && (
+                <Col span={12}>
+                  <ActionButton
+                    icon={<StarOutlined />}
+                    color={color.primary1}
+                    onClick={() => navigate('/DetailDronerHistorySum/id=' + row.id)}
+                  />
+                </Col>
+              )}
+              {findDronerRole?.edit.value && (
+                <Col span={12}>
+                  <ActionButton
+                    icon={<EditOutlined />}
+                    color={color.primary1}
+                    onClick={() => {
+                      navigate('/EditDroner?=' + row.id)
+                    }}
+                  />
+                </Col>
+              )}
             </Row>
           ),
         }

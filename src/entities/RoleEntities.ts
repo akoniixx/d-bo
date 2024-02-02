@@ -1,6 +1,7 @@
 export interface MenuPermission {
   value: boolean
   disabled: boolean
+  name?: string
 }
 export interface listMenu {
   add: MenuPermission
@@ -11,7 +12,19 @@ export interface listMenu {
   excel: MenuPermission
   cancel: MenuPermission
   delete: MenuPermission
-  subItem: any[]
+  subItem: any
+}
+export interface NewListType {
+  subNested: {
+    add: MenuPermission
+    sub: boolean
+    edit: MenuPermission
+    name: string
+    view: MenuPermission
+    excel: MenuPermission
+    cancel: MenuPermission
+    delete: MenuPermission
+  }[]
 }
 export const listMenu_INIT: listMenu = {
   add: {
@@ -27,6 +40,7 @@ export const listMenu_INIT: listMenu = {
   view: {
     value: false,
     disabled: false,
+    name: '',
   },
   excel: {
     value: false,
@@ -59,7 +73,7 @@ export interface RoleEntity {
   challenge: listMenu[]
   admin: listMenu[]
   settings: listMenu[]
-  point: listMenu[]
+  infinity: listMenu[]
 }
 export const RoleEntity_INIT: RoleEntity = {
   id: '',
@@ -77,6 +91,7 @@ export const RoleEntity_INIT: RoleEntity = {
   admin: [listMenu_INIT],
   settings: [listMenu_INIT],
   point: [listMenu_INIT],
+  infinity: [listMenu_INIT],
 }
 export interface RoleAllEntity {
   data: RoleEntity[]
