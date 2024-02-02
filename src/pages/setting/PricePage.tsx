@@ -223,14 +223,14 @@ function PricePage() {
       dataIndex: 'price',
       key: 'price',
       render: (value: any, row: any, index: number) => {
+        const priceText =
+          row.min_price === null || row.max_price === null
+            ? '-'
+            : row.min_price === row.max_price
+            ? `${row.max_price} บาท`
+            : `${row.min_price} - ${row.max_price} บาท`
         return {
-          children: (
-            <span style={{ color: color.primary1, fontWeight: '700' }}>
-              {row.min_price === row.max_price
-                ? `${row.max_price + ' บาท'}`
-                : `${row.min_price + ' - ' + row.max_price + ' บาท'}`}
-            </span>
-          ),
+          children: <span style={{ color: color.primary1, fontWeight: '700' }}>{priceText}</span>,
         }
       },
     },
@@ -288,13 +288,14 @@ function PricePage() {
       dataIndex: 'priceSow',
       key: 'priceSow',
       render: (value: any, row: any, index: number) => {
-        const checkNull = row.min_price_sow === null && row.max_price_sow === null
+        const priceText =
+          row.min_price_sow === null || row.max_price_sow === null
+            ? '-'
+            : row.min_price_sow === row.max_price_sow
+            ? `${row.max_price_sow} บาท`
+            : `${row.min_price_sow} - ${row.max_price_sow} บาท`
         return {
-          children: (
-            <span style={{ color: color.primary1, fontWeight: '700' }}>
-              {`${checkNull ? '-' : row.min_price_sow + ' - ' + row.max_price_sow + ' บาท'}`}
-            </span>
-          ),
+          children: <span style={{ color: color.primary1, fontWeight: '700' }}>{priceText}</span>,
         }
       },
     },

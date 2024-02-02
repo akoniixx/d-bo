@@ -163,14 +163,14 @@ function IndexCrop() {
       key: 'maxPrice',
       width: '18%',
       render: (value: any, row: any, index: number) => {
-        const checkNull = row.minPrice === null && row.maxPrice === null
-
+        const priceText =
+          row.minPrice === null || row.maxPrice === null
+            ? '-'
+            : row.minPrice === row.maxPrice
+            ? `${row.maxPrice} บาท`
+            : `${row.minPrice} - ${row.maxPrice} บาท`
         return {
-          children: (
-            <span style={{ color: color.primary1, fontWeight: '700' }}>{`${
-              checkNull ? '-' : row.minPrice + ' - ' + row.maxPrice + ' บาท'
-            }`}</span>
-          ),
+          children: <span style={{ color: color.primary1, fontWeight: '700' }}>{priceText}</span>,
         }
       },
     },
@@ -229,14 +229,15 @@ function IndexCrop() {
       key: 'maxPriceSow',
       width: '18%',
       render: (value: any, row: any, index: number) => {
-        const checkNull = row.minPriceSow === null && row.maxPriceSow === null
+        const priceText =
+          row.minPriceSow === null || row.maxPriceSow === null
+            ? '-'
+            : row.minPriceSow === row.maxPriceSow
+            ? `${row.maxPriceSow} บาท`
+            : `${row.minPriceSow} - ${row.maxPriceSow} บาท`
 
         return {
-          children: (
-            <span style={{ color: color.primary1, fontWeight: '700' }}>{`${
-              checkNull ? '-' : row.minPriceSow + ' - ' + row.maxPriceSow + ' บาท'
-            }`}</span>
-          ),
+          children: <span style={{ color: color.primary1, fontWeight: '700' }}>{priceText}</span>,
         }
       },
     },
