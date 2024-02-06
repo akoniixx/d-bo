@@ -1,8 +1,9 @@
 import SummaryPoint from '../../../../components/card/SummaryPoint'
+import { ShopProductListEntity } from '../../../../entities/ShopProductEntities'
 import { color } from '../../../../resource'
 
 interface SummaryProps {
-  data?: string
+  data: ShopProductListEntity
 }
 const SummaryContent: React.FC<SummaryProps> = ({ data }) => {
   return (
@@ -12,7 +13,7 @@ const SummaryContent: React.FC<SummaryProps> = ({ data }) => {
           <SummaryPoint
             title={'สินค้าของร้านค้า'}
             bgColor={color.blue}
-            point={1}
+            point={data?.countProduct}
             label={'จำนวน'}
             unit=''
           />
@@ -21,7 +22,7 @@ const SummaryContent: React.FC<SummaryProps> = ({ data }) => {
           <SummaryPoint
             title={'สินค้าของ ICK'}
             bgColor={color.secondary1}
-            point={1}
+            point={data?.countIck}
             label={'จำนวน'}
             unit=''
           />

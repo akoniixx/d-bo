@@ -1,6 +1,11 @@
 ## [Version - 0]
 
+## Feature [v0.49.0] 2024-2-6
+
+- product shop in 1finity menu
+
 ## Feature [v0.48.0] 2024-2-02
+
 - role management
 - detect permission in menu
 

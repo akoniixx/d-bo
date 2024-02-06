@@ -316,8 +316,8 @@ function IndexListStore() {
                     />
                   }
                   color={color.primary1}
-                  onClick={() => navigate('/IndexProductShop/id=' + row.shopId)}
-                />
+                  onClick={() => navigate(`/IndexProductShop/id=${row.shopId}&name=${encodeURIComponent(row.shopName)}`)}
+                  />
               </div>
               <div className='pr-1'>
                 <ActionButton
