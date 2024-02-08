@@ -27,14 +27,7 @@ const NavSidebar: React.FC<any> = ({ children }) => {
 
   const [persistedProfile, setPersistedProfile] = useLocalStorage('profile', [])
 
-  const listReportAcc = [
-    'ick_accounting',
-    'minkact',
-    'arisa.m@iconkaset',
-    'nathapon',
-    'issariya',
-    // 'user02',
-  ]
+  const listReportAcc = ['ick_accounting', 'minkact', 'arisa.m@iconkaset', 'nathapon', 'issariya']
   const listAdminTask = [
     'Khanittha.w',
     'oatchara.s@iconkaset',
@@ -66,6 +59,7 @@ const NavSidebar: React.FC<any> = ({ children }) => {
       const mutateNewSubMenus = newSideBar.map((el) => {
         const key = mappingRoles[el.name as keyof typeof mappingRoles]
         const currentRoleKey: listMenu[] = currentRole[key as keyof typeof currentRole]
+
         if (currentRoleKey.length > 0) {
           const subMenu = el.subMenu.filter((sub) => {
             const key = mappingSubAllMenu[el.name as keyof typeof mappingSubAllMenu]
@@ -75,6 +69,9 @@ const NavSidebar: React.FC<any> = ({ children }) => {
             })
 
             if (findByKey) {
+              if (findByKey.name === 'แก้ไขงาน / ดูประวัติงาน') {
+                return findByKey.view.value && findByKey.edit.value
+              }
               return findByKey?.view.value
             } else {
               return false
