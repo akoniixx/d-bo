@@ -56,9 +56,8 @@ const AddCampaignPoint = () => {
     const condition: any = { ...create?.condition }
     condition.num = 1
     condition.point = parseFloat(getForm.point)
-    condition.rai = parseFloat(getForm.rai)
+    condition.rai = 1
     condition.rewardId = null
-
     data.campaignName = getForm.campaignName
     data.campaignType = 'POINT'
     data.application = getForm.application
@@ -249,21 +248,8 @@ const AddCampaignPoint = () => {
               <label>
                 จำนวนไร่ <span style={{ color: color.Error }}>*</span>
               </label>
-              <Form.Item
-                name='rai'
-                rules={[
-                  {
-                    required: true,
-                    message: 'กรุณากรอกจำนวนไร่!',
-                  },
-                ]}
-              >
-                <Input
-                  placeholder='กรอกจำนวนไร่ '
-                  suffix='ไร่'
-                  autoComplete='off'
-                  onChange={(e) => checkNumber(e, 'rai')}
-                />
+              <Form.Item name='rai'>
+                <Input suffix='ไร่' autoComplete='off' disabled defaultValue={1} />
               </Form.Item>
             </Col>
           </Row>
@@ -307,11 +293,14 @@ const AddCampaignPoint = () => {
           </Col>
         </Form>
       </CardContainer>
-      <FooterPage
-        onClickBack={() => navigate(-1)}
-        styleFooter={{ padding: '6px' }}
-        onClickSave={() => submit()}
-      />
+      <div className='pt-3'>
+        <FooterPage
+          onClickBack={() => navigate(-1)}
+          styleFooter={{ padding: '6px' }}
+          onClickSave={() => submit()}
+        />
+      </div>
+
       {showModal && (
         <Modal
           title='ยืนยันการเพิ่ม'

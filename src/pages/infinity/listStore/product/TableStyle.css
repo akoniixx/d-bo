@@ -1,0 +1,14 @@
+.table-custom table thead tr th {
+  background-color: #219653 !important;
+  font-family: 'Prompt' !important;
+  font-weight: 500 !important;
+  color: rgb(255, 255, 255) !important;
+  font-weight: bold !important;
+  padding: 0;
+  margin: 0;
+}
+.table-custom-body {
+  color: rgb(0, 0, 0) !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}

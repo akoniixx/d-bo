@@ -13,6 +13,9 @@ interface SummaryProps {
   icon?: string
   time?: number
   pointManual?: boolean
+  unit?: string
+  titleLeft?: string
+  colorPointText?: string
 }
 const SummaryPoint: React.FC<SummaryProps> = ({
   title,
@@ -22,6 +25,9 @@ const SummaryPoint: React.FC<SummaryProps> = ({
   icon,
   time,
   pointManual,
+  unit = 'แต้ม',
+  titleLeft,
+  colorPointText,
 }) => {
   return (
     <>
@@ -32,7 +38,23 @@ const SummaryPoint: React.FC<SummaryProps> = ({
           borderRadius: '5px',
         }}
       >
-        <p style={{ fontSize: '16px', fontWeight: '600' }}>{title}</p>
+        <div className='d-flex'>
+          <p className='col-lg-8' style={{ fontSize: '16px', fontWeight: '600' }}>
+            {title}
+          </p>
+          <u
+            className='col-lg'
+            style={{
+              fontSize: '16px',
+              fontWeight: '400',
+              textAlign: 'end',
+              color: color.Success,
+              cursor: titleLeft ? 'pointer' : 'auto',
+            }}
+          >
+            {titleLeft}
+          </u>
+        </div>
         <div className='d-flex justify-content-between'>
           <CardContainer
             style={{
@@ -61,11 +83,13 @@ const SummaryPoint: React.FC<SummaryProps> = ({
                   </div>
                 )}
                 <div>
-                  <span>{label}</span>
+                  <span style={{ color: colorPointText }}>{label}</span>
                 </div>
               </div>
               {!pointManual ? (
-                <div style={{ fontSize: '16px' }}>{numberWithCommas(point) + ' แต้ม'}</div>
+                <div style={{ fontSize: '16px', color: colorPointText }}>{`${numberWithCommas(
+                  point,
+                )} ${unit}`}</div>
               ) : (
                 <div style={{ fontSize: '16px' }}>
                   {numberWithCommas(time || 0) +

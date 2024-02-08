@@ -125,6 +125,7 @@ const EditCrop = lazy(() => import('./pages/setting/crop/EditCrop'))
 const ViewHisRedeem = lazy(() => import('./pages/point/historyRedeem/ViewHisRedeem'))
 const ViewDetailDroner = lazy(() => import('./pages/point/historyRedeem/ViewDetailDroner'))
 const ViewDetailFarmer = lazy(() => import('./pages/point/historyRedeem/ViewDetailFarmer'))
+const IndexProductShop = lazy(() => import('./pages/infinity/listStore/product/IndexProductShop'))
 
 const FallBack = () => {
   return (
@@ -259,6 +260,7 @@ const WebRoutes: React.FC<any> = () => {
             <Route path='/ViewHisRedeem/:type' element={<ViewHisRedeem />} />
             <Route path='/ViewDetailFarmer/:id' element={<ViewDetailFarmer />} />
             <Route path='/ViewDetailDroner/:id' element={<ViewDetailDroner />} />
+            <Route path='/IndexProductShop/:id' element={<IndexProductShop />} />
           </Route>
           <Route element={<PublicRoute />}>
             <Route index element={<AuthPage />} />

@@ -76,4 +76,7 @@ export default {
   upload_droner: require('./media/images/upload_droner.png'),
   icon_setting_inactive: require('./media/images/icon_setting_inactive.png'),
   icon_setting: require('./media/images/icon_setting.png'),
+  icon_cart: require('./media/images/icon_cart.png'),
+  info_redeem_inactive: require('./media/images/info-redeem-inactive.png'),
+
 }
