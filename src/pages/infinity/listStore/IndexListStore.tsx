@@ -12,8 +12,12 @@ import {
 } from 'antd'
 import React, { useEffect, useState } from 'react'
 import { color, image } from '../../../resource'
-import { CaretDownOutlined, CaretUpOutlined, FileTextOutlined } from '@ant-design/icons'
-import { DateTimeUtil } from '../../../utilities/DateTimeUtil'
+import {
+  CaretDownOutlined,
+  CaretUpOutlined,
+  FileTextOutlined,
+  SearchOutlined,
+} from '@ant-design/icons'
 import { numberWithCommas } from '../../../utilities/TextFormatter'
 import ActionButton from '../../../components/button/ActionButton'
 import { useNavigate } from 'react-router-dom'
@@ -23,6 +27,7 @@ import icon from '../../../resource/icon'
 import { AuthDatasource } from '../../../datasource/AuthDatasource'
 import { AllshopOneFinityEntity } from '../../../entities/OneFinityShopEntities'
 import { OneFinityShopDatasource } from '../../../datasource/OneFinityShopDatasource'
+import SummaryPoint from '../../../components/card/SummaryPoint'
 
 function IndexListStore() {
   const [status, setStatus] = useState<boolean>(true)
@@ -311,8 +316,8 @@ function IndexListStore() {
                     />
                   }
                   color={color.primary1}
-                  // onClick={() => navigate('/DetailStore')}
-                />
+                  onClick={() => navigate(`/IndexProductShop/id=${row.shopId}&name=${encodeURIComponent(row.shopName)}`)}
+                  />
               </div>
               <div className='pr-1'>
                 <ActionButton
@@ -345,6 +350,29 @@ function IndexListStore() {
           </span>
         </div>
       </div>
+      <div className='d-flex'>
+        <div className='col-lg'>
+          <SummaryPoint
+            title={'ยอดขายนักบินโดรน'}
+            bgColor={color.secondary2}
+            point={10000.0}
+            label={'จำนวน'}
+            unit='บาท'
+            titleLeft='ดูรายการ'
+            colorPointText={color.font}
+          />
+        </div>
+        <div className='col-lg'>
+          <SummaryPoint
+            title={'เงินค้างจ่ายร้านค้า'}
+            bgColor={color.Error}
+            point={70000.0}
+            label={'จำนวน'}
+            unit='บาท'
+            titleLeft='ดูรายการ'
+          />
+        </div>
+      </div>
       <div className='pt-3'>
         <Tabs
           className={status ? '' : 'tab-status-inactive'}
@@ -359,6 +387,7 @@ function IndexListStore() {
       <div className='d-flex justify-content-between pb-4'>
         <div className='col-lg-8 p-1'>
           <Input
+            prefix={<SearchOutlined style={{ color: color.Disable }} />}
             placeholder='ค้นหาชื่อรหัสร้านค้า / ชื่อร้านค้า / หมายเลขนิติบุคคล / เบอร์โทร'
             className='col-lg-12'
             onChange={(e: any) => setSearchText(e.target.value)}
