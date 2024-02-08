@@ -18,6 +18,7 @@ const mappingTask = {
   IndexInprogressTask: 'งานรอดำเนินงาน',
   IndexTodayTask: 'งานในวันนี้',
   IndexFinishTask: 'งานที่เสร็จแล้ว',
+  AdminTask: 'แก้ไขงาน / ดูประวัติงาน',
 }
 const mappingAdmin = {
   IndexAdmin: 'รายชื่อผู้ดูแล',

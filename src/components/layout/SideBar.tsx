@@ -30,6 +30,25 @@ export const pathLists = (isAccounting: boolean, isAdminTask?: boolean) => {
           title: 'งานที่เสร็จสิ้น',
           subMenu: [],
         },
+        {
+          path: 'AdminTask',
+          name: 'AdminTask',
+          title: 'จัดการงานทั้งหมด',
+          subMenu: [
+            {
+              path: '/IndexAdminTask',
+              name: 'IndexAdminTask',
+              title: 'แก้ไข/ประวัติงาน',
+              subMenu: [],
+            },
+            {
+              path: '/AdminCancelTask',
+              name: 'AdminCancelTask',
+              title: 'ยกเลิกงาน',
+              subMenu: [],
+            },
+          ],
+        },
       ],
     },
     {
@@ -401,40 +420,40 @@ export const pathLists = (isAccounting: boolean, isAdminTask?: boolean) => {
     },
   ]
 
-  if (isAdminTask) {
-    return menu.map((x) => {
-      const find = menu.findIndex(() => x.name === 'task')
-      if (find === 0) {
-        const newMenu = menu[find]
-        return {
-          ...newMenu,
-          subMenu: [
-            ...newMenu.subMenu,
-            {
-              path: 'AdminTask',
-              name: 'AdminTask',
-              title: 'จัดการงานทั้งหมด',
-              subMenu: [
-                {
-                  path: '/IndexAdminTask',
-                  name: 'IndexAdminTask',
-                  title: 'แก้ไข/ประวัติงาน',
-                  subMenu: [],
-                },
-                {
-                  path: '/AdminCancelTask',
-                  name: 'AdminCancelTask',
-                  title: 'ยกเลิกงาน',
-                  subMenu: [],
-                },
-              ],
-            },
-          ],
-        }
-      } else {
-        return { ...x }
-      }
-    })
-  }
+  // if (isAdminTask) {
+  //   return menu.map((x) => {
+  //     const find = menu.findIndex(() => x.name === 'task')
+  //     if (find === 0) {
+  //       const newMenu = menu[find]
+  //       return {
+  //         ...newMenu,
+  //         subMenu: [
+  //           ...newMenu.subMenu,
+  //           {
+  //             path: 'AdminTask',
+  //             name: 'AdminTask',
+  //             title: 'จัดการงานทั้งหมด',
+  //             subMenu: [
+  //               {
+  //                 path: '/IndexAdminTask',
+  //                 name: 'IndexAdminTask',
+  //                 title: 'แก้ไข/ประวัติงาน',
+  //                 subMenu: [],
+  //               },
+  //               {
+  //                 path: '/AdminCancelTask',
+  //                 name: 'AdminCancelTask',
+  //                 title: 'ยกเลิกงาน',
+  //                 subMenu: [],
+  //               },
+  //             ],
+  //           },
+  //         ],
+  //       }
+  //     } else {
+  //       return { ...x }
+  //     }
+  //   })
+  // }
   return menu
 }
