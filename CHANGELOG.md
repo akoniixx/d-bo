@@ -1,5 +1,9 @@
 ## [Version - 0]
 
+## improve [v0.49.1] 2024-2-16
+
+- sticky table head in role management menu.
+
 ## Feature [v0.49.0] 2024-2-6
 
 - product shop in 1finity menu

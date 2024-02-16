@@ -415,8 +415,43 @@ function TableRole({
 
   return (
     <div className='pt-3'>
+      <div
+        className='d-flex'
+        style={{
+          backgroundColor: '#219653',
+          fontFamily: 'Prompt',
+          color: 'rgb(255, 255, 255)',
+          fontWeight: 'bold',
+          padding: '12px',
+          alignContent: 'center',
+          alignItems: 'center',
+          height: '58px',
+          borderRadius: '2px',
+          position: 'sticky',
+          top: '-22px',
+          zIndex: 999,
+        }}
+      >
+        <div className='col-lg-3'>ชื่อเมนู</div>
+        <div className='col' style={{ maxWidth: '12%' }}>
+          ดูข้อมูล (View)
+        </div>
+        <div className='col' style={{ maxWidth: '11%' }}>
+          เพิ่ม (Add)
+        </div>
+        <div className='col' style={{ maxWidth: '12%' }}>
+          แก้ไข (Edit)
+        </div>
+        <div className='col' style={{ maxWidth: '11%' }}>
+          ลบ (Delete)
+        </div>
+        <div className='col' style={{ maxWidth: '13%' }}>
+          ยกเลิก (cancel)
+        </div>
+        <div className='col'>บันทึกไฟล์ (Export File)</div>
+      </div>
       <TableHeaderRole
-        showHeader={true}
+        showHeader={false}
         header='ติดตามงาน'
         data={dataJob}
         onChange={(data, key, checked, index) => {
