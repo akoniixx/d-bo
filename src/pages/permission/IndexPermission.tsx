@@ -142,8 +142,9 @@ function IndexPermission() {
               {adminRole?.delete.value && (
                 <ActionButton
                   icon={<DeleteOutlined />}
-                  color={color.Error}
+                  color={row.count > 0 ? color.Grey : color.Error}
                   onClick={() => showDelete(row.id)}
+                  actionDisable={row.count > 0}
                 />
               )}
             </div>
