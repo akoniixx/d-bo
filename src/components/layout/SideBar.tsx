@@ -38,7 +38,7 @@ export const pathLists = (isAccounting: boolean) => {
             {
               path: '/IndexAdminTask',
               name: 'IndexAdminTask',
-              title: 'แก้ไข/ประวัติงาน',
+              title: 'แก้ไข / ประวัติงาน',
               subMenu: [],
             },
             {

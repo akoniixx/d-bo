@@ -332,7 +332,7 @@ export class TaskDatasource {
       formData.append('remark', remark)
     }
     return httpClient
-      .post(BASE_URL + `//tasks/task-image/image-finish-task`, formData)
+      .post(BASE_URL + `/tasks/task-image/image-finish-task`, formData)
       .then((response) => {
         return response.data
       })
