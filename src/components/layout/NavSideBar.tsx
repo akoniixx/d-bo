@@ -42,7 +42,7 @@ const NavSidebar: React.FC<any> = ({ children }) => {
   const isReportAccount = checkReportAcc
   const isAdminTask = checkAdminTask
   const newSideBarWithPermission = useMemo(() => {
-    const currentPathList = pathLists(isReportAccount, isAdminTask)
+    const currentPathList = pathLists(isReportAccount)
     if (currentRole) {
       const newSideBar = currentPathList.filter((el) => {
         const key = mappingRoles[el.name as keyof typeof mappingRoles]
@@ -59,7 +59,6 @@ const NavSidebar: React.FC<any> = ({ children }) => {
       const mutateNewSubMenus = newSideBar.map((el) => {
         const key = mappingRoles[el.name as keyof typeof mappingRoles]
         const currentRoleKey: listMenu[] = currentRole[key as keyof typeof currentRole]
-
         if (currentRoleKey.length > 0) {
           const subMenu = el.subMenu.filter((sub) => {
             const key = mappingSubAllMenu[el.name as keyof typeof mappingSubAllMenu]
@@ -72,6 +71,7 @@ const NavSidebar: React.FC<any> = ({ children }) => {
               if (findByKey.name === 'แก้ไขงาน / ดูประวัติงาน') {
                 return findByKey.view.value && findByKey.edit.value
               }
+
               return findByKey?.view.value
             } else {
               return false
