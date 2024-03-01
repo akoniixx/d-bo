@@ -195,6 +195,9 @@ export interface CreateReviewDroner {
   discountCampaignPoint: string
   applicationType: string
   preparationRemark: string
+  isDelay: boolean
+  statusDelay: string | null
+  dateDelay: string | null
 }
 export const CreateReviewDroner_INIT: CreateReviewDroner = {
   id: '',
@@ -218,6 +221,7 @@ export const CreateReviewDroner_INIT: CreateReviewDroner = {
   updateBy: '',
   distance: '',
   status: '',
+  isDelay: false,
   statusRemark: '',
   reviewDronerAvg: '',
   reviewDronerDetail: CreateReview_INIT,
@@ -243,6 +247,8 @@ export const CreateReviewDroner_INIT: CreateReviewDroner = {
   discountCampaignPoint: '',
   applicationType: '',
   preparationRemark: '',
+  statusDelay: null,
+  dateDelay: null,
 }
 export interface DetailReviewTask {
   data: CreateReviewDroner

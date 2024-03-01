@@ -30,7 +30,6 @@ const NavSidebar: React.FC<any> = ({ children }) => {
   const [persistedProfile] = useLocalStorage('profile', [])
 
   const isReportAccount = currentProfile && currentProfile?.role.toLowerCase() === 'account'
-
   const newSideBarWithPermission = useMemo(() => {
     const currentPathList = pathLists(!!isReportAccount)
     if (currentRole) {

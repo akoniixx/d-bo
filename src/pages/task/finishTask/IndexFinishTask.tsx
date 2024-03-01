@@ -54,6 +54,17 @@ import { icon } from '../../../resource'
 import ShowNickName from '../../../components/popover/ShowNickName'
 import { useRecoilValueLoadable } from 'recoil'
 import { getUserRoleById } from '../../../store/ProfileAtom'
+
+const MAP_COLOR = {
+  APPROVED: color.Success,
+  WAIT_APPROVE: color.Warning,
+  REJECTED: color.Error,
+}
+const MAP_TEXT = {
+  APPROVED: 'อนุมัติขยายแล้ว',
+  WAIT_APPROVE: 'รออนุมัติขยายเวลา',
+  REJECTED: 'ปฏิเสธการขยายเวลา',
+}
 export default function IndexFinishTask() {
   const navigate = useNavigate()
   const role = useRecoilValueLoadable(getUserRoleById)
@@ -811,6 +822,9 @@ export default function IndexFinishTask() {
       key: 'district_district_name',
       render: (value: any, row: any, index: number) => {
         const beforeValue = row.taskHistory[0]
+        const isDelay = row.isDelay
+        const statusDelayText = MAP_TEXT[row.statusDelay as keyof typeof MAP_TEXT]
+        const statusDelayColor = MAP_COLOR[row.statusDelay as keyof typeof MAP_COLOR]
         return {
           children: (
             <>
@@ -823,6 +837,9 @@ export default function IndexFinishTask() {
                   : null}
                 <br />
               </span>
+              {isDelay && (
+                <div style={{ color: statusDelayColor, fontSize: 13 }}>({statusDelayText})</div>
+              )}
               <span style={{ color: color.Grey, fontSize: '12px' }}>
                 <UserOutlined style={{ padding: '0 4px 0 0', verticalAlign: 0.5 }} />
                 {row.updateBy}
