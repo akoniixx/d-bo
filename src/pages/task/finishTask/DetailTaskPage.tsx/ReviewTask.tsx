@@ -26,13 +26,13 @@ import { image } from '../../../../resource'
 import { listAppType } from '../../../../definitions/ApplicatoionTypes'
 import ShowNickName from '../../../../components/popover/ShowNickName'
 
-const MAP_COLOR = {
+export const MAP_COLOR = {
   APPROVED: color.Success,
   WAIT_APPROVE: color.Warning,
   REJECTED: color.Error,
 }
-const MAP_TEXT = {
-  APPROVED: 'อนุมัติขยายแล้ว',
+export const MAP_TEXT = {
+  APPROVED: 'อนุมัติขยายเวลา',
   WAIT_APPROVE: 'รออนุมัติขยายเวลา',
   REJECTED: 'ปฏิเสธการขยายเวลา',
 }
@@ -375,7 +375,7 @@ function ReviewTask() {
                   <br />
                 </span>
               </div>
-              <div> วันที่อัปเดตสถานะ {dateDelay}</div>
+              <div> วันที่ขยายเวลา {dateDelay}</div>
             </>
           )}
         </div>
