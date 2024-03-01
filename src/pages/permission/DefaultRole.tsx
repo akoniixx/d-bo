@@ -125,7 +125,7 @@ const disableCancel = [
   ...dataSetting,
   ...dataFinity,
 ]
-const disableExcel = ['งานที่เสร็จแล้ว (บัญชี)']
+const disableExcel = ['งานที่เสร็จแล้ว']
 
 const followJob: { [key: string]: any } = {
   followJob: tacking.map((name) => {

@@ -10,7 +10,7 @@ import { useLocalStorage } from '../../hook/useLocalStorage'
 import { MenuSide } from './MenuSide'
 import { pathLists } from './SideBar'
 import { useRecoilValueLoadable } from 'recoil'
-import { getUserRoleById } from '../../store/ProfileAtom'
+import { getUserRoleById, profileAtom } from '../../store/ProfileAtom'
 import { listMenu } from '../../entities/RoleEntities'
 import { mappingRoles, mappingSubAllMenu } from '../../definitions/RolesMappingObj'
 
@@ -23,26 +23,16 @@ const logout = () => {
 
 const NavSidebar: React.FC<any> = ({ children }) => {
   const data = useRecoilValueLoadable(getUserRoleById)
+  const profile = useRecoilValueLoadable(profileAtom)
   const currentRole = data.state === 'hasValue' ? data.contents : null
+  const currentProfile = profile.state === 'hasValue' ? profile.contents : null
 
-  const [persistedProfile, setPersistedProfile] = useLocalStorage('profile', [])
+  const [persistedProfile] = useLocalStorage('profile', [])
 
-  const listReportAcc = ['ick_accounting', 'minkact', 'arisa.m@iconkaset', 'nathapon', 'issariya']
-  const listAdminTask = [
-    'Khanittha.w',
-    'oatchara.s@iconkaset',
-    'nathapon.h@iconkaset.com',
-    'sawatdee.k',
-    'natarkarn.h',
-    'saimhai',
-    'user02',
-  ]
-  const checkReportAcc = listReportAcc.includes(persistedProfile.username)
-  const checkAdminTask = listAdminTask.includes(persistedProfile.username)
-  const isReportAccount = checkReportAcc
-  const isAdminTask = checkAdminTask
+  const isReportAccount = currentProfile && currentProfile?.role.toLowerCase() === 'account'
+
   const newSideBarWithPermission = useMemo(() => {
-    const currentPathList = pathLists(isReportAccount, isAdminTask)
+    const currentPathList = pathLists(!!isReportAccount)
     if (currentRole) {
       const newSideBar = currentPathList.filter((el) => {
         const key = mappingRoles[el.name as keyof typeof mappingRoles]
@@ -59,7 +49,6 @@ const NavSidebar: React.FC<any> = ({ children }) => {
       const mutateNewSubMenus = newSideBar.map((el) => {
         const key = mappingRoles[el.name as keyof typeof mappingRoles]
         const currentRoleKey: listMenu[] = currentRole[key as keyof typeof currentRole]
-
         if (currentRoleKey.length > 0) {
           const subMenu = el.subMenu.filter((sub) => {
             const key = mappingSubAllMenu[el.name as keyof typeof mappingSubAllMenu]
@@ -72,6 +61,7 @@ const NavSidebar: React.FC<any> = ({ children }) => {
               if (findByKey.name === 'แก้ไขงาน / ดูประวัติงาน') {
                 return findByKey.view.value && findByKey.edit.value
               }
+
               return findByKey?.view.value
             } else {
               return false
@@ -85,7 +75,7 @@ const NavSidebar: React.FC<any> = ({ children }) => {
       return mutateNewSubMenus as typeof newSideBar
     }
     return currentPathList
-  }, [currentRole, isReportAccount, isAdminTask])
+  }, [currentRole, isReportAccount])
 
   const navigate = useNavigate()
 

@@ -1,4 +1,4 @@
-export const pathLists = (isAccounting: boolean, isAdminTask?: boolean) => {
+export const pathLists = (isAccounting: boolean) => {
   const menu = [
     {
       path: 'task',
