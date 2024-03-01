@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { Avatar, Badge, Form, Input, Radio, Row, Select, Spin } from 'antd'
 import { BackIconButton } from '../../../../components/button/BackButton'
 import { CardContainer } from '../../../../components/card/CardContainer'
@@ -26,6 +26,16 @@ import { image } from '../../../../resource'
 import { listAppType } from '../../../../definitions/ApplicatoionTypes'
 import ShowNickName from '../../../../components/popover/ShowNickName'
 
+const MAP_COLOR = {
+  APPROVED: color.Success,
+  WAIT_APPROVE: color.Warning,
+  REJECTED: color.Error,
+}
+const MAP_TEXT = {
+  APPROVED: 'อนุมัติขยายแล้ว',
+  WAIT_APPROVE: 'รออนุมัติขยายเวลา',
+  REJECTED: 'ปฏิเสธการขยายเวลา',
+}
 const { Map } = require('immutable')
 const _ = require('lodash')
 const dateFormat = 'DD/MM/YYYY'
@@ -46,6 +56,20 @@ function ReviewTask() {
     couponDiscount: null,
   })
   const [data, setData] = useState<DetailReviewTask>(DetailReviewTask_INIT)
+  console.log(data)
+
+  const { isDelay, statusDelay, dateDelay } = useMemo(() => {
+    const isDelay = data.data.isDelay
+    const statusDelay = data.data.statusDelay
+    const dateDelay = data.data.dateDelay
+
+    return {
+      isDelay,
+      statusDelay,
+      dateDelay: dateDelay ? moment(dateDelay).format(dateFormat) : '',
+    }
+  }, [data.data.isDelay, data.data.statusDelay])
+
   const [imgTask, setImgTask] = useState<DetailReviewTask>(DetailReviewTask_INIT)
   const [detailDroner, setDetailDroner] = useState<any>()
   const [mapPosition, setMapPosition] = useState<{ lat: number; lng: number }>({
@@ -329,12 +353,31 @@ function ReviewTask() {
           </Form.Item>
 
           <label>สถานะ</label>
-          <Form.Item>
-            <span style={{ color: '#2F80ED' }}>
+          <Form.Item noStyle>
+            <div style={{ color: '#2F80ED' }}>
               <Badge color={'#2F80ED'} /> {data.data.status == 'WAIT_REVIEW' ? 'รอรีวิว' : null}
               <br />
-            </span>
+            </div>
           </Form.Item>
+          <div
+            style={{
+              marginBottom: '10px',
+            }}
+          />
+
+          {isDelay && (
+            <>
+              <label>สถานะขยายเวลา</label>
+              <div>
+                <span style={{ color: MAP_COLOR[statusDelay as keyof typeof MAP_COLOR] }}>
+                  <Badge color={MAP_COLOR[statusDelay as keyof typeof MAP_COLOR]} />{' '}
+                  {MAP_TEXT[statusDelay as keyof typeof MAP_TEXT]}
+                  <br />
+                </span>
+              </div>
+              <div> วันที่อัปเดตสถานะ {dateDelay}</div>
+            </>
+          )}
         </div>
       </div>
     </Form>
