@@ -54,17 +54,8 @@ import { icon } from '../../../resource'
 import ShowNickName from '../../../components/popover/ShowNickName'
 import { useRecoilValueLoadable } from 'recoil'
 import { getUserRoleById } from '../../../store/ProfileAtom'
+import { MAP_COLOR, MAP_TEXT } from './DetailTaskPage.tsx/ReviewTask'
 
-const MAP_COLOR = {
-  APPROVED: color.Success,
-  WAIT_APPROVE: color.Warning,
-  REJECTED: color.Error,
-}
-const MAP_TEXT = {
-  APPROVED: 'อนุมัติขยายแล้ว',
-  WAIT_APPROVE: 'รออนุมัติขยายเวลา',
-  REJECTED: 'ปฏิเสธการขยายเวลา',
-}
 export default function IndexFinishTask() {
   const navigate = useNavigate()
   const role = useRecoilValueLoadable(getUserRoleById)
