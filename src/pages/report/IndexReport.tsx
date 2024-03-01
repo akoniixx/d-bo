@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useMemo, useState } from 'react'
 import {
   Alert,
   Badge,
@@ -61,6 +61,8 @@ import CheckDocument from '../../components/dropdownCheck/CheckDocument'
 import { listAppType } from '../../definitions/ApplicatoionTypes'
 import { ListCheck } from '../../components/dropdownCheck/ListStatusAppType'
 import ShowNickName from '../../components/popover/ShowNickName'
+import { useRecoilValueLoadable } from 'recoil'
+import { getUserRoleById } from '../../store/ProfileAtom'
 
 interface DataType {
   key: React.Key
@@ -97,6 +99,14 @@ interface DataType {
 function IndexReport() {
   const navigate = useNavigate()
   const [getData, setGetData] = useState<TaskReportListEntity>()
+  const role = useRecoilValueLoadable(getUserRoleById)
+  const currentRole = role.state === 'hasValue' ? role.contents : null
+
+  const finishTaskRole = useMemo(() => {
+    const find = currentRole?.followJob?.find((el) => el.name === 'งานที่เสร็จแล้ว')
+    return find
+  }, [currentRole])
+
   const [row, setRow] = useState(10)
   const [current, setCurrent] = useState(1)
   const [searchText, setSearchText] = useState<string>()
@@ -1053,7 +1063,7 @@ function IndexReport() {
         <div style={{ color: color.Error }}>
           <RangePicker allowClear onCalendarChange={SearchDate} format={dateFormat} />
         </div>
-        {CheckEnum[0] != undefined ? (
+        {CheckEnum[0] != undefined && finishTaskRole?.excel.value ? (
           <>
             {CheckEnum.length > 0 && CheckEnum.length != 2 ? (
               <>
