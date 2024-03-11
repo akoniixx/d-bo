@@ -86,7 +86,6 @@ const disableAdd = [
   'นักบินโดรน',
   'เกษตรกร',
   'แต้มรายบุคคล',
-  'รายการแต้มพิเศษ',
   'ราคา',
   'เครดิต',
   'แต้ม',
@@ -102,7 +101,6 @@ const disableDelete = [
   'โปรโมชั่น',
   'รายชื่อพืช',
   'แต้มรายบุคคล',
-  'รายการแต้มพิเศษ',
   'ราคา',
   'เครดิต',
   'แต้ม',
@@ -125,7 +123,7 @@ const disableCancel = [
   ...dataSetting,
   ...dataFinity,
 ]
-const disableExcel = ['งานที่เสร็จแล้ว']
+const disableExcel = ['งานที่เสร็จแล้ว','รายการแต้มพิเศษ']
 
 const followJob: { [key: string]: any } = {
   followJob: tacking.map((name) => {
