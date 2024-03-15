@@ -91,11 +91,12 @@ const disableAdd = [
   'แต้ม',
   'สถิติภาพรวม',
 ]
-const disableView = ['อันดับเกษตรกร', 'กูรูเกษตร', 'โปรโมชั่น']
-const disableEdit = ['อันดับเกษตรกร', 'อันดับนักบินโดรน', 'กูรูเกษตร', 'โปรโมชั่น', 'สถิติภาพรวม']
+const disableView = ['อันดับเกษตรกร', 'โปรโมชั่น']
+const disableEdit = ['อันดับเกษตรกร', 'อันดับนักบินโดรน', 'โปรโมชั่น', 'สถิติภาพรวม']
 const disableDelete = [
   ...dataFarmer,
   ...tacking,
+  ...dataFinity,
   'อันดับเกษตรกร',
   'อันดับนักบินโดรน',
   'โปรโมชั่น',
@@ -104,7 +105,7 @@ const disableDelete = [
   'ราคา',
   'เครดิต',
   'แต้ม',
-  ...dataFinity,
+  'รายการโดรนเกษตร',
 ]
 const disableCancel = [
   'งานรอดำเนินงาน',
@@ -123,7 +124,7 @@ const disableCancel = [
   ...dataSetting,
   ...dataFinity,
 ]
-const disableExcel = ['งานที่เสร็จแล้ว','รายการแต้มพิเศษ']
+const disableExcel = ['งานที่เสร็จแล้ว', 'รายการแต้มพิเศษ']
 
 const followJob: { [key: string]: any } = {
   followJob: tacking.map((name) => {
