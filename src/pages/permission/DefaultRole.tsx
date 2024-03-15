@@ -90,9 +90,10 @@ const disableAdd = [
   'เครดิต',
   'แต้ม',
   'สถิติภาพรวม',
+  'รายงานแต้ม',
 ]
 const disableView = ['อันดับเกษตรกร', 'โปรโมชั่น']
-const disableEdit = ['อันดับเกษตรกร', 'อันดับนักบินโดรน', 'โปรโมชั่น', 'สถิติภาพรวม']
+const disableEdit = ['อันดับเกษตรกร', 'อันดับนักบินโดรน', 'โปรโมชั่น', 'สถิติภาพรวม', 'รายงานแต้ม']
 const disableDelete = [
   ...dataFarmer,
   ...tacking,
@@ -106,6 +107,7 @@ const disableDelete = [
   'เครดิต',
   'แต้ม',
   'รายการโดรนเกษตร',
+  'รายงานแต้ม',
 ]
 const disableCancel = [
   'งานรอดำเนินงาน',
@@ -113,6 +115,7 @@ const disableCancel = [
   'งานที่เสร็จแล้ว',
   'แต้มรายบุคคล',
   'สถิติภาพรวม',
+  'รายงานแต้ม',
   ...dataFarmer,
   ...dataDroner,
   ...dataNews,
@@ -207,7 +210,7 @@ const pointJob: { [key: string]: any } = {
     return {
       add: { value: false, disabled: disableAdd.includes(name) },
       sub: false,
-      edit: { value: false, disabled: false },
+      edit: { value: false, disabled: disableAdd.includes(name) },
       name,
       view: { value: false, disabled: false },
       excel: { value: false, disabled: !disableExcel.includes(name) },
