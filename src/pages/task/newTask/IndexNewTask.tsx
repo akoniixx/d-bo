@@ -15,7 +15,6 @@ import {
   Dropdown,
   Image,
   Input,
-  Menu,
   MenuProps,
   Pagination,
   PaginationProps,

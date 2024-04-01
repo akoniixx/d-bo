@@ -1397,12 +1397,11 @@ const AddNewTask = () => {
   ) => {
     const defaultRai: any = +farmerPlotSeleced.raiAmount >= +data.farmAreaAmount
     if (currentStep === 0) {
-      const checkEmptySting = ![
-        data?.farmerId,
-        data?.farmerPlotId,
-        data?.purposeSprayId,
-        data.farmAreaAmount,
-      ].includes('')
+      const checkEmptySting = ![data?.farmerId, data?.farmerPlotId, data.farmAreaAmount].includes(
+        '',
+      )
+
+      const purposeSparyIsNull = !!data?.purposeSprayId
       const checkEmptyNumber = ![data.price, data.unitPrice, data.farmAreaAmount].includes(0)
       let checkEmptyArray = false
       let checkPreparationBy = false
@@ -1433,7 +1432,8 @@ const AddNewTask = () => {
             checkEmptyNumber &&
             defaultRai &&
             checkEmptySting &&
-            checkPreparationBy
+            checkPreparationBy &&
+            purposeSparyIsNull
       ) {
         setDisableBtn(false)
       } else {
@@ -1568,7 +1568,7 @@ const AddNewTask = () => {
         payload.discountCoupon = data?.discountResult ?? 0
         await TaskDatasource.insertNewTask(payload)
           .then(async (res) => {
-            if (res.userMessage === 'success') {
+            if (res?.userMessage === 'success') {
               if (!data?.couponCode) {
                 if (res.responseData.dronerId) {
                   navigate('/IndexInprogressTask')
@@ -1586,7 +1586,28 @@ const AddNewTask = () => {
               }
             }
           })
-          .catch((err) => console.log(err))
+          .catch((err) => {
+            if (err?.response?.data) {
+              const message = err.response.data.message
+              const isArray = Array.isArray(message)
+              let msg = 'ข้อมูลไม่ถูกต้องกรุณาตรวจสอบข้อมูลอีกครั้ง'
+              if (isArray) {
+                message.map((el: string) => {
+                  const m = el === 'purposeSprayId should not be empty'
+                  if (m) {
+                    msg = 'ช่วงเวลาการฉีดพ่นเป็นค่าว่าง'
+                  } else {
+                    msg = 'ข้อมูลไม่ถูกต้องกรุณาตรวจสอบข้อมูลอีกครั้ง'
+                  }
+                })
+              }
+              Swal.fire({
+                icon: 'error',
+                title: 'ไม่สามารถบันทึกข้อมูลได้',
+                text: msg,
+              })
+            }
+          })
       }
     })
   }

@@ -93,14 +93,17 @@ export class TaskDatasource {
       })
   }
   static insertNewTask(data: CreateNewTaskEntity): Promise<any> {
-    return httpClient
-      .post(BASE_URL + '/tasks/task/create-task-bo', data)
-      .then((response) => {
-        return response.data
-      })
-      .catch((error) => {
-        console.log(error)
-      })
+    return (
+      httpClient
+        .post(BASE_URL + '/tasks/task/create-task-bo', data)
+        // .post(BASE_URL + '/tasks/task/create-task-boo', data)
+        .then((response) => {
+          return response.data
+        })
+        .catch((error) => {
+          throw error
+        })
+    )
   }
   static getNewTaskById(id: string): Promise<GetNewTaskEntity> {
     return httpClient
