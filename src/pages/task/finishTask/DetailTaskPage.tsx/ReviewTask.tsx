@@ -56,7 +56,6 @@ function ReviewTask() {
     couponDiscount: null,
   })
   const [data, setData] = useState<DetailReviewTask>(DetailReviewTask_INIT)
-  console.log(data)
 
   const { isDelay, statusDelay, dateDelay } = useMemo(() => {
     const isDelay = data.data.isDelay
