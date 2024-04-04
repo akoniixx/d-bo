@@ -394,7 +394,7 @@ export const ConfirmNewTask: React.FC<ConfirmNewTaskProps> = ({
                 </div>
                 <div className='d-flex'>
                   <span className='col'>{dataAppointment}</span>
-                  <span className='col'>{dataSearchFarmer?.farmerPlot[0].plantName}</span>
+                  <span className='col'>{cropSelected}</span>
                 </div>
                 <div className='d-flex pt-4'>
                   <span className='col'>จำนวนไร่</span>
