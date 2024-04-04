@@ -1617,7 +1617,7 @@ const AddNewTask = () => {
       }
     })
   }
-console.log(createNewTask,cropSelected)
+
   const titleStep = [
     {
       title: 'เลือกเกษตรกร และนัดหมาย',
