@@ -348,11 +348,19 @@ const EditNewTask = () => {
     payload.farmAreaAmount = values
     setData(payload)
   }
-  const handlePeriodSpray = (e: any) => {
-    const d = Map(data).set('purposeSprayId', e)
-    setData(d.toJS())
-  }
 
+  const handlePeriodSpray = (e: any) => {
+    const mapData = periodSpray?.purposeSpray.find((x) => x.id === e)
+    const d = {
+      ...data,
+      purposeSpray: {
+        ...data.purposeSpray,
+        ...mapData,
+      },
+      purposeSprayId: e,
+    }
+    setData(d)
+  }
   const handleCalServiceCharge = (e: any) => {
     const values = validateOnlyNumWDecimal(e.target.value)
     if (values.startsWith('.')) {
@@ -830,23 +838,18 @@ const EditNewTask = () => {
             </label>
             <Form.Item>
               <AntdSelect
-                key={data?.purposeSprayId}
-                placeholder='-'
+                placeholder='เลือกช่วงเวลาการพ่น'
                 disabled={
                   current == 2 || checkSelectPlot == 'error' || data.couponId ? true : false
                 }
-                defaultValue={data?.purposeSprayId}
+                value={data?.purposeSpray.id}
                 onChange={handlePeriodSpray}
               >
-                {periodSpray?.purposeSpray?.length ? (
-                  periodSpray?.purposeSpray?.map((item) => (
-                    <Option key={item.id} value={item.id}>
-                      {item.purposeSprayName}
-                    </Option>
-                  ))
-                ) : (
-                  <Option>-</Option>
-                )}
+                {periodSpray?.purposeSpray?.map((item) => (
+                  <Option key={item.id} value={item.id}>
+                    {item.purposeSprayName}
+                  </Option>
+                ))}
               </AntdSelect>
             </Form.Item>
           </div>
@@ -1665,7 +1668,7 @@ const EditNewTask = () => {
             }
             createNewTask={data}
             farmerPlotId={farmerPlotSeleced?.id}
-            cropSelected={''}
+            cropSelected={farmerPlotSeleced?.plantName}
             isEdit={true}
             couponData={couponData}
             updateNewTask={updateNewTask}

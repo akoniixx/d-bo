@@ -37,7 +37,7 @@ import MapGoogle from '../../../components/map/GoogleMap'
 import { LAT_LNG_BANGKOK } from '../../../definitions/Location'
 import { RowSelectionType } from 'antd/lib/table/interface'
 import { CreateNewTaskEntity, CreateNewTaskEntity_INIT } from '../../../entities/NewTaskEntities'
-import { CropPurposeSprayEntity } from '../../../entities/CropEntities'
+import { CropPurposeSprayEntity, CropPurposeSprayEntity_INT } from '../../../entities/CropEntities'
 import { CropDatasource } from '../../../datasource/CropDatasource'
 import { TaskSearchDroner, TaskSearchDroner_INIT } from '../../../entities/TaskSearchDroner'
 import { TaskSearchDronerDatasource } from '../../../datasource/TaskSearchDronerDatasource'
@@ -95,8 +95,8 @@ const AddNewTask = () => {
   const [selectionType] = useState<RowSelectionType>(queryString[1])
   const [checkSelectPlot, setCheckSelectPlot] = useState<any>('error')
   const [otherSpray, setOtherSpray] = useState<any>()
-  const [cropSelected, setCropSelected] = useState<any>('')
-  const [periodSpray, setPeriodSpray] = useState<CropPurposeSprayEntity>()
+  const [cropSelected, setCropSelected] = useState<any>()
+  const [periodSpray, setPeriodSpray] = useState<CropPurposeSprayEntity>(CropPurposeSprayEntity_INT)
   const [checkCrop, setCheckCrop] = useState<boolean>(true)
   const [validateComma, setValidateComma] = useState<{
     status: any
@@ -160,11 +160,6 @@ const AddNewTask = () => {
       setRowFarmer(rowFarmer + 10)
     }
   }
-  const fetchPurposeSpray = async () => {
-    await CropDatasource.getPurposeByCroupName(cropSelected).then((res) => {
-      setPeriodSpray(res)
-    })
-  }
 
   const [dataDronerList, setDataDronerList] = useState<TaskSearchDroner[]>([TaskSearchDroner_INIT])
   const [dronerSelected, setDronerSelected] = useState<TaskSearchDroner[]>([TaskSearchDroner_INIT])
@@ -174,10 +169,6 @@ const AddNewTask = () => {
     fetchFarmerList()
     getAllTargetSpray()
   }, [currenSearch, rowFarmer])
-
-  useEffect(() => {
-    fetchPurposeSpray()
-  }, [cropSelected])
 
   useEffect(() => {
     TaskDatasource.getFarmerListTask(searchFilterFarmer, currenSearch, 10).then(
@@ -219,6 +210,19 @@ const AddNewTask = () => {
       checkValidateStep(g.toJS(), current)
     })
   }
+  const fetchPurposeSpray = async () => {
+    try {
+      const res = await CropDatasource.getPurposeByCroupName(cropSelected)
+      setPeriodSpray(res)
+    } catch (error) {
+      console.error(error)
+    }
+  }
+
+  useEffect(() => {
+    fetchPurposeSpray()
+  }, [cropSelected])
+
   const handleSelectFarmer = () => {
     const f = Map(createNewTask).set('farmerId', farmerSelected.id)
     setShowData(true)
@@ -228,6 +232,15 @@ const AddNewTask = () => {
     setDataFarmer(farmerSelected)
     checkValidateStep(f.toJS(), current)
   }
+  useEffect(() => {
+    const plotSelected = farmerSelected?.farmerPlot.filter((x: any) => x.id === farmerPlotId)[0]
+    fetchLocationPrice(
+      plotSelected?.plotArea.provinceId,
+      plotSelected?.plantName,
+      plotSelected?.raiAmount,
+      plotSelected?.id,
+    )
+  }, [farmerPlotId])
 
   const handleSelectFarmerPlot = (value: any) => {
     const plotSelected = farmerSelected?.farmerPlot.filter((x: any) => x.id === value)[0]
@@ -235,13 +248,10 @@ const AddNewTask = () => {
     setCropSelected(plotSelected?.plantName)
     setCheckSelectPlot('')
     plotSelected && setFarmerPlotSelected(plotSelected)
-    fetchLocationPrice(
-      plotSelected?.plotArea.provinceId,
-      plotSelected?.plantName,
-      plotSelected?.raiAmount,
-      plotSelected?.id,
-    )
     setFarmerPlotId(value)
+    const updatedTask = { ...createNewTask, purposeSprayId: null, purposeSprayName: null }
+    setCreateNewTask(updatedTask)
+    setPeriodSpray(CropPurposeSprayEntity_INT)
   }
 
   const handleAmountRai = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -452,7 +462,7 @@ const AddNewTask = () => {
                     <AntdSelect
                       status={checkSelectPlot}
                       allowClear
-                      className='col-lg-12 p-1'
+                      className='col-lg-12'
                       placeholder='เลือกแปลง'
                       onChange={handleSelectFarmerPlot}
                       showSearch
@@ -729,22 +739,18 @@ const AddNewTask = () => {
             <label>
               ช่วงเวลาการพ่น <span style={{ color: 'red' }}>*</span>
             </label>
-            <Form.Item name='searchAddress'>
+            <Form.Item>
               <AntdSelect
-                placeholder='-'
+                placeholder='เลือกช่วงเวลาการพ่น'
                 disabled={current === 2 || checkSelectPlot === 'error'}
                 onChange={handlePeriodSpray}
-                defaultValue={createNewTask.purposeSprayId}
+                value={createNewTask.purposeSprayName}
               >
-                {periodSpray?.purposeSpray?.length ? (
-                  periodSpray?.purposeSpray?.map((item) => (
-                    <Option key={item.id} value={item.id}>
-                      {item.purposeSprayName}
-                    </Option>
-                  ))
-                ) : (
-                  <Option>-</Option>
-                )}
+                {periodSpray?.purposeSpray?.map((item) => (
+                  <Option key={item.id} value={item.id}>
+                    {item.purposeSprayName}
+                  </Option>
+                ))}
               </AntdSelect>
             </Form.Item>
           </div>

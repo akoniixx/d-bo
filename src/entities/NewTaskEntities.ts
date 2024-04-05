@@ -48,8 +48,8 @@ export interface CreateNewTaskEntity {
   dateAppointment: string
   targetSpray: string[]
   preparationBy: string
-  purposeSprayId: string
-  purposeSprayName?: string
+  purposeSprayId: string | null
+  purposeSprayName?: string | null
   taskDronerTemp?: CreateDronerTempEntity[]
   status: string
   statusRemark: string
@@ -80,6 +80,7 @@ export const CreateNewTaskEntity_INIT: CreateNewTaskEntity = {
   targetSpray: [''],
   preparationBy: '',
   purposeSprayId: '',
+  purposeSprayName: '',
   taskDronerTemp: [CreateDronerTempEntity_INIT],
   status: '',
   statusRemark: '',

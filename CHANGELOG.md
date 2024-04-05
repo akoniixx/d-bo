@@ -1,7 +1,12 @@
 ## [Version - 0]
-## fix [v0.50.0] 2024-3-1
-- admin report not show when detect role
 
+## fix [v0.50.1] 2024-3-1
+
+- clear purposeSprayName in new task
+
+## fix [v0.50.0] 2024-3-1
+
+- admin report not show when detect role
 
 ## improve [v0.49.1] 2024-2-16
 
