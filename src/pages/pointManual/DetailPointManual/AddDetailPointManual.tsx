@@ -589,7 +589,7 @@ const AddDetailPointManual = () => {
         </span>
       </Row>
       <CardContainer>
-        <CardHeader textHeader='รายละแต้มพิเศษ' />
+        <CardHeader textHeader='รายละเอียดแต้มพิเศษ' />
         <Form style={{ padding: '32px' }} form={form} onFieldsChange={onFieldsChange}>
           <label>
             ประเภทผู้ใช้งาน <span style={{ color: color.Error }}>*</span>
