@@ -110,7 +110,7 @@ const AddDetailPointManual = () => {
     )
   }
   const fetchDroner = (text?: string, dataProvice?: any) => {
-    DronerDatasource.getDronerList([], [], [], currentPage, row, ['ACTIVE']).then(
+    DronerDatasource.getDronerList([], [], [], currentPage, row, ['ACTIVE'],text).then(
       (res: DronerListEntity) => {
         const data = res.data.map((x: any) => {
           const res = { ...x, provinceName: '' }

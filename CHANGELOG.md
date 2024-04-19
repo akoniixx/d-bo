@@ -1,5 +1,9 @@
 ## [Version - 0]
 
+## Fix [v0.47.2] 2024-4-19
+
+- search text droner (special point)
+
 ## improve [v0.47.1] 2024-1-19
 
 - change icon menu
