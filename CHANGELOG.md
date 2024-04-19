@@ -1,5 +1,9 @@
 ## [Version - 0]
 
+## fix [v0.50.2] 2024-4-19
+
+- search text droner (special point)
+
 ## fix [v0.50.1] 2024-3-1
 
 - clear purposeSprayName in new task
